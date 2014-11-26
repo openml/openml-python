@@ -1,0 +1,61 @@
+*.py[cod]
+
+# Optimizers
+HPOlib/optimizers/smac_2_06_01-dev/*
+HPOlib/optimizers/spearmint_april2013_mod/*
+HPOlib/optimizers/hyperopt_august2013_mod/*
+
+# Runsolver
+runsolver/src/*
+
+# benchmark runs
+HPOlib/benchmarks/*/*_*/*
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+__pycache__
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# pycharm
+.idea
+
+# Others
+coverage_html
+*~
+.nfs*
+*.ipynb_checkpoints
+htmlcov
+*.pdf
+*.dot
+*.png
+*.dat
