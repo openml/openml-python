@@ -1,16 +1,5 @@
 *.py[cod]
 
-# Optimizers
-HPOlib/optimizers/smac_2_06_01-dev/*
-HPOlib/optimizers/spearmint_april2013_mod/*
-HPOlib/optimizers/hyperopt_august2013_mod/*
-
-# Runsolver
-runsolver/src/*
-
-# benchmark runs
-HPOlib/benchmarks/*/*_*/*
-
 # C extensions
 *.so
 
@@ -34,6 +23,9 @@ __pycache__
 pip-log.txt
 
 # Unit test / coverage reports
+cover
+coverage_html
+htmlcov
 .coverage
 .tox
 nosetests.xml
@@ -50,12 +42,6 @@ nosetests.xml
 .idea
 
 # Others
-coverage_html
 *~
 .nfs*
-*.ipynb_checkpoints
-htmlcov
-*.pdf
-*.dot
-*.png
-*.dat
+.profile.pstats
