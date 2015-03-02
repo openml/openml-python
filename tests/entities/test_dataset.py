@@ -13,9 +13,9 @@ class OpenMLDatasetTest(unittest.TestCase):
         __file__ = inspect.getfile(OpenMLDatasetTest)
         self.directory = os.path.dirname(__file__)
         self.arff_filename = os.path.join(self.directory, "..",
-                                          "files", "dataset.arff")
+            "files", "datasets", "2", "dataset.arff")
         self.pandas_filename = os.path.join(self.directory, "..",
-                                            "files", "dataset.pd")
+            "files", "datasets", "2", "dataset.pd")
         self.dataset = OpenMLDataset(1, "anneal", 1, "Lorem ipsum.",
                                      "arff", None, None, None,
                                      "2014-04-06 23:19:24", None, "Public",

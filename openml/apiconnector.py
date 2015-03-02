@@ -281,11 +281,43 @@ class APIConnector(object):
 
     def get_cached_dataset(self, did):
         # This code is slow...replace it with new API calls
-        description = self.download_dataset_description(did)
-        arff_file = self.download_dataset_arff(did, description=description)
+        description = self._get_cached_dataset_description(did)
+        arff_file = self._get_cached_dataset_arff(did)
         dataset = self._create_dataset_from_description(description, arff_file)
 
         return dataset
+
+    def _get_cached_dataset_description(self, did):
+        did_cache_dir = os.path.join(self.dataset_cache_dir, str(did))
+        description_file = os.path.join(did_cache_dir, "description.xml")
+
+        try:
+            with open(description_file) as fh:
+                dataset_xml = fh.read()
+        except (IOError, OSError) as e:
+            # TODO create NOTCACHEDEXCEPTION
+            print(e)
+            raise e
+
+        try:
+           return xmltodict.parse(dataset_xml)["oml:data_set_description"]
+        except Exception as e:
+            # TODO logger.debug; create CACHEEXCEPTION
+            print("Dataset ID", did)
+            raise e
+
+    def _get_cached_dataset_arff(self, did):
+        did_cache_dir = os.path.join(self.dataset_cache_dir, str(did))
+        output_file = os.path.join(did_cache_dir, "dataset.arff")
+
+        try:
+            with open(output_file):
+                pass
+            return output_file
+        except (OSError, IOError) as e:
+            # TODO create NOTCACHEDEXCEPTION
+            print(e)
+            raise e
 
     def get_cached_tasks(self):
         directory_content = os.listdir(self.task_cache_dir)
@@ -462,8 +494,7 @@ class APIConnector(object):
         description_file = os.path.join(did_cache_dir, "description.xml")
 
         try:
-            with open(description_file) as fh:
-                dataset_xml = fh.read()
+            return self._get_cached_dataset_description(did)
         except (IOError, OSError):
             try:
                 return_code, dataset_xml = self._perform_api_call(
