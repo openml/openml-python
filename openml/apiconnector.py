@@ -468,8 +468,9 @@ class APIConnector(object):
             try:
                 return_code, dataset_xml = self._perform_api_call(
                     "openml.data.description", data_id=did)
-            except URLError as e:
+            except (URLError, UnicodeEncodeError) as e:
                 # TODO logger.debug
+                self._remove_dataset_chache_dir(did)
                 print(e)
                 raise e
 
@@ -481,6 +482,7 @@ class APIConnector(object):
                 "oml:data_set_description"]
         except Exception as e:
             # TODO logger.debug
+            self._remove_dataset_chache_dir()
             print("Dataset ID", did)
             raise e
 
@@ -526,7 +528,7 @@ class APIConnector(object):
             try:
                 return_code, features_xml = self._perform_api_call(
                     "openml.data.features", data_id=did)
-            except URLError as e:
+            except (URLError, UnicodeEncodeError) as e:
                 # TODO logger.debug
                 print(e)
                 raise e
@@ -550,7 +552,7 @@ class APIConnector(object):
         try:
             return_code, qualities_xml = self._perform_api_call(
                 "openml.data.qualities", data_id=did)
-        except URLError as e:
+        except (URLError, UnicodeEncodeError) as e:
             # TODO logger.debug
             print(e)
             raise e
@@ -574,6 +576,14 @@ class APIConnector(object):
             # TODO add debug information!
             pass
         return dataset_cache_dir
+
+    def _remove_dataset_chache_dir(self, did):
+        dataset_cache_dir = os.path.join(self.dataset_cache_dir, str(did))
+        try:
+            os.rmdir(dataset_cache_dir)
+        except (OSError, IOError):
+            # TODO add debug information
+            pass
 
     def _create_dataset_from_description(self, description, arff_file):
         dataset = OpenMLDataset(
@@ -680,7 +690,7 @@ class APIConnector(object):
             try:
                 return_code, task_xml = self._perform_api_call(
                     "openml.task.search", task_id=task_id)
-            except URLError as e:
+            except (URLError, UnicodeEncodeError) as e:
                 print(e)
                 raise e
 
@@ -764,7 +774,7 @@ class APIConnector(object):
             split_url = task.estimation_procedure["data_splits_url"]
             try:
                 return_code, split_arff = self._read_url(split_url)
-            except URLError as e:
+            except (URLError, UnicodeEncodeError) as e:
                 print(e, split_url)
                 raise e
 
