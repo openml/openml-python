@@ -75,10 +75,12 @@ class OpenMLDatasetTest(unittest.TestCase):
         self.assertEqual((2, 20001), rval.shape)
         rval, categorical = self.sparse_dataset.get_dataset(
             return_categorical_indicator=True)
+        self.assertIsInstance(rval, scipy.sparse.spmatrix)
         self.assertEqual(len(categorical), 20001)
         self.assertTrue(all([isinstance(cat, bool) for cat in categorical]))
         rval, attribute_names = self.sparse_dataset.get_dataset(
             return_attribute_names=True)
+        self.assertIsInstance(rval, scipy.sparse.spmatrix)
         self.assertEqual(len(attribute_names), 20001)
         self.assertTrue(all([is_string(att) for att in attribute_names]))
 
@@ -103,6 +105,7 @@ class OpenMLDatasetTest(unittest.TestCase):
         self.assertEqual(X.shape, (2, 20000))
         X, y, attribute_names = self.sparse_dataset.get_dataset(
             target="class", return_attribute_names=True)
+        self.assertIsInstance(X, scipy.sparse.spmatrix)
         self.assertEqual(len(attribute_names), 20000)
         self.assertNotIn("class", attribute_names)
         self.assertEqual(y.shape, (2, ))
@@ -164,16 +167,20 @@ class OpenMLDatasetTest(unittest.TestCase):
     def test_get_sparse_dataset_with_ignore_attributes(self):
         self.sparse_dataset.ignore_attributes = "a_0"
         rval = self.sparse_dataset.get_dataset(include_ignore_attributes=True)
+        self.assertIsInstance(rval, scipy.sparse.spmatrix)
         self.assertEqual(rval.dtype, np.float32)
         self.assertEqual(rval.shape, (2, 20001))
         rval, categorical = self.sparse_dataset.get_dataset(
             include_ignore_attributes=True, return_categorical_indicator=True)
+        self.assertIsInstance(rval, scipy.sparse.spmatrix)
         self.assertEqual(len(categorical), 20001)
         rval = self.sparse_dataset.get_dataset(include_ignore_attributes=False)
+        self.assertIsInstance(rval, scipy.sparse.spmatrix)
         self.assertEqual(rval.dtype, np.float32)
         self.assertEqual(rval.shape, (2, 20000))
         rval, categorical = self.sparse_dataset.get_dataset(
             include_ignore_attributes=False, return_categorical_indicator=True)
+        self.assertIsInstance(rval, scipy.sparse.spmatrix)
         self.assertEqual(len(categorical), 20000)
         # TODO test multiple ignore attributes!
 
@@ -197,11 +204,13 @@ class OpenMLDatasetTest(unittest.TestCase):
         self.sparse_dataset.row_id_attribute = "a_1"
         X, y = self.sparse_dataset.get_dataset(target="class",
             include_row_id=False, include_ignore_attributes=False)
+        self.assertIsInstance(X, scipy.sparse.spmatrix)
         self.assertEqual(X.dtype, np.float32)
         self.assertEqual(y.dtype, np.int32)
         self.assertEqual(X.shape, (2, 19998))
         X, y, categorical = self.sparse_dataset.get_dataset(
             target="class", return_categorical_indicator=True)
+        self.assertIsInstance(X, scipy.sparse.spmatrix)
         self.assertEqual(len(categorical), 19998)
         self.assertListEqual(categorical, [False] * 19998)
         self.assertEqual(y.shape, (2, ))
