@@ -54,6 +54,10 @@ class AuthentificationError(PyOpenMLError):
     def __init__(self, message):
         super(AuthentificationError, self).__init__(message)
 
+class OpenMLCacheException(PyOpenMLError):
+    def __init__(self, message):
+        super(OpenMLCacheException, self).__init__(message)
+
 
 class APIConnector(object):
     """
@@ -99,6 +103,10 @@ class APIConnector(object):
         `here <http://pieces.openpolitics.com
         /2012/04/python-logging-best-practices/>`_.
 
+    private_directory : str, optional (default=None)
+        A local directory which can be accessed through the OpenML package.
+        Useful to access private datasets through the same interface.
+
     Raises
     ------
     ValueError
@@ -119,7 +127,7 @@ class APIConnector(object):
     """
     def __init__(self, cache_directory=None, username=None, password=None,
                  server=None, verbosity=None, configure_logger=True,
-                 authenticate=True):
+                 authenticate=True, private_directory=None):
         # The .openml directory is necessary, just try to create it (EAFP)
         try:
             os.mkdir(os.path.expanduser('~/.openml'))
@@ -139,6 +147,8 @@ class APIConnector(object):
             self.config.set('FAKE_SECTION', 'server', server)
         if verbosity is not None:
             self.config.set('FAKE_SECTION', 'verbosity', verbosity)
+        if private_directory is not None:
+            self.config.set('FAKE_SECTION', 'private_directory', private_directory)
 
         if configure_logger:
             verbosity = self.config.getint('FAKE_SECTION', 'verbosity')
@@ -162,8 +172,18 @@ class APIConnector(object):
         self.dataset_cache_dir = os.path.join(self.cache_dir, "datasets")
         self.task_cache_dir = os.path.join(self.cache_dir, "tasks")
 
+        # Set up the private directory
+        self.private_directory = self.config.get('FAKE_SECTION',
+                                                 'private_directory')
+        self._private_directory_datasets = os.path.join(
+            self.private_directory, "datasets")
+        self._private_directory_tasks = os.path.join(
+            self.private_directory, "tasks")
+
         for dir_ in [self.cache_dir, self.dataset_cache_dir,
-                     self.task_cache_dir]:
+                     self.task_cache_dir, self.private_directory,
+                     self._private_directory_datasets,
+                     self._private_directory_tasks]:
             if not os.path.exists(dir_) and not os.path.isdir(dir_):
                 os.mkdir(dir_)
 
@@ -213,7 +233,8 @@ class APIConnector(object):
                     'password': '',
                     'server': OPENML_URL,
                     'verbosity': 0,
-                    'cachedir': os.path.expanduser('~/.openml/cache')}
+                    'cachedir': os.path.expanduser('~/.openml/cache'),
+                    'private_directory': os.path.expanduser('~/.openml/private')}
 
         config_file = os.path.expanduser('~/.openml/config')
         config = configparser.RawConfigParser(defaults=defaults)
@@ -243,26 +264,30 @@ class APIConnector(object):
     # Local getters/accessors to the cache directory
     def get_list_of_cached_datasets(self):
         """Return list with ids of all cached datasets"""
-        directory_content = os.listdir(self.dataset_cache_dir)
-        directory_content.sort()
-
-        # Find all dataset ids for which we have downloaded the dataset
-        # description
         datasets = []
-        for directory_name in directory_content:
-            # First check if the directory name could be an OpenML dataset id
-            if not re.match(r"[0-9]*", directory_name):
-                continue
 
-            did = int(directory_name)
+        for dataset_cache_dir in [self.dataset_cache_dir,
+                                  self._private_directory_datasets]:
+            directory_content = os.listdir(dataset_cache_dir)
+            directory_content.sort()
 
-            directory_name = os.path.join(self.dataset_cache_dir,
-                                          directory_name)
-            dataset_directory_content = os.listdir(directory_name)
+            # Find all dataset ids for which we have downloaded the dataset
+            # description
 
-            if "dataset.arff" in dataset_directory_content and \
-                    "description.xml" in dataset_directory_content:
-                datasets.append(did)
+            for directory_name in directory_content:
+                # First check if the directory name could be an OpenML dataset id
+                if not re.match(r"[0-9]*", directory_name):
+                    continue
+
+                did = int(directory_name)
+
+                directory_name = os.path.join(dataset_cache_dir,
+                                              directory_name)
+                dataset_directory_content = os.listdir(directory_name)
+
+                if "dataset.arff" in dataset_directory_content and \
+                        "description.xml" in dataset_directory_content:
+                    datasets.append(did)
 
         datasets.sort()
         return datasets
@@ -288,82 +313,110 @@ class APIConnector(object):
         return dataset
 
     def _get_cached_dataset_description(self, did):
-        did_cache_dir = os.path.join(self.dataset_cache_dir, str(did))
-        description_file = os.path.join(did_cache_dir, "description.xml")
+        for dataset_cache_dir in [self.dataset_cache_dir,
+                                  self._private_directory_datasets]:
+            did_cache_dir = os.path.join(dataset_cache_dir, str(did))
+            description_file = os.path.join(did_cache_dir, "description.xml")
 
-        try:
-            with open(description_file) as fh:
-                dataset_xml = fh.read()
-        except (IOError, OSError) as e:
-            # TODO create NOTCACHEDEXCEPTION
-            print(e)
-            raise e
+            try:
+                with open(description_file) as fh:
+                    dataset_xml = fh.read()
+            except (IOError, OSError) as e:
+                continue
 
-        try:
-           return xmltodict.parse(dataset_xml)["oml:data_set_description"]
-        except Exception as e:
-            # TODO logger.debug; create CACHEEXCEPTION
-            print("Dataset ID", did)
-            raise e
+            return xmltodict.parse(dataset_xml)["oml:data_set_description"]
+
+        raise OpenMLCacheException("Dataset description for did %d not "
+                                   "cached" % did)
+
 
     def _get_cached_dataset_arff(self, did):
-        did_cache_dir = os.path.join(self.dataset_cache_dir, str(did))
-        output_file = os.path.join(did_cache_dir, "dataset.arff")
+        for dataset_cache_dir in [self.dataset_cache_dir,
+                                  self._private_directory_datasets]:
+            did_cache_dir = os.path.join(dataset_cache_dir, str(did))
+            output_file = os.path.join(did_cache_dir, "dataset.arff")
 
-        try:
-            with open(output_file):
-                pass
-            return output_file
-        except (OSError, IOError) as e:
-            # TODO create NOTCACHEDEXCEPTION
-            print(e)
-            raise e
+            try:
+                with open(output_file):
+                    pass
+                return output_file
+            except (OSError, IOError) as e:
+                # TODO create NOTCACHEDEXCEPTION
+                continue
+
+        print("Dataset ID", did)
+        raise Exception()
+
 
     def get_cached_tasks(self):
-        directory_content = os.listdir(self.task_cache_dir)
-        directory_content.sort()
-
-        # Find all dataset ids for which we have downloaded the dataset
-        # description
         tasks = OrderedDict()
-        for filename in directory_content:
-            match = re.match(r"(tid)_([0-9]*)\.xml", filename)
-            if match:
-                tid = match.group(2)
-                tid = int(tid)
+        for task_cache_dir in [self.task_cache_dir,
+                                  self._private_directory_tasks]:
 
-                tasks[tid] = self.get_cached_task(tid)
+            directory_content = os.listdir(task_cache_dir)
+            directory_content.sort()
+
+            # Find all dataset ids for which we have downloaded the dataset
+            # description
+
+            for filename in directory_content:
+                match = re.match(r"(tid)_([0-9]*)\.xml", filename)
+                if match:
+                    tid = match.group(2)
+                    tid = int(tid)
+
+                    tasks[tid] = self.get_cached_task(tid)
 
         return tasks
 
     def get_cached_task(self, tid):
-        task_file = os.path.join(self.task_cache_dir,
-                                 "tid_%d.xml" % int(tid))
+        for task_cache_dir in [self.task_cache_dir,
+                               self._private_directory_tasks]:
+            task_file = os.path.join(task_cache_dir,
+                                     "tid_%d.xml" % int(tid))
 
-        with open(task_file) as fh:
-            task = self._create_task_from_xml(xml=fh.read())
-        return task
+            try:
+                with open(task_file) as fh:
+                    task = self._create_task_from_xml(xml=fh.read())
+                return task
+            except (OSError, IOError) as e:
+                continue
+
+        print("Task ID", tid)
+        raise Exception()
 
     def get_cached_splits(self):
-        directory_content = os.listdir(self.task_cache_dir)
-        directory_content.sort()
-
         splits = OrderedDict()
-        for filename in directory_content:
-            match = re.match(r"(tid)_([0-9]*)\.arff", filename)
-            if match:
-                tid = match.group(2)
-                tid = int(tid)
+        for task_cache_dir in [self.task_cache_dir,
+                               self._private_directory_tasks]:
+            directory_content = os.listdir(task_cache_dir)
+            directory_content.sort()
 
-                splits[tid] = self.get_cached_task(tid)
+
+            for filename in directory_content:
+                match = re.match(r"(tid)_([0-9]*)\.arff", filename)
+                if match:
+                    tid = match.group(2)
+                    tid = int(tid)
+
+                    splits[tid] = self.get_cached_task(tid)
 
         return splits
 
     def get_cached_split(self, tid):
-        split_file = os.path.join(self.task_cache_dir,
-                                  "tid_%d.arff" % int(tid))
-        split = OpenMLSplit.from_arff_file(split_file)
-        return split
+        for task_cache_dir in [self.task_cache_dir,
+                               self._private_directory_tasks]:
+            try:
+                split_file = os.path.join(task_cache_dir,
+                                          "tid_%d.arff" % int(tid))
+                split = OpenMLSplit.from_arff_file(split_file)
+                return split
+
+            except (OSError, IOError) as e:
+                continue
+
+        print("Task ID", tid)
+        raise Exception()
 
     ############################################################################
     # Remote getters/API calls to OpenML
@@ -495,7 +548,7 @@ class APIConnector(object):
 
         try:
             return self._get_cached_dataset_description(did)
-        except (IOError, OSError):
+        except (OpenMLCacheException):
             try:
                 return_code, dataset_xml = self._perform_api_call(
                     "openml.data.description", data_id=did)
