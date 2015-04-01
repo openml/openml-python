@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 from openml.entities.dataset import OpenMLDataset
+from openml.util import is_string
 
 class OpenMLDatasetTest(unittest.TestCase):
     def setUp(self):
@@ -14,8 +15,8 @@ class OpenMLDatasetTest(unittest.TestCase):
         self.directory = os.path.dirname(__file__)
         self.arff_filename = os.path.join(self.directory, "..",
             "files", "datasets", "2", "dataset.arff")
-        self.pandas_filename = os.path.join(self.directory, "..",
-            "files", "datasets", "2", "dataset.pd")
+        self.pickle_filename = os.path.join(self.directory, "..",
+            "files", "datasets", "2", "dataset.pkl")
         self.dataset = OpenMLDataset(1, "anneal", 1, "Lorem ipsum.",
                                      "arff", None, None, None,
                                      "2014-04-06 23:19:24", None, "Public",
@@ -26,7 +27,7 @@ class OpenMLDatasetTest(unittest.TestCase):
                                      data_file=self.arff_filename)
 
     def tearDown(self):
-        for file_ in [self.pandas_filename]:
+        for file_ in [self.pickle_filename]:
             os.remove(file_)
 
     ############################################################################
@@ -40,80 +41,83 @@ class OpenMLDatasetTest(unittest.TestCase):
         self.assertTrue(hasattr(rval[1], '__dict__'))
         self.assertEqual(rval[0].shape, (898, ))
 
-    def test_get_pandas(self):
+    def test_get_dataset(self):
         # Basic usage
-        rval, categorical = self.dataset.get_pandas()
-        self.assertIsInstance(rval, pd.DataFrame)
-        self.assertEqual(rval.values.dtype, np.float64)
+        rval = self.dataset.get_dataset()
+        self.assertIsInstance(rval, np.ndarray)
+        self.assertEqual(rval.dtype, np.float32)
         self.assertEqual((898, 39), rval.shape)
+        rval, categorical = self.dataset.get_dataset(
+            return_categorical_indicator=True)
         self.assertEqual(len(categorical), 39)
+        self.assertTrue(all([isinstance(cat, bool) for cat in categorical]))
+        rval, attribute_names = self.dataset.get_dataset(
+            return_attribute_names=True)
+        self.assertEqual(len(attribute_names), 39)
+        self.assertTrue(all([is_string(att) for att in attribute_names]))
 
-    def test_get_pandas_with_target(self):
-        X, y, categorical = self.dataset.get_pandas(target="class")
-        self.assertEqual(X.values.dtype, np.float64)
-        self.assertEqual(y.values.dtype, np.int64)
+    def test_get_dataset_with_target(self):
+        X, y = self.dataset.get_dataset(target="class")
+        self.assertEqual(X.dtype, np.float32)
+        self.assertEqual(y.dtype, np.int32)
         self.assertEqual(X.shape, (898, 38))
-        self.assertEqual(len(categorical), 38)
-        self.assertNotIn("class", X)
+        X, y, attribute_names = self.dataset.get_dataset(
+            target="class", return_attribute_names=True)
+        self.assertEqual(len(attribute_names), 38)
+        self.assertNotIn("class", attribute_names)
         self.assertEqual(y.shape, (898, ))
-        self.assertEqual(y.name, "class")
 
-    def test_get_pandas_with_rowid(self):
+    def test_get_dataset_with_rowid(self):
         self.dataset.row_id_attribute = "condition"
-        rval, categorical = self.dataset.get_pandas(include_row_id=True)
-        self.assertEqual(rval.values.dtype, np.float64)
+        rval, categorical = self.dataset.get_dataset(
+            include_row_id=True, return_categorical_indicator=True)
+        self.assertEqual(rval.dtype, np.float32)
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
-        self.assertIn("condition", rval)
-        rval, categorical = self.dataset.get_pandas(include_row_id=False)
-        self.assertEqual(rval.values.dtype, np.float64)
+        rval, categorical = self.dataset.get_dataset(
+            include_row_id=False, return_categorical_indicator=True)
+        self.assertEqual(rval.dtype, np.float32)
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
-        self.assertNotIn("condition", rval)
 
         # TODO this is not yet supported!
         #rowid = ["condition", "formability"]
         #self.dataset.row_id_attribute = rowid
         #rval = self.dataset.get_pandas(include_row_id=False)
 
-    def test_get_pandas_with_ignore_attributes(self):
+    def test_get_dataset_with_ignore_attributes(self):
         self.dataset.ignore_attributes = "condition"
-        rval, categorical = self.dataset.get_pandas(include_ignore_attributes=True)
-        self.assertEqual(rval.values.dtype, np.float64)
+        rval = self.dataset.get_dataset(include_ignore_attributes=True)
+        self.assertEqual(rval.dtype, np.float32)
         self.assertEqual(rval.shape, (898, 39))
+        rval, categorical = self.dataset.get_dataset(
+            include_ignore_attributes=True, return_categorical_indicator=True)
         self.assertEqual(len(categorical), 39)
-        self.assertIn("condition", rval)
-        rval, categorical = self.dataset.get_pandas(include_ignore_attributes=False)
-        self.assertEqual(rval.values.dtype, np.float64)
+        rval = self.dataset.get_dataset(include_ignore_attributes=False)
+        self.assertEqual(rval.dtype, np.float32)
         self.assertEqual(rval.shape, (898, 38))
+        rval, categorical = self.dataset.get_dataset(
+            include_ignore_attributes=False, return_categorical_indicator=True)
         self.assertEqual(len(categorical), 38)
-        self.assertNotIn("condition", rval)
         # TODO test multiple ignore attributes!
 
-    def test_get_pandas_rowid_and_ignore(self):
+    def test_get_dataset_rowid_and_ignore(self):
         self.dataset.ignore_attributes = "condition"
         self.dataset.row_id_attribute = "condition"
-        rval, categorical = self.dataset.get_pandas(include_ignore_attributes=False,
-                                       include_row_id=False)
-        self.assertEqual(rval.values.dtype, np.float64)
-        self.assertEqual(rval.shape, (898, 38))
-        self.assertEqual(len(categorical), 38)
-        self.dataset.ignore_attributes = "hardness"
-        rval, categorical = self.dataset.get_pandas(include_ignore_attributes=False,
-                                       include_row_id=False)
-        self.assertEqual(rval.values.dtype, np.float64)
-        self.assertEqual(rval.shape, (898, 37))
-        self.assertEqual(len(categorical), 37)
+        rval = self.dataset.get_dataset(include_ignore_attributes=False,
+                                        include_row_id=False)
+        self.assertEqual(rval.dtype, np.float32)
 
-    def test_get_pandas_rowid_and_ignore_and_target(self):
+    def test_get_dataset_rowid_and_ignore_and_target(self):
         self.dataset.ignore_attributes = "condition"
         self.dataset.row_id_attribute = "hardness"
-        X, y, categorical = self.dataset.get_pandas(target="class",
-                                                 include_row_id=False,
-                                       include_ignore_attributes=False)
-        self.assertEqual(X.values.dtype, np.float64)
-        self.assertEqual(y.values.dtype, np.int64)
+        X, y = self.dataset.get_dataset(target="class", include_row_id=False,
+                                        include_ignore_attributes=False)
+        self.assertEqual(X.dtype, np.float32)
+        self.assertEqual(y.dtype, np.int32)
         self.assertEqual(X.shape, (898, 36))
+        X, y , categorical = self.dataset.get_dataset(
+            target="class", return_categorical_indicator=True)
         self.assertEqual(len(categorical), 36)
         self.assertListEqual(categorical, [True]*3 + [False] + [True]*2 + [
             False] + [True]*23 + [False]*3 + [True]*3)
