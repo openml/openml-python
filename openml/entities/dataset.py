@@ -16,6 +16,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import numpy as np
+import scipy.sparse
 
 from ..util import is_string
 
@@ -68,8 +69,17 @@ class OpenMLDataset(object):
             categorical = [False if type(type_) != list else True
                                 for name, type_ in data['attributes']]
             attribute_names = [name for name, type_ in data['attributes']]
-            # X = pd.DataFrame(data=data['data'], columns=attribute_names)
-            X = np.array(data['data'], dtype=np.float32)
+
+            if isinstance(data['data'], tuple):
+                X = data['data']
+                X_shape = (max(X[1]) + 1, max(X[2]) + 1)
+                X = scipy.sparse.coo_matrix(
+                    (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
+                X = X.tocsr()
+            elif isinstance(data['data'], list):
+                X = np.array(data['data'], dtype=np.float32)
+            else:
+                raise Exception()
 
             with open(self.data_pickle_file, "w") as fh:
                 pickle.dump((X, categorical, attribute_names), fh, -1)
@@ -128,7 +138,7 @@ class OpenMLDataset(object):
                 data, categorical, attribute_names = pickle.load(fh)
 
         to_exclude = []
-        if include_row_id == False:
+        if include_row_id is False:
             if not self.row_id_attribute:
                 pass
             else:
@@ -137,7 +147,7 @@ class OpenMLDataset(object):
                 else:
                     to_exclude.extend(self.row_id_attribute)
 
-        if include_ignore_attributes == False:
+        if include_ignore_attributes is False:
             if not self.ignore_attributes:
                 pass
             else:
@@ -179,6 +189,10 @@ class OpenMLDataset(object):
                 import sys
                 sys.stdout.flush()
                 raise e
+
+            if scipy.sparse.issparse(y):
+                y = np.asarray(y.todense()).astype(np.int32).flatten()
+
             rval.append(x)
             rval.append(y)
 
