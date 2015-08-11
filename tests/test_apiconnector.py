@@ -72,6 +72,7 @@ class TestAPIConnector(unittest.TestCase):
         self.assertEqual(session_hash,
                          "G9MPPN114ZCZNWW2VN3JE9VF1FMV8Y5FXHUDUL4P")
 
+    @unittest.skip("Not implemented yet.")
     def test_parse_config(self):
         raise Exception()
 
@@ -83,7 +84,7 @@ class TestAPIConnector(unittest.TestCase):
         connector = APIConnector(cache_directory=workdir)
         datasets = connector.get_cached_datasets()
         self.assertIsInstance(datasets, dict)
-        self.assertEqual(len(datasets), 1)
+        self.assertEqual(len(datasets), 2)
         self.assertIsInstance(datasets.values()[0], OpenMLDataset)
 
     def test_get_cached_dataset(self):
@@ -110,15 +111,19 @@ class TestAPIConnector(unittest.TestCase):
         description = connector._get_cached_dataset_description(2)
         self.assertIsInstance(description, dict)
 
+    @unittest.skip("Not implemented yet.")
     def test_get_cached_tasks(self):
         raise Exception()
 
+    @unittest.skip("Not implemented yet.")
     def test_get_cached_task(self):
         raise Exception()
 
+    @unittest.skip("Not implemented yet.")
     def test_get_cached_splits(self):
         raise Exception()
 
+    @unittest.skip("Not implemented yet.")
     def test_get_cached_split(self):
         raise Exception()
 
@@ -143,6 +148,7 @@ class TestAPIConnector(unittest.TestCase):
             self.assertIn(dataset['status'], ['in_preparation', 'active',
                                               'deactivated'])
 
+    @unittest.skip("Not implemented yet.")
     def test_datasets_active(self):
         raise NotImplementedError()
 

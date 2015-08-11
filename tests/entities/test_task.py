@@ -23,7 +23,7 @@ class OpenMLTaskTest(unittest.TestCase):
         __file__ = inspect.getfile(OpenMLTaskTest)
         self.directory = os.path.dirname(__file__)
         self.split_filename = os.path.join(self.directory, "..",
-                                           "files", "datasplits.arff")
+                                           "files", "tasks", "datasplits.arff")
 
         api_connector_mock.return_value = None
         self.api_connector = APIConnector()

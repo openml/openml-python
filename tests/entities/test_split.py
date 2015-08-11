@@ -13,8 +13,8 @@ class OpenMLSplitTest(unittest.TestCase):
         self.directory = os.path.dirname(__file__)
         # This is for dataset
         self.arff_filename = os.path.join(self.directory, "..",
-                                          "files", "datasplits.arff")
-        self.pd_filename = self.arff_filename.replace(".arff", ".pd")
+                                          "files", "tasks", "datasplits.arff")
+        self.pd_filename = self.arff_filename.replace(".arff", ".pkl")
 
     def tearDown(self):
         try:
