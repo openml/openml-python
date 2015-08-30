@@ -4,7 +4,6 @@ import unittest
 import os
 import shutil
 import sys
-import types
 
 if sys.version_info[0] >= 3:
     from unittest import mock
