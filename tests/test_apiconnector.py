@@ -52,11 +52,11 @@ class TestAPIConnector(unittest.TestCase):
     def test_authentication(self, mock_perform_API_call):
         # TODO return error messages
         mock_perform_API_call.return_value = 400, \
-        """<oml:authenticate xmlns:oml = "http://openml.org/openml">
-  <oml:session_hash>G9MPPN114ZCZNWW2VN3JE9VF1FMV8Y5FXHUDUL4P</oml:session_hash>
-  <oml:valid_until>2014-08-13 20:01:29</oml:valid_until>
-  <oml:timezone>Europe/Berlin</oml:timezone>
-</oml:authenticate>"""
+        """ <oml:authenticate xmlns:oml = "http://openml.org/openml">
+            <oml:session_hash>G9MPPN114ZCZNWW2VN3JE9VF1FMV8Y5FXHUDUL4P</oml:session_hash>
+            <oml:valid_until>2017-08-13 20:01:29</oml:valid_until>
+            <oml:timezone>Europe/Berlin</oml:timezone>
+            </oml:authenticate> """
 
         # This already does an authentication
         connector = APIConnector()
