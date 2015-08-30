@@ -891,7 +891,7 @@ class APIConnector(object):
         if data is None:
             data = {}
         if add_authentication:
-            data = {'session_hash': self._session_hash}
+            data['session_hash'] = self._session_hash
         data = urlencode(data)
         data = data.encode('utf-8')
 
