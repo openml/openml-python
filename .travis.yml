@@ -26,11 +26,9 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy==0.13.3 matplotlib setuptools nose
   - source activate test-environment
   - python setup.py install
-  - pip install xmltodict
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
       pip install mock
     fi
-  - python setup.py install
 
 # command to run tests, e.g. python setup.py test
 script:  python setup.py test
