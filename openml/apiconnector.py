@@ -27,7 +27,7 @@ from .util import is_string
 
 logger = logging.getLogger(__name__)
 
-OPENML_URL = "http://openml.org"
+OPENML_URL = "http://www.openml.org"
 
 
 class OpenMLStatusChange(Warning):
