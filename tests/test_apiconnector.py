@@ -239,4 +239,55 @@ class TestAPIConnector(unittest.TestCase):
         self.assertTrue(os.path.exists(
             os.path.join(os.getcwd(), "tasks", "1", "datasplits.arff")))
 
+    def test_upload_dataset(self):
+
+        dataset = """@relation accelerometer
+
+                     @attribute id {?}
+                     @attribute bag relational
+                        @attribute y numeric
+                        @attribute x numeric
+                        @attribute z numeric
+                    @end bag
+
+                    @attribute class {A,B,C,?}
+
+                    @data
+                    ?,"3.18163375854,-1.96720916748,9.26677963257\n3.52741470337,-2.7294241333,9.70147567749\n
+                    4.42030792236,-0.964743804932,6.52074005127\n
+                    4.59963500977,-2.74214767456,8.6741619873\n5.19749176025,-1.80330001831,7.57110580444\n","?"
+                    """
+        description = """ <oml:data_set_description xmlns:oml="http://openml.org/openml">
+                        <oml:name>anneal</oml:name>
+                        <oml:version>1</oml:version>
+                        <oml:description>test</oml:description>
+                        <oml:format>ARFF</oml:format>
+                        <oml:upload_date>2014-04-06 23:19:24</oml:upload_date>
+                        <oml:licence>Public</oml:licence>
+                        <oml:url></oml:url>
+                        <oml:default_target_attribute>class</oml:default_target_attribute>
+                        <oml:md5_checksum></oml:md5_checksum>
+                        </oml:data_set_description>
+                         """
+        return_code, dataset_xml = self.connector.upload_dataset(dataset, description)
+        self.assertEqual(return_code, 200)
+
+    def test_upload_dataset_features(self):
+        raise Exception()
+
+    def test_upload_dataset_qualities(self):
+
+        description = """ <oml:data_qualities xmlns:oml="http://openml.org/openml">
+                          <oml:did>1</oml:did>
+                          <oml:quality>
+                            <oml:name>NumberOfInstances</oml:name>
+                            <oml:value>898</oml:value>
+                          </oml:quality>
+                          </oml:data_qualities>
+                        """
+        return_code, dataset_xml = self.connector.upload_dataset_qualities(description)
+        self.assertEqual(return_code, 200)
+
+
+
 

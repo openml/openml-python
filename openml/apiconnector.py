@@ -933,3 +933,84 @@ class APIConnector(object):
                 string.write(chunk)
 
         return return_code, string.getvalue()
+
+    def upload_dataset(self, dataset, description):
+        try:
+            data = {'dataset': dataset, 'description': description}
+            return_code, dataset_xml = self._perform_api_call("openml.data.upload",data=data)
+
+        except URLError as e:
+            # TODO logger.debug
+            print(e)
+            raise e
+        return return_code, dataset_xml
+
+    def upload_dataset(self, description):
+        try:
+            data = {'description': description}
+            return_code, dataset_xml = self._perform_api_call("openml.data.upload",data=data)
+
+        except URLError as e:
+            # TODO logger.debug
+            print(e)
+            raise e
+        return return_code, dataset_xml
+
+    def upload_dataset_features(self, description):
+        try:
+            data = {'description': description}
+            return_code, dataset_xml = self._perform_api_call("openml.data.features.upload", data=data)
+
+        except URLError as e:
+            # TODO logger.debug
+            print(e)
+            raise e
+        return return_code, dataset_xml
+
+    def upload_dataset_qualities(self, description):
+        try:
+            data = {'description': description}
+            return_code, dataset_xml = self._perform_api_call("openml.data.qualities.upload", data=data)
+
+        except URLError as e:
+            # TODO logger.debug
+            print(e)
+            raise e
+        return return_code, dataset_xml
+
+    def upload_implementation(self, description, binary, source):
+        try:
+            data = {'description': description, 'binary': binary, 'source': source}
+            return_code, dataset_xml = self._perform_api_call("openml.implementation.upload", data=data)
+
+        except URLError as e:
+            # TODO logger.debug
+            print(e)
+            raise e
+        return return_code, dataset_xml
+
+    def upload_run(self, description, files):
+        try:
+            data ={'description': description}
+            for key, value in files:
+                data[key] = value
+
+            return_code, dataset_xml = self._perform_api_call("openml.run.upload", data=data)
+
+        except URLError as e:
+            # TODO logger.debug
+            print(e)
+            raise e
+        return return_code, dataset_xml
+
+    def upload_file(self, file):
+        try:
+            data ={'file': file}
+            return_code, dataset_xml = self._perform_api_call("openml.file.upload", data=data)
+
+        except URLError as e:
+            # TODO logger.debug
+            print(e)
+            raise e
+        return return_code, dataset_xml
+
