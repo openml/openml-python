@@ -269,7 +269,7 @@ class TestAPIConnector(unittest.TestCase):
                         <oml:md5_checksum></oml:md5_checksum>
                         </oml:data_set_description>
                          """
-        return_code, dataset_xml = self.connector.upload_dataset(dataset, description)
+        return_code, dataset_xml = self.connector.upload_dataset (description, dataset)
         self.assertEqual(return_code, 200)
 
     def test_upload_dataset_features(self):

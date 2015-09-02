@@ -934,20 +934,14 @@ class APIConnector(object):
 
         return return_code, string.getvalue()
 
-    def upload_dataset(self, dataset, description):
+    def upload_dataset(self, description, dataset=None):
         try:
-            data = {'dataset': dataset, 'description': description}
-            return_code, dataset_xml = self._perform_api_call("openml.data.upload",data=data)
+            data={}
+            if dataset is None:
+                data = {'description': description}
+            else:
+                data = {'dataset': dataset, 'description': description}
 
-        except URLError as e:
-            # TODO logger.debug
-            print(e)
-            raise e
-        return return_code, dataset_xml
-
-    def upload_dataset(self, description):
-        try:
-            data = {'description': description}
             return_code, dataset_xml = self._perform_api_call("openml.data.upload",data=data)
 
         except URLError as e:
