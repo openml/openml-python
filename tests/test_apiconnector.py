@@ -43,7 +43,8 @@ class TestAPIConnector(unittest.TestCase):
         self.connector = APIConnector(cache_directory=self.workdir)
         print(self.connector._session_hash)
 
-        if not os.path.exists(self.connector.config_file):
+        config_file = os.path.expanduser('~/.openml/config')
+        if not os.path.exists(config_file):
             raise Exception("OpenML config file required to run unit tests. "
                             "See https://github.com/openml/OpenML/wiki/Client-API")
 
