@@ -1,4 +1,3 @@
-import os
 import sys
 
 if sys.version_info[0] > 3:
@@ -8,13 +7,6 @@ else:
         import cPickle as pickle
     except:
         import pickle
-
-import numpy as np
-import sklearn.metrics
-from sklearn.cross_validation import StratifiedKFold
-
-from openml.entities.dataset import OpenMLDataset
-from openml.entities.split import OpenMLSplit
 
 
 class Task(object):

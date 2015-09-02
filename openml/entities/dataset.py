@@ -16,7 +16,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import numpy as np
-import pandas as pd
+import scipy.sparse
 
 from ..util import is_string
 
@@ -54,10 +54,10 @@ class OpenMLDataset(object):
         self.md5_cheksum = md5_checksum
         self.data_file = data_file
 
-        self.pandas_file = data_file.replace('.arff', '.pd')
+        self.data_pickle_file = data_file.replace('.arff', '.pkl')
 
-        if os.path.exists(self.pandas_file):
-            logger.debug("Pandas file already exists.")
+        if os.path.exists(self.data_pickle_file):
+            logger.debug("Data pickle file already exists.")
         else:
             try:
                 data = self.get_arff()
@@ -69,12 +69,22 @@ class OpenMLDataset(object):
             categorical = [False if type(type_) != list else True
                                 for name, type_ in data['attributes']]
             attribute_names = [name for name, type_ in data['attributes']]
-            X = pd.DataFrame(data=data['data'], columns=attribute_names)
 
-            with open(self.pandas_file, "w") as fh:
-                pickle.dump((X, categorical), fh, -1)
+            if isinstance(data['data'], tuple):
+                X = data['data']
+                X_shape = (max(X[1]) + 1, max(X[2]) + 1)
+                X = scipy.sparse.coo_matrix(
+                    (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
+                X = X.tocsr()
+            elif isinstance(data['data'], list):
+                X = np.array(data['data'], dtype=np.float32)
+            else:
+                raise Exception()
+
+            with open(self.data_pickle_file, "w") as fh:
+                pickle.dump((X, categorical, attribute_names), fh, -1)
             logger.debug("Saved dataset %d: %s to file %s" %
-                         (self.id, self.name, self.pandas_file))
+                         (self.id, self.name, self.data_pickle_file))
 
     def __eq__(self, other):
         if type(other) != OpenMLDataset:
@@ -113,19 +123,22 @@ class OpenMLDataset(object):
 
     ############################################################################
     # pandas related stuff...
-    def get_pandas(self, target=None, include_row_id=False,
-                   include_ignore_attributes=False):
+    def get_dataset(self, target=None, include_row_id=False,
+                   include_ignore_attributes=False,
+                   return_categorical_indicator=False,
+                   return_attribute_names=False):
+        rval = []
 
-        path = self.pandas_file
+        path = self.data_pickle_file
         if not os.path.exists(path):
             raise ValueError("Cannot find a ndarray file for dataset %s at"
                              "location %s " % (self.name, path))
         else:
             with open(path) as fh:
-                data, categorical = pickle.load(fh)
+                data, categorical, attribute_names = pickle.load(fh)
 
         to_exclude = []
-        if include_row_id == False:
+        if include_row_id is False:
             if not self.row_id_attribute:
                 pass
             else:
@@ -134,7 +147,7 @@ class OpenMLDataset(object):
                 else:
                     to_exclude.extend(self.row_id_attribute)
 
-        if include_ignore_attributes == False:
+        if include_ignore_attributes is False:
             if not self.ignore_attributes:
                 pass
             else:
@@ -143,33 +156,52 @@ class OpenMLDataset(object):
                 else:
                     to_exclude.extend(self.ignore_attributes)
 
-        logger.info("Going to remove the following row_id_attributes:"
-                    " %s" % self.row_id_attribute)
-        keep = [True if column not in to_exclude else False
-                 for column in data.columns]
-        data = data.loc[:,keep]
-        categorical = [cat for cat, k in zip(categorical, keep) if k]
+        if len(to_exclude) > 0:
+            logger.info("Going to remove the following row_id_attributes:"
+                        " %s" % self.row_id_attribute)
+            keep = np.array([True if column not in to_exclude else False
+                             for column in attribute_names])
+            data = data[:,keep]
+            categorical = [cat for cat, k in zip(categorical, keep) if k]
+            attribute_names = [att for att, k in
+                               zip(attribute_names, keep) if k]
 
         if target is None:
-            return data, categorical
+            rval.append(data)
         else:
             if is_string(target):
                 target = [target]
             targets = np.array([True if column in target else False
-                                for column in data.columns])
+                                for column in attribute_names])
 
             try:
-                x = data.loc[:,~targets]
-                y = data.loc[:,targets]
+                x = data[:,~targets]
+                y = data[:,targets].astype(np.int32)
 
-                # Convert to series if possible
                 if len(y.shape) == 2 and y.shape[1] == 1:
-                    y = y.iloc[:,0]
+                    y = y[:,0]
 
-                categorical = [cat for cat, t in zip(categorical, targets)
-                               if not t]
+                categorical = [cat for cat, t in
+                               zip(categorical, targets) if not t]
+                attribute_names = [att for att, k in
+                                   zip(attribute_names, targets) if not k]
             except KeyError as e:
                 import sys
                 sys.stdout.flush()
                 raise e
-            return x, y, categorical
+
+            if scipy.sparse.issparse(y):
+                y = np.asarray(y.todense()).astype(np.int32).flatten()
+
+            rval.append(x)
+            rval.append(y)
+
+        if return_categorical_indicator:
+            rval.append(categorical)
+        if return_attribute_names:
+            rval.append(attribute_names)
+
+        if len(rval) == 1:
+            return rval[0]
+        else:
+            return rval

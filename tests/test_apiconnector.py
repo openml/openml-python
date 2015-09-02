@@ -72,27 +72,58 @@ class TestAPIConnector(unittest.TestCase):
         self.assertEqual(session_hash,
                          "G9MPPN114ZCZNWW2VN3JE9VF1FMV8Y5FXHUDUL4P")
 
-
+    @unittest.skip("Not implemented yet.")
     def test_parse_config(self):
         raise Exception()
 
     ############################################################################
     # Test all local stuff
     def test_get_cached_datasets(self):
-        raise Exception()
+        workdir = os.path.dirname(os.path.abspath(__file__))
+        workdir = os.path.join(workdir, "files")
+        connector = APIConnector(cache_directory=workdir)
+        datasets = connector.get_cached_datasets()
+        self.assertIsInstance(datasets, dict)
+        self.assertEqual(len(datasets), 2)
+        self.assertIsInstance(datasets.values()[0], OpenMLDataset)
 
     def test_get_cached_dataset(self):
-        raise Exception()
+        workdir = os.path.dirname(os.path.abspath(__file__))
+        workdir = os.path.join(workdir, "files")
 
+        with mock.patch.object(APIConnector, "_perform_api_call") as api_mock:
+            api_mock.return_value = 400, \
+                """<oml:authenticate xmlns:oml = "http://openml.org/openml">
+                <oml:session_hash>G9MPPN114ZCZNWW2VN3JE9VF1FMV8Y5FXHUDUL4P</oml:session_hash>
+                <oml:valid_until>2014-08-13 20:01:29</oml:valid_until>
+                <oml:timezone>Europe/Berlin</oml:timezone>
+                </oml:authenticate>"""
+
+            connector = APIConnector(cache_directory=workdir)
+            dataset = connector.get_cached_dataset(2)
+            self.assertIsInstance(dataset, OpenMLDataset)
+            self.assertTrue(connector._perform_api_call.is_called_once())
+
+    def test_get_chached_dataset_description(self):
+        workdir = os.path.dirname(os.path.abspath(__file__))
+        workdir = os.path.join(workdir, "files")
+        connector = APIConnector(cache_directory=workdir)
+        description = connector._get_cached_dataset_description(2)
+        self.assertIsInstance(description, dict)
+
+    @unittest.skip("Not implemented yet.")
     def test_get_cached_tasks(self):
         raise Exception()
 
+    @unittest.skip("Not implemented yet.")
     def test_get_cached_task(self):
         raise Exception()
 
+    @unittest.skip("Not implemented yet.")
     def test_get_cached_splits(self):
         raise Exception()
 
+    @unittest.skip("Not implemented yet.")
     def test_get_cached_split(self):
         raise Exception()
 
@@ -117,6 +148,7 @@ class TestAPIConnector(unittest.TestCase):
             self.assertIn(dataset['status'], ['in_preparation', 'active',
                                               'deactivated'])
 
+    @unittest.skip("Not implemented yet.")
     def test_datasets_active(self):
         raise NotImplementedError()
 
