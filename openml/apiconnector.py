@@ -237,6 +237,8 @@ class APIConnector(object):
                     'private_directory': os.path.expanduser('~/.openml/private')}
 
         config_file = os.path.expanduser('~/.openml/config')
+        # Save the config file to check its existence at test time
+        self.config_file = config_file
         config = configparser.RawConfigParser(defaults=defaults)
 
         if not os.path.exists(config_file):
