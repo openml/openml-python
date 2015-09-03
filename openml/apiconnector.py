@@ -813,11 +813,11 @@ class APIConnector(object):
             pass
         return task_cache_dir
 
-    def _perform_api_call(self, call, data=None, filePath=None, add_authentication=True,
-        """Perform an API call at the OpenML server.
+    def _perform_api_call(self, call, data=None, filePath=None, add_authentication=True):
+        """
+        Perform an API call at the OpenML server.
         return self._read_url(url, data=data, filePath=filePath,
-
-    def _read_url(self, url, add_authentication=False, data=None, filePath=None):
+        def _read_url(self, url, add_authentication=False, data=None, filePath=None):
 
         Parameters
         ----------
@@ -845,8 +845,7 @@ class APIConnector(object):
     def _read_url(self, url, data=None):
         if data is None:
             data = {}
-        data['session_hash'] = self.config.get('FAKE_SECTION', 'apikey')
-            data['session_hash'] = self._session_hash
+            data['session_hash'] = self.config.get('FAKE_SECTION', 'apikey')
 
         if filePath is not None:
             if os.path.isabs(filePath):
@@ -867,8 +866,6 @@ class APIConnector(object):
                 return response.status_code, response
             else:
                 raise "File doesn't exists"
-
-
         else:
             data = urlencode(data)
             data = data.encode('utf-8')
@@ -908,7 +905,6 @@ class APIConnector(object):
                     if not chunk:
                         break
                     string.write(chunk)
-
             return return_code, string.getvalue()
 
     def upload_dataset(self, description, filePath=None):
