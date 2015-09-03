@@ -221,6 +221,39 @@ class TestAPIConnector(unittest.TestCase):
         self.assertTrue(os.path.exists(
             os.path.join(os.getcwd(), "tasks", "1", "datasplits.arff")))
 
+    ############################################################################
+    # Runs
+    def test_download_run_list(self):
+        def check_run(run):
+            self.assertIsInstance(run, dict)
+            self.assertEqual(len(run), 5)
+
+        runs = self.connector.get_runs_list(task_id=1)
+        # 1759 as the number of supervised classification tasks retrieved
+        # openml.org from this call; don't trust the number on openml.org as
+        # it also counts private datasets
+        self.assertGreaterEqual(len(runs), 800)
+        for run in runs:
+            check_run(run)
+
+        runs = self.connector.get_runs_list(flow_id=1)
+        self.assertGreaterEqual(len(runs), 1)
+        for task in runs:
+            check_run(task)
+
+        runs = self.connector.get_runs_list(setup_id=1)
+        self.assertGreaterEqual(len(runs), 261)
+        for task in runs:
+            check_run(task)
+
+    def test_download_run(self):
+        run = self.connector.download_run(473350)
+        self.assertGreaterEqual(len(run.tags), 2)
+        self.assertEqual(len(run.datasets), 1)
+        self.assertGreaterEqual(len(run.files), 2)
+        self.assertGreaterEqual(len(run.evaluations), 18)
+        self.assertEqual(len(run.evaluations['f_measure']), 2)
+
     def test_upload_dataset(self):
 
         dataset = self.connector.download_dataset(3)
