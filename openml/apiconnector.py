@@ -5,6 +5,8 @@ import os
 import re
 import sys
 import tempfile
+import requests
+import arff
 
 if sys.version_info[0] < 3:
     import ConfigParser as configparser
@@ -875,7 +877,7 @@ class APIConnector(object):
             pass
         return task_cache_dir
 
-    def _perform_api_call(self, call, data=None, add_authentication=True,
+    def _perform_api_call(self, call, data=None, filePath=None, add_authentication=True,
                           **kwargs):
         # TODO: do input validation!
         url = self.config.get("FAKE_SECTION", "server") + "/api/?f="
@@ -884,76 +886,82 @@ class APIConnector(object):
             for key in kwargs:
                 url += "&" + key + "=" + str(kwargs[key])
         # TODO logger.debug(url)
-        return self._read_url(url, data=data,
+        return self._read_url(url, data=data, filePath=filePath,
                               add_authentication=add_authentication)
 
-    def _read_url(self, url, add_authentication=False, data=None):
+    def _read_url(self, url, add_authentication=False, data=None, filePath=None):
         if data is None:
             data = {}
         if add_authentication:
             data['session_hash'] = self._session_hash
-        data = urlencode(data)
-        data = data.encode('utf-8')
 
-        CHUNK = 16 * 1024
+        if filePath is not None:
+            if os.path.isabs(filePath):
+                try:
+                    decoder = arff.ArffDecoder()
+                except:
+                    raise "The file you provided is not a valid arff file"
 
-        string = StringIO()
-        connection = urlopen(url, data=data)
-        return_code = connection.getcode()
-        content_type = connection.info()['Content-Type']
-        # TODO maybe switch on the unicode flag!
-        match = re.search(r'text/([\w-]*)(; charset=([\w-]*))?', content_type)
-        if match:
-            if match.groups()[2] is not None:
-                encoding = match.group(3)
+                fileElement={'dataset': open(filePath, 'rb')}
+                data['description']= data.get('description')
+                data.pop('dataset', None)
+
+                try:
+                    response = requests.post(url, data=data, files=fileElement)
+                except URLError, error:
+                    print error
+
+                return response.status_code, response
             else:
-                encoding = "ascii"
+                raise "File doesn't exists"
+
+
         else:
-            # TODO ask JAN why this happens
-            logger.warn("Data from %s has content type %s; going to treat "
-                        "this as ascii." % (url, content_type))
-            encoding = "ascii"
+            data = urlencode(data)
+            data = data.encode('utf-8')
 
-        tmp = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        with tmp as fh:
-            while True:
-                chunk = connection.read(CHUNK)
-                # Chunk is now a proper string (UTF-8 in python)
-                chunk = chunk.decode(encoding)
-                if not chunk:
-                    break
-                fh.write(chunk)
-
-        tmp = open(tmp.name, "r")
-        with tmp as fh:
-            while True:
-                chunk = fh.read(CHUNK)
-                if not chunk:
-                    break
-                string.write(chunk)
-
-        return return_code, string.getvalue()
-
-    def upload_dataset(self, description, dataset=None):
-        try:
-            data={}
-            if dataset is None:
-                data = {'description': description}
+            CHUNK = 16 * 1024
+            string = StringIO()
+            connection = urlopen(url, data=data)
+            return_code = connection.getcode()
+            content_type = connection.info()['Content-Type']
+            # TODO maybe switch on the unicode flag!
+            match = re.search(r'text/([\w-]*)(; charset=([\w-]*))?', content_type)
+            if match:
+                if match.groups()[2] is not None:
+                    encoding = match.group(3)
+                else:
+                    encoding = "ascii"
             else:
-                data = {'dataset': dataset, 'description': description}
+                # TODO ask JAN why this happens
+                logger.warn("Data from %s has content type %s; going to treat "
+                            "this as ascii." % (url, content_type))
+                encoding = "ascii"
 
-            return_code, dataset_xml = self._perform_api_call("openml.data.upload",data=data)
+            tmp = tempfile.NamedTemporaryFile(mode='w', delete=False)
+            with tmp as fh:
+                while True:
+                    chunk = connection.read(CHUNK)
+                    # Chunk is now a proper string (UTF-8 in python)
+                    chunk = chunk.decode(encoding)
+                    if not chunk:
+                        break
+                    fh.write(chunk)
 
-        except URLError as e:
-            # TODO logger.debug
-            print(e)
-            raise e
-        return return_code, dataset_xml
+            tmp = open(tmp.name, "r")
+            with tmp as fh:
+                while True:
+                    chunk = fh.read(CHUNK)
+                    if not chunk:
+                        break
+                    string.write(chunk)
 
-    def upload_dataset_features(self, description):
+            return return_code, string.getvalue()
+
+    def upload_dataset(self, description, filePath=None):
         try:
             data = {'description': description}
-            return_code, dataset_xml = self._perform_api_call("openml.data.features.upload", data=data)
+            return_code, dataset_xml = self._perform_api_call("openml.data.upload",data=data, filePath = filePath)
 
         except URLError as e:
             # TODO logger.debug
@@ -961,18 +969,7 @@ class APIConnector(object):
             raise e
         return return_code, dataset_xml
 
-    def upload_dataset_qualities(self, description):
-        try:
-            data = {'description': description}
-            return_code, dataset_xml = self._perform_api_call("openml.data.qualities.upload", data=data)
-
-        except URLError as e:
-            # TODO logger.debug
-            print(e)
-            raise e
-        return return_code, dataset_xml
-
-    def upload_implementation(self, description, binary, source):
+    def upload_flow(self, description, binary, source):
         try:
             data = {'description': description, 'binary': binary, 'source': source}
             return_code, dataset_xml = self._perform_api_call("openml.implementation.upload", data=data)
@@ -990,17 +987,6 @@ class APIConnector(object):
                 data[key] = value
 
             return_code, dataset_xml = self._perform_api_call("openml.run.upload", data=data)
-
-        except URLError as e:
-            # TODO logger.debug
-            print(e)
-            raise e
-        return return_code, dataset_xml
-
-    def upload_file(self, file):
-        try:
-            data ={'file': file}
-            return_code, dataset_xml = self._perform_api_call("openml.file.upload", data=data)
 
         except URLError as e:
             # TODO logger.debug
