@@ -13,7 +13,6 @@ API calls
 API call                                        implemented tested properly tested loads json proper error handling
 =============================================== =========== ====== =============== ========== =====================
 /data/list/                                     yes         yes
-/data/list/active/
 /data/list/tag/{tag}
 /data/{data_id}                                 yes         yes
 /data/delete/
@@ -26,7 +25,6 @@ API call                                        implemented tested properly test
 /data/tag
 /data/untag
 /task/list                                      yes         yes
-/task/list/active
 /task/list/tag/{tag}
 /task/{task_id}                                 yes         yes
 /task/tag
@@ -40,8 +38,8 @@ API call                                        implemented tested properly test
 /flow/
 /flow/exists/{name,ext_version}
 /flow/owned
-/run/list
-/run/{run_id}
+/run/list                                      yes          yes
+/run/{run_id}                                  yes          yes
 /run
 /run/tag
 /run/untag
