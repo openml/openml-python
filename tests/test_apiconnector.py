@@ -39,13 +39,11 @@ class TestAPIConnector(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-
+        self.connector = APIConnector(cache_directory=self.workdir)
         try:
             apikey = os.environ['OPENMLAPIKEY']
         except:
             apikey = None
-        self.connector = APIConnector(cache_directory=self.workdir,
-                                      apikey=apikey)
 
     def tearDown(self):
         os.chdir(self.cwd)
@@ -257,7 +255,7 @@ class TestAPIConnector(unittest.TestCase):
     def test_upload_dataset(self):
 
         dataset = self.connector.download_dataset(3)
-        filePath = os.path.join(self.connector.dataset_cache_dir, "3", "dataset.arff")
+        file_path = os.path.join(self.connector.dataset_cache_dir, "3", "dataset.arff")
 
         description = """ <oml:data_set_description xmlns:oml="http://openml.org/openml">
                         <oml:name>anneal</oml:name>
@@ -269,7 +267,7 @@ class TestAPIConnector(unittest.TestCase):
                         <oml:md5_checksum></oml:md5_checksum>
                         </oml:data_set_description>
                          """
-        return_code, dataset_xml = self.connector.upload_dataset(description, filePath)
+        return_code, dataset_xml = self.connector.upload_dataset(description, file_path)
         self.assertEqual(return_code, 200)
 
     def test_upload_dataset_with_url(self):
@@ -282,20 +280,16 @@ class TestAPIConnector(unittest.TestCase):
                         <oml:url>http://expdb.cs.kuleuven.be/expdb/data/uci/nominal/iris.arff</oml:url>
                         </oml:data_set_description>
                          """
-        return_code, dataset_xml = self.connector.upload_dataset (description)
+        return_code, dataset_xml = self.connector.upload_dataset(description)
         self.assertEqual(return_code, 200)
 
     def test_upload_flow(self):
-
-        description = """ <oml:data_set_description xmlns:oml="http://openml.org/openml">
-                        <oml:name>UploadTestWithURL</oml:name>
-                        <oml:version>1</oml:version>
-                        <oml:description>test</oml:description>
-                        <oml:format>ARFF</oml:format>
-                        <oml:url>http://expdb.cs.kuleuven.be/expdb/data/uci/nominal/iris.arff</oml:url>
-                        </oml:data_set_description>
-                         """
-        return_code, dataset_xml = self.connector.upload_dataset (description)
+        file_path = os.path.join(self.connector.dataset_cache_dir,"uploadflow.txt")
+        file = open(file_path, "w")
+        file.write("Testing upload flow")
+        file.close()
+        description = '''<oml:flow xmlns:oml="http://openml.org/openml"><oml:name>Test</oml:name><oml:description>description</oml:description> </oml:flow>'''
+        return_code, dataset_xml = self.connector.upload_flow(description, file_path)
         self.assertEqual(return_code, 200)
 
 

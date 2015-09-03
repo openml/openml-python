@@ -816,6 +816,7 @@ class APIConnector(object):
             pass
         return task_cache_dir
 
+    def _perform_api_call(self, call, data=None, file_path=None, add_authentication=True):
     ############################################################################
     # Runs
     def get_runs_list(self, task_id=None, flow_id=None, setup_id=None):
@@ -996,25 +997,29 @@ class APIConnector(object):
         data['api_key'] = self.config.get('FAKE_SECTION', 'apikey')
 
         if file_path is not None:
-            if os.path.isabs(file_path):
-                try:
-                    decoder = arff.ArffDecoder()
-                except:
-                    raise "The file you provided is not a valid arff file"
+            file_elements = {}
+            for key, path in file_path.items():
+                if os.path.isabs(path) and os.path.exists(path):
+                    try:
+                        if key is 'dataset':
+                            decoder = arff.ArffDecoder()
+                            with open(path) as fh:
+                                decoder.decode(fh, encode_nominal=True)
+                    except:
+                        raise ValueError("The file you have provided is not a valid arff file")
 
-                fileElement={'dataset': open(file_path, 'rb')}
-                data['description']= data.get('description')
-                data.pop('dataset', None)
-
-                try:
-                    response = requests.post(url, data=data, files=fileElement)
+                    file_elements[key] = open(path, 'rb')
                 except URLError as error:
                     print(error)
 
-                return response.status_code, response
-            else:
-                raise "File doesn't exists"
+                else:
+                    raise ValueError("File doesn't exist")
 
+                response = requests.post(url, data=data, files=file_elements)
+                return response.status_code, response
+
+            except URLError as error:
+                print(error)
         else:
             data = urlencode(data)
             data = data.encode('utf-8')
@@ -1059,8 +1064,8 @@ class APIConnector(object):
     def upload_dataset(self, description, file_path=None):
         try:
             data = {'description': description}
-            return_code, dataset_xml = self._perform_api_call(
-                "/data/", data=data, file_path=file_path)
+            if file_path is not None:
+                return_code, dataset_xml = self._perform_api_call("/data/",data=data, file_path={'dataset':file_path})
 
         except URLError as e:
             # TODO logger.debug
@@ -1068,11 +1073,10 @@ class APIConnector(object):
             raise e
         return return_code, dataset_xml
 
-    def upload_flow(self, description, binary, source):
+    def upload_flow(self, description, file_path=None):
         try:
-            data = {'description': description, 'binary': binary, 'source': source}
-            return_code, dataset_xml = self._perform_api_call(
-                "openml.implementation.upload", data=data)
+            data = {'description': description}
+            return_code, dataset_xml = self._perform_api_call("/flow/", data=data, file_path={'source':file_path})
 
         except URLError as e:
             # TODO logger.debug
