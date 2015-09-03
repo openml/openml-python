@@ -12,33 +12,49 @@ API calls
 =============================================== =========== ====== =============== ========== =====================
 API call                                        implemented tested properly tested loads json proper error handling
 =============================================== =========== ====== =============== ========== =====================
-authenticate                                    yes         yes
-authenticate.check
-data                                            yes         yes
-data.description                                yes         yes
-data.upload
-data.delete
-data.licences
-data.features                                   yes         yes
-data.qualities                                  yes         yes
-data.qualities.list
-task                                            yes         yes
-task.types.search                               yes         yes
-task.evaluations
-task.types
-estimationprocedure
-implementation.exists
-implementation.upload
-implementation.owned
-implementation.delete
-implementation.licences
-evaluation.measures
-run
-run.upload
-run.delete
-job
-setup
+/data/list/                                     yes         yes
+/data/list/active/
+/data/list/tag/{tag}
+/data/{data_id}                                 yes         yes
+/data/delete/
+/data/upload/
+/data/features/{data_id}                        yes         yes
+/data/features/upload/
+/data/qualities/{data_id}                       yes         yes
+/data/qualities/list
+/data/qualities/upload
+/data/tag
+/data/untag
+/task/list                                      yes         yes
+/task/list/active
+/task/list/tag/{tag}
+/task/{task_id}                                 yes         yes
+/task/tag
+/task/untag
+/task/delete
+/tasktype/list
+/tasktype/{task_id}
+/flow/tag
+/flow/untag
+/flow/{flow_id}
+/flow/
+/flow/exists/{name,ext_version}
+/flow/owned
+/run/list
+/run/{run_id}
+/run
+/run/tag
+/run/untag
+/run/evaluate
+/run/reset
+/estimationprocedure/{proc_id}
+/estimationprocedure/list
+/evaluationmeasures/list
+/job/request/
 =============================================== =========== ====== =============== ========== =====================
+
+This list does not contain the `/setup/` calls because we do not need them
+according to Jan.
 
 Convenience Functions
 =====================

@@ -13,7 +13,7 @@ import pandas as pd
 
 from openml.entities.dataset import OpenMLDataset
 from openml.entities.split import OpenMLSplit
-from openml.entities.task import Task
+from openml.entities.task import OpenMLTask
 from openml.apiconnector import APIConnector
 
 
@@ -27,7 +27,7 @@ class OpenMLTaskTest(unittest.TestCase):
 
         api_connector_mock.return_value = None
         self.api_connector = APIConnector()
-        self.task = Task(1, "supervised classification", 1, "class",
+        self.task = OpenMLTask(1, "supervised classification", 1, "class",
                          "crossvalidation wth holdout", None, None, None,
                          None, self.api_connector)
 
@@ -38,7 +38,7 @@ class OpenMLTaskTest(unittest.TestCase):
         self.assertEqual(api_connector_mock.return_value, retval)
         api_connector_mock.assert_called_with(self.api_connector, 1)
 
-    @mock.patch.object(Task, "get_dataset", autospec=True)
+    @mock.patch.object(OpenMLTask, "get_dataset", autospec=True)
     def test_get_X_and_Y(self, task_mock):
         dataset = mock.create_autospec(OpenMLDataset)
         dataset.get_pandas = lambda target=None: (pd.DataFrame(np.zeros((10, 10))),
