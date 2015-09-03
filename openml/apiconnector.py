@@ -877,6 +877,30 @@ class APIConnector(object):
 
     def _perform_api_call(self, call, data=None, add_authentication=True,
                           **kwargs):
+        """Perform an API call at the OpenML server.
+
+        This method must be used by all other methods using the REST API.
+
+        Parameters
+        ----------
+        call : str
+            The API call. For example openml.task.search
+        data : dict (default=None)
+            Dictionary containing data which will be sent to the OpenML
+            server via a POST request.
+        add_authentication : bool (default=True)
+            DO NOT CHANGE THIS. The only method which should set this
+            argument to False is `authenticate`.
+        **kwargs
+            Further arguments which are appended as GET arguments.
+
+        Returns
+        -------
+        return_code : int
+            HTTP return code
+        return_value : str
+            Return value of the OpenML server
+        """
         # TODO: do input validation!
         url = self.config.get("FAKE_SECTION", "server") + "/api/?f="
         url += "" + call
