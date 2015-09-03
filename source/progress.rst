@@ -38,8 +38,8 @@ API call                                        implemented tested properly test
 /flow/
 /flow/exists/{name,ext_version}
 /flow/owned
-/run/list                                      yes          yes
-/run/{run_id}                                  yes          yes
+/run/list                                       yes         yes
+/run/{run_id}                                   yes         yes
 /run
 /run/tag
 /run/untag
