@@ -45,8 +45,8 @@ class TestAPIConnector(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-        self.connector = APIConnector(cache_directory=self.workdir)
-        print(self.connector._session_hash)
+        self.connector = APIConnector(cache_directory=self.workdir,
+                                      apikey='test')
 
     def tearDown(self):
         os.chdir(self.cwd)
@@ -54,29 +54,6 @@ class TestAPIConnector(unittest.TestCase):
 
     ############################################################################
     # Test administrative stuff
-    @mock.patch.object(APIConnector, '_perform_api_call', autospec=True)
-    def test_authentication(self, mock_perform_API_call):
-        # TODO return error messages
-        mock_perform_API_call.return_value = 400, \
-        """<oml:authenticate xmlns:oml = "http://openml.org/openml">
-  <oml:session_hash>G9MPPN114ZCZNWW2VN3JE9VF1FMV8Y5FXHUDUL4P</oml:session_hash>
-  <oml:valid_until>2014-08-13 20:01:29</oml:valid_until>
-  <oml:timezone>Europe/Berlin</oml:timezone>
-</oml:authenticate>"""
-
-        # This already does an authentication
-        connector = APIConnector()
-        # but we only test it here...
-        self.assertEqual(1, mock_perform_API_call.call_count)
-        self.assertEqual(connector._session_hash,
-                         "G9MPPN114ZCZNWW2VN3JE9VF1FMV8Y5FXHUDUL4P")
-
-        # Test that it actually returns what we want
-        session_hash = connector._authenticate("Bla", "Blub")
-        self.assertEqual(2, mock_perform_API_call.call_count)
-        self.assertEqual(session_hash,
-                         "G9MPPN114ZCZNWW2VN3JE9VF1FMV8Y5FXHUDUL4P")
-
     @unittest.skip("Not implemented yet.")
     def test_parse_config(self):
         raise Exception()

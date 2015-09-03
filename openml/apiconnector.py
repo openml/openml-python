@@ -27,7 +27,7 @@ from .util import is_string
 
 logger = logging.getLogger(__name__)
 
-OPENML_URL = "http://www.openml.org"
+OPENML_URL = "http://api_new.openml.org/v1/"
 
 
 class OpenMLStatusChange(Warning):
@@ -49,10 +49,6 @@ class OpenMLServerError(PyOpenMLError):
     def __init__(self, message):
         super(OpenMLServerError, self).__init__(message)
 
-
-class AuthentificationError(PyOpenMLError):
-    def __init__(self, message):
-        super(AuthentificationError, self).__init__(message)
 
 class OpenMLCacheException(PyOpenMLError):
     def __init__(self, message):
@@ -77,14 +73,9 @@ class APIConnector(object):
         directory '.openml/cache' in the users home directory will be used.
         If either directory does not exist, it will be created.
 
-    username : string, optional (default=None)
-        Your username.
-
-    password : string, optional (default=None)
-        Your passwort. This will not be stored! Instead, the md5 hash is
-        calculated and used to authenticate to the OpenML server,
-        which returns a session key. This session key is the only credential
-        which is stored.
+    apikey : string, optional (default=None)
+        Your OpenML API key which will be used to authenticate you at the OpenML
+        server.
 
     server : string, optional (default=None)
         The OpenML server to connect to.
@@ -110,24 +101,18 @@ class APIConnector(object):
     Raises
     ------
     ValueError
-        If one of the following variables is neither specified in the
-        configuration file nor when creating the APIconnector class:
-        username, password
-    AuthentificationError
-        If authentification at the OpenML server does not work.
+        If apikey is neither specified in the config nor given as an argument.
     OpenMLServerError
         If the OpenML server returns an unexptected response.
 
     Testing the API calls in Firefox
     --------------------------------
-    With the Firefox AddOn HTTPRequestor, one can check the OpenML API calls
-    which need authentification (by providing such). First, create the md5
-    hash of your OpenML password and add it to
+    With the Firefox AddOn HTTPRequestor, one can check the OpenML API calls.
 
     """
-    def __init__(self, cache_directory=None, username=None, password=None,
+    def __init__(self, cache_directory=None, apikey=None,
                  server=None, verbosity=None, configure_logger=True,
-                 authenticate=True, private_directory=None):
+                 private_directory=None):
         # The .openml directory is necessary, just try to create it (EAFP)
         try:
             os.mkdir(os.path.expanduser('~/.openml'))
@@ -139,10 +124,8 @@ class APIConnector(object):
         self.config = self._parse_config()
         if cache_directory is not None:
             self.config.set('FAKE_SECTION', 'cachedir', cache_directory)
-        if username is not None:
-            self.config.set('FAKE_SECTION', 'username', username)
-        if password is not None:
-            self.config.set('FAKE_SECTION', 'password', password)
+        if apikey is not None:
+            self.config.set('FAKE_SECTION', 'apikey', apikey)
         if server is not None:
             self.config.set('FAKE_SECTION', 'server', server)
         if verbosity is not None:
@@ -161,11 +144,6 @@ class APIConnector(object):
             logging.basicConfig(
                 format='[%(levelname)s] [%(asctime)s:%(name)s] %('
                        'message)s', datefmt='%H:%M:%S', level=level)
-
-        if authenticate:
-            self._session_hash = self._authenticate(
-                self.config.get('FAKE_SECTION', 'username'),
-                self.config.get('FAKE_SECTION', 'password'))
 
         # Set up the cache directories
         self.cache_dir = self.config.get('FAKE_SECTION', 'cachedir')
@@ -187,50 +165,8 @@ class APIConnector(object):
             if not os.path.exists(dir_) and not os.path.isdir(dir_):
                 os.mkdir(dir_)
 
-    def _authenticate(self, username, password):
-        # Check the username
-        if username is None:
-            raise ValueError("No username specified.")
-        elif not is_string(username):
-            raise ValueError("Username must be of type string.")
-        elif not username:
-            raise ValueError("No value for argument username specified.")
-
-        # Check the password
-        if password is None:
-            raise ValueError("No password specified.")
-        elif not is_string(password):
-            raise ValueError("Password must be of type string.")
-        elif not password:
-            raise ValueError("No value for argument password specified.")
-
-        m = hashlib.md5()
-        m.update(password.encode('utf-8'))
-        md5 = m.hexdigest()
-
-        # TODO: catch possible exceptions
-        data = {'username': username, 'password': md5}
-        return_code, xml_string = self._perform_api_call(
-            "openml.authenticate", data=data, add_authentication=False)
-
-        xml_dict = xmltodict.parse(xml_string)
-        if xml_dict.get('oml:authenticate'):
-            session_hash = xml_dict['oml:authenticate']['oml:session_hash']
-            return session_hash
-        elif xml_dict.get('oml:error'):
-            error_code = xml_dict['oml:error']['oml:code']
-            if error_code == '252':
-                raise AuthentificationError(
-                    "Authentication failed. The username and password did not "
-                    "match any record in the database.")
-            else:
-                OpenMLServerError(
-                    "Unexpected server response code %d with response"
-                    " message %s" % (return_code, xml_string))
-
     def _parse_config(self):
-        defaults = {'username': '',
-                    'password': '',
+        defaults = {'apikey': '',
                     'server': OPENML_URL,
                     'verbosity': 0,
                     'cachedir': os.path.expanduser('~/.openml/cache'),
@@ -436,7 +372,7 @@ class APIConnector(object):
             these are also returned.
         """
         # TODO add proper error handling here!
-        return_code, xml_string = self._perform_api_call("openml.data")
+        return_code, xml_string = self._perform_api_call("data/list/")
         datasets_dict = xmltodict.parse(xml_string)
 
         # Minimalistic check if the XML is useful
@@ -551,7 +487,7 @@ class APIConnector(object):
         except (OpenMLCacheException):
             try:
                 return_code, dataset_xml = self._perform_api_call(
-                    "openml.data.description", data_id=did)
+                    "data/%d" % did)
             except (URLError, UnicodeEncodeError) as e:
                 # TODO logger.debug
                 self._remove_dataset_chache_dir(did)
@@ -566,7 +502,7 @@ class APIConnector(object):
                 "oml:data_set_description"]
         except Exception as e:
             # TODO logger.debug
-            self._remove_dataset_chache_dir()
+            self._remove_dataset_chache_dir(did)
             print("Dataset ID", did)
             raise e
 
@@ -611,7 +547,7 @@ class APIConnector(object):
         except (OSError, IOError):
             try:
                 return_code, features_xml = self._perform_api_call(
-                    "openml.data.features", data_id=did)
+                    "data/features/%d" % did)
             except (URLError, UnicodeEncodeError) as e:
                 # TODO logger.debug
                 print(e)
@@ -635,7 +571,7 @@ class APIConnector(object):
         qualities_file = os.path.join(did_cache_dir, "qualities.xml")
         try:
             return_code, qualities_xml = self._perform_api_call(
-                "openml.data.qualities", data_id=did)
+                "data/qualities/%d" % did)
         except (URLError, UnicodeEncodeError) as e:
             # TODO logger.debug
             print(e)
@@ -723,7 +659,7 @@ class APIConnector(object):
                              "cast to an Integer.")
 
         return_code, xml_string = self._perform_api_call(
-            "openml.tasks", task_type_id=task_type_id)
+            "task/list/%d" % task_type_id)
         tasks_dict = xmltodict.parse(xml_string)
         # Minimalistic check if the XML is useful
         assert tasks_dict['oml:tasks']['@xmlns:oml'] == \
@@ -773,7 +709,7 @@ class APIConnector(object):
 
             try:
                 return_code, task_xml = self._perform_api_call(
-                    "openml.task.search", task_id=task_id)
+                    "task/%d" % task_id)
             except (URLError, UnicodeEncodeError) as e:
                 print(e)
                 raise e
@@ -875,8 +811,7 @@ class APIConnector(object):
             pass
         return task_cache_dir
 
-    def _perform_api_call(self, call, data=None, add_authentication=True,
-                          **kwargs):
+    def _perform_api_call(self, call, data=None):
         """Perform an API call at the OpenML server.
 
         This method must be used by all other methods using the REST API.
@@ -884,13 +819,10 @@ class APIConnector(object):
         Parameters
         ----------
         call : str
-            The API call. For example openml.task.search
+            The API call. For example data/list
         data : dict (default=None)
             Dictionary containing data which will be sent to the OpenML
             server via a POST request.
-        add_authentication : bool (default=True)
-            DO NOT CHANGE THIS. The only method which should set this
-            argument to False is `authenticate`.
         **kwargs
             Further arguments which are appended as GET arguments.
 
@@ -901,21 +833,16 @@ class APIConnector(object):
         return_value : str
             Return value of the OpenML server
         """
-        # TODO: do input validation!
-        url = self.config.get("FAKE_SECTION", "server") + "/api/?f="
-        url += "" + call
-        if kwargs:
-            for key in kwargs:
-                url += "&" + key + "=" + str(kwargs[key])
-        # TODO logger.debug(url)
-        return self._read_url(url, data=data,
-                              add_authentication=add_authentication)
+        url = self.config.get("FAKE_SECTION", "server")
+        if not url.endswith("/"):
+            url += "/"
+        url += call
+        return self._read_url(url, data=data)
 
-    def _read_url(self, url, add_authentication=False, data=None):
+    def _read_url(self, url, data=None):
         if data is None:
             data = {}
-        if add_authentication:
-            data = {'session_hash': self._session_hash}
+        data['session_hash'] = self.config.get('FAKE_SECTION', 'apikey')
         data = urlencode(data)
         data = data.encode('utf-8')
 
