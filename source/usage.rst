@@ -16,13 +16,11 @@ platform. If you don't have an account yet,
 
     >>> from openml.apiconnector import APIConnector
 
-    >>> username = "Your OpenML username"
-    >>> password = "Your OpenML password"
-    >>> connector = APIConnector(username=username, password=password)
+    >>> apikey = 'Your API key'
+    >>> connector = APIConnector(apikey=apikey)
 
 The :class:`~openml.apiconnector.APIConnector` will create a cache directory
-and authenticate you at the OpenML server. By this you obtain a session key,
-which is valid for one hour.
+and manage all your queries to the OpenML server.
 
 You can also configure the OpenML package, e.g. change the cache directory.
 Information about the configuration is in the
@@ -35,7 +33,7 @@ Working with datasets
 .. code:: python
 
     >>> dataset_id = 31
-    >>> dataset = connector.download_dataset(1)
+    >>> dataset = connector.download_dataset(dataset_id)
 
 Attributes of the dataset are stored as member variables:
 
@@ -50,18 +48,24 @@ Data can be loaded in the following ways:
 
 .. code:: python
 
-    >>> pd, categorical = dataset.get_pandas()
+    >>> X = dataset.get_dataset()
 
-returns the dataset as a pandas.DataFrame and a list of booleans,
-indicating which attributes are categorical. Categorical attributes are
-already encoded as integers.
+returns the dataset as a np.ndarray. In case the data is sparse,
+a scipy.sparse.csr matrix is returned.
+
+Most times, having only the X matrix is not enough. Two very useful arguments
+are `target` and `return_categorical_indicator`. `target` makes `get_dataset
+()` return `X` and `y` seperate; `return_categorical_indicator` makes
+`get_dataset()` return a boolean array which indicate which attributes are
+categorical (and should be one hot encoded.)
 
 .. code:: python
 
-    >>> X, y, categorical = dataset.get_pandas()
+    >>> X, y, categorical = dataset.get_dataset(
+        target=dataset.default_target_attribute,
+        return_categorical_indicator=True)
 
-returns the dataset split into X and y, as well as a list indicating which
-attributes are categorical. In case you are working with `scikit-learn
+In case you are working with `scikit-learn
 <http://scikit-learn>`_, you can use this data right away:
 
 .. code:: python
@@ -72,7 +76,7 @@ attributes are categorical. In case you are working with `scikit-learn
         True, False, True, True, False, True, False, True, True, False, True,
         False, True, True], dtype=<type 'float'>, n_values='auto',
         sparse=True)
-    >>> X = enc.transform(X).todense()
+    >>> X = enc.fit_transform(X).todense()
     >>> clf = ensemble.RandomForestClassifier()
     >>> clf.fit(X, y)
     RandomForestClassifier(bootstrap=True, compute_importances=None,

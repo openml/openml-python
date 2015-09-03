@@ -9,7 +9,7 @@ else:
         import pickle
 
 
-class Task(object):
+class OpenMLTask(object):
     def __init__(self, task_id, task_type, data_set_id, target_feature,
                  estimation_procedure_type, data_splits_url,
                  estimation_parameters, evaluation_measure,cost_matrix, api_connector):

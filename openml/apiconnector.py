@@ -21,7 +21,7 @@ else:
 import xmltodict
 
 from .entities.dataset import OpenMLDataset
-from .entities.task import Task
+from .entities.task import OpenMLTask
 from .entities.split import OpenMLSplit
 from .util import is_string
 
@@ -753,7 +753,7 @@ class APIConnector(object):
             text = parameter.get("#text", "")
             estimation_parameters[name] = text
 
-        return Task(
+        return OpenMLTask(
             dic["oml:task_id"], dic["oml:task_type"],
             inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
             inputs["source_data"]["oml:data_set"]["oml:target_feature"],
