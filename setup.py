@@ -11,11 +11,12 @@ setuptools.setup(name="openml",
                  version="0.0.1dev",
                  packages=setuptools.find_packages(),
                  package_data={'': ['*.txt', '*.md']},
-                 install_requires=["liac-arff>=2.1.0",
+                 install_requires=["liac-arff>=2.1.1dev",
                                    "numpy>=1.6.2",
                                    "scipy>=0.13.3",
                                    "xmltodict",
-                                   "nose"],
+                                   "nose",
+                                   "numpydoc"],
                  test_suite="nose.collector",
                  classifiers=['Intended Audience :: Science/Research',
                               'Intended Audience :: Developers',
@@ -31,4 +32,7 @@ setuptools.setup(name="openml",
                               'Programming Language :: Python :: 3',
                               'Programming Language :: Python :: 3.3',
                               'Programming Language :: Python :: 3.4',
-                 ])
+                 ],
+                 dependency_links=[
+                     "http://github.com/mfeurer/liac-arff/archive/master.zip"
+                     "#egg=liac-arff-2.1.1dev"])
