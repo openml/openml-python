@@ -840,12 +840,12 @@ class APIConnector(object):
         if not url.endswith("/"):
             url += "/"
         url += call
-        return self._read_url(url, data=data)
+        return self._read_url(url, data=data,filePath= filePath)
 
-    def _read_url(self, url, data=None):
+    def _read_url(self, url, data=None, filePath=None):
         if data is None:
             data = {}
-            data['session_hash'] = self.config.get('FAKE_SECTION', 'apikey')
+        data['session_hash'] = self.config.get('FAKE_SECTION', 'apikey')
 
         if filePath is not None:
             if os.path.isabs(filePath):
@@ -910,7 +910,7 @@ class APIConnector(object):
     def upload_dataset(self, description, filePath=None):
         try:
             data = {'description': description}
-            return_code, dataset_xml = self._perform_api_call("openml.data.upload",data=data, filePath = filePath)
+            return_code, dataset_xml = self._perform_api_call("/data/",data=data, filePath=filePath)
 
         except URLError as e:
             # TODO logger.debug
