@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import hashlib
 import logging
 import os
 import re
@@ -816,7 +817,7 @@ class APIConnector(object):
             pass
         return task_cache_dir
 
-    def _perform_api_call(self, call, data=None, file_path=None, add_authentication=True):
+    def _perform_api_call(self, call, data=None, file_dictionary=None, add_authentication=True):
     ############################################################################
     # Runs
     def get_runs_list(self, task_id=None, flow_id=None, setup_id=None):
@@ -989,16 +990,16 @@ class APIConnector(object):
         if not url.endswith("/"):
             url += "/"
         url += call
-        return self._read_url(url, data=data, file_path=file_path)
+        return self._read_url(url, data=data, file_dictionary=file_dictionary)
 
-    def _read_url(self, url, data=None, file_path=None):
+    def _read_url(self, url, data=None, file_dictionary=None):
         if data is None:
             data = {}
         data['api_key'] = self.config.get('FAKE_SECTION', 'apikey')
 
-        if file_path is not None:
+        if file_dictionary is not None:
             file_elements = {}
-            for key, path in file_path.items():
+            for key, path in file_dictionary.items():
                 if os.path.isabs(path) and os.path.exists(path):
                     try:
                         if key is 'dataset':
@@ -1065,7 +1066,7 @@ class APIConnector(object):
         try:
             data = {'description': description}
             if file_path is not None:
-                return_code, dataset_xml = self._perform_api_call("/data/",data=data, file_path={'dataset':file_path})
+                return_code, dataset_xml = self._perform_api_call("/data/",data=data, file_dictionary={'dataset': file_path})
 
         except URLError as e:
             # TODO logger.debug
@@ -1076,7 +1077,7 @@ class APIConnector(object):
     def upload_flow(self, description, file_path=None):
         try:
             data = {'description': description}
-            return_code, dataset_xml = self._perform_api_call("/flow/", data=data, file_path={'source':file_path})
+            return_code, dataset_xml = self._perform_api_call("/flow/", data=data, file_dictionary={'source': file_path})
 
         except URLError as e:
             # TODO logger.debug
@@ -1084,17 +1085,21 @@ class APIConnector(object):
             raise e
         return return_code, dataset_xml
 
-    def upload_run(self, description, files):
-        try:
-            data ={'description': description}
-            for key, value in files:
-                data[key] = value
+    def upload_run(self, files):
+        file_dictionary = {}
+        if 'predictions' in files:
+            try:
+                for key, value in files.items():
+                    file_dictionary[key] = value
 
-            return_code, dataset_xml = self._perform_api_call("openml.run.upload", data=data)
+                return_code, dataset_xml = self._perform_api_call("/run/", file_dictionary=file_dictionary)
 
-        except URLError as e:
-            # TODO logger.debug
-            print(e)
-            raise e
-        return return_code, dataset_xml
+            except URLError as e:
+                # TODO logger.debug
+                print(e)
+                raise e
+            return return_code, dataset_xml
+        else:
+            raise ValueError("prediction files doesn't exist")
+
 
