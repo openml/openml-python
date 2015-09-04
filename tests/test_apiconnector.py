@@ -71,7 +71,7 @@ class TestAPIConnector(unittest.TestCase):
         datasets = connector.get_cached_datasets()
         self.assertIsInstance(datasets, dict)
         self.assertEqual(len(datasets), 2)
-        self.assertIsInstance(datasets.values()[0], OpenMLDataset)
+        self.assertIsInstance(list(datasets.values())[0], OpenMLDataset)
 
     def test_get_cached_dataset(self):
         workdir = os.path.dirname(os.path.abspath(__file__))

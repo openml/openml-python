@@ -947,7 +947,6 @@ class APIConnector(object):
             url = file_[u"oml:url"]
             files[name] = url
 
-        print dic.keys()
         evaluations = dict()
         for evaluation in dic[u"oml:output_data"][u"oml:evaluation"]:
             name = evaluation[u"oml:name"]
@@ -1009,8 +1008,8 @@ class APIConnector(object):
 
                 try:
                     response = requests.post(url, data=data, files=fileElement)
-                except URLError, error:
-                    print error
+                except URLError as error:
+                    print(error)
 
                 return response.status_code, response
             else:
