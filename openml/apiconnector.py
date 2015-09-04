@@ -832,7 +832,7 @@ class APIConnector(object):
         Returns
         -------
         list
-            A list of all runs run IDs for a given ID.
+            A list of all runs for a given ID.
         """
         test = [task_id is None, flow_id is None, setup_id is None]
         if np.nansum(test) != 2:
@@ -843,7 +843,7 @@ class APIConnector(object):
         if task_id is not None:
             call += "?task_id=%d" % task_id
         elif flow_id is not None:
-            call += "?implementation_id=%d" % flow_id
+            call += "?flow_id=%d" % flow_id
         elif setup_id is not None:
             call += "?setup_id=%d" % setup_id
 
@@ -865,8 +865,9 @@ class APIConnector(object):
                 run = {'run_id': int(runs_['oml:run_id']),
                        'task_id': int(runs_['oml:task_id']),
                        'setup_id': int(runs_['oml:setup_id']),
-                       'implementation_id': int(runs_['oml:implementation_id']),
-                       'uploader': int(runs_['oml:uploader'])}
+                       'flow_id': int(runs_['oml:flow_id']),
+                       'uploader': int(runs_['oml:uploader']),
+                       'error_message': runs_['oml:error_message']}
 
                 runs.append(run)
             runs.sort(key=lambda t: t['run_id'])
@@ -957,9 +958,45 @@ class APIConnector(object):
 
         return OpenMLRun(
             dic[u"oml:run_id"], dic[u"oml:uploader"],
-            dic[u"oml:task_id"], dic[u"oml:implementation_id"],
+            dic[u"oml:task_id"], dic[u"oml:flow_id"],
             dic[u"oml:setup_string"], dic[u'oml:setup_id'],
             tags, datasets, files, evaluations)
+
+    ############################################################################
+    # Flows
+    def get_flow_list(self):
+        """Return a list of all flows on OpenML.
+
+        Returns
+        -------
+        list
+            A list of all flows.
+        """
+        return_code, xml_string = self._perform_api_call("/flow/list")
+        datasets_dict = xmltodict.parse(xml_string)
+
+        if isinstance(datasets_dict['oml:flows']['oml:flow'], dict):
+            flows = [datasets_dict['oml:implementations']['oml:implementation']]
+        else:
+            # Minimalistic check if the XML is useful
+            assert type(datasets_dict['oml:flows']['oml:flow']) == list, \
+                type(datasets_dict['oml:flows']['oml:flow'])
+            assert datasets_dict['oml:flows']['@xmlns:oml'] == \
+                   'http://openml.org/openml'
+
+            flows = []
+            for flow_ in datasets_dict['oml:flows']['oml:flow']:
+                flow = {'id': int(flow_['oml:id']),
+                        'full_name': flow_['oml:full_name'],
+                        'name': flow_['oml:name'],
+                        'version': flow_['oml:version'],
+                        'external_version': flow_['oml:external_version'],
+                        'uploader': int(flow_['oml:uploader'])}
+
+                flows.append(flow)
+            flows.sort(key=lambda t: t['id'])
+
+        return flows
 
     ############################################################################
     # Internal stuff
