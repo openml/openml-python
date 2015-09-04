@@ -32,6 +32,7 @@ API call                                        implemented tested properly test
 /task/delete
 /tasktype/list
 /tasktype/{task_id}
+/flow/list                                      yes
 /flow/tag
 /flow/untag
 /flow/{flow_id}
