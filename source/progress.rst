@@ -16,7 +16,7 @@ API call                                        implemented tested properly test
 /data/list/tag/{tag}
 /data/{data_id}                                 yes         yes
 /data/delete/
-/data/upload/
+/data/upload/                                   yes         yes
 /data/features/{data_id}                        yes         yes
 /data/features/upload/
 /data/qualities/{data_id}                       yes         yes
@@ -35,12 +35,12 @@ API call                                        implemented tested properly test
 /flow/tag
 /flow/untag
 /flow/{flow_id}
-/flow/
+/flow/                                          yes         yes
 /flow/exists/{name,ext_version}
 /flow/owned
 /run/list                                       yes         yes
 /run/{run_id}                                   yes         yes
-/run
+/run                                            yes         yes
 /run/tag
 /run/untag
 /run/evaluate
