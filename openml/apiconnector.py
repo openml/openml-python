@@ -994,7 +994,7 @@ class APIConnector(object):
     def _read_url(self, url, data=None, file_path=None):
         if data is None:
             data = {}
-        data['session_hash'] = self.config.get('FAKE_SECTION', 'apikey')
+        data['api_key'] = self.config.get('FAKE_SECTION', 'apikey')
 
         if file_path is not None:
             if os.path.isabs(file_path):

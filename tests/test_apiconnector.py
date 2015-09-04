@@ -44,8 +44,13 @@ class TestAPIConnector(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
+
+        try:
+            apikey = os.environ['OPENML_APIKEY']
+        except:
+            apikey = None
         self.connector = APIConnector(cache_directory=self.workdir,
-                                      apikey='test')
+                                      apikey=apikey)
 
     def tearDown(self):
         os.chdir(self.cwd)

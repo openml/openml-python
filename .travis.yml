@@ -4,6 +4,9 @@ python:
   - "2.7"
   - "3.4"
 
+env:
+  secure: "cEIvnra5uFYph1v32vkpwRf1nxzCsSWfOtkjPSg0z6szLg3IJN7bhg/5A1S3DRRi0YLZ4CEJYLcCCcnj6OUwMotaVphFwJZ/Y3gGo1BXNHlrOmQL1vUR8LgJC+FN2PIFk4rAUM/Zq6oxldxkW8YtJx4l/RCcams8GRHKWtO+IR4="
+
 before_install:
   - sudo apt-get install -q libatlas3gf-base libatlas-dev liblapack-dev gfortran
 
