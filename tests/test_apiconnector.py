@@ -41,7 +41,7 @@ class TestAPIConnector(unittest.TestCase):
         self.cached = True
 
         try:
-            apikey = os.environ['OPENML_APIKEY']
+            apikey = os.environ['OPENMLAPIKEY']
         except:
             apikey = None
         self.connector = APIConnector(cache_directory=self.workdir,
