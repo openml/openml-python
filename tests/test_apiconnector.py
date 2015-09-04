@@ -27,11 +27,6 @@ class TestAPIConnector(unittest.TestCase):
     """
 
     def setUp(self):
-        config_file = os.path.expanduser('~/.openml/config')
-        if not os.path.exists(config_file):
-            raise Exception("OpenML config file required to run unit tests. "
-                            "See https://github.com/openml/OpenML/wiki/Client-API")
-
         self.cwd = os.getcwd()
         workdir = os.path.dirname(os.path.abspath(__file__))
         self.workdir = os.path.join(workdir, "tmp")
@@ -44,8 +39,13 @@ class TestAPIConnector(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
+
+        try:
+            apikey = os.environ['OPENMLAPIKEY']
+        except:
+            apikey = None
         self.connector = APIConnector(cache_directory=self.workdir,
-                                      apikey='test')
+                                      apikey=apikey)
 
     def tearDown(self):
         os.chdir(self.cwd)
@@ -66,7 +66,7 @@ class TestAPIConnector(unittest.TestCase):
         datasets = connector.get_cached_datasets()
         self.assertIsInstance(datasets, dict)
         self.assertEqual(len(datasets), 2)
-        self.assertIsInstance(datasets.values()[0], OpenMLDataset)
+        self.assertIsInstance(list(datasets.values())[0], OpenMLDataset)
 
     def test_get_cached_dataset(self):
         workdir = os.path.dirname(os.path.abspath(__file__))

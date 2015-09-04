@@ -81,7 +81,7 @@ class OpenMLDataset(object):
             else:
                 raise Exception()
 
-            with open(self.data_pickle_file, "w") as fh:
+            with open(self.data_pickle_file, "wb") as fh:
                 pickle.dump((X, categorical, attribute_names), fh, -1)
             logger.debug("Saved dataset %d: %s to file %s" %
                          (self.id, self.name, self.data_pickle_file))
