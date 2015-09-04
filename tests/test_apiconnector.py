@@ -5,10 +5,17 @@ import os
 import shutil
 import sys
 
+
 if sys.version_info[0] >= 3:
     from unittest import mock
+    from urllib.request import urlopen
+    from urllib.parse import urlencode
+    from urllib.error import URLError
 else:
     import mock
+    from urllib import urlencode, urlopen
+    from urllib2 import URLError, urlopen
+
 
 from openml.util import is_string
 
@@ -39,13 +46,11 @@ class TestAPIConnector(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-
+        self.connector = APIConnector(cache_directory=self.workdir)
         try:
             apikey = os.environ['OPENMLAPIKEY']
         except:
             apikey = None
-        self.connector = APIConnector(cache_directory=self.workdir,
-                                      apikey=apikey)
 
     def tearDown(self):
         os.chdir(self.cwd)
@@ -226,7 +231,7 @@ class TestAPIConnector(unittest.TestCase):
     def test_download_run_list(self):
         def check_run(run):
             self.assertIsInstance(run, dict)
-            self.assertEqual(len(run), 5)
+            self.assertEqual(len(run), 6)
 
         runs = self.connector.get_runs_list(task_id=1)
         # 1759 as the number of supervised classification tasks retrieved
@@ -238,13 +243,13 @@ class TestAPIConnector(unittest.TestCase):
 
         runs = self.connector.get_runs_list(flow_id=1)
         self.assertGreaterEqual(len(runs), 1)
-        for task in runs:
-            check_run(task)
+        for run in runs:
+            check_run(run)
 
         runs = self.connector.get_runs_list(setup_id=1)
         self.assertGreaterEqual(len(runs), 261)
-        for task in runs:
-            check_run(task)
+        for run in runs:
+            check_run(run)
 
     def test_download_run(self):
         run = self.connector.download_run(473350)
@@ -254,10 +259,22 @@ class TestAPIConnector(unittest.TestCase):
         self.assertGreaterEqual(len(run.evaluations), 18)
         self.assertEqual(len(run.evaluations['f_measure']), 2)
 
+    # ###########################################################################
+    # Flows
+    def test_download_flow_list(self):
+        def check_flow(flow):
+            self.assertIsInstance(flow, dict)
+            self.assertEqual(len(flow), 6)
+
+        flows = self.connector.get_flow_list()
+        self.assertGreaterEqual(len(flows), 1448)
+        for flow in flows:
+            check_flow(flow)
+
     def test_upload_dataset(self):
 
         dataset = self.connector.download_dataset(3)
-        filePath = os.path.join(self.connector.dataset_cache_dir, "3", "dataset.arff")
+        file_path = os.path.join(self.connector.dataset_cache_dir, "3", "dataset.arff")
 
         description = """ <oml:data_set_description xmlns:oml="http://openml.org/openml">
                         <oml:name>anneal</oml:name>
@@ -269,7 +286,7 @@ class TestAPIConnector(unittest.TestCase):
                         <oml:md5_checksum></oml:md5_checksum>
                         </oml:data_set_description>
                          """
-        return_code, dataset_xml = self.connector.upload_dataset(description, filePath)
+        return_code, dataset_xml = self.connector.upload_dataset(description, file_path)
         self.assertEqual(return_code, 200)
 
     def test_upload_dataset_with_url(self):
@@ -282,20 +299,33 @@ class TestAPIConnector(unittest.TestCase):
                         <oml:url>http://expdb.cs.kuleuven.be/expdb/data/uci/nominal/iris.arff</oml:url>
                         </oml:data_set_description>
                          """
-        return_code, dataset_xml = self.connector.upload_dataset (description)
+        return_code, dataset_xml = self.connector.upload_dataset(description)
         self.assertEqual(return_code, 200)
 
     def test_upload_flow(self):
+        file_path = os.path.join(self.connector.dataset_cache_dir,"uploadflow.txt")
+        file = open(file_path, "w")
+        file.write("Testing upload flow")
+        file.close()
+        description = '''<oml:flow xmlns:oml="http://openml.org/openml"><oml:name>Test</oml:name><oml:description>description</oml:description> </oml:flow>'''
+        return_code, dataset_xml = self.connector.upload_flow(description, file_path)
+        self.assertEqual(return_code, 200)
 
-        description = """ <oml:data_set_description xmlns:oml="http://openml.org/openml">
-                        <oml:name>UploadTestWithURL</oml:name>
-                        <oml:version>1</oml:version>
-                        <oml:description>test</oml:description>
-                        <oml:format>ARFF</oml:format>
-                        <oml:url>http://expdb.cs.kuleuven.be/expdb/data/uci/nominal/iris.arff</oml:url>
-                        </oml:data_set_description>
-                         """
-        return_code, dataset_xml = self.connector.upload_dataset (description)
+    def test_upload_run(self):
+        file = urlopen("http://www.openml.org/data/download/224/weka_generated_predictions1977525485999711307.arff")
+        file_text = file.read()
+        file_path = os.path.join(self.connector.dataset_cache_dir, "weka_generated_predictions1977525485999711307.arff")
+        with open(file_path, "wb") as prediction_file:
+            prediction_file.write(file_text)
+
+        description_text = '''<oml:run xmlns:oml="http://openml.org/openml"><oml:task_id>59</oml:task_id><oml:flow_id>67</oml:flow_id></oml:run>'''
+        description_path = os.path.join(self.connector.dataset_cache_dir, "description.xml")
+        with open(description_path, "w") as description_file:
+            description_file.write(description_text)
+
+        file_dictionary = {'predictions': file_path, 'description': description_path}
+
+        return_code, dataset_xml = self.connector.upload_run(file_dictionary)
         self.assertEqual(return_code, 200)
 
 

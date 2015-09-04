@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import hashlib
 import logging
 import os
 import re
@@ -816,154 +817,9 @@ class APIConnector(object):
             pass
         return task_cache_dir
 
-    ############################################################################
-    # Runs
-    def get_runs_list(self, task_id=None, flow_id=None, setup_id=None):
-        """Return a list of all runs for either a task, flow or setup.
-
-        Exactly one of the optional parameters must be given.
-
-        Parameters
-        ----------
-        task_id : int, optional
-        flow_id : int, optional
-        setup_id : int, optional
-
-        Returns
-        -------
-        list
-            A list of all runs run IDs for a given ID.
+    def _perform_api_call(self, call, data=None, file_dictionary=None, add_authentication=True):
         """
-        test = [task_id is None, flow_id is None, setup_id is None]
-        if np.nansum(test) != 2:
-            raise ValueError
-
-        call = "run/list"
-
-        if task_id is not None:
-            call += "?task_id=%d" % task_id
-        elif flow_id is not None:
-            call += "?implementation_id=%d" % flow_id
-        elif setup_id is not None:
-            call += "?setup_id=%d" % setup_id
-
-        return_code, xml_string = self._perform_api_call(call)
-        datasets_dict = xmltodict.parse(xml_string)
-
-
-        if isinstance(datasets_dict['oml:runs']['oml:run'], dict):
-            runs = [datasets_dict['oml:runs']['oml:run']]
-        else:
-            # Minimalistic check if the XML is useful
-            assert type(datasets_dict['oml:runs']['oml:run']) == list, \
-                type(datasets_dict['oml:runs']['oml:run'])
-            assert datasets_dict['oml:runs']['@xmlns:oml'] == \
-                   'http://openml.org/openml'
-
-            runs = []
-            for runs_ in datasets_dict['oml:runs']['oml:run']:
-                run = {'run_id': int(runs_['oml:run_id']),
-                       'task_id': int(runs_['oml:task_id']),
-                       'setup_id': int(runs_['oml:setup_id']),
-                       'implementation_id': int(runs_['oml:implementation_id']),
-                       'uploader': int(runs_['oml:uploader'])}
-
-                runs.append(run)
-            runs.sort(key=lambda t: t['run_id'])
-
-        return runs
-
-    def download_run(self, run_id):
-        """Download the OpenML run for a given run ID.
-
-        Parameters
-        ----------
-        run_id : int
-            The OpenML run id.
-        """
-        try:
-            run_id = int(run_id)
-        except:
-            raise ValueError("Task ID is neither an Integer nor can be "
-                             "cast to an Integer.")
-
-        xml_file = os.path.join(self._create_run_cache_dir(run_id),
-                                "run.xml")
-
-        try:
-            with open(xml_file) as fh:
-                run = self._create_run_from_xml(fh.read())
-        except (OSError, IOError):
-
-            try:
-                return_code, run_xml = self._perform_api_call(
-                    "run/%d" % run_id)
-            except (URLError, UnicodeEncodeError) as e:
-                print(e)
-                raise e
-
-            # Cache the xml task file
-            if os.path.exists(xml_file):
-                with open(xml_file) as fh:
-                    local_xml = fh.read()
-
-                if run_xml != local_xml:
-                    raise ValueError("Run description of run %d cached at %s "
-                                     "has changed." % (run_id, xml_file))
-
-            else:
-                with open(xml_file, "w") as fh:
-                    fh.write(run_xml)
-
-            run = self._create_run_from_xml(run_xml)
-
-        return run
-
-    def _create_run_cache_dir(self, run_id):
-        run_cache_dir = os.path.join(self.task_cache_dir, str(run_id))
-
-        try:
-            os.makedirs(run_cache_dir)
-        except (IOError, OSError):
-            # TODO add debug information!
-            pass
-        return run_cache_dir
-
-    def _create_run_from_xml(self, xml):
-        dic = xmltodict.parse(xml)[u"oml:run"]
-        datasets = []
-        for key in dic[u'oml:input_data']:
-            dataset = dic[u'oml:input_data'][key]
-            did = dataset[u'oml:did']
-            datasets.append(did)
-
-        tags = []
-        for tag in dic[u"oml:tag"]:
-            tags.append(tag)
-
-        files = dict()
-        for file_ in dic[u"oml:output_data"][u"oml:file"]:
-            name = file_[u"oml:name"]
-            url = file_[u"oml:url"]
-            files[name] = url
-
-        evaluations = dict()
-        for evaluation in dic[u"oml:output_data"][u"oml:evaluation"]:
-            name = evaluation[u"oml:name"]
-            value = evaluation.get(u"oml:value")
-            value_array = evaluation.get(u"oml:array_data")
-            evaluations[name] = (value, value_array)
-
-        return OpenMLRun(
-            dic[u"oml:run_id"], dic[u"oml:uploader"],
-            dic[u"oml:task_id"], dic[u"oml:implementation_id"],
-            dic[u"oml:setup_string"], dic[u'oml:setup_id'],
-            tags, datasets, files, evaluations)
-
-    ############################################################################
-    # Internal stuff
-    def _perform_api_call(self, call, data=None, file_path=None):
-        """Perform an API call at the OpenML server.
+        Perform an API call at the OpenML server.
         return self._read_url(url, data=data, filePath=filePath,
         def _read_url(self, url, add_authentication=False, data=None, filePath=None):
 
@@ -988,33 +844,35 @@ class APIConnector(object):
         if not url.endswith("/"):
             url += "/"
         url += call
-        return self._read_url(url, data=data, file_path=file_path)
+        return self._read_url(url, data=data, file_dictionary=file_dictionary)
 
-    def _read_url(self, url, data=None, file_path=None):
+    def _read_url(self, url, data=None, file_dictionary=None):
         if data is None:
             data = {}
         data['api_key'] = self.config.get('FAKE_SECTION', 'apikey')
 
-        if file_path is not None:
-            if os.path.isabs(file_path):
-                try:
-                    decoder = arff.ArffDecoder()
-                except:
-                    raise "The file you provided is not a valid arff file"
+        if file_dictionary is not None:
+            file_elements = {}
+            for key, path in file_dictionary.items():
+                if os.path.isabs(path) and os.path.exists(path):
+                    try:
+                        if key is 'dataset':
+                            decoder = arff.ArffDecoder()
+                            with open(path) as fh:
+                                decoder.decode(fh, encode_nominal=True)
+                    except:
+                        raise ValueError("The file you have provided is not a valid arff file")
 
-                fileElement={'dataset': open(file_path, 'rb')}
-                data['description']= data.get('description')
-                data.pop('dataset', None)
+                    file_elements[key] = open(path, 'rb')
 
-                try:
-                    response = requests.post(url, data=data, files=fileElement)
-                except URLError as error:
-                    print(error)
-
+                else:
+                    raise ValueError("File doesn't exist")
+            try:
+                response = requests.post(url, data=data, files=file_elements)
                 return response.status_code, response
-            else:
-                raise "File doesn't exists"
 
+            except URLError as error:
+                print(error)
         else:
             data = urlencode(data)
             data = data.encode('utf-8')
@@ -1059,8 +917,10 @@ class APIConnector(object):
     def upload_dataset(self, description, file_path=None):
         try:
             data = {'description': description}
-            return_code, dataset_xml = self._perform_api_call(
-                "/data/", data=data, file_path=file_path)
+            if file_path is not None:
+                return_code, dataset_xml = self._perform_api_call("/data/",data=data, file_dictionary={'dataset': file_path})
+            else:
+                return_code, dataset_xml = self._perform_api_call("/data/",data=data)
 
         except URLError as e:
             # TODO logger.debug
@@ -1068,11 +928,10 @@ class APIConnector(object):
             raise e
         return return_code, dataset_xml
 
-    def upload_flow(self, description, binary, source):
+    def upload_flow(self, description, file_path=None):
         try:
-            data = {'description': description, 'binary': binary, 'source': source}
-            return_code, dataset_xml = self._perform_api_call(
-                "openml.implementation.upload", data=data)
+            data = {'description': description}
+            return_code, dataset_xml = self._perform_api_call("/flow/", data=data, file_dictionary={'source': file_path})
 
         except URLError as e:
             # TODO logger.debug
@@ -1080,17 +939,19 @@ class APIConnector(object):
             raise e
         return return_code, dataset_xml
 
-    def upload_run(self, description, files):
-        try:
-            data ={'description': description}
-            for key, value in files:
-                data[key] = value
+    def upload_run(self, files):
+        file_dictionary = {}
+        if 'predictions' in files:
+            try:
+                for key, value in files.items():
+                    file_dictionary[key] = value
 
-            return_code, dataset_xml = self._perform_api_call("openml.run.upload", data=data)
+                return_code, dataset_xml = self._perform_api_call("/run/", file_dictionary=file_dictionary)
 
-        except URLError as e:
-            # TODO logger.debug
-            print(e)
-            raise e
-        return return_code, dataset_xml
-
+            except URLError as e:
+                # TODO logger.debug
+                print(e)
+                raise e
+            return return_code, dataset_xml
+        else:
+            raise ValueError("prediction files doesn't exist")
