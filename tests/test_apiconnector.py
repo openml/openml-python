@@ -229,9 +229,6 @@ class TestAPIConnector(unittest.TestCase):
             self.assertEqual(len(run), 6)
 
         runs = self.connector.get_runs_list(task_id=1)
-        # 1759 as the number of supervised classification tasks retrieved
-        # openml.org from this call; don't trust the number on openml.org as
-        # it also counts private datasets
         self.assertGreaterEqual(len(runs), 800)
         for run in runs:
             check_run(run)
@@ -242,7 +239,7 @@ class TestAPIConnector(unittest.TestCase):
             check_run(run)
 
         runs = self.connector.get_runs_list(setup_id=1)
-        self.assertGreaterEqual(len(runs), 261)
+        self.assertGreaterEqual(len(runs), 260)
         for run in runs:
             check_run(run)
 
