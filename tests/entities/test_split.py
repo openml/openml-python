@@ -43,7 +43,7 @@ class OpenMLSplitTest(unittest.TestCase):
         self.assertNotEqual(split, split2)
 
         split2 = OpenMLSplit.from_arff_file(self.arff_filename)
-        split2.split[0][0] = (np.zeros((80)), np.zeros((9)))
+        split2.split[0][0] = Split(np.zeros((80)), np.zeros((9)))
         self.assertNotEqual(split, split2)
 
     def test_from_arff_file(self):
