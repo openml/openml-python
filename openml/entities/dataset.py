@@ -134,7 +134,7 @@ class OpenMLDataset(object):
             raise ValueError("Cannot find a ndarray file for dataset %s at"
                              "location %s " % (self.name, path))
         else:
-            with open(path) as fh:
+            with open(path, "rb") as fh:
                 data, categorical, attribute_names = pickle.load(fh)
 
         to_exclude = []
