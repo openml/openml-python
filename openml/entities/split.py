@@ -43,10 +43,11 @@ class OpenMLSplit(object):
                     return False
                 else:
                     for fold in self.split[repetition]:
-                        if all(self.split[repetition][fold][0] != \
-                                other.split[repetition][fold][0]) and \
-                                all(self.split[repetition][fold][1] != \
-                                other.split[repetition][fold][1]):
+                        if np.all(self.split[repetition][fold].test != \
+                                other.split[repetition][fold].test)\
+                                and \
+                                np.all(self.split[repetition][fold].train
+                                != other.split[repetition][fold].train):
                             return False
         return True
 
