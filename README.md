@@ -5,3 +5,6 @@
 
 A python interface for [OpenML](http://openml.org). The documentation is
 hosted at [readthedocs.org](https://readthedocs.org/projects/openml/).
+
+Please commit to the right branches following the gitflow pattern:
+http://nvie.com/posts/a-successful-git-branching-model/

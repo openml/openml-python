@@ -44,7 +44,7 @@ class OpenMLTask(object):
     def get_X_and_Y(self):
         dataset = self.get_dataset()
         # Replace with retrieve from cache
-        X_and_Y = dataset.get_pandas(target=self.target_feature)
+        X_and_Y = dataset.get_dataset(target=self.target_feature)
         return X_and_Y
 
     def evaluate(self, algo):
