@@ -122,8 +122,7 @@ class OpenMLDataset(object):
                 return decode_arff(fh)
 
     ############################################################################
-    # pandas related stuff...
-    def get_dataset(self, target=None, include_row_id=False,
+    def get_dataset(self, target=None, target_dtype=int, include_row_id=False,
                    include_ignore_attributes=False,
                    return_categorical_indicator=False,
                    return_attribute_names=False):
@@ -176,7 +175,7 @@ class OpenMLDataset(object):
 
             try:
                 x = data[:,~targets]
-                y = data[:,targets].astype(np.int32)
+                y = data[:,targets].astype(target_dtype)
 
                 if len(y.shape) == 2 and y.shape[1] == 1:
                     y = y[:,0]
@@ -191,7 +190,7 @@ class OpenMLDataset(object):
                 raise e
 
             if scipy.sparse.issparse(y):
-                y = np.asarray(y.todense()).astype(np.int32).flatten()
+                y = np.asarray(y.todense()).astype(target_dtype).flatten()
 
             rval.append(x)
             rval.append(y)
