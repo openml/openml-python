@@ -1,4 +1,3 @@
-
 language: python
 python:
   - "2.7"
@@ -7,29 +6,35 @@ python:
 env:
   secure: "KTU56Bhft39FhFnV80Ek+Ht8nwAAJWlLAN104bALBzQWVraoD/znx0gQnoS+YQDjzxgpj30UKBua/o8q1IrvkjxJb8yUBzpS0P1jcGwqmpVRoNdb3pQPk8R7fB9pTFiaJUQbdQJ2/xTrB/T9Kda0J1zq81LC1zSOxAxUL47UI50="
 
-before_install:
-  - sudo apt-get install -q libatlas3gf-base libatlas-dev liblapack-dev gfortran
+cache:
+  directories:
+    - $HOME/.cache/pip
+  pip: true
 
-install:
-  - sudo apt-get update
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
-    else
-      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-    fi
+sudo: false
+
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log
+
+# command to install dependencies
+addons:
+  apt:
+    packages:
+    - libatlas-dev
+    - liblapack-dev
+    - libatlas-base-dev
+    - gfortran
+
+before_install:
+  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  # Useful for debugging any issues with conda
-  - conda info -a
+  - conda update --yes conda
 
-  # Replace dep1 dep2 ... with your dependencies
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy==0.13.3 matplotlib setuptools nose
-  - source activate test-environment
+install:
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION pip numpy=1.9 scipy=0.16 nose pandas
+  - pip install mock --no-deps
   - python setup.py install
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then pip install mock; fi
 
 # command to run tests, e.g. python setup.py test
 script:  python setup.py test
