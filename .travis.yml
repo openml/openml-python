@@ -33,7 +33,7 @@ before_install:
 
 install:
   - conda install --yes python=$TRAVIS_PYTHON_VERSION pip numpy=1.9 scipy=0.16 nose pandas
-  - pip install mock --no-deps
+  - pip install mock
   - python setup.py install
 
 # command to run tests, e.g. python setup.py test
