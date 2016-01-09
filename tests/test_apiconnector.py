@@ -46,11 +46,21 @@ class TestAPIConnector(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-        self.connector = APIConnector(cache_directory=self.workdir)
         try:
             apikey = os.environ['OPENMLAPIKEY']
         except:
             apikey = None
+
+        try:
+            travis = os.environ['TRAVIS']
+            if apikey is None:
+                raise Exception('Running on travis-ci, but no environment '
+                                'variable OPENMLAPIKEY found.')
+        except:
+            pass
+        
+        self.connector = APIConnector(cache_directory=self.workdir,
+                                      apikey=apikey)
 
     def tearDown(self):
         os.chdir(self.cwd)
