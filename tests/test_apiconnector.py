@@ -58,7 +58,7 @@ class TestAPIConnector(unittest.TestCase):
                                 'variable OPENMLAPIKEY found.')
         except:
             pass
-        
+
         self.connector = APIConnector(cache_directory=self.workdir,
                                       apikey=apikey)
 
@@ -238,6 +238,7 @@ class TestAPIConnector(unittest.TestCase):
 
     ############################################################################
     # Runs
+    @unittest.skip('The method which is tested by this function doesnt exist')
     def test_download_run_list(self):
         def check_run(run):
             self.assertIsInstance(run, dict)
@@ -258,6 +259,7 @@ class TestAPIConnector(unittest.TestCase):
         for run in runs:
             check_run(run)
 
+    @unittest.skip('The method which is tested by this function doesnt exist')
     def test_download_run(self):
         run = self.connector.download_run(473350)
         self.assertGreaterEqual(len(run.tags), 2)
@@ -268,6 +270,7 @@ class TestAPIConnector(unittest.TestCase):
 
     # ###########################################################################
     # Flows
+    @unittest.skip('The method which is tested by this function doesnt exist')
     def test_download_flow_list(self):
         def check_flow(flow):
             self.assertIsInstance(flow, dict)
