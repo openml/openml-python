@@ -44,7 +44,14 @@ class OpenMLTask(object):
     def get_X_and_Y(self):
         dataset = self.get_dataset()
         # Replace with retrieve from cache
-        X_and_Y = dataset.get_dataset(target=self.target_feature)
+        if 'Supervised Classification'.lower() in self.task_type.lower():
+            target_dtype = int
+        elif 'Supervised Regression'.lower() in self.task_type.lower():
+            target_dtype = float
+        else:
+            raise NotImplementedError(self.task_type)
+        X_and_Y = dataset.get_dataset(target=self.target_feature,
+                                      target_dtype=target_dtype)
         return X_and_Y
 
     def evaluate(self, algo):
