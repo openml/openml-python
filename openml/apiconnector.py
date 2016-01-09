@@ -258,7 +258,6 @@ class APIConnector(object):
                                   self._private_directory_datasets]:
             did_cache_dir = os.path.join(dataset_cache_dir, str(did))
             description_file = os.path.join(did_cache_dir, "description.xml")
-
             try:
                 with open(description_file) as fh:
                     dataset_xml = fh.read()
@@ -882,19 +881,17 @@ class APIConnector(object):
             connection = urlopen(url, data=data)
             return_code = connection.getcode()
             content_type = connection.info()['Content-Type']
-            # TODO maybe switch on the unicode flag!
             match = re.search(r'text/([\w-]*)(; charset=([\w-]*))?', content_type)
             if match:
                 if match.groups()[2] is not None:
                     encoding = match.group(3)
                 else:
-                    encoding = "ascii"
+                    encoding = "utf8"
             else:
                 # TODO ask JAN why this happens
                 logger.warn("Data from %s has content type %s; going to treat "
                             "this as ascii." % (url, content_type))
-                encoding = "ascii"
-
+                encoding = "utf8"
             tmp = tempfile.NamedTemporaryFile(mode='w', delete=False)
             with tmp as fh:
                 while True:
