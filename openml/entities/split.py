@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 import os
 import sys
 if sys.version_info[0] > 3:
@@ -20,13 +20,19 @@ class OpenMLSplit(object):
         self.description = description
         self.name = name
         self.split = dict()
-
+        
         # Add splits according to repetition
         for repetition in split:
             repetition = int(repetition)
-            self.split[repetition] = dict()
+            self.split[repetition] = OrderedDict()
             for fold in split[repetition]:
                 self.split[repetition][fold] = split[repetition][fold]
+                
+        self.repeats = len(self.split)
+        if any([len(self.split[0]) != len(self.split[i]) 
+                for i in range(self.repeats)]):
+            raise ValueError('')
+        self.folds = len(self.split[0])
 
     def __eq__(self, other):
         if type(self) != type(other):
@@ -62,17 +68,20 @@ class OpenMLSplit(object):
                 repetitions = _["repetitions"]
                 name = _["name"]
 
+        # Cache miss
         if repetitions is None:
+            # Faster than liac-arff and sufficient in this situation!
             splits, meta = scipy.io.arff.loadarff(filename)
             name = meta.name
 
-            repetitions = dict()
+            repetitions = OrderedDict()
             for line in splits:
+                # A line looks like type, rowid, repeat, fold
                 repetition = int(line[2])
                 fold = int(line[3])
 
                 if repetition not in repetitions:
-                    repetitions[repetition] = dict()
+                    repetitions[repetition] = OrderedDict()
                 if fold not in repetitions[repetition]:
                     repetitions[repetition][fold] = ([], [])
 
@@ -98,11 +107,16 @@ class OpenMLSplit(object):
         return cls(name, '', repetitions)
 
     def from_dataset(self, X, Y, folds, repeats):
-        pass
+        raise NotImplementedError()
 
-    def get(self, fold=0, repeat=0):
+    def get(self, repeat=0, fold=0):
         if repeat not in self.split:
             raise ValueError("Repeat %s not known" % str(repeat))
         if fold not in self.split[repeat]:
             raise ValueError("Fold %s not known" % str(fold))
         return self.split[repeat][fold]
+        
+    def iterate_splits(self):
+        for rep in range(self.repeats):
+            for fold in range(self.folds):
+                yield self.get(repeat=rep, fold=fold)
