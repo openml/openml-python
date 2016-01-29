@@ -925,7 +925,7 @@ class APIConnector(object):
             raise e
         return return_code, dataset_xml
 
-    def upload_flow(self, description, file_path=None):
+    def upload_flow(self, description, file_path):
         try:
             data = {'description': description}
             return_code, dataset_xml = self._perform_api_call("/flow/", data=data, file_dictionary={'source': file_path})
