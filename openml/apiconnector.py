@@ -936,19 +936,13 @@ class APIConnector(object):
             raise e
         return return_code, dataset_xml
 
-    def upload_run(self, files):
-        file_dictionary = {}
-        if 'predictions' in files:
-            try:
-                for key, value in files.items():
-                    file_dictionary[key] = value
+    def upload_run(self, prediction_file_path, description_path):
+        try:
+            file_dictionary = {'predictions': prediction_file_path, 'description': description_path}
+            return_code, dataset_xml = self._perform_api_call("/run/", file_dictionary=file_dictionary)
 
-                return_code, dataset_xml = self._perform_api_call("/run/", file_dictionary=file_dictionary)
-
-            except URLError as e:
-                # TODO logger.debug
-                print(e)
-                raise e
-            return return_code, dataset_xml
-        else:
-            raise ValueError("prediction files doesn't exist")
+        except URLError as e:
+        # TODO logger.debug
+            print(e)
+            raise e
+        return return_code, dataset_xml

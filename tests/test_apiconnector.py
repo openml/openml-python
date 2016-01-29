@@ -324,8 +324,8 @@ class TestAPIConnector(unittest.TestCase):
     def test_upload_run(self):
         file = urlopen("http://www.openml.org/data/download/224/weka_generated_predictions1977525485999711307.arff")
         file_text = file.read()
-        file_path = os.path.join(self.connector.dataset_cache_dir, "weka_generated_predictions1977525485999711307.arff")
-        with open(file_path, "wb") as prediction_file:
+        prediction_file_path = os.path.join(self.connector.dataset_cache_dir, "weka_generated_predictions1977525485999711307.arff")
+        with open(prediction_file_path, "wb") as prediction_file:
             prediction_file.write(file_text)
 
         description_text = '''<oml:run xmlns:oml="http://openml.org/openml"><oml:task_id>59</oml:task_id><oml:flow_id>67</oml:flow_id></oml:run>'''
@@ -333,9 +333,7 @@ class TestAPIConnector(unittest.TestCase):
         with open(description_path, "w") as description_file:
             description_file.write(description_text)
 
-        file_dictionary = {'predictions': file_path, 'description': description_path}
-
-        return_code, dataset_xml = self.connector.upload_run(file_dictionary)
+        return_code, dataset_xml = self.connector.upload_run(prediction_file_path, description_path)
         self.assertEqual(return_code, 200)
 
 
