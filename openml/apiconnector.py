@@ -926,9 +926,20 @@ class APIConnector(object):
         return return_code, dataset_xml
 
     def upload_flow(self, description, file_path=None):
+        """
+        The 'description' is binary data of an XML file according to the XSD Schema (OUTDATED!):
+        https://github.com/openml/website/blob/master/openml_OS/views/pages/rest_api/xsd/openml.implementation.upload.xsd
+
+        (optional) file_path is the absolute path to the file that is the flow (eg. a script)
+        """
         try:
             data = {'description': description}
-            return_code, dataset_xml = self._perform_api_call("/flow/", data=data, file_dictionary={'source': file_path})
+            file_dictionary = None
+
+            if(file_path != None):
+                file_dictionary={'source': file_path}
+
+            return_code, dataset_xml = self._perform_api_call("/flow/", data=data, file_dictionary=file_dictionary)
 
         except URLError as e:
             # TODO logger.debug
