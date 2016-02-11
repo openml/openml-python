@@ -12,7 +12,7 @@ else:
 class OpenMLTask(object):
     def __init__(self, task_id, task_type, data_set_id, target_feature,
                  estimation_procedure_type, data_splits_url,
-                 estimation_parameters, evaluation_measure,cost_matrix, api_connector):
+                 estimation_parameters, evaluation_measure,cost_matrix, api_connector, class_labels = None):
         self.task_id = int(task_id)
         self.task_type = task_type
         self.dataset_id = int(data_set_id)
@@ -29,6 +29,7 @@ class OpenMLTask(object):
         self.evaluation_measure = evaluation_measure
         self.cost_matrix = cost_matrix
         self.api_connector = api_connector
+        self.class_labels = class_labels
 
         if cost_matrix is not None:
             raise NotImplementedError("Costmatrix")

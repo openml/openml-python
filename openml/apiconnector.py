@@ -734,7 +734,12 @@ class APIConnector(object):
             task = self._create_task_from_xml(task_xml)
 
         self.download_split(task)
-        self.download_dataset(task.dataset_id)
+        dataset = self.download_dataset(task.dataset_id)
+
+        # TODO look into either adding the class labels to task xml, or other
+        # way of reading it.
+        class_labels = self.retrieve_class_labels_for_dataset(dataset)
+        task.class_labels = class_labels
         return task
 
     def _create_task_from_xml(self, xml):
@@ -925,7 +930,7 @@ class APIConnector(object):
             raise e
         return return_code, dataset_xml
 
-    def upload_flow(self, description, file_path=None):
+    def upload_flow(self, description, source_file_path=None):
         """
         The 'description' is binary data of an XML file according to the XSD Schema (OUTDATED!):
         https://github.com/openml/website/blob/master/openml_OS/views/pages/rest_api/xsd/openml.implementation.upload.xsd
@@ -936,8 +941,8 @@ class APIConnector(object):
             data = {'description': description}
             file_dictionary = None
 
-            if(file_path != None):
-                file_dictionary={'source': file_path}
+            if(source_file_path != None):
+                file_dictionary={'source': source_file_path}
 
             return_code, dataset_xml = self._perform_api_call("/flow/", data=data, file_dictionary=file_dictionary)
 
@@ -984,3 +989,18 @@ class APIConnector(object):
             print(e)
             raise e
         return return_code, xml_response, flow_id
+
+    def retrieve_class_labels_for_dataset(self, dataset):
+        """Reads the datasets arff to determine the class-labels, and returns those.
+        If the task has no class labels (for example a regression problem) it returns None."""
+        # TODO improve performance, currently reads the whole file
+        # Should make a method that only reads the attributes
+        arffFileName = dataset.data_file
+        with open(arffFileName) as fh:
+            arffData = arff.ArffDecoder().decode(fh)
+
+        dataAttributes = dict(arffData['attributes'])
+        if('class' in dataAttributes):
+            return dataAttributes['class']
+        else:
+            return None
