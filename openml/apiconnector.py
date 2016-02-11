@@ -946,3 +946,30 @@ class APIConnector(object):
             print(e)
             raise e
         return return_code, dataset_xml
+
+    def check_flow_exists(self, name, version):
+        """
+        Retrieves the flow id of the flow uniquely identified by name+version.
+        Returns flow id if such a flow exists, 
+        returns -1 if flow does not exists,
+        returns -2 if there was not a well-formed response from the server
+        http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
+        """
+        # Perhaps returns the -1/-2 business with proper raising of exceptions?
+
+        if not (type(name) is str and len(name) > 0):
+            raise ValueError('Parameter \'name\' should be a non-empty string')
+        if not (type(version) is str and len(version) > 0):
+            raise ValueError('Parameter \'version\' should be a non-empty string')
+
+        try:
+            return_code, xml_response = self._perform_api_call("/flow/exists/%s/%s" % (name, version))
+            flow_id = -2
+            if return_code == 200:
+                xml_dict = xmltodict.parse(xml_response)
+                flow_id = xml_dict['oml:flow_exists']['oml:id']
+        except URLError as e:
+            # TODO logger.debug
+            print(e)
+            raise e
+        return return_code, xml_response, flow_id
