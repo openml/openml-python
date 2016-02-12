@@ -258,7 +258,6 @@ class APIConnector(object):
                                   self._private_directory_datasets]:
             did_cache_dir = os.path.join(dataset_cache_dir, str(did))
             description_file = os.path.join(did_cache_dir, "description.xml")
-
             try:
                 with open(description_file) as fh:
                     dataset_xml = fh.read()
@@ -735,7 +734,12 @@ class APIConnector(object):
             task = self._create_task_from_xml(task_xml)
 
         self.download_split(task)
-        self.download_dataset(task.dataset_id)
+        dataset = self.download_dataset(task.dataset_id)
+
+        # TODO look into either adding the class labels to task xml, or other
+        # way of reading it.
+        class_labels = self.retrieve_class_labels_for_dataset(dataset)
+        task.class_labels = class_labels
         return task
 
     def _create_task_from_xml(self, xml):
@@ -882,19 +886,17 @@ class APIConnector(object):
             connection = urlopen(url, data=data)
             return_code = connection.getcode()
             content_type = connection.info()['Content-Type']
-            # TODO maybe switch on the unicode flag!
             match = re.search(r'text/([\w-]*)(; charset=([\w-]*))?', content_type)
             if match:
                 if match.groups()[2] is not None:
                     encoding = match.group(3)
                 else:
-                    encoding = "ascii"
+                    encoding = "utf8"
             else:
                 # TODO ask JAN why this happens
                 logger.warn("Data from %s has content type %s; going to treat "
                             "this as ascii." % (url, content_type))
-                encoding = "ascii"
-
+                encoding = "utf8"
             tmp = tempfile.NamedTemporaryFile(mode='w', delete=False)
             with tmp as fh:
                 while True:
@@ -928,10 +930,21 @@ class APIConnector(object):
             raise e
         return return_code, dataset_xml
 
-    def upload_flow(self, description, file_path=None):
+    def upload_flow(self, description, source_file_path=None):
+        """
+        The 'description' is binary data of an XML file according to the XSD Schema (OUTDATED!):
+        https://github.com/openml/website/blob/master/openml_OS/views/pages/rest_api/xsd/openml.implementation.upload.xsd
+
+        (optional) file_path is the absolute path to the file that is the flow (eg. a script)
+        """
         try:
             data = {'description': description}
-            return_code, dataset_xml = self._perform_api_call("/flow/", data=data, file_dictionary={'source': file_path})
+            file_dictionary = None
+
+            if(source_file_path != None):
+                file_dictionary={'source': source_file_path}
+
+            return_code, dataset_xml = self._perform_api_call("/flow/", data=data, file_dictionary=file_dictionary)
 
         except URLError as e:
             # TODO logger.debug
@@ -939,19 +952,55 @@ class APIConnector(object):
             raise e
         return return_code, dataset_xml
 
-    def upload_run(self, files):
-        file_dictionary = {}
-        if 'predictions' in files:
-            try:
-                for key, value in files.items():
-                    file_dictionary[key] = value
+    def upload_run(self, prediction_file_path, description_path):
+        try:
+            file_dictionary = {'predictions': prediction_file_path, 'description': description_path}
+            return_code, dataset_xml = self._perform_api_call("/run/", file_dictionary=file_dictionary)
 
-                return_code, dataset_xml = self._perform_api_call("/run/", file_dictionary=file_dictionary)
+        except URLError as e:
+        # TODO logger.debug
+            print(e)
+            raise e
+        return return_code, dataset_xml
 
-            except URLError as e:
-                # TODO logger.debug
-                print(e)
-                raise e
-            return return_code, dataset_xml
+    def check_flow_exists(self, name, version):
+        """
+        Retrieves the flow id of the flow uniquely identified by name+version.
+        Returns flow id if such a flow exists, 
+        returns -1 if flow does not exists,
+        returns -2 if there was not a well-formed response from the server
+        http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
+        """
+        # Perhaps returns the -1/-2 business with proper raising of exceptions?
+
+        if not (type(name) is str and len(name) > 0):
+            raise ValueError('Parameter \'name\' should be a non-empty string')
+        if not (type(version) is str and len(version) > 0):
+            raise ValueError('Parameter \'version\' should be a non-empty string')
+
+        try:
+            return_code, xml_response = self._perform_api_call("/flow/exists/%s/%s" % (name, version))
+            flow_id = -2
+            if return_code == 200:
+                xml_dict = xmltodict.parse(xml_response)
+                flow_id = xml_dict['oml:flow_exists']['oml:id']
+        except URLError as e:
+            # TODO logger.debug
+            print(e)
+            raise e
+        return return_code, xml_response, flow_id
+
+    def retrieve_class_labels_for_dataset(self, dataset):
+        """Reads the datasets arff to determine the class-labels, and returns those.
+        If the task has no class labels (for example a regression problem) it returns None."""
+        # TODO improve performance, currently reads the whole file
+        # Should make a method that only reads the attributes
+        arffFileName = dataset.data_file
+        with open(arffFileName) as fh:
+            arffData = arff.ArffDecoder().decode(fh)
+
+        dataAttributes = dict(arffData['attributes'])
+        if('class' in dataAttributes):
+            return dataAttributes['class']
         else:
-            raise ValueError("prediction files doesn't exist")
+            return None

@@ -46,11 +46,21 @@ class TestAPIConnector(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-        self.connector = APIConnector(cache_directory=self.workdir)
         try:
             apikey = os.environ['OPENMLAPIKEY']
         except:
             apikey = None
+
+        try:
+            travis = os.environ['TRAVIS']
+            if apikey is None:
+                raise Exception('Running on travis-ci, but no environment '
+                                'variable OPENMLAPIKEY found.')
+        except:
+            pass
+
+        self.connector = APIConnector(cache_directory=self.workdir,
+                                      apikey=apikey)
 
     def tearDown(self):
         os.chdir(self.cwd)
@@ -228,6 +238,7 @@ class TestAPIConnector(unittest.TestCase):
 
     ############################################################################
     # Runs
+    @unittest.skip('The method which is tested by this function doesnt exist')
     def test_download_run_list(self):
         def check_run(run):
             self.assertIsInstance(run, dict)
@@ -248,6 +259,7 @@ class TestAPIConnector(unittest.TestCase):
         for run in runs:
             check_run(run)
 
+    @unittest.skip('The method which is tested by this function doesnt exist')
     def test_download_run(self):
         run = self.connector.download_run(473350)
         self.assertGreaterEqual(len(run.tags), 2)
@@ -258,6 +270,7 @@ class TestAPIConnector(unittest.TestCase):
 
     # ###########################################################################
     # Flows
+    @unittest.skip('The method which is tested by this function doesnt exist')
     def test_download_flow_list(self):
         def check_flow(flow):
             self.assertIsInstance(flow, dict)
@@ -311,8 +324,8 @@ class TestAPIConnector(unittest.TestCase):
     def test_upload_run(self):
         file = urlopen("http://www.openml.org/data/download/224/weka_generated_predictions1977525485999711307.arff")
         file_text = file.read()
-        file_path = os.path.join(self.connector.dataset_cache_dir, "weka_generated_predictions1977525485999711307.arff")
-        with open(file_path, "wb") as prediction_file:
+        prediction_file_path = os.path.join(self.connector.dataset_cache_dir, "weka_generated_predictions1977525485999711307.arff")
+        with open(prediction_file_path, "wb") as prediction_file:
             prediction_file.write(file_text)
 
         description_text = '''<oml:run xmlns:oml="http://openml.org/openml"><oml:task_id>59</oml:task_id><oml:flow_id>67</oml:flow_id></oml:run>'''
@@ -320,9 +333,7 @@ class TestAPIConnector(unittest.TestCase):
         with open(description_path, "w") as description_file:
             description_file.write(description_text)
 
-        file_dictionary = {'predictions': file_path, 'description': description_path}
-
-        return_code, dataset_xml = self.connector.upload_run(file_dictionary)
+        return_code, dataset_xml = self.connector.upload_run(prediction_file_path, description_path)
         self.assertEqual(return_code, 200)
 
 
