@@ -939,11 +939,7 @@ class APIConnector(object):
         """
         try:
             data = {'description': description}
-            file_dictionary = None
-
-            if(source_file_path != None):
-                file_dictionary={'source': source_file_path}
-
+            file_dictionary = {'source': source_file_path} if source_file_path is not None else None
             return_code, dataset_xml = self._perform_api_call("/flow/", data=data, file_dictionary=file_dictionary)
 
         except URLError as e:
