@@ -179,37 +179,43 @@ def openml_run(task, classifier):
       return 0, 2
     print(flow_id)
 
-    split = task.api_connector.download_split(task)
     runname = "t"+str(task.task_id) + "_" + classifier.__class__.__name__
-    nr_repeats = len(split.split)
     arff_datacontent = []
     
     dataset = task.get_dataset()
+    X, Y = dataset.get_dataset(target = task.target_feature)
+
     class_labels = task.class_labels
     if(class_labels is None):
         raise ValueError('The task has no class labels. This method currently only works for tasks with class labels.')
     
     train_times = []
 
-    for r in range(0, nr_repeats):
-        nr_folds = len(split.split[r])
-        
-        for f in range(0, nr_folds):
+    rep_no = 0
+    for rep in task.iterate_repeats():
+        fold_no = 0
+        for fold in rep:
+            train_indices, test_indices = fold
+            trainX = X[train_indices]
+            trainY = Y[train_indices]
+            testX = X[test_indices]
+            testY = Y[test_indices]
+
             start_time = time.time()
-            TrainX, TrainY, TestX, TestY = task.get_train_and_test_set(f, r)
-            _,test_idx = task.get_train_test_split_indices(f)
-            
-            classifier.fit(TrainX, TrainY)
-            ProbaY = classifier.predict_proba(TestX)
-            PredY = classifier.predict(TestX)
+            classifier.fit(trainX, trainY)
+            ProbaY = classifier.predict_proba(testX)
+            PredY = classifier.predict(testX)
             end_time = time.time()
 
             train_times.append(end_time - start_time)
 
-            for i in range(0,len(test_idx)):
-                arff_line = [r, f, test_idx[i], class_labels[PredY[i]], class_labels[TestY[i]]]
+            for i in range(0,len(test_indices)):
+                arff_line = [rep_no, fold_no, test_indices[i], class_labels[PredY[i]], class_labels[testY[i]]]
                 arff_line[3:3] = ProbaY[i]
-                arff_datacontent.append( arff_line)
+                arff_datacontent.append(arff_line)
+
+            fold_no = fold_no + 1
+        rep_no = rep_no + 1
 
     # Generate a dictionary which represents the arff file (with predictions)
     arff_dict = generate_arff(arff_datacontent, task)
@@ -223,7 +229,6 @@ def openml_run(task, classifier):
         fh.write(description_xml)
 
     # Retrain on all data to save the final model
-    X, Y = dataset.get_dataset(target = dataset.default_target_attribute)
     classifier.fit(X, Y)
     
     # While serializing the model with joblib is often more efficient than pickle[1],
