@@ -34,7 +34,6 @@ logger = logging.getLogger(__name__)
 
 OPENML_URL = "http://api_new.openml.org/v1/"
 
-
 class OpenMLStatusChange(Warning):
     def __init__(self, message):
         super(OpenMLStatusChange, self).__init__(message)
@@ -388,6 +387,8 @@ class APIConnector(object):
         datasets = []
         for dataset_ in datasets_dict['oml:data']['oml:dataset']:
             dataset = {'did': int(dataset_['oml:did']),
+                       'name': dataset_['oml:name'],
+                       'format': dataset_['oml:format'],
                        'status': dataset_['oml:status']}
 
             # The number of qualities can range from 0 to infinity
@@ -638,6 +639,38 @@ class APIConnector(object):
         return dataset
 
     ############################################################################
+    # Estimation procedures
+    def get_estimation_procedure_list(self):
+        """Return a list of all estimation procedures which are on OpenML.
+
+        Returns
+        -------
+        procedures : list
+            A list of all estimation procedures. Every procedure is represented by a
+            dictionary containing the following information: id,
+            task type id, name, type, repeats, folds, stratified.
+        """
+
+        return_code, xml_string = self._perform_api_call(
+            "estimationprocedure/list")
+        procs_dict = xmltodict.parse(xml_string)
+        # Minimalistic check if the XML is useful
+        assert procs_dict['oml:estimationprocedures']['@xmlns:oml'] == \
+            'http://openml.org/openml'
+        assert type(procs_dict['oml:estimationprocedures']['oml:estimationprocedure']) == list
+
+        procs = []
+        for proc_ in procs_dict['oml:estimationprocedures']['oml:estimationprocedure']:
+            proc = {'id': int(proc_['oml:id']),
+                    'task_type_id': int(proc_['oml:ttid']),
+                    'name': proc_['oml:name'],
+                    'type': proc_['oml:type']}
+
+            procs.append(proc)
+
+        return procs
+
+    ############################################################################
     # Tasks
     def get_task_list(self, task_type_id=1):
         """Return a list of all tasks which are on OpenML.
@@ -671,11 +704,23 @@ class APIConnector(object):
         assert type(tasks_dict['oml:tasks']['oml:task']) == list
 
         tasks = []
+        procs = self.get_estimation_procedure_list()
+        proc_dict = dict((x['id'], x) for x in procs)
         for task_ in tasks_dict['oml:tasks']['oml:task']:
             task = {'tid': int(task_['oml:task_id']),
                     'did': int(task_['oml:did']),
+                    'name': task_['oml:name'],
                     'task_type': task_['oml:task_type'],
                     'status': task_['oml:status']}
+
+            # Other task inputs
+            for input in task_.get('oml:input', list()):
+                if input['@name'] == 'estimation_procedure':
+                    task[input['@name']] = proc_dict[int(input['#text'])]['name']
+                else:
+                    task[input['@name']] = input['#text']
+
+            task[input['@name']] = input['#text']
 
             # The number of qualities can range from 0 to infinity
             for quality in task_.get('oml:quality', list()):
@@ -962,7 +1007,7 @@ class APIConnector(object):
     def check_flow_exists(self, name, version):
         """
         Retrieves the flow id of the flow uniquely identified by name+version.
-        Returns flow id if such a flow exists, 
+        Returns flow id if such a flow exists,
         returns -1 if flow does not exists,
         returns -2 if there was not a well-formed response from the server
         http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
