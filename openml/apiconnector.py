@@ -858,7 +858,8 @@ class APIConnector(object):
         if file_dictionary is not None:
             file_elements = {}
             for key, path in file_dictionary.items():
-                if os.path.isabs(path) and os.path.exists(path):
+                path = os.path.abspath(path)
+                if os.path.exists(path):
                     try:
                         if key is 'dataset':
                             decoder = arff.ArffDecoder()
