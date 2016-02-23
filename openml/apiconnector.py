@@ -1,5 +1,4 @@
 from collections import OrderedDict
-import hashlib
 import logging
 import os
 import re
@@ -25,10 +24,6 @@ import xmltodict
 from .entities.dataset import OpenMLDataset
 from .entities.task import OpenMLTask
 from .entities.split import OpenMLSplit
-from .entities.run import OpenMLRun
-from .util import is_string
-
-import numpy as np
 
 logger = logging.getLogger(__name__)
 
