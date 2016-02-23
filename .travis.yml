@@ -2,6 +2,7 @@ language: python
 python:
   - "2.7"
   - "3.4"
+  - "3.5"
 
 env:
   secure: "KTU56Bhft39FhFnV80Ek+Ht8nwAAJWlLAN104bALBzQWVraoD/znx0gQnoS+YQDjzxgpj30UKBua/o8q1IrvkjxJb8yUBzpS0P1jcGwqmpVRoNdb3pQPk8R7fB9pTFiaJUQbdQJ2/xTrB/T9Kda0J1zq81LC1zSOxAxUL47UI50="
