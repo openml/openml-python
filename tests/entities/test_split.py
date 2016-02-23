@@ -67,7 +67,7 @@ class OpenMLSplitTest(unittest.TestCase):
         train_split, test_split = split.get(fold=5, repeat=2)
         self.assertEqual(train_split.shape, (81,))
         self.assertEqual(test_split.shape, (9,))
-        self.assertRaisesRegexp(ValueError, "Fold 10 not known",
-                                split.get, 10, 2)
         self.assertRaisesRegexp(ValueError, "Repeat 10 not known",
+                                split.get, 10, 2)
+        self.assertRaisesRegexp(ValueError, "Fold 10 not known",
                                 split.get, 2, 10)
