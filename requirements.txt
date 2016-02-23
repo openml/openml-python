@@ -1,3 +1,7 @@
 numpy>=1.6.2
 scipy>=0.13.3
 numpydoc
+liac-arff>=2.1.1dev
+xmltodict
+nose
+requests

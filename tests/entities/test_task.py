@@ -9,7 +9,6 @@ else:
     import mock
 
 import numpy as np
-import pandas as pd
 
 from openml.entities.dataset import OpenMLDataset
 from openml.entities.split import OpenMLSplit
@@ -43,7 +42,7 @@ class OpenMLTaskTest(unittest.TestCase):
     def test_get_X_and_Y(self, task_mock):
         dataset = mock.create_autospec(OpenMLTask)
         dataset.get_pandas = lambda target=None: (pd.DataFrame(np.zeros((10, 10))),
-                                                  pd.Series(np.zeros((10, ))))
+                                                   pd.Series(np.zeros((10, ))))
         task_mock.return_value = dataset
         rval = self.dataset.get_X_and_Y()
         X, Y = self.task.get_X_and_Y()
