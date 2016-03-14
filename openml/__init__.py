@@ -14,3 +14,4 @@ In particular, this module implemts a python interface for the
 (`REST on wikipedia
 <http://en.wikipedia.org/wiki/Representational_state_transfer>`_).
 """
+__version__ = "0.2.1"
