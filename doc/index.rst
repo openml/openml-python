@@ -59,6 +59,7 @@ Usage
 
 * :ref:`usage`
 * :ref:`api`
+* :ref:`developing`
 
 Contributing
 ~~~~~~~~~~~~

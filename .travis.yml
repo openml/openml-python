@@ -5,7 +5,7 @@ python:
   - "3.5"
 
 env:
-  secure: "KTU56Bhft39FhFnV80Ek+Ht8nwAAJWlLAN104bALBzQWVraoD/znx0gQnoS+YQDjzxgpj30UKBua/o8q1IrvkjxJb8yUBzpS0P1jcGwqmpVRoNdb3pQPk8R7fB9pTFiaJUQbdQJ2/xTrB/T9Kda0J1zq81LC1zSOxAxUL47UI50="
+  secure: "P1WXTdrqiihFPpjz5gSj7eyToLcEwfsaY9LLYUJei+a6VnAmNH66f99w7CSA6cFATpU4NgPrcVDSekxNDIY4CeQAUSo/BQArf0z3cTXVi9kNyA5BQsqhV5lTD0DM8AJCorXZ2dBpVA7L9rhTmzACLsRL4qn3NVY5oEzx9KY737M="
 
 cache:
   directories:
