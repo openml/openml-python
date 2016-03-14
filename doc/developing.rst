@@ -16,4 +16,4 @@ the `.travis.yml` file
 
 .. code:: bash
 
-    travis encrypt OPENMLAPIKEY=secretvalue
+    travis encrypt OPENMLAPIKEY=secretvalue --add
