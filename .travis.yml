@@ -21,9 +21,6 @@ addons:
   apt:
     packages:
     - libatlas-dev
-    - liblapack-dev
-    - libatlas-base-dev
-    - gfortran
 
 before_install:
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
@@ -32,7 +29,7 @@ before_install:
   - conda update --yes conda
 
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION pip numpy=1.9 scipy=0.16 nose pandas
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION pip numpy=1.10.2 scipy=0.16 nose pandas
   - pip install mock
   - python setup.py install
 
