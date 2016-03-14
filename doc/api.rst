@@ -4,11 +4,13 @@
 
 APIs
 ****
+.. currentmodule:: openml
 
-.. autoclass:: openml.apiconnector.APIConnector
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
 
-.. autoclass:: openml.entities.dataset.OpenMLDataset
-
-.. autoclass:: openml.entities.task.OpenMLTask
-
-.. autoclass:: openml.entities.split.OpenMLSplit
+   apiconnector.APIConnector
+   entities.dataset.OpenMLDataset
+   entities.task.OpenMLTask
+   entities.split.OpenMLSplit
