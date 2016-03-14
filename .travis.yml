@@ -1,41 +1,24 @@
 language: python
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-
-env:
-  secure: "P1WXTdrqiihFPpjz5gSj7eyToLcEwfsaY9LLYUJei+a6VnAmNH66f99w7CSA6cFATpU4NgPrcVDSekxNDIY4CeQAUSo/BQArf0z3cTXVi9kNyA5BQsqhV5lTD0DM8AJCorXZ2dBpVA7L9rhTmzACLsRL4qn3NVY5oEzx9KY737M="
 
 cache:
+  apt: true
+  # We use three different cache directory
+  # to work around a Travis bug with multi-platform cache
   directories:
-    - $HOME/.cache/pip
-  pip: true
-
-sudo: false
-
-before_cache:
-  - rm -f $HOME/.cache/pip/log/debug.log
-
-# command to install dependencies
-addons:
-  apt:
-    packages:
-    - libatlas-dev
-    - liblapack-dev
-    - libatlas-base-dev
-    - gfortran
-
-before_install:
-  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - conda update --yes conda
-
-install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION pip numpy=1.9 scipy=0.16 nose pandas
-  - pip install mock
-  - python setup.py install
-
-# command to run tests, e.g. python setup.py test
-script:  python setup.py test
+  - $HOME/.cache/pip
+  - $HOME/download
+env:
+  secure:
+  - Oq94aDjQ/grAI14Qj5gNGRKV038pPI+Rw23fFkaRvSIrcUSJGLgLtNm+2UFcDeVaOYiuxE3cs1Ob5a8IFvcn0VrOz0qSeH7FNof0f4vED2mHi7SBp89qbLyK2cXDjd1TTNdLkwiPt9FmRAiXJFT93X6FjZx1CuTIPrAwVVeXSc8=
+  global:
+  # Directory where tests are run from
+  - TEST_DIR=/tmp/test_dir/
+  - MODULE=openml
+  - secure: ZfC4lEMGSbbsJ/EnqKPWXGxDu2oqJ9MKkvQoRXp76d9tbI7wOQGv991VjU/FMLUOpDgHu+EWwRZqTmaTXfYRbMvS0WoD6xAHMhBClYFN5kcP7qUj1NUt4QywV9WIuoyO5kSEgY52F4Ob18+t/Bz5iDhFB+tH4+mnQn37VPlpB30=
+  matrix:
+  - DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY_VERSION="1.10.2" SCIPY_VERSION="0.16.1" CYTHON_VERSION="0.21"
+  - DISTRIB="conda" PYTHON_VERSION="3.4" COVERAGE="true" NUMPY_VERSION="1.10.2" SCIPY_VERSION="0.16.1" CYTHON_VERSION="0.23.4"
+  - DISTRIB="conda" PYTHON_VERSION="3.5" COVERAGE="true" NUMPY_VERSION="1.10.2" SCIPY_VERSION="0.16.1" CYTHON_VERSION="0.23.4"
+install: source ci_scripts/install.sh
+script: bash ci_scripts/test.sh
+after_success: source ci_scripts/success.sh

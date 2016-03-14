@@ -1,5 +1,6 @@
 import os
 import setuptools
+import sys
 
 
 requirements_file = os.path.join(os.path.dirname(__file__), 'requirements.txt')
@@ -20,6 +21,19 @@ with open(requirements_file) as fh:
             # setup.py test to work
             if 'git+https' in url:
                 dependency_links.append(line.replace('git+', ''))
+
+
+try:
+    import numpy
+except ImportError:
+    print('numpy is required during installation')
+    sys.exit(1)
+
+try:
+    import scipy
+except ImportError:
+    print('scipy is required during installation')
+    sys.exit(1)
 
 
 setuptools.setup(name="openml",
