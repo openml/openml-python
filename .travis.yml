@@ -8,6 +8,8 @@ cache:
   - $HOME/.cache/pip
   - $HOME/download
 env:
+  secure:
+    - "HmDJDvvk6o5QNrHI9s7wQLlaOdMWLmWNxZ2X4vm6u5avTbzJiGYRQFaCnDKdl9hxQBWyURlEnLA4NkrSdmvNiTY5rSHvInRDFQiBvMjFhs8cFRxULQ3dvavJMawI+gtLnchiJsvJr8deJE9W2zBEWzBN+dM6az/c4UK+KFkFI0o="
   global:
     # Directory where tests are run from
     - TEST_DIR=/tmp/test_dir/
