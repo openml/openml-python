@@ -14,4 +14,13 @@ In particular, this module implemts a python interface for the
 (`REST on wikipedia
 <http://en.wikipedia.org/wiki/Representational_state_transfer>`_).
 """
+
+from .apiconnector import APIConnector
+from .entities.dataset import OpenMLDataset
+from .entities.run import OpenMLRun
+from .entities.split import OpenMLSplit
+
+
 __version__ = "0.2.1"
+
+__all__ = ['APIConnector', 'OpenMLDataset', 'OpenMLRun', 'OpenMLSplit']
