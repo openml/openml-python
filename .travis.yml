@@ -9,7 +9,7 @@ cache:
   - $HOME/download
 env:
   secure:
-    - "HmDJDvvk6o5QNrHI9s7wQLlaOdMWLmWNxZ2X4vm6u5avTbzJiGYRQFaCnDKdl9hxQBWyURlEnLA4NkrSdmvNiTY5rSHvInRDFQiBvMjFhs8cFRxULQ3dvavJMawI+gtLnchiJsvJr8deJE9W2zBEWzBN+dM6az/c4UK+KFkFI0o="
+    - "Oq94aDjQ/grAI14Qj5gNGRKV038pPI+Rw23fFkaRvSIrcUSJGLgLtNm+2UFcDeVaOYiuxE3cs1Ob5a8IFvcn0VrOz0qSeH7FNof0f4vED2mHi7SBp89qbLyK2cXDjd1TTNdLkwiPt9FmRAiXJFT93X6FjZx1CuTIPrAwVVeXSc8="
   global:
     # Directory where tests are run from
     - TEST_DIR=/tmp/test_dir/
