@@ -19,9 +19,9 @@ else:
 
 from openml.util import is_string
 
-from openml.apiconnector import APIConnector
-from openml.entities.dataset import OpenMLDataset
-from openml.entities.split import OpenMLSplit
+from openml import APIConnector
+from openml import OpenMLDataset
+from openml import OpenMLSplit
 
 
 class TestAPIConnector(unittest.TestCase):
