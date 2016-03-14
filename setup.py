@@ -1,5 +1,6 @@
 import os
 import setuptools
+import sys
 
 
 requirements_file = os.path.join(os.path.dirname(__file__), 'requirements.txt')

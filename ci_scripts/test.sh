@@ -4,10 +4,13 @@ set -e
 # check if we do not leave artifacts
 mkdir -p $TEST_DIR
 
+cwd=`pwd`
+test_dir=$cwd/tests
+
 cd $TEST_DIR
 
 if [[ "$COVERAGE" == "true" ]]; then
-    nosetests -s --with-coverage --cover-package=$MODULE $MODULE
+    nosetests -s --with-coverage --cover-package=$MODULE $test_dir
 else
-    nosetests -s $MODULE
+    nosetests -s $test_dir
 fi
