@@ -22,6 +22,19 @@ with open(requirements_file) as fh:
                 dependency_links.append(line.replace('git+', ''))
 
 
+try:
+    import numpy
+except ImportError:
+    print('numpy is required during installation')
+    sys.exit(1)
+
+try:
+    import scipy
+except ImportError:
+    print('scipy is required during installation')
+    sys.exit(1)
+
+
 setuptools.setup(name="openml",
                  author="Matthias Feurer",
                  author_email="feurerm@informatik.uni-freiburg.de",
