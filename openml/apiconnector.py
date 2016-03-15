@@ -18,6 +18,7 @@ else:
     from urllib.error import URLError
 
 
+from .exceptions import OpenMLCacheException
 from .entities.dataset import OpenMLDataset
 from .entities.task import OpenMLTask
 from .entities.split import OpenMLSplit
@@ -26,31 +27,6 @@ from .entities.run import OpenMLRun
 logger = logging.getLogger(__name__)
 
 OPENML_URL = "http://api_new.openml.org/v1/"
-
-
-class OpenMLStatusChange(Warning):
-    def __init__(self, message):
-        super(OpenMLStatusChange, self).__init__(message)
-
-
-class OpenMLDatasetStatusChange(OpenMLStatusChange):
-    def __init__(self, message):
-        super(OpenMLDatasetStatusChange, self).__init__(message)
-
-
-class PyOpenMLError(Exception):
-    def __init__(self, message):
-        super(PyOpenMLError, self).__init__(message)
-
-
-class OpenMLServerError(PyOpenMLError):
-    def __init__(self, message):
-        super(OpenMLServerError, self).__init__(message)
-
-
-class OpenMLCacheException(PyOpenMLError):
-    def __init__(self, message):
-        super(OpenMLCacheException, self).__init__(message)
 
 
 class APIConnector(object):
@@ -201,6 +177,7 @@ class APIConnector(object):
 
     ############################################################################
     # Local getters/accessors to the cache directory
+    # -> OpenMLDataset
     def get_list_of_cached_datasets(self):
         """Return list with ids of all cached datasets"""
         datasets = []
@@ -231,6 +208,7 @@ class APIConnector(object):
         datasets.sort()
         return datasets
 
+    # -> OpenMLDataset
     def get_cached_datasets(self):
         """Searches for all OpenML datasets in the OpenML cache dir.
 
@@ -243,6 +221,7 @@ class APIConnector(object):
 
         return datasets
 
+    # -> OpenMLDataset
     def get_cached_dataset(self, did):
         # This code is slow...replace it with new API calls
         description = self._get_cached_dataset_description(did)
@@ -251,6 +230,7 @@ class APIConnector(object):
 
         return dataset
 
+    # -> OpenMLDataset
     def _get_cached_dataset_description(self, did):
         for dataset_cache_dir in [self.dataset_cache_dir,
                                   self._private_directory_datasets]:
@@ -267,6 +247,7 @@ class APIConnector(object):
         raise OpenMLCacheException("Dataset description for did %d not "
                                    "cached" % did)
 
+    # -> OpenMLDataset
     def _get_cached_dataset_arff(self, did):
         for dataset_cache_dir in [self.dataset_cache_dir,
                                   self._private_directory_datasets]:
@@ -284,6 +265,7 @@ class APIConnector(object):
         raise OpenMLCacheException("ARFF file for did %d not "
                                    "cached" % did)
 
+    # -> OpenMLTask
     def get_cached_tasks(self):
         tasks = OrderedDict()
         for task_cache_dir in [self.task_cache_dir,
@@ -305,6 +287,7 @@ class APIConnector(object):
 
         return tasks
 
+    # OpenMLTask
     def get_cached_task(self, tid):
         for task_cache_dir in [self.task_cache_dir,
                                self._private_directory_tasks]:
@@ -321,6 +304,7 @@ class APIConnector(object):
         raise OpenMLCacheException("Task file for tid %d not "
                                    "cached" % tid)
 
+    # -> OpenMLSplit
     def get_cached_splits(self):
         splits = OrderedDict()
         for task_cache_dir in [self.task_cache_dir,
@@ -338,6 +322,7 @@ class APIConnector(object):
 
         return splits
 
+    # -> OpenMLSplit
     def get_cached_split(self, tid):
         for task_cache_dir in [self.task_cache_dir,
                                self._private_directory_tasks]:
@@ -353,6 +338,7 @@ class APIConnector(object):
         raise OpenMLCacheException("Split file for tid %d not "
                                    "cached" % tid)
 
+    # -> OpenMLRun
     def get_cached_run(self, run_id):
         for run_cache_dir in [self.run_cache_dir,
                               self._private_directory_runs]:
@@ -375,6 +361,7 @@ class APIConnector(object):
     ############################################################################
     # Datasets
 
+    # OpenMLDataset
     def get_dataset_list(self):
         """Return a list of all dataset which are on OpenML.
 
@@ -415,6 +402,7 @@ class APIConnector(object):
 
         return datasets
 
+    # -> OpenMLDataset
     def datasets_active(self, dids):
         """Check if the dataset ids provided are active.
 
@@ -441,6 +429,7 @@ class APIConnector(object):
                     active['did'] = bool(dataset_list[idx]['status'])
             dataset_list_idx = idx
 
+    # -> OpenMLDataset
     def download_datasets(self, dids):
         """Download datasets.
 
@@ -465,6 +454,7 @@ class APIConnector(object):
             datasets.append(self.download_dataset(did))
         return datasets
 
+    # -> OpenMLDataset
     def download_dataset(self, did):
         """Download a dataset.
 
@@ -491,6 +481,7 @@ class APIConnector(object):
         dataset = self._create_dataset_from_description(description, arff_file)
         return dataset
 
+    # OpenMLDataset
     def download_dataset_description(self, did):
         # TODO implement a cache for this that invalidates itself after some
         # time
@@ -528,6 +519,7 @@ class APIConnector(object):
 
         return description
 
+    # -> OpenMLDataset
     def download_dataset_arff(self, did, description=None):
         did_cache_dir = self._create_dataset_cache_dir(did)
         output_file = os.path.join(did_cache_dir, "dataset.arff")
@@ -553,6 +545,7 @@ class APIConnector(object):
 
         return output_file
 
+    # -> OpenMLDataset
     def download_dataset_features(self, did):
         did_cache_dir = self._create_dataset_cache_dir(did)
         features_file = os.path.join(did_cache_dir, "features.xml")
@@ -582,6 +575,7 @@ class APIConnector(object):
 
         return features
 
+    # -> OpenMLDataset
     def download_dataset_qualities(self, did):
         # Dataset qualities are subject to change and must be fetched every time
         did_cache_dir = self._create_dataset_cache_dir(did)
@@ -605,6 +599,7 @@ class APIConnector(object):
 
         return qualities
 
+    # -> OpenMLDataset
     def _create_dataset_cache_dir(self, did):
         dataset_cache_dir = os.path.join(self.dataset_cache_dir, str(did))
         try:
@@ -614,6 +609,7 @@ class APIConnector(object):
             pass
         return dataset_cache_dir
 
+    # -> OpenMLDataset
     def _remove_dataset_chache_dir(self, did):
         dataset_cache_dir = os.path.join(self.dataset_cache_dir, str(did))
         try:
@@ -622,6 +618,7 @@ class APIConnector(object):
             # TODO add debug information
             pass
 
+    # -> OpenMLDataset
     def _create_dataset_from_description(self, description, arff_file):
         dataset = OpenMLDataset(
             description["oml:id"],
@@ -652,6 +649,7 @@ class APIConnector(object):
 
     ############################################################################
     # Estimation procedures
+    # -> OpenMLTask
     def get_estimation_procedure_list(self):
         """Return a list of all estimation procedures which are on OpenML.
 
@@ -684,6 +682,7 @@ class APIConnector(object):
 
     ############################################################################
     # Tasks
+    # -> OpenMLTask
     def get_task_list(self, task_type_id=1):
         """Return a list of all tasks which are on OpenML.
 
@@ -746,6 +745,7 @@ class APIConnector(object):
 
         return tasks
 
+    # -> OpenMLTask
     def download_task(self, task_id):
         """Download the OpenML task for a given task ID.
 
@@ -799,6 +799,7 @@ class APIConnector(object):
         task.class_labels = class_labels
         return task
 
+    # -> OpenMLTask
     def _create_task_from_xml(self, xml):
         dic = xmltodict.parse(xml)["oml:task"]
 
@@ -830,6 +831,7 @@ class APIConnector(object):
             inputs["evaluation_measures"]["oml:evaluation_measures"][
                 "oml:evaluation_measure"], None, self)
 
+    # OpenMLTask
     def download_split(self, task):
         """Download the OpenML split for a given task.
 
@@ -852,6 +854,7 @@ class APIConnector(object):
 
         return split
 
+    # -> OpenMLTask
     def _download_split(self, task, cache_file):
         try:
             with open(cache_file):
@@ -868,6 +871,7 @@ class APIConnector(object):
                 fh.write(split_arff)
             del split_arff
 
+    # -> OpenMLTask
     def _create_task_cache_dir(self, task_id):
         task_cache_dir = os.path.join(self.task_cache_dir, str(task_id))
 
@@ -878,6 +882,7 @@ class APIConnector(object):
             pass
         return task_cache_dir
 
+    # -> OpenMLRun
     def download_run(self, run_id):
         run_file = os.path.join(self.run_cache_dir, "run_%d.xml" % run_id)
 
@@ -907,6 +912,7 @@ class APIConnector(object):
 
         return run
 
+    # -> OpenMLRun
     def _create_run_from_xml(self, xml):
         run = xmltodict.parse(xml)["oml:run"]
         run_id = int(run['oml:run_id'])
@@ -1032,6 +1038,7 @@ class APIConnector(object):
         response = requests.post(url, data=data)
         return response.status_code, response.text
 
+    # -> OpenMLDataset
     def upload_dataset(self, description, file_path=None):
         data = {'description': description}
         if file_path is not None:
@@ -1041,6 +1048,7 @@ class APIConnector(object):
             return_code, dataset_xml = self._perform_api_call("/data/", data=data)
         return return_code, dataset_xml
 
+    # -> OpenMLFlow
     def upload_flow(self, description, flow):
         """
         The 'description' is binary data of an XML file according to the XSD Schema (OUTDATED!):
@@ -1053,12 +1061,14 @@ class APIConnector(object):
             "/flow/", data=data)
         return return_code, dataset_xml
 
+    # -> OpenMLRun
     def upload_run(self, prediction, description):
         data = {'predictions': prediction, 'description': description}
         return_code, dataset_xml = self._perform_api_call(
             "/run/", file_elements=data)
         return return_code, dataset_xml
 
+    # -> OpenMLFlow
     def check_flow_exists(self, name, version):
         """Retrieves the flow id of the flow uniquely identified by name+version.
 
@@ -1082,6 +1092,7 @@ class APIConnector(object):
             flow_id = xml_dict['oml:flow_exists']['oml:id']
         return return_code, xml_response, flow_id
 
+    # -> OpenMLDataset
     def retrieve_class_labels_for_dataset(self, dataset):
         """Reads the datasets arff to determine the class-labels, and returns those.
         If the task has no class labels (for example a regression problem) it returns None."""
