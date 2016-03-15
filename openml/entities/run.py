@@ -2,15 +2,18 @@ from collections import OrderedDict
 import xmltodict
 import sys
 import time
-import arff
-import pickle
+#import arff
+#import pickle
+
+from .flow import OpenMLFlow
 
 
 class OpenMLRun(object):
-    def __init__(self, run_id, uploader, uploader_name, task_id, task_type,
-                 task_evaluation_measure, flow_id, flow_name,  setup_id,
-                 setup_string, parameter_settings, dataset_id,
-                 predictions_url, evaluations):
+    def __init__(self, task_id, flow_id, setup_string, dataset_id, files=None,
+                 setup_id=None, tags=None, run_id=None, uploader=None,
+                 uploader_name=None, evaluations=None, data_content=None,
+                 classifier=None, task_type=None, task_evaluation_measure=None,
+                 flow_name=None, parameter_settings=None, predictions_url=None):
         self.run_id = run_id
         self.uploader = uploader
         self.uploader_name = uploader_name
@@ -25,8 +28,11 @@ class OpenMLRun(object):
         self.dataset_id = dataset_id
         self.predictions_url = predictions_url
         self.evaluations = evaluations
+        self.data_content = data_content
+        self.classifier = classifier
 
-    def construct_description_dictionary(self, taskid, flow_id, setup_string,
+    @staticmethod
+    def construct_description_dictionary(taskid, flow_id, setup_string,
                                          parameter_settings, tags):
         """ Creates a dictionary corresponding to the desired xml desired by openML
 
@@ -68,7 +74,8 @@ class OpenMLRun(object):
         # must be of special data type
         return description
 
-    def generate_arff(self, arff_datacontent, task):
+    @staticmethod
+    def generate_arff(arff_datacontent, task):
         """Generates an arff
 
         Parameters
@@ -84,8 +91,8 @@ class OpenMLRun(object):
         task : Task
             the OpenML task for which the run is done
         """
-        run_environment = self.get_version_information(
-        ) + [time.strftime("%c")] + ['Created by openml_run()']
+        run_environment = (OpenMLRun.get_version_information() +
+                           [time.strftime("%c")] + ['Created by openml_run()'])
         class_labels = task.class_labels
 
         arff_dict = {}
@@ -100,8 +107,15 @@ class OpenMLRun(object):
         arff_dict['relation'] = 'openml_task_' + str(task.task_id) + '_predictions'
         return arff_dict
 
-    def create_description_xml(self, taskid, flow_id, classifier):
-        run_environment = self.get_version_information()
+    @staticmethod
+    def create_setup_string(classifier):
+        run_environment = " ".join(OpenMLRun.get_version_information())
+        # fixme str(classifier) might contain (...)
+        return run_environment + " " + str(classifier)
+
+    @staticmethod
+    def create_description_xml(taskid, flow_id, classifier):
+        run_environment = OpenMLRun.get_version_information()
         setup_string = ''  # " ".join(sys.argv);
 
         parameter_settings = classifier.get_params()
@@ -111,14 +125,15 @@ class OpenMLRun(object):
             ' ', '_').replace('/', '-').replace(':', '.')
         tags = run_environment + [well_formatted_time] + ['openml_run'] + \
             [classifier.__module__ + "." + classifier.__class__.__name__]
-        description = self.construct_description_dictionary(
+        description = OpenMLRun.construct_description_dictionary(
             taskid, flow_id, setup_string, parameter_settings, tags)
         description_xml = xmltodict.unparse(description, pretty=True)
         return description_xml
 
     # This can possibly be done by a package such as pyxb, but I could not get
     # it to work properly.
-    def get_version_information(self):
+    @staticmethod
+    def get_version_information():
         """Gets versions of python, sklearn, numpy and scipy, returns them in an array,
 
         Returns
@@ -138,7 +153,8 @@ class OpenMLRun(object):
 
         return [python_version, sklearn_version, numpy_version, scipy_version]
 
-    def openml_run(self, task, classifier):
+    @staticmethod
+    def openml_run(connector, task, classifier):
         """Performs a CV run on the dataset of the given task, using the split.
 
         Parameters
@@ -160,22 +176,25 @@ class OpenMLRun(object):
         arff-dict : dict
             a dictionary with an 'attributes' and 'data' entry for an arff file
         """
-        flow_id = self.ensure_flow_exists(task.api_connector, classifier)
+        flow_id = OpenMLFlow.ensure_flow_exists(task.api_connector, classifier)
         if(flow_id < 0):
             print("No flow")
             return 0, 2
         print(flow_id)
 
-        runname = "t" + str(task.task_id) + "_" + classifier.__class__.__name__
+        #runname = "t" + str(task.task_id) + "_" + str(classifier)
         arff_datacontent = []
 
         dataset = task.get_dataset()
         X, Y = dataset.get_dataset(target=task.target_feature)
 
         class_labels = task.class_labels
-        if(class_labels is None):
+        if class_labels is None:
             raise ValueError('The task has no class labels. This method currently '
                              'only works for tasks with class labels.')
+        setup_string = OpenMLRun.create_setup_string(classifier)
+
+        run = OpenMLRun(task.task_id, flow_id, setup_string, dataset.id)
 
         train_times = []
 
@@ -206,25 +225,31 @@ class OpenMLRun(object):
                 fold_no = fold_no + 1
             rep_no = rep_no + 1
 
-        # Generate a dictionary which represents the arff file (with predictions)
-        arff_dict = self.generate_arff(arff_datacontent, task)
-        predictions_path = runname + '.arff'
-        with open(predictions_path, 'w') as fh:
-            arff.dump(arff_dict, fh)
+        run.data_content = arff_datacontent
+        run.classifier = classifier.fit(X, Y)
 
-        description_xml = self.create_description_xml(task.task_id, flow_id, classifier)
-        description_path = runname + '.xml'
-        with open(description_path, 'w') as fh:
-            fh.write(description_xml)
+        # Generate a dictionary which represents the arff file (with predictions)
+        #arff_dict = OpenMLRun.generate_arff(arff_datacontent, task)
+        #predictions_path = runname + '.arff'
+        #with open(predictions_path, 'w') as fh:
+        #    #arff.dump(arff_dict, fh)
+
+        #description_xml = OpenMLRun.create_description_xml(task.task_id, flow_id, classifier)
+        #description_path = runname + '.xml'
+        #with open(description_path, 'w') as fh:
+        #    #fh.write(description_xml)
 
         # Retrain on all data to save the final model
-        classifier.fit(X, Y)
 
         # While serializing the model with joblib is often more efficient than pickle[1],
         # for now we use pickle[2].
         # [1] http://scikit-learn.org/stable/modules/model_persistence.html
         # [2] https://github.com/openml/python/issues/21 and correspondence with my supervisor
-        pickle.dump(classifier, open(runname + '.pkl', "wb"))
+        #pickle.dump(classifier, open(runname + '.pkl', "wb"))
 
         # TODO (?) Return an OpenML run instead.
-        return predictions_path, description_path
+        return run
+
+    def upload(self, api_connector):
+        print("FIXME")
+        pass

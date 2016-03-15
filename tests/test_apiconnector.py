@@ -320,9 +320,3 @@ class TestAPIConnector(unittest.TestCase):
         description = '''<oml:run xmlns:oml="http://openml.org/openml"><oml:task_id>59</oml:task_id><oml:flow_id>67</oml:flow_id></oml:run>'''
         return_code, dataset_xml = self.connector.upload_run(prediction, description)
         self.assertEqual(return_code, 200)
-
-
-
-
-
-

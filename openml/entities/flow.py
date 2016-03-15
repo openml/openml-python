@@ -7,7 +7,8 @@ class OpenMLFlow(object):
     def __init__(self):
         pass
 
-    def generate_flow_xml(self, classifier):
+    @staticmethod
+    def generate_flow_xml(classifier):
         import sklearn
         flow_dict = OrderedDict()
         flow_dict['oml:flow'] = OrderedDict()
@@ -35,7 +36,8 @@ class OpenMLFlow(object):
         flow_xml = flow_xml.split('\n', 1)[-1]
         return flow_xml
 
-    def ensure_flow_exists(self, connector, classifier):
+    @staticmethod
+    def ensure_flow_exists(connector, classifier):
         """
         First checks if a flow exists for the given classifier.
         If it does, then it will return the corresponding flow id.
@@ -49,7 +51,7 @@ class OpenMLFlow(object):
 
         if int(flow_id) == -1:
             # flow does not exist yet, create it
-            flow_xml = self.generate_flow_xml(classifier)
+            flow_xml = OpenMLFlow.generate_flow_xml(classifier)
             file_name = classifier.__class__.__name__ + '_flow.xml'
             abs_file_path = os.path.abspath(file_name)
             with open(abs_file_path, 'w') as fh:
