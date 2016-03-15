@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to OpenML’s documentation! &mdash; OpenML 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.3.4/flatly/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="OpenML 0.2.1 documentation" href="#" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2.1</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="#">Start</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="usage.html">User Guide</a></li>
+                <li><a href="progress.html">Progress</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">Welcome to OpenML&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#module-openml">Introduction</a><ul>
+<li><a class="reference internal" href="#how-to-get-openml-for-python">How to get OpenML for python</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#contributing">Contributing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <div class="section" id="welcome-to-openml-s-documentation">
+<h1>Welcome to OpenML&#8217;s documentation!<a class="headerlink" href="#welcome-to-openml-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>The OpenML module is still under development. You can watch its progress
+<a class="reference internal" href="progress.html#progress"><span>here</span></a>.</p>
+<div class="section" id="module-openml">
+<span id="introduction"></span><h2>Introduction<a class="headerlink" href="#module-openml" title="Permalink to this headline">¶</a></h2>
+<p>The OpenML module implements a python interface to
+<a class="reference external" href="http://openml.org">OpenML</a>, a collaborative platform for machine learning.
+OpenML can be used to</p>
+<ul class="simple">
+<li>store, download and analyze datasets</li>
+<li>make experiments and their results (e.g. models, predictions)
+accesible and reproducible for everybody</li>
+<li>analyze experiments (uploaded by you and other collaborators) and conduct
+meta studies</li>
+</ul>
+<p>In particular, this module implemts a python interface for the
+<a class="reference external" href="http://openml.org/guide#!rest_services">OpenML REST API</a>
+(<a class="reference external" href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST on wikipedia</a>).</p>
+<dl class="class">
+<dt id="openml.APIConnector">
+<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">APIConnector</code><span class="sig-paren">(</span><em>cache_directory=None</em>, <em>apikey=None</em>, <em>server=None</em>, <em>verbosity=None</em>, <em>configure_logger=True</em>, <em>private_directory=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides an interface to the OpenML server.</p>
+<p>All parameters of the APIConnector can be either specified in a config
+file or when creating this object. The config file must be placed in a
+directory <code class="docutils literal"><span class="pre">.openml</span></code> inside the users home directory and have the name
+<code class="docutils literal"><span class="pre">config</span></code>. If one of the parameters is specified by passing it to the
+constructor of this class, it will override the value specified in the
+configuration file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cache_directory</strong> : string, optional (default=None)</p>
+<blockquote>
+<div><p>A local directory which will be used for caching. If this is not set, a
+directory &#8216;.openml/cache&#8217; in the users home directory will be used.
+If either directory does not exist, it will be created.</p>
+</div></blockquote>
+<p><strong>apikey</strong> : string, optional (default=None)</p>
+<blockquote>
+<div><p>Your OpenML API key which will be used to authenticate you at the OpenML
+server.</p>
+</div></blockquote>
+<p><strong>server</strong> : string, optional (default=None)</p>
+<blockquote>
+<div><p>The OpenML server to connect to.</p>
+</div></blockquote>
+<p><strong>verbosity</strong> : int, optional (default=None)</p>
+<p><strong>configure_logger</strong> : bool (default=True)</p>
+<blockquote>
+<div><p>Whether the python logging module should be configured by the openml
+package. If set to true, this is a very basic configuration,
+which only prints to the standard output. This is only recommended
+for testing or small problems. It is set to True to adhere to the
+<a class="reference external" href="https://github.com/openml/OpenML/wiki/Client-API">specifications of the OpenML client API</a>.
+When the openml module is used as a library, it is recommended that
+the main application controls the logging level, e.g. see
+<a class="reference external" href="http://pieces.openpolitics.com/2012/04/python-logging-best-practices/">here</a>.</p>
+</div></blockquote>
+<p><strong>private_directory</strong> : str, optional (default=None)</p>
+<blockquote>
+<div><p>A local directory which can be accessed through the OpenML package.
+Useful to access private datasets through the same interface.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError</strong></p>
+<blockquote>
+<div><p>If apikey is neither specified in the config nor given as an argument.</p>
+</div></blockquote>
+<p><strong>OpenMLServerError</strong></p>
+<blockquote class="last">
+<div><p>If the OpenML server returns an unexptected response.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="openml.APIConnector.check_flow_exists">
+<code class="descname">check_flow_exists</code><span class="sig-paren">(</span><em>name</em>, <em>version</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.check_flow_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the flow id of the flow uniquely identified by name+version.</p>
+<p>Returns flow id if such a flow exists,
+returns -1 if flow does not exists,
+returns -2 if there was not a well-formed response from the server
+<a class="reference external" href="http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version">http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.APIConnector.datasets_active">
+<code class="descname">datasets_active</code><span class="sig-paren">(</span><em>dids</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.datasets_active" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the dataset ids provided are active.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dids</strong> : iterable</p>
+<blockquote>
+<div><p>A list of integers representing dataset ids.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>A dictionary with items {did: active}, where active is a boolean. It
+is set to True if the dataset is active.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.APIConnector.download_dataset">
+<code class="descname">download_dataset</code><span class="sig-paren">(</span><em>did</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.download_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a dataset.</p>
+<p>TODO: explain caching!</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dids</strong> : int</p>
+<blockquote>
+<div><p>Dataset ID of the dataset to download</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dataset</strong> : <code class="xref py py-class docutils literal"><span class="pre">pyMetaLearn.entities.dataset.Dataset</span></code></p>
+<blockquote class="last">
+<div><p>The downloaded dataset.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.APIConnector.download_datasets">
+<code class="descname">download_datasets</code><span class="sig-paren">(</span><em>dids</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.download_datasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download datasets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dids</strong> : iterable</p>
+<blockquote>
+<div><p>A list of integers representing dataset ids.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list</p>
+<blockquote class="last">
+<div><p>A list of dataset objects.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.APIConnector.download_split">
+<code class="descname">download_split</code><span class="sig-paren">(</span><em>task</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.download_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the OpenML split for a given task.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>task_id</strong> : Task</p>
+<blockquote class="last">
+<div><p>An entity of <code class="xref py py-class docutils literal"><span class="pre">pyMetaLearn.entities.task.Task</span></code>.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.APIConnector.download_task">
+<code class="descname">download_task</code><span class="sig-paren">(</span><em>task_id</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.download_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the OpenML task for a given task ID.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>task_id</strong> : int</p>
+<blockquote class="last">
+<div><p>The OpenML task id.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.APIConnector.get_cached_datasets">
+<code class="descname">get_cached_datasets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.get_cached_datasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Searches for all OpenML datasets in the OpenML cache dir.</p>
+<p>Return a dictionary which maps dataset ids to dataset objects</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.APIConnector.get_dataset_list">
+<code class="descname">get_dataset_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.get_dataset_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all dataset which are on OpenML.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>datasets</strong> : list</p>
+<blockquote class="last">
+<div><p>A list of all datasets. Every dataset is represented by a
+dictionary containing the following information: dataset id,
+and status. If qualities are calculated for the dataset, some of
+these are also returned.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.APIConnector.get_estimation_procedure_list">
+<code class="descname">get_estimation_procedure_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.get_estimation_procedure_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all estimation procedures which are on OpenML.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>procedures</strong> : list</p>
+<blockquote class="last">
+<div><p>A list of all estimation procedures. Every procedure is represented by a
+dictionary containing the following information: id,
+task type id, name, type, repeats, folds, stratified.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.APIConnector.get_list_of_cached_datasets">
+<code class="descname">get_list_of_cached_datasets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.get_list_of_cached_datasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list with ids of all cached datasets</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.APIConnector.get_task_list">
+<code class="descname">get_task_list</code><span class="sig-paren">(</span><em>task_type_id=1</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.get_task_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all tasks which are on OpenML.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>task_type_id</strong> : int</p>
+<blockquote>
+<div><p>ID of the task type as detailed
+<a class="reference external" href="http://openml.org/api/?f=openml.task.types">here</a>.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>tasks</strong> : list</p>
+<blockquote class="last">
+<div><p>A list of all tasks. Every task is represented by a
+dictionary containing the following information: task id,
+dataset id, task_type and status. If qualities are calculated for
+the associated dataset, some of these are also returned.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.APIConnector.retrieve_class_labels_for_dataset">
+<code class="descname">retrieve_class_labels_for_dataset</code><span class="sig-paren">(</span><em>dataset</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.retrieve_class_labels_for_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the datasets arff to determine the class-labels, and returns those.
+If the task has no class labels (for example a regression problem) it returns None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.APIConnector.upload_flow">
+<code class="descname">upload_flow</code><span class="sig-paren">(</span><em>description</em>, <em>flow</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.upload_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>The &#8216;description&#8217; is binary data of an XML file according to the XSD Schema (OUTDATED!):
+<a class="reference external" href="https://github.com/openml/website/blob/master/openml_OS/views/pages/rest_api/xsd/openml.implementation.upload.xsd">https://github.com/openml/website/blob/master/openml_OS/views/pages/rest_api/xsd/openml.implementation.upload.xsd</a></p>
+<p>(optional) file_path is the absolute path to the file that is the flow (eg. a script)</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="how-to-get-openml-for-python">
+<h3>How to get OpenML for python<a class="headerlink" href="#how-to-get-openml-for-python" title="Permalink to this headline">¶</a></h3>
+<p>Currently, the OpenML package for python is only available from
+<a class="reference external" href="https://github.com/openml/python">github</a>.</p>
+<div class="code bash highlight-python"><div class="highlight"><pre><span></span>git clone https://github.com/openml/python.git
+</pre></div>
+</div>
+</div>
+<div class="section" id="installation">
+<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
+<p>Once you cloned the package, change into the new directory <code class="docutils literal"><span class="pre">python</span></code> and
+execute</p>
+<div class="code bash highlight-python"><div class="highlight"><pre><span></span>python setup.py install
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing">
+<h3>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
+<p>From within the directory of the cloned package, execute</p>
+<div class="code bash highlight-python"><div class="highlight"><pre><span></span>python setup.py test
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference internal" href="usage.html#usage"><span>Basic Usage</span></a></li>
+<li><a class="reference internal" href="api.html#api"><span>APIs</span></a></li>
+<li><a class="reference internal" href="developing.html#developing"><span>Updating the API key for travis-ci</span></a></li>
+</ul>
+</div>
+<div class="section" id="contributing">
+<h3>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h3>
+<p>Contribution to the OpenML package is highly appreciated. Currently,
+there is a lot of work left on implementing API calls,
+testing them and providing examples to allow new users to easily use the
+OpenML package. See the <a class="reference internal" href="progress.html#progress"><span>Progress</span></a> page for open tasks.</p>
+<p>Please contact <a class="reference external" href="http://aad.informatik.uni-freiburg.de/people/feurer/index.html">Matthias</a>
+prior to start working on an issue or missing feature to avoid duplicate work
+. Please check the current implementations of the API calls and the method</p>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Matthias Feurer.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

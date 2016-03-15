@@ -1,0 +1,6 @@
+:mod:`openml.entities.dataset`.OpenMLDataset
+===================================================
+
+.. currentmodule:: openml.entities.dataset
+
+.. autoclass:: OpenMLDataset

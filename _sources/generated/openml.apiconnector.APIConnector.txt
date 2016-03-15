@@ -1,0 +1,6 @@
+:mod:`openml.apiconnector`.APIConnector
+==============================================
+
+.. currentmodule:: openml.apiconnector
+
+.. autoclass:: APIConnector

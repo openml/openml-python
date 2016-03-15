@@ -1,0 +1,6 @@
+:mod:`openml.entities.task`.OpenMLTask
+=============================================
+
+.. currentmodule:: openml.entities.task
+
+.. autoclass:: OpenMLTask
