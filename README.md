@@ -8,3 +8,6 @@ hosted at [readthedocs.org](https://readthedocs.org/projects/openml/).
 
 Please commit to the right branches following the gitflow pattern:
 http://nvie.com/posts/a-successful-git-branching-model/
+
+
+[![Join the chat at https://gitter.im/openml/openml-python](https://badges.gitter.im/openml/openml-python.svg)](https://gitter.im/openml/openml-python?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
