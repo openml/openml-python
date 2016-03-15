@@ -313,12 +313,8 @@ class TestAPIConnector(unittest.TestCase):
         self.assertEqual(return_code, 200)
 
     def test_upload_flow(self):
-        file_path = os.path.join(self.connector.dataset_cache_dir,"uploadflow.txt")
-        file = open(file_path, "w")
-        file.write("Testing upload flow")
-        file.close()
         description = '''<oml:flow xmlns:oml="http://openml.org/openml"><oml:name>Test</oml:name><oml:description>description</oml:description> </oml:flow>'''
-        return_code, dataset_xml = self.connector.upload_flow(description, file_path)
+        return_code, dataset_xml = self.connector.upload_flow(description, "Testing upload flow")
         self.assertEqual(return_code, 200)
 
     def test_upload_run(self):

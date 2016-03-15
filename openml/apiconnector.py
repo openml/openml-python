@@ -3,7 +3,7 @@ import logging
 import os
 import re
 import sys
-import tempfile
+#import tempfile
 import requests
 import arff
 
@@ -912,84 +912,36 @@ class APIConnector(object):
 
             else:
                 raise ValueError("File doesn't exist")
-        try:
-            response = requests.post(url, data=data, files=file_elements)
-            return response.status_code, response
-
-        except URLError as error:
-            print(error)
+        response = requests.post(url, data=data, files=file_elements)
+        return response.status_code, response
 
     def _read_url(self, url, data=None):
-        data = urlencode(data)
-        data = data.encode('utf-8')
+        if data is None:
+            data = {}
+        data['api_key'] = self.config.get('FAKE_SECTION', 'apikey')
 
-        CHUNK = 16 * 1024
-        string = StringIO()
-        connection = urlopen(url, data=data)
-        return_code = connection.getcode()
-        content_type = connection.info()['Content-Type']
-        match = re.search(r'text/([\w-]*)(; charset=([\w-]*))?', content_type)
-        if match:
-            if match.groups()[2] is not None:
-                encoding = match.group(3)
-            else:
-                encoding = "utf8"
-        else:
-            # TODO ask JAN why this happens
-            logger.warn("Data from %s has content type %s; going to treat "
-                        "this as ascii." % (url, content_type))
-            encoding = "utf8"
-        tmp = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        with tmp as fh:
-            while True:
-                chunk = connection.read(CHUNK)
-                # Chunk is now a proper string (UTF-8 in python)
-                chunk = chunk.decode(encoding)
-                if not chunk:
-                    break
-                fh.write(chunk)
-
-        tmp = open(tmp.name, "r")
-        with tmp as fh:
-            while True:
-                chunk = fh.read(CHUNK)
-                if not chunk:
-                    break
-                string.write(chunk)
-        return return_code, string.getvalue()
+        response = requests.post(url, data=data)
+        return response.status_code, response.text
 
     def upload_dataset(self, description, file_path=None):
-        try:
-            data = {'description': description}
-            if file_path is not None:
-                return_code, dataset_xml = self._perform_api_call(
-                    "/data/", data=data, file_dictionary={'dataset': file_path})
-            else:
-                return_code, dataset_xml = self._perform_api_call("/data/", data=data)
-
-        except URLError as e:
-            # TODO logger.debug
-            print(e)
-            raise e
+        data = {'description': description}
+        if file_path is not None:
+            return_code, dataset_xml = self._perform_api_call(
+                "/data/", data=data, file_dictionary={'dataset': file_path})
+        else:
+            return_code, dataset_xml = self._perform_api_call("/data/", data=data)
         return return_code, dataset_xml
 
-    def upload_flow(self, description, source_file_path=None):
+    def upload_flow(self, description, flow):
         """
         The 'description' is binary data of an XML file according to the XSD Schema (OUTDATED!):
         https://github.com/openml/website/blob/master/openml_OS/views/pages/rest_api/xsd/openml.implementation.upload.xsd
 
         (optional) file_path is the absolute path to the file that is the flow (eg. a script)
         """
-        try:
-            data = {'description': description}
-            file_dictionary = {'source': source_file_path} if source_file_path is not None else None
-            return_code, dataset_xml = self._perform_api_call(
-                "/flow/", data=data, file_dictionary=file_dictionary)
-
-        except URLError as e:
-            # TODO logger.debug
-            print(e)
-            raise e
+        data = {'description': description, 'source': flow}
+        return_code, dataset_xml = self._perform_api_call(
+            "/flow/", data=data)
         return return_code, dataset_xml
 
     def upload_run(self, prediction_file_path, description_path):
@@ -1019,17 +971,12 @@ class APIConnector(object):
         if not (type(version) is str and len(version) > 0):
             raise ValueError('Parameter \'version\' should be a non-empty string')
 
-        try:
-            return_code, xml_response = self._perform_api_call(
-                "/flow/exists/%s/%s" % (name, version))
-            flow_id = -2
-            if return_code == 200:
-                xml_dict = xmltodict.parse(xml_response)
-                flow_id = xml_dict['oml:flow_exists']['oml:id']
-        except URLError as e:
-            # TODO logger.debug
-            print(e)
-            raise e
+        return_code, xml_response = self._perform_api_call(
+            "/flow/exists/%s/%s" % (name, version))
+        flow_id = -2
+        if return_code == 200:
+            xml_dict = xmltodict.parse(xml_response)
+            flow_id = xml_dict['oml:flow_exists']['oml:id']
         return return_code, xml_response, flow_id
 
     def retrieve_class_labels_for_dataset(self, dataset):
