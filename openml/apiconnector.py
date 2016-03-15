@@ -878,10 +878,6 @@ class APIConnector(object):
             pass
         return task_cache_dir
 
-<<<<<<< HEAD
-    def _perform_api_call(self, call, data=None, file_dictionary=None,
-                          file_elements=None, add_authentication=True):
-=======
     def download_run(self, run_id):
         run_file = os.path.join(self.run_cache_dir, "run_%d.xml" % run_id)
 
@@ -966,8 +962,8 @@ class APIConnector(object):
                          dataset_id=dataset_id, predictions_url=predictions_url,
                          evaluations=evaluations)
 
-    def _perform_api_call(self, call, data=None, file_dictionary=None, add_authentication=True):
->>>>>>> ADD download run functionality
+    def _perform_api_call(self, call, data=None, file_dictionary=None,
+                          file_elements=None, add_authentication=True):
         """
         Perform an API call at the OpenML server.
         return self._read_url(url, data=data, filePath=filePath,

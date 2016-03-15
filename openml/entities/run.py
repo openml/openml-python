@@ -13,14 +13,7 @@ class OpenMLRun(object):
         self.flow_name = flow_name
         self.setup_id = setup_id
         self.setup_string = setup_string
-<<<<<<< HEAD
-        self.tags = tags
-        self.datasets = datasets
-        self.files = files
-        self.evaluations = evaluations
-=======
         self.parameter_settings = parameter_settings
         self.dataset_id = dataset_id
         self.predictions_url = predictions_url
         self.evaluations = evaluations
->>>>>>> ADD download run functionality
