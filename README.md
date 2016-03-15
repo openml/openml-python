@@ -2,6 +2,7 @@
 [![Code Health](https://landscape.io/github/openml/python/master/landscape.svg)](https://landscape.io/github/openml/python/master)
 [![Stories in Ready](https://badge.waffle.io/openml/python.png?label=ready&title=Ready)](https://waffle.io/openml/python)
 [![Documentation Status](https://readthedocs.org/projects/openml/badge/?version=latest)](https://readthedocs.org/projects/openml/?badge=latest)
+[![Coverage Status](https://coveralls.io/repos/github/openml/openml-python/badge.png?branch=develop)](https://coveralls.io/github/openml/openml-python?branch=develop)
 
 A python interface for [OpenML](http://openml.org). You can find the documentation on the [openml-python website](https://openml.github.io/openml-python).
 
