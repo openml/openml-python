@@ -9,7 +9,7 @@ An example of an automated machine learning experiment using openml_run
 
 key_file_path = "apikey.txt"
 with open(key_file_path, 'r') as fh:
-	key = fh.readline()
+    key = fh.readline()
 
 task_id = 59
 
@@ -25,6 +25,6 @@ description_abspath = os.path.abspath(description_path)
 return_code, response = connector.upload_run(prediction_abspath, description_abspath)
 
 if(return_code == 200):
-	response_dict = xmltodict.parse(response.content)
-	run_id = response_dict['oml:upload_run']['oml:run_id']
-	print("Uploaded run with id %s" % (run_id))
+    response_dict = xmltodict.parse(response.content)
+    run_id = response_dict['oml:upload_run']['oml:run_id']
+    print("Uploaded run with id %s" % (run_id))
