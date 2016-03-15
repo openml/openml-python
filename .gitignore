@@ -24,7 +24,7 @@ pip-log.txt
 
 # Unit test / coverage reports
 cover
-coverage_html
+coverage
 htmlcov
 .coverage
 .tox
