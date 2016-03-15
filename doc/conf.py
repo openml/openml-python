@@ -44,6 +44,11 @@ extensions = [
     'numpydoc'
 ]
 
+autosummary_generate = True
+numpydoc_show_class_members = False
+
+autodoc_default_flags = ['members', 'inherited-members']
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -81,7 +86,7 @@ release = openml.__version__
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = []
+exclude_patterns = ['_build', '_templates', '_static']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.

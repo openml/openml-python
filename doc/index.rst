@@ -9,15 +9,6 @@ Welcome to OpenML's documentation!
 The OpenML module is still under development. You can watch its progress
 :ref:`here <progress>`.
 
-..
-  .. toctree::
-      :maxdepth: 2
-
-  progress
-
-.. contents::
-    :depth: 2
-    :local:
 
 ------------
 Introduction
@@ -72,6 +63,3 @@ OpenML package. See the :ref:`progress` page for open tasks.
 Please contact `Matthias <http://aad.informatik.uni-freiburg.de/people/feurer/index.html>`_
 prior to start working on an issue or missing feature to avoid duplicate work
 . Please check the current implementations of the API calls and the method
-
-.. automethod:: openml.apiconnector.APIConnector._perform_api_call
-
