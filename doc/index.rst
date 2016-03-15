@@ -14,8 +14,6 @@ The OpenML module is still under development. You can watch its progress
 Introduction
 ------------
 
-.. automodule:: openml
-
 How to get OpenML for python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

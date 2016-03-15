@@ -2,13 +2,12 @@ import gzip
 import os
 import sys
 import logging
-
 import arff
 
 import numpy as np
 import scipy.sparse
 
-if sys.version_info[0] > 3:
+if sys.version_info[0] >= 3:
     import pickle
 else:
     try:
@@ -205,3 +204,27 @@ class OpenMLDataset(object):
             return rval[0]
         else:
             return rval
+
+    def retrieve_class_labels(self):
+        """Reads the datasets arff to determine the class-labels, and returns those.
+        If the task has no class labels (for example a regression problem) it returns None."""
+        # TODO improve performance, currently reads the whole file
+        # Should make a method that only reads the attributes
+        arffFileName = self.data_file
+        with open(arffFileName) as fh:
+            arffData = arff.ArffDecoder().decode(fh)
+
+        dataAttributes = dict(arffData['attributes'])
+        if('class' in dataAttributes):
+            return dataAttributes['class']
+        else:
+            return None
+
+    def upload_dataset(self, api_connector):
+        data = {'description': self.description}
+        if self.file_path is not None:
+            return_code, dataset_xml = api_connector._perform_api_call(
+                "/data/", data=data, file_dictionary={'dataset': self.file_path})
+        else:
+            return_code, dataset_xml = api_connector._perform_api_call("/data/", data=data)
+        return return_code, dataset_xml
