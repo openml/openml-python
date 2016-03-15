@@ -1,6 +1,9 @@
 from collections import namedtuple, OrderedDict
 import os
 import sys
+import numpy as np
+import scipy.io.arff
+
 if sys.version_info[0] > 3:
     import pickle
 else:
@@ -9,27 +12,26 @@ else:
     except:
         import pickle
 
-import numpy as np
-import scipy.io.arff
 
 Split = namedtuple("Split", ["train", "test"])
 
 
 class OpenMLSplit(object):
+
     def __init__(self, name, description, split):
         self.description = description
         self.name = name
         self.split = dict()
-        
+
         # Add splits according to repetition
         for repetition in split:
             repetition = int(repetition)
             self.split[repetition] = OrderedDict()
             for fold in split[repetition]:
                 self.split[repetition][fold] = split[repetition][fold]
-                
+
         self.repeats = len(self.split)
-        if any([len(self.split[0]) != len(self.split[i]) 
+        if any([len(self.split[0]) != len(self.split[i])
                 for i in range(self.repeats)]):
             raise ValueError('')
         self.folds = len(self.split[0])
@@ -49,11 +51,11 @@ class OpenMLSplit(object):
                     return False
                 else:
                     for fold in self.split[repetition]:
-                        if np.all(self.split[repetition][fold].test != \
-                                other.split[repetition][fold].test)\
+                        if np.all(self.split[repetition][fold].test !=
+                                  other.split[repetition][fold].test)\
                                 and \
                                 np.all(self.split[repetition][fold].train
-                                != other.split[repetition][fold].train):
+                                       != other.split[repetition][fold].train):
                             return False
         return True
 
@@ -95,9 +97,9 @@ class OpenMLSplit(object):
 
             for repetition in repetitions:
                 for fold in repetitions[repetition]:
-                    repetitions[repetition][fold] = Split \
-                        (np.array(repetitions[repetition][fold][0], dtype=np.int32),
-                         np.array(repetitions[repetition][fold][1], dtype=np.int32))
+                    repetitions[repetition][fold] = Split(
+                        np.array(repetitions[repetition][fold][0], dtype=np.int32),
+                        np.array(repetitions[repetition][fold][1], dtype=np.int32))
 
             if cache:
                 with open(pkl_filename, "wb") as fh:
@@ -115,8 +117,7 @@ class OpenMLSplit(object):
         if fold not in self.split[repeat]:
             raise ValueError("Fold %s not known" % str(fold))
         return self.split[repeat][fold]
-        
+
     def iterate_splits(self):
         for rep in range(self.repeats):
             yield (self.get(repeat=rep, fold=fold) for fold in range(self.folds))
-                 

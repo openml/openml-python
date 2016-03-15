@@ -1,18 +1,10 @@
-import sys
-
-if sys.version_info[0] > 3:
-    import pickle
-else:
-    try:
-        import cPickle as pickle
-    except:
-        import pickle
 
 
 class OpenMLTask(object):
     def __init__(self, task_id, task_type, data_set_id, target_feature,
                  estimation_procedure_type, data_splits_url,
-                 estimation_parameters, evaluation_measure,cost_matrix, api_connector, class_labels = None):
+                 estimation_parameters, evaluation_measure, cost_matrix,
+                 api_connector, class_labels=None):
         self.task_id = int(task_id)
         self.task_type = task_type
         self.dataset_id = int(data_set_id)
@@ -37,6 +29,7 @@ class OpenMLTask(object):
                % (self.task_id, self.task_type, self.dataset_id)
 
     def get_dataset(self):
+        """Download dataset associated with task"""
         return self.api_connector.download_dataset(self.dataset_id)
 
     def get_X_and_Y(self):
@@ -78,4 +71,3 @@ class OpenMLTask(object):
         for rep in split.iterate_splits():
             for fold in rep:
                 yield fold
-        

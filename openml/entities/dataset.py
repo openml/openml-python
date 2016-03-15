@@ -1,8 +1,12 @@
 import gzip
 import os
 import sys
+import logging
 
 import arff
+
+import numpy as np
+import scipy.sparse
 
 if sys.version_info[0] > 3:
     import pickle
@@ -12,16 +16,13 @@ else:
     except:
         import pickle
 
-import logging
-logger = logging.getLogger(__name__)
-
-import numpy as np
-import scipy.sparse
-
 from ..util import is_string
+
+logger = logging.getLogger(__name__)
 
 
 class OpenMLDataset(object):
+
     def __init__(self, id, name, version, description, format, creator,
                  contributor, collection_date, upload_date, language,
                  licence, url, default_target_attribute, row_id_attribute,
@@ -67,7 +68,7 @@ class OpenMLDataset(object):
                 raise e
 
             categorical = [False if type(type_) != list else True
-                                for name, type_ in data['attributes']]
+                           for name, type_ in data['attributes']]
             attribute_names = [name for name, type_ in data['attributes']]
 
             if isinstance(data['data'], tuple):
@@ -95,7 +96,7 @@ class OpenMLDataset(object):
         else:
             return False
 
-    ############################################################################
+    ##########################################################################
     # ARFF related stuff
     def get_arff(self):
         # TODO: add a partial read method which only returns the attribute
@@ -106,7 +107,7 @@ class OpenMLDataset(object):
         import struct
 
         filename = self.data_file
-        bits = ( 8 * struct.calcsize("P"))
+        bits = (8 * struct.calcsize("P"))
         if bits != 64 and os.path.getsize(filename) > 120000000:
             return NotImplementedError("File too big")
 
@@ -121,11 +122,11 @@ class OpenMLDataset(object):
             with open(filename) as fh:
                 return decode_arff(fh)
 
-    ############################################################################
+    ##########################################################################
     def get_dataset(self, target=None, target_dtype=int, include_row_id=False,
-                   include_ignore_attributes=False,
-                   return_categorical_indicator=False,
-                   return_attribute_names=False):
+                    include_ignore_attributes=False,
+                    return_categorical_indicator=False,
+                    return_attribute_names=False):
         rval = []
 
         path = self.data_pickle_file
@@ -160,7 +161,7 @@ class OpenMLDataset(object):
                         " %s" % self.row_id_attribute)
             keep = np.array([True if column not in to_exclude else False
                              for column in attribute_names])
-            data = data[:,keep]
+            data = data[:, keep]
             categorical = [cat for cat, k in zip(categorical, keep) if k]
             attribute_names = [att for att, k in
                                zip(attribute_names, keep) if k]
@@ -174,11 +175,11 @@ class OpenMLDataset(object):
                                 for column in attribute_names])
 
             try:
-                x = data[:,~targets]
-                y = data[:,targets].astype(target_dtype)
+                x = data[:, ~targets]
+                y = data[:, targets].astype(target_dtype)
 
                 if len(y.shape) == 2 and y.shape[1] == 1:
-                    y = y[:,0]
+                    y = y[:, 0]
 
                 categorical = [cat for cat, t in
                                zip(categorical, targets) if not t]
