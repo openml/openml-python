@@ -10,13 +10,10 @@ import arff
 if sys.version_info[0] < 3:
     import ConfigParser as configparser
     from StringIO import StringIO
-    from urllib import urlencode, urlopen
     from urllib2 import URLError
 else:
     import configparser
     from io import StringIO
-    from urllib.request import urlopen
-    from urllib.parse import urlencode
     from urllib.error import URLError
 
 import xmltodict
@@ -859,7 +856,8 @@ class APIConnector(object):
             pass
         return task_cache_dir
 
-    def _perform_api_call(self, call, data=None, file_dictionary=None, add_authentication=True):
+    def _perform_api_call(self, call, data=None, file_dictionary=None,
+                          file_elements=None, add_authentication=True):
         """
         Perform an API call at the OpenML server.
         return self._read_url(url, data=data, filePath=filePath,
@@ -886,32 +884,37 @@ class APIConnector(object):
         if not url.endswith("/"):
             url += "/"
         url += call
-        if file_dictionary is not None:
-            return self._read_url_files(url, data=data, file_dictionary=file_dictionary)
+        if file_dictionary is not None or file_elements is not None:
+            return self._read_url_files(url, data=data,
+                                        file_dictionary=file_dictionary,
+                                        file_elements=file_elements)
         return self._read_url(url, data=data)
 
-    def _read_url_files(self, url, data=None, file_dictionary=None):
+    def _read_url_files(self, url, data=None, file_dictionary=None, file_elements=None):
+        """do a post request to url with data None, file content of
+        file_dictionary and sending file_elements as files"""
         if data is None:
             data = {}
         data['api_key'] = self.config.get('FAKE_SECTION', 'apikey')
+        if file_elements is None:
+            file_elements = {}
+        if file_dictionary is not None:
+            for key, path in file_dictionary.items():
+                path = os.path.abspath(path)
+                if os.path.exists(path):
+                    try:
+                        if key is 'dataset':
+                            # check if arff is valid?
+                            decoder = arff.ArffDecoder()
+                            with open(path) as fh:
+                                decoder.decode(fh, encode_nominal=True)
+                    except:
+                        raise ValueError("The file you have provided is not a valid arff file")
 
-        file_elements = {}
-        for key, path in file_dictionary.items():
-            path = os.path.abspath(path)
-            if os.path.exists(path):
-                try:
-                    if key is 'dataset':
-                        # check if arff is valid?
-                        decoder = arff.ArffDecoder()
-                        with open(path) as fh:
-                            decoder.decode(fh, encode_nominal=True)
-                except:
-                    raise ValueError("The file you have provided is not a valid arff file")
+                    file_elements[key] = open(path, 'rb')
 
-                file_elements[key] = open(path, 'rb')
-
-            else:
-                raise ValueError("File doesn't exist")
+                else:
+                    raise ValueError("File doesn't exist")
         response = requests.post(url, data=data, files=file_elements)
         return response.status_code, response
 
@@ -944,16 +947,10 @@ class APIConnector(object):
             "/flow/", data=data)
         return return_code, dataset_xml
 
-    def upload_run(self, prediction_file_path, description_path):
-        try:
-            file_dictionary = {'predictions': prediction_file_path, 'description': description_path}
-            return_code, dataset_xml = self._perform_api_call(
-                "/run/", file_dictionary=file_dictionary)
-
-        except URLError as e:
-            # TODO logger.debug
-            print(e)
-            raise e
+    def upload_run(self, prediction, description):
+        data = {'predictions': prediction, 'description': description}
+        return_code, dataset_xml = self._perform_api_call(
+            "/run/", file_elements=data)
         return return_code, dataset_xml
 
     def check_flow_exists(self, name, version):
