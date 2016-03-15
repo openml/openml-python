@@ -17,9 +17,9 @@ else:
     from io import StringIO
     from urllib.error import URLError
 
-
+from . import datasets
 from .exceptions import OpenMLCacheException
-from .entities.dataset import OpenMLDataset
+#from .dataset.dataset import OpenMLDataset
 from .entities.task import OpenMLTask
 from .entities.split import OpenMLSplit
 from .entities.run import OpenMLRun
@@ -175,96 +175,6 @@ class APIConnector(object):
                          config_file, e.message)
         return config
 
-    ############################################################################
-    # Local getters/accessors to the cache directory
-    # -> OpenMLDataset
-    def get_list_of_cached_datasets(self):
-        """Return list with ids of all cached datasets"""
-        datasets = []
-
-        for dataset_cache_dir in [self.dataset_cache_dir,
-                                  self._private_directory_datasets]:
-            directory_content = os.listdir(dataset_cache_dir)
-            directory_content.sort()
-
-            # Find all dataset ids for which we have downloaded the dataset
-            # description
-
-            for directory_name in directory_content:
-                # First check if the directory name could be an OpenML dataset id
-                if not re.match(r"[0-9]*", directory_name):
-                    continue
-
-                did = int(directory_name)
-
-                directory_name = os.path.join(dataset_cache_dir,
-                                              directory_name)
-                dataset_directory_content = os.listdir(directory_name)
-
-                if "dataset.arff" in dataset_directory_content and \
-                        "description.xml" in dataset_directory_content:
-                    datasets.append(did)
-
-        datasets.sort()
-        return datasets
-
-    # -> OpenMLDataset
-    def get_cached_datasets(self):
-        """Searches for all OpenML datasets in the OpenML cache dir.
-
-        Return a dictionary which maps dataset ids to dataset objects"""
-        dataset_list = self.get_list_of_cached_datasets()
-        datasets = OrderedDict()
-
-        for did in dataset_list:
-            datasets[did] = self.get_cached_dataset(did)
-
-        return datasets
-
-    # -> OpenMLDataset
-    def get_cached_dataset(self, did):
-        # This code is slow...replace it with new API calls
-        description = self._get_cached_dataset_description(did)
-        arff_file = self._get_cached_dataset_arff(did)
-        dataset = self._create_dataset_from_description(description, arff_file)
-
-        return dataset
-
-    # -> OpenMLDataset
-    def _get_cached_dataset_description(self, did):
-        for dataset_cache_dir in [self.dataset_cache_dir,
-                                  self._private_directory_datasets]:
-            did_cache_dir = os.path.join(dataset_cache_dir, str(did))
-            description_file = os.path.join(did_cache_dir, "description.xml")
-            try:
-                with open(description_file) as fh:
-                    dataset_xml = fh.read()
-            except (IOError, OSError):
-                continue
-
-            return xmltodict.parse(dataset_xml)["oml:data_set_description"]
-
-        raise OpenMLCacheException("Dataset description for did %d not "
-                                   "cached" % did)
-
-    # -> OpenMLDataset
-    def _get_cached_dataset_arff(self, did):
-        for dataset_cache_dir in [self.dataset_cache_dir,
-                                  self._private_directory_datasets]:
-            did_cache_dir = os.path.join(dataset_cache_dir, str(did))
-            output_file = os.path.join(did_cache_dir, "dataset.arff")
-
-            try:
-                with open(output_file):
-                    pass
-                return output_file
-            except (OSError, IOError):
-                # TODO create NOTCACHEDEXCEPTION
-                continue
-
-        raise OpenMLCacheException("ARFF file for did %d not "
-                                   "cached" % did)
-
     # -> OpenMLTask
     def get_cached_tasks(self):
         tasks = OrderedDict()
@@ -357,295 +267,6 @@ class APIConnector(object):
 
     ############################################################################
     # Remote getters/API calls to OpenML
-
-    ############################################################################
-    # Datasets
-
-    # OpenMLDataset
-    def get_dataset_list(self):
-        """Return a list of all dataset which are on OpenML.
-
-        Returns
-        -------
-        datasets : list
-            A list of all datasets. Every dataset is represented by a
-            dictionary containing the following information: dataset id,
-            and status. If qualities are calculated for the dataset, some of
-            these are also returned.
-        """
-        # TODO add proper error handling here!
-        return_code, xml_string = self._perform_api_call("data/list/")
-        datasets_dict = xmltodict.parse(xml_string)
-
-        # Minimalistic check if the XML is useful
-        assert type(datasets_dict['oml:data']['oml:dataset']) == list, \
-            type(datasets_dict['oml:data'])
-        assert datasets_dict['oml:data']['@xmlns:oml'] == \
-            'http://openml.org/openml'
-
-        datasets = []
-        for dataset_ in datasets_dict['oml:data']['oml:dataset']:
-            dataset = {'did': int(dataset_['oml:did']),
-                       'name': dataset_['oml:name'],
-                       'format': dataset_['oml:format'],
-                       'status': dataset_['oml:status']}
-
-            # The number of qualities can range from 0 to infinity
-            for quality in dataset_.get('oml:quality', list()):
-                quality['#text'] = float(quality['#text'])
-                if abs(int(quality['#text']) - quality['#text']) < 0.0000001:
-                    quality['#text'] = int(quality['#text'])
-                dataset[quality['@name']] = quality['#text']
-
-            datasets.append(dataset)
-        datasets.sort(key=lambda t: t['did'])
-
-        return datasets
-
-    # -> OpenMLDataset
-    def datasets_active(self, dids):
-        """Check if the dataset ids provided are active.
-
-        Parameters
-        ----------
-        dids : iterable
-            A list of integers representing dataset ids.
-
-        Returns
-        -------
-        dict
-            A dictionary with items {did: active}, where active is a boolean. It
-            is set to True if the dataset is active.
-        """
-        dataset_list = self.get_dataset_list()
-        dids = sorted(dids)
-        active = {}
-
-        dataset_list_idx = 0
-        for did in dids:
-            # TODO replace with a more efficient while loop!
-            for idx in range(dataset_list_idx, len(dataset_list)):
-                if did == dataset_list[idx]['did']:
-                    active['did'] = bool(dataset_list[idx]['status'])
-            dataset_list_idx = idx
-
-    # -> OpenMLDataset
-    def download_datasets(self, dids):
-        """Download datasets.
-
-        Parameters
-        ----------
-        dids : iterable
-            A list of integers representing dataset ids.
-
-        Returns
-        -------
-        list
-            A list of dataset objects.
-
-        Note
-        ----
-        Uses the method :method:`pyMetaLearn.data_repositories.openml
-        .apiconnector.APIConnector.download_dataset` internally. Please read
-        the documentation of this.
-        """
-        datasets = []
-        for did in dids:
-            datasets.append(self.download_dataset(did))
-        return datasets
-
-    # -> OpenMLDataset
-    def download_dataset(self, did):
-        """Download a dataset.
-
-        TODO: explain caching!
-
-        Parameters
-        ----------
-        dids : int
-            Dataset ID of the dataset to download
-
-        Returns
-        -------
-        dataset : :class:`pyMetaLearn.entities.dataset.Dataset`
-            The downloaded dataset."""
-        try:
-            did = int(did)
-        except:
-            raise ValueError("Dataset ID is neither an Integer nor can be "
-                             "cast to an Integer.")
-
-        description = self.download_dataset_description(did)
-        arff_file = self.download_dataset_arff(did, description=description)
-
-        dataset = self._create_dataset_from_description(description, arff_file)
-        return dataset
-
-    # OpenMLDataset
-    def download_dataset_description(self, did):
-        # TODO implement a cache for this that invalidates itself after some
-        # time
-        # This can be saved on disk, but cannot be cached properly, because
-        # it contains the information on whether a dataset is active.
-        did_cache_dir = self._create_dataset_cache_dir(did)
-        description_file = os.path.join(did_cache_dir, "description.xml")
-
-        try:
-            return self._get_cached_dataset_description(did)
-        except (OpenMLCacheException):
-            try:
-                return_code, dataset_xml = self._perform_api_call(
-                    "data/%d" % did)
-            except (URLError, UnicodeEncodeError) as e:
-                # TODO logger.debug
-                self._remove_dataset_chache_dir(did)
-                print(e)
-                raise e
-
-            with open(description_file, "w") as fh:
-                fh.write(dataset_xml)
-
-        try:
-            description = xmltodict.parse(dataset_xml)[
-                "oml:data_set_description"]
-        except Exception as e:
-            # TODO logger.debug
-            self._remove_dataset_chache_dir(did)
-            print("Dataset ID", did)
-            raise e
-
-        with open(description_file, "w") as fh:
-            fh.write(dataset_xml)
-
-        return description
-
-    # -> OpenMLDataset
-    def download_dataset_arff(self, did, description=None):
-        did_cache_dir = self._create_dataset_cache_dir(did)
-        output_file = os.path.join(did_cache_dir, "dataset.arff")
-
-        # This means the file is still there; whether it is useful is up to
-        # the user and not checked by the program.
-        try:
-            with open(output_file):
-                pass
-            return output_file
-        except (OSError, IOError):
-            pass
-
-        if description is None:
-            description = self.download_dataset_description(did)
-        url = description['oml:url']
-        return_code, arff_string = self._read_url(url)
-        # TODO: it is inefficient to load the dataset in memory prior to
-        # saving it to the hard disk!
-        with open(output_file, "w") as fh:
-            fh.write(arff_string)
-        del arff_string
-
-        return output_file
-
-    # -> OpenMLDataset
-    def download_dataset_features(self, did):
-        did_cache_dir = self._create_dataset_cache_dir(did)
-        features_file = os.path.join(did_cache_dir, "features.xml")
-
-        # Dataset features aren't subject to change...
-        try:
-            with open(features_file) as fh:
-                features_xml = fh.read()
-        except (OSError, IOError):
-            try:
-                return_code, features_xml = self._perform_api_call(
-                    "data/features/%d" % did)
-            except (URLError, UnicodeEncodeError) as e:
-                # TODO logger.debug
-                print(e)
-                raise e
-
-            with open(features_file, "w") as fh:
-                fh.write(features_xml)
-
-        try:
-            features = xmltodict.parse(features_xml)["oml:data_features"]
-        except Exception as e:
-            # TODO logger.debug
-            print("Dataset ID", did)
-            raise e
-
-        return features
-
-    # -> OpenMLDataset
-    def download_dataset_qualities(self, did):
-        # Dataset qualities are subject to change and must be fetched every time
-        did_cache_dir = self._create_dataset_cache_dir(did)
-        qualities_file = os.path.join(did_cache_dir, "qualities.xml")
-        try:
-            return_code, qualities_xml = self._perform_api_call(
-                "data/qualities/%d" % did)
-        except (URLError, UnicodeEncodeError) as e:
-            # TODO logger.debug
-            print(e)
-            raise e
-
-        with open(qualities_file, "w") as fh:
-            fh.write(qualities_xml)
-
-        try:
-            qualities = xmltodict.parse(qualities_xml)['oml:data_qualities']
-        except Exception as e:
-            # TODO useful debug
-            raise e
-
-        return qualities
-
-    # -> OpenMLDataset
-    def _create_dataset_cache_dir(self, did):
-        dataset_cache_dir = os.path.join(self.dataset_cache_dir, str(did))
-        try:
-            os.makedirs(dataset_cache_dir)
-        except (OSError, IOError):
-            # TODO add debug information!
-            pass
-        return dataset_cache_dir
-
-    # -> OpenMLDataset
-    def _remove_dataset_chache_dir(self, did):
-        dataset_cache_dir = os.path.join(self.dataset_cache_dir, str(did))
-        try:
-            os.rmdir(dataset_cache_dir)
-        except (OSError, IOError):
-            # TODO add debug information
-            pass
-
-    # -> OpenMLDataset
-    def _create_dataset_from_description(self, description, arff_file):
-        dataset = OpenMLDataset(
-            description["oml:id"],
-            description["oml:name"],
-            description["oml:version"],
-            description.get("oml:description"),
-            description["oml:format"],
-            description.get("oml:creator"),
-            description.get("oml:contributor"),
-            description.get("oml:collection_date"),
-            description.get("oml:upload_date"),
-            description.get("oml:language"),
-            description.get("oml:licence"),
-            description["oml:url"],
-            description.get("oml:default_target_attribute"),
-            description.get("oml:row_id_attribute"),
-            description.get("oml:ignore_attribute"),
-            description.get("oml:version_label"),
-            description.get("oml:citation"),
-            description.get("oml:tag"),
-            description.get("oml:visibility"),
-            description.get("oml:original_data_url"),
-            description.get("oml:paper_url"),
-            description.get("oml:update_comment"),
-            description.get("oml:md5_checksum"),
-            data_file=arff_file)
-        return dataset
 
     ############################################################################
     # Estimation procedures
@@ -791,11 +412,11 @@ class APIConnector(object):
             task = self._create_task_from_xml(task_xml)
 
         self.download_split(task)
-        dataset = self.download_dataset(task.dataset_id)
+        dataset = datasets.download_dataset(self, task.dataset_id)
 
         # TODO look into either adding the class labels to task xml, or other
         # way of reading it.
-        class_labels = self.retrieve_class_labels_for_dataset(dataset)
+        class_labels = dataset.retrieve_class_labels()
         task.class_labels = class_labels
         return task
 
@@ -1038,16 +659,6 @@ class APIConnector(object):
         response = requests.post(url, data=data)
         return response.status_code, response.text
 
-    # -> OpenMLDataset
-    def upload_dataset(self, description, file_path=None):
-        data = {'description': description}
-        if file_path is not None:
-            return_code, dataset_xml = self._perform_api_call(
-                "/data/", data=data, file_dictionary={'dataset': file_path})
-        else:
-            return_code, dataset_xml = self._perform_api_call("/data/", data=data)
-        return return_code, dataset_xml
-
     # -> OpenMLFlow
     def upload_flow(self, description, flow):
         """
@@ -1091,19 +702,3 @@ class APIConnector(object):
             xml_dict = xmltodict.parse(xml_response)
             flow_id = xml_dict['oml:flow_exists']['oml:id']
         return return_code, xml_response, flow_id
-
-    # -> OpenMLDataset
-    def retrieve_class_labels_for_dataset(self, dataset):
-        """Reads the datasets arff to determine the class-labels, and returns those.
-        If the task has no class labels (for example a regression problem) it returns None."""
-        # TODO improve performance, currently reads the whole file
-        # Should make a method that only reads the attributes
-        arffFileName = dataset.data_file
-        with open(arffFileName) as fh:
-            arffData = arff.ArffDecoder().decode(fh)
-
-        dataAttributes = dict(arffData['attributes'])
-        if('class' in dataAttributes):
-            return dataAttributes['class']
-        else:
-            return None
