@@ -259,14 +259,10 @@ class TestAPIConnector(unittest.TestCase):
         for run in runs:
             check_run(run)
 
-    @unittest.skip('The method which is tested by this function doesnt exist')
     def test_download_run(self):
         run = self.connector.download_run(473350)
-        self.assertGreaterEqual(len(run.tags), 2)
-        self.assertEqual(len(run.datasets), 1)
-        self.assertGreaterEqual(len(run.files), 2)
-        self.assertGreaterEqual(len(run.evaluations), 18)
-        self.assertEqual(len(run.evaluations['f_measure']), 2)
+        self.assertEqual(run.dataset_id, 1167)
+        self.assertEqual(run.evaluations['f_measure'], 0.624668)
 
     # ###########################################################################
     # Flows
