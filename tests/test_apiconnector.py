@@ -313,27 +313,16 @@ class TestAPIConnector(unittest.TestCase):
         self.assertEqual(return_code, 200)
 
     def test_upload_flow(self):
-        file_path = os.path.join(self.connector.dataset_cache_dir,"uploadflow.txt")
-        file = open(file_path, "w")
-        file.write("Testing upload flow")
-        file.close()
         description = '''<oml:flow xmlns:oml="http://openml.org/openml"><oml:name>Test</oml:name><oml:description>description</oml:description> </oml:flow>'''
-        return_code, dataset_xml = self.connector.upload_flow(description, file_path)
+        return_code, dataset_xml = self.connector.upload_flow(description, "Testing upload flow")
         self.assertEqual(return_code, 200)
 
     def test_upload_run(self):
-        file = urlopen("http://www.openml.org/data/download/224/weka_generated_predictions1977525485999711307.arff")
-        file_text = file.read()
-        prediction_file_path = os.path.join(self.connector.dataset_cache_dir, "weka_generated_predictions1977525485999711307.arff")
-        with open(prediction_file_path, "wb") as prediction_file:
-            prediction_file.write(file_text)
+        url = urlopen("http://www.openml.org/data/download/224/weka_generated_predictions1977525485999711307.arff")
+        prediction = url.read()
 
-        description_text = '''<oml:run xmlns:oml="http://openml.org/openml"><oml:task_id>59</oml:task_id><oml:flow_id>67</oml:flow_id></oml:run>'''
-        description_path = os.path.join(self.connector.dataset_cache_dir, "description.xml")
-        with open(description_path, "w") as description_file:
-            description_file.write(description_text)
-
-        return_code, dataset_xml = self.connector.upload_run(prediction_file_path, description_path)
+        description = '''<oml:run xmlns:oml="http://openml.org/openml"><oml:task_id>59</oml:task_id><oml:flow_id>67</oml:flow_id></oml:run>'''
+        return_code, dataset_xml = self.connector.upload_run(prediction, description)
         self.assertEqual(return_code, 200)
 
 
