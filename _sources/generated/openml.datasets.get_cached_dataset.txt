@@ -1,0 +1,10 @@
+:mod:`openml.datasets`.get_cached_dataset
+======================================================
+
+.. currentmodule:: openml.datasets
+
+.. autofunction:: get_cached_dataset
+
+.. raw:: html
+
+    <div class="clearer"></div>

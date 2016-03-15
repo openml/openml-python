@@ -97,7 +97,13 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#">APIs</a></li>
+<li><a class="reference internal" href="#">APIs</a><ul>
+<li><a class="reference internal" href="#top-level-classes">Top-level Classes</a></li>
+<li><a class="reference internal" href="#dataset-functions">Dataset Functions</a><ul>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -106,18 +112,75 @@
       
   <div class="section" id="apis">
 <span id="api"></span><h1>APIs<a class="headerlink" href="#apis" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="top-level-classes">
+<h2>Top-level Classes<a class="headerlink" href="#top-level-classes" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/openml.apiconnector.APIConnector.html#openml.apiconnector.APIConnector" title="openml.apiconnector.APIConnector"><code class="xref py py-obj docutils literal"><span class="pre">apiconnector.APIConnector</span></code></a>([cache_directory,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.APIConnector.html#openml.APIConnector" title="openml.APIConnector"><code class="xref py py-obj docutils literal"><span class="pre">APIConnector</span></code></a>([cache_directory,&nbsp;apikey,&nbsp;...])</td>
 <td>Provides an interface to the OpenML server.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/openml.entities.dataset.OpenMLDataset.html#openml.entities.dataset.OpenMLDataset" title="openml.entities.dataset.OpenMLDataset"><code class="xref py py-obj docutils literal"><span class="pre">entities.dataset.OpenMLDataset</span></code></a>(id,&nbsp;name,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset" title="openml.OpenMLDataset"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLDataset</span></code></a>(id,&nbsp;name,&nbsp;version,&nbsp;...)</td>
 <td></td>
 </tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="dataset-functions">
+<h2>Dataset Functions<a class="headerlink" href="#dataset-functions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.datasets.datasets_active.html#openml.datasets.datasets_active" title="openml.datasets.datasets_active"><code class="xref py py-obj docutils literal"><span class="pre">datasets_active</span></code></a>(api_connector,&nbsp;dids)</td>
+<td>Check if the dataset ids provided are active.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.datasets.download_dataset_arff.html#openml.datasets.download_dataset_arff" title="openml.datasets.download_dataset_arff"><code class="xref py py-obj docutils literal"><span class="pre">download_dataset_arff</span></code></a>(api_connector,&nbsp;did[,&nbsp;...])</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.datasets.download_dataset_description.html#openml.datasets.download_dataset_description" title="openml.datasets.download_dataset_description"><code class="xref py py-obj docutils literal"><span class="pre">download_dataset_description</span></code></a>(api_connector,&nbsp;did)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.datasets.download_dataset_features.html#openml.datasets.download_dataset_features" title="openml.datasets.download_dataset_features"><code class="xref py py-obj docutils literal"><span class="pre">download_dataset_features</span></code></a>(api_connector,&nbsp;did)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.datasets.download_dataset_qualities.html#openml.datasets.download_dataset_qualities" title="openml.datasets.download_dataset_qualities"><code class="xref py py-obj docutils literal"><span class="pre">download_dataset_qualities</span></code></a>(api_connector,&nbsp;did)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.datasets.download_dataset.html#openml.datasets.download_dataset" title="openml.datasets.download_dataset"><code class="xref py py-obj docutils literal"><span class="pre">download_dataset</span></code></a>(api_connector,&nbsp;did)</td>
+<td>Download a dataset.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.datasets.download_datasets.html#openml.datasets.download_datasets" title="openml.datasets.download_datasets"><code class="xref py py-obj docutils literal"><span class="pre">download_datasets</span></code></a>(api_connector,&nbsp;dids)</td>
+<td>Download datasets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.datasets.get_cached_datasets.html#openml.datasets.get_cached_datasets" title="openml.datasets.get_cached_datasets"><code class="xref py py-obj docutils literal"><span class="pre">get_cached_datasets</span></code></a>(api_connector)</td>
+<td>Searches for all OpenML datasets in the OpenML cache dir.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.datasets.get_list_of_cached_datasets.html#openml.datasets.get_list_of_cached_datasets" title="openml.datasets.get_list_of_cached_datasets"><code class="xref py py-obj docutils literal"><span class="pre">get_list_of_cached_datasets</span></code></a>(api_connector)</td>
+<td>Return list with ids of all cached datasets</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.datasets.get_dataset_list.html#openml.datasets.get_dataset_list" title="openml.datasets.get_dataset_list"><code class="xref py py-obj docutils literal"><span class="pre">get_dataset_list</span></code></a>(api_connector)</td>
+<td>Return a list of all dataset which are on OpenML.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.datasets.get_cached_dataset.html#openml.datasets.get_cached_dataset" title="openml.datasets.get_cached_dataset"><code class="xref py py-obj docutils literal"><span class="pre">get_cached_dataset</span></code></a>(api_connector,&nbsp;did)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.datasets.get_dataset_list.html#openml.datasets.get_dataset_list" title="openml.datasets.get_dataset_list"><code class="xref py py-obj docutils literal"><span class="pre">get_dataset_list</span></code></a>(api_connector)</td>
+<td>Return a list of all dataset which are on OpenML.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="generated/openml.entities.task.OpenMLTask.html#openml.entities.task.OpenMLTask" title="openml.entities.task.OpenMLTask"><code class="xref py py-obj docutils literal"><span class="pre">entities.task.OpenMLTask</span></code></a>(task_id,&nbsp;task_type,&nbsp;...)</td>
 <td></td>
 </tr>
@@ -126,6 +189,7 @@
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 
 

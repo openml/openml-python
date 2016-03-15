@@ -1,0 +1,10 @@
+:mod:`openml.datasets`.datasets_active
+===================================================
+
+.. currentmodule:: openml.datasets
+
+.. autofunction:: datasets_active
+
+.. raw:: html
+
+    <div class="clearer"></div>

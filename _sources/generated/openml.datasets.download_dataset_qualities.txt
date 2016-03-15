@@ -1,0 +1,10 @@
+:mod:`openml.datasets`.download_dataset_qualities
+==============================================================
+
+.. currentmodule:: openml.datasets
+
+.. autofunction:: download_dataset_qualities
+
+.. raw:: html
+
+    <div class="clearer"></div>

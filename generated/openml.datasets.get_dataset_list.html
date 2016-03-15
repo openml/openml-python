@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>openml.entities.dataset.OpenMLDataset &mdash; OpenML 0.2.1 documentation</title>
+    <title>openml.datasets.get_dataset_list &mdash; OpenML 0.2.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -97,21 +97,37 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.entities.dataset</span></code>.OpenMLDataset</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.datasets</span></code>.get_dataset_list</a></li>
 </ul>
 
         </div>
       </div>
     <div class="col-md-9 content">
       
-  <div class="section" id="openml-entities-dataset-openmldataset">
-<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.entities.dataset</span></code>.OpenMLDataset<a class="headerlink" href="#openml-entities-dataset-openmldataset" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="openml.entities.dataset.OpenMLDataset">
-<em class="property">class </em><code class="descclassname">openml.entities.dataset.</code><code class="descname">OpenMLDataset</code><span class="sig-paren">(</span><em>id</em>, <em>name</em>, <em>version</em>, <em>description</em>, <em>format</em>, <em>creator</em>, <em>contributor</em>, <em>collection_date</em>, <em>upload_date</em>, <em>language</em>, <em>licence</em>, <em>url</em>, <em>default_target_attribute</em>, <em>row_id_attribute</em>, <em>ignore_attribute</em>, <em>version_label</em>, <em>citation</em>, <em>tag</em>, <em>visibility</em>, <em>original_data_url</em>, <em>paper_url</em>, <em>update_comment</em>, <em>md5_checksum</em>, <em>data_file</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.entities.dataset.OpenMLDataset" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+  <div class="section" id="openml-datasets-get-dataset-list">
+<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.datasets</span></code>.get_dataset_list<a class="headerlink" href="#openml-datasets-get-dataset-list" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="openml.datasets.get_dataset_list">
+<code class="descclassname">openml.datasets.</code><code class="descname">get_dataset_list</code><span class="sig-paren">(</span><em>api_connector</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.get_dataset_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all dataset which are on OpenML.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>datasets</strong> : list</p>
+<blockquote class="last">
+<div><p>A list of all datasets. Every dataset is represented by a
+dictionary containing the following information: dataset id,
+and status. If qualities are calculated for the dataset, some of
+these are also returned.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
-</div>
+<div class="clearer"></div></div>
 
 
     </div>
