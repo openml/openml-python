@@ -79,9 +79,10 @@ class APIConnector(object):
     OpenMLServerError
         If the OpenML server returns an unexptected response.
 
-    Testing the API calls in Firefox
-    --------------------------------
-    With the Firefox AddOn HTTPRequestor, one can check the OpenML API calls.
+    Notes
+    -----
+    Testing the API calls in Firefox is possible with the Firefox AddOn
+    HTTPRequestor.
 
     """
     def __init__(self, cache_directory=None, apikey=None,

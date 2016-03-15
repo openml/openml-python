@@ -184,8 +184,8 @@ def download_datasets(api_connector, dids):
     list
         A list of dataset objects.
 
-    Note
-    ----
+    Notes
+    -----
     Uses the method :method:`pyMetaLearn.data_repositories.openml
     .apiconnector.APIConnector.download_dataset` internally. Please read
     the documentation of this.
