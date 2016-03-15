@@ -6,6 +6,7 @@ import sys
 #import tempfile
 import requests
 import arff
+import xmltodict
 
 if sys.version_info[0] < 3:
     import ConfigParser as configparser
@@ -16,7 +17,6 @@ else:
     from io import StringIO
     from urllib.error import URLError
 
-import xmltodict
 
 from .entities.dataset import OpenMLDataset
 from .entities.task import OpenMLTask
@@ -363,7 +363,7 @@ class APIConnector(object):
                     run = self._create_task_from_xml(xml=fh.read())
                 return run
 
-            except (OSError, IOError) as e:
+            except (OSError, IOError):
                 continue
 
         raise OpenMLCacheException("Run file for run id %d not "
@@ -1060,8 +1060,8 @@ class APIConnector(object):
         return return_code, dataset_xml
 
     def check_flow_exists(self, name, version):
-        """
-        Retrieves the flow id of the flow uniquely identified by name+version.
+        """Retrieves the flow id of the flow uniquely identified by name+version.
+
         Returns flow id if such a flow exists,
         returns -1 if flow does not exists,
         returns -2 if there was not a well-formed response from the server
