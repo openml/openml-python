@@ -179,11 +179,3 @@ class TestAPIConnector(unittest.TestCase):
         description = '''<oml:flow xmlns:oml="http://openml.org/openml"><oml:name>Test</oml:name><oml:description>description</oml:description> </oml:flow>'''
         return_code, dataset_xml = self.connector.upload_flow(description, "Testing upload flow")
         self.assertEqual(return_code, 200)
-
-    def test_upload_run(self):
-        url = urlopen("http://www.openml.org/data/download/224/weka_generated_predictions1977525485999711307.arff")
-        prediction = url.read()
-
-        description = '''<oml:run xmlns:oml="http://openml.org/openml"><oml:task_id>59</oml:task_id><oml:flow_id>67</oml:flow_id></oml:run>'''
-        return_code, dataset_xml = self.connector.upload_run(prediction, description)
-        self.assertEqual(return_code, 200)

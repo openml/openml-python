@@ -673,13 +673,6 @@ class APIConnector(object):
             "/flow/", data=data)
         return return_code, dataset_xml
 
-    # -> OpenMLRun
-    def upload_run(self, prediction, description):
-        data = {'predictions': prediction, 'description': description}
-        return_code, dataset_xml = self._perform_api_call(
-            "/run/", file_elements=data)
-        return return_code, dataset_xml
-
     # -> OpenMLFlow
     def check_flow_exists(self, name, version):
         """Retrieves the flow id of the flow uniquely identified by name+version.

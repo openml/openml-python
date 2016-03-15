@@ -2,8 +2,7 @@ from collections import OrderedDict
 import xmltodict
 import sys
 import time
-#import arff
-#import pickle
+import arff
 
 from .flow import OpenMLFlow
 
@@ -74,8 +73,7 @@ class OpenMLRun(object):
         # must be of special data type
         return description
 
-    @staticmethod
-    def generate_arff(arff_datacontent, task):
+    def generate_arff(self, api_connector):
         """Generates an arff
 
         Parameters
@@ -93,6 +91,7 @@ class OpenMLRun(object):
         """
         run_environment = (OpenMLRun.get_version_information() +
                            [time.strftime("%c")] + ['Created by openml_run()'])
+        task = api_connector.download_task(self.task_id)
         class_labels = task.class_labels
 
         arff_dict = {}
@@ -102,7 +101,7 @@ class OpenMLRun(object):
             [('confidence.' + class_labels[i], 'NUMERIC') for i in range(len(class_labels))] +\
             [('prediction', class_labels),
              ('correct', class_labels)]
-        arff_dict['data'] = arff_datacontent
+        arff_dict['data'] = self.data_content
         arff_dict['description'] = "\n".join(run_environment)
         arff_dict['relation'] = 'openml_task_' + str(task.task_id) + '_predictions'
         return arff_dict
@@ -113,20 +112,19 @@ class OpenMLRun(object):
         # fixme str(classifier) might contain (...)
         return run_environment + " " + str(classifier)
 
-    @staticmethod
-    def create_description_xml(taskid, flow_id, classifier):
+    def create_description_xml(self):
         run_environment = OpenMLRun.get_version_information()
         setup_string = ''  # " ".join(sys.argv);
 
-        parameter_settings = classifier.get_params()
+        parameter_settings = self.classifier.get_params()
         # as a tag, it must be of the form ([a-zA-Z0-9_\-\.])+
         # so we format time from 'mm/dd/yy hh:mm:ss' to 'mm-dd-yy_hh.mm.ss'
         well_formatted_time = time.strftime("%c").replace(
             ' ', '_').replace('/', '-').replace(':', '.')
         tags = run_environment + [well_formatted_time] + ['openml_run'] + \
-            [classifier.__module__ + "." + classifier.__class__.__name__]
+            [self.classifier.__module__ + "." + self.classifier.__class__.__name__]
         description = OpenMLRun.construct_description_dictionary(
-            taskid, flow_id, setup_string, parameter_settings, tags)
+            self.task_id, self.flow_id, setup_string, parameter_settings, tags)
         description_xml = xmltodict.unparse(description, pretty=True)
         return description_xml
 
@@ -250,6 +248,11 @@ class OpenMLRun(object):
         # TODO (?) Return an OpenML run instead.
         return run
 
-    def upload(self, api_connector):
-        print("FIXME")
-        pass
+    def publish(self, api_connector):
+        predictions = arff.dumps(self.generate_arff(api_connector))
+        description_xml = self.create_description_xml()
+        data = {'predictions': predictions, 'description':
+                description_xml}
+        return_code, dataset_xml = api_connector._perform_api_call(
+            "/run/", file_elements=data)
+        return return_code, dataset_xml
