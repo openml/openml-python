@@ -11,7 +11,7 @@ if sys.version_info[0] < 3:
     import ConfigParser as configparser
     from StringIO import StringIO
     from urllib import urlencode, urlopen
-    from urllib2 import URLError, urlopen
+    from urllib2 import URLError
 else:
     import configparser
     from io import StringIO
@@ -28,6 +28,7 @@ from .entities.split import OpenMLSplit
 logger = logging.getLogger(__name__)
 
 OPENML_URL = "http://api_new.openml.org/v1/"
+
 
 class OpenMLStatusChange(Warning):
     def __init__(self, message):
@@ -255,14 +256,13 @@ class APIConnector(object):
             try:
                 with open(description_file) as fh:
                     dataset_xml = fh.read()
-            except (IOError, OSError) as e:
+            except (IOError, OSError):
                 continue
 
             return xmltodict.parse(dataset_xml)["oml:data_set_description"]
 
         raise OpenMLCacheException("Dataset description for did %d not "
                                    "cached" % did)
-
 
     def _get_cached_dataset_arff(self, did):
         for dataset_cache_dir in [self.dataset_cache_dir,
@@ -274,18 +274,17 @@ class APIConnector(object):
                 with open(output_file):
                     pass
                 return output_file
-            except (OSError, IOError) as e:
+            except (OSError, IOError):
                 # TODO create NOTCACHEDEXCEPTION
                 continue
 
         print("Dataset ID", did)
         raise Exception()
 
-
     def get_cached_tasks(self):
         tasks = OrderedDict()
         for task_cache_dir in [self.task_cache_dir,
-                                  self._private_directory_tasks]:
+                               self._private_directory_tasks]:
 
             directory_content = os.listdir(task_cache_dir)
             directory_content.sort()
@@ -313,7 +312,7 @@ class APIConnector(object):
                 with open(task_file) as fh:
                     task = self._create_task_from_xml(xml=fh.read())
                 return task
-            except (OSError, IOError) as e:
+            except (OSError, IOError):
                 continue
 
         print("Task ID", tid)
@@ -325,7 +324,6 @@ class APIConnector(object):
                                self._private_directory_tasks]:
             directory_content = os.listdir(task_cache_dir)
             directory_content.sort()
-
 
             for filename in directory_content:
                 match = re.match(r"(tid)_([0-9]*)\.arff", filename)
@@ -346,7 +344,7 @@ class APIConnector(object):
                 split = OpenMLSplit.from_arff_file(split_file)
                 return split
 
-            except (OSError, IOError) as e:
+            except (OSError, IOError):
                 continue
 
         print("Task ID", tid)
@@ -888,82 +886,86 @@ class APIConnector(object):
         if not url.endswith("/"):
             url += "/"
         url += call
-        return self._read_url(url, data=data, file_dictionary=file_dictionary)
+        if file_dictionary is not None:
+            return self._read_url_files(url, data=data, file_dictionary=file_dictionary)
+        return self._read_url(url, data=data)
 
-    def _read_url(self, url, data=None, file_dictionary=None):
+    def _read_url_files(self, url, data=None, file_dictionary=None):
         if data is None:
             data = {}
         data['api_key'] = self.config.get('FAKE_SECTION', 'apikey')
 
-        if file_dictionary is not None:
-            file_elements = {}
-            for key, path in file_dictionary.items():
-                path = os.path.abspath(path)
-                if os.path.exists(path):
-                    try:
-                        if key is 'dataset':
-                            decoder = arff.ArffDecoder()
-                            with open(path) as fh:
-                                decoder.decode(fh, encode_nominal=True)
-                    except:
-                        raise ValueError("The file you have provided is not a valid arff file")
+        file_elements = {}
+        for key, path in file_dictionary.items():
+            path = os.path.abspath(path)
+            if os.path.exists(path):
+                try:
+                    if key is 'dataset':
+                        # check if arff is valid?
+                        decoder = arff.ArffDecoder()
+                        with open(path) as fh:
+                            decoder.decode(fh, encode_nominal=True)
+                except:
+                    raise ValueError("The file you have provided is not a valid arff file")
 
-                    file_elements[key] = open(path, 'rb')
+                file_elements[key] = open(path, 'rb')
 
-                else:
-                    raise ValueError("File doesn't exist")
-            try:
-                response = requests.post(url, data=data, files=file_elements)
-                return response.status_code, response
-
-            except URLError as error:
-                print(error)
-        else:
-            data = urlencode(data)
-            data = data.encode('utf-8')
-
-            CHUNK = 16 * 1024
-            string = StringIO()
-            connection = urlopen(url, data=data)
-            return_code = connection.getcode()
-            content_type = connection.info()['Content-Type']
-            match = re.search(r'text/([\w-]*)(; charset=([\w-]*))?', content_type)
-            if match:
-                if match.groups()[2] is not None:
-                    encoding = match.group(3)
-                else:
-                    encoding = "utf8"
             else:
-                # TODO ask JAN why this happens
-                logger.warn("Data from %s has content type %s; going to treat "
-                            "this as ascii." % (url, content_type))
-                encoding = "utf8"
-            tmp = tempfile.NamedTemporaryFile(mode='w', delete=False)
-            with tmp as fh:
-                while True:
-                    chunk = connection.read(CHUNK)
-                    # Chunk is now a proper string (UTF-8 in python)
-                    chunk = chunk.decode(encoding)
-                    if not chunk:
-                        break
-                    fh.write(chunk)
+                raise ValueError("File doesn't exist")
+        try:
+            response = requests.post(url, data=data, files=file_elements)
+            return response.status_code, response
 
-            tmp = open(tmp.name, "r")
-            with tmp as fh:
-                while True:
-                    chunk = fh.read(CHUNK)
-                    if not chunk:
-                        break
-                    string.write(chunk)
-            return return_code, string.getvalue()
+        except URLError as error:
+            print(error)
+
+    def _read_url(self, url, data=None):
+        data = urlencode(data)
+        data = data.encode('utf-8')
+
+        CHUNK = 16 * 1024
+        string = StringIO()
+        connection = urlopen(url, data=data)
+        return_code = connection.getcode()
+        content_type = connection.info()['Content-Type']
+        match = re.search(r'text/([\w-]*)(; charset=([\w-]*))?', content_type)
+        if match:
+            if match.groups()[2] is not None:
+                encoding = match.group(3)
+            else:
+                encoding = "utf8"
+        else:
+            # TODO ask JAN why this happens
+            logger.warn("Data from %s has content type %s; going to treat "
+                        "this as ascii." % (url, content_type))
+            encoding = "utf8"
+        tmp = tempfile.NamedTemporaryFile(mode='w', delete=False)
+        with tmp as fh:
+            while True:
+                chunk = connection.read(CHUNK)
+                # Chunk is now a proper string (UTF-8 in python)
+                chunk = chunk.decode(encoding)
+                if not chunk:
+                    break
+                fh.write(chunk)
+
+        tmp = open(tmp.name, "r")
+        with tmp as fh:
+            while True:
+                chunk = fh.read(CHUNK)
+                if not chunk:
+                    break
+                string.write(chunk)
+        return return_code, string.getvalue()
 
     def upload_dataset(self, description, file_path=None):
         try:
             data = {'description': description}
             if file_path is not None:
-                return_code, dataset_xml = self._perform_api_call("/data/",data=data, file_dictionary={'dataset': file_path})
+                return_code, dataset_xml = self._perform_api_call(
+                    "/data/", data=data, file_dictionary={'dataset': file_path})
             else:
-                return_code, dataset_xml = self._perform_api_call("/data/",data=data)
+                return_code, dataset_xml = self._perform_api_call("/data/", data=data)
 
         except URLError as e:
             # TODO logger.debug
@@ -981,7 +983,8 @@ class APIConnector(object):
         try:
             data = {'description': description}
             file_dictionary = {'source': source_file_path} if source_file_path is not None else None
-            return_code, dataset_xml = self._perform_api_call("/flow/", data=data, file_dictionary=file_dictionary)
+            return_code, dataset_xml = self._perform_api_call(
+                "/flow/", data=data, file_dictionary=file_dictionary)
 
         except URLError as e:
             # TODO logger.debug
@@ -992,10 +995,11 @@ class APIConnector(object):
     def upload_run(self, prediction_file_path, description_path):
         try:
             file_dictionary = {'predictions': prediction_file_path, 'description': description_path}
-            return_code, dataset_xml = self._perform_api_call("/run/", file_dictionary=file_dictionary)
+            return_code, dataset_xml = self._perform_api_call(
+                "/run/", file_dictionary=file_dictionary)
 
         except URLError as e:
-        # TODO logger.debug
+            # TODO logger.debug
             print(e)
             raise e
         return return_code, dataset_xml
@@ -1016,7 +1020,8 @@ class APIConnector(object):
             raise ValueError('Parameter \'version\' should be a non-empty string')
 
         try:
-            return_code, xml_response = self._perform_api_call("/flow/exists/%s/%s" % (name, version))
+            return_code, xml_response = self._perform_api_call(
+                "/flow/exists/%s/%s" % (name, version))
             flow_id = -2
             if return_code == 200:
                 xml_dict = xmltodict.parse(xml_response)
