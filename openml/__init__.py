@@ -20,8 +20,10 @@ from .datasets import OpenMLDataset
 from . import datasets
 from .runs import OpenMLRun
 from .entities.split import OpenMLSplit
+from .entities.task import OpenMLTask
 
 
 __version__ = "0.2.1"
 
-__all__ = ['APIConnector', 'OpenMLDataset', 'OpenMLRun', 'OpenMLSplit', 'datasets']
+__all__ = ['APIConnector', 'OpenMLDataset', 'OpenMLRun', 'OpenMLSplit',
+           'datasets', 'OpenMLTask']
