@@ -308,7 +308,7 @@ class APIConnector(object):
                              "cast to an Integer.")
 
         return_code, xml_string = self._perform_api_call(
-            "task/list/%d" % task_type_id)
+            "task/list/type/%d" % task_type_id)
         tasks_dict = xmltodict.parse(xml_string)
         # Minimalistic check if the XML is useful
         assert tasks_dict['oml:tasks']['@xmlns:oml'] == \
