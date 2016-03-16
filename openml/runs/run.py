@@ -4,7 +4,7 @@ import sys
 import time
 import arff
 
-from .flow import OpenMLFlow
+from ..entities.flow import OpenMLFlow
 
 
 class OpenMLRun(object):

@@ -22,14 +22,16 @@ logger = logging.getLogger(__name__)
 
 class OpenMLDataset(object):
 
-    def __init__(self, id, name, version, description, format, creator,
-                 contributor, collection_date, upload_date, language,
-                 licence, url, default_target_attribute, row_id_attribute,
-                 ignore_attribute, version_label, citation, tag, visibility,
-                 original_data_url, paper_url, update_comment, md5_checksum,
-                 data_file):
+    def __init__(self, id=None, name=None, version=None, description=None,
+                 format=None, creator=None, contributor=None,
+                 collection_date=None, upload_date=None, language=None,
+                 licence=None, url=None, default_target_attribute=None,
+                 row_id_attribute=None, ignore_attribute=None,
+                 version_label=None, citation=None, tag=None, visibility=None,
+                 original_data_url=None, paper_url=None, update_comment=None,
+                 md5_checksum=None, data_file=None):
         # Attributes received by querying the RESTful API
-        self.id = int(id)
+        self.id = int(id) if id is not None else None
         self.name = name
         self.version = int(version)
         self.description = description
@@ -220,11 +222,27 @@ class OpenMLDataset(object):
         else:
             return None
 
-    def upload_dataset(self, api_connector):
-        data = {'description': self.description}
-        if self.file_path is not None:
+    def publish(self, api_connector):
+        data = {'description': self.to_xml()}
+        if self.data_file is not None:
             return_code, dataset_xml = api_connector._perform_api_call(
-                "/data/", data=data, file_dictionary={'dataset': self.file_path})
+                "/data/", data=data, file_dictionary={'dataset': self.data_file})
         else:
             return_code, dataset_xml = api_connector._perform_api_call("/data/", data=data)
         return return_code, dataset_xml
+
+    def to_xml(self):
+        xml_dataset = ('<oml:data_set_description '
+                       'xmlns:oml="http://openml.org/openml">')
+        props = ['id', 'name', 'version', 'description', 'format', 'creator',
+                 'contributor', 'collection_date', 'upload_date', 'language',
+                 'licence', 'url', 'default_target_attribute',
+                 'row_id_attribute', 'ignore_attribute', 'version_label',
+                 'citation', 'tag', 'visibility', 'original_data_url',
+                 'paper_url', 'update_comment', 'md5_checksum']  # , 'data_file']
+        for prop in props:
+            content = getattr(self, prop, None)
+            if content is not None:
+                xml_dataset += "<oml:{0}>{1}</oml:{0}>".format(prop, content)
+        xml_dataset += "</oml:data_set_description>"
+        return xml_dataset

@@ -22,7 +22,7 @@ from .exceptions import OpenMLCacheException
 #from .dataset.dataset import OpenMLDataset
 from .entities.task import OpenMLTask
 from .entities.split import OpenMLSplit
-from .entities.run import OpenMLRun
+from .runs import OpenMLRun
 
 logger = logging.getLogger(__name__)
 

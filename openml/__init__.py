@@ -18,7 +18,7 @@ In particular, this module implemts a python interface for the
 from .apiconnector import APIConnector
 from .datasets import OpenMLDataset
 from . import datasets
-from .entities.run import OpenMLRun
+from .runs import OpenMLRun
 from .entities.split import OpenMLSplit
 
 
