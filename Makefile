@@ -16,12 +16,12 @@ inplace:
 	$(PYTHON) setup.py build_ext -i
 
 test-code: in
-	$(NOSETESTS) -s -v openml
+	$(NOSETESTS) -s -v tests
 test-doc:
 	$(NOSETESTS) -s -v doc/*.rst
 
 test-coverage:
 	rm -rf coverage .coverage
-	$(NOSETESTS) -s -v --with-coverage openml
+	$(NOSETESTS) -s -v --with-coverage tests
 
 test: test-code test-sphinxext test-doc
