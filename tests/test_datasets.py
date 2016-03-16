@@ -124,8 +124,8 @@ class TestOpenMLDataset(TestBase):
         dataset = OpenMLDataset(
             name="anneal", version=1, description="test",
             format="ARFF", licence="public", default_target_attribute="class", data_file=file_path)
-        return_code, dataset_xml = dataset.publish(self.connector)
-        self.assertTrue("This is a read-only account" in dataset_xml)
+        return_code, return_value = dataset.publish(self.connector)
+        self.assertTrue("This is a read-only account" in return_value)
         # self.assertEqual(return_code, 200)
 
     def test_upload_dataset_with_url(self):
@@ -133,6 +133,6 @@ class TestOpenMLDataset(TestBase):
             name="UploadTestWithURL", version=1, description="test",
             format="ARFF",
             url="http://expdb.cs.kuleuven.be/expdb/data/uci/nominal/iris.arff")
-        return_code, dataset_xml = dataset.publish(self.connector)
-        self.assertTrue("This is a read-only account" in dataset_xml)
+        return_code, return_value = dataset.publish(self.connector)
+        self.assertTrue("This is a read-only account" in return_value)
         # self.assertEqual(return_code, 200)

@@ -225,11 +225,11 @@ class OpenMLDataset(object):
     def publish(self, api_connector):
         data = {'description': self.to_xml()}
         if self.data_file is not None:
-            return_code, dataset_xml = api_connector._perform_api_call(
+            return_code, return_value = api_connector._perform_api_call(
                 "/data/", data=data, file_dictionary={'dataset': self.data_file})
         else:
-            return_code, dataset_xml = api_connector._perform_api_call("/data/", data=data)
-        return return_code, dataset_xml
+            return_code, return_value = api_connector._perform_api_call("/data/", data=data)
+        return return_code, return_value
 
     def to_xml(self):
         xml_dataset = ('<oml:data_set_description '
