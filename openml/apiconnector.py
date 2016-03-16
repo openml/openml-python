@@ -22,7 +22,6 @@ from .exceptions import OpenMLCacheException
 #from .dataset.dataset import OpenMLDataset
 from .entities.task import OpenMLTask
 from .entities.split import OpenMLSplit
-from .entities.run import OpenMLRun
 
 logger = logging.getLogger(__name__)
 
@@ -248,26 +247,6 @@ class APIConnector(object):
 
         raise OpenMLCacheException("Split file for tid %d not "
                                    "cached" % tid)
-
-    # -> OpenMLRun
-    def get_cached_run(self, run_id):
-        for run_cache_dir in [self.run_cache_dir,
-                              self._private_directory_runs]:
-            try:
-                run_file = os.path.join(run_cache_dir,
-                                        "run_%d.xml" % int(run_id))
-                with open(run_file) as fh:
-                    run = self._create_task_from_xml(xml=fh.read())
-                return run
-
-            except (OSError, IOError):
-                continue
-
-        raise OpenMLCacheException("Run file for run id %d not "
-                                   "cached" % run_id)
-
-    ############################################################################
-    # Remote getters/API calls to OpenML
 
     ############################################################################
     # Estimation procedures
@@ -504,92 +483,6 @@ class APIConnector(object):
             pass
         return task_cache_dir
 
-    # -> OpenMLRun
-    def download_run(self, run_id):
-        run_file = os.path.join(self.run_cache_dir, "run_%d.xml" % run_id)
-
-        try:
-            return self.get_cached_run(run_id)
-        except (OpenMLCacheException):
-            try:
-                return_code, run_xml = self._perform_api_call(
-                    "run/%d" % run_id)
-            except (URLError, UnicodeEncodeError) as e:
-                # TODO logger.debug
-                print(e)
-                raise e
-
-            with open(run_file, "w") as fh:
-                fh.write(run_xml)
-
-        try:
-            run = self._create_run_from_xml(run_xml)
-        except Exception as e:
-            # TODO logger.debug
-            print("Run ID", run_id)
-            raise e
-
-        with open(run_file, "w") as fh:
-            fh.write(run_xml)
-
-        return run
-
-    # -> OpenMLRun
-    def _create_run_from_xml(self, xml):
-        run = xmltodict.parse(xml)["oml:run"]
-        run_id = int(run['oml:run_id'])
-        uploader = int(run['oml:uploader'])
-        uploader_name = run['oml:uploader_name']
-        task_id = int(run['oml:task_id'])
-        task_type = run['oml:task_type']
-        task_evaluation_measure = run['oml:task_evaluation_measure']
-        flow_id = int(run['oml:flow_id'])
-        flow_name = run['oml:flow_name']
-        setup_id = int(run['oml:setup_id'])
-        setup_string = run['oml:setup_string']
-
-        parameters = dict()
-        if 'oml:parameter_settings' in run:
-            parameter_settings = run['oml:parameter_settings']
-            for parameter_dict in parameter_settings:
-                key = parameter_dict['oml:name']
-                value = parameter_dict['oml:value']
-                parameters[key] = value
-
-        dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
-
-        predictions_url = None
-        for file_dict in run['oml:output_data']['oml:file']:
-            if file_dict['oml:name'] == 'predictions':
-                predictions_url = file_dict['oml:url']
-        if predictions_url is None:
-            raise ValueError('No URL to download predictions for run %d in run '
-                             'description XML' % run_id)
-        evaluations = dict()
-        evaluation_flows = dict()
-        for evaluation_dict in run['oml:output_data']['oml:evaluation']:
-            key = evaluation_dict['oml:name']
-            if 'oml:value' in evaluation_dict:
-                value = float(evaluation_dict['oml:value'])
-            elif 'oml:array_data' in evaluation_dict:
-                value = evaluation_dict['oml:array_data']
-            else:
-                raise ValueError('Could not find keys "value" or "array_data" '
-                                 'in %s' % str(evaluation_dict.keys()))
-            flow_id = evaluation_dict['oml:flow_id']
-            evaluations[key] = value
-            evaluation_flows[key] = flow_id
-
-        return OpenMLRun(run_id=run_id, uploader=uploader,
-                         uploader_name=uploader_name, task_id=task_id,
-                         task_type=task_type,
-                         task_evaluation_measure=task_evaluation_measure,
-                         flow_id=flow_id, flow_name=flow_name,
-                         setup_id=setup_id, setup_string=setup_string,
-                         parameter_settings=parameters,
-                         dataset_id=dataset_id, predictions_url=predictions_url,
-                         evaluations=evaluations)
-
     def _perform_api_call(self, call, data=None, file_dictionary=None,
                           file_elements=None, add_authentication=True):
         """
@@ -671,13 +564,6 @@ class APIConnector(object):
         data = {'description': description, 'source': flow}
         return_code, dataset_xml = self._perform_api_call(
             "/flow/", data=data)
-        return return_code, dataset_xml
-
-    # -> OpenMLRun
-    def upload_run(self, prediction, description):
-        data = {'predictions': prediction, 'description': description}
-        return_code, dataset_xml = self._perform_api_call(
-            "/run/", file_elements=data)
         return return_code, dataset_xml
 
     # -> OpenMLFlow

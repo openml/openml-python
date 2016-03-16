@@ -22,14 +22,16 @@ logger = logging.getLogger(__name__)
 
 class OpenMLDataset(object):
 
-    def __init__(self, id, name, version, description, format, creator,
-                 contributor, collection_date, upload_date, language,
-                 licence, url, default_target_attribute, row_id_attribute,
-                 ignore_attribute, version_label, citation, tag, visibility,
-                 original_data_url, paper_url, update_comment, md5_checksum,
-                 data_file):
+    def __init__(self, id=None, name=None, version=None, description=None,
+                 format=None, creator=None, contributor=None,
+                 collection_date=None, upload_date=None, language=None,
+                 licence=None, url=None, default_target_attribute=None,
+                 row_id_attribute=None, ignore_attribute=None,
+                 version_label=None, citation=None, tag=None, visibility=None,
+                 original_data_url=None, paper_url=None, update_comment=None,
+                 md5_checksum=None, data_file=None):
         # Attributes received by querying the RESTful API
-        self.id = int(id)
+        self.id = int(id) if id is not None else None
         self.name = name
         self.version = int(version)
         self.description = description
@@ -53,38 +55,38 @@ class OpenMLDataset(object):
         self.update_comment = update_comment
         self.md5_cheksum = md5_checksum
         self.data_file = data_file
+        if data_file is not None:
+            self.data_pickle_file = data_file.replace('.arff', '.pkl')
 
-        self.data_pickle_file = data_file.replace('.arff', '.pkl')
-
-        if os.path.exists(self.data_pickle_file):
-            logger.debug("Data pickle file already exists.")
-        else:
-            try:
-                data = self.get_arff()
-            except OSError as e:
-                logger.critical("Please check that the data file %s is there "
-                                "and can be read.", self.data_file)
-                raise e
-
-            categorical = [False if type(type_) != list else True
-                           for name, type_ in data['attributes']]
-            attribute_names = [name for name, type_ in data['attributes']]
-
-            if isinstance(data['data'], tuple):
-                X = data['data']
-                X_shape = (max(X[1]) + 1, max(X[2]) + 1)
-                X = scipy.sparse.coo_matrix(
-                    (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
-                X = X.tocsr()
-            elif isinstance(data['data'], list):
-                X = np.array(data['data'], dtype=np.float32)
+            if os.path.exists(self.data_pickle_file):
+                logger.debug("Data pickle file already exists.")
             else:
-                raise Exception()
+                try:
+                    data = self.get_arff()
+                except OSError as e:
+                    logger.critical("Please check that the data file %s is there "
+                                    "and can be read.", self.data_file)
+                    raise e
 
-            with open(self.data_pickle_file, "wb") as fh:
-                pickle.dump((X, categorical, attribute_names), fh, -1)
-            logger.debug("Saved dataset %d: %s to file %s" %
-                         (self.id, self.name, self.data_pickle_file))
+                categorical = [False if type(type_) != list else True
+                               for name, type_ in data['attributes']]
+                attribute_names = [name for name, type_ in data['attributes']]
+
+                if isinstance(data['data'], tuple):
+                    X = data['data']
+                    X_shape = (max(X[1]) + 1, max(X[2]) + 1)
+                    X = scipy.sparse.coo_matrix(
+                        (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
+                    X = X.tocsr()
+                elif isinstance(data['data'], list):
+                    X = np.array(data['data'], dtype=np.float32)
+                else:
+                    raise Exception()
+
+                with open(self.data_pickle_file, "wb") as fh:
+                    pickle.dump((X, categorical, attribute_names), fh, -1)
+                logger.debug("Saved dataset %d: %s to file %s" %
+                             (self.id, self.name, self.data_pickle_file))
 
     def __eq__(self, other):
         if type(other) != OpenMLDataset:
@@ -220,11 +222,27 @@ class OpenMLDataset(object):
         else:
             return None
 
-    def upload_dataset(self, api_connector):
-        data = {'description': self.description}
-        if self.file_path is not None:
+    def publish(self, api_connector):
+        data = {'description': self.to_xml()}
+        if self.data_file is not None:
             return_code, dataset_xml = api_connector._perform_api_call(
-                "/data/", data=data, file_dictionary={'dataset': self.file_path})
+                "/data/", data=data, file_dictionary={'dataset': self.data_file})
         else:
             return_code, dataset_xml = api_connector._perform_api_call("/data/", data=data)
         return return_code, dataset_xml
+
+    def to_xml(self):
+        xml_dataset = ('<oml:data_set_description '
+                       'xmlns:oml="http://openml.org/openml">')
+        props = ['id', 'name', 'version', 'description', 'format', 'creator',
+                 'contributor', 'collection_date', 'upload_date', 'language',
+                 'licence', 'url', 'default_target_attribute',
+                 'row_id_attribute', 'ignore_attribute', 'version_label',
+                 'citation', 'tag', 'visibility', 'original_data_url',
+                 'paper_url', 'update_comment', 'md5_checksum']  # , 'data_file']
+        for prop in props:
+            content = getattr(self, prop, None)
+            if content is not None:
+                xml_dataset += "<oml:{0}>{1}</oml:{0}>".format(prop, content)
+        xml_dataset += "</oml:data_set_description>"
+        return xml_dataset

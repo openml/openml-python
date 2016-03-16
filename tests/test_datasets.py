@@ -11,10 +11,11 @@ else:
 from openml import APIConnector
 from openml import OpenMLDataset
 from openml.util import is_string
+from openml.testing import TestBase
 import openml
 
 
-class TestOpenMLDataset(unittest.TestCase):
+class TestOpenMLDataset(TestBase):
 
     def setUp(self):
         # FIXME REFACTOR with test apiconnector
@@ -34,7 +35,7 @@ class TestOpenMLDataset(unittest.TestCase):
             apikey = os.environ['OPENMLAPIKEY']
         except:
             apikey = None
-        
+
         if "TRAVIS" in os.environ and apikey is None:
             raise Exception('Running on travis-ci, but no environment '
                             'variable OPENMLAPIKEY found.')
@@ -143,33 +144,20 @@ class TestOpenMLDataset(unittest.TestCase):
         qualities = openml.datasets.download_dataset_qualities(self.con, 2)
         self.assertIsInstance(qualities, dict)
 
-    def test_upload_dataset(self):
+    def test_publish_dataset(self):
 
         dataset = openml.datasets.download_dataset(self.con, 3)
-        file_path = os.path.join(self.connector.dataset_cache_dir, "3", "dataset.arff")
-
-        description = """ <oml:data_set_description xmlns:oml="http://openml.org/openml">
-                        <oml:name>anneal</oml:name>
-                        <oml:version>1</oml:version>
-                        <oml:description>test</oml:description>
-                        <oml:format>ARFF</oml:format>
-                        <oml:licence>Public</oml:licence>
-                        <oml:default_target_attribute>class</oml:default_target_attribute>
-                        <oml:md5_checksum></oml:md5_checksum>
-                        </oml:data_set_description>
-                         """
-        return_code, dataset_xml = openml.datasets.upload_dataset(self.con, description, file_path)
+        file_path = os.path.join(self.con.dataset_cache_dir, "3", "dataset.arff")
+        dataset = OpenMLDataset(
+            name="anneal", version=1, description="test",
+            format="ARFF", licence="public", default_target_attribute="class", data_file=file_path)
+        return_code, dataset_xml = dataset.publish(self.con)
         self.assertEqual(return_code, 200)
 
     def test_upload_dataset_with_url(self):
-
-        description = """ <oml:data_set_description xmlns:oml="http://openml.org/openml">
-                        <oml:name>UploadTestWithURL</oml:name>
-                        <oml:version>1</oml:version>
-                        <oml:description>test</oml:description>
-                        <oml:format>ARFF</oml:format>
-                        <oml:url>http://expdb.cs.kuleuven.be/expdb/data/uci/nominal/iris.arff</oml:url>
-                        </oml:data_set_description>
-                         """
-        return_code, dataset_xml = openml.datasets.upload_dataset(self.con, description)
+        dataset = OpenMLDataset(
+            name="UploadTestWithURL", version=1, description="test",
+            format="ARFF",
+            url="http://expdb.cs.kuleuven.be/expdb/data/uci/nominal/iris.arff")
+        return_code, dataset_xml = dataset.publish(self.con)
         self.assertEqual(return_code, 200)
