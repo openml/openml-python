@@ -10,8 +10,8 @@ class TestRun(TestBase):
         clf = LogisticRegression()
         run = openml.runs.openml_run(self.connector, task, clf)
         return_code, return_value = run.publish(self.connector)
-        self.assertTrue("This is a read-only account" in return_value)
-        #self.assertEqual(return_code, 200)
+        self.assertEqual(return_code, 200)
+        # self.assertTrue("This is a read-only account" in return_value)
 
     ############################################################################
     # Runs

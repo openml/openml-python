@@ -26,8 +26,8 @@ class TestBase(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-        # amueller's read only api key
-        apikey = "4e36ac93097f979f921b74b02a600f34"
+        # amueller's read/write key that he will throw away later
+        apikey = "610344db6388d9ba34f6db45a3cf71de"
 
         self.connector = APIConnector(cache_directory=self.workdir,
                                       apikey=apikey)
