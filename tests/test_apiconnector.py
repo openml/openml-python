@@ -98,5 +98,6 @@ class TestAPIConnector(TestBase):
     def test_upload_flow(self):
         description = ('''<oml:flow xmlns:oml="http://openml.org/openml"><oml:name>Test</oml:name>'''
                        '''<oml:description>description</oml:description> </oml:flow>''')
-        return_code, dataset_xml = self.connector.upload_flow(description, "Testing upload flow")
+        return_code, return_value = self.connector.upload_flow(description, "Testing upload flow")
+        # self.assertTrue("This is a read-only account" in return_value)
         self.assertEqual(return_code, 200)

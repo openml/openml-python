@@ -543,7 +543,7 @@ class APIConnector(object):
                 else:
                     raise ValueError("File doesn't exist")
         response = requests.post(url, data=data, files=file_elements)
-        return response.status_code, response
+        return response.status_code, response.text
 
     def _read_url(self, url, data=None):
         if data is None:
@@ -584,8 +584,9 @@ class APIConnector(object):
 
         return_code, xml_response = self._perform_api_call(
             "/flow/exists/%s/%s" % (name, version))
-        flow_id = -2
-        if return_code == 200:
-            xml_dict = xmltodict.parse(xml_response)
-            flow_id = xml_dict['oml:flow_exists']['oml:id']
+        if return_code != 200:
+            # fixme raise appropriate error
+            raise ValueError("api call failed: %s" % xml_response)
+        xml_dict = xmltodict.parse(xml_response)
+        flow_id = xml_dict['oml:flow_exists']['oml:id']
         return return_code, xml_response, flow_id
