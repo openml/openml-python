@@ -26,14 +26,8 @@ class TestBase(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-        try:
-            apikey = os.environ['OPENMLAPIKEY']
-        except:
-            apikey = None
-
-        if "TRAVIS" in os.environ and apikey is None:
-            raise Exception('Running on travis-ci, but no environment '
-                            'variable OPENMLAPIKEY found.')
+        # amueller's read only api key
+        apikey = "4e36ac93097f979f921b74b02a600f34"
 
         self.connector = APIConnector(cache_directory=self.workdir,
                                       apikey=apikey)

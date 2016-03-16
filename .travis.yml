@@ -8,13 +8,10 @@ cache:
   - $HOME/.cache/pip
   - $HOME/download
 env:
-  secure:
-  - Oq94aDjQ/grAI14Qj5gNGRKV038pPI+Rw23fFkaRvSIrcUSJGLgLtNm+2UFcDeVaOYiuxE3cs1Ob5a8IFvcn0VrOz0qSeH7FNof0f4vED2mHi7SBp89qbLyK2cXDjd1TTNdLkwiPt9FmRAiXJFT93X6FjZx1CuTIPrAwVVeXSc8=
   global:
   # Directory where tests are run from
   - TEST_DIR=/tmp/test_dir/
   - MODULE=openml
-  - secure: ZfC4lEMGSbbsJ/EnqKPWXGxDu2oqJ9MKkvQoRXp76d9tbI7wOQGv991VjU/FMLUOpDgHu+EWwRZqTmaTXfYRbMvS0WoD6xAHMhBClYFN5kcP7qUj1NUt4QywV9WIuoyO5kSEgY52F4Ob18+t/Bz5iDhFB+tH4+mnQn37VPlpB30=
   matrix:
   - DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY_VERSION="1.10.2" SCIPY_VERSION="0.16.1" CYTHON_VERSION="0.21"
   - DISTRIB="conda" PYTHON_VERSION="3.4" COVERAGE="true" NUMPY_VERSION="1.10.2" SCIPY_VERSION="0.16.1" CYTHON_VERSION="0.23.4"
