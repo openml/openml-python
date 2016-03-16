@@ -1,3 +1,4 @@
+from .. import datasets
 
 
 class OpenMLTask(object):
@@ -30,7 +31,7 @@ class OpenMLTask(object):
 
     def get_dataset(self):
         """Download dataset associated with task"""
-        return self.api_connector.download_dataset(self.dataset_id)
+        return datasets.download_dataset(self.api_connector, self.dataset_id)
 
     def get_X_and_Y(self):
         dataset = self.get_dataset()

@@ -55,38 +55,38 @@ class OpenMLDataset(object):
         self.update_comment = update_comment
         self.md5_cheksum = md5_checksum
         self.data_file = data_file
+        if data_file is not None:
+            self.data_pickle_file = data_file.replace('.arff', '.pkl')
 
-        self.data_pickle_file = data_file.replace('.arff', '.pkl')
-
-        if os.path.exists(self.data_pickle_file):
-            logger.debug("Data pickle file already exists.")
-        else:
-            try:
-                data = self.get_arff()
-            except OSError as e:
-                logger.critical("Please check that the data file %s is there "
-                                "and can be read.", self.data_file)
-                raise e
-
-            categorical = [False if type(type_) != list else True
-                           for name, type_ in data['attributes']]
-            attribute_names = [name for name, type_ in data['attributes']]
-
-            if isinstance(data['data'], tuple):
-                X = data['data']
-                X_shape = (max(X[1]) + 1, max(X[2]) + 1)
-                X = scipy.sparse.coo_matrix(
-                    (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
-                X = X.tocsr()
-            elif isinstance(data['data'], list):
-                X = np.array(data['data'], dtype=np.float32)
+            if os.path.exists(self.data_pickle_file):
+                logger.debug("Data pickle file already exists.")
             else:
-                raise Exception()
+                try:
+                    data = self.get_arff()
+                except OSError as e:
+                    logger.critical("Please check that the data file %s is there "
+                                    "and can be read.", self.data_file)
+                    raise e
 
-            with open(self.data_pickle_file, "wb") as fh:
-                pickle.dump((X, categorical, attribute_names), fh, -1)
-            logger.debug("Saved dataset %d: %s to file %s" %
-                         (self.id, self.name, self.data_pickle_file))
+                categorical = [False if type(type_) != list else True
+                               for name, type_ in data['attributes']]
+                attribute_names = [name for name, type_ in data['attributes']]
+
+                if isinstance(data['data'], tuple):
+                    X = data['data']
+                    X_shape = (max(X[1]) + 1, max(X[2]) + 1)
+                    X = scipy.sparse.coo_matrix(
+                        (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
+                    X = X.tocsr()
+                elif isinstance(data['data'], list):
+                    X = np.array(data['data'], dtype=np.float32)
+                else:
+                    raise Exception()
+
+                with open(self.data_pickle_file, "wb") as fh:
+                    pickle.dump((X, categorical, attribute_names), fh, -1)
+                logger.debug("Saved dataset %d: %s to file %s" %
+                             (self.id, self.name, self.data_pickle_file))
 
     def __eq__(self, other):
         if type(other) != OpenMLDataset:
