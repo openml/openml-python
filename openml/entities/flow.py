@@ -57,15 +57,12 @@ class OpenMLFlow(object):
             with open(abs_file_path, 'w') as fh:
                 fh.write(flow_xml)
 
-            flow_binary = open(abs_file_path, 'rb').read()
-            return_code, response_xml = connector.upload_flow(flow_binary)
+            flow_xml_binary = open(abs_file_path, 'rb').read()
+            return_code, response_xml = connector.upload_flow(flow_xml_binary,
+                                                              "FIXME DEFINE PYTHON FLOW")
 
             response_dict = xmltodict.parse(response_xml)
             flow_id = response_dict['oml:upload_flow']['oml:id']
             return int(flow_id)
-
-        elif int(flow_id) == -2:
-            # Something went wrong retrieving the flow
-            raise NotImplementedError('Error handling - check_flow_exists fail')
 
         return int(flow_id)

@@ -584,8 +584,9 @@ class APIConnector(object):
 
         return_code, xml_response = self._perform_api_call(
             "/flow/exists/%s/%s" % (name, version))
-        flow_id = -2
-        if return_code == 200:
-            xml_dict = xmltodict.parse(xml_response)
-            flow_id = xml_dict['oml:flow_exists']['oml:id']
+        if return_code != 200:
+            # fixme raise appropriate error
+            raise ValueError("api call failed: %s" % xml_response)
+        xml_dict = xmltodict.parse(xml_response)
+        flow_id = xml_dict['oml:flow_exists']['oml:id']
         return return_code, xml_response, flow_id
