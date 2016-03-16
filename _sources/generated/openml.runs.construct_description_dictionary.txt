@@ -1,0 +1,10 @@
+:mod:`openml.runs`.construct_description_dictionary
+================================================================
+
+.. currentmodule:: openml.runs
+
+.. autofunction:: construct_description_dictionary
+
+.. raw:: html
+
+    <div class="clearer"></div>

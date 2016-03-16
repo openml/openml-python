@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>openml.entities.task.OpenMLTask &mdash; OpenML 0.2.1 documentation</title>
+    <title>openml.runs.openml_run &mdash; OpenML 0.2.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -97,39 +97,54 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.entities.task</span></code>.OpenMLTask</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.runs</span></code>.openml_run</a></li>
 </ul>
 
         </div>
       </div>
     <div class="col-md-9 content">
       
-  <div class="section" id="openml-entities-task-openmltask">
-<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.entities.task</span></code>.OpenMLTask<a class="headerlink" href="#openml-entities-task-openmltask" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="openml.entities.task.OpenMLTask">
-<em class="property">class </em><code class="descclassname">openml.entities.task.</code><code class="descname">OpenMLTask</code><span class="sig-paren">(</span><em>task_id</em>, <em>task_type</em>, <em>data_set_id</em>, <em>target_feature</em>, <em>estimation_procedure_type</em>, <em>data_splits_url</em>, <em>estimation_parameters</em>, <em>evaluation_measure</em>, <em>cost_matrix</em>, <em>api_connector</em>, <em>class_labels=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.entities.task.OpenMLTask" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="openml.entities.task.OpenMLTask.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>algo</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.entities.task.OpenMLTask.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate an algorithm on the test data.</p>
+  <div class="section" id="openml-runs-openml-run">
+<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.runs</span></code>.openml_run<a class="headerlink" href="#openml-runs-openml-run" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="openml.runs.openml_run">
+<code class="descclassname">openml.runs.</code><code class="descname">openml_run</code><span class="sig-paren">(</span><em>connector</em>, <em>task</em>, <em>classifier</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.openml_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a CV run on the dataset of the given task, using the split.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>connector</strong> : APIConnector</p>
+<blockquote>
+<div><p>Openml APIConnector which is used to download the OpenML Task and Dataset</p>
+</div></blockquote>
+<p><strong>taskid</strong> : int</p>
+<blockquote>
+<div><p>The integer identifier of the task to run the classifier on</p>
+</div></blockquote>
+<p><strong>classifier</strong> : sklearn classifier</p>
+<blockquote>
+<div><p>a classifier which has a function fit(X,Y) and predict(X),
+all supervised estimators of scikit learn follow this definition of a classifier [1]
+[1](<a class="reference external" href="http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html">http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html</a>)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>classifier</strong> : sklearn classifier</p>
+<blockquote>
+<div><p>the classifier, trained on the whole dataset</p>
+</div></blockquote>
+<p><strong>arff-dict</strong> : dict</p>
+<blockquote class="last">
+<div><p>a dictionary with an &#8216;attributes&#8217; and &#8216;data&#8217; entry for an arff file</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
-<dl class="method">
-<dt id="openml.entities.task.OpenMLTask.get_dataset">
-<code class="descname">get_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.entities.task.OpenMLTask.get_dataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download dataset associated with task</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.entities.task.OpenMLTask.validate">
-<code class="descname">validate</code><span class="sig-paren">(</span><em>algo</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.entities.task.OpenMLTask.validate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate an algorithm on the validation data.</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
+<div class="clearer"></div></div>
 
 
     </div>

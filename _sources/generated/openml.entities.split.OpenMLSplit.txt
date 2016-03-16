@@ -1,6 +1,0 @@
-:mod:`openml.entities.split`.OpenMLSplit
-===============================================
-
-.. currentmodule:: openml.entities.split
-
-.. autoclass:: OpenMLSplit

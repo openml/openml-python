@@ -99,9 +99,8 @@
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
 <li><a class="reference internal" href="#">APIs</a><ul>
 <li><a class="reference internal" href="#top-level-classes">Top-level Classes</a></li>
-<li><a class="reference internal" href="#dataset-functions">Dataset Functions</a><ul>
-</ul>
-</li>
+<li><a class="reference internal" href="#dataset-functions">Dataset Functions</a></li>
+<li><a class="reference internal" href="#run-functions">Run Functions</a></li>
 </ul>
 </li>
 </ul>
@@ -124,6 +123,15 @@
 <td>Provides an interface to the OpenML server.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset" title="openml.OpenMLDataset"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLDataset</span></code></a>([id,&nbsp;name,&nbsp;version,&nbsp;...])</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.OpenMLRun.html#openml.OpenMLRun" title="openml.OpenMLRun"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLRun</span></code></a>(task_id,&nbsp;flow_id,&nbsp;setup_string,&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.OpenMLTask.html#openml.OpenMLTask" title="openml.OpenMLTask"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLTask</span></code></a>(task_id,&nbsp;task_type,&nbsp;data_set_id,&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.OpenMLSplit.html#openml.OpenMLSplit" title="openml.OpenMLSplit"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLSplit</span></code></a>(name,&nbsp;description,&nbsp;split)</td>
 <td></td>
 </tr>
 </tbody>
@@ -175,16 +183,31 @@
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section" id="run-functions">
+<h2>Run Functions<a class="headerlink" href="#run-functions" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/openml.entities.task.OpenMLTask.html#openml.entities.task.OpenMLTask" title="openml.entities.task.OpenMLTask"><code class="xref py py-obj docutils literal"><span class="pre">entities.task.OpenMLTask</span></code></a>(task_id,&nbsp;task_type,&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.runs.construct_description_dictionary.html#openml.runs.construct_description_dictionary" title="openml.runs.construct_description_dictionary"><code class="xref py py-obj docutils literal"><span class="pre">construct_description_dictionary</span></code></a>(taskid,&nbsp;...)</td>
+<td>Creates a dictionary corresponding to the desired xml desired by openML</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.create_setup_string.html#openml.runs.create_setup_string" title="openml.runs.create_setup_string"><code class="xref py py-obj docutils literal"><span class="pre">create_setup_string</span></code></a>(classifier)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/openml.entities.split.OpenMLSplit.html#openml.entities.split.OpenMLSplit" title="openml.entities.split.OpenMLSplit"><code class="xref py py-obj docutils literal"><span class="pre">entities.split.OpenMLSplit</span></code></a>(name,&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.runs.get_version_information.html#openml.runs.get_version_information" title="openml.runs.get_version_information"><code class="xref py py-obj docutils literal"><span class="pre">get_version_information</span></code></a>()</td>
+<td>Gets versions of python, sklearn, numpy and scipy, returns them in an array,</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.openml_run.html#openml.runs.openml_run" title="openml.runs.openml_run"><code class="xref py py-obj docutils literal"><span class="pre">openml_run</span></code></a>(connector,&nbsp;task,&nbsp;classifier)</td>
+<td>Performs a CV run on the dataset of the given task, using the split.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.runs.download_run.html#openml.runs.download_run" title="openml.runs.download_run"><code class="xref py py-obj docutils literal"><span class="pre">download_run</span></code></a>(api_connector,&nbsp;run_id)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.get_cached_run.html#openml.runs.get_cached_run" title="openml.runs.get_cached_run"><code class="xref py py-obj docutils literal"><span class="pre">get_cached_run</span></code></a>(api_connector,&nbsp;run_id)</td>
 <td></td>
 </tr>
 </tbody>

@@ -1,0 +1,10 @@
+:mod:`openml.runs`.create_setup_string
+===================================================
+
+.. currentmodule:: openml.runs
+
+.. autofunction:: create_setup_string
+
+.. raw:: html
+
+    <div class="clearer"></div>

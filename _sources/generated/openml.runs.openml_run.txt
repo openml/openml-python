@@ -1,0 +1,10 @@
+:mod:`openml.runs`.openml_run
+==========================================
+
+.. currentmodule:: openml.runs
+
+.. autofunction:: openml_run
+
+.. raw:: html
+
+    <div class="clearer"></div>

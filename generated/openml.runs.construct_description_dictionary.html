@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>openml.datasets.download_datasets &mdash; OpenML 0.2.1 documentation</title>
+    <title>openml.runs.construct_description_dictionary &mdash; OpenML 0.2.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -97,40 +97,47 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.datasets</span></code>.download_datasets</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.runs</span></code>.construct_description_dictionary</a></li>
 </ul>
 
         </div>
       </div>
     <div class="col-md-9 content">
       
-  <div class="section" id="openml-datasets-download-datasets">
-<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.datasets</span></code>.download_datasets<a class="headerlink" href="#openml-datasets-download-datasets" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="openml-runs-construct-description-dictionary">
+<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.runs</span></code>.construct_description_dictionary<a class="headerlink" href="#openml-runs-construct-description-dictionary" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="openml.datasets.download_datasets">
-<code class="descclassname">openml.datasets.</code><code class="descname">download_datasets</code><span class="sig-paren">(</span><em>api_connector</em>, <em>dids</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.download_datasets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download datasets.</p>
+<dt id="openml.runs.construct_description_dictionary">
+<code class="descclassname">openml.runs.</code><code class="descname">construct_description_dictionary</code><span class="sig-paren">(</span><em>taskid</em>, <em>flow_id</em>, <em>setup_string</em>, <em>parameter_settings</em>, <em>tags</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.construct_description_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a dictionary corresponding to the desired xml desired by openML</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dids</strong> : iterable</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>taskid</strong> : int</p>
 <blockquote>
-<div><p>A list of integers representing dataset ids.</p>
+<div><p>the identifier of the task</p>
+</div></blockquote>
+<p><strong>setup_string</strong> : string</p>
+<blockquote>
+<div><p>a CLI string which can invoke the learning with the correct parameter settings</p>
+</div></blockquote>
+<p><strong>parameter_settings</strong> : array of dicts</p>
+<blockquote>
+<div><p>each dict containing keys name, value and component, one per parameter setting</p>
+</div></blockquote>
+<p><strong>tags</strong> : array of strings</p>
+<blockquote>
+<div><p>information that give a description of the run, must conform to
+regex <code class="docutils literal"><span class="pre">([a-zA-Z0-9_\-\.])+</span></code></p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list</p>
-<blockquote class="last">
-<div><p>A list of dataset objects.</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>result</strong> : an array with version information of the above packages</p>
 </td>
 </tr>
 </tbody>
 </table>
-<p class="rubric">Notes</p>
-<p>Uses <a class="reference internal" href="openml.datasets.download_dataset.html#openml.datasets.download_dataset" title="openml.datasets.download_dataset"><code class="xref py py-func docutils literal"><span class="pre">download_dataset()</span></code></a> internally. Please read
-the documentation of this.</p>
 </dd></dl>
 
 <div class="clearer"></div></div>

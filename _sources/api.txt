@@ -15,6 +15,9 @@ Top-level Classes
 
    APIConnector
    OpenMLDataset
+   OpenMLRun
+   OpenMLTask
+   OpenMLSplit
 
 
 Dataset Functions
@@ -38,11 +41,17 @@ Dataset Functions
     get_cached_dataset
     get_dataset_list
 
+Run Functions
+--------------
+.. currentmodule:: openml.runs
 
-.. currentmodule:: openml
 .. autosummary::
    :toctree: generated/
-   :template: class.rst
+   :template: function.rst
 
-   entities.task.OpenMLTask
-   entities.split.OpenMLSplit
+   construct_description_dictionary
+   create_setup_string
+   get_version_information
+   openml_run
+   download_run
+   get_cached_run

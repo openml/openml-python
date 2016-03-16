@@ -1,0 +1,10 @@
+:mod:`openml.runs`.get_cached_run
+==============================================
+
+.. currentmodule:: openml.runs
+
+.. autofunction:: get_cached_run
+
+.. raw:: html
+
+    <div class="clearer"></div>
