@@ -186,8 +186,7 @@ def download_datasets(api_connector, dids):
 
     Notes
     -----
-    Uses the method :method:`pyMetaLearn.data_repositories.openml
-    .apiconnector.APIConnector.download_dataset` internally. Please read
+    Uses :func:`download_dataset` internally. Please read
     the documentation of this.
     """
     datasets = []

@@ -183,7 +183,7 @@ def construct_description_dictionary(taskid, flow_id, setup_string,
         each dict containing keys name, value and component, one per parameter setting
     tags : array of strings
         information that give a description of the run, must conform to
-        regex "([a-zA-Z0-9_\-\.])+"
+        regex ``([a-zA-Z0-9_\-\.])+``
 
     Returns
     -------
