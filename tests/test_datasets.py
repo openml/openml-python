@@ -11,10 +11,11 @@ else:
 from openml import APIConnector
 from openml import OpenMLDataset
 from openml.util import is_string
+from openml.testing import TestBase
 import openml
 
 
-class TestOpenMLDataset(unittest.TestCase):
+class TestOpenMLDataset(TestBase):
 
     def setUp(self):
         # FIXME REFACTOR with test apiconnector

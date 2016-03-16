@@ -1,30 +1,13 @@
-__author__ = 'feurerm'
-
 import unittest
 import os
-import shutil
-import sys
-
-
-if sys.version_info[0] >= 3:
-    from unittest import mock
-    from urllib.request import urlopen
-    from urllib.parse import urlencode
-    from urllib.error import URLError
-else:
-    import mock
-    from urllib import urlencode
-    from urllib2 import URLError, urlopen
 
 
 from openml.util import is_string
-
-from openml import APIConnector
-from openml import OpenMLDataset
+from openml.testing import TestBase
 from openml import OpenMLSplit
 
 
-class TestAPIConnector(unittest.TestCase):
+class TestAPIConnector(TestBase):
     """Test the APIConnector
 
     Note
@@ -33,41 +16,11 @@ class TestAPIConnector(unittest.TestCase):
     API calls.
     """
 
-    def setUp(self):
-        self.cwd = os.getcwd()
-        workdir = os.path.dirname(os.path.abspath(__file__))
-        self.workdir = os.path.join(workdir, "tmp")
-        try:
-            shutil.rmtree(self.workdir)
-        except:
-            pass
-
-        os.mkdir(self.workdir)
-        os.chdir(self.workdir)
-
-        self.cached = True
-        try:
-            apikey = os.environ['OPENMLAPIKEY']
-        except:
-            apikey = None
-
-        if "TRAVIS" in os.environ and apikey is None:
-            raise Exception('Running on travis-ci, but no environment '
-                            'variable OPENMLAPIKEY found.')
-
-        self.connector = APIConnector(cache_directory=self.workdir,
-                                      apikey=apikey)
-
-    def tearDown(self):
-        os.chdir(self.cwd)
-        shutil.rmtree(self.workdir)
-
     ############################################################################
     # Test administrative stuff
     @unittest.skip("Not implemented yet.")
     def test_parse_config(self):
         raise Exception()
-
 
     @unittest.skip("Not implemented yet.")
     def test_get_cached_tasks(self):
@@ -84,10 +37,6 @@ class TestAPIConnector(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def test_get_cached_split(self):
         raise Exception()
-
-    ############################################################################
-    # Test all remote stuff
-
 
     ############################################################################
     # Tasks
@@ -133,34 +82,6 @@ class TestAPIConnector(unittest.TestCase):
         self.assertTrue(os.path.exists(
             os.path.join(os.getcwd(), "tasks", "1", "datasplits.arff")))
 
-    ############################################################################
-    # Runs
-    @unittest.skip('The method which is tested by this function doesnt exist')
-    def test_download_run_list(self):
-        def check_run(run):
-            self.assertIsInstance(run, dict)
-            self.assertEqual(len(run), 6)
-
-        runs = self.connector.get_runs_list(task_id=1)
-        self.assertGreaterEqual(len(runs), 800)
-        for run in runs:
-            check_run(run)
-
-        runs = self.connector.get_runs_list(flow_id=1)
-        self.assertGreaterEqual(len(runs), 1)
-        for run in runs:
-            check_run(run)
-
-        runs = self.connector.get_runs_list(setup_id=1)
-        self.assertGreaterEqual(len(runs), 260)
-        for run in runs:
-            check_run(run)
-
-    def test_download_run(self):
-        run = self.connector.download_run(473350)
-        self.assertEqual(run.dataset_id, 1167)
-        self.assertEqual(run.evaluations['f_measure'], 0.624668)
-
     # ###########################################################################
     # Flows
     @unittest.skip('The method which is tested by this function doesnt exist')
@@ -174,8 +95,8 @@ class TestAPIConnector(unittest.TestCase):
         for flow in flows:
             check_flow(flow)
 
-
     def test_upload_flow(self):
-        description = '''<oml:flow xmlns:oml="http://openml.org/openml"><oml:name>Test</oml:name><oml:description>description</oml:description> </oml:flow>'''
+        description = ('''<oml:flow xmlns:oml="http://openml.org/openml"><oml:name>Test</oml:name>'''
+                       '''<oml:description>description</oml:description> </oml:flow>''')
         return_code, dataset_xml = self.connector.upload_flow(description, "Testing upload flow")
         self.assertEqual(return_code, 200)
