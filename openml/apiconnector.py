@@ -543,7 +543,7 @@ class APIConnector(object):
                 else:
                     raise ValueError("File doesn't exist")
         response = requests.post(url, data=data, files=file_elements)
-        return response.status_code, response
+        return response.status_code, response.text
 
     def _read_url(self, url, data=None):
         if data is None:
