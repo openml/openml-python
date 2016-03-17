@@ -38,7 +38,7 @@ Dataset Functions
     list_datasets
 
 Run Functions
---------------
+-------------
 .. currentmodule:: openml.runs
 
 .. autosummary::
@@ -47,6 +47,12 @@ Run Functions
 
    run_task
    get_run
+   list_runs
+   list_runs_by_flow
+   list_runs_by_tag
+   list_runs_by_task
+   list_runs_by_uploader
+   list_runs_by_filters
 
 Task Functions
 --------------
