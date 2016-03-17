@@ -1,0 +1,10 @@
+:mod:`openml.tasks`.download_task
+==============================================
+
+.. currentmodule:: openml.tasks
+
+.. autofunction:: download_task
+
+.. raw:: html
+
+    <div class="clearer"></div>

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>openml.OpenMLTask &mdash; OpenML 0.2.1 documentation</title>
+    <title>openml.tasks.download_task &mdash; OpenML 0.2.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -97,29 +97,26 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml</span></code>.OpenMLTask</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.tasks</span></code>.download_task</a></li>
 </ul>
 
         </div>
       </div>
     <div class="col-md-9 content">
       
-  <div class="section" id="openml-openmltask">
-<h1><code class="xref py py-mod docutils literal"><span class="pre">openml</span></code>.OpenMLTask<a class="headerlink" href="#openml-openmltask" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="openml.OpenMLTask">
-<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLTask</code><span class="sig-paren">(</span><em>task_id</em>, <em>task_type</em>, <em>data_set_id</em>, <em>target_feature</em>, <em>estimation_procedure_type</em>, <em>data_splits_url</em>, <em>estimation_parameters</em>, <em>evaluation_measure</em>, <em>cost_matrix</em>, <em>api_connector</em>, <em>class_labels=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="openml.OpenMLTask.download_split">
-<code class="descname">download_split</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask.download_split" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download the OpenML split for a given task.</p>
+  <div class="section" id="openml-tasks-download-task">
+<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.tasks</span></code>.download_task<a class="headerlink" href="#openml-tasks-download-task" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="openml.tasks.download_task">
+<code class="descclassname">openml.tasks.</code><code class="descname">download_task</code><span class="sig-paren">(</span><em>api_connector</em>, <em>task_id</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.download_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the OpenML task for a given task ID.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>task_id</strong> : Task</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>task_id</strong> : int</p>
 <blockquote class="last">
-<div><p>An entity of <code class="xref py py-class docutils literal"><span class="pre">pyMetaLearn.entities.task.Task</span></code>.</p>
+<div><p>The OpenML task id.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -127,27 +124,7 @@
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="openml.OpenMLTask.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>algo</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate an algorithm on the test data.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLTask.get_dataset">
-<code class="descname">get_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask.get_dataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download dataset associated with task</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLTask.validate">
-<code class="descname">validate</code><span class="sig-paren">(</span><em>algo</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask.validate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate an algorithm on the validation data.</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
+<div class="clearer"></div></div>
 
 
     </div>
