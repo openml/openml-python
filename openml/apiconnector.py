@@ -14,7 +14,7 @@ else:
 
 logger = logging.getLogger(__name__)
 
-OPENML_URL = "http://www.openml.org/api_new/v1/xml"
+OPENML_URL = "http://www.openml.org/api/v1/xml"
 
 
 class APIConnector(object):
