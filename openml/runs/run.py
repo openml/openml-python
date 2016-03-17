@@ -9,7 +9,7 @@ import os
 from ..flows import OpenMLFlow
 from ..exceptions import OpenMLCacheException
 from ..util import URLError
-from ..tasks import download_task
+from ..tasks import get_task
 
 
 class OpenMLRun(object):
@@ -51,9 +51,9 @@ class OpenMLRun(object):
         task : Task
             the OpenML task for which the run is done
         """
-        run_environment = (get_version_information() +
-                           [time.strftime("%c")] + ['Created by openml_run()'])
-        task = download_task(api_connector, self.task_id)
+        run_environment = (_get_version_information() +
+                           [time.strftime("%c")] + ['Created by run_task()'])
+        task = get_task(api_connector, self.task_id)
         class_labels = task.class_labels
 
         arff_dict = {}
@@ -78,7 +78,7 @@ class OpenMLRun(object):
         return return_code, dataset_xml
 
     def create_description_xml(self):
-        run_environment = get_version_information()
+        run_environment = _get_version_information()
         setup_string = ''  # " ".join(sys.argv);
 
         parameter_settings = self.model.get_params()
@@ -86,15 +86,15 @@ class OpenMLRun(object):
         # so we format time from 'mm/dd/yy hh:mm:ss' to 'mm-dd-yy_hh.mm.ss'
         well_formatted_time = time.strftime("%c").replace(
             ' ', '_').replace('/', '-').replace(':', '.')
-        tags = run_environment + [well_formatted_time] + ['openml_run'] + \
+        tags = run_environment + [well_formatted_time] + ['run_task'] + \
             [self.model.__module__ + "." + self.model.__class__.__name__]
-        description = construct_description_dictionary(
+        description = _to_dict(
             self.task_id, self.flow_id, setup_string, parameter_settings, tags)
         description_xml = xmltodict.unparse(description, pretty=True)
         return description_xml
 
 
-def openml_run(connector, task, model):
+def run_task(connector, task, model):
     """Performs a CV run on the dataset of the given task, using the split.
 
     Parameters
@@ -133,7 +133,7 @@ def openml_run(connector, task, model):
     if class_labels is None:
         raise ValueError('The task has no class labels. This method currently '
                          'only works for tasks with class labels.')
-    setup_string = create_setup_string(model)
+    setup_string = _create_setup_string(model)
 
     run = OpenMLRun(task.task_id, flow_id, setup_string, dataset.id)
 
@@ -171,7 +171,7 @@ def openml_run(connector, task, model):
     return run
 
 
-def construct_description_dictionary(taskid, flow_id, setup_string,
+def _to_dict(taskid, flow_id, setup_string,
                                      parameter_settings, tags):
     """ Creates a dictionary corresponding to the desired xml desired by openML
 
@@ -214,15 +214,15 @@ def construct_description_dictionary(taskid, flow_id, setup_string,
     return description
 
 
-def create_setup_string(model):
-    run_environment = " ".join(get_version_information())
+def _create_setup_string(model):
+    run_environment = " ".join(_get_version_information())
     # fixme str(model) might contain (...)
     return run_environment + " " + str(model)
 
 
 # This can possibly be done by a package such as pyxb, but I could not get
 # it to work properly.
-def get_version_information():
+def _get_version_information():
     """Gets versions of python, sklearn, numpy and scipy, returns them in an array,
 
     Returns
@@ -243,11 +243,11 @@ def get_version_information():
     return [python_version, sklearn_version, numpy_version, scipy_version]
 
 
-def download_run(api_connector, run_id):
+def get_run(api_connector, run_id):
     run_file = os.path.join(api_connector.run_cache_dir, "run_%d.xml" % run_id)
 
     try:
-        return get_cached_run(api_connector, run_id)
+        return _get_cached_run(api_connector, run_id)
     except (OpenMLCacheException):
         try:
             return_code, run_xml = api_connector._perform_api_call(
@@ -329,7 +329,7 @@ def _create_run_from_xml(xml):
                      evaluations=evaluations)
 
 
-def get_cached_run(api_connector, run_id):
+def _get_cached_run(api_connector, run_id):
     for run_cache_dir in [api_connector.run_cache_dir,
                           api_connector._private_directory_runs]:
         try:

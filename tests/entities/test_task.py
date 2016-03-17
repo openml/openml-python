@@ -30,7 +30,7 @@ class OpenMLTaskTest(unittest.TestCase):
                          "crossvalidation wth holdout", None, None, None,
                          None, self.api_connector)
 
-    @mock.patch.object(APIConnector, "download_dataset", autospec=True)
+    @mock.patch.object(APIConnector, "get_dataset", autospec=True)
     def test_get_dataset(self, api_connector_mock):
         api_connector_mock.return_value = "Some strange string"
         retval = self.task.get_dataset()

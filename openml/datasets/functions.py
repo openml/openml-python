@@ -15,7 +15,7 @@ else:
 ############################################################################
 # Local getters/accessors to the cache directory
 
-def get_list_of_cached_datasets(api_connector):
+def _list_cached_datasets(api_connector):
     """Return list with ids of all cached datasets"""
     datasets = []
 
@@ -46,20 +46,20 @@ def get_list_of_cached_datasets(api_connector):
     return datasets
 
 
-def get_cached_datasets(api_connector):
+def _get_cached_datasets(api_connector):
     """Searches for all OpenML datasets in the OpenML cache dir.
 
     Return a dictionary which maps dataset ids to dataset objects"""
-    dataset_list = get_list_of_cached_datasets(api_connector)
+    dataset_list = _list_cached_datasets(api_connector)
     datasets = OrderedDict()
 
     for did in dataset_list:
-        datasets[did] = get_cached_dataset(api_connector, did)
+        datasets[did] = _get_cached_dataset(api_connector, did)
 
     return datasets
 
 
-def get_cached_dataset(api_connector, did):
+def _get_cached_dataset(api_connector, did):
     # This code is slow...replace it with new API calls
     description = _get_cached_dataset_description(api_connector, did)
     arff_file = _get_cached_dataset_arff(api_connector, did)
@@ -103,7 +103,7 @@ def _get_cached_dataset_arff(api_connector, did):
                                "cached" % did)
 
 
-def get_dataset_list(api_connector):
+def list_datasets(api_connector):
     """Return a list of all dataset which are on OpenML.
 
     Returns
@@ -144,7 +144,7 @@ def get_dataset_list(api_connector):
     return datasets
 
 
-def datasets_active(api_connector, dids):
+def check_datasets_active(api_connector, dids):
     """Check if the dataset ids provided are active.
 
     Parameters
@@ -158,7 +158,7 @@ def datasets_active(api_connector, dids):
         A dictionary with items {did: active}, where active is a boolean. It
         is set to True if the dataset is active.
     """
-    dataset_list = get_dataset_list(api_connector)
+    dataset_list = list_datasets(api_connector)
     dids = sorted(dids)
     active = {}
 
@@ -171,7 +171,7 @@ def datasets_active(api_connector, dids):
         dataset_list_idx = idx
 
 
-def download_datasets(api_connector, dids):
+def get_datasets(api_connector, dids):
     """Download datasets.
 
     Parameters
@@ -186,16 +186,16 @@ def download_datasets(api_connector, dids):
 
     Notes
     -----
-    Uses :func:`download_dataset` internally. Please read
+    Uses :func:`get_dataset` internally. Please read
     the documentation of this.
     """
     datasets = []
     for did in dids:
-        datasets.append(download_dataset(api_connector, did))
+        datasets.append(get_dataset(api_connector, did))
     return datasets
 
 
-def download_dataset(api_connector, did):
+def get_dataset(api_connector, did):
     """Download a dataset.
 
     TODO: explain caching!
@@ -215,14 +215,14 @@ def download_dataset(api_connector, did):
         raise ValueError("Dataset ID is neither an Integer nor can be "
                          "cast to an Integer.")
 
-    description = download_dataset_description(api_connector, did)
-    arff_file = download_dataset_arff(api_connector, did, description=description)
+    description = get_dataset_description(api_connector, did)
+    arff_file = _get_dataset_arff(api_connector, did, description=description)
 
     dataset = _create_dataset_from_description(description, arff_file)
     return dataset
 
 
-def download_dataset_description(api_connector, did):
+def get_dataset_description(api_connector, did):
     # TODO implement a cache for this that invalidates itself after some
     # time
     # This can be saved on disk, but cannot be cached properly, because
@@ -260,7 +260,7 @@ def download_dataset_description(api_connector, did):
     return description
 
 
-def download_dataset_arff(api_connector, did, description=None):
+def _get_dataset_arff(api_connector, did, description=None):
     did_cache_dir = _create_dataset_cache_dir(api_connector, did)
     output_file = os.path.join(did_cache_dir, "dataset.arff")
 
@@ -274,7 +274,7 @@ def download_dataset_arff(api_connector, did, description=None):
         pass
 
     if description is None:
-        description = download_dataset_description(api_connector, did)
+        description = get_dataset_description(api_connector, did)
     url = description['oml:url']
     return_code, arff_string = api_connector._read_url(url)
     # TODO: it is inefficient to load the dataset in memory prior to
@@ -286,7 +286,7 @@ def download_dataset_arff(api_connector, did, description=None):
     return output_file
 
 
-def download_dataset_features(api_connector, did):
+def get_dataset_features(api_connector, did):
     did_cache_dir = _create_dataset_cache_dir(api_connector, did)
     features_file = os.path.join(did_cache_dir, "features.xml")
 
@@ -316,7 +316,7 @@ def download_dataset_features(api_connector, did):
     return features
 
 
-def download_dataset_qualities(api_connector, did):
+def get_dataset_qualities(api_connector, did):
     # Dataset qualities are subject to change and must be fetched every time
     did_cache_dir = _create_dataset_cache_dir(api_connector, did)
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")

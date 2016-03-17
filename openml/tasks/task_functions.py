@@ -79,7 +79,7 @@ def get_estimation_procedure_list(api_connector):
     return procs
 
 
-def get_task_list(api_connector, task_type_id=1):
+def list_tasks(api_connector, task_type_id=1):
     """Return a list of all tasks which are on OpenML.
 
     Parameters
@@ -142,7 +142,7 @@ def get_task_list(api_connector, task_type_id=1):
     return tasks
 
 
-def download_task(api_connector, task_id):
+def get_task(api_connector, task_id):
     """Download the OpenML task for a given task ID.
 
     Parameters
@@ -187,7 +187,7 @@ def download_task(api_connector, task_id):
         task = _create_task_from_xml(api_connector, task_xml)
 
     task.download_split()
-    dataset = datasets.download_dataset(api_connector, task.dataset_id)
+    dataset = datasets.get_dataset(api_connector, task.dataset_id)
 
     # TODO look into either adding the class labels to task xml, or other
     # way of reading it.

@@ -5,7 +5,7 @@ from ..exceptions import OpenMLCacheException
 from .split import OpenMLSplit
 
 
-def get_cached_splits(api_connector):
+def _get_cached_splits(api_connector):
     splits = OrderedDict()
     for task_cache_dir in [api_connector.task_cache_dir,
                            api_connector._private_directory_tasks]:
@@ -23,7 +23,7 @@ def get_cached_splits(api_connector):
     return splits
 
 
-def get_cached_split(api_connector, tid):
+def _get_cached_split(api_connector, tid):
     for task_cache_dir in [api_connector.task_cache_dir,
                            api_connector._private_directory_tasks]:
         try:

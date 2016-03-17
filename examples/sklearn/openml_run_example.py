@@ -1,10 +1,10 @@
 from openml.apiconnector import APIConnector
-from openml.autorun import openml_run
+from openml.autorun import run_task
 from sklearn import ensemble
 import xmltodict
 import os
 """
-An example of an automated machine learning experiment using openml_run
+An example of an automated machine learning experiment using run_task
 """
 
 key_file_path = "apikey.txt"
@@ -15,9 +15,9 @@ task_id = 59
 
 clf = ensemble.RandomForestClassifier()
 connector = APIConnector(apikey = key)
-task = connector.download_task(task_id)
+task = connector.get_task(task_id)
 
-prediction_path, description_path = openml_run(task, clf)
+prediction_path, description_path = run_task(task, clf)
 
 prediction_abspath = os.path.abspath(prediction_path)
 description_abspath = os.path.abspath(description_path)

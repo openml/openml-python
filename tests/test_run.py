@@ -6,9 +6,9 @@ from openml.testing import TestBase
 
 class TestRun(TestBase):
     def test_run_iris(self):
-        task = openml.tasks.download_task(self.connector, 10107)
+        task = openml.tasks.get_task(self.connector, 10107)
         clf = LogisticRegression()
-        run = openml.runs.openml_run(self.connector, task, clf)
+        run = openml.runs.run_task(self.connector, task, clf)
         return_code, return_value = run.publish(self.connector)
         self.assertEqual(return_code, 200)
         # self.assertTrue("This is a read-only account" in return_value)
@@ -16,7 +16,7 @@ class TestRun(TestBase):
     ############################################################################
     # Runs
     @unittest.skip('The method which is tested by this function doesnt exist')
-    def test_download_run_list(self):
+    def test_get_run_list(self):
         def check_run(run):
             self.assertIsInstance(run, dict)
             self.assertEqual(len(run), 6)
@@ -36,7 +36,7 @@ class TestRun(TestBase):
         for run in runs:
             check_run(run)
 
-    def test_download_run(self):
-        run = openml.runs.download_run(self.connector, 473350)
+    def test_get_run(self):
+        run = openml.runs.get_run(self.connector, 473350)
         self.assertEqual(run.dataset_id, 1167)
         self.assertEqual(run.evaluations['f_measure'], 0.624668)
