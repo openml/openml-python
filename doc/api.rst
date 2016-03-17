@@ -55,3 +55,14 @@ Run Functions
    openml_run
    download_run
    get_cached_run
+
+Task Functions
+--------------
+.. currentmodule:: openml.tasks
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+    download_task
+    get_task_list

@@ -9,6 +9,7 @@ import os
 from ..entities.flow import OpenMLFlow
 from ..exceptions import OpenMLCacheException
 from ..util import URLError
+from ..tasks import download_task
 
 
 class OpenMLRun(object):
@@ -52,7 +53,7 @@ class OpenMLRun(object):
         """
         run_environment = (get_version_information() +
                            [time.strftime("%c")] + ['Created by openml_run()'])
-        task = api_connector.download_task(self.task_id)
+        task = download_task(api_connector, self.task_id)
         class_labels = task.class_labels
 
         arff_dict = {}

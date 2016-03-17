@@ -1,4 +1,8 @@
+import os
+
 from .. import datasets
+from ..util import URLError
+from ..entities.split import OpenMLSplit
 
 
 class OpenMLTask(object):
@@ -58,17 +62,66 @@ class OpenMLTask(object):
 
     def get_train_test_split_indices(self, fold=0, repeat=0):
         # Replace with retrieve from cache
-        split = self.api_connector.download_split(self)
+        split = self.download_split()
         train_indices, test_indices = split.get(repeat=repeat, fold=fold)
         return train_indices, test_indices
 
     def iterate_repeats(self):
-        split = self.api_connector.download_split(self)
+        split = self.download_split()
         for rep in split.iterate_splits():
             yield rep
 
     def iterate_all_splits(self):
-        split = self.api_connector.download_split(self)
+        split = self.download_split()
         for rep in split.iterate_splits():
             for fold in rep:
                 yield fold
+
+    def _download_split(self, cache_file):
+        try:
+            with open(cache_file):
+                pass
+        except (OSError, IOError):
+            split_url = self.estimation_procedure["data_splits_url"]
+            try:
+                return_code, split_arff = self.api_connector._read_url(split_url)
+            except (URLError, UnicodeEncodeError) as e:
+                print(e, split_url)
+                raise e
+
+            with open(cache_file, "w") as fh:
+                fh.write(split_arff)
+            del split_arff
+
+    def download_split(self):
+        """Download the OpenML split for a given task.
+
+        Parameters
+        ----------
+        task_id : Task
+            An entity of :class:`pyMetaLearn.entities.task.Task`.
+        """
+        cached_split_file = os.path.join(
+            _create_task_cache_dir(self.api_connector, self.task_id), "datasplits.arff")
+
+        try:
+            split = OpenMLSplit.from_arff_file(cached_split_file)
+        # Add FileNotFoundError in python3 version (which should be a
+        # subclass of OSError.
+        except (OSError, IOError):
+            # Next, download and cache the associated split file
+            self._download_split(cached_split_file)
+            split = OpenMLSplit.from_arff_file(cached_split_file)
+
+        return split
+
+
+def _create_task_cache_dir(api_connector, task_id):
+    task_cache_dir = os.path.join(api_connector.task_cache_dir, str(task_id))
+
+    try:
+        os.makedirs(task_cache_dir)
+    except (IOError, OSError):
+        # TODO add debug information!
+        pass
+    return task_cache_dir
