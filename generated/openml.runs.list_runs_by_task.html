@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>openml.OpenMLRun &mdash; OpenML 0.2.1 documentation</title>
+    <title>openml.runs.list_runs_by_task &mdash; OpenML 0.2.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -97,44 +97,31 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml</span></code>.OpenMLRun</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.runs</span></code>.list_runs_by_task</a></li>
 </ul>
 
         </div>
       </div>
     <div class="col-md-9 content">
       
-  <div class="section" id="openml-openmlrun">
-<h1><code class="xref py py-mod docutils literal"><span class="pre">openml</span></code>.OpenMLRun<a class="headerlink" href="#openml-openmlrun" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="openml.OpenMLRun">
-<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLRun</code><span class="sig-paren">(</span><em>task_id</em>, <em>flow_id</em>, <em>setup_string</em>, <em>dataset_id</em>, <em>files=None</em>, <em>setup_id=None</em>, <em>tags=None</em>, <em>run_id=None</em>, <em>uploader=None</em>, <em>uploader_name=None</em>, <em>evaluations=None</em>, <em>detailed_evaluations=None</em>, <em>data_content=None</em>, <em>model=None</em>, <em>task_type=None</em>, <em>task_evaluation_measure=None</em>, <em>flow_name=None</em>, <em>parameter_settings=None</em>, <em>predictions_url=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="openml.OpenMLRun.generate_arff">
-<code class="descname">generate_arff</code><span class="sig-paren">(</span><em>api_connector</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.generate_arff" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates an arff</p>
+  <div class="section" id="openml-runs-list-runs-by-task">
+<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.runs</span></code>.list_runs_by_task<a class="headerlink" href="#openml-runs-list-runs-by-task" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="openml.runs.list_runs_by_task">
+<code class="descclassname">openml.runs.</code><code class="descname">list_runs_by_task</code><span class="sig-paren">(</span><em>api_connector</em>, <em>task_id</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.list_runs_by_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>List runs by task.</p>
+<p>Perform API call <a class="reference external" href="http://www.openml.org/api_docs/#!/run/get_run_list_task_ids">/run/list/task/{ids}</a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>arff_datacontent</strong> : list</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>a list of lists containing, in order:</dt>
-<dd><ul class="first last simple">
-<li>repeat (int)</li>
-<li>fold (int)</li>
-<li>test index (int)</li>
-<li>predictions per task label (float)</li>
-<li>predicted class label (string)</li>
-<li>actual class label (string)</li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-<p><strong>task</strong> : Task</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>api_connector</strong> : <a class="reference internal" href="openml.APIConnector.html#openml.APIConnector" title="openml.APIConnector"><code class="xref py py-class docutils literal"><span class="pre">openml.APIConnector</span></code></a></p>
+<p><strong>task_id</strong> : int or list</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list</p>
 <blockquote class="last">
-<div><p>the OpenML task for which the run is done</p>
+<div><p>List of found runs.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -142,9 +129,7 @@
 </table>
 </dd></dl>
 
-</dd></dl>
-
-</div>
+<div class="clearer"></div></div>
 
 
     </div>

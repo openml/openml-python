@@ -39,21 +39,22 @@ API call                                        implemented tested properly test
 /flow/                                          yes         yes
 /flow/exists/{name,ext_version}
 /flow/owned
-/run/list                                       yes         yes
-/run/{run_id}                                   yes         yes
-/run                                            yes         yes
+/run/list/task/{task_ids}                       yes         yes
+/run/list/run/{run_ids}                         yes         yes
+/run/list/tag/{tag}                             yes         yes
+/run/{id}                                       yes         yes
+/run/list/uploader/{ids}                        yes         yes
+/run/list/flow/{ids}                            yes         yes
+/run/list/{filters}                             yes         yes
 /run/tag
 /run/untag
-/run/evaluate
-/run/reset
+/run (POST)                                     yes         yes
+/run/{id} (DELETE)
 /estimationprocedure/{proc_id}
 /estimationprocedure/list
 /evaluationmeasures/list
 /job/request/
 =============================================== =========== ====== =============== ========== =====================
-
-This list does not contain the `/setup/` calls because we do not need them
-according to Jan.
 
 Convenience Functions
 =====================

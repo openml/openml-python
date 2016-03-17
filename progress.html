@@ -320,21 +320,49 @@
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-odd"><td>/run/list</td>
+<tr class="row-odd"><td>/run/list/task/{task_ids}</td>
 <td>yes</td>
 <td>yes</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-even"><td>/run/{run_id}</td>
+<tr class="row-even"><td>/run/list/run/{run_ids}</td>
 <td>yes</td>
 <td>yes</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-odd"><td>/run</td>
+<tr class="row-odd"><td>/run/list/tag/{tag}</td>
+<td>yes</td>
+<td>yes</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>/run/{id}</td>
+<td>yes</td>
+<td>yes</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>/run/list/uploader/{ids}</td>
+<td>yes</td>
+<td>yes</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>/run/list/flow/{ids}</td>
+<td>yes</td>
+<td>yes</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>/run/list/{filters}</td>
 <td>yes</td>
 <td>yes</td>
 <td>&nbsp;</td>
@@ -355,14 +383,14 @@
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-even"><td>/run/evaluate</td>
-<td>&nbsp;</td>
-<td>&nbsp;</td>
+<tr class="row-even"><td>/run (POST)</td>
+<td>yes</td>
+<td>yes</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-odd"><td>/run/reset</td>
+<tr class="row-odd"><td>/run/{id} (DELETE)</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
@@ -399,8 +427,6 @@
 </tr>
 </tbody>
 </table>
-<p>This list does not contain the <cite>/setup/</cite> calls because we do not need them
-according to Jan.</p>
 </div>
 <div class="section" id="convenience-functions">
 <h2>Convenience Functions<a class="headerlink" href="#convenience-functions" title="Permalink to this headline">¶</a></h2>
