@@ -13,7 +13,7 @@ from .._api_calls import _perform_api_call
 
 def get_cached_tasks():
     tasks = OrderedDict()
-    for cache_dir in [config.cachedir, config.privatedir]:
+    for cache_dir in [config.get_cache_dir(), config.get_private_dir()]:
 
         task_cache_dir = os.path.join(cache_dir, "tasks")
         directory_content = os.listdir(task_cache_dir)
@@ -34,7 +34,7 @@ def get_cached_tasks():
 
 
 def get_cached_task(tid):
-    for cache_dir in [config.cachedir, config.privatedir]:
+    for cache_dir in [config.get_cache_dir(), config.get_private_dir()]:
         task_cache_dir = os.path.join(cache_dir, "tasks")
         task_file = os.path.join(task_cache_dir,
                                  "tid_%d.xml" % int(tid))

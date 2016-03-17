@@ -71,22 +71,22 @@ class TestOpenMLDataset(TestBase):
         datasets = openml.datasets.get_datasets(dids)
         self.assertEqual(len(datasets), 2)
         self.assertTrue(os.path.exists(os.path.join(
-            openml.config.cachedir, "datasets", "1", "description.xml")))
+            openml.config.get_cache_dir(), "datasets", "1", "description.xml")))
         self.assertTrue(os.path.exists(os.path.join(
-            openml.config.cachedir, "datasets", "2", "description.xml")))
+            openml.config.get_cache_dir(), "datasets", "2", "description.xml")))
         self.assertTrue(os.path.exists(os.path.join(
-            openml.config.cachedir, "datasets", "1", "dataset.arff")))
+            openml.config.get_cache_dir(), "datasets", "1", "dataset.arff")))
         self.assertTrue(os.path.exists(os.path.join(
-            openml.config.cachedir, "datasets", "2", "dataset.arff")))
+            openml.config.get_cache_dir(), "datasets", "2", "dataset.arff")))
 
     def test_get_dataset(self):
         dataset = openml.datasets.get_dataset(1)
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, 'anneal')
         self.assertTrue(os.path.exists(os.path.join(
-            openml.config.cachedir, "datasets", "1", "description.xml")))
+            openml.config.get_cache_dir(), "datasets", "1", "description.xml")))
         self.assertTrue(os.path.exists(os.path.join(
-            openml.config.cachedir, "datasets", "1", "dataset.arff")))
+            openml.config.get_cache_dir(), "datasets", "1", "dataset.arff")))
 
     def test_download_rowid(self):
         # Smoke test which checks that the dataset has the row-id set correctly
@@ -113,7 +113,7 @@ class TestOpenMLDataset(TestBase):
     def test_publish_dataset(self):
 
         dataset = openml.datasets.get_dataset(3)
-        file_path = os.path.join(openml.config.cachedir, "datssets", "3", "dataset.arff")
+        file_path = os.path.join(openml.config.get_cache_dir(), "datssets", "3", "dataset.arff")
         dataset = OpenMLDataset(
             name="anneal", version=1, description="test",
             format="ARFF", licence="public", default_target_attribute="class", data_file=file_path)

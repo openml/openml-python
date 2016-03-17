@@ -21,7 +21,8 @@ def _list_cached_datasets():
     """Return list with ids of all cached datasets"""
     datasets = []
 
-    for dataset_cache_dir in config.CACHE_DIR:
+    for dataset_cache in [config.get_cache_dir(), config.get_private_dir()]:
+        dataset_cache_dir = os.path.join(dataset_cache, "datasets")
         directory_content = os.listdir(dataset_cache_dir)
         directory_content.sort()
 
@@ -87,8 +88,8 @@ def _get_cached_dataset_description(did):
 
 
 def _get_cached_dataset_arff(did):
-    for dataset_cache_dir in [config.cachedir,
-                              config.privatedir]:
+    for dataset_cache_dir in [config.get_cache_dir(),
+                              config.get_private_dir()]:
         did_cache_dir = os.path.join(dataset_cache_dir, str(did))
         output_file = os.path.join(did_cache_dir, "dataset.arff")
 
@@ -342,7 +343,7 @@ def get_dataset_qualities(did):
 
 
 def _create_dataset_cache_dir(did):
-    dataset_cache_dir = os.path.join(config.cachedir, str(did))
+    dataset_cache_dir = os.path.join(config.get_cache_dir(), str(did))
     try:
         os.makedirs(dataset_cache_dir)
     except (OSError, IOError):
@@ -352,7 +353,7 @@ def _create_dataset_cache_dir(did):
 
 
 def _remove_dataset_chache_dir(did):
-    dataset_cache_dir = os.path.join(config.cachedir, str(did))
+    dataset_cache_dir = os.path.join(config.get_cache_dir(), str(did))
     try:
         os.rmdir(dataset_cache_dir)
     except (OSError, IOError):

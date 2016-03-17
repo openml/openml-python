@@ -21,6 +21,8 @@ else:
 
 
 def _setup():
+    global apikey
+    global server
     # read config file, create cache directory
     try:
         os.mkdir(os.path.expanduser('~/.openml'))
@@ -28,31 +30,36 @@ def _setup():
         # TODO add debug information
         pass
     config = _parse_config()
-    set_api_key(config.get('FAKE_SECTION', 'apikey'))
-    set_server(config.get('FAKE_SECTION', 'server'))
+    apikey = config.get('FAKE_SECTION', 'apikey')
+    server = config.get('FAKE_SECTION', 'server')
     private_dir = config.get('FAKE_SECTION', 'private_directory')
     cache_dir = config.get('FAKE_SECTION', 'cachedir')
     set_cache_directory(cache_dir, private_dir)
     print(config)
 
 
-def _setup_cache_directories(cache_dir, private_dir):
+def set_cache_directory(cachedir, privatedir):
+    global _cachedir
+    global _privatedir
+    _cachedir = _cachedir
+    _privatedir = _privatedir
+
     # Set up the cache directories
-    dataset_cache_dir = os.path.join(cache_dir, "datasets")
-    task_cache_dir = os.path.join(cache_dir, "tasks")
-    run_cache_dir = os.path.join(cache_dir, 'runs')
+    dataset_cache_dir = os.path.join(cachedir, "datasets")
+    task_cache_dir = os.path.join(cachedir, "tasks")
+    run_cache_dir = os.path.join(cachedir, 'runs')
 
     # Set up the private directory
     _private_directory_datasets = os.path.join(
-        private_dir, "datasets")
+        privatedir, "datasets")
     _private_directory_tasks = os.path.join(
-        private_dir, "tasks")
+        privatedir, "tasks")
     _private_directory_runs = os.path.join(
-        private_dir, "runs")
+        privatedir, "runs")
 
-    for dir_ in [cache_dir, dataset_cache_dir,
+    for dir_ in [cachedir, dataset_cache_dir,
                  task_cache_dir, run_cache_dir,
-                 private_dir,
+                 privatedir,
                  _private_directory_datasets,
                  _private_directory_tasks,
                  _private_directory_runs]:
@@ -60,27 +67,9 @@ def _setup_cache_directories(cache_dir, private_dir):
             os.mkdir(dir_)
 
 
-def set_cache_directory(cache_dir, private_dir):
-    global CACHEDIR
-    global PRIVATEDIR
-    CACHEDIR = cache_dir
-    PRIVATEDIR = private_dir
-    _setup_cache_directories(cache_dir, private_dir)
-
-
-def set_api_key(apikey):
-    global APIKEY
-    APIKEY = apikey
-
-
-def set_server(url):
-    global OPENML_URL
-    OPENML_URL = url
-
-
 def _parse_config():
-    defaults = {'apikey': APIKEY,
-                'server': OPENML_URL,
+    defaults = {'apikey': apikey,
+                'server': server,
                 'verbosity': 0,
                 'cachedir': os.path.expanduser('~/.openml/cache'),
                 'private_directory': os.path.expanduser('~/.openml/private')}
@@ -109,6 +98,14 @@ def _parse_config():
                      config_file, e.message)
     return config
 
-__all__ = ["set_cache_directory", "set_api_key"]
+
+def get_cache_directory():
+    return _cachedir
+
+
+def get_private_directory():
+    return _privatedir
+
+__all__ = ["set_cache_directory", 'get_cache_directory', 'get_private_directory']
 
 _setup()

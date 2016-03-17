@@ -349,7 +349,7 @@ def _create_run_from_xml(xml):
 
 
 def _get_cached_run(run_id):
-    for cache_dir in [config.cachedir, config.privatedir]:
+    for cache_dir in [config.get_cache_dir(), config.get_private_dir()]:
         run_cache_dir = os.path.join(cache_dir, "runs")
         try:
             run_file = os.path.join(run_cache_dir,
