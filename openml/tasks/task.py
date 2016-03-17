@@ -118,7 +118,7 @@ class OpenMLTask(object):
 
 
 def _create_task_cache_dir(task_id):
-    task_cache_dir = os.path.join(config.get_cache_dir(), "tasks", str(task_id))
+    task_cache_dir = os.path.join(config.get_cache_directory(), "tasks", str(task_id))
 
     try:
         os.makedirs(task_cache_dir)

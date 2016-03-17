@@ -86,7 +86,7 @@ def _perform_api_call(call, data=None, file_dictionary=None,
     return_value : str
         Return value of the OpenML server
     """
-    url = config.SERVER
+    url = config.server
     if not url.endswith("/"):
         url += "/"
     url += call
@@ -101,7 +101,7 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
     file_dictionary and sending file_elements as files"""
     if data is None:
         data = {}
-    data['api_key'] = config.APIKEY
+    data['api_key'] = config.apikey
     if file_elements is None:
         file_elements = {}
     if file_dictionary is not None:
@@ -128,7 +128,7 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
 def _read_url(url, data=None):
     if data is None:
         data = {}
-    data['api_key'] = config.APIKEY
+    data['api_key'] = config.apikey
 
     response = requests.post(url, data=data)
     return response.status_code, response.text

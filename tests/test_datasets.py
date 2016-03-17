@@ -8,7 +8,6 @@ else:
     import mock
 
 import openml
-from openml._api_calls import _perform_api_call
 from openml import OpenMLDataset
 from openml.util import is_string
 from openml.testing import TestBase
@@ -20,8 +19,8 @@ class TestOpenMLDataset(TestBase):
     def test__get_cached_datasets(self):
         workdir = os.path.dirname(os.path.abspath(__file__))
         workdir = os.path.join(workdir, "files")
-        con = openml.config.set_cache_dir(cache_dir=workdir)
-        datasets = _get_cached_datasets(con)
+        openml.config.set_cache_directory(cachedir=workdir, privatedir=workdir)
+        datasets = _get_cached_datasets()
         self.assertIsInstance(datasets, dict)
         self.assertEqual(len(datasets), 2)
         self.assertIsInstance(list(datasets.values())[0], OpenMLDataset)
@@ -29,20 +28,23 @@ class TestOpenMLDataset(TestBase):
     def test__get_cached_dataset(self):
         workdir = os.path.dirname(os.path.abspath(__file__))
         workdir = os.path.join(workdir, "files")
+        openml.config.set_cache_directory(workdir, workdir)
         api_mock_return_value = 400, \
             """<oml:authenticate xmlns:oml = "http://openml.org/openml">
             <oml:session_hash>G9MPPN114ZCZNWW2VN3JE9VF1FMV8Y5FXHUDUL4P</oml:session_hash>
             <oml:valid_until>2014-08-13 20:01:29</oml:valid_until>
             <oml:timezone>Europe/Berlin</oml:timezone>
             </oml:authenticate>"""
-        with mock.patch("_perform_api_call", return_value=api_mock_return_value):
+        with mock.patch("openml._api_calls._perform_api_call",
+                        return_value=api_mock_return_value) as api_mock:
             dataset = _get_cached_dataset(2)
             self.assertIsInstance(dataset, OpenMLDataset)
-            self.assertTrue(_perform_api_call.is_called_once())
+            self.assertTrue(api_mock.is_called_once())
 
     def test_get_chached_dataset_description(self):
         workdir = os.path.dirname(os.path.abspath(__file__))
         workdir = os.path.join(workdir, "files")
+        openml.config.set_cache_directory(workdir, workdir)
         description = openml.datasets.functions._get_cached_dataset_description(2)
         self.assertIsInstance(description, dict)
 
@@ -71,22 +73,22 @@ class TestOpenMLDataset(TestBase):
         datasets = openml.datasets.get_datasets(dids)
         self.assertEqual(len(datasets), 2)
         self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_dir(), "datasets", "1", "description.xml")))
+            openml.config.get_cache_directory(), "datasets", "1", "description.xml")))
         self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_dir(), "datasets", "2", "description.xml")))
+            openml.config.get_cache_directory(), "datasets", "2", "description.xml")))
         self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_dir(), "datasets", "1", "dataset.arff")))
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
         self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_dir(), "datasets", "2", "dataset.arff")))
+            openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")))
 
     def test_get_dataset(self):
         dataset = openml.datasets.get_dataset(1)
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, 'anneal')
         self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_dir(), "datasets", "1", "description.xml")))
+            openml.config.get_cache_directory(), "datasets", "1", "description.xml")))
         self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_dir(), "datasets", "1", "dataset.arff")))
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
 
     def test_download_rowid(self):
         # Smoke test which checks that the dataset has the row-id set correctly
@@ -113,7 +115,8 @@ class TestOpenMLDataset(TestBase):
     def test_publish_dataset(self):
 
         dataset = openml.datasets.get_dataset(3)
-        file_path = os.path.join(openml.config.get_cache_dir(), "datssets", "3", "dataset.arff")
+        file_path = os.path.join(openml.config.get_cache_directory(),
+                                 "datasets", "3", "dataset.arff")
         dataset = OpenMLDataset(
             name="anneal", version=1, description="test",
             format="ARFF", licence="public", default_target_attribute="class", data_file=file_path)

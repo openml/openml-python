@@ -9,7 +9,7 @@ from .task_functions import get_cached_task
 
 def _get_cached_splits():
     splits = OrderedDict()
-    for cache_dir in [config.get_cache_dir(), config.get_private_dir()]:
+    for cache_dir in [config.get_cache_directory(), config.get_private_directory()]:
         task_cache_dir = os.path.join(cache_dir, "tasks")
         directory_content = os.listdir(task_cache_dir)
         directory_content.sort()
@@ -26,7 +26,7 @@ def _get_cached_splits():
 
 
 def _get_cached_split(tid):
-    for cache_dir in [config.get_cache_dir(), config.get_private_dir()]:
+    for cache_dir in [config.get_cache_directory(), config.get_private_directory()]:
         task_cache_dir = os.path.join(cache_dir, "tasks")
         split_file = os.path.join(task_cache_dir,
                                   "tid_%d.arff" % int(tid))

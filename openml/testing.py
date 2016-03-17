@@ -17,6 +17,7 @@ class TestBase(unittest.TestCase):
         self.cwd = os.getcwd()
         workdir = os.path.dirname(os.path.abspath(__file__))
         self.workdir = os.path.join(workdir, "tmp")
+        self.workdir = os.path.join(workdir, "tmp")
         try:
             shutil.rmtree(self.workdir)
         except:
@@ -27,9 +28,8 @@ class TestBase(unittest.TestCase):
 
         self.cached = True
         # amueller's read/write key that he will throw away later
-        apikey = "610344db6388d9ba34f6db45a3cf71de"
-        openml.config.set_apikey(apikey)
-        openml.config.set_cache_directory(self.workdir)
+        openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
+        openml.config.set_cache_directory(self.workdir, self.workdir)
 
     def tearDown(self):
         os.chdir(self.cwd)

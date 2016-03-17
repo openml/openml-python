@@ -41,8 +41,8 @@ def _setup():
 def set_cache_directory(cachedir, privatedir):
     global _cachedir
     global _privatedir
-    _cachedir = _cachedir
-    _privatedir = _privatedir
+    _cachedir = cachedir
+    _privatedir = privatedir
 
     # Set up the cache directories
     dataset_cache_dir = os.path.join(cachedir, "datasets")

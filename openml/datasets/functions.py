@@ -21,7 +21,7 @@ def _list_cached_datasets():
     """Return list with ids of all cached datasets"""
     datasets = []
 
-    for dataset_cache in [config.get_cache_dir(), config.get_private_dir()]:
+    for dataset_cache in [config.get_cache_directory(), config.get_private_directory()]:
         dataset_cache_dir = os.path.join(dataset_cache, "datasets")
         directory_content = os.listdir(dataset_cache_dir)
         directory_content.sort()
@@ -71,9 +71,9 @@ def _get_cached_dataset(did):
 
 
 def _get_cached_dataset_description(did):
-    for dataset_cache_dir in [config.CACHEDIR,
-                              config.PRIVATEDIR]:
-        did_cache_dir = os.path.join(dataset_cache_dir, str(did))
+    for cache_dir in [config.get_cache_directory(),
+                      config.get_private_directory()]:
+        did_cache_dir = os.path.join(cache_dir, "datasets", str(did))
         description_file = os.path.join(did_cache_dir, "description.xml")
         try:
             with open(description_file) as fh:
@@ -88,9 +88,9 @@ def _get_cached_dataset_description(did):
 
 
 def _get_cached_dataset_arff(did):
-    for dataset_cache_dir in [config.get_cache_dir(),
-                              config.get_private_dir()]:
-        did_cache_dir = os.path.join(dataset_cache_dir, str(did))
+    for cache_dir in [config.get_cache_directory(),
+                      config.get_private_directory()]:
+        did_cache_dir = os.path.join(cache_dir, "datasets", str(did))
         output_file = os.path.join(did_cache_dir, "dataset.arff")
 
         try:
@@ -229,7 +229,7 @@ def get_dataset_description(did):
     # time
     # This can be saved on disk, but cannot be cached properly, because
     # it contains the information on whether a dataset is active.
-    did_cache_dir = _create_dataset_cache_dir(did)
+    did_cache_dir = _create_dataset_cache_directory(did)
     description_file = os.path.join(did_cache_dir, "description.xml")
 
     try:
@@ -263,7 +263,7 @@ def get_dataset_description(did):
 
 
 def _get_dataset_arff(did, description=None):
-    did_cache_dir = _create_dataset_cache_dir(did)
+    did_cache_dir = _create_dataset_cache_directory(did)
     output_file = os.path.join(did_cache_dir, "dataset.arff")
 
     # This means the file is still there; whether it is useful is up to
@@ -289,7 +289,7 @@ def _get_dataset_arff(did, description=None):
 
 
 def get_dataset_features(did):
-    did_cache_dir = _create_dataset_cache_dir(did)
+    did_cache_dir = _create_dataset_cache_directory(did)
     features_file = os.path.join(did_cache_dir, "features.xml")
 
     # Dataset features aren't subject to change...
@@ -320,7 +320,7 @@ def get_dataset_features(did):
 
 def get_dataset_qualities(did):
     # Dataset qualities are subject to change and must be fetched every time
-    did_cache_dir = _create_dataset_cache_dir(did)
+    did_cache_dir = _create_dataset_cache_directory(did)
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")
     try:
         return_code, qualities_xml = _perform_api_call(
@@ -342,8 +342,8 @@ def get_dataset_qualities(did):
     return qualities
 
 
-def _create_dataset_cache_dir(did):
-    dataset_cache_dir = os.path.join(config.get_cache_dir(), str(did))
+def _create_dataset_cache_directory(did):
+    dataset_cache_dir = os.path.join(config.get_cache_directory(), "datasets", str(did))
     try:
         os.makedirs(dataset_cache_dir)
     except (OSError, IOError):
@@ -353,7 +353,7 @@ def _create_dataset_cache_dir(did):
 
 
 def _remove_dataset_chache_dir(did):
-    dataset_cache_dir = os.path.join(config.get_cache_dir(), str(did))
+    dataset_cache_dir = os.path.join(config.get_cache_directory(), "datasets", str(did))
     try:
         os.rmdir(dataset_cache_dir)
     except (OSError, IOError):

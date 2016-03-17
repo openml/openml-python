@@ -107,4 +107,3 @@ class TestRun(TestBase):
     def test_get_runs_list_by_tag(self):
         runs = openml.runs.list_runs_by_tag(self.connector, '02-11-16_21.46.39')
         self.assertEqual(len(runs), 1)
-
