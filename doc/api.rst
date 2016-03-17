@@ -18,6 +18,7 @@ Top-level Classes
    OpenMLRun
    OpenMLTask
    OpenMLSplit
+   OpenMLFlow
 
 
 Dataset Functions
@@ -68,3 +69,13 @@ Task Functions
     get_task_list
     get_cached_splits
     get_cached_split
+
+Flow Functions
+--------------
+.. currentmodule:: openml.flow
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+ 
+    check_flow_exists
