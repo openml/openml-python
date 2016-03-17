@@ -6,10 +6,10 @@ from openml.testing import TestBase
 
 class TestRun(TestBase):
     def test_run_iris(self):
-        task = openml.tasks.get_task(self.connector, 10107)
+        task = openml.tasks.get_task(10107)
         clf = LogisticRegression()
-        run = openml.runs.run_task(self.connector, task, clf)
-        return_code, return_value = run.publish(self.connector)
+        run = openml.runs.run_task(task, clf)
+        return_code, return_value = run.publish()
         self.assertEqual(return_code, 200)
         # self.assertTrue("This is a read-only account" in return_value)
 

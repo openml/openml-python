@@ -2,6 +2,8 @@ from collections import OrderedDict
 import xmltodict
 import sklearn
 
+from .._api_calls import _perform_api_call
+
 
 class OpenMLFlow(object):
     def __init__(self, model, id=None, uploader=None,
@@ -44,7 +46,7 @@ class OpenMLFlow(object):
         flow_xml = flow_xml.split('\n', 1)[-1]
         return flow_xml
 
-    def publish(self, api_connector):
+    def publish(self):
         """
         The 'description' is binary data of an XML file according to the XSD Schema (OUTDATED!):
         https://github.com/openml/website/blob/master/openml_OS/views/pages/rest_api/xsd/openml.implementation.upload.xsd
@@ -53,11 +55,11 @@ class OpenMLFlow(object):
         """
         xml_description = self.generate_flow_xml()
         data = {'description': xml_description, 'source': self.source}
-        return_code, return_value = api_connector._perform_api_call(
+        return_code, return_value = _perform_api_call(
             "/flow/", data=data)
         return return_code, return_value
 
-    def ensure_flow_exists(self, connector):
+    def ensure_flow_exists(self):
         """
         First checks if a flow exists for the given model.
         If it does, then it will return the corresponding flow id.
@@ -66,10 +68,10 @@ class OpenMLFlow(object):
         """
         import sklearn
         flow_version = 'Tsklearn_' + sklearn.__version__
-        _, _, flow_id = _check_flow_exists(connector, self.name, flow_version)
+        _, _, flow_id = _check_flow_exists(self.name, flow_version)
 
         if int(flow_id) == -1:
-            return_code, response_xml = self.publish(connector)
+            return_code, response_xml = self.publish()
 
             response_dict = xmltodict.parse(response_xml)
             flow_id = response_dict['oml:upload_flow']['oml:id']
@@ -78,7 +80,7 @@ class OpenMLFlow(object):
         return int(flow_id)
 
 
-def _check_flow_exists(api_connector, name, version):
+def _check_flow_exists(name, version):
     """Retrieves the flow id of the flow uniquely identified by name+version.
 
     Returns flow id if such a flow exists,
@@ -90,7 +92,7 @@ def _check_flow_exists(api_connector, name, version):
     if not (type(version) is str and len(version) > 0):
         raise ValueError('Parameter \'version\' should be a non-empty string')
 
-    return_code, xml_response = api_connector._perform_api_call(
+    return_code, xml_response = _perform_api_call(
         "/flow/exists/%s/%s" % (name, version))
     if return_code != 200:
         # fixme raise appropriate error

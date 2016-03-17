@@ -1,7 +1,7 @@
-from .apiconnector import APIConnector
 import os
 import shutil
 import unittest
+import openml
 
 
 class TestBase(unittest.TestCase):
@@ -28,9 +28,8 @@ class TestBase(unittest.TestCase):
         self.cached = True
         # amueller's read/write key that he will throw away later
         apikey = "610344db6388d9ba34f6db45a3cf71de"
-
-        self.connector = APIConnector(cache_directory=self.workdir,
-                                      apikey=apikey)
+        openml.config.set_apikey(apikey)
+        openml.config.set_cachedir(self.workdir)
 
     def tearDown(self):
         os.chdir(self.cwd)

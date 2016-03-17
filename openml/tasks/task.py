@@ -1,15 +1,17 @@
 import os
 
+from .. import config
 from .. import datasets
 from ..util import URLError
 from .split import OpenMLSplit
+from .._api_calls import _read_url
 
 
 class OpenMLTask(object):
     def __init__(self, task_id, task_type, data_set_id, target_feature,
                  estimation_procedure_type, data_splits_url,
                  estimation_parameters, evaluation_measure, cost_matrix,
-                 api_connector, class_labels=None):
+                 class_labels=None):
         self.task_id = int(task_id)
         self.task_type = task_type
         self.dataset_id = int(data_set_id)
@@ -22,7 +24,6 @@ class OpenMLTask(object):
         self.estimation_parameters = estimation_parameters
         self.evaluation_measure = evaluation_measure
         self.cost_matrix = cost_matrix
-        self.api_connector = api_connector
         self.class_labels = class_labels
 
         if cost_matrix is not None:
@@ -35,7 +36,7 @@ class OpenMLTask(object):
 
     def get_dataset(self):
         """Download dataset associated with task"""
-        return datasets.get_dataset(self.api_connector, self.dataset_id)
+        return datasets.get_dataset(self.dataset_id)
 
     def get_X_and_Y(self):
         dataset = self.get_dataset()
@@ -84,7 +85,7 @@ class OpenMLTask(object):
         except (OSError, IOError):
             split_url = self.estimation_procedure["data_splits_url"]
             try:
-                return_code, split_arff = self.api_connector._read_url(split_url)
+                return_code, split_arff = _read_url(split_url)
             except (URLError, UnicodeEncodeError) as e:
                 print(e, split_url)
                 raise e
@@ -102,7 +103,7 @@ class OpenMLTask(object):
             An entity of :class:`openml.OpenMLTask`.
         """
         cached_split_file = os.path.join(
-            _create_task_cache_dir(self.api_connector, self.task_id), "datasplits.arff")
+            _create_task_cache_dir(self.task_id), "datasplits.arff")
 
         try:
             split = OpenMLSplit.from_arff_file(cached_split_file)
@@ -116,8 +117,8 @@ class OpenMLTask(object):
         return split
 
 
-def _create_task_cache_dir(api_connector, task_id):
-    task_cache_dir = os.path.join(api_connector.task_cache_dir, str(task_id))
+def _create_task_cache_dir(task_id):
+    task_cache_dir = os.path.join(config.cachedir, "tasks", str(task_id))
 
     try:
         os.makedirs(task_cache_dir)
