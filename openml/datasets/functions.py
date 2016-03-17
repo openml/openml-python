@@ -110,14 +110,33 @@ def list_datasets():
 
     Returns
     -------
-    datasets : list
+    list
         A list of all datasets. Every dataset is represented by a
         dictionary containing the following information: dataset id,
         and status. If qualities are calculated for the dataset, some of
         these are also returned.
     """
+    return _list_datasets("data/list")
+
+
+def list_datasets_by_tag(tag):
+    """Return all datasets having the given tag.
+
+    Returns
+    -------
+    list
+        A list of all datasets having the given tag. Every dataset is
+        represented by a dictionary containing the following information:
+        dataset id, and status. If qualities are calculated for the dataset,
+        some of these are also returned.
+
+    """
+    return _list_datasets("data/list/%s" % tag)
+
+
+def _list_datasets(api_call):
     # TODO add proper error handling here!
-    return_code, xml_string = _perform_api_call("data/list/")
+    return_code, xml_string = _perform_api_call(api_call)
     datasets_dict = xmltodict.parse(xml_string)
 
     # Minimalistic check if the XML is useful

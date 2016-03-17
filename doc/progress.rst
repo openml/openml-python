@@ -16,7 +16,7 @@ API call                                        implemented tested properly test
 /data/features/{id}                             yes         yes
 /data/qualities/{id}                            yes         yes
 /data/list/                                     yes         yes
-/data/list/tag/{tag}
+/data/list/tag/{tag}                            yes         yes
 /data/upload/                                   yes         yes
 /data/tag
 /data/untag
@@ -24,8 +24,8 @@ API call                                        implemented tested properly test
 
 /task/{task}                                    yes         yes
 /task/list                                      yes         yes
-/task/list/type/{id}
-/task/list/tag/{tag}
+/task/list/type/{id}                            yes         yes
+/task/list/tag/{tag}                            yes         yes
 /task {POST}
 /task/tag
 /task/untag

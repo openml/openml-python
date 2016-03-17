@@ -7,29 +7,36 @@ import openml
 
 
 class TestTask(TestBase):
-    def test_list_tasks(self):
-        # We can only perform a smoke test here because we test on dynamic
-        # data from the internet...
-        def check_task(task):
-            self.assertEqual(type(task), dict)
-            self.assertGreaterEqual(len(task), 2)
-            self.assertIn('did', task)
-            self.assertIsInstance(task['did'], int)
-            self.assertIn('status', task)
-            self.assertTrue(is_string(task['status']))
-            self.assertIn(task['status'],
-                          ['in_preparation', 'active', 'deactivated'])
+    def _check_task(self, task):
+        self.assertEqual(type(task), dict)
+        self.assertGreaterEqual(len(task), 2)
+        self.assertIn('did', task)
+        self.assertIsInstance(task['did'], int)
+        self.assertIn('status', task)
+        self.assertTrue(is_string(task['status']))
+        self.assertIn(task['status'],
+                      ['in_preparation', 'active', 'deactivated'])
 
-        # use a small task type as we cant limit tasks.
-        # TODO inspect the tasks maybe?
-        tasks = openml.tasks.list_tasks(task_type_id=3)
+    def test_list_tasks(self):
+        tasks = openml.tasks.list_tasks()
+        self.assertGreaterEqual(len(tasks), 2000)
+        for task in tasks:
+            self._check_task(task)
+
+    def test_list_tasks_by_type(self):
+        tasks = openml.tasks.list_tasks_by_type(task_type_id=3)
         self.assertGreaterEqual(len(tasks), 300)
         for task in tasks:
-            check_task(task)
+            self._check_task(task)
+
+    def test_list_tasks_by_tag(self):
+        tasks = openml.tasks.list_tasks_by_tag('basic')
+        self.assertGreaterEqual(len(tasks), 57)
+        for task in tasks:
+            self._check_task(task)
 
     def test_get_task(self):
         task = openml.tasks.get_task(1)
-        print(task)
         self.assertTrue(os.path.exists(
             os.path.join(os.getcwd(), "tasks", "1", "task.xml")))
         self.assertTrue(os.path.exists(

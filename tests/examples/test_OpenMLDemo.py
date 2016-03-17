@@ -45,7 +45,7 @@ class OpenMLDemoTest(unittest.TestCase):
                 msg = 'Error executing the notebook "%s". ' % notebook_filename
                 msg += 'See notebook "%s" for the traceback.\n\n' % notebook_filename_out
                 msg += e.traceback
-                self.fail(msg)
+                 self.fail(msg)
             finally:
                 with open(notebook_filename_out, mode='wt') as f:
                     nbformat.write(nb, f)

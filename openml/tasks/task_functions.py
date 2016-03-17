@@ -81,20 +81,20 @@ def get_estimation_procedure_list():
     return procs
 
 
-def list_tasks(task_type_id=1):
-    """Return a list of all tasks which are on OpenML.
+def list_tasks_by_type(task_type_id):
+    """Return a list of all tasks for a given tasks type which are on OpenML.
 
     Parameters
     ----------
     task_type_id : int
         ID of the task type as detailed
-        `here <http://openml.org/api/?f=openml.task.types>`_.
+        `here <http://www.openml.org/search?type=task_type>`_.
 
     Returns
     -------
-    tasks : list
-        A list of all tasks. Every task is represented by a
-        dictionary containing the following information: task id,
+    list
+        A list of all tasks of the given task type. Every task is represented by
+        a dictionary containing the following information: task id,
         dataset id, task_type and status. If qualities are calculated for
         the associated dataset, some of these are also returned.
     """
@@ -103,14 +103,57 @@ def list_tasks(task_type_id=1):
     except:
         raise ValueError("Task Type ID is neither an Integer nor can be "
                          "cast to an Integer.")
+    return _list_tasks("task/list/type/%d" % task_type_id)
 
-    return_code, xml_string = _perform_api_call(
-        "task/list/type/%d" % task_type_id)
+
+def list_tasks_by_tag(tag):
+    """Return all tasks having the given tag
+
+    Parameters
+    ----------
+    tag : str
+
+    Returns
+    -------
+    list
+        A list of all tasks having a give tag. Every task is represented by
+        a dictionary containing the following information: task id,
+        dataset id, task_type and status. If qualities are calculated for
+        the associated dataset, some of these are also returned.
+    """
+    return _list_tasks("task/list/tag/%s" % tag)
+
+
+def list_tasks():
+    """Return a list of all tasks which are on OpenML.
+
+    Returns
+    -------
+    list
+        A list of all tasks. Every task is represented by a
+        dictionary containing the following information: task id,
+        dataset id, task_type and status. If qualities are calculated for
+        the associated dataset, some of these are also returned.
+    """
+    return _list_tasks('task/list')
+
+
+def _list_tasks(api_call):
+    return_code, xml_string = _perform_api_call(api_call)
     tasks_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
-    assert tasks_dict['oml:tasks']['@xmlns:oml'] == \
-        'http://openml.org/openml'
-    assert type(tasks_dict['oml:tasks']['oml:task']) == list
+    if 'oml:tasks' not in tasks_dict:
+        raise ValueError('Error in return XML, does not contain "oml:runs": %s'
+                         % str(tasks_dict))
+    elif '@xmlns:oml' not in tasks_dict['oml:tasks']:
+        raise ValueError('Error in return XML, does not contain '
+                         '"oml:runs"/@xmlns:oml: %s'
+                         % str(tasks_dict))
+    elif tasks_dict['oml:tasks']['@xmlns:oml'] != 'http://openml.org/openml':
+        raise ValueError('Error in return XML, value of  '
+                         '"oml:runs"/@xmlns:oml is not '
+                         '"http://openml.org/openml": %s'
+                         % str(tasks_dict))
 
     tasks = []
     procs = get_estimation_procedure_list()
@@ -127,7 +170,8 @@ def list_tasks(task_type_id=1):
             if input['@name'] == 'estimation_procedure':
                 task[input['@name']] = proc_dict[int(input['#text'])]['name']
             else:
-                task[input['@name']] = input['#text']
+                value = input.get('#text')
+                task[input['@name']] = value
 
         task[input['@name']] = input['#text']
 
