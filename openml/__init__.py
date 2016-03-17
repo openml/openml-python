@@ -20,7 +20,7 @@ from .datasets import OpenMLDataset
 from . import datasets
 from .runs import OpenMLRun
 from .entities.split import OpenMLSplit
-from .entities.task import OpenMLTask
+from .tasks import OpenMLTask
 
 
 __version__ = "0.2.1"

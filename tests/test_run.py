@@ -6,7 +6,7 @@ from openml.testing import TestBase
 
 class TestRun(TestBase):
     def test_run_iris(self):
-        task = self.connector.download_task(10107)
+        task = openml.tasks.download_task(self.connector, 10107)
         clf = LogisticRegression()
         run = openml.runs.openml_run(self.connector, task, clf)
         return_code, return_value = run.publish(self.connector)
