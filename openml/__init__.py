@@ -18,6 +18,7 @@ In particular, this module implemts a python interface for the
 from .apiconnector import APIConnector
 from .datasets import OpenMLDataset
 from . import datasets
+from . import runs
 from .runs import OpenMLRun
 from .tasks import OpenMLTask, OpenMLSplit
 from .flows import OpenMLFlow
@@ -26,4 +27,4 @@ from .flows import OpenMLFlow
 __version__ = "0.2.1"
 
 __all__ = ['APIConnector', 'OpenMLDataset', 'OpenMLRun', 'OpenMLSplit',
-           'datasets', 'OpenMLTask', 'OpenMLFlow']
+           'datasets', 'OpenMLTask', 'OpenMLFlow', 'runs']

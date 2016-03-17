@@ -1,7 +1,7 @@
 import time
 import arff
 import xmltodict
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import sys
 import os
 
@@ -15,7 +15,8 @@ from ..tasks import get_task
 class OpenMLRun(object):
     def __init__(self, task_id, flow_id, setup_string, dataset_id, files=None,
                  setup_id=None, tags=None, run_id=None, uploader=None,
-                 uploader_name=None, evaluations=None, data_content=None,
+                 uploader_name=None, evaluations=None,
+                 detailed_evaluations=None, data_content=None,
                  model=None, task_type=None, task_evaluation_measure=None,
                  flow_name=None, parameter_settings=None, predictions_url=None):
         self.run_id = run_id
@@ -32,6 +33,7 @@ class OpenMLRun(object):
         self.dataset_id = dataset_id
         self.predictions_url = predictions_url
         self.evaluations = evaluations
+        self.detailed_evaluations = detailed_evaluations
         self.data_content = data_content
         self.model = model
 
@@ -243,6 +245,13 @@ def _get_version_information():
     return [python_version, sklearn_version, numpy_version, scipy_version]
 
 
+def get_runs(run_ids):
+    runs = []
+    for run_id in run_ids:
+        runs.append(get_run(run_id))
+    return runs
+
+
 def get_run(api_connector, run_id):
     run_file = os.path.join(api_connector.run_cache_dir, "run_%d.xml" % run_id)
 
@@ -304,9 +313,11 @@ def _create_run_from_xml(xml):
         raise ValueError('No URL to download predictions for run %d in run '
                          'description XML' % run_id)
     evaluations = dict()
+    detailed_evaluations = defaultdict(lambda : defaultdict(dict))
     evaluation_flows = dict()
     for evaluation_dict in run['oml:output_data']['oml:evaluation']:
         key = evaluation_dict['oml:name']
+        flow_id = int(evaluation_dict['oml:flow_id'])
         if 'oml:value' in evaluation_dict:
             value = float(evaluation_dict['oml:value'])
         elif 'oml:array_data' in evaluation_dict:
@@ -314,8 +325,17 @@ def _create_run_from_xml(xml):
         else:
             raise ValueError('Could not find keys "value" or "array_data" '
                              'in %s' % str(evaluation_dict.keys()))
-        flow_id = evaluation_dict['oml:flow_id']
-        evaluations[key] = value
+
+        if 'oml:repeat' in evaluation_dict:
+            repeat = int(evaluation_dict['oml:repeat'])
+            fold = int(evaluation_dict['oml:fold'])
+            repeat_dict = detailed_evaluations[key]
+            fold_dict = repeat_dict[repeat]
+            fold_dict[fold] = value
+        else:
+            evaluations[key] = value
+            evaluation_flows[key] = flow_id
+
         evaluation_flows[key] = flow_id
 
     return OpenMLRun(run_id=run_id, uploader=uploader,
@@ -326,7 +346,8 @@ def _create_run_from_xml(xml):
                      setup_id=setup_id, setup_string=setup_string,
                      parameter_settings=parameters,
                      dataset_id=dataset_id, predictions_url=predictions_url,
-                     evaluations=evaluations)
+                     evaluations=evaluations,
+                     detailed_evaluations=detailed_evaluations)
 
 
 def _get_cached_run(api_connector, run_id):
@@ -344,3 +365,247 @@ def _get_cached_run(api_connector, run_id):
 
     raise OpenMLCacheException("Run file for run id %d not "
                                "cached" % run_id)
+
+
+def list_runs_by_filters(api_connector, id=None, task=None, flow=None,
+                         uploader=None):
+    """List all runs matching all of the given filters.
+
+    Perform API call `/run/list/{filters} <http://www.openml.org/api_docs/#!/run/get_run_list_filters>`_
+
+    Parameters
+    ==========
+    api_connector : :class:`openml.APIConnector`
+
+    id : int or list
+
+    task : int or list
+
+    flow : int or list
+
+    uploader : int or list
+
+    Returns
+    =======
+    list
+        List of found runs.
+    """
+
+    value = []
+    by = []
+
+    if id is not None:
+        value.append(id)
+        by.append('run')
+    if task is not None:
+        value.append(task)
+        by.append('task')
+    if flow is not None:
+        value.append(flow)
+        by.append('flow')
+    if uploader is not None:
+        value.append(uploader)
+        by.append('uploader')
+
+    if len(value) == 0:
+        raise ValueError('At least one argument out of task, flow, uploader '
+                         'must have a different value than None')
+
+    api_call = "run/list"
+    for id_, by_ in zip(value, by):
+        if isinstance(id_, list):
+            for i in range(len(id_)):
+                # Type checking to avoid bad calls to the server
+                id_[i] = str(int(id_[i]))
+            id_ = ','.join(id_)
+        else:
+            # Only type checking here
+            id_ = int(id_)
+
+        if by_ is None:
+            raise ValueError("Argument 'by' must not contain None!")
+        api_call = "%s/%s/%s" % (api_call, by_, id_)
+
+    return _list_runs(api_connector, api_call)
+
+
+def list_runs_by_tag(api_connector, tag):
+    """List runs by tag.
+
+    Perform API call `/run/list/tag/{tag} <http://www.openml.org/api_docs/#!/run/get_run_list_tag_tag>`_
+
+    Parameters
+    ==========
+    api_connector : :class:`openml.APIConnector`
+
+    tag : str
+
+    Returns
+    =======
+    list
+        List of found runs.
+    """
+    return _list_runs_by(api_connector, tag, 'tag')
+
+
+def list_runs(api_connector, run_ids):
+    """List runs by their ID.
+
+    Perform API call `/run/list/run/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_run_ids>`_
+
+    Parameters
+    ==========
+    api_connector : :class:`openml.APIConnector`
+
+    run_id : int or list
+
+    Returns
+    =======
+    list
+        List of found runs.
+    """
+    return _list_runs_by(api_connector, run_ids, 'run')
+
+
+def list_runs_by_task(api_connector, task_id):
+    """List runs by task.
+
+    Perform API call `/run/list/task/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_task_ids>`_
+
+    Parameters
+    ==========
+    api_connector : :class:`openml.APIConnector`
+
+    task_id : int or list
+
+    Returns
+    =======
+    list
+        List of found runs.
+    """
+    return _list_runs_by(api_connector, task_id, 'task')
+
+
+def list_runs_by_flow(api_connector, flow_id):
+    """List runs by flow.
+
+    Perform API call `/run/list/flow/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_flow_ids>`_
+
+    Parameters
+    ==========
+    api_connector : :class:`openml.APIConnector`
+
+    flow_id : int or list
+
+    Returns
+    =======
+    list
+        List of found runs.
+    """
+    return _list_runs_by(api_connector, flow_id, 'flow')
+
+
+def list_runs_by_uploader(api_connector, uploader_id):
+    """List runs by uploader.
+
+    Perform API call `/run/list/uploader/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_uploader_ids>`_
+
+    Parameters
+    ==========
+    api_connector : :class:`openml.APIConnector`
+
+    uploader_id : int or list
+
+    Returns
+    =======
+    list
+        List of found runs.
+    """
+    return _list_runs_by(api_connector, uploader_id, 'uploader')
+
+
+def _list_runs_by(api_connector, id_, by):
+    """Helper function to create API call strings.
+
+    Helper for the following api calls:
+
+    * http://www.openml.org/api_docs/#!/run/get_run_list_task_ids
+    * http://www.openml.org/api_docs/#!/run/get_run_list_run_ids
+    * http://www.openml.org/api_docs/#!/run/get_run_list_tag_tag
+    * http://www.openml.org/api_docs/#!/run/get_run_list_uploader_ids
+    * http://www.openml.org/api_docs/#!/run/get_run_list_flow_ids
+
+    All of these allow either an integer as ID or a list of integers. Their
+    name follows the convention run/list/{by}/{id}
+
+    Parameters
+    ==========
+    api_connector : :class:`APIConnector`
+
+    id_ : int or list
+
+    by : str
+
+    Returns
+    =======
+    list
+        List of found runs.
+
+    """
+
+    if isinstance(id_, list):
+        for i in range(len(id_)):
+            # Type checking to avoid bad calls to the server
+            id_[i] = str(int(id_[i]))
+        id_ = ','.join(id_)
+    elif by == 'tag':
+        pass
+    else:
+        id_ = int(id_)
+
+    api_call = "run/list"
+    if by is not None:
+        api_call += "/%s" % by
+    api_call = "%s/%s" % (api_call, id_)
+    return _list_runs(api_connector, api_call)
+
+
+def _list_runs(api_connector, api_call):
+    """Helper function to parse API calls which are lists of runs"""
+
+    return_code, xml_string = api_connector._perform_api_call(api_call)
+
+    runs_dict = xmltodict.parse(xml_string)
+    # Minimalistic check if the XML is useful
+    if 'oml:runs' not in runs_dict:
+        raise ValueError('Error in return XML, does not contain "oml:runs": %s'
+                         % str(runs_dict))
+    elif '@xmlns:oml' not in runs_dict['oml:runs']:
+        raise ValueError('Error in return XML, does not contain '
+                         '"oml:runs"/@xmlns:oml: %s'
+                         % str(runs_dict))
+    elif runs_dict['oml:runs']['@xmlns:oml'] != 'http://openml.org/openml':
+        raise ValueError('Error in return XML, value of  '
+                         '"oml:runs"/@xmlns:oml is not '
+                         '"http://openml.org/openml": %s'
+                         % str(runs_dict))
+
+    if isinstance(runs_dict['oml:runs']['oml:run'], list):
+        runs_list = runs_dict['oml:runs']['oml:run']
+    elif isinstance(runs_dict['oml:runs']['oml:run'], dict):
+        runs_list = [runs_dict['oml:runs']['oml:run']]
+    else:
+        raise TypeError()
+
+    runs = []
+    for run_ in runs_list:
+        run = {'run_id': int(run_['oml:run_id']),
+               'task_id': int(run_['oml:task_id']),
+               'setup_id': int(run_['oml:setup_id']),
+               'flow_id': int(run_['oml:flow_id']),
+               'uploader': int(run_['oml:uploader'])}
+
+        runs.append(run)
+    runs.sort(key=lambda t: t['run_id'])
+
+    return runs
