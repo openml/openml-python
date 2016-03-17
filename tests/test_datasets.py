@@ -13,20 +13,20 @@ from openml.util import is_string
 from openml.testing import TestBase
 import openml
 
+from openml.datasets.functions import _get_cached_dataset, _get_cached_datasets
+
 
 class TestOpenMLDataset(TestBase):
-    ############################################################################
-    # Test all local stuff
-    def test_get_cached_datasets(self):
+    def test__get_cached_datasets(self):
         workdir = os.path.dirname(os.path.abspath(__file__))
         workdir = os.path.join(workdir, "files")
         con = APIConnector(cache_directory=workdir)
-        datasets = openml.datasets.get_cached_datasets(con)
+        datasets = _get_cached_datasets(con)
         self.assertIsInstance(datasets, dict)
         self.assertEqual(len(datasets), 2)
         self.assertIsInstance(list(datasets.values())[0], OpenMLDataset)
 
-    def test_get_cached_dataset(self):
+    def test__get_cached_dataset(self):
         workdir = os.path.dirname(os.path.abspath(__file__))
         workdir = os.path.join(workdir, "files")
 
@@ -39,7 +39,7 @@ class TestOpenMLDataset(TestBase):
                 </oml:authenticate>"""
 
             connector = APIConnector(cache_directory=workdir)
-            dataset = openml.datasets.get_cached_dataset(connector, 2)
+            dataset = _get_cached_dataset(connector, 2)
             self.assertIsInstance(dataset, OpenMLDataset)
             self.assertTrue(connector._perform_api_call.is_called_once())
 
@@ -51,12 +51,10 @@ class TestOpenMLDataset(TestBase):
                                                                       2)
         self.assertIsInstance(description, dict)
 
-    ############################################################################
-    # Datasets
-    def test_get_dataset_list(self):
+    def test_list_datasets(self):
         # We can only perform a smoke test here because we test on dynamic
         # data from the internet...
-        datasets = openml.datasets.get_dataset_list(self.connector)
+        datasets = openml.datasets.list_datasets(self.connector)
         # 1087 as the number of datasets on openml.org
         self.assertTrue(len(datasets) >= 1087)
         for dataset in datasets:
@@ -70,12 +68,12 @@ class TestOpenMLDataset(TestBase):
                                               'deactivated'])
 
     @unittest.skip("Not implemented yet.")
-    def test_datasets_active(self):
+    def test_check_datasets_active(self):
         raise NotImplementedError()
 
-    def test_download_datasets(self):
+    def test_get_datasets(self):
         dids = [1, 2]
-        datasets = openml.datasets.download_datasets(self.connector, dids)
+        datasets = openml.datasets.get_datasets(self.connector, dids)
         self.assertEqual(len(datasets), 2)
         self.assertTrue(os.path.exists(os.path.join(
             self.connector.dataset_cache_dir, "1", "description.xml")))
@@ -86,8 +84,8 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(os.path.exists(os.path.join(
             self.connector.dataset_cache_dir, "2", "dataset.arff")))
 
-    def test_download_dataset(self):
-        dataset = openml.datasets.download_dataset(self.connector, 1)
+    def test_get_dataset(self):
+        dataset = openml.datasets.get_dataset(self.connector, 1)
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, 'anneal')
         self.assertTrue(os.path.exists(os.path.join(
@@ -98,28 +96,28 @@ class TestOpenMLDataset(TestBase):
     def test_download_rowid(self):
         # Smoke test which checks that the dataset has the row-id set correctly
         did = 164
-        dataset = openml.datasets.download_dataset(self.connector, did)
+        dataset = openml.datasets.get_dataset(self.connector, did)
         self.assertEqual(dataset.row_id_attribute, 'instance')
 
-    def test_download_dataset_description(self):
+    def test_get_dataset_description(self):
         # Only a smoke test, I don't know exactly how to test the URL
         # retrieval and "caching"
-        description = openml.datasets.download_dataset_description(self.connector, 2)
+        description = openml.datasets.get_dataset_description(self.connector, 2)
         self.assertIsInstance(description, dict)
 
-    def test_download_dataset_features(self):
+    def test_get_dataset_features(self):
         # Only a smoke check
-        features = openml.datasets.download_dataset_features(self.connector, 2)
+        features = openml.datasets.get_dataset_features(self.connector, 2)
         self.assertIsInstance(features, dict)
 
-    def test_download_dataset_qualities(self):
+    def test_get_dataset_qualities(self):
         # Only a smoke check
-        qualities = openml.datasets.download_dataset_qualities(self.connector, 2)
+        qualities = openml.datasets.get_dataset_qualities(self.connector, 2)
         self.assertIsInstance(qualities, dict)
 
     def test_publish_dataset(self):
 
-        dataset = openml.datasets.download_dataset(self.connector, 3)
+        dataset = openml.datasets.get_dataset(self.connector, 3)
         file_path = os.path.join(self.connector.dataset_cache_dir, "3", "dataset.arff")
         dataset = OpenMLDataset(
             name="anneal", version=1, description="test",

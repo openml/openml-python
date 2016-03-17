@@ -26,10 +26,10 @@ class TestAPIConnector(TestBase):
         raise Exception()
 
     @unittest.skip("Not implemented yet.")
-    def test_get_cached_splits(self):
+    def test__get_cached_splits(self):
         raise Exception()
 
     @unittest.skip("Not implemented yet.")
-    def test_get_cached_split(self):
+    def test__get_cached_split(self):
         raise Exception()
 
