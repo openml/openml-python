@@ -1,5 +1,7 @@
 language: python
 
+sudo: false
+
 cache:
   apt: true
   # We use three different cache directory
