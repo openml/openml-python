@@ -326,9 +326,9 @@ def _create_run_from_xml(xml):
             raise ValueError('Could not find keys "value" or "array_data" '
                              'in %s' % str(evaluation_dict.keys()))
 
-        if 'oml:repeat' in evaluation_dict:
-            repeat = int(evaluation_dict['oml:repeat'])
-            fold = int(evaluation_dict['oml:fold'])
+        if '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
+            repeat = int(evaluation_dict['@repeat'])
+            fold = int(evaluation_dict['@fold'])
             repeat_dict = detailed_evaluations[key]
             fold_dict = repeat_dict[repeat]
             fold_dict[fold] = value
