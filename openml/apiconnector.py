@@ -1,10 +1,8 @@
 import logging
 import os
 import sys
-#import tempfile
 import requests
 import arff
-import xmltodict
 
 if sys.version_info[0] < 3:
     import ConfigParser as configparser
@@ -235,41 +233,3 @@ class APIConnector(object):
 
         response = requests.post(url, data=data)
         return response.status_code, response.text
-
-    # -> OpenMLFlow
-    def upload_flow(self, description, flow):
-        """
-        The 'description' is binary data of an XML file according to the XSD Schema (OUTDATED!):
-        https://github.com/openml/website/blob/master/openml_OS/views/pages/rest_api/xsd/openml.implementation.upload.xsd
-
-        (optional) file_path is the absolute path to the file that is the flow (eg. a script)
-        """
-        data = {'description': description, 'source': flow}
-        return_code, dataset_xml = self._perform_api_call(
-            "/flow/", data=data)
-        return return_code, dataset_xml
-
-    # -> OpenMLFlow
-    def check_flow_exists(self, name, version):
-        """Retrieves the flow id of the flow uniquely identified by name+version.
-
-        Returns flow id if such a flow exists,
-        returns -1 if flow does not exists,
-        returns -2 if there was not a well-formed response from the server
-        http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
-        """
-        # Perhaps returns the -1/-2 business with proper raising of exceptions?
-
-        if not (type(name) is str and len(name) > 0):
-            raise ValueError('Parameter \'name\' should be a non-empty string')
-        if not (type(version) is str and len(version) > 0):
-            raise ValueError('Parameter \'version\' should be a non-empty string')
-
-        return_code, xml_response = self._perform_api_call(
-            "/flow/exists/%s/%s" % (name, version))
-        if return_code != 200:
-            # fixme raise appropriate error
-            raise ValueError("api call failed: %s" % xml_response)
-        xml_dict = xmltodict.parse(xml_response)
-        flow_id = xml_dict['oml:flow_exists']['oml:id']
-        return return_code, xml_response, flow_id

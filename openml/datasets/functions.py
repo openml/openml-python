@@ -207,7 +207,7 @@ def download_dataset(api_connector, did):
 
     Returns
     -------
-    dataset : :class:`pyMetaLearn.entities.dataset.Dataset`
+    dataset : :class:`openml.OpenMLDataset`
         The downloaded dataset."""
     try:
         did = int(did)
