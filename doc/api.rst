@@ -13,7 +13,6 @@ Top-level Classes
    :toctree: generated/
    :template: class.rst
 
-   APIConnector
    OpenMLDataset
    OpenMLRun
    OpenMLTask
@@ -21,8 +20,8 @@ Top-level Classes
    OpenMLFlow
 
 
-Dataset Functions
------------------
+:mod:`openml.datasets`: Dataset Functions
+-----------------------------------------
 .. currentmodule:: openml.datasets
 
 .. autosummary::
@@ -37,8 +36,8 @@ Dataset Functions
     get_datasets
     list_datasets
 
-Run Functions
--------------
+:mod:`openml.runs`: Run Functions
+----------------------------------
 .. currentmodule:: openml.runs
 
 .. autosummary::
@@ -54,8 +53,8 @@ Run Functions
    list_runs_by_uploader
    list_runs_by_filters
 
-Task Functions
---------------
+:mod:`openml.tasks`: Task Functions
+-----------------------------------
 .. currentmodule:: openml.tasks
 
 .. autosummary::
@@ -65,8 +64,8 @@ Task Functions
     get_task
     list_tasks
 
-Flow Functions
---------------
+:mod:`openml.flows`: Flow Functions
+-----------------------------------
 .. currentmodule:: openml.flow
 
 .. autosummary::
