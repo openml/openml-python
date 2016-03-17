@@ -1,0 +1,10 @@
+:mod:`openml.tasks`.get_cached_split
+=================================================
+
+.. currentmodule:: openml.tasks
+
+.. autofunction:: get_cached_split
+
+.. raw:: html
+
+    <div class="clearer"></div>

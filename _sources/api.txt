@@ -66,3 +66,5 @@ Task Functions
 
     download_task
     get_task_list
+    get_cached_splits
+    get_cached_split
