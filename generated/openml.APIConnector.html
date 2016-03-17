@@ -169,24 +169,6 @@ Useful to access private datasets through the same interface.</p>
 <p class="rubric">Notes</p>
 <p>Testing the API calls in Firefox is possible with the Firefox AddOn
 HTTPRequestor.</p>
-<dl class="method">
-<dt id="openml.APIConnector.check_flow_exists">
-<code class="descname">check_flow_exists</code><span class="sig-paren">(</span><em>name</em>, <em>version</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.check_flow_exists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves the flow id of the flow uniquely identified by name+version.</p>
-<p>Returns flow id if such a flow exists,
-returns -1 if flow does not exists,
-returns -2 if there was not a well-formed response from the server
-<a class="reference external" href="http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version">http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version</a></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.APIConnector.upload_flow">
-<code class="descname">upload_flow</code><span class="sig-paren">(</span><em>description</em>, <em>flow</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.APIConnector.upload_flow" title="Permalink to this definition">¶</a></dt>
-<dd><p>The &#8216;description&#8217; is binary data of an XML file according to the XSD Schema (OUTDATED!):
-<a class="reference external" href="https://github.com/openml/website/blob/master/openml_OS/views/pages/rest_api/xsd/openml.implementation.upload.xsd">https://github.com/openml/website/blob/master/openml_OS/views/pages/rest_api/xsd/openml.implementation.upload.xsd</a></p>
-<p>(optional) file_path is the absolute path to the file that is the flow (eg. a script)</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>

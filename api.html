@@ -102,6 +102,7 @@
 <li><a class="reference internal" href="#dataset-functions">Dataset Functions</a></li>
 <li><a class="reference internal" href="#run-functions">Run Functions</a></li>
 <li><a class="reference internal" href="#task-functions">Task Functions</a></li>
+<li><a class="reference internal" href="#flow-functions">Flow Functions</a></li>
 </ul>
 </li>
 </ul>
@@ -133,6 +134,9 @@
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/openml.OpenMLSplit.html#openml.OpenMLSplit" title="openml.OpenMLSplit"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLSplit</span></code></a>(name,&nbsp;description,&nbsp;split)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow" title="openml.OpenMLFlow"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLFlow</span></code></a>(model[,&nbsp;id,&nbsp;uploader,&nbsp;...])</td>
 <td></td>
 </tr>
 </tbody>
@@ -196,13 +200,13 @@
 <tr class="row-odd"><td><a class="reference internal" href="generated/openml.runs.construct_description_dictionary.html#openml.runs.construct_description_dictionary" title="openml.runs.construct_description_dictionary"><code class="xref py py-obj docutils literal"><span class="pre">construct_description_dictionary</span></code></a>(taskid,&nbsp;...)</td>
 <td>Creates a dictionary corresponding to the desired xml desired by openML</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.create_setup_string.html#openml.runs.create_setup_string" title="openml.runs.create_setup_string"><code class="xref py py-obj docutils literal"><span class="pre">create_setup_string</span></code></a>(classifier)</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.create_setup_string.html#openml.runs.create_setup_string" title="openml.runs.create_setup_string"><code class="xref py py-obj docutils literal"><span class="pre">create_setup_string</span></code></a>(model)</td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/openml.runs.get_version_information.html#openml.runs.get_version_information" title="openml.runs.get_version_information"><code class="xref py py-obj docutils literal"><span class="pre">get_version_information</span></code></a>()</td>
 <td>Gets versions of python, sklearn, numpy and scipy, returns them in an array,</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.openml_run.html#openml.runs.openml_run" title="openml.runs.openml_run"><code class="xref py py-obj docutils literal"><span class="pre">openml_run</span></code></a>(connector,&nbsp;task,&nbsp;classifier)</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.openml_run.html#openml.runs.openml_run" title="openml.runs.openml_run"><code class="xref py py-obj docutils literal"><span class="pre">openml_run</span></code></a>(connector,&nbsp;task,&nbsp;model)</td>
 <td>Performs a CV run on the dataset of the given task, using the split.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/openml.runs.download_run.html#openml.runs.download_run" title="openml.runs.download_run"><code class="xref py py-obj docutils literal"><span class="pre">download_run</span></code></a>(api_connector,&nbsp;run_id)</td>
@@ -232,6 +236,20 @@
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/openml.tasks.get_cached_split.html#openml.tasks.get_cached_split" title="openml.tasks.get_cached_split"><code class="xref py py-obj docutils literal"><span class="pre">get_cached_split</span></code></a>(api_connector,&nbsp;tid)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="flow-functions">
+<h2>Flow Functions<a class="headerlink" href="#flow-functions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">check_flow_exists</span></code></td>
 <td></td>
 </tr>
 </tbody>
