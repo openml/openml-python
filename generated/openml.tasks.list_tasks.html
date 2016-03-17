@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>openml.runs.download_run &mdash; OpenML 0.2.1 documentation</title>
+    <title>openml.tasks.list_tasks &mdash; OpenML 0.2.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -97,19 +97,42 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.runs</span></code>.download_run</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.tasks</span></code>.list_tasks</a></li>
 </ul>
 
         </div>
       </div>
     <div class="col-md-9 content">
       
-  <div class="section" id="openml-runs-download-run">
-<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.runs</span></code>.download_run<a class="headerlink" href="#openml-runs-download-run" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="openml-tasks-list-tasks">
+<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.tasks</span></code>.list_tasks<a class="headerlink" href="#openml-tasks-list-tasks" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="openml.runs.download_run">
-<code class="descclassname">openml.runs.</code><code class="descname">download_run</code><span class="sig-paren">(</span><em>api_connector</em>, <em>run_id</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.download_run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="openml.tasks.list_tasks">
+<code class="descclassname">openml.tasks.</code><code class="descname">list_tasks</code><span class="sig-paren">(</span><em>api_connector</em>, <em>task_type_id=1</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.list_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all tasks which are on OpenML.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>task_type_id</strong> : int</p>
+<blockquote>
+<div><p>ID of the task type as detailed
+<a class="reference external" href="http://openml.org/api/?f=openml.task.types">here</a>.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>tasks</strong> : list</p>
+<blockquote class="last">
+<div><p>A list of all tasks. Every task is represented by a
+dictionary containing the following information: task id,
+dataset id, task_type and status. If qualities are calculated for
+the associated dataset, some of these are also returned.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <div class="clearer"></div></div>
 

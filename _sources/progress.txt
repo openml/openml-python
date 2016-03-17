@@ -61,10 +61,10 @@ Convenience Functions
 =============================================== =========== ====== =============== ========== =====================
 Method                                          implemented tested properly tested loads json proper error handling
 =============================================== =========== ====== =============== ========== =====================
-get_cached_split                                yes
-get_cached_splits                               yes
-get_cached_dataset                              yes         yes
-get_cached_datasets                             yes         yes
+_get_cached_split                               yes
+_get_cached_splits                              yes
+_get_cached_dataset                             yes         yes
+_get_cached_datasets                            yes         yes
 get_cached_task                                 yes
 get_cached_tasks                                yes
 =============================================== =========== ====== =============== ========== =====================

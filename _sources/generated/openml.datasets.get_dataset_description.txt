@@ -1,0 +1,10 @@
+:mod:`openml.datasets`.get_dataset_description
+===========================================================
+
+.. currentmodule:: openml.datasets
+
+.. autofunction:: get_dataset_description
+
+.. raw:: html
+
+    <div class="clearer"></div>

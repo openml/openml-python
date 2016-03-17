@@ -1,9 +1,9 @@
-:mod:`openml.datasets`.download_dataset_arff
+:mod:`openml.datasets`.check_datasets_active
 =========================================================
 
 .. currentmodule:: openml.datasets
 
-.. autofunction:: download_dataset_arff
+.. autofunction:: check_datasets_active
 
 .. raw:: html
 

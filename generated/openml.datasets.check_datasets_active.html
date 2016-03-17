@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>openml.runs.get_cached_run &mdash; OpenML 0.2.1 documentation</title>
+    <title>openml.datasets.check_datasets_active &mdash; OpenML 0.2.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -97,19 +97,39 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.runs</span></code>.get_cached_run</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.datasets</span></code>.check_datasets_active</a></li>
 </ul>
 
         </div>
       </div>
     <div class="col-md-9 content">
       
-  <div class="section" id="openml-runs-get-cached-run">
-<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.runs</span></code>.get_cached_run<a class="headerlink" href="#openml-runs-get-cached-run" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="openml-datasets-check-datasets-active">
+<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.datasets</span></code>.check_datasets_active<a class="headerlink" href="#openml-datasets-check-datasets-active" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="openml.runs.get_cached_run">
-<code class="descclassname">openml.runs.</code><code class="descname">get_cached_run</code><span class="sig-paren">(</span><em>api_connector</em>, <em>run_id</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.get_cached_run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="openml.datasets.check_datasets_active">
+<code class="descclassname">openml.datasets.</code><code class="descname">check_datasets_active</code><span class="sig-paren">(</span><em>api_connector</em>, <em>dids</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.check_datasets_active" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the dataset ids provided are active.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dids</strong> : iterable</p>
+<blockquote>
+<div><p>A list of integers representing dataset ids.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>A dictionary with items {did: active}, where active is a boolean. It
+is set to True if the dataset is active.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <div class="clearer"></div></div>
 

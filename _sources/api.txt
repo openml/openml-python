@@ -29,18 +29,13 @@ Dataset Functions
    :toctree: generated/
    :template: function.rst
 
-    datasets_active
-    download_dataset_arff
-    download_dataset_description
-    download_dataset_features
-    download_dataset_qualities
-    download_dataset
-    download_datasets
-    get_cached_datasets
-    get_list_of_cached_datasets
-    get_dataset_list
-    get_cached_dataset
-    get_dataset_list
+    check_datasets_active
+    get_dataset_description
+    get_dataset_features
+    get_dataset_qualities
+    get_dataset
+    get_datasets
+    list_datasets
 
 Run Functions
 --------------
@@ -50,12 +45,8 @@ Run Functions
    :toctree: generated/
    :template: function.rst
 
-   construct_description_dictionary
-   create_setup_string
-   get_version_information
-   openml_run
-   download_run
-   get_cached_run
+   run_task
+   get_run
 
 Task Functions
 --------------
@@ -65,10 +56,8 @@ Task Functions
    :toctree: generated/
    :template: function.rst
 
-    download_task
-    get_task_list
-    get_cached_splits
-    get_cached_split
+    get_task
+    list_tasks
 
 Flow Functions
 --------------
@@ -78,4 +67,3 @@ Flow Functions
    :toctree: generated/
    :template: function.rst
  
-    check_flow_exists

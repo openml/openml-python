@@ -33,7 +33,7 @@ Working with datasets
 .. code:: python
 
     >>> dataset_id = 31
-    >>> dataset = connector.download_dataset(dataset_id)
+    >>> dataset = connector.get_dataset(dataset_id)
 
 Attributes of the dataset are stored as member variables:
 
