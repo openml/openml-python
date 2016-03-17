@@ -1,7 +1,5 @@
-from collections import OrderedDict
 import logging
 import os
-import re
 import sys
 #import tempfile
 import requests
@@ -15,8 +13,6 @@ else:
     import configparser
     from io import StringIO
 
-from .exceptions import OpenMLCacheException
-from .entities.split import OpenMLSplit
 
 logger = logging.getLogger(__name__)
 
@@ -169,40 +165,6 @@ class APIConnector(object):
             logging.info("Error opening file %s: %s" %
                          config_file, e.message)
         return config
-
-    # -> OpenMLSplit
-    def get_cached_splits(self):
-        splits = OrderedDict()
-        for task_cache_dir in [self.task_cache_dir,
-                               self._private_directory_tasks]:
-            directory_content = os.listdir(task_cache_dir)
-            directory_content.sort()
-
-            for filename in directory_content:
-                match = re.match(r"(tid)_([0-9]*)\.arff", filename)
-                if match:
-                    tid = match.group(2)
-                    tid = int(tid)
-
-                    splits[tid] = self.get_cached_task(tid)
-
-        return splits
-
-    # -> OpenMLSplit
-    def get_cached_split(self, tid):
-        for task_cache_dir in [self.task_cache_dir,
-                               self._private_directory_tasks]:
-            try:
-                split_file = os.path.join(task_cache_dir,
-                                          "tid_%d.arff" % int(tid))
-                split = OpenMLSplit.from_arff_file(split_file)
-                return split
-
-            except (OSError, IOError):
-                continue
-
-        raise OpenMLCacheException("Split file for tid %d not "
-                                   "cached" % tid)
 
     def _perform_api_call(self, call, data=None, file_dictionary=None,
                           file_elements=None, add_authentication=True):
