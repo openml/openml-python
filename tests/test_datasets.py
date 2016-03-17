@@ -53,7 +53,20 @@ class TestOpenMLDataset(TestBase):
         # data from the internet...
         datasets = openml.datasets.list_datasets()
         # 1087 as the number of datasets on openml.org
-        self.assertTrue(len(datasets) >= 1087)
+        self.assertGreaterEqual(len(datasets), 1087)
+        for dataset in datasets:
+            self.assertEqual(type(dataset), dict)
+            self.assertGreaterEqual(len(dataset), 2)
+            self.assertIn('did', dataset)
+            self.assertIsInstance(dataset['did'], int)
+            self.assertIn('status', dataset)
+            self.assertTrue(is_string(dataset['status']))
+            self.assertIn(dataset['status'], ['in_preparation', 'active',
+                                              'deactivated'])
+
+    def test_list_datasets_by_tag(self):
+        datasets = openml.datasets.list_datasets_by_tag('uci')
+        self.assertGreaterEqual(len(datasets), 5)
         for dataset in datasets:
             self.assertEqual(type(dataset), dict)
             self.assertGreaterEqual(len(dataset), 2)

@@ -35,7 +35,6 @@ def _setup():
     private_dir = config.get('FAKE_SECTION', 'private_directory')
     cache_dir = config.get('FAKE_SECTION', 'cachedir')
     set_cache_directory(cache_dir, private_dir)
-    print(config)
 
 
 def set_cache_directory(cachedir, privatedir):
