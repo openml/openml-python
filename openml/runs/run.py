@@ -6,7 +6,7 @@ import sys
 import os
 
 
-from ..entities.flow import OpenMLFlow
+from ..flows import OpenMLFlow
 from ..exceptions import OpenMLCacheException
 from ..util import URLError
 from ..tasks import download_task
@@ -16,7 +16,7 @@ class OpenMLRun(object):
     def __init__(self, task_id, flow_id, setup_string, dataset_id, files=None,
                  setup_id=None, tags=None, run_id=None, uploader=None,
                  uploader_name=None, evaluations=None, data_content=None,
-                 classifier=None, task_type=None, task_evaluation_measure=None,
+                 model=None, task_type=None, task_evaluation_measure=None,
                  flow_name=None, parameter_settings=None, predictions_url=None):
         self.run_id = run_id
         self.uploader = uploader
@@ -33,7 +33,7 @@ class OpenMLRun(object):
         self.predictions_url = predictions_url
         self.evaluations = evaluations
         self.data_content = data_content
-        self.classifier = classifier
+        self.model = model
 
     def generate_arff(self, api_connector):
         """Generates an arff
@@ -81,20 +81,20 @@ class OpenMLRun(object):
         run_environment = get_version_information()
         setup_string = ''  # " ".join(sys.argv);
 
-        parameter_settings = self.classifier.get_params()
+        parameter_settings = self.model.get_params()
         # as a tag, it must be of the form ([a-zA-Z0-9_\-\.])+
         # so we format time from 'mm/dd/yy hh:mm:ss' to 'mm-dd-yy_hh.mm.ss'
         well_formatted_time = time.strftime("%c").replace(
             ' ', '_').replace('/', '-').replace(':', '.')
         tags = run_environment + [well_formatted_time] + ['openml_run'] + \
-            [self.classifier.__module__ + "." + self.classifier.__class__.__name__]
+            [self.model.__module__ + "." + self.model.__class__.__name__]
         description = construct_description_dictionary(
             self.task_id, self.flow_id, setup_string, parameter_settings, tags)
         description_xml = xmltodict.unparse(description, pretty=True)
         return description_xml
 
 
-def openml_run(connector, task, classifier):
+def openml_run(connector, task, model):
     """Performs a CV run on the dataset of the given task, using the split.
 
     Parameters
@@ -102,27 +102,28 @@ def openml_run(connector, task, classifier):
     connector : APIConnector
         Openml APIConnector which is used to download the OpenML Task and Dataset
     taskid : int
-        The integer identifier of the task to run the classifier on
-    classifier : sklearn classifier
-        a classifier which has a function fit(X,Y) and predict(X),
-        all supervised estimators of scikit learn follow this definition of a classifier [1]
+        The integer identifier of the task to run the model on
+    model : sklearn model
+        a model which has a function fit(X,Y) and predict(X),
+        all supervised estimators of scikit learn follow this definition of a model [1]
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
 
 
     Returns
     -------
-    classifier : sklearn classifier
-        the classifier, trained on the whole dataset
+    model : sklearn model
+        the model, trained on the whole dataset
     arff-dict : dict
         a dictionary with an 'attributes' and 'data' entry for an arff file
     """
-    flow_id = OpenMLFlow.ensure_flow_exists(task.api_connector, classifier)
+    flow = OpenMLFlow(model=model)
+    flow_id = flow.ensure_flow_exists(task.api_connector)
     if(flow_id < 0):
         print("No flow")
         return 0, 2
     print(flow_id)
 
-    #runname = "t" + str(task.task_id) + "_" + str(classifier)
+    #runname = "t" + str(task.task_id) + "_" + str(model)
     arff_datacontent = []
 
     dataset = task.get_dataset()
@@ -132,7 +133,7 @@ def openml_run(connector, task, classifier):
     if class_labels is None:
         raise ValueError('The task has no class labels. This method currently '
                          'only works for tasks with class labels.')
-    setup_string = create_setup_string(classifier)
+    setup_string = create_setup_string(model)
 
     run = OpenMLRun(task.task_id, flow_id, setup_string, dataset.id)
 
@@ -149,9 +150,9 @@ def openml_run(connector, task, classifier):
             testY = Y[test_indices]
 
             start_time = time.time()
-            classifier.fit(trainX, trainY)
-            ProbaY = classifier.predict_proba(testX)
-            PredY = classifier.predict(testX)
+            model.fit(trainX, trainY)
+            ProbaY = model.predict_proba(testX)
+            PredY = model.predict(testX)
             end_time = time.time()
 
             train_times.append(end_time - start_time)
@@ -166,7 +167,7 @@ def openml_run(connector, task, classifier):
         rep_no = rep_no + 1
 
     run.data_content = arff_datacontent
-    run.classifier = classifier.fit(X, Y)
+    run.model = model.fit(X, Y)
     return run
 
 
@@ -213,10 +214,10 @@ def construct_description_dictionary(taskid, flow_id, setup_string,
     return description
 
 
-def create_setup_string(classifier):
+def create_setup_string(model):
     run_environment = " ".join(get_version_information())
-    # fixme str(classifier) might contain (...)
-    return run_environment + " " + str(classifier)
+    # fixme str(model) might contain (...)
+    return run_environment + " " + str(model)
 
 
 # This can possibly be done by a package such as pyxb, but I could not get
