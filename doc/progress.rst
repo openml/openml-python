@@ -16,7 +16,7 @@ API call                                        implemented tested properly test
 /data/features/{id}                             yes         yes
 /data/qualities/{id}                            yes         yes
 /data/list/                                     yes         yes
-/data/list/tag/{tag}
+/data/list/tag/{tag}                            yes         yes
 /data/upload/                                   yes         yes
 /data/tag
 /data/untag
