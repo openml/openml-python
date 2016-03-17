@@ -1,7 +1,5 @@
 doc/generated
 examples/.ipynb_checkpoints
-*.xml
-*.arff
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
