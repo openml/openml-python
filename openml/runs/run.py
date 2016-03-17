@@ -365,7 +365,7 @@ def _get_cached_run(run_id):
                                "cached" % run_id)
 
 
-def list_runs_by_filters(api_connector, id=None, task=None, flow=None,
+def list_runs_by_filters(id=None, task=None, flow=None,
                          uploader=None):
     """List all runs matching all of the given filters.
 
@@ -373,8 +373,6 @@ def list_runs_by_filters(api_connector, id=None, task=None, flow=None,
 
     Parameters
     ==========
-    api_connector : :class:`openml.APIConnector`
-
     id : int or list
 
     task : int or list
@@ -424,18 +422,16 @@ def list_runs_by_filters(api_connector, id=None, task=None, flow=None,
             raise ValueError("Argument 'by' must not contain None!")
         api_call = "%s/%s/%s" % (api_call, by_, id_)
 
-    return _list_runs(api_connector, api_call)
+    return _list_runs(api_call)
 
 
-def list_runs_by_tag(api_connector, tag):
+def list_runs_by_tag(tag):
     """List runs by tag.
 
     Perform API call `/run/list/tag/{tag} <http://www.openml.org/api_docs/#!/run/get_run_list_tag_tag>`_
 
     Parameters
     ==========
-    api_connector : :class:`openml.APIConnector`
-
     tag : str
 
     Returns
@@ -443,18 +439,16 @@ def list_runs_by_tag(api_connector, tag):
     list
         List of found runs.
     """
-    return _list_runs_by(api_connector, tag, 'tag')
+    return _list_runs_by(tag, 'tag')
 
 
-def list_runs(api_connector, run_ids):
+def list_runs(run_ids):
     """List runs by their ID.
 
     Perform API call `/run/list/run/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_run_ids>`_
 
     Parameters
     ==========
-    api_connector : :class:`openml.APIConnector`
-
     run_id : int or list
 
     Returns
@@ -462,18 +456,16 @@ def list_runs(api_connector, run_ids):
     list
         List of found runs.
     """
-    return _list_runs_by(api_connector, run_ids, 'run')
+    return _list_runs_by(run_ids, 'run')
 
 
-def list_runs_by_task(api_connector, task_id):
+def list_runs_by_task(task_id):
     """List runs by task.
 
     Perform API call `/run/list/task/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_task_ids>`_
 
     Parameters
     ==========
-    api_connector : :class:`openml.APIConnector`
-
     task_id : int or list
 
     Returns
@@ -481,18 +473,16 @@ def list_runs_by_task(api_connector, task_id):
     list
         List of found runs.
     """
-    return _list_runs_by(api_connector, task_id, 'task')
+    return _list_runs_by(task_id, 'task')
 
 
-def list_runs_by_flow(api_connector, flow_id):
+def list_runs_by_flow(flow_id):
     """List runs by flow.
 
     Perform API call `/run/list/flow/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_flow_ids>`_
 
     Parameters
     ==========
-    api_connector : :class:`openml.APIConnector`
-
     flow_id : int or list
 
     Returns
@@ -500,18 +490,16 @@ def list_runs_by_flow(api_connector, flow_id):
     list
         List of found runs.
     """
-    return _list_runs_by(api_connector, flow_id, 'flow')
+    return _list_runs_by(flow_id, 'flow')
 
 
-def list_runs_by_uploader(api_connector, uploader_id):
+def list_runs_by_uploader(uploader_id):
     """List runs by uploader.
 
     Perform API call `/run/list/uploader/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_uploader_ids>`_
 
     Parameters
     ==========
-    api_connector : :class:`openml.APIConnector`
-
     uploader_id : int or list
 
     Returns
@@ -519,10 +507,10 @@ def list_runs_by_uploader(api_connector, uploader_id):
     list
         List of found runs.
     """
-    return _list_runs_by(api_connector, uploader_id, 'uploader')
+    return _list_runs_by(uploader_id, 'uploader')
 
 
-def _list_runs_by(api_connector, id_, by):
+def _list_runs_by(id_, by):
     """Helper function to create API call strings.
 
     Helper for the following api calls:
@@ -538,8 +526,6 @@ def _list_runs_by(api_connector, id_, by):
 
     Parameters
     ==========
-    api_connector : :class:`APIConnector`
-
     id_ : int or list
 
     by : str
@@ -565,13 +551,13 @@ def _list_runs_by(api_connector, id_, by):
     if by is not None:
         api_call += "/%s" % by
     api_call = "%s/%s" % (api_call, id_)
-    return _list_runs(api_connector, api_call)
+    return _list_runs(api_call)
 
 
-def _list_runs(api_connector, api_call):
+def _list_runs(api_call):
     """Helper function to parse API calls which are lists of runs"""
 
-    return_code, xml_string = api_connector._perform_api_call(api_call)
+    return_code, xml_string = _perform_api_call(api_call)
 
     runs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
