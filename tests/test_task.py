@@ -20,16 +20,10 @@ class TestTask(TestBase):
             self.assertIn(task['status'],
                           ['in_preparation', 'active', 'deactivated'])
 
-        tasks = openml.tasks.get_task_list(self.connector, task_type_id=1)
-        # 1759 as the number of supervised classification tasks retrieved
-        # openml.org from this call; don't trust the number on openml.org as
-        # it also counts private datasets
-        self.assertGreaterEqual(len(tasks), 1759)
-        for task in tasks:
-            check_task(task)
-
-        tasks = openml.tasks.get_task_list(self.connector, task_type_id=1)
-        self.assertGreaterEqual(len(tasks), 735)
+        # use a small task type as we cant limit tasks.
+        # TODO inspect the tasks maybe?
+        tasks = self.connector.get_task_list(task_type_id=3)
+        self.assertGreaterEqual(len(tasks), 300)
         for task in tasks:
             check_task(task)
 

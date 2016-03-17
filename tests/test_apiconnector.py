@@ -34,7 +34,6 @@ class TestAPIConnector(TestBase):
         raise Exception()
 
     ############################################################################
-    # ###########################################################################
     # Flows
     @unittest.skip('The method which is tested by this function doesnt exist')
     def test_download_flow_list(self):
