@@ -22,7 +22,7 @@ class TestTask(TestBase):
 
         # use a small task type as we cant limit tasks.
         # TODO inspect the tasks maybe?
-        tasks = self.connector.get_task_list(task_type_id=3)
+        tasks = openml.tasks.get_task_list(self.connector, task_type_id=3)
         self.assertGreaterEqual(len(tasks), 300)
         for task in tasks:
             check_task(task)
