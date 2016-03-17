@@ -5,11 +5,13 @@ from collections import OrderedDict, defaultdict
 import sys
 import os
 
-
+from .. import config
 from ..flows import OpenMLFlow
 from ..exceptions import OpenMLCacheException
 from ..util import URLError
 from ..tasks import get_task
+from ..tasks.task_functions import _create_task_from_xml
+from .._api_calls import _perform_api_call
 
 
 class OpenMLRun(object):
@@ -37,7 +39,7 @@ class OpenMLRun(object):
         self.data_content = data_content
         self.model = model
 
-    def generate_arff(self, api_connector):
+    def generate_arff(self):
         """Generates an arff
 
         Parameters
@@ -55,7 +57,7 @@ class OpenMLRun(object):
         """
         run_environment = (_get_version_information() +
                            [time.strftime("%c")] + ['Created by run_task()'])
-        task = get_task(api_connector, self.task_id)
+        task = get_task(self.task_id)
         class_labels = task.class_labels
 
         arff_dict = {}
@@ -70,12 +72,12 @@ class OpenMLRun(object):
         arff_dict['relation'] = 'openml_task_' + str(task.task_id) + '_predictions'
         return arff_dict
 
-    def publish(self, api_connector):
-        predictions = arff.dumps(self.generate_arff(api_connector))
+    def publish(self):
+        predictions = arff.dumps(self.generate_arff())
         description_xml = self.create_description_xml()
         data = {'predictions': predictions, 'description':
                 description_xml}
-        return_code, dataset_xml = api_connector._perform_api_call(
+        return_code, dataset_xml = _perform_api_call(
             "/run/", file_elements=data)
         return return_code, dataset_xml
 
@@ -96,13 +98,11 @@ class OpenMLRun(object):
         return description_xml
 
 
-def run_task(connector, task, model):
+def run_task(task, model):
     """Performs a CV run on the dataset of the given task, using the split.
 
     Parameters
     ----------
-    connector : APIConnector
-        Openml APIConnector which is used to download the OpenML Task and Dataset
     taskid : int
         The integer identifier of the task to run the model on
     model : sklearn model
@@ -119,7 +119,7 @@ def run_task(connector, task, model):
         a dictionary with an 'attributes' and 'data' entry for an arff file
     """
     flow = OpenMLFlow(model=model)
-    flow_id = flow.ensure_flow_exists(task.api_connector)
+    flow_id = flow.ensure_flow_exists()
     if(flow_id < 0):
         print("No flow")
         return 0, 2
@@ -173,8 +173,7 @@ def run_task(connector, task, model):
     return run
 
 
-def _to_dict(taskid, flow_id, setup_string,
-                                     parameter_settings, tags):
+def _to_dict(taskid, flow_id, setup_string, parameter_settings, tags):
     """ Creates a dictionary corresponding to the desired xml desired by openML
 
     Parameters
@@ -252,15 +251,14 @@ def get_runs(run_ids):
     return runs
 
 
-def get_run(api_connector, run_id):
-    run_file = os.path.join(api_connector.run_cache_dir, "run_%d.xml" % run_id)
+def get_run(run_id):
+    run_file = os.path.join(config.get_cache_directory(), "runs", "run_%d.xml" % run_id)
 
     try:
-        return _get_cached_run(api_connector, run_id)
+        return _get_cached_run(run_id)
     except (OpenMLCacheException):
         try:
-            return_code, run_xml = api_connector._perform_api_call(
-                "run/%d" % run_id)
+            return_code, run_xml = _perform_api_call("run/%d" % run_id)
         except (URLError, UnicodeEncodeError) as e:
             # TODO logger.debug
             print(e)
@@ -350,14 +348,14 @@ def _create_run_from_xml(xml):
                      detailed_evaluations=detailed_evaluations)
 
 
-def _get_cached_run(api_connector, run_id):
-    for run_cache_dir in [api_connector.run_cache_dir,
-                          api_connector._private_directory_runs]:
+def _get_cached_run(run_id):
+    for cache_dir in [config.get_cache_directory(), config.get_private_directory()]:
+        run_cache_dir = os.path.join(cache_dir, "runs")
         try:
             run_file = os.path.join(run_cache_dir,
                                     "run_%d.xml" % int(run_id))
             with open(run_file) as fh:
-                run = api_connector._create_task_from_xml(xml=fh.read())
+                run = _create_task_from_xml(xml=fh.read())
             return run
 
         except (OSError, IOError):
@@ -367,7 +365,7 @@ def _get_cached_run(api_connector, run_id):
                                "cached" % run_id)
 
 
-def list_runs_by_filters(api_connector, id=None, task=None, flow=None,
+def list_runs_by_filters(id=None, task=None, flow=None,
                          uploader=None):
     """List all runs matching all of the given filters.
 
@@ -375,8 +373,6 @@ def list_runs_by_filters(api_connector, id=None, task=None, flow=None,
 
     Parameters
     ==========
-    api_connector : :class:`openml.APIConnector`
-
     id : int or list
 
     task : int or list
@@ -426,18 +422,16 @@ def list_runs_by_filters(api_connector, id=None, task=None, flow=None,
             raise ValueError("Argument 'by' must not contain None!")
         api_call = "%s/%s/%s" % (api_call, by_, id_)
 
-    return _list_runs(api_connector, api_call)
+    return _list_runs(api_call)
 
 
-def list_runs_by_tag(api_connector, tag):
+def list_runs_by_tag(tag):
     """List runs by tag.
 
     Perform API call `/run/list/tag/{tag} <http://www.openml.org/api_docs/#!/run/get_run_list_tag_tag>`_
 
     Parameters
     ==========
-    api_connector : :class:`openml.APIConnector`
-
     tag : str
 
     Returns
@@ -445,18 +439,16 @@ def list_runs_by_tag(api_connector, tag):
     list
         List of found runs.
     """
-    return _list_runs_by(api_connector, tag, 'tag')
+    return _list_runs_by(tag, 'tag')
 
 
-def list_runs(api_connector, run_ids):
+def list_runs(run_ids):
     """List runs by their ID.
 
     Perform API call `/run/list/run/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_run_ids>`_
 
     Parameters
     ==========
-    api_connector : :class:`openml.APIConnector`
-
     run_id : int or list
 
     Returns
@@ -464,18 +456,16 @@ def list_runs(api_connector, run_ids):
     list
         List of found runs.
     """
-    return _list_runs_by(api_connector, run_ids, 'run')
+    return _list_runs_by(run_ids, 'run')
 
 
-def list_runs_by_task(api_connector, task_id):
+def list_runs_by_task(task_id):
     """List runs by task.
 
     Perform API call `/run/list/task/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_task_ids>`_
 
     Parameters
     ==========
-    api_connector : :class:`openml.APIConnector`
-
     task_id : int or list
 
     Returns
@@ -483,18 +473,16 @@ def list_runs_by_task(api_connector, task_id):
     list
         List of found runs.
     """
-    return _list_runs_by(api_connector, task_id, 'task')
+    return _list_runs_by(task_id, 'task')
 
 
-def list_runs_by_flow(api_connector, flow_id):
+def list_runs_by_flow(flow_id):
     """List runs by flow.
 
     Perform API call `/run/list/flow/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_flow_ids>`_
 
     Parameters
     ==========
-    api_connector : :class:`openml.APIConnector`
-
     flow_id : int or list
 
     Returns
@@ -502,18 +490,16 @@ def list_runs_by_flow(api_connector, flow_id):
     list
         List of found runs.
     """
-    return _list_runs_by(api_connector, flow_id, 'flow')
+    return _list_runs_by(flow_id, 'flow')
 
 
-def list_runs_by_uploader(api_connector, uploader_id):
+def list_runs_by_uploader(uploader_id):
     """List runs by uploader.
 
     Perform API call `/run/list/uploader/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_uploader_ids>`_
 
     Parameters
     ==========
-    api_connector : :class:`openml.APIConnector`
-
     uploader_id : int or list
 
     Returns
@@ -521,10 +507,10 @@ def list_runs_by_uploader(api_connector, uploader_id):
     list
         List of found runs.
     """
-    return _list_runs_by(api_connector, uploader_id, 'uploader')
+    return _list_runs_by(uploader_id, 'uploader')
 
 
-def _list_runs_by(api_connector, id_, by):
+def _list_runs_by(id_, by):
     """Helper function to create API call strings.
 
     Helper for the following api calls:
@@ -540,8 +526,6 @@ def _list_runs_by(api_connector, id_, by):
 
     Parameters
     ==========
-    api_connector : :class:`APIConnector`
-
     id_ : int or list
 
     by : str
@@ -567,13 +551,13 @@ def _list_runs_by(api_connector, id_, by):
     if by is not None:
         api_call += "/%s" % by
     api_call = "%s/%s" % (api_call, id_)
-    return _list_runs(api_connector, api_call)
+    return _list_runs(api_call)
 
 
-def _list_runs(api_connector, api_call):
+def _list_runs(api_call):
     """Helper function to parse API calls which are lists of runs"""
 
-    return_code, xml_string = api_connector._perform_api_call(api_call)
+    return_code, xml_string = _perform_api_call(api_call)
 
     runs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful

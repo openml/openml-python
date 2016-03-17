@@ -3,12 +3,14 @@ import re
 import os
 from ..exceptions import OpenMLCacheException
 from .split import OpenMLSplit
+from .. import config
+from .task_functions import get_cached_task
 
 
-def _get_cached_splits(api_connector):
+def _get_cached_splits():
     splits = OrderedDict()
-    for task_cache_dir in [api_connector.task_cache_dir,
-                           api_connector._private_directory_tasks]:
+    for cache_dir in [config.get_cache_directory(), config.get_private_directory()]:
+        task_cache_dir = os.path.join(cache_dir, "tasks")
         directory_content = os.listdir(task_cache_dir)
         directory_content.sort()
 
@@ -18,17 +20,17 @@ def _get_cached_splits(api_connector):
                 tid = match.group(2)
                 tid = int(tid)
 
-                splits[tid] = api_connector.get_cached_task(tid)
+                splits[tid] = get_cached_task(tid)
 
     return splits
 
 
-def _get_cached_split(api_connector, tid):
-    for task_cache_dir in [api_connector.task_cache_dir,
-                           api_connector._private_directory_tasks]:
+def _get_cached_split(tid):
+    for cache_dir in [config.get_cache_directory(), config.get_private_directory()]:
+        task_cache_dir = os.path.join(cache_dir, "tasks")
+        split_file = os.path.join(task_cache_dir,
+                                  "tid_%d.arff" % int(tid))
         try:
-            split_file = os.path.join(task_cache_dir,
-                                      "tid_%d.arff" % int(tid))
             split = OpenMLSplit.from_arff_file(split_file)
             return split
 

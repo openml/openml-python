@@ -16,6 +16,7 @@ else:
         import pickle
 
 from ..util import is_string
+from .._api_calls import _perform_api_call
 
 logger = logging.getLogger(__name__)
 
@@ -222,13 +223,13 @@ class OpenMLDataset(object):
         else:
             return None
 
-    def publish(self, api_connector):
+    def publish(self):
         data = {'description': self.to_xml()}
         if self.data_file is not None:
-            return_code, return_value = api_connector._perform_api_call(
+            return_code, return_value = _perform_api_call(
                 "/data/", data=data, file_dictionary={'dataset': self.data_file})
         else:
-            return_code, return_value = api_connector._perform_api_call("/data/", data=data)
+            return_code, return_value = _perform_api_call("/data/", data=data)
         return return_code, return_value
 
     def to_xml(self):

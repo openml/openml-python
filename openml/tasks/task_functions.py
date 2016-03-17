@@ -7,13 +7,15 @@ from ..util import URLError
 from ..exceptions import OpenMLCacheException
 from .. import datasets
 from .task import OpenMLTask, _create_task_cache_dir
+from .. import config
+from .._api_calls import _perform_api_call
 
 
-def get_cached_tasks(api_connector):
+def get_cached_tasks():
     tasks = OrderedDict()
-    for task_cache_dir in [api_connector.task_cache_dir,
-                           api_connector._private_directory_tasks]:
+    for cache_dir in [config.get_cache_directory(), config.get_private_directory()]:
 
+        task_cache_dir = os.path.join(cache_dir, "tasks")
         directory_content = os.listdir(task_cache_dir)
         directory_content.sort()
 
@@ -26,20 +28,20 @@ def get_cached_tasks(api_connector):
                 tid = match.group(2)
                 tid = int(tid)
 
-                tasks[tid] = api_connector.get_cached_task(tid)
+                tasks[tid] = get_cached_task(tid)
 
     return tasks
 
 
-def get_cached_task(api_connector, tid):
-    for task_cache_dir in [api_connector.task_cache_dir,
-                           api_connector._private_directory_tasks]:
+def get_cached_task(tid):
+    for cache_dir in [config.get_cache_directory(), config.get_private_directory()]:
+        task_cache_dir = os.path.join(cache_dir, "tasks")
         task_file = os.path.join(task_cache_dir,
                                  "tid_%d.xml" % int(tid))
 
         try:
             with open(task_file) as fh:
-                task = _create_task_from_xml(api_connector, xml=fh.read())
+                task = _create_task_from_xml(xml=fh.read())
             return task
         except (OSError, IOError):
             continue
@@ -48,7 +50,7 @@ def get_cached_task(api_connector, tid):
                                "cached" % tid)
 
 
-def get_estimation_procedure_list(api_connector):
+def get_estimation_procedure_list():
     """Return a list of all estimation procedures which are on OpenML.
 
     Returns
@@ -59,7 +61,7 @@ def get_estimation_procedure_list(api_connector):
         task type id, name, type, repeats, folds, stratified.
     """
 
-    return_code, xml_string = api_connector._perform_api_call(
+    return_code, xml_string = _perform_api_call(
         "estimationprocedure/list")
     procs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
@@ -79,7 +81,7 @@ def get_estimation_procedure_list(api_connector):
     return procs
 
 
-def list_tasks(api_connector, task_type_id=1):
+def list_tasks(task_type_id=1):
     """Return a list of all tasks which are on OpenML.
 
     Parameters
@@ -102,7 +104,7 @@ def list_tasks(api_connector, task_type_id=1):
         raise ValueError("Task Type ID is neither an Integer nor can be "
                          "cast to an Integer.")
 
-    return_code, xml_string = api_connector._perform_api_call(
+    return_code, xml_string = _perform_api_call(
         "task/list/type/%d" % task_type_id)
     tasks_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
@@ -111,7 +113,7 @@ def list_tasks(api_connector, task_type_id=1):
     assert type(tasks_dict['oml:tasks']['oml:task']) == list
 
     tasks = []
-    procs = get_estimation_procedure_list(api_connector)
+    procs = get_estimation_procedure_list()
     proc_dict = dict((x['id'], x) for x in procs)
     for task_ in tasks_dict['oml:tasks']['oml:task']:
         task = {'tid': int(task_['oml:task_id']),
@@ -142,7 +144,7 @@ def list_tasks(api_connector, task_type_id=1):
     return tasks
 
 
-def get_task(api_connector, task_id):
+def get_task(task_id):
     """Download the OpenML task for a given task ID.
 
     Parameters
@@ -156,16 +158,16 @@ def get_task(api_connector, task_id):
         raise ValueError("Task ID is neither an Integer nor can be "
                          "cast to an Integer.")
 
-    xml_file = os.path.join(_create_task_cache_dir(api_connector, task_id),
+    xml_file = os.path.join(_create_task_cache_dir(task_id),
                             "task.xml")
 
     try:
         with open(xml_file) as fh:
-            task = _create_task_from_xml(api_connector, fh.read())
+            task = _create_task_from_xml(fh.read())
     except (OSError, IOError):
 
         try:
-            return_code, task_xml = api_connector._perform_api_call(
+            return_code, task_xml = _perform_api_call(
                 "task/%d" % task_id)
         except (URLError, UnicodeEncodeError) as e:
             print(e)
@@ -184,10 +186,10 @@ def get_task(api_connector, task_id):
             with open(xml_file, "w") as fh:
                 fh.write(task_xml)
 
-        task = _create_task_from_xml(api_connector, task_xml)
+        task = _create_task_from_xml(task_xml)
 
     task.download_split()
-    dataset = datasets.get_dataset(api_connector, task.dataset_id)
+    dataset = datasets.get_dataset(task.dataset_id)
 
     # TODO look into either adding the class labels to task xml, or other
     # way of reading it.
@@ -196,7 +198,7 @@ def get_task(api_connector, task_id):
     return task
 
 
-def _create_task_from_xml(api_connector, xml):
+def _create_task_from_xml(xml):
     dic = xmltodict.parse(xml)["oml:task"]
 
     estimation_parameters = dict()
@@ -225,4 +227,4 @@ def _create_task_from_xml(api_connector, xml):
         inputs["estimation_procedure"]["oml:estimation_procedure"][
             "oml:data_splits_url"], estimation_parameters,
         inputs["evaluation_measures"]["oml:evaluation_measures"][
-            "oml:evaluation_measure"], None, api_connector)
+            "oml:evaluation_measure"], None)

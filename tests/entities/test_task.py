@@ -10,10 +10,9 @@ else:
 
 import numpy as np
 
-from openml.entities.dataset import OpenMLDataset
-from openml.entities.split import OpenMLSplit
-from openml.entities.task import OpenMLTask
-from openml.apiconnector import APIConnector
+from openml import OpenMLDataset
+from openml import OpenMLSplit
+from openml import OpenMLTask
 
 
 class OpenMLTaskTest(unittest.TestCase):

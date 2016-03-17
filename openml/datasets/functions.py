@@ -5,6 +5,8 @@ from collections import OrderedDict
 import xmltodict
 from .dataset import OpenMLDataset
 from ..exceptions import OpenMLCacheException
+from .. import config
+from .._api_calls import _perform_api_call, _read_url
 
 if sys.version_info[0] >= 3:
     from urllib.error import URLError
@@ -15,12 +17,12 @@ else:
 ############################################################################
 # Local getters/accessors to the cache directory
 
-def _list_cached_datasets(api_connector):
+def _list_cached_datasets():
     """Return list with ids of all cached datasets"""
     datasets = []
 
-    for dataset_cache_dir in [api_connector.dataset_cache_dir,
-                              api_connector._private_directory_datasets]:
+    for dataset_cache in [config.get_cache_directory(), config.get_private_directory()]:
+        dataset_cache_dir = os.path.join(dataset_cache, "datasets")
         directory_content = os.listdir(dataset_cache_dir)
         directory_content.sort()
 
@@ -46,32 +48,32 @@ def _list_cached_datasets(api_connector):
     return datasets
 
 
-def _get_cached_datasets(api_connector):
+def _get_cached_datasets():
     """Searches for all OpenML datasets in the OpenML cache dir.
 
     Return a dictionary which maps dataset ids to dataset objects"""
-    dataset_list = _list_cached_datasets(api_connector)
+    dataset_list = _list_cached_datasets()
     datasets = OrderedDict()
 
     for did in dataset_list:
-        datasets[did] = _get_cached_dataset(api_connector, did)
+        datasets[did] = _get_cached_dataset(did)
 
     return datasets
 
 
-def _get_cached_dataset(api_connector, did):
+def _get_cached_dataset(did):
     # This code is slow...replace it with new API calls
-    description = _get_cached_dataset_description(api_connector, did)
-    arff_file = _get_cached_dataset_arff(api_connector, did)
+    description = _get_cached_dataset_description(did)
+    arff_file = _get_cached_dataset_arff(did)
     dataset = _create_dataset_from_description(description, arff_file)
 
     return dataset
 
 
-def _get_cached_dataset_description(api_connector, did):
-    for dataset_cache_dir in [api_connector.dataset_cache_dir,
-                              api_connector._private_directory_datasets]:
-        did_cache_dir = os.path.join(dataset_cache_dir, str(did))
+def _get_cached_dataset_description(did):
+    for cache_dir in [config.get_cache_directory(),
+                      config.get_private_directory()]:
+        did_cache_dir = os.path.join(cache_dir, "datasets", str(did))
         description_file = os.path.join(did_cache_dir, "description.xml")
         try:
             with open(description_file) as fh:
@@ -85,10 +87,10 @@ def _get_cached_dataset_description(api_connector, did):
                                "cached" % did)
 
 
-def _get_cached_dataset_arff(api_connector, did):
-    for dataset_cache_dir in [api_connector.dataset_cache_dir,
-                              api_connector._private_directory_datasets]:
-        did_cache_dir = os.path.join(dataset_cache_dir, str(did))
+def _get_cached_dataset_arff(did):
+    for cache_dir in [config.get_cache_directory(),
+                      config.get_private_directory()]:
+        did_cache_dir = os.path.join(cache_dir, "datasets", str(did))
         output_file = os.path.join(did_cache_dir, "dataset.arff")
 
         try:
@@ -103,7 +105,7 @@ def _get_cached_dataset_arff(api_connector, did):
                                "cached" % did)
 
 
-def list_datasets(api_connector):
+def list_datasets():
     """Return a list of all dataset which are on OpenML.
 
     Returns
@@ -115,7 +117,7 @@ def list_datasets(api_connector):
         these are also returned.
     """
     # TODO add proper error handling here!
-    return_code, xml_string = api_connector._perform_api_call("data/list/")
+    return_code, xml_string = _perform_api_call("data/list/")
     datasets_dict = xmltodict.parse(xml_string)
 
     # Minimalistic check if the XML is useful
@@ -144,7 +146,7 @@ def list_datasets(api_connector):
     return datasets
 
 
-def check_datasets_active(api_connector, dids):
+def check_datasets_active(dids):
     """Check if the dataset ids provided are active.
 
     Parameters
@@ -158,7 +160,7 @@ def check_datasets_active(api_connector, dids):
         A dictionary with items {did: active}, where active is a boolean. It
         is set to True if the dataset is active.
     """
-    dataset_list = list_datasets(api_connector)
+    dataset_list = list_datasets()
     dids = sorted(dids)
     active = {}
 
@@ -171,7 +173,7 @@ def check_datasets_active(api_connector, dids):
         dataset_list_idx = idx
 
 
-def get_datasets(api_connector, dids):
+def get_datasets(dids):
     """Download datasets.
 
     Parameters
@@ -191,11 +193,11 @@ def get_datasets(api_connector, dids):
     """
     datasets = []
     for did in dids:
-        datasets.append(get_dataset(api_connector, did))
+        datasets.append(get_dataset(did))
     return datasets
 
 
-def get_dataset(api_connector, did):
+def get_dataset(did):
     """Download a dataset.
 
     TODO: explain caching!
@@ -215,30 +217,30 @@ def get_dataset(api_connector, did):
         raise ValueError("Dataset ID is neither an Integer nor can be "
                          "cast to an Integer.")
 
-    description = get_dataset_description(api_connector, did)
-    arff_file = _get_dataset_arff(api_connector, did, description=description)
+    description = get_dataset_description(did)
+    arff_file = _get_dataset_arff(did, description=description)
 
     dataset = _create_dataset_from_description(description, arff_file)
     return dataset
 
 
-def get_dataset_description(api_connector, did):
+def get_dataset_description(did):
     # TODO implement a cache for this that invalidates itself after some
     # time
     # This can be saved on disk, but cannot be cached properly, because
     # it contains the information on whether a dataset is active.
-    did_cache_dir = _create_dataset_cache_dir(api_connector, did)
+    did_cache_dir = _create_dataset_cache_directory(did)
     description_file = os.path.join(did_cache_dir, "description.xml")
 
     try:
-        return _get_cached_dataset_description(api_connector, did)
+        return _get_cached_dataset_description(did)
     except (OpenMLCacheException):
         try:
-            return_code, dataset_xml = api_connector._perform_api_call(
+            return_code, dataset_xml = _perform_api_call(
                 "data/%d" % did)
         except (URLError, UnicodeEncodeError) as e:
             # TODO logger.debug
-            _remove_dataset_chache_dir(api_connector, did)
+            _remove_dataset_chache_dir(did)
             print(e)
             raise e
 
@@ -250,7 +252,7 @@ def get_dataset_description(api_connector, did):
             "oml:data_set_description"]
     except Exception as e:
         # TODO logger.debug
-        _remove_dataset_chache_dir(api_connector, did)
+        _remove_dataset_chache_dir(did)
         print("Dataset ID", did)
         raise e
 
@@ -260,8 +262,8 @@ def get_dataset_description(api_connector, did):
     return description
 
 
-def _get_dataset_arff(api_connector, did, description=None):
-    did_cache_dir = _create_dataset_cache_dir(api_connector, did)
+def _get_dataset_arff(did, description=None):
+    did_cache_dir = _create_dataset_cache_directory(did)
     output_file = os.path.join(did_cache_dir, "dataset.arff")
 
     # This means the file is still there; whether it is useful is up to
@@ -274,9 +276,9 @@ def _get_dataset_arff(api_connector, did, description=None):
         pass
 
     if description is None:
-        description = get_dataset_description(api_connector, did)
+        description = get_dataset_description(did)
     url = description['oml:url']
-    return_code, arff_string = api_connector._read_url(url)
+    return_code, arff_string = _read_url(url)
     # TODO: it is inefficient to load the dataset in memory prior to
     # saving it to the hard disk!
     with open(output_file, "w") as fh:
@@ -286,8 +288,8 @@ def _get_dataset_arff(api_connector, did, description=None):
     return output_file
 
 
-def get_dataset_features(api_connector, did):
-    did_cache_dir = _create_dataset_cache_dir(api_connector, did)
+def get_dataset_features(did):
+    did_cache_dir = _create_dataset_cache_directory(did)
     features_file = os.path.join(did_cache_dir, "features.xml")
 
     # Dataset features aren't subject to change...
@@ -296,7 +298,7 @@ def get_dataset_features(api_connector, did):
             features_xml = fh.read()
     except (OSError, IOError):
         try:
-            return_code, features_xml = api_connector._perform_api_call(
+            return_code, features_xml = _perform_api_call(
                 "data/features/%d" % did)
         except (URLError, UnicodeEncodeError) as e:
             # TODO logger.debug
@@ -316,12 +318,12 @@ def get_dataset_features(api_connector, did):
     return features
 
 
-def get_dataset_qualities(api_connector, did):
+def get_dataset_qualities(did):
     # Dataset qualities are subject to change and must be fetched every time
-    did_cache_dir = _create_dataset_cache_dir(api_connector, did)
+    did_cache_dir = _create_dataset_cache_directory(did)
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")
     try:
-        return_code, qualities_xml = api_connector._perform_api_call(
+        return_code, qualities_xml = _perform_api_call(
             "data/qualities/%d" % did)
     except (URLError, UnicodeEncodeError) as e:
         # TODO logger.debug
@@ -340,8 +342,8 @@ def get_dataset_qualities(api_connector, did):
     return qualities
 
 
-def _create_dataset_cache_dir(api_connector, did):
-    dataset_cache_dir = os.path.join(api_connector.dataset_cache_dir, str(did))
+def _create_dataset_cache_directory(did):
+    dataset_cache_dir = os.path.join(config.get_cache_directory(), "datasets", str(did))
     try:
         os.makedirs(dataset_cache_dir)
     except (OSError, IOError):
@@ -350,8 +352,8 @@ def _create_dataset_cache_dir(api_connector, did):
     return dataset_cache_dir
 
 
-def _remove_dataset_chache_dir(api_connector, did):
-    dataset_cache_dir = os.path.join(api_connector.dataset_cache_dir, str(did))
+def _remove_dataset_chache_dir(did):
+    dataset_cache_dir = os.path.join(config.get_cache_directory(), "datasets", str(did))
     try:
         os.rmdir(dataset_cache_dir)
     except (OSError, IOError):
