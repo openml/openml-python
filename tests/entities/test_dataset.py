@@ -3,10 +3,10 @@ import unittest
 import os
 
 import numpy as np
-import scipy.sparse
 
-from openml.entities.dataset import OpenMLDataset
+from openml import OpenMLDataset
 from openml.util import is_string
+
 
 class OpenMLDatasetTest(unittest.TestCase):
     def setUp(self):
