@@ -2,7 +2,7 @@ import os
 
 from .. import datasets
 from ..util import URLError
-from ..entities.split import OpenMLSplit
+from .split import OpenMLSplit
 
 
 class OpenMLTask(object):
