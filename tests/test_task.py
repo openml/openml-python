@@ -29,6 +29,12 @@ class TestTask(TestBase):
         for task in tasks:
             self._check_task(task)
 
+    def test_list_tasks_by_tag(self):
+        tasks = openml.tasks.list_tasks_by_tag('basic')
+        self.assertGreaterEqual(len(tasks), 57)
+        for task in tasks:
+            self._check_task(task)
+
     def test_get_task(self):
         task = openml.tasks.get_task(1)
         self.assertTrue(os.path.exists(

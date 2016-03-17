@@ -106,6 +106,24 @@ def list_tasks_by_type(task_type_id):
     return _list_tasks("task/list/type/%d" % task_type_id)
 
 
+def list_tasks_by_tag(tag):
+    """Return all tasks having the given tag
+
+    Parameters
+    ----------
+    tag : str
+
+    Returns
+    -------
+    list
+        A list of all tasks having a give tag. Every task is represented by
+        a dictionary containing the following information: task id,
+        dataset id, task_type and status. If qualities are calculated for
+        the associated dataset, some of these are also returned.
+    """
+    return _list_tasks("task/list/tag/%s" % tag)
+
+
 def list_tasks():
     """Return a list of all tasks which are on OpenML.
 
@@ -124,9 +142,18 @@ def _list_tasks(api_call):
     return_code, xml_string = _perform_api_call(api_call)
     tasks_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
-    assert tasks_dict['oml:tasks']['@xmlns:oml'] == \
-        'http://openml.org/openml'
-    assert type(tasks_dict['oml:tasks']['oml:task']) == list
+    if 'oml:tasks' not in tasks_dict:
+        raise ValueError('Error in return XML, does not contain "oml:runs": %s'
+                         % str(tasks_dict))
+    elif '@xmlns:oml' not in tasks_dict['oml:tasks']:
+        raise ValueError('Error in return XML, does not contain '
+                         '"oml:runs"/@xmlns:oml: %s'
+                         % str(tasks_dict))
+    elif tasks_dict['oml:tasks']['@xmlns:oml'] != 'http://openml.org/openml':
+        raise ValueError('Error in return XML, value of  '
+                         '"oml:runs"/@xmlns:oml is not '
+                         '"http://openml.org/openml": %s'
+                         % str(tasks_dict))
 
     tasks = []
     procs = get_estimation_procedure_list()
