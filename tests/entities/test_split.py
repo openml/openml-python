@@ -4,7 +4,7 @@ import unittest
 
 import numpy as np
 
-from openml.entities.split import OpenMLSplit, Split
+from openml import OpenMLSplit
 
 
 class OpenMLSplitTest(unittest.TestCase):
@@ -42,15 +42,10 @@ class OpenMLSplitTest(unittest.TestCase):
         split2.split[0][10] = dict()
         self.assertNotEqual(split, split2)
 
-        split2 = OpenMLSplit.from_arff_file(self.arff_filename)
-        split2.split[0][0] = Split(np.zeros((80)), np.zeros((9)))
-        self.assertNotEqual(split, split2)
-
     def test_from_arff_file(self):
         split = OpenMLSplit.from_arff_file(self.arff_filename)
         self.assertIsInstance(split.split, dict)
         self.assertIsInstance(split.split[0], dict)
-        self.assertIsInstance(split.split[0][0], Split)
         self.assertIsInstance(split.split[0][0][0], np.ndarray)
         self.assertIsInstance(split.split[0][0].train, np.ndarray)
         self.assertIsInstance(split.split[0][0].train, np.ndarray)
