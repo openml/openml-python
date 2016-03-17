@@ -12,49 +12,60 @@ API calls
 =============================================== =========== ====== =============== ========== =====================
 API call                                        implemented tested properly tested loads json proper error handling
 =============================================== =========== ====== =============== ========== =====================
+/data/{id}                                      yes         yes
+/data/features/{id}                             yes         yes
+/data/qualities/{id}                            yes         yes
 /data/list/                                     yes         yes
 /data/list/tag/{tag}
-/data/{data_id}                                 yes         yes
-/data/delete/
 /data/upload/                                   yes         yes
-/data/features/{data_id}                        yes         yes
-/data/features/upload/
-/data/qualities/{data_id}                       yes         yes
-/data/qualities/list
-/data/qualities/upload
 /data/tag
 /data/untag
+/data/delete/                                   X
+
+/task/{task}                                    yes         yes
 /task/list                                      yes         yes
+/task/list/type/{id}
 /task/list/tag/{tag}
-/task/{task_id}                                 yes         yes
+/task {POST}
 /task/tag
 /task/untag
-/task/delete
+/task/delete                                    X
+
+/tasktype/{id}
 /tasktype/list
-/tasktype/{task_id}
+
+/flow/{id}
+/flow/exists/{name}/{ext_version}               yes
 /flow/list                                      yes
+/flow/list/tag/{tag}
+/flow/owned
+/flow/ {POST}                                   yes         yes
 /flow/tag
 /flow/untag
-/flow/{flow_id}
-/flow/                                          yes         yes
-/flow/exists/{name,ext_version}
-/flow/owned
-/run/list/task/{task_ids}                       yes         yes
-/run/list/run/{run_ids}                         yes         yes
+/flow/{id} {DELETE}                             X
+
+/run/list/task/{ids}                            yes         yes
+/run/list/run/{ids}                             yes         yes
 /run/list/tag/{tag}                             yes         yes
 /run/{id}                                       yes         yes
 /run/list/uploader/{ids}                        yes         yes
 /run/list/flow/{ids}                            yes         yes
 /run/list/{filters}                             yes         yes
-/run/tag
 /run/untag
 /run (POST)                                     yes         yes
-/run/{id} (DELETE)
-/estimationprocedure/{proc_id}
-/estimationprocedure/list
-/evaluationmeasures/list
-/job/request/
+/run/tag
+/run/{id} (DELETE)                              X
+
+/evaluation/list/run/{ids}
+/evaluation/list/tag/{tag}
+/evaluation/list/task/{ids}
+/evaluation/list/uploader/{ids}
+/evaluation/list/flow/{ids}
+/evaluation/list/{filters}
+
 =============================================== =========== ====== =============== ========== =====================
+
+We do not plan to implement API calls marked with an **X**!
 
 Convenience Functions
 =====================
