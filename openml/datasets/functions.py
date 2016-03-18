@@ -236,14 +236,14 @@ def get_dataset(did):
         raise ValueError("Dataset ID is neither an Integer nor can be "
                          "cast to an Integer.")
 
-    description = get_dataset_description(did)
+    description = _get_dataset_description(did)
     arff_file = _get_dataset_arff(did, description=description)
 
     dataset = _create_dataset_from_description(description, arff_file)
     return dataset
 
 
-def get_dataset_description(did):
+def _get_dataset_description(did):
     # TODO implement a cache for this that invalidates itself after some
     # time
     # This can be saved on disk, but cannot be cached properly, because
@@ -295,7 +295,7 @@ def _get_dataset_arff(did, description=None):
         pass
 
     if description is None:
-        description = get_dataset_description(did)
+        description = _get_dataset_description(did)
     url = description['oml:url']
     return_code, arff_string = _read_url(url)
     # TODO: it is inefficient to load the dataset in memory prior to
@@ -307,7 +307,7 @@ def _get_dataset_arff(did, description=None):
     return output_file
 
 
-def get_dataset_features(did):
+def _get_dataset_features(did):
     did_cache_dir = _create_dataset_cache_directory(did)
     features_file = os.path.join(did_cache_dir, "features.xml")
 
@@ -337,7 +337,7 @@ def get_dataset_features(did):
     return features
 
 
-def get_dataset_qualities(did):
+def _get_dataset_qualities(did):
     # Dataset qualities are subject to change and must be fetched every time
     did_cache_dir = _create_dataset_cache_directory(did)
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")

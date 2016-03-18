@@ -109,20 +109,20 @@ class TestOpenMLDataset(TestBase):
         dataset = openml.datasets.get_dataset(did)
         self.assertEqual(dataset.row_id_attribute, 'instance')
 
-    def test_get_dataset_description(self):
+    def test__get_dataset_description(self):
         # Only a smoke test, I don't know exactly how to test the URL
         # retrieval and "caching"
-        description = openml.datasets.get_dataset_description(2)
+        description = openml.datasets._get_dataset_description(2)
         self.assertIsInstance(description, dict)
 
-    def test_get_dataset_features(self):
+    def test__get_dataset_features(self):
         # Only a smoke check
-        features = openml.datasets.get_dataset_features(2)
+        features = openml.datasets._get_dataset_features(2)
         self.assertIsInstance(features, dict)
 
-    def test_get_dataset_qualities(self):
+    def test__get_dataset_qualities(self):
         # Only a smoke check
-        qualities = openml.datasets.get_dataset_qualities(2)
+        qualities = openml.datasets._get_dataset_qualities(2)
         self.assertIsInstance(qualities, dict)
 
     def test_publish_dataset(self):
