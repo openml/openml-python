@@ -12,7 +12,6 @@ from ..util import URLError
 from ..tasks import get_task
 from ..tasks.task_functions import _create_task_from_xml
 from .._api_calls import _perform_api_call
-from ..exceptions import OpenMLServerError
 
 
 class OpenMLRun(object):
@@ -84,8 +83,6 @@ class OpenMLRun(object):
                 description_xml}
         return_code, return_value = _perform_api_call(
             "/run/", file_elements=data)
-        if return_code != 200:
-            raise OpenMLServerError(return_value)
         return return_code, return_value
 
     def _create_description_xml(self):

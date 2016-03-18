@@ -3,7 +3,6 @@ import xmltodict
 import sklearn
 
 from .._api_calls import _perform_api_call
-from ..exceptions import OpenMLServerError
 
 
 class OpenMLFlow(object):
@@ -86,8 +85,6 @@ class OpenMLFlow(object):
         data = {'description': xml_description, 'source': self.source}
         return_code, return_value = _perform_api_call(
             "/flow/", data=data)
-        if return_code != 200:
-            raise OpenMLServerError(return_value)
         return return_code, return_value
 
     def _ensure_flow_exists(self):
