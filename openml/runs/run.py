@@ -119,7 +119,7 @@ def run_task(task, model):
         a dictionary with an 'attributes' and 'data' entry for an arff file
     """
     flow = OpenMLFlow(model=model)
-    flow_id = flow.ensure_flow_exists()
+    flow_id = flow._ensure_flow_exists()
     if(flow_id < 0):
         print("No flow")
         return 0, 2
@@ -196,7 +196,6 @@ def _to_dict(taskid, flow_id, setup_string, parameter_settings, tags):
     description['oml:run'] = OrderedDict()
     description['oml:run']['@xmlns:oml'] = 'http://openml.org/openml'
     description['oml:run']['oml:task_id'] = taskid
-
     description['oml:run']['oml:flow_id'] = flow_id
 
     params = []
