@@ -29,9 +29,6 @@ Top-level Classes
    :template: function.rst
 
     check_datasets_active
-    get_dataset_description
-    get_dataset_features
-    get_dataset_qualities
     get_dataset
     get_datasets
     list_datasets
