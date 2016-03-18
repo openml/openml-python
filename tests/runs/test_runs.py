@@ -9,8 +9,7 @@ class TestRun(TestBase):
         clf = LogisticRegression()
         run = openml.runs.run_task(task, clf)
         return_code, return_value = run.publish()
-        self.assertEqual(return_code, 200)
-        # self.assertTrue("This is a read-only account" in return_value)
+        self.assertTrue(isinstance(run.dataset_id, int))
 
     def test_get_run(self):
         run = openml.runs.get_run(473350)

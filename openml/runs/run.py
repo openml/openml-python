@@ -28,7 +28,7 @@ class OpenMLRun(object):
                  data_content=None, model=None, task_type=None,
                  task_evaluation_measure=None, flow_name=None,
                  parameter_settings=None, predictions_url=None, task=None,
-                 flow=None):
+                 flow=None, run_id=None):
         self.uploader = uploader
         self.uploader_name = uploader_name
         self.task_id = task_id
@@ -46,6 +46,7 @@ class OpenMLRun(object):
         self.data_content = data_content
         self.task = task
         self.flow = flow
+        self.run_id = run_id
 
     def _generate_arff(self):
         """Generates an arff for upload to server.

@@ -7,6 +7,7 @@ import arff
 
 import numpy as np
 import scipy.sparse
+import xmltodict
 
 if sys.version_info[0] >= 3:
     import pickle
@@ -15,6 +16,7 @@ else:
         import cPickle as pickle
     except:
         import pickle
+
 
 from ..util import is_string
 from .._api_calls import _perform_api_call
@@ -279,7 +281,8 @@ class OpenMLDataset(object):
             "/data/", file_dictionary=file_dictionary,
             file_elements=file_elements)
 
-        return return_code, return_value
+        self.dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])
+        return self
 
     def _to_xml(self):
         """Serialize object to xml for upload
@@ -290,7 +293,7 @@ class OpenMLDataset(object):
             XML description of the data.
         """
         xml_dataset = ('<oml:data_set_description '
-                       'xmlns:oml="http://openml.org/openml">')
+                       'xmlns:oml="http://openml.org/openml">\n')
         props = ['id', 'name', 'version', 'description', 'format', 'creator',
                  'contributor', 'collection_date', 'upload_date', 'language',
                  'licence', 'url', 'default_target_attribute',
@@ -300,6 +303,6 @@ class OpenMLDataset(object):
         for prop in props:
             content = getattr(self, prop, None)
             if content is not None:
-                xml_dataset += "<oml:{0}>{1}</oml:{0}>".format(prop, content)
+                xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, content)
         xml_dataset += "</oml:data_set_description>"
         return xml_dataset

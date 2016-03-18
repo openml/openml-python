@@ -1,6 +1,5 @@
 import unittest
 import os
-import shutil
 import sys
 
 if sys.version_info[0] >= 3:
@@ -197,14 +196,13 @@ class TestOpenMLDataset(TestBase):
         dataset = OpenMLDataset(
             name="anneal", version=1, description="test",
             format="ARFF", licence="public", default_target_attribute="class", data_file=file_path)
-        return_code, return_value = dataset.publish()
-        self.assertEqual(return_code, 200)
+        dataset.publish()
+        self.assertTrue(isinstance(dataset.dataset_id, int))
 
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
             name="UploadTestWithURL", version=1, description="test",
             format="ARFF",
             url="http://expdb.cs.kuleuven.be/expdb/data/uci/nominal/iris.arff")
-        return_code, return_value = dataset.publish()
-        # self.assertTrue("This is a read-only account" in return_value)
-        self.assertEqual(return_code, 200)
+        dataset.publish()
+        self.assertTrue(isinstance(dataset.dataset_id, int))
