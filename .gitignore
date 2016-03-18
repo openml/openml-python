@@ -1,5 +1,6 @@
 doc/generated
 examples/.ipynb_checkpoints
+*.swp
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
