@@ -12,9 +12,17 @@ from ..util import URLError
 from ..tasks import get_task
 from ..tasks.task_functions import _create_task_from_xml
 from .._api_calls import _perform_api_call
+from ..exceptions import OpenMLServerError
 
 
 class OpenMLRun(object):
+    """OpenML Run: result of running a model on an openml dataset.
+
+    Parameters
+    ----------
+    FIXME
+
+    """
     def __init__(self, task_id, flow_id, setup_string, dataset_id, files=None,
                  setup_id=None, tags=None, run_id=None, uploader=None,
                  uploader_name=None, evaluations=None,
@@ -39,21 +47,14 @@ class OpenMLRun(object):
         self.data_content = data_content
         self.model = model
 
-    def generate_arff(self):
-        """Generates an arff
+    def _generate_arff(self):
+        """Generates an arff for upload to server.
 
-        Parameters
-        ----------
-        arff_datacontent : list
-            a list of lists containing, in order:
-                            - repeat (int)
-                            - fold (int)
-                            - test index (int)
-                            - predictions per task label (float)
-                            - predicted class label (string)
-                            - actual class label (string)
-        task : Task
-            the OpenML task for which the run is done
+        Returns
+        -------
+        arf_dict : dictionary
+            Dictionary representation of an ARFF data format containing
+            predictions and confidences.
         """
         run_environment = (_get_version_information() +
                            [time.strftime("%c")] + ['Created by run_task()'])
@@ -73,15 +74,28 @@ class OpenMLRun(object):
         return arff_dict
 
     def publish(self):
-        predictions = arff.dumps(self.generate_arff())
-        description_xml = self.create_description_xml()
+        """Publish a run to the OpenML server.
+
+        Uploads the results of a run to OpenML.
+        """
+        predictions = arff.dumps(self._generate_arff())
+        description_xml = self._create_description_xml()
         data = {'predictions': predictions, 'description':
                 description_xml}
-        return_code, dataset_xml = _perform_api_call(
+        return_code, return_value = _perform_api_call(
             "/run/", file_elements=data)
-        return return_code, dataset_xml
+        if return_code != 200:
+            raise OpenMLServerError(return_value)
+        return return_code, return_value
 
-    def create_description_xml(self):
+    def _create_description_xml(self):
+        """Create xml representation of run for upload.
+
+        Returns
+        -------
+        xml_string : string
+            XML description of run.
+        """
         run_environment = _get_version_information()
         setup_string = ''  # " ".join(sys.argv);
 
@@ -103,8 +117,8 @@ def run_task(task, model):
 
     Parameters
     ----------
-    taskid : int
-        The integer identifier of the task to run the model on
+    task : OpenMLTask
+        Task to perform.
     model : sklearn model
         a model which has a function fit(X,Y) and predict(X),
         all supervised estimators of scikit learn follow this definition of a model [1]
@@ -113,13 +127,11 @@ def run_task(task, model):
 
     Returns
     -------
-    model : sklearn model
-        the model, trained on the whole dataset
-    arff-dict : dict
-        a dictionary with an 'attributes' and 'data' entry for an arff file
+    run : OpenMLRun
+        Result of the run.
     """
     flow = OpenMLFlow(model=model)
-    flow_id = flow.ensure_flow_exists()
+    flow_id = flow._ensure_flow_exists()
     if(flow_id < 0):
         print("No flow")
         return 0, 2
@@ -129,7 +141,7 @@ def run_task(task, model):
     arff_datacontent = []
 
     dataset = task.get_dataset()
-    X, Y = dataset.get_dataset(target=task.target_feature)
+    X, Y = dataset.get_data(target=task.target_feature)
 
     class_labels = task.class_labels
     if class_labels is None:
@@ -196,7 +208,6 @@ def _to_dict(taskid, flow_id, setup_string, parameter_settings, tags):
     description['oml:run'] = OrderedDict()
     description['oml:run']['@xmlns:oml'] = 'http://openml.org/openml'
     description['oml:run']['oml:task_id'] = taskid
-
     description['oml:run']['oml:flow_id'] = flow_id
 
     params = []
@@ -216,6 +227,7 @@ def _to_dict(taskid, flow_id, setup_string, parameter_settings, tags):
 
 
 def _create_setup_string(model):
+    """Create a string representing the model"""
     run_environment = " ".join(_get_version_information())
     # fixme str(model) might contain (...)
     return run_environment + " " + str(model)
@@ -245,6 +257,18 @@ def _get_version_information():
 
 
 def get_runs(run_ids):
+    """Gets all runs in run_ids list.
+
+    Parameters
+    ----------
+    run_ids : list of ints
+
+    Returns
+    -------
+    runs : list of OpenMLRun
+        List of runs corresponding to IDs, fetched from the server.
+    """
+
     runs = []
     for run_id in run_ids:
         runs.append(get_run(run_id))
@@ -252,6 +276,17 @@ def get_runs(run_ids):
 
 
 def get_run(run_id):
+    """Gets run corresponding to run_id.
+
+    Parameters
+    ----------
+    run_id : int
+
+    Returns
+    -------
+    run : OpenMLRun
+        Run corresponding to ID, fetched from the server.
+    """
     run_file = os.path.join(config.get_cache_directory(), "runs", "run_%d.xml" % run_id)
 
     try:
@@ -281,6 +316,18 @@ def get_run(run_id):
 
 
 def _create_run_from_xml(xml):
+    """Create a run object from xml returned from server.
+
+    Parameters
+    ----------
+    run_xml : string
+        XML describing a run.
+
+    Returns
+    -------
+    run : OpenMLRun
+        New run object representing run_xml.
+    """
     run = xmltodict.parse(xml)["oml:run"]
     run_id = int(run['oml:run_id'])
     uploader = int(run['oml:uploader'])
@@ -311,7 +358,7 @@ def _create_run_from_xml(xml):
         raise ValueError('No URL to download predictions for run %d in run '
                          'description XML' % run_id)
     evaluations = dict()
-    detailed_evaluations = defaultdict(lambda : defaultdict(dict))
+    detailed_evaluations = defaultdict(lambda: defaultdict(dict))
     evaluation_flows = dict()
     for evaluation_dict in run['oml:output_data']['oml:evaluation']:
         key = evaluation_dict['oml:name']
@@ -349,6 +396,7 @@ def _create_run_from_xml(xml):
 
 
 def _get_cached_run(run_id):
+    """Load a run from the cache."""
     for cache_dir in [config.get_cache_directory(), config.get_private_directory()]:
         run_cache_dir = os.path.join(cache_dir, "runs")
         try:
@@ -372,7 +420,7 @@ def list_runs_by_filters(id=None, task=None, flow=None,
     Perform API call `/run/list/{filters} <http://www.openml.org/api_docs/#!/run/get_run_list_filters>`_
 
     Parameters
-    ==========
+    ----------
     id : int or list
 
     task : int or list
@@ -382,7 +430,7 @@ def list_runs_by_filters(id=None, task=None, flow=None,
     uploader : int or list
 
     Returns
-    =======
+    -------
     list
         List of found runs.
     """
@@ -431,11 +479,11 @@ def list_runs_by_tag(tag):
     Perform API call `/run/list/tag/{tag} <http://www.openml.org/api_docs/#!/run/get_run_list_tag_tag>`_
 
     Parameters
-    ==========
+    ----------
     tag : str
 
     Returns
-    =======
+    -------
     list
         List of found runs.
     """
@@ -448,11 +496,11 @@ def list_runs(run_ids):
     Perform API call `/run/list/run/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_run_ids>`_
 
     Parameters
-    ==========
+    ----------
     run_id : int or list
 
     Returns
-    =======
+    -------
     list
         List of found runs.
     """
@@ -465,11 +513,11 @@ def list_runs_by_task(task_id):
     Perform API call `/run/list/task/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_task_ids>`_
 
     Parameters
-    ==========
+    ----------
     task_id : int or list
 
     Returns
-    =======
+    -------
     list
         List of found runs.
     """
@@ -482,11 +530,11 @@ def list_runs_by_flow(flow_id):
     Perform API call `/run/list/flow/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_flow_ids>`_
 
     Parameters
-    ==========
+    ----------
     flow_id : int or list
 
     Returns
-    =======
+    -------
     list
         List of found runs.
     """
@@ -499,11 +547,11 @@ def list_runs_by_uploader(uploader_id):
     Perform API call `/run/list/uploader/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_uploader_ids>`_
 
     Parameters
-    ==========
+    ----------
     uploader_id : int or list
 
     Returns
-    =======
+    -------
     list
         List of found runs.
     """
@@ -525,13 +573,13 @@ def _list_runs_by(id_, by):
     name follows the convention run/list/{by}/{id}
 
     Parameters
-    ==========
+    ----------
     id_ : int or list
 
     by : str
 
     Returns
-    =======
+    -------
     list
         List of found runs.
 

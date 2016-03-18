@@ -23,27 +23,27 @@ class OpenMLSplitTest(unittest.TestCase):
             pass
 
     def test_eq(self):
-        split = OpenMLSplit.from_arff_file(self.arff_filename)
+        split = OpenMLSplit._from_arff_file(self.arff_filename)
         self.assertEqual(split, split)
 
-        split2 = OpenMLSplit.from_arff_file(self.arff_filename)
+        split2 = OpenMLSplit._from_arff_file(self.arff_filename)
         split2.name = "a"
         self.assertNotEqual(split, split2)
 
-        split2 = OpenMLSplit.from_arff_file(self.arff_filename)
+        split2 = OpenMLSplit._from_arff_file(self.arff_filename)
         split2.description = "a"
         self.assertNotEqual(split, split2)
 
-        split2 = OpenMLSplit.from_arff_file(self.arff_filename)
+        split2 = OpenMLSplit._from_arff_file(self.arff_filename)
         split2.split[10] = dict()
         self.assertNotEqual(split, split2)
 
-        split2 = OpenMLSplit.from_arff_file(self.arff_filename)
+        split2 = OpenMLSplit._from_arff_file(self.arff_filename)
         split2.split[0][10] = dict()
         self.assertNotEqual(split, split2)
 
     def test_from_arff_file(self):
-        split = OpenMLSplit.from_arff_file(self.arff_filename)
+        split = OpenMLSplit._from_arff_file(self.arff_filename)
         self.assertIsInstance(split.split, dict)
         self.assertIsInstance(split.split[0], dict)
         self.assertIsInstance(split.split[0][0][0], np.ndarray)
@@ -58,7 +58,7 @@ class OpenMLSplitTest(unittest.TestCase):
                 self.assertEqual((9,), split.split[i][j].test.shape)
 
     def test_get_split(self):
-        split = OpenMLSplit.from_arff_file(self.arff_filename)
+        split = OpenMLSplit._from_arff_file(self.arff_filename)
         train_split, test_split = split.get(fold=5, repeat=2)
         self.assertEqual(train_split.shape, (81,))
         self.assertEqual(test_split.shape, (9,))

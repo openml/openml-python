@@ -60,7 +60,7 @@ class OpenMLSplit(object):
         return True
 
     @classmethod
-    def from_arff_file(cls, filename, cache=True):
+    def _from_arff_file(cls, filename, cache=True):
         repetitions = None
         pkl_filename = filename.replace(".arff", ".pkl")
         if cache:

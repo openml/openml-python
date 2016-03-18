@@ -110,7 +110,7 @@ def list_datasets():
 
     Returns
     -------
-    list
+    datasets : list of dicts
         A list of all datasets. Every dataset is represented by a
         dictionary containing the following information: dataset id,
         and status. If qualities are calculated for the dataset, some of
@@ -124,7 +124,7 @@ def list_datasets_by_tag(tag):
 
     Returns
     -------
-    list
+    datasets : list of dicts
         A list of all datasets having the given tag. Every dataset is
         represented by a dictionary containing the following information:
         dataset id, and status. If qualities are calculated for the dataset,
@@ -174,7 +174,7 @@ def check_datasets_active(dids):
         A list of integers representing dataset ids.
 
     Returns
-    -------
+    active : dict of int to boolean
     dict
         A dictionary with items {did: active}, where active is a boolean. It
         is set to True if the dataset is active.
@@ -202,7 +202,7 @@ def get_datasets(dids):
 
     Returns
     -------
-    list
+    datasets : list of datasets
         A list of dataset objects.
 
     Notes
@@ -282,6 +282,24 @@ def _get_dataset_description(did):
 
 
 def _get_dataset_arff(did, description=None):
+    """Load dataset arff (from cache or download).
+
+    Tries to load did from cache. If that fails, uses
+    ``description`` (fetched if none) to download arff.
+
+    Parameters
+    ----------
+    did : int
+        Dataset ID
+
+    description : dictionary
+        Dataset description dict.
+
+    Returns
+    -------
+    output_filename : string
+        Location of arff file.
+    """
     did_cache_dir = _create_dataset_cache_directory(did)
     output_file = os.path.join(did_cache_dir, "dataset.arff")
 
@@ -308,6 +326,21 @@ def _get_dataset_arff(did, description=None):
 
 
 def _get_dataset_features(did):
+    """API call to get dataset features (cached)
+
+    Features are feature descriptions for each column.
+    (name, index, categorical, ...)
+
+    Parameters
+    ----------
+    did : int
+        Dataset ID
+
+    Returns
+    -------
+    features : dict
+        Dictionary containing dataset feature descriptions.
+    """
     did_cache_dir = _create_dataset_cache_directory(did)
     features_file = os.path.join(did_cache_dir, "features.xml")
 
@@ -338,6 +371,20 @@ def _get_dataset_features(did):
 
 
 def _get_dataset_qualities(did):
+    """API call to get dataset qualities (cached)
+
+    Features are metafeatures (number of features, number of classes, ...)
+
+    Parameters
+    ----------
+    did : int
+        Dataset ID
+
+    Returns
+    -------
+    qualities : dict
+        Dictionary containing dataset qualities.
+    """
     # Dataset qualities are subject to change and must be fetched every time
     did_cache_dir = _create_dataset_cache_directory(did)
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")
@@ -362,6 +409,7 @@ def _get_dataset_qualities(did):
 
 
 def _create_dataset_cache_directory(did):
+    """Create a dataset cache directory"""
     dataset_cache_dir = os.path.join(config.get_cache_directory(), "datasets", str(did))
     try:
         os.makedirs(dataset_cache_dir)
@@ -372,6 +420,7 @@ def _create_dataset_cache_directory(did):
 
 
 def _remove_dataset_chache_dir(did):
+    """Remove the dataset cache directory"""
     dataset_cache_dir = os.path.join(config.get_cache_directory(), "datasets", str(did))
     try:
         os.rmdir(dataset_cache_dir)
@@ -381,6 +430,20 @@ def _remove_dataset_chache_dir(did):
 
 
 def _create_dataset_from_description(description, arff_file):
+    """Create a dataset object from a description dict.
+
+    Parameters
+    ----------
+    description : dict
+        Description of a dataset in xmlish dict.
+    arff_file : string
+        Path of dataset arff file.
+
+    Returns
+    -------
+    dataset : dataset object
+        Dataset object from dict and arff.
+    """
     dataset = OpenMLDataset(
         description["oml:id"],
         description["oml:name"],

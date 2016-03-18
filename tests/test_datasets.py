@@ -12,7 +12,11 @@ from openml import OpenMLDataset
 from openml.util import is_string
 from openml.testing import TestBase
 
-from openml.datasets.functions import _get_cached_dataset, _get_cached_datasets
+from openml.datasets.functions import (_get_cached_dataset,
+                                       _get_cached_datasets,
+                                       _get_dataset_description,
+                                       _get_dataset_features,
+                                       _get_dataset_qualities)
 
 
 class TestOpenMLDataset(TestBase):
@@ -112,17 +116,17 @@ class TestOpenMLDataset(TestBase):
     def test__get_dataset_description(self):
         # Only a smoke test, I don't know exactly how to test the URL
         # retrieval and "caching"
-        description = openml.datasets._get_dataset_description(2)
+        description = _get_dataset_description(2)
         self.assertIsInstance(description, dict)
 
     def test__get_dataset_features(self):
         # Only a smoke check
-        features = openml.datasets._get_dataset_features(2)
+        features = _get_dataset_features(2)
         self.assertIsInstance(features, dict)
 
     def test__get_dataset_qualities(self):
         # Only a smoke check
-        qualities = openml.datasets._get_dataset_qualities(2)
+        qualities = _get_dataset_qualities(2)
         self.assertIsInstance(qualities, dict)
 
     def test_publish_dataset(self):

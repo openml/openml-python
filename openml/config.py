@@ -1,3 +1,7 @@
+"""
+Stores module level information like the API key, cache director, private
+directory and the server.
+"""
 import os
 import sys
 import logging
@@ -21,6 +25,16 @@ else:
 
 
 def _setup():
+    """Setup openml package. Called on first import.
+
+    Reads the config file and sets up apikey, server, cache appropriately.
+    key and server can be set by the user simply using
+    openml.config.apikey = THEIRKEY
+    openml.config.server = SOMESERVER
+    The cache dir needs to be set up calling set_cache_directory
+    because it needs some setup.
+    We could also make it a property but that's less clear.
+    """
     global apikey
     global server
     # read config file, create cache directory
@@ -38,6 +52,24 @@ def _setup():
 
 
 def set_cache_directory(cachedir, privatedir):
+    """Set module-wide cache directory.
+
+    Sets the cache directory into which to download datasets, tasks etc.
+    Also sets the private directory for storing local datasets.
+
+    Parameters
+    ----------
+    cachedir : string
+        Path to use as cache directory.
+
+    privatedir : string
+        Path containing private datasets, tasks, etc.
+
+    See also
+    --------
+    get_cache_directory
+    get_private_directory
+    """
     global _cachedir
     global _privatedir
     _cachedir = cachedir
@@ -67,6 +99,8 @@ def set_cache_directory(cachedir, privatedir):
 
 
 def _parse_config():
+    """Parse the config file, set up defaults.
+    """
     defaults = {'apikey': apikey,
                 'server': server,
                 'verbosity': 0,
@@ -99,10 +133,34 @@ def _parse_config():
 
 
 def get_cache_directory():
+    """Get the current cache directory.
+
+    Returns
+    -------
+    cachedir : string
+        The current cache directory.
+
+    See also
+    --------
+    set_cache_directory
+    get_private_directory
+    """
     return _cachedir
 
 
 def get_private_directory():
+    """Get the current private directory.
+
+    Returns
+    -------
+    privatecir : string
+        The current private directory.
+
+    See also
+    --------
+    set_cache_directory
+    get_cache_directory
+    """
     return _privatedir
 
 __all__ = ["set_cache_directory", 'get_cache_directory', 'get_private_directory']

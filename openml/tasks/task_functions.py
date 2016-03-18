@@ -11,7 +11,7 @@ from .. import config
 from .._api_calls import _perform_api_call
 
 
-def get_cached_tasks():
+def _get_cached_tasks():
     tasks = OrderedDict()
     for cache_dir in [config.get_cache_directory(), config.get_private_directory()]:
 
@@ -28,12 +28,12 @@ def get_cached_tasks():
                 tid = match.group(2)
                 tid = int(tid)
 
-                tasks[tid] = get_cached_task(tid)
+                tasks[tid] = _get_cached_task(tid)
 
     return tasks
 
 
-def get_cached_task(tid):
+def _get_cached_task(tid):
     for cache_dir in [config.get_cache_directory(), config.get_private_directory()]:
         task_cache_dir = os.path.join(cache_dir, "tasks")
         task_file = os.path.join(task_cache_dir,
@@ -154,35 +154,35 @@ def _list_tasks(api_call):
                          '"oml:runs"/@xmlns:oml is not '
                          '"http://openml.org/openml": %s'
                          % str(tasks_dict))
+    try:
+        tasks = []
+        procs = get_estimation_procedure_list()
+        proc_dict = dict((x['id'], x) for x in procs)
+        for task_ in tasks_dict['oml:tasks']['oml:task']:
+            task = {'tid': int(task_['oml:task_id']),
+                    'did': int(task_['oml:did']),
+                    'name': task_['oml:name'],
+                    'task_type': task_['oml:task_type'],
+                    'status': task_['oml:status']}
 
-    tasks = []
-    procs = get_estimation_procedure_list()
-    proc_dict = dict((x['id'], x) for x in procs)
-    for task_ in tasks_dict['oml:tasks']['oml:task']:
-        task = {'tid': int(task_['oml:task_id']),
-                'did': int(task_['oml:did']),
-                'name': task_['oml:name'],
-                'task_type': task_['oml:task_type'],
-                'status': task_['oml:status']}
+            # Other task inputs
+            for input in task_.get('oml:input', list()):
+                if input['@name'] == 'estimation_procedure':
+                    task[input['@name']] = proc_dict[int(input['#text'])]['name']
+                else:
+                    value = input.get('#text')
+                    task[input['@name']] = value
 
-        # Other task inputs
-        for input in task_.get('oml:input', list()):
-            if input['@name'] == 'estimation_procedure':
-                task[input['@name']] = proc_dict[int(input['#text'])]['name']
-            else:
-                value = input.get('#text')
-                task[input['@name']] = value
+            # The number of qualities can range from 0 to infinity
+            for quality in task_.get('oml:quality', list()):
+                quality['#text'] = float(quality['#text'])
+                if abs(int(quality['#text']) - quality['#text']) < 0.0000001:
+                    quality['#text'] = int(quality['#text'])
+                task[quality['@name']] = quality['#text']
+            tasks.append(task)
+    except KeyError as e:
+        raise KeyError("Invalid xml for task: %s" % e)
 
-        task[input['@name']] = input['#text']
-
-        # The number of qualities can range from 0 to infinity
-        for quality in task_.get('oml:quality', list()):
-            quality['#text'] = float(quality['#text'])
-            if abs(int(quality['#text']) - quality['#text']) < 0.0000001:
-                quality['#text'] = int(quality['#text'])
-            task[quality['@name']] = quality['#text']
-
-        tasks.append(task)
     tasks.sort(key=lambda t: t['tid'])
 
     return tasks
@@ -237,7 +237,7 @@ def get_task(task_id):
 
     # TODO look into either adding the class labels to task xml, or other
     # way of reading it.
-    class_labels = dataset.retrieve_class_labels()
+    class_labels = dataset._retrieve_class_labels()
     task.class_labels = class_labels
     return task
 

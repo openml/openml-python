@@ -5,63 +5,6 @@ import arff
 from . import config
 
 
-"""
-Provides an interface to the OpenML server.
-
-All parameters of the APIConnector can be either specified in a config
-file or when creating this object. The config file must be placed in a
-directory ``.openml`` inside the users home directory and have the name
-``config``. If one of the parameters is specified by passing it to the
-constructor of this class, it will override the value specified in the
-configuration file.
-
-Parameters
-----------
-cache_directory : string, optional (default=None)
-    A local directory which will be used for caching. If this is not set, a
-    directory '.openml/cache' in the users home directory will be used.
-    If either directory does not exist, it will be created.
-
-apikey : string, optional (default=None)
-    Your OpenML API key which will be used to authenticate you at the OpenML
-    server.
-
-server : string, optional (default=None)
-    The OpenML server to connect to.
-
-verbosity : int, optional (default=None)
-
-configure_logger : bool (default=True)
-    Whether the python logging module should be configured by the openml
-    package. If set to true, this is a very basic configuration,
-    which only prints to the standard output. This is only recommended
-    for testing or small problems. It is set to True to adhere to the
-    `specifications of the OpenML client API
-    <https://github.com/openml/OpenML/wiki/Client-API>`_.
-    When the openml module is used as a library, it is recommended that
-    the main application controls the logging level, e.g. see
-    `here <http://pieces.openpolitics.com
-    /2012/04/python-logging-best-practices/>`_.
-
-private_directory : str, optional (default=None)
-    A local directory which can be accessed through the OpenML package.
-    Useful to access private datasets through the same interface.
-
-Raises
-------
-ValueError
-    If apikey is neither specified in the config nor given as an argument.
-OpenMLServerError
-    If the OpenML server returns an unexptected response.
-
-Notes
------
-Testing the API calls in Firefox is possible with the Firefox AddOn
-HTTPRequestor.
-
-"""
-
-
 def _perform_api_call(call, data=None, file_dictionary=None,
                       file_elements=None, add_authentication=True):
     """
