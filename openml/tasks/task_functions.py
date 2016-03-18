@@ -179,10 +179,10 @@ def _list_tasks(api_call):
                 if abs(int(quality['#text']) - quality['#text']) < 0.0000001:
                     quality['#text'] = int(quality['#text'])
                 task[quality['@name']] = quality['#text']
+            tasks.append(task)
     except KeyError as e:
         raise KeyError("Invalid xml for task: %s" % e)
 
-    tasks.append(task)
     tasks.sort(key=lambda t: t['tid'])
 
     return tasks
