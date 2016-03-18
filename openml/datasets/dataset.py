@@ -110,6 +110,17 @@ class OpenMLDataset(object):
             return False
 
     def _get_arff(self):
+        """Read ARFF file and return decoded arff.
+
+        Reads the file referenced in self.data_file.
+
+        Returns
+        -------
+        arff_string :
+            Decoded arff.
+
+        """
+
         # TODO: add a partial read method which only returns the attribute
         # headers of the corresponding .arff file!
 
@@ -226,7 +237,7 @@ class OpenMLDataset(object):
         else:
             return rval
 
-    def retrieve_class_labels(self):
+    def _retrieve_class_labels(self):
         """Reads the datasets arff to determine the class-labels, and returns those.
         If the task has no class labels (for example a regression problem) it returns None."""
         # TODO improve performance, currently reads the whole file
@@ -248,8 +259,13 @@ class OpenMLDataset(object):
 
         Returns
         -------
+        return_code : int
+            Return code from server
+
+        return_value : string
+            xml return from server
         """
-        data = {'description': self.to_xml()}
+        data = {'description': self._to_xml()}
         if self.data_file is not None:
             return_code, return_value = _perform_api_call(
                 "/data/", data=data, file_dictionary={'dataset': self.data_file})
@@ -257,7 +273,14 @@ class OpenMLDataset(object):
             return_code, return_value = _perform_api_call("/data/", data=data)
         return return_code, return_value
 
-    def to_xml(self):
+    def _to_xml(self):
+        """Serialize object to xml for upload
+
+        Returns
+        -------
+        xml_dataset : string
+            XML description of the data.
+        """
         xml_dataset = ('<oml:data_set_description '
                        'xmlns:oml="http://openml.org/openml">')
         props = ['id', 'name', 'version', 'description', 'format', 'creator',
