@@ -3,6 +3,7 @@ import requests
 import arff
 
 from . import config
+from .exceptions import OpenMLServerError
 
 
 def _perform_api_call(call, data=None, file_dictionary=None,
@@ -65,6 +66,8 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
             else:
                 raise ValueError("File doesn't exist")
     response = requests.post(url, data=data, files=file_elements)
+    if response.status_code != 200:
+        raise OpenMLServerError(response.text)
     return response.status_code, response.text
 
 
@@ -74,4 +77,6 @@ def _read_url(url, data=None):
     data['api_key'] = config.apikey
 
     response = requests.post(url, data=data)
+    if response.status_code != 200:
+        raise OpenMLServerError(response.text)
     return response.status_code, response.text

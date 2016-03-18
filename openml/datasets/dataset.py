@@ -16,7 +16,6 @@ else:
         import pickle
 
 from ..util import is_string
-from ..exceptions import OpenMLServerError
 from .._api_calls import _perform_api_call
 
 logger = logging.getLogger(__name__)
@@ -272,8 +271,6 @@ class OpenMLDataset(object):
                 "/data/", data=data, file_dictionary={'dataset': self.data_file})
         else:
             return_code, return_value = _perform_api_call("/data/", data=data)
-        if return_code != 200:
-            raise OpenMLServerError(return_value)
         return return_code, return_value
 
     def _to_xml(self):
