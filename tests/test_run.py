@@ -39,7 +39,7 @@ class TestRun(TestBase):
 
     def test_get_runs_list_by_task(self):
         runs = openml.runs.list_runs_by_task(1)
-        self.assertGreaterEqual(len(runs), 800)
+        self.assertGreaterEqual(len(runs), 600)
         for run in runs:
             self._check_run(run)
         num_runs = len(runs)
