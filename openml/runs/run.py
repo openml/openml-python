@@ -77,9 +77,9 @@ class OpenMLRun(object):
         description_xml = self.create_description_xml()
         data = {'predictions': predictions, 'description':
                 description_xml}
-        return_code, dataset_xml = _perform_api_call(
+        return_code, return_value = _perform_api_call(
             "/run/", file_elements=data)
-        return return_code, dataset_xml
+        return return_code, return_value
 
     def create_description_xml(self):
         run_environment = _get_version_information()
@@ -311,7 +311,7 @@ def _create_run_from_xml(xml):
         raise ValueError('No URL to download predictions for run %d in run '
                          'description XML' % run_id)
     evaluations = dict()
-    detailed_evaluations = defaultdict(lambda : defaultdict(dict))
+    detailed_evaluations = defaultdict(lambda: defaultdict(dict))
     evaluation_flows = dict()
     for evaluation_dict in run['oml:output_data']['oml:evaluation']:
         key = evaluation_dict['oml:name']

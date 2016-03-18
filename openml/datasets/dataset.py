@@ -22,7 +22,18 @@ logger = logging.getLogger(__name__)
 
 
 class OpenMLDataset(object):
+    """Dataset object.
 
+    Allows fetching and uploading datasets to OpenML.
+
+    Parameters
+    ----------
+    name : string
+        Name of the dataset
+    description : string
+        Description of the dataset
+    FIXME : which of these do we actually nee?
+    """
     def __init__(self, id=None, name=None, version=None, description=None,
                  format=None, creator=None, contributor=None,
                  collection_date=None, upload_date=None, language=None,
@@ -63,7 +74,7 @@ class OpenMLDataset(object):
                 logger.debug("Data pickle file already exists.")
             else:
                 try:
-                    data = self.get_arff()
+                    data = self._get_arff()
                 except OSError as e:
                     logger.critical("Please check that the data file %s is there "
                                     "and can be read.", self.data_file)
@@ -98,9 +109,7 @@ class OpenMLDataset(object):
         else:
             return False
 
-    ##########################################################################
-    # ARFF related stuff
-    def get_arff(self):
+    def _get_arff(self):
         # TODO: add a partial read method which only returns the attribute
         # headers of the corresponding .arff file!
 
@@ -124,11 +133,20 @@ class OpenMLDataset(object):
             with open(filename) as fh:
                 return decode_arff(fh)
 
-    ##########################################################################
-    def get_dataset(self, target=None, target_dtype=int, include_row_id=False,
-                    include_ignore_attributes=False,
-                    return_categorical_indicator=False,
-                    return_attribute_names=False):
+    def get_data(self, target=None, target_dtype=int, include_row_id=False,
+                 include_ignore_attributes=False,
+                 return_categorical_indicator=False,
+                 return_attribute_names=False):
+        """Returns dataset content as numpy arrays / sparse matrices.
+
+        Parameters
+        ----------
+
+
+        Returns
+        -------
+
+        """
         rval = []
 
         path = self.data_pickle_file
@@ -224,6 +242,13 @@ class OpenMLDataset(object):
             return None
 
     def publish(self):
+        """Publish the dataset on the OpenML server.
+
+        Upload the dataset description and dataset content to openml.
+
+        Returns
+        -------
+        """
         data = {'description': self.to_xml()}
         if self.data_file is not None:
             return_code, return_value = _perform_api_call(

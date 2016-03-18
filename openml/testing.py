@@ -9,8 +9,8 @@ class TestBase(unittest.TestCase):
 
     Note
     ----
-    A config file with the username and password must be present to test the
-    API calls.
+    Curently hard-codes a read-write key.
+    Hopefully soon allows using a test server, not the production server.
     """
 
     def setUp(self):
