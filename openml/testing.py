@@ -9,7 +9,7 @@ class TestBase(unittest.TestCase):
 
     Note
     ----
-    Curently hard-codes a read-write key.
+    Currently hard-codes a read-write key.
     Hopefully soon allows using a test server, not the production server.
     """
 
