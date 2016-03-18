@@ -141,7 +141,7 @@ def run_task(task, model):
     arff_datacontent = []
 
     dataset = task.get_dataset()
-    X, Y = dataset.get_dataset(target=task.target_feature)
+    X, Y = dataset.get_data(target=task.target_feature)
 
     class_labels = task.class_labels
     if class_labels is None:
