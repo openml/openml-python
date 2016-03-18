@@ -173,8 +173,6 @@ def _list_tasks(api_call):
                     value = input.get('#text')
                     task[input['@name']] = value
 
-            task[input['@name']] = input['#text']
-
             # The number of qualities can range from 0 to infinity
             for quality in task_.get('oml:quality', list()):
                 quality['#text'] = float(quality['#text'])
@@ -184,7 +182,7 @@ def _list_tasks(api_call):
     except KeyError as e:
         raise KeyError("Invalid xml for task: %s" % e)
 
-        tasks.append(task)
+    tasks.append(task)
     tasks.sort(key=lambda t: t['tid'])
 
     return tasks
