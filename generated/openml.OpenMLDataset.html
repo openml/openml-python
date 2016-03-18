@@ -124,11 +124,52 @@
 <dl class="class">
 <dt id="openml.OpenMLDataset">
 <em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLDataset</code><span class="sig-paren">(</span><em>id=None</em>, <em>name=None</em>, <em>version=None</em>, <em>description=None</em>, <em>format=None</em>, <em>creator=None</em>, <em>contributor=None</em>, <em>collection_date=None</em>, <em>upload_date=None</em>, <em>language=None</em>, <em>licence=None</em>, <em>url=None</em>, <em>default_target_attribute=None</em>, <em>row_id_attribute=None</em>, <em>ignore_attribute=None</em>, <em>version_label=None</em>, <em>citation=None</em>, <em>tag=None</em>, <em>visibility=None</em>, <em>original_data_url=None</em>, <em>paper_url=None</em>, <em>update_comment=None</em>, <em>md5_checksum=None</em>, <em>data_file=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="openml.OpenMLDataset.retrieve_class_labels">
-<code class="descname">retrieve_class_labels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.retrieve_class_labels" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads the datasets arff to determine the class-labels, and returns those.
-If the task has no class labels (for example a regression problem) it returns None.</p>
+<dd><p>Dataset object.</p>
+<p>Allows fetching and uploading datasets to OpenML.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : string</p>
+<blockquote>
+<div><p>Name of the dataset</p>
+</div></blockquote>
+<p><strong>description</strong> : string</p>
+<blockquote>
+<div><p>Description of the dataset</p>
+</div></blockquote>
+<p class="last"><strong>FIXME</strong> : which of these do we actually nee?</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="openml.OpenMLDataset.get_data">
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>target=None</em>, <em>target_dtype=&lt;type 'int'&gt;</em>, <em>include_row_id=False</em>, <em>include_ignore_attributes=False</em>, <em>return_categorical_indicator=False</em>, <em>return_attribute_names=False</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns dataset content as numpy arrays / sparse matrices.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLDataset.publish">
+<code class="descname">publish</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.publish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Publish the dataset on the OpenML server.</p>
+<p>Upload the dataset description and dataset content to openml.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>return_code</strong> : int</p>
+<blockquote>
+<div><p>Return code from server</p>
+</div></blockquote>
+<p><strong>return_value</strong> : string</p>
+<blockquote class="last">
+<div><p>xml return from server</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

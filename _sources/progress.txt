@@ -66,17 +66,3 @@ API call                                        implemented tested properly test
 =============================================== =========== ====== =============== ========== =====================
 
 We do not plan to implement API calls marked with an **X**!
-
-Convenience Functions
-=====================
-
-=============================================== =========== ====== =============== ========== =====================
-Method                                          implemented tested properly tested loads json proper error handling
-=============================================== =========== ====== =============== ========== =====================
-_get_cached_split                               yes
-_get_cached_splits                              yes
-_get_cached_dataset                             yes         yes
-_get_cached_datasets                            yes         yes
-get_cached_task                                 yes
-get_cached_tasks                                yes
-=============================================== =========== ====== =============== ========== =====================
