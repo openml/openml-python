@@ -35,7 +35,7 @@ class OpenMLDataset(object):
         Description of the dataset
     FIXME : which of these do we actually nee?
     """
-    def __init__(self, id=None, name=None, version=None, description=None,
+    def __init__(self, dataset_id=None, name=None, version=None, description=None,
                  format=None, creator=None, contributor=None,
                  collection_date=None, upload_date=None, language=None,
                  licence=None, url=None, default_target_attribute=None,
@@ -44,7 +44,7 @@ class OpenMLDataset(object):
                  original_data_url=None, paper_url=None, update_comment=None,
                  md5_checksum=None, data_file=None):
         # Attributes received by querying the RESTful API
-        self.id = int(id) if id is not None else None
+        self.dataset_id = int(dataset_id) if dataset_id is not None else None
         self.name = name
         self.version = int(version)
         self.description = description
@@ -99,7 +99,7 @@ class OpenMLDataset(object):
                 with open(self.data_pickle_file, "wb") as fh:
                     pickle.dump((X, categorical, attribute_names), fh, -1)
                 logger.debug("Saved dataset %d: %s to file %s" %
-                             (self.id, self.name, self.data_pickle_file))
+                             (self.dataset_id, self.name, self.data_pickle_file))
 
     def __eq__(self, other):
         if type(other) != OpenMLDataset:

@@ -23,12 +23,12 @@ class OpenMLRun(object):
 
     """
     def __init__(self, task_id, flow_id, setup_string, dataset_id, files=None,
-                 setup_id=None, tags=None, run_id=None, uploader=None,
-                 uploader_name=None, evaluations=None,
-                 detailed_evaluations=None, data_content=None,
-                 model=None, task_type=None, task_evaluation_measure=None,
-                 flow_name=None, parameter_settings=None, predictions_url=None):
-        self.run_id = run_id
+                 setup_id=None, tags=None, uploader=None, uploader_name=None,
+                 evaluations=None, detailed_evaluations=None,
+                 data_content=None, model=None, task_type=None,
+                 task_evaluation_measure=None, flow_name=None,
+                 parameter_settings=None, predictions_url=None, task=None,
+                 flow=None):
         self.uploader = uploader
         self.uploader_name = uploader_name
         self.task_id = task_id
@@ -44,7 +44,8 @@ class OpenMLRun(object):
         self.evaluations = evaluations
         self.detailed_evaluations = detailed_evaluations
         self.data_content = data_content
-        self.model = model
+        self.task = task
+        self.flow = flow
 
     def _generate_arff(self):
         """Generates an arff for upload to server.
@@ -76,6 +77,11 @@ class OpenMLRun(object):
         """Publish a run to the OpenML server.
 
         Uploads the results of a run to OpenML.
+        Sets the run_id on self
+
+        Returns
+        -------
+        self : OpenMLRun
         """
         predictions = arff.dumps(self._generate_arff())
         description_xml = self._create_description_xml()
@@ -83,7 +89,9 @@ class OpenMLRun(object):
                          'description': ("description.xml", description_xml)}
         return_code, return_value = _perform_api_call(
             "/run/", file_elements=file_elements)
-        return return_code, return_value
+        run_id = int(xmltodict.parse(return_value)['oml:upload_run']['oml:run_id'])
+        self.run_id = run_id
+        return self
 
     def _create_description_xml(self):
         """Create xml representation of run for upload.
@@ -136,9 +144,8 @@ def run_task(task, model):
     if(flow_id < 0):
         print("No flow")
         return 0, 2
-    print(flow_id)
+    config.logger.info(flow_id)
 
-    #runname = "t" + str(task.task_id) + "_" + str(model)
     arff_datacontent = []
 
     dataset = task.get_dataset()
@@ -150,7 +157,9 @@ def run_task(task, model):
                          'only works for tasks with class labels.')
     setup_string = _create_setup_string(model)
 
-    run = OpenMLRun(task.task_id, flow_id, setup_string, dataset.id)
+    run = OpenMLRun(task_id=task.task_id, flow_id=flow_id,
+                    setup_string=setup_string, dataset_id=dataset.dataset_id,
+                    task=task, flow=flow)
 
     train_times = []
 
