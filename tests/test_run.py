@@ -52,7 +52,7 @@ class TestRun(TestBase):
     def test_get_runs_list_by_uploader(self):
         # 29 is Dominik Kirchhoff - Joaquin and Jan have too many runs right now
         runs = openml.runs.list_runs_by_uploader(29)
-        self.assertGreaterEqual(len(runs), 4)
+        self.assertGreaterEqual(len(runs), 3)
         for run in runs:
             self._check_run(run)
         num_runs = len(runs)
