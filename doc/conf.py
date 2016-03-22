@@ -63,7 +63,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'OpenML'
-copyright = u'2014, Matthias Feurer'
+copyright = u'2014-2016, Matthias Feurer, Andreas Müller, Farzan Majdani, ' \
+            u'Joaquin Vanschoren and Pieter Gijsbers'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
