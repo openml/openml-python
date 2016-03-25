@@ -127,6 +127,10 @@ def run_task(task, model):
     run : OpenMLRun
         Result of the run.
     """
+    # TODO move this into its onwn module. While it somehow belongs here, it
+    # adds quite a lot of functionality which is better suited in other places!
+    # TODO why doesn't this accept a flow as input?
+
     flow = OpenMLFlow(model=model)
     flow_id = flow._ensure_flow_exists()
     if(flow_id < 0):
@@ -151,6 +155,8 @@ def run_task(task, model):
     train_times = []
 
     rep_no = 0
+    # TODO use different iterator to only provide a single iterator (less
+    # methods, less maintenance, less confusion)
     for rep in task.iterate_repeats():
         fold_no = 0
         for fold in rep:
