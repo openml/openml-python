@@ -249,6 +249,8 @@ class OpenMLDataset(object):
         dataAttributes = dict(arffData['attributes'])
         if('class' in dataAttributes):
             return dataAttributes['class']
+        elif('Class' in dataAttributes):
+            return dataAttributes['Class']
         else:
             return None
 
