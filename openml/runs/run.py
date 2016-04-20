@@ -10,7 +10,7 @@ from ..flows import OpenMLFlow
 from ..exceptions import OpenMLCacheException
 from ..util import URLError
 from ..tasks import get_task
-from ..tasks.task_functions import _create_task_from_xml
+from ..tasks.functions import _create_task_from_xml
 from .._api_calls import _perform_api_call
 
 
