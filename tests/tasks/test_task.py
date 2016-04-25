@@ -1,95 +1,91 @@
-import os
 import sys
+import types
 
 if sys.version_info[0] >= 3:
     from unittest import mock
 else:
     import mock
 
-from openml.util import is_string
-from openml.testing import TestBase
-from openml import OpenMLSplit, OpenMLTask
-from openml.exceptions import OpenMLCacheException
+import numpy as np
+
 import openml
+from openml.testing import TestBase
 
 
-class TestTask(TestBase):
-    def test__get_cached_tasks(self):
+class OpenMLTaskTest(TestBase):
+
+    def test_get_clustering_task(self):
+        self.assertRaisesRegexp(KeyError, 'oml:target_feature',
+                                openml.tasks.get_task, 10128)
+
+    @mock.patch('openml.datasets.get_dataset')
+    def test_get_dataset(self, patch):
+        patch.return_value = mock.MagicMock()
+        mm = mock.MagicMock()
+        patch.return_value._retrieve_class_labels = mm
+        patch.return_value._retrieve_class_labels.return_value = 'LA'
+        retval = openml.tasks.get_task(1)
+        self.assertEqual(patch.call_count, 1)
+        self.assertIsInstance(retval, openml.OpenMLTask)
+        self.assertEqual(retval.class_labels, 'LA')
+
+    def test_get_X_and_Y(self):
+        # Classification task
+        task = openml.tasks.get_task(1)
+        X, Y = task.get_X_and_Y()
+        self.assertEqual((898, 38), X.shape)
+        self.assertIsInstance(X, np.ndarray)
+        self.assertEqual((898, ), Y.shape)
+        self.assertIsInstance(Y, np.ndarray)
+        self.assertEqual(Y.dtype, int)
+
+        # Regression task
+        task = openml.tasks.get_task(2280)
+        X, Y = task.get_X_and_Y()
+        self.assertEqual((8192, 8), X.shape)
+        self.assertIsInstance(X, np.ndarray)
+        self.assertEqual((8192,), Y.shape)
+        self.assertIsInstance(Y, np.ndarray)
+        self.assertEqual(Y.dtype, float)
+
+    def test_get_train_and_test_split_indices(self):
         openml.config.set_cache_directory(self.static_cache_dir)
-        tasks = openml.tasks.functions._get_cached_tasks()
-        self.assertIsInstance(tasks, dict)
-        self.assertEqual(len(tasks), 3)
-        self.assertIsInstance(list(tasks.values())[0], OpenMLTask)
+        task = openml.tasks.get_task(1882)
+        train_indices, test_indices = task.get_train_test_split_indices(0, 0)
+        self.assertEqual(16, train_indices[0])
+        self.assertEqual(395, train_indices[-1])
+        self.assertEqual(412, test_indices[0])
+        self.assertEqual(364, test_indices[-1])
+        train_indices, test_indices = task.get_train_test_split_indices(2, 2)
+        self.assertEqual(237, train_indices[0])
+        self.assertEqual(681, train_indices[-1])
+        self.assertEqual(583, test_indices[0])
+        self.assertEqual(24, test_indices[-1])
+        self.assertRaisesRegexp(ValueError, "Fold 10 not known",
+                                task.get_train_test_split_indices, 10, 0)
+        self.assertRaisesRegexp(ValueError, "Repeat 10 not known",
+                                task.get_train_test_split_indices, 0, 10)
 
-    def test__get_cached_task(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
-        task = openml.tasks.functions._get_cached_task(1)
-        self.assertIsInstance(task, OpenMLTask)
-
-    def test__get_cached_task_not_cached(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
-        self.assertRaisesRegexp(OpenMLCacheException,
-                                'Task file for tid 2 not cached',
-                                openml.tasks.functions._get_cached_task, 2)
-
-    def test__get_estimation_procedure_list(self):
-        estimation_procedures = openml.tasks.functions.\
-            _get_estimation_procedure_list()
-        self.assertIsInstance(estimation_procedures, list)
-        self.assertIsInstance(estimation_procedures[0], dict)
-        self.assertEqual(estimation_procedures[0]['task_type_id'], 1)
-        print(estimation_procedures)
-
-    def _check_task(self, task):
-        self.assertEqual(type(task), dict)
-        self.assertGreaterEqual(len(task), 2)
-        self.assertIn('did', task)
-        self.assertIsInstance(task['did'], int)
-        self.assertIn('status', task)
-        self.assertTrue(is_string(task['status']))
-        self.assertIn(task['status'],
-                      ['in_preparation', 'active', 'deactivated'])
-
-    def test_list_tasks_by_type(self):
-        tasks = openml.tasks.list_tasks_by_type(task_type_id=3)
-        self.assertGreaterEqual(len(tasks), 300)
-        for task in tasks:
-            self._check_task(task)
-
-    def test_list_tasks_by_tag(self):
-        tasks = openml.tasks.list_tasks_by_tag('basic')
-        self.assertGreaterEqual(len(tasks), 57)
-        for task in tasks:
-            self._check_task(task)
-
-    def test_list_tasks(self):
-        tasks = openml.tasks.list_tasks()
-        self.assertGreaterEqual(len(tasks), 2000)
-        for task in tasks:
-            self._check_task(task)
-
-    def test__get_task(self):
+    def test_iterate_repeats(self):
         openml.config.set_cache_directory(self.static_cache_dir)
         task = openml.tasks.get_task(1882)
 
-    def test_get_task(self):
-        task = openml.tasks.get_task(1)
-        self.assertIsInstance(task, OpenMLTask)
-        self.assertTrue(os.path.exists(
-            os.path.join(os.getcwd(), "tasks", "1", "task.xml")))
-        self.assertTrue(os.path.exists(
-            os.path.join(os.getcwd(), "tasks", "1", "datasplits.arff")))
-        self.assertTrue(os.path.exists(
-            os.path.join(os.getcwd(), "datasets", "1", "dataset.arff")))
+        num_repeats = 0
+        for rep in task.iterate_repeats():
+            num_repeats += 1
+            self.assertIsInstance(rep, types.GeneratorType)
+        self.assertEqual(num_repeats, 10)
 
-    def test_get_task_with_cache(self):
+    def test_iterate_all_splits(self):
         openml.config.set_cache_directory(self.static_cache_dir)
-        task = openml.tasks.get_task(1)
-        self.assertIsInstance(task, OpenMLTask)
+        task = openml.tasks.get_task(1882)
 
-    def test_download_split(self):
-        task = openml.tasks.get_task(1)
-        split = task.download_split()
-        self.assertEqual(type(split), OpenMLSplit)
-        self.assertTrue(os.path.exists(
-            os.path.join(os.getcwd(), "tasks", "1", "datasplits.arff")))
+        num_splits = 0
+        for split in task.iterate_all_splits():
+            num_splits += 1
+            self.assertIsInstance(split[0], np.ndarray)
+            self.assertIsInstance(split[1], np.ndarray)
+            self.assertEqual(split[0].shape[0] + split[1].shape[0], 898)
+        self.assertEqual(num_splits, 100)
+
+

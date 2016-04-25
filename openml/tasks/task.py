@@ -29,11 +29,6 @@ class OpenMLTask(object):
         if cost_matrix is not None:
             raise NotImplementedError("Costmatrix")
 
-    def __str__(self):
-        return "OpenMLTask instance.\nTask ID: %s\n" \
-               "Task type: %s\nDataset id: %s" \
-               % (self.task_id, self.task_type, self.dataset_id)
-
     def get_dataset(self):
         """Download dataset associated with task"""
         return datasets.get_dataset(self.dataset_id)
@@ -47,19 +42,9 @@ class OpenMLTask(object):
             target_dtype = float
         else:
             raise NotImplementedError(self.task_type)
-        X_and_Y = dataset.get_dataset(target=self.target_feature,
-                                      target_dtype=target_dtype)
+        X_and_Y = dataset.get_data(target=self.target_feature,
+                                   target_dtype=target_dtype)
         return X_and_Y
-
-    def evaluate(self, algo):
-        """Evaluate an algorithm on the test data.
-        """
-        raise NotImplementedError()
-
-    def validate(self, algo):
-        """Evaluate an algorithm on the validation data.
-        """
-        raise NotImplementedError()
 
     def get_train_test_split_indices(self, fold=0, repeat=0):
         # Replace with retrieve from cache
