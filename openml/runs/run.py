@@ -5,6 +5,9 @@ from collections import OrderedDict, defaultdict
 import sys
 import os
 
+import numpy as np
+import six
+
 from .. import config
 from ..flows import OpenMLFlow
 from ..exceptions import OpenMLCacheException
@@ -22,9 +25,9 @@ class OpenMLRun(object):
     FIXME
 
     """
-    def __init__(self, task_id, flow_id, setup_string, dataset_id, files=None,
-                 setup_id=None, tags=None, run_id=None, uploader=None,
-                 uploader_name=None, evaluations=None,
+    def __init__(self, task_id, flow_id, dataset_id, setup_string=None,
+                 files=None, setup_id=None, tags=None, run_id=None,
+                 uploader=None, uploader_name=None, evaluations=None,
                  detailed_evaluations=None, data_content=None,
                  model=None, task_type=None, task_evaluation_measure=None,
                  flow_name=None, parameter_settings=None, predictions_url=None):
@@ -46,8 +49,8 @@ class OpenMLRun(object):
         self.data_content = data_content
         self.model = model
 
-    def _generate_arff(self):
-        """Generates an arff for upload to server.
+    def _generate_arff_header_dict(self):
+        """Generates the arff header dictionary for upload to the server.
 
         Returns
         -------
@@ -77,7 +80,7 @@ class OpenMLRun(object):
 
         Uploads the results of a run to OpenML.
         """
-        predictions = arff.dumps(self._generate_arff())
+        predictions = arff.dumps(self._generate_arff_header_dict())
         description_xml = self._create_description_xml()
         data = {'predictions': ("predictions.csv", predictions),
                 'description': ("description.xml", description_xml)}
@@ -94,7 +97,10 @@ class OpenMLRun(object):
             XML description of run.
         """
         run_environment = _get_version_information()
-        setup_string = ''  # " ".join(sys.argv);
+        # The setup string is a string necessary to instantiate the model. In
+        # this case it's python code necessary to instantiate the passed model
+        # with the given hyperparameters!
+        setup_string = _create_setup_string(self.model)
 
         parameter_settings = self.model.get_params()
         # as a tag, it must be of the form ([a-zA-Z0-9_\-\.])+
@@ -116,9 +122,10 @@ def run_task(task, model):
     ----------
     task : OpenMLTask
         Task to perform.
-    model : sklearn model
-        a model which has a function fit(X,Y) and predict(X),
-        all supervised estimators of scikit learn follow this definition of a model [1]
+    model : sklearn model or OpenMLFlow
+        a model which has a function fit(X,Y), predict(X) and predict_proba(X,
+        most supervised estimators of scikit learn follow this definition of a
+        model [1]
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
 
 
@@ -127,65 +134,65 @@ def run_task(task, model):
     run : OpenMLRun
         Result of the run.
     """
-    # TODO move this into its onwn module. While it somehow belongs here, it
-    # adds quite a lot of functionality which is better suited in other places!
-    # TODO why doesn't this accept a flow as input?
+    # TODO test this function and it's subfunctions
 
-    flow = OpenMLFlow(model=model)
+    if not isinstance(model, OpenMLFlow):
+        flow = OpenMLFlow(model=model)
+    else:
+        flow = model
+
     flow_id = flow._ensure_flow_exists()
-    if(flow_id < 0):
-        print("No flow")
-        return 0, 2
-    print(flow_id)
-
-    #runname = "t" + str(task.task_id) + "_" + str(model)
-    arff_datacontent = []
-
-    dataset = task.get_dataset()
-    X, Y = dataset.get_data(target=task.target_feature)
+    if flow_id < 0:
+        raise ValueError('Trying to run a task with an unregistered flow. '
+                         'Register the flow first.')
 
     class_labels = task.class_labels
     if class_labels is None:
         raise ValueError('The task has no class labels. This method currently '
                          'only works for tasks with class labels.')
-    setup_string = _create_setup_string(model)
 
-    run = OpenMLRun(task.task_id, flow_id, setup_string, dataset.id)
+    run = OpenMLRun(task.task_id, flow_id, task.dataset_id)
+    run.data_content = _run_task_get_arffcontent(model, task, class_labels)
 
-    train_times = []
+    # The model will not be uploaded at the moment, but used to get the
+    # hyperparameter values when uploading the run
+    X, Y = task.get_X_and_Y()
+    run.model = model.fit(X, Y)
 
+    return run
+
+
+def _run_task_get_arffcontent(model, task, class_labels):
+    X, Y = task.get_X_and_Y()
+    arff_datacontent = []
     rep_no = 0
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
     for rep in task.iterate_repeats():
         fold_no = 0
         for fold in rep:
+            # TODO Put into its own function for testability!
             train_indices, test_indices = fold
             trainX = X[train_indices]
             trainY = Y[train_indices]
             testX = X[test_indices]
             testY = Y[test_indices]
 
-            start_time = time.time()
             model.fit(trainX, trainY)
             ProbaY = model.predict_proba(testX)
             PredY = model.predict(testX)
-            end_time = time.time()
-
-            train_times.append(end_time - start_time)
 
             for i in range(0, len(test_indices)):
-                arff_line = [rep_no, fold_no, test_indices[i],
-                             class_labels[PredY[i]], class_labels[testY[i]]]
-                arff_line[3:3] = ProbaY[i]
+                arff_line = [rep_no, fold_no, test_indices[i]]
+                arff_line.extend(ProbaY[i])
+                arff_line.append(class_labels[PredY[i]])
+                arff_line.append(class_labels[testY[i]])
                 arff_datacontent.append(arff_line)
 
             fold_no = fold_no + 1
         rep_no = rep_no + 1
 
-    run.data_content = arff_datacontent
-    run.model = model.fit(X, Y)
-    return run
+    return arff_datacontent
 
 
 def _to_dict(taskid, flow_id, setup_string, parameter_settings, tags):
@@ -231,9 +238,73 @@ def _to_dict(taskid, flow_id, setup_string, parameter_settings, tags):
 
 def _create_setup_string(model):
     """Create a string representing the model"""
-    run_environment = " ".join(_get_version_information())
+    run_environment = _get_version_information()
+    run_environment = "".join(['# %s\n' % package
+                               for package in run_environment])
     # fixme str(model) might contain (...)
-    return run_environment + " " + str(model)
+    return run_environment + _pprint_model(model)
+
+
+def _pprint_model(model):
+    """Pretty print a model
+
+    Copied from sklearn version 0.18 dev.
+    """
+    class_name = model.__class__.__name__
+    return '%s(%s)' % (class_name,
+                       _pprint_parameters(model.get_params(deep=False),
+                                          offset=len(class_name), ),)
+
+
+def _pprint_parameters(params, offset=0, printer=repr):
+    """Pretty print the dictionary 'params'
+
+    Code from sklearn version 0.18 dev, changed to output representation of
+    parameters longer than 500 characters
+
+    Parameters
+    ----------
+    params: dict
+        The dictionary to pretty print
+
+    offset: int
+        The offset in characters to add at the begin of each line.
+
+    printer:
+        The function to convert entries to strings, typically
+        the builtin str or repr
+
+    """
+    # Do a multi-line justified repr:
+    options = np.get_printoptions()
+    np.set_printoptions(precision=5, threshold=64, edgeitems=2)
+    params_list = list()
+    this_line_length = offset
+    line_sep = ',\n' + (1 + offset // 2) * ' '
+    for i, (k, v) in enumerate(sorted(six.iteritems(params))):
+        if type(v) is float:
+            # use str for representing floating point numbers
+            # this way we get consistent representation across
+            # architectures and versions.
+            this_repr = '%s=%s' % (k, str(v))
+        else:
+            # use repr of the rest
+            this_repr = '%s=%s' % (k, printer(v))
+        if i > 0:
+            if (this_line_length + len(this_repr) >= 75 or '\n' in this_repr):
+                params_list.append(line_sep)
+                this_line_length = len(line_sep)
+            else:
+                params_list.append(', ')
+                this_line_length += 2
+        params_list.append(this_repr)
+        this_line_length += len(this_repr)
+
+    np.set_printoptions(**options)
+    lines = ''.join(params_list)
+    # Strip trailing space to avoid nightmare in doctests
+    lines = '\n'.join(l.rstrip(' ') for l in lines.split('\n'))
+    return lines
 
 
 # This can possibly be done by a package such as pyxb, but I could not get

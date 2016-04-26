@@ -101,6 +101,7 @@ class OpenMLFlow(object):
         flow_version = 'sklearn_' + sklearn.__version__
         _, _, flow_id = _check_flow_exists(self.name, flow_version)
         # TODO add numpy and scipy version!
+        # MF not sure if this is necessary - what would we get from that?
 
         if int(flow_id) == -1:
             return_code, response_xml = self.publish()

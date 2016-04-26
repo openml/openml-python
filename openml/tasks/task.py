@@ -50,6 +50,7 @@ class OpenMLTask(object):
         # Replace with retrieve from cache
         split = self.download_split()
         train_indices, test_indices = split.get(repeat=repeat, fold=fold)
+        # TODO check that indices are zero-based
         return train_indices, test_indices
 
     def iterate_repeats(self):
