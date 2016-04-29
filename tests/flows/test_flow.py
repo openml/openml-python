@@ -20,5 +20,16 @@ class TestFlow(TestBase):
     def test_upload_flow(self):
         flow = openml.OpenMLFlow(model=DummyClassifier(), description="test description")
         return_code, return_value = flow.publish()
-        # self.assertTrue("This is a read-only account" in return_value)
+
         self.assertEqual(return_code, 200)
+    def test_get_flow(self):
+        flow = openml.flows.get_flow(1185)
+        self.assertIsInstance(flow, openml.OpenMLFlow)
+        self.assertEqual(flow.id, 1185)
+        self.assertEqual(len(flow.parameters), 14)
+        for parameter in flow.parameters:
+            self.assertEqual(len(parameter), 4)
+        self.assertEqual(len(flow.components), 1)
+        for component in flow.components:
+            self.assertEqual(len(component), 2)
+            self.assertIsInstance(component['flow'], openml.OpenMLFlow)

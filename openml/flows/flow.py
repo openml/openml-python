@@ -146,3 +146,79 @@ def _check_flow_exists(name, version):
     xml_dict = xmltodict.parse(xml_response)
     flow_id = xml_dict['oml:flow_exists']['oml:id']
     return return_code, xml_response, flow_id
+
+
+def get_flow(flow_id):
+    """Download the OpenML flow for a given flow ID.
+
+    Parameters
+    ----------
+    flow_id : int
+        The OpenML flow id.
+    """
+    try:
+        flow_id = int(flow_id)
+    except:
+        raise ValueError("Flow ID is neither an Integer nor can be "
+                         "cast to an Integer.")
+
+    try:
+        return_code, flow_xml = _perform_api_call(
+            "flow/%d" % flow_id)
+    except (URLError, UnicodeEncodeError) as e:
+        print(e)
+        raise e
+
+    flow_dict = xmltodict.parse(flow_xml)
+    flow = _create_flow_from_dict(flow_dict)
+    return flow
+
+
+def _create_flow_from_dict(xml_dict):
+    dic = xml_dict["oml:flow"]
+
+    flow_id = int(dic['oml:id'])
+    uploader = dic['oml:uploader']
+    name = dic['oml:name']
+    version = dic['oml:version']
+    external_version = dic.get('oml:external_version', None)
+    description = dic['oml:description']
+    upload_date = dic['oml:upload_date']
+    language = dic.get('oml:language', None)
+    dependencies = dic.get('oml:dependencies', None)
+
+    parameters = []
+    if 'oml:parameter' in dic:
+        if isinstance(dic['oml:parameter'], dict):
+            oml_parameters = [dic['oml:parameter']]
+        else:
+            oml_parameters = dic['oml:parameter']
+
+        for oml_parameter in oml_parameters:
+            parameter_name = oml_parameter['oml:name']
+            data_type = oml_parameter['oml:data_type']
+            default_value = oml_parameter['oml:default_value']
+            parameter_description = oml_parameter['oml:description']
+            parameters.append({'name': parameter_name,
+                               'data_type': data_type,
+                               'default_value': default_value,
+                               'description': parameter_description})
+
+    components = []
+    if 'oml:component' in dic:
+        if isinstance(dic['oml:component'], dict):
+            oml_components = [dic['oml:component']]
+        else:
+            oml_components = dic['oml:component']
+
+        for component in oml_components:
+            identifier = component['oml:identifier']
+            flow = _create_flow_from_dict({'oml:flow': component['oml:flow']})
+            components.append({'identifier': identifier, 'flow': flow})
+
+    return OpenMLFlow(id=flow_id, uploader=uploader, name=name,
+                      version=version, external_version=external_version,
+                      description=description, upload_date=upload_date,
+                      language=language, dependencies=dependencies,
+                      parameters=parameters, components=components)
+
