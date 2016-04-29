@@ -1,6 +1,7 @@
 from collections import defaultdict
 import os
 
+import numpy as np
 import sklearn
 import xmltodict
 
@@ -12,7 +13,7 @@ from ..exceptions import OpenMLCacheException
 from ..util import URLError
 
 
-def run_task(task, model, dependencies=None):
+def run_task(task, model, dependencies=None, seed=None):
     """Performs a CV run on the dataset of the given task, using the split.
 
     Parameters
@@ -26,13 +27,18 @@ def run_task(task, model, dependencies=None):
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
     dependencies : str
         Dependencies are passed to flow generation when a model is passed.
+    seed : int, optional (default=None)
+        Seed used to seed the random state(s) inside the model. If given,
+        a random state is seeded, and seeds for all random states inside the
+        model are drawn from this initial random state. If no seed is given,
+        we assume that the random states in the model are already correctly
+        seeded.
 
     Returns
     -------
     run : OpenMLRun
         Result of the run.
     """
-    # TODO test this function and it's subfunctions
 
     if not isinstance(model, OpenMLFlow):
         # Try to extract the source code, name, description, external version
@@ -57,6 +63,8 @@ def run_task(task, model, dependencies=None):
         raise ValueError('The task has no class labels. This method currently '
                          'only works for tasks with class labels.')
 
+    _seed_model(model, seed)
+
     run = OpenMLRun(task.task_id, flow_id, task.dataset_id)
     run.data_content = _run_task_get_arffcontent(model, task, class_labels)
 
@@ -64,8 +72,37 @@ def run_task(task, model, dependencies=None):
     # hyperparameter values when uploading the run
     X, Y = task.get_X_and_Y()
     run.model = model.fit(X, Y)
+    _seed_model(model, seed)
 
     return run
+
+
+def _seed_model(model, seed):
+    """Set the random state of the given model and its components.
+
+    First construct a numpy.random.RandomState(seed), then loops over all
+    parameters given by get_params(), but sorted in alphabetical order (with
+    sorted()). If one has the substring random_state, this hyperparameter
+    will be set to a random integer sampled from the random state created in
+    the first place.
+
+    Parameters
+    ----------
+    model : object
+        sklearn-compatible object
+    seed : int
+        Integer used to seed the random state.
+    """
+    if seed is None:
+        return
+
+    rs = np.random.RandomState(seed)
+    model_params = model.get_params()
+    random_states = {}
+    for param_name in sorted(model_params):
+        if 'random_state' in param_name:
+            random_states[param_name] = rs.randint(0, 100000)
+    model.set_params(**random_states)
 
 
 def _run_task_get_arffcontent(model, task, class_labels):
@@ -84,9 +121,10 @@ def _run_task_get_arffcontent(model, task, class_labels):
             testX = X[test_indices]
             testY = Y[test_indices]
 
-            model.fit(trainX, trainY)
-            ProbaY = model.predict_proba(testX)
-            PredY = model.predict(testX)
+            model_ = sklearn.clone(model)
+            model_.fit(trainX, trainY)
+            ProbaY = model_.predict_proba(testX)
+            PredY = model_.predict(testX)
 
             for i in range(0, len(test_indices)):
                 arff_line = [rep_no, fold_no, test_indices[i]]

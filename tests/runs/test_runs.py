@@ -12,7 +12,7 @@ class TestRun(TestBase):
     def test_run_iris(self):
         task = openml.tasks.get_task(10107)
         clf = LogisticRegression()
-        run = openml.runs.run_task(task, clf)
+        run = openml.runs.run_task(task, clf, seed=15)
         return_code, return_value = run.publish()
         self.assertEqual(return_code, 200)
         # self.assertTrue("This is a read-only account" in return_value)
@@ -46,6 +46,10 @@ class TestRun(TestBase):
                                          'Iris-virginica'])
             self.assertIn(arff_line[7], ['Iris-setosa', 'Iris-versicolor',
                                          'Iris-virginica'])
+
+        # This assures that the classifier was cloned inside
+        # _run_task_get_arffcontent
+        self.assertEqual(clf.random_state, 1)
 
     def test__create_setup_string(self):
         def strip_version_information(string):
