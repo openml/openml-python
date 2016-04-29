@@ -2,6 +2,7 @@ import ast
 from collections import OrderedDict, deque
 import distutils.version
 import re
+import types
 import warnings
 
 import importlib
@@ -516,7 +517,7 @@ def _construct_model_for_flow(flow):
 
         # FeatureUnion and Pipeline can have lists or tuples as arguments.
         # This tries to recreate the list of tuples of strings representation
-        if isinstance(value, str):
+        if isinstance(value, types.StringTypes):
             try:
                 value = ast.literal_eval(value)
                 if isinstance(value, tuple):
