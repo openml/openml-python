@@ -12,7 +12,7 @@ from ..exceptions import OpenMLCacheException
 from ..util import URLError
 
 
-def run_task(task, model):
+def run_task(task, model, dependencies=None):
     """Performs a CV run on the dataset of the given task, using the split.
 
     Parameters
@@ -24,7 +24,8 @@ def run_task(task, model):
         most supervised estimators of scikit learn follow this definition of a
         model [1]
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
-
+    dependencies : str
+        Dependencies are passed to flow generation when a model is passed.
 
     Returns
     -------
@@ -38,7 +39,8 @@ def run_task(task, model):
         # etc from the package in order to usefully create the flow!
         external_version = 'sklearn_' + sklearn.__version__
         flow = OpenMLFlow(model=model, external_version=external_version,
-                          description='Automatically generated.')
+                          description='Automatically generated.',
+                          dependencies=dependencies)
         # Triggers generating the name which is needed for
         # _ensure_flow_exists() below!
         flow._generate_flow_xml()

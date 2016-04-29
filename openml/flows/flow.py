@@ -1,10 +1,11 @@
 import ast
-import re
 from collections import OrderedDict, deque
+import distutils.version
+import re
+import warnings
 
 import importlib
 import xmltodict
-import sklearn
 
 from ..util import URLError
 from .._api_calls import _perform_api_call
@@ -38,7 +39,8 @@ class OpenMLFlow(object):
     language : str
         Natural language the flow is described in.
     dependencies : str
-        A list of dependencies necessary to run the flow.
+        A list of dependencies necessary to run the flow. The default values
+        will be numpy, scipy and scikit-learn (sklearn).
     source : str
         Programming code of the flow.
     parameters : list
@@ -58,6 +60,18 @@ class OpenMLFlow(object):
                  uploader=None, version=None, external_version=None,
                  upload_date=None, language=None, dependencies=None,
                  source=None, parameters=None, components=None):
+        if dependencies is None:
+            import numpy as np
+            numpy_version = np.__version__
+            import scipy
+            scipy_version = scipy.__version__
+            import sklearn
+            sklearn_version = sklearn.__version__
+            dependencies = ['numpy=%s' % numpy_version,
+                            'scipy=%s' % scipy_version,
+                            'sklearn=%s' % sklearn_version]
+            dependencies = ' '.join(dependencies)
+
         self.model = model
         self.id = id
         self.upoader = uploader
@@ -385,7 +399,94 @@ def _create_flow_from_dict(xml_dict):
                       parameters=parameters, components=components)
 
     flow.model = _construct_model_for_flow(flow)
+    _check_dependencies(flow.dependencies, flow.id)
     return flow
+
+
+def _check_dependencies(dependencies, flow_id):
+    """Check dependencies of a flow and emit warning if these are not satisfied.
+
+    A warning is emitted in the following cases:
+    * no dependencies are specified
+    * the dependencies cannot be imported
+    * the dependencies have a different version number
+
+    This function assumes that a dependency has a field __version__.
+
+    Parameters
+    ----------
+    dependencies : str
+        Dependency string in pip's requirements format
+
+    Returns
+    -------
+    dict
+        {name: bool}
+
+    """
+
+    fulfilled_dependencies = {}
+    if dependencies is not None:
+        dependencies = dependencies.split()
+        for dependency in dependencies:
+            if dependency:
+                dependency_ = re.split(r'([>=<\!]{1,2})', dependency)
+                package_name = dependency_[0]
+
+                if len(dependency_) == 1:
+                    depended_version = None
+                    version_operator = None
+                elif len(dependency_) == 3:
+                    version_operator = dependency_[1]
+                    depended_version = distutils.version.LooseVersion(
+                        dependency_[2])
+                else:
+                    warnings.warn('Cannot parse dependency %s of flow %d' %
+                                  (dependency, flow_id))
+                    fulfilled_dependencies[dependency] = False
+                    continue
+
+                try:
+                    module = importlib.import_module(package_name)
+                except ImportError:
+                    warnings.warn('Cannot import dependency %s of flow %d' %
+                                  (package_name, flow_id))
+                    fulfilled_dependencies[dependency] = False
+                    continue
+
+                installed_version = distutils.version.LooseVersion(
+                    module.__version__)
+
+                if depended_version is not None:
+                    fulfillment_lookup_table = {
+                        '=': depended_version == installed_version,
+                        '==': depended_version == installed_version,
+                        '>=': depended_version >= installed_version,
+                        '>': depended_version > installed_version,
+                        '<=': depended_version <= installed_version,
+                        '<': depended_version < installed_version,
+                        '!=': depended_version != installed_version
+                    }
+                    if version_operator in fulfillment_lookup_table:
+                        dependency_fulfilled = fulfillment_lookup_table[version_operator]
+                    else:
+                        fulfilled_dependencies[dependency] = False
+                        raise ValueError('Cannot parse dependency operator %s '
+                                         'for flow %d' % (version_operator,
+                                                          flow_id))
+                else:
+                    dependency_fulfilled = True
+
+                if not dependency_fulfilled:
+                    fulfilled_dependencies[dependency] = False
+                    warnings.warn('Dependency %s installed in wrong version:'
+                                  '%s %s %s' % (module, depended_version,
+                                                version_operator,
+                                                installed_version))
+                else:
+                    fulfilled_dependencies[dependency] = True
+
+    return fulfilled_dependencies
 
 
 def _construct_model_for_flow(flow):
@@ -454,6 +555,8 @@ def _construct_model_for_flow(flow):
         model_class = getattr(importlib.import_module(module_name[0]),
                               module_name[1])
     except:
+        warnings.warn('Cannot create model %s for flow %d.' %
+                      (model_name, flow.id))
         return None
 
     model = model_class(**parameter_dict)

@@ -1,5 +1,7 @@
 import unittest
 
+import numpy as np
+
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.pipeline import Pipeline, FeatureUnion
@@ -39,6 +41,9 @@ class TestFlow(TestBase):
 
         self.assertEqual(new_flow.name, flow.name)
         self.assertEqual(new_flow.description, flow.description)
+        self.assertIn('sklearn', new_flow.dependencies)
+        self.assertIn('numpy', new_flow.dependencies)
+        self.assertIn('scipy', new_flow.dependencies)
 
     def test_upload_flow_with_exchangable_component(self):
         # The classifier inside AdaBoost can be changed, therefore we
@@ -103,6 +108,35 @@ class TestFlow(TestBase):
         for component in flow.components:
             self.assertEqual(len(component), 2)
             self.assertIsInstance(component['flow'], openml.OpenMLFlow)
+            self.assertIsNone(component['flow'].model)
+
+    def test__check_dependency(self):
+        # simple dependency on one line
+        input = 'numpy'
+        fixture = {'numpy': True}
+        output = openml.flows.flow._check_dependencies(input, 3)
+        self.assertEqual(output, fixture)
+
+        # all dependency operators
+        current_version = np.__version__
+
+        for operator in ['=', '==', '>=', '<=', ]:
+            input = 'numpy%s%s' % (operator, current_version)
+            fixture = {'numpy%s%s' % (operator, current_version): True}
+            output = openml.flows.flow._check_dependencies(input, 3)
+            self.assertEqual(output, fixture)
+
+        for operator in ['>', '<', '!=']:
+            input = 'numpy%s%s' % (operator, current_version)
+            fixture = {'numpy%s%s' % (operator, current_version): False}
+            output = openml.flows.flow._check_dependencies(input, 3)
+            self.assertEqual(output, fixture)
+
+        # two dependencies seperated by whitespace
+        input = 'numpy scipy'
+        fixture = {'numpy': True, 'scipy': True}
+        output = openml.flows.flow._check_dependencies(input, 3)
+        self.assertEqual(output, fixture)
 
     def test__construct_model_for_flow(self):
         flow_xml = """<oml:flow xmlns:oml="http://openml.org/openml">
