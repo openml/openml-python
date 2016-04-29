@@ -371,4 +371,4 @@ class TestFlow(TestBase):
         flow_dict = xmltodict.parse(flow_xml)
         # This calls the model creation part
         flow = openml.flows.flow._create_flow_from_dict(flow_dict)
-        print(flow.model)
+        self.assertIsInstance(flow.model, RandomizedSearchCV)
