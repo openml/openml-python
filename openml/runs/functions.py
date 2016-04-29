@@ -1,6 +1,7 @@
 from collections import defaultdict
 import os
 
+import sklearn
 import xmltodict
 
 from .._api_calls import _perform_api_call
@@ -33,7 +34,14 @@ def run_task(task, model):
     # TODO test this function and it's subfunctions
 
     if not isinstance(model, OpenMLFlow):
-        flow = OpenMLFlow(model=model)
+        # Try to extract the source code, name, description, external version
+        # etc from the package in order to usefully create the flow!
+        external_version = 'sklearn_' + sklearn.__version__
+        flow = OpenMLFlow(model=model, external_version=external_version,
+                          description='Automatically generated.')
+        # Triggers generating the name which is needed for
+        # _ensure_flow_exists() below!
+        flow._generate_flow_xml()
     else:
         flow = model
 

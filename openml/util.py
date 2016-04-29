@@ -12,4 +12,7 @@ def is_string(obj):
     except NameError:
         return isinstance(obj, str)
 
-__all__ = ['URLError', 'is_string']
+
+oml_cusual_string = r'([a-z]|[A-Z]|[0-9]|[_,-,.\(\)])+'
+
+__all__ = ['URLError', 'is_string', 'oml_cusual_string']
