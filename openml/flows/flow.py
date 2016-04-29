@@ -1,6 +1,8 @@
+import ast
 import re
 from collections import OrderedDict, deque
 
+import importlib
 import xmltodict
 import sklearn
 
@@ -153,7 +155,7 @@ class OpenMLFlow(object):
                 for elem in v:
                     sub_name = elem[1].__module__ + "." + \
                                elem[1].__class__.__name__
-                    new_value.append('(%s, %s)' % (elem[0], sub_name))
+                    new_value.append('("%s", "%s")' % (elem[0], sub_name))
                     component_sort.append(elem[0])
                 new_value = '(' + ', '.join(new_value) + ')'
 
@@ -356,9 +358,9 @@ def _create_flow_from_dict(xml_dict):
 
         for oml_parameter in oml_parameters:
             parameter_name = oml_parameter['oml:name']
-            data_type = oml_parameter['oml:data_type']
-            default_value = oml_parameter['oml:default_value']
-            parameter_description = oml_parameter['oml:description']
+            data_type = oml_parameter.get('oml:data_type', None)
+            default_value = oml_parameter.get('oml:default_value', None)
+            parameter_description = oml_parameter.get('oml:description', None)
             parameters.append({'name': parameter_name,
                                'data_type': data_type,
                                'default_value': default_value,
@@ -376,9 +378,84 @@ def _create_flow_from_dict(xml_dict):
             flow = _create_flow_from_dict({'oml:flow': component['oml:flow']})
             components.append({'identifier': identifier, 'flow': flow})
 
-    return OpenMLFlow(id=flow_id, uploader=uploader, name=name,
+    flow = OpenMLFlow(id=flow_id, uploader=uploader, name=name,
                       version=version, external_version=external_version,
                       description=description, upload_date=upload_date,
                       language=language, dependencies=dependencies,
                       parameters=parameters, components=components)
 
+    flow.model = _construct_model_for_flow(flow)
+    return flow
+
+
+def _construct_model_for_flow(flow):
+    model_name = flow.name
+
+    # Generate a parameters dict because some sklearn objects have mandatory
+    # arguments (for example the pipeline)
+    parameters = flow.parameters
+    parameter_dict = {}
+    for parameter in parameters:
+        name = parameter['name']
+        value = parameter.get('default_value', None)
+
+        if value is None:
+            continue
+
+        try:
+            value = int(value)
+        except:
+            pass
+
+        if isinstance(value, str):
+            try:
+                value = float(value)
+            except:
+                pass
+
+        # FeatureUnion and Pipeline can have lists or tuples as arguments.
+        # This tries to recreate the list of tuples of strings representation
+        if isinstance(value, str):
+            try:
+                value = ast.literal_eval(value)
+                if isinstance(value, tuple):
+                    value = list(value)
+            except:
+                pass
+
+        parameter_dict[name] = value
+
+    if len(flow.components) > 0:
+        added = False
+        for component in flow.components:
+            # Search for hyperparameters to which we can assign the components
+            for name in parameter_dict:
+                # List of tuple like for Pipeline or FeatureUnion
+                if isinstance(parameter_dict[name], list):
+                    steps = parameter_dict[name]
+                    for i in range(len(steps)):
+                        if steps[i][0] == component['identifier']:
+                            steps[i] = (component['identifier'],
+                                        component['flow'].model)
+                            added = True
+
+            # A regular component
+            if added is False:
+                parameter_dict[component['identifier']] = component[
+                    'flow'].model
+
+    # Remove everything after the first bracket
+    pos = model_name.find('(')
+    if pos >= 0:
+        model_name = model_name[:pos]
+
+    module_name = model_name.rsplit('.', 1)
+    try:
+        model_class = getattr(importlib.import_module(module_name[0]),
+                              module_name[1])
+    except:
+        return None
+
+    model = model_class(**parameter_dict)
+
+    return model

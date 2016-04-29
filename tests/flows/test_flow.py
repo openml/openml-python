@@ -11,6 +11,7 @@ import xmltodict
 
 from openml.testing import TestBase
 import openml
+import openml.flows.flow
 
 
 class TestFlow(TestBase):
@@ -102,3 +103,238 @@ class TestFlow(TestBase):
         for component in flow.components:
             self.assertEqual(len(component), 2)
             self.assertIsInstance(component['flow'], openml.OpenMLFlow)
+
+    def test__construct_model_for_flow(self):
+        flow_xml = """<oml:flow xmlns:oml="http://openml.org/openml">
+    <oml:description>Test flow!</oml:description>
+    <oml:id>-1</oml:id>
+    <oml:version>1</oml:version>
+    <oml:upload_date>00.00.00</oml:upload_date>
+    <oml:uploader>-1</oml:uploader>
+    <oml:parameter>
+        <oml:name>cv</oml:name>
+    </oml:parameter>
+    <oml:parameter>
+        <oml:name>error_score</oml:name>
+        <oml:default_value>raise</oml:default_value>
+    </oml:parameter>
+    <oml:parameter>
+        <oml:name>fit_params</oml:name>
+    </oml:parameter>
+    <oml:parameter>
+        <oml:name>iid</oml:name>
+        <oml:default_value>True</oml:default_value>
+    </oml:parameter>
+    <oml:parameter>
+        <oml:name>n_iter</oml:name>
+        <oml:default_value>10</oml:default_value>
+    </oml:parameter>
+    <oml:parameter>
+        <oml:name>n_jobs</oml:name>
+        <oml:default_value>1</oml:default_value>
+    </oml:parameter>
+    <oml:parameter>
+        <oml:name>param_distributions</oml:name>
+        <oml:default_value>{'classifier__n_estimators': [50, 100, 500, 1000]}</oml:default_value>
+    </oml:parameter>
+    <oml:parameter>
+        <oml:name>pre_dispatch</oml:name>
+        <oml:default_value>2*n_jobs</oml:default_value>
+    </oml:parameter>
+    <oml:parameter>
+        <oml:name>random_state</oml:name>
+    </oml:parameter>
+    <oml:parameter>
+        <oml:name>refit</oml:name>
+        <oml:default_value>True</oml:default_value>
+    </oml:parameter>
+    <oml:parameter>
+        <oml:name>scoring</oml:name>
+    </oml:parameter>
+    <oml:parameter>
+        <oml:name>verbose</oml:name>
+    </oml:parameter>
+    <oml:component>
+        <oml:identifier>estimator</oml:identifier>
+        <oml:flow xmlns:oml="http://openml.org/openml">
+            <oml:id>-1</oml:id>
+            <oml:version>1</oml:version>
+            <oml:upload_date>00.00.00</oml:upload_date>
+            <oml:uploader>-1</oml:uploader>
+            <oml:description>Automatically created sub-component.</oml:description>
+            <oml:parameter>
+                <oml:name>steps</oml:name>
+                <oml:default_value>(("scaler", "sklearn.preprocessing.data.StandardScaler"), ("fu", "sklearn.pipeline.FeatureUnion"), ("classifier", "sklearn.ensemble.weight_boosting.AdaBoostClassifier"))</oml:default_value>
+            </oml:parameter>
+            <oml:component>
+                <oml:identifier>scaler</oml:identifier>
+                <oml:flow xmlns:oml="http://openml.org/openml">
+                    <oml:id>-1</oml:id>
+                    <oml:version>1</oml:version>
+                    <oml:upload_date>00.00.00</oml:upload_date>
+                    <oml:uploader>-1</oml:uploader>
+                    <oml:description>Automatically created sub-component.</oml:description>
+                    <oml:parameter>
+                        <oml:name>copy</oml:name>
+                        <oml:default_value>True</oml:default_value>
+                    </oml:parameter>
+                    <oml:parameter>
+                        <oml:name>with_mean</oml:name>
+                        <oml:default_value>True</oml:default_value>
+                    </oml:parameter>
+                    <oml:parameter>
+                        <oml:name>with_std</oml:name>
+                        <oml:default_value>True</oml:default_value>
+                    </oml:parameter>
+                    <oml:name>sklearn.preprocessing.data.StandardScaler</oml:name>
+                </oml:flow>
+            </oml:component>
+            <oml:component>
+                <oml:identifier>fu</oml:identifier>
+                <oml:flow xmlns:oml="http://openml.org/openml">
+                    <oml:id>-1</oml:id>
+                    <oml:version>1</oml:version>
+                    <oml:upload_date>00.00.00</oml:upload_date>
+                    <oml:uploader>-1</oml:uploader>
+                    <oml:description>Automatically created sub-component.</oml:description>
+                    <oml:parameter>
+                        <oml:name>n_jobs</oml:name>
+                        <oml:default_value>1</oml:default_value>
+                    </oml:parameter>
+                    <oml:parameter>
+                        <oml:name>transformer_list</oml:name>
+                        <oml:default_value>(("poly", "sklearn.preprocessing.data.PolynomialFeatures"), ("pca", "sklearn.decomposition.pca.PCA"))</oml:default_value>
+                    </oml:parameter>
+                    <oml:parameter>
+                        <oml:name>transformer_weights</oml:name>
+                    </oml:parameter>
+                    <oml:component>
+                        <oml:identifier>poly</oml:identifier>
+                        <oml:flow xmlns:oml="http://openml.org/openml">
+                            <oml:id>-1</oml:id>
+                    <oml:version>1</oml:version>
+                    <oml:upload_date>00.00.00</oml:upload_date>
+                    <oml:uploader>-1</oml:uploader>
+                            <oml:description>Automatically created sub-component.</oml:description>
+                            <oml:parameter>
+                                <oml:name>degree</oml:name>
+                                <oml:default_value>2</oml:default_value>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>include_bias</oml:name>
+                                <oml:default_value>True</oml:default_value>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>interaction_only</oml:name>
+                            </oml:parameter>
+                            <oml:name>sklearn.preprocessing.data.PolynomialFeatures</oml:name>
+                        </oml:flow>
+                    </oml:component>
+                    <oml:component>
+                        <oml:identifier>pca</oml:identifier>
+                        <oml:flow xmlns:oml="http://openml.org/openml">
+                            <oml:id>-1</oml:id>
+                            <oml:version>1</oml:version>
+                            <oml:upload_date>00.00.00</oml:upload_date>
+                            <oml:uploader>-1</oml:uploader>
+                            <oml:description>Automatically created sub-component.</oml:description>
+                            <oml:parameter>
+                                <oml:name>copy</oml:name>
+                                <oml:default_value>True</oml:default_value>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>n_components</oml:name>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>whiten</oml:name>
+                            </oml:parameter>
+                            <oml:name>sklearn.decomposition.pca.PCA</oml:name>
+                        </oml:flow>
+                    </oml:component>
+                    <oml:name>sklearn.pipeline.FeatureUnion(sklearn.preprocessing.data.PolynomialFeatures,sklearn.decomposition.pca.PCA)</oml:name>
+                </oml:flow>
+            </oml:component>
+            <oml:component>
+                <oml:identifier>classifier</oml:identifier>
+                <oml:flow xmlns:oml="http://openml.org/openml">
+                    <oml:id>-1</oml:id>
+                    <oml:version>1</oml:version>
+                    <oml:upload_date>00.00.00</oml:upload_date>
+                    <oml:uploader>-1</oml:uploader>
+                    <oml:description>Automatically created sub-component.</oml:description>
+                    <oml:parameter>
+                        <oml:name>algorithm</oml:name>
+                        <oml:default_value>SAMME.R</oml:default_value>
+                    </oml:parameter>
+                    <oml:parameter>
+                        <oml:name>learning_rate</oml:name>
+                        <oml:default_value>1.0</oml:default_value>
+                    </oml:parameter>
+                    <oml:parameter>
+                        <oml:name>n_estimators</oml:name>
+                        <oml:default_value>50</oml:default_value>
+                    </oml:parameter>
+                    <oml:parameter>
+                        <oml:name>random_state</oml:name>
+                    </oml:parameter>
+                    <oml:component>
+                        <oml:identifier>base_estimator</oml:identifier>
+                        <oml:flow xmlns:oml="http://openml.org/openml">
+                            <oml:id>-1</oml:id>
+                            <oml:version>1</oml:version>
+                            <oml:upload_date>00.00.00</oml:upload_date>
+                            <oml:uploader>-1</oml:uploader>
+                            <oml:description>Automatically created sub-component.</oml:description>
+                            <oml:parameter>
+                                <oml:name>class_weight</oml:name>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>criterion</oml:name>
+                                <oml:default_value>gini</oml:default_value>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>max_depth</oml:name>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>max_features</oml:name>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>max_leaf_nodes</oml:name>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>min_samples_leaf</oml:name>
+                                <oml:default_value>1</oml:default_value>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>min_samples_split</oml:name>
+                                <oml:default_value>2</oml:default_value>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>min_weight_fraction_leaf</oml:name>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>presort</oml:name>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>random_state</oml:name>
+                            </oml:parameter>
+                            <oml:parameter>
+                                <oml:name>splitter</oml:name>
+                                <oml:default_value>best</oml:default_value>
+                            </oml:parameter>
+                            <oml:name>sklearn.tree.tree.DecisionTreeClassifier</oml:name>
+                        </oml:flow>
+                    </oml:component>
+                    <oml:name>sklearn.ensemble.weight_boosting.AdaBoostClassifier(sklearn.tree.tree.DecisionTreeClassifier)</oml:name>
+                </oml:flow>
+            </oml:component>
+            <oml:name>sklearn.pipeline.Pipeline(sklearn.preprocessing.data.StandardScaler,sklearn.pipeline.FeatureUnion(sklearn.preprocessing.data.PolynomialFeatures,sklearn.decomposition.pca.PCA),sklearn.ensemble.weight_boosting.AdaBoostClassifier(sklearn.tree.tree.DecisionTreeClassifier))</oml:name>
+        </oml:flow>
+    </oml:component>
+    <oml:name>sklearn.grid_search.RandomizedSearchCV(sklearn.pipeline.Pipeline(sklearn.preprocessing.data.StandardScaler,sklearn.pipeline.FeatureUnion(sklearn.preprocessing.data.PolynomialFeatures,sklearn.decomposition.pca.PCA),sklearn.ensemble.weight_boosting.AdaBoostClassifier(sklearn.tree.tree.DecisionTreeClassifier)))</oml:name>
+</oml:flow>"""
+
+        flow_dict = xmltodict.parse(flow_xml)
+        # This calls the model creation part
+        flow = openml.flows.flow._create_flow_from_dict(flow_dict)
+        print(flow.model)
