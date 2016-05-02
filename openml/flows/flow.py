@@ -89,28 +89,14 @@ class OpenMLFlow(object):
         self.name = name
         self.external_version = external_version
 
-    def _generate_flow_xml(self, model=None, description=None,
-                           return_dict=False):
-        """Generate xml representation of self for upload to server.
+    def init_parameters_and_components(self, model=None, description=None):
+        if description is None and model is None:
+            flow = self
+        else:
+            flow = OpenMLFlow(description, model=model)
 
-        Returns
-        -------
-        flow_xml : string
-            Flow represented as XML string.
-        """
-        flow_dict = OrderedDict()
-        flow_dict['oml:flow'] = OrderedDict()
-
-        # Necessary when this method is called recursive!
         if model is None:
-            model = self.model
-        if description is None:
-            description = self.description
-
-        flow_dict['oml:flow']['oml:description'] = description
-        flow_dict['oml:flow']['@xmlns:oml'] = 'http://openml.org/openml'
-        if self.external_version is not None:
-            flow_dict['oml:flow']['oml:external_version'] = self.external_version
+            model = flow.model
 
         clf_params = model.get_params()
         flow_parameters = []
@@ -150,14 +136,18 @@ class OpenMLFlow(object):
                 # TODO check if component already exists, if yes, reuse it!
                 # TODO factor all this out in a scikit-learn specifit
                 # sub-package
-                component_xml = self._generate_flow_xml(
+                subflow = self.init_parameters_and_components(
                     model=v, description='Automatically created '
-                                          'sub-component.',
-                    return_dict=True)
+                                         'sub-component.')
                 flow_component = OrderedDict()
                 flow_component['oml:identifier'] = k
-                flow_component['oml:flow'] = component_xml['oml:flow']
+                flow_component['oml:flow'] = subflow
                 flow_components[k] = flow_component
+                param_dict = OrderedDict()
+                param_dict['oml:name'] = k
+                param_dict['oml:default_value'] = v.__module__ + "." + \
+                                                  v.__class__.__name__
+                flow_parameters.append(param_dict)
 
             # Try to handle list or tuples from pipelines/feature unions
             elif isinstance(v, list) or isinstance(v, tuple):
@@ -194,7 +184,7 @@ class OpenMLFlow(object):
         while len(to_visit) > 0:
             component = to_visit.pop()
             found_flow_components.add(component['oml:identifier'])
-            to_visit.extendleft(component['oml:flow']['oml:component'])
+            to_visit.extendleft(component['oml:flow'].components)
         if len(found_flow_components) != len(expected_flow_components):
             raise ValueError('%s != %s' % (found_flow_components,
                                            expected_flow_components))
@@ -211,29 +201,53 @@ class OpenMLFlow(object):
         for value in flow_components.values():
             flow_components_list.append(value)
 
-        flow_dict['oml:flow']['oml:parameter'] = flow_parameters
-        flow_dict['oml:flow']['oml:component'] = flow_components_list
+        flow.parameters = flow_parameters
+        flow.components = flow_components_list
 
-        sub_components_names = ",".join([sub_component['oml:flow']['oml:name'] for
-                                         sub_component in
-                                         flow_components_list])
+        sub_components_names = ",".join(
+            [sub_component['oml:flow'].name
+             for sub_component in flow_components_list])
         name = model.__module__ + "." + model.__class__.__name__
         if sub_components_names:
             name = '%s(%s)' % (name, sub_components_names)
+        flow.name = name
 
-        # We have to add the name at the beginning of the xml. Only python
-        # 2/3 compatible way is to create a new ordered dict
-        new_flow_dict = OrderedDict()
-        new_flow_dict['oml:name'] = name
-        for k in flow_dict['oml:flow']:
-            new_flow_dict[k] = flow_dict['oml:flow'][k]
-        flow_dict['oml:flow'] = new_flow_dict
-        del new_flow_dict
+        return flow
+
+    def _generate_flow_xml(self, return_dict=False):
+        """Generate xml representation of self for upload to server.
+
+        Returns
+        -------
+        flow_xml : string
+            Flow represented as XML string.
+        """
+
+        # Necessary when this method is called recursive!
+        self.init_parameters_and_components()
+
+        flow_dict = OrderedDict()
+        flow_dict['oml:flow'] = OrderedDict()
+
+        flow_dict['oml:flow']['@xmlns:oml'] = 'http://openml.org/openml'
+        flow_dict['oml:flow']['oml:name'] = self.name
+        if self.external_version is not None:
+            flow_dict['oml:flow']['oml:external_version'] = self.external_version
+        flow_dict['oml:flow']['oml:description'] = self.description
+
+        components = []
+        for component in self.components:
+            component_dict = OrderedDict()
+            component_dict['oml:identifier'] = component['oml:identifier']
+            component_dict['oml:flow'] = component[
+                'oml:flow']._generate_flow_xml(return_dict=True)['oml:flow']
+            components.append(component_dict)
+
+        flow_dict['oml:flow']['oml:parameter'] = self.parameters
+        flow_dict['oml:flow']['oml:component'] = components
 
         if return_dict:
             return flow_dict
-        else:
-            self.name = name
 
         flow_xml = xmltodict.unparse(flow_dict, pretty=True)
         # A flow may not be uploaded with the encoding specification..
@@ -247,7 +261,7 @@ class OpenMLFlow(object):
         """
         xml_description = self._generate_flow_xml()
 
-        # Checking that the name adheres to oml:system_string
+        # Checking that the name adheres to oml:casual_string
         match = re.match(oml_cusual_string, self.name)
         if not match or ((match.span()[1] - match.span()[0]) < len(self.name)):
             raise ValueError('Flow name does not adhere to the '
@@ -260,10 +274,12 @@ class OpenMLFlow(object):
         return return_code, return_value
 
     def _ensure_flow_exists(self):
-        """ Checks if a flow exists for the given model and possibly creates it.
+        """ Checks if a flow and its components exists for the given model and
+        possibly creates it.
 
-        If the given flow exists on the server, the flow-id will simply
-        be returned. Otherwise it will be uploaded to the server.
+        If the given flow exists on the server, the flow-id will be set on
+        this instance and be returned as well. Otherwise the flow will be
+        uploaded to the server. Does this recursively for all components.
 
         Returns
         -------
@@ -281,8 +297,12 @@ class OpenMLFlow(object):
 
             response_dict = xmltodict.parse(response_xml)
             flow_id = response_dict['oml:upload_flow']['oml:id']
-            return int(flow_id)
 
+        for component in self.components:
+            component_id = component['oml:flow']._ensure_flow_exists()
+            component['oml:flow'].id = component_id
+
+        self.id = flow_id
         return int(flow_id)
 
 

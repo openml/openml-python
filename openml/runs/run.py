@@ -19,12 +19,13 @@ class OpenMLRun(object):
     FIXME
 
     """
-    def __init__(self, task_id, flow_id, dataset_id, setup_string=None,
+    def __init__(self, task_id, flow_id, dataset_id, flow, setup_string=None,
                  files=None, setup_id=None, tags=None, run_id=None,
                  uploader=None, uploader_name=None, evaluations=None,
                  detailed_evaluations=None, data_content=None,
                  model=None, task_type=None, task_evaluation_measure=None,
-                 flow_name=None, parameter_settings=None, predictions_url=None):
+                 flow_name=None, parameter_settings=None,
+                 predictions_url=None, trace=None):
         self.run_id = run_id
         self.uploader = uploader
         self.uploader_name = uploader_name
@@ -32,12 +33,14 @@ class OpenMLRun(object):
         self.task_type = task_type
         self.task_evaluation_measure = task_evaluation_measure
         self.flow_id = flow_id
+        self.flow = flow
         self.flow_name = flow_name
         self.setup_id = setup_id
         self.setup_string = setup_string
         self.parameter_settings = parameter_settings
         self.dataset_id = dataset_id
         self.predictions_url = predictions_url
+        self.trace = trace
         self.evaluations = evaluations
         self.detailed_evaluations = detailed_evaluations
         self.data_content = data_content
@@ -69,6 +72,33 @@ class OpenMLRun(object):
         arff_dict['relation'] = 'openml_task_' + str(task.task_id) + '_predictions'
         return arff_dict
 
+    def _generate_arff_trace(self):
+        """Generates the arff header dictionary for upload to the server.
+
+        Returns
+        -------
+        arf_dict : dictionary
+            Dictionary representation of an ARFF data format containing
+            hyperparameter optimization trace.
+        """
+        if self.trace is None:
+            return None
+
+        relation = 'openml_task_%d_optimization_trace' % self.task_id
+        arff_dict = {}
+        arff_dict['attributes'] = [('repeat', 'NUMERIC'),
+                                   ('fold', 'NUMERIC'),
+                                   ('iteration', 'NUMERIC')]
+        for parameter in self.trace[0][3:-2]:
+            arff_dict['attributes'].append((parameter, 'STRING'))
+        arff_dict['attributes'].extend([('evaluation', 'NUMERIC'),
+                                        ('selected', ['true', 'false'])])
+        arff_dict['data'] = self.trace[1:]
+        arff_dict['description'] = ''
+        arff_dict['relation'] = relation
+
+        return arff_dict
+
     def publish(self):
         """Publish a run to the OpenML server.
 
@@ -78,6 +108,15 @@ class OpenMLRun(object):
         description_xml = self._create_description_xml()
         data = {'predictions': ("predictions.csv", predictions),
                 'description': ("description.xml", description_xml)}
+
+        # Trace can be None if no hyperparameter optimization performed for
+        # this run
+        if self.trace is not None:
+            trace = arff.dumps(self._generate_arff_trace())
+            data['trace'] = trace
+
+        print(description_xml)
+
         return_code, return_value = _perform_api_call(
             "/run/", file_elements=data)
         return return_code, return_value
@@ -96,7 +135,6 @@ class OpenMLRun(object):
         # with the given hyperparameters!
         setup_string = _create_setup_string(self.model)
 
-        parameter_settings = self.model.get_params()
         # as a tag, it must be of the form ([a-zA-Z0-9_\-\.])+
         # so we format time from 'mm/dd/yy hh:mm:ss' to 'mm-dd-yy_hh.mm.ss'
         well_formatted_time = time.strftime("%c").replace(
@@ -104,7 +142,7 @@ class OpenMLRun(object):
         tags = run_environment + [well_formatted_time] + ['run_task'] + \
             [self.model.__module__ + "." + self.model.__class__.__name__]
         description = _to_dict(
-            self.task_id, self.flow_id, setup_string, parameter_settings, tags)
+            self.task_id, self.flow, setup_string,  tags)
         description_xml = xmltodict.unparse(description, pretty=True)
         return description_xml
 
@@ -203,17 +241,17 @@ def _get_version_information():
     return [python_version, sklearn_version, numpy_version, scipy_version]
 
 
-def _to_dict(taskid, flow_id, setup_string, parameter_settings, tags):
+def _to_dict(taskid, flow, setup_string, tags):
     """ Creates a dictionary corresponding to the desired xml desired by openML
 
     Parameters
     ----------
     taskid : int
         the identifier of the task
+    flow : OpenMLFlow
+        OpenMLFlow used to generate this run
     setup_string : string
         a CLI string which can invoke the learning with the correct parameter settings
-    parameter_settings : array of dicts
-        each dict containing keys name, value and component, one per parameter setting
     tags : array of strings
         information that give a description of the run, must conform to
         regex ``([a-zA-Z0-9_\-\.])+``
@@ -222,17 +260,68 @@ def _to_dict(taskid, flow_id, setup_string, parameter_settings, tags):
     -------
     result : an array with version information of the above packages
     """
+
+    def correct_parameter_value(value):
+        def is_estimator(v):
+            return (hasattr(v, 'fit') and hasattr(v, 'predict') and
+                    hasattr(v, 'get_params') and hasattr(v, 'set_params'))
+
+        def is_transformer(v):
+            return (hasattr(v, 'fit') and hasattr(v, 'transform') and
+                    hasattr(v, 'get_params') and hasattr(v, 'set_params'))
+
+        # Estimators
+        if is_estimator(value) or is_transformer(value):
+            value = value.__module__ + "." + value.__class__.__name__
+        # Pipeline or featureunion
+        elif isinstance(value, list) or isinstance(value, tuple):
+            all_subcomponents = [is_transformer(elem[1]) or
+                                 is_estimator(elem[1]) for elem in value]
+            if not all(all_subcomponents):
+                raise ValueError('%s contains elements which are neither '
+                                 'an estimator nor a transformer.')
+            new_value = []
+            for elem in value:
+                sub_name = elem[1].__module__ + "." + \
+                           elem[1].__class__.__name__
+                new_value.append('("%s", "%s")' % (elem[0], sub_name))
+            value = '(' + ', '.join(new_value) + ')'
+        # Empty dictionaries such as fit_params
+        elif isinstance(value, dict) and len(value) == 0:
+            value = 'None'
+        value = str(value)
+        return value
+
     description = OrderedDict()
     description['oml:run'] = OrderedDict()
     description['oml:run']['@xmlns:oml'] = 'http://openml.org/openml'
     description['oml:run']['oml:task_id'] = taskid
-    description['oml:run']['oml:flow_id'] = flow_id
+    description['oml:run']['oml:flow_id'] = flow.id
 
     params = []
-    for k, v in parameter_settings.items():
+    parameter_settings = flow.model.get_params()
+    for param in parameter_settings:
+        value = parameter_settings[param]
+        value = correct_parameter_value(value)
+
+        if '__' in param:
+            # Get the correct ID for components of the flow
+            name_parts = param.split('__')
+            name = name_parts[-1]
+            tmp = flow
+            for name_part in name_parts[:-1]:
+                for component in flow.components:
+                    if component['oml:identifier'] == name_part:
+                        tmp = component['oml:flow']
+            id = tmp.id
+        else:
+            name = param
+            id = flow.id
+
         param_dict = OrderedDict()
-        param_dict['oml:name'] = k
-        param_dict['oml:value'] = ('None' if v is None else v)
+        param_dict['oml:name'] = name
+        param_dict['oml:value'] = ('None' if value is None else value)
+        param_dict['oml:component'] = id
         params.append(param_dict)
 
     description['oml:run']['oml:parameter_setting'] = params

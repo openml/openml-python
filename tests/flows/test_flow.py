@@ -57,15 +57,13 @@ class TestFlow(TestBase):
         response_dict = xmltodict.parse(return_value)
         flow_id = response_dict['oml:upload_flow']['oml:id']
         new_flow = openml.flows.get_flow(flow_id)
-        print(new_flow.parameters, new_flow.components)
-        self.assertEqual(len(new_flow.parameters), 4)
+        self.assertEqual(len(new_flow.parameters), 5)
         for parameter in new_flow.parameters:
             self.assertIn(parameter['name'], AdaBoostClassifier().get_params())
         self.assertEqual(len(new_flow.components), 1)
         self.assertEqual(new_flow.components[0]['identifier'], 'base_estimator')
         component = new_flow.components[0]['flow']
         self.assertGreaterEqual(len(component.parameters), 9)
-        print(component.parameters)
         for parameter in component.parameters:
             self.assertIn(parameter['name'], DecisionTreeClassifier().get_params())
 

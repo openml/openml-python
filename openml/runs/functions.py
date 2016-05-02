@@ -7,7 +7,7 @@ import xmltodict
 
 from .._api_calls import _perform_api_call
 from .. import config
-from ..flows import OpenMLFlow
+from ..flows import OpenMLFlow, get_flow
 from .run import OpenMLRun
 from ..exceptions import OpenMLCacheException
 from ..util import URLError
@@ -49,7 +49,7 @@ def run_task(task, model, dependencies=None, seed=None):
                           dependencies=dependencies)
         # Triggers generating the name which is needed for
         # _ensure_flow_exists() below!
-        flow._generate_flow_xml()
+        flow.init_parameters_and_components()
     else:
         flow = model
 
@@ -65,8 +65,15 @@ def run_task(task, model, dependencies=None, seed=None):
 
     _seed_model(model, seed)
 
-    run = OpenMLRun(task.task_id, flow_id, task.dataset_id)
-    run.data_content = _run_task_get_arffcontent(model, task, class_labels)
+    run = OpenMLRun(task.task_id, flow_id, task.dataset_id, flow)
+    data_content, optimization_trajectory = _run_task_get_arffcontent(
+        model, task, class_labels)
+    run.data_content = data_content
+    if len(optimization_trajectory):
+        run.trace = _fix_optimization_trajectory_parameter_names(
+            optimization_trajectory, flow.id, flow.parameters, flow.components)
+    else:
+        run.trace = None
 
     # The model will not be uploaded at the moment, but used to get the
     # hyperparameter values when uploading the run
@@ -108,13 +115,12 @@ def _seed_model(model, seed):
 def _run_task_get_arffcontent(model, task, class_labels):
     X, Y = task.get_X_and_Y()
     arff_datacontent = []
+    arff_tracecontent = []
+    arff_tracecontent_header = ''
     rep_no = 0
-    # TODO use different iterator to only provide a single iterator (less
-    # methods, less maintenance, less confusion)
     for rep in task.iterate_repeats():
         fold_no = 0
         for fold in rep:
-            # TODO Put into its own function for testability!
             train_indices, test_indices = fold
             trainX = X[train_indices]
             trainY = Y[train_indices]
@@ -133,10 +139,75 @@ def _run_task_get_arffcontent(model, task, class_labels):
                 arff_line.append(class_labels[testY[i]])
                 arff_datacontent.append(arff_line)
 
+            tracecontent_header, tracecontent = _get_optimization_trajectory(
+                model_, rep_no, fold_no)
+            arff_tracecontent_header = tracecontent_header
+            arff_tracecontent.extend(tracecontent)
+
             fold_no = fold_no + 1
         rep_no = rep_no + 1
 
-    return arff_datacontent
+    if len(arff_tracecontent) > 0 and len(arff_tracecontent_header) > 0:
+        arff_tracecontent.insert(0, arff_tracecontent_header)
+    return arff_datacontent, arff_tracecontent
+
+
+def _get_optimization_trajectory(model, rep_number, fold_number):
+    header = []
+    trace = []
+
+    if hasattr(model, 'grid_scores_'):
+        header.extend(['repeat', 'fold', 'iteration'])
+        # process hyperparameters subject to change in the trajectory
+        for hyperparameter in sorted(model.best_params_):
+            header.append(hyperparameter)
+        header.extend(['evaluation', 'selected'])
+
+        for iter, grid_score in enumerate(model.grid_scores_):
+            trace_line = [rep_number, fold_number, iter]
+            parameters = grid_score.parameters
+            if model.best_params_ == parameters:
+                selected = True
+            else:
+                selected = False
+            for parameter in sorted(parameters):
+                trace_line.append(parameters[parameter])
+            trace_line.append(grid_score.mean_validation_score)
+            trace_line.append(str(selected).lower())
+            assert len(trace_line) == len(header)
+            trace.append(trace_line)
+
+    return header, trace
+
+
+def _fix_optimization_trajectory_parameter_names(optimization_trajectory,
+                                                 flow_id, parameters,
+                                                 components,
+                                                 component_name=None):
+    parameters_to_flow_ids = {}
+    for parameter in parameters:
+        parameter_name = parameter['oml:name']
+        if component_name is not None:
+            parameter_name = '%s__%s' % (component_name, parameter_name)
+        parameters_to_flow_ids[parameter_name] = (flow_id, parameter['oml:name'])
+
+    for component in components:
+        name = component['oml:identifier']
+        if component_name is not None:
+            name = '%s__%s' % (component_name, name)
+        subflow = component['oml:flow']
+        sub_flow_id = subflow.id
+        optimization_trajectory =_fix_optimization_trajectory_parameter_names(
+            optimization_trajectory, sub_flow_id, subflow.parameters,
+            subflow.components, component_name=name)
+
+    for i in range(3, 3 + len(optimization_trajectory[0][3:-2])):
+        for parameter in parameters_to_flow_ids:
+            if optimization_trajectory[0][i] == parameter:
+                optimization_trajectory[0][i] = '%d:%s' % \
+                                                parameters_to_flow_ids[parameter]
+                break
+    return optimization_trajectory
 
 
 def get_runs(run_ids):
@@ -220,6 +291,7 @@ def _create_run_from_xml(xml):
     task_type = run['oml:task_type']
     task_evaluation_measure = run['oml:task_evaluation_measure']
     flow_id = int(run['oml:flow_id'])
+    flow = get_flow(flow_id)
     flow_name = run['oml:flow_name']
     setup_id = int(run['oml:setup_id'])
     setup_string = run['oml:setup_string']
@@ -271,7 +343,7 @@ def _create_run_from_xml(xml):
                      uploader_name=uploader_name, task_id=task_id,
                      task_type=task_type,
                      task_evaluation_measure=task_evaluation_measure,
-                     flow_id=flow_id, flow_name=flow_name,
+                     flow_id=flow_id, flow_name=flow_name, flow=flow,
                      setup_id=setup_id, setup_string=setup_string,
                      parameter_settings=parameters,
                      dataset_id=dataset_id, predictions_url=predictions_url,
