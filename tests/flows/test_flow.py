@@ -147,16 +147,18 @@ class TestFlow(TestBase):
         response_dict = xmltodict.parse(return_value)
         flow_id = response_dict['oml:upload_flow']['oml:id']
         new_flow = openml.flows.get_flow(flow_id)
-        # Pipeline
-        self.assertEqual(len(new_flow.components), 1)
+        # Pipeline and random search
+        self.assertEqual(len(new_flow.components), 2)
         # steps
-        self.assertEqual(len(new_flow.components[0]['flow'].parameters), 1)
-        self.assertEqual(new_flow.components[0]['flow'].parameters[0]['default_value'],
-                         "((scaler, sklearn.preprocessing.data.StandardScaler), "
-                         "(fu, sklearn.pipeline.FeatureUnion), "
-                         "(classifier, sklearn.ensemble.weight_boosting.AdaBoostClassifier))")
+        self.assertEqual(len(new_flow.components[0]['flow'].parameters), 3)
+        self.assertEqual(len(new_flow.components[1]['flow'].parameters), 1)
+        self.assertEqual(new_flow.components[1]['flow'].parameters[0]['default_value'],
+                         '(("ohe", "sklearn.preprocessing.data.OneHotEncoder"), '
+                         '("scaler", "sklearn.preprocessing.data.StandardScaler"), '
+                         '("fu", "sklearn.pipeline.FeatureUnion"), '
+                         '("classifier", "sklearn.ensemble.weight_boosting.AdaBoostClassifier"))')
         # Components of the pipeline
-        self.assertEqual(len(new_flow.components[0]['flow'].components), 3)
+        self.assertEqual(len(new_flow.components[1]['flow'].components), 4)
 
     def test_get_flow(self):
         flow = openml.flows.get_flow(1185)

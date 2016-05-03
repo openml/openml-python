@@ -212,7 +212,7 @@ class OpenMLFlow(object):
         flow.parameters = flow_parameters
         flow.components = flow_components_list
 
-        sub_components_names = ",".join(
+        sub_components_names = "__".join(
             [sub_component['oml:flow'].name
              for sub_component in flow_components_list])
         name = model.__module__ + "." + model.__class__.__name__
