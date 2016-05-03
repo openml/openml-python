@@ -107,6 +107,24 @@ class TestFlow(TestBase):
         for parameter in component.parameters:
             self.assertIn(parameter['name'], DecisionTreeClassifier().get_params())
 
+    def test_upload_flow_reuse_component(self):
+        # The classifier inside AdaBoost can be changed, therefore we
+        # register the classifier inside AdaBoost if it is not registered yet!
+        model = AdaBoostClassifier(base_estimator=DecisionTreeClassifier())
+
+        flow = openml.OpenMLFlow(description='Test flow!', model=model)
+        return_code, return_value = flow.publish()
+        response_dict = xmltodict.parse(return_value)
+        flow_id = response_dict['oml:upload_flow']['oml:id']
+        flow_1 = openml.flows.flow.get_flow(flow_id)
+
+        return_code, return_value = flow.publish()
+        response_dict = xmltodict.parse(return_value)
+        flow_id_2 = response_dict['oml:upload_flow']['oml:id']
+        flow_2 = openml.flows.flow.get_flow(flow_id_2)
+        self.assertEqual(flow_1.components[0]['flow'].id,
+                         flow_2.components[0]['flow'].id)
+
     def test_upload_complicated_flow(self):
         model = Pipeline((('ohe', OneHotEncoder(categorical_features=[
                                                 True, False, True])),
