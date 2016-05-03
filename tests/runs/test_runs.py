@@ -1,10 +1,11 @@
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import AdaBoostClassifier, ExtraTreesClassifier
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.grid_search import RandomizedSearchCV
+from sklearn.model_selection import RandomizedSearchCV
 import openml
+import openml.sklearn
 from openml.testing import TestBase
 import re
 import sys
@@ -25,8 +26,9 @@ class TestRun(TestBase):
 
     def test_publish_trace(self):
         task = openml.tasks.get_task(10107)
-        param_distribution = {'C': [10**i for i in range(-5, 5)]}
-        clf = LogisticRegression()
+        param_distribution = {'n_estimators': [1, 2, 5, 10],
+                              'max_depth': openml.sklearn.stats.RandInt(3, 10)}
+        clf = ExtraTreesClassifier()
         rs = RandomizedSearchCV(clf, param_distribution, n_iter=5)
         run = openml.runs.run_task(task, rs, seed=15)
         return_code, return_value = run.publish()
@@ -119,7 +121,7 @@ class TestRun(TestBase):
     def test__create_setup_string(self):
         def strip_version_information(string):
             string = re.sub(r'# Python_[0-9]\.[0-9]\.[0-9]\.\n', '', string)
-            string = re.sub(r'# Sklearn_[0-9]\.[0-9][0-9]\.[0-9]\.\n', '', string)
+            string = re.sub(r'# Sklearn_[0-9]\.[0-9][0-9]\.[a-zA-Z0-9]*\.\n', '', string)
             string = re.sub(r'# NumPy_[0-9]\.[0-9][0-9]\.[0-9]\.\n', '', string)
             string = re.sub(r'# SciPy_[0-9]\.[0-9][0-9]\.[0-9]\.\n', '', string)
             return string

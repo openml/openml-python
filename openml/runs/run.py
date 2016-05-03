@@ -242,7 +242,7 @@ def _get_version_information():
 
 
 def _to_dict(taskid, flow, setup_string, tags):
-    """ Creates a dictionary corresponding to the desired xml desired by openML
+    """Creates a dictionary corresponding to the xml desired by openML
 
     Parameters
     ----------

@@ -1,10 +1,15 @@
 import ast
 from collections import OrderedDict, deque
+import copy
 import distutils.version
 import re
 import warnings
-
 import importlib
+
+# Necessary to have signature available in python 2.7
+from sklearn.utils.fixes import signature
+
+import numpy as np
 import six
 import xmltodict
 
@@ -12,6 +17,24 @@ from ..util import URLError
 from .._api_calls import _perform_api_call
 from ..util import oml_cusual_string
 
+
+def _is_estimator(v):
+    return (hasattr(v, 'fit') and hasattr(v, 'predict') and
+            hasattr(v, 'get_params') and hasattr(v, 'set_params'))
+
+
+def _is_transformer(v):
+    return (hasattr(v, 'fit') and hasattr(v, 'transform') and
+            hasattr(v, 'get_params') and hasattr(v, 'set_params'))
+
+
+def _is_crossvalidator(v):
+    return (hasattr(v, '_iter_test_masks') and hasattr(v, 'get_n_splits')) or \
+           (hasattr(v, '_iter_test_indices') and hasattr(v, 'get_n_splits'))
+
+
+def _is_distribution(v):
+    return (hasattr(v, 'rvs') and hasattr(v, 'get_params'))
 
 
 class OpenMLFlow(object):
@@ -93,7 +116,8 @@ class OpenMLFlow(object):
         if description is None and model is None:
             flow = self
         else:
-            flow = OpenMLFlow(description, model=model)
+            flow = OpenMLFlow(description, model=model,
+                              external_version=self.external_version)
 
         if model is None:
             model = flow.model
@@ -103,14 +127,6 @@ class OpenMLFlow(object):
         flow_components = OrderedDict()
         component_sort = []
         expected_flow_components = set()
-
-        def is_estimator(v):
-            return (hasattr(v, 'fit') and hasattr(v, 'predict') and
-                    hasattr(v, 'get_params') and hasattr(v, 'set_params'))
-
-        def is_transformer(v):
-            return (hasattr(v, 'fit') and hasattr(v, 'transform') and
-                    hasattr(v, 'get_params') and hasattr(v, 'set_params'))
 
         for k, v in sorted(clf_params.items(), key=lambda t: t[0]):
             # data_type, default_value, description, recommendedRange
@@ -130,12 +146,11 @@ class OpenMLFlow(object):
             # they also return estimators in their in get_params which
             # makes this piece of code work, also, they return the estimator in
             # steps which allows us to set the steps parameter further down
-            elif is_estimator(v) or is_transformer(v) or \
-                    (isinstance(v, tuple) and is_estimator(v[1])) or \
-                    (isinstance(v, tuple) and is_transformer(v[1])):
+            elif _is_estimator(v) or _is_transformer(v) or \
+                    _is_crossvalidator(v) or _is_distribution(v):
                 # TODO check if component already exists, if yes, reuse it!
-                # TODO factor all this out in a scikit-learn specifit
-                # sub-package
+                # TODO factor all this out in a scikit-learn specific
+                # sub-package?
                 subflow = self.init_parameters_and_components(
                     model=v, description='Automatically created '
                                          'sub-component.')
@@ -143,37 +158,30 @@ class OpenMLFlow(object):
                 flow_component['oml:identifier'] = k
                 flow_component['oml:flow'] = subflow
                 flow_components[k] = flow_component
-                param_dict = OrderedDict()
-                param_dict['oml:name'] = k
-                param_dict['oml:default_value'] = v.__module__ + "." + \
-                                                  v.__class__.__name__
-                flow_parameters.append(param_dict)
 
-            # Try to handle list or tuples from pipelines/feature unions
-            elif isinstance(v, list) or isinstance(v, tuple):
-                all_subcomponents = [is_transformer(elem[1]) or
-                                     is_estimator(elem[1]) for elem in v]
-                if not all(all_subcomponents):
-                    raise ValueError('%s contains elements which are neither '
-                                     'an estimator nor a transformer.')
-                new_value = []
-                for elem in v:
-                    sub_name = elem[1].__module__ + "." + \
-                               elem[1].__class__.__name__
-                    new_value.append('("%s", "%s")' % (elem[0], sub_name))
-                    component_sort.append(elem[0])
-                new_value = '(' + ', '.join(new_value) + ')'
-
-                param_dict = OrderedDict()
-                param_dict['oml:name'] = k
-                param_dict['oml:default_value'] = new_value
-                flow_parameters.append(param_dict)
+                # Only add components as a parameter which are direct
+                # arguments to the constructor like
+                # AdaBoostClassifier(base_estimator=DecisionTreeClassifier).
+                # Since Pipeline and FeatureUnion also return estimators and
+                # transformers in the 'steps' list with get_params(), we must
+                # add them as a component, but not as a parameter of the
+                # flow. The next if makes sure that we only add parameters
+                # for the first case.
+                model_parameters = signature(model.__init__)
+                if k in model_parameters.parameters:
+                    param_dict = OrderedDict()
+                    param_dict['oml:name'] = k
+                    param_dict['oml:default_value'] = v.__module__ + "." + \
+                                                      v.__class__.__name__
+                    flow_parameters.append(param_dict)
 
             else:
                 param_dict = OrderedDict()
                 param_dict['oml:name'] = k
                 if v:
-                    param_dict['oml:default_value'] = str(v)
+                    new_value, tmp = _param_value_to_string(v)
+                    param_dict['oml:default_value'] = new_value
+                    component_sort.extend(tmp)
                 flow_parameters.append(param_dict)
 
         # Check if all expected flow components which are in the
@@ -306,15 +314,56 @@ class OpenMLFlow(object):
         return int(flow_id)
 
 
-def _check_flow_exists(name, version):
+def _param_value_to_string(value):
+    component_sort = []
+    # Try to handle list or tuples from pipelines/feature unions or
+    # 'categorical' list to a OneHotEncoder
+    if isinstance(value, list) or isinstance(value, tuple):
+        all_subcomponents = [(hasattr(elem, '__len__')
+                              and len(elem) == 2)
+                             and
+                             (_is_transformer(elem[1]) or
+                              _is_estimator(elem[1]))
+                             for elem in value]
+        # XOR
+        if (not all(all_subcomponents)) ^ (not any(all_subcomponents)):
+            raise ValueError('%s mixes elements that are lists like '
+                             '("name", estimator/transformer) and '
+                             'other values.' % str(value))
+        elif not any(all_subcomponents):
+            rval = str(value)
+        else:
+            new_value = []
+            for elem in value:
+                sub_name = elem[1].__module__ + "." + \
+                           elem[1].__class__.__name__
+                new_value.append('("%s", "%s")' % (elem[0], sub_name))
+                component_sort.append(elem[0])
+            new_value = '(' + ', '.join(new_value) + ')'
+
+            rval = new_value
+
+    elif isinstance(value, dict):
+        value = copy.deepcopy(value)
+        for k in value:
+            if _is_distribution(value[k]):
+                value[k] = "%s" % str(value[k])
+        rval = str(value)
+    else:
+        rval = str(value)
+
+    return rval, component_sort
+
+
+def _check_flow_exists(name, external_version):
     """Retrieves the flow id of the flow uniquely identified by name+external version.
 
     Parameter
     ---------
     name : string
         Name of the flow
-    version : string
-        Version information associated with flow.
+    external_version : string
+        External version information associated with flow.
 
     Returns
     -------
@@ -331,11 +380,12 @@ def _check_flow_exists(name, version):
     """
     if not (type(name) is str and len(name) > 0):
         raise ValueError('Argument \'name\' should be a non-empty string')
-    if not (type(version) is str and len(version) > 0):
+    if not (type(external_version) is str and len(external_version) > 0):
         raise ValueError('Argument \'version\' should be a non-empty string')
 
     return_code, xml_response = _perform_api_call(
-        "/flow/exists/%s/%s" % (name, version))
+        "/flow/exists/", data={'name': name,
+                               'external_version': external_version})
     # TODO check with latest version of code if this raises an exception
     if return_code != 200:
         # fixme raise appropriate error
@@ -379,7 +429,9 @@ def _create_flow_from_dict(xml_dict):
     name = dic['oml:name']
     version = dic['oml:version']
     external_version = dic.get('oml:external_version', None)
-    description = dic['oml:description']
+    # The description field can be empty which causes the server not return
+    # the description tag in the XML response.
+    description = dic.get('oml:description', '')
     upload_date = dic['oml:upload_date']
     language = dic.get('oml:language', None)
     dependencies = dic.get('oml:dependencies', None)
@@ -542,8 +594,69 @@ def _construct_model_for_flow(flow):
                 value = ast.literal_eval(value)
                 if isinstance(value, tuple):
                     value = list(value)
+
             except:
                 pass
+
+        # Having a dictionary means that this is a parameter distribution.
+        # Try to find some parameter distributions from openml.sklearn.stats
+        # that we can turn into real objects
+        if isinstance(value, dict):
+            for k in value:
+                if not isinstance(value[k], six.string_types):
+                    continue
+
+                match = re.match(r"^openml\.sklearn\.stats\.([a-zA-Z0-9]+)\(([a-zA-Z0-9_=, ]+)\)$",
+                                 value[k])
+                if match:
+                    distribution_name = match.group(1)
+                    distribution_parameters = match.group(2)
+                    distribution_parameters = distribution_parameters.split(',')
+                    distribution_parameters_as_dict = {}
+                    for distr_param in distribution_parameters:
+                        distr_param = distr_param.strip()
+                        distr_param = distr_param.split('=')
+                        distr_param_name = distr_param[0]
+                        distr_param_value = distr_param[1]
+
+                        try:
+                            distr_param_value = int(distr_param_value)
+                        except:
+                            try:
+                                distr_param_value = float(distr_param_value)
+                            except:
+                                pass
+
+                        distribution_parameters_as_dict[distr_param_name] = \
+                            distr_param_value
+
+                    distr_object = getattr(importlib.import_module(
+                        'openml.sklearn.stats'), distribution_name)
+                    distribution = distr_object(
+                        **distribution_parameters_as_dict)
+                    value[k] = distribution
+
+        # Figure out whether a string is actually represents a type object.
+        # This can happen for the OneHotEncoder which has a dtype parameter
+        if isinstance(value, six.string_types):
+            match = re.match(r"^<class '([A-Za-z0-9\.]+)'>$", value)
+
+            dtypes = {'float': float,
+                      'numpy.float': np.float,
+                      'np.float': np.float,
+                      'numpy.float16': np.float16,
+                      'np.float16': np.float16,
+                      'float16': np.float16,
+                      'numpy.float32': np.float32,
+                      'np.float32': np.float32,
+                      'float32': np.float32,
+                      'numpy.float64': np.float64,
+                      'np.float64': np.float64,
+                      'float64': np.float64,
+                      }
+
+            if match:
+                value = dtypes[match.group(1)]
 
         parameter_dict[name] = value
 
