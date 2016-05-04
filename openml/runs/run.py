@@ -115,8 +115,6 @@ class OpenMLRun(object):
             trace = arff.dumps(self._generate_arff_trace())
             data['trace'] = trace
 
-        print(description_xml)
-
         return_code, return_value = _perform_api_call(
             "/run/", file_elements=data)
         return return_code, return_value

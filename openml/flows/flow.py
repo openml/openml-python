@@ -16,6 +16,7 @@ import xmltodict
 from ..util import URLError
 from .._api_calls import _perform_api_call
 from ..util import oml_cusual_string
+from .. import config
 
 
 def _is_estimator(v):
@@ -238,17 +239,35 @@ class OpenMLFlow(object):
         flow_dict['oml:flow'] = OrderedDict()
 
         flow_dict['oml:flow']['@xmlns:oml'] = 'http://openml.org/openml'
-        flow_dict['oml:flow']['oml:name'] = self.name
+
+        if config._testmode:
+            flow_name = '%s%s' % (config.testsentinel, self.name)
+        else:
+            flow_name = self.name
+
+        flow_dict['oml:flow']['oml:name'] = flow_name
         if self.external_version is not None:
             flow_dict['oml:flow']['oml:external_version'] = self.external_version
         flow_dict['oml:flow']['oml:description'] = self.description
 
         components = []
         for component in self.components:
+            # Before registering a component, we must check whether it
+            # already exists. If yes, we don't have to register it again and
+            # can reuse it.
+            sub_flow = component['oml:flow']
+            component_id = _check_flow_exists(sub_flow.name,
+                                              sub_flow.external_version)
+            # if component_id > 0:
+            #     pass
+            #     # TODO register already existing flows
+            # else:
+            #     pass
+            #     # TODO do the same as below
             component_dict = OrderedDict()
             component_dict['oml:identifier'] = component['oml:identifier']
-            component_dict['oml:flow'] = component[
-                'oml:flow']._generate_flow_xml(return_dict=True)['oml:flow']
+            component_dict['oml:flow'] = sub_flow._generate_flow_xml(
+                return_dict=True)['oml:flow']
             components.append(component_dict)
 
         flow_dict['oml:flow']['oml:parameter'] = self.parameters
@@ -295,8 +314,8 @@ class OpenMLFlow(object):
             Flow id on the server.
         """
         import sklearn
-        flow_version = 'sklearn_' + sklearn.__version__
-        _, _, flow_id = _check_flow_exists(self.name, flow_version)
+        external_version = 'sklearn_' + sklearn.__version__
+        _, _, flow_id = _check_flow_exists(self.name, external_version)
         # TODO add numpy and scipy version!
         # MF not sure if this is necessary - what would we get from that?
 
@@ -307,8 +326,9 @@ class OpenMLFlow(object):
             flow_id = response_dict['oml:upload_flow']['oml:id']
 
         for component in self.components:
-            component_id = component['oml:flow']._ensure_flow_exists()
-            component['oml:flow'].id = component_id
+            key = 'oml:flow' if 'oml:flow' in component else 'flow'
+            component_id = component[key]._ensure_flow_exists()
+            component[key].id = component_id
 
         self.id = flow_id
         return int(flow_id)
@@ -382,6 +402,12 @@ def _check_flow_exists(name, external_version):
         raise ValueError('Argument \'name\' should be a non-empty string')
     if not (type(external_version) is str and len(external_version) > 0):
         raise ValueError('Argument \'version\' should be a non-empty string')
+
+    if config._testmode:
+        # It could already be in the name, for example when checking if a
+        # downloaded flow exists on the server
+        if config.testsentinel not in name:
+            name = '%s%s' % (config.testsentinel, name)
 
     return_code, xml_response = _perform_api_call(
         "/flow/exists/", data={'name': name,
@@ -564,6 +590,8 @@ def _check_dependencies(dependencies, flow_id):
 
 def _construct_model_for_flow(flow):
     model_name = flow.name
+    if config._testmode:
+        model_name = model_name.replace(config.testsentinel, '')
 
     # Generate a parameters dict because some sklearn objects have mandatory
     # arguments (for example the pipeline)

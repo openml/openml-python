@@ -3,6 +3,7 @@ import unittest
 
 import numpy as np
 
+import sklearn
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.pipeline import Pipeline, FeatureUnion
@@ -42,7 +43,7 @@ class TestFlow(TestBase):
         flow_id = response_dict['oml:upload_flow']['oml:id']
         new_flow = openml.flows.get_flow(flow_id)
 
-        self.assertEqual(new_flow.name, flow.name)
+        self.assertEqual(new_flow.name, '%s%s' % (self.sentinel, flow.name))
         self.assertEqual(new_flow.description, flow.description)
         self.assertIn('sklearn', new_flow.dependencies)
         self.assertIn('numpy', new_flow.dependencies)
@@ -90,7 +91,8 @@ class TestFlow(TestBase):
         # register the classifier inside AdaBoost if it is not registered yet!
         model = AdaBoostClassifier(base_estimator=DecisionTreeClassifier())
 
-        flow = openml.OpenMLFlow(description='Test flow!', model=model)
+        flow = openml.OpenMLFlow(description='Test flow!', model=model,
+                                 external_version='sklearn_' + sklearn.__version__)
         return_code, return_value = flow.publish()
 
         self.assertEqual(return_code, 200)
@@ -112,7 +114,8 @@ class TestFlow(TestBase):
         # register the classifier inside AdaBoost if it is not registered yet!
         model = AdaBoostClassifier(base_estimator=DecisionTreeClassifier())
 
-        flow = openml.OpenMLFlow(description='Test flow!', model=model)
+        flow = openml.OpenMLFlow(description='Test flow!', model=model,
+                                 external_version='sklearn_' + sklearn.__version__)
         return_code, return_value = flow.publish()
         response_dict = xmltodict.parse(return_value)
         flow_id = response_dict['oml:upload_flow']['oml:id']
@@ -124,6 +127,28 @@ class TestFlow(TestBase):
         flow_2 = openml.flows.flow.get_flow(flow_id_2)
         self.assertEqual(flow_1.components[0]['flow'].id,
                          flow_2.components[0]['flow'].id)
+
+    def test__ensure_flow_exists(self):
+        model = AdaBoostClassifier(base_estimator=DecisionTreeClassifier())
+        flow = openml.OpenMLFlow(description='Test flow!', model=model,
+                                 external_version='sklearn_' + sklearn.__version__)
+        return_code, return_value = flow.publish()
+        response_dict = xmltodict.parse(return_value)
+        flow_id = response_dict['oml:upload_flow']['oml:id']
+        # Update flow name with test sentinel
+        flow.name = '%s%s' % (self.sentinel, flow.name)
+        flow.components[0]['oml:flow'].name = '%s%s' % (
+            self.sentinel, flow.components[0]['oml:flow'].name)
+
+        flow_1 = openml.flows.flow.get_flow(flow_id)
+
+        # The flows are basically the same, except that they are represented
+        # by two different instances in the program. Nevertheless, they have
+        # the same ID on the server.
+        self.assertEqual(flow._ensure_flow_exists(),
+                         flow_1._ensure_flow_exists())
+        self.assertEqual(flow.components[0]['oml:flow']._ensure_flow_exists(),
+                         flow_1.components[0]['flow']._ensure_flow_exists())
 
     def test_upload_complicated_flow(self):
         model = Pipeline((('ohe', OneHotEncoder(categorical_features=[
@@ -140,7 +165,8 @@ class TestFlow(TestBase):
         gridsearch = RandomizedSearchCV(model, parameters, cv=cv)
 
         flow = openml.OpenMLFlow(description='Test flow!',
-                                 model=gridsearch)
+                                 model=gridsearch,
+                                 external_version='sklearn_' + sklearn.__version__)
         return_code, return_value = flow.publish()
         self.assertEqual(return_code, 200)
 

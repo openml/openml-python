@@ -3,7 +3,7 @@ import os
 import shutil
 import unittest
 import openml
-
+import hashlib
 
 class TestBase(unittest.TestCase):
     """Base class for tests
@@ -39,6 +39,18 @@ class TestBase(unittest.TestCase):
         os.mkdir(self.workdir)
         os.chdir(self.workdir)
 
+        # Remove testmode once mock.wraps is available?
+        openml.config._testmode = True
+        apikey = openml.config.apikey
+        pid = os.getpid()
+        md5 = hashlib.md5()
+        md5.update(apikey.encode('utf-8'))
+        md5.update(str(pid).encode('utf-8'))
+        sentinel = md5.hexdigest()
+        # For testing the hash code mustn't be bulletproof
+        self.sentinel = '%sTESTSENTINEL999' % sentinel[:8]
+        openml.config.testsentinel = self.sentinel
+
         self.cached = True
         # amueller's read/write key that he will throw away later
         openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
@@ -48,5 +60,7 @@ class TestBase(unittest.TestCase):
     def tearDown(self):
         os.chdir(self.cwd)
         shutil.rmtree(self.workdir)
+
+        openml.config._testmode = False
 
 __all__ = ['TestBase']
