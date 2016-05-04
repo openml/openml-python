@@ -1,7 +1,7 @@
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier, ExtraTreesClassifier
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.model_selection import RandomizedSearchCV
 import openml
@@ -25,11 +25,19 @@ class TestRun(TestBase):
         self.assertEqual(return_code, 200)
 
     def test_publish_trace(self):
-        task = openml.tasks.get_task(10107)
-        param_distribution = {'n_estimators': [1, 2, 5, 10],
-                              'max_depth': openml.sklearn.stats.RandInt(3, 10)}
+        task = openml.tasks.get_task(31)
+        dataset = task.get_dataset()
+        _, _, categorical_features = dataset.get_data(
+            target=task.target_feature,
+            return_categorical_indicator=True)
+
+        param_distribution = {'clf__n_estimators': [1, 2, 5, 10],
+                              'clf__max_depth':
+                                  openml.sklearn.stats.RandInt(3, 10)}
+        onehot = OneHotEncoder(categorical_features=categorical_features)
         clf = ExtraTreesClassifier()
-        rs = RandomizedSearchCV(clf, param_distribution, n_iter=5)
+        pipeline = Pipeline((('ohe', onehot), ('clf', clf)))
+        rs = RandomizedSearchCV(pipeline, param_distribution, n_iter=5)
         run = openml.runs.run_task(task, rs, seed=15)
         return_code, return_value = run.publish()
         self.assertEqual(return_code, 200)

@@ -6,6 +6,7 @@ import arff
 import numpy as np
 import six
 import xmltodict
+from sklearn.utils.fixes import signature
 
 from ..tasks import get_task
 from .._api_calls import _perform_api_call
@@ -273,17 +274,25 @@ def _to_dict(taskid, flow, setup_string, tags):
             value = value.__module__ + "." + value.__class__.__name__
         # Pipeline or featureunion
         elif isinstance(value, list) or isinstance(value, tuple):
-            all_subcomponents = [is_transformer(elem[1]) or
-                                 is_estimator(elem[1]) for elem in value]
-            if not all(all_subcomponents):
-                raise ValueError('%s contains elements which are neither '
-                                 'an estimator nor a transformer.')
-            new_value = []
-            for elem in value:
-                sub_name = elem[1].__module__ + "." + \
-                           elem[1].__class__.__name__
-                new_value.append('("%s", "%s")' % (elem[0], sub_name))
-            value = '(' + ', '.join(new_value) + ')'
+            all_subcomponents = [(hasattr(elem, '__len__')
+                                  and len(elem) == 2)
+                                 and
+                                 (is_transformer(elem[1]) or
+                                  is_estimator(elem[1]))
+                                 for elem in value]
+            if (not all(all_subcomponents)) ^ (not any(all_subcomponents)):
+                raise ValueError('%s mixes elements that are lists like '
+                                 '("name", estimator/transformer) and '
+                                 'other values.' % str(value))
+            elif not any(all_subcomponents):
+                value = str(value)
+            else:
+                new_value = []
+                for elem in value:
+                    sub_name = elem[1].__module__ + "." + \
+                               elem[1].__class__.__name__
+                    new_value.append('("%s", "%s")' % (elem[0], sub_name))
+                value = '(' + ', '.join(new_value) + ')'
         # Empty dictionaries such as fit_params
         elif isinstance(value, dict) and len(value) == 0:
             value = 'None'
@@ -308,19 +317,24 @@ def _to_dict(taskid, flow, setup_string, tags):
             name = name_parts[-1]
             tmp = flow
             for name_part in name_parts[:-1]:
-                for component in flow.components:
+                for component in tmp.components:
                     if component['oml:identifier'] == name_part:
                         tmp = component['oml:flow']
+                        break
             id = tmp.id
+            tmp_model = tmp.model
         else:
             name = param
             id = flow.id
+            tmp_model = flow.model
 
-        param_dict = OrderedDict()
-        param_dict['oml:name'] = name
-        param_dict['oml:value'] = ('None' if value is None else value)
-        param_dict['oml:component'] = id
-        params.append(param_dict)
+        model_parameters = signature(tmp_model.__init__)
+        if name in model_parameters.parameters:
+            param_dict = OrderedDict()
+            param_dict['oml:name'] = name
+            param_dict['oml:value'] = ('None' if value is None else value)
+            param_dict['oml:component'] = id
+            params.append(param_dict)
 
     description['oml:run']['oml:parameter_setting'] = params
     description['oml:run']['oml:tag'] = tags  # Tags describing the run
