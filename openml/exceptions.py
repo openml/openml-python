@@ -14,3 +14,11 @@ class OpenMLCacheException(PyOpenMLError):
     """Dataset / task etc not found in cache"""
     def __init__(self, message):
         super(OpenMLCacheException, self).__init__(message)
+
+
+class OpenMLRestrictionViolated(PyOpenMLError):
+    """Flows for example have a maximum number of 128 (
+    https://github.com/openml/OpenML/issues/283#issuecomment-216879769)"""
+
+    def __init__(self, message):
+        super(OpenMLRestrictionViolated, self).__init__(message)

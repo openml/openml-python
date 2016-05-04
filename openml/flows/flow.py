@@ -13,10 +13,14 @@ import numpy as np
 import six
 import xmltodict
 
+from ..exceptions import OpenMLRestrictionViolated
 from ..util import URLError
 from .._api_calls import _perform_api_call
 from ..util import oml_cusual_string
 from .. import config
+
+
+MAXIMAL_FLOW_LENGTH = 1024
 
 
 def _is_estimator(v):
@@ -219,6 +223,11 @@ class OpenMLFlow(object):
         name = model.__module__ + "." + model.__class__.__name__
         if sub_components_names:
             name = '%s(%s)' % (name, sub_components_names)
+
+        if len(name) > MAXIMAL_FLOW_LENGTH:
+            raise OpenMLRestrictionViolated('Flow name must not be longer '
+                                            'than %d characters!' % MAXIMAL_FLOW_LENGTH)
+
         flow.name = name
 
         return flow
@@ -242,6 +251,9 @@ class OpenMLFlow(object):
 
         if config._testmode:
             flow_name = '%s%s' % (config.testsentinel, self.name)
+            if len(flow_name) > MAXIMAL_FLOW_LENGTH:
+                raise OpenMLRestrictionViolated('Flow name must not be longer '
+                                                'than %d characters!' % MAXIMAL_FLOW_LENGTH)
         else:
             flow_name = self.name
 
@@ -408,6 +420,10 @@ def _check_flow_exists(name, external_version):
         # downloaded flow exists on the server
         if config.testsentinel not in name:
             name = '%s%s' % (config.testsentinel, name)
+
+    if len(name) > MAXIMAL_FLOW_LENGTH:
+        raise OpenMLRestrictionViolated('Flow name must not be longer '
+                                        'than %d characters!' % MAXIMAL_FLOW_LENGTH)
 
     return_code, xml_response = _perform_api_call(
         "/flow/exists/", data={'name': name,
