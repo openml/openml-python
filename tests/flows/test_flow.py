@@ -185,6 +185,8 @@ class TestFlow(TestBase):
                          '("classifier", "sklearn.ensemble.weight_boosting.AdaBoostClassifier"))')
         # Components of the pipeline
         self.assertEqual(len(new_flow.components[1]['flow'].components), 4)
+        self.assertEqual(len(new_flow.components[1]['flow'].components[
+                                 0]['flow'].parameters), 5)
 
     def test_get_flow(self):
         flow = openml.flows.get_flow(1185)

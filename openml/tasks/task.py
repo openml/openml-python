@@ -1,3 +1,4 @@
+import io
 import os
 
 from .. import config
@@ -66,7 +67,7 @@ class OpenMLTask(object):
 
     def _download_split(self, cache_file):
         try:
-            with open(cache_file):
+            with io.open(cache_file, encoding='utf8' "w"):
                 pass
         except (OSError, IOError):
             split_url = self.estimation_procedure["data_splits_url"]
@@ -76,7 +77,7 @@ class OpenMLTask(object):
                 print(e, split_url)
                 raise e
 
-            with open(cache_file, "w") as fh:
+            with io.open(cache_file, "w", encoding='utf8') as fh:
                 fh.write(split_arff)
             del split_arff
 

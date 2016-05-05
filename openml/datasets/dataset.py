@@ -1,4 +1,5 @@
 import gzip
+import io
 import os
 import sys
 import logging
@@ -149,7 +150,7 @@ class OpenMLDataset(object):
             with gzip.open(filename) as fh:
                 return decode_arff(fh)
         else:
-            with open(filename) as fh:
+            with io.open(filename, encoding='utf8') as fh:
                 return decode_arff(fh)
 
     def get_data(self, target=None, target_dtype=int, include_row_id=False,
@@ -173,7 +174,7 @@ class OpenMLDataset(object):
             raise ValueError("Cannot find a ndarray file for dataset %s at"
                              "location %s " % (self.name, path))
         else:
-            with open(path, "rb") as fh:
+            with io.open(path, "rb") as fh:
                 data, categorical, attribute_names = pickle.load(fh)
 
         to_exclude = []
@@ -259,7 +260,7 @@ class OpenMLDataset(object):
         else:
             raise ValueError('Unknown data format %s' % self.format)
 
-        with open(arffFileName) as fh:
+        with io.open(arffFileName, encoding='utf8') as fh:
             arffData = arff.ArffDecoder().decode(fh, return_type=return_type)
 
         dataAttributes = dict(arffData['attributes'])
