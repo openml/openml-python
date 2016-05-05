@@ -235,7 +235,7 @@ def get_task(task_id):
 
     # TODO look into either adding the class labels to task xml, or other
     # way of reading it.
-    class_labels = dataset._retrieve_class_labels()
+    class_labels = dataset._retrieve_class_labels(task.target_feature)
     task.class_labels = class_labels
     return task
 
