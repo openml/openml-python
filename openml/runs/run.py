@@ -260,7 +260,7 @@ def _to_dict(taskid, flow, setup_string, tags):
     result : an array with version information of the above packages
     """
 
-    def correct_parameter_value(value):
+    def correct_parameter_value(name, value):
         def is_estimator(v):
             return (hasattr(v, 'fit') and hasattr(v, 'predict') and
                     hasattr(v, 'get_params') and hasattr(v, 'set_params'))
@@ -293,10 +293,15 @@ def _to_dict(taskid, flow, setup_string, tags):
                                elem[1].__class__.__name__
                     new_value.append('("%s", "%s")' % (elem[0], sub_name))
                 value = '(' + ', '.join(new_value) + ')'
+
         # Empty dictionaries such as fit_params
         elif isinstance(value, dict) and len(value) == 0:
             value = 'None'
-        value = str(value)
+        elif isinstance(value, dict) and name == 'param_distributions':
+            pass
+        else:
+            value = str(value)
+
         return value
 
     description = OrderedDict()
@@ -309,7 +314,7 @@ def _to_dict(taskid, flow, setup_string, tags):
     parameter_settings = flow.model.get_params()
     for param in parameter_settings:
         value = parameter_settings[param]
-        value = correct_parameter_value(value)
+        value = correct_parameter_value(param, value)
 
         if '__' in param:
             # Get the correct ID for components of the flow
@@ -323,6 +328,14 @@ def _to_dict(taskid, flow, setup_string, tags):
                         break
             id = tmp.id
             tmp_model = tmp.model
+        elif param == 'param_distributions' and isinstance(value, dict):
+            for k, v in value.items():
+                param_dict = OrderedDict()
+                param_dict['oml:name'] = 'parameter_distribution__estimator__%s' % k
+                param_dict['oml:value'] = correct_parameter_value(k, v)
+                param_dict['oml:component'] = flow.id
+                params.append(param_dict)
+            continue
         else:
             name = param
             id = flow.id

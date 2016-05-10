@@ -18,6 +18,7 @@ from ..util import URLError
 from .._api_calls import _perform_api_call
 from ..util import oml_cusual_string
 from .. import config
+from ..sklearn.stats import Distribution, Unparametrized
 
 
 MAXIMAL_FLOW_LENGTH = 1024
@@ -39,7 +40,8 @@ def _is_crossvalidator(v):
 
 
 def _is_distribution(v):
-    return (hasattr(v, 'rvs') and hasattr(v, 'get_params'))
+    return ((hasattr(v, 'rvs') and hasattr(v, 'get_params'))) or \
+            isinstance(v, Distribution)
 
 
 class OpenMLFlow(object):
@@ -130,8 +132,13 @@ class OpenMLFlow(object):
         clf_params = model.get_params()
         flow_parameters = []
         flow_components = OrderedDict()
+        flow_distribution_components = OrderedDict()
+        flow_distribution_parameters = []
         component_sort = []
         expected_flow_components = set()
+
+        contains_parameter_distribution = False
+        parametrized_parameters = {}
 
         for k, v in sorted(clf_params.items(), key=lambda t: t[0]):
             # data_type, default_value, description, recommendedRange
@@ -179,15 +186,38 @@ class OpenMLFlow(object):
                     param_dict['oml:default_value'] = v.__module__ + "." + \
                                                       v.__class__.__name__
                     flow_parameters.append(param_dict)
+            elif isinstance(v, dict) and k == 'param_distributions':
+                # Treat param_distributions as a special case: add each as a
+                # tunable hyperparameter as a parameter to the flow.
+                contains_parameter_distribution = True
+
+                for k_ in v:
+                    if not _is_distribution(v[k_]):
+                        raise ValueError('Can only work with subclasses of '
+                                         'openml.sklearn.stats.distribution, '
+                                         'got %s!' % str(v[k_]))
+                    parametrized_parameters[k_] = v[k_]
 
             else:
                 param_dict = OrderedDict()
                 param_dict['oml:name'] = k
-                if v:
+                if not (hasattr(v, '__len__') and len(v) == 0):
                     new_value, tmp = _param_value_to_string(v)
                     param_dict['oml:default_value'] = new_value
                     component_sort.extend(tmp)
                 flow_parameters.append(param_dict)
+
+        # Add a component for each tunable hyperparameter, these are all
+        # unparametrized in the default setting since there cannot be any
+        # 'default settings'. Settings for hyperparameter optimization are
+        # given in the run.
+        if contains_parameter_distribution:
+            for k, v in sorted(clf_params.items(), key=lambda t: t[0]):
+
+                param_dict = OrderedDict()
+                param_dict['oml:name'] = 'parameter_distribution__%s' % k
+                param_dict['oml:default_value'] = 'Unparametrized'
+                flow_distribution_parameters.append(param_dict)
 
         # Check if all expected flow components which are in the
         # hyperparameters (given by __) are actually present as sub-components
@@ -199,8 +229,9 @@ class OpenMLFlow(object):
             found_flow_components.add(component['oml:identifier'])
             to_visit.extendleft(component['oml:flow'].components)
         if len(found_flow_components) != len(expected_flow_components):
-            raise ValueError('%s != %s' % (found_flow_components,
-                                           expected_flow_components))
+            raise ValueError('%s != %s' %
+                             (found_flow_components,
+                              expected_flow_components))
 
         # Sort all components - this makes the naming nice and consistent
         # with the step order in pipelines
@@ -214,9 +245,6 @@ class OpenMLFlow(object):
         for value in flow_components.values():
             flow_components_list.append(value)
 
-        flow.parameters = flow_parameters
-        flow.components = flow_components_list
-
         sub_components_names = "__".join(
             [sub_component['oml:flow'].name
              for sub_component in flow_components_list])
@@ -227,6 +255,15 @@ class OpenMLFlow(object):
         if len(name) > MAXIMAL_FLOW_LENGTH:
             raise OpenMLRestrictionViolated('Flow name must not be longer '
                                             'than %d characters!' % MAXIMAL_FLOW_LENGTH)
+
+        flow.parameters = flow_parameters
+        flow.components = flow_components_list
+        # Add the distribution components afterwards to not let them make the
+        #  name unreadable
+        for flow_distribution in flow_distribution_components:
+            flow.components.append(flow_distribution_components[flow_distribution])
+        for flow_distribution in flow_distribution_parameters:
+            flow.parameters.append(flow_distribution)
 
         flow.name = name
 
@@ -272,7 +309,8 @@ class OpenMLFlow(object):
                                               sub_flow.external_version)
             # if component_id > 0:
             #     pass
-            #     # TODO register already existing flows
+            #     # TODO register already existing flows - don't know if
+            # OpenML does that automatically???
             # else:
             #     pass
             #     # TODO do the same as below
@@ -337,10 +375,47 @@ class OpenMLFlow(object):
             response_dict = xmltodict.parse(response_xml)
             flow_id = response_dict['oml:upload_flow']['oml:id']
 
-        for component in self.components:
-            key = 'oml:flow' if 'oml:flow' in component else 'flow'
-            component_id = component[key]._ensure_flow_exists()
-            component[key].id = component_id
+        # Go through the flow and correctly set all IDs
+        flow = get_flow(flow_id)
+        queue_local_flow = deque()
+        queue_openml_flow = deque()
+        queue_local_flow.extendleft(self.components)
+        queue_openml_flow.extendleft(flow.components)
+        while len(queue_local_flow) > 0 and len(queue_openml_flow) > 0:
+            local_component = queue_local_flow.pop()
+            openml_component = queue_openml_flow.pop()
+            local_component_identifier = \
+                'identifier' if 'identifier' in local_component else 'oml:identifier'
+            openml_component_identifier = \
+                'identifier' if 'identifier' in openml_component else 'oml:identifier'
+            if local_component[local_component_identifier] != openml_component[
+                    openml_component_identifier]:
+                raise ValueError('%s != %s' % (local_component[
+                                                   local_component_identifier],
+                                               openml_component[
+                                                   openml_component_identifier]))
+            local_component_flow = 'flow' if 'flow' in local_component else 'oml:flow'
+            openml_component_flow = 'flow' if 'flow' in openml_component else 'oml:flow'
+            local_component = local_component[local_component_flow]
+            openml_component = openml_component[openml_component_flow]
+            local_component_name = local_component.name
+            openml_component_name = openml_component.name
+            if config._testmode:
+                local_component_name = local_component_name.replace(config.testsentinel, '')
+                openml_component_name = openml_component_name.replace(config.testsentinel, '')
+
+            if local_component_name != openml_component_name:
+                raise ValueError('%s != %s' % (local_component_name,
+                                               openml_component_name))
+
+            # Transfer the ID
+            local_component.id = openml_component.id
+            queue_local_flow.extendleft(local_component.components)
+            queue_openml_flow.extendleft(openml_component.components)
+
+        if len(queue_local_flow) != len(queue_openml_flow):
+            raise ValueError('%s != %s' % (str(queue_local_flow),
+                                           str(queue_openml_flow)))
 
         self.id = flow_id
         return int(flow_id)
@@ -433,7 +508,7 @@ def _check_flow_exists(name, external_version):
         # fixme raise appropriate error
         raise ValueError("api call failed: %s" % xml_response)
     xml_dict = xmltodict.parse(xml_response)
-    flow_id = xml_dict['oml:flow_exists']['oml:id']
+    flow_id = int(xml_dict['oml:flow_exists']['oml:id'])
     return return_code, xml_response, flow_id
 
 
@@ -613,6 +688,10 @@ def _construct_model_for_flow(flow):
     # arguments (for example the pipeline)
     parameters = flow.parameters
     parameter_dict = {}
+    # If we reconstruct a SearchCV object, it need a dict called
+    # param_distributions
+    add_param_distributions = {}
+
     for parameter in parameters:
         name = parameter['name']
         value = parameter.get('default_value', None)
@@ -642,44 +721,6 @@ def _construct_model_for_flow(flow):
             except:
                 pass
 
-        # Having a dictionary means that this is a parameter distribution.
-        # Try to find some parameter distributions from openml.sklearn.stats
-        # that we can turn into real objects
-        if isinstance(value, dict):
-            for k in value:
-                if not isinstance(value[k], six.string_types):
-                    continue
-
-                match = re.match(r"^openml\.sklearn\.stats\.([a-zA-Z0-9]+)\(([a-zA-Z0-9_=, ]+)\)$",
-                                 value[k])
-                if match:
-                    distribution_name = match.group(1)
-                    distribution_parameters = match.group(2)
-                    distribution_parameters = distribution_parameters.split(',')
-                    distribution_parameters_as_dict = {}
-                    for distr_param in distribution_parameters:
-                        distr_param = distr_param.strip()
-                        distr_param = distr_param.split('=')
-                        distr_param_name = distr_param[0]
-                        distr_param_value = distr_param[1]
-
-                        try:
-                            distr_param_value = int(distr_param_value)
-                        except:
-                            try:
-                                distr_param_value = float(distr_param_value)
-                            except:
-                                pass
-
-                        distribution_parameters_as_dict[distr_param_name] = \
-                            distr_param_value
-
-                    distr_object = getattr(importlib.import_module(
-                        'openml.sklearn.stats'), distribution_name)
-                    distribution = distr_object(
-                        **distribution_parameters_as_dict)
-                    value[k] = distribution
-
         # Figure out whether a string is actually represents a type object.
         # This can happen for the OneHotEncoder which has a dtype parameter
         if isinstance(value, six.string_types):
@@ -699,8 +740,13 @@ def _construct_model_for_flow(flow):
                       'float64': np.float64,
                       }
 
-            if match:
+            if match and match.group(1) in dtypes:
                 value = dtypes[match.group(1)]
+
+        if name.startswith('parameter_distribution__') and value == \
+                'Unparametrized':
+            add_param_distributions = True
+            continue
 
         parameter_dict[name] = value
 
@@ -736,6 +782,9 @@ def _construct_model_for_flow(flow):
         warnings.warn('Cannot create model %s for flow %d.' %
                       (model_name, flow.id))
         return None
+
+    if add_param_distributions:
+        parameter_dict['param_distributions'] = {}
 
     model = model_class(**parameter_dict)
 

@@ -9,13 +9,38 @@ class Distribution(object):
                                         for p, v in
                                          sorted(self.get_params().items())]))
 
+class Unparametrized(Distribution):
+    def get_params(self):
+        return {}
+
+
+class Discrete(Distribution):
+    def __init__(self, values):
+        self.values = values
+        if self.values is None:
+            self.values = []
+
+    def __getitem__(self, item):
+        return self.values[item]
+
+    def __len__(self):
+        return len(self.values)
+
+    def get_params(self):
+        return {'values': self.values}
+
+
 class RandInt(Distribution):
     def __init__(self, lower, upper):
         self.lower = lower
         self.upper = upper
 
+        if self.lower is None or self.upper is None:
+            self.lower = 0
+            self.upper = 1
+
     def rvs(self, random_state):
-        return random_state.randint(self.lower, self.upper)
+        return random_state.randint(self.lower, self.upper + 1)
 
     def get_params(self):
         return {'lower': self.lower, 'upper': self.upper}
@@ -25,6 +50,10 @@ class Uniform(Distribution):
     def __init__(self, lower, upper):
         self.lower = lower
         self.upper = upper
+
+        if self.lower is None or self.upper is None:
+            self.lower = 0
+            self.upper = 1
 
     def rvs(self, random_state):
         return random_state.uniform(self.lower, self.upper)
@@ -38,6 +67,12 @@ class LogUniform(Distribution):
         self.base = base
         self.exponent_lower = exponent_lower
         self.exponent_upper = exponent_upper
+
+        if self.base is None or self.exponent_lower is None or\
+                        self.exponent_upper is None:
+            self.base = 2
+            self.exponent_lower = 0
+            self.exponent_upper = 1
 
     def rvs(self, random_state):
         return self.base ** random_state.uniform(self.exponent_lower,
@@ -54,6 +89,12 @@ class LogUniformInt(Distribution):
         self.exponent_lower = exponent_lower
         self.exponent_upper = exponent_upper
 
+        if self.base is None or self.exponent_lower is None or \
+                        self.exponent_upper is None:
+            self.base = 2
+            self.exponent_lower = 0
+            self.exponent_upper = 1
+
     def rvs(self, random_state):
         return int(self.base ** random_state.uniform(self.exponent_lower,
                                                      self.exponent_upper) + 0.5)
@@ -68,6 +109,11 @@ class MultipleUniformIntegers(Distribution):
         self.number = number
         self.lower = lower
         self.upper = upper
+
+        if self.number is None or self.lower is None or self.upper is None:
+            self.number = 1
+            self.lower = 0
+            self.upper = 1
 
     def rvs(self, random_state):
         number = random_state.randint(self.number) + 1

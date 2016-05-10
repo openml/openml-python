@@ -31,7 +31,8 @@ class TestRun(TestBase):
             target=task.target_feature,
             return_categorical_indicator=True)
 
-        param_distribution = {'clf__n_estimators': [1, 2, 5, 10],
+        param_distribution = {'clf__n_estimators':
+                                  openml.sklearn.stats.Discrete([1, 2, 5, 10]),
                               'clf__max_depth':
                                   openml.sklearn.stats.RandInt(3, 10)}
         onehot = OneHotEncoder(categorical_features=categorical_features)
