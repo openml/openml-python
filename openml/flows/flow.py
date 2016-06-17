@@ -207,16 +207,31 @@ class OpenMLFlow(object):
                     component_sort.extend(tmp)
                 flow_parameters.append(param_dict)
 
-        # Add a component for each tunable hyperparameter, these are all
-        # unparametrized in the default setting since there cannot be any
-        # 'default settings'. Settings for hyperparameter optimization are
-        # given in the run.
+        # Add a component for each tunable hyperparameter. The ones specified
+        # in the dict param_distributions are serialized to a string,
+        # all others unparametrized in the default setting. They can be
+        # overridden by uploading a run.
         if contains_parameter_distribution:
             for k, v in sorted(clf_params.items(), key=lambda t: t[0]):
 
                 param_dict = OrderedDict()
                 param_dict['oml:name'] = 'parameter_distribution__%s' % k
-                param_dict['oml:default_value'] = 'Unparametrized'
+
+                if k.startswith('estimator__') and \
+                        k.replace('estimator__', '', 1) in parametrized_parameters:
+                    distribution = parametrized_parameters[
+                        k.replace('estimator__', '', 1)]
+                    distribution_name = distribution.__class__.__name__
+                    distribution_parameters = distribution.get_params()
+                    default_value = '%s(%s)' % (
+                        distribution_name,
+                        ','.join(['%s=%s' % items for items in sorted(distribution_parameters.items())]))
+                    default_value = 'LogUniformInt(base=2,expon_lower=0,' \
+                                    'expo_upper=3)'
+                else:
+                    default_value = 'Unparametrized'
+
+                param_dict['oml:default_value'] = default_value
                 flow_distribution_parameters.append(param_dict)
 
         # Check if all expected flow components which are in the
@@ -301,19 +316,10 @@ class OpenMLFlow(object):
 
         components = []
         for component in self.components:
-            # Before registering a component, we must check whether it
-            # already exists. If yes, we don't have to register it again and
-            # can reuse it.
+            # If a flow with the same name and same external version already
+            # exists, it will be re-used as a sub_flow!
             sub_flow = component['oml:flow']
-            component_id = _check_flow_exists(sub_flow.name,
-                                              sub_flow.external_version)
-            # if component_id > 0:
-            #     pass
-            #     # TODO register already existing flows - don't know if
-            # OpenML does that automatically???
-            # else:
-            #     pass
-            #     # TODO do the same as below
+
             component_dict = OrderedDict()
             component_dict['oml:identifier'] = component['oml:identifier']
             component_dict['oml:flow'] = sub_flow._generate_flow_xml(
@@ -337,6 +343,8 @@ class OpenMLFlow(object):
         https://github.com/openml/website/blob/master/openml_OS/views/pages/rest_api/xsd/openml.implementation.upload.xsd
         """
         xml_description = self._generate_flow_xml()
+
+        print(xml_description)
 
         # Checking that the name adheres to oml:casual_string
         match = re.match(oml_cusual_string, self.name)
