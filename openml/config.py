@@ -71,7 +71,7 @@ def set_cache_directory(cachedir, privatedir):
     get_private_directory
     """
     if privatedir is None:
-         privatedir = cachedir
+        privatedir = cachedir
 
     global _cachedir
     global _privatedir
