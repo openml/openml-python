@@ -193,15 +193,15 @@ def check_datasets_active(dids):
     dids = sorted(dids)
     active = {}
 
-    for did in dids:
-        for dataset in dataset_list:
-            if did == int(dataset['did']):
-                active[did] = dataset['status'] == 'active'
+    for dataset in dataset_list:
+        active[dataset['did']] = dataset['status'] == 'active'
 
     for did in dids:
         if did not in active:
             raise ValueError('Could not find dataset %d in OpenML dataset list.'
                              % did)
+
+    active = {did: active[did] for did in dids}
 
     return active
 
