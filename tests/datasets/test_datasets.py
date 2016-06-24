@@ -59,7 +59,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_get_cached_dataset_arff(self):
         openml.config.set_cache_directory(self.static_cache_dir)
-        description = openml.datasets.functions._get_cached_dataset_arff(2)
+        description = openml.datasets.functions._get_cached_dataset_arff(did=2)
         self.assertIsInstance(description, str)
 
     def test_get_cached_dataset_arff_not_cached(self):

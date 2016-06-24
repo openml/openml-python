@@ -33,7 +33,7 @@ class OpenMLTask(object):
         """Download dataset associated with task"""
         return datasets.get_dataset(self.dataset_id)
 
-    def get_X_and_Y(self):
+    def get_X_and_y(self):
         dataset = self.get_dataset()
         # Replace with retrieve from cache
         if 'Supervised Classification'.lower() in self.task_type.lower():
@@ -42,9 +42,9 @@ class OpenMLTask(object):
             target_dtype = float
         else:
             raise NotImplementedError(self.task_type)
-        X_and_Y = dataset.get_data(target=self.target_feature,
+        X_and_y = dataset.get_data(target=self.target_feature,
                                    target_dtype=target_dtype)
-        return X_and_Y
+        return X_and_y
 
     def get_train_test_split_indices(self, fold=0, repeat=0):
         # Replace with retrieve from cache

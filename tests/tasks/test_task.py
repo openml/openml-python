@@ -32,7 +32,7 @@ class OpenMLTaskTest(TestBase):
     def test_get_X_and_Y(self):
         # Classification task
         task = openml.tasks.get_task(1)
-        X, Y = task.get_X_and_Y()
+        X, Y = task.get_X_and_y()
         self.assertEqual((898, 38), X.shape)
         self.assertIsInstance(X, np.ndarray)
         self.assertEqual((898, ), Y.shape)
@@ -41,7 +41,7 @@ class OpenMLTaskTest(TestBase):
 
         # Regression task
         task = openml.tasks.get_task(2280)
-        X, Y = task.get_X_and_Y()
+        X, Y = task.get_X_and_y()
         self.assertEqual((8192, 8), X.shape)
         self.assertIsInstance(X, np.ndarray)
         self.assertEqual((8192,), Y.shape)
