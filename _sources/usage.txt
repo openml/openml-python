@@ -13,18 +13,18 @@ Basic Usage
 ***********
 
 This document will guide you through the most important functions and classes
-in the OpenML python API. Throughout the document, we will use
+in the OpenML Python API. Throughout this document, we will use
 `pandas <http://pandas.pydata.org/>`_ to format and filter tables.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Connecting to the OpenML server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The OpenML server can only be accessed by users who have signed up to the OpenML
+The OpenML server can only be accessed by users who have signed up on the OpenML
 platform. If you don't have an account yet,
-`sign up now <http://openml.org/register>`_. You will receive an API key which
+`sign up now <http://openml.org/register>`_. You will receive an API key, which
 will authenticate you to the server and allow you to download and upload
-datasets, tasks, runs and flows. There are two ways of telling the API key
+datasets, tasks, runs and flows. There are two ways of providing the API key
 to the OpenML API package. The first option is to specify the API key
 programmatically after loading the package:
 
@@ -35,17 +35,17 @@ programmatically after loading the package:
     >>> apikey = 'Your API key'
     >>> openml.apikey = apikey
 
-The second option is to create a config like this:
+The second option is to create a config file:
 
 .. code:: bash
 
     apikey = qxlfpbeaudtprb23985hcqlfoebairtd
 
-The config file has to be in the directory :bash:`~/.openml/config` and must
+The config file must be in the directory :bash:`~/.openml/config` and 
 exist prior to importing the openml module.
 
 When downloading datasets, tasks, runs and flows, they will be cached to
-retrieve them without calling the server later. As with the api key, the cache
+retrieve them without calling the server later. As with the API key, the cache
 directory can be either specified through the API or through the config file:
 
 API:
@@ -69,17 +69,17 @@ Datasets are a key concept in OpenML (see `OpenML documentation <openml.org/guid
 Datasets are identified by IDs and can be accessed in two different ways:
 
 1. In a list providing basic information on all datasets available on OpenML.
-   This function will not download the actual dataset, but only very little
+   This function will not download the actual dataset, but will instead download
    meta data which can be used to filter the datasets and retrieve a set of IDs.
-2. A single dataset by its ID. It contains all meta information and the actual
+2. A single dataset by its ID. A single dataset contains all meta information and the actual
    data in form of an .arff file. The .arff file will be converted into a numpy
-   array by the OpenML python API.
+   array by the OpenML Python API.
 
 Listing datasets
 ~~~~~~~~~~~~~~~~
 
 A common task when using OpenML is to find a set of datasets which fulfill
-several criteria. They should for example have between 1.000 and 10.000
+several criteria. They should for example have between 1,000 and 10,000
 data points and at least five features.
 
 .. code:: python
@@ -137,7 +137,7 @@ and can see the first data point:
 We can now filter the data:
 
     >>> filter = (datasets.NumberOfInstances > 1000) & (datasets.NumberOfFeatures > 5)
-    >>> filtered_datasets = datasets[filter]
+    >>> filtered_datasets = datasets.loc[filter]
     >>> dataset_indices = list(filtered_datasets.index)
     >>> print(dataset_indices)                                                  # doctest: +SKIP
     [3, 6, 12, 14, 16, 18, 20, 21, 22, 23, 24, 26, 28, 30, 32, 36, 38, 44,
@@ -164,11 +164,11 @@ Properties of the dataset are stored as member variables:
     >>> print(dataset.__dict__)                                               # doctest: +SKIP
     {'upload_date': u'2014-04-06 23:21:03', 'md5_cheksum': u'3149646ecff276abac3e892d1556655f', 'creator': None, 'citation': None, 'tag': [u'study_1', u'study_7', u'uci'], 'version_label': u'1', 'contributor': None, 'paper_url': None, 'original_data_url': None, 'id': 23, 'collection_date': None, 'row_id_attribute': None, 'version': 1, 'data_pickle_file': '/home/matthias/.openml/cache/datasets/23/dataset.pkl', 'default_target_attribute': u'Contraceptive_method_used', 'description': u"**Author**:   \n**Source**: Unknown -   \n**Please cite**:   \n\n1. Title: Contraceptive Method Choice\n \n 2. Sources:\n    (a) Origin:  This dataset is a subset of the 1987 National Indonesia\n                 Contraceptive Prevalence Survey\n    (b) Creator: Tjen-Sien Lim (limt@stat.wisc.edu)\n    (c) Donor:   Tjen-Sien Lim (limt@stat.wisc.edu)\n    (c) Date:    June 7, 1997\n \n 3. Past Usage:\n    Lim, T.-S., Loh, W.-Y. & Shih, Y.-S. (1999). A Comparison of\n    Prediction Accuracy, Complexity, and Training Time of Thirty-three\n    Old and New Classification Algorithms. Machine Learning. Forthcoming.\n    (ftp://ftp.stat.wisc.edu/pub/loh/treeprogs/quest1.7/mach1317.pdf or\n    (http://www.stat.wisc.edu/~limt/mach1317.pdf)\n \n 4. Relevant Information:\n    This dataset is a subset of the 1987 National Indonesia Contraceptive\n    Prevalence Survey. The samples are married women who were either not \n    pregnant or do not know if they were at the time of interview. The \n    problem is to predict the current contraceptive method choice \n    (no use, long-term methods, or short-term methods) of a woman based \n    on her demographic and socio-economic characteristics.\n \n 5. Number of Instances: 1473\n \n 6. Number of Attributes: 10 (including the class attribute)\n \n 7. Attribute Information:\n \n    1. Wife's age                     (numerical)\n    2. Wife's education               (categorical)      1=low, 2, 3, 4=high\n    3. Husband's education            (categorical)      1=low, 2, 3, 4=high\n    4. Number of children ever born   (numerical)\n    5. Wife's religion                (binary)           0=Non-Islam, 1=Islam\n    6. Wife's now working?            (binary)           0=Yes, 1=No\n    7. Husband's occupation           (categorical)      1, 2, 3, 4\n    8. Standard-of-living index       (categorical)      1=low, 2, 3, 4=high\n    9. Media exposure                 (binary)           0=Good, 1=Not good\n    10. Contraceptive method used     (class attribute)  1=No-use \n                                                         2=Long-term\n                                                         3=Short-term\n \n 8. Missing Attribute Values: None\n\n Information about the dataset\n CLASSTYPE: nominal\n CLASSINDEX: last", 'format': u'ARFF', 'visibility': u'public', 'update_comment': None, 'licence': u'Public', 'name': u'cmc', 'language': None, 'url': u'http://www.openml.org/data/download/23/dataset_23_cmc.arff', 'data_file': '~/.openml/cache/datasets/23/dataset.arff', 'ignore_attributes': None}
 
-Then, to obtain the data matrix:
+Next, to obtain the data matrix:
 
 .. code:: python
 
-    >>> X = dataset.get_dataset()
+    >>> X = dataset.get_data()
     >>> print(X.shape, X.dtype)
     ((1473, 10), dtype('float32'))
 
@@ -178,21 +178,21 @@ variables are encoded as integers, the inverse encoding can be retrieved via:
 
 .. code:: python
 
-    >>> X, names = dataset.get_dataset(return_attribute_names=True)
+    >>> X, names = dataset.get_data(return_attribute_names=True)
     >>> print(names)
     [u'Wifes_age', u'Wifes_education', u'Husbands_education', u'Number_of_children_ever_born', u'Wifes_religion', u'Wifes_now_working%3F', u'Husbands_occupation', u'Standard-of-living_index', u'Media_exposure', u'Contraceptive_method_used']
 
-Most times, having a single data matrix :python:`X` is not enough. Two very
+Most times, having a single data matrix :python:`X` is not enough. Two 
 useful arguments are :python:`target` and
 :python:`return_categorical_indicator`. :python:`target` makes
-:meth:`openml.datasets.get_dataset()` return :python:`X` and :python:`y`
+:meth:`get_data()` return :python:`X` and :python:`y`
 seperate; :python:`return_categorical_indicator` makes
-:meth:`openml.datasets.get_dataset()` return a boolean array which indicate
+:meth:`get_data()` return a boolean array which indicate
 which attributes are categorical (and should be one hot encoded if necessary.)
 
 .. code:: python
 
-    >>> X, y, categorical = dataset.get_dataset(
+    >>> X, y, categorical = dataset.get_data(
     ... target=dataset.default_target_attribute,
     ... return_categorical_indicator=True)
     >>> print(X.shape, y.shape)
@@ -222,7 +222,7 @@ In case you are working with `scikit-learn
                 warm_start=False)
 
 When you have to retrieve several datasets, you can use the convenience function
-:meth:`openml.datasets.get_datasets()` which downloads all datasets given by
+:meth:`openml.datasets.get_datasets()`, which downloads all datasets given by
 a list of IDs:
 
     >>> ids = [12, 14, 16, 18, 20, 22]
@@ -248,8 +248,8 @@ Just like datasets, tasks are identified by IDs and can be accessed in three
 different ways:
 
 1. In a list providing basic information on all tasks available on OpenML.
-   This function will not download the actual tasks, but only very little
-   meta data which can be used to filter the tasks and retrieve a set of IDs.
+   This function will not download the actual tasks, but will instead download
+   meta data that can be used to filter the tasks and retrieve a set of IDs.
 2. By functions only list a subset of all available tasks, restricted either by
    their :TODO:`task_type`, :TODO:`tag` or :TODO:`check_for_more`.
 3. A single task by its ID. It contains all meta information, the target metric,
@@ -261,19 +261,19 @@ You can also read more about tasks in the `OpenML guide <http://www.openml.org/g
 Listing tasks
 ~~~~~~~~~~~~~
 
-Once we figured out the datasets we want to work on, we have to download the
+Once we decide on the datasets we want to work on, we have to download the
 corresponding tasks. Tasks can be pre-filtered by either by a task type or
 a tag.
 
-So far, this package only supports the tasks supervised classification (task
-type :python:`1`) and supervised regression (task type :python:`2`) #TODO check this
+So far, this package only supports supervised classification tasks (task
+type :python:`1`) and supervised regression tasks (task type :python:`2`) #TODO check this
 We desribe how to find other task types in the subsection `Finding out task types`_
-and are very happy about contributions which help us to support all other task
+and are happy to receive contributions that help us to support all other task
 types.
 
 The most natural way to retrieve tasks is by their task type. In this example
-we will use the most commonly studied machine learning task supervised
-classification (task type :python:`1`):
+we will use the most commonly studied machine learning supervised
+classification task (task type :python:`1`):
 
 .. code:: python
 
