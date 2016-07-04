@@ -2,7 +2,7 @@ machine:
   environment:
     # The github organization or username of the repository which hosts the
     # project and documentation.
-    USERNAME: "openml"
+    USERNAME: "ayaro"
 
     # The repository where the documentation will be hosted
     DOC_REPO: "openml-python"
@@ -22,7 +22,9 @@ dependencies:
     - sudo apt-get install libatlas-dev libatlas3gf-base
     - sudo apt-get install build-essential python-dev python-setuptools
     # install numpy first as it is a compile time dependency for other packages
+    - pip install --upgrade pip
     - pip install --upgrade numpy
+    - pip install --upgrade scipy
     # install documentation building dependencies
     - pip install --upgrade matplotlib setuptools nose coverage sphinx pillow sphinx-gallery sphinx_bootstrap_theme cython numpydoc scikit-learn nbformat nbconvert
     # Installing required packages for `make -C doc check command` to work.
@@ -42,10 +44,14 @@ test:
   override:
     - cat ~/log.txt && if grep -q "Traceback (most recent call last):" ~/log.txt; then false; else true; fi
 deployment:
-  push:
-    branch: develop
+  master:
+    branch: master
     commands:
-      - bash ci_scripts/push_doc.sh
+      - bash ci_scripts/push_doc.sh 'stable'
+  development:
+    branch: development
+    commands:
+      - bash ci_scripts/push_doc.sh 'dev'
 general:
   # Open the doc to the API
   artifacts:
@@ -54,4 +60,5 @@ general:
   # Restric the build to the branch master only
   branches:
     only:
+       - master
        - develop
