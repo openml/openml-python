@@ -111,9 +111,14 @@ def list_datasets():
     Returns
     -------
     datasets : list of dicts
-        A list of all datasets. Every dataset is represented by a
-        dictionary containing the following information: dataset id,
-        and status. If qualities are calculated for the dataset, some of
+        A list of all datasets. 
+        
+        Every dataset is represented by a dictionary containing 
+        the following information: 
+        - dataset id
+        - status
+        
+        If qualities are calculated for the dataset, some of
         these are also returned.
     """
     return _list_datasets("data/list")

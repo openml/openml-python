@@ -79,8 +79,8 @@ class OpenMLRun(object):
         """
         predictions = arff.dumps(self._generate_arff())
         description_xml = self._create_description_xml()
-        data = {'predictions': predictions, 'description':
-                description_xml}
+        data = {'predictions': ("predictions.csv", predictions),
+                'description': ("description.xml", description_xml)}
         return_code, return_value = _perform_api_call(
             "/run/", file_elements=data)
         return return_code, return_value
