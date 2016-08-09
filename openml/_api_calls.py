@@ -1,6 +1,7 @@
 import os
 import requests
 import arff
+import warnings
 
 from . import config
 from .exceptions import OpenMLServerError
@@ -65,9 +66,15 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
 
             else:
                 raise ValueError("File doesn't exist")
+
+    # Using requests.post sets header 'Accept-encoding' automatically to
+    # 'gzip,deflate'
     response = requests.post(url, data=data, files=file_elements)
     if response.status_code != 200:
         raise OpenMLServerError(response.text)
+    if 'Content-Encoding' not in response.headers or \
+            response.headers['Content-Encoding'] != 'gzip':
+        warnings.warn('Received uncompressed content from OpenML for %s.' % url)
     return response.status_code, response.text
 
 
@@ -76,7 +83,12 @@ def _read_url(url, data=None):
         data = {}
     data['api_key'] = config.apikey
 
+    # Using requests.post sets header 'Accept-encoding' automatically to
+    # 'gzip,deflate'
     response = requests.post(url, data=data)
     if response.status_code != 200:
         raise OpenMLServerError(response.text)
+    if 'Content-Encoding' not in response.headers or \
+            response.headers['Content-Encoding'] != 'gzip':
+        warnings.warn('Received uncompressed content from OpenML for %s.' % url)
     return response.status_code, response.text
