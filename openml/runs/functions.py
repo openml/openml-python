@@ -78,7 +78,7 @@ def run_task(task, model, dependencies=None, seed=None):
 
     # The model will not be uploaded at the moment, but used to get the
     # hyperparameter values when uploading the run
-    X, Y = task.get_X_and_Y()
+    X, Y = task.get_X_and_y()
     run.model = model.fit(X, Y)
     _seed_model(model, seed)
 
@@ -114,7 +114,7 @@ def _seed_model(model, seed):
 
 
 def _run_task_get_arffcontent(model, task, class_labels):
-    X, Y = task.get_X_and_Y()
+    X, Y = task.get_X_and_y()
     arff_datacontent = []
     arff_tracecontent = []
     arff_tracecontent_header = ''

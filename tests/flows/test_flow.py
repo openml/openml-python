@@ -86,9 +86,9 @@ class TestFlow(TestBase):
             parameter_dict[parameter['oml:name']] = parameter['oml:default_value']
 
         self.assertEqual(parameter_dict['parameter_distribution__estimator__classifier__n_estimators'],
-                         "Unparametrized")
+                         "LogUniformInt(base=2,expon_lower=0,expo_upper=3)")
         self.assertEqual(parameter_dict['parameter_distribution__estimator__classifier__base_estimator__max_depth'],
-                         "Unparametrized")
+                         "LogUniformInt(base=2,expon_lower=0,expo_upper=3)")
         # Check one other if it unparametrized
         self.assertEqual(parameter_dict['parameter_distribution__estimator__classifier__learning_rate'],
                          "Unparametrized")

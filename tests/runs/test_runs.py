@@ -79,7 +79,7 @@ class TestRun(TestBase):
 
     def test__get_optimization_trajectory(self):
         task = openml.tasks.get_task(3)
-        X, y = task.get_X_and_Y()
+        X, y = task.get_X_and_y()
         model = AdaBoostClassifier(base_estimator=DecisionTreeClassifier())
         param_distributions = {'n_estimators': [3, 4, 5],
                                'learning_rate': [0.05, 0.1, 0.5],
