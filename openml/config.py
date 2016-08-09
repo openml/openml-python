@@ -16,6 +16,8 @@ apikey = ""
 cachedir = ""
 privatedir = ""
 
+_testmode = False
+
 if sys.version_info[0] < 3:
     import ConfigParser as configparser
     from StringIO import StringIO
@@ -51,7 +53,7 @@ def _setup():
     set_cache_directory(cache_dir, private_dir)
 
 
-def set_cache_directory(cachedir, privatedir):
+def set_cache_directory(cachedir, privatedir=None):
     """Set module-wide cache directory.
 
     Sets the cache directory into which to download datasets, tasks etc.

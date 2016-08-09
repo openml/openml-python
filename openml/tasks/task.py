@@ -1,3 +1,4 @@
+import io
 import os
 
 from .. import config
@@ -29,16 +30,11 @@ class OpenMLTask(object):
         if cost_matrix is not None:
             raise NotImplementedError("Costmatrix")
 
-    def __str__(self):
-        return "OpenMLTask instance.\nTask ID: %s\n" \
-               "Task type: %s\nDataset id: %s" \
-               % (self.task_id, self.task_type, self.dataset_id)
-
     def get_dataset(self):
         """Download dataset associated with task"""
         return datasets.get_dataset(self.dataset_id)
 
-    def get_X_and_Y(self):
+    def get_X_and_y(self):
         dataset = self.get_dataset()
         # Replace with retrieve from cache
         if 'Supervised Classification'.lower() in self.task_type.lower():
@@ -47,24 +43,15 @@ class OpenMLTask(object):
             target_dtype = float
         else:
             raise NotImplementedError(self.task_type)
-        X_and_Y = dataset.get_dataset(target=self.target_feature,
-                                      target_dtype=target_dtype)
-        return X_and_Y
-
-    def evaluate(self, algo):
-        """Evaluate an algorithm on the test data.
-        """
-        raise NotImplementedError()
-
-    def validate(self, algo):
-        """Evaluate an algorithm on the validation data.
-        """
-        raise NotImplementedError()
+        X_and_y = dataset.get_data(target=self.target_feature,
+                                   target_dtype=target_dtype)
+        return X_and_y
 
     def get_train_test_split_indices(self, fold=0, repeat=0):
         # Replace with retrieve from cache
         split = self.download_split()
         train_indices, test_indices = split.get(repeat=repeat, fold=fold)
+        # TODO check that indices are zero-based
         return train_indices, test_indices
 
     def iterate_repeats(self):
@@ -80,7 +67,7 @@ class OpenMLTask(object):
 
     def _download_split(self, cache_file):
         try:
-            with open(cache_file):
+            with io.open(cache_file, encoding='utf8' "w"):
                 pass
         except (OSError, IOError):
             split_url = self.estimation_procedure["data_splits_url"]
@@ -90,7 +77,7 @@ class OpenMLTask(object):
                 print(e, split_url)
                 raise e
 
-            with open(cache_file, "w") as fh:
+            with io.open(cache_file, "w", encoding='utf8') as fh:
                 fh.write(split_arff)
             del split_arff
 

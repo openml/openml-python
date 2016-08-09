@@ -1,3 +1,4 @@
+import io
 import os
 import re
 from collections import OrderedDict
@@ -23,12 +24,11 @@ def _get_cached_tasks():
         # description
 
         for filename in directory_content:
-            match = re.match(r"(tid)_([0-9]*)\.xml", filename)
-            if match:
-                tid = match.group(2)
-                tid = int(tid)
+            if not re.match(r"[0-9]*", filename):
+                continue
 
-                tasks[tid] = _get_cached_task(tid)
+            tid = int(filename)
+            tasks[tid] = _get_cached_task(tid)
 
     return tasks
 
@@ -36,11 +36,10 @@ def _get_cached_tasks():
 def _get_cached_task(tid):
     for cache_dir in [config.get_cache_directory(), config.get_private_directory()]:
         task_cache_dir = os.path.join(cache_dir, "tasks")
-        task_file = os.path.join(task_cache_dir,
-                                 "tid_%d.xml" % int(tid))
+        task_file = os.path.join(task_cache_dir, str(tid), "task.xml")
 
         try:
-            with open(task_file) as fh:
+            with io.open(task_file, encoding='utf8') as fh:
                 task = _create_task_from_xml(xml=fh.read())
             return task
         except (OSError, IOError):
@@ -50,7 +49,7 @@ def _get_cached_task(tid):
                                "cached" % tid)
 
 
-def get_estimation_procedure_list():
+def _get_estimation_procedure_list():
     """Return a list of all estimation procedures which are on OpenML.
 
     Returns
@@ -65,9 +64,18 @@ def get_estimation_procedure_list():
         "estimationprocedure/list")
     procs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
-    assert procs_dict['oml:estimationprocedures']['@xmlns:oml'] == \
-        'http://openml.org/openml'
-    assert type(procs_dict['oml:estimationprocedures']['oml:estimationprocedure']) == list
+    if 'oml:estimationprocedures' not in procs_dict:
+        raise ValueError('Error in return XML, does not contain tag '
+                         'oml:estimationprocedures.')
+    elif '@xmlns:oml' not in procs_dict['oml:estimationprocedures']:
+        raise ValueError('Error in return XML, does not contain tag '
+                         '@xmlns:oml as a child of oml:estimationprocedures.')
+    elif procs_dict['oml:estimationprocedures']['@xmlns:oml'] != \
+            'http://openml.org/openml':
+        raise ValueError('Error in return XML, value of '
+                         'oml:estimationprocedures/@xmlns:oml is not '
+                         'http://openml.org/openml, but %s' %
+                         str(procs_dict['oml:estimationprocedures']['@xmlns:oml']))
 
     procs = []
     for proc_ in procs_dict['oml:estimationprocedures']['oml:estimationprocedure']:
@@ -156,7 +164,7 @@ def _list_tasks(api_call):
                          % str(tasks_dict))
     try:
         tasks = []
-        procs = get_estimation_procedure_list()
+        procs = _get_estimation_procedure_list()
         proc_dict = dict((x['id'], x) for x in procs)
         for task_ in tasks_dict['oml:tasks']['oml:task']:
             task = {'tid': int(task_['oml:task_id']),
@@ -206,7 +214,7 @@ def get_task(task_id):
                             "task.xml")
 
     try:
-        with open(xml_file) as fh:
+        with io.open(xml_file, encoding='utf8') as fh:
             task = _create_task_from_xml(fh.read())
     except (OSError, IOError):
 
@@ -217,27 +225,18 @@ def get_task(task_id):
             print(e)
             raise e
 
-        # Cache the xml task file
-        if os.path.exists(xml_file):
-            with open(xml_file) as fh:
-                local_xml = fh.read()
-
-            if task_xml != local_xml:
-                raise ValueError("Task description of task %d cached at %s "
-                                 "has changed." % (task_id, xml_file))
-
-        else:
-            with open(xml_file, "w") as fh:
-                fh.write(task_xml)
+        with io.open(xml_file, "w", encoding='utf8') as fh:
+            fh.write(task_xml)
 
         task = _create_task_from_xml(task_xml)
 
+    # TODO extract this to a function
     task.download_split()
     dataset = datasets.get_dataset(task.dataset_id)
 
     # TODO look into either adding the class labels to task xml, or other
     # way of reading it.
-    class_labels = dataset._retrieve_class_labels()
+    class_labels = dataset._retrieve_class_labels(task.target_feature)
     task.class_labels = class_labels
     return task
 

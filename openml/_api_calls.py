@@ -1,4 +1,5 @@
 import os
+import io
 import requests
 import arff
 import warnings
@@ -57,7 +58,7 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
                     if key is 'dataset':
                         # check if arff is valid?
                         decoder = arff.ArffDecoder()
-                        with open(path) as fh:
+                        with io.open(path, encoding='utf8') as fh:
                             decoder.decode(fh, encode_nominal=True)
                 except:
                     raise ValueError("The file you have provided is not a valid arff file")

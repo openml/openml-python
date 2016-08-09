@@ -1,16 +1,29 @@
-from sklearn.linear_model import LogisticRegression
 import openml
 from openml.testing import TestBase
 
+import sklearn.linear_model
+import sklearn.ensemble
+
 
 class TestRun(TestBase):
-    def test_run_iris(self):
-        task = openml.tasks.get_task(10107)
-        clf = LogisticRegression()
-        run = openml.runs.run_task(task, clf)
-        return_code, return_value = run.publish()
-        self.assertEqual(return_code, 200)
-        # self.assertTrue("This is a read-only account" in return_value)
+    def test_seed_model(self):
+        sgd = sklearn.linear_model.SGDClassifier()
+        self.assertIsNone(sgd.random_state)
+        openml.runs.functions._seed_model(sgd, None)
+        self.assertIsNone(sgd.random_state)
+
+        sgd = sklearn.linear_model.SGDClassifier()
+        self.assertIsNone(sgd.random_state)
+        openml.runs.functions._seed_model(sgd, 37)
+        self.assertIsInstance(sgd.random_state, int)
+
+        ada = sklearn.ensemble.AdaBoostClassifier(
+            sklearn.linear_model.SGDClassifier())
+        self.assertIsNone(ada.random_state)
+        self.assertIsNone(ada.base_estimator.random_state)
+        openml.runs.functions._seed_model(ada, 37)
+        self.assertIsInstance(ada.random_state, int)
+        self.assertIsInstance(ada.base_estimator.random_state, int)
 
     def test_get_run(self):
         run = openml.runs.get_run(473350)
