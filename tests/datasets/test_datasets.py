@@ -98,6 +98,7 @@ class TestOpenMLDataset(TestBase):
             self.assertIn(dataset['status'], ['in_preparation', 'active',
                                               'deactivated'])
 
+    @unittest.skip('See https://github.com/openml/openml-python/issues/149')
     def test_check_datasets_active(self):
         active = openml.datasets.check_datasets_active([1, 17])
         self.assertTrue(active[1])
