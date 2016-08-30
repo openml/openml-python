@@ -19,12 +19,12 @@ class TestBase(unittest.TestCase):
         # cache
         self.static_cache_dir = None
         static_cache_dir = os.path.dirname(os.path.abspath(inspect.getfile(self.__class__)))
-        for i in range(2):
-            static_cache_dir = os.path.abspath(os.path.join(static_cache_dir,
-                                                            '..'))
-            content = os.listdir(static_cache_dir)
-            if 'files' in content:
-                self.static_cache_dir = os.path.join(static_cache_dir, 'files')
+
+        static_cache_dir = os.path.abspath(os.path.join(static_cache_dir, '..'))
+        content = os.listdir(static_cache_dir)
+        if 'files' in content:
+            self.static_cache_dir = os.path.join(static_cache_dir, 'files')
+
         if self.static_cache_dir is None:
             raise ValueError('Cannot find test cache dir!')
 
