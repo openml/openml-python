@@ -1,7 +1,8 @@
 import gzip
+import logging
 import os
 import sys
-import logging
+
 import arff
 
 import numpy as np
@@ -267,12 +268,17 @@ class OpenMLDataset(object):
         return_value : string
             xml return from server
         """
-        data = {'description': self._to_xml()}
+
+        file_elements = {'description': self._to_xml()}
+        file_dictionary = {}
+
         if self.data_file is not None:
-            return_code, return_value = _perform_api_call(
-                "/data/", data=data, file_dictionary={'dataset': self.data_file})
-        else:
-            return_code, return_value = _perform_api_call("/data/", data=data)
+            file_dictionary['dataset'] = self.data_file
+
+        return_code, return_value = _perform_api_call(
+            "/data/", file_dictionary=file_dictionary,
+            file_elements=file_elements)
+
         return return_code, return_value
 
     def _to_xml(self):

@@ -81,9 +81,10 @@ class OpenMLFlow(object):
         https://github.com/openml/website/blob/master/openml_OS/views/pages/rest_api/xsd/openml.implementation.upload.xsd
         """
         xml_description = self._generate_flow_xml()
-        data = {'description': xml_description, 'source': self.source}
+
+        file_elements = {'description': xml_description} #, 'source': self.source}
         return_code, return_value = _perform_api_call(
-            "/flow/", data=data)
+            "flow/", file_elements=file_elements)
         return return_code, return_value
 
     def _ensure_flow_exists(self):
@@ -137,7 +138,7 @@ def _check_flow_exists(name, version):
         raise ValueError('Argument \'version\' should be a non-empty string')
 
     return_code, xml_response = _perform_api_call(
-        "/flow/exists/%s/%s" % (name, version))
+        "flow/exists/%s/%s" % (name, version))
     # TODO check with latest version of code if this raises an exception
     if return_code != 200:
         # fixme raise appropriate error
