@@ -17,6 +17,7 @@ class TestFlow(TestBase):
         for flow in flows:
             check_flow(flow)
 
+    @unittest.skip('Not tested until test sentinels are added back.')
     def test_upload_flow(self):
         flow = openml.OpenMLFlow(model=DummyClassifier(), description="test description")
         return_code, return_value = flow.publish()

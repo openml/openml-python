@@ -10,7 +10,7 @@ from ..flows import OpenMLFlow
 from ..exceptions import OpenMLCacheException
 from ..util import URLError
 from ..tasks import get_task
-from ..tasks.task_functions import _create_task_from_xml
+from ..tasks.functions import _create_task_from_xml
 from .._api_calls import _perform_api_call
 
 
@@ -79,10 +79,10 @@ class OpenMLRun(object):
         """
         predictions = arff.dumps(self._generate_arff())
         description_xml = self._create_description_xml()
-        data = {'predictions': ("predictions.csv", predictions),
-                'description': ("description.xml", description_xml)}
+        file_elements = {'predictions': ("predictions.csv", predictions),
+                         'description': ("description.xml", description_xml)}
         return_code, return_value = _perform_api_call(
-            "/run/", file_elements=data)
+            "/run/", file_elements=file_elements)
         return return_code, return_value
 
     def _create_description_xml(self):
@@ -127,6 +127,10 @@ def run_task(task, model):
     run : OpenMLRun
         Result of the run.
     """
+    # TODO move this into its onwn module. While it somehow belongs here, it
+    # adds quite a lot of functionality which is better suited in other places!
+    # TODO why doesn't this accept a flow as input?
+
     flow = OpenMLFlow(model=model)
     flow_id = flow._ensure_flow_exists()
     if(flow_id < 0):
@@ -151,6 +155,8 @@ def run_task(task, model):
     train_times = []
 
     rep_no = 0
+    # TODO use different iterator to only provide a single iterator (less
+    # methods, less maintenance, less confusion)
     for rep in task.iterate_repeats():
         fold_no = 0
         for fold in rep:

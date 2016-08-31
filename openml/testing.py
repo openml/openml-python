@@ -1,3 +1,4 @@
+import inspect
 import os
 import shutil
 import unittest
@@ -14,6 +15,19 @@ class TestBase(unittest.TestCase):
     """
 
     def setUp(self):
+        # This cache directory is checked in to git to simulate a populated
+        # cache
+        self.static_cache_dir = None
+        static_cache_dir = os.path.dirname(os.path.abspath(inspect.getfile(self.__class__)))
+
+        static_cache_dir = os.path.abspath(os.path.join(static_cache_dir, '..'))
+        content = os.listdir(static_cache_dir)
+        if 'files' in content:
+            self.static_cache_dir = os.path.join(static_cache_dir, 'files')
+
+        if self.static_cache_dir is None:
+            raise ValueError('Cannot find test cache dir!')
+
         self.cwd = os.getcwd()
         workdir = os.path.dirname(os.path.abspath(__file__))
         self.workdir = os.path.join(workdir, "tmp")

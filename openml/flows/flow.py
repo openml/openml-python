@@ -37,9 +37,10 @@ class OpenMLFlow(object):
         self.tag = tag
         self.model = model
         self.source = "FIXME DEFINE PYTHON FLOW"
+        # TODO add scikit-learn here!
         self.name = (model.__module__ + "." +
                      model.__class__.__name__)
-        self.external_version = 'Tsklearn_' + sklearn.__version__
+        self.external_version = 'sklearn_' + sklearn.__version__
 
     def _generate_flow_xml(self):
         """Generate xml representation of self for upload to server.
@@ -78,13 +79,12 @@ class OpenMLFlow(object):
         """
         The 'description' is binary data of an XML file according to the XSD Schema (OUTDATED!):
         https://github.com/openml/website/blob/master/openml_OS/views/pages/rest_api/xsd/openml.implementation.upload.xsd
-
-        (optional) file_path is the absolute path to the file that is the flow (eg. a script)
         """
         xml_description = self._generate_flow_xml()
-        data = {'description': xml_description, 'source': self.source}
+
+        file_elements = {'description': xml_description} #, 'source': self.source}
         return_code, return_value = _perform_api_call(
-            "/flow/", data=data)
+            "flow/", file_elements=file_elements)
         return return_code, return_value
 
     def _ensure_flow_exists(self):
@@ -99,8 +99,9 @@ class OpenMLFlow(object):
             Flow id on the server.
         """
         import sklearn
-        flow_version = 'Tsklearn_' + sklearn.__version__
+        flow_version = 'sklearn_' + sklearn.__version__
         _, _, flow_id = _check_flow_exists(self.name, flow_version)
+        # TODO add numpy and scipy version!
 
         if int(flow_id) == -1:
             return_code, response_xml = self.publish()
@@ -132,12 +133,13 @@ def _check_flow_exists(name, version):
     see http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
     """
     if not (type(name) is str and len(name) > 0):
-        raise ValueError('Parameter \'name\' should be a non-empty string')
+        raise ValueError('Argument \'name\' should be a non-empty string')
     if not (type(version) is str and len(version) > 0):
-        raise ValueError('Parameter \'version\' should be a non-empty string')
+        raise ValueError('Argument \'version\' should be a non-empty string')
 
     return_code, xml_response = _perform_api_call(
-        "/flow/exists/%s/%s" % (name, version))
+        "flow/exists/%s/%s" % (name, version))
+    # TODO check with latest version of code if this raises an exception
     if return_code != 200:
         # fixme raise appropriate error
         raise ValueError("api call failed: %s" % xml_response)

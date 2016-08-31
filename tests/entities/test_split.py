@@ -12,8 +12,8 @@ class OpenMLSplitTest(unittest.TestCase):
         __file__ = inspect.getfile(OpenMLSplitTest)
         self.directory = os.path.dirname(__file__)
         # This is for dataset
-        self.arff_filename = os.path.join(self.directory, "..",
-                                          "files", "tasks", "datasplits.arff")
+        self.arff_filename = os.path.join(
+            self.directory, "..", "files", "tasks", "1882", "datasplits.arff")
         self.pd_filename = self.arff_filename.replace(".arff", ".pkl")
 
     def tearDown(self):
@@ -54,14 +54,16 @@ class OpenMLSplitTest(unittest.TestCase):
         self.assertIsInstance(split.split[0][0].test, np.ndarray)
         for i in range(10):
             for j in range(10):
-                self.assertEqual((81,), split.split[i][j].train.shape)
-                self.assertEqual((9,), split.split[i][j].test.shape)
+                self.assertGreaterEqual(split.split[i][j].train.shape[0], 808)
+                self.assertGreaterEqual(split.split[i][j].test.shape[0], 89)
+                self.assertEqual(split.split[i][j].train.shape[0] +
+                                 split.split[i][j].test.shape[0], 898)
 
     def test_get_split(self):
         split = OpenMLSplit._from_arff_file(self.arff_filename)
         train_split, test_split = split.get(fold=5, repeat=2)
-        self.assertEqual(train_split.shape, (81,))
-        self.assertEqual(test_split.shape, (9,))
+        self.assertEqual(train_split.shape[0], 808)
+        self.assertEqual(test_split.shape[0], 90)
         self.assertRaisesRegexp(ValueError, "Repeat 10 not known",
                                 split.get, 10, 2)
         self.assertRaisesRegexp(ValueError, "Fold 10 not known",
