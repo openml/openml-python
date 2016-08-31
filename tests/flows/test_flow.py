@@ -20,6 +20,5 @@ class TestFlow(TestBase):
     @unittest.skip('Not tested until test sentinels are added back.')
     def test_upload_flow(self):
         flow = openml.OpenMLFlow(model=DummyClassifier(), description="test description")
-        return_code, return_value = flow.publish()
-        # self.assertTrue("This is a read-only account" in return_value)
-        self.assertEqual(return_code, 200)
+        flow.publish()
+        self.assertTrue(isinstance(flow.flow_id, int))
