@@ -8,6 +8,7 @@ import arff
 
 import numpy as np
 import scipy.sparse
+import xmltodict
 
 if sys.version_info[0] >= 3:
     import pickle
@@ -16,6 +17,7 @@ else:
         import cPickle as pickle
     except:
         import pickle
+
 
 from ..util import is_string
 from .._api_calls import _perform_api_call
@@ -36,7 +38,7 @@ class OpenMLDataset(object):
         Description of the dataset
     FIXME : which of these do we actually nee?
     """
-    def __init__(self, id=None, name=None, version=None, description=None,
+    def __init__(self, dataset_id=None, name=None, version=None, description=None,
                  format=None, creator=None, contributor=None,
                  collection_date=None, upload_date=None, language=None,
                  licence=None, url=None, default_target_attribute=None,
@@ -45,7 +47,7 @@ class OpenMLDataset(object):
                  original_data_url=None, paper_url=None, update_comment=None,
                  md5_checksum=None, data_file=None):
         # Attributes received by querying the RESTful API
-        self.id = int(id) if id is not None else None
+        self.dataset_id = int(dataset_id) if dataset_id is not None else None
         self.name = name
         self.version = int(version)
         self.description = description
@@ -100,7 +102,7 @@ class OpenMLDataset(object):
                 with open(self.data_pickle_file, "wb") as fh:
                     pickle.dump((X, categorical, attribute_names), fh, -1)
                 logger.debug("Saved dataset %d: %s to file %s" %
-                             (self.id, self.name, self.data_pickle_file))
+                             (self.dataset_id, self.name, self.data_pickle_file))
 
     def __eq__(self, other):
         if type(other) != OpenMLDataset:
@@ -281,7 +283,8 @@ class OpenMLDataset(object):
             "/data/", file_dictionary=file_dictionary,
             file_elements=file_elements)
 
-        return return_code, return_value
+        self.dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])
+        return self
 
     def _to_xml(self):
         """Serialize object to xml for upload
@@ -292,7 +295,7 @@ class OpenMLDataset(object):
             XML description of the data.
         """
         xml_dataset = ('<oml:data_set_description '
-                       'xmlns:oml="http://openml.org/openml">')
+                       'xmlns:oml="http://openml.org/openml">\n')
         props = ['id', 'name', 'version', 'description', 'format', 'creator',
                  'contributor', 'collection_date', 'upload_date', 'language',
                  'licence', 'url', 'default_target_attribute',
@@ -302,6 +305,6 @@ class OpenMLDataset(object):
         for prop in props:
             content = getattr(self, prop, None)
             if content is not None:
-                xml_dataset += "<oml:{0}>{1}</oml:{0}>".format(prop, content)
+                xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, content)
         xml_dataset += "</oml:data_set_description>"
         return xml_dataset
