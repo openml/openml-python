@@ -17,10 +17,10 @@ class TestRun(TestBase):
         class_labels = task.class_labels
 
         clf = SGDClassifier(loss='hinge', random_state=1)
-        self.assertRaisesRegex(AttributeError,
-                               "probability estimates are not available for loss='hinge'",
-                               openml.runs.run._run_task_get_arffcontent,
-                               clf, task, class_labels)
+        self.assertRaisesRegexp(AttributeError,
+                                "probability estimates are not available for loss='hinge'",
+                                openml.runs.run._run_task_get_arffcontent,
+                                clf, task, class_labels)
 
         clf = SGDClassifier(loss='log', random_state=1)
         arff_datacontent = openml.runs.run._run_task_get_arffcontent(
