@@ -5,6 +5,8 @@ import shutil
 import unittest
 import openml
 
+import numpy as np
+
 
 class TestBase(unittest.TestCase):
     """Base class for tests
@@ -47,6 +49,8 @@ class TestBase(unittest.TestCase):
         md5 = hashlib.md5()
         md5.update(apikey.encode('utf-8'))
         md5.update(str(pid).encode('utf-8'))
+        random_number = np.random.randint(1000000000)
+        md5.update(str(random_number).encode('utf-8'))
         sentinel = md5.hexdigest()
         # For testing the hash code mustn't be bulletproof
         self.sentinel = '%sTESTSENTINEL999' % sentinel[:8]
