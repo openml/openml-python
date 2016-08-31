@@ -75,7 +75,7 @@ class OpenMLDataset(object):
                 logger.debug("Data pickle file already exists.")
             else:
                 try:
-                    data = self._get_arff()
+                    data = self._get_arff(self.format)
                 except OSError as e:
                     logger.critical("Please check that the data file %s is there "
                                     "and can be read.", self.data_file)
@@ -110,7 +110,7 @@ class OpenMLDataset(object):
         else:
             return False
 
-    def _get_arff(self):
+    def _get_arff(self, format):
         """Read ARFF file and return decoded arff.
 
         Reads the file referenced in self.data_file.
@@ -134,9 +134,17 @@ class OpenMLDataset(object):
         if bits != 64 and os.path.getsize(filename) > 120000000:
             return NotImplementedError("File too big")
 
+        if format.lower() == 'arff':
+            return_type = arff.DENSE
+        elif format.lower() == 'sparse_arff':
+            return_type = arff.COO
+        else:
+            raise ValueError('Unknown data format %s' % format)
+
         def decode_arff(fh):
             decoder = arff.ArffDecoder()
-            return decoder.decode(fh, encode_nominal=True)
+            return decoder.decode(fh, encode_nominal=True,
+                                  return_type=return_type)
 
         if filename[-3:] == ".gz":
             with gzip.open(filename) as fh:
@@ -244,8 +252,16 @@ class OpenMLDataset(object):
         # TODO improve performance, currently reads the whole file
         # Should make a method that only reads the attributes
         arffFileName = self.data_file
+
+        if self.format.lower() == 'arff':
+            return_type = arff.DENSE
+        elif self.format.lower() == 'sparse_arff':
+            return_type = arff.COO
+        else:
+            raise ValueError('Unknown data format %s' % self.format)
+
         with open(arffFileName) as fh:
-            arffData = arff.ArffDecoder().decode(fh)
+            arffData = arff.ArffDecoder().decode(fh, return_type=return_type)
 
         dataAttributes = dict(arffData['attributes'])
         if('class' in dataAttributes):
