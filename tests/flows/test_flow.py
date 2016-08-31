@@ -21,4 +21,4 @@ class TestFlow(TestBase):
     def test_upload_flow(self):
         flow = openml.OpenMLFlow(model=DummyClassifier(), description="test description")
         flow.publish()
-        self.assertTrue(isinstance(flow.flow_id, int))
+        self.assertIsInstance(flow.flow_id, int)

@@ -106,7 +106,7 @@ def _get_cached_dataset_arff(dataset_id):
         except (OSError, IOError):
             continue
 
-    raise OpenMLCacheException("ARFF file for dataset_id %d not "
+    raise OpenMLCacheException("ARFF file for dataset id %d not "
                                "cached" % dataset_id)
 
 

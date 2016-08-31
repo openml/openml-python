@@ -52,19 +52,20 @@ class TestOpenMLDataset(TestBase):
     def test_get_cached_dataset_description_not_cached(self):
         openml.config.set_cache_directory(self.static_cache_dir)
         self.assertRaisesRegexp(OpenMLCacheException, "Dataset description for "
-                                                      "did 3 not cached",
+                                                      "dataset id 3 not cached",
                                 openml.datasets.functions._get_cached_dataset_description,
                                 3)
 
     def test_get_cached_dataset_arff(self):
         openml.config.set_cache_directory(self.static_cache_dir)
-        description = openml.datasets.functions._get_cached_dataset_arff(did=2)
+        description = openml.datasets.functions._get_cached_dataset_arff(
+            dataset_id=2)
         self.assertIsInstance(description, str)
 
     def test_get_cached_dataset_arff_not_cached(self):
         openml.config.set_cache_directory(self.static_cache_dir)
         self.assertRaisesRegexp(OpenMLCacheException, "ARFF file for "
-                                                      "did 3 not cached",
+                                                      "dataset id 3 not cached",
                                 openml.datasets.functions._get_cached_dataset_arff,
                                 3)
 
@@ -197,7 +198,7 @@ class TestOpenMLDataset(TestBase):
             name="anneal", version=1, description="test",
             format="ARFF", licence="public", default_target_attribute="class", data_file=file_path)
         dataset.publish()
-        self.assertTrue(isinstance(dataset.dataset_id, int))
+        self.assertIsInstance(dataset.dataset_id, int)
 
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
@@ -205,4 +206,4 @@ class TestOpenMLDataset(TestBase):
             format="ARFF",
             url="http://expdb.cs.kuleuven.be/expdb/data/uci/nominal/iris.arff")
         dataset.publish()
-        self.assertTrue(isinstance(dataset.dataset_id, int))
+        self.assertIsInstance(dataset.dataset_id, int)
