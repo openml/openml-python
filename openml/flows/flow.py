@@ -37,7 +37,6 @@ class OpenMLFlow(object):
         self.tag = tag
         self.model = model
         self.source = "FIXME DEFINE PYTHON FLOW"
-        # TODO add scikit-learn here!
         self.name = (model.__module__ + "." +
                      model.__class__.__name__)
         self.external_version = 'sklearn_' + sklearn.__version__
