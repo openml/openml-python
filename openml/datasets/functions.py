@@ -1,3 +1,4 @@
+import io
 import os
 import re
 import shutil
@@ -88,7 +89,7 @@ def _get_cached_dataset_description(did):
         did_cache_dir = os.path.join(cache_dir, "datasets", str(did))
         description_file = os.path.join(did_cache_dir, "description.xml")
         try:
-            with open(description_file) as fh:
+            with io.open(description_file, encoding='utf8') as fh:
                 dataset_xml = fh.read()
         except (IOError, OSError):
             continue
@@ -106,7 +107,7 @@ def _get_cached_dataset_arff(did):
         output_file = os.path.join(did_cache_dir, "dataset.arff")
 
         try:
-            with open(output_file):
+            with io.open(output_file, encoding='utf8'):
                 pass
             return output_file
         except (OSError, IOError):
@@ -298,13 +299,13 @@ def _get_dataset_description(did_cache_dir, did):
         return_code, dataset_xml = _perform_api_call(
             "data/%d" % did)
 
-        with open(description_file, "w") as fh:
+        with io.open(description_file, "w", encoding='utf8') as fh:
             fh.write(dataset_xml)
 
     description = xmltodict.parse(dataset_xml)[
         "oml:data_set_description"]
 
-    with open(description_file, "w") as fh:
+    with io.open(description_file, "w", encoding='utf8') as fh:
         fh.write(dataset_xml)
 
     return description
@@ -337,7 +338,7 @@ def _get_dataset_arff(did_cache_dir, description):
     # This means the file is still there; whether it is useful is up to
     # the user and not checked by the program.
     try:
-        with open(output_file_path):
+        with io.open(output_file_path, encoding='utf8'):
             pass
         return output_file_path
     except (OSError, IOError):
@@ -346,7 +347,7 @@ def _get_dataset_arff(did_cache_dir, description):
     url = description['oml:url']
     return_code, arff_string = _read_url(url)
 
-    with open(output_file_path, "w") as fh:
+    with io.open(output_file_path, "w", encoding='utf8') as fh:
         fh.write(arff_string)
     del arff_string
 
@@ -376,13 +377,13 @@ def _get_dataset_features(did_cache_dir, did):
 
     # Dataset features aren't subject to change...
     try:
-        with open(features_file) as fh:
+        with io.open(features_file, encoding='utf8') as fh:
             features_xml = fh.read()
     except (OSError, IOError):
         return_code, features_xml = _perform_api_call(
             "data/features/%d" % did)
 
-        with open(features_file, "w") as fh:
+        with io.open(features_file, "w", encoding='utf8') as fh:
             fh.write(features_xml)
 
     features = xmltodict.parse(features_xml)["oml:data_features"]
@@ -411,13 +412,13 @@ def _get_dataset_qualities(did_cache_dir, did):
     # Dataset qualities are subject to change and must be fetched every time
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")
     try:
-        with open(qualities_file) as fh:
+        with io.open(qualities_file, encoding='utf8') as fh:
             qualities_xml = fh.read()
     except (OSError, IOError):
         return_code, qualities_xml = _perform_api_call(
             "data/qualities/%d" % did)
 
-        with open(qualities_file, "w") as fh:
+        with io.open(qualities_file, "w", encoding='utf8') as fh:
             fh.write(qualities_xml)
 
     qualities = xmltodict.parse(qualities_xml)['oml:data_qualities']

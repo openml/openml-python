@@ -1,4 +1,5 @@
 import gzip
+import io
 import logging
 import os
 import sys
@@ -142,7 +143,7 @@ class OpenMLDataset(object):
             with gzip.open(filename) as fh:
                 return decode_arff(fh)
         else:
-            with open(filename) as fh:
+            with io.open(filename, encoding='utf8') as fh:
                 return decode_arff(fh)
 
     def get_data(self, target=None, target_dtype=int, include_row_id=False,
@@ -244,7 +245,8 @@ class OpenMLDataset(object):
         # TODO improve performance, currently reads the whole file
         # Should make a method that only reads the attributes
         arffFileName = self.data_file
-        with open(arffFileName) as fh:
+
+        with io.open(arffFileName, encoding='utf8') as fh:
             arffData = arff.ArffDecoder().decode(fh)
 
         dataAttributes = dict(arffData['attributes'])
