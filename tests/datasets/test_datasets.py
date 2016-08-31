@@ -200,6 +200,15 @@ class TestOpenMLDataset(TestBase):
         return_code, return_value = dataset.publish()
         self.assertEqual(return_code, 200)
 
+    def test__retrieve_class_labels(self):
+        openml.config.set_cache_directory(self.static_cache_dir)
+        labels = openml.datasets.get_dataset(2)._retrieve_class_labels()
+        self.assertEqual(labels, ['1', '2', '3', '4', '5', 'U'])
+        labels = openml.datasets.get_dataset(2)._retrieve_class_labels(
+            target_attribute='product-type')
+        self.assertEqual(labels, ['C', 'H', 'G'])
+        print(labels)
+
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
             name="UploadTestWithURL", version=1, description="test",
