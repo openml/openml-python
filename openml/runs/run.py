@@ -47,15 +47,20 @@ class OpenMLRun(object):
         self.data_content = data_content
         self.model = model
 
-    def _generate_arff_header_dict(self):
-        """Generates the arff header dictionary for upload to the server.
+    def _generate_arff_dict(self):
+        """Generates the arff dictionary for upload to the server.
+
+        Assumes that the run has been executed.
 
         Returns
         -------
-        arf_dict : dictionary
-            Dictionary representation of an ARFF data format containing
-            predictions and confidences.
+        arf_dict : dict
+            Dictionary representation of the ARFF file that will be uploaded.
+            Contains predictions and information about the run environment.
         """
+        if self.data_content is None:
+            raise ValueError('Run has not been executed.')
+
         run_environment = (_get_version_information() +
                            [time.strftime("%c")] + ['Created by run_task()'])
         task = get_task(self.task_id)
@@ -78,7 +83,7 @@ class OpenMLRun(object):
 
         Uploads the results of a run to OpenML.
         """
-        predictions = arff.dumps(self._generate_arff_header_dict())
+        predictions = arff.dumps(self._generate_arff_dict())
         description_xml = self._create_description_xml()
         file_elements = {'predictions': ("predictions.csv", predictions),
                          'description': ("description.xml", description_xml)}
