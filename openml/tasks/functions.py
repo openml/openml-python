@@ -1,3 +1,4 @@
+import io
 import os
 import re
 from collections import OrderedDict
@@ -38,7 +39,7 @@ def _get_cached_task(tid):
         task_file = os.path.join(task_cache_dir, str(tid), "task.xml")
 
         try:
-            with open(task_file) as fh:
+            with io.open(task_file, encoding='utf8') as fh:
                 task = _create_task_from_xml(xml=fh.read())
             return task
         except (OSError, IOError):
@@ -213,7 +214,7 @@ def get_task(task_id):
                             "task.xml")
 
     try:
-        with open(xml_file) as fh:
+        with io.open(xml_file, encoding='utf8') as fh:
             task = _create_task_from_xml(fh.read())
     except (OSError, IOError):
 
@@ -224,7 +225,7 @@ def get_task(task_id):
             print(e)
             raise e
 
-        with open(xml_file, "w") as fh:
+        with io.open(xml_file, "w", encoding='utf8') as fh:
             fh.write(task_xml)
 
         task = _create_task_from_xml(task_xml)

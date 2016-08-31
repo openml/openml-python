@@ -1,3 +1,4 @@
+import io
 import time
 import arff
 import xmltodict
@@ -308,7 +309,7 @@ def get_run(run_id):
             print(e)
             raise e
 
-        with open(run_file, "w") as fh:
+        with io.open(run_file, "w", encoding='utf8') as fh:
             fh.write(run_xml)
 
     try:
@@ -318,7 +319,7 @@ def get_run(run_id):
         print("Run ID", run_id)
         raise e
 
-    with open(run_file, "w") as fh:
+    with io.open(run_file, "w", encoding='utf8') as fh:
         fh.write(run_xml)
 
     return run
@@ -411,7 +412,7 @@ def _get_cached_run(run_id):
         try:
             run_file = os.path.join(run_cache_dir,
                                     "run_%d.xml" % int(run_id))
-            with open(run_file) as fh:
+            with io.open(run_file, encoding='utf8') as fh:
                 run = _create_task_from_xml(xml=fh.read())
             return run
 
