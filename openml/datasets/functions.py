@@ -1,18 +1,12 @@
 import os
 import re
 import shutil
-import sys
 from collections import OrderedDict
 import xmltodict
 from .dataset import OpenMLDataset
 from ..exceptions import OpenMLCacheException
 from .. import config
 from .._api_calls import _perform_api_call, _read_url
-
-if sys.version_info[0] >= 3:
-    from urllib.error import URLError
-else:
-    from urllib2 import URLError
 
 
 ############################################################################
@@ -413,10 +407,6 @@ def _get_dataset_qualities(did_cache_dir, dataset_id):
     except (OSError, IOError):
         return_code, qualities_xml = _perform_api_call(
             "data/qualities/%d" % dataset_id)
-    except (URLError, UnicodeEncodeError) as e:
-        # TODO logger.debug
-        print(e)
-        raise e
 
     with open(qualities_file, "w") as fh:
         fh.write(qualities_xml)
