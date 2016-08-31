@@ -1,12 +1,13 @@
 import unittest
 import os
-import shutil
 import sys
 
 if sys.version_info[0] >= 3:
     from unittest import mock
 else:
     import mock
+
+import scipy.sparse
 
 import openml
 from openml import OpenMLDataset
@@ -140,6 +141,11 @@ class TestOpenMLDataset(TestBase):
             openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
         self.assertTrue(os.path.exists(os.path.join(
             openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
+
+    def test_get_dataset_sparse(self):
+        dataset = openml.datasets.get_dataset(1571)
+        X = dataset.get_data()
+        self.assertIsInstance(X, scipy.sparse.csr_matrix)
 
     def test_download_rowid(self):
         # Smoke test which checks that the dataset has the row-id set correctly
