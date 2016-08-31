@@ -66,6 +66,4 @@ class TestBase(unittest.TestCase):
         os.chdir(self.cwd)
         shutil.rmtree(self.workdir)
 
-        openml.config._testmode = False
-
 __all__ = ['TestBase']

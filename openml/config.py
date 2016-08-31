@@ -16,7 +16,6 @@ apikey = ""
 cachedir = ""
 privatedir = ""
 
-_testmode = False
 
 if sys.version_info[0] < 3:
     import ConfigParser as configparser

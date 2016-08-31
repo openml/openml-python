@@ -1,8 +1,15 @@
+import sys
 import unittest
+
 from sklearn.dummy import DummyClassifier
 
 from openml.testing import TestBase
 import openml
+
+if sys.version_info[0] >= 3:
+    from unittest import mock
+else:
+    import mock
 
 
 class TestFlow(TestBase):
@@ -17,9 +24,9 @@ class TestFlow(TestBase):
         for flow in flows:
             check_flow(flow)
 
-    # @unittest.skip('Not tested until test sentinels are added back.')
-    def test_upload_flow(self):
+    @mock.patch.object(openml.OpenMLFlow, '_get_name', autospec=True)
+    def test_upload_flow(self, name_mock):
         flow = openml.OpenMLFlow(model=DummyClassifier(), description="test description")
+        name_mock.return_value = '%s%s' % (self.sentinel, flow.name)
         return_code, return_value = flow.publish()
-        # self.assertTrue("This is a read-only account" in return_value)
         self.assertEqual(return_code, 200)
