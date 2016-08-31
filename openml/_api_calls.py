@@ -7,7 +7,7 @@ from . import config
 from .exceptions import OpenMLServerError
 
 
-def _perform_api_call(call, data=None, file_dictionary=None,
+def _perform_api_call(call, file_dictionary=None,
                       file_elements=None, add_authentication=True):
     """
     Perform an API call at the OpenML server.
@@ -18,11 +18,14 @@ def _perform_api_call(call, data=None, file_dictionary=None,
     ----------
     call : str
         The API call. For example data/list
-    data : dict (default=None)
-        Dictionary containing data which will be sent to the OpenML
-        server via a POST request.
-    **kwargs
-        Further arguments which are appended as GET arguments.
+    file_dictionary : dict
+        Mapping of {filename: path} of files which should be uploaded to the
+        server.
+    file_elements : dict
+        Mapping of {filename: str} of strings which should be uploaded as
+        files to the server.
+    add_authentication : bool
+        Whether to add authentication (api key) to the request.
 
     Returns
     -------
@@ -36,16 +39,16 @@ def _perform_api_call(call, data=None, file_dictionary=None,
         url += "/"
     url += call
     if file_dictionary is not None or file_elements is not None:
-        return _read_url_files(url, data=data, file_dictionary=file_dictionary,
+        return _read_url_files(url, file_dictionary=file_dictionary,
                                file_elements=file_elements)
-    return _read_url(url, data=data)
+    return _read_url(url)
 
 
-def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
+def _read_url_files(url, file_dictionary=None, file_elements=None):
     """do a post request to url with data None, file content of
     file_dictionary and sending file_elements as files"""
-    if data is None:
-        data = {}
+
+    data = {}
     data['api_key'] = config.apikey
     if file_elements is None:
         file_elements = {}
@@ -78,9 +81,9 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
     return response.status_code, response.text
 
 
-def _read_url(url, data=None):
-    if data is None:
-        data = {}
+def _read_url(url):
+
+    data = {}
     data['api_key'] = config.apikey
 
     # Using requests.post sets header 'Accept-encoding' automatically to
