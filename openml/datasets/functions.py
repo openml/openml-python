@@ -417,8 +417,8 @@ def _get_dataset_qualities(did_cache_dir, did):
         return_code, qualities_xml = _perform_api_call(
             "data/qualities/%d" % did)
 
-    with open(qualities_file, "w") as fh:
-        fh.write(qualities_xml)
+        with open(qualities_file, "w") as fh:
+            fh.write(qualities_xml)
 
     qualities = xmltodict.parse(qualities_xml)['oml:data_qualities']
 
