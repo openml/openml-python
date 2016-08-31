@@ -239,9 +239,24 @@ class OpenMLDataset(object):
         else:
             return rval
 
-    def _retrieve_class_labels(self, target_attribute='class'):
-        """Reads the datasets arff to determine the class-labels, and returns those.
-        If the task has no class labels (for example a regression problem) it returns None."""
+    def retrieve_class_labels(self, target_name='class'):
+        """Reads the datasets arff to determine the class-labels.
+
+        If the task has no class labels (for example a regression problem)
+        it returns None. Necessary because the data returned by get_data
+        only contains the indices of the classes, while OpenML needs the real
+        classname when uploading the results of a run.
+
+        Parameters
+        ----------
+        target_name : str
+            Name of the target attribute
+
+        Returns
+        -------
+        list
+        """
+
         # TODO improve performance, currently reads the whole file
         # Should make a method that only reads the attributes
         arffFileName = self.data_file
@@ -250,8 +265,8 @@ class OpenMLDataset(object):
             arffData = arff.ArffDecoder().decode(fh)
 
         dataAttributes = dict(arffData['attributes'])
-        if target_attribute in dataAttributes:
-            return dataAttributes[target_attribute]
+        if target_name in dataAttributes:
+            return dataAttributes[target_name]
         else:
             return None
 
