@@ -3,6 +3,7 @@ import xmltodict
 import sklearn
 
 from .._api_calls import _perform_api_call
+from .. import config
 
 
 class OpenMLFlow(object):
@@ -51,10 +52,16 @@ class OpenMLFlow(object):
             Flow represented as XML string.
         """
         model = self.model
+
+        if config._testmode:
+            flow_name = '%s%s' % (config.testsentinel, self.name)
+        else:
+            flow_name = self.name
+
         flow_dict = OrderedDict()
         flow_dict['oml:flow'] = OrderedDict()
         flow_dict['oml:flow']['@xmlns:oml'] = 'http://openml.org/openml'
-        flow_dict['oml:flow']['oml:name'] = self.name
+        flow_dict['oml:flow']['oml:name'] = flow_name
         flow_dict['oml:flow']['oml:external_version'] = self.external_version
         flow_dict['oml:flow']['oml:description'] = self.description
 
@@ -136,6 +143,12 @@ def _check_flow_exists(name, version):
         raise ValueError('Argument \'name\' should be a non-empty string')
     if not (type(version) is str and len(version) > 0):
         raise ValueError('Argument \'version\' should be a non-empty string')
+
+    if config._testmode:
+        # It could already be in the name, for example when checking if a
+        # downloaded flow exists on the server
+        if config.testsentinel not in name:
+            name = '%s%s' % (config.testsentinel, name)
 
     return_code, xml_response = _perform_api_call(
         "flow/exists/%s/%s" % (name, version))
