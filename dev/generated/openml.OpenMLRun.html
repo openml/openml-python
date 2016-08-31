@@ -123,7 +123,7 @@
 <h1><code class="xref py py-mod docutils literal"><span class="pre">openml</span></code>.OpenMLRun<a class="headerlink" href="#openml-openmlrun" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="openml.OpenMLRun">
-<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLRun</code><span class="sig-paren">(</span><em>task_id</em>, <em>flow_id</em>, <em>setup_string</em>, <em>dataset_id</em>, <em>files=None</em>, <em>setup_id=None</em>, <em>tags=None</em>, <em>run_id=None</em>, <em>uploader=None</em>, <em>uploader_name=None</em>, <em>evaluations=None</em>, <em>detailed_evaluations=None</em>, <em>data_content=None</em>, <em>model=None</em>, <em>task_type=None</em>, <em>task_evaluation_measure=None</em>, <em>flow_name=None</em>, <em>parameter_settings=None</em>, <em>predictions_url=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLRun</code><span class="sig-paren">(</span><em>task_id</em>, <em>flow_id</em>, <em>setup_string</em>, <em>dataset_id</em>, <em>files=None</em>, <em>setup_id=None</em>, <em>tags=None</em>, <em>uploader=None</em>, <em>uploader_name=None</em>, <em>evaluations=None</em>, <em>detailed_evaluations=None</em>, <em>data_content=None</em>, <em>model=None</em>, <em>task_type=None</em>, <em>task_evaluation_measure=None</em>, <em>flow_name=None</em>, <em>parameter_settings=None</em>, <em>predictions_url=None</em>, <em>task=None</em>, <em>flow=None</em>, <em>run_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun" title="Permalink to this definition">¶</a></dt>
 <dd><p>OpenML Run: result of running a model on an openml dataset.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -137,7 +137,16 @@
 <dt id="openml.OpenMLRun.publish">
 <code class="descname">publish</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.publish" title="Permalink to this definition">¶</a></dt>
 <dd><p>Publish a run to the OpenML server.</p>
-<p>Uploads the results of a run to OpenML.</p>
+<p>Uploads the results of a run to OpenML.
+Sets the run_id on self</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>self</strong> : OpenMLRun</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
