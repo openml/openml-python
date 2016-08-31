@@ -27,7 +27,7 @@ class TestOpenMLDataset(TestBase):
         openml.config.set_cache_directory(self.static_cache_dir)
         cached_datasets = openml.datasets.functions._list_cached_datasets()
         self.assertIsInstance(cached_datasets, list)
-        self.assertEqual(len(cached_datasets), 2)
+        self.assertEqual(len(cached_datasets), 3)
         self.assertIsInstance(cached_datasets[0], int)
 
     @mock.patch('openml.datasets.functions._list_cached_datasets')
@@ -52,7 +52,7 @@ class TestOpenMLDataset(TestBase):
     def test_get_cached_dataset_description_not_cached(self):
         openml.config.set_cache_directory(self.static_cache_dir)
         self.assertRaisesRegexp(OpenMLCacheException, "Dataset description for "
-                                                      "dataset_id 3 not cached",
+                                                      "dataset id 3 not cached",
                                 openml.datasets.functions._get_cached_dataset_description,
                                 3)
 

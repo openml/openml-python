@@ -8,7 +8,7 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(10107)
         clf = LogisticRegression()
         run = openml.runs.run_task(task, clf)
-        return_code, return_value = run.publish()
+        run.publish()
         self.assertTrue(isinstance(run.dataset_id, int))
 
     def test_get_run(self):
