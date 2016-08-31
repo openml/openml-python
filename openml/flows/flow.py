@@ -3,7 +3,6 @@ import xmltodict
 import sklearn
 
 from .._api_calls import _perform_api_call
-from .. import config
 
 
 class OpenMLFlow(object):
