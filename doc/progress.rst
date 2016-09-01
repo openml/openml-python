@@ -6,6 +6,14 @@
 Progress
 ========
 
+Changelog
+=========
+
+0.3.0
+~~~~~
+
+* Add this changelog (Matthias Feurer)
+
 API calls
 =========
 
