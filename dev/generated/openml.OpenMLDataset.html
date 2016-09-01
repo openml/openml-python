@@ -172,6 +172,31 @@
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="openml.OpenMLDataset.retrieve_class_labels">
+<code class="descname">retrieve_class_labels</code><span class="sig-paren">(</span><em>target_name='class'</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.retrieve_class_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the datasets arff to determine the class-labels.</p>
+<p>If the task has no class labels (for example a regression problem)
+it returns None. Necessary because the data returned by get_data
+only contains the indices of the classes, while OpenML needs the real
+classname when uploading the results of a run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>target_name</strong> : str</p>
+<blockquote>
+<div><p>Name of the target attribute</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>
