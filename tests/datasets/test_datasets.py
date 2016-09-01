@@ -100,6 +100,22 @@ class TestOpenMLDataset(TestBase):
             self.assertIn(dataset['status'], ['in_preparation', 'active',
                                               'deactivated'])
 
+    def test_list_datasets_paginate(self):
+        size = 10
+        max = 100
+        for i in range(0, max, size):
+            data = openml.datasets.list_datasets_paginate(i, size)
+            self.assertGreaterEqual(size, len(data))
+            for dataset in data:
+                self.assertEqual(type(dataset), dict)
+                self.assertGreaterEqual(len(dataset), 2)
+                self.assertIn('did', dataset)
+                self.assertIsInstance(dataset['did'], int)
+                self.assertIn('status', dataset)
+                self.assertTrue(is_string(dataset['status']))
+                self.assertIn(dataset['status'], ['in_preparation',
+                                                  'active', 'deactivated'])
+
     @unittest.skip('See https://github.com/openml/openml-python/issues/149')
     def test_check_datasets_active(self):
         active = openml.datasets.check_datasets_active([1, 17])

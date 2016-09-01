@@ -130,6 +130,42 @@ def list_datasets():
     return _list_datasets("data/list")
 
 
+def list_datasets_paginate(offset,size):
+    """Return a partial list (of given size) dataset which are on OpenML, starting with offset.
+
+    Parameters
+    ----------
+    offset : int
+        the number of datasets to skip, starting from the first
+    size : int
+        the maximum datasets of tasks to show
+
+    Returns
+    -------
+    datasets : list of dicts
+        A partial list of datasets.
+
+        Every dataset is represented by a dictionary containing
+        the following information:
+        - dataset id
+        - status
+
+        If qualities are calculated for the dataset, some of
+        these are also returned.
+    """
+    try:
+        offset = int(offset)
+    except:
+        raise ValueError("Offset is neither an Integer nor can be "
+                         "cast to an Integer.")
+    try:
+        limit = int(size)
+    except:
+        raise ValueError("Size is neither an Integer nor can be "
+                         "cast to an Integer.")
+    return _list_datasets("data/list/offset/%d/limit/%d" % (offset, size))
+
+
 def list_datasets_by_tag(tag):
     """Return all datasets having the given tag.
 

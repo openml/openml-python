@@ -114,6 +114,76 @@ def list_tasks_by_type(task_type_id):
     return _list_tasks("task/list/type/%d" % task_type_id)
 
 
+def list_tasks_paginate(offset,size):
+    """Return a partial list (of given size) tasks for a given tasks type, starting with offset.
+
+    Parameters
+    ----------
+    offset : int
+        the number of tasks to skip, starting from the first
+    size : int
+        the maximum number of tasks to show
+
+     Returns
+    -------
+    list
+        A partial list of tasks of the task type. Every task is represented by a
+        dictionary containing the following information: task id,
+        dataset id, task_type and status. If qualities are calculated for
+        the associated dataset, some of these are also returned.
+    """
+    try:
+        offset = int(offset)
+    except:
+        raise ValueError("Offset is neither an Integer nor can be "
+                         "cast to an Integer.")
+    try:
+        size = int(size)
+    except:
+        raise ValueError("Size is neither an Integer nor can be "
+                         "cast to an Integer.")
+    return _list_tasks("task/list/offset/%d/limit/%d" % (offset, size))
+
+
+def list_tasks_by_type_paginate(task_type_id,offset,size):
+    """Return a partial list (of given size) tasks, starting with offset.
+
+    Parameters
+    ----------
+    task_type_id : int
+        ID of the task type as detailed
+        `here <http://www.openml.org/search?type=task_type>`_.
+    offset : int
+        the number of tasks to skip, starting from the first
+    size : int
+        the maximum number of tasks to show
+
+     Returns
+    -------
+    list
+        A partial list of tasks. Every task is represented by a
+        dictionary containing the following information: task id,
+        dataset id, task_type and status. If qualities are calculated for
+        the associated dataset, some of these are also returned.
+    """
+    try:
+        task_type_id = int(task_type_id)
+    except:
+        raise ValueError("Task Type ID is neither an Integer nor can be "
+                         "cast to an Integer.")
+    try:
+        offset = int(offset)
+    except:
+        raise ValueError("Offset is neither an Integer nor can be "
+                         "cast to an Integer.")
+    try:
+        size = int(size)
+    except:
+        raise ValueError("Size is neither an Integer nor can be "
+                         "cast to an Integer.")
+    return _list_tasks("task/list/type/%d/offset/%d/limit/%d" % (task_type_id,offset, size))
+
+
 def list_tasks_by_tag(tag):
     """Return all tasks having the given tag
 
