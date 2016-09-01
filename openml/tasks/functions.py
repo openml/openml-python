@@ -89,64 +89,8 @@ def _get_estimation_procedure_list():
     return procs
 
 
-def list_tasks_by_type(task_type_id):
-    """Return a list of all tasks for a given tasks type which are on OpenML.
-
-    Parameters
-    ----------
-    task_type_id : int
-        ID of the task type as detailed
-        `here <http://www.openml.org/search?type=task_type>`_.
-
-    Returns
-    -------
-    list
-        A list of all tasks of the given task type. Every task is represented by
-        a dictionary containing the following information: task id,
-        dataset id, task_type and status. If qualities are calculated for
-        the associated dataset, some of these are also returned.
-    """
-    try:
-        task_type_id = int(task_type_id)
-    except:
-        raise ValueError("Task Type ID is neither an Integer nor can be "
-                         "cast to an Integer.")
-    return _list_tasks("task/list/type/%d" % task_type_id)
-
-
-def list_tasks_paginate(offset,size):
-    """Return a partial list (of given size) tasks for a given tasks type, starting with offset.
-
-    Parameters
-    ----------
-    offset : int
-        the number of tasks to skip, starting from the first
-    size : int
-        the maximum number of tasks to show
-
-     Returns
-    -------
-    list
-        A partial list of tasks of the task type. Every task is represented by a
-        dictionary containing the following information: task id,
-        dataset id, task_type and status. If qualities are calculated for
-        the associated dataset, some of these are also returned.
-    """
-    try:
-        offset = int(offset)
-    except:
-        raise ValueError("Offset is neither an Integer nor can be "
-                         "cast to an Integer.")
-    try:
-        size = int(size)
-    except:
-        raise ValueError("Size is neither an Integer nor can be "
-                         "cast to an Integer.")
-    return _list_tasks("task/list/offset/%d/limit/%d" % (offset, size))
-
-
-def list_tasks_by_type_paginate(task_type_id,offset,size):
-    """Return a partial list (of given size) tasks, starting with offset.
+def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
+    """Return a number of tasks having the given tag and task_type_id
 
     Parameters
     ----------
@@ -157,63 +101,46 @@ def list_tasks_by_type_paginate(task_type_id,offset,size):
         the number of tasks to skip, starting from the first
     size : int
         the maximum number of tasks to show
-
-     Returns
-    -------
-    list
-        A partial list of tasks. Every task is represented by a
-        dictionary containing the following information: task id,
-        dataset id, task_type and status. If qualities are calculated for
-        the associated dataset, some of these are also returned.
-    """
-    try:
-        task_type_id = int(task_type_id)
-    except:
-        raise ValueError("Task Type ID is neither an Integer nor can be "
-                         "cast to an Integer.")
-    try:
-        offset = int(offset)
-    except:
-        raise ValueError("Offset is neither an Integer nor can be "
-                         "cast to an Integer.")
-    try:
-        size = int(size)
-    except:
-        raise ValueError("Size is neither an Integer nor can be "
-                         "cast to an Integer.")
-    return _list_tasks("task/list/type/%d/offset/%d/limit/%d" % (task_type_id,offset, size))
-
-
-def list_tasks_by_tag(tag):
-    """Return all tasks having the given tag
-
-    Parameters
-    ----------
     tag : str
+        the tag to include
 
     Returns
     -------
     list
-        A list of all tasks having a give tag. Every task is represented by
-        a dictionary containing the following information: task id,
-        dataset id, task_type and status. If qualities are calculated for
-        the associated dataset, some of these are also returned.
+        A list of all tasks having the given task_type_id and the give tag.
+        Every task is represented by a dictionary containing the following
+        information: task id, dataset id, task_type and status. If qualities
+        are calculated for the associated dataset, some of these are also
+        returned.
     """
-    return _list_tasks("task/list/tag/%s" % tag)
+    api_call = "task/list"
+    if task_type_id is not None:
+        try:
+            task_type_id = int(task_type_id)
+            api_call += "/task_type_id/%d" % task_type_id
+        except:
+            raise ValueError("Task_type_id is neither an Integer nor can be "
+                             "cast to an Integer.")
 
+    if offset is not None:
+        try:
+            offset = int(offset)
+            api_call += "/offset/%d" % offset
+        except:
+            raise ValueError("Offset is neither an Integer nor can be "
+                             "cast to an Integer.")
 
-def list_tasks():
-    """Return a list of all tasks which are on OpenML.
+    if size is not None:
+        try:
+            size = int(size)
+            api_call += "/limit/%d" % size
+        except:
+            raise ValueError("Size is neither an Integer nor can be "
+                             "cast to an Integer.")
+    if tag is not None:
+        api_call += "/tag/%s" % tag
 
-    Returns
-    -------
-    list
-        A list of all tasks. Every task is represented by a
-        dictionary containing the following information: task id,
-        dataset id, task_type and status. If qualities are calculated for
-        the associated dataset, some of these are also returned.
-    """
-    return _list_tasks('task/list')
+    return _list_tasks(api_call)
 
 
 def _list_tasks(api_call):

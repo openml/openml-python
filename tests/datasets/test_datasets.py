@@ -88,7 +88,7 @@ class TestOpenMLDataset(TestBase):
                                               'deactivated'])
 
     def test_list_datasets_by_tag(self):
-        datasets = openml.datasets.list_datasets_by_tag('uci')
+        datasets = openml.datasets.list_datasets(tag='uci')
         self.assertGreaterEqual(len(datasets), 5)
         for dataset in datasets:
             self.assertEqual(type(dataset), dict)
@@ -104,7 +104,7 @@ class TestOpenMLDataset(TestBase):
         size = 10
         max = 100
         for i in range(0, max, size):
-            data = openml.datasets.list_datasets_paginate(i, size)
+            data = openml.datasets.list_datasets(offset=i, size=size)
             self.assertGreaterEqual(size, len(data))
             for dataset in data:
                 self.assertEqual(type(dataset), dict)

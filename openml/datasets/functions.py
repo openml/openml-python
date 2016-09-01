@@ -42,7 +42,7 @@ def _list_cached_datasets():
             dataset_directory_content = os.listdir(directory_name)
 
             if "dataset.arff" in dataset_directory_content and \
-                    "description.xml" in dataset_directory_content:
+                            "description.xml" in dataset_directory_content:
                 if dataset_id not in datasets:
                     datasets.append(dataset_id)
 
@@ -111,27 +111,8 @@ def _get_cached_dataset_arff(dataset_id):
                                "cached" % dataset_id)
 
 
-def list_datasets():
+def list_datasets(offset=None, size=None, tag=None):
     """Return a list of all dataset which are on OpenML.
-
-    Returns
-    -------
-    datasets : list of dicts
-        A list of all datasets.
-
-        Every dataset is represented by a dictionary containing
-        the following information:
-        - dataset id
-        - status
-
-        If qualities are calculated for the dataset, some of
-        these are also returned.
-    """
-    return _list_datasets("data/list")
-
-
-def list_datasets_paginate(offset,size):
-    """Return a partial list (of given size) dataset which are on OpenML, starting with offset.
 
     Parameters
     ----------
@@ -139,46 +120,42 @@ def list_datasets_paginate(offset,size):
         the number of datasets to skip, starting from the first
     size : int
         the maximum datasets of tasks to show
+    tag : str
+        the tag to include
 
     Returns
     -------
     datasets : list of dicts
-        A partial list of datasets.
+        A list of datasets having the given tag (if applicable).
 
         Every dataset is represented by a dictionary containing
         the following information:
         - dataset id
         - status
-
+        
         If qualities are calculated for the dataset, some of
         these are also returned.
     """
-    try:
-        offset = int(offset)
-    except:
-        raise ValueError("Offset is neither an Integer nor can be "
-                         "cast to an Integer.")
-    try:
-        limit = int(size)
-    except:
-        raise ValueError("Size is neither an Integer nor can be "
-                         "cast to an Integer.")
-    return _list_datasets("data/list/offset/%d/limit/%d" % (offset, size))
+    api_call = "data/list"
+    if offset is not None:
+        try:
+            offset = int(offset)
+            api_call += "/offset/%d" % offset
+        except:
+            raise ValueError("Offset is neither an Integer nor can be "
+                             "cast to an Integer.")
 
+    if size is not None:
+        try:
+            size = int(size)
+            api_call += "/limit/%d" % size
+        except:
+            raise ValueError("Size is neither an Integer nor can be "
+                             "cast to an Integer.")
+    if tag is not None:
+        api_call += "/tag/%s" % tag
 
-def list_datasets_by_tag(tag):
-    """Return all datasets having the given tag.
-
-    Returns
-    -------
-    datasets : list of dicts
-        A list of all datasets having the given tag. Every dataset is
-        represented by a dictionary containing the following information:
-        dataset id, and status. If qualities are calculated for the dataset,
-        some of these are also returned.
-
-    """
-    return _list_datasets("data/list/%s" % tag)
+    return _list_datasets(api_call)
 
 
 def _list_datasets(api_call):
@@ -190,7 +167,7 @@ def _list_datasets(api_call):
     assert type(datasets_dict['oml:data']['oml:dataset']) == list, \
         type(datasets_dict['oml:data'])
     assert datasets_dict['oml:data']['@xmlns:oml'] == \
-        'http://openml.org/openml'
+           'http://openml.org/openml'
 
     datasets = []
     for dataset_ in datasets_dict['oml:data']['oml:dataset']:
