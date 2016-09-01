@@ -8,6 +8,7 @@ import arff
 
 import numpy as np
 import scipy.sparse
+import xmltodict
 
 if sys.version_info[0] >= 3:
     import pickle
@@ -16,6 +17,7 @@ else:
         import cPickle as pickle
     except:
         import pickle
+
 
 from ..util import is_string
 from .._api_calls import _perform_api_call
@@ -36,7 +38,7 @@ class OpenMLDataset(object):
         Description of the dataset
     FIXME : which of these do we actually nee?
     """
-    def __init__(self, id=None, name=None, version=None, description=None,
+    def __init__(self, dataset_id=None, name=None, version=None, description=None,
                  format=None, creator=None, contributor=None,
                  collection_date=None, upload_date=None, language=None,
                  licence=None, url=None, default_target_attribute=None,
@@ -45,7 +47,7 @@ class OpenMLDataset(object):
                  original_data_url=None, paper_url=None, update_comment=None,
                  md5_checksum=None, data_file=None):
         # Attributes received by querying the RESTful API
-        self.id = int(id) if id is not None else None
+        self.dataset_id = int(dataset_id) if dataset_id is not None else None
         self.name = name
         self.version = int(version)
         self.description = description
@@ -76,7 +78,7 @@ class OpenMLDataset(object):
                 logger.debug("Data pickle file already exists.")
             else:
                 try:
-                    data = self._get_arff()
+                    data = self._get_arff(self.format)
                 except OSError as e:
                     logger.critical("Please check that the data file %s is there "
                                     "and can be read.", self.data_file)
@@ -100,7 +102,7 @@ class OpenMLDataset(object):
                 with open(self.data_pickle_file, "wb") as fh:
                     pickle.dump((X, categorical, attribute_names), fh, -1)
                 logger.debug("Saved dataset %d: %s to file %s" %
-                             (self.id, self.name, self.data_pickle_file))
+                             (self.dataset_id, self.name, self.data_pickle_file))
 
     def __eq__(self, other):
         if type(other) != OpenMLDataset:
@@ -111,7 +113,7 @@ class OpenMLDataset(object):
         else:
             return False
 
-    def _get_arff(self):
+    def _get_arff(self, format):
         """Read ARFF file and return decoded arff.
 
         Reads the file referenced in self.data_file.
@@ -135,9 +137,17 @@ class OpenMLDataset(object):
         if bits != 64 and os.path.getsize(filename) > 120000000:
             return NotImplementedError("File too big")
 
+        if format.lower() == 'arff':
+            return_type = arff.DENSE
+        elif format.lower() == 'sparse_arff':
+            return_type = arff.COO
+        else:
+            raise ValueError('Unknown data format %s' % format)
+
         def decode_arff(fh):
             decoder = arff.ArffDecoder()
-            return decoder.decode(fh, encode_nominal=True)
+            return decoder.decode(fh, encode_nominal=True,
+                                  return_type=return_type)
 
         if filename[-3:] == ".gz":
             with gzip.open(filename) as fh:
@@ -239,21 +249,41 @@ class OpenMLDataset(object):
         else:
             return rval
 
-    def _retrieve_class_labels(self):
-        """Reads the datasets arff to determine the class-labels, and returns those.
-        If the task has no class labels (for example a regression problem) it returns None."""
+    def retrieve_class_labels(self, target_name='class'):
+        """Reads the datasets arff to determine the class-labels.
+
+        If the task has no class labels (for example a regression problem)
+        it returns None. Necessary because the data returned by get_data
+        only contains the indices of the classes, while OpenML needs the real
+        classname when uploading the results of a run.
+
+        Parameters
+        ----------
+        target_name : str
+            Name of the target attribute
+
+        Returns
+        -------
+        list
+        """
+
         # TODO improve performance, currently reads the whole file
         # Should make a method that only reads the attributes
         arffFileName = self.data_file
 
+        if self.format.lower() == 'arff':
+            return_type = arff.DENSE
+        elif self.format.lower() == 'sparse_arff':
+            return_type = arff.COO
+        else:
+            raise ValueError('Unknown data format %s' % self.format)
+
         with io.open(arffFileName, encoding='utf8') as fh:
-            arffData = arff.ArffDecoder().decode(fh)
+            arffData = arff.ArffDecoder().decode(fh, return_type=return_type)
 
         dataAttributes = dict(arffData['attributes'])
-        if('class' in dataAttributes):
-            return dataAttributes['class']
-        elif('Class' in dataAttributes):
-            return dataAttributes['Class']
+        if target_name in dataAttributes:
+            return dataAttributes[target_name]
         else:
             return None
 
@@ -281,7 +311,8 @@ class OpenMLDataset(object):
             "/data/", file_dictionary=file_dictionary,
             file_elements=file_elements)
 
-        return return_code, return_value
+        self.dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])
+        return self
 
     def _to_xml(self):
         """Serialize object to xml for upload
@@ -292,7 +323,7 @@ class OpenMLDataset(object):
             XML description of the data.
         """
         xml_dataset = ('<oml:data_set_description '
-                       'xmlns:oml="http://openml.org/openml">')
+                       'xmlns:oml="http://openml.org/openml">\n')
         props = ['id', 'name', 'version', 'description', 'format', 'creator',
                  'contributor', 'collection_date', 'upload_date', 'language',
                  'licence', 'url', 'default_target_attribute',
@@ -302,6 +333,6 @@ class OpenMLDataset(object):
         for prop in props:
             content = getattr(self, prop, None)
             if content is not None:
-                xml_dataset += "<oml:{0}>{1}</oml:{0}>".format(prop, content)
+                xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, content)
         xml_dataset += "</oml:data_set_description>"
         return xml_dataset

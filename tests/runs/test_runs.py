@@ -8,9 +8,9 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(10107)
         clf = LogisticRegression()
         run = openml.runs.run_task(task, clf)
-        return_code, return_value = run.publish()
-        self.assertEqual(return_code, 200)
-        # self.assertTrue("This is a read-only account" in return_value)
+        run_ = run.publish()
+        self.assertEqual(run_, run)
+        self.assertIsInstance(run.dataset_id, int)
 
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(1939)

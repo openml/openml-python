@@ -18,12 +18,12 @@ class OpenMLTaskTest(TestBase):
         self.assertRaisesRegexp(KeyError, 'oml:target_feature',
                                 openml.tasks.get_task, 10128)
 
-    @mock.patch('openml.datasets.get_dataset')
+    @mock.patch('openml.datasets.get_dataset', autospec=True)
     def test_get_dataset(self, patch):
         patch.return_value = mock.MagicMock()
         mm = mock.MagicMock()
-        patch.return_value._retrieve_class_labels = mm
-        patch.return_value._retrieve_class_labels.return_value = 'LA'
+        patch.return_value.retrieve_class_labels = mm
+        patch.return_value.retrieve_class_labels.return_value = 'LA'
         retval = openml.tasks.get_task(1)
         self.assertEqual(patch.call_count, 1)
         self.assertIsInstance(retval, openml.OpenMLTask)

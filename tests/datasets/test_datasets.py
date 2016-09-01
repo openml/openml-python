@@ -1,12 +1,13 @@
 import unittest
 import os
-import shutil
 import sys
 
 if sys.version_info[0] >= 3:
     from unittest import mock
 else:
     import mock
+
+import scipy.sparse
 
 import openml
 from openml import OpenMLDataset
@@ -53,19 +54,20 @@ class TestOpenMLDataset(TestBase):
     def test_get_cached_dataset_description_not_cached(self):
         openml.config.set_cache_directory(self.static_cache_dir)
         self.assertRaisesRegexp(OpenMLCacheException, "Dataset description for "
-                                                      "did 3 not cached",
+                                                      "dataset id 3 not cached",
                                 openml.datasets.functions._get_cached_dataset_description,
                                 3)
 
     def test_get_cached_dataset_arff(self):
         openml.config.set_cache_directory(self.static_cache_dir)
-        description = openml.datasets.functions._get_cached_dataset_arff(did=2)
+        description = openml.datasets.functions._get_cached_dataset_arff(
+            dataset_id=2)
         self.assertIsInstance(description, str)
 
     def test_get_cached_dataset_arff_not_cached(self):
         openml.config.set_cache_directory(self.static_cache_dir)
         self.assertRaisesRegexp(OpenMLCacheException, "ARFF file for "
-                                                      "did 3 not cached",
+                                                      "dataset id 3 not cached",
                                 openml.datasets.functions._get_cached_dataset_arff,
                                 3)
 
@@ -141,6 +143,11 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(os.path.exists(os.path.join(
             openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
 
+    def test_get_dataset_sparse(self):
+        dataset = openml.datasets.get_dataset(1571)
+        X = dataset.get_data()
+        self.assertIsInstance(X, scipy.sparse.csr_matrix)
+
     def test_download_rowid(self):
         # Smoke test which checks that the dataset has the row-id set correctly
         did = 164
@@ -197,14 +204,21 @@ class TestOpenMLDataset(TestBase):
         dataset = OpenMLDataset(
             name="anneal", version=1, description="test",
             format="ARFF", licence="public", default_target_attribute="class", data_file=file_path)
-        return_code, return_value = dataset.publish()
-        self.assertEqual(return_code, 200)
+        dataset.publish()
+        self.assertIsInstance(dataset.dataset_id, int)
+
+    def test__retrieve_class_labels(self):
+        openml.config.set_cache_directory(self.static_cache_dir)
+        labels = openml.datasets.get_dataset(2).retrieve_class_labels()
+        self.assertEqual(labels, ['1', '2', '3', '4', '5', 'U'])
+        labels = openml.datasets.get_dataset(2).retrieve_class_labels(
+            target_name='product-type')
+        self.assertEqual(labels, ['C', 'H', 'G'])
 
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
             name="UploadTestWithURL", version=1, description="test",
             format="ARFF",
             url="http://expdb.cs.kuleuven.be/expdb/data/uci/nominal/iris.arff")
-        return_code, return_value = dataset.publish()
-        # self.assertTrue("This is a read-only account" in return_value)
-        self.assertEqual(return_code, 200)
+        dataset.publish()
+        self.assertIsInstance(dataset.dataset_id, int)
