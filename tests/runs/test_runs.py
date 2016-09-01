@@ -1,4 +1,4 @@
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, SGDClassifier
 import openml
 from openml.testing import TestBase
 
@@ -11,6 +11,36 @@ class TestRun(TestBase):
         run_ = run.publish()
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
+
+    def test__run_task_get_arffcontent(self):
+        task = openml.tasks.get_task(1939)
+        class_labels = task.class_labels
+
+        clf = SGDClassifier(loss='hinge', random_state=1)
+        self.assertRaisesRegexp(AttributeError,
+                                "probability estimates are not available for loss='hinge'",
+                                openml.runs.run._run_task_get_arffcontent,
+                                clf, task, class_labels)
+
+        clf = SGDClassifier(loss='log', random_state=1)
+        arff_datacontent = openml.runs.run._run_task_get_arffcontent(
+            clf, task, class_labels)
+        self.assertIsInstance(arff_datacontent, list)
+        # 10 times 10 fold CV of 150 samples
+        self.assertEqual(len(arff_datacontent), 1500)
+        for arff_line in arff_datacontent:
+            self.assertEqual(len(arff_line), 8)
+            self.assertGreaterEqual(arff_line[0], 0)
+            self.assertLessEqual(arff_line[0], 9)
+            self.assertGreaterEqual(arff_line[1], 0)
+            self.assertLessEqual(arff_line[1], 9)
+            self.assertGreaterEqual(arff_line[2], 0)
+            self.assertLessEqual(arff_line[2], 149)
+            self.assertAlmostEqual(sum(arff_line[3:6]), 1.0)
+            self.assertIn(arff_line[6], ['Iris-setosa', 'Iris-versicolor',
+                                         'Iris-virginica'])
+            self.assertIn(arff_line[7], ['Iris-setosa', 'Iris-versicolor',
+                                         'Iris-virginica'])
 
     def test_get_run(self):
         run = openml.runs.get_run(473350)

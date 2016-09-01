@@ -23,8 +23,8 @@ class OpenMLRun(object):
     FIXME
 
     """
-    def __init__(self, task_id, flow_id, setup_string, dataset_id, files=None,
-                 setup_id=None, tags=None, uploader=None, uploader_name=None,
+    def __init__(self, task_id, flow_id, dataset_id, setup_string=None, 
+                 files=None, setup_id=None, tags=None, uploader=None, uploader_name=None,
                  evaluations=None, detailed_evaluations=None,
                  data_content=None, model=None, task_type=None,
                  task_evaluation_measure=None, flow_name=None,
@@ -49,15 +49,20 @@ class OpenMLRun(object):
         self.flow = flow
         self.run_id = run_id
 
-    def _generate_arff(self):
-        """Generates an arff for upload to server.
+    def _generate_arff_dict(self):
+        """Generates the arff dictionary for upload to the server.
+
+        Assumes that the run has been executed.
 
         Returns
         -------
-        arf_dict : dictionary
-            Dictionary representation of an ARFF data format containing
-            predictions and confidences.
+        arf_dict : dict
+            Dictionary representation of the ARFF file that will be uploaded.
+            Contains predictions and information about the run environment.
         """
+        if self.data_content is None:
+            raise ValueError('Run has not been executed.')
+
         run_environment = (_get_version_information() +
                            [time.strftime("%c")] + ['Created by run_task()'])
         task = get_task(self.task_id)
@@ -85,7 +90,7 @@ class OpenMLRun(object):
         -------
         self : OpenMLRun
         """
-        predictions = arff.dumps(self._generate_arff())
+        predictions = arff.dumps(self._generate_arff_dict())
         description_xml = self._create_description_xml()
         file_elements = {'predictions': ("predictions.csv", predictions),
                          'description': ("description.xml", description_xml)}
@@ -159,11 +164,19 @@ def run_task(task, model):
                          'only works for tasks with class labels.')
     setup_string = _create_setup_string(model)
 
-    run = OpenMLRun(task_id=task.task_id, flow_id=flow_id,
-                    setup_string=setup_string, dataset_id=dataset.dataset_id,
-                    task=task, flow=flow)
+    run = OpenMLRun(task.task_id, flow_id, setup_string, dataset.id)
+    run.data_content = _run_task_get_arffcontent(model, task, class_labels)
 
-    train_times = []
+    # The model will not be uploaded at the moment, but used to get the
+    # hyperparameter values when uploading the run
+    X, Y = task.get_X_and_y()
+    run.model = model.fit(X, Y)
+    return run
+
+
+def _run_task_get_arffcontent(model, task, class_labels):
+    X, Y = task.get_X_and_y()
+    arff_datacontent = []
 
     rep_no = 0
     # TODO use different iterator to only provide a single iterator (less
@@ -177,26 +190,21 @@ def run_task(task, model):
             testX = X[test_indices]
             testY = Y[test_indices]
 
-            start_time = time.time()
             model.fit(trainX, trainY)
             ProbaY = model.predict_proba(testX)
             PredY = model.predict(testX)
-            end_time = time.time()
-
-            train_times.append(end_time - start_time)
 
             for i in range(0, len(test_indices)):
-                arff_line = [rep_no, fold_no, test_indices[i],
-                             class_labels[PredY[i]], class_labels[testY[i]]]
-                arff_line[3:3] = ProbaY[i]
+                arff_line = [rep_no, fold_no, test_indices[i]]
+                arff_line.extend(ProbaY[i])
+                arff_line.append(class_labels[PredY[i]])
+                arff_line.append(class_labels[testY[i]])
                 arff_datacontent.append(arff_line)
 
             fold_no = fold_no + 1
         rep_no = rep_no + 1
 
-    run.data_content = arff_datacontent
-    run.model = model.fit(X, Y)
-    return run
+    return arff_datacontent
 
 
 def _to_dict(taskid, flow_id, setup_string, parameter_settings, tags):
