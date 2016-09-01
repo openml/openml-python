@@ -1,8 +1,17 @@
+import hashlib
+import sys
+import time
 import unittest
+
 from sklearn.dummy import DummyClassifier
 
 from openml.testing import TestBase
 import openml
+
+if sys.version_info[0] >= 3:
+    from unittest import mock
+else:
+    import mock
 
 
 class TestFlow(TestBase):
@@ -17,8 +26,17 @@ class TestFlow(TestBase):
         for flow in flows:
             check_flow(flow)
 
-    @unittest.skip('Not tested until test sentinels are added back.')
-    def test_upload_flow(self):
+    @mock.patch.object(openml.OpenMLFlow, '_get_name', autospec=True)
+    def test_upload_flow(self, name_mock):
         flow = openml.OpenMLFlow(model=DummyClassifier(), description="test description")
+
+        # Create a unique prefix for the flow. Necessary because the flow is
+        # identified by its name and external version online. Having a unique
+        #  name allows us to publish the same flow in each test run
+        md5 = hashlib.md5()
+        md5.update(str(time.time()).encode('utf-8'))
+        sentinel = md5.hexdigest()[:10]
+        name_mock.return_value = '%s%s' % (sentinel, flow.name)
+
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)

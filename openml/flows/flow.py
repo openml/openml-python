@@ -50,10 +50,11 @@ class OpenMLFlow(object):
             Flow represented as XML string.
         """
         model = self.model
+
         flow_dict = OrderedDict()
         flow_dict['oml:flow'] = OrderedDict()
         flow_dict['oml:flow']['@xmlns:oml'] = 'http://openml.org/openml'
-        flow_dict['oml:flow']['oml:name'] = self.name
+        flow_dict['oml:flow']['oml:name'] = self._get_name()
         flow_dict['oml:flow']['oml:external_version'] = self.external_version
         flow_dict['oml:flow']['oml:description'] = self.description
 
@@ -103,7 +104,7 @@ class OpenMLFlow(object):
         """
         import sklearn
         flow_version = 'sklearn_' + sklearn.__version__
-        _, _, flow_id = _check_flow_exists(self.name, flow_version)
+        _, _, flow_id = _check_flow_exists(self._get_name(), flow_version)
         # TODO add numpy and scipy version!
 
         if int(flow_id) == -1:
@@ -114,6 +115,10 @@ class OpenMLFlow(object):
             return int(flow_id)
 
         return int(flow_id)
+
+    def _get_name(self):
+        """Helper function. Can be mocked for testing."""
+        return self.name
 
 
 def _check_flow_exists(name, version):
