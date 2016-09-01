@@ -5,3 +5,4 @@ liac-arff>=2.1.1dev
 xmltodict
 nose
 requests
+scikit-learn
