@@ -200,8 +200,8 @@ class OpenMLDataset(object):
                     to_exclude.extend(self.ignore_attributes)
 
         if len(to_exclude) > 0:
-            logger.info("Going to remove the following row_id_attributes:"
-                        " %s" % self.row_id_attribute)
+            logger.info("Going to remove the following attributes:"
+                        " %s" % to_exclude)
             keep = np.array([True if column not in to_exclude else False
                              for column in attribute_names])
             data = data[:, keep]
