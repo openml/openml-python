@@ -28,5 +28,5 @@ class TestFlow(TestBase):
     def test_upload_flow(self, name_mock):
         flow = openml.OpenMLFlow(model=DummyClassifier(), description="test description")
         name_mock.return_value = '%s%s' % (self.sentinel, flow.name)
-        return_code, return_value = flow.publish()
-        self.assertEqual(return_code, 200)
+        flow.publish()
+        self.assertIsInstance(flow.flow_id, int)
