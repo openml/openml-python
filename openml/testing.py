@@ -1,11 +1,8 @@
-import hashlib
 import inspect
 import os
 import shutil
 import unittest
 import openml
-
-import numpy as np
 
 
 class TestBase(unittest.TestCase):
@@ -41,20 +38,6 @@ class TestBase(unittest.TestCase):
 
         os.mkdir(self.workdir)
         os.chdir(self.workdir)
-
-        # Remove testmode once mock.wraps is available?
-        openml.config._testmode = True
-        apikey = openml.config.apikey
-        pid = os.getpid()
-        md5 = hashlib.md5()
-        md5.update(apikey.encode('utf-8'))
-        md5.update(str(pid).encode('utf-8'))
-        random_number = np.random.randint(1000000000)
-        md5.update(str(random_number).encode('utf-8'))
-        sentinel = md5.hexdigest()
-        # For testing the hash code mustn't be bulletproof
-        self.sentinel = '%sTESTSENTINEL999' % sentinel[:8]
-        openml.config.testsentinel = self.sentinel
 
         self.cached = True
         # amueller's read/write key that he will throw away later
