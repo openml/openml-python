@@ -9,14 +9,14 @@ from .._api_calls import _read_url
 
 
 class OpenMLTask(object):
-    def __init__(self, task_id, task_type, data_set_id, target_feature,
+    def __init__(self, task_id, task_type, data_set_id, target_name,
                  estimation_procedure_type, data_splits_url,
                  estimation_parameters, evaluation_measure, cost_matrix,
                  class_labels=None):
         self.task_id = int(task_id)
         self.task_type = task_type
         self.dataset_id = int(data_set_id)
-        self.target_feature = target_feature
+        self.target_name = target_name
         self.estimation_procedure = dict()
         self.estimation_procedure["type"] = estimation_procedure_type
         self.estimation_procedure["data_splits_url"] = data_splits_url
@@ -43,7 +43,7 @@ class OpenMLTask(object):
             target_dtype = float
         else:
             raise NotImplementedError(self.task_type)
-        X_and_y = dataset.get_data(target=self.target_feature,
+        X_and_y = dataset.get_data(target=self.target_name,
                                    target_dtype=target_dtype)
         return X_and_y
 
