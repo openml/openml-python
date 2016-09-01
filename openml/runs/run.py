@@ -164,7 +164,8 @@ def run_task(task, model):
                          'only works for tasks with class labels.')
     setup_string = _create_setup_string(model)
 
-    run = OpenMLRun(task.task_id, flow_id, setup_string, dataset.id)
+    run = OpenMLRun(task_id=task.task_id, flow_id=flow_id,
+                    setup_string=setup_string, dataset_id=dataset.dataset_id)
     run.data_content = _run_task_get_arffcontent(model, task, class_labels)
 
     # The model will not be uploaded at the moment, but used to get the
