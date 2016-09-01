@@ -13,6 +13,7 @@ Changelog
 ~~~~~
 
 * Add this changelog (Matthias Feurer)
+* 2nd example notebook PyOpenML.ipynb (Joaquin Vanschoren)
 
 API calls
 =========

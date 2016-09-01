@@ -26,7 +26,7 @@ class OpenMLDemoTest(unittest.TestCase):
         except:
             pass
 
-    def test_notebook(self):
+    def _test_notebook(self, notebook_name):
         notebook_name = 'OpenMLDemo.ipynb'
 
         notebook_filename = os.path.abspath(os.path.join(
@@ -49,3 +49,9 @@ class OpenMLDemoTest(unittest.TestCase):
             finally:
                 with open(notebook_filename_out, mode='wt') as f:
                     nbformat.write(nb, f)
+
+    def test_OpenMLDemo(self):
+        self._test_notebook('OpenMLDemo.ipynb')
+
+    def test_PyOpenML(self):
+        self._test_notebook('PyOpenML.ipynb')
