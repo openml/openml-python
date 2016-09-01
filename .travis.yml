@@ -1,40 +1,23 @@
 language: python
-python:
-  - "2.7"
-  - "3.4"
-
-env:
-  secure: "KTU56Bhft39FhFnV80Ek+Ht8nwAAJWlLAN104bALBzQWVraoD/znx0gQnoS+YQDjzxgpj30UKBua/o8q1IrvkjxJb8yUBzpS0P1jcGwqmpVRoNdb3pQPk8R7fB9pTFiaJUQbdQJ2/xTrB/T9Kda0J1zq81LC1zSOxAxUL47UI50="
-
-cache:
-  directories:
-    - $HOME/.cache/pip
-  pip: true
 
 sudo: false
 
-before_cache:
-  - rm -f $HOME/.cache/pip/log/debug.log
-
-# command to install dependencies
-addons:
-  apt:
-    packages:
-    - libatlas-dev
-    - liblapack-dev
-    - libatlas-base-dev
-    - gfortran
-
-before_install:
-  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - conda update --yes conda
-
-install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION pip numpy=1.9 scipy=0.16 nose pandas
-  - pip install mock
-  - python setup.py install
-
-# command to run tests, e.g. python setup.py test
-script:  python setup.py test
+cache:
+  apt: true
+  # We use three different cache directory
+  # to work around a Travis bug with multi-platform cache
+  directories:
+  - $HOME/.cache/pip
+  - $HOME/download
+env:
+  global:
+  # Directory where tests are run from
+  - TEST_DIR=/tmp/test_dir/
+  - MODULE=openml
+  matrix:
+  - DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY_VERSION="1.10.4" SCIPY_VERSION="0.17.0" CYTHON_VERSION="0.21"
+  - DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY_VERSION="1.10.4" SCIPY_VERSION="0.17.0" CYTHON_VERSION="0.23.4"
+  - DISTRIB="conda" PYTHON_VERSION="3.5" COVERAGE="true" NUMPY_VERSION="1.10.4" SCIPY_VERSION="0.17.0" CYTHON_VERSION="0.23.4"
+install: source ci_scripts/install.sh
+script: bash ci_scripts/test.sh
+after_success: source ci_scripts/success.sh

@@ -14,3 +14,17 @@ In particular, this module implemts a python interface for the
 (`REST on wikipedia
 <http://en.wikipedia.org/wiki/Representational_state_transfer>`_).
 """
+from . import config
+
+from .datasets import OpenMLDataset
+from . import datasets
+from . import runs
+from .runs import OpenMLRun
+from .tasks import OpenMLTask, OpenMLSplit
+from .flows import OpenMLFlow
+
+
+__version__ = "0.2.1"
+
+__all__ = ['OpenMLDataset', 'OpenMLRun', 'OpenMLSplit',
+           'datasets', 'OpenMLTask', 'OpenMLFlow', 'config', 'runs']

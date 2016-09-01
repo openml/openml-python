@@ -1,4 +1,40 @@
+import os
 import setuptools
+import sys
+
+
+requirements_file = os.path.join(os.path.dirname(__file__), 'requirements.txt')
+requirements = []
+dependency_links = []
+with open(requirements_file) as fh:
+    for line in fh:
+        line = line.strip()
+        if line:
+            # Make sure the github URLs work here as well
+            split = line.split('@')
+            split = split[0]
+            split = split.split('/')
+            url = '/'.join(split[:-1])
+            requirement = split[-1]
+            requirements.append(requirement)
+            # Add the rest of the URL to the dependency links to allow
+            # setup.py test to work
+            if 'git+https' in url:
+                dependency_links.append(line.replace('git+', ''))
+
+
+try:
+    import numpy
+except ImportError:
+    print('numpy is required during installation')
+    sys.exit(1)
+
+try:
+    import scipy
+except ImportError:
+    print('scipy is required during installation')
+    sys.exit(1)
+
 
 setuptools.setup(name="openml",
                  author="Matthias Feurer",
@@ -11,13 +47,7 @@ setuptools.setup(name="openml",
                  version="0.2.1",
                  packages=setuptools.find_packages(),
                  package_data={'': ['*.txt', '*.md']},
-                 install_requires=["liac-arff>=2.1.1dev",
-                                   "numpy>=1.6.2",
-                                   "scipy>=0.13.3",
-                                   "xmltodict",
-                                   "nose",
-                                   "numpydoc",
-                                   "requests"],
+                 install_requires=requirements,
                  test_suite="nose.collector",
                  classifiers=['Intended Audience :: Science/Research',
                               'Intended Audience :: Developers',
@@ -31,8 +61,8 @@ setuptools.setup(name="openml",
                               'Programming Language :: Python :: 2',
                               'Programming Language :: Python :: 2.7',
                               'Programming Language :: Python :: 3',
-                              'Programming Language :: Python :: 3.3',
                               'Programming Language :: Python :: 3.4',
+                              'Programming Language :: Python :: 3.5',
                  ],
                  dependency_links=[
                      "http://github.com/mfeurer/liac-arff/archive/master.zip"
