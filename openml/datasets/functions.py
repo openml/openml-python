@@ -160,9 +160,10 @@ def _list_datasets(api_call):
     assert datasets_dict['oml:data']['@xmlns:oml'] == \
            'http://openml.org/openml'
 
-    datasets = []
+    datasets = dict()
     for dataset_ in datasets_dict['oml:data']['oml:dataset']:
-        dataset = {'did': int(dataset_['oml:did']),
+        did = int(dataset_['oml:did'])
+        dataset = {'did': did,
                    'name': dataset_['oml:name'],
                    'format': dataset_['oml:format'],
                    'status': dataset_['oml:status']}
@@ -173,9 +174,7 @@ def _list_datasets(api_call):
             if abs(int(quality['#text']) - quality['#text']) < 0.0000001:
                 quality['#text'] = int(quality['#text'])
             dataset[quality['@name']] = quality['#text']
-
-        datasets.append(dataset)
-    datasets.sort(key=lambda t: t['did'])
+        datasets[did] = dataset
 
     return datasets
 
