@@ -42,7 +42,7 @@ def _list_cached_datasets():
             dataset_directory_content = os.listdir(directory_name)
 
             if "dataset.arff" in dataset_directory_content and \
-                    "description.xml" in dataset_directory_content:
+                            "description.xml" in dataset_directory_content:
                 if dataset_id not in datasets:
                     datasets.append(dataset_id)
 
@@ -111,13 +111,22 @@ def _get_cached_dataset_arff(dataset_id):
                                "cached" % dataset_id)
 
 
-def list_datasets():
+def list_datasets(offset=None, size=None, tag=None):
     """Return a list of all dataset which are on OpenML.
+
+    Parameters
+    ----------
+    offset : int, optional
+        the number of datasets to skip, starting from the first
+    size : int, optional
+        the maximum datasets of tasks to show
+    tag : str, optional
+        the tag to include
 
     Returns
     -------
     datasets : list of dicts
-        A list of all datasets.
+        A list of datasets having the given tag (if applicable).
 
         Every dataset is represented by a dictionary containing
         the following information:
@@ -127,22 +136,17 @@ def list_datasets():
         If qualities are calculated for the dataset, some of
         these are also returned.
     """
-    return _list_datasets("data/list")
+    api_call = "data/list"
+    if offset is not None:
+        api_call += "/offset/%d" % int(offset)
 
+    if size is not None:
+       api_call += "/limit/%d" % int(size)
 
-def list_datasets_by_tag(tag):
-    """Return all datasets having the given tag.
+    if tag is not None:
+        api_call += "/tag/%s" % tag
 
-    Returns
-    -------
-    datasets : list of dicts
-        A list of all datasets having the given tag. Every dataset is
-        represented by a dictionary containing the following information:
-        dataset id, and status. If qualities are calculated for the dataset,
-        some of these are also returned.
-
-    """
-    return _list_datasets("data/list/%s" % tag)
+    return _list_datasets(api_call)
 
 
 def _list_datasets(api_call):
@@ -154,7 +158,7 @@ def _list_datasets(api_call):
     assert type(datasets_dict['oml:data']['oml:dataset']) == list, \
         type(datasets_dict['oml:data'])
     assert datasets_dict['oml:data']['@xmlns:oml'] == \
-        'http://openml.org/openml'
+           'http://openml.org/openml'
 
     datasets = []
     for dataset_ in datasets_dict['oml:data']['oml:dataset']:
