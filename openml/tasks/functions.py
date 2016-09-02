@@ -115,7 +115,7 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
     """
     api_call = "task/list"
     if task_type_id is not None:
-        api_call += "/task_type_id/%d" % int(task_type_id)
+        api_call += "/type/%d" % int(task_type_id)
 
     if offset is not None:
         api_call += "/offset/%d" % int(offset)
