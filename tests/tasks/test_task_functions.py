@@ -38,7 +38,6 @@ class TestTask(TestBase):
         self.assertIsInstance(estimation_procedures, list)
         self.assertIsInstance(estimation_procedures[0], dict)
         self.assertEqual(estimation_procedures[0]['task_type_id'], 1)
-        print(estimation_procedures)
 
     def _check_task(self, task):
         self.assertEqual(type(task), dict)
