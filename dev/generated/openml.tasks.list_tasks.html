@@ -123,18 +123,38 @@
 <h1><code class="xref py py-mod docutils literal"><span class="pre">openml.tasks</span></code>.list_tasks<a class="headerlink" href="#openml-tasks-list-tasks" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.tasks.list_tasks">
-<code class="descclassname">openml.tasks.</code><code class="descname">list_tasks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.list_tasks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of all tasks which are on OpenML.</p>
+<code class="descclassname">openml.tasks.</code><code class="descname">list_tasks</code><span class="sig-paren">(</span><em>task_type_id=None</em>, <em>offset=None</em>, <em>size=None</em>, <em>tag=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.list_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a number of tasks having the given tag and task_type_id</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>task_type_id</strong> : int, optional</p>
+<blockquote>
+<div><p>ID of the task type as detailed
+<a class="reference external" href="http://www.openml.org/search?type=task_type">here</a>.</p>
+</div></blockquote>
+<p><strong>offset</strong> : int, optional</p>
+<blockquote>
+<div><p>the number of tasks to skip, starting from the first</p>
+</div></blockquote>
+<p><strong>size</strong> : int, optional</p>
+<blockquote>
+<div><p>the maximum number of tasks to show</p>
+</div></blockquote>
+<p><strong>tag</strong> : str, optional</p>
+<blockquote>
+<div><p>the tag to include</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list</p>
 <blockquote class="last">
-<div><p>A list of all tasks. Every task is represented by a
-dictionary containing the following information: task id,
-dataset id, task_type and status. If qualities are calculated for
-the associated dataset, some of these are also returned.</p>
+<div><p>A list of all tasks having the given task_type_id and the give tag.
+Every task is represented by a dictionary containing the following
+information: task id, dataset id, task_type and status. If qualities
+are calculated for the associated dataset, some of these are also
+returned.</p>
 </div></blockquote>
 </td>
 </tr>
