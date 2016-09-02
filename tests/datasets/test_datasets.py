@@ -71,13 +71,7 @@ class TestOpenMLDataset(TestBase):
                                 openml.datasets.functions._get_cached_dataset_arff,
                                 3)
 
-    def test_list_datasets(self):
-        # We can only perform a smoke test here because we test on dynamic
-        # data from the internet...
-        datasets = openml.datasets.list_datasets()
-        # 1087 as the number of datasets on openml.org
-        self.assertGreaterEqual(len(datasets), 1087)
-        for dataset in datasets:
+    def _check_dataset(self, dataset):
             self.assertEqual(type(dataset), dict)
             self.assertGreaterEqual(len(dataset), 2)
             self.assertIn('did', dataset)
@@ -87,18 +81,29 @@ class TestOpenMLDataset(TestBase):
             self.assertIn(dataset['status'], ['in_preparation', 'active',
                                               'deactivated'])
 
+    def test_list_datasets(self):
+        # We can only perform a smoke test here because we test on dynamic
+        # data from the internet...
+        datasets = openml.datasets.list_datasets()
+        # 1087 as the number of datasets on openml.org
+        self.assertGreaterEqual(len(datasets), 1087)
+        for did in datasets:
+            self._check_dataset(datasets[did])
+
     def test_list_datasets_by_tag(self):
-        datasets = openml.datasets.list_datasets_by_tag('uci')
+        datasets = openml.datasets.list_datasets(tag='uci')
         self.assertGreaterEqual(len(datasets), 5)
-        for dataset in datasets:
-            self.assertEqual(type(dataset), dict)
-            self.assertGreaterEqual(len(dataset), 2)
-            self.assertIn('did', dataset)
-            self.assertIsInstance(dataset['did'], int)
-            self.assertIn('status', dataset)
-            self.assertTrue(is_string(dataset['status']))
-            self.assertIn(dataset['status'], ['in_preparation', 'active',
-                                              'deactivated'])
+        for did in datasets:
+            self._check_dataset(datasets[did])
+
+    def test_list_datasets_paginate(self):
+        size = 10
+        max = 100
+        for i in range(0, max, size):
+            datasets = openml.datasets.list_datasets(offset=i, size=size)
+            self.assertGreaterEqual(size, len(datasets))
+            for did in datasets:
+                self._check_dataset(datasets[did])
 
     @unittest.skip('See https://github.com/openml/openml-python/issues/149')
     def test_check_datasets_active(self):

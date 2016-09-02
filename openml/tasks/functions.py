@@ -89,61 +89,44 @@ def _get_estimation_procedure_list():
     return procs
 
 
-def list_tasks_by_type(task_type_id):
-    """Return a list of all tasks for a given tasks type which are on OpenML.
+def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
+    """Return a number of tasks having the given tag and task_type_id
 
     Parameters
     ----------
-    task_type_id : int
+    task_type_id : int, optional
         ID of the task type as detailed
         `here <http://www.openml.org/search?type=task_type>`_.
+    offset : int, optional
+        the number of tasks to skip, starting from the first
+    size : int, optional
+        the maximum number of tasks to show
+    tag : str, optional
+        the tag to include
 
     Returns
     -------
     list
-        A list of all tasks of the given task type. Every task is represented by
-        a dictionary containing the following information: task id,
-        dataset id, task_type and status. If qualities are calculated for
-        the associated dataset, some of these are also returned.
+        A list of all tasks having the given task_type_id and the give tag.
+        Every task is represented by a dictionary containing the following
+        information: task id, dataset id, task_type and status. If qualities
+        are calculated for the associated dataset, some of these are also
+        returned.
     """
-    try:
-        task_type_id = int(task_type_id)
-    except:
-        raise ValueError("Task Type ID is neither an Integer nor can be "
-                         "cast to an Integer.")
-    return _list_tasks("task/list/type/%d" % task_type_id)
+    api_call = "task/list"
+    if task_type_id is not None:
+        api_call += "/type/%d" % int(task_type_id)
 
+    if offset is not None:
+        api_call += "/offset/%d" % int(offset)
 
-def list_tasks_by_tag(tag):
-    """Return all tasks having the given tag
+    if size is not None:
+        api_call += "/limit/%d" % int(size)
 
-    Parameters
-    ----------
-    tag : str
+    if tag is not None:
+        api_call += "/tag/%s" % tag
 
-    Returns
-    -------
-    list
-        A list of all tasks having a give tag. Every task is represented by
-        a dictionary containing the following information: task id,
-        dataset id, task_type and status. If qualities are calculated for
-        the associated dataset, some of these are also returned.
-    """
-    return _list_tasks("task/list/tag/%s" % tag)
-
-
-def list_tasks():
-    """Return a list of all tasks which are on OpenML.
-
-    Returns
-    -------
-    list
-        A list of all tasks. Every task is represented by a
-        dictionary containing the following information: task id,
-        dataset id, task_type and status. If qualities are calculated for
-        the associated dataset, some of these are also returned.
-    """
-    return _list_tasks('task/list')
+    return _list_tasks(api_call)
 
 
 def _list_tasks(api_call):
@@ -162,12 +145,15 @@ def _list_tasks(api_call):
                          '"oml:runs"/@xmlns:oml is not '
                          '"http://openml.org/openml": %s'
                          % str(tasks_dict))
+
     try:
-        tasks = []
+        tasks = dict();
         procs = _get_estimation_procedure_list()
         proc_dict = dict((x['id'], x) for x in procs)
         for task_ in tasks_dict['oml:tasks']['oml:task']:
-            task = {'tid': int(task_['oml:task_id']),
+            tid = int(task_['oml:task_id'])
+            task = {'tid': tid,
+                    'ttid': int(task_['oml:task_type_id']),
                     'did': int(task_['oml:did']),
                     'name': task_['oml:name'],
                     'task_type': task_['oml:task_type'],
@@ -187,11 +173,9 @@ def _list_tasks(api_call):
                 if abs(int(quality['#text']) - quality['#text']) < 0.0000001:
                     quality['#text'] = int(quality['#text'])
                 task[quality['@name']] = quality['#text']
-            tasks.append(task)
+            tasks[tid] = task
     except KeyError as e:
         raise KeyError("Invalid xml for task: %s" % e)
-
-    tasks.sort(key=lambda t: t['tid'])
 
     return tasks
 
@@ -262,7 +246,7 @@ def _create_task_from_xml(xml):
         estimation_parameters[name] = text
 
     return OpenMLTask(
-        dic["oml:task_id"], dic["oml:task_type"],
+        dic["oml:task_id"], dic['oml:task_type_id'], dic["oml:task_type"],
         inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
         inputs["source_data"]["oml:data_set"]["oml:target_feature"],
         inputs["estimation_procedure"]["oml:estimation_procedure"][
