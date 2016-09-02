@@ -145,12 +145,15 @@ def _list_tasks(api_call):
                          '"oml:runs"/@xmlns:oml is not '
                          '"http://openml.org/openml": %s'
                          % str(tasks_dict))
+
     try:
-        tasks = []
+        tasks = dict();
         procs = _get_estimation_procedure_list()
         proc_dict = dict((x['id'], x) for x in procs)
         for task_ in tasks_dict['oml:tasks']['oml:task']:
-            task = {'tid': int(task_['oml:task_id']),
+            tid = int(task_['oml:task_id'])
+            task = {'tid': tid,
+                    'ttid': int(task_['oml:task_type_id']),
                     'did': int(task_['oml:did']),
                     'name': task_['oml:name'],
                     'task_type': task_['oml:task_type'],
@@ -170,11 +173,9 @@ def _list_tasks(api_call):
                 if abs(int(quality['#text']) - quality['#text']) < 0.0000001:
                     quality['#text'] = int(quality['#text'])
                 task[quality['@name']] = quality['#text']
-            tasks.append(task)
+            tasks[tid] = task
     except KeyError as e:
         raise KeyError("Invalid xml for task: %s" % e)
-
-    tasks.sort(key=lambda t: t['tid'])
 
     return tasks
 
@@ -245,7 +246,7 @@ def _create_task_from_xml(xml):
         estimation_parameters[name] = text
 
     return OpenMLTask(
-        dic["oml:task_id"], dic["oml:task_type"],
+        dic["oml:task_id"], dic['oml:task_type_id'], dic["oml:task_type"],
         inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
         inputs["source_data"]["oml:data_set"]["oml:target_feature"],
         inputs["estimation_procedure"]["oml:estimation_procedure"][
