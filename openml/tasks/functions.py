@@ -94,14 +94,14 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
 
     Parameters
     ----------
-    task_type_id : int
+    task_type_id : int, optional
         ID of the task type as detailed
         `here <http://www.openml.org/search?type=task_type>`_.
-    offset : int
+    offset : int, optional
         the number of tasks to skip, starting from the first
-    size : int
+    size : int, optional
         the maximum number of tasks to show
-    tag : str
+    tag : str, optional
         the tag to include
 
     Returns
@@ -115,28 +115,14 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
     """
     api_call = "task/list"
     if task_type_id is not None:
-        try:
-            task_type_id = int(task_type_id)
-            api_call += "/task_type_id/%d" % task_type_id
-        except:
-            raise ValueError("Task_type_id is neither an Integer nor can be "
-                             "cast to an Integer.")
+        api_call += "/task_type_id/%d" % int(task_type_id)
 
     if offset is not None:
-        try:
-            offset = int(offset)
-            api_call += "/offset/%d" % offset
-        except:
-            raise ValueError("Offset is neither an Integer nor can be "
-                             "cast to an Integer.")
+        api_call += "/offset/%d" % int(offset)
 
     if size is not None:
-        try:
-            size = int(size)
-            api_call += "/limit/%d" % size
-        except:
-            raise ValueError("Size is neither an Integer nor can be "
-                             "cast to an Integer.")
+        api_call += "/limit/%d" % int(size)
+
     if tag is not None:
         api_call += "/tag/%s" % tag
 

@@ -116,11 +116,11 @@ def list_datasets(offset=None, size=None, tag=None):
 
     Parameters
     ----------
-    offset : int
+    offset : int, optional
         the number of datasets to skip, starting from the first
-    size : int
+    size : int, optional
         the maximum datasets of tasks to show
-    tag : str
+    tag : str, optional
         the tag to include
 
     Returns
@@ -132,26 +132,17 @@ def list_datasets(offset=None, size=None, tag=None):
         the following information:
         - dataset id
         - status
-        
+
         If qualities are calculated for the dataset, some of
         these are also returned.
     """
     api_call = "data/list"
     if offset is not None:
-        try:
-            offset = int(offset)
-            api_call += "/offset/%d" % offset
-        except:
-            raise ValueError("Offset is neither an Integer nor can be "
-                             "cast to an Integer.")
+        api_call += "/offset/%d" % int(offset)
 
     if size is not None:
-        try:
-            size = int(size)
-            api_call += "/limit/%d" % size
-        except:
-            raise ValueError("Size is neither an Integer nor can be "
-                             "cast to an Integer.")
+       api_call += "/limit/%d" % int(size)
+
     if tag is not None:
         api_call += "/tag/%s" % tag
 
