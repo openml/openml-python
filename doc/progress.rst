@@ -6,6 +6,15 @@
 Progress
 ========
 
+Changelog
+=========
+
+0.3.0
+~~~~~
+
+* Add this changelog (Matthias Feurer)
+* 2nd example notebook PyOpenML.ipynb (Joaquin Vanschoren)
+
 API calls
 =========
 
