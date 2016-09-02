@@ -14,6 +14,7 @@ Changelog
 
 * Add this changelog (Matthias Feurer)
 * 2nd example notebook PyOpenML.ipynb (Joaquin Vanschoren)
+* Pagination support for list datasets and list tasks
 
 API calls
 =========
