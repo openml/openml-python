@@ -51,9 +51,12 @@ class TestTask(TestBase):
                       ['in_preparation', 'active', 'deactivated'])
 
     def test_list_tasks_by_type(self):
-        tasks = openml.tasks.list_tasks(task_type_id=3)
+        ttid=3
+        tasks = openml.tasks.list_tasks(task_type_id=ttid)
         self.assertGreaterEqual(len(tasks), 300)
         for tid in tasks:
+            print(tasks[tid])
+            self.assertEquals(ttid, tasks[tid]["ttid"])
             self._check_task(tasks[tid])
 
     def test_list_tasks_by_tag(self):
@@ -86,6 +89,7 @@ class TestTask(TestBase):
                 tasks = openml.tasks.list_tasks(task_type_id=j, offset=i, size=size)
                 self.assertGreaterEqual(size, len(tasks))
                 for tid in tasks:
+                    self.assertEquals(j, tasks[tid]["ttid"])
                     self._check_task(tasks[tid])
 
     def test__get_task(self):
