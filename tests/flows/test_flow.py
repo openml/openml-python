@@ -28,7 +28,9 @@ class TestFlow(TestBase):
 
     @mock.patch.object(openml.OpenMLFlow, '_get_name', autospec=True)
     def test_upload_flow(self, name_mock):
-        flow = openml.OpenMLFlow(model=DummyClassifier(), description="test description")
+        flow = openml.OpenMLFlow(name='Test',
+                                 description="test description",
+                                 model=DummyClassifier())
 
         # Create a unique prefix for the flow. Necessary because the flow is
         # identified by its name and external version online. Having a unique

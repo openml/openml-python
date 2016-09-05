@@ -1,3 +1,3 @@
-from .flow import OpenMLFlow
+from .flow import OpenMLFlow, create_flow_from_model
 
-__all__ = ['OpenMLFlow']
+__all__ = ['OpenMLFlow', 'create_flow_from_model']

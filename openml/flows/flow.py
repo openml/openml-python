@@ -1,6 +1,5 @@
 from collections import OrderedDict
 import xmltodict
-import sklearn
 
 from .._api_calls import _perform_api_call
 from .functions import _check_flow_exists
@@ -28,30 +27,31 @@ class OpenMLFlow(object):
 
 
     """
-    def __init__(self, model, flow_id=None, uploader=None,
-                 description=None, creator=None, components=None,
-                 parameters=None, contributor=None, tag=None):
-        self.flow_id = flow_id
-        self.upoader = uploader
+    def __init__(self, name, description=None, model=None, components=None,
+                 parameters=None, external_version=None, creator=None,
+                 uploader=None, tag=None, flow_id=None):
+        self.name = name
         self.description = description
-        self.creator = creator
-        self.tag = tag
         self.model = model
 
-        # TODO update these - the sklearn transformation class should be able
-        # to do this!
-        self.source = "FIXME DEFINE PYTHON FLOW"
-        self.name = (model.__module__ + "." +
-                     model.__class__.__name__)
-        self.external_version = 'sklearn_' + sklearn.__version__
-
         if components is None:
-            components = []
+            components = OrderedDict()
+        elif not isinstance(components, OrderedDict):
+            raise TypeError('Components must be of type OrderedDict, but are %s.' %
+                            type(components))
         self.components = components
         if parameters is None:
-            parameters = []
+            parameters = OrderedDict()
+        elif not isinstance(parameters, OrderedDict):
+            raise TypeError('Parameters must be of type OrderedDict, but are %s.' %
+                            type(parameters))
         self.parameters = parameters
 
+        self.external_version = external_version
+        self.creator = creator
+        self.upoader = uploader
+        self.tag = tag
+        self.flow_id = flow_id
 
     def _generate_flow_xml(self):
         """Generate xml representation of self for upload to server.
@@ -133,3 +133,12 @@ class OpenMLFlow(object):
         return self.name
 
 
+def create_flow_from_model(model, converter, description=None):
+    flow = converter.serialize_object(model)
+    if not isinstance(flow, OpenMLFlow):
+        raise ValueError('Converter %s did return %s, not OpenMLFlow!' %
+                         (str(converter), type(flow)))
+    if description is not None:
+        flow.description = description
+
+    return flow
