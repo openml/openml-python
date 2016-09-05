@@ -1,5 +1,6 @@
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 import openml
+import openml.exceptions
 from openml.testing import TestBase
 
 
@@ -63,46 +64,71 @@ class TestRun(TestBase):
         self.assertEqual(len(run), 5)
 
     def test_get_runs_list(self):
-        runs = openml.runs.list_runs(2)
+        runs = openml.runs.list_runs(id=[2])
         self.assertEqual(len(runs), 1)
-        self._check_run(runs[0])
+        for rid in runs:
+            self._check_run(runs[rid])
 
     def test_get_runs_list_by_task(self):
-        runs = openml.runs.list_runs_by_task(1)
-        self.assertGreaterEqual(len(runs), 600)
-        for run in runs:
-            self._check_run(run)
+        task_ids = [20]
+        runs = openml.runs.list_runs(task=task_ids)
+        self.assertGreaterEqual(len(runs), 590)
+        for rid in runs:
+            self.assertIn(runs[rid]['task_id'], task_ids)
+            self._check_run(runs[rid])
         num_runs = len(runs)
 
-        runs = openml.runs.list_runs_by_task([1, 2])
+        task_ids.append(21)
+        runs = openml.runs.list_runs(task=task_ids)
         self.assertGreaterEqual(len(runs), num_runs + 1)
-        for run in runs:
-            self._check_run(run)
+        for rid in runs:
+            self.assertIn(runs[rid]['task_id'], task_ids)
+            self._check_run(runs[rid])
 
     def test_get_runs_list_by_uploader(self):
         # 29 is Dominik Kirchhoff - Joaquin and Jan have too many runs right now
-        runs = openml.runs.list_runs_by_uploader(29)
+        uploader_ids = [29]
+
+        runs = openml.runs.list_runs(uploader=uploader_ids)
         self.assertGreaterEqual(len(runs), 3)
-        for run in runs:
-            self._check_run(run)
+        for rid in runs:
+            self.assertIn(runs[rid]['uploader'], uploader_ids)
+            self._check_run(runs[rid])
         num_runs = len(runs)
 
-        runs = openml.runs.list_runs_by_uploader([29, 274])
+        uploader_ids.append(274)
+
+        runs = openml.runs.list_runs(uploader=uploader_ids)
         self.assertGreaterEqual(len(runs), num_runs + 1)
-        for run in runs:
-            self._check_run(run)
+        for rid in runs:
+            self.assertIn(runs[rid]['uploader'], uploader_ids)
+            self._check_run(runs[rid])
 
     def test_get_runs_list_by_flow(self):
-        runs = openml.runs.list_runs_by_flow(1)
+        flow_ids = [1154]
+        runs = openml.runs.list_runs(flow=flow_ids)
         self.assertGreaterEqual(len(runs), 1)
-        for run in runs:
-            self._check_run(run)
+        for rid in runs:
+            self.assertIn(runs[rid]['flow_id'], flow_ids)
+            self._check_run(runs[rid])
         num_runs = len(runs)
 
-        runs = openml.runs.list_runs_by_flow([1154, 1069])
+        flow_ids.append(1069)
+        runs = openml.runs.list_runs(flow=flow_ids)
         self.assertGreaterEqual(len(runs), num_runs + 1)
-        for run in runs:
-            self._check_run(run)
+        for rid in runs:
+            self.assertIn(runs[rid]['flow_id'], flow_ids)
+            self._check_run(runs[rid])
+
+    def test_get_runs_pagination(self):
+        uploader_ids = [1]
+        size = 10
+        max = 100
+        for i in range(0, max, size):
+            runs = openml.runs.list_runs(offset=i, size=size, uploader=uploader_ids)
+            self.assertGreaterEqual(size, len(runs))
+            for rid in runs:
+                self.assertIn(runs[rid]["uploader"], uploader_ids)
 
     def test_get_runs_list_by_filters(self):
         ids = [505212, 6100]
@@ -111,23 +137,22 @@ class TestRun(TestBase):
         uploaders_2 = [29, 274]
         flows = [74, 1718]
 
-        self.assertRaises(ValueError, openml.runs.list_runs_by_filters)
+        self.assertRaises(openml.exceptions.OpenMLServerError, openml.runs.list_runs)
 
-        runs = openml.runs.list_runs_by_filters(id=ids)
+        runs = openml.runs.list_runs(id=ids)
         self.assertEqual(len(runs), 2)
 
-        runs = openml.runs.list_runs_by_filters(task=tasks)
+        runs = openml.runs.list_runs(task=tasks)
         self.assertGreaterEqual(len(runs), 2)
 
-        runs = openml.runs.list_runs_by_filters(uploader=uploaders_2)
+        runs = openml.runs.list_runs(uploader=uploaders_2)
         self.assertGreaterEqual(len(runs), 10)
 
-        runs = openml.runs.list_runs_by_filters(flow=flows)
+        runs = openml.runs.list_runs(flow=flows)
         self.assertGreaterEqual(len(runs), 100)
 
-        runs = openml.runs.list_runs_by_filters(id=ids, task=tasks,
-                                                uploader=uploaders_1)
+        runs = openml.runs.list_runs(id=ids, task=tasks, uploader=uploaders_1)
 
     def test_get_runs_list_by_tag(self):
-        runs = openml.runs.list_runs_by_tag('02-11-16_21.46.39')
+        runs = openml.runs.list_runs(tag='02-11-16_21.46.39')
         self.assertEqual(len(runs), 1)
