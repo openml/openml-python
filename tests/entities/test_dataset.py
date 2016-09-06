@@ -86,7 +86,7 @@ class OpenMLDatasetTest(unittest.TestCase):
         X, y = self.dataset.get_data(target="class")
         self.assertIsInstance(X, np.ndarray)
         self.assertEqual(X.dtype, np.float32)
-        self.assertEqual(y.dtype, np.int64)
+        self.assertIn(y.dtype, [np.int32, np.int64])
         self.assertEqual(X.shape, (898, 38))
         X, y, attribute_names = self.dataset.get_data(
             target="class", return_attribute_names=True)
@@ -99,7 +99,7 @@ class OpenMLDatasetTest(unittest.TestCase):
         self.assertIsInstance(X, np.ndarray)
         self.assertEqual(X.dtype, np.float32)
         self.assertIsInstance(y, np.ndarray)
-        self.assertEqual(y.dtype, np.int64)
+        self.assertIn(y.dtype, [np.int32, np.int64])
         self.assertEqual(X.shape, (2, 20000))
         X, y, attribute_names = self.sparse_dataset.get_data(
             target="class", return_attribute_names=True)
@@ -188,7 +188,7 @@ class OpenMLDatasetTest(unittest.TestCase):
         X, y = self.dataset.get_data(target="class", include_row_id=False,
                                      include_ignore_attributes=False)
         self.assertEqual(X.dtype, np.float32)
-        self.assertEqual(y.dtype, np.int64)
+        self.assertIn(y.dtype, [np.int32, np.int64])
         self.assertEqual(X.shape, (898, 36))
         X, y, categorical = self.dataset.get_data(
             target="class", return_categorical_indicator=True)
@@ -205,7 +205,7 @@ class OpenMLDatasetTest(unittest.TestCase):
             include_ignore_attributes=False)
         self.assertIsInstance(X, np.ndarray)
         self.assertEqual(X.dtype, np.float32)
-        self.assertEqual(y.dtype, np.int64)
+        self.assertIn(y.dtype, [np.int32, np.int64])
         self.assertEqual(X.shape, (2, 19998))
         X, y, categorical = self.sparse_dataset.get_data(
             target="class", return_categorical_indicator=True)
