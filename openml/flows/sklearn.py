@@ -119,6 +119,7 @@ class SklearnToFlowConverter(object):
     def serialize_model(self, model):
         sub_components = OrderedDict()
         parameters = OrderedDict()
+        parameters_meta_info = OrderedDict()
 
         model_parameters = model.get_params()
 
@@ -159,6 +160,9 @@ class SklearnToFlowConverter(object):
                 else:
                     parameters[k] = None
 
+            parameters_meta_info[k] = OrderedDict((('description', None),
+                                                   ('data_type', None)))
+
         name = model.__module__ + "." + model.__class__.__name__
         sub_components_names = ",".join(
             [sub_components[key].name for key in sub_components])
@@ -174,6 +178,7 @@ class SklearnToFlowConverter(object):
                           model=model,
                           components=sub_components,
                           parameters=parameters,
+                          parameters_meta_info=parameters_meta_info,
                           external_version=external_version)
 
         return flow
@@ -276,6 +281,7 @@ class SklearnToFlowConverter(object):
     # to serialize_model() because cross-validators do not have get_params().
     def serialize_cross_validator(self, o):
         parameters = OrderedDict()
+        parameters_meta_info = OrderedDict()
 
         # XXX this is copied from sklearn.model_selection._split
         cls = o.__class__
@@ -308,6 +314,8 @@ class SklearnToFlowConverter(object):
                 parameters[key] = value
             else:
                 parameters[key] = None
+            parameters_meta_info[key] = OrderedDict((('description', None),
+                                                     ('data_type', None)))
 
         # Create a flow
         name = o.__module__ + "." + o.__class__.__name__
@@ -316,7 +324,8 @@ class SklearnToFlowConverter(object):
         flow = OpenMLFlow(name=name,
                           description='Automatically created sub-component.',
                           model=o,
-                          parameters=parameters)
+                          parameters=parameters,
+                          parameters_meta_info=parameters_meta_info)
 
         return flow
 

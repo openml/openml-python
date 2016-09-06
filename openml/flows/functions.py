@@ -1,38 +1,31 @@
 import xmltodict
 
 from openml._api_calls import _perform_api_call
+from . import OpenMLFlow
+from ..util import URLError
 
 
-def _check_flow_exists(name, version):
-    """Retrieves the flow id of the flow uniquely identified by name+version.
+def get_flow(flow_id):
+    """Download the OpenML flow for a given flow ID.
 
-    Parameter
-    ---------
-    name : string
-        Name of the flow
-    version : string
-        Version information associated with flow.
-
-    Returns
-    -------
-    flow_exist : int
-        Flow id or -1 if the flow doesn't exist.
-
-    Notes
-    -----
-    see http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
+    Parameters
+    ----------
+    flow_id : int
+        The OpenML flow id.
     """
-    if not (type(name) is str and len(name) > 0):
-        raise ValueError('Argument \'name\' should be a non-empty string')
-    if not (type(version) is str and len(version) > 0):
-        raise ValueError('Argument \'version\' should be a non-empty string')
+    try:
+        flow_id = int(flow_id)
+    except:
+        raise ValueError("Flow ID is neither an Integer nor can be "
+                         "cast to an Integer.")
 
-    return_code, xml_response = _perform_api_call(
-        "flow/exists/%s/%s" % (name, version))
-    # TODO check with latest version of code if this raises an exception
-    if return_code != 200:
-        # fixme raise appropriate error
-        raise ValueError("api call failed: %s" % xml_response)
-    xml_dict = xmltodict.parse(xml_response)
-    flow_id = xml_dict['oml:flow_exists']['oml:id']
-    return return_code, xml_response, flow_id
+    try:
+        return_code, flow_xml = _perform_api_call(
+            "flow/%d" % flow_id)
+    except (URLError, UnicodeEncodeError) as e:
+        print(e)
+        raise e
+
+    flow_dict = xmltodict.parse(flow_xml)
+    flow = OpenMLFlow._from_xml(flow_dict)
+    return flow
