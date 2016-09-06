@@ -123,14 +123,26 @@
 <h1><code class="xref py py-mod docutils literal"><span class="pre">openml.runs</span></code>.list_runs<a class="headerlink" href="#openml-runs-list-runs" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.runs.list_runs">
-<code class="descclassname">openml.runs.</code><code class="descname">list_runs</code><span class="sig-paren">(</span><em>run_ids</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.list_runs" title="Permalink to this definition">¶</a></dt>
-<dd><p>List runs by their ID.</p>
-<p>Perform API call <a class="reference external" href="http://www.openml.org/api_docs/#!/run/get_run_list_run_ids">/run/list/run/{ids}</a></p>
+<code class="descclassname">openml.runs.</code><code class="descname">list_runs</code><span class="sig-paren">(</span><em>offset=None</em>, <em>size=None</em>, <em>id=None</em>, <em>task=None</em>, <em>flow=None</em>, <em>uploader=None</em>, <em>tag=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.list_runs" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all runs matching all of the given filters.</p>
+<p>Perform API call <a class="reference external" href="http://www.openml.org/api_docs/#!/run/get_run_list_filters">/run/list/{filters}</a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>run_id</strong> : int or list</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>offset</strong> : int, optional</p>
+<blockquote>
+<div><p>the number of runs to skip, starting from the first</p>
+</div></blockquote>
+<p><strong>size</strong> : int, optional</p>
+<blockquote>
+<div><p>the maximum number of runs to show</p>
+</div></blockquote>
+<p><strong>id</strong> : list, optional</p>
+<p><strong>task</strong> : list, optional</p>
+<p><strong>flow</strong> : list, optional</p>
+<p><strong>uploader</strong> : list, optional</p>
+<p><strong>tag</strong> : str, optional</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list</p>
