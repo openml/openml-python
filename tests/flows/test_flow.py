@@ -114,6 +114,7 @@ class TestFlow(TestBase):
 
         flow = openml.OpenMLFlow(name='Test',
                                  description="test description",
+                                 external_version=str(sklearn.__version__),
                                  model=sklearn.dummy.DummyClassifier())
         name_mock.return_value = 'TEST%s%s' % (sentinel, flow.name)
 
@@ -128,6 +129,12 @@ class TestFlow(TestBase):
         md5 = hashlib.md5()
         md5.update(str(time.time()).encode('utf-8'))
         sentinel = md5.hexdigest()[:10]
+        def side_effect(self):
+            if sentinel in self.name:
+                return self.name
+            else:
+                return 'TEST%s%s' % (sentinel, self.name)
+        name_mock.side_effect = side_effect
 
         # Test a more complicated flow
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
@@ -141,7 +148,6 @@ class TestFlow(TestBase):
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid)
         flow = openml.flows.create_flow_from_model(rs, SklearnToFlowConverter())
-        name_mock.return_value = 'TEST%s%s' % (sentinel, flow.name)
 
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)

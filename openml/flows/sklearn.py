@@ -37,11 +37,11 @@ class SklearnToFlowConverter(object):
             # The check for bool has to be before the check for int, otherwise,
             # isinstance will think the bool is an int and convert the bool will
             # be converted to a string which can't be parsed by json.loads
-            rval = json.dumps(o)
+            rval = o
         elif isinstance(o, int):
-            rval = repr(o)
+            rval = o
         elif isinstance(o, float):
-            rval = repr(o)
+            rval = o
         elif isinstance(o, dict):
             rval = {}
             for key, value in o.items():
@@ -51,7 +51,7 @@ class SklearnToFlowConverter(object):
                 key = self.serialize_object(key)
                 value = self.serialize_object(value)
                 rval[key] = value
-            rval = json.dumps(rval)
+            rval = rval
         elif isinstance(o, type):
             rval = self.serialize_type(o)
         elif isinstance(o, scipy.stats.distributions.rv_frozen):
@@ -187,7 +187,7 @@ class SklearnToFlowConverter(object):
                                            'value': {'key': k,
                                                      'step_name': None}}
                 component_reference = self.serialize_object(component_reference)
-                parameters[k] = (component_reference)
+                parameters[k] = json.dumps(component_reference)
 
             else:
                 # Since Pipeline and FeatureUnion also return estimators and
@@ -201,6 +201,7 @@ class SklearnToFlowConverter(object):
 
                 # a regular hyperparameter
                 if not (hasattr(rval, '__len__') and len(rval) == 0):
+                    rval = json.dumps(rval)
                     parameters[k] = rval
                 else:
                     parameters[k] = None
@@ -279,9 +280,8 @@ class SklearnToFlowConverter(object):
                    np.int: 'np.int',
                    np.int32: 'np.int32',
                    np.int64: 'np.int64'}
-        jason = json.dumps({'oml:serialized_object': 'type',
-                            'value': mapping[o]})
-        return jason
+        return {'oml:serialized_object': 'type',
+                            'value': mapping[o]}
 
     def deserialize_type(self, o, **kwargs):
         mapping = {'float': float,
@@ -300,9 +300,8 @@ class SklearnToFlowConverter(object):
         a = o.a
         b = o.b
         dist = o.dist.__class__.__module__ + '.' + o.dist.__class__.__name__
-        jason = json.dumps({'oml:serialized_object': 'rv_frozen',
-                            'value': {'dist': dist, 'a': a, 'b': b, 'args': args, 'kwds': kwds}})
-        return jason
+        return {'oml:serialized_object': 'rv_frozen',
+                            'value': {'dist': dist, 'a': a, 'b': b, 'args': args, 'kwds': kwds}}
 
     def deserialize_rv_frozen(self, o, **kwargs):
         args = o['args']
@@ -327,9 +326,8 @@ class SklearnToFlowConverter(object):
 
     def serialize_function(self, o):
         name = o.__module__ + '.' + o.__name__
-        jason = json.dumps({'oml:serialized_object': 'function',
-                            'value': name})
-        return jason
+        return {'oml:serialized_object': 'function',
+                            'value': name}
 
     def deserialize_function(self, name, **kwargs):
         module_name = name.rsplit('.', 1)

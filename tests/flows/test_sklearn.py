@@ -3,6 +3,7 @@ import json
 import unittest
 
 import numpy as np
+import sklearn.base
 import sklearn.datasets
 import scipy.stats
 import sklearn.decomposition
@@ -16,6 +17,13 @@ import sklearn.tree
 
 from openml.flows.sklearn import SklearnToFlowConverter
 from openml.flows import OpenMLFlow
+
+
+class Model(sklearn.base.BaseEstimator):
+    def __init__(self, boolean, integer, floating_point_value):
+        self.boolean = boolean
+        self.integer = integer
+        self.floating_point_value = floating_point_value
 
 
 class TestSklearn(unittest.TestCase):
@@ -34,18 +42,18 @@ class TestSklearn(unittest.TestCase):
         fixture_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_description = 'Automatically created sub-component.'
         fixture_parameters = \
-            OrderedDict((('class_weight', None),
-                         ('criterion', 'entropy'),
-                         ('max_depth', None),
-                         ('max_features', 'auto'),
+            OrderedDict((('class_weight', 'null'),
+                         ('criterion', '"entropy"'),
+                         ('max_depth', 'null'),
+                         ('max_features', '"auto"'),
                          ('max_leaf_nodes', '2000'),
                          ('min_impurity_split', '1e-07'),
                          ('min_samples_leaf', '1'),
                          ('min_samples_split', '2'),
                          ('min_weight_fraction_leaf', '0.0'),
                          ('presort', 'false'),
-                         ('random_state', None),
-                         ('splitter', 'best')))
+                         ('random_state', 'null'),
+                         ('splitter', '"best"')))
 
         serialization = self.converter.serialize_object(model)
 
@@ -73,7 +81,7 @@ class TestSklearn(unittest.TestCase):
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
-        self.assertEqual(serialization.parameters['algorithm'], 'SAMME.R')
+        self.assertEqual(serialization.parameters['algorithm'], '"SAMME.R"')
         self.assertIsInstance(serialization.parameters['base_estimator'], str)
         self.assertEqual(serialization.parameters['learning_rate'], '1.0')
         self.assertEqual(serialization.parameters['n_estimators'], '100')
@@ -294,11 +302,14 @@ class TestSklearn(unittest.TestCase):
         self.assertIsNot(deserialized, kfold)
 
     def test_hypothetical_parameter_values(self):
-        values = ['true', '1', '0.1']
-        for value in values:
-            serialized = self.converter.serialize_object(value)
-            deserialized = self.converter.deserialize_object(value)
-            self.assertEqual(deserialized, value)
+        # Can only be checked inside a model
+
+        model = Model('true', '1', '0.1')
+
+        serialized = self.converter.serialize_object(model)
+        deserialized = self.converter.deserialize_object(serialized)
+        self.assertEqual(deserialized.get_params(), model.get_params())
+        self.assertIsNot(deserialized, model)
 
 
 
