@@ -6,8 +6,10 @@ import unittest
 
 import xmltodict
 
+import scipy.stats
 import sklearn.dummy
 import sklearn.ensemble
+import sklearn.model_selection
 import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
@@ -82,10 +84,6 @@ class TestFlow(TestBase):
             flow_xml = re.sub(r'^$', '', flow_xml)
             new_xml = new_xml.replace('  ', '').replace('\t', '').strip().replace('\n\n', '\n').replace('&quot;', '"')
             new_xml = re.sub(r'^$', '', new_xml)
-            with open('../new.xml', 'w') as fh:
-                fh.write(new_xml)
-            with open('../old.xml', 'w') as fh:
-                fh.write(flow_xml)
 
             self.assertEqual(new_xml, flow_xml)
 
@@ -106,18 +104,69 @@ class TestFlow(TestBase):
         self.assertIsNot(new_flow, flow)
 
     @mock.patch.object(openml.OpenMLFlow, '_get_name', autospec=True)
-    def test_upload_flow(self, name_mock):
-        flow = openml.OpenMLFlow(name='Test',
-                                 description="test description",
-                                 model=sklearn.dummy.DummyClassifier())
-
+    def test_publish_flow(self, name_mock):
         # Create a unique prefix for the flow. Necessary because the flow is
         # identified by its name and external version online. Having a unique
         #  name allows us to publish the same flow in each test run
         md5 = hashlib.md5()
         md5.update(str(time.time()).encode('utf-8'))
         sentinel = md5.hexdigest()[:10]
-        name_mock.return_value = '%s%s' % (sentinel, flow.name)
+
+        flow = openml.OpenMLFlow(name='Test',
+                                 description="test description",
+                                 model=sklearn.dummy.DummyClassifier())
+        name_mock.return_value = 'TEST%s%s' % (sentinel, flow.name)
 
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)
+
+    @mock.patch.object(openml.OpenMLFlow, '_get_name', autospec=True)
+    def test_sklearn_to_upload_to_flow(self, name_mock):
+        # Create a unique prefix for the flow. Necessary because the flow is
+        # identified by its name and external version online. Having a unique
+        #  name allows us to publish the same flow in each test run
+        md5 = hashlib.md5()
+        md5.update(str(time.time()).encode('utf-8'))
+        sentinel = md5.hexdigest()[:10]
+
+        # Test a more complicated flow
+        scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
+        boosting = sklearn.ensemble.AdaBoostClassifier(
+            base_estimator=sklearn.tree.DecisionTreeClassifier())
+        model = sklearn.pipeline.Pipeline(steps=(
+            ('scaler', scaler), ('boosting', boosting)))
+        parameter_grid = {'n_estimators': [1, 5, 10, 100],
+                          'learning_rate': scipy.stats.uniform(0.01, 0.99),
+                          'base_estimator__max_depth': scipy.stats.randint(1, 10)}
+        rs = sklearn.model_selection.RandomizedSearchCV(
+            estimator=model, param_distributions=parameter_grid)
+        flow = openml.flows.create_flow_from_model(rs, SklearnToFlowConverter())
+        name_mock.return_value = 'TEST%s%s' % (sentinel, flow.name)
+
+        flow.publish()
+        self.assertIsInstance(flow.flow_id, int)
+
+        # Check whether we can load the flow again
+        new_flow = openml.flows.get_flow(flow_id=flow.flow_id)
+
+        local_xml = flow._to_xml()
+        server_xml = new_flow._to_xml()
+
+        local_xml = re.sub('<oml:id>[0-9]+</oml:id>', '', local_xml)
+        server_xml = re.sub('<oml:id>[0-9]+</oml:id>', '', server_xml)
+        server_xml = re.sub('<oml:uploader>[0-9]+</oml:uploader>', '', server_xml)
+        server_xml = re.sub('<oml:version>[0-9]+</oml:version>', '', server_xml)
+        server_xml = re.sub('<oml:upload_date>[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}</oml:upload_date>', '', server_xml)
+
+        for i in range(10):
+            # Make sure that we replace all occurences of two newlines
+            local_xml = local_xml.replace('  ', '').replace('\t', '').strip().replace('\n\n', '\n').replace('&quot;', '"')
+            local_xml = re.sub(r'(^$)', '', local_xml)
+            server_xml = server_xml.replace('  ', '').replace('\t', '').strip().replace('\n\n', '\n').replace('&quot;', '"')
+            server_xml = re.sub(r'^$', '', server_xml)
+
+        self.assertEqual(server_xml, local_xml)
+
+        self.assertEqual(new_flow, flow)
+        self.assertIsNot(new_flow, flow)
+

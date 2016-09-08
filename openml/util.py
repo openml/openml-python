@@ -5,6 +5,9 @@ if sys.version_info[0] < 3:
 else:
     from urllib.error import URLError
 
+import six
+
+oml_cusual_string = r'([a-zA-Z0-9_\-,\.\(\)])+'
 
 def is_string(obj):
     try:
@@ -12,4 +15,4 @@ def is_string(obj):
     except NameError:
         return isinstance(obj, str)
 
-__all__ = ['URLError', 'is_string']
+__all__ = ['URLError', 'is_string', 'oml_cusual_string']

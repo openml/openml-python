@@ -1,6 +1,8 @@
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import importlib
 import inspect
+import json
+import json.decoder
 import six
 import warnings
 
@@ -18,7 +20,9 @@ MAXIMAL_FLOW_LENGTH = 1024
 
 
 class SklearnToFlowConverter(object):
+
     def serialize_object(self, o):
+
         if self._is_estimator(o) or self._is_transformer(o):
             rval = self.serialize_model(o)
         elif isinstance(o, (list, tuple)):
@@ -29,10 +33,15 @@ class SklearnToFlowConverter(object):
             rval = None
         elif isinstance(o, six.string_types):
             rval = o
+        elif isinstance(o, bool):
+            # The check for bool has to be before the check for int, otherwise,
+            # isinstance will think the bool is an int and convert the bool will
+            # be converted to a string which can't be parsed by json.loads
+            rval = json.dumps(o)
         elif isinstance(o, int):
-            rval = o
+            rval = repr(o)
         elif isinstance(o, float):
-            rval = o
+            rval = repr(o)
         elif isinstance(o, dict):
             rval = {}
             for key, value in o.items():
@@ -42,6 +51,7 @@ class SklearnToFlowConverter(object):
                 key = self.serialize_object(key)
                 value = self.serialize_object(value)
                 rval[key] = value
+            rval = json.dumps(rval)
         elif isinstance(o, type):
             rval = self.serialize_type(o)
         elif isinstance(o, scipy.stats.distributions.rv_frozen):
@@ -78,38 +88,55 @@ class SklearnToFlowConverter(object):
     def _is_cross_validator(self, o):
         return isinstance(o, sklearn.model_selection.BaseCrossValidator)
 
-    def deserialize_object(self, o):
+    def deserialize_object(self, o, **kwargs):
+        if isinstance(o, six.string_types):
+            try:
+                o = json.loads(o)
+            except json.decoder.JSONDecodeError:
+                pass
+
         if isinstance(o, dict):
             if 'oml:name' in o and 'oml:description' in o:
-                rval = self.deserialize_model(o)
+                rval = self.deserialize_model(o, **kwargs)
             elif 'oml:serialized_object' in o:
                 serialized_type = o['oml:serialized_object']
                 value = o['value']
                 if serialized_type == 'type':
-                    rval = self.deserialize_type(value)
+                    rval = self.deserialize_type(value, **kwargs)
                 elif serialized_type == 'rv_frozen':
-                    rval = self.deserialize_rv_frozen(value)
+                    rval = self.deserialize_rv_frozen(value, **kwargs)
                 elif serialized_type == 'function':
-                    rval = self.deserialize_function(value)
+                    rval = self.deserialize_function(value, **kwargs)
+                elif serialized_type == 'component_reference':
+                    value = self.deserialize_object(value)
+                    step_name = value['step_name']
+                    key = value['key']
+                    component = self.deserialize_object(kwargs['components'][key])
+                    if step_name is None:
+                        rval = component
+                    else:
+                        rval = (step_name, component)
                 else:
                     raise ValueError('Cannot deserialize %s' % serialized_type)
             else:
-                rval = {self.deserialize_object(key): self.deserialize_object(value)
+                rval = {self.deserialize_object(key, **kwargs): self.deserialize_object(value, **kwargs)
                         for key, value in o.items()}
         elif isinstance(o, (list, tuple)):
-            rval = [self.deserialize_object(element) for element in o]
+            rval = [self.deserialize_object(element, **kwargs) for element in o]
             if isinstance(o, tuple):
                 rval = tuple(rval)
-        elif o is None:
-            rval = None
-        elif isinstance(o, six.string_types):
+        elif isinstance(o, bool):
             rval = o
         elif isinstance(o, int):
             rval = o
         elif isinstance(o, float):
             rval = o
+        elif isinstance(o, six.string_types):
+            rval = o
+        elif o is None:
+            rval = None
         elif isinstance(o, OpenMLFlow):
-            rval = self.deserialize_model(o)
+            rval = self.deserialize_model(o, **kwargs)
         else:
             raise TypeError(o)
         assert o is None or rval is not None
@@ -128,9 +155,23 @@ class SklearnToFlowConverter(object):
 
             if isinstance(rval, (list, tuple)):
                 # Steps in a pipeline or feature union
+                parameter_value = list()
                 for identifier, sub_component in rval:
-                    sub_components['steps__' + identifier] = sub_component
-                parameters[k] = rval
+                    pos = identifier.find('(')
+                    if pos >= 0:
+                        identifier = identifier[:pos]
+
+                    sub_component_identifier = k + '__' + identifier
+                    sub_components[sub_component_identifier] = sub_component
+                    component_reference = {'oml:serialized_object':'component_reference',
+                                           'value': {'key': sub_component_identifier,
+                                                     'step_name': identifier}}
+                    parameter_value.append(component_reference)
+                if isinstance(rval, tuple):
+                    parameter_value = tuple(parameter_value)
+
+                parameter_value = json.dumps(parameter_value)
+                parameters[k] = parameter_value
 
             elif isinstance(rval, OpenMLFlow):
                 # Since serialize_object can return a Flow, we need to check
@@ -141,9 +182,13 @@ class SklearnToFlowConverter(object):
                     continue
 
                 # A subcomponent, for example the base model in AdaBoostClassifier
-                identifier = rval.name
-                sub_components[identifier] = rval
-                parameters[k] = rval
+                sub_components[k] = rval
+                component_reference = {'oml:serialized_object':'component_reference',
+                                           'value': {'key': k,
+                                                     'step_name': None}}
+                component_reference = self.serialize_object(component_reference)
+                parameters[k] = (component_reference)
+
             else:
                 # Since Pipeline and FeatureUnion also return estimators and
                 # transformers in the 'steps' list with get_params(), we must
@@ -183,7 +228,7 @@ class SklearnToFlowConverter(object):
 
         return flow
 
-    def deserialize_model(self, flow):
+    def deserialize_model(self, flow, **kwargs):
         # TODO remove potential test sentinel during testing!
         model_name = flow.name
         # Remove everything after the first bracket
@@ -192,11 +237,27 @@ class SklearnToFlowConverter(object):
             model_name = model_name[:pos]
 
         parameters = flow.parameters
+        components = flow.components
+        component_dict = defaultdict(dict)
         parameter_dict = {}
+
+        for name in components:
+            if '__' in name:
+                parameter_name, step = name.split('__')
+                value = components[name]
+                rval = self.deserialize_object(value)
+                component_dict[parameter_name][step] = rval
+            else:
+                value = components[name]
+                rval = self.deserialize_object(value)
+                parameter_dict[name] = rval
 
         for name in parameters:
             value = parameters.get(name)
-            rval = self.deserialize_object(value)
+            rval = self.deserialize_object(value, components=components)
+            if isinstance(rval, dict) and 'oml:serialized_object' in rval:
+                parameter_name, step = rval['value'].split('__')
+                rval = component_dict[parameter_name][step]
             parameter_dict[name] = rval
 
         module_name = model_name.rsplit('.', 1)
@@ -218,10 +279,11 @@ class SklearnToFlowConverter(object):
                    np.int: 'np.int',
                    np.int32: 'np.int32',
                    np.int64: 'np.int64'}
-        return {'oml:serialized_object': 'type',
-                'value': mapping[o]}
+        jason = json.dumps({'oml:serialized_object': 'type',
+                            'value': mapping[o]})
+        return jason
 
-    def deserialize_type(self, o):
+    def deserialize_type(self, o, **kwargs):
         mapping = {'float': float,
                    'np.float': np.float,
                    'np.float32': np.float32,
@@ -238,10 +300,11 @@ class SklearnToFlowConverter(object):
         a = o.a
         b = o.b
         dist = o.dist.__class__.__module__ + '.' + o.dist.__class__.__name__
-        return {'oml:serialized_object': 'rv_frozen',
-                'value': {'dist': dist, 'a': a, 'b': b, 'args': args, 'kwds': kwds}}
+        jason = json.dumps({'oml:serialized_object': 'rv_frozen',
+                            'value': {'dist': dist, 'a': a, 'b': b, 'args': args, 'kwds': kwds}})
+        return jason
 
-    def deserialize_rv_frozen(self, o):
+    def deserialize_rv_frozen(self, o, **kwargs):
         args = o['args']
         kwds = o['kwds']
         a = o['a']
@@ -264,10 +327,11 @@ class SklearnToFlowConverter(object):
 
     def serialize_function(self, o):
         name = o.__module__ + '.' + o.__name__
-        return {'oml:serialized_object': 'function',
-                'value': name}
+        jason = json.dumps({'oml:serialized_object': 'function',
+                            'value': name})
+        return jason
 
-    def deserialize_function(self, name):
+    def deserialize_function(self, name, **kwargs):
         module_name = name.rsplit('.', 1)
         try:
             model_class = getattr(importlib.import_module(module_name[0]),
