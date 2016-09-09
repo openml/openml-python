@@ -5,7 +5,7 @@ import xmltodict
 
 from .. import config
 from ..flows import create_flow_from_model
-from ..flows.sklearn import SklearnToFlowConverter
+from ..flows.sklearn_converter import SklearnToFlowConverter
 from ..exceptions import OpenMLCacheException
 from ..util import URLError
 from ..tasks.functions import _create_task_from_xml

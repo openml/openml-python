@@ -5,6 +5,7 @@ import json
 import json.decoder
 import six
 import warnings
+import sys
 
 import numpy as np
 import scipy.stats.distributions
@@ -17,6 +18,12 @@ from .flow import OpenMLFlow
 from ..exceptions import OpenMLRestrictionViolated
 
 MAXIMAL_FLOW_LENGTH = 1024
+
+
+if sys.version_info >= (3, 5):
+    from json.decoder import JSONDecodeError
+else:
+    JSONDecodeError = ValueError
 
 
 class SklearnToFlowConverter(object):
@@ -92,7 +99,7 @@ class SklearnToFlowConverter(object):
         if isinstance(o, six.string_types):
             try:
                 o = json.loads(o)
-            except json.decoder.JSONDecodeError:
+            except JSONDecodeError:
                 pass
 
         if isinstance(o, dict):

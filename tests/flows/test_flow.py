@@ -17,7 +17,7 @@ import sklearn.tree
 from openml.testing import TestBase
 from openml._api_calls import _perform_api_call
 import openml
-from openml.flows.sklearn import SklearnToFlowConverter
+from openml.flows.sklearn_converter import SklearnToFlowConverter
 
 if sys.version_info[0] >= 3:
     from unittest import mock

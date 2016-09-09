@@ -15,7 +15,7 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
 
-from openml.flows.sklearn import SklearnToFlowConverter
+from openml.flows.sklearn_converter import SklearnToFlowConverter
 from openml.flows import OpenMLFlow
 
 
