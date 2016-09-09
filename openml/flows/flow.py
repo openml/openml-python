@@ -11,23 +11,56 @@ from openml.util import oml_cusual_string
 class OpenMLFlow(object):
     """OpenML Flow. Stores machine learning models.
 
+    Flows should not be generated manually, but by the function
+    :meth:`openml.flows.create_flow_from_model`. Using this helper function
+    ensures that all relevant fields are filled in.
+
     Parameters
     ----------
-    model : scikit-learn compatible model
-        The model the flow consists of. The model needs to have fit and predict methods.
-    description : string
+    name : str
+        Name of the flow. Is used together with the attribute `external_version`
+        as a unique identifier of the flow.
+    description : str
         Description of the flow (free text).
-    contributor : string
-        FIXME
-    tag : string
-        FIXME
+    model : object
+        ML model which is described by this flow.
+    components : OrderedDict
+        Mapping from component identifier to an OpenMLFlow object.
+    parameters : OrderedDict
+        Mapping from parameter name to the parameter default value. The
+        parameter default value must be of type `str`, so that the respective
+        toolbox plugin can take care of casting the parameter default value to
+        the correct type.
+    parameters_meta_info : OrderedDict
+        Mapping from parameter name to `dict`. Stores additional information for
+        each parameter. Required keys are `data_type` and `description`.
+    external_version : str
+        Version number of the software the flow is implemented in. Is used
+        together with the attribute `name` as a uniquer identifier of the flow.
+    uploader : str
+        OpenML user ID of the uploader. Filled in by the server.
+    tags : list
+        List of tags. Created on the server by other API calls.
+    binary_url : str
+        ??? - don't use - implemented because it is used by flows on the server
+    binary_format : str
+        ??? - don't use - implemented because it is used by flows on the server
+    binary_md5 : str
+        ??? - don't use - implemented because it is used by flows on the server
+    version : str
+        OpenML version of the flow.
+    upload_date : str
+        Date the flow was uploaded. Filled in by the server.
+    language : str
+        Natural language the flow is described in (not the programming
+        language).
+    dependencies : str
+        A list of dependencies necessary to run the flow.
     flow_id : int, optional
         Flow ID. Assigned by the server (fixme shouldn't be here?)
-    uploader : string, optional
-        User uploading the model (fixme shouldn't be here?). Assigned by the server.
-
-
     """
+    # TODO @Jan can you find better descriptions for binary_url, binary_md5,
+    # binary_format and version?
     def __init__(self, name, description=None, model=None, components=None,
                  parameters=None, parameters_meta_info=None,
                  external_version=None, uploader=None, tags=None,
@@ -41,29 +74,34 @@ class OpenMLFlow(object):
         if components is None:
             components = OrderedDict()
         elif not isinstance(components, OrderedDict):
-            raise TypeError('components must be of type OrderedDict, but is %s.' %
-                            type(components))
+            raise TypeError('components must be of type OrderedDict, '
+                            'but is %s.' % type(components))
         self.components = components
+
         if parameters is None:
             parameters = OrderedDict()
         elif not isinstance(parameters, OrderedDict):
-            raise TypeError('parameters must be of type OrderedDict, but is %s.' %
-                            type(parameters))
+            raise TypeError('parameters must be of type OrderedDict, '
+                            'but is %s.' % type(parameters))
+
         if parameters_meta_info is None:
             parameters_meta_info = OrderedDict()
         elif not isinstance(parameters_meta_info, OrderedDict):
-            raise TypeError('parameters_meta_info must be of type OrderedDict, but is %s.' %
-                            type(parameters_meta_info))
+            raise TypeError('parameters_meta_info must be of type OrderedDict, '
+                            'but is %s.' % type(parameters_meta_info))
+
         keys_parameters = set(parameters.keys())
         keys_parameters_meta_info = set(parameters_meta_info.keys())
         if len(keys_parameters.difference(keys_parameters_meta_info)) > 0:
             raise ValueError('Parameter %s only in parameters, but not in'
                              'parameters_meta_info.' %
-                             str(keys_parameters.difference(keys_parameters_meta_info)))
+                             str(keys_parameters.difference(
+                                 keys_parameters_meta_info)))
         if len(keys_parameters_meta_info.difference(keys_parameters)) > 0:
-            raise ValueError('Parameter %s only in parameters_meta_info, but not in'
-                             'parameters.' %
-                             str(keys_parameters_meta_info.difference(keys_parameters)))
+            raise ValueError('Parameter %s only in parameters_meta_info, '
+                             'but not in parameters.' %
+                             str(keys_parameters_meta_info.difference(
+                                 keys_parameters)))
 
         self.parameters = parameters
         self.parameters_meta_info = parameters_meta_info
@@ -88,7 +126,7 @@ class OpenMLFlow(object):
 
         Returns
         -------
-        flow_xml : string
+        str
             Flow represented as XML string.
         """
         flow_dict = self.__to_dict()
@@ -99,6 +137,17 @@ class OpenMLFlow(object):
         return flow_xml
 
     def __to_dict(self):
+        """ Helper function used by _to_xml and __to_dict.
+
+        Creates a dictionary representation of self which can be serialized
+        to xml by the function _to_xml.
+
+        Returns
+        -------
+        OrderedDict
+            Flow represented as OrderedDict.
+
+        """
         flow_dict = OrderedDict()
         flow_dict['oml:flow'] = OrderedDict()
         flow_dict['oml:flow']['@xmlns:oml'] = 'http://openml.org/openml'
@@ -122,17 +171,21 @@ class OpenMLFlow(object):
         for key in self.parameters:
             param_dict = OrderedDict()
             param_dict['oml:name'] = key
+
             if self.parameters_meta_info[key]['data_type'] is not None:
-                param_dict['oml:data_type'] = self.parameters_meta_info[key].get('data_type')
+                param_dict['oml:data_type'] = self.parameters_meta_info[key].\
+                    get('data_type')
+
             param_dict['oml:default_value'] = self.parameters[key]
             if self.parameters_meta_info[key]['description'] is not None:
-                param_dict['oml:description'] = self.parameters_meta_info[key].get('description')
+                param_dict['oml:description'] = self.parameters_meta_info[key].\
+                    get('description')
 
-            for key, value in param_dict.items():
-                if key is not None and not isinstance(key, six.string_types):
+            for key_, value in param_dict.items():
+                if key_ is not None and not isinstance(key_, six.string_types):
                     raise ValueError('Parameter name %s cannot be serialized '
                                      'because it is of type %s. Only strings '
-                                     'can be serialized.' % (key, type(key)))
+                                     'can be serialized.' % (key_, type(key_)))
                 if value is not None and not isinstance(value, six.string_types):
                     raise ValueError('Parameter value %s cannot be serialized '
                                      'because it is of type %s. Only strings '
@@ -146,15 +199,16 @@ class OpenMLFlow(object):
         for key in self.components:
             component_dict = OrderedDict()
             component_dict['oml:identifier'] = key
-            component_dict['oml:flow'] = self.components[key].__to_dict()['oml:flow']
+            component_dict['oml:flow'] = \
+                self.components[key].__to_dict()['oml:flow']
 
-            for key in component_dict:
-                # We can only check the key here, because the value is a flow.
-                # The flow itself has to be valid by recursion
-                if key is not None and not isinstance(key, six.string_types):
+            for key_ in component_dict:
+                # We only need to check if the key is a string, because the
+                # value is a flow. The flow itself is valid by recursion
+                if key_ is not None and not isinstance(key_, six.string_types):
                     raise ValueError('Parameter name %s cannot be serialized '
                                      'because it is of type %s. Only strings '
-                                     'can be serialized.' % (key, type(key)))
+                                     'can be serialized.' % (key_, type(key_)))
 
             components.append(component_dict)
 
@@ -173,6 +227,18 @@ class OpenMLFlow(object):
 
     @classmethod
     def _from_xml(cls, xml_dict):
+        """Create a flow from an xml description.
+
+        Parameters
+        ----------
+        xml_dict : dict
+            Dictionary representation of the flow as created by _to_dict()
+
+        Returns
+        -------
+            OpenMLFlow
+
+        """
         dic = xml_dict["oml:flow"]
         flow_id = int(dic['oml:id']) if 'oml:id' in dic else None
         uploader = dic.get('oml:uploader')
@@ -237,7 +303,11 @@ class OpenMLFlow(object):
                    flow_id=flow_id)
 
     def __eq__(self, other):
-        """Override the default Equals behavior"""
+        """Check equality.
+
+        Two flows are equal if their all keys which are not set by the server
+        are equal, as well as all their parameters and components.
+        """
         if isinstance(other, self.__class__):
             this_dict = self.__dict__.copy()
             this_parameters = this_dict['parameters']
@@ -253,7 +323,8 @@ class OpenMLFlow(object):
             del other_dict['components']
             del other_dict['model']
 
-            # Name is actually not generated by the server, but it will be tested further down with a getter (allows mocking)
+            # Name is actually not generated by the server, but it will be
+            # tested further down with a getter (allows mocking in the tests)
             generated_by_the_server = ['name', 'flow_id', 'uploader', 'version',
                                        'upload_date', 'source_url',
                                        'binary_url', 'source_format',
@@ -267,14 +338,18 @@ class OpenMLFlow(object):
             equal = this_dict == other_dict
             equal_name = self._get_name() == other._get_name()
 
-            parameters_equal = this_parameters.keys() == other_parameters.keys() and \
-                               all([this_parameter == other_parameter
-                                    for this_parameter, other_parameter in
-                                    zip(this_parameters.values(), other_parameters.values())])
-            components_equal = this_components.keys() == other_components.keys() and \
-                               all([this_component == other_component
-                                    for this_component, other_component in
-                                    zip(this_components.values(), other_components.values())])
+            parameters_equal = \
+                this_parameters.keys() == other_parameters.keys() and \
+                    all([this_parameter == other_parameter
+                         for this_parameter, other_parameter in
+                         zip(this_parameters.values(),
+                             other_parameters.values())])
+            components_equal = \
+                this_components.keys() == other_components.keys() and \
+                    all([this_component == other_component
+                         for this_component, other_component in
+                         zip(this_components.values(),
+                             other_components.values())])
 
             return parameters_equal and components_equal and equal and equal_name
         return NotImplemented
@@ -333,6 +408,27 @@ class OpenMLFlow(object):
 
 
 def create_flow_from_model(model, converter, description=None):
+    """Use a converter to create an OpenMLFlow from model.
+
+    Allows to configure how a model (for example a scikit-learn estimator) is
+    transformed into an OpenMLFlow.
+
+    Parameters
+    ----------
+    model : object
+        ML model. Must match the converter.
+    converter : object
+        Class that implements a method `flow = serialize_object(model)`.
+        Abstract interface to come soon.
+    description : str, optional
+        Provide a description of the flow, overwriting the default description
+        generated by the converter.
+
+    Returns
+    -------
+    OpenMLFlow
+
+    """
     flow = converter.serialize_object(model)
     if not isinstance(flow, OpenMLFlow):
         raise ValueError('Converter %s did return %s, not OpenMLFlow!' %

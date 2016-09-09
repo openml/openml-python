@@ -27,11 +27,12 @@ else:
 
 
 class SklearnToFlowConverter(object):
+    """Convert scikit-learn estimator into an OpenMLFlow."""
 
     def serialize_object(self, o):
 
         if self._is_estimator(o) or self._is_transformer(o):
-            rval = self.serialize_model(o)
+            rval = self._serialize_model(o)
         elif isinstance(o, (list, tuple)):
             rval = [self.serialize_object(element) for element in o]
             if isinstance(o, tuple):
@@ -54,7 +55,8 @@ class SklearnToFlowConverter(object):
             for key, value in o.items():
                 if not isinstance(key, six.string_types):
                     raise TypeError('Can only use string as keys, you passed '
-                                    'type %s for value %s.' % (type(key), str(key)))
+                                    'type %s for value %s.' %
+                                    (type(key), str(key)))
                 key = self.serialize_object(key)
                 value = self.serialize_object(value)
                 rval[key] = value
@@ -64,8 +66,8 @@ class SklearnToFlowConverter(object):
         elif isinstance(o, scipy.stats.distributions.rv_frozen):
             rval = self.serialize_rv_frozen(o)
         # This only works for user-defined functions (and not even partial).
-        # I think this exactly we want here as there shouldn't be any built-in or
-        # functool.partials in a pipeline
+        # I think this exactly we want here as there shouldn't be any built-in
+        # or functool.partials in a pipeline
         elif inspect.isfunction(o):
             rval = self.serialize_function(o)
         elif self._is_cross_validator(o):
@@ -80,10 +82,9 @@ class SklearnToFlowConverter(object):
     # TODO maybe remove those functions and put the check to the long
     # if-constructs above?
     def _is_estimator(self, o):
-        # TODO @amueller should one rather check whether this is a subclass of
-        # BaseEstimator?
-        #return (hasattr(o, 'fit') and hasattr(o, 'predict') and
-        #        hasattr(o, 'get_params') and hasattr(o, 'set_params'))
+        # TODO @amueller which checks is preferable?
+        # return (hasattr(o, 'fit') and hasattr(o, 'predict') and
+        #         hasattr(o, 'get_params') and hasattr(o, 'set_params'))
         return isinstance(o, sklearn.base.BaseEstimator)
 
     def _is_transformer(self, o):
@@ -96,6 +97,10 @@ class SklearnToFlowConverter(object):
         return isinstance(o, sklearn.model_selection.BaseCrossValidator)
 
     def deserialize_object(self, o, **kwargs):
+        # First, we need to check whether the presented object is a json string.
+        # JSON strings are used to encoder parameter values. By passing around
+        # json strings for parameters, we make sure that we can deserialize
+        # the parameter values to the correct type.
         if isinstance(o, six.string_types):
             try:
                 o = json.loads(o)
@@ -104,7 +109,12 @@ class SklearnToFlowConverter(object):
 
         if isinstance(o, dict):
             if 'oml:name' in o and 'oml:description' in o:
-                rval = self.deserialize_model(o, **kwargs)
+                # TODO check if this code is actually called
+                rval = self._deserialize_model(o, **kwargs)
+
+            # Check if the dict encodes a 'special' object, which could not
+            # easily converted into a string, but rather the information to
+            # re-create the object were stored in a dictionary.
             elif 'oml:serialized_object' in o:
                 serialized_type = o['oml:serialized_object']
                 value = o['value']
@@ -118,15 +128,20 @@ class SklearnToFlowConverter(object):
                     value = self.deserialize_object(value)
                     step_name = value['step_name']
                     key = value['key']
-                    component = self.deserialize_object(kwargs['components'][key])
+                    component = self.deserialize_object(
+                        kwargs['components'][key])
                     if step_name is None:
                         rval = component
                     else:
                         rval = (step_name, component)
+
                 else:
                     raise ValueError('Cannot deserialize %s' % serialized_type)
+
             else:
-                rval = {self.deserialize_object(key, **kwargs): self.deserialize_object(value, **kwargs)
+                # Regular dictionary
+                rval = {self.deserialize_object(key, **kwargs):
+                        self.deserialize_object(value, **kwargs)
                         for key, value in o.items()}
         elif isinstance(o, (list, tuple)):
             rval = [self.deserialize_object(element, **kwargs) for element in o]
@@ -143,14 +158,28 @@ class SklearnToFlowConverter(object):
         elif o is None:
             rval = None
         elif isinstance(o, OpenMLFlow):
-            rval = self.deserialize_model(o, **kwargs)
+            rval = self._deserialize_model(o, **kwargs)
         else:
             raise TypeError(o)
         assert o is None or rval is not None
 
         return rval
 
-    def serialize_model(self, model):
+    def _serialize_model(self, model):
+        """Create an OpenMLFlow.
+
+        Calls `self.serialize_object` recursively to properly serialize the
+        parameters to strings and the components (other models) to OpenMLFlows.
+
+        Parameters
+        ----------
+        model : sklearn estimator
+
+        Returns
+        -------
+        OpenMLFlow
+
+        """
         sub_components = OrderedDict()
         parameters = OrderedDict()
         parameters_meta_info = OrderedDict()
@@ -164,44 +193,62 @@ class SklearnToFlowConverter(object):
                 # Steps in a pipeline or feature union
                 parameter_value = list()
                 for identifier, sub_component in rval:
+                    # Use only the name of the module (and not all submodules
+                    # in the brackets) as the identifier
                     pos = identifier.find('(')
                     if pos >= 0:
                         identifier = identifier[:pos]
 
+                    # Add the component to the list of components, add a
+                    # component reference as a placeholder to the list of
+                    # parameters, which will be replaced by the real component
+                    # when deserealizing the parameter
                     sub_component_identifier = k + '__' + identifier
                     sub_components[sub_component_identifier] = sub_component
-                    component_reference = {'oml:serialized_object':'component_reference',
-                                           'value': {'key': sub_component_identifier,
-                                                     'step_name': identifier}}
+                    component_reference = \
+                        {'oml:serialized_object': 'component_reference',
+                         'value': {'key': sub_component_identifier,
+                                   'step_name': identifier}}
                     parameter_value.append(component_reference)
                 if isinstance(rval, tuple):
                     parameter_value = tuple(parameter_value)
 
+                # Here (and in the elif and else branch below) are the only
+                # places where we encode a value as json to make sure that all
+                # parameter values still have the same type after
+                # deserialization
                 parameter_value = json.dumps(parameter_value)
                 parameters[k] = parameter_value
 
             elif isinstance(rval, OpenMLFlow):
                 # Since serialize_object can return a Flow, we need to check
-                # whether that flow represents a hyperparameter value (or is a
-                # flow which was created because of a pipeline or e feature union)
+                # whether that flow represents a hyperparameter value of the
+                # current flow or of a subcomponent. We only add it to the
+                # parameters in the first case. In the second case, it will
+                # be added to the correct flow when deserializing the subflow
+                # (which happens either in the body of the if statement above
+                # or in this body when the component is the value of a
+                # hyperparameter, as it could be for example in the
+                # AdaBoostClassifier.
                 model_parameters = signature(model.__init__)
                 if k not in model_parameters.parameters:
                     continue
 
-                # A subcomponent, for example the base model in AdaBoostClassifier
+                # A subcomponent, for example the base model in
+                # AdaBoostClassifier
                 sub_components[k] = rval
-                component_reference = {'oml:serialized_object':'component_reference',
-                                           'value': {'key': k,
-                                                     'step_name': None}}
+                component_reference = \
+                    {'oml:serialized_object': 'component_reference',
+                     'value': {'key': k, 'step_name': None}}
                 component_reference = self.serialize_object(component_reference)
                 parameters[k] = json.dumps(component_reference)
 
             else:
-                # Since Pipeline and FeatureUnion also return estimators and
-                # transformers in the 'steps' list with get_params(), we must
-                # add them as a component, but not as a parameter of the
-                # flow. The next if makes sure that we only add parameters
-                # for the first case.
+                # In case of pipelines, or when having a component (for example
+                # in the AdaBoostClassifier or the RandomizedSearchCV), the
+                # parameters of that component are also returned by get_params()
+                # This check makes sure that we only add the parameters for the
+                # current component, and not the ones of the child component.
                 model_parameters = signature(model.__init__)
                 if k not in model_parameters.parameters:
                     continue
@@ -216,14 +263,18 @@ class SklearnToFlowConverter(object):
             parameters_meta_info[k] = OrderedDict((('description', None),
                                                    ('data_type', None)))
 
+        # Create a flow name, which contains all components in brackets, for
+        # example RandomizedSearchCV(Pipeline(StandardScaler,AdaBoostClassifier(DecisionTreeClassifier)),StandardScaler,AdaBoostClassifier(DecisionTreeClassifier))
+        # TODO the name above is apparently wrong, I need to test and check this
         name = model.__module__ + "." + model.__class__.__name__
         sub_components_names = ",".join(
             [sub_components[key].name for key in sub_components])
         if sub_components_names:
             name = '%s(%s)' % (name, sub_components_names)
         if len(name) > MAXIMAL_FLOW_LENGTH:
-            raise OpenMLRestrictionViolated('Flow name must not be longer ' +
-                                            'than %d characters!' % MAXIMAL_FLOW_LENGTH)
+            raise OpenMLRestrictionViolated('Flow name must not be longer than '
+                                            '%d characters!' %
+                                            MAXIMAL_FLOW_LENGTH)
 
         external_version = self._get_external_version_info()
         flow = OpenMLFlow(name=name,
@@ -236,10 +287,11 @@ class SklearnToFlowConverter(object):
 
         return flow
 
-    def deserialize_model(self, flow, **kwargs):
-        # TODO remove potential test sentinel during testing!
+    def _deserialize_model(self, flow, **kwargs):
+
         model_name = flow.name
-        # Remove everything after the first bracket
+        # Remove everything after the first bracket, it is not necessary for
+        # creating the current flow
         pos = model_name.find('(')
         if pos >= 0:
             model_name = model_name[:pos]
@@ -263,6 +315,8 @@ class SklearnToFlowConverter(object):
         for name in parameters:
             value = parameters.get(name)
             rval = self.deserialize_object(value, components=components)
+
+            # Replace the component placeholder by the actual flow
             if isinstance(rval, dict) and 'oml:serialized_object' in rval:
                 parameter_name, step = rval['value'].split('__')
                 rval = component_dict[parameter_name][step]
@@ -287,8 +341,7 @@ class SklearnToFlowConverter(object):
                    np.int: 'np.int',
                    np.int32: 'np.int32',
                    np.int64: 'np.int64'}
-        return {'oml:serialized_object': 'type',
-                            'value': mapping[o]}
+        return {'oml:serialized_object': 'type', 'value': mapping[o]}
 
     def deserialize_type(self, o, **kwargs):
         mapping = {'float': float,
@@ -308,7 +361,8 @@ class SklearnToFlowConverter(object):
         b = o.b
         dist = o.dist.__class__.__module__ + '.' + o.dist.__class__.__name__
         return {'oml:serialized_object': 'rv_frozen',
-                            'value': {'dist': dist, 'a': a, 'b': b, 'args': args, 'kwds': kwds}}
+                'value': {'dist': dist, 'a': a, 'b': b,
+                          'args': args, 'kwds': kwds}}
 
     def deserialize_rv_frozen(self, o, **kwargs):
         args = o['args']
@@ -333,8 +387,7 @@ class SklearnToFlowConverter(object):
 
     def serialize_function(self, o):
         name = o.__module__ + '.' + o.__name__
-        return {'oml:serialized_object': 'function',
-                            'value': name}
+        return {'oml:serialized_object': 'function', 'value': name}
 
     def deserialize_function(self, name, **kwargs):
         module_name = name.rsplit('.', 1)
@@ -346,7 +399,8 @@ class SklearnToFlowConverter(object):
             return None
         return model_class
 
-    # This produces a flow, thus it does not need a deserialize. It cannot be fed
+    # This produces a flow, thus it does not need a deserialize function as
+    # the function _deserialize_model is used for that. It cannot be fed
     # to serialize_model() because cross-validators do not have get_params().
     def serialize_cross_validator(self, o):
         parameters = OrderedDict()
@@ -394,7 +448,8 @@ class SklearnToFlowConverter(object):
                           description='Automatically created sub-component.',
                           model=o,
                           parameters=parameters,
-                          parameters_meta_info=parameters_meta_info)
+                          parameters_meta_info=parameters_meta_info,
+                          external_version=external_version)
 
         return flow
 
