@@ -163,6 +163,10 @@ class TestSklearn(unittest.TestCase):
         fu = sklearn.pipeline.FeatureUnion(transformer_list=(('ohe', ohe),
                                                              ('scaler', scaler)))
         serialization =  self.converter.serialize_object(fu)
+        self.assertEqual(serialization.name,
+                         'sklearn.pipeline.FeatureUnion('
+                         'sklearn.preprocessing.data.OneHotEncoder,'
+                         'sklearn.preprocessing.data.StandardScaler)')
         new_model = self.converter.deserialize_object(serialization)
 
         self.assertEqual(type(new_model), type(fu))
@@ -192,6 +196,30 @@ class TestSklearn(unittest.TestCase):
 
         self.assertEqual(new_model_params, fu_params)
         new_model.fit(self.X, self.y)
+
+    def test_serialize_complex_flow(self):
+        scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
+
+        boosting = sklearn.ensemble.AdaBoostClassifier(
+            base_estimator=sklearn.tree.DecisionTreeClassifier())
+        model = sklearn.pipeline.Pipeline(steps=(
+            ('scaler', scaler), ('boosting', boosting)))
+        parameter_grid = {'n_estimators': [1, 5, 10, 100],
+                          'learning_rate': scipy.stats.uniform(0.01, 0.99),
+                          'base_estimator__max_depth': scipy.stats.randint(1,
+                                                                           10)}
+        cv = sklearn.model_selection.StratifiedKFold(n_splits=5, shuffle=True)
+        rs = sklearn.model_selection.RandomizedSearchCV(
+            estimator=model, param_distributions=parameter_grid, cv=cv)
+        serialized = self.converter.serialize_object(rs)
+
+        fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV(' \
+                       'sklearn.model_selection._split.StratifiedKFold,' \
+                       'sklearn.pipeline.Pipeline(' \
+                       'sklearn.preprocessing.data.StandardScaler,' \
+                       'sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
+                       'sklearn.tree.tree.DecisionTreeClassifier)))'
+        self.assertEqual(serialized.name, fixture_name)
 
     def test_serialize_type(self):
         supported_types = [float, np.float, np.float32, np.float64,

@@ -189,7 +189,20 @@ class SklearnToFlowConverter(object):
         for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
             rval = self.serialize_object(v)
 
+
+            # In case of pipelines, or when having a component (for example
+            # in the AdaBoostClassifier or the RandomizedSearchCV), the
+            # parameters of that component are also returned by get_params()
+            # This check makes sure that we only add the parameters for the
+            # current component, and not the ones of the child component.
+            # Parameters of child components will be added to the correct flow
+            # when deserializing the subflow
+            model_parameters = signature(model.__init__)
+            if k not in model_parameters.parameters:
+                continue
+
             if isinstance(rval, (list, tuple)):
+
                 # Steps in a pipeline or feature union
                 parameter_value = list()
                 for identifier, sub_component in rval:
@@ -221,18 +234,6 @@ class SklearnToFlowConverter(object):
                 parameters[k] = parameter_value
 
             elif isinstance(rval, OpenMLFlow):
-                # Since serialize_object can return a Flow, we need to check
-                # whether that flow represents a hyperparameter value of the
-                # current flow or of a subcomponent. We only add it to the
-                # parameters in the first case. In the second case, it will
-                # be added to the correct flow when deserializing the subflow
-                # (which happens either in the body of the if statement above
-                # or in this body when the component is the value of a
-                # hyperparameter, as it could be for example in the
-                # AdaBoostClassifier.
-                model_parameters = signature(model.__init__)
-                if k not in model_parameters.parameters:
-                    continue
 
                 # A subcomponent, for example the base model in
                 # AdaBoostClassifier
@@ -244,14 +245,6 @@ class SklearnToFlowConverter(object):
                 parameters[k] = json.dumps(component_reference)
 
             else:
-                # In case of pipelines, or when having a component (for example
-                # in the AdaBoostClassifier or the RandomizedSearchCV), the
-                # parameters of that component are also returned by get_params()
-                # This check makes sure that we only add the parameters for the
-                # current component, and not the ones of the child component.
-                model_parameters = signature(model.__init__)
-                if k not in model_parameters.parameters:
-                    continue
 
                 # a regular hyperparameter
                 if not (hasattr(rval, '__len__') and len(rval) == 0):
@@ -289,7 +282,7 @@ class SklearnToFlowConverter(object):
 
     def _deserialize_model(self, flow, **kwargs):
 
-        model_name = flow.name
+        model_name = flow._get_name()
         # Remove everything after the first bracket, it is not necessary for
         # creating the current flow
         pos = model_name.find('(')
@@ -434,6 +427,7 @@ class SklearnToFlowConverter(object):
                 warnings.filters.pop(0)
 
             if not (hasattr(value, '__len__') and len(value) == 0):
+                value = json.dumps(value)
                 parameters[key] = value
             else:
                 parameters[key] = None

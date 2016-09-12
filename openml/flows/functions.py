@@ -5,7 +5,7 @@ from . import OpenMLFlow
 from ..util import URLError
 
 
-def get_flow(flow_id):
+def get_flow(flow_id, converter=None):
     """Download the OpenML flow for a given flow ID.
 
     Parameters
@@ -28,4 +28,9 @@ def get_flow(flow_id):
 
     flow_dict = xmltodict.parse(flow_xml)
     flow = OpenMLFlow._from_xml(flow_dict)
+
+    if converter is not None:
+        model = converter.deserialize_object(flow)
+        flow.model = model
+
     return flow

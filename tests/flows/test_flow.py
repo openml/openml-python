@@ -7,6 +7,7 @@ import unittest
 import xmltodict
 
 import scipy.stats
+import sklearn.datasets
 import sklearn.dummy
 import sklearn.ensemble
 import sklearn.model_selection
@@ -123,17 +124,22 @@ class TestFlow(TestBase):
 
     @mock.patch.object(openml.OpenMLFlow, '_get_name', autospec=True)
     def test_sklearn_to_upload_to_flow(self, name_mock):
+        iris = sklearn.datasets.load_iris()
+        X = iris.data
+        y = iris.target
+
         # Create a unique prefix for the flow. Necessary because the flow is
         # identified by its name and external version online. Having a unique
         #  name allows us to publish the same flow in each test run
         md5 = hashlib.md5()
         md5.update(str(time.time()).encode('utf-8'))
         sentinel = md5.hexdigest()[:10]
+        sentinel = 'TEST%s' % sentinel
         def side_effect(self):
             if sentinel in self.name:
                 return self.name
             else:
-                return 'TEST%s%s' % (sentinel, self.name)
+                return '%s%s' % (sentinel, self.name)
         name_mock.side_effect = side_effect
 
         # Test a more complicated flow
@@ -142,18 +148,32 @@ class TestFlow(TestBase):
             base_estimator=sklearn.tree.DecisionTreeClassifier())
         model = sklearn.pipeline.Pipeline(steps=(
             ('scaler', scaler), ('boosting', boosting)))
-        parameter_grid = {'n_estimators': [1, 5, 10, 100],
-                          'learning_rate': scipy.stats.uniform(0.01, 0.99),
-                          'base_estimator__max_depth': scipy.stats.randint(1, 10)}
+        parameter_grid = {'boosting__n_estimators': [1, 5, 10, 100],
+                          'boosting__learning_rate': scipy.stats.uniform(0.01, 0.99),
+                          'boosting__base_estimator__max_depth': scipy.stats.randint(1, 10)}
+        cv = sklearn.model_selection.StratifiedKFold(n_splits=5, shuffle=True)
         rs = sklearn.model_selection.RandomizedSearchCV(
-            estimator=model, param_distributions=parameter_grid)
+            estimator=model, param_distributions=parameter_grid, cv=cv)
+        rs.fit(X, y)
         flow = openml.flows.create_flow_from_model(rs, SklearnToFlowConverter())
 
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)
 
         # Check whether we can load the flow again
-        new_flow = openml.flows.get_flow(flow_id=flow.flow_id)
+        # Remove the sentinel from the name again so that we can reinstantiate
+        # the object again
+        def side_effect(self):
+            if sentinel in self.name:
+                name = self.name.replace(sentinel, '')
+                return name
+            else:
+                return self.name
+        name_mock.side_effect = side_effect
+
+        name_mock.side_effect = side_effect
+        new_flow = openml.flows.get_flow(flow_id=flow.flow_id,
+                                         converter=SklearnToFlowConverter())
 
         local_xml = flow._to_xml()
         server_xml = new_flow._to_xml()
@@ -175,4 +195,14 @@ class TestFlow(TestBase):
 
         self.assertEqual(new_flow, flow)
         self.assertIsNot(new_flow, flow)
+        new_flow.model.fit(X, y)
+
+        fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV(' \
+                       'sklearn.model_selection._split.StratifiedKFold,' \
+                       'sklearn.pipeline.Pipeline(' \
+                       'sklearn.preprocessing.data.StandardScaler,' \
+                       'sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
+                       'sklearn.tree.tree.DecisionTreeClassifier)))'
+
+        self.assertEqual(new_flow._get_name(), fixture_name)
 
