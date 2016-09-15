@@ -198,12 +198,12 @@ class TestSklearn(unittest.TestCase):
         new_model.fit(self.X, self.y)
 
     def test_serialize_complex_flow(self):
+        ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[0])
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
-
         boosting = sklearn.ensemble.AdaBoostClassifier(
             base_estimator=sklearn.tree.DecisionTreeClassifier())
         model = sklearn.pipeline.Pipeline(steps=(
-            ('scaler', scaler), ('boosting', boosting)))
+            ('ohe', ohe), ('scaler', scaler), ('boosting', boosting)))
         parameter_grid = {'n_estimators': [1, 5, 10, 100],
                           'learning_rate': scipy.stats.uniform(0.01, 0.99),
                           'base_estimator__max_depth': scipy.stats.randint(1,
@@ -216,6 +216,7 @@ class TestSklearn(unittest.TestCase):
         fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV(' \
                        'sklearn.model_selection._split.StratifiedKFold,' \
                        'sklearn.pipeline.Pipeline(' \
+                       'sklearn.preprocessing.data.OneHotEncoder,' \
                        'sklearn.preprocessing.data.StandardScaler,' \
                        'sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
                        'sklearn.tree.tree.DecisionTreeClassifier)))'

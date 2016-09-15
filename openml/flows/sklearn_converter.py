@@ -73,7 +73,7 @@ class SklearnToFlowConverter(object):
         elif self._is_cross_validator(o):
             rval = self.serialize_cross_validator(o)
         else:
-            raise TypeError(o)
+            raise TypeError(o, type(o))
 
         assert o is None or rval is not None
 
@@ -201,7 +201,9 @@ class SklearnToFlowConverter(object):
             if k not in model_parameters.parameters:
                 continue
 
-            if isinstance(rval, (list, tuple)):
+            if isinstance(rval, (list, tuple)) and \
+                    isinstance(rval[0], (list, tuple)) and \
+                    [type(rval[0]) == type(rval[i]) for i in range(len(rval))]:
 
                 # Steps in a pipeline or feature union
                 parameter_value = list()
