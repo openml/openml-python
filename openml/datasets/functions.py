@@ -5,7 +5,7 @@ import shutil
 from collections import OrderedDict
 import xmltodict
 from .dataset import OpenMLDataset
-from ..exceptions import OpenMLCacheException
+from ..exceptions import OpenMLCacheException, PyOpenMLError
 from .. import config
 from .._api_calls import _perform_api_call, _read_url
 
@@ -255,12 +255,18 @@ def get_dataset(dataset_id):
     try:
         description = _get_dataset_description(did_cache_dir, dataset_id)
         arff_file = _get_dataset_arff(did_cache_dir, description)
-        # TODO not used yet, figure out what to do with them...
         features = _get_dataset_features(did_cache_dir, dataset_id)
+        # TODO not used yet, figure out what to do with this...
         qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
     except Exception as e:
         _remove_dataset_cache_dir(did_cache_dir)
         raise e
+
+    for feature in features['oml:feature']:
+        if (feature['oml:data_type'] == 'string'):
+            raise PyOpenMLError('Dataset not compatible, PyOpenML cannot handle string features: index ' +
+                                feature['oml:index'] + ', attribute name ' + feature['oml:name'])
+
 
     dataset = _create_dataset_from_description(description, arff_file)
     return dataset
