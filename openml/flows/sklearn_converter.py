@@ -201,30 +201,43 @@ class SklearnToFlowConverter(object):
             if k not in model_parameters.parameters:
                 continue
 
-            if isinstance(rval, (list, tuple)) and \
+            if isinstance(rval, (list, tuple)) and len(rval) > 0 and \
                     isinstance(rval[0], (list, tuple)) and \
                     [type(rval[0]) == type(rval[i]) for i in range(len(rval))]:
 
                 # Steps in a pipeline or feature union
                 parameter_value = list()
-                for identifier, sub_component in rval:
+                for sub_component_tuple in rval:
+                    identifier, sub_component = sub_component_tuple
+                    sub_component_type = type(sub_component_tuple)
+
                     # Use only the name of the module (and not all submodules
                     # in the brackets) as the identifier
                     pos = identifier.find('(')
                     if pos >= 0:
                         identifier = identifier[:pos]
 
-                    # Add the component to the list of components, add a
-                    # component reference as a placeholder to the list of
-                    # parameters, which will be replaced by the real component
-                    # when deserealizing the parameter
-                    sub_component_identifier = k + '__' + identifier
-                    sub_components[sub_component_identifier] = sub_component
-                    component_reference = \
-                        {'oml:serialized_object': 'component_reference',
-                         'value': {'key': sub_component_identifier,
-                                   'step_name': identifier}}
-                    parameter_value.append(component_reference)
+                    if sub_component is None:
+                        # In a FeatureUnion it is legal to have a None step
+
+                        pv = [identifier, None]
+                        if sub_component_type is tuple:
+                            pv = tuple(pv)
+                        parameter_value.append(pv)
+
+                    else:
+                        # Add the component to the list of components, add a
+                        # component reference as a placeholder to the list of
+                        # parameters, which will be replaced by the real component
+                        # when deserealizing the parameter
+                        sub_component_identifier = k + '__' + identifier
+                        sub_components[sub_component_identifier] = sub_component
+                        component_reference = \
+                            {'oml:serialized_object': 'component_reference',
+                             'value': {'key': sub_component_identifier,
+                                       'step_name': identifier}}
+                        parameter_value.append(component_reference)
+
                 if isinstance(rval, tuple):
                     parameter_value = tuple(parameter_value)
 

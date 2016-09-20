@@ -160,8 +160,8 @@ class TestSklearn(unittest.TestCase):
     def test_serialize_feature_union(self):
         ohe = sklearn.preprocessing.OneHotEncoder(sparse=False)
         scaler = sklearn.preprocessing.StandardScaler()
-        fu = sklearn.pipeline.FeatureUnion(transformer_list=(('ohe', ohe),
-                                                             ('scaler', scaler)))
+        fu = sklearn.pipeline.FeatureUnion(transformer_list=[('ohe', ohe),
+                                                             ('scaler', scaler)])
         serialization =  self.converter.serialize_object(fu)
         self.assertEqual(serialization.name,
                          'sklearn.pipeline.FeatureUnion('
@@ -196,6 +196,16 @@ class TestSklearn(unittest.TestCase):
 
         self.assertEqual(new_model_params, fu_params)
         new_model.fit(self.X, self.y)
+
+        fu.set_params(scaler=None)
+        serialization = self.converter.serialize_object(fu)
+        self.assertEqual(serialization.name,
+                         'sklearn.pipeline.FeatureUnion('
+                         'sklearn.preprocessing.data.OneHotEncoder)')
+        new_model = self.converter.deserialize_object(serialization)
+        self.assertEqual(type(new_model), type(fu))
+        self.assertIsNot(new_model, fu)
+        self.assertIs(new_model.transformer_list[1][1], None)
 
     def test_serialize_complex_flow(self):
         ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[0])
