@@ -52,7 +52,7 @@ class TestTask(TestBase):
     def test_list_tasks_by_type(self):
         ttid=3
         tasks = openml.tasks.list_tasks(task_type_id=ttid)
-        self.assertGreaterEqual(len(tasks), 300)
+        self.assertGreaterEqual(len(tasks), 250)
         for tid in tasks:
             print(tasks[tid])
             self.assertEquals(ttid, tasks[tid]["ttid"])
@@ -60,7 +60,7 @@ class TestTask(TestBase):
 
     def test_list_tasks_by_tag(self):
         tasks = openml.tasks.list_tasks(tag='basic')
-        self.assertGreaterEqual(len(tasks), 57)
+        self.assertGreaterEqual(len(tasks), 50)
         for tid in tasks:
             self._check_task(tasks[tid])
 
