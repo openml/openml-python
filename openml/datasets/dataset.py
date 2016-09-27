@@ -76,7 +76,7 @@ class OpenMLDataset(object):
         self.features = features
 
         if data_file is not None:
-            if(self._data_contains_string_features() == False):
+            if self._data_features_supported():
                 self.data_pickle_file = data_file.replace('.arff', '.pkl')
 
                 if os.path.exists(self.data_pickle_file):
@@ -137,7 +137,7 @@ class OpenMLDataset(object):
         # 32 bit system...currently 120mb (just a little bit more than covtype)
         import struct
 
-        if (self._data_contains_string_features()):
+        if not self._data_features_supported():
             raise PyOpenMLError('Dataset not compatible, PyOpenML cannot handle string features')
 
         filename = self.data_file
@@ -180,7 +180,7 @@ class OpenMLDataset(object):
         """
         rval = []
 
-        if (self._data_contains_string_features()):
+        if not self._data_features_supported():
             raise PyOpenMLError('Dataset not compatible, PyOpenML cannot handle string features')
 
         path = self.data_pickle_file
@@ -348,10 +348,10 @@ class OpenMLDataset(object):
         xml_dataset += "</oml:data_set_description>"
         return xml_dataset
 
-    def _data_contains_string_features(self):
-        if (self.features is not  None):
+    def _data_features_supported(self):
+        if self.features is not None:
             for feature in self.features['oml:feature']:
-                if (feature['oml:data_type'] == 'string'):
-                    return True
-            return False
-        return False
+                if feature['oml:data_type'] not in ['numeric', 'nominal']:
+                    return False
+            return True
+        return True
