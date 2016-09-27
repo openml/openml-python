@@ -55,7 +55,6 @@ class TestTask(TestBase):
         tasks = openml.tasks.list_tasks(task_type_id=ttid)
         self.assertGreaterEqual(len(tasks), num_curves_tasks)
         for tid in tasks:
-            print(tasks[tid])
             self.assertEquals(ttid, tasks[tid]["ttid"])
             self._check_task(tasks[tid])
 
