@@ -149,7 +149,9 @@ class TestOpenMLDataset(TestBase):
             openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
 
     def test_get_dataset_with_string(self):
-        self.assertRaises(PyOpenMLError, get_dataset, '373')
+        dataset = openml.datasets.get_dataset(373)
+        self.assertRaises(PyOpenMLError, dataset._get_arff, 'arff')
+        self.assertRaises(PyOpenMLError, dataset.get_data)
 
     def test_get_dataset_sparse(self):
         dataset = openml.datasets.get_dataset(1571)

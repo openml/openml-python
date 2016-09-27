@@ -5,7 +5,7 @@ import shutil
 from collections import OrderedDict
 import xmltodict
 from .dataset import OpenMLDataset
-from ..exceptions import OpenMLCacheException, PyOpenMLError
+from ..exceptions import OpenMLCacheException
 from .. import config
 from .._api_calls import _perform_api_call, _read_url
 
@@ -72,7 +72,8 @@ def _get_cached_dataset(dataset_id):
     """
     description = _get_cached_dataset_description(dataset_id)
     arff_file = _get_cached_dataset_arff(dataset_id)
-    dataset = _create_dataset_from_description(description, arff_file)
+    features = _get_cached_dataset_features(dataset_id)
+    dataset = _create_dataset_from_description(description, features, arff_file)
 
     return dataset
 
@@ -91,6 +92,22 @@ def _get_cached_dataset_description(dataset_id):
         return xmltodict.parse(dataset_xml)["oml:data_set_description"]
 
     raise OpenMLCacheException("Dataset description for dataset id %d not "
+                               "cached" % dataset_id)
+
+def _get_cached_dataset_features(dataset_id):
+    for cache_dir in [config.get_cache_directory(),
+                      config.get_private_directory()]:
+        did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
+        features_file = os.path.join(did_cache_dir, "features.xml")
+        try:
+            with io.open(features_file, encoding='utf8') as fh:
+                features_xml = fh.read()
+        except (IOError, OSError):
+            continue
+
+        return xmltodict.parse(features_xml)["oml:data_features"]
+
+    raise OpenMLCacheException("Dataset features for dataset id %d not "
                                "cached" % dataset_id)
 
 
@@ -262,13 +279,7 @@ def get_dataset(dataset_id):
         _remove_dataset_cache_dir(did_cache_dir)
         raise e
 
-    for feature in features['oml:feature']:
-        if (feature['oml:data_type'] == 'string'):
-            raise PyOpenMLError('Dataset not compatible, PyOpenML cannot handle string features: index ' +
-                                feature['oml:index'] + ', attribute name ' + feature['oml:name'])
-
-
-    dataset = _create_dataset_from_description(description, arff_file)
+    dataset = _create_dataset_from_description(description, features, arff_file)
     return dataset
 
 
@@ -469,7 +480,7 @@ def _remove_dataset_cache_dir(did_cache_dir):
                              'Please do this manually!' % did_cache_dir)
 
 
-def _create_dataset_from_description(description, arff_file):
+def _create_dataset_from_description(description, features, arff_file):
     """Create a dataset object from a description dict.
 
     Parameters
@@ -508,5 +519,6 @@ def _create_dataset_from_description(description, arff_file):
         description.get("oml:paper_url"),
         description.get("oml:update_comment"),
         description.get("oml:md5_checksum"),
-        data_file=arff_file)
+        data_file=arff_file,
+        features=features)
     return dataset
