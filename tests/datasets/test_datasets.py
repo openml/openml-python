@@ -11,16 +11,17 @@ import scipy.sparse
 
 import openml
 from openml import OpenMLDataset
-from openml.exceptions import OpenMLCacheException
+from openml.exceptions import OpenMLCacheException, PyOpenMLError
 from openml.util import is_string
 from openml.testing import TestBase
 
 from openml.datasets.functions import (_get_cached_dataset,
+                                       _get_cached_dataset_features,
                                        _get_cached_datasets,
                                        _get_dataset_description,
                                        _get_dataset_arff,
                                        _get_dataset_features,
-                                       _get_dataset_qualities)
+                                       _get_dataset_qualities, get_dataset)
 
 
 class TestOpenMLDataset(TestBase):
@@ -44,7 +45,10 @@ class TestOpenMLDataset(TestBase):
     def test__get_cached_dataset(self, ):
         openml.config.set_cache_directory(self.static_cache_dir)
         dataset = _get_cached_dataset(2)
+        features = _get_cached_dataset_features(2)
         self.assertIsInstance(dataset, OpenMLDataset)
+        self.assertTrue(len(dataset.features) > 0)
+        self.assertTrue(len(dataset.features) == len(features))
 
     def test_get_chached_dataset_description(self):
         openml.config.set_cache_directory(self.static_cache_dir)
@@ -147,6 +151,11 @@ class TestOpenMLDataset(TestBase):
             openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
         self.assertTrue(os.path.exists(os.path.join(
             openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
+
+    def test_get_dataset_with_string(self):
+        dataset = openml.datasets.get_dataset(373)
+        self.assertRaises(PyOpenMLError, dataset._get_arff, 'arff')
+        self.assertRaises(PyOpenMLError, dataset.get_data)
 
     def test_get_dataset_sparse(self):
         dataset = openml.datasets.get_dataset(1571)
