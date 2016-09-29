@@ -394,18 +394,15 @@ class OpenMLFlow(object):
         # TODO add numpy and scipy version!
 
         if int(flow_id) == -1:
-            return_code, response_xml = self.publish()
+            flow = self.publish()
 
-            response_dict = xmltodict.parse(response_xml)
-            flow_id = response_dict['oml:upload_flow']['oml:id']
-            return int(flow_id)
+            return int(flow.flow_id)
 
         return int(flow_id)
 
     def _get_name(self):
         """Helper function. Can be mocked for testing."""
         return self.name
-
 
 def create_flow_from_model(model, converter, description=None):
     """Use a converter to create an OpenMLFlow from model.

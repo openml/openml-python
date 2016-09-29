@@ -1,6 +1,7 @@
 import xmltodict
 
 from openml._api_calls import _perform_api_call
+from openml.exceptions import PyOpenMLError
 from . import OpenMLFlow
 from ..util import URLError
 
@@ -34,3 +35,18 @@ def get_flow(flow_id, converter=None):
         flow.model = model
 
     return flow
+
+
+def get_flow_dict(flow):
+    """Returns a dictionary with keys flow name and values flow id.
+
+        Parameters
+        ----------
+        flow : OpenMLFlow
+        """
+    if flow.flow_id is None:
+        raise PyOpenMLError("Can only invoke function 'get_flow_map' on a server downloaded flow. ")
+    flow_map = {flow.name : flow.flow_id}
+    for subflow in flow.components:
+        flow_map.update(get_flow_dict(flow.components[subflow]))
+    return flow_map

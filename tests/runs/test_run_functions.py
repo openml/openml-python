@@ -1,4 +1,6 @@
 from sklearn.linear_model import LogisticRegression, SGDClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.grid_search import RandomizedSearchCV
 import openml
 from openml.testing import TestBase
 
@@ -8,6 +10,24 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(10107)
         clf = LogisticRegression()
         run = openml.runs.run_task(task, clf)
+        run_ = run.publish()
+        self.assertEqual(run_, run)
+        self.assertIsInstance(run.dataset_id, int)
+
+    def test_run_optimize_randomforest_iris(self):
+        task = openml.tasks.get_task(10107)
+        clf = RandomForestClassifier(n_estimators=5)
+
+        param_dist = {"max_depth": [3, None],
+                      "max_features": [1,2,3,4],
+                      "min_samples_split": [1,2,3,4,5,6,7,8,9,10],
+                      "min_samples_leaf": [1,2,3,4,5,6,7,8,9,10],
+                      "bootstrap": [True, False],
+                      "criterion": ["gini", "entropy"]}
+        random_search = RandomizedSearchCV(clf, param_distributions=param_dist,n_iter=20)
+
+
+        run = openml.runs.run_task(task, random_search)
         run_ = run.publish()
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
