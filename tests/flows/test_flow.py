@@ -182,7 +182,7 @@ class TestFlow(TestBase):
         server_xml = re.sub('<oml:id>[0-9]+</oml:id>', '', server_xml)
         server_xml = re.sub('<oml:uploader>[0-9]+</oml:uploader>', '', server_xml)
         server_xml = re.sub('<oml:version>[0-9]+</oml:version>', '', server_xml)
-        server_xml = re.sub('<oml:upload_date>[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}</oml:upload_date>', '', server_xml)
+        server_xml = re.sub('<oml:upload_date>[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}</oml:upload_date>', '', server_xml)
 
         for i in range(10):
             # Make sure that we replace all occurences of two newlines

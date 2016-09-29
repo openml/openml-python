@@ -43,9 +43,13 @@ class TestRun(TestBase):
                                 clf, task, class_labels)
 
         clf = SGDClassifier(loss='log', random_state=1)
-        arff_datacontent = openml.runs.functions._run_task_get_arffcontent(
+        arff_datacontent, arff_tracecontent = openml.runs.functions._run_task_get_arffcontent(
             clf, task, class_labels)
+        # predictions
         self.assertIsInstance(arff_datacontent, list)
+        # trace. SGD does not produce any
+        self.assertIsInstance(arff_tracecontent, type(None))
+
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), 1500)
         for arff_line in arff_datacontent:
