@@ -2,7 +2,7 @@ from collections import defaultdict
 import io
 import os
 import xmltodict
-from sklearn.grid_search import BaseSearchCV
+from sklearn.model_selection._search import BaseSearchCV
 
 from .. import config
 from ..flows import create_flow_from_model
@@ -83,13 +83,16 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
             model.fit(trainX, trainY)
             if isinstance(model, BaseSearchCV):
-                for itt_no in range(0, len(model.grid_scores_)):
-                    current = model.grid_scores_[itt_no]
+                for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
                     # we use the string values for True and False, as it is defined in this way by the OpenML server
                     selected = 'false'
-                    if current.parameters == model.best_params_:
+                    if itt_no == model.best_index_:
                        selected = 'true'
-                    arff_line = [rep_no, fold_no, itt_no, current.parameters, current.mean_validation_score, selected]
+                    test_score = model.cv_results_['mean_test_score'][itt_no]
+                    arff_line = [rep_no, fold_no, itt_no, test_score, selected]
+                    for key in model.cv_results_:
+                        if key.startswith("param_"):
+                            arff_line.append(str(model.cv_results_[key][itt_no]))
                     arff_tracecontent.append(arff_line)
 
             ProbaY = model.predict_proba(testX)

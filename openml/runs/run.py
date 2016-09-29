@@ -5,6 +5,7 @@ import time
 import arff
 import xmltodict
 from sklearn.base import BaseEstimator
+from sklearn.model_selection._search import BaseSearchCV
 
 import openml
 from ..tasks import get_task
@@ -78,18 +79,48 @@ class OpenMLRun(object):
         arff_dict['relation'] = 'openml_task_' + str(task.task_id) + '_predictions'
         return arff_dict
 
-    def _generate_trace_arff_dict(self):
+    def _generate_trace_arff_dict(self, model):
+        """Generates the arff dictionary for uploading predictions to the server.
+
+        Assumes that the run has been executed.
+
+        Returns
+        -------
+        arf_dict : dict
+            Dictionary representation of the ARFF file that will be uploaded.
+            Contains information about the optimization trace.
+        """
         if self.trace_content is None:
-            raise ValueError('No trace content avaiable. (This should never happen.)')
+            raise ValueError('No trace content avaiable.')
+        if not isinstance(model, BaseSearchCV):
+            raise PyOpenMLError('Cannot generate trace on provided classifier. (This should never happen.)')
+
         arff_dict = {}
         arff_dict['attributes'] = [('repeat', 'NUMERIC'),
                                    ('fold', 'NUMERIC'),
                                    ('iteration', 'NUMERIC'),
-                                   ('setup_string', 'STRING'),
                                    ('evaluation', 'NUMERIC'),
                                    ('selected', ['true', 'false'])]
+        for key in model.cv_results_:
+            if key.startswith("param_"):
+                type = 'STRING'
+                if all(isinstance(i, (bool)) for i in model.cv_results_[key]):
+                    type = ['True', 'False']
+                elif all(isinstance(i, (int, float)) for i in model.cv_results_[key]):
+                    type = 'NUMERIC'
+                else:
+                    values = list(set(model.cv_results_[key])) # unique values
+                    if len(values) < 100: # arbitrary number. make it an option?
+                        type = [str(i) for i in values]
+                    print(key + ": " + str(type))
+
+                attribute = ("parameter_" + key[6:], type)
+                arff_dict['attributes'].append(attribute)
+
         arff_dict['data'] = self.trace_content
         arff_dict['relation'] = 'openml_task_' + str(self.task_id) + '_predictions'
+
+        print(arff_dict)
         return arff_dict
 
     def publish(self):
@@ -111,7 +142,7 @@ class OpenMLRun(object):
         file_elements = {'predictions': ("predictions.arff", predictions),
                          'description': ("description.xml", description_xml)}
         if self.trace_content is not None:
-            trace_arff = arff.dumps(self._generate_trace_arff_dict())
+            trace_arff = arff.dumps(self._generate_trace_arff_dict(self.model))
             file_elements['trace'] = ("trace.arff", trace_arff)
 
         return_code, return_value = _perform_api_call(
@@ -149,6 +180,16 @@ class OpenMLRun(object):
         return description_xml
 
 def _parse_parameters(model, flow):
+    """Extracts all parameter settings from an model in OpenML format.
+
+    Parameters
+    ----------
+    model
+        the sci-kit learn model (fitted)
+    flow
+        openml flow object (containing flow ids, i.e., it has to be downloaded from the server)
+
+    """
     python_param_settings = model.get_params()
     openml_param_settings = []
     flow_dict = openml.flows.get_flow_dict(flow)
@@ -160,12 +201,13 @@ def _parse_parameters(model, flow):
         if isinstance(python_param_settings[param], BaseEstimator):
             # extract parameters of the subflow individually
             subflow = flow.components[param]
+            openml_param_settings += _parse_parameters(python_param_settings[param], subflow)
 
         # add parameter setting (also the subflow. Just because we can)
         param_dict = OrderedDict()
-        param_dict['oml:name'] = param;
-        param_dict['oml:value'] = str(python_param_settings[param]);
-        param_dict['oml:component'] = flow_dict[flow.name];
+        param_dict['oml:name'] = param
+        param_dict['oml:value'] = str(python_param_settings[param])
+        param_dict['oml:component'] = flow_dict[flow.name]
         openml_param_settings.append(param_dict)
 
     return openml_param_settings
