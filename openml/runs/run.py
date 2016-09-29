@@ -120,7 +120,6 @@ class OpenMLRun(object):
         arff_dict['data'] = self.trace_content
         arff_dict['relation'] = 'openml_task_' + str(self.task_id) + '_predictions'
 
-        print(arff_dict)
         return arff_dict
 
     def publish(self):
