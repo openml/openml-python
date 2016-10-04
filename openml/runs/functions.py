@@ -259,21 +259,28 @@ def _get_cached_run(run_id):
                                "cached" % run_id)
 
 
-def list_runs_by_filters(id=None, task=None, flow=None,
-                         uploader=None):
+def list_runs(offset=None, size=None, id=None, task=None,
+              flow=None, uploader=None, tag=None):
     """List all runs matching all of the given filters.
 
     Perform API call `/run/list/{filters} <http://www.openml.org/api_docs/#!/run/get_run_list_filters>`_
 
     Parameters
     ----------
-    id : int or list
+    offset : int, optional
+        the number of runs to skip, starting from the first
+    size : int, optional
+        the maximum number of runs to show
 
-    task : int or list
+    id : list, optional
 
-    flow : int or list
+    task : list, optional
 
-    uploader : int or list
+    flow : list, optional
+
+    uploader : list, optional
+
+    tag : str, optional
 
     Returns
     -------
@@ -281,170 +288,22 @@ def list_runs_by_filters(id=None, task=None, flow=None,
         List of found runs.
     """
 
-    value = []
-    by = []
-
+    api_call = "run/list"
+    if offset is not None:
+        api_call += "/offset/%d" % int(offset)
+    if size is not None:
+       api_call += "/limit/%d" % int(size)
     if id is not None:
-        value.append(id)
-        by.append('run')
+        api_call += "/run/%s" % ','.join([str(int(i)) for i in id])
     if task is not None:
-        value.append(task)
-        by.append('task')
+        api_call += "/task/%s" % ','.join([str(int(i)) for i in task])
     if flow is not None:
-        value.append(flow)
-        by.append('flow')
+        api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
     if uploader is not None:
-        value.append(uploader)
-        by.append('uploader')
+        api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
+    if tag is not None:
+        api_call += "/tag/%s" % tag
 
-    if len(value) == 0:
-        raise ValueError('At least one argument out of task, flow, uploader '
-                         'must have a different value than None')
-
-    api_call = "run/list"
-    for id_, by_ in zip(value, by):
-        if isinstance(id_, list):
-            for i in range(len(id_)):
-                # Type checking to avoid bad calls to the server
-                id_[i] = str(int(id_[i]))
-            id_ = ','.join(id_)
-        else:
-            # Only type checking here
-            id_ = int(id_)
-
-        if by_ is None:
-            raise ValueError("Argument 'by' must not contain None!")
-        api_call = "%s/%s/%s" % (api_call, by_, id_)
-
-    return _list_runs(api_call)
-
-
-def list_runs_by_tag(tag):
-    """List runs by tag.
-
-    Perform API call `/run/list/tag/{tag} <http://www.openml.org/api_docs/#!/run/get_run_list_tag_tag>`_
-
-    Parameters
-    ----------
-    tag : str
-
-    Returns
-    -------
-    list
-        List of found runs.
-    """
-    return _list_runs_by(tag, 'tag')
-
-
-def list_runs(run_ids):
-    """List runs by their ID.
-
-    Perform API call `/run/list/run/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_run_ids>`_
-
-    Parameters
-    ----------
-    run_id : int or list
-
-    Returns
-    -------
-    list
-        List of found runs.
-    """
-    return _list_runs_by(run_ids, 'run')
-
-
-def list_runs_by_task(task_id):
-    """List runs by task.
-
-    Perform API call `/run/list/task/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_task_ids>`_
-
-    Parameters
-    ----------
-    task_id : int or list
-
-    Returns
-    -------
-    list
-        List of found runs.
-    """
-    return _list_runs_by(task_id, 'task')
-
-
-def list_runs_by_flow(flow_id):
-    """List runs by flow.
-
-    Perform API call `/run/list/flow/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_flow_ids>`_
-
-    Parameters
-    ----------
-    flow_id : int or list
-
-    Returns
-    -------
-    list
-        List of found runs.
-    """
-    return _list_runs_by(flow_id, 'flow')
-
-
-def list_runs_by_uploader(uploader_id):
-    """List runs by uploader.
-
-    Perform API call `/run/list/uploader/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_uploader_ids>`_
-
-    Parameters
-    ----------
-    uploader_id : int or list
-
-    Returns
-    -------
-    list
-        List of found runs.
-    """
-    return _list_runs_by(uploader_id, 'uploader')
-
-
-def _list_runs_by(id_, by):
-    """Helper function to create API call strings.
-
-    Helper for the following api calls:
-
-    * http://www.openml.org/api_docs/#!/run/get_run_list_task_ids
-    * http://www.openml.org/api_docs/#!/run/get_run_list_run_ids
-    * http://www.openml.org/api_docs/#!/run/get_run_list_tag_tag
-    * http://www.openml.org/api_docs/#!/run/get_run_list_uploader_ids
-    * http://www.openml.org/api_docs/#!/run/get_run_list_flow_ids
-
-    All of these allow either an integer as ID or a list of integers. Their
-    name follows the convention run/list/{by}/{id}
-
-    Parameters
-    ----------
-    id_ : int or list
-
-    by : str
-
-    Returns
-    -------
-    list
-        List of found runs.
-
-    """
-
-    if isinstance(id_, list):
-        for i in range(len(id_)):
-            # Type checking to avoid bad calls to the server
-            id_[i] = str(int(id_[i]))
-        id_ = ','.join(id_)
-    elif by == 'tag':
-        pass
-    else:
-        id_ = int(id_)
-
-    api_call = "run/list"
-    if by is not None:
-        api_call += "/%s" % by
-    api_call = "%s/%s" % (api_call, id_)
     return _list_runs(api_call)
 
 
@@ -475,15 +334,15 @@ def _list_runs(api_call):
     else:
         raise TypeError()
 
-    runs = []
+    runs = dict()
     for run_ in runs_list:
-        run = {'run_id': int(run_['oml:run_id']),
+        run_id = int(run_['oml:run_id'])
+        run = {'run_id': run_id,
                'task_id': int(run_['oml:task_id']),
                'setup_id': int(run_['oml:setup_id']),
                'flow_id': int(run_['oml:flow_id']),
                'uploader': int(run_['oml:uploader'])}
 
-        runs.append(run)
-    runs.sort(key=lambda t: t['run_id'])
+        runs[run_id] = run
 
     return runs

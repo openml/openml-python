@@ -50,17 +50,18 @@ class TestTask(TestBase):
                       ['in_preparation', 'active', 'deactivated'])
 
     def test_list_tasks_by_type(self):
+        num_curves_tasks = 200 # number is flexible, check server if fails
         ttid=3
         tasks = openml.tasks.list_tasks(task_type_id=ttid)
-        self.assertGreaterEqual(len(tasks), 286)
+        self.assertGreaterEqual(len(tasks), num_curves_tasks)
         for tid in tasks:
-            print(tasks[tid])
             self.assertEquals(ttid, tasks[tid]["ttid"])
             self._check_task(tasks[tid])
 
     def test_list_tasks_by_tag(self):
+        num_basic_tasks = 54 # number is flexible, check server if fails
         tasks = openml.tasks.list_tasks(tag='basic')
-        self.assertGreaterEqual(len(tasks), 54)
+        self.assertGreaterEqual(len(tasks), num_basic_tasks)
         for tid in tasks:
             self._check_task(tasks[tid])
 

@@ -10,6 +10,8 @@ import numpy as np
 import scipy.sparse
 import xmltodict
 
+from ..exceptions import PyOpenMLError
+
 if sys.version_info[0] >= 3:
     import pickle
 else:
@@ -45,7 +47,7 @@ class OpenMLDataset(object):
                  row_id_attribute=None, ignore_attribute=None,
                  version_label=None, citation=None, tag=None, visibility=None,
                  original_data_url=None, paper_url=None, update_comment=None,
-                 md5_checksum=None, data_file=None):
+                 md5_checksum=None, data_file=None, features=None):
         # Attributes received by querying the RESTful API
         self.dataset_id = int(dataset_id) if dataset_id is not None else None
         self.name = name
@@ -71,38 +73,41 @@ class OpenMLDataset(object):
         self.update_comment = update_comment
         self.md5_cheksum = md5_checksum
         self.data_file = data_file
+        self.features = features
+
         if data_file is not None:
-            self.data_pickle_file = data_file.replace('.arff', '.pkl')
+            if self._data_features_supported():
+                self.data_pickle_file = data_file.replace('.arff', '.pkl')
 
-            if os.path.exists(self.data_pickle_file):
-                logger.debug("Data pickle file already exists.")
-            else:
-                try:
-                    data = self._get_arff(self.format)
-                except OSError as e:
-                    logger.critical("Please check that the data file %s is there "
-                                    "and can be read.", self.data_file)
-                    raise e
-
-                categorical = [False if type(type_) != list else True
-                               for name, type_ in data['attributes']]
-                attribute_names = [name for name, type_ in data['attributes']]
-
-                if isinstance(data['data'], tuple):
-                    X = data['data']
-                    X_shape = (max(X[1]) + 1, max(X[2]) + 1)
-                    X = scipy.sparse.coo_matrix(
-                        (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
-                    X = X.tocsr()
-                elif isinstance(data['data'], list):
-                    X = np.array(data['data'], dtype=np.float32)
+                if os.path.exists(self.data_pickle_file):
+                    logger.debug("Data pickle file already exists.")
                 else:
-                    raise Exception()
+                    try:
+                        data = self._get_arff(self.format)
+                    except OSError as e:
+                        logger.critical("Please check that the data file %s is there "
+                                        "and can be read.", self.data_file)
+                        raise e
 
-                with open(self.data_pickle_file, "wb") as fh:
-                    pickle.dump((X, categorical, attribute_names), fh, -1)
-                logger.debug("Saved dataset %d: %s to file %s" %
-                             (self.dataset_id, self.name, self.data_pickle_file))
+                    categorical = [False if type(type_) != list else True
+                                   for name, type_ in data['attributes']]
+                    attribute_names = [name for name, type_ in data['attributes']]
+
+                    if isinstance(data['data'], tuple):
+                        X = data['data']
+                        X_shape = (max(X[1]) + 1, max(X[2]) + 1)
+                        X = scipy.sparse.coo_matrix(
+                            (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
+                        X = X.tocsr()
+                    elif isinstance(data['data'], list):
+                        X = np.array(data['data'], dtype=np.float32)
+                    else:
+                        raise Exception()
+
+                    with open(self.data_pickle_file, "wb") as fh:
+                        pickle.dump((X, categorical, attribute_names), fh, -1)
+                    logger.debug("Saved dataset %d: %s to file %s" %
+                                 (self.dataset_id, self.name, self.data_pickle_file))
 
     def __eq__(self, other):
         if type(other) != OpenMLDataset:
@@ -131,6 +136,9 @@ class OpenMLDataset(object):
         # A random number after which we consider a file for too large on a
         # 32 bit system...currently 120mb (just a little bit more than covtype)
         import struct
+
+        if not self._data_features_supported():
+            raise PyOpenMLError('Dataset not compatible, PyOpenML cannot handle string features')
 
         filename = self.data_file
         bits = (8 * struct.calcsize("P"))
@@ -171,6 +179,9 @@ class OpenMLDataset(object):
 
         """
         rval = []
+
+        if not self._data_features_supported():
+            raise PyOpenMLError('Dataset not compatible, PyOpenML cannot handle string features')
 
         path = self.data_pickle_file
         if not os.path.exists(path):
@@ -336,3 +347,11 @@ class OpenMLDataset(object):
                 xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, content)
         xml_dataset += "</oml:data_set_description>"
         return xml_dataset
+
+    def _data_features_supported(self):
+        if self.features is not None:
+            for feature in self.features['oml:feature']:
+                if feature['oml:data_type'] not in ['numeric', 'nominal']:
+                    return False
+            return True
+        return True
