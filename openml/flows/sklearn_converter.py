@@ -16,8 +16,6 @@ from sklearn.utils.fixes import signature
 
 from .flow import OpenMLFlow
 
-MAXIMAL_FLOW_LENGTH = 1024
-
 
 if sys.version_info >= (3, 5):
     from json.decoder import JSONDecodeError
@@ -28,26 +26,19 @@ else:
 class SklearnToFlowConverter(object):
     """Convert scikit-learn estimator into an OpenMLFlow."""
 
-    def serialize_object(self, o):
+    def serialize(self, o):
 
-        if self._is_estimator(o) or self._is_transformer(o):
+        if self._is_estimator(o):
             rval = self._serialize_model(o)
         elif isinstance(o, (list, tuple)):
-            rval = [self.serialize_object(element) for element in o]
+            rval = [self.serialize(element) for element in o]
             if isinstance(o, tuple):
                 rval = tuple(rval)
         elif o is None:
             rval = None
         elif isinstance(o, six.string_types):
             rval = o
-        elif isinstance(o, bool):
-            # The check for bool has to be before the check for int, otherwise,
-            # isinstance will think the bool is an int and convert the bool will
-            # be converted to a string which can't be parsed by json.loads
-            rval = o
-        elif isinstance(o, int):
-            rval = o
-        elif isinstance(o, float):
+        elif isinstance(o, (bool, int, float)):
             rval = o
         elif isinstance(o, dict):
             rval = {}
@@ -56,8 +47,8 @@ class SklearnToFlowConverter(object):
                     raise TypeError('Can only use string as keys, you passed '
                                     'type %s for value %s.' %
                                     (type(key), str(key)))
-                key = self.serialize_object(key)
-                value = self.serialize_object(value)
+                key = self.serialize(key)
+                value = self.serialize(value)
                 rval[key] = value
             rval = rval
         elif isinstance(o, type):
@@ -65,8 +56,8 @@ class SklearnToFlowConverter(object):
         elif isinstance(o, scipy.stats.distributions.rv_frozen):
             rval = self.serialize_rv_frozen(o)
         # This only works for user-defined functions (and not even partial).
-        # I think this exactly we want here as there shouldn't be any built-in
-        # or functool.partials in a pipeline
+        # I think this is exactly we want here as there shouldn't be any
+        # built-in or functool.partials in a pipeline
         elif inspect.isfunction(o):
             rval = self.serialize_function(o)
         elif self._is_cross_validator(o):
@@ -74,28 +65,16 @@ class SklearnToFlowConverter(object):
         else:
             raise TypeError(o, type(o))
 
-        assert o is None or rval is not None
-
         return rval
 
-    # TODO maybe remove those functions and put the check to the long
-    # if-constructs above?
     def _is_estimator(self, o):
-        # TODO @amueller which checks is preferable?
-        # return (hasattr(o, 'fit') and hasattr(o, 'predict') and
-        #         hasattr(o, 'get_params') and hasattr(o, 'set_params'))
-        return isinstance(o, sklearn.base.BaseEstimator)
-
-    def _is_transformer(self, o):
-        # TODO @amueller should one rather check whether this is a subclass of
-        # BaseTransformer?
-        return (hasattr(o, 'fit') and hasattr(o, 'transform') and
-                hasattr(o, 'get_params') and hasattr(o, 'set_params'))
+        return (hasattr(o, 'fit') and hasattr(o, 'get_params') and
+                hasattr(o, 'set_params'))
 
     def _is_cross_validator(self, o):
         return isinstance(o, sklearn.model_selection.BaseCrossValidator)
 
-    def deserialize_object(self, o, **kwargs):
+    def deserialize(self, o, **kwargs):
         # First, we need to check whether the presented object is a json string.
         # JSON strings are used to encoder parameter values. By passing around
         # json strings for parameters, we make sure that we can deserialize
@@ -124,10 +103,10 @@ class SklearnToFlowConverter(object):
                 elif serialized_type == 'function':
                     rval = self.deserialize_function(value, **kwargs)
                 elif serialized_type == 'component_reference':
-                    value = self.deserialize_object(value)
+                    value = self.deserialize(value)
                     step_name = value['step_name']
                     key = value['key']
-                    component = self.deserialize_object(
+                    component = self.deserialize(
                         kwargs['components'][key])
                     if step_name is None:
                         rval = component
@@ -139,18 +118,14 @@ class SklearnToFlowConverter(object):
 
             else:
                 # Regular dictionary
-                rval = {self.deserialize_object(key, **kwargs):
-                        self.deserialize_object(value, **kwargs)
+                rval = {self.deserialize(key, **kwargs):
+                        self.deserialize(value, **kwargs)
                         for key, value in o.items()}
         elif isinstance(o, (list, tuple)):
-            rval = [self.deserialize_object(element, **kwargs) for element in o]
+            rval = [self.deserialize(element, **kwargs) for element in o]
             if isinstance(o, tuple):
                 rval = tuple(rval)
-        elif isinstance(o, bool):
-            rval = o
-        elif isinstance(o, int):
-            rval = o
-        elif isinstance(o, float):
+        elif isinstance(o, (bool, int, float)):
             rval = o
         elif isinstance(o, six.string_types):
             rval = o
@@ -167,7 +142,7 @@ class SklearnToFlowConverter(object):
     def _serialize_model(self, model):
         """Create an OpenMLFlow.
 
-        Calls `self.serialize_object` recursively to properly serialize the
+        Calls `self.serialize` recursively to properly serialize the
         parameters to strings and the components (other models) to OpenMLFlows.
 
         Parameters
@@ -183,26 +158,14 @@ class SklearnToFlowConverter(object):
         parameters = OrderedDict()
         parameters_meta_info = OrderedDict()
 
-        model_parameters = model.get_params()
+        model_parameters = model.get_params(deep=False)
 
         for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
-            rval = self.serialize_object(v)
+            rval = self.serialize(v)
 
-
-            # In case of pipelines, or when having a component (for example
-            # in the AdaBoostClassifier or the RandomizedSearchCV), the
-            # parameters of that component are also returned by get_params()
-            # This check makes sure that we only add the parameters for the
-            # current component, and not the ones of the child component.
-            # Parameters of child components will be added to the correct flow
-            # when deserializing the subflow
-            model_parameters = signature(model.__init__)
-            if k not in model_parameters.parameters:
-                continue
-
-            if isinstance(rval, (list, tuple)) and len(rval) > 0 and \
-                    isinstance(rval[0], (list, tuple)) and \
-                    [type(rval[0]) == type(rval[i]) for i in range(len(rval))]:
+            if (isinstance(rval, (list, tuple)) and len(rval) > 0 and
+                    isinstance(rval[0], (list, tuple)) and
+                    [type(rval[0]) == type(rval[i]) for i in range(len(rval))]):
 
                 # Steps in a pipeline or feature union
                 parameter_value = list()
@@ -255,7 +218,7 @@ class SklearnToFlowConverter(object):
                 component_reference = \
                     {'oml:serialized_object': 'component_reference',
                      'value': {'key': k, 'step_name': None}}
-                component_reference = self.serialize_object(component_reference)
+                component_reference = self.serialize(component_reference)
                 parameters[k] = json.dumps(component_reference)
 
             else:
@@ -286,7 +249,11 @@ class SklearnToFlowConverter(object):
                           components=sub_components,
                           parameters=parameters,
                           parameters_meta_info=parameters_meta_info,
-                          external_version=external_version)
+                          external_version=external_version,
+                          tags=[],
+                          language='English',
+                          # TODO fill in dependencies!
+                          dependencies=None)
 
         return flow
 
@@ -308,16 +275,16 @@ class SklearnToFlowConverter(object):
             if '__' in name:
                 parameter_name, step = name.split('__')
                 value = components[name]
-                rval = self.deserialize_object(value)
+                rval = self.deserialize(value)
                 component_dict[parameter_name][step] = rval
             else:
                 value = components[name]
-                rval = self.deserialize_object(value)
+                rval = self.deserialize(value)
                 parameter_dict[name] = rval
 
         for name in parameters:
             value = parameters.get(name)
-            rval = self.deserialize_object(value, components=components)
+            rval = self.deserialize(value, components=components)
 
             # Replace the component placeholder by the actual flow
             if isinstance(rval, dict) and 'oml:serialized_object' in rval:
@@ -453,7 +420,12 @@ class SklearnToFlowConverter(object):
                           model=o,
                           parameters=parameters,
                           parameters_meta_info=parameters_meta_info,
-                          external_version=external_version)
+                          external_version=external_version,
+                          components=OrderedDict(),
+                          tags=[],
+                          language='English',
+                          # TODO fill in dependencies!
+                          dependencies=None)
 
         return flow
 

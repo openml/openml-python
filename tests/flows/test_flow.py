@@ -1,3 +1,4 @@
+import collections
 import hashlib
 import re
 import sys
@@ -115,8 +116,15 @@ class TestFlow(TestBase):
 
         flow = openml.OpenMLFlow(name='Test',
                                  description="test description",
+                                 model=sklearn.dummy.DummyClassifier(),
+                                 components=collections.OrderedDict(),
+                                 parameters=collections.OrderedDict(),
+                                 parameters_meta_info=collections.OrderedDict(),
                                  external_version=str(sklearn.__version__),
-                                 model=sklearn.dummy.DummyClassifier())
+                                 tags=[],
+                                 language='English',
+                                 dependencies=''
+                                 )
         name_mock.return_value = 'TEST%s%s' % (sentinel, flow.name)
 
         flow.publish()

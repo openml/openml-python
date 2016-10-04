@@ -16,21 +16,15 @@ def get_flow(flow_id, converter=None):
     try:
         flow_id = int(flow_id)
     except:
-        raise ValueError("Flow ID is neither an Integer nor can be "
-                         "cast to an Integer.")
+        raise ValueError("Flow ID must be an int, got %s." % str(flow_id))
 
-    try:
-        return_code, flow_xml = _perform_api_call(
-            "flow/%d" % flow_id)
-    except (URLError, UnicodeEncodeError) as e:
-        print(e)
-        raise e
+    return_code, flow_xml = _perform_api_call("flow/%d" % flow_id)
 
     flow_dict = xmltodict.parse(flow_xml)
     flow = OpenMLFlow._from_xml(flow_dict)
 
     if converter is not None:
-        model = converter.deserialize_object(flow)
+        model = converter.deserialize(flow)
         flow.model = model
 
     return flow

@@ -5,7 +5,6 @@ import six
 import xmltodict
 
 from .._api_calls import _perform_api_call
-from openml.util import oml_cusual_string
 
 
 class OpenMLFlow(object):
@@ -15,17 +14,24 @@ class OpenMLFlow(object):
     :meth:`openml.flows.create_flow_from_model`. Using this helper function
     ensures that all relevant fields are filled in.
 
+    Implements https://github.com/openml/website/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.implementation.upload.xsd.
+
     Parameters
     ----------
     name : str
         Name of the flow. Is used together with the attribute `external_version`
         as a unique identifier of the flow.
     description : str
-        Description of the flow (free text).
+        Human-readable description of the flow (free text).
     model : object
         ML model which is described by this flow.
     components : OrderedDict
-        Mapping from component identifier to an OpenMLFlow object.
+        Mapping from component identifier to an OpenMLFlow object. Components
+        are usually subfunctions of an algorithm (e.g. kernels), base learners
+        in ensemble algorithms (decision tree in adaboost) or building blocks
+        of a machine learning pipeline. Components are modeled as independent
+        flows and can be shared between flows (different pipelines can use
+        the same components).
     parameters : OrderedDict
         Mapping from parameter name to the parameter default value. The
         parameter default value must be of type `str`, so that the respective
@@ -37,58 +43,55 @@ class OpenMLFlow(object):
     external_version : str
         Version number of the software the flow is implemented in. Is used
         together with the attribute `name` as a uniquer identifier of the flow.
-    uploader : str
-        OpenML user ID of the uploader. Filled in by the server.
     tags : list
         List of tags. Created on the server by other API calls.
-    binary_url : str
-        ??? - don't use - implemented because it is used by flows on the server
-    binary_format : str
-        ??? - don't use - implemented because it is used by flows on the server
-    binary_md5 : str
-        ??? - don't use - implemented because it is used by flows on the server
-    version : str
-        OpenML version of the flow.
-    upload_date : str
-        Date the flow was uploaded. Filled in by the server.
     language : str
         Natural language the flow is described in (not the programming
         language).
     dependencies : str
-        A list of dependencies necessary to run the flow.
+        A list of dependencies necessary to run the flow. This field should
+        contain all libraries the flow depends on. To allow reproducibility
+        it should also specify the exact version numbers.
+    binary_url : str
+        Url from which the binary can be downloaded. Added by the server.
+        Ignored when uploaded manually. Will not be used by the python API
+        because binaries aren't compatible across machines.
+    binary_format : str
+        Format in which the binary code was uploaded. Will not be used by the
+        python API because binaries aren't compatible across machines.
+    binary_md5 : str
+        MD5 checksum to check if the binary code was correctly downloaded. Will
+        not be used by the python API because binaries aren't compatible across
+        machines.
+    uploader : str
+        OpenML user ID of the uploader. Filled in by the server.
+    upload_date : str
+        Date the flow was uploaded. Filled in by the server.
     flow_id : int, optional
         Flow ID. Assigned by the server (fixme shouldn't be here?)
+    version : str
+        OpenML version of the flow.
     """
-    # TODO @Jan can you find better descriptions for binary_url, binary_md5,
-    # binary_format and version?
-    def __init__(self, name, description=None, model=None, components=None,
-                 parameters=None, parameters_meta_info=None,
-                 external_version=None, uploader=None, tags=None,
-                 binary_url=None, binary_format=None, binary_md5=None,
-                 version=None, upload_date=None, language=None,
-                 dependencies=None, flow_id=None):
+
+    def __init__(self, name, description, model, components, parameters,
+                 parameters_meta_info, external_version, tags, language,
+                 dependencies, binary_url=None, binary_format=None,
+                 binary_md5=None, uploader=None, upload_date=None, flow_id=None,
+                 version=None):
         self.name = name
         self.description = description
         self.model = model
 
-        if components is None:
-            components = OrderedDict()
-        elif not isinstance(components, OrderedDict):
-            raise TypeError('components must be of type OrderedDict, '
-                            'but is %s.' % type(components))
+        for variable, variable_name in [[components, 'components'],
+                                        [parameters, 'parameters'],
+                                        [parameters_meta_info, 'parameters_meta_info']]:
+            if not isinstance(variable, OrderedDict):
+                raise TypeError('%s must be of type OrderedDict, '
+                                'but is %s.' % (variable_name, type(variable)))
+
         self.components = components
-
-        if parameters is None:
-            parameters = OrderedDict()
-        elif not isinstance(parameters, OrderedDict):
-            raise TypeError('parameters must be of type OrderedDict, '
-                            'but is %s.' % type(parameters))
-
-        if parameters_meta_info is None:
-            parameters_meta_info = OrderedDict()
-        elif not isinstance(parameters_meta_info, OrderedDict):
-            raise TypeError('parameters_meta_info must be of type OrderedDict, '
-                            'but is %s.' % type(parameters_meta_info))
+        self.parameters = parameters
+        self.parameters_meta_info = parameters_meta_info
 
         keys_parameters = set(parameters.keys())
         keys_parameters_meta_info = set(parameters_meta_info.keys())
@@ -103,15 +106,10 @@ class OpenMLFlow(object):
                              str(keys_parameters_meta_info.difference(
                                  keys_parameters)))
 
-        self.parameters = parameters
-        self.parameters_meta_info = parameters_meta_info
-
         self.external_version = external_version
         self.uploader = uploader
 
-        if tags is None:
-            tags = []
-        self.tags = tags
+        self.tags = tags if tags is not None else []
         self.binary_url = binary_url
         self.binary_format = binary_format
         self.binary_md5 = binary_md5
@@ -129,18 +127,24 @@ class OpenMLFlow(object):
         str
             Flow represented as XML string.
         """
-        flow_dict = self.__to_dict()
+        flow_dict = self._to_dict()
         flow_xml = xmltodict.unparse(flow_dict, pretty=True)
 
-        # A flow may not be uploaded with the encoding specification..
+        # A flow may not be uploaded with the xml encoding specification:
+        # <?xml version="1.0" encoding="utf-8"?>
         flow_xml = flow_xml.split('\n', 1)[-1]
         return flow_xml
 
-    def __to_dict(self):
-        """ Helper function used by _to_xml and __to_dict.
+    def _to_dict(self):
+        """ Helper function used by _to_xml and _to_dict.
 
         Creates a dictionary representation of self which can be serialized
-        to xml by the function _to_xml.
+        to xml by the function _to_xml. Uses OrderedDict to
+
+        Uses OrderedDict everywhere to make sure that the order of data stays
+        at it is added here. The return value (OrderedDict) will be used to
+        create the upload xml file. The xml file must have the tags in exactly
+        the order given in the xsd schema of a flow (see class docstring).
 
         Returns
         -------
@@ -200,7 +204,7 @@ class OpenMLFlow(object):
             component_dict = OrderedDict()
             component_dict['oml:identifier'] = key
             component_dict['oml:flow'] = \
-                self.components[key].__to_dict()['oml:flow']
+                self.components[key]._to_dict()['oml:flow']
 
             for key_ in component_dict:
                 # We only need to check if the key is a string, because the
@@ -239,23 +243,36 @@ class OpenMLFlow(object):
             OpenMLFlow
 
         """
+        arguments = {}
         dic = xml_dict["oml:flow"]
-        flow_id = int(dic['oml:id']) if 'oml:id' in dic else None
-        uploader = dic.get('oml:uploader')
-        name = dic['oml:name']
-        external_version = dic.get('oml:external_version')
-        description = dic.get('oml:description')
-        upload_date = dic.get('oml:upload_date')
-        language = dic.get('oml:language')
-        dependencies = dic.get('oml:dependencies')
-        version = dic.get('oml:version')
-        binary_url = dic.get('oml:binary_url')
-        binary_format = dic.get('oml:binary_format')
-        binary_md5 = dic.get('oml:binary_md5')
+
+        # Mandatory parts in the xml file
+        for key in ['name', 'external_version']:
+            arguments[key] = dic["oml:" + key]
+
+        # non-mandatory parts in the xml file
+        for key in ['uploader', 'description', 'upload_date', 'language',
+                    'dependencies', 'version', 'binary_url', 'binary_format',
+                    'binary_md5']:
+            arguments[key] = dic.get("oml:" + key)
+
+        # has to be converted to an int if present and cannot parsed in the
+        # two loops above
+        arguments['flow_id'] = int(dic['oml:id']) if 'oml:id' in dic else None
+
+        # Now parse parts of a flow which can occur multiple times like
+        # parameters, components (subflows) and tags. These can't be tackled
+        # in the loops above because xmltodict returns a dict if such an
+        # entity occurs once, and a list if it occurs multiple times.
+        # Furthermore, for components this method is called recursively and
+        # for parameters the actual xml is split into two dictionaries for
+        # easier access in python.
 
         parameters = OrderedDict()
         parameters_meta_info = OrderedDict()
         if 'oml:parameter' in dic:
+            # In case of a single parameter, xmltodict returns a dictionary,
+            # otherwise a list.
             if isinstance(dic['oml:parameter'], dict):
                 oml_parameters = [dic['oml:parameter']]
             else:
@@ -270,9 +287,13 @@ class OpenMLFlow(object):
                 meta_info['description'] = oml_parameter.get('oml:description')
                 meta_info['data_type'] = oml_parameter.get('oml:data_type')
                 parameters_meta_info[parameter_name] = meta_info
+        arguments['parameters'] = parameters
+        arguments['parameters_meta_info'] = parameters_meta_info
 
         components = OrderedDict()
         if 'oml:component' in dic:
+            # In case of a single component xmltodict returns a dict,
+            # otherwise a list.
             if isinstance(dic['oml:component'], dict):
                 oml_components = [dic['oml:component']]
             else:
@@ -281,9 +302,11 @@ class OpenMLFlow(object):
             for component in oml_components:
                 flow = OpenMLFlow._from_xml(component)
                 components[component['oml:identifier']] = flow
+        arguments['components'] = components
 
         tags = []
         if 'oml:tag' in dic and dic['oml:tag'] is not None:
+            # In case of a single tag xmltodict returns a dict, otherwise a list
             if isinstance(dic['oml:tag'], dict):
                 oml_tags = [dic['oml:tag']]
             else:
@@ -291,16 +314,9 @@ class OpenMLFlow(object):
 
             for tag in oml_tags:
                 tags.append(tag)
+        arguments['tags'] = tags
 
-        return cls(name=name, description=description, model=None,
-                   components=components, parameters=parameters,
-                   parameters_meta_info=parameters_meta_info,
-                   external_version=external_version,
-                   uploader=uploader, tags=tags, version=version,
-                   upload_date=upload_date, language=language,
-                   dependencies=dependencies, binary_url=binary_url,
-                   binary_format=binary_format, binary_md5=binary_md5,
-                   flow_id=flow_id)
+        return cls(**arguments)
 
     def __eq__(self, other):
         """Check equality.
@@ -362,13 +378,6 @@ class OpenMLFlow(object):
         self : OpenMLFlow
 
         """
-        # Checking that the name adheres to oml:casual_string
-        match = re.match(oml_cusual_string, self.name)
-        if not match or ((match.span()[1] - match.span()[0]) < len(self.name)):
-            raise ValueError('Flow name does not adhere to the '
-                             'oml:system_string, the name %s must be matched by '
-                             'the following regular expression: %s' %
-                             (self.name, oml_cusual_string))
 
         xml_description = self._to_xml()
         file_elements = {'description': xml_description}
@@ -418,7 +427,7 @@ def create_flow_from_model(model, converter, description=None):
     model : object
         ML model. Must match the converter.
     converter : object
-        Class that implements a method `flow = serialize_object(model)`.
+        Class that implements a method `flow = serialize(model)`.
         Abstract interface to come soon.
     description : str, optional
         Provide a description of the flow, overwriting the default description
@@ -429,7 +438,7 @@ def create_flow_from_model(model, converter, description=None):
     OpenMLFlow
 
     """
-    flow = converter.serialize_object(model)
+    flow = converter.serialize(model)
     if not isinstance(flow, OpenMLFlow):
         raise ValueError('Converter %s did return %s, not OpenMLFlow!' %
                          (str(converter), type(flow)))

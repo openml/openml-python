@@ -7,12 +7,10 @@ else:
 
 import six
 
-oml_cusual_string = r'([a-zA-Z0-9_\-,\.\(\)])+'
-
 def is_string(obj):
     try:
         return isinstance(obj, basestring)
     except NameError:
         return isinstance(obj, str)
 
-__all__ = ['URLError', 'is_string', 'oml_cusual_string']
+__all__ = ['URLError', 'is_string']
