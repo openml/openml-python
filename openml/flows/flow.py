@@ -316,6 +316,7 @@ class OpenMLFlow(object):
                 tags.append(tag)
         arguments['tags'] = tags
 
+        arguments['model'] = None
         return cls(**arguments)
 
     def __eq__(self, other):
