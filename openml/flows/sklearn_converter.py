@@ -15,7 +15,6 @@ import sklearn.model_selection
 from sklearn.utils.fixes import signature
 
 from .flow import OpenMLFlow
-from ..exceptions import OpenMLRestrictionViolated
 
 MAXIMAL_FLOW_LENGTH = 1024
 
@@ -279,10 +278,6 @@ class SklearnToFlowConverter(object):
             [sub_components[key].name for key in sub_components])
         if sub_components_names:
             name = '%s(%s)' % (name, sub_components_names)
-        if len(name) > MAXIMAL_FLOW_LENGTH:
-            raise OpenMLRestrictionViolated('Flow name must not be longer than '
-                                            '%d characters!' %
-                                            MAXIMAL_FLOW_LENGTH)
 
         external_version = self._get_external_version_info()
         flow = OpenMLFlow(name=name,
