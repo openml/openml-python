@@ -25,10 +25,9 @@ popd
 # Configure the conda environment and put it in the path using the
 # provided versions
 conda create -n testenv --yes python=$PYTHON_VERSION pip nose \
-   numpy=$NUMPY_VERSION scipy=$SCIPY_VERSION cython=$CYTHON_VERSION matplotlib nbconvert nbformat jupyter_client ipython jupyter notebook ipykernel pandas
+   numpy=$NUMPY_VERSION scipy=$SCIPY_VERSION cython=$CYTHON_VERSION matplotlib scikit-learn nbconvert nbformat jupyter_client ipython jupyter notebook ipykernel pandas
 source activate testenv
 ipython kernel install
-pip install git+https://github.com/scikit-learn/scikit-learn
 
 
 if [[ "$COVERAGE" == "true" ]]; then
