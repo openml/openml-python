@@ -24,7 +24,7 @@ else:
 
 
 class SklearnToFlowConverter(object):
-    """Convert scikit-learn estimator into an OpenMLFlow."""
+    """Convert scikit-learn estimator into an OpenMLFlow and vice versa."""
 
     def serialize(self, o):
 

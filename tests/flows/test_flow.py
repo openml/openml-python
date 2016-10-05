@@ -9,8 +9,10 @@ import xmltodict
 
 import scipy.stats
 import sklearn.datasets
+import sklearn.decomposition
 import sklearn.dummy
 import sklearn.ensemble
+import sklearn.feature_selection
 import sklearn.model_selection
 import sklearn.pipeline
 import sklearn.preprocessing
@@ -151,11 +153,17 @@ class TestFlow(TestBase):
         name_mock.side_effect = side_effect
 
         # Test a more complicated flow
+        ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[1])
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
+        pca = sklearn.decomposition.TruncatedSVD()
+        fs = sklearn.feature_selection.SelectPercentile(
+            score_func=sklearn.feature_selection.f_classif, percentile=30)
+        fu = sklearn.pipeline.FeatureUnion(transformer_list=[
+            ('pca', pca), ('fs', fs)])
         boosting = sklearn.ensemble.AdaBoostClassifier(
             base_estimator=sklearn.tree.DecisionTreeClassifier())
-        model = sklearn.pipeline.Pipeline(steps=(
-            ('scaler', scaler), ('boosting', boosting)))
+        model = sklearn.pipeline.Pipeline(steps=[('ohe', ohe), ('scaler', scaler),
+                                                 ('fu', fu), ('boosting', boosting)])
         parameter_grid = {'boosting__n_estimators': [1, 5, 10, 100],
                           'boosting__learning_rate': scipy.stats.uniform(0.01, 0.99),
                           'boosting__base_estimator__max_depth': scipy.stats.randint(1, 10)}
@@ -199,6 +207,7 @@ class TestFlow(TestBase):
             server_xml = server_xml.replace('  ', '').replace('\t', '').strip().replace('\n\n', '\n').replace('&quot;', '"')
             server_xml = re.sub(r'^$', '', server_xml)
 
+
         self.assertEqual(server_xml, local_xml)
 
         self.assertEqual(new_flow, flow)
@@ -208,7 +217,11 @@ class TestFlow(TestBase):
         fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV(' \
                        'sklearn.model_selection._split.StratifiedKFold,' \
                        'sklearn.pipeline.Pipeline(' \
+                       'sklearn.preprocessing.data.OneHotEncoder,' \
                        'sklearn.preprocessing.data.StandardScaler,' \
+                       'sklearn.pipeline.FeatureUnion(' \
+                       'sklearn.decomposition.truncated_svd.TruncatedSVD,' \
+                       'sklearn.feature_selection.univariate_selection.SelectPercentile),' \
                        'sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
                        'sklearn.tree.tree.DecisionTreeClassifier)))'
 

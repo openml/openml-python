@@ -52,25 +52,25 @@ class OpenMLFlow(object):
         A list of dependencies necessary to run the flow. This field should
         contain all libraries the flow depends on. To allow reproducibility
         it should also specify the exact version numbers.
-    binary_url : str
+    binary_url : str, optional
         Url from which the binary can be downloaded. Added by the server.
         Ignored when uploaded manually. Will not be used by the python API
         because binaries aren't compatible across machines.
-    binary_format : str
+    binary_format : str, optional
         Format in which the binary code was uploaded. Will not be used by the
         python API because binaries aren't compatible across machines.
-    binary_md5 : str
+    binary_md5 : str, optional
         MD5 checksum to check if the binary code was correctly downloaded. Will
         not be used by the python API because binaries aren't compatible across
         machines.
-    uploader : str
+    uploader : str, optional
         OpenML user ID of the uploader. Filled in by the server.
-    upload_date : str
+    upload_date : str, optional
         Date the flow was uploaded. Filled in by the server.
     flow_id : int, optional
-        Flow ID. Assigned by the server (fixme shouldn't be here?)
-    version : str
-        OpenML version of the flow.
+        Flow ID. Assigned by the server.
+    version : str, optional
+        OpenML version of the flow. Assigned by the server.
     """
 
     def __init__(self, name, description, model, components, parameters,
@@ -139,7 +139,9 @@ class OpenMLFlow(object):
         """ Helper function used by _to_xml and _to_dict.
 
         Creates a dictionary representation of self which can be serialized
-        to xml by the function _to_xml. Uses OrderedDict to
+        to xml by the function _to_xml. Since a flow can contain subflows
+        (components) this helper function calls itself recursively to also
+        serialize these flows to dictionaries.
 
         Uses OrderedDict everywhere to make sure that the order of data stays
         at it is added here. The return value (OrderedDict) will be used to
@@ -217,7 +219,6 @@ class OpenMLFlow(object):
             components.append(component_dict)
 
         flow_dict['oml:flow']['oml:component'] = components
-
         flow_dict['oml:flow']['oml:tag'] = self.tags
 
         if self.binary_url is not None:
@@ -232,6 +233,9 @@ class OpenMLFlow(object):
     @classmethod
     def _from_xml(cls, xml_dict):
         """Create a flow from an xml description.
+
+        Calls itself recursively to create :class:`OpenMLFlow` objects of
+        subflows (components).
 
         Parameters
         ----------
@@ -264,9 +268,10 @@ class OpenMLFlow(object):
         # parameters, components (subflows) and tags. These can't be tackled
         # in the loops above because xmltodict returns a dict if such an
         # entity occurs once, and a list if it occurs multiple times.
-        # Furthermore, for components this method is called recursively and
-        # for parameters the actual xml is split into two dictionaries for
-        # easier access in python.
+        # Furthermore, they must be treated differently, for example
+        # for components this method is called recursively and
+        # for parameters the actual information is split into two dictionaries
+        # for easier access in python.
 
         parameters = OrderedDict()
         parameters_meta_info = OrderedDict()
