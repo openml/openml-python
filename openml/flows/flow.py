@@ -172,15 +172,14 @@ class OpenMLFlow(object):
         for key in self.parameters:
             param_dict = OrderedDict()
             param_dict['oml:name'] = key
+            meta_info = self.parameters_meta_info[key]
 
-            if self.parameters_meta_info[key]['data_type'] is not None:
-                param_dict['oml:data_type'] = self.parameters_meta_info[key].\
-                    get('data_type')
+            if meta_info['data_type'] is not None:
+                param_dict['oml:data_type'] = meta_info.get('data_type')
 
             param_dict['oml:default_value'] = self.parameters[key]
-            if self.parameters_meta_info[key]['description'] is not None:
-                param_dict['oml:description'] = self.parameters_meta_info[key].\
-                    get('description')
+            if meta_info['description'] is not None:
+                param_dict['oml:description'] = meta_info.get('description')
 
             for key_, value in param_dict.items():
                 if key_ is not None and not isinstance(key_, six.string_types):
