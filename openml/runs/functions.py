@@ -4,8 +4,7 @@ import os
 import xmltodict
 
 from .. import config
-from ..flows import create_flow_from_model
-from ..flows.sklearn_converter import SklearnToFlowConverter
+from ..flows import sklearn_to_flow
 from ..exceptions import OpenMLCacheException
 from ..util import URLError
 from ..tasks.functions import _create_task_from_xml
@@ -39,7 +38,7 @@ def run_task(task, model):
     # TODO move this into its onwn module. While it somehow belongs here, it
     # adds quite a lot of functionality which is better suited in other places!
     # TODO why doesn't this accept a flow as input? - this would make this more flexible!
-    flow = create_flow_from_model(model=model, converter=SklearnToFlowConverter())
+    flow = sklearn_to_flow(model)
     flow_id = flow._ensure_flow_exists()
     if (flow_id < 0):
         print("No flow")

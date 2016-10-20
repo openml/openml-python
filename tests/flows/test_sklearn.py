@@ -15,8 +15,7 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
 
-from openml.flows.sklearn_converter import SklearnToFlowConverter
-from openml.flows import OpenMLFlow
+from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
 
 
 class Model(sklearn.base.BaseEstimator):
@@ -32,7 +31,6 @@ class Model(sklearn.base.BaseEstimator):
 class TestSklearn(unittest.TestCase):
     
     def setUp(self):
-        self.converter = SklearnToFlowConverter()
         iris = sklearn.datasets.load_iris()
         self.X = iris.data
         self.y = iris.target
@@ -58,13 +56,13 @@ class TestSklearn(unittest.TestCase):
                          ('random_state', 'null'),
                          ('splitter', '"best"')))
 
-        serialization = self.converter.serialize(model)
+        serialization = sklearn_to_flow(model)
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertEqual(serialization.parameters, fixture_parameters)
 
-        new_model = self.converter.deserialize(serialization)
+        new_model = flow_to_sklearn(serialization)
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -80,7 +78,7 @@ class TestSklearn(unittest.TestCase):
                        '(sklearn.tree.tree.DecisionTreeClassifier)'
         fixture_description = 'Automatically created sub-component.'
 
-        serialization =  self.converter.serialize(model)
+        serialization =  sklearn_to_flow(model)
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
@@ -89,7 +87,7 @@ class TestSklearn(unittest.TestCase):
         self.assertEqual(serialization.parameters['learning_rate'], '1.0')
         self.assertEqual(serialization.parameters['n_estimators'], '100')
 
-        new_model = self.converter.deserialize(serialization)
+        new_model = flow_to_sklearn(serialization)
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -115,7 +113,7 @@ class TestSklearn(unittest.TestCase):
                        'sklearn.preprocessing.data.StandardScaler,sklearn.dummy.DummyClassifier)'
         fixture_description = 'Automatically created sub-component.'
 
-        serialization =  self.converter.serialize(model)
+        serialization =  sklearn_to_flow(model)
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
@@ -138,7 +136,7 @@ class TestSklearn(unittest.TestCase):
                               OpenMLFlow)
 
         #del serialization.model
-        new_model = self.converter.deserialize(serialization)
+        new_model = flow_to_sklearn(serialization)
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -165,12 +163,12 @@ class TestSklearn(unittest.TestCase):
         scaler = sklearn.preprocessing.StandardScaler()
         fu = sklearn.pipeline.FeatureUnion(transformer_list=[('ohe', ohe),
                                                              ('scaler', scaler)])
-        serialization =  self.converter.serialize(fu)
+        serialization =  sklearn_to_flow(fu)
         self.assertEqual(serialization.name,
                          'sklearn.pipeline.FeatureUnion('
                          'sklearn.preprocessing.data.OneHotEncoder,'
                          'sklearn.preprocessing.data.StandardScaler)')
-        new_model = self.converter.deserialize(serialization)
+        new_model = flow_to_sklearn(serialization)
 
         self.assertEqual(type(new_model), type(fu))
         self.assertIsNot(new_model, fu)
@@ -201,11 +199,11 @@ class TestSklearn(unittest.TestCase):
         new_model.fit(self.X, self.y)
 
         fu.set_params(scaler=None)
-        serialization = self.converter.serialize(fu)
+        serialization = sklearn_to_flow(fu)
         self.assertEqual(serialization.name,
                          'sklearn.pipeline.FeatureUnion('
                          'sklearn.preprocessing.data.OneHotEncoder)')
-        new_model = self.converter.deserialize(serialization)
+        new_model = flow_to_sklearn(serialization)
         self.assertEqual(type(new_model), type(fu))
         self.assertIsNot(new_model, fu)
         self.assertIs(new_model.transformer_list[1][1], None)
@@ -224,7 +222,7 @@ class TestSklearn(unittest.TestCase):
         cv = sklearn.model_selection.StratifiedKFold(n_splits=5, shuffle=True)
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
-        serialized = self.converter.serialize(rs)
+        serialized = sklearn_to_flow(rs)
 
         fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV(' \
                        'sklearn.model_selection._split.StratifiedKFold,' \
@@ -240,8 +238,8 @@ class TestSklearn(unittest.TestCase):
                            int, np.int, np.int32, np.int64]
 
         for supported_type in supported_types:
-            serialized = self.converter.serialize(supported_type)
-            deserialized = self.converter.deserialize(serialized)
+            serialized = sklearn_to_flow(supported_type)
+            deserialized = flow_to_sklearn(serialized)
             self.assertEqual(deserialized, supported_type)
 
     def test_serialize_rvs(self):
@@ -250,8 +248,8 @@ class TestSklearn(unittest.TestCase):
                          scipy.stats.randint(low=-3, high=15)]
 
         for supported_rv in supported_rvs:
-            serialized = self.converter.serialize(supported_rv)
-            deserialized = self.converter.deserialize(serialized)
+            serialized = sklearn_to_flow(supported_rv)
+            deserialized = flow_to_sklearn(serialized)
             self.assertEqual(type(deserialized.__dict__['dist']),
                              type(supported_rv.__dict__['dist']))
             del deserialized.__dict__['dist']
@@ -260,8 +258,8 @@ class TestSklearn(unittest.TestCase):
                              supported_rv.__dict__)
 
     def test_serialize_function(self):
-        serialized =  self.converter.serialize(sklearn.feature_selection.chi2)
-        deserialized = self.converter.deserialize(serialized)
+        serialized =  sklearn_to_flow(sklearn.feature_selection.chi2)
+        deserialized = flow_to_sklearn(serialized)
         self.assertEqual(deserialized, sklearn.feature_selection.chi2)
 
     def test_serialize_simple_parameter_grid(self):
@@ -283,8 +281,8 @@ class TestSklearn(unittest.TestCase):
               "criterion": ["gini", "entropy"]}]
 
         for grid in grids:
-            serialized = self.converter.serialize(grid)
-            deserialized = self.converter.deserialize(serialized)
+            serialized = sklearn_to_flow(grid)
+            deserialized = flow_to_sklearn(serialized)
 
             self.assertEqual(deserialized, grid)
             self.assertIsNot(deserialized, grid)
@@ -310,8 +308,8 @@ class TestSklearn(unittest.TestCase):
                  'reduce_dim__k': N_FEATURES_OPTIONS,
                  'classify__C': C_OPTIONS}]
 
-        serialized = self.converter.serialize(grid)
-        deserialized = self.converter.deserialize(serialized)
+        serialized = sklearn_to_flow(grid)
+        deserialized = flow_to_sklearn(serialized)
 
         self.assertEqual(grid[0]['reduce_dim'][0].get_params(),
                          deserialized[0]['reduce_dim'][0].get_params())
@@ -337,8 +335,8 @@ class TestSklearn(unittest.TestCase):
     def test_serialize_resampling(self):
         kfold = sklearn.model_selection.StratifiedKFold(
             n_splits=4, shuffle=True)
-        serialized =  self.converter.serialize(kfold)
-        deserialized = self.converter.deserialize(serialized)
+        serialized =  sklearn_to_flow(kfold)
+        deserialized = flow_to_sklearn(serialized)
         # Best approximation to get_params()
         self.assertEqual(str(deserialized), str(kfold))
         self.assertIsNot(deserialized, kfold)
@@ -350,8 +348,8 @@ class TestSklearn(unittest.TestCase):
 
         model = Model('true', '1', '0.1')
 
-        serialized = self.converter.serialize(model)
-        deserialized = self.converter.deserialize(serialized)
+        serialized = sklearn_to_flow(model)
+        deserialized = flow_to_sklearn(serialized)
         self.assertEqual(deserialized.get_params(), model.get_params())
         self.assertIsNot(deserialized, model)
 

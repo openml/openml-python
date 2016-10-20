@@ -21,7 +21,6 @@ import sklearn.tree
 from openml.testing import TestBase
 from openml._api_calls import _perform_api_call
 import openml
-from openml.flows.sklearn_converter import SklearnToFlowConverter
 
 if sys.version_info[0] >= 3:
     from unittest import mock
@@ -97,7 +96,7 @@ class TestFlow(TestBase):
             base_estimator=sklearn.tree.DecisionTreeClassifier())
         model = sklearn.pipeline.Pipeline(steps=(
             ('scaler', scaler), ('boosting', boosting)))
-        flow = openml.flows.create_flow_from_model(model, SklearnToFlowConverter())
+        flow = openml.flows.sklearn_to_flow(model)
         flow.flow_id = -234
         # end of setup
 
@@ -171,7 +170,7 @@ class TestFlow(TestBase):
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
         rs.fit(X, y)
-        flow = openml.flows.create_flow_from_model(rs, SklearnToFlowConverter())
+        flow = openml.flows.sklearn_to_flow(rs)
 
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)
@@ -188,8 +187,7 @@ class TestFlow(TestBase):
         name_mock.side_effect = side_effect
 
         name_mock.side_effect = side_effect
-        new_flow = openml.flows.get_flow(flow_id=flow.flow_id,
-                                         converter=SklearnToFlowConverter())
+        new_flow = openml.flows.get_flow(flow_id=flow.flow_id)
 
         local_xml = flow._to_xml()
         server_xml = new_flow._to_xml()
