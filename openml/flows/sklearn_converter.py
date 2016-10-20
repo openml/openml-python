@@ -262,7 +262,7 @@ def _serialize_model(model):
 
 def _deserialize_model(flow, **kwargs):
 
-    model_name = flow._get_name()
+    model_name = flow.name
     # Remove everything after the first bracket, it is not necessary for
     # creating the current flow
     pos = model_name.find('(')

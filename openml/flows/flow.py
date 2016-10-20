@@ -159,11 +159,10 @@ class OpenMLFlow(object):
         flow_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])
         flow_container['oml:flow'] = flow_dict
         _add_if_nonempty(flow_dict, 'oml:id', self.flow_id)
-        _add_if_nonempty(flow_dict, 'oml:uploader', self.uploader)
-        _add_if_nonempty(flow_dict, 'oml:name', self._get_name())
 
-        for attribute in ["version", "external_version", "description",
-                          "upload_date", "language", "dependencies"]:
+        for attribute in ["uploader", "name", "version", "external_version",
+                          "description", "upload_date", "language",
+                          "dependencies"]:
             _add_if_nonempty(flow_dict, 'oml:{}'.format(attribute),
                              getattr(self, attribute))
 
@@ -366,7 +365,7 @@ class OpenMLFlow(object):
         """
         import sklearn
         flow_version = 'sklearn_' + sklearn.__version__
-        _, _, flow_id = _check_flow_exists(self._get_name(), flow_version)
+        _, _, flow_id = _check_flow_exists(self.name, flow_version)
         # TODO add numpy and scipy version!
 
         if int(flow_id) == -1:
@@ -377,10 +376,6 @@ class OpenMLFlow(object):
             return int(flow_id)
 
         return int(flow_id)
-
-    def _get_name(self):
-        """Helper function. Can be mocked for testing."""
-        return self.name
 
 
 def _check_flow_exists(name, version):
