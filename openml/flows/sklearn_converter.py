@@ -196,10 +196,10 @@ def _serialize_model(model):
                     # when deserealizing the parameter
                     sub_component_identifier = k + '__' + identifier
                     sub_components[sub_component_identifier] = sub_component
-                    component_reference = \
-                        {'oml:serialized_object': 'component_reference',
-                         'value': {'key': sub_component_identifier,
-                                   'step_name': identifier}}
+                    component_reference = OrderedDict()
+                    component_reference['oml:serialized_object'] = 'component_reference'
+                    component_reference['value'] = OrderedDict(
+                        key=sub_component_identifier, step_name=identifier)
                     parameter_value.append(component_reference)
 
             if isinstance(rval, tuple):
