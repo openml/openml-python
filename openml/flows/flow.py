@@ -155,18 +155,17 @@ class OpenMLFlow(object):
             Flow represented as OrderedDict.
 
         """
-        flow_dict = OrderedDict()
-        flow_dict['oml:flow'] = OrderedDict([
-            ('@xmlns:oml', 'http://openml.org/openml'),
-            ('oml:id', self.flow_id),
-            ('oml:uploader', self.uploader),
-            ('oml:name', self._get_name()),
-        ])
+        flow_container = OrderedDict()
+        flow_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])
+        flow_container['oml:flow'] = flow_dict
+        _add_if_nonempty(flow_dict, 'oml:id', self.flow_id)
+        _add_if_nonempty(flow_dict, 'oml:uploader', self.uploader)
+        _add_if_nonempty(flow_dict, 'oml:name', self._get_name())
+
         for attribute in ["version", "external_version", "description",
                           "upload_date", "language", "dependencies"]:
-            value = getattr(self, attribute)
-            if value is not None:
-                flow_dict['oml:flow']['oml:{}'.format(attribute)] = value
+            _add_if_nonempty(flow_dict, 'oml:{}'.format(attribute),
+                             getattr(self, attribute))
 
         flow_parameters = []
         for key in self.parameters:
@@ -174,12 +173,11 @@ class OpenMLFlow(object):
             param_dict['oml:name'] = key
             meta_info = self.parameters_meta_info[key]
 
-            if meta_info['data_type'] is not None:
-                param_dict['oml:data_type'] = meta_info.get('data_type')
-
+            _add_if_nonempty(param_dict, 'oml:data_type',
+                             meta_info['data_type'])
             param_dict['oml:default_value'] = self.parameters[key]
-            if meta_info['description'] is not None:
-                param_dict['oml:description'] = meta_info.get('description')
+            _add_if_nonempty(param_dict, 'oml:description',
+                             meta_info['description'])
 
             for key_, value in param_dict.items():
                 if key_ is not None and not isinstance(key_, six.string_types):
@@ -193,7 +191,7 @@ class OpenMLFlow(object):
 
             flow_parameters.append(param_dict)
 
-        flow_dict['oml:flow']['oml:parameter'] = flow_parameters
+        flow_dict['oml:parameter'] = flow_parameters
 
         components = []
         for key in self.components:
@@ -212,14 +210,13 @@ class OpenMLFlow(object):
 
             components.append(component_dict)
 
-        flow_dict['oml:flow']['oml:component'] = components
-        flow_dict['oml:flow']['oml:tag'] = self.tags
+        flow_dict['oml:component'] = components
+        flow_dict['oml:tag'] = self.tags
         for attribute in ["binary_url", "binary_format", "binary_md5"]:
-            value = getattr(self, attribute)
-            if value is not None:
-                flow_dict['oml:flow']['oml:{}'.format(attribute)] = value
+            _add_if_nonempty(flow_dict, 'oml:{}'.format(attribute),
+                             getattr(self, attribute))
 
-        return flow_dict
+        return flow_container
 
     @classmethod
     def _from_xml(cls, xml_dict):
@@ -447,3 +444,8 @@ def _check_flow_exists(name, version):
     xml_dict = xmltodict.parse(xml_response)
     flow_id = xml_dict['oml:flow_exists']['oml:id']
     return return_code, xml_response, flow_id
+
+
+def _add_if_nonempty(dic, key, value):
+    if value is not None:
+        dic[key] = value
