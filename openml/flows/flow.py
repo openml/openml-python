@@ -160,6 +160,10 @@ class OpenMLFlow(object):
         flow_container['oml:flow'] = flow_dict
         _add_if_nonempty(flow_dict, 'oml:id', self.flow_id)
 
+        for required in ["name", "external_version"]:
+            if getattr(self, required) is None:
+                raise ValueError("self.{} is required but None".format(
+                    required))
         for attribute in ["uploader", "name", "version", "external_version",
                           "description", "upload_date", "language",
                           "dependencies"]:
