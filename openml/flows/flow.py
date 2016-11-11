@@ -1,5 +1,4 @@
 from collections import OrderedDict
-import re
 
 import six
 import xmltodict
@@ -14,13 +13,14 @@ class OpenMLFlow(object):
     :meth:`openml.flows.create_flow_from_model`. Using this helper function
     ensures that all relevant fields are filled in.
 
-    Implements https://github.com/openml/website/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.implementation.upload.xsd.
+    Implements https://github.com/openml/website/blob/master/openml_OS/ \
+        views/pages/api_new/v1/xsd/openml.implementation.upload.xsd.
 
     Parameters
     ----------
     name : str
-        Name of the flow. Is used together with the attribute `external_version`
-        as a unique identifier of the flow.
+        Name of the flow. Is used together with the attribute
+        `external_version` as a unique identifier of the flow.
     description : str
         Human-readable description of the flow (free text).
     model : object
@@ -38,8 +38,8 @@ class OpenMLFlow(object):
         toolbox plugin can take care of casting the parameter default value to
         the correct type.
     parameters_meta_info : OrderedDict
-        Mapping from parameter name to `dict`. Stores additional information for
-        each parameter. Required keys are `data_type` and `description`.
+        Mapping from parameter name to `dict`. Stores additional information
+        for each parameter. Required keys are `data_type` and `description`.
     external_version : str
         Version number of the software the flow is implemented in. Is used
         together with the attribute `name` as a uniquer identifier of the flow.
@@ -76,15 +76,16 @@ class OpenMLFlow(object):
     def __init__(self, name, description, model, components, parameters,
                  parameters_meta_info, external_version, tags, language,
                  dependencies, binary_url=None, binary_format=None,
-                 binary_md5=None, uploader=None, upload_date=None, flow_id=None,
-                 version=None):
+                 binary_md5=None, uploader=None, upload_date=None,
+                 flow_id=None, version=None):
         self.name = name
         self.description = description
         self.model = model
 
-        for variable, variable_name in [[components, 'components'],
-                                        [parameters, 'parameters'],
-                                        [parameters_meta_info, 'parameters_meta_info']]:
+        for variable, variable_name in [
+                [components, 'components'],
+                [parameters, 'parameters'],
+                [parameters_meta_info, 'parameters_meta_info']]:
             if not isinstance(variable, OrderedDict):
                 raise TypeError('%s must be of type OrderedDict, '
                                 'but is %s.' % (variable_name, type(variable)))
@@ -154,38 +155,32 @@ class OpenMLFlow(object):
             Flow represented as OrderedDict.
 
         """
-        flow_dict = OrderedDict()
-        flow_dict['oml:flow'] = OrderedDict()
-        flow_dict['oml:flow']['@xmlns:oml'] = 'http://openml.org/openml'
-        if self.flow_id is not None:
-            flow_dict['oml:flow']['oml:id'] = self.flow_id
-        if self.uploader is not None:
-            flow_dict['oml:flow']['oml:uploader'] = self.uploader
-        flow_dict['oml:flow']['oml:name'] = self._get_name()
-        if self.version is not None:
-            flow_dict['oml:flow']['oml:version'] = self.version
-        flow_dict['oml:flow']['oml:external_version'] = self.external_version
-        flow_dict['oml:flow']['oml:description'] = self.description
-        if self.upload_date is not None:
-            flow_dict['oml:flow']['oml:upload_date'] = self.upload_date
-        if self.language is not None:
-            flow_dict['oml:flow']['oml:language'] = self.language
-        if self.dependencies is not None:
-            flow_dict['oml:flow']['oml:dependencies'] = self.dependencies
+        flow_container = OrderedDict()
+        flow_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])
+        flow_container['oml:flow'] = flow_dict
+        _add_if_nonempty(flow_dict, 'oml:id', self.flow_id)
+
+        for required in ["name", "external_version"]:
+            if getattr(self, required) is None:
+                raise ValueError("self.{} is required but None".format(
+                    required))
+        for attribute in ["uploader", "name", "version", "external_version",
+                          "description", "upload_date", "language",
+                          "dependencies"]:
+            _add_if_nonempty(flow_dict, 'oml:{}'.format(attribute),
+                             getattr(self, attribute))
 
         flow_parameters = []
         for key in self.parameters:
             param_dict = OrderedDict()
             param_dict['oml:name'] = key
+            meta_info = self.parameters_meta_info[key]
 
-            if self.parameters_meta_info[key]['data_type'] is not None:
-                param_dict['oml:data_type'] = self.parameters_meta_info[key].\
-                    get('data_type')
-
+            _add_if_nonempty(param_dict, 'oml:data_type',
+                             meta_info['data_type'])
             param_dict['oml:default_value'] = self.parameters[key]
-            if self.parameters_meta_info[key]['description'] is not None:
-                param_dict['oml:description'] = self.parameters_meta_info[key].\
-                    get('description')
+            _add_if_nonempty(param_dict, 'oml:description',
+                             meta_info['description'])
 
             for key_, value in param_dict.items():
                 if key_ is not None and not isinstance(key_, six.string_types):
@@ -199,7 +194,7 @@ class OpenMLFlow(object):
 
             flow_parameters.append(param_dict)
 
-        flow_dict['oml:flow']['oml:parameter'] = flow_parameters
+        flow_dict['oml:parameter'] = flow_parameters
 
         components = []
         for key in self.components:
@@ -218,17 +213,13 @@ class OpenMLFlow(object):
 
             components.append(component_dict)
 
-        flow_dict['oml:flow']['oml:component'] = components
-        flow_dict['oml:flow']['oml:tag'] = self.tags
+        flow_dict['oml:component'] = components
+        flow_dict['oml:tag'] = self.tags
+        for attribute in ["binary_url", "binary_format", "binary_md5"]:
+            _add_if_nonempty(flow_dict, 'oml:{}'.format(attribute),
+                             getattr(self, attribute))
 
-        if self.binary_url is not None:
-            flow_dict['oml:flow']['oml:binary_url'] = self.binary_url
-        if self.binary_format is not None:
-            flow_dict['oml:flow']['oml:binary_format'] = self.binary_format
-        if self.binary_md5 is not None:
-            flow_dict['oml:flow']['oml:binary_md5'] = self.binary_md5
-
-        return flow_dict
+        return flow_container
 
     @classmethod
     def _from_xml(cls, xml_dict):
@@ -262,7 +253,8 @@ class OpenMLFlow(object):
 
         # has to be converted to an int if present and cannot parsed in the
         # two loops above
-        arguments['flow_id'] = int(dic['oml:id']) if 'oml:id' in dic else None
+        arguments['flow_id'] = (int(dic['oml:id']) if dic.get("oml:id")
+                                is not None else None)
 
         # Now parse parts of a flow which can occur multiple times like
         # parameters, components (subflows) and tags. These can't be tackled
@@ -330,51 +322,23 @@ class OpenMLFlow(object):
         Two flows are equal if their all keys which are not set by the server
         are equal, as well as all their parameters and components.
         """
-        if isinstance(other, self.__class__):
-            this_dict = self.__dict__.copy()
-            this_parameters = this_dict['parameters']
-            del this_dict['parameters']
-            this_components = this_dict['components']
-            del this_dict['components']
-            del this_dict['model']
+        if not isinstance(other, self.__class__):
+            return NotImplemented
 
-            other_dict = other.__dict__.copy()
-            other_parameters = other_dict['parameters']
-            del other_dict['parameters']
-            other_components = other_dict['components']
-            del other_dict['components']
-            del other_dict['model']
+        # Name is actually not generated by the server, but it will be
+        # tested further down with a getter (allows mocking in the tests)
+        generated_by_the_server = ['name', 'flow_id', 'uploader', 'version',
+                                   'upload_date', 'source_url',
+                                   'binary_url', 'source_format',
+                                   'binary_format', 'source_md5',
+                                   'binary_md5', 'model']
 
-            # Name is actually not generated by the server, but it will be
-            # tested further down with a getter (allows mocking in the tests)
-            generated_by_the_server = ['name', 'flow_id', 'uploader', 'version',
-                                       'upload_date', 'source_url',
-                                       'binary_url', 'source_format',
-                                       'binary_format', 'source_md5',
-                                       'binary_md5']
-            for field in generated_by_the_server:
-                if field in this_dict:
-                    del this_dict[field]
-                if field in other_dict:
-                    del other_dict[field]
-            equal = this_dict == other_dict
-            equal_name = self._get_name() == other._get_name()
-
-            parameters_equal = \
-                this_parameters.keys() == other_parameters.keys() and \
-                    all([this_parameter == other_parameter
-                         for this_parameter, other_parameter in
-                         zip(this_parameters.values(),
-                             other_parameters.values())])
-            components_equal = \
-                this_components.keys() == other_components.keys() and \
-                    all([this_component == other_component
-                         for this_component, other_component in
-                         zip(this_components.values(),
-                             other_components.values())])
-
-            return parameters_equal and components_equal and equal and equal_name
-        return NotImplemented
+        for key in set(self.__dict__.keys()).union(other.__dict__.keys()):
+            if key in generated_by_the_server:
+                continue
+            if getattr(self, key, None) != getattr(other, key, None):
+                return False
+        return True
 
     def publish(self):
         """Publish flow to OpenML server.
@@ -405,7 +369,7 @@ class OpenMLFlow(object):
         """
         import sklearn
         flow_version = 'sklearn_' + sklearn.__version__
-        _, _, flow_id = _check_flow_exists(self._get_name(), flow_version)
+        _, _, flow_id = _check_flow_exists(self.name, flow_version)
         # TODO add numpy and scipy version!
 
         if int(flow_id) == -1:
@@ -416,10 +380,6 @@ class OpenMLFlow(object):
             return int(flow_id)
 
         return int(flow_id)
-
-    def _get_name(self):
-        """Helper function. Can be mocked for testing."""
-        return self.name
 
 
 def _check_flow_exists(name, version):
@@ -455,3 +415,8 @@ def _check_flow_exists(name, version):
     xml_dict = xmltodict.parse(xml_response)
     flow_id = xml_dict['oml:flow_exists']['oml:id']
     return return_code, xml_response, flow_id
+
+
+def _add_if_nonempty(dic, key, value):
+    if value is not None:
+        dic[key] = value

@@ -196,10 +196,10 @@ def _serialize_model(model):
                     # when deserealizing the parameter
                     sub_component_identifier = k + '__' + identifier
                     sub_components[sub_component_identifier] = sub_component
-                    component_reference = \
-                        {'oml:serialized_object': 'component_reference',
-                         'value': {'key': sub_component_identifier,
-                                   'step_name': identifier}}
+                    component_reference = OrderedDict()
+                    component_reference['oml:serialized_object'] = 'component_reference'
+                    component_reference['value'] = OrderedDict(
+                        key=sub_component_identifier, step_name=identifier)
                     parameter_value.append(component_reference)
 
             if isinstance(rval, tuple):
@@ -262,7 +262,7 @@ def _serialize_model(model):
 
 def _deserialize_model(flow, **kwargs):
 
-    model_name = flow._get_name()
+    model_name = flow.name
     # Remove everything after the first bracket, it is not necessary for
     # creating the current flow
     pos = model_name.find('(')
