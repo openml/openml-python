@@ -219,7 +219,7 @@ def _serialize_model(model):
             sub_components[k] = rval
             component_reference = OrderedDict()
             component_reference['oml:serialized_object'] = 'component_reference'
-            component_reference['value'] = OrderedDict(key=k, step_name=None))
+            component_reference['value'] = OrderedDict(key=k, step_name=None)
             component_reference = sklearn_to_flow(component_reference)
             parameters[k] = json.dumps(component_reference)
 
