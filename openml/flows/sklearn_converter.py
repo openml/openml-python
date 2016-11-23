@@ -218,8 +218,8 @@ def _serialize_model(model):
             # AdaBoostClassifier
             sub_components[k] = rval
             component_reference = \
-                {'oml:serialized_object': 'component_reference',
-                 'value': {'key': k, 'step_name': None}}
+                OrderedDict('oml:serialized_object': 'component_reference',
+                        'value': OrderedDict('key': k, 'step_name': None))
             component_reference = sklearn_to_flow(component_reference)
             parameters[k] = json.dumps(component_reference)
 
