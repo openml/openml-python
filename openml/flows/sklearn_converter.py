@@ -217,9 +217,9 @@ def _serialize_model(model):
             # A subcomponent, for example the base model in
             # AdaBoostClassifier
             sub_components[k] = rval
-            component_reference = \
-                OrderedDict('oml:serialized_object': 'component_reference',
-                        'value': OrderedDict('key': k, 'step_name': None))
+            component_reference = OrderedDict()
+            component_reference['oml:serialized_object'] = 'component_reference'
+            component_reference['value'] = OrderedDict(key=k, step_name=None))
             component_reference = sklearn_to_flow(component_reference)
             parameters[k] = json.dumps(component_reference)
 
@@ -315,7 +315,10 @@ def serialize_type(o):
                np.int: 'np.int',
                np.int32: 'np.int32',
                np.int64: 'np.int64'}
-    return {'oml:serialized_object': 'type', 'value': mapping[o]}
+    ret = OrderedDict()
+    ret['oml:serialized_object'] = 'type'
+    ret['value'] = mapping[o]
+    return ret
 
 
 def deserialize_type(o, **kwargs):
@@ -336,10 +339,10 @@ def serialize_rv_frozen(o):
     a = o.a
     b = o.b
     dist = o.dist.__class__.__module__ + '.' + o.dist.__class__.__name__
-    return {'oml:serialized_object': 'rv_frozen',
-            'value': {'dist': dist, 'a': a, 'b': b,
-                      'args': args, 'kwds': kwds}}
-
+    ret = OrderedDict()
+    ret['oml:serialized_object'] = 'rv_frozen'
+    ret['value'] = OrderedDict(dist=dist, a=a, b=b, args=args, kwds=kwds)
+    return ret
 
 def deserialize_rv_frozen(o, **kwargs):
     args = o['args']
@@ -365,7 +368,10 @@ def deserialize_rv_frozen(o, **kwargs):
 
 def serialize_function(o):
     name = o.__module__ + '.' + o.__name__
-    return {'oml:serialized_object': 'function', 'value': name}
+    ret = OrderedDict()
+    ret['oml:serialized_object'] = 'function'
+    ret['value'] = name
+    return ret
 
 
 def deserialize_function(name, **kwargs):
