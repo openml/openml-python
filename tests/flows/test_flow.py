@@ -158,7 +158,15 @@ class TestFlow(TestBase):
             estimator=model, param_distributions=parameter_grid, cv=cv)
         rs.fit(X, y)
         flow = openml.flows.sklearn_to_flow(rs)
-        flow.external_version = sentinel + flow.external_version
+
+        # Add the sentinel to all external version strings in all subflows
+        to_visit = collections.deque()
+        to_visit.appendleft(flow)
+        while len(to_visit) > 0:
+            current_flow = to_visit.pop()
+            for sub_flow in current_flow.components.values():
+                to_visit.appendleft(sub_flow)
+            current_flow.external_version = sentinel + current_flow.external_version
 
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)

@@ -41,7 +41,7 @@ def sklearn_to_flow(o):
     elif isinstance(o, (bool, int, float)):
         rval = o
     elif isinstance(o, dict):
-        rval = {}
+        rval = OrderedDict()
         for key, value in o.items():
             if not isinstance(key, six.string_types):
                 raise TypeError('Can only use string as keys, you passed '
@@ -120,8 +120,9 @@ def flow_to_sklearn(o, **kwargs):
 
         else:
             # Regular dictionary
-            rval = {flow_to_sklearn(key, **kwargs): flow_to_sklearn(value, **kwargs)
-                    for key, value in o.items()}
+            rval = OrderedDict((flow_to_sklearn(key, **kwargs),
+                                flow_to_sklearn(value, **kwargs))
+                               for key, value in o.items())
     elif isinstance(o, (list, tuple)):
         rval = [flow_to_sklearn(element, **kwargs) for element in o]
         if isinstance(o, tuple):
@@ -271,14 +272,16 @@ def _deserialize_model(flow, **kwargs):
 
     parameters = flow.parameters
     components = flow.components
-    component_dict = defaultdict(dict)
-    parameter_dict = {}
+    component_dict = OrderedDict()
+    parameter_dict = OrderedDict()
 
     for name in components:
         if '__' in name:
             parameter_name, step = name.split('__')
             value = components[name]
             rval = flow_to_sklearn(value)
+            if parameter_name not in component_dict:
+                component_dict[parameter_name] = OrderedDict()
             component_dict[parameter_name][step] = rval
         else:
             value = components[name]
@@ -292,6 +295,8 @@ def _deserialize_model(flow, **kwargs):
         # Replace the component placeholder by the actual flow
         if isinstance(rval, dict) and 'oml:serialized_object' in rval:
             parameter_name, step = rval['value'].split('__')
+            if parameter_name not in component_dict:
+                component_dict[parameter_name] = OrderedDict()
             rval = component_dict[parameter_name][step]
         parameter_dict[name] = rval
 
