@@ -75,7 +75,7 @@ class TestFlow(TestBase):
             flow_xml = _perform_api_call("flow/%d" % flow_id)[1]
             flow_dict = xmltodict.parse(flow_xml)
 
-            flow = openml.OpenMLFlow._from_xml(flow_dict)
+            flow = openml.OpenMLFlow._from_dict(flow_dict)
             new_xml = flow._to_xml()
 
             flow_xml = flow_xml.replace('  ', '').replace('\t', '').strip().replace('\n\n', '\n').replace('&quot;', '"')
@@ -97,7 +97,7 @@ class TestFlow(TestBase):
 
         xml = flow._to_xml()
         xml_dict = xmltodict.parse(xml)
-        new_flow = openml.flows.OpenMLFlow._from_xml(xml_dict)
+        new_flow = openml.flows.OpenMLFlow._from_dict(xml_dict)
         self.assertEqual(new_flow, flow)
         self.assertIsNot(new_flow, flow)
 

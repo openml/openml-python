@@ -22,7 +22,7 @@ def get_flow(flow_id):
     return_code, flow_xml = _perform_api_call("flow/%d" % flow_id)
 
     flow_dict = xmltodict.parse(flow_xml)
-    flow = OpenMLFlow._from_xml(flow_dict)
+    flow = OpenMLFlow._from_dict(flow_dict)
 
     if 'sklearn' in flow.external_version:
         flow.model = flow_to_sklearn(flow)

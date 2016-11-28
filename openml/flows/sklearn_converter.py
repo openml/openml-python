@@ -350,13 +350,13 @@ def deserialize_rv_frozen(o, **kwargs):
 
     module_name = dist_name.rsplit('.', 1)
     try:
-        model_class = getattr(importlib.import_module(module_name[0]),
-                              module_name[1])
+        rv_class = getattr(importlib.import_module(module_name[0]),
+                           module_name[1])
     except:
         warnings.warn('Cannot create model %s for flow.' % dist_name)
         return None
 
-    dist = scipy.stats.distributions.rv_frozen(model_class(), *args, **kwds)
+    dist = scipy.stats.distributions.rv_frozen(rv_class(), *args, **kwds)
     dist.a = a
     dist.b = b
 
@@ -371,12 +371,12 @@ def serialize_function(o):
 def deserialize_function(name, **kwargs):
     module_name = name.rsplit('.', 1)
     try:
-        model_class = getattr(importlib.import_module(module_name[0]),
-                              module_name[1])
+        function_handle = getattr(importlib.import_module(module_name[0]),
+                                  module_name[1])
     except Exception as e:
         warnings.warn('Cannot load function %s due to %s.' % (name, e))
         return None
-    return model_class
+    return function_handle
 
 # This produces a flow, thus it does not need a deserialize function as
 # the function _deserialize_model is used for that. It cannot be fed

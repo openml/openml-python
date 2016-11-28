@@ -222,7 +222,7 @@ class OpenMLFlow(object):
         return flow_container
 
     @classmethod
-    def _from_xml(cls, xml_dict):
+    def _from_dict(cls, xml_dict):
         """Create a flow from an xml description.
 
         Calls itself recursively to create :class:`OpenMLFlow` objects of
@@ -297,7 +297,7 @@ class OpenMLFlow(object):
                 oml_components = dic['oml:component']
 
             for component in oml_components:
-                flow = OpenMLFlow._from_xml(component)
+                flow = OpenMLFlow._from_dict(component)
                 components[component['oml:identifier']] = flow
         arguments['components'] = components
 
