@@ -156,7 +156,10 @@ def _serialize_model(model):
     OpenMLFlow
 
     """
+    # stores all entities that should become subcomponents
     sub_components = OrderedDict()
+    # stores the keys of all subcomponents that should become
+    sub_components_explicit = set()
     parameters = OrderedDict()
     parameters_meta_info = OrderedDict()
 
@@ -217,6 +220,7 @@ def _serialize_model(model):
             # A subcomponent, for example the base model in
             # AdaBoostClassifier
             sub_components[k] = rval
+            sub_components_explicit.add(k)
             component_reference = \
                 {'oml:serialized_object': 'component_reference',
                  'value': {'key': k, 'step_name': None}}
@@ -239,10 +243,18 @@ def _serialize_model(model):
     # example RandomizedSearchCV(Pipeline(StandardScaler,AdaBoostClassifier(DecisionTreeClassifier)),StandardScaler,AdaBoostClassifier(DecisionTreeClassifier))
     # TODO the name above is apparently wrong, I need to test and check this
     name = model.__module__ + "." + model.__class__.__name__
-    sub_components_names = ",".join(
-        [sub_components[key].name for key in sub_components])
+
+    # will be part of the name (in brackets)
+    sub_components_names = ""
+    for key in sub_components:
+        if key in sub_components_explicit:
+            sub_components_names += "," + key + "=" + sub_components[key].name
+        else:
+            sub_components_names += "," + sub_components[key].name
+
     if sub_components_names:
-        name = '%s(%s)' % (name, sub_components_names)
+        # slice operation on string in order to get rid of leading comma
+        name = '%s(%s)' % (name, sub_components_names[1:])
 
     external_version = _get_external_version_info()
     flow = OpenMLFlow(name=name,
@@ -256,7 +268,6 @@ def _serialize_model(model):
                       language='English',
                       # TODO fill in dependencies!
                       dependencies=None)
-
     return flow
 
 

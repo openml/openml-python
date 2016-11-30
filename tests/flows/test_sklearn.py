@@ -75,7 +75,7 @@ class TestSklearn(unittest.TestCase):
             n_estimators=100, base_estimator=sklearn.tree.DecisionTreeClassifier())
 
         fixture_name = 'sklearn.ensemble.weight_boosting.AdaBoostClassifier' \
-                       '(sklearn.tree.tree.DecisionTreeClassifier)'
+                       '(base_estimator=sklearn.tree.tree.DecisionTreeClassifier)'
         fixture_description = 'Automatically created sub-component.'
 
         serialization =  sklearn_to_flow(model)
@@ -225,13 +225,20 @@ class TestSklearn(unittest.TestCase):
         serialized = sklearn_to_flow(rs)
 
         fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV(' \
-                       'sklearn.model_selection._split.StratifiedKFold,' \
-                       'sklearn.pipeline.Pipeline(' \
+                       'cv=sklearn.model_selection._split.StratifiedKFold,' \
+                       'estimator=sklearn.pipeline.Pipeline(' \
                        'sklearn.preprocessing.data.OneHotEncoder,' \
                        'sklearn.preprocessing.data.StandardScaler,' \
                        'sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
-                       'sklearn.tree.tree.DecisionTreeClassifier)))'
+                       'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))'
         self.assertEqual(serialized.name, fixture_name)
+
+        # now do deserialization
+        deserialized = flow_to_sklearn(serialized)
+
+        serialized2 = sklearn_to_flow(deserialized)
+        self.assertNotEqual(rs, deserialized)
+        self.assertEqual(serialized, serialized2)
 
     def test_serialize_type(self):
         supported_types = [float, np.float, np.float32, np.float64,
