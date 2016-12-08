@@ -33,7 +33,7 @@ programmatically after loading the package:
     >>> import openml
 
     >>> apikey = 'Your API key'
-    >>> openml.apikey = apikey
+    >>> openml.config.apikey = apikey
 
 The second option is to create a config file:
 
