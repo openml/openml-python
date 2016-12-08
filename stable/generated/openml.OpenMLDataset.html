@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>openml.OpenMLDataset &mdash; OpenML 0.2.1 documentation</title>
+    <title>openml.OpenMLDataset &#8212; OpenML 0.2.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -18,7 +18,8 @@
         VERSION:     '0.2.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
@@ -29,7 +30,8 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="OpenML 0.2.1 documentation" href="../index.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -123,7 +125,7 @@
 <h1><code class="xref py py-mod docutils literal"><span class="pre">openml</span></code>.OpenMLDataset<a class="headerlink" href="#openml-openmldataset" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="openml.OpenMLDataset">
-<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLDataset</code><span class="sig-paren">(</span><em>id=None</em>, <em>name=None</em>, <em>version=None</em>, <em>description=None</em>, <em>format=None</em>, <em>creator=None</em>, <em>contributor=None</em>, <em>collection_date=None</em>, <em>upload_date=None</em>, <em>language=None</em>, <em>licence=None</em>, <em>url=None</em>, <em>default_target_attribute=None</em>, <em>row_id_attribute=None</em>, <em>ignore_attribute=None</em>, <em>version_label=None</em>, <em>citation=None</em>, <em>tag=None</em>, <em>visibility=None</em>, <em>original_data_url=None</em>, <em>paper_url=None</em>, <em>update_comment=None</em>, <em>md5_checksum=None</em>, <em>data_file=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLDataset</code><span class="sig-paren">(</span><em>dataset_id=None</em>, <em>name=None</em>, <em>version=None</em>, <em>description=None</em>, <em>format=None</em>, <em>creator=None</em>, <em>contributor=None</em>, <em>collection_date=None</em>, <em>upload_date=None</em>, <em>language=None</em>, <em>licence=None</em>, <em>url=None</em>, <em>default_target_attribute=None</em>, <em>row_id_attribute=None</em>, <em>ignore_attribute=None</em>, <em>version_label=None</em>, <em>citation=None</em>, <em>tag=None</em>, <em>visibility=None</em>, <em>original_data_url=None</em>, <em>paper_url=None</em>, <em>update_comment=None</em>, <em>md5_checksum=None</em>, <em>data_file=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dataset object.</p>
 <p>Allows fetching and uploading datasets to OpenML.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -172,6 +174,31 @@
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="openml.OpenMLDataset.retrieve_class_labels">
+<code class="descname">retrieve_class_labels</code><span class="sig-paren">(</span><em>target_name='class'</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.retrieve_class_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the datasets arff to determine the class-labels.</p>
+<p>If the task has no class labels (for example a regression problem)
+it returns None. Necessary because the data returned by get_data
+only contains the indices of the classes, while OpenML needs the real
+classname when uploading the results of a run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>target_name</strong> : str</p>
+<blockquote>
+<div><p>Name of the target attribute</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -189,7 +216,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2016, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.<br/>
     </p>
   </div>
 </footer>

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>openml.datasets.get_datasets &mdash; OpenML 0.2.1 documentation</title>
+    <title>openml.datasets.get_datasets &#8212; OpenML 0.2.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -18,7 +18,8 @@
         VERSION:     '0.2.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
@@ -29,7 +30,8 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="OpenML 0.2.1 documentation" href="../index.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -123,15 +125,16 @@
 <h1><code class="xref py py-mod docutils literal"><span class="pre">openml.datasets</span></code>.get_datasets<a class="headerlink" href="#openml-datasets-get-datasets" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.datasets.get_datasets">
-<code class="descclassname">openml.datasets.</code><code class="descname">get_datasets</code><span class="sig-paren">(</span><em>dids</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.get_datasets" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.datasets.</code><code class="descname">get_datasets</code><span class="sig-paren">(</span><em>dataset_ids</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.get_datasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download datasets.</p>
+<p>This function iterates <a class="reference internal" href="openml.datasets.get_dataset.html#openml.datasets.get_dataset" title="openml.datasets.get_dataset"><code class="xref py py-meth docutils literal"><span class="pre">openml.datasets.get_dataset()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dids</strong> : iterable</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset_ids</strong> : iterable</p>
 <blockquote>
-<div><p>A list of integers representing dataset ids.</p>
+<div><p>Integers representing dataset ids.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -143,9 +146,6 @@
 </tr>
 </tbody>
 </table>
-<p class="rubric">Notes</p>
-<p>Uses <a class="reference internal" href="openml.datasets.get_dataset.html#openml.datasets.get_dataset" title="openml.datasets.get_dataset"><code class="xref py py-func docutils literal"><span class="pre">get_dataset()</span></code></a> internally. Please read
-the documentation of this.</p>
 </dd></dl>
 
 <div class="clearer"></div></div>
@@ -163,7 +163,7 @@ the documentation of this.</p>
     </p>
     <p>
         &copy; Copyright 2014-2016, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.<br/>
     </p>
   </div>
 </footer>

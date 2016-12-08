@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>APIs &mdash; OpenML 0.2.1 documentation</title>
+    <title>APIs &#8212; OpenML 0.2.1 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -18,7 +18,8 @@
         VERSION:     '0.2.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
@@ -29,7 +30,8 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="OpenML 0.2.1 documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -136,10 +138,10 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset" title="openml.OpenMLDataset"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLDataset</span></code></a>([id,&nbsp;name,&nbsp;version,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset" title="openml.OpenMLDataset"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLDataset</span></code></a>([dataset_id,&nbsp;name,&nbsp;version,&nbsp;...])</td>
 <td>Dataset object.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/openml.OpenMLRun.html#openml.OpenMLRun" title="openml.OpenMLRun"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLRun</span></code></a>(task_id,&nbsp;flow_id,&nbsp;setup_string,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.OpenMLRun.html#openml.OpenMLRun" title="openml.OpenMLRun"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLRun</span></code></a>(task_id,&nbsp;flow_id,&nbsp;dataset_id[,&nbsp;...])</td>
 <td>OpenML Run: result of running a model on an openml dataset.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/openml.OpenMLTask.html#openml.OpenMLTask" title="openml.OpenMLTask"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLTask</span></code></a>(task_id,&nbsp;task_type,&nbsp;data_set_id,&nbsp;...)</td>
@@ -148,7 +150,7 @@
 <tr class="row-even"><td><a class="reference internal" href="generated/openml.OpenMLSplit.html#openml.OpenMLSplit" title="openml.OpenMLSplit"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLSplit</span></code></a>(name,&nbsp;description,&nbsp;split)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow" title="openml.OpenMLFlow"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLFlow</span></code></a>(model[,&nbsp;id,&nbsp;uploader,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow" title="openml.OpenMLFlow"><code class="xref py py-obj docutils literal"><span class="pre">OpenMLFlow</span></code></a>(model[,&nbsp;flow_id,&nbsp;uploader,&nbsp;...])</td>
 <td>OpenML Flow.</td>
 </tr>
 </tbody>
@@ -162,13 +164,13 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/openml.datasets.check_datasets_active.html#openml.datasets.check_datasets_active" title="openml.datasets.check_datasets_active"><code class="xref py py-obj docutils literal"><span class="pre">check_datasets_active</span></code></a>(dids)</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.datasets.check_datasets_active.html#openml.datasets.check_datasets_active" title="openml.datasets.check_datasets_active"><code class="xref py py-obj docutils literal"><span class="pre">check_datasets_active</span></code></a>(dataset_ids)</td>
 <td>Check if the dataset ids provided are active.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/openml.datasets.get_dataset.html#openml.datasets.get_dataset" title="openml.datasets.get_dataset"><code class="xref py py-obj docutils literal"><span class="pre">get_dataset</span></code></a>(did)</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.datasets.get_dataset.html#openml.datasets.get_dataset" title="openml.datasets.get_dataset"><code class="xref py py-obj docutils literal"><span class="pre">get_dataset</span></code></a>(dataset_id)</td>
 <td>Download a dataset.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/openml.datasets.get_datasets.html#openml.datasets.get_datasets" title="openml.datasets.get_datasets"><code class="xref py py-obj docutils literal"><span class="pre">get_datasets</span></code></a>(dids)</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.datasets.get_datasets.html#openml.datasets.get_datasets" title="openml.datasets.get_datasets"><code class="xref py py-obj docutils literal"><span class="pre">get_datasets</span></code></a>(dataset_ids)</td>
 <td>Download datasets.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/openml.datasets.list_datasets.html#openml.datasets.list_datasets" title="openml.datasets.list_datasets"><code class="xref py py-obj docutils literal"><span class="pre">list_datasets</span></code></a>()</td>
@@ -255,7 +257,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2016, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.<br/>
     </p>
   </div>
 </footer>

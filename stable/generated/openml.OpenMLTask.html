@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>openml.OpenMLTask &mdash; OpenML 0.2.1 documentation</title>
+    <title>openml.OpenMLTask &#8212; OpenML 0.2.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -18,7 +18,8 @@
         VERSION:     '0.2.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
@@ -29,7 +30,8 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="OpenML 0.2.1 documentation" href="../index.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -123,7 +125,7 @@
 <h1><code class="xref py py-mod docutils literal"><span class="pre">openml</span></code>.OpenMLTask<a class="headerlink" href="#openml-openmltask" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="openml.OpenMLTask">
-<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLTask</code><span class="sig-paren">(</span><em>task_id</em>, <em>task_type</em>, <em>data_set_id</em>, <em>target_feature</em>, <em>estimation_procedure_type</em>, <em>data_splits_url</em>, <em>estimation_parameters</em>, <em>evaluation_measure</em>, <em>cost_matrix</em>, <em>class_labels=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLTask</code><span class="sig-paren">(</span><em>task_id</em>, <em>task_type</em>, <em>data_set_id</em>, <em>target_name</em>, <em>estimation_procedure_type</em>, <em>data_splits_url</em>, <em>estimation_parameters</em>, <em>evaluation_measure</em>, <em>cost_matrix</em>, <em>class_labels=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="openml.OpenMLTask.download_split">
 <code class="descname">download_split</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask.download_split" title="Permalink to this definition">¶</a></dt>
@@ -143,21 +145,9 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="openml.OpenMLTask.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>algo</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate an algorithm on the test data.</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="openml.OpenMLTask.get_dataset">
 <code class="descname">get_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask.get_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download dataset associated with task</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLTask.validate">
-<code class="descname">validate</code><span class="sig-paren">(</span><em>algo</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask.validate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate an algorithm on the validation data.</p>
 </dd></dl>
 
 </dd></dl>
@@ -177,7 +167,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2016, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.<br/>
     </p>
   </div>
 </footer>
