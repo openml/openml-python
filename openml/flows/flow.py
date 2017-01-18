@@ -238,7 +238,7 @@ class OpenMLFlow(object):
             OpenMLFlow
 
         """
-        arguments = {}
+        arguments = OrderedDict()
         dic = xml_dict["oml:flow"]
 
         # Mandatory parts in the xml file

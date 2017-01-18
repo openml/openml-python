@@ -41,7 +41,7 @@ def sklearn_to_flow(o):
     elif isinstance(o, (bool, int, float)):
         rval = o
     elif isinstance(o, dict):
-        rval = {}
+        rval = OrderedDict()
         for key, value in o.items():
             if not isinstance(key, six.string_types):
                 raise TypeError('Can only use string as keys, you passed '
@@ -120,8 +120,9 @@ def flow_to_sklearn(o, **kwargs):
 
         else:
             # Regular dictionary
-            rval = {flow_to_sklearn(key, **kwargs): flow_to_sklearn(value, **kwargs)
-                    for key, value in o.items()}
+            rval = OrderedDict((flow_to_sklearn(key, **kwargs),
+                                flow_to_sklearn(value, **kwargs))
+                               for key, value in o.items())
     elif isinstance(o, (list, tuple)):
         rval = [flow_to_sklearn(element, **kwargs) for element in o]
         if isinstance(o, tuple):
@@ -221,9 +222,9 @@ def _serialize_model(model):
             # AdaBoostClassifier
             sub_components[k] = rval
             sub_components_explicit.add(k)
-            component_reference = \
-                {'oml:serialized_object': 'component_reference',
-                 'value': {'key': k, 'step_name': None}}
+            component_reference = OrderedDict()
+            component_reference['oml:serialized_object'] = 'component_reference'
+            component_reference['value'] = OrderedDict(key=k, step_name=None)
             component_reference = sklearn_to_flow(component_reference)
             parameters[k] = json.dumps(component_reference)
 
@@ -268,6 +269,7 @@ def _serialize_model(model):
                       language='English',
                       # TODO fill in dependencies!
                       dependencies=None)
+
     return flow
 
 
@@ -282,14 +284,16 @@ def _deserialize_model(flow, **kwargs):
 
     parameters = flow.parameters
     components = flow.components
-    component_dict = defaultdict(dict)
-    parameter_dict = {}
+    component_dict = OrderedDict()
+    parameter_dict = OrderedDict()
 
     for name in components:
         if '__' in name:
             parameter_name, step = name.split('__')
             value = components[name]
             rval = flow_to_sklearn(value)
+            if parameter_name not in component_dict:
+                component_dict[parameter_name] = OrderedDict()
             component_dict[parameter_name][step] = rval
         else:
             value = components[name]
@@ -303,6 +307,8 @@ def _deserialize_model(flow, **kwargs):
         # Replace the component placeholder by the actual flow
         if isinstance(rval, dict) and 'oml:serialized_object' in rval:
             parameter_name, step = rval['value'].split('__')
+            if parameter_name not in component_dict:
+                component_dict[parameter_name] = OrderedDict()
             rval = component_dict[parameter_name][step]
         parameter_dict[name] = rval
 
@@ -326,7 +332,10 @@ def serialize_type(o):
                np.int: 'np.int',
                np.int32: 'np.int32',
                np.int64: 'np.int64'}
-    return {'oml:serialized_object': 'type', 'value': mapping[o]}
+    ret = OrderedDict()
+    ret['oml:serialized_object'] = 'type'
+    ret['value'] = mapping[o]
+    return ret
 
 
 def deserialize_type(o, **kwargs):
@@ -347,10 +356,10 @@ def serialize_rv_frozen(o):
     a = o.a
     b = o.b
     dist = o.dist.__class__.__module__ + '.' + o.dist.__class__.__name__
-    return {'oml:serialized_object': 'rv_frozen',
-            'value': {'dist': dist, 'a': a, 'b': b,
-                      'args': args, 'kwds': kwds}}
-
+    ret = OrderedDict()
+    ret['oml:serialized_object'] = 'rv_frozen'
+    ret['value'] = OrderedDict(dist=dist, a=a, b=b, args=args, kwds=kwds)
+    return ret
 
 def deserialize_rv_frozen(o, **kwargs):
     args = o['args']
@@ -376,7 +385,10 @@ def deserialize_rv_frozen(o, **kwargs):
 
 def serialize_function(o):
     name = o.__module__ + '.' + o.__name__
-    return {'oml:serialized_object': 'function', 'value': name}
+    ret = OrderedDict()
+    ret['oml:serialized_object'] = 'function'
+    ret['value'] = name
+    return ret
 
 
 def deserialize_function(name, **kwargs):
