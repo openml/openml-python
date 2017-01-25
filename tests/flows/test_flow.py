@@ -198,15 +198,15 @@ class TestFlow(TestBase):
         self.assertIsNot(new_flow, flow)
 
         fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV(' \
-                       'sklearn.model_selection._split.StratifiedKFold,' \
-                       'sklearn.pipeline.Pipeline(' \
+                       'cv=sklearn.model_selection._split.StratifiedKFold,' \
+                       'estimator=sklearn.pipeline.Pipeline(' \
                        'sklearn.preprocessing.data.OneHotEncoder,' \
                        'sklearn.preprocessing.data.StandardScaler,' \
                        'sklearn.pipeline.FeatureUnion(' \
                        'sklearn.decomposition.truncated_svd.TruncatedSVD,' \
                        'sklearn.feature_selection.univariate_selection.SelectPercentile),' \
                        'sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
-                       'sklearn.tree.tree.DecisionTreeClassifier)))'
+                       'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))'
 
         self.assertEqual(new_flow.name, fixture_name)
 
