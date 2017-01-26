@@ -75,7 +75,7 @@ def _read_url_files(url, file_dictionary=None, file_elements=None):
     # 'gzip,deflate'
     response = requests.post(url, data=data, files=file_elements)
     if response.status_code != 200:
-        raise OpenMLServerError(response.text)
+        raise OpenMLServerError(('Status code: %d\n' % response.status_code) + response.text)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
@@ -91,7 +91,7 @@ def _read_url(url):
     # 'gzip,deflate'
     response = requests.post(url, data=data)
     if response.status_code != 200:
-        raise OpenMLServerError(response.text)
+        raise OpenMLServerError(('Status code: %d\n' % response.status_code) + response.text)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)

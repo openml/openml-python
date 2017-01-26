@@ -381,11 +381,8 @@ class OpenMLFlow(object):
         # TODO add numpy and scipy version!
 
         if int(flow_id) == -1:
-            return_code, response_xml = self.publish()
-
-            response_dict = xmltodict.parse(response_xml)
-            flow_id = response_dict['oml:upload_flow']['oml:id']
-            return int(flow_id)
+            flow = self.publish()
+            return int(flow.flow_id)
 
         return int(flow_id)
 
@@ -416,6 +413,7 @@ def _check_flow_exists(name, version):
 
     return_code, xml_response = _perform_api_call(
         "flow/exists/%s/%s" % (name, version))
+    print(return_code)
     # TODO check with latest version of code if this raises an exception
     if return_code != 200:
         # fixme raise appropriate error

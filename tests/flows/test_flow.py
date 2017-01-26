@@ -23,6 +23,17 @@ from openml._api_calls import _perform_api_call
 import openml
 
 
+def get_sentinel():
+    # Create a unique prefix for the flow. Necessary because the flow is
+    # identified by its name and external version online. Having a unique
+    #  name allows us to publish the same flow in each test run
+    md5 = hashlib.md5()
+    md5.update(str(time.time()).encode('utf-8'))
+    sentinel = md5.hexdigest()[:10]
+    sentinel = 'TEST%s' % sentinel
+    return sentinel
+
+
 class TestFlow(TestBase):
 
     @unittest.skip('The method which is tested by this function doesnt exist')
@@ -102,12 +113,7 @@ class TestFlow(TestBase):
         self.assertIsNot(new_flow, flow)
 
     def test_publish_flow(self):
-        # Create a unique prefix for the flow. Necessary because the flow is
-        # identified by its name and external version online. Having a unique
-        #  name allows us to publish the same flow in each test run
-        md5 = hashlib.md5()
-        md5.update(str(time.time()).encode('utf-8'))
-        sentinel = md5.hexdigest()[:10]
+        sentinel = get_sentinel()
 
         flow = openml.OpenMLFlow(name='Test',
                                  description="test description",
@@ -118,25 +124,35 @@ class TestFlow(TestBase):
                                  external_version=str(sklearn.__version__),
                                  tags=[],
                                  language='English',
-                                 dependencies=''
-                                 )
+                                 dependencies='')
         flow.name = 'TEST%s%s' % (sentinel, flow.name)
 
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)
 
+    def test_ensure_flow_exists(self):
+        sentinel = get_sentinel()
+
+        flow = openml.OpenMLFlow(name='Test',
+                                 description="test description",
+                                 model=sklearn.dummy.DummyClassifier(),
+                                 components=collections.OrderedDict(),
+                                 parameters=collections.OrderedDict(),
+                                 parameters_meta_info=collections.OrderedDict(),
+                                 external_version=str(sklearn.__version__),
+                                 tags=[],
+                                 language='English',
+                                 dependencies='')
+        flow.name = 'TEST%s%s' % (sentinel, flow.name)
+        flow_id = flow._ensure_flow_exists()
+        self.assertIsInstance(flow_id, int)
+        self.assertEqual(flow._ensure_flow_exists(), flow_id)
+
     def test_sklearn_to_upload_to_flow(self):
         iris = sklearn.datasets.load_iris()
         X = iris.data
         y = iris.target
-
-        # Create a unique prefix for the flow. Necessary because the flow is
-        # identified by its name and external version online. Having a unique
-        #  name allows us to publish the same flow in each test run
-        md5 = hashlib.md5()
-        md5.update(str(time.time()).encode('utf-8'))
-        sentinel = md5.hexdigest()[:10]
-        sentinel = 'TEST%s' % sentinel
+        sentinel = get_sentinel()
 
         # Test a more complicated flow
         ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[1])
