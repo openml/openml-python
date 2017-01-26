@@ -127,8 +127,10 @@ class TestSklearn(unittest.TestCase):
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
         self.assertEqual(json.loads(serialization.parameters['steps']),
-                         [{'oml:serialized_object': 'component_reference', 'value': {'key': 'steps__scaler', 'step_name': 'scaler'}},
-                          {'oml:serialized_object': 'component_reference', 'value': {'key': 'steps__dummy', 'step_name': 'dummy'}}])
+                         [{'oml-python:serialized_object':
+                               'component_reference', 'value': {'key': 'steps__scaler', 'step_name': 'scaler'}},
+                          {'oml-python:serialized_object':
+                               'component_reference', 'value': {'key': 'steps__dummy', 'step_name': 'dummy'}}])
 
         # Checking the sub-component
         self.assertEqual(len(serialization.components), 2)
@@ -273,12 +275,12 @@ class TestSklearn(unittest.TestCase):
     def test_serialize_cvobject(self):
         methods = [sklearn.model_selection.KFold(3),
                    sklearn.model_selection.LeaveOneOut()]
-        fixtures = [OrderedDict([('oml:serialized_object', 'cv_object'),
+        fixtures = [OrderedDict([('oml-python:serialized_object', 'cv_object'),
                                  ('value', OrderedDict([('name', 'sklearn.model_selection._split.KFold'),
                                                         ('parameters', OrderedDict([('n_splits', '3'),
                                                                                     ('random_state', 'null'),
                                                                                     ('shuffle', 'false')]))]))]),
-                    OrderedDict([('oml:serialized_object', 'cv_object'),
+                    OrderedDict([('oml-python:serialized_object', 'cv_object'),
                                  ('value', OrderedDict([('name', 'sklearn.model_selection._split.LeaveOneOut'),
                                                         ('parameters', OrderedDict())]))])]
         for method, fixture in zip(methods, fixtures):

@@ -96,8 +96,8 @@ def flow_to_sklearn(o, **kwargs):
         # Check if the dict encodes a 'special' object, which could not
         # easily converted into a string, but rather the information to
         # re-create the object were stored in a dictionary.
-        elif 'oml:serialized_object' in o:
-            serialized_type = o['oml:serialized_object']
+        elif 'oml-python:serialized_object' in o:
+            serialized_type = o['oml-python:serialized_object']
             value = o['value']
             if serialized_type == 'type':
                 rval = deserialize_type(value, **kwargs)
@@ -202,7 +202,7 @@ def _serialize_model(model):
                     sub_component_identifier = k + '__' + identifier
                     sub_components[sub_component_identifier] = sub_component
                     component_reference = OrderedDict()
-                    component_reference['oml:serialized_object'] = 'component_reference'
+                    component_reference['oml-python:serialized_object'] = 'component_reference'
                     component_reference['value'] = OrderedDict(
                         key=sub_component_identifier, step_name=identifier)
                     parameter_value.append(component_reference)
@@ -224,7 +224,7 @@ def _serialize_model(model):
             sub_components[k] = rval
             sub_components_explicit.add(k)
             component_reference = OrderedDict()
-            component_reference['oml:serialized_object'] = 'component_reference'
+            component_reference['oml-python:serialized_object'] = 'component_reference'
             component_reference['value'] = OrderedDict(key=k, step_name=None)
             component_reference = sklearn_to_flow(component_reference)
             parameters[k] = json.dumps(component_reference)
@@ -306,7 +306,7 @@ def _deserialize_model(flow, **kwargs):
         rval = flow_to_sklearn(value, components=components)
 
         # Replace the component placeholder by the actual flow
-        if isinstance(rval, dict) and 'oml:serialized_object' in rval:
+        if isinstance(rval, dict) and 'oml-python:serialized_object' in rval:
             parameter_name, step = rval['value'].split('__')
             if parameter_name not in component_dict:
                 component_dict[parameter_name] = OrderedDict()
@@ -334,7 +334,7 @@ def serialize_type(o):
                np.int32: 'np.int32',
                np.int64: 'np.int64'}
     ret = OrderedDict()
-    ret['oml:serialized_object'] = 'type'
+    ret['oml-python:serialized_object'] = 'type'
     ret['value'] = mapping[o]
     return ret
 
@@ -358,7 +358,7 @@ def serialize_rv_frozen(o):
     b = o.b
     dist = o.dist.__class__.__module__ + '.' + o.dist.__class__.__name__
     ret = OrderedDict()
-    ret['oml:serialized_object'] = 'rv_frozen'
+    ret['oml-python:serialized_object'] = 'rv_frozen'
     ret['value'] = OrderedDict(dist=dist, a=a, b=b, args=args, kwds=kwds)
     return ret
 
@@ -387,7 +387,7 @@ def deserialize_rv_frozen(o, **kwargs):
 def serialize_function(o):
     name = o.__module__ + '.' + o.__name__
     ret = OrderedDict()
-    ret['oml:serialized_object'] = 'function'
+    ret['oml-python:serialized_object'] = 'function'
     ret['value'] = name
     return ret
 
@@ -440,7 +440,7 @@ def _serialize_cross_validator(o):
         else:
             parameters[key] = None
 
-    ret['oml:serialized_object'] = 'cv_object'
+    ret['oml-python:serialized_object'] = 'cv_object'
     name = o.__module__ + "." + o.__class__.__name__
     value = OrderedDict(name=name, parameters=parameters)
     ret['value'] = value
