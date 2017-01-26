@@ -96,7 +96,7 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
     ----------
     task_type_id : int, optional
         ID of the task type as detailed
-        `here <http://www.openml.org/search?type=task_type>`_.
+        `here <https://www.openml.org/search?type=task_type>`_.
     offset : int, optional
         the number of tasks to skip, starting from the first
     size : int, optional
@@ -131,6 +131,8 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
 
 def _list_tasks(api_call):
     return_code, xml_string = _perform_api_call(api_call)
+    with open('/tmp/list_tasks.xml', 'w') as fh:
+        fh.write(xml_string)
     tasks_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:

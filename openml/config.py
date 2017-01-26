@@ -11,7 +11,7 @@ logging.basicConfig(
     format='[%(levelname)s] [%(asctime)s:%(name)s] %('
            'message)s', datefmt='%H:%M:%S')
 
-server = "http://www.openml.org/api/v1/xml"
+server = "https://www.openml.org/api/v1/xml"
 apikey = ""
 cachedir = ""
 privatedir = ""

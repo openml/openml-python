@@ -175,7 +175,7 @@ def _list_datasets(api_call):
     assert type(datasets_dict['oml:data']['oml:dataset']) == list, \
         type(datasets_dict['oml:data'])
     assert datasets_dict['oml:data']['@xmlns:oml'] == \
-           'http://openml.org/openml'
+           'http://openml.org/openml', datasets_dict['oml:data']['@xmlns:oml']
 
     datasets = dict()
     for dataset_ in datasets_dict['oml:data']['oml:dataset']:

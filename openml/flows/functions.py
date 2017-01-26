@@ -20,7 +20,7 @@ def _check_flow_exists(name, version):
 
     Notes
     -----
-    see http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
+    see https://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
     """
     if not (type(name) is str and len(name) > 0):
         raise ValueError('Argument \'name\' should be a non-empty string')
