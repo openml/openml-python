@@ -1,5 +1,7 @@
 from collections import OrderedDict
 import json
+import os
+import sys
 import unittest
 
 import numpy as np
@@ -61,6 +63,7 @@ class TestSklearn(unittest.TestCase):
         serialization = sklearn_to_flow(model)
 
         self.assertEqual(serialization.name, fixture_name)
+        self.assertEqual(serialization.class_name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertEqual(serialization.parameters, fixture_parameters)
 
@@ -78,16 +81,21 @@ class TestSklearn(unittest.TestCase):
 
         fixture_name = 'sklearn.ensemble.weight_boosting.AdaBoostClassifier' \
                        '(base_estimator=sklearn.tree.tree.DecisionTreeClassifier)'
+        fixture_class_name = 'sklearn.ensemble.weight_boosting.AdaBoostClassifier'
         fixture_description = 'Automatically created sub-component.'
+        fixture_subcomponent_class_name = 'sklearn.tree.tree.DecisionTreeClassifier'
 
         serialization =  sklearn_to_flow(model)
 
         self.assertEqual(serialization.name, fixture_name)
+        self.assertEqual(serialization.class_name, fixture_class_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertEqual(serialization.parameters['algorithm'], '"SAMME.R"')
         self.assertIsInstance(serialization.parameters['base_estimator'], str)
         self.assertEqual(serialization.parameters['learning_rate'], '1.0')
         self.assertEqual(serialization.parameters['n_estimators'], '100')
+        self.assertEqual(serialization.components['base_estimator'].class_name,
+                         fixture_subcomponent_class_name)
 
         new_model = flow_to_sklearn(serialization)
 
@@ -403,7 +411,7 @@ class TestSklearn(unittest.TestCase):
                   "\('pca2', PCA\(copy=True, iterated_power='auto', " \
                   "n_components=None, random_state=None,\n" \
                   "  svd_solver='auto', tol=0.0, whiten=False\)\)\)\)."
-        #self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline)
+        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline)
 
         fu = sklearn.pipeline.FeatureUnion((('pca1', pca), ('pca2', pca2)))
         fixture = "Found a second occurence of component sklearn.decomposition.pca.PCA when trying to serialize " \
@@ -416,7 +424,7 @@ class TestSklearn(unittest.TestCase):
                   " n_components=None, random_state=None,\n" \
                   "  svd_solver='auto', tol=0.0, whiten=False\)\)\),\n" \
                   "       transformer_weights=None\)."
-        #self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, fu)
+        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, fu)
 
         fs = sklearn.feature_selection.SelectKBest()
         fu2 = sklearn.pipeline.FeatureUnion((('pca1', pca), ('fs', fs)))
@@ -435,3 +443,17 @@ class TestSklearn(unittest.TestCase):
                   " n_components=None, random_state=None,\n" \
                   "  svd_solver='auto', tol=0.0, whiten=False\)\)\)\)."
         self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline2)
+
+    def test_subflow_version_change(self):
+        this_directory = os.path.dirname(os.path.abspath(__file__))
+        sys.path.append(this_directory)
+        import dummy_learn
+        import dummy_learn.dummy_forest
+        pca = sklearn.decomposition.PCA()
+        dummy = dummy_learn.dummy_forest.DummyRegressor()
+        pipeline = sklearn.pipeline.Pipeline((('pca', pca), ('dummy', dummy)))
+        flow = sklearn_to_flow(pipeline)
+        self.assertEqual(flow.external_version, 'dummy_learn==1.0,sklearn==0.18.1')
+        dummy_learn.__version__ = '1.1.0'
+        flow = sklearn_to_flow(pipeline)
+        self.assertEqual(flow.external_version, 'dummy_learn==1.1.0,sklearn==0.18.1')

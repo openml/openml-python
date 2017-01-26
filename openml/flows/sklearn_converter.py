@@ -257,7 +257,6 @@ def _serialize_model(model):
 
     # Create a flow name, which contains all components in brackets, for
     # example RandomizedSearchCV(Pipeline(StandardScaler,AdaBoostClassifier(DecisionTreeClassifier)),StandardScaler,AdaBoostClassifier(DecisionTreeClassifier))
-    # TODO the name above is apparently wrong, I need to test and check this
     class_name = model.__module__ + "." + model.__class__.__name__
 
     # will be part of the name (in brackets)
@@ -274,7 +273,24 @@ def _serialize_model(model):
     else:
         name = class_name
 
-    external_version = _get_external_version_info()
+    # Get the external versions of all sub-components
+    model_package_name = model.__module__.split('.')[0]
+    module = importlib.import_module(model_package_name)
+    model_package_version_number = module.__version__
+    external_version = '%s==%s' % (model_package_name, model_package_version_number)
+
+    external_versions = set()
+    external_versions.add(external_version)
+    to_visit_stack = []
+    to_visit_stack.extend(sub_components.values())
+    while len(to_visit_stack) > 0:
+        visitee = to_visit_stack.pop()
+        for external_version in visitee.external_version.split(','):
+            external_versions.add(external_version)
+        to_visit_stack.extend(visitee.components.values())
+    external_versions = list(sorted(external_versions))
+    external_version = ','.join(external_versions)
+
     flow = OpenMLFlow(name=name,
                       class_name=class_name,
                       description='Automatically created sub-component.',
@@ -470,7 +486,3 @@ def _deserialize_cross_validator(value, **kwargs):
     for parameter in parameters:
         parameters[parameter] = flow_to_sklearn(parameters[parameter])
     return model_class(**parameters)
-
-
-def _get_external_version_info():
-    return 'sklearn_' + sklearn.__version__
