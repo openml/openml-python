@@ -271,7 +271,8 @@ class TestSklearn(unittest.TestCase):
 
         serialized2 = sklearn_to_flow(deserialized)
         self.assertNotEqual(rs, deserialized)
-        self.assertEqual(serialized, serialized2)
+        self.assertEqual(serialized, serialized2,
+                         msg='%s\n%s' % (serialized, serialized2))
 
     def test_serialize_type(self):
         supported_types = [float, np.float, np.float32, np.float64,

@@ -89,14 +89,10 @@ def flow_to_sklearn(o, **kwargs):
             pass
 
     if isinstance(o, dict):
-        if 'oml:name' in o and 'oml:description' in o:
-            # TODO check if this code is actually called
-            rval = _deserialize_model(o, **kwargs)
-
         # Check if the dict encodes a 'special' object, which could not
         # easily converted into a string, but rather the information to
         # re-create the object were stored in a dictionary.
-        elif 'oml-python:serialized_object' in o:
+        if 'oml-python:serialized_object' in o:
             serialized_type = o['oml-python:serialized_object']
             value = o['value']
             if serialized_type == 'type':
@@ -128,9 +124,7 @@ def flow_to_sklearn(o, **kwargs):
         rval = [flow_to_sklearn(element, **kwargs) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif isinstance(o, (bool, int, float)):
-        rval = o
-    elif isinstance(o, six.string_types):
+    elif isinstance(o, (bool, int, float, six.string_types)):
         rval = o
     elif o is None:
         rval = None
@@ -179,12 +173,6 @@ def _serialize_model(model):
             for sub_component_tuple in rval:
                 identifier, sub_component = sub_component_tuple
                 sub_component_type = type(sub_component_tuple)
-
-                # Use only the name of the module (and not all submodules
-                # in the brackets) as the identifier
-                pos = identifier.find('(')
-                if pos >= 0:
-                    identifier = identifier[:pos]
 
                 if sub_component is None:
                     # In a FeatureUnion it is legal to have a None step
@@ -333,13 +321,6 @@ def _deserialize_model(flow, **kwargs):
     for name in parameters:
         value = parameters.get(name)
         rval = flow_to_sklearn(value, components=components)
-
-        # Replace the component placeholder by the actual flow
-        if isinstance(rval, dict) and 'oml-python:serialized_object' in rval:
-            parameter_name, step = rval['value'].split('__')
-            if parameter_name not in component_dict:
-                component_dict[parameter_name] = OrderedDict()
-            rval = component_dict[parameter_name][step]
         parameter_dict[name] = rval
 
     module_name = model_name.rsplit('.', 1)
@@ -471,7 +452,7 @@ def _serialize_cross_validator(o):
 
     ret['oml-python:serialized_object'] = 'cv_object'
     name = o.__module__ + "." + o.__class__.__name__
-    value = OrderedDict(name=name, parameters=parameters)
+    value = OrderedDict([['name', name], ['parameters', parameters]])
     ret['value'] = value
 
     return ret
