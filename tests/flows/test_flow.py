@@ -198,7 +198,6 @@ class TestFlow(TestBase):
         self.assertIsNot(new_flow, flow)
 
         fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV(' \
-                       'cv=sklearn.model_selection._split.StratifiedKFold,' \
                        'estimator=sklearn.pipeline.Pipeline(' \
                        'sklearn.preprocessing.data.OneHotEncoder,' \
                        'sklearn.preprocessing.data.StandardScaler,' \

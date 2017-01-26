@@ -225,7 +225,6 @@ class TestSklearn(unittest.TestCase):
         serialized = sklearn_to_flow(rs)
 
         fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV(' \
-                       'cv=sklearn.model_selection._split.StratifiedKFold,' \
                        'estimator=sklearn.pipeline.Pipeline(' \
                        'sklearn.preprocessing.data.OneHotEncoder,' \
                        'sklearn.preprocessing.data.StandardScaler,' \
@@ -268,6 +267,25 @@ class TestSklearn(unittest.TestCase):
         serialized =  sklearn_to_flow(sklearn.feature_selection.chi2)
         deserialized = flow_to_sklearn(serialized)
         self.assertEqual(deserialized, sklearn.feature_selection.chi2)
+
+    def test_serialize_cvobject(self):
+        methods = [sklearn.model_selection.KFold(3),
+                   sklearn.model_selection.LeaveOneOut()]
+        fixtures = [OrderedDict([('oml:serialized_object', 'cv_object'),
+                                 ('value', OrderedDict([('name', 'sklearn.model_selection._split.KFold'),
+                                                        ('parameters', OrderedDict([('n_splits', '3'),
+                                                                                    ('random_state', 'null'),
+                                                                                    ('shuffle', 'false')]))]))]),
+                    OrderedDict([('oml:serialized_object', 'cv_object'),
+                                 ('value', OrderedDict([('name', 'sklearn.model_selection._split.LeaveOneOut'),
+                                                        ('parameters', OrderedDict())]))])]
+        for method, fixture in zip(methods, fixtures):
+            m = sklearn_to_flow(method)
+            self.assertEqual(m, fixture)
+
+            m_new = flow_to_sklearn(m)
+            self.assertIsNot(m_new, m)
+            self.assertIsInstance(m_new, type(method))
 
     def test_serialize_simple_parameter_grid(self):
         # TODO instead a GridSearchCV object should be serialized

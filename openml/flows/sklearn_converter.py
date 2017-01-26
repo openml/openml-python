@@ -114,7 +114,8 @@ def flow_to_sklearn(o, **kwargs):
                     rval = component
                 else:
                     rval = (step_name, component)
-
+            elif serialized_type == 'cv_object':
+                rval = _deserialize_cross_validator(value, **kwargs)
             else:
                 raise ValueError('Cannot flow_to_sklearn %s' % serialized_type)
 
@@ -401,12 +402,10 @@ def deserialize_function(name, **kwargs):
         return None
     return function_handle
 
-# This produces a flow, thus it does not need a deserialize function as
-# the function _deserialize_model is used for that. It cannot be fed
-# to serialize_model() because cross-validators do not have get_params().
-def _serialize_cross_validator( o):
+def _serialize_cross_validator(o):
+    ret = OrderedDict()
+
     parameters = OrderedDict()
-    parameters_meta_info = OrderedDict()
 
     # XXX this is copied from sklearn.model_selection._split
     cls = o.__class__
@@ -440,26 +439,25 @@ def _serialize_cross_validator( o):
             parameters[key] = value
         else:
             parameters[key] = None
-        parameters_meta_info[key] = OrderedDict((('description', None),
-                                                 ('data_type', None)))
 
-    # Create a flow
+    ret['oml:serialized_object'] = 'cv_object'
     name = o.__module__ + "." + o.__class__.__name__
+    value = OrderedDict(name=name, parameters=parameters)
+    ret['value'] = value
 
-    external_version = _get_external_version_info()
-    flow = OpenMLFlow(name=name,
-                      description='Automatically created sub-component.',
-                      model=o,
-                      parameters=parameters,
-                      parameters_meta_info=parameters_meta_info,
-                      external_version=external_version,
-                      components=OrderedDict(),
-                      tags=[],
-                      language='English',
-                      # TODO fill in dependencies!
-                      dependencies=None)
+    return ret
 
-    return flow
+
+def _deserialize_cross_validator(value, **kwargs):
+    model_name = value['name']
+    parameters = value['parameters']
+
+    module_name = model_name.rsplit('.', 1)
+    model_class = getattr(importlib.import_module(module_name[0]),
+                          module_name[1])
+    for parameter in parameters:
+        parameters[parameter] = flow_to_sklearn(parameters[parameter])
+    return model_class(**parameters)
 
 
 def _get_external_version_info():
