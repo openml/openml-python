@@ -6,3 +6,4 @@ xmltodict
 nose
 requests
 scikit-learn
+nbformat
