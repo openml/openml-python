@@ -391,3 +391,47 @@ class TestSklearn(unittest.TestCase):
                                            "<class 'sklearn.gaussian_process.kernels.Matern'>",
                                 sklearn_to_flow, gp)
 
+    def test_error_on_adding_component_multiple_times_to_flow(self):
+        pca = sklearn.decomposition.PCA()
+        pca2 = sklearn.decomposition.PCA()
+        pipeline = sklearn.pipeline.Pipeline((('pca1', pca), ('pca2', pca2)))
+        fixture = "Found a second occurence of component sklearn.decomposition.pca.PCA" \
+                  " when trying to serialize Pipeline\(steps=\(\('pca1', " \
+                  "PCA\(copy=True, iterated_power='auto', n_components=None, " \
+                  "random_state=None,\n" \
+                  "  svd_solver='auto', tol=0.0, whiten=False\)\), " \
+                  "\('pca2', PCA\(copy=True, iterated_power='auto', " \
+                  "n_components=None, random_state=None,\n" \
+                  "  svd_solver='auto', tol=0.0, whiten=False\)\)\)\)."
+        #self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline)
+
+        fu = sklearn.pipeline.FeatureUnion((('pca1', pca), ('pca2', pca2)))
+        fixture = "Found a second occurence of component sklearn.decomposition.pca.PCA when trying to serialize " \
+                  "FeatureUnion\(n_jobs=1,\n" \
+                  "       transformer_list=\(\('pca1', PCA\(copy=True, " \
+                  "iterated_power='auto'," \
+                  " n_components=None, random_state=None,\n" \
+                  "  svd_solver='auto', tol=0.0, whiten=False\)\), \('pca2', " \
+                  "PCA\(copy=True, iterated_power='auto'," \
+                  " n_components=None, random_state=None,\n" \
+                  "  svd_solver='auto', tol=0.0, whiten=False\)\)\),\n" \
+                  "       transformer_weights=None\)."
+        #self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, fu)
+
+        fs = sklearn.feature_selection.SelectKBest()
+        fu2 = sklearn.pipeline.FeatureUnion((('pca1', pca), ('fs', fs)))
+        pipeline2 = sklearn.pipeline.Pipeline((('fu', fu2), ('pca2', pca2)))
+        fixture = "Found a second occurence of component " \
+                  "sklearn.decomposition.pca.PCA when trying to serialize " \
+                  "Pipeline\(steps=\(\('fu', FeatureUnion\(n_jobs=1,\n" \
+                  "       transformer_list=\(\('pca1', PCA\(copy=True, " \
+                  "iterated_power='auto'," \
+                  " n_components=None, random_state=None,\n"  \
+                  "  svd_solver='auto', tol=0.0, whiten=False\)\), " \
+                  "\('fs', SelectKBest\(k=10, score_func=<function " \
+                  "f_classif at 0x[a-z0-9]+>\)\)\),\n" \
+                  "       transformer_weights=None\)\), \('pca2', " \
+                  "PCA\(copy=True, iterated_power='auto'," \
+                  " n_components=None, random_state=None,\n" \
+                  "  svd_solver='auto', tol=0.0, whiten=False\)\)\)\)."
+        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline2)

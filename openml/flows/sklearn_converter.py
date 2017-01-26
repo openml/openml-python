@@ -241,6 +241,20 @@ def _serialize_model(model):
         parameters_meta_info[k] = OrderedDict((('description', None),
                                                ('data_type', None)))
 
+    # Check that a component does not occur multiple times in a flow as this
+    # is not supported by OpenML
+    to_visit_stack = []
+    to_visit_stack.extend(sub_components.values())
+    known_sub_components = set()
+    while len(to_visit_stack) > 0:
+        visitee = to_visit_stack.pop()
+        if visitee.name in known_sub_components:
+            raise ValueError('Found a second occurence of component %s when '
+                             'trying to serialize %s.' % (visitee.name, model))
+        else:
+            known_sub_components.add(visitee.name)
+            to_visit_stack.extend(visitee.components.values())
+
     # Create a flow name, which contains all components in brackets, for
     # example RandomizedSearchCV(Pipeline(StandardScaler,AdaBoostClassifier(DecisionTreeClassifier)),StandardScaler,AdaBoostClassifier(DecisionTreeClassifier))
     # TODO the name above is apparently wrong, I need to test and check this
