@@ -262,7 +262,7 @@ def list_runs(offset=None, size=None, id=None, task=None,
               flow=None, uploader=None, tag=None):
     """List all runs matching all of the given filters.
 
-    Perform API call `/run/list/{filters} <http://www.openml.org/api_docs/#!/run/get_run_list_filters>`_
+    Perform API call `/run/list/{filters} <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`_
 
     Parameters
     ----------
