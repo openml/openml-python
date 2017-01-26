@@ -42,7 +42,9 @@ class TestBase(unittest.TestCase):
         self.cached = True
         # amueller's read/write key that he will throw away later
         openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
-        openml.config.server = "https://test.openml.org/api/v1/xml"
+        self.production_server = "http://www.openml.org/api/v1/xml"
+        self.test_server = "https://test.openml.org/api/v1/xml"
+        openml.config.server = self.test_server
         openml.config.set_cache_directory(self.workdir, self.workdir)
 
     def tearDown(self):
