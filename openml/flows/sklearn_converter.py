@@ -244,7 +244,7 @@ def _serialize_model(model):
     # Create a flow name, which contains all components in brackets, for
     # example RandomizedSearchCV(Pipeline(StandardScaler,AdaBoostClassifier(DecisionTreeClassifier)),StandardScaler,AdaBoostClassifier(DecisionTreeClassifier))
     # TODO the name above is apparently wrong, I need to test and check this
-    name = model.__module__ + "." + model.__class__.__name__
+    class_name = model.__module__ + "." + model.__class__.__name__
 
     # will be part of the name (in brackets)
     sub_components_names = ""
@@ -256,10 +256,13 @@ def _serialize_model(model):
 
     if sub_components_names:
         # slice operation on string in order to get rid of leading comma
-        name = '%s(%s)' % (name, sub_components_names[1:])
+        name = '%s(%s)' % (class_name, sub_components_names[1:])
+    else:
+        name = class_name
 
     external_version = _get_external_version_info()
     flow = OpenMLFlow(name=name,
+                      class_name=class_name,
                       description='Automatically created sub-component.',
                       model=model,
                       components=sub_components,
@@ -276,12 +279,7 @@ def _serialize_model(model):
 
 def _deserialize_model(flow, **kwargs):
 
-    model_name = flow.name
-    # Remove everything after the first bracket, it is not necessary for
-    # creating the current flow
-    pos = model_name.find('(')
-    if pos >= 0:
-        model_name = model_name[:pos]
+    model_name = flow.class_name
 
     parameters = flow.parameters
     components = flow.components

@@ -52,6 +52,11 @@ class OpenMLFlow(object):
         A list of dependencies necessary to run the flow. This field should
         contain all libraries the flow depends on. To allow reproducibility
         it should also specify the exact version numbers.
+    class_name : str
+        The development language name of the class which is described by this
+        flow.
+    custom_name : str
+        Custom name of the flow given by the owner.
     binary_url : str, optional
         Url from which the binary can be downloaded. Added by the server.
         Ignored when uploaded manually. Will not be used by the python API
@@ -75,7 +80,8 @@ class OpenMLFlow(object):
 
     def __init__(self, name, description, model, components, parameters,
                  parameters_meta_info, external_version, tags, language,
-                 dependencies, binary_url=None, binary_format=None,
+                 dependencies, class_name=None, custom_name=None,
+                 binary_url=None, binary_format=None,
                  binary_md5=None, uploader=None, upload_date=None,
                  flow_id=None, version=None):
         self.name = name
@@ -93,6 +99,7 @@ class OpenMLFlow(object):
         self.components = components
         self.parameters = parameters
         self.parameters_meta_info = parameters_meta_info
+        self.class_name = class_name
 
         keys_parameters = set(parameters.keys())
         keys_parameters_meta_info = set(parameters_meta_info.keys())
@@ -110,6 +117,7 @@ class OpenMLFlow(object):
         self.external_version = external_version
         self.uploader = uploader
 
+        self.custom_name = custom_name
         self.tags = tags if tags is not None else []
         self.binary_url = binary_url
         self.binary_format = binary_format
@@ -164,9 +172,9 @@ class OpenMLFlow(object):
             if getattr(self, required) is None:
                 raise ValueError("self.{} is required but None".format(
                     required))
-        for attribute in ["uploader", "name", "version", "external_version",
-                          "description", "upload_date", "language",
-                          "dependencies"]:
+        for attribute in ["uploader", "name", "custom_name", "class_name",
+                          "version", "external_version", "description",
+                          "upload_date", "language", "dependencies"]:
             _add_if_nonempty(flow_dict, 'oml:{}'.format(attribute),
                              getattr(self, attribute))
 
@@ -248,7 +256,7 @@ class OpenMLFlow(object):
         # non-mandatory parts in the xml file
         for key in ['uploader', 'description', 'upload_date', 'language',
                     'dependencies', 'version', 'binary_url', 'binary_format',
-                    'binary_md5']:
+                    'binary_md5', 'class_name', 'custom_name']:
             arguments[key] = dic.get("oml:" + key)
 
         # has to be converted to an int if present and cannot parsed in the
