@@ -3,13 +3,15 @@ import json
 import unittest
 
 import numpy as np
+import scipy.optimize
+import scipy.stats
 import sklearn.base
 import sklearn.datasets
-import scipy.stats
 import sklearn.decomposition
 import sklearn.dummy
 import sklearn.ensemble
 import sklearn.feature_selection
+import sklearn.gaussian_process
 import sklearn.model_selection
 import sklearn.pipeline
 import sklearn.preprocessing
@@ -378,5 +380,12 @@ class TestSklearn(unittest.TestCase):
         self.assertEqual(deserialized.get_params(), model.get_params())
         self.assertIsNot(deserialized, model)
 
-
+    def test_gaussian_process(self):
+        opt = scipy.optimize.fmin_l_bfgs_b
+        kernel = sklearn.gaussian_process.kernels.Matern()
+        gp = sklearn.gaussian_process.GaussianProcessClassifier(
+            kernel=kernel, optimizer=opt)
+        self.assertRaisesRegexp(TypeError, "Matern\(length_scale=1, nu=1.5\), "
+                                           "<class 'sklearn.gaussian_process.kernels.Matern'>",
+                                sklearn_to_flow, gp)
 
