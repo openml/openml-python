@@ -22,6 +22,9 @@ import sklearn.tree
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
 
 
+__version__ = 0.1
+
+
 class Model(sklearn.base.BaseEstimator):
     def __init__(self, boolean, integer, floating_point_value):
         self.boolean = boolean
@@ -120,7 +123,8 @@ class TestSklearn(unittest.TestCase):
             ('scaler', scaler), ('dummy', dummy)))
 
         fixture_name = 'sklearn.pipeline.Pipeline(' \
-                       'sklearn.preprocessing.data.StandardScaler,sklearn.dummy.DummyClassifier)'
+                       'steps__scaler=sklearn.preprocessing.data.StandardScaler,' \
+                       'steps__dummy=sklearn.dummy.DummyClassifier)'
         fixture_description = 'Automatically created sub-component.'
 
         serialization =  sklearn_to_flow(model)
@@ -178,8 +182,8 @@ class TestSklearn(unittest.TestCase):
         serialization =  sklearn_to_flow(fu)
         self.assertEqual(serialization.name,
                          'sklearn.pipeline.FeatureUnion('
-                         'sklearn.preprocessing.data.OneHotEncoder,'
-                         'sklearn.preprocessing.data.StandardScaler)')
+                         'transformer_list__ohe=sklearn.preprocessing.data.OneHotEncoder,'
+                         'transformer_list__scaler=sklearn.preprocessing.data.StandardScaler)')
         new_model = flow_to_sklearn(serialization)
 
         self.assertEqual(type(new_model), type(fu))
@@ -214,11 +218,29 @@ class TestSklearn(unittest.TestCase):
         serialization = sklearn_to_flow(fu)
         self.assertEqual(serialization.name,
                          'sklearn.pipeline.FeatureUnion('
-                         'sklearn.preprocessing.data.OneHotEncoder)')
+                         'transformer_list__ohe=sklearn.preprocessing.data.OneHotEncoder)')
         new_model = flow_to_sklearn(serialization)
         self.assertEqual(type(new_model), type(fu))
         self.assertIsNot(new_model, fu)
         self.assertIs(new_model.transformer_list[1][1], None)
+
+    def test_serialize_feature_union_switched_names(self):
+        ohe = sklearn.preprocessing.OneHotEncoder()
+        scaler = sklearn.preprocessing.StandardScaler()
+        fu1 = sklearn.pipeline.FeatureUnion(transformer_list=[('ohe', ohe), ('scaler', scaler)])
+        fu2 = sklearn.pipeline.FeatureUnion(transformer_list=[('scaler', ohe), ('ohe', scaler)])
+        fu1_serialization = sklearn_to_flow(fu1)
+        fu2_serialization = sklearn_to_flow(fu2)
+        self.assertEqual(
+            fu1_serialization.name,
+            "sklearn.pipeline.FeatureUnion("
+            "transformer_list__ohe=sklearn.preprocessing.data.OneHotEncoder,"
+            "transformer_list__scaler=sklearn.preprocessing.data.StandardScaler)")
+        self.assertEqual(
+            fu2_serialization.name,
+            "sklearn.pipeline.FeatureUnion("
+            "transformer_list__scaler=sklearn.preprocessing.data.OneHotEncoder,"
+            "transformer_list__ohe=sklearn.preprocessing.data.StandardScaler)")
 
     def test_serialize_complex_flow(self):
         ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[0])
@@ -238,9 +260,9 @@ class TestSklearn(unittest.TestCase):
 
         fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV(' \
                        'estimator=sklearn.pipeline.Pipeline(' \
-                       'sklearn.preprocessing.data.OneHotEncoder,' \
-                       'sklearn.preprocessing.data.StandardScaler,' \
-                       'sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
+                       'steps__ohe=sklearn.preprocessing.data.OneHotEncoder,' \
+                       'steps__scaler=sklearn.preprocessing.data.StandardScaler,' \
+                       'steps__boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
                        'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))'
         self.assertEqual(serialized.name, fixture_name)
 

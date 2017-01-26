@@ -200,6 +200,7 @@ def _serialize_model(model):
                     # parameters, which will be replaced by the real component
                     # when deserealizing the parameter
                     sub_component_identifier = k + '__' + identifier
+                    sub_components_explicit.add(sub_component_identifier)
                     sub_components[sub_component_identifier] = sub_component
                     component_reference = OrderedDict()
                     component_reference['oml-python:serialized_object'] = 'component_reference'
