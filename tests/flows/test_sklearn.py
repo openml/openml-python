@@ -20,6 +20,7 @@ import sklearn.preprocessing
 import sklearn.tree
 
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
+from openml.flows.sklearn_converter import _format_external_version
 
 
 __version__ = 0.1
@@ -480,5 +481,10 @@ class TestSklearn(unittest.TestCase):
         # different value, it is still correct as it is a propagation of the
         # subclasses' module name
         self.assertIn(flow.external_version,
-                      ['dummy_learn==1.0,sklearn==0.18.1',
-                       'sklearn==0.18.1,tests==0.1'])
+                      ['%s,%s' % (
+                          _format_external_version('dummy_learn', '1.0'),
+                          _format_external_version('sklearn', sklearn.__version__)),
+                       '%s,%s' % (
+                           _format_external_version('sklearn', sklearn.__version__),
+                           _format_external_version('tests', '1.0'))
+                       ])

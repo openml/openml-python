@@ -34,11 +34,7 @@ def sklearn_to_flow(o):
         rval = [sklearn_to_flow(element) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif o is None:
-        rval = None
-    elif isinstance(o, six.string_types):
-        rval = o
-    elif isinstance(o, (bool, int, float)):
+    elif isinstance(o, (bool, int, float, six.string_types)) or o is None:
         rval = o
     elif isinstance(o, dict):
         rval = OrderedDict()
@@ -124,10 +120,8 @@ def flow_to_sklearn(o, **kwargs):
         rval = [flow_to_sklearn(element, **kwargs) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif isinstance(o, (bool, int, float, six.string_types)):
+    elif isinstance(o, (bool, int, float, six.string_types)) or o is None:
         rval = o
-    elif o is None:
-        rval = None
     elif isinstance(o, OpenMLFlow):
         rval = _deserialize_model(o, **kwargs)
     else:
@@ -152,83 +146,10 @@ def _serialize_model(model):
     OpenMLFlow
 
     """
-    # stores all entities that should become subcomponents
-    sub_components = OrderedDict()
-    # stores the keys of all subcomponents that should become
-    sub_components_explicit = set()
-    parameters = OrderedDict()
-    parameters_meta_info = OrderedDict()
 
-    model_parameters = model.get_params(deep=False)
-
-    for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
-        rval = sklearn_to_flow(v)
-
-        if (isinstance(rval, (list, tuple)) and len(rval) > 0 and
-                isinstance(rval[0], (list, tuple)) and
-                [type(rval[0]) == type(rval[i]) for i in range(len(rval))]):
-
-            # Steps in a pipeline or feature union
-            parameter_value = list()
-            for sub_component_tuple in rval:
-                identifier, sub_component = sub_component_tuple
-                sub_component_type = type(sub_component_tuple)
-
-                if sub_component is None:
-                    # In a FeatureUnion it is legal to have a None step
-
-                    pv = [identifier, None]
-                    if sub_component_type is tuple:
-                        pv = tuple(pv)
-                    parameter_value.append(pv)
-
-                else:
-                    # Add the component to the list of components, add a
-                    # component reference as a placeholder to the list of
-                    # parameters, which will be replaced by the real component
-                    # when deserealizing the parameter
-                    sub_component_identifier = k + '__' + identifier
-                    sub_components_explicit.add(sub_component_identifier)
-                    sub_components[sub_component_identifier] = sub_component
-                    component_reference = OrderedDict()
-                    component_reference['oml-python:serialized_object'] = 'component_reference'
-                    component_reference['value'] = OrderedDict(
-                        key=sub_component_identifier, step_name=identifier)
-                    parameter_value.append(component_reference)
-
-            if isinstance(rval, tuple):
-                parameter_value = tuple(parameter_value)
-
-            # Here (and in the elif and else branch below) are the only
-            # places where we encode a value as json to make sure that all
-            # parameter values still have the same type after
-            # deserialization
-            parameter_value = json.dumps(parameter_value)
-            parameters[k] = parameter_value
-
-        elif isinstance(rval, OpenMLFlow):
-
-            # A subcomponent, for example the base model in
-            # AdaBoostClassifier
-            sub_components[k] = rval
-            sub_components_explicit.add(k)
-            component_reference = OrderedDict()
-            component_reference['oml-python:serialized_object'] = 'component_reference'
-            component_reference['value'] = OrderedDict(key=k, step_name=None)
-            component_reference = sklearn_to_flow(component_reference)
-            parameters[k] = json.dumps(component_reference)
-
-        else:
-
-            # a regular hyperparameter
-            if not (hasattr(rval, '__len__') and len(rval) == 0):
-                rval = json.dumps(rval)
-                parameters[k] = rval
-            else:
-                parameters[k] = None
-
-        parameters_meta_info[k] = OrderedDict((('description', None),
-                                               ('data_type', None)))
+    # Get all necessary information about the model objects itself
+    parameters, parameters_meta_info, sub_components, sub_components_explicit =\
+        _extract_information_from_model(model)
 
     # Check that a component does not occur multiple times in a flow as this
     # is not supported by OpenML
@@ -266,7 +187,7 @@ def _serialize_model(model):
     model_package_name = model.__module__.split('.')[0]
     module = importlib.import_module(model_package_name)
     model_package_version_number = module.__version__
-    external_version = '%s==%s' % (model_package_name, model_package_version_number)
+    external_version = _format_external_version(model_package_name, model_package_version_number)
 
     external_versions = set()
     external_versions.add(external_version)
@@ -294,6 +215,95 @@ def _serialize_model(model):
                       dependencies=None)
 
     return flow
+
+
+def _extract_information_from_model(model):
+    # This function contains four "global" states and is quite long and
+    # complicated. If it gets to complicated to ensure it's correctness,
+    # it would be best to make it a class with the four "global" states being
+    # the class attributes and the if/elif/else in the for-loop calls to
+    # separate class methods
+
+    # stores all entities that should become subcomponents
+    sub_components = OrderedDict()
+    # stores the keys of all subcomponents that should become
+    sub_components_explicit = set()
+    parameters = OrderedDict()
+    parameters_meta_info = OrderedDict()
+
+    model_parameters = model.get_params(deep=False)
+    for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
+        rval = sklearn_to_flow(v)
+
+        if (isinstance(rval, (list, tuple)) and len(rval) > 0 and
+                isinstance(rval[0], (list, tuple)) and
+                [type(rval[0]) == type(rval[i]) for i in range(len(rval))]):
+
+            # Steps in a pipeline or feature union
+            parameter_value = list()
+            for sub_component_tuple in rval:
+                identifier, sub_component = sub_component_tuple
+                sub_component_type = type(sub_component_tuple)
+
+                if sub_component is None:
+                    # In a FeatureUnion it is legal to have a None step
+
+                    pv = [identifier, None]
+                    if sub_component_type is tuple:
+                        pv = tuple(pv)
+                    parameter_value.append(pv)
+
+                else:
+                    # Add the component to the list of components, add a
+                    # component reference as a placeholder to the list of
+                    # parameters, which will be replaced by the real component
+                    # when deserealizing the parameter
+                    sub_component_identifier = k + '__' + identifier
+                    sub_components_explicit.add(sub_component_identifier)
+                    sub_components[sub_component_identifier] = sub_component
+                    component_reference = OrderedDict()
+                    component_reference[
+                        'oml-python:serialized_object'] = 'component_reference'
+                    component_reference['value'] = OrderedDict(
+                        key=sub_component_identifier, step_name=identifier)
+                    parameter_value.append(component_reference)
+
+            if isinstance(rval, tuple):
+                parameter_value = tuple(parameter_value)
+
+            # Here (and in the elif and else branch below) are the only
+            # places where we encode a value as json to make sure that all
+            # parameter values still have the same type after
+            # deserialization
+            parameter_value = json.dumps(parameter_value)
+            parameters[k] = parameter_value
+
+        elif isinstance(rval, OpenMLFlow):
+
+            # A subcomponent, for example the base model in
+            # AdaBoostClassifier
+            sub_components[k] = rval
+            sub_components_explicit.add(k)
+            component_reference = OrderedDict()
+            component_reference[
+                'oml-python:serialized_object'] = 'component_reference'
+            component_reference['value'] = OrderedDict(key=k, step_name=None)
+            component_reference = sklearn_to_flow(component_reference)
+            parameters[k] = json.dumps(component_reference)
+
+        else:
+
+            # a regular hyperparameter
+            if not (hasattr(rval, '__len__') and len(rval) == 0):
+                rval = json.dumps(rval)
+                parameters[k] = rval
+            else:
+                parameters[k] = None
+
+        parameters_meta_info[k] = OrderedDict((('description', None),
+                                               ('data_type', None)))
+
+    return parameters, parameters_meta_info, sub_components, sub_components_explicit
 
 
 def _deserialize_model(flow, **kwargs):
@@ -468,3 +478,7 @@ def _deserialize_cross_validator(value, **kwargs):
     for parameter in parameters:
         parameters[parameter] = flow_to_sklearn(parameters[parameter])
     return model_class(**parameters)
+
+
+def _format_external_version(model_package_name, model_package_version_number):
+    return '%s==%s' % (model_package_name, model_package_version_number)
