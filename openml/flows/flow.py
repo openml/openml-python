@@ -375,9 +375,7 @@ class OpenMLFlow(object):
         flow_id : int
             Flow id on the server.
         """
-        import sklearn
-        flow_version = 'sklearn_' + sklearn.__version__
-        _, _, flow_id = _check_flow_exists(self.name, flow_version)
+        _, _, flow_id = _check_flow_exists(self.name, self.external_version)
         # TODO add numpy and scipy version!
 
         if int(flow_id) == -1:
@@ -413,7 +411,6 @@ def _check_flow_exists(name, version):
 
     return_code, xml_response = _perform_api_call(
         "flow/exists/%s/%s" % (name, version))
-    print(return_code)
     # TODO check with latest version of code if this raises an exception
     if return_code != 200:
         # fixme raise appropriate error

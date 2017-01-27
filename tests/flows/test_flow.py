@@ -21,6 +21,7 @@ import sklearn.tree
 from openml.testing import TestBase
 from openml._api_calls import _perform_api_call
 import openml
+from openml.flows.sklearn_converter import _format_external_version
 
 
 def get_sentinel():
@@ -121,7 +122,8 @@ class TestFlow(TestBase):
                                  components=collections.OrderedDict(),
                                  parameters=collections.OrderedDict(),
                                  parameters_meta_info=collections.OrderedDict(),
-                                 external_version=str(sklearn.__version__),
+                                 external_version=_format_external_version(
+                                     'sklearn', sklearn.__version__),
                                  tags=[],
                                  language='English',
                                  dependencies='')
@@ -139,7 +141,8 @@ class TestFlow(TestBase):
                                  components=collections.OrderedDict(),
                                  parameters=collections.OrderedDict(),
                                  parameters_meta_info=collections.OrderedDict(),
-                                 external_version=str(sklearn.__version__),
+                                 external_version=_format_external_version(
+                                     'sklearn', sklearn.__version__),
                                  tags=[],
                                  language='English',
                                  dependencies='')
