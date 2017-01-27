@@ -1,4 +1,6 @@
-from collections import OrderedDict, defaultdict
+"""Convert scikit-learn estimators into an OpenMLFlows and vice versa."""
+
+from collections import OrderedDict
 import importlib
 import inspect
 import json
@@ -21,9 +23,6 @@ if sys.version_info >= (3, 5):
     from json.decoder import JSONDecodeError
 else:
     JSONDecodeError = ValueError
-
-
-"""Convert scikit-learn estimators into an OpenMLFlows and vice versa."""
 
 
 def sklearn_to_flow(o):
@@ -52,7 +51,7 @@ def sklearn_to_flow(o):
     elif isinstance(o, scipy.stats.distributions.rv_frozen):
         rval = serialize_rv_frozen(o)
     # This only works for user-defined functions (and not even partial).
-    # I think this is exactly we want here as there shouldn't be any
+    # I think this is exactly what we want here as there shouldn't be any
     # built-in or functool.partials in a pipeline
     elif inspect.isfunction(o):
         rval = serialize_function(o)
@@ -126,7 +125,6 @@ def flow_to_sklearn(o, **kwargs):
         rval = _deserialize_model(o, **kwargs)
     else:
         raise TypeError(o)
-    assert o is None or rval is not None
 
     return rval
 
@@ -153,17 +151,7 @@ def _serialize_model(model):
 
     # Check that a component does not occur multiple times in a flow as this
     # is not supported by OpenML
-    to_visit_stack = []
-    to_visit_stack.extend(sub_components.values())
-    known_sub_components = set()
-    while len(to_visit_stack) > 0:
-        visitee = to_visit_stack.pop()
-        if visitee.name in known_sub_components:
-            raise ValueError('Found a second occurence of component %s when '
-                             'trying to serialize %s.' % (visitee.name, model))
-        else:
-            known_sub_components.add(visitee.name)
-            to_visit_stack.extend(visitee.components.values())
+    _check_multiple_occurence_of_component_in_flow(model, sub_components)
 
     # Create a flow name, which contains all components in brackets, for
     # example RandomizedSearchCV(Pipeline(StandardScaler,AdaBoostClassifier(DecisionTreeClassifier)),StandardScaler,AdaBoostClassifier(DecisionTreeClassifier))
@@ -184,22 +172,7 @@ def _serialize_model(model):
         name = class_name
 
     # Get the external versions of all sub-components
-    model_package_name = model.__module__.split('.')[0]
-    module = importlib.import_module(model_package_name)
-    model_package_version_number = module.__version__
-    external_version = _format_external_version(model_package_name, model_package_version_number)
-
-    external_versions = set()
-    external_versions.add(external_version)
-    to_visit_stack = []
-    to_visit_stack.extend(sub_components.values())
-    while len(to_visit_stack) > 0:
-        visitee = to_visit_stack.pop()
-        for external_version in visitee.external_version.split(','):
-            external_versions.add(external_version)
-        to_visit_stack.extend(visitee.components.values())
-    external_versions = list(sorted(external_versions))
-    external_version = ','.join(external_versions)
+    external_version = _get_external_version_string(model, sub_components)
 
     flow = OpenMLFlow(name=name,
                       class_name=class_name,
@@ -215,6 +188,41 @@ def _serialize_model(model):
                       dependencies=None)
 
     return flow
+
+
+def _get_external_version_string(model, sub_components):
+    # Create external version string for a flow, given the model and the
+    # already parsed dictionary of sub_components. Retrieves the external
+    # version of all subcomponents, which themselves already contain all
+    # requirements for their subcomponents. The external version string is a
+    # sorted concatenation of all modules which are present in this run.
+    model_package_name = model.__module__.split('.')[0]
+    module = importlib.import_module(model_package_name)
+    model_package_version_number = module.__version__
+    external_version = _format_external_version(model_package_name,
+                                                model_package_version_number)
+    external_versions = set()
+    external_versions.add(external_version)
+    for visitee in sub_components.values():
+        for external_version in visitee.external_version.split(','):
+            external_versions.add(external_version)
+    external_versions = list(sorted(external_versions))
+    external_version = ','.join(external_versions)
+    return external_version
+
+
+def _check_multiple_occurence_of_component_in_flow(model, sub_components):
+    to_visit_stack = []
+    to_visit_stack.extend(sub_components.values())
+    known_sub_components = set()
+    while len(to_visit_stack) > 0:
+        visitee = to_visit_stack.pop()
+        if visitee.name in known_sub_components:
+            raise ValueError('Found a second occurence of component %s when '
+                             'trying to serialize %s.' % (visitee.name, model))
+        else:
+            known_sub_components.add(visitee.name)
+            to_visit_stack.extend(visitee.components.values())
 
 
 def _extract_information_from_model(model):
@@ -257,7 +265,7 @@ def _extract_information_from_model(model):
                     # Add the component to the list of components, add a
                     # component reference as a placeholder to the list of
                     # parameters, which will be replaced by the real component
-                    # when deserealizing the parameter
+                    # when deserializing the parameter
                     sub_component_identifier = k + '__' + identifier
                     sub_components_explicit.add(sub_component_identifier)
                     sub_components[sub_component_identifier] = sub_component

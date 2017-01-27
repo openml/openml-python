@@ -22,6 +22,10 @@ import sklearn.tree
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
 from openml.flows.sklearn_converter import _format_external_version
 
+this_directory = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(this_directory)
+from test_flow import are_flows_equal
+
 
 __version__ = 0.1
 
@@ -87,7 +91,9 @@ class TestSklearn(unittest.TestCase):
                        '(base_estimator=sklearn.tree.tree.DecisionTreeClassifier)'
         fixture_class_name = 'sklearn.ensemble.weight_boosting.AdaBoostClassifier'
         fixture_description = 'Automatically created sub-component.'
+        fixture_subcomponent_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_subcomponent_class_name = 'sklearn.tree.tree.DecisionTreeClassifier'
+        fixture_subcomponent_description = 'Automatically created sub-component.'
 
         serialization =  sklearn_to_flow(model)
 
@@ -98,8 +104,12 @@ class TestSklearn(unittest.TestCase):
         self.assertIsInstance(serialization.parameters['base_estimator'], str)
         self.assertEqual(serialization.parameters['learning_rate'], '1.0')
         self.assertEqual(serialization.parameters['n_estimators'], '100')
+        self.assertEqual(serialization.components['base_estimator'].name,
+                         fixture_subcomponent_name)
         self.assertEqual(serialization.components['base_estimator'].class_name,
                          fixture_subcomponent_class_name)
+        self.assertEqual(serialization.components['base_estimator'].description,
+                         fixture_subcomponent_description)
 
         new_model = flow_to_sklearn(serialization)
 
@@ -270,9 +280,10 @@ class TestSklearn(unittest.TestCase):
         # now do deserialization
         deserialized = flow_to_sklearn(serialized)
 
+        # Checks that sklearn_to_flow is idempotent.
         serialized2 = sklearn_to_flow(deserialized)
         self.assertNotEqual(rs, deserialized)
-        self.assertEqual(serialized, serialized2,
+        self.assertTrue(are_flows_equal(serialized, serialized2),
                          msg='%s\n%s' % (serialized, serialized2))
 
     def test_serialize_type(self):
@@ -292,10 +303,9 @@ class TestSklearn(unittest.TestCase):
         for supported_rv in supported_rvs:
             serialized = sklearn_to_flow(supported_rv)
             deserialized = flow_to_sklearn(serialized)
-            self.assertEqual(type(deserialized.__dict__['dist']),
-                             type(supported_rv.__dict__['dist']))
-            del deserialized.__dict__['dist']
-            del supported_rv.__dict__['dist']
+            self.assertEqual(type(deserialized.dist), type(supported_rv.dist))
+            del deserialized.dist
+            del supported_rv.dist
             self.assertEqual(deserialized.__dict__,
                              supported_rv.__dict__)
 
@@ -324,12 +334,12 @@ class TestSklearn(unittest.TestCase):
             self.assertIsInstance(m_new, type(method))
 
     def test_serialize_simple_parameter_grid(self):
-        # TODO instead a GridSearchCV object should be serialized
 
         # We cannot easily test for scipy random variables in here, but they
         # should be covered
 
         # Examples from the scikit-learn documentation
+        models = [sklearn.svm.SVC(), sklearn.ensemble.RandomForestClassifier()]
         grids = \
             [[{'C': [1, 10, 100, 1000], 'kernel': ['linear']},
               {'C': [1, 10, 100, 1000], 'gamma': [0.001, 0.0001],
@@ -341,12 +351,26 @@ class TestSklearn(unittest.TestCase):
               "bootstrap": [True, False],
               "criterion": ["gini", "entropy"]}]
 
-        for grid in grids:
+        for grid, model in zip(grids, models):
             serialized = sklearn_to_flow(grid)
             deserialized = flow_to_sklearn(serialized)
 
             self.assertEqual(deserialized, grid)
             self.assertIsNot(deserialized, grid)
+
+            hpo = sklearn.model_selection.GridSearchCV(
+                param_grid=grid, estimator=model)
+
+            serialized = sklearn_to_flow(hpo)
+            deserialized = flow_to_sklearn(serialized)
+            self.assertEqual(hpo.param_grid, deserialized.param_grid)
+            self.assertEqual(hpo.estimator.get_params(),
+                             deserialized.estimator.get_params())
+            hpo_params = hpo.get_params(deep=False)
+            deserialized_params = deserialized.get_params(deep=False)
+            del hpo_params['estimator']
+            del deserialized_params['estimator']
+            self.assertEqual(hpo_params, deserialized_params)
 
     @unittest.skip('This feature needs further reworking. If we allow several '
                    'components, we need to register them all in the downstream '
@@ -470,21 +494,17 @@ class TestSklearn(unittest.TestCase):
 
     def test_subflow_version_propagated(self):
         this_directory = os.path.dirname(os.path.abspath(__file__))
-        sys.path.append(this_directory)
-        import dummy_learn.dummy_forest
+        tests_directory = os.path.abspath(os.path.join(this_directory, '..', '..'))
+        sys.path.append(tests_directory)
+        import tests.flows.dummy_learn.dummy_forest
         pca = sklearn.decomposition.PCA()
-        dummy = dummy_learn.dummy_forest.DummyRegressor()
+        dummy = tests.flows.dummy_learn.dummy_forest.DummyRegressor()
         pipeline = sklearn.pipeline.Pipeline((('pca', pca), ('dummy', dummy)))
         flow = sklearn_to_flow(pipeline)
         # In python2.7, the unit tests work differently on travis-ci; therefore,
         # I put the alternative travis-ci answer here as well. While it has a
         # different value, it is still correct as it is a propagation of the
         # subclasses' module name
-        self.assertIn(flow.external_version,
-                      ['%s,%s' % (
-                          _format_external_version('dummy_learn', '1.0'),
-                          _format_external_version('sklearn', sklearn.__version__)),
-                       '%s,%s' % (
-                           _format_external_version('sklearn', sklearn.__version__),
-                           _format_external_version('tests', '1.0'))
-                       ])
+        self.assertEqual(flow.external_version, '%s,%s' % (
+            _format_external_version('sklearn', sklearn.__version__),
+            _format_external_version('tests', '0.1')))

@@ -9,4 +9,4 @@ class DummyRegressor(object):
         return {}
 
     def set_params(self, params):
-        return None
+        return self

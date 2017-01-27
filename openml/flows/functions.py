@@ -1,9 +1,7 @@
 import xmltodict
 
 from openml._api_calls import _perform_api_call
-# Absolute imports, to avoid circular dependencies
-from openml.flows.sklearn_converter import flow_to_sklearn
-from . import OpenMLFlow
+from . import OpenMLFlow, flow_to_sklearn
 
 
 def get_flow(flow_id):

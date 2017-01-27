@@ -5,12 +5,12 @@ if sys.version_info[0] < 3:
 else:
     from urllib.error import URLError
 
-import six
 
 def is_string(obj):
     try:
         return isinstance(obj, basestring)
     except NameError:
         return isinstance(obj, str)
+
 
 __all__ = ['URLError', 'is_string']
