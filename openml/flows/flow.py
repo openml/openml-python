@@ -386,7 +386,7 @@ def _check_flow_exists(name, version):
         raise ValueError('Argument \'version\' should be a non-empty string')
 
     return_code, xml_response = _perform_api_call(
-        "flow/exists/%s/%s" % (name, version))
+        "flow/exists", data={'name': name, 'external_version': version})
     # TODO check with latest version of code if this raises an exception
     if return_code != 200:
         # fixme raise appropriate error
