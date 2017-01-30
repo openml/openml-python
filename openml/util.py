@@ -12,4 +12,5 @@ def is_string(obj):
     except NameError:
         return isinstance(obj, str)
 
+
 __all__ = ['URLError', 'is_string']

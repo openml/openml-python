@@ -8,7 +8,7 @@ from . import config
 from .exceptions import OpenMLServerError
 
 
-def _perform_api_call(call, file_dictionary=None,
+def _perform_api_call(call, data=None, file_dictionary=None,
                       file_elements=None, add_authentication=True):
     """
     Perform an API call at the OpenML server.
@@ -19,6 +19,8 @@ def _perform_api_call(call, file_dictionary=None,
     ----------
     call : str
         The API call. For example data/list
+    data : dict
+        Dictionary with post-request payload.
     file_dictionary : dict
         Mapping of {filename: path} of files which should be uploaded to the
         server.
@@ -39,17 +41,20 @@ def _perform_api_call(call, file_dictionary=None,
     if not url.endswith("/"):
         url += "/"
     url += call
+
+    url = url.replace('=', '%3d')
+
     if file_dictionary is not None or file_elements is not None:
-        return _read_url_files(url, file_dictionary=file_dictionary,
+        return _read_url_files(url, data=data, file_dictionary=file_dictionary,
                                file_elements=file_elements)
-    return _read_url(url)
+    return _read_url(url, data)
 
 
-def _read_url_files(url, file_dictionary=None, file_elements=None):
-    """do a post request to url with data None, file content of
+def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
+    """do a post request to url with data, file content of
     file_dictionary and sending file_elements as files"""
 
-    data = {}
+    data = {} if data is None else data
     data['api_key'] = config.apikey
     if file_elements is None:
         file_elements = {}
@@ -75,23 +80,24 @@ def _read_url_files(url, file_dictionary=None, file_elements=None):
     # 'gzip,deflate'
     response = requests.post(url, data=data, files=file_elements)
     if response.status_code != 200:
-        raise OpenMLServerError(response.text)
+        raise OpenMLServerError(('Status code: %d\n' % response.status_code) + response.text)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
     return response.status_code, response.text
 
 
-def _read_url(url):
+def _read_url(url, data=None):
 
-    data = {}
+    data = {} if data is None else data
     data['api_key'] = config.apikey
 
     # Using requests.post sets header 'Accept-encoding' automatically to
     # 'gzip,deflate'
     response = requests.post(url, data=data)
+
     if response.status_code != 200:
-        raise OpenMLServerError(response.text)
+        raise OpenMLServerError(('Status code: %d\n' % response.status_code) + response.text)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)

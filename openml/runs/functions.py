@@ -1,11 +1,10 @@
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 import io
 import os
-import sys
 import xmltodict
 
 from .. import config
-from ..flows import OpenMLFlow
+from ..flows import sklearn_to_flow
 from ..exceptions import OpenMLCacheException
 from ..util import URLError
 from ..tasks.functions import _create_task_from_xml
@@ -38,9 +37,8 @@ def run_task(task, model):
     """
     # TODO move this into its onwn module. While it somehow belongs here, it
     # adds quite a lot of functionality which is better suited in other places!
-    # TODO why doesn't this accept a flow as input?
-
-    flow = OpenMLFlow(model=model)
+    # TODO why doesn't this accept a flow as input? - this would make this more flexible!
+    flow = sklearn_to_flow(model)
     flow_id = flow._ensure_flow_exists()
     if (flow_id < 0):
         print("No flow")
