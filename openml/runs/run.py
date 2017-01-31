@@ -4,10 +4,13 @@ import time
 
 import arff
 import xmltodict
+from sklearn.base import BaseEstimator
+from sklearn.model_selection._search import BaseSearchCV
 
+import openml
 from ..tasks import get_task
 from .._api_calls import _perform_api_call
-
+from ..exceptions import PyOpenMLError
 
 class OpenMLRun(object):
     """OpenML Run: result of running a model on an openml dataset.
@@ -17,10 +20,10 @@ class OpenMLRun(object):
     FIXME
 
     """
-    def __init__(self, task_id, flow_id, dataset_id, setup_string=None, 
+    def __init__(self, task_id, flow_id, dataset_id, setup_string=None,
                  files=None, setup_id=None, tags=None, uploader=None, uploader_name=None,
                  evaluations=None, detailed_evaluations=None,
-                 data_content=None, model=None, task_type=None,
+                 data_content=None, trace_content=None, model=None, task_type=None,
                  task_evaluation_measure=None, flow_name=None,
                  parameter_settings=None, predictions_url=None, task=None,
                  flow=None, run_id=None):
@@ -39,12 +42,14 @@ class OpenMLRun(object):
         self.evaluations = evaluations
         self.detailed_evaluations = detailed_evaluations
         self.data_content = data_content
+        self.trace_content = trace_content
         self.task = task
         self.flow = flow
         self.run_id = run_id
+        self.model = model
 
     def _generate_arff_dict(self):
-        """Generates the arff dictionary for upload to the server.
+        """Generates the arff dictionary for uploading predictions to the server.
 
         Assumes that the run has been executed.
 
@@ -74,6 +79,49 @@ class OpenMLRun(object):
         arff_dict['relation'] = 'openml_task_' + str(task.task_id) + '_predictions'
         return arff_dict
 
+    def _generate_trace_arff_dict(self, model):
+        """Generates the arff dictionary for uploading predictions to the server.
+
+        Assumes that the run has been executed.
+
+        Returns
+        -------
+        arf_dict : dict
+            Dictionary representation of the ARFF file that will be uploaded.
+            Contains information about the optimization trace.
+        """
+        if self.trace_content is None:
+            raise ValueError('No trace content avaiable.')
+        if not isinstance(model, BaseSearchCV):
+            raise PyOpenMLError('Cannot generate trace on provided classifier. (This should never happen.)')
+
+        arff_dict = {}
+        arff_dict['attributes'] = [('repeat', 'NUMERIC'),
+                                   ('fold', 'NUMERIC'),
+                                   ('iteration', 'NUMERIC'),
+                                   ('evaluation', 'NUMERIC'),
+                                   ('selected', ['true', 'false'])]
+        for key in model.cv_results_:
+            if key.startswith("param_"):
+                type = 'STRING'
+                if all(isinstance(i, (bool)) for i in model.cv_results_[key]):
+                    type = ['True', 'False']
+                elif all(isinstance(i, (int, float)) for i in model.cv_results_[key]):
+                    type = 'NUMERIC'
+                else:
+                    values = list(set(model.cv_results_[key])) # unique values
+                    if len(values) < 100: # arbitrary number. make it an option?
+                        type = [str(i) for i in values]
+                    print(key + ": " + str(type))
+
+                attribute = ("parameter_" + key[6:], type)
+                arff_dict['attributes'].append(attribute)
+
+        arff_dict['data'] = self.trace_content
+        arff_dict['relation'] = 'openml_task_' + str(self.task_id) + '_predictions'
+
+        return arff_dict
+
     def publish(self):
         """Publish a run to the OpenML server.
 
@@ -84,10 +132,18 @@ class OpenMLRun(object):
         -------
         self : OpenMLRun
         """
+        if self.model is None:
+            raise PyOpenMLError("OpenMLRun obj does not contain a model. (This should never happen.) ");
+
         predictions = arff.dumps(self._generate_arff_dict())
         description_xml = self._create_description_xml()
-        file_elements = {'predictions': ("predictions.csv", predictions),
+
+        file_elements = {'predictions': ("predictions.arff", predictions),
                          'description': ("description.xml", description_xml)}
+        if self.trace_content is not None:
+            trace_arff = arff.dumps(self._generate_trace_arff_dict(self.model))
+            file_elements['trace'] = ("trace.arff", trace_arff)
+
         return_code, return_value = _perform_api_call(
             "/run/", file_elements=file_elements)
         run_id = int(xmltodict.parse(return_value)['oml:upload_run']['oml:run_id'])
@@ -104,7 +160,11 @@ class OpenMLRun(object):
         """
         run_environment = _get_version_information()
 
-        parameter_settings = self.model.get_params()
+        # TODO: don't we have flow object in data structure? Use this one
+        downloaded_flow = openml.flows.get_flow(self.flow_id)
+
+        openml_param_settings = _parse_parameters(self.model, downloaded_flow)
+
         # as a tag, it must be of the form ([a-zA-Z0-9_\-\.])+
         # so we format time from 'mm/dd/yy hh:mm:ss' to 'mm-dd-yy_hh.mm.ss'
         well_formatted_time = time.strftime("%c").replace(
@@ -113,10 +173,43 @@ class OpenMLRun(object):
             [self.model.__module__ + "." + self.model.__class__.__name__]
         description = _to_dict(taskid=self.task_id, flow_id=self.flow_id,
                                setup_string=_create_setup_string(self.model),
-                               parameter_settings=parameter_settings,
+                               parameter_settings=openml_param_settings,
                                tags=tags)
         description_xml = xmltodict.unparse(description, pretty=True)
         return description_xml
+
+def _parse_parameters(model, flow):
+    """Extracts all parameter settings from an model in OpenML format.
+
+    Parameters
+    ----------
+    model
+        the sci-kit learn model (fitted)
+    flow
+        openml flow object (containing flow ids, i.e., it has to be downloaded from the server)
+
+    """
+    python_param_settings = model.get_params()
+    openml_param_settings = []
+    flow_dict = openml.flows.get_flow_dict(flow)
+
+    for param in python_param_settings:
+        if "__" in param:
+            # parameter of subflow. will be handled later
+            continue
+        if isinstance(python_param_settings[param], BaseEstimator):
+            # extract parameters of the subflow individually
+            subflow = flow.components[param]
+            openml_param_settings += _parse_parameters(python_param_settings[param], subflow)
+
+        # add parameter setting (also the subflow. Just because we can)
+        param_dict = OrderedDict()
+        param_dict['oml:name'] = param
+        param_dict['oml:value'] = str(python_param_settings[param])
+        param_dict['oml:component'] = flow_dict[flow.name]
+        openml_param_settings.append(param_dict)
+
+    return openml_param_settings
 
 ################################################################################
 # Functions which cannot be in runs/functions due to circular imports
@@ -169,15 +262,7 @@ def _to_dict(taskid, flow_id, setup_string, parameter_settings, tags):
     description['oml:run']['@xmlns:oml'] = 'http://openml.org/openml'
     description['oml:run']['oml:task_id'] = taskid
     description['oml:run']['oml:flow_id'] = flow_id
-
-    params = []
-    for k, v in parameter_settings.items():
-        param_dict = OrderedDict()
-        param_dict['oml:name'] = k
-        param_dict['oml:value'] = ('None' if v is None else v)
-        params.append(param_dict)
-
-    description['oml:run']['oml:parameter_setting'] = params
+    description['oml:run']['oml:parameter_setting'] = parameter_settings
     description['oml:run']['oml:tag'] = tags  # Tags describing the run
     # description['oml:run']['oml:output_data'] = 0;
     # all data that was output of this run, which can be evaluation scores

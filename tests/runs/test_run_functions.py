@@ -1,17 +1,67 @@
 from sklearn.linear_model import LogisticRegression, SGDClassifier
+from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
+from sklearn.svm import SVC
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 import openml
 import openml.exceptions
 from openml.testing import TestBase
 
 
 class TestRun(TestBase):
-    def test_run_iris(self):
-        task = openml.tasks.get_task(10107)
-        clf = LogisticRegression()
+
+    def _perform_run(self, task_id, num_instances, clf):
+        task = openml.tasks.get_task(task_id)
         run = openml.runs.run_task(task, clf)
         run_ = run.publish()
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
+
+        # check arff output
+        self.assertEqual(len(run.data_content), num_instances)
+        return run
+
+
+    def test_run_iris(self):
+        task_id = 10107
+        num_instances = 150
+
+        clf = LogisticRegression()
+        self._perform_run(task_id,num_instances, clf)
+
+
+    def test_run_optimize_randomforest_iris(self):
+        task_id = 10107
+        num_instances = 150
+        num_folds = 10
+        num_iterations = 5
+
+        clf = RandomForestClassifier(n_estimators=10)
+        param_dist = {"max_depth": [3, None],
+                      "max_features": [1,2,3,4],
+                      "min_samples_split": [2,3,4,5,6,7,8,9,10],
+                      "min_samples_leaf": [1,2,3,4,5,6,7,8,9,10],
+                      "bootstrap": [True, False],
+                      "criterion": ["gini", "entropy"]}
+        random_search = RandomizedSearchCV(clf, param_dist,n_iter=num_iterations)
+
+        run = self._perform_run(task_id,num_instances, random_search)
+        self.assertEqual(len(run.trace_content), num_iterations * num_folds)
+
+    def test_run_optimize_bagging_iris(self):
+        task_id = 10107
+        num_instances = 150
+        num_folds = 10
+        num_iterations = 36 # (num values for C times gamma)
+
+        task = openml.tasks.get_task(task_id)
+        bag = BaggingClassifier(base_estimator=SVC())
+        param_dist = {"base_estimator__C": [0.001, 0.01, 0.1, 1, 10, 100],
+                      "base_estimator__gamma": [0.001, 0.01, 0.1, 1, 10, 100]}
+        grid_search = GridSearchCV(bag, param_dist)
+
+        run = self._perform_run(task_id, num_instances, grid_search)
+        self.assertEqual(len(run.trace_content), num_iterations * num_folds)
+
 
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(1939)
@@ -24,9 +74,13 @@ class TestRun(TestBase):
                                 clf, task, class_labels)
 
         clf = SGDClassifier(loss='log', random_state=1)
-        arff_datacontent = openml.runs.functions._run_task_get_arffcontent(
+        arff_datacontent, arff_tracecontent = openml.runs.functions._run_task_get_arffcontent(
             clf, task, class_labels)
+        # predictions
         self.assertIsInstance(arff_datacontent, list)
+        # trace. SGD does not produce any
+        self.assertIsInstance(arff_tracecontent, type(None))
+
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), 1500)
         for arff_line in arff_datacontent:

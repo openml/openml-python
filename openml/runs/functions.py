@@ -2,6 +2,7 @@ from collections import defaultdict
 import io
 import os
 import xmltodict
+from sklearn.model_selection._search import BaseSearchCV
 
 from .. import config
 from ..flows import sklearn_to_flow
@@ -56,19 +57,16 @@ def run_task(task, model):
                          'only works for tasks with class labels.')
 
     run = OpenMLRun(task_id=task.task_id, flow_id=flow_id,
-                    dataset_id=dataset.dataset_id)
-    run.data_content = _run_task_get_arffcontent(model, task, class_labels)
+                    dataset_id=dataset.dataset_id, model=model)
+    run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
 
-    # The model will not be uploaded at the moment, but used to get the
-    # hyperparameter values when uploading the run
-    X, Y = task.get_X_and_y()
-    run.model = model.fit(X, Y)
     return run
 
 
 def _run_task_get_arffcontent(model, task, class_labels):
     X, Y = task.get_X_and_y()
     arff_datacontent = []
+    arff_tracecontent = []
 
     rep_no = 0
     # TODO use different iterator to only provide a single iterator (less
@@ -83,6 +81,19 @@ def _run_task_get_arffcontent(model, task, class_labels):
             testY = Y[test_indices]
 
             model.fit(trainX, trainY)
+            if isinstance(model, BaseSearchCV):
+                for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
+                    # we use the string values for True and False, as it is defined in this way by the OpenML server
+                    selected = 'false'
+                    if itt_no == model.best_index_:
+                       selected = 'true'
+                    test_score = model.cv_results_['mean_test_score'][itt_no]
+                    arff_line = [rep_no, fold_no, itt_no, test_score, selected]
+                    for key in model.cv_results_:
+                        if key.startswith("param_"):
+                            arff_line.append(str(model.cv_results_[key][itt_no]))
+                    arff_tracecontent.append(arff_line)
+
             ProbaY = model.predict_proba(testX)
             PredY = model.predict(testX)
 
@@ -96,7 +107,10 @@ def _run_task_get_arffcontent(model, task, class_labels):
             fold_no = fold_no + 1
         rep_no = rep_no + 1
 
-    return arff_datacontent
+    if not isinstance(model, BaseSearchCV):
+        arff_tracecontent = None
+
+    return arff_datacontent, arff_tracecontent
 
 
 def get_runs(run_ids):
