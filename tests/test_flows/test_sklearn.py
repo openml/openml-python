@@ -496,9 +496,9 @@ class TestSklearn(unittest.TestCase):
         this_directory = os.path.dirname(os.path.abspath(__file__))
         tests_directory = os.path.abspath(os.path.join(this_directory, '..', '..'))
         sys.path.append(tests_directory)
-        import tests.flows.dummy_learn.dummy_forest
+        import tests.test_flows.dummy_learn.dummy_forest
         pca = sklearn.decomposition.PCA()
-        dummy = tests.flows.dummy_learn.dummy_forest.DummyRegressor()
+        dummy = tests.test_flows.dummy_learn.dummy_forest.DummyRegressor()
         pipeline = sklearn.pipeline.Pipeline((('pca', pca), ('dummy', dummy)))
         flow = sklearn_to_flow(pipeline)
         # In python2.7, the unit tests work differently on travis-ci; therefore,
