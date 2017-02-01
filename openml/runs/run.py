@@ -110,8 +110,7 @@ class OpenMLRun(object):
                     type = 'NUMERIC'
                 else:
                     values = list(set(model.cv_results_[key])) # unique values
-                    if len(values) < 100: # arbitrary number. make it an option?
-                        type = [str(i) for i in values]
+                    type = [str(i) for i in values]
                     print(key + ": " + str(type))
 
                 attribute = ("parameter_" + key[6:], type)
@@ -179,19 +178,26 @@ class OpenMLRun(object):
         return description_xml
 
 def _parse_parameters(model, flow):
-    """Extracts all parameter settings from an model in OpenML format.
+    """Extracts all parameter settings from a model in OpenML format.
 
     Parameters
     ----------
     model
-        the sci-kit learn model (fitted)
+        the scikit-learn model (fitted)
     flow
         openml flow object (containing flow ids, i.e., it has to be downloaded from the server)
 
     """
     python_param_settings = model.get_params()
     openml_param_settings = []
-    flow_dict = openml.flows.get_flow_dict(flow)
+
+    def get_flow_dict(_flow):
+        flow_map = {_flow.name: _flow.flow_id}
+        for subflow in _flow.components:
+            flow_map.update(get_flow_dict(_flow.components[subflow]))
+        return flow_map
+
+    flow_dict = get_flow_dict(flow)
 
     for param in python_param_settings:
         if "__" in param:

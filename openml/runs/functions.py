@@ -82,17 +82,8 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
             model.fit(trainX, trainY)
             if isinstance(model, BaseSearchCV):
-                for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
-                    # we use the string values for True and False, as it is defined in this way by the OpenML server
-                    selected = 'false'
-                    if itt_no == model.best_index_:
-                       selected = 'true'
-                    test_score = model.cv_results_['mean_test_score'][itt_no]
-                    arff_line = [rep_no, fold_no, itt_no, test_score, selected]
-                    for key in model.cv_results_:
-                        if key.startswith("param_"):
-                            arff_line.append(str(model.cv_results_[key][itt_no]))
-                    arff_tracecontent.append(arff_line)
+                _add_results_to_arfftrace(arff_tracecontent, fold_no, model,
+                                          rep_no)
 
             ProbaY = model.predict_proba(testX)
             PredY = model.predict(testX)
@@ -111,6 +102,20 @@ def _run_task_get_arffcontent(model, task, class_labels):
         arff_tracecontent = None
 
     return arff_datacontent, arff_tracecontent
+
+
+def _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no):
+    for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
+        # we use the string values for True and False, as it is defined in this way by the OpenML server
+        selected = 'false'
+        if itt_no == model.best_index_:
+            selected = 'true'
+        test_score = model.cv_results_['mean_test_score'][itt_no]
+        arff_line = [rep_no, fold_no, itt_no, test_score, selected]
+        for key in model.cv_results_:
+            if key.startswith("param_"):
+                arff_line.append(str(model.cv_results_[key][itt_no]))
+        arff_tracecontent.append(arff_line)
 
 
 def get_runs(run_ids):
