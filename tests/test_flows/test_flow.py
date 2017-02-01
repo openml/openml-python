@@ -69,17 +69,6 @@ def get_sentinel():
 
 class TestFlow(TestBase):
 
-    @unittest.skip('The method which is tested by this function doesnt exist')
-    def test_download_flow_list(self):
-        def check_flow(flow):
-            self.assertIsInstance(flow, dict)
-            self.assertEqual(len(flow), 6)
-
-        flows = openml.flows.get_flow_list()
-        self.assertGreaterEqual(len(flows), 1448)
-        for flow in flows:
-            check_flow(flow)
-
     def test_get_flow(self):
         # We need to use the production server here because 4024 is not the test
         # server

@@ -1,10 +1,12 @@
 """Convert scikit-learn estimators into an OpenMLFlows and vice versa."""
 
 from collections import OrderedDict
+from distutils.version import LooseVersion
 import importlib
 import inspect
 import json
 import json.decoder
+import re
 import six
 import warnings
 import sys
@@ -23,6 +25,10 @@ if sys.version_info >= (3, 5):
     from json.decoder import JSONDecodeError
 else:
     JSONDecodeError = ValueError
+
+
+DEPENDENCIES_PATTERN = re.compile(
+    '^(?P<name>[\w\-]+)((?P<operation>==|>=|>)(?P<version>(\d+\.)?(\d+\.)?(\d+)))?$')
 
 
 def sklearn_to_flow(o):
@@ -174,6 +180,10 @@ def _serialize_model(model):
     # Get the external versions of all sub-components
     external_version = _get_external_version_string(model, sub_components)
 
+    dependencies = [_format_external_version('sklearn', sklearn.__version__),
+                    'numpy>=1.6.1', 'scipy>=0.9']
+    dependencies = '\n'.join(dependencies)
+
     flow = OpenMLFlow(name=name,
                       class_name=class_name,
                       description='Automatically created sub-component.',
@@ -185,7 +195,7 @@ def _serialize_model(model):
                       tags=[],
                       language='English',
                       # TODO fill in dependencies!
-                      dependencies=None)
+                      dependencies=dependencies)
 
     return flow
 
@@ -317,6 +327,7 @@ def _extract_information_from_model(model):
 def _deserialize_model(flow, **kwargs):
 
     model_name = flow.class_name
+    _check_dependencies(flow.dependencies)
 
     parameters = flow.parameters
     components = flow.components
@@ -350,6 +361,33 @@ def _deserialize_model(flow, **kwargs):
         return None
 
     return model_class(**parameter_dict)
+
+
+def _check_dependencies(dependencies):
+    dependencies = dependencies.split('\n')
+    for dependency_string in dependencies:
+        match = DEPENDENCIES_PATTERN.match(dependency_string)
+        dependency_name = match.group('name')
+        operation = match.group('operation')
+        version = match.group('version')
+
+        module = importlib.import_module(dependency_name)
+        required_version = LooseVersion(version)
+        installed_version = LooseVersion(module.__version__)
+
+        if operation == '==':
+            check = required_version == installed_version
+        elif operation == '>':
+            check = installed_version > required_version
+        elif operation == '>=':
+            check = installed_version > required_version or \
+                    installed_version == required_version
+        else:
+            raise NotImplementedError(
+                'operation \'%s\' is not supported' % operation)
+        if not check:
+            raise ValueError('Trying to deserialize a model with dependency '
+                             '%s not satisfied.' % dependency_string)
 
 
 def serialize_type(o):

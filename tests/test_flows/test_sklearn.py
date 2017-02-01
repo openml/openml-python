@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import unittest
+import unittest.mock
 
 import numpy as np
 import scipy.optimize
@@ -19,8 +20,9 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
 
+import openml
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
-from openml.flows.sklearn_converter import _format_external_version
+from openml.flows.sklearn_converter import _format_external_version, _check_dependencies
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(this_directory)
@@ -47,13 +49,15 @@ class TestSklearn(unittest.TestCase):
         self.X = iris.data
         self.y = iris.target
 
-    def test_serialize_model(self):
+    @unittest.mock.patch('openml.flows.sklearn_converter._check_dependencies')
+    def test_serialize_model(self, check_dependencies_mock):
         model = sklearn.tree.DecisionTreeClassifier(criterion='entropy',
                                                     max_features='auto',
                                                     max_leaf_nodes=2000)
 
         fixture_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_description = 'Automatically created sub-component.'
+        version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' % sklearn.__version__
         fixture_parameters = \
             OrderedDict((('class_weight', 'null'),
                          ('criterion', '"entropy"'),
@@ -74,6 +78,7 @@ class TestSklearn(unittest.TestCase):
         self.assertEqual(serialization.class_name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertEqual(serialization.parameters, fixture_parameters)
+        self.assertEqual(serialization.dependencies, version_fixture)
 
         new_model = flow_to_sklearn(serialization)
 
@@ -82,6 +87,8 @@ class TestSklearn(unittest.TestCase):
 
         self.assertEqual(new_model.get_params(), model.get_params())
         new_model.fit(self.X, self.y)
+
+        self.assertEqual(check_dependencies_mock.call_count, 1)
 
     def test_serialize_model_with_subcomponent(self):
         model = sklearn.ensemble.AdaBoostClassifier(
@@ -508,3 +515,8 @@ class TestSklearn(unittest.TestCase):
         self.assertEqual(flow.external_version, '%s,%s' % (
             _format_external_version('sklearn', sklearn.__version__),
             _format_external_version('tests', '0.1')))
+
+    def test_check_dependencies(self):
+        dependencies = ['sklearn==0.1', 'sklearn>=99.99.99', 'sklearn>99.99.99']
+        for dependency in dependencies:
+            self.assertRaises(ValueError, _check_dependencies, dependency)
