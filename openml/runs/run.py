@@ -133,6 +133,9 @@ class OpenMLRun(object):
         """
         if self.model is None:
             raise PyOpenMLError("OpenMLRun obj does not contain a model. (This should never happen.) ");
+        if self.flow_id is None:
+            raise PyOpenMLError("OpenMLRun obj does not contain a flow id. (Should have been added while executing the task.) ");
+
 
         predictions = arff.dumps(self._generate_arff_dict())
         description_xml = self._create_description_xml()

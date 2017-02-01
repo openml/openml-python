@@ -39,14 +39,6 @@ def run_task(task, model):
     # TODO move this into its onwn module. While it somehow belongs here, it
     # adds quite a lot of functionality which is better suited in other places!
     # TODO why doesn't this accept a flow as input? - this would make this more flexible!
-    flow = sklearn_to_flow(model)
-    flow_id = flow._ensure_flow_exists()
-    if (flow_id < 0):
-        print("No flow")
-        return 0, 2
-    config.logger.info(flow_id)
-
-    arff_datacontent = []
 
     dataset = task.get_dataset()
     X, Y = dataset.get_data(target=task.target_name)
@@ -56,9 +48,20 @@ def run_task(task, model):
         raise ValueError('The task has no class labels. This method currently '
                          'only works for tasks with class labels.')
 
-    run = OpenMLRun(task_id=task.task_id, flow_id=flow_id,
-                    dataset_id=dataset.dataset_id, model=model)
+    # execute the run
+    run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
     run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
+
+    # now generate the flow
+    flow = sklearn_to_flow(model)
+    flow_id = flow._ensure_flow_exists()
+    if flow_id < 0:
+        print("No flow")
+        return 0, 2
+    config.logger.info(flow_id)
+
+    # attach the flow to the run
+    run.flow_id = flow_id
 
     return run
 
