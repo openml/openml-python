@@ -1,4 +1,4 @@
-from sklearn.linear_model import LogisticRegression, SGDClassifier
+from sklearn.linear_model import LogisticRegression, SGDClassifier, LinearRegression
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.svm import SVC
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
@@ -20,6 +20,12 @@ class TestRun(TestBase):
         self.assertEqual(len(run.data_content), num_instances)
         return run
 
+    def test_run_regression_on_classif_task(self):
+        task_id = 10107
+
+        clf = LinearRegression()
+        task = openml.tasks.get_task(task_id)
+        self.assertRaises(AttributeError, openml.runs.run_task, task=task, model=clf)
 
     def test_run_iris(self):
         task_id = 10107
@@ -44,18 +50,18 @@ class TestRun(TestBase):
                       "criterion": ["gini", "entropy"]}
         random_search = RandomizedSearchCV(clf, param_dist,n_iter=num_iterations)
 
-        run = self._perform_run(task_id,num_instances, random_search)
+        run = self._perform_run(task_id, num_instances, random_search)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
 
     def test_run_optimize_bagging_iris(self):
         task_id = 10107
         num_instances = 150
         num_folds = 10
-        num_iterations = 36 # (num values for C times gamma)
+        num_iterations = 16 # (num values for C times gamma)
 
         bag = BaggingClassifier(base_estimator=SVC())
-        param_dist = {"base_estimator__C": [0.001, 0.01, 0.1, 1, 10, 100],
-                      "base_estimator__gamma": [0.001, 0.01, 0.1, 1, 10, 100]}
+        param_dist = {"base_estimator__C": [0.01, 0.1, 1, 10],
+                      "base_estimator__gamma": [0.01, 0.1, 1, 10]}
         grid_search = GridSearchCV(bag, param_dist)
 
         run = self._perform_run(task_id, num_instances, grid_search)
