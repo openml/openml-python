@@ -199,14 +199,16 @@ class TestFlow(TestBase):
         rs.fit(X, y)
         flow = openml.flows.sklearn_to_flow(rs)
 
-        # Add the sentinel to all external version strings in all subflows
+        # Add the sentinel to all name strings in all subflows. Adds it to
+        # name to make it easier in the web gui to see that the flow is only
+        # a test flow
         to_visit = collections.deque()
         to_visit.appendleft(flow)
         while len(to_visit) > 0:
             current_flow = to_visit.pop()
             for sub_flow in current_flow.components.values():
                 to_visit.appendleft(sub_flow)
-            current_flow.external_version = sentinel + current_flow.external_version
+            current_flow.name = sentinel + current_flow.name
 
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)
@@ -227,8 +229,10 @@ class TestFlow(TestBase):
 
         for i in range(10):
             # Make sure that we replace all occurences of two newlines
+            local_xml = local_xml.replace(sentinel, '')
             local_xml = local_xml.replace('  ', '').replace('\t', '').strip().replace('\n\n', '\n').replace('&quot;', '"')
             local_xml = re.sub(r'(^$)', '', local_xml)
+            server_xml = server_xml.replace(sentinel, '')
             server_xml = server_xml.replace('  ', '').replace('\t', '').strip().replace('\n\n', '\n').replace('&quot;', '"')
             server_xml = re.sub(r'^$', '', server_xml)
 
@@ -237,7 +241,7 @@ class TestFlow(TestBase):
         self.assertTrue(are_flows_equal(new_flow, flow))
         self.assertIsNot(new_flow, flow)
 
-        fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV(' \
+        fixture_name = '%ssklearn.model_selection._search.RandomizedSearchCV(' \
                        'estimator=sklearn.pipeline.Pipeline(' \
                        'steps__ohe=sklearn.preprocessing.data.OneHotEncoder,' \
                        'steps__scaler=sklearn.preprocessing.data.StandardScaler,' \
@@ -245,7 +249,8 @@ class TestFlow(TestBase):
                        'transformer_list__pca=sklearn.decomposition.truncated_svd.TruncatedSVD,' \
                        'transformer_list__fs=sklearn.feature_selection.univariate_selection.SelectPercentile),' \
                        'steps__boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
-                       'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))'
+                       'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))' \
+                        % sentinel
 
         self.assertEqual(new_flow.name, fixture_name)
 
