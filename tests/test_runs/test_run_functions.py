@@ -1,10 +1,17 @@
+import sys
+
 from sklearn.linear_model import LogisticRegression, SGDClassifier, LinearRegression
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.svm import SVC
-from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, StratifiedKFold
 import openml
 import openml.exceptions
 from openml.testing import TestBase
+
+if sys.version_info[0] >= 3:
+    from unittest import mock
+else:
+    import mock
 
 
 class TestRun(TestBase):
@@ -27,6 +34,17 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(task_id)
         self.assertRaises(AttributeError, openml.runs.run_task, task=task, model=clf)
 
+    @mock.patch('openml.flows.sklearn_to_flow')
+    def test_check_erronous_sklearn_flow_fails(self, sklearn_to_flow_mock):
+        task_id = 10107
+        task = openml.tasks.get_task(task_id)
+
+        # Invalid parameter values
+        clf = LogisticRegression(C='abc')
+        self.assertEqual(sklearn_to_flow_mock.call_count, 0)
+        self.assertRaisesRegexp(ValueError, "Penalty term must be positive; got \(C='abc'\)",
+                                openml.runs.run_task, task=task, model=clf)
+
     def test_run_iris(self):
         task_id = 10107
         num_instances = 150
@@ -34,21 +52,22 @@ class TestRun(TestBase):
         clf = LogisticRegression()
         self._perform_run(task_id,num_instances, clf)
 
-
     def test_run_optimize_randomforest_iris(self):
         task_id = 10107
         num_instances = 150
         num_folds = 10
         num_iterations = 5
 
-        clf = RandomForestClassifier(n_estimators=10)
+        clf = RandomForestClassifier(n_estimators=5)
         param_dist = {"max_depth": [3, None],
                       "max_features": [1,2,3,4],
                       "min_samples_split": [2,3,4,5,6,7,8,9,10],
                       "min_samples_leaf": [1,2,3,4,5,6,7,8,9,10],
                       "bootstrap": [True, False],
                       "criterion": ["gini", "entropy"]}
-        random_search = RandomizedSearchCV(clf, param_dist,n_iter=num_iterations)
+        cv = StratifiedKFold(n_splits=3)
+        random_search = RandomizedSearchCV(clf, param_dist, cv=cv,
+                                           n_iter=num_iterations)
 
         run = self._perform_run(task_id, num_instances, random_search)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
@@ -57,11 +76,11 @@ class TestRun(TestBase):
         task_id = 10107
         num_instances = 150
         num_folds = 10
-        num_iterations = 16 # (num values for C times gamma)
+        num_iterations = 9 # (num values for C times gamma)
 
         bag = BaggingClassifier(base_estimator=SVC())
-        param_dist = {"base_estimator__C": [0.01, 0.1, 1, 10],
-                      "base_estimator__gamma": [0.01, 0.1, 1, 10]}
+        param_dist = {"base_estimator__C": [0.01, 0.1, 10],
+                      "base_estimator__gamma": [0.01, 0.1, 10]}
         grid_search = GridSearchCV(bag, param_dist)
 
         run = self._perform_run(task_id, num_instances, grid_search)
