@@ -46,7 +46,7 @@ class TestBase(unittest.TestCase):
         self.test_server = "https://test.openml.org/api/v1/xml"
         openml.config.server = self.test_server
 
-        openml.config.set_cache_directory(self.workdir, self.workdir)
+        openml.config.set_cache_directory(self.workdir)
 
     def tearDown(self):
         os.chdir(self.cwd)

@@ -1,6 +1,5 @@
 """
-Stores module level information like the API key, cache director, private
-directory and the server.
+Stores module level information like the API key, cache directory and the server.
 """
 import os
 import sys
@@ -14,7 +13,6 @@ logging.basicConfig(
 server = "https://www.openml.org/api/v1/xml"
 apikey = ""
 cachedir = ""
-privatedir = ""
 
 
 if sys.version_info[0] < 3:
@@ -47,57 +45,35 @@ def _setup():
     config = _parse_config()
     apikey = config.get('FAKE_SECTION', 'apikey')
     server = config.get('FAKE_SECTION', 'server')
-    private_dir = config.get('FAKE_SECTION', 'private_directory')
     cache_dir = config.get('FAKE_SECTION', 'cachedir')
-    set_cache_directory(cache_dir, private_dir)
+    set_cache_directory(cache_dir)
 
 
-def set_cache_directory(cachedir, privatedir=None):
+def set_cache_directory(cachedir):
     """Set module-wide cache directory.
 
     Sets the cache directory into which to download datasets, tasks etc.
-    Also sets the private directory for storing local datasets.
 
     Parameters
     ----------
     cachedir : string
         Path to use as cache directory.
 
-    privatedir : string
-        Path containing private datasets, tasks, etc.
-
     See also
     --------
     get_cache_directory
-    get_private_directory
     """
-    if privatedir is None:
-        privatedir = cachedir
 
     global _cachedir
-    global _privatedir
     _cachedir = cachedir
-    _privatedir = privatedir
 
     # Set up the cache directories
     dataset_cache_dir = os.path.join(cachedir, "datasets")
     task_cache_dir = os.path.join(cachedir, "tasks")
     run_cache_dir = os.path.join(cachedir, 'runs')
 
-    # Set up the private directory
-    _private_directory_datasets = os.path.join(
-        privatedir, "datasets")
-    _private_directory_tasks = os.path.join(
-        privatedir, "tasks")
-    _private_directory_runs = os.path.join(
-        privatedir, "runs")
 
-    for dir_ in [cachedir, dataset_cache_dir,
-                 task_cache_dir, run_cache_dir,
-                 privatedir,
-                 _private_directory_datasets,
-                 _private_directory_tasks,
-                 _private_directory_runs]:
+    for dir_ in [cachedir, dataset_cache_dir, task_cache_dir, run_cache_dir]:
         if not os.path.exists(dir_) and not os.path.isdir(dir_):
             os.mkdir(dir_)
 
@@ -108,8 +84,7 @@ def _parse_config():
     defaults = {'apikey': apikey,
                 'server': server,
                 'verbosity': 0,
-                'cachedir': os.path.expanduser('~/.openml/cache'),
-                'private_directory': os.path.expanduser('~/.openml/private')}
+                'cachedir': os.path.expanduser('~/.openml/cache')}
 
     config_file = os.path.expanduser('~/.openml/config')
     config = configparser.RawConfigParser(defaults=defaults)
@@ -147,26 +122,10 @@ def get_cache_directory():
     See also
     --------
     set_cache_directory
-    get_private_directory
     """
     return _cachedir
 
 
-def get_private_directory():
-    """Get the current private directory.
-
-    Returns
-    -------
-    privatecir : string
-        The current private directory.
-
-    See also
-    --------
-    set_cache_directory
-    get_cache_directory
-    """
-    return _privatedir
-
-__all__ = ["set_cache_directory", 'get_cache_directory', 'get_private_directory']
+__all__ = ["set_cache_directory", 'get_cache_directory']
 
 _setup()

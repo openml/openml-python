@@ -260,21 +260,18 @@ def _create_run_from_xml(xml):
 
 def _get_cached_run(run_id):
     """Load a run from the cache."""
-    for cache_dir in [config.get_cache_directory(),
-                      config.get_private_directory()]:
-        run_cache_dir = os.path.join(cache_dir, "runs")
-        try:
-            run_file = os.path.join(run_cache_dir,
-                                    "run_%d.xml" % int(run_id))
-            with io.open(run_file, encoding='utf8') as fh:
-                run = _create_task_from_xml(xml=fh.read())
-            return run
+    cache_dir = config.get_cache_directory()
+    run_cache_dir = os.path.join(cache_dir, "runs")
+    try:
+        run_file = os.path.join(run_cache_dir,
+                                "run_%d.xml" % int(run_id))
+        with io.open(run_file, encoding='utf8') as fh:
+            run = _create_task_from_xml(xml=fh.read())
+        return run
 
-        except (OSError, IOError):
-            continue
-
-    raise OpenMLCacheException("Run file for run id %d not "
-                               "cached" % run_id)
+    except (OSError, IOError):
+        raise OpenMLCacheException("Run file for run id %d not "
+                                   "cached" % run_id)
 
 
 def list_runs(offset=None, size=None, id=None, task=None,

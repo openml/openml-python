@@ -14,39 +14,37 @@ from .._api_calls import _perform_api_call
 
 def _get_cached_tasks():
     tasks = OrderedDict()
-    for cache_dir in [config.get_cache_directory(), config.get_private_directory()]:
+    cache_dir = config.get_cache_directory()
 
-        task_cache_dir = os.path.join(cache_dir, "tasks")
-        directory_content = os.listdir(task_cache_dir)
-        directory_content.sort()
+    task_cache_dir = os.path.join(cache_dir, "tasks")
+    directory_content = os.listdir(task_cache_dir)
+    directory_content.sort()
 
-        # Find all dataset ids for which we have downloaded the dataset
-        # description
+    # Find all dataset ids for which we have downloaded the dataset
+    # description
 
-        for filename in directory_content:
-            if not re.match(r"[0-9]*", filename):
-                continue
+    for filename in directory_content:
+        if not re.match(r"[0-9]*", filename):
+            continue
 
-            tid = int(filename)
-            tasks[tid] = _get_cached_task(tid)
+        tid = int(filename)
+        tasks[tid] = _get_cached_task(tid)
 
     return tasks
 
 
 def _get_cached_task(tid):
-    for cache_dir in [config.get_cache_directory(), config.get_private_directory()]:
-        task_cache_dir = os.path.join(cache_dir, "tasks")
-        task_file = os.path.join(task_cache_dir, str(tid), "task.xml")
+    cache_dir = config.get_cache_directory()
+    task_cache_dir = os.path.join(cache_dir, "tasks")
+    task_file = os.path.join(task_cache_dir, str(tid), "task.xml")
 
-        try:
-            with io.open(task_file, encoding='utf8') as fh:
-                task = _create_task_from_xml(xml=fh.read())
-            return task
-        except (OSError, IOError):
-            continue
-
-    raise OpenMLCacheException("Task file for tid %d not "
-                               "cached" % tid)
+    try:
+        with io.open(task_file, encoding='utf8') as fh:
+            task = _create_task_from_xml(xml=fh.read())
+        return task
+    except (OSError, IOError):
+        raise OpenMLCacheException("Task file for tid %d not "
+                                   "cached" % tid)
 
 
 def _get_estimation_procedure_list():

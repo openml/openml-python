@@ -23,28 +23,28 @@ def _list_cached_datasets():
     """
     datasets = []
 
-    for dataset_cache in [config.get_cache_directory(), config.get_private_directory()]:
-        dataset_cache_dir = os.path.join(dataset_cache, "datasets")
-        directory_content = os.listdir(dataset_cache_dir)
-        directory_content.sort()
+    dataset_cache = config.get_cache_directory()
+    dataset_cache_dir = os.path.join(dataset_cache, "datasets")
+    directory_content = os.listdir(dataset_cache_dir)
+    directory_content.sort()
 
-        # Find all dataset ids for which we have downloaded the dataset
-        # description
-        for directory_name in directory_content:
-            # First check if the directory name could be an OpenML dataset id
-            if not re.match(r"[0-9]*", directory_name):
-                continue
+    # Find all dataset ids for which we have downloaded the dataset
+    # description
+    for directory_name in directory_content:
+        # First check if the directory name could be an OpenML dataset id
+        if not re.match(r"[0-9]*", directory_name):
+            continue
 
-            dataset_id = int(directory_name)
+        dataset_id = int(directory_name)
 
-            directory_name = os.path.join(dataset_cache_dir,
-                                          directory_name)
-            dataset_directory_content = os.listdir(directory_name)
+        directory_name = os.path.join(dataset_cache_dir,
+                                      directory_name)
+        dataset_directory_content = os.listdir(directory_name)
 
-            if "dataset.arff" in dataset_directory_content and \
-                            "description.xml" in dataset_directory_content:
-                if dataset_id not in datasets:
-                    datasets.append(dataset_id)
+        if "dataset.arff" in dataset_directory_content and \
+                        "description.xml" in dataset_directory_content:
+            if dataset_id not in datasets:
+                datasets.append(dataset_id)
 
     datasets.sort()
     return datasets
@@ -79,53 +79,44 @@ def _get_cached_dataset(dataset_id):
 
 
 def _get_cached_dataset_description(dataset_id):
-    for cache_dir in [config.get_cache_directory(),
-                      config.get_private_directory()]:
-        did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
-        description_file = os.path.join(did_cache_dir, "description.xml")
-        try:
-            with io.open(description_file, encoding='utf8') as fh:
-                dataset_xml = fh.read()
-        except (IOError, OSError):
-            continue
-
+    cache_dir = config.get_cache_directory()
+    did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
+    description_file = os.path.join(did_cache_dir, "description.xml")
+    try:
+        with io.open(description_file, encoding='utf8') as fh:
+            dataset_xml = fh.read()
         return xmltodict.parse(dataset_xml)["oml:data_set_description"]
+    except (IOError, OSError):
+        raise OpenMLCacheException(
+            "Dataset description for dataset id %d not "
+            "cached" % dataset_id)
 
-    raise OpenMLCacheException("Dataset description for dataset id %d not "
-                               "cached" % dataset_id)
 
 def _get_cached_dataset_features(dataset_id):
-    for cache_dir in [config.get_cache_directory(),
-                      config.get_private_directory()]:
-        did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
-        features_file = os.path.join(did_cache_dir, "features.xml")
-        try:
-            with io.open(features_file, encoding='utf8') as fh:
-                features_xml = fh.read()
-        except (IOError, OSError):
-            continue
-
-        return xmltodict.parse(features_xml)["oml:data_features"]
-
-    raise OpenMLCacheException("Dataset features for dataset id %d not "
-                               "cached" % dataset_id)
+    cache_dir = config.get_cache_directory()
+    did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
+    features_file = os.path.join(did_cache_dir, "features.xml")
+    try:
+        with io.open(features_file, encoding='utf8') as fh:
+            features_xml = fh.read()
+            return xmltodict.parse(features_xml)["oml:data_features"]
+    except (IOError, OSError):
+        raise OpenMLCacheException("Dataset features for dataset id %d not "
+                                   "cached" % dataset_id)
 
 
 def _get_cached_dataset_arff(dataset_id):
-    for cache_dir in [config.get_cache_directory(),
-                      config.get_private_directory()]:
-        did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
-        output_file = os.path.join(did_cache_dir, "dataset.arff")
+    cache_dir = config.get_cache_directory()
+    did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
+    output_file = os.path.join(did_cache_dir, "dataset.arff")
 
-        try:
-            with io.open(output_file, encoding='utf8'):
-                pass
-            return output_file
-        except (OSError, IOError):
-            continue
-
-    raise OpenMLCacheException("ARFF file for dataset id %d not "
-                               "cached" % dataset_id)
+    try:
+        with io.open(output_file, encoding='utf8'):
+            pass
+        return output_file
+    except (OSError, IOError):
+        raise OpenMLCacheException("ARFF file for dataset id %d not "
+                                   "cached" % dataset_id)
 
 
 def list_datasets(offset=None, size=None, tag=None):

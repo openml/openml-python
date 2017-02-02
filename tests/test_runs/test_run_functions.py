@@ -53,7 +53,6 @@ class TestRun(TestBase):
         num_folds = 10
         num_iterations = 36 # (num values for C times gamma)
 
-        task = openml.tasks.get_task(task_id)
         bag = BaggingClassifier(base_estimator=SVC())
         param_dist = {"base_estimator__C": [0.001, 0.01, 0.1, 1, 10, 100],
                       "base_estimator__gamma": [0.001, 0.01, 0.1, 1, 10, 100]}
@@ -61,7 +60,6 @@ class TestRun(TestBase):
 
         run = self._perform_run(task_id, num_instances, grid_search)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
-
 
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(1939)
