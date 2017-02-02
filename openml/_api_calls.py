@@ -84,7 +84,7 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
-    return response.status_code, response.text
+    return response.text
 
 
 def _read_url(url, data=None):
@@ -101,4 +101,4 @@ def _read_url(url, data=None):
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
-    return response.status_code, response.text
+    return response.text

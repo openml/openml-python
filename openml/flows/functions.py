@@ -18,7 +18,7 @@ def get_flow(flow_id):
     except:
         raise ValueError("Flow ID must be an int, got %s." % str(flow_id))
 
-    return_code, flow_xml = _perform_api_call("flow/%d" % flow_id)
+    flow_xml = _perform_api_call("flow/%d" % flow_id)
 
     flow_dict = xmltodict.parse(flow_xml)
     flow = OpenMLFlow._from_dict(flow_dict)
@@ -71,7 +71,7 @@ def list_flows(offset=None, size=None, tag=None):
 
 def _list_datasets(api_call):
     # TODO add proper error handling here!
-    return_code, xml_string = _perform_api_call(api_call)
+    xml_string = _perform_api_call(api_call)
     flows_dict = xmltodict.parse(xml_string)
 
     # Minimalistic check if the XML is useful

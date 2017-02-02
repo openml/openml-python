@@ -105,7 +105,7 @@ class TestFlow(TestBase):
         # Get the raw xml thing
         # TODO maybe get this via get_flow(), which would have to be refactored to allow getting only the xml dictionary
         for flow_id in [1185, 1244, 1196, 1112, ]:
-            flow_xml = _perform_api_call("flow/%d" % flow_id)[1]
+            flow_xml = _perform_api_call("flow/%d" % flow_id)
             flow_dict = xmltodict.parse(flow_xml)
 
             flow = openml.OpenMLFlow._from_dict(flow_dict)

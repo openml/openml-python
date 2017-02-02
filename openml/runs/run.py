@@ -146,8 +146,7 @@ class OpenMLRun(object):
             trace_arff = arff.dumps(self._generate_trace_arff_dict(self.model))
             file_elements['trace'] = ("trace.arff", trace_arff)
 
-        return_code, return_value = _perform_api_call(
-            "/run/", file_elements=file_elements)
+        return_value = _perform_api_call("/run/", file_elements=file_elements)
         run_id = int(xmltodict.parse(return_value)['oml:upload_run']['oml:run_id'])
         self.run_id = run_id
         return self

@@ -58,8 +58,7 @@ def _get_estimation_procedure_list():
         task type id, name, type, repeats, folds, stratified.
     """
 
-    return_code, xml_string = _perform_api_call(
-        "estimationprocedure/list")
+    xml_string = _perform_api_call("estimationprocedure/list")
     procs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
     if 'oml:estimationprocedures' not in procs_dict:
@@ -128,7 +127,7 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
 
 
 def _list_tasks(api_call):
-    return_code, xml_string = _perform_api_call(api_call)
+    xml_string = _perform_api_call(api_call)
     with open('/tmp/list_tasks.xml', 'w') as fh:
         fh.write(xml_string)
     tasks_dict = xmltodict.parse(xml_string)
@@ -203,8 +202,7 @@ def get_task(task_id):
     except (OSError, IOError):
 
         try:
-            return_code, task_xml = _perform_api_call(
-                "task/%d" % task_id)
+            task_xml = _perform_api_call("task/%d" % task_id)
         except (URLError, UnicodeEncodeError) as e:
             print(e)
             raise e

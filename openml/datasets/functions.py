@@ -159,7 +159,7 @@ def list_datasets(offset=None, size=None, tag=None):
 
 def _list_datasets(api_call):
     # TODO add proper error handling here!
-    return_code, xml_string = _perform_api_call(api_call)
+    xml_string = _perform_api_call(api_call)
     datasets_dict = xmltodict.parse(xml_string)
 
     # Minimalistic check if the XML is useful
@@ -301,8 +301,7 @@ def _get_dataset_description(did_cache_dir, dataset_id):
     try:
         return _get_cached_dataset_description(dataset_id)
     except (OpenMLCacheException):
-        return_code, dataset_xml = _perform_api_call(
-            "data/%d" % dataset_id)
+        dataset_xml = _perform_api_call("data/%d" % dataset_id)
 
         with io.open(description_file, "w", encoding='utf8') as fh:
             fh.write(dataset_xml)
@@ -347,7 +346,7 @@ def _get_dataset_arff(did_cache_dir, description):
         pass
 
     url = description['oml:url']
-    return_code, arff_string = _read_url(url)
+    arff_string = _read_url(url)
 
     with io.open(output_file_path, "w", encoding='utf8') as fh:
         fh.write(arff_string)
@@ -382,8 +381,7 @@ def _get_dataset_features(did_cache_dir, dataset_id):
         with io.open(features_file, encoding='utf8') as fh:
             features_xml = fh.read()
     except (OSError, IOError):
-        return_code, features_xml = _perform_api_call(
-            "data/features/%d" % dataset_id)
+        features_xml = _perform_api_call("data/features/%d" % dataset_id)
 
         with io.open(features_file, "w", encoding='utf8') as fh:
             fh.write(features_xml)
@@ -417,8 +415,7 @@ def _get_dataset_qualities(did_cache_dir, dataset_id):
         with io.open(qualities_file, encoding='utf8') as fh:
             qualities_xml = fh.read()
     except (OSError, IOError):
-        return_code, qualities_xml = _perform_api_call(
-            "data/qualities/%d" % dataset_id)
+        qualities_xml = _perform_api_call("data/qualities/%d" % dataset_id)
 
         with io.open(qualities_file, "w", encoding='utf8') as fh:
             fh.write(qualities_xml)

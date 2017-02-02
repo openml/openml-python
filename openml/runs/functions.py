@@ -159,7 +159,7 @@ def get_run(run_id):
         return _get_cached_run(run_id)
     except (OpenMLCacheException):
         try:
-            return_code, run_xml = _perform_api_call("run/%d" % run_id)
+            run_xml = _perform_api_call("run/%d" % run_id)
         except (URLError, UnicodeEncodeError) as e:
             # TODO logger.debug
             print(e)
@@ -328,7 +328,7 @@ def list_runs(offset=None, size=None, id=None, task=None,
 def _list_runs(api_call):
     """Helper function to parse API calls which are lists of runs"""
 
-    return_code, xml_string = _perform_api_call(api_call)
+    xml_string = _perform_api_call(api_call)
 
     runs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful

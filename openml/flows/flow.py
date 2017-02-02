@@ -335,8 +335,7 @@ class OpenMLFlow(object):
 
         xml_description = self._to_xml()
         file_elements = {'description': xml_description}
-        return_code, return_value = _perform_api_call(
-            "flow/", file_elements=file_elements)
+        return_value = _perform_api_call("flow/", file_elements=file_elements)
         self.flow_id = int(xmltodict.parse(return_value)['oml:upload_flow']['oml:id'])
         return self
 
@@ -351,7 +350,7 @@ class OpenMLFlow(object):
         flow_id : int
             Flow id on the server.
         """
-        _, _, flow_id = _check_flow_exists(self.name, self.external_version)
+        _, flow_id = _check_flow_exists(self.name, self.external_version)
         # TODO add numpy and scipy version!
 
         if int(flow_id) == -1:
@@ -385,15 +384,12 @@ def _check_flow_exists(name, version):
     if not (type(version) is str and len(version) > 0):
         raise ValueError('Argument \'version\' should be a non-empty string')
 
-    return_code, xml_response = _perform_api_call(
-        "flow/exists", data={'name': name, 'external_version': version})
-    # TODO check with latest version of code if this raises an exception
-    if return_code != 200:
-        # fixme raise appropriate error
-        raise ValueError("api call failed: %s" % xml_response)
+    xml_response = _perform_api_call("flow/exists",
+                                     data={'name': name, 'external_version': version})
+
     xml_dict = xmltodict.parse(xml_response)
     flow_id = xml_dict['oml:flow_exists']['oml:id']
-    return return_code, xml_response, flow_id
+    return xml_response, flow_id
 
 
 def _add_if_nonempty(dic, key, value):

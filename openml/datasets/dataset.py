@@ -318,9 +318,8 @@ class OpenMLDataset(object):
         if self.data_file is not None:
             file_dictionary['dataset'] = self.data_file
 
-        return_code, return_value = _perform_api_call(
-            "/data/", file_dictionary=file_dictionary,
-            file_elements=file_elements)
+        return_value = _perform_api_call("/data/", file_dictionary=file_dictionary,
+                                         file_elements=file_elements)
 
         self.dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])
         return self
