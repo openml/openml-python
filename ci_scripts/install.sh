@@ -25,13 +25,11 @@ popd
 # Configure the conda environment and put it in the path using the
 # provided versions
 conda create -n testenv --yes python=$PYTHON_VERSION pip nose \
-   numpy=$NUMPY_VERSION scipy=$SCIPY_VERSION cython=$CYTHON_VERSION matplotlib \
-   scikit-learn=$SKLEARN_VERSION nbconvert nbformat jupyter_client ipython \
-   jupyter notebook ipykernel pandas
+   numpy=$NUMPY_VERSION scipy=$SCIPY_VERSION cython=$CYTHON_VERSION  \
+   scikit-learn=$SKLEARN_VERSION pandas
 source activate testenv
-ipython kernel install
 
-
+pip install matplotlib jupyter notebook nbconvert nbformat jupyter_client ipython ipykernel
 if [[ "$COVERAGE" == "true" ]]; then
     pip install coverage coveralls
 fi
