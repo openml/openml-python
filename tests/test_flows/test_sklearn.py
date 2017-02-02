@@ -3,7 +3,11 @@ import json
 import os
 import sys
 import unittest
-import unittest.mock
+
+if sys.version_info[0] >= 3:
+    from unittest import mock
+else:
+    import mock
 
 import numpy as np
 import scipy.optimize
@@ -49,7 +53,7 @@ class TestSklearn(unittest.TestCase):
         self.X = iris.data
         self.y = iris.target
 
-    @unittest.mock.patch('openml.flows.sklearn_converter._check_dependencies')
+    @mock.patch('openml.flows.sklearn_converter._check_dependencies')
     def test_serialize_model(self, check_dependencies_mock):
         model = sklearn.tree.DecisionTreeClassifier(criterion='entropy',
                                                     max_features='auto',

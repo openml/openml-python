@@ -17,11 +17,11 @@ class TestFlowFunctions(unittest.TestCase):
         self.assertTrue(is_string(flow['external_version']) or
                         flow['external_version'] is None)
 
-    def test_list_datasets(self):
+    def test_list_flows(self):
         # We can only perform a smoke test here because we test on dynamic
         # data from the internet...
         flows = openml.flows.list_flows()
-        # 3000 as the number of datasets on openml.org
+        # 3000 as the number of flows on openml.org
         self.assertGreaterEqual(len(flows), 3000)
         for fid in flows:
             self._check_flow(flows[fid])
