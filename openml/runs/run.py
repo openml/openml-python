@@ -210,12 +210,22 @@ def _parse_parameters(model, flow):
             subflow = flow.components[param]
             openml_param_settings += _parse_parameters(python_param_settings[param], subflow)
 
-        # add parameter setting (also the subflow. Just because we can)
-        param_dict = OrderedDict()
-        param_dict['oml:name'] = param
-        param_dict['oml:value'] = str(python_param_settings[param])
-        param_dict['oml:component'] = flow_dict[flow.name]
-        openml_param_settings.append(param_dict)
+        # add parameter setting (in some cases also the subflow. Just because we can)
+        if param in flow.parameters.keys():
+            param_dict = OrderedDict()
+            param_dict['oml:name'] = param
+            param_dict['oml:value'] = str(python_param_settings[param])
+            param_dict['oml:component'] = flow_dict[flow.name]
+            openml_param_settings.append(param_dict)
+        else:
+            if flow.name.startswith("sklearn.pipeline.Pipeline"):
+                # tolerate
+                pass
+            elif flow.name.startswith("sklearn.pipeline.FeatureUnion"):
+                # tolerate
+                pass
+            else:
+                raise ValueError("parameter %s not in flow description of flow %s" %(param,flow.name))
 
     return openml_param_settings
 
