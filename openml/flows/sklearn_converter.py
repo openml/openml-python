@@ -1,6 +1,7 @@
 """Convert scikit-learn estimators into an OpenMLFlows and vice versa."""
 
 from collections import OrderedDict
+import copy
 from distutils.version import LooseVersion
 import importlib
 import inspect
@@ -107,6 +108,10 @@ def flow_to_sklearn(o, **kwargs):
                 step_name = value['step_name']
                 key = value['key']
                 component = flow_to_sklearn(kwargs['components'][key])
+                # The component is now added to where it should be used
+                # later. It should not be passed to the constructor of the
+                # main flow object.
+                del kwargs['components'][key]
                 if step_name is None:
                     rval = component
                 else:
@@ -276,14 +281,13 @@ def _extract_information_from_model(model):
                     # component reference as a placeholder to the list of
                     # parameters, which will be replaced by the real component
                     # when deserializing the parameter
-                    sub_component_identifier = k + '__' + identifier
-                    sub_components_explicit.add(sub_component_identifier)
-                    sub_components[sub_component_identifier] = sub_component
+                    sub_components_explicit.add(identifier)
+                    sub_components[identifier] = sub_component
                     component_reference = OrderedDict()
                     component_reference[
                         'oml-python:serialized_object'] = 'component_reference'
                     component_reference['value'] = OrderedDict(
-                        key=sub_component_identifier, step_name=identifier)
+                        key=identifier, step_name=identifier)
                     parameter_value.append(component_reference)
 
             if isinstance(rval, tuple):
@@ -331,25 +335,27 @@ def _deserialize_model(flow, **kwargs):
 
     parameters = flow.parameters
     components = flow.components
-    component_dict = OrderedDict()
     parameter_dict = OrderedDict()
 
-    for name in components:
-        if '__' in name:
-            parameter_name, step = name.split('__')
-            value = components[name]
-            rval = flow_to_sklearn(value)
-            if parameter_name not in component_dict:
-                component_dict[parameter_name] = OrderedDict()
-            component_dict[parameter_name][step] = rval
-        else:
-            value = components[name]
-            rval = flow_to_sklearn(value)
-            parameter_dict[name] = rval
+    # Do a shallow copy of the components dictionary so we can remove the
+    # components from this copy once we added them into the pipeline. This
+    # allows us to not consider them any more when looping over the
+    # components, but keeping the dictionary of components untouched in the
+    # original components dictionary.
+    components_ = copy.copy(components)
 
     for name in parameters:
         value = parameters.get(name)
-        rval = flow_to_sklearn(value, components=components)
+        rval = flow_to_sklearn(value, components=components_)
+        parameter_dict[name] = rval
+
+    for name in components:
+        if name in parameter_dict:
+            continue
+        if name not in components_:
+            continue
+        value = components[name]
+        rval = flow_to_sklearn(value)
         parameter_dict[name] = rval
 
     module_name = model_name.rsplit('.', 1)

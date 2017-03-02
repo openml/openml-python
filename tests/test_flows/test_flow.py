@@ -243,12 +243,12 @@ class TestFlow(TestBase):
 
         fixture_name = '%ssklearn.model_selection._search.RandomizedSearchCV(' \
                        'estimator=sklearn.pipeline.Pipeline(' \
-                       'steps__ohe=sklearn.preprocessing.data.OneHotEncoder,' \
-                       'steps__scaler=sklearn.preprocessing.data.StandardScaler,' \
-                       'steps__fu=sklearn.pipeline.FeatureUnion(' \
-                       'transformer_list__pca=sklearn.decomposition.truncated_svd.TruncatedSVD,' \
-                       'transformer_list__fs=sklearn.feature_selection.univariate_selection.SelectPercentile),' \
-                       'steps__boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
+                       'ohe=sklearn.preprocessing.data.OneHotEncoder,' \
+                       'scaler=sklearn.preprocessing.data.StandardScaler,' \
+                       'fu=sklearn.pipeline.FeatureUnion(' \
+                       'pca=sklearn.decomposition.truncated_svd.TruncatedSVD,' \
+                       'fs=sklearn.feature_selection.univariate_selection.SelectPercentile),' \
+                       'boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
                        'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))' \
                         % sentinel
 

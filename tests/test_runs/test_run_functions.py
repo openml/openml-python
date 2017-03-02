@@ -1,9 +1,12 @@
 import sys
 
+from sklearn.dummy import DummyClassifier
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression, SGDClassifier, LinearRegression
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.svm import SVC
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, StratifiedKFold
+from sklearn.pipeline import Pipeline
 import openml
 import openml.exceptions
 from openml.testing import TestBase
@@ -85,6 +88,19 @@ class TestRun(TestBase):
 
         run = self._perform_run(task_id, num_instances, grid_search)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
+
+    def test_run_pipeline(self):
+        task_id = 10107
+        num_instances = 150
+        num_folds = 10
+        num_iterations = 9  # (num values for C times gamma)
+
+        scaler = StandardScaler(with_mean=False)
+        dummy = DummyClassifier(strategy='prior')
+        model = Pipeline(steps=(('scaler', scaler), ('dummy', dummy)))
+
+        run = self._perform_run(task_id, num_instances, model)
+        self.assertEqual(run.trace_content, None)
 
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(1939)
@@ -231,5 +247,5 @@ class TestRun(TestBase):
         runs = openml.runs.list_runs(id=ids, task=tasks, uploader=uploaders_1)
 
     def test_get_runs_list_by_tag(self):
-        runs = openml.runs.list_runs(tag='02-11-16_21.46.39')
-        self.assertEqual(len(runs), 1)
+        runs = openml.runs.list_runs(tag='curves')
+        self.assertGreaterEqual(len(runs), 1)

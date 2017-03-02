@@ -145,8 +145,8 @@ class TestSklearn(unittest.TestCase):
             ('scaler', scaler), ('dummy', dummy)))
 
         fixture_name = 'sklearn.pipeline.Pipeline(' \
-                       'steps__scaler=sklearn.preprocessing.data.StandardScaler,' \
-                       'steps__dummy=sklearn.dummy.DummyClassifier)'
+                       'scaler=sklearn.preprocessing.data.StandardScaler,' \
+                       'dummy=sklearn.dummy.DummyClassifier)'
         fixture_description = 'Automatically created sub-component.'
 
         serialization =  sklearn_to_flow(model)
@@ -162,15 +162,15 @@ class TestSklearn(unittest.TestCase):
         # different sorting. Making a json makes it easier
         self.assertEqual(json.loads(serialization.parameters['steps']),
                          [{'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'steps__scaler', 'step_name': 'scaler'}},
+                               'component_reference', 'value': {'key': 'scaler', 'step_name': 'scaler'}},
                           {'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'steps__dummy', 'step_name': 'dummy'}}])
+                               'component_reference', 'value': {'key': 'dummy', 'step_name': 'dummy'}}])
 
         # Checking the sub-component
         self.assertEqual(len(serialization.components), 2)
-        self.assertIsInstance(serialization.components['steps__scaler'],
+        self.assertIsInstance(serialization.components['scaler'],
                               OpenMLFlow)
-        self.assertIsInstance(serialization.components['steps__dummy'],
+        self.assertIsInstance(serialization.components['dummy'],
                               OpenMLFlow)
 
         #del serialization.model
@@ -204,8 +204,8 @@ class TestSklearn(unittest.TestCase):
         serialization =  sklearn_to_flow(fu)
         self.assertEqual(serialization.name,
                          'sklearn.pipeline.FeatureUnion('
-                         'transformer_list__ohe=sklearn.preprocessing.data.OneHotEncoder,'
-                         'transformer_list__scaler=sklearn.preprocessing.data.StandardScaler)')
+                         'ohe=sklearn.preprocessing.data.OneHotEncoder,'
+                         'scaler=sklearn.preprocessing.data.StandardScaler)')
         new_model = flow_to_sklearn(serialization)
 
         self.assertEqual(type(new_model), type(fu))
@@ -240,7 +240,7 @@ class TestSklearn(unittest.TestCase):
         serialization = sklearn_to_flow(fu)
         self.assertEqual(serialization.name,
                          'sklearn.pipeline.FeatureUnion('
-                         'transformer_list__ohe=sklearn.preprocessing.data.OneHotEncoder)')
+                         'ohe=sklearn.preprocessing.data.OneHotEncoder)')
         new_model = flow_to_sklearn(serialization)
         self.assertEqual(type(new_model), type(fu))
         self.assertIsNot(new_model, fu)
@@ -256,13 +256,13 @@ class TestSklearn(unittest.TestCase):
         self.assertEqual(
             fu1_serialization.name,
             "sklearn.pipeline.FeatureUnion("
-            "transformer_list__ohe=sklearn.preprocessing.data.OneHotEncoder,"
-            "transformer_list__scaler=sklearn.preprocessing.data.StandardScaler)")
+            "ohe=sklearn.preprocessing.data.OneHotEncoder,"
+            "scaler=sklearn.preprocessing.data.StandardScaler)")
         self.assertEqual(
             fu2_serialization.name,
             "sklearn.pipeline.FeatureUnion("
-            "transformer_list__scaler=sklearn.preprocessing.data.OneHotEncoder,"
-            "transformer_list__ohe=sklearn.preprocessing.data.StandardScaler)")
+            "scaler=sklearn.preprocessing.data.OneHotEncoder,"
+            "ohe=sklearn.preprocessing.data.StandardScaler)")
 
     def test_serialize_complex_flow(self):
         ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[0])
@@ -282,9 +282,9 @@ class TestSklearn(unittest.TestCase):
 
         fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV(' \
                        'estimator=sklearn.pipeline.Pipeline(' \
-                       'steps__ohe=sklearn.preprocessing.data.OneHotEncoder,' \
-                       'steps__scaler=sklearn.preprocessing.data.StandardScaler,' \
-                       'steps__boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
+                       'ohe=sklearn.preprocessing.data.OneHotEncoder,' \
+                       'scaler=sklearn.preprocessing.data.StandardScaler,' \
+                       'boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
                        'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))'
         self.assertEqual(serialized.name, fixture_name)
 

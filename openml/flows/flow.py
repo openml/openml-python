@@ -334,6 +334,7 @@ class OpenMLFlow(object):
         """
 
         xml_description = self._to_xml()
+
         file_elements = {'description': xml_description}
         return_value = _perform_api_call("flow/", file_elements=file_elements)
         self.flow_id = int(xmltodict.parse(return_value)['oml:upload_flow']['oml:id'])
