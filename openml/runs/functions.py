@@ -228,7 +228,6 @@ def _create_run_from_xml(xml):
     evaluation_flows = dict()
     for evaluation_dict in run['oml:output_data']['oml:evaluation']:
         key = evaluation_dict['oml:name']
-        flow_id = int(evaluation_dict['oml:flow_id'])
         if 'oml:value' in evaluation_dict:
             value = float(evaluation_dict['oml:value'])
         elif 'oml:array_data' in evaluation_dict:
