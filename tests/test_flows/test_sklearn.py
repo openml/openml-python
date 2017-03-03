@@ -60,7 +60,7 @@ class TestSklearn(unittest.TestCase):
                                                     max_leaf_nodes=2000)
 
         fixture_name = 'sklearn.tree.tree.DecisionTreeClassifier'
-        fixture_description = 'Automatically created sub-component.'
+        fixture_description = 'Automatically created scikit-learn flow.'
         version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' % sklearn.__version__
         fixture_parameters = \
             OrderedDict((('class_weight', 'null'),
