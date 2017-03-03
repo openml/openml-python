@@ -1,5 +1,6 @@
 <oml:task xmlns:oml="http://openml.org/openml">
 	<oml:task_id>3</oml:task_id>
+  <oml:task_type_id>1</oml:task_type_id>
 	<oml:task_type>Supervised Classification</oml:task_type>
 	      <oml:input name="source_data">
     <oml:data_set>

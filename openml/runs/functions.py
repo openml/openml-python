@@ -1,11 +1,11 @@
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 import io
 import os
-import sys
 import xmltodict
+from sklearn.model_selection._search import BaseSearchCV
 
 from .. import config
-from ..flows import OpenMLFlow
+from ..flows import sklearn_to_flow
 from ..exceptions import OpenMLCacheException
 from ..util import URLError
 from ..tasks.functions import _create_task_from_xml
@@ -38,16 +38,7 @@ def run_task(task, model):
     """
     # TODO move this into its onwn module. While it somehow belongs here, it
     # adds quite a lot of functionality which is better suited in other places!
-    # TODO why doesn't this accept a flow as input?
-
-    flow = OpenMLFlow(model=model)
-    flow_id = flow._ensure_flow_exists()
-    if (flow_id < 0):
-        print("No flow")
-        return 0, 2
-    config.logger.info(flow_id)
-
-    arff_datacontent = []
+    # TODO why doesn't this accept a flow as input? - this would make this more flexible!
 
     dataset = task.get_dataset()
     X, Y = dataset.get_data(target=task.target_name)
@@ -57,20 +48,28 @@ def run_task(task, model):
         raise ValueError('The task has no class labels. This method currently '
                          'only works for tasks with class labels.')
 
-    run = OpenMLRun(task_id=task.task_id, flow_id=flow_id,
-                    dataset_id=dataset.dataset_id)
-    run.data_content = _run_task_get_arffcontent(model, task, class_labels)
+    # execute the run
+    run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
+    run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
 
-    # The model will not be uploaded at the moment, but used to get the
-    # hyperparameter values when uploading the run
-    X, Y = task.get_X_and_y()
-    run.model = model.fit(X, Y)
+    # now generate the flow
+    flow = sklearn_to_flow(model)
+    flow_id = flow._ensure_flow_exists()
+    if flow_id < 0:
+        print("No flow")
+        return 0, 2
+    config.logger.info(flow_id)
+
+    # attach the flow to the run
+    run.flow_id = flow_id
+
     return run
 
 
 def _run_task_get_arffcontent(model, task, class_labels):
     X, Y = task.get_X_and_y()
     arff_datacontent = []
+    arff_tracecontent = []
 
     rep_no = 0
     # TODO use different iterator to only provide a single iterator (less
@@ -85,6 +84,10 @@ def _run_task_get_arffcontent(model, task, class_labels):
             testY = Y[test_indices]
 
             model.fit(trainX, trainY)
+            if isinstance(model, BaseSearchCV):
+                _add_results_to_arfftrace(arff_tracecontent, fold_no, model,
+                                          rep_no)
+
             ProbaY = model.predict_proba(testX)
             PredY = model.predict(testX)
 
@@ -98,7 +101,24 @@ def _run_task_get_arffcontent(model, task, class_labels):
             fold_no = fold_no + 1
         rep_no = rep_no + 1
 
-    return arff_datacontent
+    if not isinstance(model, BaseSearchCV):
+        arff_tracecontent = None
+
+    return arff_datacontent, arff_tracecontent
+
+
+def _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no):
+    for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
+        # we use the string values for True and False, as it is defined in this way by the OpenML server
+        selected = 'false'
+        if itt_no == model.best_index_:
+            selected = 'true'
+        test_score = model.cv_results_['mean_test_score'][itt_no]
+        arff_line = [rep_no, fold_no, itt_no, test_score, selected]
+        for key in model.cv_results_:
+            if key.startswith("param_"):
+                arff_line.append(str(model.cv_results_[key][itt_no]))
+        arff_tracecontent.append(arff_line)
 
 
 def get_runs(run_ids):
@@ -139,7 +159,7 @@ def get_run(run_id):
         return _get_cached_run(run_id)
     except (OpenMLCacheException):
         try:
-            return_code, run_xml = _perform_api_call("run/%d" % run_id)
+            run_xml = _perform_api_call("run/%d" % run_id)
         except (URLError, UnicodeEncodeError) as e:
             # TODO logger.debug
             print(e)
@@ -208,7 +228,6 @@ def _create_run_from_xml(xml):
     evaluation_flows = dict()
     for evaluation_dict in run['oml:output_data']['oml:evaluation']:
         key = evaluation_dict['oml:name']
-        flow_id = int(evaluation_dict['oml:flow_id'])
         if 'oml:value' in evaluation_dict:
             value = float(evaluation_dict['oml:value'])
         elif 'oml:array_data' in evaluation_dict:
@@ -243,38 +262,42 @@ def _create_run_from_xml(xml):
 
 def _get_cached_run(run_id):
     """Load a run from the cache."""
-    for cache_dir in [config.get_cache_directory(),
-                      config.get_private_directory()]:
-        run_cache_dir = os.path.join(cache_dir, "runs")
-        try:
-            run_file = os.path.join(run_cache_dir,
-                                    "run_%d.xml" % int(run_id))
-            with io.open(run_file, encoding='utf8') as fh:
-                run = _create_task_from_xml(xml=fh.read())
-            return run
+    cache_dir = config.get_cache_directory()
+    run_cache_dir = os.path.join(cache_dir, "runs")
+    try:
+        run_file = os.path.join(run_cache_dir,
+                                "run_%d.xml" % int(run_id))
+        with io.open(run_file, encoding='utf8') as fh:
+            run = _create_task_from_xml(xml=fh.read())
+        return run
 
-        except (OSError, IOError):
-            continue
-
-    raise OpenMLCacheException("Run file for run id %d not "
-                               "cached" % run_id)
+    except (OSError, IOError):
+        raise OpenMLCacheException("Run file for run id %d not "
+                                   "cached" % run_id)
 
 
-def list_runs_by_filters(id=None, task=None, flow=None,
-                         uploader=None):
+def list_runs(offset=None, size=None, id=None, task=None,
+              flow=None, uploader=None, tag=None):
     """List all runs matching all of the given filters.
 
-    Perform API call `/run/list/{filters} <http://www.openml.org/api_docs/#!/run/get_run_list_filters>`_
+    Perform API call `/run/list/{filters} <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`_
 
     Parameters
     ----------
-    id : int or list
+    offset : int, optional
+        the number of runs to skip, starting from the first
+    size : int, optional
+        the maximum number of runs to show
 
-    task : int or list
+    id : list, optional
 
-    flow : int or list
+    task : list, optional
 
-    uploader : int or list
+    flow : list, optional
+
+    uploader : list, optional
+
+    tag : str, optional
 
     Returns
     -------
@@ -282,177 +305,29 @@ def list_runs_by_filters(id=None, task=None, flow=None,
         List of found runs.
     """
 
-    value = []
-    by = []
-
+    api_call = "run/list"
+    if offset is not None:
+        api_call += "/offset/%d" % int(offset)
+    if size is not None:
+       api_call += "/limit/%d" % int(size)
     if id is not None:
-        value.append(id)
-        by.append('run')
+        api_call += "/run/%s" % ','.join([str(int(i)) for i in id])
     if task is not None:
-        value.append(task)
-        by.append('task')
+        api_call += "/task/%s" % ','.join([str(int(i)) for i in task])
     if flow is not None:
-        value.append(flow)
-        by.append('flow')
+        api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
     if uploader is not None:
-        value.append(uploader)
-        by.append('uploader')
+        api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
+    if tag is not None:
+        api_call += "/tag/%s" % tag
 
-    if len(value) == 0:
-        raise ValueError('At least one argument out of task, flow, uploader '
-                         'must have a different value than None')
-
-    api_call = "run/list"
-    for id_, by_ in zip(value, by):
-        if isinstance(id_, list):
-            for i in range(len(id_)):
-                # Type checking to avoid bad calls to the server
-                id_[i] = str(int(id_[i]))
-            id_ = ','.join(id_)
-        else:
-            # Only type checking here
-            id_ = int(id_)
-
-        if by_ is None:
-            raise ValueError("Argument 'by' must not contain None!")
-        api_call = "%s/%s/%s" % (api_call, by_, id_)
-
-    return _list_runs(api_call)
-
-
-def list_runs_by_tag(tag):
-    """List runs by tag.
-
-    Perform API call `/run/list/tag/{tag} <http://www.openml.org/api_docs/#!/run/get_run_list_tag_tag>`_
-
-    Parameters
-    ----------
-    tag : str
-
-    Returns
-    -------
-    list
-        List of found runs.
-    """
-    return _list_runs_by(tag, 'tag')
-
-
-def list_runs(run_ids):
-    """List runs by their ID.
-
-    Perform API call `/run/list/run/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_run_ids>`_
-
-    Parameters
-    ----------
-    run_id : int or list
-
-    Returns
-    -------
-    list
-        List of found runs.
-    """
-    return _list_runs_by(run_ids, 'run')
-
-
-def list_runs_by_task(task_id):
-    """List runs by task.
-
-    Perform API call `/run/list/task/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_task_ids>`_
-
-    Parameters
-    ----------
-    task_id : int or list
-
-    Returns
-    -------
-    list
-        List of found runs.
-    """
-    return _list_runs_by(task_id, 'task')
-
-
-def list_runs_by_flow(flow_id):
-    """List runs by flow.
-
-    Perform API call `/run/list/flow/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_flow_ids>`_
-
-    Parameters
-    ----------
-    flow_id : int or list
-
-    Returns
-    -------
-    list
-        List of found runs.
-    """
-    return _list_runs_by(flow_id, 'flow')
-
-
-def list_runs_by_uploader(uploader_id):
-    """List runs by uploader.
-
-    Perform API call `/run/list/uploader/{ids} <http://www.openml.org/api_docs/#!/run/get_run_list_uploader_ids>`_
-
-    Parameters
-    ----------
-    uploader_id : int or list
-
-    Returns
-    -------
-    list
-        List of found runs.
-    """
-    return _list_runs_by(uploader_id, 'uploader')
-
-
-def _list_runs_by(id_, by):
-    """Helper function to create API call strings.
-
-    Helper for the following api calls:
-
-    * http://www.openml.org/api_docs/#!/run/get_run_list_task_ids
-    * http://www.openml.org/api_docs/#!/run/get_run_list_run_ids
-    * http://www.openml.org/api_docs/#!/run/get_run_list_tag_tag
-    * http://www.openml.org/api_docs/#!/run/get_run_list_uploader_ids
-    * http://www.openml.org/api_docs/#!/run/get_run_list_flow_ids
-
-    All of these allow either an integer as ID or a list of integers. Their
-    name follows the convention run/list/{by}/{id}
-
-    Parameters
-    ----------
-    id_ : int or list
-
-    by : str
-
-    Returns
-    -------
-    list
-        List of found runs.
-
-    """
-
-    if isinstance(id_, list):
-        for i in range(len(id_)):
-            # Type checking to avoid bad calls to the server
-            id_[i] = str(int(id_[i]))
-        id_ = ','.join(id_)
-    elif by == 'tag':
-        pass
-    else:
-        id_ = int(id_)
-
-    api_call = "run/list"
-    if by is not None:
-        api_call += "/%s" % by
-    api_call = "%s/%s" % (api_call, id_)
     return _list_runs(api_call)
 
 
 def _list_runs(api_call):
     """Helper function to parse API calls which are lists of runs"""
 
-    return_code, xml_string = _perform_api_call(api_call)
+    xml_string = _perform_api_call(api_call)
 
     runs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
@@ -476,15 +351,15 @@ def _list_runs(api_call):
     else:
         raise TypeError()
 
-    runs = []
+    runs = dict()
     for run_ in runs_list:
-        run = {'run_id': int(run_['oml:run_id']),
+        run_id = int(run_['oml:run_id'])
+        run = {'run_id': run_id,
                'task_id': int(run_['oml:task_id']),
                'setup_id': int(run_['oml:setup_id']),
                'flow_id': int(run_['oml:flow_id']),
                'uploader': int(run_['oml:uploader'])}
 
-        runs.append(run)
-    runs.sort(key=lambda t: t['run_id'])
+        runs[run_id] = run
 
     return runs

@@ -13,10 +13,10 @@ ls -l
 echo
 if [[ ! -f miniconda.sh ]]
    then
-   wget http://repo.continuum.io/miniconda/Miniconda-3.6.0-Linux-x86_64.sh \
+   wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
        -O miniconda.sh
    fi
-chmod +x miniconda.sh && ./miniconda.sh -b
+chmod +x miniconda.sh && ./miniconda.sh -b -p $HOME/miniconda
 cd ..
 export PATH=/home/travis/miniconda/bin:$PATH
 conda update --yes conda
@@ -25,11 +25,11 @@ popd
 # Configure the conda environment and put it in the path using the
 # provided versions
 conda create -n testenv --yes python=$PYTHON_VERSION pip nose \
-   numpy=$NUMPY_VERSION scipy=$SCIPY_VERSION cython=$CYTHON_VERSION matplotlib scikit-learn nbconvert nbformat jupyter_client ipython jupyter notebook ipykernel pandas
+   numpy=$NUMPY_VERSION scipy=$SCIPY_VERSION cython=$CYTHON_VERSION  \
+   scikit-learn=$SKLEARN_VERSION pandas
 source activate testenv
-ipython kernel install
 
-
+pip install matplotlib jupyter notebook nbconvert nbformat jupyter_client ipython ipykernel
 if [[ "$COVERAGE" == "true" ]]; then
     pip install coverage coveralls
 fi

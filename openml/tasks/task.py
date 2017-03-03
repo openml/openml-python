@@ -9,8 +9,8 @@ from .._api_calls import _read_url
 
 
 class OpenMLTask(object):
-    def __init__(self, task_id, task_type, data_set_id, target_name,
-                 estimation_procedure_type, data_splits_url,
+    def __init__(self, task_id, task_type_id, task_type, data_set_id,
+                 target_name, estimation_procedure_type, data_splits_url,
                  estimation_parameters, evaluation_measure, cost_matrix,
                  class_labels=None):
         self.task_id = int(task_id)
@@ -71,7 +71,7 @@ class OpenMLTask(object):
         except (OSError, IOError):
             split_url = self.estimation_procedure["data_splits_url"]
             try:
-                return_code, split_arff = _read_url(split_url)
+                split_arff = _read_url(split_url)
             except (URLError, UnicodeEncodeError) as e:
                 print(e, split_url)
                 raise e
