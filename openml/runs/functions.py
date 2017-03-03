@@ -201,7 +201,11 @@ def _create_run_from_xml(xml):
     uploader_name = run['oml:uploader_name']
     task_id = int(run['oml:task_id'])
     task_type = run['oml:task_type']
-    task_evaluation_measure = run['oml:task_evaluation_measure']
+    if 'oml:task_evaluation_measure' in run:
+        task_evaluation_measure = run['oml:task_evaluation_measure']
+    else:
+        task_evaluation_measure = None
+
     flow_id = int(run['oml:flow_id'])
     flow_name = run['oml:flow_name']
     setup_id = int(run['oml:setup_id'])
