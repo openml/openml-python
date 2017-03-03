@@ -101,10 +101,10 @@ class TestSklearn(unittest.TestCase):
         fixture_name = 'sklearn.ensemble.weight_boosting.AdaBoostClassifier' \
                        '(base_estimator=sklearn.tree.tree.DecisionTreeClassifier)'
         fixture_class_name = 'sklearn.ensemble.weight_boosting.AdaBoostClassifier'
-        fixture_description = 'Automatically created sub-component.'
+        fixture_description = 'Automatically created scikit-learn flow.'
         fixture_subcomponent_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_subcomponent_class_name = 'sklearn.tree.tree.DecisionTreeClassifier'
-        fixture_subcomponent_description = 'Automatically created sub-component.'
+        fixture_subcomponent_description = 'Automatically created scikit-learn flow.'
 
         serialization =  sklearn_to_flow(model)
 
@@ -147,7 +147,7 @@ class TestSklearn(unittest.TestCase):
         fixture_name = 'sklearn.pipeline.Pipeline(' \
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
                        'dummy=sklearn.dummy.DummyClassifier)'
-        fixture_description = 'Automatically created sub-component.'
+        fixture_description = 'Automatically created scikit-learn flow.'
 
         serialization =  sklearn_to_flow(model)
 
