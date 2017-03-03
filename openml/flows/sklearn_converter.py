@@ -191,7 +191,7 @@ def _serialize_model(model):
 
     flow = OpenMLFlow(name=name,
                       class_name=class_name,
-                      description='Automatically created sub-component.',
+                      description='Automatically created scikit-learn flow.',
                       model=model,
                       components=sub_components,
                       parameters=parameters,
