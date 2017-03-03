@@ -50,7 +50,11 @@ def run_task(task, model):
 
     # execute the run
     run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
-    run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
+
+    try:
+        run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
+    except AttributeError as message:
+        run.error_message = str(message)
 
     # now generate the flow
     flow = sklearn_to_flow(model)

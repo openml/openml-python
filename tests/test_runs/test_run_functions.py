@@ -35,7 +35,11 @@ class TestRun(TestBase):
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
-        self.assertRaises(AttributeError, openml.runs.run_task, task=task, model=clf)
+        run = openml.runs.run_task(task=task, model=clf)
+        run.publish()
+
+        # TODO: download and check whether it really contains the error message
+        #downloaded_run = openml.runs.get_run(run.run_id)
 
     @mock.patch('openml.flows.sklearn_to_flow')
     def test_check_erronous_sklearn_flow_fails(self, sklearn_to_flow_mock):

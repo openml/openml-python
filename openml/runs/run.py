@@ -43,6 +43,7 @@ class OpenMLRun(object):
         self.detailed_evaluations = detailed_evaluations
         self.data_content = data_content
         self.trace_content = trace_content
+        self.error_message = None
         self.task = task
         self.flow = flow
         self.run_id = run_id
@@ -136,12 +137,13 @@ class OpenMLRun(object):
         if self.flow_id is None:
             raise PyOpenMLError("OpenMLRun obj does not contain a flow id. (Should have been added while executing the task.) ");
 
-
-        predictions = arff.dumps(self._generate_arff_dict())
         description_xml = self._create_description_xml()
+        file_elements = {'description': ("description.xml", description_xml)}
 
-        file_elements = {'predictions': ("predictions.arff", predictions),
-                         'description': ("description.xml", description_xml)}
+        if self.error_message is None:
+            predictions = arff.dumps(self._generate_arff_dict())
+            file_elements['predictions'] = ("predictions.arff", predictions)
+
         if self.trace_content is not None:
             trace_arff = arff.dumps(self._generate_trace_arff_dict(self.model))
             file_elements['trace'] = ("trace.arff", trace_arff)
@@ -175,6 +177,7 @@ class OpenMLRun(object):
         description = _to_dict(taskid=self.task_id, flow_id=self.flow_id,
                                setup_string=_create_setup_string(self.model),
                                parameter_settings=openml_param_settings,
+                               error_message=self.error_message,
                                tags=tags)
         description_xml = xmltodict.unparse(description, pretty=True)
         return description_xml
@@ -256,7 +259,7 @@ def _get_version_information():
     return [python_version, sklearn_version, numpy_version, scipy_version]
 
 
-def _to_dict(taskid, flow_id, setup_string, parameter_settings, tags):
+def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings, tags):
     """ Creates a dictionary corresponding to the desired xml desired by openML
 
     Parameters
@@ -280,6 +283,8 @@ def _to_dict(taskid, flow_id, setup_string, parameter_settings, tags):
     description['oml:run']['@xmlns:oml'] = 'http://openml.org/openml'
     description['oml:run']['oml:task_id'] = taskid
     description['oml:run']['oml:flow_id'] = flow_id
+    if error_message is not None:
+        description['oml:run']['oml:error_message'] = error_message
     description['oml:run']['oml:parameter_setting'] = parameter_settings
     description['oml:run']['oml:tag'] = tags  # Tags describing the run
     # description['oml:run']['oml:output_data'] = 0;
