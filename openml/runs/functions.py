@@ -92,6 +92,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
             PredY = model.predict(testX)
 
             for i in range(0, len(test_indices)):
+                assert(len(ProbaY[i]) == len(class_labels)), 'Predicted probabilities and available classes do not match. (sklearn bug?) '
                 arff_line = [rep_no, fold_no, test_indices[i]]
                 arff_line.extend(ProbaY[i])
                 arff_line.append(class_labels[PredY[i]])
