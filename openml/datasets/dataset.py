@@ -10,6 +10,7 @@ import numpy as np
 import scipy.sparse
 import xmltodict
 
+from ..datasets.data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
 
 if sys.version_info[0] >= 3:
@@ -73,7 +74,17 @@ class OpenMLDataset(object):
         self.update_comment = update_comment
         self.md5_cheksum = md5_checksum
         self.data_file = data_file
-        self.features = features
+        self.features = {}
+
+        for xmlfeature in features['oml:feature']:
+            feature = OpenMLDataFeature(int(xmlfeature['oml:index']),
+                                        xmlfeature['oml:name'],
+                                        xmlfeature['oml:data_type'],
+                                        None) #todo add nominal values
+            self.features[feature.index] = feature
+
+        print("dataset %s initialized" %dataset_id)
+
 
         if data_file is not None:
             if self._data_features_supported():
@@ -349,8 +360,8 @@ class OpenMLDataset(object):
 
     def _data_features_supported(self):
         if self.features is not None:
-            for feature in self.features['oml:feature']:
-                if feature['oml:data_type'] not in ['numeric', 'nominal']:
+            for idx in self.features:
+                if self.features[idx].data_type not in ['numeric', 'nominal']:
                     return False
             return True
         return True
