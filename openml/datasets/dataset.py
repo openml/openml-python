@@ -76,14 +76,14 @@ class OpenMLDataset(object):
         self.data_file = data_file
         self.features = {}
 
-        for xmlfeature in features['oml:feature']:
+        for idx, xmlfeature in enumerate(features['oml:feature']):
             feature = OpenMLDataFeature(int(xmlfeature['oml:index']),
                                         xmlfeature['oml:name'],
                                         xmlfeature['oml:data_type'],
-                                        None) #todo add nominal values
+                                        None, #todo add nominal values (currently not in database)
+                                        int(xmlfeature['oml:number_of_missing_values']))
+            assert idx == feature.index, "Data features not provided in right order"
             self.features[feature.index] = feature
-
-        print("dataset %s initialized" %dataset_id)
 
 
         if data_file is not None:
@@ -308,6 +308,18 @@ class OpenMLDataset(object):
             return dataAttributes[target_name]
         else:
             return None
+
+    def get_features_by_type(self, data_type, exclude=None):
+        assert type(exclude) is list, "Exclude should be a list of indeces"
+        assert data_type in OpenMLDataFeature.LEGAL_DATA_TYPES, "Illegal feature type requested"
+
+        result = []
+        for idx in self.features:
+            # in many cases we want to exclude, for example, the target feature
+            if idx not in exclude:
+                if self.features[idx].data_type == data_type:
+                    result.append(idx)
+        return result
 
     def publish(self):
         """Publish the dataset on the OpenML server.

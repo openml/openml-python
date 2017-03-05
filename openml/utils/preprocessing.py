@@ -68,12 +68,12 @@ class ConditionalImputer(Imputer):
     """
     def __init__(self, missing_values="NaN", strategy="mean",
                  strategy_nominal="most_frequent",
-                 indexes_nominal=None,
+                 indeces_nominal=None,
                  axis=0, verbose=0, copy=True):
         self.missing_values = missing_values
         self.strategy = strategy
         self.strategy_nominal = strategy_nominal
-        self.indexes_nominal = indexes_nominal
+        self.indeces_nominal = indeces_nominal
         self.axis = axis
         self.verbose = verbose
         self.copy = copy
@@ -125,8 +125,8 @@ class ConditionalImputer(Imputer):
 
         # here the indexes of nominal values get set
         self.statistics_ = statistics_general
-        if self.indexes_nominal is not None:
-            for i in self.indexes_nominal:
+        if self.indeces_nominal is not None:
+            for i in self.indeces_nominal:
                 self.statistics_[i] = statistics_nominal[i]
 
         return self
