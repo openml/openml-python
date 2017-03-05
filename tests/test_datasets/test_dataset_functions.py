@@ -48,7 +48,7 @@ class TestOpenMLDataset(TestBase):
         features = _get_cached_dataset_features(2)
         self.assertIsInstance(dataset, OpenMLDataset)
         self.assertTrue(len(dataset.features) > 0)
-        self.assertTrue(len(dataset.features) == len(features))
+        self.assertTrue(len(dataset.features) == len(features['oml:feature']))
 
     def test_get_chached_dataset_description(self):
         openml.config.set_cache_directory(self.static_cache_dir)

@@ -74,16 +74,18 @@ class OpenMLDataset(object):
         self.update_comment = update_comment
         self.md5_cheksum = md5_checksum
         self.data_file = data_file
-        self.features = {}
+        self.features = None
 
-        for idx, xmlfeature in enumerate(features['oml:feature']):
-            feature = OpenMLDataFeature(int(xmlfeature['oml:index']),
-                                        xmlfeature['oml:name'],
-                                        xmlfeature['oml:data_type'],
-                                        None, #todo add nominal values (currently not in database)
-                                        int(xmlfeature['oml:number_of_missing_values']))
-            assert idx == feature.index, "Data features not provided in right order"
-            self.features[feature.index] = feature
+        if features is not None:
+            self.features = {}
+            for idx, xmlfeature in enumerate(features['oml:feature']):
+                feature = OpenMLDataFeature(int(xmlfeature['oml:index']),
+                                            xmlfeature['oml:name'],
+                                            xmlfeature['oml:data_type'],
+                                            None, #todo add nominal values (currently not in database)
+                                            int(xmlfeature['oml:number_of_missing_values']))
+                assert idx == feature.index, "Data features not provided in right order"
+                self.features[feature.index] = feature
 
 
         if data_file is not None:
