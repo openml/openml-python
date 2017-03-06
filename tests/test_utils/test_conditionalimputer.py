@@ -34,13 +34,14 @@ class OpenMLTaskTest(TestBase):
         return X_prime
 
     def test_impute_indices(self):
-        task_ids = [2, 24, 42, 59]
+        task_ids = [2, 24, 41, 42, 59]
 
         for task_id in task_ids:
             task = openml.tasks.get_task(task_id)
             dataset = task.get_dataset()
             X, _ = dataset.get_data(target=task.target_name)
-            nominal_indices = dataset.get_features_by_type('nominal', exclude=[len(dataset.features)-1])
+            nominal_indices = dataset.get_features_by_type('nominal', exclude=[task.target_name])
+            # print("task id %d indices %s" %(task_id, str(nominal_indices)))
             clf = ConditionalImputer(strategy="median",
                                      strategy_nominal="most_frequent",
                                      categorical_features=nominal_indices,
@@ -50,13 +51,14 @@ class OpenMLTaskTest(TestBase):
 
 
     def test_impute_smart(self):
-        task_ids = [2, 24, 42, 59]
+        task_ids = [2, 24, 41, 42, 59]
 
         for task_id in task_ids:
             task = openml.tasks.get_task(task_id)
             dataset = task.get_dataset()
             X, _ = dataset.get_data(target=task.target_name)
-            nominal_indices = dataset.get_features_by_type('nominal', exclude=[len(dataset.features)-1])
+            nominal_indices = dataset.get_features_by_type('nominal', exclude=[task.target_name])
+            # print("task id %d indices %s" %(task_id, str(nominal_indices)))
             clf = ConditionalImputer(strategy="median",
                                      strategy_nominal="most_frequent",
                                      categorical_features=None,
@@ -71,7 +73,7 @@ class OpenMLTaskTest(TestBase):
             task = openml.tasks.get_task(task_id)
             dataset = task.get_dataset()
             X, _ = dataset.get_data(target=task.target_name)
-            nominal_indices = dataset.get_features_by_type('nominal', exclude=[len(dataset.features) - 1])
+            nominal_indices = dataset.get_features_by_type('nominal', exclude=[task.target_name])
             clf = ConditionalImputer(strategy="median",
                                      strategy_nominal="most_frequent",
                                      categorical_features=None,

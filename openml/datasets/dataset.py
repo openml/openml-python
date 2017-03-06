@@ -64,7 +64,7 @@ class OpenMLDataset(object):
         self.url = url
         self.default_target_attribute = default_target_attribute
         self.row_id_attribute = row_id_attribute
-        self.ignore_attributes = ignore_attribute
+        self.ignore_attributes = list(ignore_attribute) if ignore_attribute is not None else None # TODO: check
         self.version_label = version_label
         self.citation = citation
         self.tag = tag
@@ -218,10 +218,7 @@ class OpenMLDataset(object):
             if not self.ignore_attributes:
                 pass
             else:
-                if is_string(self.ignore_attributes):
-                    to_exclude.append(self.ignore_attributes)
-                else:
-                    to_exclude.extend(self.ignore_attributes)
+                to_exclude.extend(self.ignore_attributes)
 
         if len(to_exclude) > 0:
             logger.info("Going to remove the following attributes:"
@@ -311,17 +308,29 @@ class OpenMLDataset(object):
         else:
             return None
 
-    def get_features_by_type(self, data_type, exclude=None):
+
+    def get_features_by_type(self, data_type, exclude=None, exclude_ignore_attributes=True):
         assert data_type in OpenMLDataFeature.LEGAL_DATA_TYPES, "Illegal feature type requested"
         if exclude is not None:
-            assert type(exclude) is list, "Exclude should be a list of indeces"
+            assert type(exclude) is list, "Exclude should be a list"
+            assert all(isinstance(elem, str) for elem in exclude), "Exclude should be a list of strings"
+        to_exclude = []
+        if exclude is not None:
+            to_exclude.extend(exclude)
+        if exclude_ignore_attributes and self.ignore_attributes is not None:
+            to_exclude.extend(self.ignore_attributes)
+        print(to_exclude)
 
         result = []
+        offset = 0
+        # this function assumes that everything in to_exclude will be 'excluded' from the dataset (hence the offset)
         for idx in self.features:
-            # in many cases we want to exclude, for example, the target feature
-            if exclude is None or idx not in exclude:
+            name = self.features[idx].name
+            if name in to_exclude:
+                offset += 1
+            else:
                 if self.features[idx].data_type == data_type:
-                    result.append(idx)
+                    result.append(idx-offset)
         return result
 
     def publish(self):
