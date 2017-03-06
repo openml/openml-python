@@ -313,10 +313,12 @@ class OpenMLDataset(object):
             return None
 
 
-    def get_features_by_type(self, data_type, exclude=None, exclude_ignore_attributes=True):
+    def get_features_by_type(self, data_type, exclude=None, exclude_ignore_attributes=True, exclude_row_id_attribute=True):
         assert data_type in OpenMLDataFeature.LEGAL_DATA_TYPES, "Illegal feature type requested"
         if self.ignore_attributes is not None:
             assert type(self.ignore_attributes) is list, "ignore_attributes should be a list"
+        if self.row_id_attribute is not None:
+            assert type(self.row_id_attribute) is str, "row id attribute should be a str"
         if exclude is not None:
             assert type(exclude) is list, "Exclude should be a list"
             assert all(isinstance(elem, str) for elem in exclude), "Exclude should be a list of strings"
@@ -325,6 +327,8 @@ class OpenMLDataset(object):
             to_exclude.extend(exclude)
         if exclude_ignore_attributes and self.ignore_attributes is not None:
             to_exclude.extend(self.ignore_attributes)
+        if exclude_row_id_attribute and self.row_id_attribute is not None:
+            to_exclude.append(self.row_id_attribute)
 
         result = []
         offset = 0
