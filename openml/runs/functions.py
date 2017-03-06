@@ -6,6 +6,7 @@ import numpy as np
 import warnings
 from sklearn.model_selection._search import BaseSearchCV
 
+from build.lib.openml.exceptions import PyOpenMLError
 from .. import config
 from ..flows import sklearn_to_flow
 from ..exceptions import OpenMLCacheException
@@ -55,8 +56,9 @@ def run_task(task, model):
 
     try:
         run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
-    except AttributeError as message:
+    except PyOpenMLError as message:
         run.error_message = str(message)
+        warnings.warn("Run terminated with error: %s" %run.error_message)
 
     # now generate the flow
     flow = sklearn_to_flow(model)
@@ -124,9 +126,17 @@ def _run_task_get_arffcontent(model, task, class_labels):
             testX = X[test_indices]
             testY = Y[test_indices]
 
-            model.fit(trainX, trainY)
-            if isinstance(model, BaseSearchCV):
-                _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no)
+            try:
+                model.fit(trainX, trainY)
+
+                if isinstance(model, BaseSearchCV):
+                    _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no)
+                    model_classes = model.best_estimator_.classes_
+                else:
+                    model_classes = model.classes_
+            except AttributeError as e:
+                # typically happens when training a regressor on classification task
+                raise PyOpenMLError(str(e))
 
             ProbaY = model.predict_proba(testX)
             PredY = model.predict(testX)
@@ -134,7 +144,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
                 warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" %(rep_no, fold_no, ProbaY.shape[1], len(class_labels)))
 
             for i in range(0, len(test_indices)):
-                arff_line = _prediction_to_row(rep_no, fold_no, test_indices[i], class_labels[testY[i]], PredY[i], ProbaY[i], class_labels, model.classes_)
+                arff_line = _prediction_to_row(rep_no, fold_no, test_indices[i], class_labels[testY[i]], PredY[i], ProbaY[i], class_labels, model_classes)
                 arff_datacontent.append(arff_line)
 
             fold_no = fold_no + 1
