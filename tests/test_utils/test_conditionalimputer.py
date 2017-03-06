@@ -34,27 +34,33 @@ class OpenMLTaskTest(TestBase):
         return X_prime
 
     def test_impute_indices(self):
-        task_ids = [2,59]
+        task_ids = [2, 24, 42, 59]
 
         for task_id in task_ids:
             task = openml.tasks.get_task(task_id)
             dataset = task.get_dataset()
             X, _ = dataset.get_data(target=task.target_name)
             nominal_indices = dataset.get_features_by_type('nominal', exclude=[len(dataset.features)-1])
-            clf = ConditionalImputer(strategy="median", strategy_nominal="most_frequent", categorical_features=nominal_indices, verbose=True)
+            clf = ConditionalImputer(strategy="median",
+                                     strategy_nominal="most_frequent",
+                                     categorical_features=nominal_indices,
+                                     verbose=True)
 
             self._do_test(dataset, X, nominal_indices, clf)
 
 
     def test_impute_smart(self):
-        task_ids = [2,59]
+        task_ids = [2, 24, 42, 59]
 
         for task_id in task_ids:
             task = openml.tasks.get_task(task_id)
             dataset = task.get_dataset()
             X, _ = dataset.get_data(target=task.target_name)
             nominal_indices = dataset.get_features_by_type('nominal', exclude=[len(dataset.features)-1])
-            clf = ConditionalImputer(strategy="median", strategy_nominal="most_frequent", categorical_features=None, verbose=True)
+            clf = ConditionalImputer(strategy="median",
+                                     strategy_nominal="most_frequent",
+                                     categorical_features=None,
+                                     verbose=True)
 
             self._do_test(dataset, X, nominal_indices, clf)
 
@@ -66,8 +72,11 @@ class OpenMLTaskTest(TestBase):
             dataset = task.get_dataset()
             X, _ = dataset.get_data(target=task.target_name)
             nominal_indices = dataset.get_features_by_type('nominal', exclude=[len(dataset.features) - 1])
-            clf = ConditionalImputer(strategy="median", strategy_nominal="most_frequent", categorical_features=None,
-                                     verbose=True, empty_attribute_constant=-1)
+            clf = ConditionalImputer(strategy="median",
+                                     strategy_nominal="most_frequent",
+                                     categorical_features=None,
+                                     verbose=True,
+                                     empty_attribute_constant=-1)
 
             X_prime = self._do_test(dataset, X, nominal_indices, clf)
             assert np.isnan(np.min(X_prime)) == False, 'Result contains nans'
