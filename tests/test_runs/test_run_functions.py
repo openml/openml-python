@@ -253,3 +253,48 @@ class TestRun(TestBase):
     def test_get_runs_list_by_tag(self):
         runs = openml.runs.list_runs(tag='curves')
         self.assertGreaterEqual(len(runs), 1)
+
+    def test_run_on_dataset_with_missing_labels(self):
+        from openml.runs.functions import _prediction_to_row
+        from sklearn.tree import DecisionTreeClassifier
+        from sklearn.preprocessing.imputation import Imputer
+        task = openml.tasks.get_task(2)
+        class_labels = task.class_labels
+
+        model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+                                ('Estimator', DecisionTreeClassifier())])
+
+        X, Y = task.get_X_and_y()
+        rep_no = 0
+        # TODO use different iterator to only provide a single iterator (less
+        # methods, less maintenance, less confusion)
+        for rep in task.iterate_repeats():
+            fold_no = 0
+            for fold in rep:
+                train_indices, test_indices = fold
+                trainX = X[train_indices]
+                trainY = Y[train_indices]
+                testX = X[test_indices]
+                testY = Y[test_indices]
+
+                model.fit(trainX, trainY)
+
+                ProbaY = model.predict_proba(testX)
+                PredY = model.predict(testX)
+
+                missing_label_idx = [3]
+
+                for i in range(0, len(test_indices)):
+                    arff_line = _prediction_to_row(rep_no, fold_no, test_indices[i], class_labels[testY[i]], PredY[i],
+                                                   ProbaY[i], class_labels, model.classes_)
+
+                    offset = 0
+                    for idx, proba in enumerate(arff_line[3:-2]):
+                        if idx in missing_label_idx:
+                            offset += 1
+                        else:
+                            assert proba == ProbaY[i][idx-offset]
+
+                fold_no = fold_no + 1
+            rep_no = rep_no + 1
+

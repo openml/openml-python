@@ -2,6 +2,8 @@ from collections import defaultdict
 import io
 import os
 import xmltodict
+import numpy as np
+import warnings
 from sklearn.model_selection._search import BaseSearchCV
 
 from .. import config
@@ -70,6 +72,41 @@ def run_task(task, model):
     return run
 
 
+def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label, predicted_probabilities, class_labels, model_classes_mapping):
+    """Complicated util function that turns probability estimates of a classifier for a given instance into the right arff format to upload to openml.
+
+        Parameters
+        ----------
+        rep_no : int
+        fold_no : int
+        row_id : int
+            row id in the initial dataset
+        correct_label : str
+            original label of the instance
+        predicted_label : str
+            the label that was predicted
+        predicted_probabilities : array (size=num_classes)
+            probabilities per class
+        class_labels : array (size=num_classes)
+
+        Returns
+        -------
+        arff_line : list
+            representation of the current prediction in OpenML format
+        """
+    arff_line = [rep_no, fold_no, row_id]
+    for class_label_idx in range(len(class_labels)):
+        if class_label_idx in model_classes_mapping:
+            index = np.where(model_classes_mapping == class_label_idx)[0][0]  # TODO: WHY IS THIS 2D???
+            arff_line.append(predicted_probabilities[index])
+        else:
+            arff_line.append(0.0)
+
+    arff_line.append(class_labels[predicted_label])
+    arff_line.append(correct_label)
+    return arff_line
+
+# JvR: why is class labels a parameter? could be removed and taken from task object, right?
 def _run_task_get_arffcontent(model, task, class_labels):
     X, Y = task.get_X_and_y()
     arff_datacontent = []
@@ -89,18 +126,15 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
             model.fit(trainX, trainY)
             if isinstance(model, BaseSearchCV):
-                _add_results_to_arfftrace(arff_tracecontent, fold_no, model,
-                                          rep_no)
+                _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no)
 
             ProbaY = model.predict_proba(testX)
             PredY = model.predict(testX)
+            if ProbaY.shape[1] != len(class_labels):
+                warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" %(rep_no, fold_no, ProbaY.shape[1], len(class_labels)))
 
             for i in range(0, len(test_indices)):
-                assert(len(ProbaY[i]) == len(class_labels)), 'Predicted probabilities and available classes do not match. (sklearn bug?) '
-                arff_line = [rep_no, fold_no, test_indices[i]]
-                arff_line.extend(ProbaY[i])
-                arff_line.append(class_labels[PredY[i]])
-                arff_line.append(class_labels[testY[i]])
+                arff_line = _prediction_to_row(rep_no, fold_no, test_indices[i], class_labels[testY[i]], PredY[i], ProbaY[i], class_labels, model.classes_)
                 arff_datacontent.append(arff_line)
 
             fold_no = fold_no + 1
