@@ -64,7 +64,11 @@ class OpenMLDataset(object):
         self.url = url
         self.default_target_attribute = default_target_attribute
         self.row_id_attribute = row_id_attribute
-        self.ignore_attributes = list(ignore_attribute) if ignore_attribute is not None else None # TODO: check
+        self.ignore_attributes = None
+        if isinstance(ignore_attribute, str):
+            self.ignore_attributes = [ignore_attribute]
+        elif isinstance(ignore_attribute, list):
+            self.ignore_attributes = ignore_attribute
         self.version_label = version_label
         self.citation = citation
         self.tag = tag
@@ -311,6 +315,8 @@ class OpenMLDataset(object):
 
     def get_features_by_type(self, data_type, exclude=None, exclude_ignore_attributes=True):
         assert data_type in OpenMLDataFeature.LEGAL_DATA_TYPES, "Illegal feature type requested"
+        if self.ignore_attributes is not None:
+            assert type(self.ignore_attributes) is list, "ignore_attributes should be a list"
         if exclude is not None:
             assert type(exclude) is list, "Exclude should be a list"
             assert all(isinstance(elem, str) for elem in exclude), "Exclude should be a list of strings"
@@ -319,7 +325,6 @@ class OpenMLDataset(object):
             to_exclude.extend(exclude)
         if exclude_ignore_attributes and self.ignore_attributes is not None:
             to_exclude.extend(self.ignore_attributes)
-        print(to_exclude)
 
         result = []
         offset = 0
