@@ -312,13 +312,14 @@ class OpenMLDataset(object):
             return None
 
     def get_features_by_type(self, data_type, exclude=None):
-        assert type(exclude) is list, "Exclude should be a list of indeces"
         assert data_type in OpenMLDataFeature.LEGAL_DATA_TYPES, "Illegal feature type requested"
+        if exclude is not None:
+            assert type(exclude) is list, "Exclude should be a list of indeces"
 
         result = []
         for idx in self.features:
             # in many cases we want to exclude, for example, the target feature
-            if idx not in exclude:
+            if exclude is None or idx not in exclude:
                 if self.features[idx].data_type == data_type:
                     result.append(idx)
         return result
