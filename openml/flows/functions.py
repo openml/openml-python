@@ -66,10 +66,10 @@ def list_flows(offset=None, size=None, tag=None):
     if tag is not None:
         api_call += "/tag/%s" % tag
 
-    return _list_datasets(api_call)
+    return _list_flows(api_call)
 
 
-def _list_datasets(api_call):
+def _list_flows(api_call):
     # TODO add proper error handling here!
     xml_string = _perform_api_call(api_call)
     flows_dict = xmltodict.parse(xml_string)

@@ -8,7 +8,6 @@ from scipy import sparse
 
 from sklearn.utils import check_array
 from sklearn.utils.fixes import astype
-from sklearn.utils.sparsefuncs import _get_median
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils.validation import FLOAT_DTYPES
 
@@ -176,7 +175,7 @@ class ConditionalImputer(Imputer):
         if self.empty_attribute_constant is not None:
             invalid_mask = np.isnan(statistics)
             X[:, invalid_mask] = self.empty_attribute_constant
-            self.statistics_[invalid_mask] = self.empty_attribute_constant
+            statistics[invalid_mask] = self.empty_attribute_constant
 
         # Delete the invalid rows/columns
         invalid_mask = np.isnan(statistics)
