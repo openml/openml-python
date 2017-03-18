@@ -8,7 +8,8 @@ from sklearn.model_selection._search import BaseSearchCV
 
 from build.lib.openml.exceptions import PyOpenMLError
 from .. import config
-from ..flows import sklearn_to_flow
+from ..flows import sklearn_to_flow, get_flow
+from ..setups import setup_exists
 from ..exceptions import OpenMLCacheException
 from ..util import URLError
 from ..tasks.functions import _create_task_from_xml
@@ -42,6 +43,20 @@ def run_task(task, model):
     # TODO move this into its onwn module. While it somehow belongs here, it
     # adds quite a lot of functionality which is better suited in other places!
     # TODO why doesn't this accept a flow as input? - this would make this more flexible!
+    flow = sklearn_to_flow(model)
+    flow_id = flow._ensure_flow_exists()
+    if flow_id < 0:
+        print("No flow")
+        return 0, 2
+    config.logger.info(flow_id)
+
+    if config.avoid_duplicate_runs:
+        # TODO: would be nice if flow._ensure_flow_exists already handled this
+        flow = get_flow(flow_id)
+        setup_id = setup_exists(flow, model)
+        ids = _run_exists(task.task_id, setup_id)
+        if ids:
+            raise PyOpenMLError("Run already exists in server. Run id(s): %s" %str(ids))
 
     dataset = task.get_dataset()
     X, Y = dataset.get_data(target=task.target_name)
@@ -52,7 +67,7 @@ def run_task(task, model):
                          'only works for tasks with class labels.')
 
     # execute the run
-    run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
+    run = OpenMLRun(task_id=task.task_id, flow_id=flow_id, dataset_id=dataset.dataset_id, model=model)
 
     try:
         run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
@@ -60,18 +75,25 @@ def run_task(task, model):
         run.error_message = str(message)
         warnings.warn("Run terminated with error: %s" %run.error_message)
 
-    # now generate the flow
-    flow = sklearn_to_flow(model)
-    flow_id = flow._ensure_flow_exists()
-    if flow_id < 0:
-        print("No flow")
-        return 0, 2
-    config.logger.info(flow_id)
-
-    # attach the flow to the run
-    run.flow_id = flow_id
-
     return run
+
+def _run_exists(task_id, setup_id):
+    '''
+    Checks whether a task/setup combination is already present on the server.
+
+    :param task_id: int
+    :param setup_id: int
+    :return: List of run ids iff these already exists on the server, False otherwise
+    '''
+    if setup_id <= 0:
+        # openml setups are in range 1-inf
+        return False
+
+    result = list_runs(task=[task_id], setup=[setup_id])
+    if len(result) > 0:
+        return set(result.keys())
+    else:
+        return False
 
 
 def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label, predicted_probabilities, class_labels, model_classes_mapping):
@@ -329,7 +351,7 @@ def _get_cached_run(run_id):
                                    "cached" % run_id)
 
 
-def list_runs(offset=None, size=None, id=None, task=None,
+def list_runs(offset=None, size=None, id=None, task=None, setup=None,
               flow=None, uploader=None, tag=None):
     """List all runs matching all of the given filters.
 
@@ -345,6 +367,8 @@ def list_runs(offset=None, size=None, id=None, task=None,
     id : list, optional
 
     task : list, optional
+
+    setup: list, optional
 
     flow : list, optional
 
@@ -367,6 +391,8 @@ def list_runs(offset=None, size=None, id=None, task=None,
         api_call += "/run/%s" % ','.join([str(int(i)) for i in id])
     if task is not None:
         api_call += "/task/%s" % ','.join([str(int(i)) for i in task])
+    if setup is not None:
+        api_call += "/setup/%s" % ','.join([str(int(i)) for i in setup])
     if flow is not None:
         api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
     if uploader is not None:
