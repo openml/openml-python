@@ -23,6 +23,7 @@ from . import flows
 from .runs import OpenMLRun
 from .tasks import OpenMLTask, OpenMLSplit
 from .flows import OpenMLFlow
+from .utils import ConditionalImputer
 
 
 __version__ = "0.2.1"
