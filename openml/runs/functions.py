@@ -10,7 +10,7 @@ from build.lib.openml.exceptions import PyOpenMLError
 from .. import config
 from ..flows import sklearn_to_flow, get_flow
 from ..setups import setup_exists
-from ..exceptions import OpenMLCacheException
+from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError
 from ..tasks.functions import _create_task_from_xml
 from .._api_calls import _perform_api_call
@@ -89,11 +89,17 @@ def _run_exists(task_id, setup_id):
         # openml setups are in range 1-inf
         return False
 
-    result = list_runs(task=[task_id], setup=[setup_id])
-    if len(result) > 0:
-        return set(result.keys())
-    else:
+    try:
+        result = list_runs(task=[task_id], setup=[setup_id])
+        if len(result) > 0:
+            return set(result.keys())
+        else:
+            return False
+    except OpenMLServerException as exception:
+        # error code 512 implies no results. This means the run does not exist yet
+        assert(exception.code == 512)
         return False
+
 
 
 def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label, predicted_probabilities, class_labels, model_classes_mapping):

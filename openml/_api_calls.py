@@ -3,9 +3,10 @@ import os
 import requests
 import arff
 import warnings
+import xmltodict
 
 from . import config
-from .exceptions import OpenMLServerError
+from .exceptions import OpenMLServerError, OpenMLServerException
 
 
 def _perform_api_call(call, data=None, file_dictionary=None,
@@ -80,7 +81,7 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
     # 'gzip,deflate'
     response = requests.post(url, data=data, files=file_elements)
     if response.status_code != 200:
-        raise OpenMLServerError(('Status code: %d\n' % response.status_code) + response.text)
+        raise _parse_server_exception(response)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
@@ -97,8 +98,23 @@ def _read_url(url, data=None):
     response = requests.post(url, data=data)
 
     if response.status_code != 200:
-        raise OpenMLServerError(('Status code: %d\n' % response.status_code) + response.text)
+        raise _parse_server_exception(response)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
     return response.text
+
+def _parse_server_exception(response):
+    # OpenML has a sopisticated error system
+    # where information about failures is provided. try to parse this
+    try:
+        server_exception = xmltodict.parse(response.text)
+    except:
+        raise OpenMLServerError(('Status code: %d\n' % response.status_code) + response.text)
+
+    code = int(server_exception['oml:error']['oml:code'])
+    message = server_exception['oml:error']['oml:message']
+    additional = None
+    if 'oml:additional_information' in server_exception['oml:error']:
+        additional = server_exception['oml:error']['oml:additional_information']
+    return OpenMLServerException(code, message, additional)
