@@ -5,6 +5,7 @@ import xmltodict
 import numpy as np
 import warnings
 import sklearn
+import time
 from sklearn.model_selection._search import BaseSearchCV
 
 from build.lib.openml.exceptions import PyOpenMLError
@@ -12,7 +13,7 @@ from .. import config
 from ..flows import sklearn_to_flow, get_flow
 from ..setups import setup_exists
 from ..exceptions import OpenMLCacheException, OpenMLServerException
-from ..util import URLError
+from ..util import URLError, version_complies
 from ..tasks.functions import _create_task_from_xml
 from .._api_calls import _perform_api_call
 from .run import OpenMLRun
@@ -70,7 +71,7 @@ def run_task(task, model):
     run = OpenMLRun(task_id=task.task_id, flow_id=flow_id, dataset_id=dataset.dataset_id, model=model)
 
     try:
-        run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
+        run.data_content, run.trace_content, run.detailed_evaluations = _run_task_get_arffcontent(model, task, class_labels)
     except PyOpenMLError as message:
         run.error_message = str(message)
         warnings.warn("Run terminated with error: %s" %run.error_message)
@@ -141,6 +142,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
     X, Y = task.get_X_and_y()
     arff_datacontent = []
     arff_tracecontent = []
+    user_defined_measures = defaultdict(lambda: defaultdict(dict))
 
     rep_no = 0
     # TODO use different iterator to only provide a single iterator (less
@@ -156,7 +158,14 @@ def _run_task_get_arffcontent(model, task, class_labels):
             testY = Y[test_indices]
 
             try:
+                # for measuring runtime. Only available since Python 3.3
+                if version_complies(3, 3):
+                    modelfit_starttime = time.process_time()
                 model_fold.fit(trainX, trainY)
+
+                if version_complies(3, 3):
+                    modelfit_duration = time.process_time() - modelfit_starttime
+                    user_defined_measures['usercpu_time_millis_training'][rep_no][fold_no] = modelfit_duration
 
                 if isinstance(model_fold, BaseSearchCV):
                     _add_results_to_arfftrace(arff_tracecontent, fold_no, model_fold, rep_no)
@@ -167,8 +176,15 @@ def _run_task_get_arffcontent(model, task, class_labels):
                 # typically happens when training a regressor on classification task
                 raise PyOpenMLError(str(e))
 
+            if version_complies(3, 3):
+                modelpredict_starttime = time.process_time()
             ProbaY = model_fold.predict_proba(testX)
             PredY = model_fold.predict(testX)
+            if version_complies(3, 3):
+                modelpredict_duration = time.process_time() - modelpredict_starttime
+                user_defined_measures['usercpu_time_millis_testing'][rep_no][fold_no] = modelpredict_duration
+                user_defined_measures['usercpu_time_millis'][rep_no][fold_no] = modelfit_duration + modelpredict_duration
+
             if ProbaY.shape[1] != len(class_labels):
                 warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" %(rep_no, fold_no, ProbaY.shape[1], len(class_labels)))
 
@@ -182,10 +198,20 @@ def _run_task_get_arffcontent(model, task, class_labels):
     if not isinstance(model, BaseSearchCV):
         arff_tracecontent = None
 
-    return arff_datacontent, arff_tracecontent
+    return arff_datacontent, arff_tracecontent, user_defined_measures
 
 
 def _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no):
+    '''
+    Extracts the various results calculated by `BaseSearchCV` classes into openml trace arff format
+
+    :param arff_tracecontent: the list that the results should be appended to
+    :param fold_no: cv fold number
+    :param model: the model to extract from
+    :param rep_no: cv repetition number
+
+    :return: A list lists, each representing an arff line
+    '''
     for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
         # we use the string values for True and False, as it is defined in this way by the OpenML server
         selected = 'false'
@@ -350,7 +376,7 @@ def _get_cached_run(run_id):
         run_file = os.path.join(run_cache_dir,
                                 "run_%d.xml" % int(run_id))
         with io.open(run_file, encoding='utf8') as fh:
-            run = _create_task_from_xml(xml=fh.read())
+            run = _create_run_from_xml(xml=fh.read())
         return run
 
     except (OSError, IOError):
