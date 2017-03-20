@@ -189,11 +189,16 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
     if not isinstance(model, BaseSearchCV):
         arff_tracecontent = None
+        arff_trace_attributes = None
+    else:
+        # arff_tracecontent is already set
+        arff_trace_attributes = _extract_arfftrace_attributes(model_fold)
 
-    return arff_datacontent, arff_tracecontent
+    return arff_datacontent, arff_tracecontent, arff_trace_attributes
 
 
-def _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no):
+def _extract_arfftrace(model, rep_no, fold_no):
+    arff_tracecontent = []
     for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
         # we use the string values for True and False, as it is defined in this way by the OpenML server
         selected = 'false'
@@ -205,6 +210,30 @@ def _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no):
             if key.startswith("param_"):
                 arff_line.append(str(model.cv_results_[key][itt_no]))
         arff_tracecontent.append(arff_line)
+    return arff_tracecontent
+
+def _extract_arfftrace_attributes(model):
+    # attributes that will be in trace arff, regardless of the model
+    trace_attributes = [('repeat', 'NUMERIC'),
+                        ('fold', 'NUMERIC'),
+                        ('iteration', 'NUMERIC'),
+                        ('evaluation', 'NUMERIC'),
+                        ('selected', ['true', 'false'])]
+
+    # model dependent attributes for trace arff
+    for key in model.cv_results_:
+        if key.startswith("param_"):
+            if all(isinstance(i, (bool)) for i in model.cv_results_[key]):
+                type = ['True', 'False']
+            elif all(isinstance(i, (int, float)) for i in model.cv_results_[key]):
+                type = 'NUMERIC'
+            else:
+                values = list(set(model.cv_results_[key]))  # unique values
+                type = [str(i) for i in values]
+
+            attribute = ("parameter_" + key[6:], type)
+            trace_attributes.append(attribute)
+    return trace_attributes
 
 
 def get_runs(run_ids):

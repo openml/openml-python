@@ -124,7 +124,7 @@ class TestRun(TestBase):
                                 clf, task, class_labels)
 
         clf = SGDClassifier(loss='log', random_state=1)
-        arff_datacontent, arff_tracecontent = openml.runs.functions._run_task_get_arffcontent(
+        arff_datacontent, arff_tracecontent, _ = openml.runs.functions._run_task_get_arffcontent(
             clf, task, class_labels)
         # predictions
         self.assertIsInstance(arff_datacontent, list)
