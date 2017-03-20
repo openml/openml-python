@@ -23,8 +23,8 @@ class OpenMLRun(object):
     def __init__(self, task_id, flow_id, dataset_id, setup_string=None,
                  files=None, setup_id=None, tags=None, uploader=None, uploader_name=None,
                  evaluations=None, detailed_evaluations=None,
-                 data_content=None, trace_content=None, model=None, task_type=None,
-                 task_evaluation_measure=None, flow_name=None,
+                 data_content=None, trace_attributes=None, trace_content=None,
+                 model=None, task_type=None, task_evaluation_measure=None, flow_name=None,
                  parameter_settings=None, predictions_url=None, task=None,
                  flow=None, run_id=None):
         self.uploader = uploader
@@ -42,6 +42,7 @@ class OpenMLRun(object):
         self.evaluations = evaluations
         self.detailed_evaluations = detailed_evaluations
         self.data_content = data_content
+        self.trace_attributes = trace_attributes
         self.trace_content = trace_content
         self.error_message = None
         self.task = task
@@ -80,7 +81,7 @@ class OpenMLRun(object):
         arff_dict['relation'] = 'openml_task_' + str(task.task_id) + '_predictions'
         return arff_dict
 
-    def _generate_trace_arff_dict(self, model):
+    def _generate_trace_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the server.
 
         Assumes that the run has been executed.
@@ -91,32 +92,13 @@ class OpenMLRun(object):
             Dictionary representation of the ARFF file that will be uploaded.
             Contains information about the optimization trace.
         """
-        if self.trace_content is None:
+        if self.trace_content is None or len(self.trace_content) == 0:
             raise ValueError('No trace content avaiable.')
-        if not isinstance(model, BaseSearchCV):
-            raise PyOpenMLError('Cannot generate trace on provided classifier. (This should never happen.)')
+        if len(self.trace_attributes) != len(self.trace_content[0]):
+            raise ValueError('Trace_attributes and trace_content not compatible')
 
         arff_dict = {}
-        arff_dict['attributes'] = [('repeat', 'NUMERIC'),
-                                   ('fold', 'NUMERIC'),
-                                   ('iteration', 'NUMERIC'),
-                                   ('evaluation', 'NUMERIC'),
-                                   ('selected', ['true', 'false'])]
-        for key in model.cv_results_:
-            if key.startswith("param_"):
-                type = 'STRING'
-                if all(isinstance(i, (bool)) for i in model.cv_results_[key]):
-                    type = ['True', 'False']
-                elif all(isinstance(i, (int, float)) for i in model.cv_results_[key]):
-                    type = 'NUMERIC'
-                else:
-                    values = list(set(model.cv_results_[key])) # unique values
-                    type = [str(i) for i in values]
-                    print(key + ": " + str(type))
-
-                attribute = ("parameter_" + key[6:], type)
-                arff_dict['attributes'].append(attribute)
-
+        arff_dict['attributes'] = self.trace_attributes
         arff_dict['data'] = self.trace_content
         arff_dict['relation'] = 'openml_task_' + str(self.task_id) + '_predictions'
 
@@ -145,7 +127,7 @@ class OpenMLRun(object):
             file_elements['predictions'] = ("predictions.arff", predictions)
 
         if self.trace_content is not None:
-            trace_arff = arff.dumps(self._generate_trace_arff_dict(self.model))
+            trace_arff = arff.dumps(self._generate_trace_arff_dict())
             file_elements['trace'] = ("trace.arff", trace_arff)
 
         return_value = _perform_api_call("/run/", file_elements=file_elements)
