@@ -153,6 +153,20 @@ class TestFlow(TestBase):
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)
 
+    def test_semi_legal_flow(self):
+        # TODO: Test if parameters are set correctly!
+        semi_legal = sklearn.ensemble.BaggingClassifier(
+            base_estimator=sklearn.ensemble.BaggingClassifier(
+                base_estimator=sklearn.tree.DecisionTreeClassifier()))
+        flow = openml.flows.sklearn_to_flow(semi_legal)
+        flow.publish()
+
+    def test_illegal_flow(self):
+        illegal = sklearn.pipeline.Pipeline(steps=[('imputer1', sklearn.preprocessing.Imputer()),
+                                                   ('imputer2', sklearn.preprocessing.Imputer()),
+                                                   ('classif', sklearn.tree.DecisionTreeClassifier())])
+        self.assertRaises(ValueError, openml.flows.sklearn_to_flow, illegal)
+
     def test_ensure_flow_exists(self):
         sentinel = get_sentinel()
 
