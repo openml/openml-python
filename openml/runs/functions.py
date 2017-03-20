@@ -5,6 +5,7 @@ import xmltodict
 import numpy as np
 import warnings
 import openml
+import sklearn
 from sklearn.model_selection._search import BaseSearchCV
 
 from ..exceptions import PyOpenMLError
@@ -59,7 +60,6 @@ def run_task(task, model, avoid_duplicate_runs=True):
             raise PyOpenMLError("Run already exists in server. Run id(s): %s" %str(ids))
 
     dataset = task.get_dataset()
-    X, Y = dataset.get_data(target=task.target_name)
 
     class_labels = task.class_labels
     if class_labels is None:
@@ -160,6 +160,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
     for rep in task.iterate_repeats():
         fold_no = 0
         for fold in rep:
+            model_fold = sklearn.base.clone(model, safe=True)
             train_indices, test_indices = fold
             trainX = X[train_indices]
             trainY = Y[train_indices]
@@ -174,8 +175,8 @@ def _run_task_get_arffcontent(model, task, class_labels):
             else:
                 model_classes = model.classes_
 
-            ProbaY = model.predict_proba(testX)
-            PredY = model.predict(testX)
+            ProbaY = model_fold.predict_proba(testX)
+            PredY = model_fold.predict(testX)
             if ProbaY.shape[1] != len(class_labels):
                 warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" %(rep_no, fold_no, ProbaY.shape[1], len(class_labels)))
 
