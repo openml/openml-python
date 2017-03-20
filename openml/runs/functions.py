@@ -4,6 +4,7 @@ import os
 import xmltodict
 import numpy as np
 import warnings
+import sklearn
 from sklearn.model_selection._search import BaseSearchCV
 
 from build.lib.openml.exceptions import PyOpenMLError
@@ -59,7 +60,6 @@ def run_task(task, model):
             raise PyOpenMLError("Run already exists in server. Run id(s): %s" %str(ids))
 
     dataset = task.get_dataset()
-    X, Y = dataset.get_data(target=task.target_name)
 
     class_labels = task.class_labels
     if class_labels is None:
@@ -148,6 +148,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
     for rep in task.iterate_repeats():
         fold_no = 0
         for fold in rep:
+            model_fold = sklearn.base.clone(model, safe=True)
             train_indices, test_indices = fold
             trainX = X[train_indices]
             trainY = Y[train_indices]
@@ -155,19 +156,19 @@ def _run_task_get_arffcontent(model, task, class_labels):
             testY = Y[test_indices]
 
             try:
-                model.fit(trainX, trainY)
+                model_fold.fit(trainX, trainY)
 
-                if isinstance(model, BaseSearchCV):
-                    _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no)
-                    model_classes = model.best_estimator_.classes_
+                if isinstance(model_fold, BaseSearchCV):
+                    _add_results_to_arfftrace(arff_tracecontent, fold_no, model_fold, rep_no)
+                    model_classes = model_fold.best_estimator_.classes_
                 else:
-                    model_classes = model.classes_
+                    model_classes = model_fold.classes_
             except AttributeError as e:
                 # typically happens when training a regressor on classification task
                 raise PyOpenMLError(str(e))
 
-            ProbaY = model.predict_proba(testX)
-            PredY = model.predict(testX)
+            ProbaY = model_fold.predict_proba(testX)
+            PredY = model_fold.predict(testX)
             if ProbaY.shape[1] != len(class_labels):
                 warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" %(rep_no, fold_no, ProbaY.shape[1], len(class_labels)))
 
