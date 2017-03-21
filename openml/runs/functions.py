@@ -23,7 +23,7 @@ from .run import OpenMLRun, _get_version_information
 
 
 
-def run_task(task, model):
+def run_task(task, model, flow_tags=[]):
     """Performs a CV run on the dataset of the given task, using the split.
 
     Parameters
@@ -34,17 +34,22 @@ def run_task(task, model):
         a model which has a function fit(X,Y) and predict(X),
         all supervised estimators of scikit learn follow this definition of a model [1]
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
-
+    flow_tags : list(str)
+        a list of tags that the flow should have at creation
 
     Returns
     -------
     run : OpenMLRun
         Result of the run.
     """
+    if not isinstance(flow_tags, list):
+        raise ValueError("flow_tags should be list")
     # TODO move this into its onwn module. While it somehow belongs here, it
     # adds quite a lot of functionality which is better suited in other places!
     # TODO why doesn't this accept a flow as input? - this would make this more flexible!
     flow = sklearn_to_flow(model)
+    flow.tags = flow_tags
+    # TODO: also tag the flow if it already exists
     flow_id = flow._ensure_flow_exists()
     if flow_id < 0:
         print("No flow")
