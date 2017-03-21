@@ -198,6 +198,7 @@ class TestFlow(TestBase):
             estimator=model, param_distributions=parameter_grid, cv=cv)
         rs.fit(X, y)
         flow = openml.flows.sklearn_to_flow(rs)
+        flow.tags.extend(['openml-python', 'unittest'])
 
         # Add the sentinel to all name strings in all subflows. Adds it to
         # name to make it easier in the web gui to see that the flow is only
@@ -253,5 +254,6 @@ class TestFlow(TestBase):
                         % sentinel
 
         self.assertEqual(new_flow.name, fixture_name)
-
+        self.assertTrue('openml-python' in new_flow.tags)
+        self.assertTrue('unittest' in new_flow.tags)
         new_flow.model.fit(X, y)
