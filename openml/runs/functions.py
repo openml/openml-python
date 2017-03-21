@@ -164,7 +164,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
                 model_fold.fit(trainX, trainY)
 
                 if version_complies(3, 3):
-                    modelfit_duration = time.process_time() - modelfit_starttime
+                    modelfit_duration = (time.process_time() - modelfit_starttime) * 1000
                     user_defined_measures['usercpu_time_millis_training'][rep_no][fold_no] = modelfit_duration
 
                 if isinstance(model_fold, BaseSearchCV):
@@ -181,7 +181,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
             ProbaY = model_fold.predict_proba(testX)
             PredY = model_fold.predict(testX)
             if version_complies(3, 3):
-                modelpredict_duration = time.process_time() - modelpredict_starttime
+                modelpredict_duration = (time.process_time() - modelpredict_starttime) * 1000
                 user_defined_measures['usercpu_time_millis_testing'][rep_no][fold_no] = modelpredict_duration
                 user_defined_measures['usercpu_time_millis'][rep_no][fold_no] = modelfit_duration + modelpredict_duration
 
