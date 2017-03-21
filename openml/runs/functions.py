@@ -180,10 +180,11 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
             fold_no = fold_no + 1
         rep_no = rep_no + 1
-
-    if get_traceble_model(model):
+    
+    traceable_model = get_traceble_model(model)
+    if traceable_model:
         # arff_tracecontent is already set
-        arff_trace_attributes = _extract_arfftrace_attributes(model_fold)
+        arff_trace_attributes = _extract_arfftrace_attributes(traceable_model)
     else:
         arff_tracecontent = None
         arff_trace_attributes = None
