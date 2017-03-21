@@ -155,10 +155,13 @@ class TestFlow(TestBase):
 
     def test_semi_legal_flow(self):
         # TODO: Test if parameters are set correctly!
+        sentinel = get_sentinel()
         semi_legal = sklearn.ensemble.BaggingClassifier(
             base_estimator=sklearn.ensemble.BaggingClassifier(
                 base_estimator=sklearn.tree.DecisionTreeClassifier()))
         flow = openml.flows.sklearn_to_flow(semi_legal)
+        flow.name = 'TEST%s%s' % (sentinel, flow.name)
+
         flow.publish()
 
     def test_illegal_flow(self):

@@ -141,6 +141,8 @@ class TestRun(TestBase):
                                          'Iris-virginica'])
 
     def test_get_run(self):
+        # this run is not available on test
+        openml.config.server = self.production_server
         run = openml.runs.get_run(473350)
         self.assertEqual(run.dataset_id, 1167)
         self.assertEqual(run.evaluations['f_measure'], 0.624668)
