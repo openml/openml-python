@@ -160,8 +160,9 @@ def _run_task_get_arffcontent(model, task, class_labels):
             try:
                 model_fold.fit(trainX, trainY)
 
-                if get_traceble_model(model_fold):
-                    arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
+                traceable_model = get_traceble_model(model)
+                if traceable_model:
+                    arff_tracecontent.extend(_extract_arfftrace(traceable_model, rep_no, fold_no))
                     model_classes = model_fold.best_estimator_.classes_
                 else:
                     model_classes = model_fold.classes_
@@ -180,7 +181,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
             fold_no = fold_no + 1
         rep_no = rep_no + 1
-    
+
     traceable_model = get_traceble_model(model)
     if traceable_model:
         # arff_tracecontent is already set
