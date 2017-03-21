@@ -561,7 +561,7 @@ def get_traceble_model(model):
     Tree, maybe later)
     '''
     if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
-        return True
+        return model
     count = 0
     returnValue = None
     if isinstance(model, sklearn.pipeline.Pipeline):

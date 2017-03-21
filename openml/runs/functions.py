@@ -159,16 +159,17 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
             try:
                 model_fold.fit(trainX, trainY)
-
-                traceable_model = get_traceble_model(model)
-                if traceable_model:
-                    arff_tracecontent.extend(_extract_arfftrace(traceable_model, rep_no, fold_no))
-                    model_classes = model_fold.best_estimator_.classes_
-                else:
-                    model_classes = model_fold.classes_
             except AttributeError as e:
                 # typically happens when training a regressor on classification task
                 raise PyOpenMLError(str(e))
+
+            # extract trace
+            traceable_model = get_traceble_model(model_fold)
+            if traceable_model:
+                arff_tracecontent.extend(_extract_arfftrace(traceable_model, rep_no, fold_no))
+                model_classes = model_fold.best_estimator_.classes_
+            else:
+                model_classes = model_fold.classes_
 
             ProbaY = model_fold.predict_proba(testX)
             PredY = model_fold.predict(testX)
@@ -182,7 +183,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
             fold_no = fold_no + 1
         rep_no = rep_no + 1
 
-    traceable_model = get_traceble_model(model)
+    traceable_model = get_traceble_model(model_fold)
     if traceable_model:
         # arff_tracecontent is already set
         arff_trace_attributes = _extract_arfftrace_attributes(traceable_model)
@@ -194,6 +195,12 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
 
 def _extract_arfftrace(model, rep_no, fold_no):
+    if not isinstance(model, sklearn.model_selection._search.BaseSearchCV):
+        raise ValueError('model should be instance of'\
+                         ' sklearn.model_selection._search.BaseSearchCV')
+    if not hasattr(model, 'cv_results_'):
+        raise ValueError('model should contain `cv_results_`')
+
     arff_tracecontent = []
     for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
         # we use the string values for True and False, as it is defined in this way by the OpenML server
@@ -209,6 +216,12 @@ def _extract_arfftrace(model, rep_no, fold_no):
     return arff_tracecontent
 
 def _extract_arfftrace_attributes(model):
+    if not isinstance(model, sklearn.model_selection._search.BaseSearchCV):
+        raise ValueError('model should be instance of'\
+                         ' sklearn.model_selection._search.BaseSearchCV')
+    if not hasattr(model, 'cv_results_'):
+        raise ValueError('model should contain `cv_results_`')
+
     # attributes that will be in trace arff, regardless of the model
     trace_attributes = [('repeat', 'NUMERIC'),
                         ('fold', 'NUMERIC'),
