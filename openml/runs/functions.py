@@ -15,7 +15,7 @@ from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError
 from ..tasks.functions import _create_task_from_xml
 from .._api_calls import _perform_api_call
-from .run import OpenMLRun
+from .run import OpenMLRun, _get_version_information
 
 
 # _get_version_info, _get_dict and _create_setup_string are in run.py to avoid
@@ -66,8 +66,10 @@ def run_task(task, model):
         raise ValueError('The task has no class labels. This method currently '
                          'only works for tasks with class labels.')
 
+    run_environment = _get_version_information()
+    tags = ['openml-python', run_environment[1]]
     # execute the run
-    run = OpenMLRun(task_id=task.task_id, flow_id=flow_id, dataset_id=dataset.dataset_id, model=model)
+    run = OpenMLRun(task_id=task.task_id, flow_id=flow_id, dataset_id=dataset.dataset_id, model=model, tags=tags)
 
     try:
         run.data_content, run.trace_content, run.trace_attributes = _run_task_get_arffcontent(model, task, class_labels)
@@ -337,27 +339,31 @@ def _create_run_from_xml(xml):
     evaluations = dict()
     detailed_evaluations = defaultdict(lambda: defaultdict(dict))
     evaluation_flows = dict()
-    for evaluation_dict in run['oml:output_data']['oml:evaluation']:
-        key = evaluation_dict['oml:name']
-        if 'oml:value' in evaluation_dict:
-            value = float(evaluation_dict['oml:value'])
-        elif 'oml:array_data' in evaluation_dict:
-            value = evaluation_dict['oml:array_data']
-        else:
-            raise ValueError('Could not find keys "value" or "array_data" '
-                             'in %s' % str(evaluation_dict.keys()))
+    if 'oml:output_data' in run and 'oml:evaluation' in run['oml:output_data']:
+        for evaluation_dict in run['oml:output_data']['oml:evaluation']:
+            key = evaluation_dict['oml:name']
+            if 'oml:value' in evaluation_dict:
+                value = float(evaluation_dict['oml:value'])
+            elif 'oml:array_data' in evaluation_dict:
+                value = evaluation_dict['oml:array_data']
+            else:
+                raise ValueError('Could not find keys "value" or "array_data" '
+                                 'in %s' % str(evaluation_dict.keys()))
 
-        if '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
-            repeat = int(evaluation_dict['@repeat'])
-            fold = int(evaluation_dict['@fold'])
-            repeat_dict = detailed_evaluations[key]
-            fold_dict = repeat_dict[repeat]
-            fold_dict[fold] = value
-        else:
-            evaluations[key] = value
+            if '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
+                repeat = int(evaluation_dict['@repeat'])
+                fold = int(evaluation_dict['@fold'])
+                repeat_dict = detailed_evaluations[key]
+                fold_dict = repeat_dict[repeat]
+                fold_dict[fold] = value
+            else:
+                evaluations[key] = value
+                evaluation_flows[key] = flow_id
+
             evaluation_flows[key] = flow_id
-
-        evaluation_flows[key] = flow_id
+    tags = None
+    if 'oml:tag' in run:
+        tags = run['oml:tag']
 
     return OpenMLRun(run_id=run_id, uploader=uploader,
                      uploader_name=uploader_name, task_id=task_id,
@@ -368,7 +374,7 @@ def _create_run_from_xml(xml):
                      parameter_settings=parameters,
                      dataset_id=dataset_id, predictions_url=predictions_url,
                      evaluations=evaluations,
-                     detailed_evaluations=detailed_evaluations)
+                     detailed_evaluations=detailed_evaluations, tags=tags)
 
 
 def _get_cached_run(run_id):

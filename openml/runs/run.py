@@ -48,6 +48,7 @@ class OpenMLRun(object):
         self.flow = flow
         self.run_id = run_id
         self.model = model
+        self.tags = tags
 
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the server.
@@ -142,24 +143,17 @@ class OpenMLRun(object):
         xml_string : string
             XML description of run.
         """
-        run_environment = _get_version_information()
 
         # TODO: don't we have flow object in data structure? Use this one
         downloaded_flow = openml.flows.get_flow(self.flow_id)
 
         openml_param_settings = OpenMLRun._parse_parameters(self.model, downloaded_flow)
 
-        # as a tag, it must be of the form ([a-zA-Z0-9_\-\.])+
-        # so we format time from 'mm/dd/yy hh:mm:ss' to 'mm-dd-yy_hh.mm.ss'
-        well_formatted_time = time.strftime("%c").replace(
-            ' ', '_').replace('/', '-').replace(':', '.')
-        tags = run_environment + [well_formatted_time] + ['run_task'] + \
-            [self.model.__module__ + "." + self.model.__class__.__name__]
         description = _to_dict(taskid=self.task_id, flow_id=self.flow_id,
                                setup_string=_create_setup_string(self.model),
                                parameter_settings=openml_param_settings,
                                error_message=self.error_message,
-                               tags=tags)
+                               tags=self.tags)
         description_xml = xmltodict.unparse(description, pretty=True)
         return description_xml
 

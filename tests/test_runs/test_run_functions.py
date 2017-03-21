@@ -57,7 +57,10 @@ class TestRun(TestBase):
         num_instances = 150
 
         clf = LogisticRegression()
-        self._perform_run(task_id,num_instances, clf)
+        res = self._perform_run(task_id,num_instances, clf)
+
+        downloaded = openml.runs.get_run(res.run_id)
+        assert('openml-python' in downloaded.tags)
 
     def test_run_optimize_randomforest_iris(self):
         task_id = 10107
@@ -141,6 +144,7 @@ class TestRun(TestBase):
                                          'Iris-virginica'])
 
     def test_get_run(self):
+        openml.config.server = self.production_server
         run = openml.runs.get_run(473350)
         self.assertEqual(run.dataset_id, 1167)
         self.assertEqual(run.evaluations['f_measure'], 0.624668)
@@ -155,6 +159,8 @@ class TestRun(TestBase):
                          (8, 0.56759),
                          (9, 0.64621)]:
             self.assertEqual(run.detailed_evaluations['f_measure'][0][i], value)
+        assert('weka' in run.tags)
+        assert('stacking' in run.tags)
 
     def _check_run(self, run):
         self.assertIsInstance(run, dict)
