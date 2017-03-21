@@ -5,11 +5,10 @@ import xmltodict
 import numpy as np
 import warnings
 import sklearn
-from sklearn.model_selection._search import BaseSearchCV
 
 from build.lib.openml.exceptions import PyOpenMLError
 from .. import config
-from ..flows import sklearn_to_flow, get_flow
+from ..flows import sklearn_to_flow, get_flow, get_traceble_model
 from ..setups import setup_exists
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError
@@ -158,7 +157,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
             try:
                 model_fold.fit(trainX, trainY)
 
-                if isinstance(model_fold, BaseSearchCV):
+                if get_traceble_model(model_fold):
                     arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
                     model_classes = model_fold.best_estimator_.classes_
                 else:
@@ -179,12 +178,12 @@ def _run_task_get_arffcontent(model, task, class_labels):
             fold_no = fold_no + 1
         rep_no = rep_no + 1
 
-    if not isinstance(model, BaseSearchCV):
-        arff_tracecontent = None
-        arff_trace_attributes = None
-    else:
+    if get_traceble_model(model):
         # arff_tracecontent is already set
         arff_trace_attributes = _extract_arfftrace_attributes(model_fold)
+    else:
+        arff_tracecontent = None
+        arff_trace_attributes = None
 
     return arff_datacontent, arff_tracecontent, arff_trace_attributes
 
