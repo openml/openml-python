@@ -167,7 +167,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
             traceable_model = get_traceble_model(model_fold)
             if traceable_model:
                 arff_tracecontent.extend(_extract_arfftrace(traceable_model, rep_no, fold_no))
-                model_classes = model_fold.best_estimator_.classes_
+                model_classes = traceable_model.best_estimator_.classes_
             else:
                 model_classes = model_fold.classes_
 
