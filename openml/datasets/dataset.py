@@ -10,7 +10,7 @@ import numpy as np
 import scipy.sparse
 import xmltodict
 
-from ..datasets.data_feature import OpenMLDataFeature
+from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
 
 if sys.version_info[0] >= 3:
