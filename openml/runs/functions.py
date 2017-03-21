@@ -8,7 +8,8 @@ import sklearn
 
 from build.lib.openml.exceptions import PyOpenMLError
 from .. import config
-from ..flows import sklearn_to_flow, get_flow, get_traceble_model
+from ..flows import sklearn_to_flow, get_flow
+from ..flows.sklearn_converter import get_traceble_model
 from ..setups import setup_exists
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError
