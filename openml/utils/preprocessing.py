@@ -1,4 +1,3 @@
-from scipy.integrate.tests.test_bvp import emden_bc
 from sklearn.preprocessing.imputation import Imputer, _get_mask
 
 import warnings
