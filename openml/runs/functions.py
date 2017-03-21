@@ -6,7 +6,6 @@ import numpy as np
 import warnings
 import openml
 import sklearn
-from sklearn.model_selection._search import BaseSearchCV
 
 from ..exceptions import PyOpenMLError
 from .. import config
@@ -187,12 +186,12 @@ def _run_task_get_arffcontent(model, task, class_labels):
             fold_no = fold_no + 1
         rep_no = rep_no + 1
 
-    if not isinstance(model, BaseSearchCV):
-        arff_tracecontent = None
-        arff_trace_attributes = None
-    else:
+    if get_traceble_model(model):
         # arff_tracecontent is already set
         arff_trace_attributes = _extract_arfftrace_attributes(model_fold)
+    else:
+        arff_tracecontent = None
+        arff_trace_attributes = None
 
     return arff_datacontent, arff_tracecontent, arff_trace_attributes
 

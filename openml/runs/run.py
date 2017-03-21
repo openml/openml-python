@@ -5,7 +5,6 @@ import time
 import arff
 import xmltodict
 from sklearn.base import BaseEstimator
-from sklearn.model_selection._search import BaseSearchCV
 
 import openml
 from ..tasks import get_task
