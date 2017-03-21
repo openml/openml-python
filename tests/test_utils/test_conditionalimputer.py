@@ -5,9 +5,12 @@ from openml.utils.preprocessing import ConditionalImputer
 
 class OpenMLTaskTest(TestBase):
 
-    def _do_test(self, dataset, X, nominal_indices, clf):
+    def _do_test(self, dataset, X, nominal_indices, clf, fill_empty=None):
         clf.fit(X)
         X_prime = clf.transform(X)
+        assert np.isnan(np.min(X_prime)) == False, 'Result contains nans'
+        if fill_empty is not None:
+            assert X_prime.shape == X.shape
 
         # in case of smart guessing nominal attributes, we accept false positives, but no false negatives
         for column_idx in nominal_indices:
@@ -18,7 +21,8 @@ class OpenMLTaskTest(TestBase):
         for idx, value in enumerate(clf.statistics_):
             if math.isnan(value):
                 # imputer can only give nan if all values are unknown
-                correction += 1
+                if fill_empty is None:
+                    correction += 1
                 assert dataset.features[idx].number_missing_values == len(X), "Imputer calculated nan for usable feature"
             else:
                 # check if nominal values get imputed correct
@@ -29,7 +33,8 @@ class OpenMLTaskTest(TestBase):
                 # check if imputation succeeded
                 counter = collections.Counter(X_prime[:, corrected_index])
                 occurances_after = counter[value]
-                assert occurances_after >= dataset.features[idx].number_missing_values
+                assert occurances_after >= dataset.features[idx].number_missing_values or \
+                       (fill_empty is not None and counter[fill_empty] == len(X)), "at attribute idx %d" %idx
 
         return X_prime
 
@@ -74,12 +79,11 @@ class OpenMLTaskTest(TestBase):
             dataset = task.get_dataset()
             X, _ = dataset.get_data(target=task.target_name)
             nominal_indices = dataset.get_features_by_type('nominal', exclude=[task.target_name])
+            fill_empty = -1
             clf = ConditionalImputer(strategy="median",
                                      strategy_nominal="most_frequent",
                                      categorical_features=None,
                                      verbose=True,
-                                     empty_attribute_constant=-1)
+                                     fill_empty=fill_empty)
 
-            X_prime = self._do_test(dataset, X, nominal_indices, clf)
-            assert np.isnan(np.min(X_prime)) == False, 'Result contains nans'
-            assert X_prime.shape == X.shape
+            self._do_test(dataset, X, nominal_indices, clf, fill_empty=fill_empty)

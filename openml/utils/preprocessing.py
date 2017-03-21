@@ -76,14 +76,14 @@ class ConditionalImputer(Imputer):
     def __init__(self, missing_values="NaN", strategy="mean",
                  strategy_nominal="most_frequent",
                  categorical_features=None,
-                 empty_attribute_constant=None,
+                 fill_empty=None,
                  axis=0, verbose=0, copy=True):
         self.missing_values = missing_values
         self.strategy = strategy
         self.strategy_nominal = strategy_nominal
         self.categorical_features = categorical_features
         self.categorical_features_implied = None
-        self.empty_attribute_constant = empty_attribute_constant
+        self.fill_empty = fill_empty
         self.axis = axis
         self.verbose = verbose
         self.copy = copy
@@ -157,24 +157,48 @@ class ConditionalImputer(Imputer):
 
     def transform(self, X):
         """Impute all missing values in X.
+
         Parameters
         ----------
         X : {array-like, sparse matrix}, shape = [n_samples, n_features]
             The input data to complete.
         """
-        check_is_fitted(self, 'statistics_')
-        X = check_array(X, accept_sparse='csc', dtype=FLOAT_DTYPES,
-                        force_all_finite=False, copy=self.copy)
-        statistics = self.statistics_
-        if X.shape[1] != statistics.shape[0]:
-            raise ValueError("X has %d features per sample, expected %d"
-                             % (X.shape[1], self.statistics_.shape[0]))
+        if self.axis == 0:
+            check_is_fitted(self, 'statistics_')
+            X = check_array(X, accept_sparse='csc', dtype=FLOAT_DTYPES,
+                            force_all_finite=False, copy=self.copy)
+            statistics = self.statistics_.copy()
+            if X.shape[1] != statistics.shape[0]:
+                raise ValueError("X has %d features per sample, expected %d"
+                                 % (X.shape[1], self.statistics_.shape[0]))
 
-        # impute completelly empty columns with constant
-        if self.empty_attribute_constant is not None:
-            invalid_mask = np.isnan(statistics)
-            X[:, invalid_mask] = self.empty_attribute_constant
-            statistics[invalid_mask] = self.empty_attribute_constant
+        # Since two different arrays can be provided in fit(X) and
+        # transform(X), the imputation data need to be recomputed
+        # when the imputation is done per sample
+        else:
+            X = check_array(X, accept_sparse='csr', dtype=FLOAT_DTYPES,
+                            force_all_finite=False, copy=self.copy)
+
+            if sparse.issparse(X):
+                statistics = self._sparse_fit(X,
+                                              self.strategy,
+                                              self.missing_values,
+                                              self.axis)
+
+            else:
+                statistics = self._dense_fit(X,
+                                             self.strategy,
+                                             self.missing_values,
+                                             self.axis)
+
+        # impute completelly empty columns with constant, if
+        # `fill_empty' parameter was set
+        if self.fill_empty is not None:
+            if sparse.issparse(X):
+                X = X.toarray()
+            empty_mask = np.all(_get_mask(X, self.missing_values),
+                                axis=self.axis)
+            statistics[empty_mask] = self.fill_empty
 
         # Delete the invalid rows/columns
         invalid_mask = np.isnan(statistics)
@@ -183,11 +207,14 @@ class ConditionalImputer(Imputer):
         valid_statistics_indexes = np.where(valid_mask)[0]
         missing = np.arange(X.shape[not self.axis])[invalid_mask]
 
-        if invalid_mask.any():
+        if self.axis == 0 and invalid_mask.any():
             if self.verbose:
                 warnings.warn("Deleting features without "
                               "observed values: %s" % missing)
             X = X[:, valid_statistics_indexes]
+        elif self.axis == 1 and invalid_mask.any():
+            raise ValueError("Some rows only contain "
+                             "missing values: %s" % missing)
 
         # Do actual imputation
         if sparse.issparse(X) and self.missing_values != 0:
@@ -205,7 +232,10 @@ class ConditionalImputer(Imputer):
             n_missing = np.sum(mask, axis=self.axis)
             values = np.repeat(valid_statistics, n_missing)
 
-            coordinates = np.where(mask.transpose())[::-1]
+            if self.axis == 0:
+                coordinates = np.where(mask.transpose())[::-1]
+            else:
+                coordinates = mask
 
             X[coordinates] = values
 
