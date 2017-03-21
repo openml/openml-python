@@ -6,7 +6,7 @@ import numpy as np
 import warnings
 from sklearn.model_selection._search import BaseSearchCV
 
-from build.lib.openml.exceptions import PyOpenMLError
+from ..exceptions import PyOpenMLError
 from .. import config
 from ..flows import sklearn_to_flow
 from ..exceptions import OpenMLCacheException
