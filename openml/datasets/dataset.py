@@ -321,7 +321,7 @@ class OpenMLDataset(object):
             assert type(self.row_id_attribute) is str, "row id attribute should be a str"
         if exclude is not None:
             assert type(exclude) is list, "Exclude should be a list"
-            assert all(isinstance(elem, str) for elem in exclude), "Exclude should be a list of strings"
+            # assert all(isinstance(elem, str) for elem in exclude), "Exclude should be a list of strings"
         to_exclude = []
         if exclude is not None:
             to_exclude.extend(exclude)
