@@ -31,7 +31,7 @@ class TestRun(TestBase):
         return run
 
     def test_run_regression_on_classif_task(self):
-        task_id = 10107
+        task_id = 115
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
@@ -43,7 +43,7 @@ class TestRun(TestBase):
 
     @mock.patch('openml.flows.sklearn_to_flow')
     def test_check_erronous_sklearn_flow_fails(self, sklearn_to_flow_mock):
-        task_id = 10107
+        task_id = 115
         task = openml.tasks.get_task(task_id)
 
         # Invalid parameter values
@@ -52,16 +52,16 @@ class TestRun(TestBase):
         self.assertRaisesRegexp(ValueError, "Penalty term must be positive; got \(C='abc'\)",
                                 openml.runs.run_task, task=task, model=clf)
 
-    def test_run_iris(self):
-        task_id = 10107
-        num_instances = 150
+    def test_run_diabetes(self):
+        task_id = 115
+        num_instances = 768
 
         clf = LogisticRegression()
         self._perform_run(task_id,num_instances, clf)
 
     def test_run_optimize_randomforest_iris(self):
-        task_id = 10107
-        num_instances = 150
+        task_id = 115
+        num_instances = 768
         num_folds = 10
         num_iterations = 5
 
@@ -80,8 +80,8 @@ class TestRun(TestBase):
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
 
     def test_run_optimize_bagging_iris(self):
-        task_id = 10107
-        num_instances = 150
+        task_id = 115
+        num_instances = 768
         num_folds = 10
         num_iterations = 9 # (num values for C times gamma)
 
@@ -94,8 +94,8 @@ class TestRun(TestBase):
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
 
     def test_run_pipeline(self):
-        task_id = 10107
-        num_instances = 150
+        task_id = 115
+        num_instances = 768
         num_folds = 10
         num_iterations = 9  # (num values for C times gamma)
 
@@ -107,8 +107,11 @@ class TestRun(TestBase):
         self.assertEqual(run.trace_content, None)
 
     def test__run_task_get_arffcontent(self):
-        task = openml.tasks.get_task(1939)
+        task = openml.tasks.get_task(7)
         class_labels = task.class_labels
+        num_instances = 3196
+        num_folds = 10
+        num_repeats = 1
 
         clf = SGDClassifier(loss='hinge', random_state=1)
         self.assertRaisesRegexp(AttributeError,
@@ -125,20 +128,24 @@ class TestRun(TestBase):
         self.assertIsInstance(arff_tracecontent, type(None))
 
         # 10 times 10 fold CV of 150 samples
-        self.assertEqual(len(arff_datacontent), 1500)
+        self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
         for arff_line in arff_datacontent:
-            self.assertEqual(len(arff_line), 8)
+            print(arff_line)
+            # check number columns
+            self.assertEqual(len(arff_line), 7)
+            # check repeat
             self.assertGreaterEqual(arff_line[0], 0)
-            self.assertLessEqual(arff_line[0], 9)
+            self.assertLessEqual(arff_line[0], num_repeats - 1)
+            # check fold
             self.assertGreaterEqual(arff_line[1], 0)
-            self.assertLessEqual(arff_line[1], 9)
+            self.assertLessEqual(arff_line[1], num_folds - 1)
+            # check row id
             self.assertGreaterEqual(arff_line[2], 0)
-            self.assertLessEqual(arff_line[2], 149)
-            self.assertAlmostEqual(sum(arff_line[3:6]), 1.0)
-            self.assertIn(arff_line[6], ['Iris-setosa', 'Iris-versicolor',
-                                         'Iris-virginica'])
-            self.assertIn(arff_line[7], ['Iris-setosa', 'Iris-versicolor',
-                                         'Iris-virginica'])
+            self.assertLessEqual(arff_line[2], num_instances - 1)
+            # check confidences
+            self.assertAlmostEqual(sum(arff_line[3:5]), 1.0)
+            self.assertIn(arff_line[5], ['won', 'nowin'])
+            self.assertIn(arff_line[6], ['won', 'nowin'])
 
     def test_get_run(self):
         # this run is not available on test
@@ -163,12 +170,16 @@ class TestRun(TestBase):
         self.assertEqual(len(run), 5)
 
     def test_get_runs_list(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         runs = openml.runs.list_runs(id=[2])
         self.assertEqual(len(runs), 1)
         for rid in runs:
             self._check_run(runs[rid])
 
     def test_get_runs_list_by_task(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         task_ids = [20]
         runs = openml.runs.list_runs(task=task_ids)
         self.assertGreaterEqual(len(runs), 590)
@@ -185,6 +196,8 @@ class TestRun(TestBase):
             self._check_run(runs[rid])
 
     def test_get_runs_list_by_uploader(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         # 29 is Dominik Kirchhoff - Joaquin and Jan have too many runs right now
         uploader_ids = [29]
 
@@ -204,6 +217,8 @@ class TestRun(TestBase):
             self._check_run(runs[rid])
 
     def test_get_runs_list_by_flow(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         flow_ids = [1154]
         runs = openml.runs.list_runs(flow=flow_ids)
         self.assertGreaterEqual(len(runs), 1)
@@ -220,6 +235,8 @@ class TestRun(TestBase):
             self._check_run(runs[rid])
 
     def test_get_runs_pagination(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         uploader_ids = [1]
         size = 10
         max = 100
@@ -230,9 +247,11 @@ class TestRun(TestBase):
                 self.assertIn(runs[rid]["uploader"], uploader_ids)
 
     def test_get_runs_list_by_filters(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         ids = [505212, 6100]
         tasks = [2974, 339]
-        uploaders_1 = [1, 17]
+        uploaders_1 = [1, 2]
         uploaders_2 = [29, 274]
         flows = [74, 1718]
 
@@ -253,6 +272,8 @@ class TestRun(TestBase):
         runs = openml.runs.list_runs(id=ids, task=tasks, uploader=uploaders_1)
 
     def test_get_runs_list_by_tag(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         runs = openml.runs.list_runs(tag='curves')
         self.assertGreaterEqual(len(runs), 1)
 

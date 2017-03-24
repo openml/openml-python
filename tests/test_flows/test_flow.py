@@ -104,7 +104,8 @@ class TestFlow(TestBase):
     def test_from_xml_to_xml(self):
         # Get the raw xml thing
         # TODO maybe get this via get_flow(), which would have to be refactored to allow getting only the xml dictionary
-        for flow_id in [1185, 1244, 1196, 1112, ]:
+        # TODO: no sklearn flows.
+        for flow_id in [3, 5, 7, 9, ]:
             flow_xml = _perform_api_call("flow/%d" % flow_id)
             flow_dict = xmltodict.parse(flow_xml)
 
