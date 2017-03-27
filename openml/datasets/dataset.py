@@ -320,19 +320,30 @@ class OpenMLDataset(object):
 
 
     def get_features_by_type(self, data_type, exclude=None,
-                             exclude_ignore_attributes=True, exclude_row_id_attribute=True):
+                             exclude_ignore_attributes=True,
+                             exclude_row_id_attribute=True):
         '''
         Returns indices of features of a given type, e.g., all nominal features.
         Can use additional parameters to exclude various features by index or ontology.
 
-        :param data_type: The data type to return (e.g., nominal, numeric, date, string)
-        :param exclude: Indices to exclude (and adapt the return values as if these indices
+        Parameters
+        ----------
+        data_type : str
+            The data type to return (e.g., nominal, numeric, date, string)
+        exclude : list(int)
+            Indices to exclude (and adapt the return values as if these indices
                         are not present)
-        :param exclude_ignore_attributes: Whether to exclude the defined ignore attributes
-                        (and adapt the return values as if these indices are not present)
-        :param exclude_row_id_attribute:Whether to exclude the defined row id attributes
-                        (and adapt the return values as if these indices are not present)
-        :return: a list of indices that have the specified data type
+        exclude_ignore_attributes : bool
+            Whether to exclude the defined ignore attributes (and adapt the
+            return values as if these indices are not present)
+        exclude_row_id_attribute : bool
+            Whether to exclude the defined row id attributes (and adapt the
+            return values as if these indices are not present)
+
+        Returns
+        -------
+        result : list
+            a list of indices that have the specified data type
         '''
         assert data_type in OpenMLDataFeature.LEGAL_DATA_TYPES, "Illegal feature type requested"
         if self.ignore_attributes is not None:
