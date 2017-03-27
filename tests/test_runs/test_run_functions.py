@@ -1,15 +1,21 @@
 import sys
 
-from sklearn.dummy import DummyClassifier
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression, SGDClassifier, LinearRegression
-from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
-from sklearn.svm import SVC
-from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, StratifiedKFold
-from sklearn.pipeline import Pipeline
 import openml
 import openml.exceptions
 from openml.testing import TestBase
+from openml.runs.functions import _run_task_get_arffcontent
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing.imputation import Imputer
+from sklearn.dummy import DummyClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression, SGDClassifier, \
+    LinearRegression
+from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
+from sklearn.svm import SVC
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
+    StratifiedKFold
+from sklearn.pipeline import Pipeline
 
 if sys.version_info[0] >= 3:
     from unittest import mock
@@ -278,14 +284,21 @@ class TestRun(TestBase):
         self.assertGreaterEqual(len(runs), 1)
 
     def test_run_on_dataset_with_missing_labels(self):
-        from openml.runs.functions import _run_task_get_arffcontent
-        from sklearn.tree import DecisionTreeClassifier
-        from sklearn.preprocessing.imputation import Imputer
+        # Check that _run_task_get_arffcontent works when one of the class
+        # labels only declared in the arff file, but is not present in the
+        # actual data
+
         task = openml.tasks.get_task(2)
         class_labels = task.class_labels
 
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        _run_task_get_arffcontent(model, task, class_labels)
-
+        data_content, _ = _run_task_get_arffcontent(model, task, class_labels)
+        # 2 folds, 5 repeats; keep in mind that this task comes from the test
+        # server, the task on the live server is different
+        self.assertEqual(len(data_content), 4490)
+        print(data_content[0])
+        for row in data_content:
+            # repeat, fold, row_id, 6 confidences, prediction and correct label
+            self.assertEqual(len(row), 11)
