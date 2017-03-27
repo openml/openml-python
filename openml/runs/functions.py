@@ -67,7 +67,7 @@ def run_task(task, model):
                          'only works for tasks with class labels.')
 
     # execute the run
-    run = OpenMLRun(task_id=task.task_id, flow_id=flow_id, dataset_id=dataset.dataset_id, model=model)
+    run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
 
     try:
         run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
