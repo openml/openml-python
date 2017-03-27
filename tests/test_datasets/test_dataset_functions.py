@@ -48,7 +48,7 @@ class TestOpenMLDataset(TestBase):
         features = _get_cached_dataset_features(2)
         self.assertIsInstance(dataset, OpenMLDataset)
         self.assertTrue(len(dataset.features) > 0)
-        self.assertTrue(len(dataset.features) == len(features))
+        self.assertTrue(len(dataset.features) == len(features['oml:feature']))
 
     def test_get_chached_dataset_description(self):
         openml.config.set_cache_directory(self.static_cache_dir)
@@ -90,13 +90,13 @@ class TestOpenMLDataset(TestBase):
         # data from the internet...
         datasets = openml.datasets.list_datasets()
         # 1087 as the number of datasets on openml.org
-        self.assertGreaterEqual(len(datasets), 1087)
+        self.assertGreaterEqual(len(datasets), 100)
         for did in datasets:
             self._check_dataset(datasets[did])
 
     def test_list_datasets_by_tag(self):
-        datasets = openml.datasets.list_datasets(tag='uci')
-        self.assertGreaterEqual(len(datasets), 5)
+        datasets = openml.datasets.list_datasets(tag='study_14')
+        self.assertGreaterEqual(len(datasets), 100)
         for did in datasets:
             self._check_dataset(datasets[did])
 
@@ -153,20 +153,20 @@ class TestOpenMLDataset(TestBase):
             openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
 
     def test_get_dataset_with_string(self):
-        dataset = openml.datasets.get_dataset(373)
+        dataset = openml.datasets.get_dataset(101)
         self.assertRaises(PyOpenMLError, dataset._get_arff, 'arff')
         self.assertRaises(PyOpenMLError, dataset.get_data)
 
     def test_get_dataset_sparse(self):
-        dataset = openml.datasets.get_dataset(1571)
+        dataset = openml.datasets.get_dataset(102)
         X = dataset.get_data()
         self.assertIsInstance(X, scipy.sparse.csr_matrix)
 
     def test_download_rowid(self):
         # Smoke test which checks that the dataset has the row-id set correctly
-        did = 164
+        did = 44
         dataset = openml.datasets.get_dataset(did)
-        self.assertEqual(dataset.row_id_attribute, 'instance')
+        self.assertEqual(dataset.row_id_attribute, 'Counter')
 
     def test__get_dataset_description(self):
         description = _get_dataset_description(self.workdir, 2)

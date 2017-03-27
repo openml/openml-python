@@ -2,6 +2,7 @@ import gzip
 import io
 import logging
 import os
+import six
 import sys
 
 import arff
@@ -10,6 +11,7 @@ import numpy as np
 import scipy.sparse
 import xmltodict
 
+from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
 
 if sys.version_info[0] >= 3:
@@ -63,7 +65,15 @@ class OpenMLDataset(object):
         self.url = url
         self.default_target_attribute = default_target_attribute
         self.row_id_attribute = row_id_attribute
-        self.ignore_attributes = ignore_attribute
+        self.ignore_attributes = None
+        if isinstance(ignore_attribute, six.string_types):
+            self.ignore_attributes = [ignore_attribute]
+        elif isinstance(ignore_attribute, list):
+            self.ignore_attributes = ignore_attribute
+        elif ignore_attribute is None:
+            pass
+        else:
+            raise ValueError('wrong data type for ignore_attribute. Should be list. ')
         self.version_label = version_label
         self.citation = citation
         self.tag = tag
@@ -73,7 +83,20 @@ class OpenMLDataset(object):
         self.update_comment = update_comment
         self.md5_cheksum = md5_checksum
         self.data_file = data_file
-        self.features = features
+        self.features = None
+
+        if features is not None:
+            self.features = {}
+            for idx, xmlfeature in enumerate(features['oml:feature']):
+                feature = OpenMLDataFeature(int(xmlfeature['oml:index']),
+                                            xmlfeature['oml:name'],
+                                            xmlfeature['oml:data_type'],
+                                            None, #todo add nominal values (currently not in database)
+                                            int(xmlfeature['oml:number_of_missing_values']))
+                if idx != feature.index:
+                    raise ValueError('Data features not provided in right order')
+                self.features[feature.index] = feature
+
 
         if data_file is not None:
             if self._data_features_supported():
@@ -205,10 +228,7 @@ class OpenMLDataset(object):
             if not self.ignore_attributes:
                 pass
             else:
-                if is_string(self.ignore_attributes):
-                    to_exclude.append(self.ignore_attributes)
-                else:
-                    to_exclude.extend(self.ignore_attributes)
+                to_exclude.extend(self.ignore_attributes)
 
         if len(to_exclude) > 0:
             logger.info("Going to remove the following attributes:"
@@ -298,6 +318,61 @@ class OpenMLDataset(object):
         else:
             return None
 
+
+    def get_features_by_type(self, data_type, exclude=None,
+                             exclude_ignore_attributes=True,
+                             exclude_row_id_attribute=True):
+        '''
+        Returns indices of features of a given type, e.g., all nominal features.
+        Can use additional parameters to exclude various features by index or ontology.
+
+        Parameters
+        ----------
+        data_type : str
+            The data type to return (e.g., nominal, numeric, date, string)
+        exclude : list(int)
+            Indices to exclude (and adapt the return values as if these indices
+                        are not present)
+        exclude_ignore_attributes : bool
+            Whether to exclude the defined ignore attributes (and adapt the
+            return values as if these indices are not present)
+        exclude_row_id_attribute : bool
+            Whether to exclude the defined row id attributes (and adapt the
+            return values as if these indices are not present)
+
+        Returns
+        -------
+        result : list
+            a list of indices that have the specified data type
+        '''
+        assert data_type in OpenMLDataFeature.LEGAL_DATA_TYPES, "Illegal feature type requested"
+        if self.ignore_attributes is not None:
+            assert type(self.ignore_attributes) is list, "ignore_attributes should be a list"
+        if self.row_id_attribute is not None:
+            assert type(self.row_id_attribute) is str, "row id attribute should be a str"
+        if exclude is not None:
+            assert type(exclude) is list, "Exclude should be a list"
+            # assert all(isinstance(elem, str) for elem in exclude), "Exclude should be a list of strings"
+        to_exclude = []
+        if exclude is not None:
+            to_exclude.extend(exclude)
+        if exclude_ignore_attributes and self.ignore_attributes is not None:
+            to_exclude.extend(self.ignore_attributes)
+        if exclude_row_id_attribute and self.row_id_attribute is not None:
+            to_exclude.append(self.row_id_attribute)
+
+        result = []
+        offset = 0
+        # this function assumes that everything in to_exclude will be 'excluded' from the dataset (hence the offset)
+        for idx in self.features:
+            name = self.features[idx].name
+            if name in to_exclude:
+                offset += 1
+            else:
+                if self.features[idx].data_type == data_type:
+                    result.append(idx-offset)
+        return result
+
     def publish(self):
         """Publish the dataset on the OpenML server.
 
@@ -349,8 +424,8 @@ class OpenMLDataset(object):
 
     def _data_features_supported(self):
         if self.features is not None:
-            for feature in self.features['oml:feature']:
-                if feature['oml:data_type'] not in ['numeric', 'nominal']:
+            for idx in self.features:
+                if self.features[idx].data_type not in ['numeric', 'nominal']:
                     return False
             return True
         return True

@@ -16,7 +16,7 @@ In particular, this module implemts a python interface for the
 """
 from . import config
 
-from .datasets import OpenMLDataset
+from .datasets import OpenMLDataset, OpenMLDataFeature
 from . import datasets
 from . import runs
 from . import flows
@@ -27,5 +27,6 @@ from .flows import OpenMLFlow
 
 __version__ = "0.2.1"
 
-__all__ = ['OpenMLDataset', 'OpenMLRun', 'OpenMLSplit', 'datasets',
-           'OpenMLTask', 'OpenMLFlow', 'config', 'runs', 'flows']
+__all__ = ['OpenMLDataset', 'OpenMLDataFeature', 'OpenMLRun',
+           'OpenMLSplit', 'datasets', 'OpenMLTask', 'OpenMLFlow',
+           'config', 'runs', 'flows']
