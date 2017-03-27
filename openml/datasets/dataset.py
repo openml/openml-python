@@ -10,6 +10,7 @@ import numpy as np
 import scipy.sparse
 import xmltodict
 
+from builtins import str
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
 
@@ -65,14 +66,14 @@ class OpenMLDataset(object):
         self.default_target_attribute = default_target_attribute
         self.row_id_attribute = row_id_attribute
         self.ignore_attributes = None
-        if type(ignore_attribute) == str:
+        if isinstance(ignore_attribute, str):
             self.ignore_attributes = [ignore_attribute]
-        elif type(ignore_attribute) == list:
+        elif isinstance(ignore_attribute, list):
             self.ignore_attributes = ignore_attribute
         elif ignore_attribute is None:
             pass
         else:
-            raise ValueError('wrong data type for ignore_attribute. Should be list (or string). ')
+            raise ValueError('wrong data type for ignore_attribute. Should be list. ')
         self.version_label = version_label
         self.citation = citation
         self.tag = tag
