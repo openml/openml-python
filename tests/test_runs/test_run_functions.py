@@ -39,7 +39,7 @@ class TestRun(TestBase):
     def test_run_regression_on_classif_task(self):
         task_id = 115
 
-        clf = LinearRegression()
+        clf = LogisticRegression()
         task = openml.tasks.get_task(task_id)
         run = openml.runs.run_task(task=task, model=clf)
         run.publish()
