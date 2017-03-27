@@ -65,14 +65,14 @@ class OpenMLDataset(object):
         self.default_target_attribute = default_target_attribute
         self.row_id_attribute = row_id_attribute
         self.ignore_attributes = None
-        if isinstance(ignore_attribute, str):
+        if type(ignore_attribute) == str:
             self.ignore_attributes = [ignore_attribute]
-        elif isinstance(ignore_attribute, list):
+        elif type(ignore_attribute) == list:
             self.ignore_attributes = ignore_attribute
         elif ignore_attribute is None:
             pass
         else:
-            raise ValueError('wrong data type for ignore_attribute. Should be list. ')
+            raise ValueError('wrong data type for ignore_attribute. Should be list (or string). ')
         self.version_label = version_label
         self.citation = citation
         self.tag = tag
