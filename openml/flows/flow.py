@@ -340,26 +340,6 @@ class OpenMLFlow(object):
         self.flow_id = int(xmltodict.parse(return_value)['oml:upload_flow']['oml:id'])
         return self
 
-    def _ensure_flow_exists(self):
-        """ Checks if a flow exists for the given model and possibly creates it.
-
-        If the given flow exists on the server, the flow-id will simply
-        be returned. Otherwise it will be uploaded to the server.
-
-        Returns
-        -------
-        flow_id : int
-            Flow id on the server.
-        """
-        _, flow_id = _check_flow_exists(self.name, self.external_version)
-        # TODO add numpy and scipy version!
-
-        if int(flow_id) == -1:
-            flow = self.publish()
-            return int(flow.flow_id)
-
-        return int(flow_id)
-
 
 def _check_flow_exists(name, version):
     """Retrieves the flow id of the flow uniquely identified by name+version.

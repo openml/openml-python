@@ -4,6 +4,7 @@ import os
 import xmltodict
 import numpy as np
 import warnings
+import openml
 from sklearn.model_selection._search import BaseSearchCV
 
 from build.lib.openml.exceptions import PyOpenMLError
@@ -44,14 +45,13 @@ def run_task(task, model):
     # adds quite a lot of functionality which is better suited in other places!
     # TODO why doesn't this accept a flow as input? - this would make this more flexible!
     flow = sklearn_to_flow(model)
-    flow_id = flow._ensure_flow_exists()
-    if flow_id < 0:
-        print("No flow")
-        return 0, 2
-    config.logger.info(flow_id)
 
-    if config.avoid_duplicate_runs:
-        # TODO: would be nice if flow._ensure_flow_exists already handled this
+    # returns flow id if the flow exists on the server, -1 otherwise
+    _, flow_id = openml.flows._check_flow_exists(flow.name, flow.external_version)
+
+    # skips the run if it already exists and the user opts for this in the config file.
+    # also, if the flow is not present on the server, the check is not needed.
+    if config.avoid_duplicate_runs and flow_id > 0:
         flow = get_flow(flow_id)
         setup_id = setup_exists(flow, model)
         ids = _run_exists(task.task_id, setup_id)
@@ -74,6 +74,14 @@ def run_task(task, model):
     except PyOpenMLError as message:
         run.error_message = str(message)
         warnings.warn("Run terminated with error: %s" %run.error_message)
+
+    if flow_id < 0:
+        flow.publish()
+    config.logger.info(flow_id)
+
+    # attach the flow to the run
+    run.flow_id = flow_id
+
 
     return run
 
