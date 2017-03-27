@@ -46,7 +46,7 @@ class TestRun(TestBase):
         from sklearn.tree import DecisionTreeClassifier
         # first publish a nonexiting flow
         bagging = BaggingClassifier(DecisionTreeClassifier(max_depth=5,
-                                                           min_samples_split=1),
+                                                           min_samples_split=3),
                                     n_estimators=3,
                                     max_samples=0.5)
         flow = openml.flows.sklearn_to_flow(bagging)
