@@ -69,6 +69,41 @@ def list_flows(offset=None, size=None, tag=None):
     return _list_flows(api_call)
 
 
+def flow_exists(name, version):
+    """Retrieves the flow id of the flow uniquely identified by name+version.
+
+    Parameter
+    ---------
+    name : string
+        Name of the flow
+    version : string
+        Version information associated with flow.
+
+    Returns
+    -------
+    flow_exist : int
+        flow id iff exists, False otherwise
+
+    Notes
+    -----
+    see http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
+    """
+    if not (type(name) is str and len(name) > 0):
+        raise ValueError('Argument \'name\' should be a non-empty string')
+    if not (type(version) is str and len(version) > 0):
+        raise ValueError('Argument \'version\' should be a non-empty string')
+
+    xml_response = _perform_api_call("flow/exists",
+                                     data={'name': name, 'external_version': version})
+
+    result_dict = xmltodict.parse(xml_response)
+    flow_id = int(result_dict['oml:flow_exists']['oml:id'])
+    if flow_id > 0:
+        return flow_id
+    else:
+        return False;
+
+
 def _list_flows(api_call):
     # TODO add proper error handling here!
     xml_string = _perform_api_call(api_call)

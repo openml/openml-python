@@ -9,7 +9,7 @@ from sklearn.model_selection._search import BaseSearchCV
 
 from ..exceptions import PyOpenMLError
 from .. import config
-from ..flows import sklearn_to_flow, get_flow
+from ..flows import sklearn_to_flow, get_flow, flow_exists
 from ..setups import setup_exists
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError
@@ -47,11 +47,11 @@ def run_task(task, model):
     flow = sklearn_to_flow(model)
 
     # returns flow id if the flow exists on the server, -1 otherwise
-    _, flow_id = openml.flows._check_flow_exists(flow.name, flow.external_version)
+    flow_id = flow_exists(flow.name, flow.external_version)
 
     # skips the run if it already exists and the user opts for this in the config file.
     # also, if the flow is not present on the server, the check is not needed.
-    if config.avoid_duplicate_runs and flow_id > 0:
+    if config.avoid_duplicate_runs and flow_id:
         flow = get_flow(flow_id)
         setup_id = setup_exists(flow, model)
         ids = _run_exists(task.task_id, setup_id)
@@ -70,13 +70,17 @@ def run_task(task, model):
     run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
     run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
 
-    if flow_id < 0:
-        flow.publish()
-    config.logger.info(flow_id)
+    if flow_id == False:
+        # means the flow did not exists.
+        # As we could run it, publish it now
+        flow = flow.publish()
+    else:
+        # flow already existed, download it from server
+        # TODO (neccessary? is this a post condition of this function)
+        flow = get_flow(flow_id)
 
-    # attach the flow to the run
-    run.flow_id = flow_id
-
+    run.flow_id = flow.flow_id
+    config.logger.info('Executed Task %d with Flow id: %d' %(task.task_id, run.flow_id))
 
     return run
 
@@ -311,27 +315,28 @@ def _create_run_from_xml(xml):
     evaluations = dict()
     detailed_evaluations = defaultdict(lambda: defaultdict(dict))
     evaluation_flows = dict()
-    for evaluation_dict in run['oml:output_data']['oml:evaluation']:
-        key = evaluation_dict['oml:name']
-        if 'oml:value' in evaluation_dict:
-            value = float(evaluation_dict['oml:value'])
-        elif 'oml:array_data' in evaluation_dict:
-            value = evaluation_dict['oml:array_data']
-        else:
-            raise ValueError('Could not find keys "value" or "array_data" '
-                             'in %s' % str(evaluation_dict.keys()))
+    if 'oml:output_data' in run and 'oml:evaluation' in run['oml:output_data']:
+        for evaluation_dict in run['oml:output_data']['oml:evaluation']:
+            key = evaluation_dict['oml:name']
+            if 'oml:value' in evaluation_dict:
+                value = float(evaluation_dict['oml:value'])
+            elif 'oml:array_data' in evaluation_dict:
+                value = evaluation_dict['oml:array_data']
+            else:
+                raise ValueError('Could not find keys "value" or "array_data" '
+                                 'in %s' % str(evaluation_dict.keys()))
 
-        if '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
-            repeat = int(evaluation_dict['@repeat'])
-            fold = int(evaluation_dict['@fold'])
-            repeat_dict = detailed_evaluations[key]
-            fold_dict = repeat_dict[repeat]
-            fold_dict[fold] = value
-        else:
-            evaluations[key] = value
+            if '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
+                repeat = int(evaluation_dict['@repeat'])
+                fold = int(evaluation_dict['@fold'])
+                repeat_dict = detailed_evaluations[key]
+                fold_dict = repeat_dict[repeat]
+                fold_dict[fold] = value
+            else:
+                evaluations[key] = value
+                evaluation_flows[key] = flow_id
+
             evaluation_flows[key] = flow_id
-
-        evaluation_flows[key] = flow_id
 
     return OpenMLRun(run_id=run_id, uploader=uploader,
                      uploader_name=uploader_name, task_id=task_id,

@@ -2,6 +2,7 @@ import collections
 import hashlib
 import re
 import time
+import random
 import unittest
 
 import xmltodict
@@ -16,6 +17,7 @@ import sklearn.feature_selection
 import sklearn.model_selection
 import sklearn.pipeline
 import sklearn.preprocessing
+import sklearn.naive_bayes
 import sklearn.tree
 
 from openml.testing import TestBase
@@ -174,24 +176,27 @@ class TestFlow(TestBase):
                                                    ('classif', sklearn.tree.DecisionTreeClassifier())])
         self.assertRaises(ValueError, openml.flows.sklearn_to_flow, illegal)
 
-    def test_ensure_flow_exists(self):
-        sentinel = get_sentinel()
+    def test_nonexiting_flow_exists(self):
+        name = get_sentinel() + get_sentinel()
+        version = get_sentinel()
 
-        flow = openml.OpenMLFlow(name='Test',
-                                 description="test description",
-                                 model=sklearn.dummy.DummyClassifier(),
-                                 components=collections.OrderedDict(),
-                                 parameters=collections.OrderedDict(),
-                                 parameters_meta_info=collections.OrderedDict(),
-                                 external_version=_format_external_version(
-                                     'sklearn', sklearn.__version__),
-                                 tags=[],
-                                 language='English',
-                                 dependencies='')
+        flow_id = openml.flows.flow_exists(name, version)
+        self.assertEquals(flow_id, False)
+
+    def test_exiting_flow_exists(self):
+        # create a flow
+        sentinel = get_sentinel()
+        nb = sklearn.naive_bayes.GaussianNB()
+        flow = openml.flows.sklearn_to_flow(nb)
         flow.name = 'TEST%s%s' % (sentinel, flow.name)
-        flow_id = flow._ensure_flow_exists()
-        self.assertIsInstance(flow_id, int)
-        self.assertEqual(flow._ensure_flow_exists(), flow_id)
+
+        flow = flow.publish()
+
+        # check if flow exists can find it
+        flow = openml.flows.get_flow(flow.flow_id)
+        downloaded_flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
+        self.assertEquals(downloaded_flow_id, flow.flow_id)
+
 
     def test_sklearn_to_upload_to_flow(self):
         iris = sklearn.datasets.load_iris()
