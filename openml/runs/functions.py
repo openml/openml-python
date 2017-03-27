@@ -74,8 +74,10 @@ def run_task(task, model):
     return run
 
 
-def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label, predicted_probabilities, class_labels, model_classes_mapping):
-    """Complicated util function that turns probability estimates of a classifier for a given instance into the right arff format to upload to openml.
+def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label,
+                       predicted_probabilities, class_labels, model_classes_mapping):
+    """Util function that turns probability estimates of a classifier for a given
+        instance into the right arff format to upload to openml.
 
         Parameters
         ----------
@@ -90,6 +92,9 @@ def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label, 
         predicted_probabilities : array (size=num_classes)
             probabilities per class
         class_labels : array (size=num_classes)
+        model_classes_mapping : list
+            A list of classes the model produced.
+            Obtained by BaseEstimator.classes_
 
         Returns
         -------

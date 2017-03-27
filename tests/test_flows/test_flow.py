@@ -156,6 +156,8 @@ class TestFlow(TestBase):
 
     def test_semi_legal_flow(self):
         # TODO: Test if parameters are set correctly!
+        # should not throw error as it contains two differentiable forms of Bagging
+        # i.e., Bagging(Bagging(J48)) and Bagging(J48)
         sentinel = get_sentinel()
         semi_legal = sklearn.ensemble.BaggingClassifier(
             base_estimator=sklearn.ensemble.BaggingClassifier(
@@ -166,6 +168,7 @@ class TestFlow(TestBase):
         flow.publish()
 
     def test_illegal_flow(self):
+        # should throw error as it contains two imputers
         illegal = sklearn.pipeline.Pipeline(steps=[('imputer1', sklearn.preprocessing.Imputer()),
                                                    ('imputer2', sklearn.preprocessing.Imputer()),
                                                    ('classif', sklearn.tree.DecisionTreeClassifier())])
