@@ -1,4 +1,5 @@
 import xmltodict
+import six
 
 from openml._api_calls import _perform_api_call
 from . import OpenMLFlow, flow_to_sklearn
@@ -88,7 +89,7 @@ def flow_exists(name, version):
     -----
     see http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
     """
-    if not (type(name) is str and len(name) > 0):
+    if not (type(name) is six.stringtypes and len(name) > 0):
         raise ValueError('Argument \'name\' should be a non-empty string')
     if not (type(version) is str and len(version) > 0):
         raise ValueError('Argument \'version\' should be a non-empty string')
