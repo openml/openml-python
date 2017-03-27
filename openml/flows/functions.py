@@ -91,7 +91,7 @@ def flow_exists(name, version):
     """
     if not (isinstance(name, six.string_types) and len(name) > 0):
         raise ValueError('Argument \'name\' should be a non-empty string')
-    if not (type(version) is str and len(version) > 0):
+    if not (isinstance(name, six.string_types) and len(version) > 0):
         raise ValueError('Argument \'version\' should be a non-empty string')
 
     xml_response = _perform_api_call("flow/exists",
