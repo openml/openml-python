@@ -189,8 +189,10 @@ class TestFlow(TestBase):
         nb = sklearn.naive_bayes.GaussianNB()
         flow = openml.flows.sklearn_to_flow(nb)
         flow.name = 'TEST%s%s' % (sentinel, flow.name)
-
+        #publish the flow
         flow = flow.publish()
+        #redownload the flow
+        flow = openml.flows.get_flow(flow.flow_id)
 
         # check if flow exists can find it
         flow = openml.flows.get_flow(flow.flow_id)
