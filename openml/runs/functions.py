@@ -53,12 +53,7 @@ def run_task(task, model):
 
     # execute the run
     run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
-
-    try:
-        run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
-    except PyOpenMLError as message:
-        run.error_message = str(message)
-        warnings.warn("Run terminated with error: %s" %run.error_message)
+    run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
 
     # now generate the flow
     flow = sklearn_to_flow(model)
@@ -131,17 +126,13 @@ def _run_task_get_arffcontent(model, task, class_labels):
             testX = X[test_indices]
             testY = Y[test_indices]
 
-            try:
-                model.fit(trainX, trainY)
+            model.fit(trainX, trainY)
 
-                if isinstance(model, BaseSearchCV):
-                    _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no)
-                    model_classes = model.best_estimator_.classes_
-                else:
-                    model_classes = model.classes_
-            except AttributeError as e:
-                # typically happens when training a regressor on classification task
-                raise PyOpenMLError(str(e))
+            if isinstance(model, BaseSearchCV):
+                _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no)
+                model_classes = model.best_estimator_.classes_
+            else:
+                model_classes = model.classes_
 
             ProbaY = model.predict_proba(testX)
             PredY = model.predict(testX)

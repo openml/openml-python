@@ -136,7 +136,6 @@ class TestRun(TestBase):
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
         for arff_line in arff_datacontent:
-            print(arff_line)
             # check number columns
             self.assertEqual(len(arff_line), 7)
             # check repeat
@@ -298,7 +297,6 @@ class TestRun(TestBase):
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)
-        print(data_content[0])
         for row in data_content:
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             self.assertEqual(len(row), 11)
