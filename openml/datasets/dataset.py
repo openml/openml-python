@@ -2,6 +2,7 @@ import gzip
 import io
 import logging
 import os
+import six
 import sys
 
 import arff
@@ -10,7 +11,7 @@ import numpy as np
 import scipy.sparse
 import xmltodict
 
-from ..datasets.data_feature import OpenMLDataFeature
+from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
 
 if sys.version_info[0] >= 3:
@@ -65,10 +66,14 @@ class OpenMLDataset(object):
         self.default_target_attribute = default_target_attribute
         self.row_id_attribute = row_id_attribute
         self.ignore_attributes = None
-        if isinstance(ignore_attribute, str):
+        if isinstance(ignore_attribute, six.string_types):
             self.ignore_attributes = [ignore_attribute]
         elif isinstance(ignore_attribute, list):
             self.ignore_attributes = ignore_attribute
+        elif ignore_attribute is None:
+            pass
+        else:
+            raise ValueError('wrong data type for ignore_attribute. Should be list. ')
         self.version_label = version_label
         self.citation = citation
         self.tag = tag
@@ -88,7 +93,8 @@ class OpenMLDataset(object):
                                             xmlfeature['oml:data_type'],
                                             None, #todo add nominal values (currently not in database)
                                             int(xmlfeature['oml:number_of_missing_values']))
-                assert idx == feature.index, "Data features not provided in right order"
+                if idx != feature.index:
+                    raise ValueError('Data features not provided in right order')
                 self.features[feature.index] = feature
 
 
@@ -313,7 +319,32 @@ class OpenMLDataset(object):
             return None
 
 
-    def get_features_by_type(self, data_type, exclude=None, exclude_ignore_attributes=True, exclude_row_id_attribute=True):
+    def get_features_by_type(self, data_type, exclude=None,
+                             exclude_ignore_attributes=True,
+                             exclude_row_id_attribute=True):
+        '''
+        Returns indices of features of a given type, e.g., all nominal features.
+        Can use additional parameters to exclude various features by index or ontology.
+
+        Parameters
+        ----------
+        data_type : str
+            The data type to return (e.g., nominal, numeric, date, string)
+        exclude : list(int)
+            Indices to exclude (and adapt the return values as if these indices
+                        are not present)
+        exclude_ignore_attributes : bool
+            Whether to exclude the defined ignore attributes (and adapt the
+            return values as if these indices are not present)
+        exclude_row_id_attribute : bool
+            Whether to exclude the defined row id attributes (and adapt the
+            return values as if these indices are not present)
+
+        Returns
+        -------
+        result : list
+            a list of indices that have the specified data type
+        '''
         assert data_type in OpenMLDataFeature.LEGAL_DATA_TYPES, "Illegal feature type requested"
         if self.ignore_attributes is not None:
             assert type(self.ignore_attributes) is list, "ignore_attributes should be a list"
@@ -321,7 +352,7 @@ class OpenMLDataset(object):
             assert type(self.row_id_attribute) is str, "row id attribute should be a str"
         if exclude is not None:
             assert type(exclude) is list, "Exclude should be a list"
-            assert all(isinstance(elem, str) for elem in exclude), "Exclude should be a list of strings"
+            # assert all(isinstance(elem, str) for elem in exclude), "Exclude should be a list of strings"
         to_exclude = []
         if exclude is not None:
             to_exclude.extend(exclude)

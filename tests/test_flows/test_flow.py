@@ -104,7 +104,8 @@ class TestFlow(TestBase):
     def test_from_xml_to_xml(self):
         # Get the raw xml thing
         # TODO maybe get this via get_flow(), which would have to be refactored to allow getting only the xml dictionary
-        for flow_id in [1185, 1244, 1196, 1112, ]:
+        # TODO: no sklearn flows.
+        for flow_id in [3, 5, 7, 9, ]:
             flow_xml = _perform_api_call("flow/%d" % flow_id)
             flow_dict = xmltodict.parse(flow_xml)
 
@@ -152,6 +153,26 @@ class TestFlow(TestBase):
 
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)
+
+    def test_semi_legal_flow(self):
+        # TODO: Test if parameters are set correctly!
+        # should not throw error as it contains two differentiable forms of Bagging
+        # i.e., Bagging(Bagging(J48)) and Bagging(J48)
+        sentinel = get_sentinel()
+        semi_legal = sklearn.ensemble.BaggingClassifier(
+            base_estimator=sklearn.ensemble.BaggingClassifier(
+                base_estimator=sklearn.tree.DecisionTreeClassifier()))
+        flow = openml.flows.sklearn_to_flow(semi_legal)
+        flow.name = 'TEST%s%s' % (sentinel, flow.name)
+
+        flow.publish()
+
+    def test_illegal_flow(self):
+        # should throw error as it contains two imputers
+        illegal = sklearn.pipeline.Pipeline(steps=[('imputer1', sklearn.preprocessing.Imputer()),
+                                                   ('imputer2', sklearn.preprocessing.Imputer()),
+                                                   ('classif', sklearn.tree.DecisionTreeClassifier())])
+        self.assertRaises(ValueError, openml.flows.sklearn_to_flow, illegal)
 
     def test_ensure_flow_exists(self):
         sentinel = get_sentinel()

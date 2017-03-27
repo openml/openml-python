@@ -7,7 +7,7 @@ import warnings
 import openml
 from sklearn.model_selection._search import BaseSearchCV
 
-from build.lib.openml.exceptions import PyOpenMLError
+from ..exceptions import PyOpenMLError
 from .. import config
 from ..flows import sklearn_to_flow, get_flow
 from ..setups import setup_exists
@@ -68,12 +68,7 @@ def run_task(task, model):
 
     # execute the run
     run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
-
-    try:
-        run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
-    except PyOpenMLError as message:
-        run.error_message = str(message)
-        warnings.warn("Run terminated with error: %s" %run.error_message)
+    run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
 
     if flow_id < 0:
         flow.publish()
@@ -110,8 +105,10 @@ def _run_exists(task_id, setup_id):
 
 
 
-def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label, predicted_probabilities, class_labels, model_classes_mapping):
-    """Complicated util function that turns probability estimates of a classifier for a given instance into the right arff format to upload to openml.
+def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label,
+                       predicted_probabilities, class_labels, model_classes_mapping):
+    """Util function that turns probability estimates of a classifier for a given
+        instance into the right arff format to upload to openml.
 
         Parameters
         ----------
@@ -126,6 +123,9 @@ def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label, 
         predicted_probabilities : array (size=num_classes)
             probabilities per class
         class_labels : array (size=num_classes)
+        model_classes_mapping : list
+            A list of classes the model produced.
+            Obtained by BaseEstimator.classes_
 
         Returns
         -------
@@ -162,17 +162,13 @@ def _run_task_get_arffcontent(model, task, class_labels):
             testX = X[test_indices]
             testY = Y[test_indices]
 
-            try:
-                model.fit(trainX, trainY)
+            model.fit(trainX, trainY)
 
-                if isinstance(model, BaseSearchCV):
-                    _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no)
-                    model_classes = model.best_estimator_.classes_
-                else:
-                    model_classes = model.classes_
-            except AttributeError as e:
-                # typically happens when training a regressor on classification task
-                raise PyOpenMLError(str(e))
+            if isinstance(model, BaseSearchCV):
+                _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no)
+                model_classes = model.best_estimator_.classes_
+            else:
+                model_classes = model.classes_
 
             ProbaY = model.predict_proba(testX)
             PredY = model.predict(testX)
