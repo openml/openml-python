@@ -39,13 +39,11 @@ class TestRun(TestBase):
     def test_run_regression_on_classif_task(self):
         task_id = 115
 
-        clf = LogisticRegression()
+        clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
-        run = openml.runs.run_task(task=task, model=clf)
-        run.publish()
-
-        # TODO: download and check whether it really contains the error message
-        #downloaded_run = openml.runs.get_run(run.run_id)
+        self.assertRaisesRegexp(AttributeError,
+                                "'LinearRegression' object has no attribute 'classes_'",
+                                openml.runs.run_task, task=task, model=clf)
 
     @mock.patch('openml.flows.sklearn_to_flow')
     def test_check_erronous_sklearn_flow_fails(self, sklearn_to_flow_mock):
