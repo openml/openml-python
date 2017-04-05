@@ -6,6 +6,9 @@ import openml
 import openml.exceptions
 from openml.testing import TestBase
 
+from sklearn.ensemble import BaggingClassifier
+from sklearn.tree import DecisionTreeClassifier
+
 if sys.version_info[0] >= 3:
     from unittest import mock
 else:
@@ -27,8 +30,7 @@ def get_sentinel():
 class TestRun(TestBase):
 
     def test_nonexisting_setup_exists(self):
-        from sklearn.tree import DecisionTreeClassifier
-        # first publish a nonexiting flow
+        # first publish a non-existing flow
         sentinel = get_sentinel()
         dectree = DecisionTreeClassifier()
         flow = openml.flows.sklearn_to_flow(dectree)
@@ -38,12 +40,10 @@ class TestRun(TestBase):
         # although the flow exists, we can be sure there are no
         # setups (yet) as it hasn't been ran
         setup_id = openml.setups.setup_exists(flow, dectree)
-        self.assertEquals(setup_id, False)
+        self.assertFalse(setup_id)
 
 
     def test_existing_setup_exists(self):
-        from sklearn.ensemble import BaggingClassifier
-        from sklearn.tree import DecisionTreeClassifier
         # first publish a nonexiting flow
         bagging = BaggingClassifier(DecisionTreeClassifier(max_depth=5,
                                                            min_samples_split=3),
@@ -57,7 +57,7 @@ class TestRun(TestBase):
         # although the flow exists, we can be sure there are no
         # setups (yet) as it hasn't been ran
         setup_id = openml.setups.setup_exists(flow, bagging)
-        self.assertEquals(setup_id, False)
+        self.assertFalse(setup_id)
 
         # now run the flow on an easy task:
         task = openml.tasks.get_task(115) #diabetes

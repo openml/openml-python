@@ -27,7 +27,7 @@ class TestRun(TestBase):
 
     def _perform_run(self, task_id, num_instances, clf):
         task = openml.tasks.get_task(task_id)
-        run = openml.runs.run_task(task, clf)
+        run = openml.runs.run_task(task, clf, openml.config.avoid_duplicate_runs)
         run_ = run.publish()
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)

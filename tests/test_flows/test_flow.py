@@ -176,14 +176,14 @@ class TestFlow(TestBase):
                                                    ('classif', sklearn.tree.DecisionTreeClassifier())])
         self.assertRaises(ValueError, openml.flows.sklearn_to_flow, illegal)
 
-    def test_nonexiting_flow_exists(self):
+    def test_nonexisting_flow_exists(self):
         name = get_sentinel() + get_sentinel()
         version = get_sentinel()
 
         flow_id = openml.flows.flow_exists(name, version)
-        self.assertEquals(flow_id, False)
+        self.assertFalse(flow_id)
 
-    def test_exiting_flow_exists(self):
+    def test_existing_flow_exists(self):
         # create a flow
         sentinel = get_sentinel()
         nb = sklearn.naive_bayes.GaussianNB()

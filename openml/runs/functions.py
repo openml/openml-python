@@ -23,7 +23,7 @@ from .run import OpenMLRun
 
 
 
-def run_task(task, model):
+def run_task(task, model, avoid_duplicate_runs=True):
     """Performs a CV run on the dataset of the given task, using the split.
 
     Parameters
@@ -46,12 +46,12 @@ def run_task(task, model):
     # TODO why doesn't this accept a flow as input? - this would make this more flexible!
     flow = sklearn_to_flow(model)
 
-    # returns flow id if the flow exists on the server, -1 otherwise
+    # returns flow id if the flow exists on the server, False otherwise
     flow_id = flow_exists(flow.name, flow.external_version)
 
     # skips the run if it already exists and the user opts for this in the config file.
     # also, if the flow is not present on the server, the check is not needed.
-    if config.avoid_duplicate_runs and flow_id:
+    if avoid_duplicate_runs and flow_id:
         flow = get_flow(flow_id)
         setup_id = setup_exists(flow, model)
         ids = _run_exists(task.task_id, setup_id)

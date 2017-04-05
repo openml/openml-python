@@ -70,8 +70,8 @@ def list_flows(offset=None, size=None, tag=None):
     return _list_flows(api_call)
 
 
-def flow_exists(name, version):
-    """Retrieves the flow id of the flow uniquely identified by name+version.
+def flow_exists(name, external_version):
+    """Retrieves the flow id of the flow uniquely identified by name + external_version.
 
     Parameter
     ---------
@@ -91,18 +91,18 @@ def flow_exists(name, version):
     """
     if not (isinstance(name, six.string_types) and len(name) > 0):
         raise ValueError('Argument \'name\' should be a non-empty string')
-    if not (isinstance(name, six.string_types) and len(version) > 0):
+    if not (isinstance(name, six.string_types) and len(external_version) > 0):
         raise ValueError('Argument \'version\' should be a non-empty string')
 
     xml_response = _perform_api_call("flow/exists",
-                                     data={'name': name, 'external_version': version})
+                                     data={'name': name, 'external_version': external_version})
 
     result_dict = xmltodict.parse(xml_response)
     flow_id = int(result_dict['oml:flow_exists']['oml:id'])
     if flow_id > 0:
         return flow_id
     else:
-        return False;
+        return False
 
 
 def _list_flows(api_call):
