@@ -1,4 +1,5 @@
 import xmltodict
+import six
 
 from openml._api_calls import _perform_api_call
 from . import OpenMLFlow, flow_to_sklearn
@@ -67,6 +68,41 @@ def list_flows(offset=None, size=None, tag=None):
         api_call += "/tag/%s" % tag
 
     return _list_flows(api_call)
+
+
+def flow_exists(name, external_version):
+    """Retrieves the flow id of the flow uniquely identified by name + external_version.
+
+    Parameter
+    ---------
+    name : string
+        Name of the flow
+    version : string
+        Version information associated with flow.
+
+    Returns
+    -------
+    flow_exist : int
+        flow id iff exists, False otherwise
+
+    Notes
+    -----
+    see http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
+    """
+    if not (isinstance(name, six.string_types) and len(name) > 0):
+        raise ValueError('Argument \'name\' should be a non-empty string')
+    if not (isinstance(name, six.string_types) and len(external_version) > 0):
+        raise ValueError('Argument \'version\' should be a non-empty string')
+
+    xml_response = _perform_api_call("flow/exists",
+                                     data={'name': name, 'external_version': external_version})
+
+    result_dict = xmltodict.parse(xml_response)
+    flow_id = int(result_dict['oml:flow_exists']['oml:id'])
+    if flow_id > 0:
+        return flow_id
+    else:
+        return False
 
 
 def _list_flows(api_call):

@@ -45,6 +45,7 @@ class TestBase(unittest.TestCase):
         self.production_server = openml.config.server
         self.test_server = "https://test.openml.org/api/v1/xml"
         openml.config.server = self.test_server
+        openml.config.avoid_duplicate_runs = False
 
         openml.config.set_cache_directory(self.workdir)
 

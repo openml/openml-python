@@ -4,12 +4,14 @@ import os
 import xmltodict
 import numpy as np
 import warnings
+import openml
 from sklearn.model_selection._search import BaseSearchCV
 
 from ..exceptions import PyOpenMLError
 from .. import config
-from ..flows import sklearn_to_flow
-from ..exceptions import OpenMLCacheException
+from ..flows import sklearn_to_flow, get_flow, flow_exists
+from ..setups import setup_exists
+from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError
 from ..tasks.functions import _create_task_from_xml
 from .._api_calls import _perform_api_call
@@ -21,7 +23,7 @@ from .run import OpenMLRun
 
 
 
-def run_task(task, model):
+def run_task(task, model, avoid_duplicate_runs=True):
     """Performs a CV run on the dataset of the given task, using the split.
 
     Parameters
@@ -42,6 +44,19 @@ def run_task(task, model):
     # TODO move this into its onwn module. While it somehow belongs here, it
     # adds quite a lot of functionality which is better suited in other places!
     # TODO why doesn't this accept a flow as input? - this would make this more flexible!
+    flow = sklearn_to_flow(model)
+
+    # returns flow id if the flow exists on the server, False otherwise
+    flow_id = flow_exists(flow.name, flow.external_version)
+
+    # skips the run if it already exists and the user opts for this in the config file.
+    # also, if the flow is not present on the server, the check is not needed.
+    if avoid_duplicate_runs and flow_id:
+        flow = get_flow(flow_id)
+        setup_id = setup_exists(flow, model)
+        ids = _run_exists(task.task_id, setup_id)
+        if ids:
+            raise PyOpenMLError("Run already exists in server. Run id(s): %s" %str(ids))
 
     dataset = task.get_dataset()
     X, Y = dataset.get_data(target=task.target_name)
@@ -55,18 +70,43 @@ def run_task(task, model):
     run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
     run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
 
-    # now generate the flow
-    flow = sklearn_to_flow(model)
-    flow_id = flow._ensure_flow_exists()
-    if flow_id < 0:
-        print("No flow")
-        return 0, 2
-    config.logger.info(flow_id)
+    if flow_id == False:
+        # means the flow did not exists.
+        # As we could run it, publish it now
+        flow = flow.publish()
+    else:
+        # flow already existed, download it from server
+        # TODO (neccessary? is this a post condition of this function)
+        flow = get_flow(flow_id)
 
-    # attach the flow to the run
-    run.flow_id = flow_id
+    run.flow_id = flow.flow_id
+    config.logger.info('Executed Task %d with Flow id: %d' %(task.task_id, run.flow_id))
 
     return run
+
+def _run_exists(task_id, setup_id):
+    '''
+    Checks whether a task/setup combination is already present on the server.
+
+    :param task_id: int
+    :param setup_id: int
+    :return: List of run ids iff these already exists on the server, False otherwise
+    '''
+    if setup_id <= 0:
+        # openml setups are in range 1-inf
+        return False
+
+    try:
+        result = list_runs(task=[task_id], setup=[setup_id])
+        if len(result) > 0:
+            return set(result.keys())
+        else:
+            return False
+    except OpenMLServerException as exception:
+        # error code 512 implies no results. This means the run does not exist yet
+        assert(exception.code == 512)
+        return False
+
 
 
 def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label,
@@ -275,27 +315,28 @@ def _create_run_from_xml(xml):
     evaluations = dict()
     detailed_evaluations = defaultdict(lambda: defaultdict(dict))
     evaluation_flows = dict()
-    for evaluation_dict in run['oml:output_data']['oml:evaluation']:
-        key = evaluation_dict['oml:name']
-        if 'oml:value' in evaluation_dict:
-            value = float(evaluation_dict['oml:value'])
-        elif 'oml:array_data' in evaluation_dict:
-            value = evaluation_dict['oml:array_data']
-        else:
-            raise ValueError('Could not find keys "value" or "array_data" '
-                             'in %s' % str(evaluation_dict.keys()))
+    if 'oml:output_data' in run and 'oml:evaluation' in run['oml:output_data']:
+        for evaluation_dict in run['oml:output_data']['oml:evaluation']:
+            key = evaluation_dict['oml:name']
+            if 'oml:value' in evaluation_dict:
+                value = float(evaluation_dict['oml:value'])
+            elif 'oml:array_data' in evaluation_dict:
+                value = evaluation_dict['oml:array_data']
+            else:
+                raise ValueError('Could not find keys "value" or "array_data" '
+                                 'in %s' % str(evaluation_dict.keys()))
 
-        if '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
-            repeat = int(evaluation_dict['@repeat'])
-            fold = int(evaluation_dict['@fold'])
-            repeat_dict = detailed_evaluations[key]
-            fold_dict = repeat_dict[repeat]
-            fold_dict[fold] = value
-        else:
-            evaluations[key] = value
+            if '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
+                repeat = int(evaluation_dict['@repeat'])
+                fold = int(evaluation_dict['@fold'])
+                repeat_dict = detailed_evaluations[key]
+                fold_dict = repeat_dict[repeat]
+                fold_dict[fold] = value
+            else:
+                evaluations[key] = value
+                evaluation_flows[key] = flow_id
+
             evaluation_flows[key] = flow_id
-
-        evaluation_flows[key] = flow_id
 
     return OpenMLRun(run_id=run_id, uploader=uploader,
                      uploader_name=uploader_name, task_id=task_id,
@@ -325,7 +366,7 @@ def _get_cached_run(run_id):
                                    "cached" % run_id)
 
 
-def list_runs(offset=None, size=None, id=None, task=None,
+def list_runs(offset=None, size=None, id=None, task=None, setup=None,
               flow=None, uploader=None, tag=None):
     """List all runs matching all of the given filters.
 
@@ -341,6 +382,8 @@ def list_runs(offset=None, size=None, id=None, task=None,
     id : list, optional
 
     task : list, optional
+
+    setup: list, optional
 
     flow : list, optional
 
@@ -363,6 +406,8 @@ def list_runs(offset=None, size=None, id=None, task=None,
         api_call += "/run/%s" % ','.join([str(int(i)) for i in id])
     if task is not None:
         api_call += "/task/%s" % ','.join([str(int(i)) for i in task])
+    if setup is not None:
+        api_call += "/setup/%s" % ','.join([str(int(i)) for i in setup])
     if flow is not None:
         api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
     if uploader is not None:
