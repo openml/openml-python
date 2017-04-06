@@ -31,7 +31,7 @@ source activate testenv
 
 pip install matplotlib jupyter notebook nbconvert nbformat jupyter_client ipython ipykernel
 if [[ "$COVERAGE" == "true" ]]; then
-    pip install coverage coveralls
+    pip install codecov
 fi
 
 python --version
