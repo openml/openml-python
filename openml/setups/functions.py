@@ -7,12 +7,19 @@ def setup_exists(downloaded_flow, sklearn_model):
     '''
     Checks whether a flow / hyperparameter configuration already exists on the server
 
-    :param downloaded_flow:
-        the openml flow object (should be downloaded from server.
-        Otherwise also give flow id parameter)
-    :param sklearn_model: obvious
-    :param flow_id: int
-    :return: int setup id iff exists, False otherwise
+    Parameter
+    ---------
+
+    downloaded_flow : flow
+        the openml flow object (should be downloaded from server)
+    sklearn_model : BaseEstimator
+        The base estimator that was used to create the flow. Will
+         be used to extract parameter settings from.
+
+    Returns
+    -------
+    setup_id : int
+        setup id iff exists, False otherwise
     '''
 
     # sadly, this api call relies on a run object
@@ -21,12 +28,13 @@ def setup_exists(downloaded_flow, sklearn_model):
     file_elements = {'description': ('description.arff',description)}
 
     result = openml._api_calls._perform_api_call('/setup/exists/',
-                                                 file_elements = file_elements)
+                                                 file_elements=file_elements)
     result_dict = xmltodict.parse(result)
-    if 'oml:id' in result_dict['oml:setup_exists']:
-        return int(result_dict['oml:setup_exists']['oml:id'])
+    setup_id = int(result_dict['oml:setup_exists']['oml:id'])
+    if setup_id > 0:
+        return setup_id
     else:
-        return False
+        return False;
 
 
 def _to_dict(flow_id, openml_parameter_settings):

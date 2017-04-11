@@ -59,15 +59,15 @@ class TestTask(TestBase):
             self._check_task(tasks[tid])
 
     def test_list_tasks_by_tag(self):
-        num_basic_tasks = 54 # number is flexible, check server if fails
-        tasks = openml.tasks.list_tasks(tag='basic')
+        num_basic_tasks = 100 # number is flexible, check server if fails
+        tasks = openml.tasks.list_tasks(tag='study_14')
         self.assertGreaterEqual(len(tasks), num_basic_tasks)
         for tid in tasks:
             self._check_task(tasks[tid])
 
     def test_list_tasks(self):
         tasks = openml.tasks.list_tasks()
-        self.assertGreaterEqual(len(tasks), 2000)
+        self.assertGreaterEqual(len(tasks), 900)
         for tid in tasks:
             self._check_task(tasks[tid])
 
@@ -83,7 +83,7 @@ class TestTask(TestBase):
     def test_list_tasks_per_type_paginate(self):
         size = 10
         max = 100
-        task_types = 5
+        task_types = 4
         for j in range(1,task_types):
             for i in range(0, max, size):
                 tasks = openml.tasks.list_tasks(task_type_id=j, offset=i, size=size)

@@ -1,15 +1,21 @@
 import sys
 
-from sklearn.dummy import DummyClassifier
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression, SGDClassifier, LinearRegression
-from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
-from sklearn.svm import SVC
-from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, StratifiedKFold
-from sklearn.pipeline import Pipeline
 import openml
 import openml.exceptions
 from openml.testing import TestBase
+from openml.runs.functions import _run_task_get_arffcontent
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing.imputation import Imputer
+from sklearn.dummy import DummyClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression, SGDClassifier, \
+    LinearRegression
+from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
+from sklearn.svm import SVC
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
+    StratifiedKFold
+from sklearn.pipeline import Pipeline
 
 if sys.version_info[0] >= 3:
     from unittest import mock
@@ -21,7 +27,7 @@ class TestRun(TestBase):
 
     def _perform_run(self, task_id, num_instances, clf):
         task = openml.tasks.get_task(task_id)
-        run = openml.runs.run_task(task, clf)
+        run = openml.runs.run_task(task, clf, openml.config.avoid_duplicate_runs)
         run_ = run.publish()
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
@@ -31,19 +37,17 @@ class TestRun(TestBase):
         return run
 
     def test_run_regression_on_classif_task(self):
-        task_id = 10107
+        task_id = 115
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
-        run = openml.runs.run_task(task=task, model=clf)
-        run.publish()
-
-        # TODO: download and check whether it really contains the error message
-        #downloaded_run = openml.runs.get_run(run.run_id)
+        self.assertRaisesRegexp(AttributeError,
+                                "'LinearRegression' object has no attribute 'classes_'",
+                                openml.runs.run_task, task=task, model=clf)
 
     @mock.patch('openml.flows.sklearn_to_flow')
     def test_check_erronous_sklearn_flow_fails(self, sklearn_to_flow_mock):
-        task_id = 10107
+        task_id = 115
         task = openml.tasks.get_task(task_id)
 
         # Invalid parameter values
@@ -52,16 +56,16 @@ class TestRun(TestBase):
         self.assertRaisesRegexp(ValueError, "Penalty term must be positive; got \(C='abc'\)",
                                 openml.runs.run_task, task=task, model=clf)
 
-    def test_run_iris(self):
-        task_id = 10107
-        num_instances = 150
+    def test_run_diabetes(self):
+        task_id = 115
+        num_instances = 768
 
         clf = LogisticRegression()
         self._perform_run(task_id,num_instances, clf)
 
     def test_run_optimize_randomforest_iris(self):
-        task_id = 10107
-        num_instances = 150
+        task_id = 115
+        num_instances = 768
         num_folds = 10
         num_iterations = 5
 
@@ -80,8 +84,8 @@ class TestRun(TestBase):
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
 
     def test_run_optimize_bagging_iris(self):
-        task_id = 10107
-        num_instances = 150
+        task_id = 115
+        num_instances = 768
         num_folds = 10
         num_iterations = 9 # (num values for C times gamma)
 
@@ -94,8 +98,8 @@ class TestRun(TestBase):
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
 
     def test_run_pipeline(self):
-        task_id = 10107
-        num_instances = 150
+        task_id = 115
+        num_instances = 768
         num_folds = 10
         num_iterations = 9  # (num values for C times gamma)
 
@@ -107,8 +111,11 @@ class TestRun(TestBase):
         self.assertEqual(run.trace_content, None)
 
     def test__run_task_get_arffcontent(self):
-        task = openml.tasks.get_task(1939)
+        task = openml.tasks.get_task(7)
         class_labels = task.class_labels
+        num_instances = 3196
+        num_folds = 10
+        num_repeats = 1
 
         clf = SGDClassifier(loss='hinge', random_state=1)
         self.assertRaisesRegexp(AttributeError,
@@ -125,22 +132,27 @@ class TestRun(TestBase):
         self.assertIsInstance(arff_tracecontent, type(None))
 
         # 10 times 10 fold CV of 150 samples
-        self.assertEqual(len(arff_datacontent), 1500)
+        self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
         for arff_line in arff_datacontent:
-            self.assertEqual(len(arff_line), 8)
+            # check number columns
+            self.assertEqual(len(arff_line), 7)
+            # check repeat
             self.assertGreaterEqual(arff_line[0], 0)
-            self.assertLessEqual(arff_line[0], 9)
+            self.assertLessEqual(arff_line[0], num_repeats - 1)
+            # check fold
             self.assertGreaterEqual(arff_line[1], 0)
-            self.assertLessEqual(arff_line[1], 9)
+            self.assertLessEqual(arff_line[1], num_folds - 1)
+            # check row id
             self.assertGreaterEqual(arff_line[2], 0)
-            self.assertLessEqual(arff_line[2], 149)
-            self.assertAlmostEqual(sum(arff_line[3:6]), 1.0)
-            self.assertIn(arff_line[6], ['Iris-setosa', 'Iris-versicolor',
-                                         'Iris-virginica'])
-            self.assertIn(arff_line[7], ['Iris-setosa', 'Iris-versicolor',
-                                         'Iris-virginica'])
+            self.assertLessEqual(arff_line[2], num_instances - 1)
+            # check confidences
+            self.assertAlmostEqual(sum(arff_line[3:5]), 1.0)
+            self.assertIn(arff_line[5], ['won', 'nowin'])
+            self.assertIn(arff_line[6], ['won', 'nowin'])
 
     def test_get_run(self):
+        # this run is not available on test
+        openml.config.server = self.production_server
         run = openml.runs.get_run(473350)
         self.assertEqual(run.dataset_id, 1167)
         self.assertEqual(run.evaluations['f_measure'], 0.624668)
@@ -161,12 +173,16 @@ class TestRun(TestBase):
         self.assertEqual(len(run), 5)
 
     def test_get_runs_list(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         runs = openml.runs.list_runs(id=[2])
         self.assertEqual(len(runs), 1)
         for rid in runs:
             self._check_run(runs[rid])
 
     def test_get_runs_list_by_task(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         task_ids = [20]
         runs = openml.runs.list_runs(task=task_ids)
         self.assertGreaterEqual(len(runs), 590)
@@ -183,6 +199,8 @@ class TestRun(TestBase):
             self._check_run(runs[rid])
 
     def test_get_runs_list_by_uploader(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         # 29 is Dominik Kirchhoff - Joaquin and Jan have too many runs right now
         uploader_ids = [29]
 
@@ -202,6 +220,8 @@ class TestRun(TestBase):
             self._check_run(runs[rid])
 
     def test_get_runs_list_by_flow(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         flow_ids = [1154]
         runs = openml.runs.list_runs(flow=flow_ids)
         self.assertGreaterEqual(len(runs), 1)
@@ -218,6 +238,8 @@ class TestRun(TestBase):
             self._check_run(runs[rid])
 
     def test_get_runs_pagination(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         uploader_ids = [1]
         size = 10
         max = 100
@@ -228,9 +250,11 @@ class TestRun(TestBase):
                 self.assertIn(runs[rid]["uploader"], uploader_ids)
 
     def test_get_runs_list_by_filters(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         ids = [505212, 6100]
         tasks = [2974, 339]
-        uploaders_1 = [1, 17]
+        uploaders_1 = [1, 2]
         uploaders_2 = [29, 274]
         flows = [74, 1718]
 
@@ -251,50 +275,26 @@ class TestRun(TestBase):
         runs = openml.runs.list_runs(id=ids, task=tasks, uploader=uploaders_1)
 
     def test_get_runs_list_by_tag(self):
+        # TODO: comes from live, no such lists on test
+        openml.config.server = self.production_server
         runs = openml.runs.list_runs(tag='curves')
         self.assertGreaterEqual(len(runs), 1)
 
     def test_run_on_dataset_with_missing_labels(self):
-        from openml.runs.functions import _prediction_to_row
-        from sklearn.tree import DecisionTreeClassifier
-        from sklearn.preprocessing.imputation import Imputer
+        # Check that _run_task_get_arffcontent works when one of the class
+        # labels only declared in the arff file, but is not present in the
+        # actual data
+
         task = openml.tasks.get_task(2)
         class_labels = task.class_labels
 
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        X, Y = task.get_X_and_y()
-        rep_no = 0
-        # TODO use different iterator to only provide a single iterator (less
-        # methods, less maintenance, less confusion)
-        for rep in task.iterate_repeats():
-            fold_no = 0
-            for fold in rep:
-                train_indices, test_indices = fold
-                trainX = X[train_indices]
-                trainY = Y[train_indices]
-                testX = X[test_indices]
-                testY = Y[test_indices]
-
-                model.fit(trainX, trainY)
-
-                ProbaY = model.predict_proba(testX)
-                PredY = model.predict(testX)
-
-                missing_label_idx = [3]
-
-                for i in range(0, len(test_indices)):
-                    arff_line = _prediction_to_row(rep_no, fold_no, test_indices[i], class_labels[testY[i]], PredY[i],
-                                                   ProbaY[i], class_labels, model.classes_)
-
-                    offset = 0
-                    for idx, proba in enumerate(arff_line[3:-2]):
-                        if idx in missing_label_idx:
-                            offset += 1
-                        else:
-                            assert proba == ProbaY[i][idx-offset]
-
-                fold_no = fold_no + 1
-            rep_no = rep_no + 1
-
+        data_content, _ = _run_task_get_arffcontent(model, task, class_labels)
+        # 2 folds, 5 repeats; keep in mind that this task comes from the test
+        # server, the task on the live server is different
+        self.assertEqual(len(data_content), 4490)
+        for row in data_content:
+            # repeat, fold, row_id, 6 confidences, prediction and correct label
+            self.assertEqual(len(row), 11)
