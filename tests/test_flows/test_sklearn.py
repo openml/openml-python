@@ -24,9 +24,9 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
 
-import openml
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
 from openml.flows.sklearn_converter import _format_external_version, _check_dependencies
+from openml.exceptions import PyOpenMLError
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(this_directory)
@@ -524,3 +524,34 @@ class TestSklearn(unittest.TestCase):
         dependencies = ['sklearn==0.1', 'sklearn>=99.99.99', 'sklearn>99.99.99']
         for dependency in dependencies:
             self.assertRaises(ValueError, _check_dependencies, dependency)
+
+    def test_illegal_parameter_names(self):
+        # illegal name: estimators
+        clf1 = sklearn.ensemble.VotingClassifier(
+            estimators=[('estimators', sklearn.ensemble.RandomForestClassifier()),
+                        ('whatevs', sklearn.ensemble.ExtraTreesClassifier())])
+        clf2 = sklearn.ensemble.VotingClassifier(
+            estimators=[('whatevs', sklearn.ensemble.RandomForestClassifier()),
+                        ('estimators', sklearn.ensemble.ExtraTreesClassifier())])
+        cases = [clf1, clf2]
+
+        for case in cases:
+            self.assertRaises(PyOpenMLError, sklearn_to_flow, case)
+
+    def test_illegal_parameter_names_pipeline(self):
+        # illegal name: steps
+        steps = [
+            ('Imputer', sklearn.preprocessing.Imputer(strategy='median')),
+            ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore')),
+            ('steps', sklearn.ensemble.BaggingClassifier(base_estimator=sklearn.tree.DecisionTreeClassifier))
+        ]
+        self.assertRaises(ValueError, sklearn.pipeline.Pipeline, steps=steps)
+
+
+    def test_illegal_parameter_names_featureunion(self):
+        # illegal name: transformer_list
+        transformer_list = [
+            ('transformer_list', sklearn.preprocessing.Imputer(strategy='median')),
+            ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore'))
+        ]
+        self.assertRaises(ValueError, sklearn.pipeline.FeatureUnion, transformer_list=transformer_list)

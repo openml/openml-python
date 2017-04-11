@@ -231,6 +231,9 @@ class OpenMLRun(object):
                 elif flow.name.startswith("sklearn.pipeline.FeatureUnion"):
                     # tolerate
                     pass
+                elif flow.name.startswith("sklearn.ensemble.voting_classifier.VotingClassifier"):
+                    # tolerate
+                    pass
                 else:
                     raise ValueError("parameter %s not in flow description of flow %s" %(param,flow.name))
 
