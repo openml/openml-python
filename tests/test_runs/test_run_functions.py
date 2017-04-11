@@ -41,9 +41,11 @@ class TestRun(TestBase):
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
-        self.assertRaisesRegexp(AttributeError,
-                                "'LinearRegression' object has no attribute 'classes_'",
-                                openml.runs.run_task, task=task, model=clf)
+        run = openml.runs.run_task(task=task, model=clf)
+        run = run.publish()
+
+        downloaded_run = openml.runs.get_run(run.run_id)
+        assert(downloaded_run.error_message is not None)
 
     @mock.patch('openml.flows.sklearn_to_flow')
     def test_check_erronous_sklearn_flow_fails(self, sklearn_to_flow_mock):
@@ -291,7 +293,7 @@ class TestRun(TestBase):
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content, _ = _run_task_get_arffcontent(model, task, class_labels)
+        data_content, _, _ = _run_task_get_arffcontent(model, task, class_labels)
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)
