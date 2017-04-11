@@ -4,12 +4,12 @@ import os
 import xmltodict
 import numpy as np
 import warnings
-import openml
 import sklearn
 
 from ..exceptions import PyOpenMLError
 from .. import config
-from ..flows import sklearn_to_flow, get_flow, flow_exists
+from ..flows import sklearn_to_flow, get_flow
+from ..flows.sklearn_converter import get_traceble_model
 from ..setups import setup_exists
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError
@@ -69,17 +69,11 @@ def run_task(task, model, avoid_duplicate_runs=True):
     run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
     run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
 
-    if flow_id == False:
-        # means the flow did not exists.
-        # As we could run it, publish it now
-        flow = flow.publish()
-    else:
-        # flow already existed, download it from server
-        # TODO (neccessary? is this a post condition of this function)
-        flow = get_flow(flow_id)
-
-    run.flow_id = flow.flow_id
-    config.logger.info('Executed Task %d with Flow id: %d' %(task.task_id, run.flow_id))
+    try:
+        run.data_content, run.trace_content, run.trace_attributes = _run_task_get_arffcontent(model, task, class_labels)
+    except PyOpenMLError as message:
+        run.error_message = str(message)
+        warnings.warn("Run terminated with error: %s" %run.error_message)
 
     return run
 
@@ -166,13 +160,17 @@ def _run_task_get_arffcontent(model, task, class_labels):
             testX = X[test_indices]
             testY = Y[test_indices]
 
-            model.fit(trainX, trainY)
+            try:
+                model_fold.fit(trainX, trainY)
 
-            if isinstance(model, BaseSearchCV):
-                _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no)
-                model_classes = model.best_estimator_.classes_
-            else:
-                model_classes = model.classes_
+                if get_traceble_model(model_fold):
+                    arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
+                    model_classes = model_fold.best_estimator_.classes_
+                else:
+                    model_classes = model_fold.classes_
+            except AttributeError as e:
+                # typically happens when training a regressor on classification task
+                raise PyOpenMLError(str(e))
 
             ProbaY = model_fold.predict_proba(testX)
             PredY = model_fold.predict(testX)
