@@ -205,7 +205,7 @@ class TestRun(TestBase):
         uploader_ids = [29]
 
         runs = openml.runs.list_runs(uploader=uploader_ids)
-        self.assertGreaterEqual(len(runs), 3)
+        self.assertGreaterEqual(len(runs), 2)
         for rid in runs:
             self.assertIn(runs[rid]['uploader'], uploader_ids)
             self._check_run(runs[rid])
