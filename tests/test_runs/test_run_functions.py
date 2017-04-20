@@ -41,7 +41,7 @@ class TestRun(TestBase):
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
-        self.assertRaises(openml.exceptions.AttributeError, openml.runs.run_task,
+        self.assertRaises(AttributeError, openml.runs.run_task,
                           task=task, model=clf, avoid_duplicate_runs=False)
 
     @mock.patch('openml.flows.sklearn_to_flow')
