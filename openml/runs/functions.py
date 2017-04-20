@@ -22,7 +22,7 @@ from .run import OpenMLRun, _get_version_information
 
 
 
-def run_task(task, model, avoid_duplicate_runs=True):
+def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None):
     """Performs a CV run on the dataset of the given task, using the split.
 
     Parameters
@@ -70,7 +70,7 @@ def run_task(task, model, avoid_duplicate_runs=True):
     run_environment = _get_version_information()
     tags = ['openml-python', run_environment[1]]
     # execute the run
-    run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
+    run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model, tags=tags)
     run.data_content, run.trace_content, run.trace_attributes = _run_task_get_arffcontent(model, task, class_labels)
 
 
