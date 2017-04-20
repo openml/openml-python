@@ -41,7 +41,7 @@ def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None):
     run : OpenMLRun
         Result of the run.
     """
-    if not isinstance(flow_tags, list):
+    if flow_tags is not None and not isinstance(flow_tags, list):
         raise ValueError("flow_tags should be list")
     # TODO move this into its onwn module. While it somehow belongs here, it
     # adds quite a lot of functionality which is better suited in other places!
@@ -183,10 +183,9 @@ def _run_task_get_arffcontent(model, task, class_labels):
                 raise PyOpenMLError(str(e))
 
             # extract trace
-            traceable_model = get_traceble_model(model_fold)
-            if traceable_model:
-                arff_tracecontent.extend(_extract_arfftrace(traceable_model, rep_no, fold_no))
-                model_classes = traceable_model.best_estimator_.classes_
+            if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
+                arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
+                model_classes = model_fold.best_estimator_.classes_
             else:
                 model_classes = model_fold.classes_
 
@@ -204,7 +203,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
     if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
         # arff_tracecontent is already set
-        arff_trace_attributes = _extract_arfftrace_attributes(traceable_model)
+        arff_trace_attributes = _extract_arfftrace_attributes(model_fold)
     else:
         arff_tracecontent = None
         arff_trace_attributes = None
@@ -401,6 +400,15 @@ def _create_run_from_xml(xml):
                 evaluation_flows[key] = flow_id
 
             evaluation_flows[key] = flow_id
+    tags = None
+    if 'oml:tag' in run:
+        if isinstance(run['oml:tag'], str):
+            tags = [run['oml:tag']]
+        elif isinstance(run['oml:tag'], list):
+            tags = run['oml:tag']
+        else:
+            raise ValueError('Received not string and non list as tag item')
+
 
     return OpenMLRun(run_id=run_id, uploader=uploader,
                      uploader_name=uploader_name, task_id=task_id,
