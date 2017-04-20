@@ -6,9 +6,9 @@ class OpenMLDataFeature(object):
        ----------
        index : int
             The index of this feature
-        name : string
+        name : str
             Name of the feature
-        data_type : string
+        data_type : str
             can be nominal, numeric, string, date (corresponds to arff)
         nominal_values : list(str)
             list of the possible values, in case of nominal attribute
@@ -17,17 +17,18 @@ class OpenMLDataFeature(object):
     LEGAL_DATA_TYPES = ['nominal', 'numeric', 'string', 'date']
 
     def __init__(self, index, name, data_type, nominal_values, number_missing_values):
-        assert type(index) is int, "Index is of wrong datatype"
-        assert type(name) is str, "Name is of wrong datatype"
-        assert type(data_type) is str, "Data_type is of wrong datatype"
-        assert data_type in self.LEGAL_DATA_TYPES, "data type should be in %s" %str(self.LEGAL_DATA_TYPES)
-        if nominal_values is not None:
-            assert type(nominal_values) is list, "Nominal_values is of wrong datatype"
-        assert type(number_missing_values) is int, "number_missing_values is of wrong datatype"
+        if type(index) != int:
+            raise ValueError('Index is of wrong datatype')
+        if data_type not in self.LEGAL_DATA_TYPES:
+            raise ValueError('data type should be in %s, found: %s' %(str(self.LEGAL_DATA_TYPES),data_type))
+        if nominal_values is not None and type(nominal_values) != list:
+            raise ValueError('Nominal_values is of wrong datatype')
+        if type(number_missing_values) != int:
+            raise ValueError('number_missing_values is of wrong datatype')
 
         self.index = index
-        self.name = name
-        self.data_type = data_type
+        self.name = str(name)
+        self.data_type = str(data_type)
         self.nominal_values = nominal_values
         self.number_missing_values = number_missing_values
 

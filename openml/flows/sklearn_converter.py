@@ -43,13 +43,6 @@ def sklearn_to_flow(o, parent_model=None):
         # TODO: explain what type of parameter is here
         rval = [sklearn_to_flow(element, parent_model) for element in o]
         if isinstance(o, tuple):
-            assert(parent_model is not None)
-            reserved_keywords = set(parent_model.get_params(deep=False).keys())
-            if o[0] in reserved_keywords:
-                parent_model_name = parent_model.__module__ + "." + \
-                                    parent_model.__class__.__name__
-                raise PyOpenMLError('Found element shadowing official ' + \
-                                    'parameter for %s: %s' %(parent_model_name, o[0]))
             rval = tuple(rval)
     elif isinstance(o, (bool, int, float, six.string_types)) or o is None:
         # base parameter values
@@ -278,11 +271,19 @@ def _extract_information_from_model(model):
                 isinstance(rval[0], (list, tuple)) and
                 [type(rval[0]) == type(rval[i]) for i in range(len(rval))]):
 
-            # Steps in a pipeline or feature union
+            # Steps in a pipeline or feature union, or base classifiers in voting classifier
             parameter_value = list()
+            reserved_keywords = set(model.get_params(deep=False).keys())
+
             for sub_component_tuple in rval:
                 identifier, sub_component = sub_component_tuple
                 sub_component_type = type(sub_component_tuple)
+
+                if identifier in reserved_keywords:
+                    parent_model_name = model.__module__ + "." + \
+                                        model.__class__.__name__
+                    raise PyOpenMLError('Found element shadowing official ' + \
+                                        'parameter for %s: %s' % (parent_model_name, identifier))
 
                 if sub_component is None:
                     # In a FeatureUnion it is legal to have a None step
@@ -550,27 +551,3 @@ def _deserialize_cross_validator(value, **kwargs):
 
 def _format_external_version(model_package_name, model_package_version_number):
     return '%s==%s' % (model_package_name, model_package_version_number)
-
-
-def get_traceble_model(model):
-    '''
-    Returns whether the model can produce an openml trace. If yes,
-    return that model. Returns false otherwise.
-    Clause holds true for instances of BaseSearchCV and Pipelines that
-    contain exactly one BaseSearchCV (no use to search deeper in the
-    Tree, maybe later)
-    '''
-    if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
-        return model
-    count = 0
-    returnValue = None
-    if isinstance(model, sklearn.pipeline.Pipeline):
-        for step in model.steps:
-            if isinstance(step[1], sklearn.model_selection._search.BaseSearchCV):
-                returnValue = step[1]
-                count += 1
-    if count == 1:
-        return returnValue
-    else:
-        return False
-

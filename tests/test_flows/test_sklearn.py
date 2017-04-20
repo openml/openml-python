@@ -530,18 +530,28 @@ class TestSklearn(unittest.TestCase):
         clf1 = sklearn.ensemble.VotingClassifier(
             estimators=[('estimators', sklearn.ensemble.RandomForestClassifier()),
                         ('whatevs', sklearn.ensemble.ExtraTreesClassifier())])
-
-
-        cases = [clf1]
+        clf2 = sklearn.ensemble.VotingClassifier(
+            estimators=[('whatevs', sklearn.ensemble.RandomForestClassifier()),
+                        ('estimators', sklearn.ensemble.ExtraTreesClassifier())])
+        cases = [clf1, clf2]
 
         for case in cases:
             self.assertRaises(PyOpenMLError, sklearn_to_flow, case)
 
-    def test_illegal_parameter_names_sklearn(self):
+    def test_illegal_parameter_names_pipeline(self):
         # illegal name: steps
         steps = [
             ('Imputer', sklearn.preprocessing.Imputer(strategy='median')),
             ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore')),
             ('steps', sklearn.ensemble.BaggingClassifier(base_estimator=sklearn.tree.DecisionTreeClassifier))
         ]
-        self.assertRaises(ValueError, sklearn.pipeline.Pipeline, {'steps': steps })
+        self.assertRaises(ValueError, sklearn.pipeline.Pipeline, steps=steps)
+
+
+    def test_illegal_parameter_names_featureunion(self):
+        # illegal name: transformer_list
+        transformer_list = [
+            ('transformer_list', sklearn.preprocessing.Imputer(strategy='median')),
+            ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore'))
+        ]
+        self.assertRaises(ValueError, sklearn.pipeline.FeatureUnion, transformer_list=transformer_list)

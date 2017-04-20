@@ -6,10 +6,9 @@ import numpy as np
 import warnings
 import sklearn
 
-from build.lib.openml.exceptions import PyOpenMLError
+from ..exceptions import PyOpenMLError
 from .. import config
-from ..flows import sklearn_to_flow, get_flow
-from ..flows.sklearn_converter import get_traceble_model
+from ..flows import sklearn_to_flow, get_flow, flow_exists
 from ..setups import setup_exists
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError
@@ -23,7 +22,7 @@ from .run import OpenMLRun, _get_version_information
 
 
 
-def run_task(task, model, flow_tags=[]):
+def run_task(task, model, avoid_duplicate_runs=True):
     """Performs a CV run on the dataset of the given task, using the split.
 
     Parameters
@@ -48,16 +47,13 @@ def run_task(task, model, flow_tags=[]):
     # adds quite a lot of functionality which is better suited in other places!
     # TODO why doesn't this accept a flow as input? - this would make this more flexible!
     flow = sklearn_to_flow(model)
-    flow.tags = flow_tags
-    # TODO: also tag the flow if it already exists
-    flow_id = flow._ensure_flow_exists()
-    if flow_id < 0:
-        print("No flow")
-        return 0, 2
-    config.logger.info(flow_id)
 
-    if config.avoid_duplicate_runs:
-        # TODO: would be nice if flow._ensure_flow_exists already handled this
+    # returns flow id if the flow exists on the server, False otherwise
+    flow_id = flow_exists(flow.name, flow.external_version)
+
+    # skips the run if it already exists and the user opts for this in the config file.
+    # also, if the flow is not present on the server, the check is not needed.
+    if avoid_duplicate_runs and flow_id:
         flow = get_flow(flow_id)
         setup_id = setup_exists(flow, model)
         ids = _run_exists(task.task_id, setup_id)
@@ -74,13 +70,20 @@ def run_task(task, model, flow_tags=[]):
     run_environment = _get_version_information()
     tags = ['openml-python', run_environment[1]]
     # execute the run
-    run = OpenMLRun(task_id=task.task_id, flow_id=flow_id, dataset_id=dataset.dataset_id, model=model, tags=tags)
+    run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
+    run.data_content, run.trace_content, run.trace_attributes = _run_task_get_arffcontent(model, task, class_labels)
 
-    try:
-        run.data_content, run.trace_content, run.trace_attributes = _run_task_get_arffcontent(model, task, class_labels)
-    except PyOpenMLError as message:
-        run.error_message = str(message)
-        warnings.warn("Run terminated with error: %s" %run.error_message)
+
+    if flow_id == False:
+        # means the flow did not exists. As we could run it, publish it now
+        flow = flow.publish()
+    else:
+        # flow already existed, download it from server
+        # TODO (neccessary? is this a post condition of this function)
+        flow = get_flow(flow_id)
+
+    run.flow_id = flow.flow_id
+    config.logger.info('Executed Task %d with Flow id: %d' % (task.task_id, run.flow_id))
 
     return run
 
@@ -109,8 +112,10 @@ def _run_exists(task_id, setup_id):
 
 
 
-def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label, predicted_probabilities, class_labels, model_classes_mapping):
-    """Complicated util function that turns probability estimates of a classifier for a given instance into the right arff format to upload to openml.
+def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label,
+                       predicted_probabilities, class_labels, model_classes_mapping):
+    """Util function that turns probability estimates of a classifier for a given
+        instance into the right arff format to upload to openml.
 
         Parameters
         ----------
@@ -125,6 +130,9 @@ def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label, 
         predicted_probabilities : array (size=num_classes)
             probabilities per class
         class_labels : array (size=num_classes)
+        model_classes_mapping : list
+            A list of classes the model produced.
+            Obtained by BaseEstimator.classes_
 
         Returns
         -------
@@ -164,6 +172,12 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
             try:
                 model_fold.fit(trainX, trainY)
+
+                if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
+                    arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
+                    model_classes = model_fold.best_estimator_.classes_
+                else:
+                    model_classes = model_fold.classes_
             except AttributeError as e:
                 # typically happens when training a regressor on classification task
                 raise PyOpenMLError(str(e))
@@ -188,8 +202,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
             fold_no = fold_no + 1
         rep_no = rep_no + 1
 
-    traceable_model = get_traceble_model(model_fold)
-    if traceable_model:
+    if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
         # arff_tracecontent is already set
         arff_trace_attributes = _extract_arfftrace_attributes(traceable_model)
     else:
@@ -350,9 +363,16 @@ def _create_run_from_xml(xml):
     dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
 
     predictions_url = None
-    for file_dict in run['oml:output_data']['oml:file']:
+    if isinstance(run['oml:output_data']['oml:file'], dict):
+        # only one result.. probably due to an upload error
+        file_dict = run['oml:output_data']['oml:file']
         if file_dict['oml:name'] == 'predictions':
             predictions_url = file_dict['oml:url']
+    else:
+        # multiple files, the normal case
+        for file_dict in run['oml:output_data']['oml:file']:
+            if file_dict['oml:name'] == 'predictions':
+                predictions_url = file_dict['oml:url']
     if predictions_url is None:
         raise ValueError('No URL to download predictions for run %d in run '
                          'description XML' % run_id)
@@ -381,9 +401,6 @@ def _create_run_from_xml(xml):
                 evaluation_flows[key] = flow_id
 
             evaluation_flows[key] = flow_id
-    tags = None
-    if 'oml:tag' in run:
-        tags = run['oml:tag']
 
     return OpenMLRun(run_id=run_id, uploader=uploader,
                      uploader_name=uploader_name, task_id=task_id,

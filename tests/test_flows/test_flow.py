@@ -2,6 +2,7 @@ import collections
 import hashlib
 import re
 import time
+import random
 import unittest
 
 import xmltodict
@@ -16,6 +17,7 @@ import sklearn.feature_selection
 import sklearn.model_selection
 import sklearn.pipeline
 import sklearn.preprocessing
+import sklearn.naive_bayes
 import sklearn.tree
 
 from openml.testing import TestBase
@@ -104,7 +106,8 @@ class TestFlow(TestBase):
     def test_from_xml_to_xml(self):
         # Get the raw xml thing
         # TODO maybe get this via get_flow(), which would have to be refactored to allow getting only the xml dictionary
-        for flow_id in [1185, 1244, 1196, 1112, ]:
+        # TODO: no sklearn flows.
+        for flow_id in [3, 5, 7, 9, ]:
             flow_xml = _perform_api_call("flow/%d" % flow_id)
             flow_dict = xmltodict.parse(flow_xml)
 
@@ -153,24 +156,49 @@ class TestFlow(TestBase):
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)
 
-    def test_ensure_flow_exists(self):
+    def test_semi_legal_flow(self):
+        # TODO: Test if parameters are set correctly!
+        # should not throw error as it contains two differentiable forms of Bagging
+        # i.e., Bagging(Bagging(J48)) and Bagging(J48)
         sentinel = get_sentinel()
-
-        flow = openml.OpenMLFlow(name='Test',
-                                 description="test description",
-                                 model=sklearn.dummy.DummyClassifier(),
-                                 components=collections.OrderedDict(),
-                                 parameters=collections.OrderedDict(),
-                                 parameters_meta_info=collections.OrderedDict(),
-                                 external_version=_format_external_version(
-                                     'sklearn', sklearn.__version__),
-                                 tags=[],
-                                 language='English',
-                                 dependencies='')
+        semi_legal = sklearn.ensemble.BaggingClassifier(
+            base_estimator=sklearn.ensemble.BaggingClassifier(
+                base_estimator=sklearn.tree.DecisionTreeClassifier()))
+        flow = openml.flows.sklearn_to_flow(semi_legal)
         flow.name = 'TEST%s%s' % (sentinel, flow.name)
-        flow_id = flow._ensure_flow_exists()
-        self.assertIsInstance(flow_id, int)
-        self.assertEqual(flow._ensure_flow_exists(), flow_id)
+
+        flow.publish()
+
+    def test_illegal_flow(self):
+        # should throw error as it contains two imputers
+        illegal = sklearn.pipeline.Pipeline(steps=[('imputer1', sklearn.preprocessing.Imputer()),
+                                                   ('imputer2', sklearn.preprocessing.Imputer()),
+                                                   ('classif', sklearn.tree.DecisionTreeClassifier())])
+        self.assertRaises(ValueError, openml.flows.sklearn_to_flow, illegal)
+
+    def test_nonexisting_flow_exists(self):
+        name = get_sentinel() + get_sentinel()
+        version = get_sentinel()
+
+        flow_id = openml.flows.flow_exists(name, version)
+        self.assertFalse(flow_id)
+
+    def test_existing_flow_exists(self):
+        # create a flow
+        sentinel = get_sentinel()
+        nb = sklearn.naive_bayes.GaussianNB()
+        flow = openml.flows.sklearn_to_flow(nb)
+        flow.name = 'TEST%s%s' % (sentinel, flow.name)
+        #publish the flow
+        flow = flow.publish()
+        #redownload the flow
+        flow = openml.flows.get_flow(flow.flow_id)
+
+        # check if flow exists can find it
+        flow = openml.flows.get_flow(flow.flow_id)
+        downloaded_flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
+        self.assertEquals(downloaded_flow_id, flow.flow_id)
+
 
     def test_sklearn_to_upload_to_flow(self):
         iris = sklearn.datasets.load_iris()
