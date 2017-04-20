@@ -9,5 +9,5 @@ if [[ "$COVERAGE" == "true" ]]; then
     # very reliable but we don't want travis to report a failure
     # in the github UI just because the coverage report failed to
     # be published.
-    coveralls || echo "Coveralls upload failed"
+    codecov || echo "Codecov upload failed"
 fi

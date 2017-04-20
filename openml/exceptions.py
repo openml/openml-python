@@ -2,16 +2,19 @@ class PyOpenMLError(Exception):
     def __init__(self, message):
         super(PyOpenMLError, self).__init__(message)
 
-# class for when something is really wrong on the server (result did not parse to dict)
 class OpenMLServerError(PyOpenMLError):
-    """Server didn't respond 200, contains unparsed error."""
+    """class for when something is really wrong on the server
+       (result did not parse to dict), contains unparsed error."""
+
     def __init__(self, message):
         message = "OpenML Server error: " + message
         super(OpenMLServerError, self).__init__(message)
 
-# class for when the result of the server was not 200 (e.g., listing call w/o results)
+#
 class OpenMLServerException(OpenMLServerError):
-    """Server didn't respond 200."""
+    """exception for when the result of the server was
+       not 200 (e.g., listing call w/o results). """
+
     def __init__(self, code, message, additional=None):
         self.code = code
         self.additional = additional

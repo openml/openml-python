@@ -26,13 +26,13 @@ class TestFlowFunctions(unittest.TestCase):
         for fid in flows:
             self._check_flow(flows[fid])
 
-    def test_list_datasets_by_tag(self):
+    def test_list_flows_by_tag(self):
         flows = openml.flows.list_flows(tag='weka')
         self.assertGreaterEqual(len(flows), 5)
         for did in flows:
             self._check_flow(flows[did])
 
-    def test_list_datasets_paginate(self):
+    def test_list_flows_paginate(self):
         size = 10
         max = 100
         for i in range(0, max, size):
