@@ -41,7 +41,7 @@ class TestRun(TestBase):
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
-        self.assertRaises(openml.exceptions.PyOpenMLError, openml.runs.run_task,
+        self.assertRaises(openml.exceptions.AttributeError, openml.runs.run_task,
                           task=task, model=clf, avoid_duplicate_runs=False)
 
     @mock.patch('openml.flows.sklearn_to_flow')
@@ -83,6 +83,7 @@ class TestRun(TestBase):
                                            n_iter=num_iterations)
 
         run = self._perform_run(task_id, num_instances, random_search)
+        print(run.trace_content)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
 
     def test_run_optimize_bagging_iris(self):
