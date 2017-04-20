@@ -178,7 +178,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
                     user_defined_measures['usercpu_time_millis_training'][rep_no][fold_no] = modelfit_duration
 
                 if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
-                    _add_results_to_arfftrace(arff_tracecontent, fold_no, model_fold, rep_no)
+                    arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
                     model_classes = model_fold.best_estimator_.classes_
                 else:
                     model_classes = model_fold.classes_
