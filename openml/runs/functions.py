@@ -4,8 +4,7 @@ import os
 import xmltodict
 import numpy as np
 import warnings
-import openml
-from sklearn.model_selection._search import BaseSearchCV
+import sklearn
 
 from ..exceptions import PyOpenMLError
 from .. import config
@@ -59,7 +58,6 @@ def run_task(task, model, avoid_duplicate_runs=True):
             raise PyOpenMLError("Run already exists in server. Run id(s): %s" %str(ids))
 
     dataset = task.get_dataset()
-    X, Y = dataset.get_data(target=task.target_name)
 
     class_labels = task.class_labels
     if class_labels is None:
@@ -68,11 +66,11 @@ def run_task(task, model, avoid_duplicate_runs=True):
 
     # execute the run
     run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
-    run.data_content, run.trace_content = _run_task_get_arffcontent(model, task, class_labels)
+    run.data_content, run.trace_content, run.trace_attributes = _run_task_get_arffcontent(model, task, class_labels)
+
 
     if flow_id == False:
-        # means the flow did not exists.
-        # As we could run it, publish it now
+        # means the flow did not exists. As we could run it, publish it now
         flow = flow.publish()
     else:
         # flow already existed, download it from server
@@ -80,7 +78,7 @@ def run_task(task, model, avoid_duplicate_runs=True):
         flow = get_flow(flow_id)
 
     run.flow_id = flow.flow_id
-    config.logger.info('Executed Task %d with Flow id: %d' %(task.task_id, run.flow_id))
+    config.logger.info('Executed Task %d with Flow id: %d' % (task.task_id, run.flow_id))
 
     return run
 
@@ -160,22 +158,27 @@ def _run_task_get_arffcontent(model, task, class_labels):
     for rep in task.iterate_repeats():
         fold_no = 0
         for fold in rep:
+            model_fold = sklearn.base.clone(model, safe=True)
             train_indices, test_indices = fold
             trainX = X[train_indices]
             trainY = Y[train_indices]
             testX = X[test_indices]
             testY = Y[test_indices]
 
-            model.fit(trainX, trainY)
+            try:
+                model_fold.fit(trainX, trainY)
 
-            if isinstance(model, BaseSearchCV):
-                _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no)
-                model_classes = model.best_estimator_.classes_
-            else:
-                model_classes = model.classes_
+                if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
+                    arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
+                    model_classes = model_fold.best_estimator_.classes_
+                else:
+                    model_classes = model_fold.classes_
+            except AttributeError as e:
+                # typically happens when training a regressor on classification task
+                raise PyOpenMLError(str(e))
 
-            ProbaY = model.predict_proba(testX)
-            PredY = model.predict(testX)
+            ProbaY = model_fold.predict_proba(testX)
+            PredY = model_fold.predict(testX)
             if ProbaY.shape[1] != len(class_labels):
                 warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" %(rep_no, fold_no, ProbaY.shape[1], len(class_labels)))
 
@@ -186,13 +189,18 @@ def _run_task_get_arffcontent(model, task, class_labels):
             fold_no = fold_no + 1
         rep_no = rep_no + 1
 
-    if not isinstance(model, BaseSearchCV):
+    if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
+        # arff_tracecontent is already set
+        arff_trace_attributes = _extract_arfftrace_attributes(model_fold)
+    else:
         arff_tracecontent = None
+        arff_trace_attributes = None
 
-    return arff_datacontent, arff_tracecontent
+    return arff_datacontent, arff_tracecontent, arff_trace_attributes
 
 
-def _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no):
+def _extract_arfftrace(model, rep_no, fold_no):
+    arff_tracecontent = []
     for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
         # we use the string values for True and False, as it is defined in this way by the OpenML server
         selected = 'false'
@@ -204,6 +212,30 @@ def _add_results_to_arfftrace(arff_tracecontent, fold_no, model, rep_no):
             if key.startswith("param_"):
                 arff_line.append(str(model.cv_results_[key][itt_no]))
         arff_tracecontent.append(arff_line)
+    return arff_tracecontent
+
+def _extract_arfftrace_attributes(model):
+    # attributes that will be in trace arff, regardless of the model
+    trace_attributes = [('repeat', 'NUMERIC'),
+                        ('fold', 'NUMERIC'),
+                        ('iteration', 'NUMERIC'),
+                        ('evaluation', 'NUMERIC'),
+                        ('selected', ['true', 'false'])]
+
+    # model dependent attributes for trace arff
+    for key in model.cv_results_:
+        if key.startswith("param_"):
+            if all(isinstance(i, (bool)) for i in model.cv_results_[key]):
+                type = ['True', 'False']
+            elif all(isinstance(i, (int, float)) for i in model.cv_results_[key]):
+                type = 'NUMERIC'
+            else:
+                values = list(set(model.cv_results_[key]))  # unique values
+                type = [str(i) for i in values]
+
+            attribute = ("parameter_" + key[6:], type)
+            trace_attributes.append(attribute)
+    return trace_attributes
 
 
 def get_runs(run_ids):
@@ -306,9 +338,16 @@ def _create_run_from_xml(xml):
     dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
 
     predictions_url = None
-    for file_dict in run['oml:output_data']['oml:file']:
+    if isinstance(run['oml:output_data']['oml:file'], dict):
+        # only one result.. probably due to an upload error
+        file_dict = run['oml:output_data']['oml:file']
         if file_dict['oml:name'] == 'predictions':
             predictions_url = file_dict['oml:url']
+    else:
+        # multiple files, the normal case
+        for file_dict in run['oml:output_data']['oml:file']:
+            if file_dict['oml:name'] == 'predictions':
+                predictions_url = file_dict['oml:url']
     if predictions_url is None:
         raise ValueError('No URL to download predictions for run %d in run '
                          'description XML' % run_id)

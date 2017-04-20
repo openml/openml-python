@@ -41,9 +41,8 @@ class TestRun(TestBase):
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
-        self.assertRaisesRegexp(AttributeError,
-                                "'LinearRegression' object has no attribute 'classes_'",
-                                openml.runs.run_task, task=task, model=clf)
+        self.assertRaises(openml.exceptions.PyOpenMLError, openml.runs.run_task,
+                          task=task, model=clf, avoid_duplicate_runs=False)
 
     @mock.patch('openml.flows.sklearn_to_flow')
     def test_check_erronous_sklearn_flow_fails(self, sklearn_to_flow_mock):
@@ -124,7 +123,7 @@ class TestRun(TestBase):
                                 clf, task, class_labels)
 
         clf = SGDClassifier(loss='log', random_state=1)
-        arff_datacontent, arff_tracecontent = openml.runs.functions._run_task_get_arffcontent(
+        arff_datacontent, arff_tracecontent, _ = openml.runs.functions._run_task_get_arffcontent(
             clf, task, class_labels)
         # predictions
         self.assertIsInstance(arff_datacontent, list)
@@ -291,7 +290,7 @@ class TestRun(TestBase):
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content, _ = _run_task_get_arffcontent(model, task, class_labels)
+        data_content, _, _ = _run_task_get_arffcontent(model, task, class_labels)
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)
