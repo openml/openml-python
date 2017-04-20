@@ -41,11 +41,8 @@ class TestRun(TestBase):
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
-        run = openml.runs.run_task(task=task, model=clf)
-        run = run.publish()
-
-        downloaded_run = openml.runs.get_run(run.run_id)
-        assert(downloaded_run.error_message is not None)
+        self.assertRaises(openml.exceptions.PyOpenMLError, openml.runs.run_task,
+                          task=task, model=clf, avoid_duplicate_runs=False)
 
     @mock.patch('openml.flows.sklearn_to_flow')
     def test_check_erronous_sklearn_flow_fails(self, sklearn_to_flow_mock):

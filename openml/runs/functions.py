@@ -67,11 +67,8 @@ def run_task(task, model, avoid_duplicate_runs=True):
 
     # execute the run
     run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
-    try:
-        run.data_content, run.trace_content, run.trace_attributes = _run_task_get_arffcontent(model, task, class_labels)
-    except PyOpenMLError as message:
-        run.error_message = str(message)
-        warnings.warn("Run terminated with error: %s" %run.error_message)
+    run.data_content, run.trace_content, run.trace_attributes = _run_task_get_arffcontent(model, task, class_labels)
+
 
     if flow_id == False:
         # means the flow did not exists. As we could run it, publish it now
@@ -342,9 +339,16 @@ def _create_run_from_xml(xml):
     dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
 
     predictions_url = None
-    for file_dict in run['oml:output_data']['oml:file']:
+    if isinstance(run['oml:output_data']['oml:file'], dict):
+        # only one result.. probably due to an upload error
+        file_dict = run['oml:output_data']['oml:file']
         if file_dict['oml:name'] == 'predictions':
             predictions_url = file_dict['oml:url']
+    else:
+        # multiple files, the normal case
+        for file_dict in run['oml:output_data']['oml:file']:
+            if file_dict['oml:name'] == 'predictions':
+                predictions_url = file_dict['oml:url']
     if predictions_url is None:
         raise ValueError('No URL to download predictions for run %d in run '
                          'description XML' % run_id)
