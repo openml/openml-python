@@ -551,27 +551,3 @@ def _deserialize_cross_validator(value, **kwargs):
 
 def _format_external_version(model_package_name, model_package_version_number):
     return '%s==%s' % (model_package_name, model_package_version_number)
-
-
-def get_traceble_model(model):
-    '''
-    Returns whether the model can produce an openml trace. If yes,
-    return that model. Returns false otherwise.
-    Clause holds true for instances of BaseSearchCV and Pipelines that
-    contain exactly one BaseSearchCV (no use to search deeper in the
-    Tree, maybe later)
-    '''
-    if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
-        return True
-    count = 0
-    returnValue = None
-    if isinstance(model, sklearn.pipeline.Pipeline):
-        for step in model.steps:
-            if isinstance(step[1], sklearn.model_selection._search.BaseSearchCV):
-                returnValue = step[1]
-                count += 1
-    if count == 1:
-        return returnValue
-    else:
-        return False
-

@@ -9,7 +9,6 @@ import sklearn
 from ..exceptions import PyOpenMLError
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists
-from ..flows.sklearn_converter import get_traceble_model
 from ..setups import setup_exists
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError
@@ -169,7 +168,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
             try:
                 model_fold.fit(trainX, trainY)
 
-                if get_traceble_model(model_fold):
+                if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
                     arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
                     model_classes = model_fold.best_estimator_.classes_
                 else:
@@ -190,7 +189,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
             fold_no = fold_no + 1
         rep_no = rep_no + 1
 
-    if get_traceble_model(model):
+    if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
         # arff_tracecontent is already set
         arff_trace_attributes = _extract_arfftrace_attributes(model_fold)
     else:
