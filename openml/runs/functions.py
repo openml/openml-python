@@ -73,7 +73,6 @@ def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None):
     run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model, tags=tags)
     run.data_content, run.trace_content, run.trace_attributes = _run_task_get_arffcontent(model, task, class_labels)
 
-
     if flow_id == False:
         # means the flow did not exists. As we could run it, publish it now
         flow = flow.publish()
@@ -172,12 +171,6 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
             try:
                 model_fold.fit(trainX, trainY)
-
-                if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
-                    arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
-                    model_classes = model_fold.best_estimator_.classes_
-                else:
-                    model_classes = model_fold.classes_
             except AttributeError as e:
                 # typically happens when training a regressor on classification task
                 raise PyOpenMLError(str(e))
