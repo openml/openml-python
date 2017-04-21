@@ -536,7 +536,11 @@ def _serialize_cross_validator(o):
 
     return ret
 
-def model_is_paralizable(model):
+def model_single_core(model):
+    '''
+    Returns True if the parameter settings of model are chosen s.t. the model
+     will run on a single core (in that case, openml-python can measure runtimes)
+    '''
     def check(param_dict):
         for param, value in param_dict.items():
             # n_jobs is scikitlearn parameter for paralizing jobs

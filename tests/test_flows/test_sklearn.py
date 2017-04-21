@@ -26,7 +26,7 @@ import sklearn.tree
 
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
 from openml.flows.sklearn_converter import _format_external_version, \
-    _check_dependencies, model_is_paralizable
+    _check_dependencies, model_single_core
 from openml.exceptions import PyOpenMLError
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -570,4 +570,4 @@ class TestSklearn(unittest.TestCase):
         answers = [True, False, False, True, False, False]
 
         for i in range(len(models)):
-            assert(model_is_paralizable(models[i]) == answers[i])
+            assert(model_single_core(models[i]) == answers[i])

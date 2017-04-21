@@ -1,5 +1,5 @@
 from .flow import OpenMLFlow
-from .sklearn_converter import sklearn_to_flow, flow_to_sklearn,  model_is_paralizable
+from .sklearn_converter import sklearn_to_flow, flow_to_sklearn,  model_single_core
 from .functions import get_flow, list_flows, flow_exists
 
 __all__ = ['OpenMLFlow', 'create_flow_from_model', 'get_flow', 'list_flows',
