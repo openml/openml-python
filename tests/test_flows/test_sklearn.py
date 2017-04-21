@@ -25,7 +25,8 @@ import sklearn.preprocessing
 import sklearn.tree
 
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
-from openml.flows.sklearn_converter import _format_external_version, _check_dependencies
+from openml.flows.sklearn_converter import _format_external_version, \
+    _check_dependencies, model_is_paralizable
 from openml.exceptions import PyOpenMLError
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -555,3 +556,18 @@ class TestSklearn(unittest.TestCase):
             ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore'))
         ]
         self.assertRaises(ValueError, sklearn.pipeline.FeatureUnion, transformer_list=transformer_list)
+
+    def test_paralizable_check(self):
+        models = [
+            sklearn.ensemble.RandomForestClassifier(),
+            sklearn.ensemble.RandomForestClassifier(n_jobs=5),
+            sklearn.ensemble.RandomForestClassifier(n_jobs=-1),
+            sklearn.pipeline.Pipeline(steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=1))]),
+            sklearn.pipeline.Pipeline(steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=5))]),
+            sklearn.pipeline.Pipeline(steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=-1))])
+        ]
+
+        answers = [True, False, False, True, False, False]
+
+        for i in range(len(models)):
+            assert(model_is_paralizable(models[i]) == answers[i])

@@ -536,6 +536,33 @@ def _serialize_cross_validator(o):
 
     return ret
 
+def model_is_paralizable(model):
+    def check(param_dict):
+        for param, value in param_dict.items():
+            # n_jobs is scikitlearn parameter for paralizing jobs
+            if 'n_jobs' in param.split('__')[-1]:
+                # 0 = illegal value (?), 1 = use one core,  n = use n cores
+                # -1 = use all available cores -> this makes it hard to
+                # measure runtime in a fair way
+                if value != 1:
+                    return False
+        return True
+
+    if not (isinstance(model, sklearn.base.BaseEstimator) or
+            isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
+        raise ValueError('model should be BaseEstimator or BaseSearchCV')
+
+    # check the parameters for n_jobs
+    if check(model.get_params()) == False:
+        return False
+
+    # check if the njobs is not in the optimization trace
+    # this would be error by the user, so we can throw it as a courtesy
+    if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
+        if check(model.get_params()) == False:
+            raise PyOpenMLError('openml-python should not be used to '
+                                'optimize the n_jobs parameter.')
+    return True
 
 def _deserialize_cross_validator(value, **kwargs):
     model_name = value['name']
