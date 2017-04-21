@@ -149,10 +149,17 @@ class OpenMLRun(object):
 
         openml_param_settings = OpenMLRun._parse_parameters(self.model, downloaded_flow)
 
+        # as a tag, it must be of the form ([a-zA-Z0-9_\-\.])+
+        # so we format time from 'mm/dd/yy hh:mm:ss' to 'mm-dd-yy_hh.mm.ss'
+        # well_formatted_time = time.strftime("%c").replace(
+        #     ' ', '_').replace('/', '-').replace(':', '.')
+        # tags = run_environment + [well_formatted_time] + ['run_task'] + \
+        #     [self.model.__module__ + "." + self.model.__class__.__name__]
         description = _to_dict(taskid=self.task_id, flow_id=self.flow_id,
                                setup_string=_create_setup_string(self.model),
                                parameter_settings=openml_param_settings,
                                error_message=self.error_message,
+                               detailed_evaluations=self.detailed_evaluations,
                                tags=self.tags)
         description_xml = xmltodict.unparse(description, pretty=True)
         return description_xml
@@ -241,7 +248,7 @@ def _get_version_information():
     return [python_version, sklearn_version, numpy_version, scipy_version]
 
 
-def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings, tags):
+def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings, tags=None, detailed_evaluations=None):
     """ Creates a dictionary corresponding to the desired xml desired by openML
 
     Parameters
@@ -268,11 +275,17 @@ def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings, t
     if error_message is not None:
         description['oml:run']['oml:error_message'] = error_message
     description['oml:run']['oml:parameter_setting'] = parameter_settings
-    description['oml:run']['oml:tag'] = tags  # Tags describing the run
-    # description['oml:run']['oml:output_data'] = 0;
-    # all data that was output of this run, which can be evaluation scores
-    # (though those are also calculated serverside)
-    # must be of special data type
+    if tags is not None:
+        description['oml:run']['oml:tag'] = tags  # Tags describing the run
+    if detailed_evaluations is not None:
+        description['oml:run']['oml:output_data'] = dict()
+        description['oml:run']['oml:output_data']['oml:evaluation'] = list()
+        for measure in detailed_evaluations:
+            for repeat in detailed_evaluations[measure]:
+                for fold, value in detailed_evaluations[measure][repeat].items():
+                    current = OrderedDict([('@repeat', str(repeat)), ('@fold', str(fold)),
+                                           ('oml:name', measure), ('oml:value', str(value))])
+                    description['oml:run']['oml:output_data']['oml:evaluation'].append(current)
     return description
 
 

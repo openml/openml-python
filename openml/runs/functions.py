@@ -5,13 +5,15 @@ import xmltodict
 import numpy as np
 import warnings
 import sklearn
+import time
+from sklearn.model_selection._search import BaseSearchCV
 
 from ..exceptions import PyOpenMLError
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists
 from ..setups import setup_exists
 from ..exceptions import OpenMLCacheException, OpenMLServerException
-from ..util import URLError
+from ..util import URLError, version_complies
 from ..tasks.functions import _create_task_from_xml
 from .._api_calls import _perform_api_call
 from .run import OpenMLRun, _get_version_information
@@ -155,6 +157,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
     X, Y = task.get_X_and_y()
     arff_datacontent = []
     arff_tracecontent = []
+    user_defined_measures = defaultdict(lambda: defaultdict(dict))
 
     rep_no = 0
     # TODO use different iterator to only provide a single iterator (less
@@ -170,11 +173,24 @@ def _run_task_get_arffcontent(model, task, class_labels):
             testY = Y[test_indices]
 
             try:
+                # for measuring runtime. Only available since Python 3.3
+                if version_complies(3, 3):
+                    modelfit_starttime = time.process_time()
                 model_fold.fit(trainX, trainY)
+
+                if version_complies(3, 3):
+                    modelfit_duration = (time.process_time() - modelfit_starttime) * 1000
+                    user_defined_measures['usercpu_time_millis_training'][rep_no][fold_no] = modelfit_duration
+
+                if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
+                    arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
+                    model_classes = model_fold.best_estimator_.classes_
+                else:
+                    model_classes = model_fold.classes_
             except AttributeError as e:
                 # typically happens when training a regressor on classification task
                 raise PyOpenMLError(str(e))
-
+            
             # extract trace
             if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
                 arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
@@ -182,8 +198,16 @@ def _run_task_get_arffcontent(model, task, class_labels):
             else:
                 model_classes = model_fold.classes_
 
+            if version_complies(3, 3):
+                modelpredict_starttime = time.process_time()
+            
             ProbaY = model_fold.predict_proba(testX)
             PredY = model_fold.predict(testX)
+            if version_complies(3, 3):
+                modelpredict_duration = (time.process_time() - modelpredict_starttime) * 1000
+                user_defined_measures['usercpu_time_millis_testing'][rep_no][fold_no] = modelpredict_duration
+                user_defined_measures['usercpu_time_millis'][rep_no][fold_no] = modelfit_duration + modelpredict_duration
+
             if ProbaY.shape[1] != len(class_labels):
                 warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" %(rep_no, fold_no, ProbaY.shape[1], len(class_labels)))
 
@@ -200,7 +224,6 @@ def _run_task_get_arffcontent(model, task, class_labels):
     else:
         arff_tracecontent = None
         arff_trace_attributes = None
-
     return arff_datacontent, arff_tracecontent, arff_trace_attributes
 
 
@@ -423,7 +446,7 @@ def _get_cached_run(run_id):
         run_file = os.path.join(run_cache_dir,
                                 "run_%d.xml" % int(run_id))
         with io.open(run_file, encoding='utf8') as fh:
-            run = _create_task_from_xml(xml=fh.read())
+            run = _create_run_from_xml(xml=fh.read())
         return run
 
     except (OSError, IOError):
