@@ -541,14 +541,14 @@ def model_single_core(model):
     Returns True if the parameter settings of model are chosen s.t. the model
      will run on a single core (in that case, openml-python can measure runtimes)
     '''
-    def check(param_dict):
+    def check(param_dict, disallow_parameter=False):
         for param, value in param_dict.items():
             # n_jobs is scikitlearn parameter for paralizing jobs
-            if 'n_jobs' in param.split('__')[-1]:
+            if param.split('__')[-1] == 'n_jobs':
                 # 0 = illegal value (?), 1 = use one core,  n = use n cores
                 # -1 = use all available cores -> this makes it hard to
                 # measure runtime in a fair way
-                if value != 1:
+                if value != 1 or disallow_parameter:
                     return False
         return True
 
@@ -556,16 +556,17 @@ def model_single_core(model):
             isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
         raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
-    # check the parameters for n_jobs
-    if check(model.get_params()) == False:
-        return False
-
     # check if the njobs is not in the optimization trace
     # this would be error by the user, so we can throw it as a courtesy
     if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
-        if check(model.get_params()) == False:
+        if not check( model.param_grid, True):
             raise PyOpenMLError('openml-python should not be used to '
                                 'optimize the n_jobs parameter.')
+
+    # check the parameters for n_jobs
+    if check(model.get_params(), False) == False:
+        return False
+
     return True
 
 def _deserialize_cross_validator(value, **kwargs):

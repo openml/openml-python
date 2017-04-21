@@ -558,16 +558,30 @@ class TestSklearn(unittest.TestCase):
         self.assertRaises(ValueError, sklearn.pipeline.FeatureUnion, transformer_list=transformer_list)
 
     def test_paralizable_check(self):
-        models = [
+        singlecore_bagging = sklearn.ensemble.BaggingClassifier()
+        multicore_bagging = sklearn.ensemble.BaggingClassifier(n_jobs=5)
+        illegal_param_dist = {"base__n_jobs": [-1, 0, 1] }
+        legal_param_dist = {"base__max_depth": [2, 3, 4]}
+
+        legal_models = [
             sklearn.ensemble.RandomForestClassifier(),
             sklearn.ensemble.RandomForestClassifier(n_jobs=5),
             sklearn.ensemble.RandomForestClassifier(n_jobs=-1),
             sklearn.pipeline.Pipeline(steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=1))]),
             sklearn.pipeline.Pipeline(steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=5))]),
-            sklearn.pipeline.Pipeline(steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=-1))])
+            sklearn.pipeline.Pipeline(steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=-1))]),
+            sklearn.model_selection.GridSearchCV(singlecore_bagging, legal_param_dist),
+            sklearn.model_selection.GridSearchCV(multicore_bagging, legal_param_dist)
+        ]
+        illegal_models = [
+            sklearn.model_selection.GridSearchCV(singlecore_bagging, illegal_param_dist),
+            sklearn.model_selection.GridSearchCV(multicore_bagging, illegal_param_dist)
         ]
 
-        answers = [True, False, False, True, False, False]
+        answers = [True, False, False, True, False, False, True, False]
 
-        for i in range(len(models)):
-            assert(model_single_core(models[i]) == answers[i])
+        for i in range(len(legal_models)):
+            self.assertTrue(model_single_core(legal_models[i]) == answers[i])
+
+        for i in range(len(illegal_models)):
+            self.assertRaises(PyOpenMLError, model_single_core, illegal_models[i])
