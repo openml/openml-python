@@ -41,7 +41,7 @@ class TestRun(TestBase):
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
-        self.assertRaises(openml.exceptions.PyOpenMLError, openml.runs.run_task,
+        self.assertRaises(AttributeError, openml.runs.run_task,
                           task=task, model=clf, avoid_duplicate_runs=False)
 
     @mock.patch('openml.flows.sklearn_to_flow')
@@ -60,7 +60,10 @@ class TestRun(TestBase):
         num_instances = 768
 
         clf = LogisticRegression()
-        self._perform_run(task_id,num_instances, clf)
+        res = self._perform_run(task_id,num_instances, clf)
+
+        downloaded = openml.runs.get_run(res.run_id)
+        assert('openml-python' in downloaded.tags)
 
     def test_run_optimize_randomforest_iris(self):
         task_id = 115
@@ -80,6 +83,7 @@ class TestRun(TestBase):
                                            n_iter=num_iterations)
 
         run = self._perform_run(task_id, num_instances, random_search)
+        print(run.trace_content)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
 
     def test_run_optimize_bagging_iris(self):
@@ -166,6 +170,8 @@ class TestRun(TestBase):
                          (8, 0.56759),
                          (9, 0.64621)]:
             self.assertEqual(run.detailed_evaluations['f_measure'][0][i], value)
+        assert('weka' in run.tags)
+        assert('stacking' in run.tags)
 
     def _check_run(self, run):
         self.assertIsInstance(run, dict)

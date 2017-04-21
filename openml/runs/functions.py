@@ -16,7 +16,7 @@ from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError, version_complies
 from ..tasks.functions import _create_task_from_xml
 from .._api_calls import _perform_api_call
-from .run import OpenMLRun
+from .run import OpenMLRun, _get_version_information
 
 
 # _get_version_info, _get_dict and _create_setup_string are in run.py to avoid
@@ -24,7 +24,7 @@ from .run import OpenMLRun
 
 
 
-def run_task(task, model, avoid_duplicate_runs=True):
+def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None):
     """Performs a CV run on the dataset of the given task, using the split.
 
     Parameters
@@ -35,13 +35,16 @@ def run_task(task, model, avoid_duplicate_runs=True):
         a model which has a function fit(X,Y) and predict(X),
         all supervised estimators of scikit learn follow this definition of a model [1]
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
-
+    flow_tags : list(str)
+        a list of tags that the flow should have at creation
 
     Returns
     -------
     run : OpenMLRun
         Result of the run.
     """
+    if flow_tags is not None and not isinstance(flow_tags, list):
+        raise ValueError("flow_tags should be list")
     # TODO move this into its onwn module. While it somehow belongs here, it
     # adds quite a lot of functionality which is better suited in other places!
     # TODO why doesn't this accept a flow as input? - this would make this more flexible!
@@ -66,8 +69,10 @@ def run_task(task, model, avoid_duplicate_runs=True):
         raise ValueError('The task has no class labels. This method currently '
                          'only works for tasks with class labels.')
 
+    run_environment = _get_version_information()
+    tags = ['openml-python', run_environment[1]]
     # execute the run
-    run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model)
+    run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model, tags=tags)
     run.data_content, run.trace_content, run.trace_attributes = _run_task_get_arffcontent(model, task, class_labels)
 
     if flow_id == False:
@@ -176,18 +181,20 @@ def _run_task_get_arffcontent(model, task, class_labels):
                 if version_complies(3, 3):
                     modelfit_duration = (time.process_time() - modelfit_starttime) * 1000
                     user_defined_measures['usercpu_time_millis_training'][rep_no][fold_no] = modelfit_duration
-
-                if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
-                    arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
-                    model_classes = model_fold.best_estimator_.classes_
-                else:
-                    model_classes = model_fold.classes_
             except AttributeError as e:
                 # typically happens when training a regressor on classification task
                 raise PyOpenMLError(str(e))
+            
+            # extract trace
+            if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
+                arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
+                model_classes = model_fold.best_estimator_.classes_
+            else:
+                model_classes = model_fold.classes_
 
             if version_complies(3, 3):
                 modelpredict_starttime = time.process_time()
+            
             ProbaY = model_fold.predict_proba(testX)
             PredY = model_fold.predict(testX)
             if version_complies(3, 3):
@@ -215,6 +222,12 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
 
 def _extract_arfftrace(model, rep_no, fold_no):
+    if not isinstance(model, sklearn.model_selection._search.BaseSearchCV):
+        raise ValueError('model should be instance of'\
+                         ' sklearn.model_selection._search.BaseSearchCV')
+    if not hasattr(model, 'cv_results_'):
+        raise ValueError('model should contain `cv_results_`')
+
     arff_tracecontent = []
     for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
         # we use the string values for True and False, as it is defined in this way by the OpenML server
@@ -230,6 +243,12 @@ def _extract_arfftrace(model, rep_no, fold_no):
     return arff_tracecontent
 
 def _extract_arfftrace_attributes(model):
+    if not isinstance(model, sklearn.model_selection._search.BaseSearchCV):
+        raise ValueError('model should be instance of'\
+                         ' sklearn.model_selection._search.BaseSearchCV')
+    if not hasattr(model, 'cv_results_'):
+        raise ValueError('model should contain `cv_results_`')
+
     # attributes that will be in trace arff, regardless of the model
     trace_attributes = [('repeat', 'NUMERIC'),
                         ('fold', 'NUMERIC'),
@@ -391,6 +410,15 @@ def _create_run_from_xml(xml):
                 evaluation_flows[key] = flow_id
 
             evaluation_flows[key] = flow_id
+    tags = None
+    if 'oml:tag' in run:
+        if isinstance(run['oml:tag'], str):
+            tags = [run['oml:tag']]
+        elif isinstance(run['oml:tag'], list):
+            tags = run['oml:tag']
+        else:
+            raise ValueError('Received not string and non list as tag item')
+
 
     return OpenMLRun(run_id=run_id, uploader=uploader,
                      uploader_name=uploader_name, task_id=task_id,
@@ -401,7 +429,7 @@ def _create_run_from_xml(xml):
                      parameter_settings=parameters,
                      dataset_id=dataset_id, predictions_url=predictions_url,
                      evaluations=evaluations,
-                     detailed_evaluations=detailed_evaluations)
+                     detailed_evaluations=detailed_evaluations, tags=tags)
 
 
 def _get_cached_run(run_id):
