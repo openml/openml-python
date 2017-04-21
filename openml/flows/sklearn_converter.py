@@ -559,7 +559,18 @@ def model_single_core(model):
     # check if the njobs is not in the optimization trace
     # this would be error by the user, so we can throw it as a courtesy
     if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
-        if not check( model.param_grid, True):
+        param_distributions = None
+        if isinstance(model, sklearn.model_selection.GridSearchCV):
+            param_distributions = model.param_grid
+        elif isinstance(model, sklearn.model_selection.RandomizedSearchCV):
+            param_distributions = model.param_distributions
+        else:
+            print('Warning! Using subclass BaseSearchCV other than ' \
+                  '{GridSearchCV, RandomizedSearchCV}. Should implement param check. ')
+            pass
+
+
+        if not check(param_distributions, True):
             raise PyOpenMLError('openml-python should not be used to '
                                 'optimize the n_jobs parameter.')
 
