@@ -6,15 +6,13 @@ import numpy as np
 import warnings
 import sklearn
 import time
-from sklearn.model_selection._search import BaseSearchCV
 
 from ..exceptions import PyOpenMLError
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists
-from ..setups import setup_exists
+from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError, version_complies
-from ..tasks.functions import _create_task_from_xml
 from .._api_calls import _perform_api_call
 from .run import OpenMLRun, _get_version_information
 
@@ -93,6 +91,24 @@ def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None, seed=None):
     config.logger.info('Executed Task %d with Flow id: %d' % (task.task_id, run.flow_id))
 
     return run
+
+def initialize_model_from_run(run_id):
+    '''
+    Initialized a model based on a run_id (i.e., using the exact
+    same parameter settings)
+
+    Parameters
+        ----------
+        run_id : int
+            The Openml run_id
+
+        Returns
+        -------
+        model : sklearn model
+            the scikitlearn model with all parameters initailized
+    '''
+    run = get_run(run_id)
+    return initialize_model(run.setup_id)
 
 def _run_exists(task_id, setup_id):
     '''

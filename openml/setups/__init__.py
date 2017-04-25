@@ -1,3 +1,3 @@
-from .functions import setup_exists
+from .functions import get_setup, setup_exists, initialize_model
 
-__all__ = ['setup_exists']
+__all__ = ['get_setup', 'setup_exists', 'initialize_model']

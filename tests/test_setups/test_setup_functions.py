@@ -72,3 +72,19 @@ class TestRun(TestBase):
         setup_id = openml.setups.setup_exists(flow, bagging)
         self.assertEquals(setup_id, run.setup_id)
 
+    def test_setup_get(self):
+        # no setups in default test server
+        openml.config.server = 'https://www.openml.org/api/v1/xml/'
+
+        # contains all special cases, 0 params, 1 param, n params.
+        # Non scikitlearn flows.
+        setups = [18, 19, 20, 118]
+        num_params = [8, 0, 3, 1]
+
+        for idx in range(len(setups)):
+            current = openml.setups.get_setup(setups[idx])
+            assert current.flow_id > 0
+            if num_params[idx] == 0:
+                assert current.parameters is None
+            else:
+                assert len(current.parameters) == num_params[idx]
