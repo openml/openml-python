@@ -536,7 +536,7 @@ def _serialize_cross_validator(o):
 
     return ret
 
-def model_single_core(model):
+def _check_n_jobs(model):
     '''
     Returns True if the parameter settings of model are chosen s.t. the model
      will run on a single core (in that case, openml-python can measure runtimes)
@@ -556,8 +556,7 @@ def model_single_core(model):
             isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
         raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
-    # check if the njobs is not in the optimization trace
-    # this would be error by the user, so we can throw it as a courtesy
+    # make sure that n_jobs is not in the parameter grid of optimization procedure
     if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
         param_distributions = None
         if isinstance(model, sklearn.model_selection.GridSearchCV):
@@ -569,16 +568,12 @@ def model_single_core(model):
                   '{GridSearchCV, RandomizedSearchCV}. Should implement param check. ')
             pass
 
-
         if not check(param_distributions, True):
             raise PyOpenMLError('openml-python should not be used to '
                                 'optimize the n_jobs parameter.')
 
     # check the parameters for n_jobs
-    if check(model.get_params(), False) == False:
-        return False
-
-    return True
+    return check(model.get_params(), False)
 
 def _deserialize_cross_validator(value, **kwargs):
     model_name = value['name']

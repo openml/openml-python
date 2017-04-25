@@ -26,7 +26,7 @@ import sklearn.tree
 
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
 from openml.flows.sklearn_converter import _format_external_version, \
-    _check_dependencies, model_single_core
+    _check_dependencies, _check_n_jobs
 from openml.exceptions import PyOpenMLError
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -558,9 +558,13 @@ class TestSklearn(unittest.TestCase):
         self.assertRaises(ValueError, sklearn.pipeline.FeatureUnion, transformer_list=transformer_list)
 
     def test_paralizable_check(self):
+        # using this model should pass the test (if param distribution is legal)
         singlecore_bagging = sklearn.ensemble.BaggingClassifier()
+        # using this model should return false (if param distribution is legal)
         multicore_bagging = sklearn.ensemble.BaggingClassifier(n_jobs=5)
+        # using this param distribution should raise an exception
         illegal_param_dist = {"base__n_jobs": [-1, 0, 1] }
+        # using this param distribution should not raise an exception
         legal_param_dist = {"base__max_depth": [2, 3, 4]}
 
         legal_models = [
@@ -581,7 +585,7 @@ class TestSklearn(unittest.TestCase):
         answers = [True, False, False, True, False, False, True, False]
 
         for i in range(len(legal_models)):
-            self.assertTrue(model_single_core(legal_models[i]) == answers[i])
+            self.assertTrue(_check_n_jobs(legal_models[i]) == answers[i])
 
         for i in range(len(illegal_models)):
-            self.assertRaises(PyOpenMLError, model_single_core, illegal_models[i])
+            self.assertRaises(PyOpenMLError, _check_n_jobs, illegal_models[i])

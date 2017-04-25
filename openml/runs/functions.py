@@ -10,7 +10,7 @@ from sklearn.model_selection._search import BaseSearchCV
 
 from ..exceptions import PyOpenMLError
 from .. import config
-from ..flows import sklearn_to_flow, get_flow, flow_exists, model_single_core
+from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs
 from ..setups import setup_exists
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError, version_complies
@@ -160,7 +160,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
     user_defined_measures = defaultdict(lambda: defaultdict(dict))
 
     rep_no = 0
-    can_measure_runtime = version_complies(3, 3) and model_single_core(model)
+    can_measure_runtime = version_complies(3, 3) and _check_n_jobs(model)
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
     for rep in task.iterate_repeats():
