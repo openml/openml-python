@@ -1,5 +1,6 @@
 import openml
 import xmltodict
+import copy
 
 from collections import OrderedDict
 from .setup import OpenMLSetup, OpenMLParameter
@@ -73,13 +74,33 @@ def initialize_model(setup_id):
         model : sklearn model
             the scikitlearn model with all parameters initailized
     '''
+    def get_flow_dict(_flow, identifier_trace):
+        flow_map = {_flow.flow_id: identifier_trace}
+        for identifier in _flow.components:
+            duplicate_trace = copy.deepcopy(identifier_trace)
+            duplicate_trace.append(identifier)
+            flow_map.update(get_flow_dict(_flow.components[identifier], duplicate_trace))
+        return flow_map
 
     setup = get_setup(setup_id)
     flow = openml.flows.get_flow(setup.flow_id)
     sklearn_model = openml.flows.flow_to_sklearn(flow)
-    # print(sklearn_model.get_params())
-
-    raise ValueError('not implemented yet')
+    identifier_trace = get_flow_dict(flow, [])
+    print(sklearn_model.get_params())
+    print(identifier_trace)
+    parameter_dict = {}
+    for param_id in setup.parameters:
+        parameter = setup.parameters[param_id]
+        if parameter.flow_id == flow.flow_id:
+            # TODO: parse value. If serialized object (e.g., steps, estimator), skip it (?)
+            parameter_dict[parameter.parameter_name] = parameter.value
+        else:
+            # TODO: parse value. If serialized object (e.g., steps, estimator), skip it (?)
+            # find my estimator path
+            parameter_name = '__'.join(identifier_trace[parameter.flow_id]) + "__" + parameter.parameter_name
+            parameter_dict[parameter_name] = parameter.value
+    print(parameter_dict)
+    sklearn_model.set_params(**parameter_dict)
 
 
 def _to_dict(flow_id, openml_parameter_settings):
