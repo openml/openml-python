@@ -24,7 +24,7 @@ from .run import OpenMLRun, _get_version_information
 
 
 
-def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None):
+def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None, seed=None):
     """Performs a CV run on the dataset of the given task, using the split.
 
     Parameters
@@ -35,8 +35,13 @@ def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None):
         a model which has a function fit(X,Y) and predict(X),
         all supervised estimators of scikit learn follow this definition of a model [1]
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
+    avoid_duplicate_runs : bool
+        if this flag is set to True, the run will throw an error if the
+        setup/task combination is already present on the server.
     flow_tags : list(str)
         a list of tags that the flow should have at creation
+    seed: int
+        the models that are not seeded will get this seed
 
     Returns
     -------
@@ -48,6 +53,7 @@ def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None):
     # TODO move this into its onwn module. While it somehow belongs here, it
     # adds quite a lot of functionality which is better suited in other places!
     # TODO why doesn't this accept a flow as input? - this would make this more flexible!
+    model = _get_seeded_model(model, seed)
     flow = sklearn_to_flow(model)
 
     # returns flow id if the flow exists on the server, False otherwise
@@ -110,6 +116,44 @@ def _run_exists(task_id, setup_id):
         # error code 512 implies no results. This means the run does not exist yet
         assert(exception.code == 512)
         return False
+
+def _get_seeded_model(model, seed=None):
+    '''Sets all the non-seeded components of a model with a seed.
+
+        Parameters
+        ----------
+        model : sklearn model
+            The model to be seeded
+        seed : int
+            The seed to initialize the RandomState with. Unseeded subcomponents
+            will be seeded with a random number from the RandomState.
+
+        Returns
+        -------
+        model : sklearn model
+            a version of the model where all (sub)components have
+            a seed
+    '''
+
+    rs = np.random.RandomState(seed)
+    model_params = model.get_params()
+    random_states = {}
+    for param_name in sorted(model_params):
+        if 'random_state' in param_name:
+            currentValue = model_params[param_name]
+            # important to draw the value at this point (and not in the if statement)
+            newValue = rs.randint(0, 2**16)
+            if currentValue is None:
+                random_states[param_name] = newValue
+            elif isinstance(currentValue, int):
+                # acceptable behaviour
+                pass
+            elif isinstance(currentValue, np.random.RandomState):
+                raise ValueError('Models initialized with a RandomState object are not supported. Please seed with an integer. ')
+            else:
+                raise ValueError('Models should be seeded with int or None (this should never happen). ')
+            model.set_params(**random_states)
+    return model
 
 
 
