@@ -10,7 +10,7 @@ from sklearn.model_selection._search import BaseSearchCV
 
 from ..exceptions import PyOpenMLError
 from .. import config
-from ..flows import sklearn_to_flow, get_flow, flow_exists
+from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs
 from ..setups import setup_exists
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError, version_complies
@@ -160,6 +160,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
     user_defined_measures = defaultdict(lambda: defaultdict(dict))
 
     rep_no = 0
+    can_measure_runtime = version_complies(3, 3) and _check_n_jobs(model)
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
     for rep in task.iterate_repeats():
@@ -174,11 +175,11 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
             try:
                 # for measuring runtime. Only available since Python 3.3
-                if version_complies(3, 3):
+                if can_measure_runtime:
                     modelfit_starttime = time.process_time()
                 model_fold.fit(trainX, trainY)
 
-                if version_complies(3, 3):
+                if can_measure_runtime:
                     modelfit_duration = (time.process_time() - modelfit_starttime) * 1000
                     user_defined_measures['usercpu_time_millis_training'][rep_no][fold_no] = modelfit_duration
             except AttributeError as e:
@@ -192,12 +193,12 @@ def _run_task_get_arffcontent(model, task, class_labels):
             else:
                 model_classes = model_fold.classes_
 
-            if version_complies(3, 3):
+            if can_measure_runtime:
                 modelpredict_starttime = time.process_time()
             
             ProbaY = model_fold.predict_proba(testX)
             PredY = model_fold.predict(testX)
-            if version_complies(3, 3):
+            if can_measure_runtime:
                 modelpredict_duration = (time.process_time() - modelpredict_starttime) * 1000
                 user_defined_measures['usercpu_time_millis_testing'][rep_no][fold_no] = modelpredict_duration
                 user_defined_measures['usercpu_time_millis'][rep_no][fold_no] = modelfit_duration + modelpredict_duration
