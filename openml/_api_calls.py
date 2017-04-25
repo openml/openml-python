@@ -110,7 +110,9 @@ def _parse_server_exception(response):
     try:
         server_exception = xmltodict.parse(response.text)
     except:
-        raise OpenMLServerError(('Status code: %d\n' % response.status_code) + response.text)
+        raise OpenMLServerError(('Unexpected server error. Please '
+                                 'contact the developers!\nStatus code: '
+                                 '%d\n' % response.status_code) + response.text)
 
     code = int(server_exception['oml:error']['oml:code'])
     message = server_exception['oml:error']['oml:message']
