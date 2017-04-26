@@ -358,4 +358,4 @@ def _check_flow(flow):
     import openml.flows.functions
 
     flow_copy = openml.flows.functions.get_flow(flow.flow_id)
-    openml.flows.functions.check_flows_equal(flow, flow_copy)
+    openml.flows.functions.assert_flows_equal(flow, flow_copy)

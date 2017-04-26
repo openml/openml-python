@@ -25,7 +25,7 @@ import sklearn.preprocessing
 import sklearn.tree
 
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
-from openml.flows.functions import check_flows_equal
+from openml.flows.functions import assert_flows_equal
 from openml.flows.sklearn_converter import _format_external_version, _check_dependencies
 from openml.exceptions import PyOpenMLError
 
@@ -295,7 +295,7 @@ class TestSklearn(unittest.TestCase):
         serialized2 = sklearn_to_flow(deserialized)
         self.assertNotEqual(rs, deserialized)
         # Would raise an exception if the flows would be unequal
-        check_flows_equal(serialized, serialized2)
+        assert_flows_equal(serialized, serialized2)
 
     def test_serialize_type(self):
         supported_types = [float, np.float, np.float32, np.float64,

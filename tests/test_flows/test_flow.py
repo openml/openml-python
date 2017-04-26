@@ -98,7 +98,7 @@ class TestFlow(TestBase):
         new_flow = openml.flows.OpenMLFlow._from_dict(xml_dict)
 
         # Would raise exception if they are not legal
-        openml.flows.functions.check_flows_equal(new_flow, flow)
+        openml.flows.functions.assert_flows_equal(new_flow, flow)
         self.assertIsNot(new_flow, flow)
 
     def test_publish_flow(self):
@@ -260,7 +260,7 @@ class TestFlow(TestBase):
         self.assertEqual(server_xml, local_xml)
 
         # Would raise exception if they are not equal!
-        openml.flows.functions.check_flows_equal(new_flow, flow)
+        openml.flows.functions.assert_flows_equal(new_flow, flow)
         self.assertIsNot(new_flow, flow)
 
         fixture_name = '%ssklearn.model_selection._search.RandomizedSearchCV(' \

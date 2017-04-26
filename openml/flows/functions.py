@@ -130,7 +130,7 @@ def _list_flows(api_call):
     return flows
 
 
-def check_flows_equal(flow1, flow2):
+def assert_flows_equal(flow1, flow2):
     """Check equality of two flows.
 
     Two flows are equal if their all keys which are not set by the server
@@ -164,7 +164,7 @@ def check_flows_equal(flow1, flow2):
                 if not name in attr2:
                     raise ValueError('Component %s only available in '
                                      'argument2, but not in argument1.' % name)
-                check_flows_equal(attr1[name], attr2[name])
+                assert_flows_equal(attr1[name], attr2[name])
 
         else:
             if attr1 != attr2:
