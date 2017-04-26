@@ -80,9 +80,12 @@ def initialize_model(setup_id):
         # parameter_names mapping to parameter_value
         _res = {}
         for _param in _params:
-            if _param.flow_id not in _res:
-                _res[_param.flow_id] = {}
-            _res[_param.flow_id][_param.parameter_name] = _param.value
+            _flow_id = _params[_param].flow_id
+            _param_name = _params[_param].parameter_name
+            _param_value = _params[_param].value
+            if _flow_id not in _res:
+                _res[_flow_id] = {}
+            _res[_flow_id][_param_name] = _param_value
         return _res
 
     def _reconstruct_flow(_flow, _params):
