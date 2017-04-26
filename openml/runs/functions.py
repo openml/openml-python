@@ -10,7 +10,7 @@ import time
 from ..exceptions import PyOpenMLError
 from .. import config
 
-from ..flows import sklearn_to_flow, get_flow, flow_exists
+from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs
 from ..setups import setup_exists, initialize_model
 
 from ..exceptions import OpenMLCacheException, OpenMLServerException
