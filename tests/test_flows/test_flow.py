@@ -1,9 +1,14 @@
 import collections
+import copy
 import hashlib
 import re
+import sys
 import time
 
-import xmltodict
+if sys.version_info[0] >= 3:
+    from unittest import mock
+else:
+    import mock
 
 import scipy.stats
 import sklearn
@@ -17,6 +22,7 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.naive_bayes
 import sklearn.tree
+import xmltodict
 
 from openml.testing import TestBase
 from openml._api_calls import _perform_api_call
@@ -24,18 +30,8 @@ import openml
 from openml.flows.sklearn_converter import _format_external_version
 
 
-def get_sentinel():
-    # Create a unique prefix for the flow. Necessary because the flow is
-    # identified by its name and external version online. Having a unique
-    #  name allows us to publish the same flow in each test run
-    md5 = hashlib.md5()
-    md5.update(str(time.time()).encode('utf-8'))
-    sentinel = md5.hexdigest()[:10]
-    sentinel = 'TEST%s' % sentinel
-    return sentinel
-
-
 class TestFlow(TestBase):
+
 
     def test_get_flow(self):
         # We need to use the production server here because 4024 is not the test
@@ -100,13 +96,14 @@ class TestFlow(TestBase):
         xml = flow._to_xml()
         xml_dict = xmltodict.parse(xml)
         new_flow = openml.flows.OpenMLFlow._from_dict(xml_dict)
-        self.assertTrue(openml.flows.functions.are_flows_equal(new_flow, flow))
+
+        # Would raise exception if they are not legal
+        openml.flows.functions.check_flows_equal(new_flow, flow)
         self.assertIsNot(new_flow, flow)
 
     def test_publish_flow(self):
-        sentinel = get_sentinel()
-
-        flow = openml.OpenMLFlow(name='Test',
+        flow = openml.OpenMLFlow(name='sklearn.dummy.DummyClassifier',
+                                 class_name='sklearn.dummy.DummyClassifier',
                                  description="test description",
                                  model=sklearn.dummy.DummyClassifier(),
                                  components=collections.OrderedDict(),
@@ -116,8 +113,9 @@ class TestFlow(TestBase):
                                      'sklearn', sklearn.__version__),
                                  tags=[],
                                  language='English',
-                                 dependencies='')
-        flow.name = 'TEST%s%s' % (sentinel, flow.name)
+                                 dependencies=None)
+
+        flow, _ = self._add_sentinel_to_flow_name(flow, None)
 
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)
@@ -126,14 +124,44 @@ class TestFlow(TestBase):
         # TODO: Test if parameters are set correctly!
         # should not throw error as it contains two differentiable forms of Bagging
         # i.e., Bagging(Bagging(J48)) and Bagging(J48)
-        sentinel = get_sentinel()
         semi_legal = sklearn.ensemble.BaggingClassifier(
             base_estimator=sklearn.ensemble.BaggingClassifier(
                 base_estimator=sklearn.tree.DecisionTreeClassifier()))
         flow = openml.flows.sklearn_to_flow(semi_legal)
-        flow.name = 'TEST%s%s' % (sentinel, flow.name)
+        flow, _ = self._add_sentinel_to_flow_name(flow, None)
 
         flow.publish()
+
+    @mock.patch('openml.flows.functions.get_flow')
+    @mock.patch('openml.flows.flow._perform_api_call')
+    def test_publish_error(self, api_call_mock, get_flow_mock):
+        model = sklearn.ensemble.RandomForestClassifier()
+        flow = openml.flows.sklearn_to_flow(model)
+        api_call_mock.return_value = "<oml:upload_flow>\n" \
+                                     "    <oml:id>1</oml:id>\n" \
+                                     "</oml:upload_flow>"
+        get_flow_mock.return_value = flow
+
+        flow.publish()
+        self.assertEqual(api_call_mock.call_count, 1)
+        self.assertEqual(get_flow_mock.call_count, 1)
+
+        flow_copy = copy.deepcopy(flow)
+        flow_copy.name = flow_copy.name[:-1]
+        get_flow_mock.return_value = flow_copy
+
+        with self.assertRaises(ValueError) as context_manager:
+            flow.publish()
+
+        fixture = "Flow was not stored correctly on the server. " \
+                  "New flow ID is 1. Please check manually and remove " \
+                  "the flow if necessary! Error is:\n" \
+                  "'Flow sklearn.ensemble.forest.RandomForestClassifier: values for attribute 'name' differ: " \
+                  "'sklearn.ensemble.forest.RandomForestClassifier' vs 'sklearn.ensemble.forest.RandomForestClassifie'.'"
+
+        self.assertEqual(context_manager.exception.args[0], fixture)
+        self.assertEqual(api_call_mock.call_count, 2)
+        self.assertEqual(get_flow_mock.call_count, 2)
 
     def test_illegal_flow(self):
         # should throw error as it contains two imputers
@@ -143,6 +171,16 @@ class TestFlow(TestBase):
         self.assertRaises(ValueError, openml.flows.sklearn_to_flow, illegal)
 
     def test_nonexisting_flow_exists(self):
+        def get_sentinel():
+            # Create a unique prefix for the flow. Necessary because the flow is
+            # identified by its name and external version online. Having a unique
+            #  name allows us to publish the same flow in each test run
+            md5 = hashlib.md5()
+            md5.update(str(time.time()).encode('utf-8'))
+            sentinel = md5.hexdigest()[:10]
+            sentinel = 'TEST%s' % sentinel
+            return sentinel
+
         name = get_sentinel() + get_sentinel()
         version = get_sentinel()
 
@@ -151,10 +189,9 @@ class TestFlow(TestBase):
 
     def test_existing_flow_exists(self):
         # create a flow
-        sentinel = get_sentinel()
         nb = sklearn.naive_bayes.GaussianNB()
         flow = openml.flows.sklearn_to_flow(nb)
-        flow.name = 'TEST%s%s' % (sentinel, flow.name)
+        flow, _ = self._add_sentinel_to_flow_name(flow, None)
         #publish the flow
         flow = flow.publish()
         #redownload the flow
@@ -170,7 +207,6 @@ class TestFlow(TestBase):
         iris = sklearn.datasets.load_iris()
         X = iris.data
         y = iris.target
-        sentinel = get_sentinel()
 
         # Test a more complicated flow
         ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[1])
@@ -193,17 +229,7 @@ class TestFlow(TestBase):
         rs.fit(X, y)
         flow = openml.flows.sklearn_to_flow(rs)
         flow.tags.extend(['openml-python', 'unittest'])
-
-        # Add the sentinel to all name strings in all subflows. Adds it to
-        # name to make it easier in the web gui to see that the flow is only
-        # a test flow
-        to_visit = collections.deque()
-        to_visit.appendleft(flow)
-        while len(to_visit) > 0:
-            current_flow = to_visit.pop()
-            for sub_flow in current_flow.components.values():
-                to_visit.appendleft(sub_flow)
-            current_flow.name = sentinel + current_flow.name
+        flow, sentinel = self._add_sentinel_to_flow_name(flow, None)
 
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)
@@ -233,7 +259,8 @@ class TestFlow(TestBase):
 
         self.assertEqual(server_xml, local_xml)
 
-        self.assertTrue(openml.flows.functions.are_flows_equal(new_flow, flow))
+        # Would raise exception if they are not equal!
+        openml.flows.functions.check_flows_equal(new_flow, flow)
         self.assertIsNot(new_flow, flow)
 
         fixture_name = '%ssklearn.model_selection._search.RandomizedSearchCV(' \
