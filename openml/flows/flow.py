@@ -355,6 +355,8 @@ def _add_if_nonempty(dic, key, value):
 
 
 def _check_flow(flow):
+    # Import is not possible at the top of the file as this would cause an
+    # ImportError due to an import cycle.
     import openml.flows.functions
 
     flow_copy = openml.flows.functions.get_flow(flow.flow_id)
