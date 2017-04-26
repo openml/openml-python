@@ -338,9 +338,26 @@ class OpenMLFlow(object):
         file_elements = {'description': xml_description}
         return_value = _perform_api_call("flow/", file_elements=file_elements)
         self.flow_id = int(xmltodict.parse(return_value)['oml:upload_flow']['oml:id'])
+        try:
+            _check_flow(self)
+        except ValueError as e:
+            message = e.args[0]
+            raise ValueError("Flow was not stored correctly on the server. "
+                             "New flow ID is %d. Please check manually and "
+                             "remove the flow if necessary! Error is:\n'%s'" %
+                             (self.flow_id, message))
         return self
 
 
 def _add_if_nonempty(dic, key, value):
     if value is not None:
         dic[key] = value
+
+
+def _check_flow(flow):
+    # Import is not possible at the top of the file as this would cause an
+    # ImportError due to an import cycle.
+    import openml.flows.functions
+
+    flow_copy = openml.flows.functions.get_flow(flow.flow_id)
+    openml.flows.functions.assert_flows_equal(flow, flow_copy)
