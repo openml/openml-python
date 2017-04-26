@@ -95,7 +95,7 @@ def initialize_model(setup_id):
         # (obtained by using the subfunction _to_dict_of_dicts)
         for _param in _flow.parameters:
             _flow.parameters[_param] = _params[_flow.flow_id][_param]
-        for _identifier in flow.components:
+        for _identifier in _flow.components:
             _flow.components[_identifier] = _reconstruct_flow(_flow.components[_identifier], _params)
         return _flow
 

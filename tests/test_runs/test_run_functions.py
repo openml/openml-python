@@ -25,7 +25,7 @@ else:
 
 class TestRun(TestBase):
 
-    def _perform_run(self, task_id, num_instances, clf):
+    def _perform_run(self, task_id, num_instances, clf, check_setup=True):
         task = openml.tasks.get_task(task_id)
         run = openml.runs.run_task(task, clf, openml.config.avoid_duplicate_runs)
         run_ = run.publish()
@@ -34,6 +34,14 @@ class TestRun(TestBase):
 
         # check arff output
         self.assertEqual(len(run.data_content), num_instances)
+
+        if check_setup:
+            run_id = run_.run_id
+            run_prime = openml.runs.get_run(run_id)
+            clf_prime = openml.setups.initialize_model(run_prime.setup_id)
+            self.assertEquals(clf.get_params(), clf_prime.get_params())
+            # self.assertEquals(clf, clf_prime)
+
         return run
 
     def test_run_regression_on_classif_task(self):

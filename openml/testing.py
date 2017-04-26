@@ -17,6 +17,7 @@ class TestBase(unittest.TestCase):
     def setUp(self):
         # This cache directory is checked in to git to simulate a populated
         # cache
+        self.maxDiff = None
         self.static_cache_dir = None
         static_cache_dir = os.path.dirname(os.path.abspath(inspect.getfile(self.__class__)))
 
