@@ -449,7 +449,7 @@ def _get_cached_run(run_id):
 
 
 def list_runs(offset=None, size=None, id=None, task=None, setup=None,
-              flow=None, uploader=None, tag=None):
+              flow=None, uploader=None, tag=None, display_errors=False):
     """List all runs matching all of the given filters.
 
     Perform API call `/run/list/{filters} <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`_
@@ -473,6 +473,9 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
 
     tag : str, optional
 
+    display_errors : bool, optional (default=None)
+        Whether to list runs which have an error (for example a missing
+        prediction file).
     Returns
     -------
     list
@@ -496,6 +499,8 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
     if tag is not None:
         api_call += "/tag/%s" % tag
+    if display_errors:
+        api_call += "/show_errors/true"
 
     return _list_runs(api_call)
 
