@@ -18,15 +18,52 @@ from . import config
 
 from .datasets import OpenMLDataset, OpenMLDataFeature
 from . import datasets
+from . import tasks
 from . import runs
 from . import flows
 from .runs import OpenMLRun
 from .tasks import OpenMLTask, OpenMLSplit
 from .flows import OpenMLFlow
 
+__version__ = "0.3.0"
 
-__version__ = "0.2.1"
+
+def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None,
+                   run_ids=None):
+    """
+    Populate a cache for offline and parallel usage of the OpenML connector.
+
+    Parameters
+    ----------
+    task_ids : iterable
+
+    dataset_ids : iterable
+
+    flow_ids : iterable
+
+    run_ids : iterable
+
+    Returns
+    -------
+    None
+    """
+    if task_ids is not None:
+        for task_id in task_ids:
+            tasks.functions.get_task(task_id)
+
+    if dataset_ids is not None:
+        for dataset_id in dataset_ids:
+            datasets.functions.get_dataset(dataset_id)
+
+    if flow_ids is not None:
+        for flow_id in flow_ids:
+            flows.functions.get_flow(flow_id)
+
+    if run_ids is not None:
+        for run_id in run_ids:
+            runs.functions.get_run(run_id)
+
 
 __all__ = ['OpenMLDataset', 'OpenMLDataFeature', 'OpenMLRun',
            'OpenMLSplit', 'datasets', 'OpenMLTask', 'OpenMLFlow',
-           'config', 'runs', 'flows']
+           'config', 'runs', 'flows', 'tasks']
