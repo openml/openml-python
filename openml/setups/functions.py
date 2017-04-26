@@ -74,33 +74,37 @@ def initialize_model(setup_id):
         model : sklearn model
             the scikitlearn model with all parameters initailized
     '''
-    def get_flow_dict(_flow, identifier_trace):
-        flow_map = {_flow.flow_id: identifier_trace}
-        for identifier in _flow.components:
-            duplicate_trace = copy.deepcopy(identifier_trace)
-            duplicate_trace.append(identifier)
-            flow_map.update(get_flow_dict(_flow.components[identifier], duplicate_trace))
-        return flow_map
+    def _to_dict_of_dicts(_params):
+        # this subfunction transforms an openml setup object into
+        # a dict of dicts, structured: flow_id maps to dict of
+        # parameter_names mapping to parameter_value
+        _res = {}
+        for _param in _params:
+            if _param.flow_id not in _res:
+                _res[_param.flow_id] = {}
+            _res[_param.flow_id][_param.parameter_name] = _param.value
+        return _res
+
+    def _reconstruct_flow(_flow, _params):
+        # sets the values of flow parameters (and subflows) to
+        # the specific values from a setup. _params is a dict of
+        # dicts, mapping from flow id to param name to param value
+        # (obtained by using the subfunction _to_dict_of_dicts)
+        for _param in _flow.parameters:
+            _flow.parameters[_param] = _params[_flow.flow_id][_param]
+        for _identifier in flow.components:
+            _flow.components[_identifier] = _reconstruct_flow(_flow.components[_identifier], _params)
+        return _flow
 
     setup = get_setup(setup_id)
+    parameters = _to_dict_of_dicts(setup.parameters)
     flow = openml.flows.get_flow(setup.flow_id)
-    sklearn_model = openml.flows.flow_to_sklearn(flow)
-    identifier_trace = get_flow_dict(flow, [])
-    print(sklearn_model.get_params())
-    print(identifier_trace)
-    parameter_dict = {}
-    for param_id in setup.parameters:
-        parameter = setup.parameters[param_id]
-        if parameter.flow_id == flow.flow_id:
-            # TODO: parse value. If serialized object (e.g., steps, estimator), skip it (?)
-            parameter_dict[parameter.parameter_name] = parameter.value
-        else:
-            # TODO: parse value. If serialized object (e.g., steps, estimator), skip it (?)
-            # find my estimator path
-            parameter_name = '__'.join(identifier_trace[parameter.flow_id]) + "__" + parameter.parameter_name
-            parameter_dict[parameter_name] = parameter.value
-    print(parameter_dict)
-    sklearn_model.set_params(**parameter_dict)
+
+    # now we 'abuse' the parameter object by passing in the
+    # parameters obtained from the setup
+    flow = _reconstruct_flow(flow, parameters)
+
+    return openml.flows.flow_to_sklearn(flow)
 
 
 def _to_dict(flow_id, openml_parameter_settings):
