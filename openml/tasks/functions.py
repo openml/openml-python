@@ -235,6 +235,11 @@ def _create_task_from_xml(xml):
         name = input_["@name"]
         inputs[name] = input_
 
+    evaluation_measures = None
+    if 'evaluation_measures' in inputs:
+        evaluation_measures = inputs["evaluation_measures"]["oml:evaluation_measures"]["oml:evaluation_measure"]
+
+
     # Convert some more parameters
     for parameter in \
             inputs["estimation_procedure"]["oml:estimation_procedure"][
@@ -251,5 +256,4 @@ def _create_task_from_xml(xml):
             "oml:type"],
         inputs["estimation_procedure"]["oml:estimation_procedure"][
             "oml:data_splits_url"], estimation_parameters,
-        inputs["evaluation_measures"]["oml:evaluation_measures"][
-            "oml:evaluation_measure"], None)
+        evaluation_measures, None)
