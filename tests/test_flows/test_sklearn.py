@@ -25,13 +25,14 @@ import sklearn.preprocessing
 import sklearn.tree
 
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
+
+from openml.flows.functions import assert_flows_equal
 from openml.flows.sklearn_converter import _format_external_version, \
     _check_dependencies, _check_n_jobs
 from openml.exceptions import PyOpenMLError
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(this_directory)
-from test_flow import are_flows_equal
 
 
 __version__ = 0.1
@@ -295,8 +296,8 @@ class TestSklearn(unittest.TestCase):
         # Checks that sklearn_to_flow is idempotent.
         serialized2 = sklearn_to_flow(deserialized)
         self.assertNotEqual(rs, deserialized)
-        self.assertTrue(are_flows_equal(serialized, serialized2),
-                         msg='%s\n%s' % (serialized, serialized2))
+        # Would raise an exception if the flows would be unequal
+        assert_flows_equal(serialized, serialized2)
 
     def test_serialize_type(self):
         supported_types = [float, np.float, np.float32, np.float64,

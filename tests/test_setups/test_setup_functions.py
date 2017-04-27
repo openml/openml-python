@@ -51,6 +51,9 @@ class TestRun(TestBase):
                                     max_samples=0.5)
         flow = openml.flows.sklearn_to_flow(bagging)
         flow.name = 'TEST%s%s' % (get_sentinel(), flow.name)
+        flow.components['base_estimator'].name = 'TEST%s%s' % (
+            get_sentinel(), flow.components['base_estimator'].name)
+
         flow = flow.publish()
         flow = openml.flows.get_flow(flow.flow_id)
 

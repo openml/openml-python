@@ -128,3 +128,44 @@ def _list_flows(api_call):
         flows[fid] = flow
 
     return flows
+
+
+def assert_flows_equal(flow1, flow2):
+    """Check equality of two flows.
+
+    Two flows are equal if their all keys which are not set by the server
+    are equal, as well as all their parameters and components.
+    """
+    if not isinstance(flow1, OpenMLFlow):
+        raise TypeError('Argument 1 must be of type OpenMLFlow, but is %s' %
+                        type(flow1))
+
+    if not isinstance(flow2, OpenMLFlow):
+        raise TypeError('Argument 2 must be of type OpenMLFlow, but is %s' %
+                        type(flow2))
+
+    generated_by_the_server = ['flow_id', 'uploader', 'version',
+                               'upload_date', ]
+    ignored_by_python_API = ['binary_url', 'binary_format', 'binary_md5',
+                             'model']
+
+    for key in set(flow1.__dict__.keys()).union(flow2.__dict__.keys()):
+        if key in generated_by_the_server + ignored_by_python_API:
+            continue
+        attr1 = getattr(flow1, key, None)
+        attr2 = getattr(flow2, key, None)
+        if key == 'components':
+            for name in set(attr1.keys()).union(attr2.keys()):
+                if not name in attr1:
+                    raise ValueError('Component %s only available in '
+                                     'argument2, but not in argument1.' % name)
+                if not name in attr2:
+                    raise ValueError('Component %s only available in '
+                                     'argument2, but not in argument1.' % name)
+                assert_flows_equal(attr1[name], attr2[name])
+
+        else:
+            if attr1 != attr2:
+                raise ValueError("Flow %s: values for attribute '%s' differ: "
+                                 "'%s' vs '%s'." %
+                                 (str(flow1.name), str(key), str(attr1), str(attr2)))

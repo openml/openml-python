@@ -131,7 +131,6 @@ def flow_to_sklearn(o, **kwargs):
                 raise ValueError('Cannot flow_to_sklearn %s' % serialized_type)
 
         else:
-            # Regular dictionary
             rval = OrderedDict((flow_to_sklearn(key, **kwargs),
                                 flow_to_sklearn(value, **kwargs))
                                for key, value in o.items())
@@ -303,8 +302,10 @@ def _extract_information_from_model(model):
                     component_reference = OrderedDict()
                     component_reference[
                         'oml-python:serialized_object'] = 'component_reference'
-                    component_reference['value'] = OrderedDict(
-                        key=identifier, step_name=identifier)
+                    cr_value = OrderedDict()
+                    cr_value['key'] = identifier
+                    cr_value['step_name'] = identifier
+                    component_reference['value'] = cr_value
                     parameter_value.append(component_reference)
 
             if isinstance(rval, tuple):
@@ -326,7 +327,10 @@ def _extract_information_from_model(model):
             component_reference = OrderedDict()
             component_reference[
                 'oml-python:serialized_object'] = 'component_reference'
-            component_reference['value'] = OrderedDict(key=k, step_name=None)
+            cr_value = OrderedDict()
+            cr_value['key'] = k
+            cr_value['step_name'] = None
+            component_reference['value'] = cr_value
             component_reference = sklearn_to_flow(component_reference, model)
             parameters[k] = json.dumps(component_reference)
 
@@ -387,6 +391,9 @@ def _deserialize_model(flow, **kwargs):
 
 
 def _check_dependencies(dependencies):
+    if not dependencies:
+        return
+
     dependencies = dependencies.split('\n')
     for dependency_string in dependencies:
         match = DEPENDENCIES_PATTERN.match(dependency_string)
@@ -448,7 +455,8 @@ def serialize_rv_frozen(o):
     dist = o.dist.__class__.__module__ + '.' + o.dist.__class__.__name__
     ret = OrderedDict()
     ret['oml-python:serialized_object'] = 'rv_frozen'
-    ret['value'] = OrderedDict(dist=dist, a=a, b=b, args=args, kwds=kwds)
+    ret['value'] = OrderedDict((('dist', dist), ('a', a), ('b', b),
+                                ('args', args), ('kwds', kwds)))
     return ret
 
 def deserialize_rv_frozen(o, **kwargs):
