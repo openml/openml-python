@@ -2,7 +2,6 @@ import sys
 
 import openml
 import openml.exceptions
-import json
 
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent
@@ -39,22 +38,13 @@ class TestRun(TestBase):
 
         if check_setup:
             run_id = run_.run_id
-            run_prime = openml.runs.get_run(run_id)
-            clf_prime = openml.setups.initialize_model(run_prime.setup_id)
+            run_server = openml.runs.get_run(run_id)
+            clf_server = openml.setups.initialize_model(run_server.setup_id)
 
-            params_orig = clf.get_params()
-            params_serv = clf_prime.get_params()
-            self.assertEqual(params_orig.keys(), params_serv.keys())
+            flow_local = openml.flows.sklearn_to_flow(clf)
+            flow_server = openml.flows.sklearn_to_flow(clf_server)
 
-            for param in params_orig:
-                print("%s : %s" %(param, str(params_serv[param])))
-                try:
-                    value_orig = json.dumps(params_orig[param])
-                    value_serv = json.dumps(params_serv[param])
-                    self.assertEqual(value_orig, value_serv)
-                except TypeError:
-                    # TODO: think of a different check
-                    print('Object not json serializable')
+            openml.flows.assert_flows_equal(flow_local, flow_server)
 
             #self.assertEquals(clf.get_params(), clf_prime.get_params())
             # self.assertEquals(clf, clf_prime)
