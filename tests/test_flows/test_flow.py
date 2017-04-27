@@ -209,7 +209,8 @@ class TestFlow(TestBase):
         y = iris.target
 
         # Test a more complicated flow
-        ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[1])
+        ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[1],
+                                                  handle_unknown='ignore')
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         pca = sklearn.decomposition.TruncatedSVD()
         fs = sklearn.feature_selection.SelectPercentile(
