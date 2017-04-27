@@ -49,6 +49,9 @@ def sklearn_to_flow(o, parent_model=None):
         rval = o
     elif isinstance(o, dict):
         # TODO: explain what type of parameter is here
+        if not isinstance(o, OrderedDict):
+            o = OrderedDict([(key, value) for key, value in sorted(o.items())])
+
         rval = OrderedDict()
         for key, value in o.items():
             if not isinstance(key, six.string_types):
@@ -133,7 +136,7 @@ def flow_to_sklearn(o, **kwargs):
         else:
             rval = OrderedDict((flow_to_sklearn(key, **kwargs),
                                 flow_to_sklearn(value, **kwargs))
-                               for key, value in o.items())
+                               for key, value in sorted(o.items()))
     elif isinstance(o, (list, tuple)):
         rval = [flow_to_sklearn(element, **kwargs) for element in o]
         if isinstance(o, tuple):
