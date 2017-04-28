@@ -39,8 +39,8 @@ def sklearn_to_flow(o, parent_model=None):
     if _is_estimator(o):
         # is the main model or a submodel
         rval = _serialize_model(o)
-    elif inspect.isgeneratorfunction(o) or (isinstance(o, Sequence) and not isinstance(o, str)):
-        # this parameter is a generator, list, range, xrange, or tuple
+    elif inspect.isgeneratorfunction(o) or isinstance(o, (Sequence, np.ndarray)) and not isinstance(o, str):
+        # this parameter is a generator, list, range, xrange, tuple or numpy array
         rval = [sklearn_to_flow(element, parent_model) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
