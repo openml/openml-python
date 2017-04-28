@@ -1,6 +1,6 @@
 """Convert scikit-learn estimators into an OpenMLFlows and vice versa."""
 
-from collections import OrderedDict
+from collections import OrderedDict, Sequence
 import copy
 from distutils.version import LooseVersion
 import importlib
@@ -39,8 +39,8 @@ def sklearn_to_flow(o, parent_model=None):
     if _is_estimator(o):
         # is the main model or a submodel
         rval = _serialize_model(o)
-    elif isinstance(o, (list, tuple)):
-        # TODO: explain what type of parameter is here
+    elif inspect.isgeneratorfunction(o) or (isinstance(o, Sequence) and not isinstance(o, str)):
+        # this parameter is a generator, list, range, xrange, or tuple
         rval = [sklearn_to_flow(element, parent_model) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
