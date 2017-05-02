@@ -37,6 +37,7 @@ class TestRun(TestBase):
         self.assertEqual(len(run.data_content), num_instances)
 
         if check_setup:
+            # test the initialize setup function
             run_id = run_.run_id
             run_server = openml.runs.get_run(run_id)
             clf_server = openml.setups.initialize_model(run_server.setup_id)
@@ -45,6 +46,11 @@ class TestRun(TestBase):
             flow_server = openml.flows.sklearn_to_flow(clf_server)
 
             openml.flows.assert_flows_equal(flow_local, flow_server)
+
+            # and test the initialize setup from run function
+            clf_server2 = openml.runs.initialize_model_from_run(run_server.run_id)
+            flow_server2 = openml.flows.sklearn_to_flow(clf_server2)
+            openml.flows.assert_flows_equal(flow_local, flow_server2)
 
             #self.assertEquals(clf.get_params(), clf_prime.get_params())
             # self.assertEquals(clf, clf_prime)

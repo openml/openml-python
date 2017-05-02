@@ -160,6 +160,8 @@ def _get_seeded_model(model, seed=None):
         if 'random_state' in param_name:
             currentValue = model_params[param_name]
             # important to draw the value at this point (and not in the if statement)
+            # this way we guarantee that if a different set of subflows is seeded,
+            # the same number of the random generator is used
             newValue = rs.randint(0, 2**16)
             if currentValue is None:
                 random_states[param_name] = newValue
