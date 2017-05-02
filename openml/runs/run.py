@@ -185,13 +185,19 @@ class OpenMLRun(object):
                 flow_map.update(get_flow_dict(_flow.components[subflow]))
             return flow_map
 
-        def extract_parameters(_flow, _param_dict):
+        def extract_parameters(_flow, _param_dict, _main_call=False, main_id=None):
+            # _flow is openml flow object, _param dict maps from flow name to flow id
+            # for the main call, the param dict can be overridden (useful for unit tests / sentinels)
+            # this way, for flows without subflows we do not have to rely on _param_dict
             _params = []
             for _param_name in _flow.parameters:
                 _current = OrderedDict()
                 _current['oml:name'] = _param_name
                 _current['oml:value'] = _flow.parameters[_param_name]
-                _current['oml:component'] = _param_dict[_flow.name]
+                if _main_call:
+                    _current['oml:component'] = main_id
+                else:
+                    _current['oml:component'] = _param_dict[_flow.name]
                 _params.append(_current)
             for _identifier in _flow.components:
                 _params.extend(extract_parameters(_flow.components[_identifier], _param_dict))
@@ -200,7 +206,7 @@ class OpenMLRun(object):
         flow_dict = get_flow_dict(server_flow)
         local_flow = openml.flows.sklearn_to_flow(model)
 
-        parameters = extract_parameters(local_flow, flow_dict)
+        parameters = extract_parameters(local_flow, flow_dict, True, server_flow.flow_id)
         return parameters
 
 ################################################################################
