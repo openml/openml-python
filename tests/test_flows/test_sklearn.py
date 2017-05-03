@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import unittest
+from six import moves
 
 if sys.version_info[0] >= 3:
     from unittest import mock
@@ -590,3 +591,66 @@ class TestSklearn(unittest.TestCase):
 
         for i in range(len(illegal_models)):
             self.assertRaises(PyOpenMLError, _check_n_jobs, illegal_models[i])
+
+    def test_list_like_objects(self):
+        def generator():
+            yield 1
+            yield 2
+            yield 3
+            yield 3
+            yield 5
+
+        param_distributions = {
+            # List
+            'criterion': ["gini", "entropy"],
+
+            # Numpy array
+            'max_features': np.arange(0.05, 1.01, 0.05),
+
+            # Range (uses xrange() in python2, and range() in python3)
+            'min_samples_split': moves.range(2, 21),
+
+            # Generator
+            'min_samples_leaf': generator(),
+
+            # Tuple
+            'bootstrap': (True, False)
+        }
+
+        param_distributions_lists = {
+            # List
+            'criterion': ["gini", "entropy"],
+
+            # Numpy array converted to list
+            'max_features': list(np.arange(0.05, 1.01, 0.05)),
+
+            # Range (uses xrange() in python2, and range() in python3) converted to list
+            'min_samples_split': [i for i in moves.range(2, 21)],
+
+            # Generator converted to list
+            'min_samples_leaf': [i for i in generator()],
+
+            # Tuple
+            'bootstrap': (True, False)
+        }
+
+        serialized = sklearn_to_flow(param_distributions)
+        deserialized = flow_to_sklearn(serialized)
+        self.assertEqual(deserialized, param_distributions_lists)
+        self.assertIsNot(deserialized, param_distributions_lists)
+
+    def test_generator_with_illegal_object(self):
+        class IllegalObject:
+            def __init__(self):
+                pass
+
+        ill_obj = IllegalObject()
+
+        def yielder():
+            yield 1
+            yield None
+            yield "something"
+            yield ill_obj
+
+        fixture = "\(.*IllegalObject instance at .*, <type 'instance'>\)"
+        self.assertRaisesRegexp(TypeError, fixture, sklearn_to_flow, yielder())
