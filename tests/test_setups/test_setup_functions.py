@@ -87,6 +87,6 @@ class TestRun(TestBase):
             current = openml.setups.get_setup(setups[idx])
             assert current.flow_id > 0
             if num_params[idx] == 0:
-                assert current.parameters is None
+                self.asserts(current.parameters is None)
             else:
-                assert len(current.parameters) == num_params[idx]
+                self.asserts(len(current.parameters) == num_params[idx])
