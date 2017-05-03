@@ -652,5 +652,5 @@ class TestSklearn(unittest.TestCase):
             yield "something"
             yield ill_obj
 
-        fixture = "\(.*IllegalObject instance at .*, <type 'instance'>\)"
+        fixture = "\(.*IllegalObject ((instance)|(object)) at .*\)"
         self.assertRaisesRegexp(TypeError, fixture, sklearn_to_flow, yielder())
