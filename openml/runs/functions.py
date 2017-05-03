@@ -137,6 +137,9 @@ def _run_exists(task_id, setup_id):
 
 def _get_seeded_model(model, seed=None):
     '''Sets all the non-seeded components of a model with a seed.
+       Models that are already seeded will maintain the seed. In
+       this case, only integer seeds are allowed (An exception
+       is thrown when a RandomState was used as seed)
 
         Parameters
         ----------
