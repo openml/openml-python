@@ -22,73 +22,94 @@ from sklearn.utils.fixes import signature
 from openml.flows import OpenMLFlow
 from openml.exceptions import PyOpenMLError
 
-
 if sys.version_info >= (3, 5):
     from json.decoder import JSONDecodeError
 else:
     JSONDecodeError = ValueError
-
 
 DEPENDENCIES_PATTERN = re.compile(
     '^(?P<name>[\w\-]+)((?P<operation>==|>=|>)(?P<version>(\d+\.)?(\d+\.)?(\d+)))?$')
 
 
 def sklearn_to_flow(o, parent_model=None):
-    # TODO: assert that only on first recursion lvl `parent_model` can be None
+    # A primitive parameter
+    if _is_primitive_parameter(o):
+        return o
 
+    # The main model or a sub model
     if _is_estimator(o):
-        # is the main model or a submodel
-        rval = _serialize_model(o)
-    elif isinstance(o, (bool, int, float, six.string_types)) or o is None:
-        # base parameter values
-        rval = o
-    elif inspect.isgenerator(o) or isinstance(o, (Sequence, np.ndarray)):
-        # a generator, list, range, tuple or numpy array
-        rval = [sklearn_to_flow(element, parent_model) for element in o]
-        if isinstance(o, tuple):
-            rval = tuple(rval)
-    elif isinstance(o, dict):
-        # TODO: explain what type of parameter is here
-        if not isinstance(o, OrderedDict):
-            o = OrderedDict([(key, value) for key, value in sorted(o.items())])
+        return _serialize_model(o)
 
-        rval = OrderedDict()
-        for key, value in o.items():
-            if not isinstance(key, six.string_types):
-                raise TypeError('Can only use string as keys, you passed '
-                                'type %s for value %s.' %
-                                (type(key), str(key)))
-            key = sklearn_to_flow(key, parent_model)
-            value = sklearn_to_flow(value, parent_model)
-            rval[key] = value
-        rval = rval
-    elif isinstance(o, type):
-        # TODO: explain what type of parameter is here
-        rval = serialize_type(o)
-    elif isinstance(o, scipy.stats.distributions.rv_frozen):
-        rval = serialize_rv_frozen(o)
-    # This only works for user-defined functions (and not even partial).
-    # I think this is exactly what we want here as there shouldn't be any
-    # built-in or functool.partials in a pipeline
-    elif inspect.isfunction(o):
-        # TODO: explain what type of parameter is here
-        rval = serialize_function(o)
-    elif _is_cross_validator(o):
-        # TODO: explain what type of parameter is here
-        rval = _serialize_cross_validator(o)
-    else:
-        raise TypeError(o, type(o))
+    # A list-like object
+    if _is_list_like(o):
+        return _serialize_list(o, parent_model)
 
-    return rval
+    # A dictionary
+    if _is_dict(o):
+        return _serialize_dict(o, parent_model)
+
+    # A type
+    if _is_type(o):
+        return _serialize_type(o)
+
+    # A scipy random variable
+    if _is_random_variable(o):
+        return _serialize_random_variable(o)
+
+    # A function
+    if _is_function(o):
+        return _serialize_function(o)
+
+    # A cross-validator
+    if _is_cross_validator(o):
+        return _serialize_cross_validator(o)
+
+    # Object does not have the right type
+    raise TypeError(o, type(o))
 
 
 def _is_estimator(o):
-    return (hasattr(o, 'fit') and hasattr(o, 'get_params') and
-            hasattr(o, 'set_params'))
+    return hasattr(o, 'fit') and hasattr(o, 'get_params') and hasattr(o, 'set_params')
 
 
 def _is_cross_validator(o):
     return isinstance(o, sklearn.model_selection.BaseCrossValidator)
+
+
+def _is_primitive_parameter(o):
+    return isinstance(o, (bool, int, float, six.string_types, type(None)))
+
+
+def _is_list_like(o):
+    return _is_generator(o) or isinstance(o, (Sequence, np.ndarray)) and not _is_string(o)
+
+
+def _is_generator(o):
+    return inspect.isgenerator(o)
+
+
+def _is_string(o):
+    return isinstance(o, six.string_types)
+
+
+def _is_dict(o):
+    return isinstance(o, dict)
+
+
+def _is_random_variable(o):
+    return isinstance(o, scipy.stats.distributions.rv_frozen)
+
+
+def _is_function(o):
+    return inspect.isfunction(o)
+
+
+def _is_tuple(o):
+    return isinstance(o, tuple)
+
+
+def _is_type(o):
+    return isinstance(o, type)
 
 
 def flow_to_sklearn(o, **kwargs):
@@ -110,11 +131,11 @@ def flow_to_sklearn(o, **kwargs):
             serialized_type = o['oml-python:serialized_object']
             value = o['value']
             if serialized_type == 'type':
-                rval = deserialize_type(value, **kwargs)
+                rval = _deserialize_type(value, **kwargs)
             elif serialized_type == 'rv_frozen':
-                rval = deserialize_rv_frozen(value, **kwargs)
+                rval = _deserialize_rv_frozen(value, **kwargs)
             elif serialized_type == 'function':
-                rval = deserialize_function(value, **kwargs)
+                rval = _deserialize_function(value, **kwargs)
             elif serialized_type == 'component_reference':
                 value = flow_to_sklearn(value)
                 step_name = value['step_name']
@@ -168,15 +189,16 @@ def _serialize_model(model):
     """
 
     # Get all necessary information about the model objects itself
-    parameters, parameters_meta_info, sub_components, sub_components_explicit =\
+    parameters, parameters_meta_info, sub_components, sub_components_explicit = \
         _extract_information_from_model(model)
 
     # Check that a component does not occur multiple times in a flow as this
     # is not supported by OpenML
     _check_multiple_occurence_of_component_in_flow(model, sub_components)
 
-    # Create a flow name, which contains all components in brackets, for
-    # example RandomizedSearchCV(Pipeline(StandardScaler,AdaBoostClassifier(DecisionTreeClassifier)),StandardScaler,AdaBoostClassifier(DecisionTreeClassifier))
+    # Create a flow name, which contains all components in brackets, for example RandomizedSearchCV(Pipeline(
+    # StandardScaler,AdaBoostClassifier(DecisionTreeClassifier)),StandardScaler,AdaBoostClassifier(
+    # DecisionTreeClassifier))
     class_name = model.__module__ + "." + model.__class__.__name__
 
     # will be part of the name (in brackets)
@@ -353,7 +375,6 @@ def _extract_information_from_model(model):
 
 
 def _deserialize_model(flow, **kwargs):
-
     model_name = flow.class_name
     _check_dependencies(flow.dependencies)
 
@@ -423,7 +444,39 @@ def _check_dependencies(dependencies):
                              '%s not satisfied.' % dependency_string)
 
 
-def serialize_type(o):
+def _make_serialized_object(object_name, value):
+    return OrderedDict([
+        ('oml-python:serialized_object', object_name),
+        ('value', value)
+    ])
+
+
+def _serialize_list(o, parent_model):
+    rval = [sklearn_to_flow(element, parent_model) for element in o]
+    if isinstance(o, tuple):
+        rval = tuple(rval)
+    return rval
+
+
+def _serialize_dict(o, parent_model):
+    # Convert to OrderedDict
+    if not isinstance(o, OrderedDict):
+        o = OrderedDict([(key, value) for key, value in sorted(o.items())])
+
+    # Convert each key and value to flow
+    serialized_dict = OrderedDict()
+    for key, value in o.items():
+        if not isinstance(key, six.string_types):
+            raise TypeError('Can only use string as keys, you passed type %s for value %s.' % (type(key), str(key)))
+        key = sklearn_to_flow(key, parent_model)
+        value = sklearn_to_flow(value, parent_model)
+        serialized_dict[key] = value
+
+    # Return the serialized dictionary
+    return serialized_dict
+
+
+def _serialize_type(o):
     mapping = {float: 'float',
                np.float: 'np.float',
                np.float32: 'np.float32',
@@ -432,13 +485,10 @@ def serialize_type(o):
                np.int: 'np.int',
                np.int32: 'np.int32',
                np.int64: 'np.int64'}
-    ret = OrderedDict()
-    ret['oml-python:serialized_object'] = 'type'
-    ret['value'] = mapping[o]
-    return ret
+    return _make_serialized_object('type', mapping[o])
 
 
-def deserialize_type(o, **kwargs):
+def _deserialize_type(o, **kwargs):
     mapping = {'float': float,
                'np.float': np.float,
                'np.float32': np.float32,
@@ -450,19 +500,21 @@ def deserialize_type(o, **kwargs):
     return mapping[o]
 
 
-def serialize_rv_frozen(o):
-    args = o.args
-    kwds = o.kwds
-    a = o.a
-    b = o.b
-    dist = o.dist.__class__.__module__ + '.' + o.dist.__class__.__name__
-    ret = OrderedDict()
-    ret['oml-python:serialized_object'] = 'rv_frozen'
-    ret['value'] = OrderedDict((('dist', dist), ('a', a), ('b', b),
-                                ('args', args), ('kwds', kwds)))
-    return ret
+def _serialize_random_variable(o):
+    return _make_serialized_object('rv_frozen', OrderedDict([
+        ('dist', o.dist.__class__.__module__ + '.' + o.dist.__class__.__name__),
+        ('a', o.a),
+        ('b', o.b),
+        ('args', o.args),
+        ('kwds', o.kwds)
+    ]))
 
-def deserialize_rv_frozen(o, **kwargs):
+
+def _serialize_function(o):
+    return _make_serialized_object('function', o.__module__ + '.' + o.__name__)
+
+
+def _deserialize_rv_frozen(o, **kwargs):
     args = o['args']
     kwds = o['kwds']
     a = o['a']
@@ -484,15 +536,7 @@ def deserialize_rv_frozen(o, **kwargs):
     return dist
 
 
-def serialize_function(o):
-    name = o.__module__ + '.' + o.__name__
-    ret = OrderedDict()
-    ret['oml-python:serialized_object'] = 'function'
-    ret['value'] = name
-    return ret
-
-
-def deserialize_function(name, **kwargs):
+def _deserialize_function(name, **kwargs):
     module_name = name.rsplit('.', 1)
     try:
         function_handle = getattr(importlib.import_module(module_name[0]),
@@ -502,16 +546,17 @@ def deserialize_function(name, **kwargs):
         return None
     return function_handle
 
-def _serialize_cross_validator(o):
-    ret = OrderedDict()
 
+def _serialize_cross_validator(o):
     parameters = OrderedDict()
 
     # XXX this is copied from sklearn.model_selection._split
     cls = o.__class__
     init = getattr(cls.__init__, 'deprecated_original', cls.__init__)
+
     # Ignore varargs, kw and default values and pop self
     init_signature = signature(init)
+
     # Consider the constructor parameters excluding 'self'
     if init is object.__init__:
         args = []
@@ -540,18 +585,18 @@ def _serialize_cross_validator(o):
         else:
             parameters[key] = None
 
-    ret['oml-python:serialized_object'] = 'cv_object'
-    name = o.__module__ + "." + o.__class__.__name__
-    value = OrderedDict([['name', name], ['parameters', parameters]])
-    ret['value'] = value
+    return _make_serialized_object('cv_object', OrderedDict([
+        ('name', o.__module__ + "." + o.__class__.__name__),
+        ('parameters', parameters)
+    ]))
 
-    return ret
 
 def _check_n_jobs(model):
     '''
     Returns True if the parameter settings of model are chosen s.t. the model
      will run on a single core (in that case, openml-python can measure runtimes)
     '''
+
     def check(param_dict, disallow_parameter=False):
         for param, value in param_dict.items():
             # n_jobs is scikitlearn parameter for paralizing jobs
@@ -564,7 +609,7 @@ def _check_n_jobs(model):
         return True
 
     if not (isinstance(model, sklearn.base.BaseEstimator) or
-            isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
+                isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
         raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
     # make sure that n_jobs is not in the parameter grid of optimization procedure
@@ -585,6 +630,7 @@ def _check_n_jobs(model):
 
     # check the parameters for n_jobs
     return check(model.get_params(), False)
+
 
 def _deserialize_cross_validator(value, **kwargs):
     model_name = value['name']
