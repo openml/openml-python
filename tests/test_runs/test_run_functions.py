@@ -6,7 +6,7 @@ import openml.exceptions
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent
 
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
 from sklearn.preprocessing.imputation import Imputer
 from sklearn.dummy import DummyClassifier
 from sklearn.preprocessing import StandardScaler
@@ -120,6 +120,18 @@ class TestRun(TestBase):
 
         run = self._perform_run(task_id, num_instances, grid_search)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
+    
+    def test_run_with_classifiers_in_param_grid(self):
+        task = openml.tasks.get_task(115)
+
+        param_grid = {
+            "base_estimator": [DecisionTreeClassifier(), ExtraTreeClassifier()]
+        }
+
+        clf = GridSearchCV(BaggingClassifier(), param_grid=param_grid)
+        self.assertRaises(TypeError, openml.runs.run_task,
+                          task=task, model=clf, avoid_duplicate_runs=False)
+
 
     def test_run_pipeline(self):
         task_id = 115
@@ -324,3 +336,4 @@ class TestRun(TestBase):
         for row in data_content:
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             self.assertEqual(len(row), 11)
+
