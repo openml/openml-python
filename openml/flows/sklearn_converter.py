@@ -322,15 +322,9 @@ def _extract_information_from_model(model):
                     # component reference as a placeholder to the list of
                     # parameters, which will be replaced by the real component
                     # when deserializing the parameter
-                    sub_components_explicit.add(identifier)
                     sub_components[identifier] = sub_component
-                    component_reference = OrderedDict()
-                    component_reference[
-                        'oml-python:serialized_object'] = 'component_reference'
-                    cr_value = OrderedDict()
-                    cr_value['key'] = identifier
-                    cr_value['step_name'] = identifier
-                    component_reference['value'] = cr_value
+                    sub_components_explicit.add(identifier)
+                    component_reference = _make_component_reference(identifier, identifier, model)
                     parameter_value.append(component_reference)
 
             if isinstance(rval, tuple):
@@ -345,18 +339,10 @@ def _extract_information_from_model(model):
 
         elif isinstance(rval, OpenMLFlow):
 
-            # A subcomponent, for example the base model in
-            # AdaBoostClassifier
+            # A subcomponent, for example the base model in AdaBoostClassifier
             sub_components[k] = rval
             sub_components_explicit.add(k)
-            component_reference = OrderedDict()
-            component_reference[
-                'oml-python:serialized_object'] = 'component_reference'
-            cr_value = OrderedDict()
-            cr_value['key'] = k
-            cr_value['step_name'] = None
-            component_reference['value'] = cr_value
-            component_reference = sklearn_to_flow(component_reference, model)
+            component_reference = _make_component_reference(k, None, model)
             parameters[k] = json.dumps(component_reference)
 
         else:
@@ -442,6 +428,18 @@ def _check_dependencies(dependencies):
         if not check:
             raise ValueError('Trying to deserialize a model with dependency '
                              '%s not satisfied.' % dependency_string)
+
+
+def _make_component_reference(key, step_name, model):
+    cr_value = OrderedDict([
+        ('key', key),
+        ('step_name', step_name)
+    ])
+
+    component_reference = _make_serialized_object('component_reference', cr_value)
+    component_reference['value'] = cr_value
+    component_reference = sklearn_to_flow(component_reference, model)
+    return component_reference
 
 
 def _make_serialized_object(object_name, value):
