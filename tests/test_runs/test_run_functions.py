@@ -2,6 +2,7 @@ import sys
 
 import openml
 import openml.exceptions
+
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent
 
@@ -25,7 +26,7 @@ else:
 
 class TestRun(TestBase):
 
-    def _perform_run(self, task_id, num_instances, clf):
+    def _perform_run(self, task_id, num_instances, clf, check_setup=True):
         task = openml.tasks.get_task(task_id)
         run = openml.runs.run_task(task, clf, openml.config.avoid_duplicate_runs)
         run_ = run.publish()
@@ -34,6 +35,26 @@ class TestRun(TestBase):
 
         # check arff output
         self.assertEqual(len(run.data_content), num_instances)
+
+        if check_setup:
+            # test the initialize setup function
+            run_id = run_.run_id
+            run_server = openml.runs.get_run(run_id)
+            clf_server = openml.setups.initialize_model(run_server.setup_id)
+
+            flow_local = openml.flows.sklearn_to_flow(clf)
+            flow_server = openml.flows.sklearn_to_flow(clf_server)
+
+            openml.flows.assert_flows_equal(flow_local, flow_server)
+
+            # and test the initialize setup from run function
+            clf_server2 = openml.runs.initialize_model_from_run(run_server.run_id)
+            flow_server2 = openml.flows.sklearn_to_flow(clf_server2)
+            openml.flows.assert_flows_equal(flow_local, flow_server2)
+
+            #self.assertEquals(clf.get_params(), clf_prime.get_params())
+            # self.assertEquals(clf, clf_prime)
+
         return run
 
     def test_run_regression_on_classif_task(self):
