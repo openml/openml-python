@@ -93,7 +93,7 @@ def _is_string(o):
 
 
 def _is_dict(o):
-    return isinstance(o, dict)
+    return isinstance(o, (dict, OrderedDict))
 
 
 def _is_random_variable(o):
@@ -293,10 +293,12 @@ def _extract_information_from_model(model):
     # the class attributes and the if/elif/else in the for-loop calls to
     # separate class methods
 
-    # stores all entities that should become subcomponents
+    # Stores all entities that should become subcomponents
     sub_components = OrderedDict()
-    # stores the keys of all subcomponents that should become
+
+    # Stores the keys of all subcomponents that should become
     sub_components_explicit = set()
+
     parameters = OrderedDict()
     parameters_meta_info = OrderedDict()
 
@@ -304,7 +306,7 @@ def _extract_information_from_model(model):
     for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
         rval = sklearn_to_flow(v, model)
 
-        # Check if rval is a homogeneous list of lists (or tuples)
+        # Check if rval is a homogeneous list-like object of lists or tuples
         if _is_homogeneous_list(rval, types=(list, tuple)):
 
             # Steps in a pipeline or feature union, or base classifiers in voting classifier
@@ -624,7 +626,6 @@ def _check_n_jobs(model):
 
     # make sure that n_jobs is not in the parameter grid of optimization procedure
     if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
-        param_distributions = None
         if isinstance(model, sklearn.model_selection.GridSearchCV):
             param_distributions = model.param_grid
         elif isinstance(model, sklearn.model_selection.RandomizedSearchCV):
