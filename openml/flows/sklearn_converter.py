@@ -112,18 +112,31 @@ def _is_type(o):
     return isinstance(o, type)
 
 
+def _is_homogeneous_list(o, types=None):
+
+    # Check if object is a non-empty list
+    if not (_is_list_like(o) and len(o) > 0):
+        return False
+
+    # Set types to given types or to type of first element
+    types = type(o[0]) if types is None else types
+
+    # Check if the list is homogeneous
+    return all(isinstance(x, types) for x in o)
+
+
 def flow_to_sklearn(o, **kwargs):
     # First, we need to check whether the presented object is a json string.
     # JSON strings are used to encoder parameter values. By passing around
     # json strings for parameters, we make sure that we can flow_to_sklearn
     # the parameter values to the correct type.
-    if isinstance(o, six.string_types):
+    if _is_string(o):
         try:
             o = json.loads(o)
         except JSONDecodeError:
             pass
 
-    if isinstance(o, dict):
+    if _is_dict(o):
         # Check if the dict encodes a 'special' object, which could not
         # easily converted into a string, but rather the information to
         # re-create the object were stored in a dictionary.
@@ -162,7 +175,7 @@ def flow_to_sklearn(o, **kwargs):
         rval = [flow_to_sklearn(element, **kwargs) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif isinstance(o, (bool, int, float, six.string_types)) or o is None:
+    elif _is_primitive_parameter(o):
         rval = o
     elif isinstance(o, OpenMLFlow):
         rval = _deserialize_model(o, **kwargs)
@@ -291,9 +304,8 @@ def _extract_information_from_model(model):
     for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
         rval = sklearn_to_flow(v, model)
 
-        if (isinstance(rval, (list, tuple)) and len(rval) > 0 and
-                isinstance(rval[0], (list, tuple)) and
-                [type(rval[0]) == type(rval[i]) for i in range(len(rval))]):
+        # Check if rval is a homogeneous list of lists (or tuples)
+        if _is_homogeneous_list(rval, types=(list, tuple)):
 
             # Steps in a pipeline or feature union, or base classifiers in voting classifier
             parameter_value = list()
@@ -620,7 +632,9 @@ def _check_n_jobs(model):
         else:
             print('Warning! Using subclass BaseSearchCV other than ' \
                   '{GridSearchCV, RandomizedSearchCV}. Should implement param check. ')
-            pass
+
+            # Return false if we can't determine the param_distributions
+            return False
 
         if not check(param_distributions, True):
             raise PyOpenMLError('openml-python should not be used to '
