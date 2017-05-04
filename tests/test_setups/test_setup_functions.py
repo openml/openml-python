@@ -38,8 +38,9 @@ class TestRun(TestBase):
         flow.name = 'TEST%s%s' % (sentinel, flow.name)
         flow.publish()
 
-        # although the flow exists, we can be sure there are no
-        # setups (yet) as it hasn't been ran
+        # although the flow exists (created as of previous statement),
+        # we can be sure there are no setups (yet) as it was just created
+        # and hasn't been ran
         setup_id = openml.setups.setup_exists(flow, dectree)
         self.assertFalse(setup_id)
 
@@ -87,6 +88,6 @@ class TestRun(TestBase):
             current = openml.setups.get_setup(setups[idx])
             assert current.flow_id > 0
             if num_params[idx] == 0:
-                self.assertTrue(current.parameters is None)
+                self.assertIsNone(current.parameters)
             else:
-                self.assertTrue(len(current.parameters) == num_params[idx])
+                self.assertEquals(len(current.parameters), num_params[idx])
