@@ -2,10 +2,11 @@ import sys
 
 import openml
 import openml.exceptions
+
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent
 
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
 from sklearn.preprocessing.imputation import Imputer
 from sklearn.dummy import DummyClassifier
 from sklearn.preprocessing import StandardScaler
@@ -25,7 +26,7 @@ else:
 
 class TestRun(TestBase):
 
-    def _perform_run(self, task_id, num_instances, clf):
+    def _perform_run(self, task_id, num_instances, clf, check_setup=True):
         task = openml.tasks.get_task(task_id)
         run = openml.runs.run_task(task, clf, openml.config.avoid_duplicate_runs)
         run_ = run.publish()
@@ -34,6 +35,26 @@ class TestRun(TestBase):
 
         # check arff output
         self.assertEqual(len(run.data_content), num_instances)
+
+        if check_setup:
+            # test the initialize setup function
+            run_id = run_.run_id
+            run_server = openml.runs.get_run(run_id)
+            clf_server = openml.setups.initialize_model(run_server.setup_id)
+
+            flow_local = openml.flows.sklearn_to_flow(clf)
+            flow_server = openml.flows.sklearn_to_flow(clf_server)
+
+            openml.flows.assert_flows_equal(flow_local, flow_server)
+
+            # and test the initialize setup from run function
+            clf_server2 = openml.runs.initialize_model_from_run(run_server.run_id)
+            flow_server2 = openml.flows.sklearn_to_flow(clf_server2)
+            openml.flows.assert_flows_equal(flow_local, flow_server2)
+
+            #self.assertEquals(clf.get_params(), clf_prime.get_params())
+            # self.assertEquals(clf, clf_prime)
+
         return run
 
     def test_run_regression_on_classif_task(self):
@@ -99,6 +120,18 @@ class TestRun(TestBase):
 
         run = self._perform_run(task_id, num_instances, grid_search)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
+    
+    def test_run_with_classifiers_in_param_grid(self):
+        task = openml.tasks.get_task(115)
+
+        param_grid = {
+            "base_estimator": [DecisionTreeClassifier(), ExtraTreeClassifier()]
+        }
+
+        clf = GridSearchCV(BaggingClassifier(), param_grid=param_grid)
+        self.assertRaises(TypeError, openml.runs.run_task,
+                          task=task, model=clf, avoid_duplicate_runs=False)
+
 
     def test_run_pipeline(self):
         task_id = 115
@@ -303,3 +336,4 @@ class TestRun(TestBase):
         for row in data_content:
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             self.assertEqual(len(row), 11)
+

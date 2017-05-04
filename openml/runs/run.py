@@ -165,7 +165,7 @@ class OpenMLRun(object):
         return description_xml
 
     @staticmethod
-    def _parse_parameters(model, flow):
+    def _parse_parameters(model, server_flow):
         """Extracts all parameter settings from a model in OpenML format.
 
         Parameters
@@ -176,11 +176,8 @@ class OpenMLRun(object):
             openml flow object (containing flow ids, i.e., it has to be downloaded from the server)
 
         """
-        if flow.flow_id is None:
+        if server_flow.flow_id is None:
             raise ValueError("The flow parameter needs to be downloaded from server")
-
-        python_param_settings = model.get_params()
-        openml_param_settings = []
 
         def get_flow_dict(_flow):
             flow_map = {_flow.name: _flow.flow_id}
@@ -188,38 +185,29 @@ class OpenMLRun(object):
                 flow_map.update(get_flow_dict(_flow.components[subflow]))
             return flow_map
 
-        flow_dict = get_flow_dict(flow)
-
-        for param in python_param_settings:
-            if "__" in param:
-                # parameter of subflow. will be handled later
-                continue
-            if isinstance(python_param_settings[param], BaseEstimator):
-                # extract parameters of the subflow individually
-                subflow = flow.components[param]
-                openml_param_settings += OpenMLRun._parse_parameters(python_param_settings[param], subflow)
-
-            # add parameter setting (in some cases also the subflow. Just because we can)
-            if param in flow.parameters.keys():
-                param_dict = OrderedDict()
-                param_dict['oml:name'] = param
-                param_dict['oml:value'] = str(python_param_settings[param])
-                param_dict['oml:component'] = flow_dict[flow.name]
-                openml_param_settings.append(param_dict)
-            else:
-                if flow.name.startswith("sklearn.pipeline.Pipeline"):
-                    # tolerate
-                    pass
-                elif flow.name.startswith("sklearn.pipeline.FeatureUnion"):
-                    # tolerate
-                    pass
-                elif flow.name.startswith("sklearn.ensemble.voting_classifier.VotingClassifier"):
-                    # tolerate
-                    pass
+        def extract_parameters(_flow, _param_dict, _main_call=False, main_id=None):
+            # _flow is openml flow object, _param dict maps from flow name to flow id
+            # for the main call, the param dict can be overridden (useful for unit tests / sentinels)
+            # this way, for flows without subflows we do not have to rely on _param_dict
+            _params = []
+            for _param_name in _flow.parameters:
+                _current = OrderedDict()
+                _current['oml:name'] = _param_name
+                _current['oml:value'] = _flow.parameters[_param_name]
+                if _main_call:
+                    _current['oml:component'] = main_id
                 else:
-                    raise ValueError("parameter %s not in flow description of flow %s" %(param,flow.name))
+                    _current['oml:component'] = _param_dict[_flow.name]
+                _params.append(_current)
+            for _identifier in _flow.components:
+                _params.extend(extract_parameters(_flow.components[_identifier], _param_dict))
+            return _params
 
-        return openml_param_settings
+        flow_dict = get_flow_dict(server_flow)
+        local_flow = openml.flows.sklearn_to_flow(model)
+
+        parameters = extract_parameters(local_flow, flow_dict, True, server_flow.flow_id)
+        return parameters
 
 ################################################################################
 # Functions which cannot be in runs/functions due to circular imports
