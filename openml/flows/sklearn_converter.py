@@ -1,16 +1,15 @@
 """Convert scikit-learn estimators into an OpenMLFlows and vice versa."""
 
-from collections import OrderedDict, Sequence
 import copy
+from collections import OrderedDict
 from distutils.version import LooseVersion
 import importlib
-import inspect
 import json
 import json.decoder
 import re
-import six
 import warnings
 import sys
+from openml.flows import type_check
 
 import numpy as np
 import scipy.stats.distributions
@@ -33,96 +32,39 @@ DEPENDENCIES_PATTERN = re.compile(
 
 def sklearn_to_flow(o, parent_model=None):
     # A primitive parameter
-    if _is_primitive_parameter(o):
+    if type_check.is_primitive_parameter(o):
         return o
 
     # The main model or a sub model
-    if _is_estimator(o):
+    if type_check.is_estimator(o):
         return _serialize_model(o)
 
     # A list-like object
-    if _is_list_like(o):
+    if type_check.is_list_like(o):
         return _serialize_list(o, parent_model)
 
     # A dictionary
-    if _is_dict(o):
+    if type_check.is_dict(o):
         return _serialize_dict(o, parent_model)
 
     # A type
-    if _is_type(o):
+    if type_check.is_type(o):
         return _serialize_type(o)
 
     # A scipy random variable
-    if _is_random_variable(o):
+    if type_check.is_random_variable(o):
         return _serialize_random_variable(o)
 
     # A function
-    if _is_function(o):
+    if type_check.is_function(o):
         return _serialize_function(o)
 
     # A cross-validator
-    if _is_cross_validator(o):
+    if type_check.is_cross_validator(o):
         return _serialize_cross_validator(o)
 
     # Object does not have the right type
     raise TypeError(o, type(o))
-
-
-def _is_estimator(o):
-    return hasattr(o, 'fit') and hasattr(o, 'get_params') and hasattr(o, 'set_params')
-
-
-def _is_cross_validator(o):
-    return isinstance(o, sklearn.model_selection.BaseCrossValidator)
-
-
-def _is_primitive_parameter(o):
-    return isinstance(o, (bool, int, float, six.string_types, type(None)))
-
-
-def _is_list_like(o):
-    return _is_generator(o) or isinstance(o, (Sequence, np.ndarray)) and not _is_string(o)
-
-
-def _is_generator(o):
-    return inspect.isgenerator(o)
-
-
-def _is_string(o):
-    return isinstance(o, six.string_types)
-
-
-def _is_dict(o):
-    return isinstance(o, (dict, OrderedDict))
-
-
-def _is_random_variable(o):
-    return isinstance(o, scipy.stats.distributions.rv_frozen)
-
-
-def _is_function(o):
-    return inspect.isfunction(o)
-
-
-def _is_tuple(o):
-    return isinstance(o, tuple)
-
-
-def _is_type(o):
-    return isinstance(o, type)
-
-
-def _is_homogeneous_list(o, types=None):
-
-    # Check if object is a non-empty list
-    if not (_is_list_like(o) and len(o) > 0):
-        return False
-
-    # Set types to given types or to type of first element
-    types = type(o[0]) if types is None else types
-
-    # Check if the list is homogeneous
-    return all(isinstance(x, types) for x in o)
 
 
 def flow_to_sklearn(o, **kwargs):
@@ -130,13 +72,13 @@ def flow_to_sklearn(o, **kwargs):
     # JSON strings are used to encoder parameter values. By passing around
     # json strings for parameters, we make sure that we can flow_to_sklearn
     # the parameter values to the correct type.
-    if _is_string(o):
+    if type_check.is_string(o):
         try:
             o = json.loads(o)
         except JSONDecodeError:
             pass
 
-    if _is_dict(o):
+    if type_check.is_dict(o):
         # Check if the dict encodes a 'special' object, which could not
         # easily converted into a string, but rather the information to
         # re-create the object were stored in a dictionary.
@@ -175,7 +117,7 @@ def flow_to_sklearn(o, **kwargs):
         rval = [flow_to_sklearn(element, **kwargs) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif _is_primitive_parameter(o):
+    elif type_check.is_primitive_parameter(o):
         rval = o
     elif isinstance(o, OpenMLFlow):
         rval = _deserialize_model(o, **kwargs)
@@ -307,7 +249,7 @@ def _extract_information_from_model(model):
         rval = sklearn_to_flow(v, model)
 
         # Check if rval is a homogeneous list-like object of lists or tuples
-        if _is_homogeneous_list(rval, types=(list, tuple)):
+        if type_check.is_homogeneous_list(rval, types=(list, tuple)):
 
             # Steps in a pipeline or feature union, or base classifiers in voting classifier
             parameter_value = list()
@@ -478,7 +420,7 @@ def _serialize_dict(o, parent_model):
     # Convert each key and value to flow
     serialized_dict = OrderedDict()
     for key, value in o.items():
-        if not isinstance(key, six.string_types):
+        if not type_check.is_string(key):
             raise TypeError('Can only use string as keys, you passed type %s for value %s.' % (type(key), str(key)))
         key = sklearn_to_flow(key, parent_model)
         value = sklearn_to_flow(value, parent_model)
