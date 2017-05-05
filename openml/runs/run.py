@@ -4,7 +4,6 @@ import time
 
 import arff
 import xmltodict
-from sklearn.base import BaseEstimator
 
 import openml
 from ..tasks import get_task
@@ -20,7 +19,7 @@ class OpenMLRun(object):
 
     """
     def __init__(self, task_id, flow_id, dataset_id, setup_string=None,
-                 files=None, setup_id=None, tags=None, uploader=None, uploader_name=None,
+                 output_files=None, setup_id=None, tags=None, uploader=None, uploader_name=None,
                  evaluations=None, detailed_evaluations=None,
                  data_content=None, trace_attributes=None, trace_content=None,
                  model=None, task_type=None, task_evaluation_measure=None, flow_name=None,
@@ -37,10 +36,10 @@ class OpenMLRun(object):
         self.setup_string = setup_string
         self.parameter_settings = parameter_settings
         self.dataset_id = dataset_id
-        self.predictions_url = predictions_url
         self.evaluations = evaluations
         self.detailed_evaluations = detailed_evaluations
         self.data_content = data_content
+        self.output_files = output_files
         self.trace_attributes = trace_attributes
         self.trace_content = trace_content
         self.error_message = None
