@@ -26,6 +26,18 @@ else:
 
 class TestRun(TestBase):
 
+    def _check_serialized_optimized_run(self, run_id):
+        run = openml.runs.get_run(run_id)
+        task = openml.tasks.get_task(run.task_id)
+        trace = openml.runs.get_run_trace(run_id)
+        # TODO: assert holdout task
+
+        model = openml.runs.initialize_model_from_trace(run_id, 0, 0)
+        # TODO: implement testcase
+        
+        return True
+
+
     def _perform_run(self, task_id, num_instances, clf, check_setup=True):
         task = openml.tasks.get_task(task_id)
         run = openml.runs.run_task(task, clf, openml.config.avoid_duplicate_runs)
@@ -86,10 +98,10 @@ class TestRun(TestBase):
         downloaded = openml.runs.get_run(res.run_id)
         assert('openml-python' in downloaded.tags)
 
-    def test_run_optimize_randomforest_iris(self):
-        task_id = 115
-        num_instances = 768
-        num_folds = 10
+    def test_run_optimize_randomforest_diabetes(self):
+        task_id = 119
+        num_test_instances = 253
+        num_folds = 1
         num_iterations = 5
 
         clf = RandomForestClassifier(n_estimators=5)
@@ -103,13 +115,16 @@ class TestRun(TestBase):
         random_search = RandomizedSearchCV(clf, param_dist, cv=cv,
                                            n_iter=num_iterations)
 
-        run = self._perform_run(task_id, num_instances, random_search)
+        run = self._perform_run(task_id, num_test_instances, random_search)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
 
-    def test_run_optimize_bagging_iris(self):
-        task_id = 115
-        num_instances = 768
-        num_folds = 10
+        # res = self._check_serialized_optimized_run(run.run_id)
+        # self.assertTrue(res)
+
+    def test_run_optimize_bagging_diabetes(self):
+        task_id = 119
+        num_test_instances = 253
+        num_folds = 1
         num_iterations = 9 # (num values for C times gamma)
 
         bag = BaggingClassifier(base_estimator=SVC())
@@ -117,7 +132,7 @@ class TestRun(TestBase):
                       "base_estimator__gamma": [0.01, 0.1, 10]}
         grid_search = GridSearchCV(bag, param_dist)
 
-        run = self._perform_run(task_id, num_instances, grid_search)
+        run = self._perform_run(task_id, num_test_instances, grid_search)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
 
     def test_run_pipeline(self):
