@@ -1,4 +1,4 @@
-
+import json
 
 class OpenMLRunTrace(object):
     """OpenML Run Trace: parsed output from Run Trace call
@@ -32,6 +32,16 @@ class OpenMLTraceIteration(object):
         self.setup_string = setup_string
         self.evaluation = evaluation
         self.selected = selected
+
+    def get_parameters(self):
+        result = {}
+        # parameters have prefix 'parameter_'
+        prefix = 'parameter_'
+
+        for param in self.setup_string:
+            key = param[len(prefix):]
+            result[key] = json.loads(self.setup_string[param])
+        return result
 
     def __str__(self):
         return '[(%d,%d,%d): %f (%r)]' %(self.repeat, self.fold, self.iteration,

@@ -122,29 +122,27 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
     parameter settings)
 
     Parameters
-        ----------
-        run_id : int
-            The Openml run_id. Should contain a trace file
+    ----------
+    run_id : int
+        The Openml run_id. Should contain a trace file
 
-        repeat: int
-            The repeat nr (column in trace file)
+    repeat: int
+        The repeat nr (column in trace file)
 
-        fold: int
-            The fold nr (column in trace file)
+    fold: int
+        The fold nr (column in trace file)
 
-        iteration: int
-            The iteration nr (column in trace file)
+    iteration: int
+        The iteration nr (column in trace file)
 
-        Returns
-        -------
-        model : sklearn model
-            the scikitlearn model with all parameters initailized
-        '''
+    Returns
+    -------
+    model : sklearn model
+        the scikitlearn model with all parameters initailized
+    '''
     run = get_run(run_id)
     if 'trace' not in run.output_files:
         raise PyOpenMLError('Run does not contain trace file')
-    trace_url = fileid_to_url(run.output_files['trace'], 'trace.arff')
-    #print(trace_url)
     trace_xml = _perform_api_call('run/trace/%d' %run_id)
     run_trace = _create_trace_from_description(trace_xml)
 
@@ -152,7 +150,14 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
     if request not in run_trace.trace_iterations:
         raise ValueError('Combination repeat, fold, iteration not availavle')
     current = run_trace.trace_iterations[(repeat, fold, iteration)]
-    
+
+    search_model = initialize_model_from_run(run_id)
+    if not isinstance(search_model, sklearn.model_selection._search.BaseSearchCV):
+        raise ValueError('Deserialized flow not instance of ' \
+                         'sklearn.model_selection._search.BaseSearchCV')
+    base_estimator = search_model.estimator
+    base_estimator.set_params(**current.get_parameters())
+    return base_estimator
 
 def _run_exists(task_id, setup_id):
     '''
@@ -347,8 +352,9 @@ def _extract_arfftrace(model, rep_no, fold_no):
         test_score = model.cv_results_['mean_test_score'][itt_no]
         arff_line = [rep_no, fold_no, itt_no, test_score, selected]
         for key in model.cv_results_:
-            if key.startswith("param_"):
-                arff_line.append(sklearn_to_flow(model.cv_results_[key][itt_no]))
+            if key.startswith('param_'):
+                serialized_value = json.dumps(model.cv_results_[key][itt_no])
+                arff_line.append(serialized_value)
         arff_tracecontent.append(arff_line)
     return arff_tracecontent
 
@@ -371,11 +377,7 @@ def _extract_arfftrace_attributes(model):
         if key.startswith('param_'):
             # supported types should include all types, including bool, int float
             supported_types = (bool, int, float, six.string_types)
-            if all(isinstance(i, (bool)) for i in model.cv_results_[key]):
-                type = ['True', 'False']
-            elif all(isinstance(i, (int, float)) for i in model.cv_results_[key]):
-                type = 'NUMERIC'
-            elif all(isinstance(i, supported_types) or i is None for i in model.cv_results_[key]):
+            if all(isinstance(i, supported_types) or i is None for i in model.cv_results_[key]):
                 type = 'STRING'
             else:
                 raise TypeError('Unsupported param type in param grid')
