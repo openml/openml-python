@@ -97,6 +97,13 @@ def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None, seed=None):
 
     return run
 
+
+def get_run_trace(run_id):
+    trace_xml = _perform_api_call('run/trace/%d' % run_id)
+    run_trace = _create_trace_from_description(trace_xml)
+    return run_trace
+
+
 def initialize_model_from_run(run_id):
     '''
     Initialized a model based on a run_id (i.e., using the exact
@@ -133,18 +140,18 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
         The fold nr (column in trace file)
 
     iteration: int
-        The iteration nr (column in trace file)
+        The iteration nr (column in trace file). If None, the
+        best (selected) iteration will be searched (slow)
 
     Returns
     -------
     model : sklearn model
         the scikitlearn model with all parameters initailized
     '''
-    run = get_run(run_id)
-    if 'trace' not in run.output_files:
-        raise PyOpenMLError('Run does not contain trace file')
-    trace_xml = _perform_api_call('run/trace/%d' %run_id)
-    run_trace = _create_trace_from_description(trace_xml)
+    run_trace = get_run_trace(run_id)
+
+    if iteration is None:
+        iteration = run_trace.get_selected_iteration(repeat, fold)
 
     request = (repeat, fold, iteration)
     if request not in run_trace.trace_iterations:
