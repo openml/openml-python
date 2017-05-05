@@ -264,7 +264,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
                 modelpredict_starttime = time.process_time()
             
             ProbaY = model_fold.predict_proba(testX)
-            PredY = model_fold.predict(testX)
+            PredY = np.argmax(ProbaY, axis=1)
             if can_measure_runtime:
                 modelpredict_duration = (time.process_time() - modelpredict_starttime) * 1000
                 user_defined_measures['usercpu_time_millis_testing'][rep_no][fold_no] = modelpredict_duration
