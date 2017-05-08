@@ -1,7 +1,10 @@
 import sys
+import arff
+import time
 
 import openml
 import openml.exceptions
+import openml._api_calls
 
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent
@@ -29,12 +32,35 @@ class TestRun(TestBase):
     def _check_serialized_optimized_run(self, run_id):
         run = openml.runs.get_run(run_id)
         task = openml.tasks.get_task(run.task_id)
-        trace = openml.runs.get_run_trace(run_id)
+
         # TODO: assert holdout task
 
-        model = openml.runs.initialize_model_from_trace(run_id, 0, 0)
-        # TODO: implement testcase
-        
+        # downloads the predictions of the old task
+        predictions_url = openml._api_calls.fileid_to_url(run.output_files['predictions'])
+        predictions = arff.loads(openml._api_calls._read_url(predictions_url))
+
+        # downloads the best model based on the optimization trace
+        print(run_id)
+        time.sleep(60)
+        model_prime = openml.runs.initialize_model_from_trace(run_id, 0, 0)
+
+        run_prime = openml.runs.run_task(task, model_prime, avoid_duplicate_runs=False)
+        predictions_prime = run_prime._generate_arff_dict()
+
+        print(model_prime)
+
+        self.assertEquals(len(predictions_prime['data']), len(predictions['data']))
+
+        # The original search model does not submit confidence bounds,
+        # so we can not compare the arff line
+        compare_slice = [0, 1, 2, -1, -2]
+        for idx in range(len(predictions['data'])):
+            # depends on the assumption "predictions are in same order"
+            # that does not necessarily hold.
+            # But with the current code base, it holds.
+            for col_idx in compare_slice:
+                self.assertEquals(predictions['data'][idx][col_idx], predictions_prime['data'][idx][col_idx])
+
         return True
 
 
@@ -118,8 +144,8 @@ class TestRun(TestBase):
         run = self._perform_run(task_id, num_test_instances, random_search)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
 
-        # res = self._check_serialized_optimized_run(run.run_id)
-        # self.assertTrue(res)
+        res = self._check_serialized_optimized_run(run.run_id)
+        self.assertTrue(res)
 
     def test_run_optimize_bagging_diabetes(self):
         task_id = 119

@@ -576,7 +576,15 @@ def _create_trace_from_description(xml):
         iteration = int(itt['oml:iteration'])
         setup_string = json.loads(itt['oml:setup_string'])
         evaluation = float(itt['oml:evaluation'])
-        selected = bool(itt['oml:selected'])
+
+        selectedValue = itt['oml:selected']
+        if selectedValue == 'true':
+            selected = True
+        elif selectedValue == 'false':
+            selected = False
+        else:
+            raise ValueError('expected {"true", "false"} value for '\
+                             'selected field, received: %s' %selectedValue)
 
         current = OpenMLTraceIteration(repeat, fold, iteration,
                                         setup_string, evaluation,
