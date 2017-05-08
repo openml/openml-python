@@ -40,14 +40,19 @@ class TestRun(TestBase):
         predictions = arff.loads(openml._api_calls._read_url(predictions_url))
 
         # downloads the best model based on the optimization trace
-        print(run_id)
-        time.sleep(60)
-        model_prime = openml.runs.initialize_model_from_trace(run_id, 0, 0)
+        # suboptimal (slow), and not guaranteed to work if evaluation
+        # engine is behind. TODO: mock this? We have the arff already on the server
+        secCount = 0
+        while secCount < 70:
+            try:
+                model_prime = openml.runs.initialize_model_from_trace(run_id, 0, 0)
+                break
+            except openml.exceptions.OpenMLServerException:
+                time.sleep(10)
+                secCount += 10
 
         run_prime = openml.runs.run_task(task, model_prime, avoid_duplicate_runs=False)
         predictions_prime = run_prime._generate_arff_dict()
-
-        print(model_prime)
 
         self.assertEquals(len(predictions_prime['data']), len(predictions['data']))
 
@@ -160,6 +165,9 @@ class TestRun(TestBase):
 
         run = self._perform_run(task_id, num_test_instances, grid_search)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
+
+        res = self._check_serialized_optimized_run(run.run_id)
+        self.assertTrue(res)
 
     def test_run_pipeline(self):
         task_id = 115
