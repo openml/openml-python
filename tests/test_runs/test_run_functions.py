@@ -48,6 +48,7 @@ class TestRun(TestBase):
                 model_prime = openml.runs.initialize_model_from_trace(run_id, 0, 0)
                 break
             except openml.exceptions.OpenMLServerException:
+                # probably because openml eval engine has not executed this run yet
                 time.sleep(10)
                 secCount += 10
 
