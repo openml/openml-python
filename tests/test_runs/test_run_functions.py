@@ -166,7 +166,9 @@ class TestRun(TestBase):
 
         run = self._perform_run(task_id, num_test_instances, grid_search)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
-    
+        res = self._check_serialized_optimized_run(run.run_id)
+        self.assertTrue(res)
+
     def test_run_with_classifiers_in_param_grid(self):
         task = openml.tasks.get_task(115)
 
@@ -177,10 +179,6 @@ class TestRun(TestBase):
         clf = GridSearchCV(BaggingClassifier(), param_grid=param_grid)
         self.assertRaises(TypeError, openml.runs.run_task,
                           task=task, model=clf, avoid_duplicate_runs=False)
-
-
-        res = self._check_serialized_optimized_run(run.run_id)
-        self.assertTrue(res)
 
     def test_run_pipeline(self):
         task_id = 115
