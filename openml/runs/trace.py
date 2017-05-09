@@ -6,6 +6,7 @@ class OpenMLRunTrace(object):
     Parameters
     ----------
     run_id : int
+        OpenML run id
 
     trace_iterations : dict
         Mapping from key ``(repeat, fold, iteration)`` to an object of
@@ -38,16 +39,25 @@ class OpenMLTraceIteration(object):
     Parameters
     ----------
     repeat : int
+        repeat number (in case of no repeats: 0)
 
     fold : int
-
+        fold number (in case of no folds: 0)
+    
     iteration : int
+        iteration number of optimization procedure
 
-    setup_string : FIXME
+    setup_string : str
+        json string representing the parameters
 
-    evaluation : FIXME
+    evaluation : double
+        The evaluation that was awarded to this trace iteration. 
+        Measure is defined by the task
 
-    selected : FIXME
+    selected : bool
+        Whether this was the best of all iterations, and hence 
+        selected for making predictions. Per fold/repeat there
+        should be only one iteration selected
     """
 
     def __init__(self, repeat, fold, iteration, setup_string, evaluation, selected):
