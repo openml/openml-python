@@ -6,6 +6,8 @@ import numpy as np
 import warnings
 import sklearn
 import time
+import six
+import json
 
 from ..exceptions import PyOpenMLError
 from .. import config
@@ -15,8 +17,9 @@ from ..setups import setup_exists, initialize_model
 
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError, version_complies
-from .._api_calls import _perform_api_call
+from .._api_calls import _perform_api_call, _file_id_to_url
 from .run import OpenMLRun, _get_version_information
+from .trace import OpenMLRunTrace, OpenMLTraceIteration
 
 
 # _get_version_info, _get_dict and _create_setup_string are in run.py to avoid
@@ -94,6 +97,24 @@ def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None, seed=None):
 
     return run
 
+
+def get_run_trace(run_id):
+    """Get the optimization trace object for a given run id.
+
+     Parameters
+     ----------
+     run_id : int
+
+     Returns
+     -------
+     openml.runs.OpenMLTrace
+    """
+
+    trace_xml = _perform_api_call('run/trace/%d' % run_id)
+    run_trace = _create_trace_from_description(trace_xml)
+    return run_trace
+
+
 def initialize_model_from_run(run_id):
     '''
     Initialized a model based on a run_id (i.e., using the exact
@@ -111,6 +132,54 @@ def initialize_model_from_run(run_id):
     '''
     run = get_run(run_id)
     return initialize_model(run.setup_id)
+
+
+def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
+    '''
+    Initialize a model based on the parameters that were set
+    by an optimization procedure (i.e., using the exact same
+    parameter settings)
+
+    Parameters
+    ----------
+    run_id : int
+        The Openml run_id. Should contain a trace file, 
+        otherwise a OpenMLServerException is raised
+
+    repeat: int
+        The repeat nr (column in trace file)
+
+    fold: int
+        The fold nr (column in trace file)
+
+    iteration: int
+        The iteration nr (column in trace file). If None, the
+        best (selected) iteration will be searched (slow), 
+        according to the selection criteria implemented in
+        OpenMLRunTrace.get_selected_iteration
+
+    Returns
+    -------
+    model : sklearn model
+        the scikit-learn model with all parameters initailized
+    '''
+    run_trace = get_run_trace(run_id)
+
+    if iteration is None:
+        iteration = run_trace.get_selected_iteration(repeat, fold)
+
+    request = (repeat, fold, iteration)
+    if request not in run_trace.trace_iterations:
+        raise ValueError('Combination repeat, fold, iteration not availavle')
+    current = run_trace.trace_iterations[(repeat, fold, iteration)]
+
+    search_model = initialize_model_from_run(run_id)
+    if not isinstance(search_model, sklearn.model_selection._search.BaseSearchCV):
+        raise ValueError('Deserialized flow not instance of ' \
+                         'sklearn.model_selection._search.BaseSearchCV')
+    base_estimator = search_model.estimator
+    base_estimator.set_params(**current.get_parameters())
+    return base_estimator
 
 def _run_exists(task_id, setup_id):
     '''
@@ -305,8 +374,9 @@ def _extract_arfftrace(model, rep_no, fold_no):
         test_score = model.cv_results_['mean_test_score'][itt_no]
         arff_line = [rep_no, fold_no, itt_no, test_score, selected]
         for key in model.cv_results_:
-            if key.startswith("param_"):
-                arff_line.append(str(model.cv_results_[key][itt_no]))
+            if key.startswith('param_'):
+                serialized_value = json.dumps(model.cv_results_[key][itt_no])
+                arff_line.append(serialized_value)
         arff_tracecontent.append(arff_line)
     return arff_tracecontent
 
@@ -326,15 +396,16 @@ def _extract_arfftrace_attributes(model):
 
     # model dependent attributes for trace arff
     for key in model.cv_results_:
-        if key.startswith("param_"):
-            if all(isinstance(i, (bool)) for i in model.cv_results_[key]):
-                type = ['True', 'False']
-            elif all(isinstance(i, (int, float)) for i in model.cv_results_[key]):
-                type = 'NUMERIC'
+        if key.startswith('param_'):
+            # supported types should include all types, including bool, int float
+            supported_types = (bool, int, float, six.string_types)
+            if all(isinstance(i, supported_types) or i is None for i in model.cv_results_[key]):
+                type = 'STRING'
             else:
-                values = list(set(model.cv_results_[key]))  # unique values
-                type = [str(i) for i in values]
+                raise TypeError('Unsupported param type in param grid')
 
+            # we renamed the attribute param to parameter, as this is a required
+            # OpenML convention
             attribute = ("parameter_" + key[6:], type)
             trace_attributes.append(attribute)
     return trace_attributes
@@ -439,45 +510,52 @@ def _create_run_from_xml(xml):
 
     dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
 
-    predictions_url = None
-    if isinstance(run['oml:output_data']['oml:file'], dict):
-        # only one result.. probably due to an upload error
-        file_dict = run['oml:output_data']['oml:file']
-        if file_dict['oml:name'] == 'predictions':
-            predictions_url = file_dict['oml:url']
-    else:
-        # multiple files, the normal case
-        for file_dict in run['oml:output_data']['oml:file']:
-            if file_dict['oml:name'] == 'predictions':
-                predictions_url = file_dict['oml:url']
-    if predictions_url is None:
-        raise ValueError('No URL to download predictions for run %d in run '
-                         'description XML' % run_id)
+    files = dict()
     evaluations = dict()
     detailed_evaluations = defaultdict(lambda: defaultdict(dict))
-    evaluation_flows = dict()
-    if 'oml:output_data' in run and 'oml:evaluation' in run['oml:output_data']:
-        for evaluation_dict in run['oml:output_data']['oml:evaluation']:
-            key = evaluation_dict['oml:name']
-            if 'oml:value' in evaluation_dict:
-                value = float(evaluation_dict['oml:value'])
-            elif 'oml:array_data' in evaluation_dict:
-                value = evaluation_dict['oml:array_data']
-            else:
-                raise ValueError('Could not find keys "value" or "array_data" '
-                                 'in %s' % str(evaluation_dict.keys()))
+    if 'oml:output_data' not in run:
+        raise ValueError('Run does not contain output_data (OpenML server error?)')
+    else:
+        if isinstance(run['oml:output_data']['oml:file'], dict):
+            # only one result.. probably due to an upload error
+            file_dict = run['oml:output_data']['oml:file']
+            files[file_dict['oml:name']] = int(file_dict['oml:file_id'])
+        else:
+            # multiple files, the normal case
+            for file_dict in run['oml:output_data']['oml:file']:
+                files[file_dict['oml:name']] = int(file_dict['oml:file_id'])
+        if 'oml:evaluation' in run['oml:output_data']:
+            # in normal cases there should be evaluations, but in case there
+            # was an error these could be absent
+            for evaluation_dict in run['oml:output_data']['oml:evaluation']:
+                key = evaluation_dict['oml:name']
+                if 'oml:value' in evaluation_dict:
+                    value = float(evaluation_dict['oml:value'])
+                elif 'oml:array_data' in evaluation_dict:
+                    value = evaluation_dict['oml:array_data']
+                else:
+                    raise ValueError('Could not find keys "value" or "array_data" '
+                                     'in %s' % str(evaluation_dict.keys()))
 
-            if '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
-                repeat = int(evaluation_dict['@repeat'])
-                fold = int(evaluation_dict['@fold'])
-                repeat_dict = detailed_evaluations[key]
-                fold_dict = repeat_dict[repeat]
-                fold_dict[fold] = value
-            else:
-                evaluations[key] = value
-                evaluation_flows[key] = flow_id
+                if '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
+                    repeat = int(evaluation_dict['@repeat'])
+                    fold = int(evaluation_dict['@fold'])
+                    repeat_dict = detailed_evaluations[key]
+                    fold_dict = repeat_dict[repeat]
+                    fold_dict[fold] = value
+                else:
+                    evaluations[key] = value
 
-            evaluation_flows[key] = flow_id
+    if 'description' not in files:
+        raise ValueError('No description file for run %d in run '
+                         'description XML' % run_id)
+
+    if 'predictions' not in files:
+        # JvR: actually, I am not sure whether this error should be raised.
+        # a run can consist without predictions. But for now let's keep it
+        raise ValueError('No prediction files for run %d in run '
+                         'description XML' % run_id)
+
     tags = None
     if 'oml:tag' in run:
         if isinstance(run['oml:tag'], str):
@@ -487,7 +565,6 @@ def _create_run_from_xml(xml):
         else:
             raise ValueError('Received not string and non list as tag item')
 
-
     return OpenMLRun(run_id=run_id, uploader=uploader,
                      uploader_name=uploader_name, task_id=task_id,
                      task_type=task_type,
@@ -495,10 +572,41 @@ def _create_run_from_xml(xml):
                      flow_id=flow_id, flow_name=flow_name,
                      setup_id=setup_id, setup_string=setup_string,
                      parameter_settings=parameters,
-                     dataset_id=dataset_id, predictions_url=predictions_url,
+                     dataset_id=dataset_id, output_files=files,
                      evaluations=evaluations,
                      detailed_evaluations=detailed_evaluations, tags=tags)
 
+def _create_trace_from_description(xml):
+    result_dict = xmltodict.parse(xml)['oml:trace']
+
+    run_id = result_dict['oml:run_id']
+    trace = dict()
+
+    if 'oml:trace_iteration' not in result_dict:
+        raise ValueError('Run does not contain valid trace. ')
+
+    for itt in result_dict['oml:trace_iteration']:
+        repeat = int(itt['oml:repeat'])
+        fold = int(itt['oml:fold'])
+        iteration = int(itt['oml:iteration'])
+        setup_string = json.loads(itt['oml:setup_string'])
+        evaluation = float(itt['oml:evaluation'])
+
+        selectedValue = itt['oml:selected']
+        if selectedValue == 'true':
+            selected = True
+        elif selectedValue == 'false':
+            selected = False
+        else:
+            raise ValueError('expected {"true", "false"} value for '\
+                             'selected field, received: %s' %selectedValue)
+
+        current = OpenMLTraceIteration(repeat, fold, iteration,
+                                        setup_string, evaluation,
+                                        selected)
+        trace[(repeat, fold, iteration)] = current
+
+    return OpenMLRunTrace(run_id, trace)
 
 def _get_cached_run(run_id):
     """Load a run from the cache."""

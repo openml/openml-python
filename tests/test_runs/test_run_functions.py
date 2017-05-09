@@ -1,7 +1,10 @@
 import sys
+import arff
+import time
 
 import openml
 import openml.exceptions
+import openml._api_calls
 
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent
@@ -25,6 +28,47 @@ else:
 
 
 class TestRun(TestBase):
+
+    def _check_serialized_optimized_run(self, run_id):
+        run = openml.runs.get_run(run_id)
+        task = openml.tasks.get_task(run.task_id)
+
+        # TODO: assert holdout task
+
+        # downloads the predictions of the old task
+        predictions_url = openml._api_calls._file_id_to_url(run.output_files['predictions'])
+        predictions = arff.loads(openml._api_calls._read_url(predictions_url))
+
+        # downloads the best model based on the optimization trace
+        # suboptimal (slow), and not guaranteed to work if evaluation
+        # engine is behind. TODO: mock this? We have the arff already on the server
+        secCount = 0
+        while secCount < 70:
+            try:
+                model_prime = openml.runs.initialize_model_from_trace(run_id, 0, 0)
+                break
+            except openml.exceptions.OpenMLServerException:
+                # probably because openml eval engine has not executed this run yet
+                time.sleep(10)
+                secCount += 10
+
+        run_prime = openml.runs.run_task(task, model_prime, avoid_duplicate_runs=False)
+        predictions_prime = run_prime._generate_arff_dict()
+
+        self.assertEquals(len(predictions_prime['data']), len(predictions['data']))
+
+        # The original search model does not submit confidence bounds,
+        # so we can not compare the arff line
+        compare_slice = [0, 1, 2, -1, -2]
+        for idx in range(len(predictions['data'])):
+            # depends on the assumption "predictions are in same order"
+            # that does not necessarily hold.
+            # But with the current code base, it holds.
+            for col_idx in compare_slice:
+                self.assertEquals(predictions['data'][idx][col_idx], predictions_prime['data'][idx][col_idx])
+
+        return True
+
 
     def _perform_run(self, task_id, num_instances, clf, check_setup=True):
         task = openml.tasks.get_task(task_id)
@@ -86,10 +130,10 @@ class TestRun(TestBase):
         downloaded = openml.runs.get_run(res.run_id)
         assert('openml-python' in downloaded.tags)
 
-    def test_run_optimize_randomforest_iris(self):
-        task_id = 115
-        num_instances = 768
-        num_folds = 10
+    def test_run_optimize_randomforest_diabetes(self):
+        task_id = 119
+        num_test_instances = 253
+        num_folds = 1
         num_iterations = 5
 
         clf = RandomForestClassifier(n_estimators=5)
@@ -103,14 +147,16 @@ class TestRun(TestBase):
         random_search = RandomizedSearchCV(clf, param_dist, cv=cv,
                                            n_iter=num_iterations)
 
-        run = self._perform_run(task_id, num_instances, random_search)
-        print(run.trace_content)
+        run = self._perform_run(task_id, num_test_instances, random_search)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
 
-    def test_run_optimize_bagging_iris(self):
-        task_id = 115
-        num_instances = 768
-        num_folds = 10
+        res = self._check_serialized_optimized_run(run.run_id)
+        self.assertTrue(res)
+
+    def test_run_optimize_bagging_diabetes(self):
+        task_id = 119
+        num_test_instances = 253
+        num_folds = 1
         num_iterations = 9 # (num values for C times gamma)
 
         bag = BaggingClassifier(base_estimator=SVC())
@@ -118,9 +164,11 @@ class TestRun(TestBase):
                       "base_estimator__gamma": [0.01, 0.1, 10]}
         grid_search = GridSearchCV(bag, param_dist)
 
-        run = self._perform_run(task_id, num_instances, grid_search)
+        run = self._perform_run(task_id, num_test_instances, grid_search)
         self.assertEqual(len(run.trace_content), num_iterations * num_folds)
-    
+        res = self._check_serialized_optimized_run(run.run_id)
+        self.assertTrue(res)
+
     def test_run_with_classifiers_in_param_grid(self):
         task = openml.tasks.get_task(115)
 
@@ -131,7 +179,6 @@ class TestRun(TestBase):
         clf = GridSearchCV(BaggingClassifier(), param_grid=param_grid)
         self.assertRaises(TypeError, openml.runs.run_task,
                           task=task, model=clf, avoid_duplicate_runs=False)
-
 
     def test_run_pipeline(self):
         task_id = 115

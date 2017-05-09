@@ -82,11 +82,6 @@ class OpenMLTask(object):
 
     def download_split(self):
         """Download the OpenML split for a given task.
-
-        Parameters
-        ----------
-        task_id : Task
-            An entity of :class:`openml.OpenMLTask`.
         """
         cached_split_file = os.path.join(
             _create_task_cache_dir(self.task_id), "datasplits.arff")
