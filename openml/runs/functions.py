@@ -133,6 +133,7 @@ def initialize_model_from_run(run_id):
     run = get_run(run_id)
     return initialize_model(run.setup_id)
 
+
 def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
     '''
     Initialize a model based on the parameters that were set
@@ -142,7 +143,8 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
     Parameters
     ----------
     run_id : int
-        The Openml run_id. Should contain a trace file
+        The Openml run_id. Should contain a trace file, 
+        otherwise a OpenMLServerException is raised
 
     repeat: int
         The repeat nr (column in trace file)
@@ -152,7 +154,9 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
 
     iteration: int
         The iteration nr (column in trace file). If None, the
-        best (selected) iteration will be searched (slow)
+        best (selected) iteration will be searched (slow), 
+        according to the selection criteria implemented in
+        OpenMLRunTrace.get_selected_iteration
 
     Returns
     -------

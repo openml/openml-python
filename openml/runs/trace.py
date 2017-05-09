@@ -18,8 +18,13 @@ class OpenMLRunTrace(object):
         self.trace_iterations = trace_iterations
 
     def get_selected_iteration(self, fold, repeat):
+        '''
+        Returns the trace iteration that was marked as selected. In
+        case multiple are marked as selected (should not happen) the
+        first of these is returned
+        '''
         for (r, f, i) in self.trace_iterations:
-            if r == repeat and f == fold and self.trace_iterations[(r, f, i)].selected == True:
+            if r == repeat and f == fold and self.trace_iterations[(r, f, i)].selected is True:
                 return i
         raise ValueError('Could not find the selected iteration for rep/fold %d/%d' %(repeat,fold))
 
@@ -64,6 +69,9 @@ class OpenMLTraceIteration(object):
         return result
 
     def __str__(self):
+        '''
+        tmp string representation, will be changed in the near future 
+        '''
         return '[(%d,%d,%d): %f (%r)]' %(self.repeat, self.fold, self.iteration,
                                           self.evaluation, self.selected)
 
