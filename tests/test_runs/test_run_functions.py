@@ -36,7 +36,7 @@ class TestRun(TestBase):
         # TODO: assert holdout task
 
         # downloads the predictions of the old task
-        predictions_url = openml._api_calls.fileid_to_url(run.output_files['predictions'])
+        predictions_url = openml._api_calls._file_id_to_url(run.output_files['predictions'])
         predictions = arff.loads(openml._api_calls._read_url(predictions_url))
 
         # downloads the best model based on the optimization trace

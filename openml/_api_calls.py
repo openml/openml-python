@@ -51,7 +51,7 @@ def _perform_api_call(call, data=None, file_dictionary=None,
     return _read_url(url, data)
 
 
-def fileid_to_url(file_id, filename=None):
+def _file_id_to_url(file_id, filename=None):
     '''
      Presents the URL how to download a given file id
      filename is optional

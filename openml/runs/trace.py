@@ -5,7 +5,11 @@ class OpenMLRunTrace(object):
 
     Parameters
     ----------
-    FIXME
+    run_id : int
+
+    trace_iterations : dict
+        Mapping from key ``(repeat, fold, iteration)`` to an object of
+        OpenMLTraceIteration.
 
     """
 
@@ -28,7 +32,17 @@ class OpenMLTraceIteration(object):
 
     Parameters
     ----------
-    FIXME
+    repeat : int
+
+    fold : int
+
+    iteration : int
+
+    setup_string : FIXME
+
+    evaluation : FIXME
+
+    selected : FIXME
     """
 
     def __init__(self, repeat, fold, iteration, setup_string, evaluation, selected):

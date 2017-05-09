@@ -17,7 +17,7 @@ from ..setups import setup_exists, initialize_model
 
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..util import URLError, version_complies
-from .._api_calls import _perform_api_call, fileid_to_url
+from .._api_calls import _perform_api_call, _file_id_to_url
 from .run import OpenMLRun, _get_version_information
 from .trace import OpenMLRunTrace, OpenMLTraceIteration
 
@@ -99,6 +99,17 @@ def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None, seed=None):
 
 
 def get_run_trace(run_id):
+    """Get the optimization trace object for a given run id.
+
+     Parameters
+     ----------
+     run_id : int
+
+     Returns
+     -------
+     openml.runs.OpenMLTrace
+    """
+
     trace_xml = _perform_api_call('run/trace/%d' % run_id)
     run_trace = _create_trace_from_description(trace_xml)
     return run_trace
@@ -124,7 +135,7 @@ def initialize_model_from_run(run_id):
 
 def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
     '''
-    Initialized a model based on the parameters that were set
+    Initialize a model based on the parameters that were set
     by an optimization procedure (i.e., using the exact same
     parameter settings)
 
@@ -146,7 +157,7 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
     Returns
     -------
     model : sklearn model
-        the scikitlearn model with all parameters initailized
+        the scikit-learn model with all parameters initailized
     '''
     run_trace = get_run_trace(run_id)
 
