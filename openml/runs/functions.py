@@ -451,12 +451,7 @@ def get_run(run_id):
         with io.open(run_file, "w", encoding='utf8') as fh:
             fh.write(run_xml)
 
-    try:
-        run = _create_run_from_xml(run_xml)
-    except Exception as e:
-        # TODO logger.debug
-        print("Run ID", run_id)
-        raise e
+    run = _create_run_from_xml(run_xml)
 
     with io.open(run_file, "w", encoding='utf8') as fh:
         fh.write(run_xml)
