@@ -1,7 +1,8 @@
-import io
-import os
-import re
 from collections import OrderedDict
+import io
+import re
+import os
+
 import xmltodict
 
 from ..exceptions import OpenMLCacheException

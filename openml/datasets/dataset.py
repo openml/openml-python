@@ -9,20 +9,11 @@ import arff
 
 import numpy as np
 import scipy.sparse
+from six.moves import cPickle as pickle
 import xmltodict
 
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
-
-if sys.version_info[0] >= 3:
-    import pickle
-else:
-    try:
-        import cPickle as pickle
-    except:
-        import pickle
-
-
 from .._api_calls import _perform_api_call
 
 logger = logging.getLogger(__name__)

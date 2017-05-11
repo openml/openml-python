@@ -1,9 +1,10 @@
 """
 Stores module level information like the API key, cache directory and the server.
 """
+import logging
 import os
 import sys
-import logging
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
