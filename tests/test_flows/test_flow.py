@@ -202,7 +202,6 @@ class TestFlow(TestBase):
         downloaded_flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
         self.assertEquals(downloaded_flow_id, flow.flow_id)
 
-
     def test_sklearn_to_upload_to_flow(self):
         iris = sklearn.datasets.load_iris()
         X = iris.data
@@ -242,12 +241,6 @@ class TestFlow(TestBase):
 
         local_xml = flow._to_xml()
         server_xml = new_flow._to_xml()
-
-        local_xml = re.sub('<oml:id>[0-9]+</oml:id>', '', local_xml)
-        server_xml = re.sub('<oml:id>[0-9]+</oml:id>', '', server_xml)
-        server_xml = re.sub('<oml:uploader>[0-9]+</oml:uploader>', '', server_xml)
-        server_xml = re.sub('<oml:version>[0-9]+</oml:version>', '', server_xml)
-        server_xml = re.sub('<oml:upload_date>[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}</oml:upload_date>', '', server_xml)
 
         for i in range(10):
             # Make sure that we replace all occurences of two newlines

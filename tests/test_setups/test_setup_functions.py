@@ -41,30 +41,34 @@ class TestRun(TestBase):
         # although the flow exists (created as of previous statement),
         # we can be sure there are no setups (yet) as it was just created
         # and hasn't been ran
-        setup_id = openml.setups.setup_exists(flow, dectree)
+        setup_id = openml.setups.setup_exists(flow)
         self.assertFalse(setup_id)
-
 
     def test_existing_setup_exists(self):
         # first publish a nonexiting flow
 
         # because of the sentinel, we can not use flows that contain subflows
         classif = DecisionTreeClassifier(max_depth=5,
-                                         min_samples_split=3)
+                                         min_samples_split=3,
+                                         # Not setting the random state will
+                                         # make this flow fail as running it
+                                         # will add a random random_state.
+                                         random_state=1)
         flow = openml.flows.sklearn_to_flow(classif)
         flow.name = 'TEST%s%s' % (get_sentinel(), flow.name)
 
+        # Replace the flow by a flow in which the ID got set up correctly
         flow = flow.publish()
         flow = openml.flows.get_flow(flow.flow_id)
 
         # although the flow exists, we can be sure there are no
         # setups (yet) as it hasn't been ran
-        setup_id = openml.setups.setup_exists(flow, classif)
+        setup_id = openml.setups.setup_exists(flow)
         self.assertFalse(setup_id)
 
         # now run the flow on an easy task:
-        task = openml.tasks.get_task(115) #diabetes
-        run = openml.runs.run_task(task, classif)
+        task = openml.tasks.get_task(115) # diabetes
+        run = openml.runs.run_flow_on_task(task, flow)
         # spoof flow id, otherwise the sentinel is ignored
         run.flow_id = flow.flow_id
         run = run.publish()
@@ -72,7 +76,7 @@ class TestRun(TestBase):
         run = openml.runs.get_run(run.run_id)
 
         # execute the function we are interested in
-        setup_id = openml.setups.setup_exists(flow, classif)
+        setup_id = openml.setups.setup_exists(flow)
         self.assertEquals(setup_id, run.setup_id)
 
     def test_get_setup(self):

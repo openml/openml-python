@@ -15,6 +15,7 @@ from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent, \
     _get_seeded_model, _run_exists, _extract_arfftrace, \
     _extract_arfftrace_attributes, _prediction_to_row, _check_n_jobs
+from openml.flows.sklearn_converter import sklearn_to_flow
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
@@ -70,7 +71,9 @@ class TestRun(TestBase):
         self._wait_for_processed_run(run_id, 80)
         model_prime = openml.runs.initialize_model_from_trace(run_id, 0, 0)
 
-        run_prime = openml.runs.run_task(task, model_prime, avoid_duplicate_runs=False)
+        run_prime = openml.runs.run_model_on_task(task, model_prime,
+                                                  avoid_duplicate_runs=False,
+                                                  seed=1)
         predictions_prime = run_prime._generate_arff_dict()
 
         self.assertEquals(len(predictions_prime['data']), len(predictions['data']))
@@ -87,10 +90,22 @@ class TestRun(TestBase):
 
         return True
 
+    def _perform_run(self, task_id, num_instances, clf,
+                     random_state_value=None, check_setup=True):
 
-    def _perform_run(self, task_id, num_instances, clf, check_setup=True):
+        def _remove_random_state(flow):
+            if 'random_state' in flow.parameters:
+                del flow.parameters['random_state']
+            for component in flow.components.values():
+                _remove_random_state(component)
+
+        flow = sklearn_to_flow(clf)
+        flow, _ = self._add_sentinel_to_flow_name(flow, None)
+        flow.publish()
+
         task = openml.tasks.get_task(task_id)
-        run = openml.runs.run_task(task, clf, openml.config.avoid_duplicate_runs)
+        run = openml.runs.run_flow_on_task(task, flow, seed=1,
+                                           avoid_duplicate_runs=openml.config.avoid_duplicate_runs)
         run_ = run.publish()
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
@@ -107,11 +122,32 @@ class TestRun(TestBase):
             flow_local = openml.flows.sklearn_to_flow(clf)
             flow_server = openml.flows.sklearn_to_flow(clf_server)
 
+            if flow.class_name not in \
+                    ['sklearn.model_selection._search.GridSearchCV',
+                     'sklearn.pipeline.Pipeline']:
+                # If the flow is initialized from a model without a random state,
+                # the flow is on the server without any random state
+                self.assertEqual(flow.parameters['random_state'], 'null')
+                # As soon as a flow is run, a random state is set in the model.
+                # If a flow is re-instantiated
+                self.assertEqual(flow_local.parameters['random_state'],
+                                 random_state_value)
+                self.assertEqual(flow_server.parameters['random_state'],
+                                 random_state_value)
+            _remove_random_state(flow_local)
+            _remove_random_state(flow_server)
             openml.flows.assert_flows_equal(flow_local, flow_server)
 
             # and test the initialize setup from run function
             clf_server2 = openml.runs.initialize_model_from_run(run_server.run_id)
             flow_server2 = openml.flows.sklearn_to_flow(clf_server2)
+            if flow.class_name not in \
+                    ['sklearn.model_selection._search.GridSearchCV',
+                     'sklearn.pipeline.Pipeline']:
+                self.assertEqual(flow_server2.parameters['random_state'],
+                                 random_state_value)
+
+            _remove_random_state(flow_server2)
             openml.flows.assert_flows_equal(flow_local, flow_server2)
 
             #self.assertEquals(clf.get_params(), clf_prime.get_params())
@@ -155,19 +191,21 @@ class TestRun(TestBase):
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
-        self.assertRaises(AttributeError, openml.runs.run_task,
+        self.assertRaises(AttributeError, openml.runs.run_model_on_task,
                           task=task, model=clf, avoid_duplicate_runs=False)
 
-    @mock.patch('openml.flows.sklearn_to_flow')
-    def test_check_erronous_sklearn_flow_fails(self, sklearn_to_flow_mock):
+    def test_check_erronous_sklearn_flow_fails(self):
         task_id = 115
         task = openml.tasks.get_task(task_id)
 
         # Invalid parameter values
         clf = LogisticRegression(C='abc')
-        self.assertEqual(sklearn_to_flow_mock.call_count, 0)
-        self.assertRaisesRegexp(ValueError, "Penalty term must be positive; got \(C='abc'\)",
-                                openml.runs.run_task, task=task, model=clf)
+        self.assertRaisesRegexp(ValueError,
+                                "Penalty term must be positive; got "
+                                # u? for 2.7/3.4-6 compability
+                                "\(C=u?'abc'\)",
+                                openml.runs.run_model_on_task, task=task,
+                                model=clf)
 
     def test_run_and_upload(self):
         # This unit test is ment to test the following functions, using a varity of flows:
@@ -182,16 +220,15 @@ class TestRun(TestBase):
         num_iterations = 5 # for base search classifiers
 
         clfs = [LogisticRegression(),
-                Pipeline(steps=(('scaler', StandardScaler(with_mean=False)),
-                                ('dummy', DummyClassifier(strategy='prior')))),
+                Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
+                                ('dummy', DummyClassifier(strategy='prior'))]),
                 Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('VarianceThreshold', VarianceThreshold()),
-                                ('Estimator', RandomizedSearchCV(DecisionTreeClassifier(),
-                                                                 {'min_samples_split': [2 ** x for x in
-                                                                                        range(1, 7 + 1)],
-                                                                  'min_samples_leaf': [2 ** x for x in
-                                                                                       range(0, 6 + 1)]},
-                                                                 cv=3, n_iter=10))]),
+                                ('Estimator', RandomizedSearchCV(
+                                    DecisionTreeClassifier(),
+                                    {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
+                                     'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
+                                    cv=3, n_iter=10))]),
                 GridSearchCV(BaggingClassifier(base_estimator=SVC()),
                              {"base_estimator__C": [0.01, 0.1, 10],
                               "base_estimator__gamma": [0.01, 0.1, 10]}),
@@ -202,12 +239,18 @@ class TestRun(TestBase):
                                     "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                                     "bootstrap": [True, False],
                                     "criterion": ["gini", "entropy"]},
-                                    cv=StratifiedKFold(n_splits=2),
-                                    n_iter=num_iterations)
-        ]
+                                    cv=StratifiedKFold(n_splits=2,
+                                                       random_state=1),
+                                    n_iter=num_iterations)]
 
-        for clf in clfs:
-            run = self._perform_run(task_id, num_test_instances, clf)
+        # The random states for the RandomizedSearchCV is set after the
+        # random state of the RandomForestClassifier is set, therefore,
+        # it has a different value than the other examples before
+        random_state_values = ['62501'] * (len(clfs) - 1) + ['33003']
+
+        for clf, rsv in zip(clfs, random_state_values):
+            run = self._perform_run(task_id, num_test_instances, clf,
+                                    random_state_value=rsv)
             if isinstance(clf, BaseSearchCV):
                 if isinstance(clf, GridSearchCV):
                     grid_iterations = 1
@@ -229,7 +272,7 @@ class TestRun(TestBase):
                                                ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
                                                ('Estimator', GaussianNB())])
         task = openml.tasks.get_task(11)
-        run = openml.runs.run_task(task, clf, avoid_duplicate_runs=False)
+        run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=False)
         run_ = run.publish()
         run = openml.runs.get_run(run_.run_id)
 
@@ -265,7 +308,7 @@ class TestRun(TestBase):
         # [SPEED] make unit test faster by exploiting run information from the past
         try:
             # in case the run did not exists yet
-            run = openml.runs.run_task(task, clf, avoid_duplicate_runs=True)
+            run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=True)
             run = run.publish()
             self._wait_for_processed_run(run.run_id, 80)
             run_id = run.run_id
@@ -275,7 +318,7 @@ class TestRun(TestBase):
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
             self.assertIsInstance(flow_exists, int)
             downloaded_flow = openml.flows.get_flow(flow_exists)
-            setup_exists = openml.setups.setup_exists(downloaded_flow, clf)
+            setup_exists = openml.setups.setup_exists(downloaded_flow)
             self.assertIsInstance(setup_exists, int)
             run_ids = _run_exists(task.task_id, setup_exists)
             run_id = random.choice(list(run_ids))
@@ -294,13 +337,15 @@ class TestRun(TestBase):
                 sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='most_frequent')),
                                                  ('VarianceThreshold', VarianceThreshold(threshold=0.1)),
                                                  ('Estimator', DecisionTreeClassifier(max_depth=4))])]
-        task = openml.tasks.get_task(1)
+
+
+        task = openml.tasks.get_task(115)
 
         for clf in clfs:
             try:
                 # first populate the server with this run.
                 # skip run if it was already performed.
-                run = openml.runs.run_task(task, clf, avoid_duplicate_runs=True)
+                run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=True)
                 run.publish()
             except openml.exceptions.PyOpenMLError:
                 # run already existed. Great.
@@ -310,11 +355,10 @@ class TestRun(TestBase):
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
             self.assertIsInstance(flow_exists, int)
             downloaded_flow = openml.flows.get_flow(flow_exists)
-            setup_exists = openml.setups.setup_exists(downloaded_flow, clf)
+            setup_exists = openml.setups.setup_exists(downloaded_flow)
             self.assertIsInstance(setup_exists, int)
             run_ids = _run_exists(task.task_id, setup_exists)
             self.assertGreater(len(run_ids), 0)
-
 
     def test__get_seeded_model(self):
         # randomized models that are initialized without seeds, can be seeded
@@ -457,7 +501,7 @@ class TestRun(TestBase):
         }
 
         clf = GridSearchCV(BaggingClassifier(), param_grid=param_grid)
-        self.assertRaises(TypeError, openml.runs.run_task,
+        self.assertRaises(TypeError, openml.runs.run_model_on_task,
                           task=task, model=clf, avoid_duplicate_runs=False)
 
     def test__run_task_get_arffcontent(self):

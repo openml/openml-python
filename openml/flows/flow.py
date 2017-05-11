@@ -322,7 +322,16 @@ class OpenMLFlow(object):
         arguments['tags'] = tags
 
         arguments['model'] = None
-        return cls(**arguments)
+        flow = cls(**arguments)
+
+        if 'sklearn' in arguments['external_version']:
+            from .sklearn_converter import flow_to_sklearn
+            model = flow_to_sklearn(flow)
+        else:
+            model = None
+        flow.model = model
+
+        return flow
 
     def publish(self):
         """Publish flow to OpenML server.
@@ -332,32 +341,38 @@ class OpenMLFlow(object):
         self : OpenMLFlow
 
         """
+        import openml.flows.functions
 
         xml_description = self._to_xml()
 
         file_elements = {'description': xml_description}
         return_value = _perform_api_call("flow/", file_elements=file_elements)
-        self.flow_id = int(xmltodict.parse(return_value)['oml:upload_flow']['oml:id'])
+        flow_id = int(xmltodict.parse(return_value)['oml:upload_flow']['oml:id'])
+        flow = openml.flows.functions.get_flow(flow_id)
         try:
-            _check_flow(self)
+            openml.flows.functions.assert_flows_equal(self, flow)
         except ValueError as e:
             message = e.args[0]
             raise ValueError("Flow was not stored correctly on the server. "
                              "New flow ID is %d. Please check manually and "
                              "remove the flow if necessary! Error is:\n'%s'" %
-                             (self.flow_id, message))
+                             (flow_id, message))
+        _copy_server_fields(flow, self)
         return self
+
+
+def _copy_server_fields(source_flow, target_flow):
+    fields_added_by_the_server = ['flow_id', 'uploader', 'version',
+                                  'upload_date']
+    for field in fields_added_by_the_server:
+        setattr(target_flow, field, getattr(source_flow, field))
+
+    for name, component in source_flow.components.items():
+        assert name in target_flow.components
+        _copy_server_fields(component, target_flow.components[name])
 
 
 def _add_if_nonempty(dic, key, value):
     if value is not None:
         dic[key] = value
 
-
-def _check_flow(flow):
-    # Import is not possible at the top of the file as this would cause an
-    # ImportError due to an import cycle.
-    import openml.flows.functions
-
-    flow_copy = openml.flows.functions.get_flow(flow.flow_id)
-    openml.flows.functions.assert_flows_equal(flow, flow_copy)

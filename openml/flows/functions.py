@@ -2,7 +2,7 @@ import xmltodict
 import six
 
 from openml._api_calls import _perform_api_call
-from . import OpenMLFlow, flow_to_sklearn
+from . import OpenMLFlow
 
 
 def get_flow(flow_id):
@@ -23,9 +23,6 @@ def get_flow(flow_id):
 
     flow_dict = xmltodict.parse(flow_xml)
     flow = OpenMLFlow._from_dict(flow_dict)
-
-    if 'sklearn' in flow.external_version:
-        flow.model = flow_to_sklearn(flow)
 
     return flow
 
@@ -144,8 +141,7 @@ def assert_flows_equal(flow1, flow2):
         raise TypeError('Argument 2 must be of type OpenMLFlow, but is %s' %
                         type(flow2))
 
-    generated_by_the_server = ['flow_id', 'uploader', 'version',
-                               'upload_date', ]
+    generated_by_the_server = ['flow_id', 'uploader', 'version', 'upload_date']
     ignored_by_python_API = ['binary_url', 'binary_format', 'binary_md5',
                              'model']
 
