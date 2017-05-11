@@ -1,22 +1,21 @@
 from collections import defaultdict
 import io
-import os
-import xmltodict
-import numpy as np
-import warnings
-import sklearn
-import time
-import six
 import json
+import os
+import sys
+import time
+import warnings
+
+import numpy as np
+import sklearn
+import six
+import xmltodict
 
 from ..exceptions import PyOpenMLError
 from .. import config
-
 from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs
 from ..setups import setup_exists, initialize_model
-
 from ..exceptions import OpenMLCacheException, OpenMLServerException
-from ..util import URLError, version_complies
 from .._api_calls import _perform_api_call, _file_id_to_url
 from .run import OpenMLRun, _get_version_information
 from .trace import OpenMLRunTrace, OpenMLTraceIteration
@@ -24,7 +23,6 @@ from .trace import OpenMLRunTrace, OpenMLTraceIteration
 
 # _get_version_info, _get_dict and _create_setup_string are in run.py to avoid
 # circular imports
-
 
 
 def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None, seed=None):
@@ -296,7 +294,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
     user_defined_measures = defaultdict(lambda: defaultdict(dict))
 
     rep_no = 0
-    can_measure_runtime = version_complies(3, 3) and _check_n_jobs(model)
+    can_measure_runtime = sys.version_info[:2] >= (3, 3) and _check_n_jobs(model)
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
     for rep in task.iterate_repeats():
@@ -447,14 +445,9 @@ def get_run(run_id):
 
     try:
         return _get_cached_run(run_id)
-    except (OpenMLCacheException):
-        try:
-            run_xml = _perform_api_call("run/%d" % run_id)
-        except (URLError, UnicodeEncodeError) as e:
-            # TODO logger.debug
-            print(e)
-            raise e
 
+    except (OpenMLCacheException):
+        run_xml = _perform_api_call("run/%d" % run_id)
         with io.open(run_file, "w", encoding='utf8') as fh:
             fh.write(run_xml)
 

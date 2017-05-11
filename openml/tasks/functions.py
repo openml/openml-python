@@ -4,7 +4,6 @@ import re
 from collections import OrderedDict
 import xmltodict
 
-from ..util import URLError
 from ..exceptions import OpenMLCacheException
 from .. import datasets
 from .task import OpenMLTask, _create_task_cache_dir
@@ -103,12 +102,11 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
 
     Returns
     -------
-    list
-        A list of all tasks having the given task_type_id and the give tag.
-        Every task is represented by a dictionary containing the following
-        information: task id, dataset id, task_type and status. If qualities
-        are calculated for the associated dataset, some of these are also
-        returned.
+    dict
+        All tasks having the given task_type_id and the give tag. Every task is
+        represented by a dictionary containing the following information:
+        task id, dataset id, task_type and status. If qualities are calculated
+        for the associated dataset, some of these are also returned.
     """
     api_call = "task/list"
     if task_type_id is not None:
@@ -146,7 +144,7 @@ def _list_tasks(api_call):
                          % str(tasks_dict))
 
     try:
-        tasks = dict();
+        tasks = dict()
         procs = _get_estimation_procedure_list()
         proc_dict = dict((x['id'], x) for x in procs)
         for task_ in tasks_dict['oml:tasks']['oml:task']:
@@ -199,13 +197,9 @@ def get_task(task_id):
     try:
         with io.open(xml_file, encoding='utf8') as fh:
             task = _create_task_from_xml(fh.read())
-    except (OSError, IOError):
 
-        try:
-            task_xml = _perform_api_call("task/%d" % task_id)
-        except (URLError, UnicodeEncodeError) as e:
-            print(e)
-            raise e
+    except (OSError, IOError):
+        task_xml = _perform_api_call("task/%d" % task_id)
 
         with io.open(xml_file, "w", encoding='utf8') as fh:
             fh.write(task_xml)

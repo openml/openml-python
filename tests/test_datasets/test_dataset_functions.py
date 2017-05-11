@@ -8,12 +8,12 @@ if sys.version_info[0] >= 3:
 else:
     import mock
 
+import six
 import scipy.sparse
 
 import openml
 from openml import OpenMLDataset
 from openml.exceptions import OpenMLCacheException, PyOpenMLError
-from openml.util import is_string
 from openml.testing import TestBase
 
 from openml.datasets.functions import (_get_cached_dataset,
@@ -98,7 +98,7 @@ class TestOpenMLDataset(TestBase):
             self.assertIn('did', dataset)
             self.assertIsInstance(dataset['did'], int)
             self.assertIn('status', dataset)
-            self.assertTrue(is_string(dataset['status']))
+            self.assertIsInstance(dataset['status'], six.string_types)
             self.assertIn(dataset['status'], ['in_preparation', 'active',
                                               'deactivated'])
 
