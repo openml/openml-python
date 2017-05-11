@@ -9,10 +9,12 @@ import openml._api_calls
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent
 
+from sklearn.model_selection._search import BaseSearchCV
 from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
 from sklearn.preprocessing.imputation import Imputer
 from sklearn.dummy import DummyClassifier
 from sklearn.preprocessing import StandardScaler
+from sklearn.feature_selection import VarianceThreshold
 from sklearn.linear_model import LogisticRegression, SGDClassifier, \
     LinearRegression
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
@@ -99,6 +101,9 @@ class TestRun(TestBase):
             #self.assertEquals(clf.get_params(), clf_prime.get_params())
             # self.assertEquals(clf, clf_prime)
 
+        downloaded = openml.runs.get_run(run_.run_id)
+        assert('openml-python' in downloaded.tags)
+
         return run
 
     def test_run_regression_on_classif_task(self):
@@ -120,54 +125,43 @@ class TestRun(TestBase):
         self.assertRaisesRegexp(ValueError, "Penalty term must be positive; got \(C='abc'\)",
                                 openml.runs.run_task, task=task, model=clf)
 
-    def test_run_diabetes(self):
-        task_id = 115
-        num_instances = 768
+    def test_run_and_upload(self):
+        task_id = 119 # diabates dataset
+        num_test_instances = 253 # 33% holdout task
+        num_folds = 1 # because of holdout
+        num_iterations = 5 # for base search classifiers
 
-        clf = LogisticRegression()
-        res = self._perform_run(task_id,num_instances, clf)
+        clfs = [LogisticRegression(),
+                Pipeline(steps=(('scaler', StandardScaler(with_mean=False)),
+                                ('dummy', DummyClassifier(strategy='prior')))),
+                Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+                                ('VarianceThreshold', VarianceThreshold()),
+                                ('Estimator', RandomizedSearchCV(DecisionTreeClassifier(),
+                                                                 {'min_samples_split': [2 ** x for x in
+                                                                                        range(1, 7 + 1)],
+                                                                  'min_samples_leaf': [2 ** x for x in
+                                                                                       range(0, 6 + 1)]},
+                                                                 cv=3, n_iter=10))]),
+                GridSearchCV(BaggingClassifier(base_estimator=SVC()),
+                             {"base_estimator__C": [0.01, 0.1, 10],
+                              "base_estimator__gamma": [0.01, 0.1, 10]}),
+                RandomizedSearchCV(RandomForestClassifier(n_estimators=5),
+                                   {"max_depth": [3, None],
+                                    "max_features": [1, 2, 3, 4],
+                                    "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                    "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                    "bootstrap": [True, False],
+                                    "criterion": ["gini", "entropy"]},
+                                    cv=StratifiedKFold(n_splits=2),
+                                    n_iter=num_iterations)
+        ]
 
-        downloaded = openml.runs.get_run(res.run_id)
-        assert('openml-python' in downloaded.tags)
-
-    def test_run_optimize_randomforest_diabetes(self):
-        task_id = 119
-        num_test_instances = 253
-        num_folds = 1
-        num_iterations = 5
-
-        clf = RandomForestClassifier(n_estimators=5)
-        param_dist = {"max_depth": [3, None],
-                      "max_features": [1,2,3,4],
-                      "min_samples_split": [2,3,4,5,6,7,8,9,10],
-                      "min_samples_leaf": [1,2,3,4,5,6,7,8,9,10],
-                      "bootstrap": [True, False],
-                      "criterion": ["gini", "entropy"]}
-        cv = StratifiedKFold(n_splits=3)
-        random_search = RandomizedSearchCV(clf, param_dist, cv=cv,
-                                           n_iter=num_iterations)
-
-        run = self._perform_run(task_id, num_test_instances, random_search)
-        self.assertEqual(len(run.trace_content), num_iterations * num_folds)
-
-        res = self._check_serialized_optimized_run(run.run_id)
-        self.assertTrue(res)
-
-    def test_run_optimize_bagging_diabetes(self):
-        task_id = 119
-        num_test_instances = 253
-        num_folds = 1
-        num_iterations = 9 # (num values for C times gamma)
-
-        bag = BaggingClassifier(base_estimator=SVC())
-        param_dist = {"base_estimator__C": [0.01, 0.1, 10],
-                      "base_estimator__gamma": [0.01, 0.1, 10]}
-        grid_search = GridSearchCV(bag, param_dist)
-
-        run = self._perform_run(task_id, num_test_instances, grid_search)
-        self.assertEqual(len(run.trace_content), num_iterations * num_folds)
-        res = self._check_serialized_optimized_run(run.run_id)
-        self.assertTrue(res)
+        for clf in clfs:
+            run = self._perform_run(task_id, num_test_instances, clf)
+            if isinstance(clf, BaseSearchCV):
+                self.assertEqual(len(run.trace_content), num_iterations * num_folds)
+                check_res = self._check_serialized_optimized_run(run.run_id)
+                self.assertTrue(check_res)
 
     def test_run_with_classifiers_in_param_grid(self):
         task = openml.tasks.get_task(115)
@@ -179,19 +173,6 @@ class TestRun(TestBase):
         clf = GridSearchCV(BaggingClassifier(), param_grid=param_grid)
         self.assertRaises(TypeError, openml.runs.run_task,
                           task=task, model=clf, avoid_duplicate_runs=False)
-
-    def test_run_pipeline(self):
-        task_id = 115
-        num_instances = 768
-        num_folds = 10
-        num_iterations = 9  # (num values for C times gamma)
-
-        scaler = StandardScaler(with_mean=False)
-        dummy = DummyClassifier(strategy='prior')
-        model = Pipeline(steps=(('scaler', scaler), ('dummy', dummy)))
-
-        run = self._perform_run(task_id, num_instances, model)
-        self.assertEqual(run.trace_content, None)
 
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(7)
