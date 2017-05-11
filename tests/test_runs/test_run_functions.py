@@ -159,7 +159,13 @@ class TestRun(TestBase):
         for clf in clfs:
             run = self._perform_run(task_id, num_test_instances, clf)
             if isinstance(clf, BaseSearchCV):
-                self.assertEqual(len(run.trace_content), num_iterations * num_folds)
+                if isinstance(clf, GridSearchCV):
+                    grid_iterations = 1
+                    for param in clf.param_grid:
+                        grid_iterations *= len(clf.param_grid[param])
+                    self.assertEqual(len(run.trace_content), grid_iterations * num_folds)
+                else:
+                    self.assertEqual(len(run.trace_content), num_iterations * num_folds)
                 check_res = self._check_serialized_optimized_run(run.run_id)
                 self.assertTrue(check_res)
 
