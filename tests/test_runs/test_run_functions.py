@@ -126,6 +126,12 @@ class TestRun(TestBase):
                                 openml.runs.run_task, task=task, model=clf)
 
     def test_run_and_upload(self):
+        # This unit test is ment to test the following functions, using a varity of flows:
+        # - openml.runs.run_task()
+        # - openml.runs.OpenMLRun.publish()
+        # - openml.runs.initialize_model()
+        # - [implicitly] openml.setups.initialize_model_from_setup()
+        # - openml.runs.initialize_model_from_trace()
         task_id = 119 # diabates dataset
         num_test_instances = 253 # 33% holdout task
         num_folds = 1 # because of holdout
