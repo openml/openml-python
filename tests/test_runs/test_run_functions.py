@@ -2,12 +2,15 @@ import sys
 import arff
 import time
 
+import numpy as np
+
 import openml
 import openml.exceptions
 import openml._api_calls
+import sklearn
 
 from openml.testing import TestBase
-from openml.runs.functions import _run_task_get_arffcontent
+from openml.runs.functions import _run_task_get_arffcontent, _get_seeded_model
 
 from sklearn.model_selection._search import BaseSearchCV
 from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
@@ -174,6 +177,39 @@ class TestRun(TestBase):
                     self.assertEqual(len(run.trace_content), num_iterations * num_folds)
                 check_res = self._check_serialized_optimized_run(run.run_id)
                 self.assertTrue(check_res)
+
+    def test_get_seeded_model(self):
+        randomized_clfs = [
+            BaggingClassifier(),
+            RandomizedSearchCV(RandomForestClassifier(),
+                               {"max_depth": [3, None],
+                                "max_features": [1, 2, 3, 4],
+                                "bootstrap": [True, False],
+                                "criterion": ["gini", "entropy"],
+                                "random_state" : [-1, 0, 1, 2]},
+                               ),
+            DummyClassifier()
+        ]
+
+        for clf in randomized_clfs:
+            const_probe = 42
+            clf_seeded = _get_seeded_model(clf, const_probe)
+            all_params = clf_seeded.get_params()
+            params = [key for key in all_params if key.endswith('random_state')]
+            self.assertGreater(len(params), 0)
+
+            for param in params:
+                self.assertTrue(isinstance(all_params[param], int))
+                self.assertIsNotNone(all_params[param])
+
+    def test_get_seeded_model_raises(self):
+        randomized_clfs = [
+            BaggingClassifier(random_state=np.random.RandomState(42)),
+            DummyClassifier(random_state="OpenMLIsGreat")
+        ]
+
+        for clf in randomized_clfs:
+            self.assertRaises(ValueError, _get_seeded_model, model=clf, seed=42)
 
     def test_run_with_classifiers_in_param_grid(self):
         task = openml.tasks.get_task(115)
