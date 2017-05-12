@@ -12,6 +12,7 @@ import sklearn
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent, _get_seeded_model
 
+from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
 from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
 from sklearn.preprocessing.imputation import Imputer
@@ -177,6 +178,29 @@ class TestRun(TestBase):
                     self.assertEqual(len(run.trace_content), num_iterations * num_folds)
                 check_res = self._check_serialized_optimized_run(run.run_id)
                 self.assertTrue(check_res)
+
+
+    def test_initialize_model_from_run(self):
+        clf = sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+                                               ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
+                                               ('Estimator', GaussianNB())])
+        task = openml.tasks.get_task(11)
+        run = openml.runs.run_task(task, clf, avoid_duplicate_runs=False)
+        run_ = run.publish()
+        run = openml.runs.get_run(run_.run_id)
+
+        modelR = openml.runs.initialize_model_from_run(run.run_id)
+        modelS = openml.setups.initialize_model(run.setup_id)
+
+        flowR = openml.flows.sklearn_to_flow(modelR)
+        flowS = openml.flows.sklearn_to_flow(modelS)
+        flowL = openml.flows.sklearn_to_flow(clf)
+        openml.flows.assert_flows_equal(flowR, flowL)
+        openml.flows.assert_flows_equal(flowS, flowL)
+
+        self.assertEquals(flowS.components['Imputer'].parameters['strategy'], '"median"')
+        self.assertEquals(flowS.components['VarianceThreshold'].parameters['threshold'], '0.05')
+        pass
 
 
     def test_get_seeded_model(self):
