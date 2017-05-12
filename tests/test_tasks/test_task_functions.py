@@ -1,12 +1,13 @@
 import os
 import sys
 
+import six
+
 if sys.version_info[0] >= 3:
     from unittest import mock
 else:
     import mock
 
-from openml.util import is_string
 from openml.testing import TestBase
 from openml import OpenMLSplit, OpenMLTask
 from openml.exceptions import OpenMLCacheException
@@ -45,7 +46,7 @@ class TestTask(TestBase):
         self.assertIn('did', task)
         self.assertIsInstance(task['did'], int)
         self.assertIn('status', task)
-        self.assertTrue(is_string(task['status']))
+        self.assertIsInstance(task['status'], six.string_types)
         self.assertIn(task['status'],
                       ['in_preparation', 'active', 'deactivated'])
 

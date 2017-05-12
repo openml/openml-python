@@ -1,9 +1,12 @@
 """
 Stores module level information like the API key, cache directory and the server.
 """
-import os
-import sys
 import logging
+import os
+
+from six import StringIO
+from six.moves import configparser
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -15,12 +18,7 @@ apikey = ""
 cachedir = ""
 
 
-if sys.version_info[0] < 3:
-    import ConfigParser as configparser
-    from StringIO import StringIO
-else:
-    import configparser
-    from io import StringIO
+
 
 
 def _setup():

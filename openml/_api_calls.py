@@ -1,8 +1,9 @@
 import io
 import os
 import requests
-import arff
 import warnings
+
+import arff
 import xmltodict
 
 from . import config
