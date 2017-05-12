@@ -82,7 +82,8 @@ def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None, seed=None):
     tags = ['openml-python', run_environment[1]]
     # execute the run
     run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model, tags=tags)
-    run.data_content, run.trace_content, run.trace_attributes = _run_task_get_arffcontent(model, task, class_labels)
+    res = _run_task_get_arffcontent(model, task, class_labels)
+    run.data_content, run.trace_content, run.trace_attributes, run.detailed_evaluations = res
 
     if flow_id == False:
         # means the flow did not exists. As we could run it, publish it now
@@ -372,7 +373,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
     else:
         arff_tracecontent = None
         arff_trace_attributes = None
-    return arff_datacontent, arff_tracecontent, arff_trace_attributes
+    return arff_datacontent, arff_tracecontent, arff_trace_attributes, user_defined_measures
 
 
 def _extract_arfftrace(model, rep_no, fold_no):

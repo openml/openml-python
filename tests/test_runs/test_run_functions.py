@@ -190,6 +190,9 @@ class TestRun(TestBase):
                     self.assertEqual(len(run.trace_content), num_iterations * num_folds)
                 check_res = self._check_serialized_optimized_run(run.run_id)
                 self.assertTrue(check_res)
+            
+            # todo: check if runtime is present
+            pass
 
 
     def test_initialize_model_from_run(self):
@@ -375,7 +378,7 @@ class TestRun(TestBase):
                         self.assertIsInstance(trace_list[line_idx][att_idx], float)
 
 
-        self.assertEqual(param_grid.keys(), optimized_params)
+        self.assertEqual(set(param_grid.keys()), optimized_params)
 
     def test__prediction_to_row(self):
         repeat_nr = 0
