@@ -276,10 +276,10 @@ def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label,
         arff_line : list
             representation of the current prediction in OpenML format
         """
-    if not isinstance(rep_no, int): raise ValueError('rep_no should be int')
-    if not isinstance(fold_no, int): raise ValueError('fold_no should be int')
-    if not isinstance(row_id, int): raise ValueError('row_id should be int')
-    if not len(predicted_probabilities) == len(class_labels):
+    if not isinstance(rep_no, (int, np.integer)): raise ValueError('rep_no should be int')
+    if not isinstance(fold_no, (int, np.integer)): raise ValueError('fold_no should be int')
+    if not isinstance(row_id, (int, np.integer)): raise ValueError('row_id should be int')
+    if not len(predicted_probabilities) == len(model_classes_mapping):
         raise ValueError('len(predicted_probabilities) != len(class_labels)')
 
     arff_line = [rep_no, fold_no, row_id]
