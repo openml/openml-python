@@ -14,7 +14,7 @@ import sklearn
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent, \
     _get_seeded_model, _run_exists, _extract_arfftrace, \
-    _extract_arfftrace_attributes
+    _extract_arfftrace_attributes, _prediction_to_row
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
@@ -283,7 +283,7 @@ class TestRun(TestBase):
             self.assertGreater(len(run_ids), 0)
 
 
-    def test_get_seeded_model(self):
+    def test__get_seeded_model(self):
         # randomized models that are initialized without seeds, can be seeded
         randomized_clfs = [
             BaggingClassifier(),
@@ -318,7 +318,7 @@ class TestRun(TestBase):
                 self.assertIsInstance(new_params[param], int)
                 self.assertIsNotNone(new_params[param])
 
-    def test_get_seeded_model_raises(self):
+    def test__get_seeded_model_raises(self):
         # the _get_seeded_model should raise exception if random_state is anything else than an int
         randomized_clfs = [
             BaggingClassifier(random_state=np.random.RandomState(42)),
@@ -377,6 +377,44 @@ class TestRun(TestBase):
 
         self.assertEqual(param_grid.keys(), optimized_params)
 
+    def test__prediction_to_row(self):
+        repeat_nr = 0
+        fold_nr = 0
+        clf = sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='mean')),
+                                               ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
+                                               ('Estimator', GaussianNB())])
+        task = openml.tasks.get_task(20)
+        train, test = task.get_train_test_split_indices(repeat_nr, fold_nr)
+        X, y = task.get_X_and_y()
+        clf.fit(X[train], y[train])
+
+        test_X = X[test]
+        test_y = y[test]
+
+        probaY = clf.predict_proba(test_X)
+        predY = clf.predict(test_X)
+        for idx in range(0, len(test_X)):
+            arff_line = _prediction_to_row(repeat_nr, fold_nr, idx,
+                                           task.class_labels[test_y[idx]],
+                                           predY[idx], probaY[idx], task.class_labels, clf.classes_)
+
+            self.assertIsInstance(arff_line, list)
+            self.assertEqual(len(arff_line), 5 + len(task.class_labels))
+            self.assertEqual(arff_line[0], repeat_nr)
+            self.assertEqual(arff_line[1], fold_nr)
+            self.assertEqual(arff_line[2], idx)
+            sum = 0.0
+            for att_idx in range(3, 3 + len(task.class_labels)):
+                self.assertIsInstance(arff_line[att_idx], float)
+                self.assertGreaterEqual(arff_line[att_idx], 0.0)
+                self.assertLessEqual(arff_line[att_idx], 1.0)
+                sum += arff_line[att_idx]
+            self.assertAlmostEqual(sum, 1.0)
+
+            self.assertIn(arff_line[-1], task.class_labels)
+            self.assertIn(arff_line[-2], task.class_labels)
+        pass
+    
 
     def test_run_with_classifiers_in_param_grid(self):
         task = openml.tasks.get_task(115)
