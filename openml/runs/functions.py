@@ -294,6 +294,8 @@ def _run_task_get_arffcontent(model, task, class_labels):
     user_defined_measures = defaultdict(lambda: defaultdict(dict))
 
     rep_no = 0
+    # sys.version_info returns a tuple, the following line compares the entry of tuples
+    # https://docs.python.org/3.6/reference/expressions.html#value-comparisons
     can_measure_runtime = sys.version_info[:2] >= (3, 3) and _check_n_jobs(model)
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
