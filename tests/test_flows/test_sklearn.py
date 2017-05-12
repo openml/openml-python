@@ -461,6 +461,8 @@ class TestSklearn(unittest.TestCase):
                                 sklearn_to_flow, gp)
 
     def test_error_on_adding_component_multiple_times_to_flow(self):
+        # this function implicitly checks
+        # - openml.flows._check_multiple_occurence_of_component_in_flow()
         pca = sklearn.decomposition.PCA()
         pca2 = sklearn.decomposition.PCA()
         pipeline = sklearn.pipeline.Pipeline((('pca1', pca), ('pca2', pca2)))

@@ -1,7 +1,8 @@
-import sys
 import arff
-import time
+import json
 import random
+import time
+import sys
 
 import numpy as np
 
@@ -12,7 +13,8 @@ import sklearn
 
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent, \
-    _get_seeded_model, _run_exists
+    _get_seeded_model, _run_exists, _extract_arfftrace, \
+    _extract_arfftrace_attributes
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
@@ -144,7 +146,7 @@ class TestRun(TestBase):
         # - openml.runs.run_task()
         # - openml.runs.OpenMLRun.publish()
         # - openml.runs.initialize_model()
-        # - [implicitly] openml.setups.initialize_model_from_setup()
+        # - [implicitly] openml.setups.initialize_model()
         # - openml.runs.initialize_model_from_trace()
         task_id = 119 # diabates dataset
         num_test_instances = 253 # 33% holdout task
@@ -325,6 +327,56 @@ class TestRun(TestBase):
 
         for clf in randomized_clfs:
             self.assertRaises(ValueError, _get_seeded_model, model=clf, seed=42)
+
+    def test__extract_arfftrace(self):
+        param_grid = {"max_depth": [3, None],
+                      "max_features": [1, 2, 3, 4],
+                      "bootstrap": [True, False],
+                      "criterion": ["gini", "entropy"]}
+        num_iters = 10
+        task = openml.tasks.get_task(20)
+        clf = RandomizedSearchCV(RandomForestClassifier(), param_grid, num_iters)
+        # just run the task
+        train, _ = task.get_train_test_split_indices(0, 0)
+        X, y = task.get_X_and_y()
+        clf.fit(X[train], y[train])
+
+        trace_attribute_list = _extract_arfftrace_attributes(clf)
+        trace_list = _extract_arfftrace(clf, 0, 0)
+        self.assertIsInstance(trace_attribute_list, list)
+        self.assertEquals(len(trace_attribute_list), 5 + len(param_grid))
+        self.assertIsInstance(trace_list, list)
+        self.assertEquals(len(trace_list), num_iters)
+
+        # found parameters
+        optimized_params = set()
+
+        for att_idx in range(len(trace_attribute_list)):
+            att_type = trace_attribute_list[att_idx][1]
+            att_name = trace_attribute_list[att_idx][0]
+            if att_name.startswith("parameter_"):
+                # add this to the found parameters
+                param_name = att_name[len("parameter_"):]
+                optimized_params.add(param_name)
+
+                for line_idx in range(len(trace_list)):
+                    val = json.loads(trace_list[line_idx][att_idx])
+                    legal_values = param_grid[param_name]
+                    self.assertIn(val, legal_values)
+            else:
+                # repeat, fold, itt, bool
+                for line_idx in range(len(trace_list)):
+                    val = trace_list[line_idx][att_idx]
+                    if isinstance(att_type, list):
+                        self.assertIn(val, att_type)
+                    elif att_name in ['repeat', 'fold', 'iteration']:
+                        self.assertIsInstance(trace_list[line_idx][att_idx], int)
+                    else: # att_type = real
+                        self.assertIsInstance(trace_list[line_idx][att_idx], float)
+
+
+        self.assertEqual(param_grid.keys(), optimized_params)
+
 
     def test_run_with_classifiers_in_param_grid(self):
         task = openml.tasks.get_task(115)
