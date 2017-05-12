@@ -322,12 +322,23 @@ def _run_task_get_arffcontent(model, task, class_labels):
                 # typically happens when training a regressor on classification task
                 raise PyOpenMLError(str(e))
             
-            # extract trace
+            # extract trace, if applicable
             if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
                 arff_tracecontent.extend(_extract_arfftrace(model_fold, rep_no, fold_no))
-                model_classes = model_fold.best_estimator_.classes_
+
+            # search for model classes_ (might differ depending on modeltype)
+            # first, pipelines are a special case (these don't have a classes_
+            # object, but rather borrows it from the last step. We do this manually,
+            # because of the BaseSearch check)
+            if isinstance(model_fold, sklearn.pipeline.Pipeline):
+                used_estimator = model_fold.steps[-1][-1]
             else:
-                model_classes = model_fold.classes_
+                used_estimator = model_fold
+
+            if isinstance(used_estimator, sklearn.model_selection._search.BaseSearchCV):
+                model_classes = used_estimator.best_estimator_.classes_
+            else:
+                model_classes = used_estimator.classes_
 
             if can_measure_runtime:
                 modelpredict_starttime = time.process_time()
