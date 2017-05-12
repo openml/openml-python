@@ -1,6 +1,7 @@
 import sys
 import arff
 import time
+import random
 
 import numpy as np
 
@@ -10,7 +11,8 @@ import openml._api_calls
 import sklearn
 
 from openml.testing import TestBase
-from openml.runs.functions import _run_task_get_arffcontent, _get_seeded_model
+from openml.runs.functions import _run_task_get_arffcontent, \
+    _get_seeded_model, _run_exists
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
@@ -35,6 +37,21 @@ else:
 
 class TestRun(TestBase):
 
+    def _wait_for_processed_run(self, run_id, max_waiting_time_seconds):
+        # it can take a while for a run to be processed on the OpenML (test) server
+        # however, sometimes it is good to wait (a bit) for this, to properly test
+        # a function. In this case, we wait for max_waiting_time_seconds on this
+        # to happen, probing the server every 10 seconds to speed up the process
+
+        # time.time() works in seconds
+        start_time = time.time()
+        while time.time() - start_time < max_waiting_time_seconds:
+            run = openml.runs.get_run(run_id)
+            if len(run.evaluations) > 0:
+                return
+            else:
+                time.sleep(10)
+
     def _check_serialized_optimized_run(self, run_id):
         run = openml.runs.get_run(run_id)
         task = openml.tasks.get_task(run.task_id)
@@ -48,15 +65,8 @@ class TestRun(TestBase):
         # downloads the best model based on the optimization trace
         # suboptimal (slow), and not guaranteed to work if evaluation
         # engine is behind. TODO: mock this? We have the arff already on the server
-        secCount = 0
-        while secCount < 70:
-            try:
-                model_prime = openml.runs.initialize_model_from_trace(run_id, 0, 0)
-                break
-            except openml.exceptions.OpenMLServerException:
-                # probably because openml eval engine has not executed this run yet
-                time.sleep(10)
-                secCount += 10
+        self._wait_for_processed_run(run_id, 80)
+        model_prime = openml.runs.initialize_model_from_trace(run_id, 0, 0)
 
         run_prime = openml.runs.run_task(task, model_prime, avoid_duplicate_runs=False)
         predictions_prime = run_prime._generate_arff_dict()
@@ -202,6 +212,46 @@ class TestRun(TestBase):
         self.assertEquals(flowS.components['VarianceThreshold'].parameters['threshold'], '0.05')
         pass
 
+    def test_get_run_trace(self):
+        # get_run_trace is already tested implicitly in test_run_and_publish
+        # this test is a bit additional.
+        num_iterations = 10
+        num_folds = 1
+        task_id = 119
+        run_id = None
+
+        task = openml.tasks.get_task(task_id)
+        # IMPORTANT! Do not sentinel this flow. is faster if we don't wait on openml server
+        clf = RandomizedSearchCV(RandomForestClassifier(random_state=42),
+                                 {"max_depth": [3, None],
+                                  "max_features": [1, 2, 3, 4],
+                                  "bootstrap": [True, False],
+                                  "criterion": ["gini", "entropy"]},
+                                 num_iterations, random_state=42)
+
+        # [START] for speeding up this unit test!
+        flow = openml.flows.sklearn_to_flow(clf)
+        flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
+        if flow_exists:
+            flow = openml.flows.get_flow(flow_exists)
+            setup_exists = openml.setups.setup_exists(flow, clf)
+            if setup_exists:
+                # receives a set of runids. These should all be the same.
+                run_id = random.choice(list(_run_exists(task_id, setup_exists)))
+        # [END] speeding up unit test
+
+        # ensure the run exists ...
+        if run_id is None:
+            print("Run not executed yet .. running random search on Random Forest")
+            # we can be strict about duplicate runs
+            run = openml.runs.run_task(task, clf, avoid_duplicate_runs=True)
+            run = run.publish()
+            self._wait_for_processed_run(run.run_id, 80)
+            run_id = run.run_id
+
+        # now the actual unit test ...
+        run_trace = openml.runs.get_run_trace(run_id)
+        self.assertEqual(len(run_trace.trace_iterations), num_iterations * num_folds)
 
     def test_get_seeded_model(self):
         # randomized models that are initialized without seeds, can be seeded
