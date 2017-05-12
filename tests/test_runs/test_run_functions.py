@@ -229,29 +229,57 @@ class TestRun(TestBase):
                                   "criterion": ["gini", "entropy"]},
                                  num_iterations, random_state=42)
 
-        # [START] for speeding up this unit test!
-        flow = openml.flows.sklearn_to_flow(clf)
-        flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
-        if flow_exists:
-            flow = openml.flows.get_flow(flow_exists)
-            setup_exists = openml.setups.setup_exists(flow, clf)
-            if setup_exists:
-                # receives a set of runids. These should all be the same.
-                run_id = random.choice(list(_run_exists(task_id, setup_exists)))
-        # [END] speeding up unit test
-
-        # ensure the run exists ...
-        if run_id is None:
-            print("Run not executed yet .. running random search on Random Forest")
-            # we can be strict about duplicate runs
+        # [SPEED] make unit test faster by exploiting run information from the past
+        try:
+            # in case the run did not exists yet
             run = openml.runs.run_task(task, clf, avoid_duplicate_runs=True)
             run = run.publish()
             self._wait_for_processed_run(run.run_id, 80)
             run_id = run.run_id
+        except openml.exceptions.PyOpenMLError:
+            # run was already
+            flow = openml.flows.sklearn_to_flow(clf)
+            flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
+            self.assertIsInstance(flow_exists, int)
+            downloaded_flow = openml.flows.get_flow(flow_exists)
+            setup_exists = openml.setups.setup_exists(downloaded_flow, clf)
+            self.assertIsInstance(setup_exists, int)
+            run_ids = _run_exists(task.task_id, setup_exists)
+            run_id = random.choice(list(run_ids))
 
         # now the actual unit test ...
         run_trace = openml.runs.get_run_trace(run_id)
         self.assertEqual(len(run_trace.trace_iterations), num_iterations * num_folds)
+
+    def test__run_exists(self):
+        # would be better to not sentinel these clfs ..
+        clfs = [sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='mean')),
+                                                ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
+                                                ('Estimator', GaussianNB())]),
+                sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='most_frequent')),
+                                                 ('VarianceThreshold', VarianceThreshold(threshold=0.1)),
+                                                 ('Estimator', DecisionTreeClassifier(max_depth=4))])]
+        task = openml.tasks.get_task(1)
+
+        for clf in clfs:
+            try:
+                # first populate the server with this run.
+                # skip run if it was already performed.
+                run = openml.runs.run_task(task, clf, avoid_duplicate_runs=True)
+                run.publish()
+            except openml.exceptions.PyOpenMLError:
+                # run already existed. Great.
+                pass
+
+            flow = openml.flows.sklearn_to_flow(clf)
+            flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
+            self.assertIsInstance(flow_exists, int)
+            downloaded_flow = openml.flows.get_flow(flow_exists)
+            setup_exists = openml.setups.setup_exists(downloaded_flow, clf)
+            self.assertIsInstance(setup_exists, int)
+            run_ids = _run_exists(task.task_id, setup_exists)
+            self.assertGreater(len(run_ids), 0)
+
 
     def test_get_seeded_model(self):
         # randomized models that are initialized without seeds, can be seeded
@@ -285,7 +313,7 @@ class TestRun(TestBase):
 
             # afterwards, param value is set
             for param in randstate_params:
-                self.assertTrue(isinstance(new_params[param], int))
+                self.assertIsInstance(new_params[param], int)
                 self.assertIsNotNone(new_params[param])
 
     def test_get_seeded_model_raises(self):
