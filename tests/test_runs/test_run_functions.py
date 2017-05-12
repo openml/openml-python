@@ -178,7 +178,9 @@ class TestRun(TestBase):
                 check_res = self._check_serialized_optimized_run(run.run_id)
                 self.assertTrue(check_res)
 
+
     def test_get_seeded_model(self):
+        # randomized models that are initialized without seeds, can be seeded
         randomized_clfs = [
             BaggingClassifier(),
             RandomizedSearchCV(RandomForestClassifier(),
@@ -193,16 +195,27 @@ class TestRun(TestBase):
 
         for clf in randomized_clfs:
             const_probe = 42
-            clf_seeded = _get_seeded_model(clf, const_probe)
-            all_params = clf_seeded.get_params()
+            all_params = clf.get_params()
             params = [key for key in all_params if key.endswith('random_state')]
             self.assertGreater(len(params), 0)
 
+            # before param value is None
             for param in params:
-                self.assertTrue(isinstance(all_params[param], int))
-                self.assertIsNotNone(all_params[param])
+                self.assertIsNone(all_params[param])
+
+            # now seed the params
+            clf_seeded = _get_seeded_model(clf, const_probe)
+            new_params = clf_seeded.get_params()
+
+            randstate_params = [key for key in new_params if key.endswith('random_state')]
+
+            # afterwards, param value is set
+            for param in randstate_params:
+                self.assertTrue(isinstance(new_params[param], int))
+                self.assertIsNotNone(new_params[param])
 
     def test_get_seeded_model_raises(self):
+        # the _get_seeded_model should raise exception if random_state is anything else than an int
         randomized_clfs = [
             BaggingClassifier(random_state=np.random.RandomState(42)),
             DummyClassifier(random_state="OpenMLIsGreat")
