@@ -190,7 +190,7 @@ class TestRun(TestBase):
                     self.assertEqual(len(run.trace_content), num_iterations * num_folds)
                 check_res = self._check_serialized_optimized_run(run.run_id)
                 self.assertTrue(check_res)
-            
+
             # todo: check if runtime is present
             pass
 
@@ -444,7 +444,7 @@ class TestRun(TestBase):
                                 clf, task, class_labels)
 
         clf = SGDClassifier(loss='log', random_state=1)
-        arff_datacontent, arff_tracecontent, _ = openml.runs.functions._run_task_get_arffcontent(
+        arff_datacontent, arff_tracecontent, _, _ = openml.runs.functions._run_task_get_arffcontent(
             clf, task, class_labels)
         # predictions
         self.assertIsInstance(arff_datacontent, list)
@@ -613,7 +613,7 @@ class TestRun(TestBase):
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content, _, _ = _run_task_get_arffcontent(model, task, class_labels)
+        data_content, _, _, _ = _run_task_get_arffcontent(model, task, class_labels)
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)
