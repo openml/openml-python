@@ -9,21 +9,11 @@ import arff
 
 import numpy as np
 import scipy.sparse
+from six.moves import cPickle as pickle
 import xmltodict
 
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
-
-if sys.version_info[0] >= 3:
-    import pickle
-else:
-    try:
-        import cPickle as pickle
-    except:
-        import pickle
-
-
-from ..util import is_string
 from .._api_calls import _perform_api_call
 
 logger = logging.getLogger(__name__)
@@ -219,7 +209,7 @@ class OpenMLDataset(object):
             if not self.row_id_attribute:
                 pass
             else:
-                if is_string(self.row_id_attribute):
+                if isinstance(self.row_id_attribute, six.string_types):
                     to_exclude.append(self.row_id_attribute)
                 else:
                     to_exclude.extend(self.row_id_attribute)
@@ -243,7 +233,7 @@ class OpenMLDataset(object):
         if target is None:
             rval.append(data)
         else:
-            if is_string(target):
+            if isinstance(target, six.string_types):
                 target = [target]
             targets = np.array([True if column in target else False
                                 for column in attribute_names])

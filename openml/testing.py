@@ -1,9 +1,10 @@
 import hashlib
 import inspect
 import os
-import time
 import shutil
+import time
 import unittest
+
 import openml
 
 

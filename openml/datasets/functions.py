@@ -1,9 +1,11 @@
+from collections import OrderedDict
 import io
 import os
 import re
 import shutil
-from collections import OrderedDict
+
 import xmltodict
+
 from .dataset import OpenMLDataset
 from ..exceptions import OpenMLCacheException
 from .. import config

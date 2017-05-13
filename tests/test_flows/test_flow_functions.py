@@ -2,8 +2,9 @@ from collections import OrderedDict
 import copy
 import unittest
 
+import six
+
 import openml
-from openml.util import is_string
 
 
 class TestFlowFunctions(unittest.TestCase):
@@ -11,12 +12,12 @@ class TestFlowFunctions(unittest.TestCase):
         self.assertEqual(type(flow), dict)
         self.assertEqual(len(flow), 6)
         self.assertIsInstance(flow['id'], int)
-        self.assertTrue(is_string(flow['name']))
-        self.assertTrue(is_string(flow['full_name']))
-        self.assertTrue(is_string(flow['version']))
+        self.assertIsInstance(flow['name'], six.string_types)
+        self.assertIsInstance(flow['full_name'], six.string_types)
+        self.assertIsInstance(flow['version'], six.string_types)
         # There are some runs on openml.org that can have an empty external
         # version
-        self.assertTrue(is_string(flow['external_version']) or
+        self.assertTrue(isinstance(flow['external_version'], six.string_types) or
                         flow['external_version'] is None)
 
     def test_list_flows(self):

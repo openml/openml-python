@@ -1,9 +1,10 @@
+from collections import OrderedDict
+
 import openml
 import xmltodict
-import copy
 
-from collections import OrderedDict
 from .setup import OpenMLSetup, OpenMLParameter
+
 
 def setup_exists(downloaded_flow, sklearn_model):
     '''
