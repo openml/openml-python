@@ -14,7 +14,7 @@ import sklearn
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent, \
     _get_seeded_model, _run_exists, _extract_arfftrace, \
-    _extract_arfftrace_attributes, _prediction_to_row
+    _extract_arfftrace_attributes, _prediction_to_row, _check_n_jobs
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
@@ -431,6 +431,7 @@ class TestRun(TestBase):
                           task=task, model=clf, avoid_duplicate_runs=False)
 
     def test__run_task_get_arffcontent(self):
+        timing_measures = {'usercpu_time_millis_testing', 'usercpu_time_millis_training', 'usercpu_time_millis'}
         task = openml.tasks.get_task(7)
         class_labels = task.class_labels
         num_instances = 3196
@@ -444,12 +445,28 @@ class TestRun(TestBase):
                                 clf, task, class_labels)
 
         clf = SGDClassifier(loss='log', random_state=1)
-        arff_datacontent, arff_tracecontent, _, _ = openml.runs.functions._run_task_get_arffcontent(
-            clf, task, class_labels)
+        res = openml.runs.functions._run_task_get_arffcontent(clf, task, class_labels)
+        arff_datacontent, arff_tracecontent, _, detailed_evaluations = res
         # predictions
         self.assertIsInstance(arff_datacontent, list)
         # trace. SGD does not produce any
         self.assertIsInstance(arff_tracecontent, type(None))
+
+        self.assertIsInstance(detailed_evaluations, dict)
+        if sys.version_info[:2] >= (3, 3): # check_n_jobs follows from the used clf:
+            self.assertEquals(set(detailed_evaluations.keys()), timing_measures)
+            for measure in timing_measures:
+                num_rep_entrees = len(detailed_evaluations[measure])
+                self.assertEquals(num_rep_entrees, num_repeats)
+                for rep in range(num_rep_entrees):
+                    num_fold_entrees = len(detailed_evaluations[measure][rep])
+                    self.assertEquals(num_fold_entrees, num_folds)
+                    for fold in range(num_fold_entrees):
+                        evaluation = detailed_evaluations[measure][rep][fold]
+                        self.assertIsInstance(evaluation, float)
+                        self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
+                        self.assertLess(evaluation, 60) # pessimistic
+
 
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
