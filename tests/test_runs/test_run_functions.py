@@ -122,6 +122,33 @@ class TestRun(TestBase):
 
         return run
 
+
+    def _check_detailed_evaluations(self, detailed_evaluations, num_repeats, num_folds):
+        '''
+        Checks whether the right timing measures are attached to the run (before upload).
+        Test is only performed for versions >= Python3.3
+
+        In case of check_n_jobs(clf) == false, please do not perform this check (check this
+        condition outside of this function. )
+        '''
+        timing_measures = {'usercpu_time_millis_testing', 'usercpu_time_millis_training', 'usercpu_time_millis'}
+
+        self.assertIsInstance(detailed_evaluations, dict)
+        if sys.version_info[:2] >= (3, 3):
+            self.assertEquals(set(detailed_evaluations.keys()), timing_measures)
+            for measure in timing_measures:
+                num_rep_entrees = len(detailed_evaluations[measure])
+                self.assertEquals(num_rep_entrees, num_repeats)
+                for rep in range(num_rep_entrees):
+                    num_fold_entrees = len(detailed_evaluations[measure][rep])
+                    self.assertEquals(num_fold_entrees, num_folds)
+                    for fold in range(num_fold_entrees):
+                        evaluation = detailed_evaluations[measure][rep][fold]
+                        self.assertIsInstance(evaluation, float)
+                        self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
+                        self.assertLess(evaluation, 360) # 5 minutes, pessimistic
+
+
     def test_run_regression_on_classif_task(self):
         task_id = 115
 
@@ -192,6 +219,7 @@ class TestRun(TestBase):
                 self.assertTrue(check_res)
 
             # todo: check if runtime is present
+            self._check_detailed_evaluations(run.detailed_evaluations, 1, num_folds)
             pass
 
 
@@ -223,7 +251,6 @@ class TestRun(TestBase):
         num_iterations = 10
         num_folds = 1
         task_id = 119
-        run_id = None
 
         task = openml.tasks.get_task(task_id)
         # IMPORTANT! Do not sentinel this flow. is faster if we don't wait on openml server
@@ -257,7 +284,9 @@ class TestRun(TestBase):
         self.assertEqual(len(run_trace.trace_iterations), num_iterations * num_folds)
 
     def test__run_exists(self):
-        # would be better to not sentinel these clfs ..
+        # would be better to not sentinel these clfs,
+        # so we do not have to perform the actual runs
+        # and can just check their status on line
         clfs = [sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='mean')),
                                                 ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
                                                 ('Estimator', GaussianNB())]),
@@ -431,7 +460,6 @@ class TestRun(TestBase):
                           task=task, model=clf, avoid_duplicate_runs=False)
 
     def test__run_task_get_arffcontent(self):
-        timing_measures = {'usercpu_time_millis_testing', 'usercpu_time_millis_training', 'usercpu_time_millis'}
         task = openml.tasks.get_task(7)
         class_labels = task.class_labels
         num_instances = 3196
@@ -452,21 +480,7 @@ class TestRun(TestBase):
         # trace. SGD does not produce any
         self.assertIsInstance(arff_tracecontent, type(None))
 
-        self.assertIsInstance(detailed_evaluations, dict)
-        if sys.version_info[:2] >= (3, 3): # check_n_jobs follows from the used clf:
-            self.assertEquals(set(detailed_evaluations.keys()), timing_measures)
-            for measure in timing_measures:
-                num_rep_entrees = len(detailed_evaluations[measure])
-                self.assertEquals(num_rep_entrees, num_repeats)
-                for rep in range(num_rep_entrees):
-                    num_fold_entrees = len(detailed_evaluations[measure][rep])
-                    self.assertEquals(num_fold_entrees, num_folds)
-                    for fold in range(num_fold_entrees):
-                        evaluation = detailed_evaluations[measure][rep][fold]
-                        self.assertIsInstance(evaluation, float)
-                        self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
-                        self.assertLess(evaluation, 60) # pessimistic
-
+        self._check_detailed_evaluations(detailed_evaluations, num_repeats, num_folds)
 
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
