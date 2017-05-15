@@ -75,7 +75,7 @@ class TestRun(TestBase):
         setup_id = openml.setups.setup_exists(flow, classif)
         self.assertEquals(setup_id, run.setup_id)
 
-    def test_setup_get(self):
+    def test_get_setup(self):
         # no setups in default test server
         openml.config.server = 'https://www.openml.org/api/v1/xml/'
 

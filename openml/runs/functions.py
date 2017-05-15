@@ -80,7 +80,8 @@ def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None, seed=None):
     tags = ['openml-python', run_environment[1]]
     # execute the run
     run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model, tags=tags)
-    run.data_content, run.trace_content, run.trace_attributes = _run_task_get_arffcontent(model, task, class_labels)
+    res = _run_task_get_arffcontent(model, task, class_labels)
+    run.data_content, run.trace_content, run.trace_attributes, run.detailed_evaluations = res
 
     if flow_id == False:
         # means the flow did not exists. As we could run it, publish it now
@@ -274,6 +275,12 @@ def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label,
         arff_line : list
             representation of the current prediction in OpenML format
         """
+    if not isinstance(rep_no, (int, np.integer)): raise ValueError('rep_no should be int')
+    if not isinstance(fold_no, (int, np.integer)): raise ValueError('fold_no should be int')
+    if not isinstance(row_id, (int, np.integer)): raise ValueError('row_id should be int')
+    if not len(predicted_probabilities) == len(model_classes_mapping):
+        raise ValueError('len(predicted_probabilities) != len(class_labels)')
+
     arff_line = [rep_no, fold_no, row_id]
     for class_label_idx in range(len(class_labels)):
         if class_label_idx in model_classes_mapping:
@@ -366,7 +373,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
     else:
         arff_tracecontent = None
         arff_trace_attributes = None
-    return arff_datacontent, arff_tracecontent, arff_trace_attributes
+    return arff_datacontent, arff_tracecontent, arff_trace_attributes, user_defined_measures
 
 
 def _extract_arfftrace(model, rep_no, fold_no):
