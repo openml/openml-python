@@ -123,13 +123,14 @@ class TestRun(TestBase):
         return run
 
 
-    def _check_detailed_evaluations(self, detailed_evaluations, num_repeats, num_folds):
+    def _check_detailed_evaluations(self, detailed_evaluations, num_repeats, num_folds, max_time_allowed=60000):
         '''
         Checks whether the right timing measures are attached to the run (before upload).
         Test is only performed for versions >= Python3.3
 
         In case of check_n_jobs(clf) == false, please do not perform this check (check this
         condition outside of this function. )
+        default max_time_allowed (per fold, in milli seconds) = 1 minute, quite pessimistic
         '''
         timing_measures = {'usercpu_time_millis_testing', 'usercpu_time_millis_training', 'usercpu_time_millis'}
 
@@ -146,7 +147,7 @@ class TestRun(TestBase):
                         evaluation = detailed_evaluations[measure][rep][fold]
                         self.assertIsInstance(evaluation, float)
                         self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
-                        self.assertLess(evaluation, 360) # 5 minutes, pessimistic
+                        self.assertLess(evaluation, max_time_allowed)
 
 
     def test_run_regression_on_classif_task(self):
