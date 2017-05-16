@@ -160,28 +160,24 @@ class OpenMLRun(object):
         return description_xml
 
     @staticmethod
-    def _parse_parameters(flow):
+    def _parse_parameters(flow, model=None):
         """Extracts all parameter settings from the model inside a flow in
         OpenML format.
 
         Parameters
         ----------
-        flow
+        flow : OpenMLFlow
             openml flow object (containing flow ids, i.e., it has to be downloaded from the server)
+
+        model : BaseEstimator, optional
+            If not given, the parameters are extracted from ``flow.model``.
 
         """
 
-        # Depth-first search to check if all components were uploaded to the
-        # server before parsing the parameters
-        stack = list()
-        stack.append(flow)
-        while len(stack) > 0:
-            current = stack.pop()
-            if current.flow_id is None:
-                raise ValueError("Flow %s has no flow_id!" % current.name)
-            else:
-                for component in current.components.values():
-                    stack.append(component)
+        if model is None:
+            model = flow.model
+
+        openml.flows.functions._check_flow_for_server_id(flow)
 
         def get_flow_dict(_flow):
             flow_map = {_flow.name: _flow.flow_id}
@@ -189,7 +185,8 @@ class OpenMLRun(object):
                 flow_map.update(get_flow_dict(_flow.components[subflow]))
             return flow_map
 
-        def extract_parameters(_flow, _flow_dict, _main_call=False, main_id=None):
+        def extract_parameters(_flow, _flow_dict, component_model,
+                               _main_call=False, main_id=None):
             # _flow is openml flow object, _param dict maps from flow name to flow id
             # for the main call, the param dict can be overridden (useful for unit tests / sentinels)
             # this way, for flows without subflows we do not have to rely on _flow_dict
@@ -198,7 +195,8 @@ class OpenMLRun(object):
                 _current = OrderedDict()
                 _current['oml:name'] = _param_name
 
-                _tmp = openml.flows.sklearn_to_flow(_flow.model.get_params()[_param_name])
+                _tmp = openml.flows.sklearn_to_flow(
+                    component_model.get_params()[_param_name])
 
                 # Try to filter out components which are handled further down!
                 if isinstance(_tmp, openml.flows.OpenMLFlow):
@@ -222,13 +220,17 @@ class OpenMLRun(object):
                 _params.append(_current)
 
             for _identifier in _flow.components:
-                _params.extend(extract_parameters(_flow.components[_identifier], _flow_dict))
+                subcomponent_model = component_model.get_params()[_identifier]
+                _params.extend(extract_parameters(_flow.components[_identifier],
+                                                  _flow_dict, subcomponent_model))
             return _params
 
         flow_dict = get_flow_dict(flow)
-        parameters = extract_parameters(flow, flow_dict, True, flow.flow_id)
+        parameters = extract_parameters(flow, flow_dict, model,
+                                        True, flow.flow_id)
 
         return parameters
+
 
 ################################################################################
 # Functions which cannot be in runs/functions due to circular imports

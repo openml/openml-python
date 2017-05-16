@@ -127,6 +127,22 @@ def _list_flows(api_call):
     return flows
 
 
+def _check_flow_for_server_id(flow):
+    """Check if the given flow and it's components have a flow_id."""
+
+    # Depth-first search to check if all components were uploaded to the
+    # server before parsing the parameters
+    stack = list()
+    stack.append(flow)
+    while len(stack) > 0:
+        current = stack.pop()
+        if current.flow_id is None:
+            raise ValueError("Flow %s has no flow_id!" % current.name)
+        else:
+            for component in current.components.values():
+                stack.append(component)
+
+
 def assert_flows_equal(flow1, flow2):
     """Check equality of two flows.
 

@@ -32,11 +32,6 @@ from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
     StratifiedKFold
 from sklearn.pipeline import Pipeline
 
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
-
 
 class TestRun(TestBase):
 
@@ -219,34 +214,50 @@ class TestRun(TestBase):
         num_folds = 1 # because of holdout
         num_iterations = 5 # for base search classifiers
 
-        clfs = [LogisticRegression(),
-                Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
-                                ('dummy', DummyClassifier(strategy='prior'))]),
-                Pipeline(steps=[('Imputer', Imputer(strategy='median')),
-                                ('VarianceThreshold', VarianceThreshold()),
-                                ('Estimator', RandomizedSearchCV(
-                                    DecisionTreeClassifier(),
-                                    {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
-                                     'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
-                                    cv=3, n_iter=10))]),
-                GridSearchCV(BaggingClassifier(base_estimator=SVC()),
-                             {"base_estimator__C": [0.01, 0.1, 10],
-                              "base_estimator__gamma": [0.01, 0.1, 10]}),
-                RandomizedSearchCV(RandomForestClassifier(n_estimators=5),
-                                   {"max_depth": [3, None],
-                                    "max_features": [1, 2, 3, 4],
-                                    "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
-                                    "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                                    "bootstrap": [True, False],
-                                    "criterion": ["gini", "entropy"]},
-                                    cv=StratifiedKFold(n_splits=2,
-                                                       random_state=1),
-                                    n_iter=num_iterations)]
+        clfs = []
+        random_state_values = []
 
+        lr = LogisticRegression()
+        clfs.append(lr)
+        random_state_values.append('62501')
+
+        pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
+                                    ('dummy', DummyClassifier(strategy='prior'))])
+        clfs.append(pipeline1)
+        random_state_values.append('62501')
+
+        pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+                                    ('VarianceThreshold', VarianceThreshold()),
+                                    ('Estimator', RandomizedSearchCV(
+                                        DecisionTreeClassifier(),
+                                        {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
+                                         'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
+                                        cv=3, n_iter=10))])
+        clfs.append(pipeline2)
+        random_state_values.append('62501')
+
+        gridsearch = GridSearchCV(BaggingClassifier(base_estimator=SVC()),
+                                  {"base_estimator__C": [0.01, 0.1, 10],
+                                   "base_estimator__gamma": [0.01, 0.1, 10]})
+        clfs.append(gridsearch)
+        random_state_values.append('62501')
+
+        randomsearch = RandomizedSearchCV(
+            RandomForestClassifier(n_estimators=5),
+            {"max_depth": [3, None],
+             "max_features": [1, 2, 3, 4],
+             "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
+             "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+             "bootstrap": [True, False],
+             "criterion": ["gini", "entropy"]},
+            cv=StratifiedKFold(n_splits=2, random_state=1),
+            n_iter=num_iterations)
+
+        clfs.append(randomsearch)
         # The random states for the RandomizedSearchCV is set after the
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
-        random_state_values = ['62501'] * (len(clfs) - 1) + ['33003']
+        random_state_values.append('33003')
 
         for clf, rsv in zip(clfs, random_state_values):
             run = self._perform_run(task_id, num_test_instances, clf,
@@ -333,11 +344,10 @@ class TestRun(TestBase):
         # and can just check their status on line
         clfs = [sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='mean')),
                                                 ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
-                                                ('Estimator', GaussianNB())]),
+                                                ('Estimator', DecisionTreeClassifier(max_depth=4))]),
                 sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='most_frequent')),
                                                  ('VarianceThreshold', VarianceThreshold(threshold=0.1)),
                                                  ('Estimator', DecisionTreeClassifier(max_depth=4))])]
-
 
         task = openml.tasks.get_task(115)
 
@@ -347,18 +357,18 @@ class TestRun(TestBase):
                 # skip run if it was already performed.
                 run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=True)
                 run.publish()
-            except openml.exceptions.PyOpenMLError:
+            except openml.exceptions.PyOpenMLError as e:
                 # run already existed. Great.
                 pass
 
             flow = openml.flows.sklearn_to_flow(clf)
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
-            self.assertIsInstance(flow_exists, int)
+            self.assertGreater(flow_exists, 0)
             downloaded_flow = openml.flows.get_flow(flow_exists)
-            setup_exists = openml.setups.setup_exists(downloaded_flow)
-            self.assertIsInstance(setup_exists, int)
+            setup_exists = openml.setups.setup_exists(downloaded_flow, clf)
+            self.assertGreater(setup_exists, 0)
             run_ids = _run_exists(task.task_id, setup_exists)
-            self.assertGreater(len(run_ids), 0)
+            self.assertTrue(run_ids, msg=(run_ids, clf))
 
     def test__get_seeded_model(self):
         # randomized models that are initialized without seeds, can be seeded
