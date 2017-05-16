@@ -99,13 +99,12 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
     run_environment = _get_version_information()
     tags = ['openml-python', run_environment[1]]
     # execute the run
-    run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id,
-                    model=flow.model, tags=tags)
+    run = OpenMLRun(task_id=task.task_id, flow_id=flow.flow_id,
+                    dataset_id=dataset.dataset_id, model=flow.model, tags=tags)
     run.parameter_settings = OpenMLRun._parse_parameters(flow)
     res = _run_task_get_arffcontent(flow.model, task, class_labels)
     run.data_content, run.trace_content, run.trace_attributes, run.detailed_evaluations = res
 
-    run.flow_id = flow.flow_id
     config.logger.info('Executed Task %d with Flow id: %d' % (task.task_id, run.flow_id))
 
     return run

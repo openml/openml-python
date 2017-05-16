@@ -324,7 +324,7 @@ class OpenMLFlow(object):
         arguments['model'] = None
         flow = cls(**arguments)
 
-        if 'sklearn' in arguments['external_version']:
+        if arguments['external_version'].startswith('sklearn'):
             from .sklearn_converter import flow_to_sklearn
             model = flow_to_sklearn(flow)
         else:
