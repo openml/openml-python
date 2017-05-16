@@ -7,7 +7,7 @@ import time
 import warnings
 
 import numpy as np
-import sklearn
+import sklearn.pipeline
 import six
 import xmltodict
 

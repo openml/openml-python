@@ -34,9 +34,7 @@ def setup_exists(flow, model=None):
     if model is None:
         model = flow.model
     else:
-        converted_flow = sklearn_to_flow(model)
-        exists = flow_exists(converted_flow.name,
-                             converted_flow.external_version)
+        exists = flow_exists(flow.name, flow.external_version)
         if exists != flow.flow_id:
             raise ValueError('This should not happen!')
 
