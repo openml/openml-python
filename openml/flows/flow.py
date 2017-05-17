@@ -349,15 +349,15 @@ class OpenMLFlow(object):
         return_value = _perform_api_call("flow/", file_elements=file_elements)
         flow_id = int(xmltodict.parse(return_value)['oml:upload_flow']['oml:id'])
         flow = openml.flows.functions.get_flow(flow_id)
+        _copy_server_fields(flow, self)
         try:
-            openml.flows.functions.assert_flows_equal(self, flow)
+            openml.flows.functions.assert_flows_equal(self, flow, flow.upload_date)
         except ValueError as e:
             message = e.args[0]
             raise ValueError("Flow was not stored correctly on the server. "
                              "New flow ID is %d. Please check manually and "
                              "remove the flow if necessary! Error is:\n'%s'" %
                              (flow_id, message))
-        _copy_server_fields(flow, self)
         return self
 
 

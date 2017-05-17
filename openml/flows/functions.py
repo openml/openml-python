@@ -1,3 +1,5 @@
+import dateutil.parser
+
 import xmltodict
 import six
 
@@ -143,11 +145,21 @@ def _check_flow_for_server_id(flow):
                 stack.append(component)
 
 
-def assert_flows_equal(flow1, flow2):
+def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None):
     """Check equality of two flows.
 
     Two flows are equal if their all keys which are not set by the server
     are equal, as well as all their parameters and components.
+
+    Parameters
+    ----------
+    flow1 : OpenMLFlow
+
+    flow2 : OpenMLFlow
+
+    ignore_parameters_on_older_children : str
+        If set to ``OpenMLFlow.upload_date``, ignores parameters in a child
+        flow if it's upload date predates the upload date of the parent flow.
     """
     if not isinstance(flow1, OpenMLFlow):
         raise TypeError('Argument 1 must be of type OpenMLFlow, but is %s' %
@@ -157,6 +169,8 @@ def assert_flows_equal(flow1, flow2):
         raise TypeError('Argument 2 must be of type OpenMLFlow, but is %s' %
                         type(flow2))
 
+    # TODO as they are actually now saved during publish, it might be good to
+    # check for the equality of these as well.
     generated_by_the_server = ['flow_id', 'uploader', 'version', 'upload_date']
     ignored_by_python_API = ['binary_url', 'binary_format', 'binary_md5',
                              'model']
@@ -174,9 +188,18 @@ def assert_flows_equal(flow1, flow2):
                 if not name in attr2:
                     raise ValueError('Component %s only available in '
                                      'argument2, but not in argument1.' % name)
-                assert_flows_equal(attr1[name], attr2[name])
+                assert_flows_equal(attr1[name], attr2[name], ignore_parameters_on_older_children)
 
         else:
+            if key == 'parameters':
+                if ignore_parameters_on_older_children:
+                    upload_date_current_flow = dateutil.parser.parse(
+                        flow1.upload_date)
+                    upload_date_parent_flow = dateutil.parser.parse(
+                        ignore_parameters_on_older_children)
+                    if upload_date_current_flow < upload_date_parent_flow:
+                        continue
+
             if attr1 != attr2:
                 raise ValueError("Flow %s: values for attribute '%s' differ: "
                                  "'%s' vs '%s'." %

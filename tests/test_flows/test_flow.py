@@ -28,6 +28,7 @@ from openml.testing import TestBase
 from openml._api_calls import _perform_api_call
 import openml
 from openml.flows.sklearn_converter import _format_external_version
+import openml.exceptions
 
 
 class TestFlow(TestBase):
@@ -119,6 +120,50 @@ class TestFlow(TestBase):
 
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)
+
+    def test_publish_existing_flow(self):
+        clf = sklearn.tree.DecisionTreeClassifier(max_depth=2)
+        flow = openml.flows.sklearn_to_flow(clf)
+        flow, _ = self._add_sentinel_to_flow_name(flow, None)
+        flow.publish()
+        self.assertRaisesRegexp(openml.exceptions.OpenMLServerException,
+                                'flow already exists', flow.publish)
+
+    def test_publish_flow_with_similar_components(self):
+        clf = sklearn.ensemble.VotingClassifier(
+            [('lr', sklearn.linear_model.LogisticRegression())])
+        flow = openml.flows.sklearn_to_flow(clf)
+        flow, _ = self._add_sentinel_to_flow_name(flow, None)
+        flow.publish()
+        # For a flow where both components are published together, the upload
+        # date should be equal
+        self.assertEqual(flow.upload_date,
+                         flow.components['lr'].upload_date,
+                         (flow.name, flow.flow_id,
+                          flow.components['lr'].name, flow.components['lr'].flow_id))
+
+        clf1 = sklearn.tree.DecisionTreeClassifier(max_depth=2)
+        flow1 = openml.flows.sklearn_to_flow(clf1)
+        flow1, sentinel = self._add_sentinel_to_flow_name(flow1, None)
+        flow1.publish()
+
+        clf2 = sklearn.ensemble.VotingClassifier(
+            [('dt', sklearn.tree.DecisionTreeClassifier(max_depth=2))])
+        flow2 = openml.flows.sklearn_to_flow(clf2)
+        flow2, _ = self._add_sentinel_to_flow_name(flow2, sentinel)
+        flow2.publish()
+        # If one component was published before the other, the components in
+        # the flow should have different upload dates
+        self.assertNotEqual(flow2.upload_date,
+                            flow2.components['dt'].upload_date)
+
+        clf3 = sklearn.ensemble.AdaBoostClassifier(
+            sklearn.tree.DecisionTreeClassifier(max_depth=3))
+        flow3 = openml.flows.sklearn_to_flow(clf3)
+        flow3, _ = self._add_sentinel_to_flow_name(flow3, sentinel)
+        # Child flow has different parameter. Check for storing the flow
+        # correctly on the server should thus not check the child's parameters!
+        flow3.publish()
 
     def test_semi_legal_flow(self):
         # TODO: Test if parameters are set correctly!
