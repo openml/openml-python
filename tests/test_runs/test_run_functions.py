@@ -180,6 +180,17 @@ class TestRun(TestBase):
                         self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
                         self.assertLess(evaluation, max_time_allowed)
 
+    def test_avoid_duplicate_runs_with_unpublished_flow(self):
+        task_id = 115
+
+        clf = LogisticRegression()
+        flow = sklearn_to_flow(clf)
+        flow, _ = self._add_sentinel_to_flow_name(flow, None)
+        task = openml.tasks.get_task(task_id)
+
+        self.assertRaisesRegexp(ValueError, 'Cannot check if a run exists if the corresponding flow has not been published yet!',
+                                openml.runs.run_flow_on_task, task=task,
+                                flow=flow, avoid_duplicate_runs=True)
 
     def test_run_regression_on_classif_task(self):
         task_id = 115
@@ -201,6 +212,21 @@ class TestRun(TestBase):
                                 "\(C=u?'abc'\)",
                                 openml.runs.run_model_on_task, task=task,
                                 model=clf)
+
+    def test__publish_flow_if_necessary(self):
+        task_id = 115
+        task = openml.tasks.get_task(task_id)
+
+        clf = LogisticRegression()
+        flow = sklearn_to_flow(clf)
+        flow, sentinel = self._add_sentinel_to_flow_name(flow, None)
+        openml.runs.functions._publish_flow_if_necessary(flow)
+        self.assertIsNotNone(flow.flow_id)
+
+        flow2 = sklearn_to_flow(clf)
+        flow2, _ = self._add_sentinel_to_flow_name(flow2, sentinel)
+        openml.runs.functions._publish_flow_if_necessary(flow2)
+        self.assertEqual(flow2.flow_id, flow.flow_id)
 
     def test_run_and_upload(self):
         # This unit test is ment to test the following functions, using a varity of flows:
@@ -276,7 +302,6 @@ class TestRun(TestBase):
             # todo: check if runtime is present
             self._check_detailed_evaluations(run.detailed_evaluations, 1, num_folds)
             pass
-
 
     def test_initialize_model_from_run(self):
         clf = sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='median')),

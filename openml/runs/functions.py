@@ -11,6 +11,7 @@ import sklearn.pipeline
 import six
 import xmltodict
 
+import openml
 from ..exceptions import PyOpenMLError
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
@@ -29,20 +30,6 @@ from .trace import OpenMLRunTrace, OpenMLTraceIteration
 def run_model_on_task(task, model, avoid_duplicate_runs=True, flow_tags=None,
                       seed=None):
     flow = sklearn_to_flow(model)
-
-    # returns flow id if the flow exists on the server, False otherwise
-    flow_id = flow_exists(flow.name, flow.external_version)
-
-    if flow_id == False:
-        # TODO this is potential race condition! someone could upload the
-        # same flow in the meantime!
-        # means the flow did not exists. As we could run it, publish it now
-        flow = flow.publish()
-    else:
-        # flow already existed, download it from server
-        # TODO (neccessary? is this a post condition of this function)
-        flow_from_server = get_flow(flow_id)
-        _copy_server_fields(flow_from_server, flow)
 
     return run_flow_on_task(task=task, flow=flow,
                             avoid_duplicate_runs=avoid_duplicate_runs,
@@ -82,6 +69,9 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
     # skips the run if it already exists and the user opts for this in the config file.
     # also, if the flow is not present on the server, the check is not needed.
     if avoid_duplicate_runs:
+        if flow.flow_id is None:
+            raise ValueError('Cannot check if a run exists if the '
+                             'corresponding flow has not been published yet!')
         flow_from_server = get_flow(flow.flow_id)
         setup_id = setup_exists(flow_from_server)
         ids = _run_exists(task.task_id, setup_id)
@@ -98,16 +88,41 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
 
     run_environment = _get_version_information()
     tags = ['openml-python', run_environment[1]]
+
     # execute the run
+    res = _run_task_get_arffcontent(flow.model, task, class_labels)
+
+    if flow.flow_id is None:
+        _publish_flow_if_necessary(flow)
+
     run = OpenMLRun(task_id=task.task_id, flow_id=flow.flow_id,
                     dataset_id=dataset.dataset_id, model=flow.model, tags=tags)
     run.parameter_settings = OpenMLRun._parse_parameters(flow)
-    res = _run_task_get_arffcontent(flow.model, task, class_labels)
+
     run.data_content, run.trace_content, run.trace_attributes, run.detailed_evaluations = res
 
     config.logger.info('Executed Task %d with Flow id: %d' % (task.task_id, run.flow_id))
 
     return run
+
+
+def _publish_flow_if_necessary(flow):
+    # try publishing the flow if one has to assume it doesn't exist yet. It
+    # might fail because it already exists, then the flow is currently not
+    # reused
+
+        try:
+            flow.publish()
+        except OpenMLServerException as e:
+            if e.message == "flow already exists":
+                flow_id = openml.flows.flow_exists(flow.name,
+                                                   flow.external_version)
+                server_flow = get_flow(flow_id)
+                openml.flows.flow._copy_server_fields(server_flow, flow)
+                openml.flows.assert_flows_equal(flow, server_flow,
+                                                ignore_parameters=True)
+            else:
+                raise e
 
 
 def get_run_trace(run_id):

@@ -145,7 +145,8 @@ def _check_flow_for_server_id(flow):
                 stack.append(component)
 
 
-def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None):
+def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None,
+                       ignore_parameters=False):
     """Check equality of two flows.
 
     Two flows are equal if their all keys which are not set by the server
@@ -160,6 +161,9 @@ def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None):
     ignore_parameters_on_older_children : str
         If set to ``OpenMLFlow.upload_date``, ignores parameters in a child
         flow if it's upload date predates the upload date of the parent flow.
+
+    ignore_parameters : bool
+        Whether to ignore parameter values when comparing flows.
     """
     if not isinstance(flow1, OpenMLFlow):
         raise TypeError('Argument 1 must be of type OpenMLFlow, but is %s' %
@@ -199,6 +203,8 @@ def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None):
                         ignore_parameters_on_older_children)
                     if upload_date_current_flow < upload_date_parent_flow:
                         continue
+                elif ignore_parameters:
+                    continue
 
             if attr1 != attr2:
                 raise ValueError("Flow %s: values for attribute '%s' differ: "
