@@ -7,16 +7,18 @@ import time
 import warnings
 
 import numpy as np
-import sklearn
+import sklearn.pipeline
 import six
 import xmltodict
 
+import openml
 from ..exceptions import PyOpenMLError
 from .. import config
-from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs
+from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
+    _copy_server_fields
 from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException
-from .._api_calls import _perform_api_call, _file_id_to_url
+from .._api_calls import _perform_api_call
 from .run import OpenMLRun, _get_version_information
 from .trace import OpenMLRunTrace, OpenMLTraceIteration
 
@@ -25,24 +27,42 @@ from .trace import OpenMLRunTrace, OpenMLTraceIteration
 # circular imports
 
 
-def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None, seed=None):
-    """Performs a CV run on the dataset of the given task, using the split.
+def run_model_on_task(task, model, avoid_duplicate_runs=True, flow_tags=None,
+                      seed=None):
+    """See ``run_flow_on_task for a documentation."""
+
+    flow = sklearn_to_flow(model)
+
+    return run_flow_on_task(task=task, flow=flow,
+                            avoid_duplicate_runs=avoid_duplicate_runs,
+                            flow_tags=flow_tags, seed=seed)
+
+
+def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
+                     seed=None):
+    """Run the model provided by the flow on the dataset defined by task.
+
+    Takes the flow and repeat information into account. In case a flow is not
+    yet published, it is published after executing the run (requires
+    internet connection).
 
     Parameters
     ----------
     task : OpenMLTask
         Task to perform.
     model : sklearn model
-        a model which has a function fit(X,Y) and predict(X),
+        A model which has a function fit(X,Y) and predict(X),
         all supervised estimators of scikit learn follow this definition of a model [1]
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
     avoid_duplicate_runs : bool
-        if this flag is set to True, the run will throw an error if the
-        setup/task combination is already present on the server.
+        If this flag is set to True, the run will throw an error if the
+        setup/task combination is already present on the server. Works only
+        if the flow is already published on the server. This feature requires an
+        internet connection.
     flow_tags : list(str)
-        a list of tags that the flow should have at creation
+        A list of tags that the flow should have at creation.
     seed: int
-        the models that are not seeded will get this seed
+        Models that are not seeded will get this seed.
 
     Returns
     -------
@@ -51,23 +71,19 @@ def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None, seed=None):
     """
     if flow_tags is not None and not isinstance(flow_tags, list):
         raise ValueError("flow_tags should be list")
-    # TODO move this into its onwn module. While it somehow belongs here, it
-    # adds quite a lot of functionality which is better suited in other places!
-    # TODO why doesn't this accept a flow as input? - this would make this more flexible!
-    model = _get_seeded_model(model, seed)
-    flow = sklearn_to_flow(model)
 
-    # returns flow id if the flow exists on the server, False otherwise
-    flow_id = flow_exists(flow.name, flow.external_version)
+    flow.model = _get_seeded_model(flow.model, seed=seed)
 
     # skips the run if it already exists and the user opts for this in the config file.
     # also, if the flow is not present on the server, the check is not needed.
+    flow_id = flow_exists(flow.name, flow.external_version)
     if avoid_duplicate_runs and flow_id:
-        flow = get_flow(flow_id)
-        setup_id = setup_exists(flow, model)
+        flow_from_server = get_flow(flow_id)
+        setup_id = setup_exists(flow_from_server)
         ids = _run_exists(task.task_id, setup_id)
         if ids:
             raise PyOpenMLError("Run already exists in server. Run id(s): %s" %str(ids))
+        _copy_server_fields(flow_from_server, flow)
 
     dataset = task.get_dataset()
 
@@ -78,23 +94,41 @@ def run_task(task, model, avoid_duplicate_runs=True, flow_tags=None, seed=None):
 
     run_environment = _get_version_information()
     tags = ['openml-python', run_environment[1]]
+
     # execute the run
-    run = OpenMLRun(task_id=task.task_id, flow_id=None, dataset_id=dataset.dataset_id, model=model, tags=tags)
-    res = _run_task_get_arffcontent(model, task, class_labels)
+    res = _run_task_get_arffcontent(flow.model, task, class_labels)
+
+    if flow.flow_id is None:
+        _publish_flow_if_necessary(flow)
+
+    run = OpenMLRun(task_id=task.task_id, flow_id=flow.flow_id,
+                    dataset_id=dataset.dataset_id, model=flow.model, tags=tags)
+    run.parameter_settings = OpenMLRun._parse_parameters(flow)
+
     run.data_content, run.trace_content, run.trace_attributes, run.detailed_evaluations = res
 
-    if flow_id == False:
-        # means the flow did not exists. As we could run it, publish it now
-        flow = flow.publish()
-    else:
-        # flow already existed, download it from server
-        # TODO (neccessary? is this a post condition of this function)
-        flow = get_flow(flow_id)
-
-    run.flow_id = flow.flow_id
     config.logger.info('Executed Task %d with Flow id: %d' % (task.task_id, run.flow_id))
 
     return run
+
+
+def _publish_flow_if_necessary(flow):
+    # try publishing the flow if one has to assume it doesn't exist yet. It
+    # might fail because it already exists, then the flow is currently not
+    # reused
+
+        try:
+            flow.publish()
+        except OpenMLServerException as e:
+            if e.message == "flow already exists":
+                flow_id = openml.flows.flow_exists(flow.name,
+                                                   flow.external_version)
+                server_flow = get_flow(flow_id)
+                openml.flows.flow._copy_server_fields(server_flow, flow)
+                openml.flows.assert_flows_equal(flow, server_flow,
+                                                ignore_parameters=True)
+            else:
+                raise e
 
 
 def get_run_trace(run_id):

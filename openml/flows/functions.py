@@ -1,8 +1,10 @@
+import dateutil.parser
+
 import xmltodict
 import six
 
 from openml._api_calls import _perform_api_call
-from . import OpenMLFlow, flow_to_sklearn
+from . import OpenMLFlow
 
 
 def get_flow(flow_id):
@@ -23,9 +25,6 @@ def get_flow(flow_id):
 
     flow_dict = xmltodict.parse(flow_xml)
     flow = OpenMLFlow._from_dict(flow_dict)
-
-    if 'sklearn' in flow.external_version:
-        flow.model = flow_to_sklearn(flow)
 
     return flow
 
@@ -130,11 +129,41 @@ def _list_flows(api_call):
     return flows
 
 
-def assert_flows_equal(flow1, flow2):
+def _check_flow_for_server_id(flow):
+    """Check if the given flow and it's components have a flow_id."""
+
+    # Depth-first search to check if all components were uploaded to the
+    # server before parsing the parameters
+    stack = list()
+    stack.append(flow)
+    while len(stack) > 0:
+        current = stack.pop()
+        if current.flow_id is None:
+            raise ValueError("Flow %s has no flow_id!" % current.name)
+        else:
+            for component in current.components.values():
+                stack.append(component)
+
+
+def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None,
+                       ignore_parameters=False):
     """Check equality of two flows.
 
     Two flows are equal if their all keys which are not set by the server
     are equal, as well as all their parameters and components.
+
+    Parameters
+    ----------
+    flow1 : OpenMLFlow
+
+    flow2 : OpenMLFlow
+
+    ignore_parameters_on_older_children : str
+        If set to ``OpenMLFlow.upload_date``, ignores parameters in a child
+        flow if it's upload date predates the upload date of the parent flow.
+
+    ignore_parameters : bool
+        Whether to ignore parameter values when comparing flows.
     """
     if not isinstance(flow1, OpenMLFlow):
         raise TypeError('Argument 1 must be of type OpenMLFlow, but is %s' %
@@ -144,8 +173,9 @@ def assert_flows_equal(flow1, flow2):
         raise TypeError('Argument 2 must be of type OpenMLFlow, but is %s' %
                         type(flow2))
 
-    generated_by_the_server = ['flow_id', 'uploader', 'version',
-                               'upload_date', ]
+    # TODO as they are actually now saved during publish, it might be good to
+    # check for the equality of these as well.
+    generated_by_the_server = ['flow_id', 'uploader', 'version', 'upload_date']
     ignored_by_python_API = ['binary_url', 'binary_format', 'binary_md5',
                              'model']
 
@@ -162,9 +192,22 @@ def assert_flows_equal(flow1, flow2):
                 if not name in attr2:
                     raise ValueError('Component %s only available in '
                                      'argument2, but not in argument1.' % name)
-                assert_flows_equal(attr1[name], attr2[name])
+                assert_flows_equal(attr1[name], attr2[name],
+                                   ignore_parameters_on_older_children,
+                                   ignore_parameters)
 
         else:
+            if key == 'parameters':
+                if ignore_parameters_on_older_children:
+                    upload_date_current_flow = dateutil.parser.parse(
+                        flow1.upload_date)
+                    upload_date_parent_flow = dateutil.parser.parse(
+                        ignore_parameters_on_older_children)
+                    if upload_date_current_flow < upload_date_parent_flow:
+                        continue
+                elif ignore_parameters:
+                    continue
+
             if attr1 != attr2:
                 raise ValueError("Flow %s: values for attribute '%s' differ: "
                                  "'%s' vs '%s'." %
