@@ -264,7 +264,7 @@ class TestRun(TestBase):
              "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
              "bootstrap": [True, False],
              "criterion": ["gini", "entropy"]},
-            cv=StratifiedKFold(n_splits=2, random_state=1),
+            cv=StratifiedKFold(n_splits=2, shuffle=True),
             n_iter=num_iterations)
 
         clfs.append(randomsearch)
