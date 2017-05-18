@@ -68,11 +68,9 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
 
     # skips the run if it already exists and the user opts for this in the config file.
     # also, if the flow is not present on the server, the check is not needed.
-    if avoid_duplicate_runs:
-        if flow.flow_id is None:
-            raise ValueError('Cannot check if a run exists if the '
-                             'corresponding flow has not been published yet!')
-        flow_from_server = get_flow(flow.flow_id)
+    flow_id = flow_exists(flow.name, flow.external_version)
+    if avoid_duplicate_runs and flow_id:
+        flow_from_server = get_flow(flow_id)
         setup_id = setup_exists(flow_from_server)
         ids = _run_exists(task.task_id, setup_id)
         if ids:

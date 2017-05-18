@@ -192,7 +192,9 @@ def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None,
                 if not name in attr2:
                     raise ValueError('Component %s only available in '
                                      'argument2, but not in argument1.' % name)
-                assert_flows_equal(attr1[name], attr2[name], ignore_parameters_on_older_children)
+                assert_flows_equal(attr1[name], attr2[name],
+                                   ignore_parameters_on_older_children,
+                                   ignore_parameters)
 
         else:
             if key == 'parameters':

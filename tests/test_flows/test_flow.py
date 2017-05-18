@@ -147,6 +147,9 @@ class TestFlow(TestBase):
         flow1, sentinel = self._add_sentinel_to_flow_name(flow1, None)
         flow1.publish()
 
+        # In order to assign different upload times to the flows!
+        time.sleep(1)
+
         clf2 = sklearn.ensemble.VotingClassifier(
             [('dt', sklearn.tree.DecisionTreeClassifier(max_depth=2))])
         flow2 = openml.flows.sklearn_to_flow(clf2)

@@ -180,18 +180,6 @@ class TestRun(TestBase):
                         self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
                         self.assertLess(evaluation, max_time_allowed)
 
-    def test_avoid_duplicate_runs_with_unpublished_flow(self):
-        task_id = 115
-
-        clf = LogisticRegression()
-        flow = sklearn_to_flow(clf)
-        flow, _ = self._add_sentinel_to_flow_name(flow, None)
-        task = openml.tasks.get_task(task_id)
-
-        self.assertRaisesRegexp(ValueError, 'Cannot check if a run exists if the corresponding flow has not been published yet!',
-                                openml.runs.run_flow_on_task, task=task,
-                                flow=flow, avoid_duplicate_runs=True)
-
     def test_run_regression_on_classif_task(self):
         task_id = 115
 
