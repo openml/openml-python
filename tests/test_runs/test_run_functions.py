@@ -229,16 +229,16 @@ class TestRun(TestBase):
         num_iterations = 5 # for base search classifiers
 
         clfs = []
-        random_state_values = []
+        random_state_fixtures = []
 
         lr = LogisticRegression()
         clfs.append(lr)
-        random_state_values.append('62501')
+        random_state_fixtures.append('62501')
 
         pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
                                     ('dummy', DummyClassifier(strategy='prior'))])
         clfs.append(pipeline1)
-        random_state_values.append('62501')
+        random_state_fixtures.append('62501')
 
         pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                     ('VarianceThreshold', VarianceThreshold()),
@@ -248,13 +248,13 @@ class TestRun(TestBase):
                                          'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
                                         cv=3, n_iter=10))])
         clfs.append(pipeline2)
-        random_state_values.append('62501')
+        random_state_fixtures.append('62501')
 
         gridsearch = GridSearchCV(BaggingClassifier(base_estimator=SVC()),
                                   {"base_estimator__C": [0.01, 0.1, 10],
                                    "base_estimator__gamma": [0.01, 0.1, 10]})
         clfs.append(gridsearch)
-        random_state_values.append('62501')
+        random_state_fixtures.append('62501')
 
         randomsearch = RandomizedSearchCV(
             RandomForestClassifier(n_estimators=5),
@@ -271,9 +271,9 @@ class TestRun(TestBase):
         # The random states for the RandomizedSearchCV is set after the
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
-        random_state_values.append('33003')
+        random_state_fixtures.append('33003')
 
-        for clf, rsv in zip(clfs, random_state_values):
+        for clf, rsv in zip(clfs, random_state_fixtures):
             run = self._perform_run(task_id, num_test_instances, clf,
                                     random_state_value=rsv)
             if isinstance(clf, BaseSearchCV):
@@ -311,7 +311,6 @@ class TestRun(TestBase):
 
         self.assertEquals(flowS.components['Imputer'].parameters['strategy'], '"median"')
         self.assertEquals(flowS.components['VarianceThreshold'].parameters['threshold'], '0.05')
-        pass
 
     def test_get_run_trace(self):
         # get_run_trace is already tested implicitly in test_run_and_publish

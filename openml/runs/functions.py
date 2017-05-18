@@ -29,6 +29,8 @@ from .trace import OpenMLRunTrace, OpenMLTraceIteration
 
 def run_model_on_task(task, model, avoid_duplicate_runs=True, flow_tags=None,
                       seed=None):
+    """See ``run_flow_on_task for a documentation."""
+
     flow = sklearn_to_flow(model)
 
     return run_flow_on_task(task=task, flow=flow,
@@ -38,23 +40,29 @@ def run_model_on_task(task, model, avoid_duplicate_runs=True, flow_tags=None,
 
 def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
                      seed=None):
-    """Performs a CV run on the dataset of the given task, using the split.
+    """Run the model provided by the flow on the dataset defined by task.
+
+    Takes the flow and repeat information into account. In case a flow is not
+    yet published, it is published after executing the run (requires
+    internet connection).
 
     Parameters
     ----------
     task : OpenMLTask
         Task to perform.
     model : sklearn model
-        a model which has a function fit(X,Y) and predict(X),
+        A model which has a function fit(X,Y) and predict(X),
         all supervised estimators of scikit learn follow this definition of a model [1]
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
     avoid_duplicate_runs : bool
-        if this flag is set to True, the run will throw an error if the
-        setup/task combination is already present on the server.
+        If this flag is set to True, the run will throw an error if the
+        setup/task combination is already present on the server. Works only
+        if the flow is already published on the server. This feature requires an
+        internet connection.
     flow_tags : list(str)
-        a list of tags that the flow should have at creation
+        A list of tags that the flow should have at creation.
     seed: int
-        the models that are not seeded will get this seed
+        Models that are not seeded will get this seed.
 
     Returns
     -------

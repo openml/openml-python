@@ -110,8 +110,14 @@ def initialize_model(setup_id):
         # dicts, mapping from flow id to param name to param value
         # (obtained by using the subfunction _to_dict_of_dicts)
         for _param in _flow.parameters:
+            # It can happen that no parameters of a flow are in a setup,
+            # then the flow_id is not in _params; usually happens for a
+            # sklearn.pipeline.Pipeline object, where the steps parameter is
+            # not in the setup
             if _flow.flow_id not in _params:
                 continue
+            # It is not guaranteed that a setup on OpenML has all parameter
+            # settings of a flow, thus a param must not be in _params!
             if _param not in _params[_flow.flow_id]:
                 continue
             _flow.parameters[_param] = _params[_flow.flow_id][_param]

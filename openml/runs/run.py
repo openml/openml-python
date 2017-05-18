@@ -190,6 +190,17 @@ class OpenMLRun(object):
             # _flow is openml flow object, _param dict maps from flow name to flow id
             # for the main call, the param dict can be overridden (useful for unit tests / sentinels)
             # this way, for flows without subflows we do not have to rely on _flow_dict
+            expected_parameters = set(_flow.parameters)
+            expected_components = set(_flow.components)
+            model_parameters = set([mp for mp in component_model.get_params()
+                                    if '__' not in mp])
+            if len((expected_parameters | expected_components) ^ model_parameters) != 0:
+                raise ValueError('Parameters of the model do not match the '
+                                 'parameters expected by the '
+                                 'flow:\nexpected flow parameters: '
+                                 '%s\nmodel parameters: %s' % (
+                    sorted(expected_parameters| expected_components), sorted(model_parameters)))
+
             _params = []
             for _param_name in _flow.parameters:
                 _current = OrderedDict()
@@ -198,7 +209,9 @@ class OpenMLRun(object):
                 _tmp = openml.flows.sklearn_to_flow(
                     component_model.get_params()[_param_name])
 
-                # Try to filter out components which are handled further down!
+                # Try to filter out components (a.k.a. subflows) which are
+                # handled further down in the code (by recursively calling
+                # this function)!
                 if isinstance(_tmp, openml.flows.OpenMLFlow):
                     continue
                 try:
@@ -210,7 +223,19 @@ class OpenMLRun(object):
                     # Object of type 'OpenMLFlow' is not JSON serializable
                     if 'OpenMLFlow' in e.args[0] and \
                             'is not JSON serializable' in e.args[0]:
+                        # Additional check that the parameter that could not
+                        # be parsed is actually a list/tuple which is used
+                        # inside a feature union or pipeline
+                        if not isinstance(_tmp, (list, tuple)):
+                            raise e
+                        for step_name, step in _tmp:
+                            if isinstance(step_name, openml.flows.OpenMLFlow):
+                                raise e
+                            elif not isinstance(step, openml.flows.OpenMLFlow):
+                                raise e
                         continue
+                    else:
+                        raise e
 
                 _current['oml:value'] = _tmp
                 if _main_call:
