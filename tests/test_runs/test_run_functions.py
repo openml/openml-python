@@ -271,7 +271,7 @@ class TestRun(TestBase):
         # The random states for the RandomizedSearchCV is set after the
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
-        random_state_fixtures.append('33003')
+        random_state_fixtures.append('12172')
 
         for clf, rsv in zip(clfs, random_state_fixtures):
             run = self._perform_run(task_id, num_test_instances, clf,
@@ -290,6 +290,30 @@ class TestRun(TestBase):
             # todo: check if runtime is present
             self._check_detailed_evaluations(run.detailed_evaluations, 1, num_folds)
             pass
+
+    def test_initialize_cv_from_run(self):
+        randomsearch = RandomizedSearchCV(
+            RandomForestClassifier(n_estimators=5),
+            {"max_depth": [3, None],
+             "max_features": [1, 2, 3, 4],
+             "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
+             "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+             "bootstrap": [True, False],
+             "criterion": ["gini", "entropy"]},
+            cv=StratifiedKFold(n_splits=2, shuffle=True),
+            n_iter=2)
+
+        task = openml.tasks.get_task(11)
+        run = openml.runs.run_model_on_task(task, randomsearch,
+                                            avoid_duplicate_runs=False, seed=1)
+        run_ = run.publish()
+        run = openml.runs.get_run(run_.run_id)
+
+        modelR = openml.runs.initialize_model_from_run(run.run_id)
+        modelS = openml.setups.initialize_model(run.setup_id)
+
+        self.assertEquals(modelS.cv.random_state, 62501)
+        self.assertEqual(modelR.cv.random_state, 62501)
 
     def test_initialize_model_from_run(self):
         clf = sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='median')),
@@ -392,11 +416,11 @@ class TestRun(TestBase):
                                 "bootstrap": [True, False],
                                 "criterion": ["gini", "entropy"],
                                 "random_state" : [-1, 0, 1, 2]},
-                               ),
+                               cv=StratifiedKFold(n_splits=2, shuffle=True)),
             DummyClassifier()
         ]
 
-        for clf in randomized_clfs:
+        for idx, clf in enumerate(randomized_clfs):
             const_probe = 42
             all_params = clf.get_params()
             params = [key for key in all_params if key.endswith('random_state')]
@@ -416,6 +440,9 @@ class TestRun(TestBase):
             for param in randstate_params:
                 self.assertIsInstance(new_params[param], int)
                 self.assertIsNotNone(new_params[param])
+
+            if idx == 1:
+                self.assertEqual(clf.cv.random_state, 56422)
 
     def test__get_seeded_model_raises(self):
         # the _get_seeded_model should raise exception if random_state is anything else than an int

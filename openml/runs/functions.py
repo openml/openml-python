@@ -277,9 +277,29 @@ def _get_seeded_model(model, seed=None):
                 raise ValueError('Models initialized with a RandomState object are not supported. Please seed with an integer. ')
             else:
                 raise ValueError('Models should be seeded with int or None (this should never happen). ')
-            model.set_params(**random_states)
-    return model
 
+        # Also seed CV objects!
+        elif isinstance(model_params[param_name],
+                        sklearn.model_selection.BaseCrossValidator):
+            if not hasattr(model_params[param_name], 'random_state'):
+                continue
+
+            currentValue = model_params[param_name].random_state
+            newValue = rs.randint(0, 2 ** 16)
+            if currentValue is None:
+                model_params[param_name].random_state = newValue
+            elif isinstance(currentValue, int):
+                # acceptable behaviour
+                pass
+            elif isinstance(currentValue, np.random.RandomState):
+                raise ValueError(
+                    'Models initialized with a RandomState object are not supported. Please seed with an integer. ')
+            else:
+                raise ValueError(
+                    'Models should be seeded with int or None (this should never happen). ')
+
+    model.set_params(**random_states)
+    return model
 
 
 def _prediction_to_row(rep_no, fold_no, row_id, correct_label, predicted_label,
