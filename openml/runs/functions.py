@@ -258,6 +258,18 @@ def _get_seeded_model(model, seed=None):
             a seed
     '''
 
+    def _seed_current_object(current_value):
+        if isinstance(current_value, int):  # acceptable behaviour
+            return False
+        elif isinstance(current_value, np.random.RandomState):
+            raise ValueError(
+                'Models initialized with a RandomState object are not supported. Please seed with an integer. ')
+        elif current_value is not None:
+            raise ValueError(
+                'Models should be seeded with int or None (this should never happen). ')
+        else:
+            return True
+
     rs = np.random.RandomState(seed)
     model_params = model.get_params()
     random_states = {}
@@ -268,15 +280,8 @@ def _get_seeded_model(model, seed=None):
             # this way we guarantee that if a different set of subflows is seeded,
             # the same number of the random generator is used
             newValue = rs.randint(0, 2**16)
-            if currentValue is None:
+            if _seed_current_object(currentValue):
                 random_states[param_name] = newValue
-            elif isinstance(currentValue, int):
-                # acceptable behaviour
-                pass
-            elif isinstance(currentValue, np.random.RandomState):
-                raise ValueError('Models initialized with a RandomState object are not supported. Please seed with an integer. ')
-            else:
-                raise ValueError('Models should be seeded with int or None (this should never happen). ')
 
         # Also seed CV objects!
         elif isinstance(model_params[param_name],
@@ -286,17 +291,8 @@ def _get_seeded_model(model, seed=None):
 
             currentValue = model_params[param_name].random_state
             newValue = rs.randint(0, 2 ** 16)
-            if currentValue is None:
+            if _seed_current_object(currentValue):
                 model_params[param_name].random_state = newValue
-            elif isinstance(currentValue, int):
-                # acceptable behaviour
-                pass
-            elif isinstance(currentValue, np.random.RandomState):
-                raise ValueError(
-                    'Models initialized with a RandomState object are not supported. Please seed with an integer. ')
-            else:
-                raise ValueError(
-                    'Models should be seeded with int or None (this should never happen). ')
 
     model.set_params(**random_states)
     return model
