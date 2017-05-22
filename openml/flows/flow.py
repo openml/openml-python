@@ -4,6 +4,7 @@ import six
 import xmltodict
 
 from .._api_calls import _perform_api_call
+from ..utils import extract_xml_tags
 
 
 class OpenMLFlow(object):
@@ -278,10 +279,8 @@ class OpenMLFlow(object):
         if 'oml:parameter' in dic:
             # In case of a single parameter, xmltodict returns a dictionary,
             # otherwise a list.
-            if isinstance(dic['oml:parameter'], dict):
-                oml_parameters = [dic['oml:parameter']]
-            else:
-                oml_parameters = dic['oml:parameter']
+            oml_parameters = extract_xml_tags('oml:parameter', dic,
+                                              allow_none=False)
 
             for oml_parameter in oml_parameters:
                 parameter_name = oml_parameter['oml:name']
@@ -299,16 +298,14 @@ class OpenMLFlow(object):
         if 'oml:component' in dic:
             # In case of a single component xmltodict returns a dict,
             # otherwise a list.
-            if isinstance(dic['oml:component'], dict):
-                oml_components = [dic['oml:component']]
-            else:
-                oml_components = dic['oml:component']
+            oml_components = extract_xml_tags('oml:component', dic,
+                                              allow_none=False)
 
             for component in oml_components:
                 flow = OpenMLFlow._from_dict(component)
                 components[component['oml:identifier']] = flow
         arguments['components'] = components
-        arguments['tags'] = extract_tags(dic)
+        arguments['tags'] = extract_xml_tags('oml:tag', dic)
 
         arguments['model'] = None
         flow = cls(**arguments)
@@ -375,15 +372,3 @@ def _add_if_nonempty(dic, key, value):
         dic[key] = value
 
 
-def extract_tags(dic):
-    if 'oml:tag' in dic and dic['oml:tag'] is not None:
-        if isinstance(dic['oml:tag'], six.string_types):
-            oml_tags = [dic['oml:tag']]
-        elif isinstance(dic['oml:tag'], list):
-            oml_tags = dic['oml:tag']
-        else:
-            raise ValueError('Received not string and non list as tag item')
-
-        return oml_tags
-    else:
-        return None

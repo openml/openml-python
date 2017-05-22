@@ -27,12 +27,12 @@ import xmltodict
 from openml.testing import TestBase
 from openml._api_calls import _perform_api_call
 import openml
+import openml.utils
 from openml.flows.sklearn_converter import _format_external_version
 import openml.exceptions
 
 
 class TestFlow(TestBase):
-
 
     def test_get_flow(self):
         # We need to use the production server here because 4024 is not the test
@@ -324,11 +324,11 @@ class TestFlow(TestBase):
     def test_extract_tags(self):
         flow_xml = "<oml:tag>study_14</oml:tag>"
         flow_dict = xmltodict.parse(flow_xml)
-        tags = openml.flows.flow.extract_tags(flow_dict)
+        tags = openml.utils.extract_xml_tags('oml:tag', flow_dict)
         self.assertEqual(tags, ['study_14'])
 
         flow_xml = "<oml:flow><oml:tag>OpenmlWeka</oml:tag>\n" \
                    "<oml:tag>weka</oml:tag></oml:flow>"
         flow_dict = xmltodict.parse(flow_xml)
-        tags = openml.flows.flow.extract_tags(flow_dict['oml:flow'])
+        tags = openml.utils.extract_xml_tags('oml:tag', flow_dict['oml:flow'])
         self.assertEqual(tags, ['OpenmlWeka', 'weka'])
