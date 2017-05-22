@@ -320,3 +320,15 @@ class TestFlow(TestBase):
         self.assertTrue('openml-python' in new_flow.tags)
         self.assertTrue('unittest' in new_flow.tags)
         new_flow.model.fit(X, y)
+
+    def test_extract_tags(self):
+        flow_xml = "<oml:tag>study_14</oml:tag>"
+        flow_dict = xmltodict.parse(flow_xml)
+        tags = openml.flows.flow.extract_tags(flow_dict)
+        self.assertEqual(tags, ['study_14'])
+
+        flow_xml = "<oml:flow><oml:tag>OpenmlWeka</oml:tag>\n" \
+                   "<oml:tag>weka</oml:tag></oml:flow>"
+        flow_dict = xmltodict.parse(flow_xml)
+        tags = openml.flows.flow.extract_tags(flow_dict['oml:flow'])
+        self.assertEqual(tags, ['OpenmlWeka', 'weka'])

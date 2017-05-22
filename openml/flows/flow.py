@@ -308,18 +308,7 @@ class OpenMLFlow(object):
                 flow = OpenMLFlow._from_dict(component)
                 components[component['oml:identifier']] = flow
         arguments['components'] = components
-
-        tags = []
-        if 'oml:tag' in dic and dic['oml:tag'] is not None:
-            # In case of a single tag xmltodict returns a dict, otherwise a list
-            if isinstance(dic['oml:tag'], dict):
-                oml_tags = [dic['oml:tag']]
-            else:
-                oml_tags = dic['oml:tag']
-
-            for tag in oml_tags:
-                tags.append(tag)
-        arguments['tags'] = tags
+        arguments['tags'] = extract_tags(dic)
 
         arguments['model'] = None
         flow = cls(**arguments)
@@ -385,3 +374,16 @@ def _add_if_nonempty(dic, key, value):
     if value is not None:
         dic[key] = value
 
+
+def extract_tags(dic):
+    if 'oml:tag' in dic and dic['oml:tag'] is not None:
+        if isinstance(dic['oml:tag'], six.string_types):
+            oml_tags = [dic['oml:tag']]
+        elif isinstance(dic['oml:tag'], list):
+            oml_tags = dic['oml:tag']
+        else:
+            raise ValueError('Received not string and non list as tag item')
+
+        return oml_tags
+    else:
+        return None

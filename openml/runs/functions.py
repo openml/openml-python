@@ -616,7 +616,7 @@ def _create_run_from_xml(xml):
 
     tags = None
     if 'oml:tag' in run:
-        if isinstance(run['oml:tag'], str):
+        if isinstance(run['oml:tag'], six.string_types):
             tags = [run['oml:tag']]
         elif isinstance(run['oml:tag'], list):
             tags = run['oml:tag']
