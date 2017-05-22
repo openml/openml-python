@@ -13,6 +13,10 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
         Node object returned by ``xmltodict`` from which ``xml_tag_name``
         should be extracted.
 
+    allow_none : bool
+        If ``False``, the tag needs to exist in the node. Will raise a
+        ``ValueError`` if it does not.
+
     Returns
     -------
     object
