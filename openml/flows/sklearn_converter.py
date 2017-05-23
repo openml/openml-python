@@ -198,8 +198,7 @@ def _serialize_model(model):
     external_version = _get_external_version_string(model, sub_components)
 
     dependencies = [_format_external_version('sklearn', sklearn.__version__),
-                    'numpy>=1.6.1', 'scipy>=0.9',
-                    _format_external_version('openml', openml.__version__)]
+                    'numpy>=1.6.1', 'scipy>=0.9']
     dependencies = '\n'.join(dependencies)
 
     flow = OpenMLFlow(name=name,
@@ -237,8 +236,10 @@ def _get_external_version_string(model, sub_components):
     model_package_version_number = module.__version__
     external_version = _format_external_version(model_package_name,
                                                 model_package_version_number)
+    openml_version = _format_external_version('openml', openml.__version__)
     external_versions = set()
     external_versions.add(external_version)
+    external_versions.add(openml_version)
     for visitee in sub_components.values():
         for external_version in visitee.external_version.split(','):
             external_versions.add(external_version)
@@ -429,13 +430,8 @@ def _check_dependencies(dependencies):
             raise NotImplementedError(
                 'operation \'%s\' is not supported' % operation)
         if not check:
-            if dependency_name == 'openml':
-                warnings.warn('De-serializing a flow which was created with '
-                              'openml==%s, this is openml==%s.' %
-                              (openml.__version__, version))
-            else:
-                raise ValueError('Trying to deserialize a model with dependency '
-                                 '%s not satisfied.' % dependency_string)
+            raise ValueError('Trying to deserialize a model with dependency '
+                             '%s not satisfied.' % dependency_string)
 
 
 def serialize_type(o):

@@ -64,8 +64,8 @@ class TestSklearn(unittest.TestCase):
 
         fixture_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_description = 'Automatically created scikit-learn flow.'
-        version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9\nopenml==%s' \
-                          '' % (sklearn.__version__, openml.__version__)
+        version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
+                          % sklearn.__version__
         fixture_parameters = \
             OrderedDict((('class_weight', 'null'),
                          ('criterion', '"entropy"'),
@@ -522,7 +522,8 @@ class TestSklearn(unittest.TestCase):
         # I put the alternative travis-ci answer here as well. While it has a
         # different value, it is still correct as it is a propagation of the
         # subclasses' module name
-        self.assertEqual(flow.external_version, '%s,%s' % (
+        self.assertEqual(flow.external_version, '%s,%s,%s' % (
+            _format_external_version('openml', openml.__version__),
             _format_external_version('sklearn', sklearn.__version__),
             _format_external_version('tests', '0.1')))
 
@@ -531,13 +532,6 @@ class TestSklearn(unittest.TestCase):
         dependencies = ['sklearn==0.1', 'sklearn>=99.99.99', 'sklearn>99.99.99']
         for dependency in dependencies:
             self.assertRaises(ValueError, _check_dependencies, dependency)
-        dependency = 'openml==0.0.12345'
-        _check_dependencies(dependency)
-        self.assertEqual(warnings_mock.call_count, 1)
-        self.assertEqual(warnings_mock.call_args[0][0],
-                         'De-serializing a flow which was created with '
-                         'openml==%s, this is openml==%s.' % (
-                             openml.__version__, '0.0.12345'))
 
     def test_illegal_parameter_names(self):
         # illegal name: estimators
