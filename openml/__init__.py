@@ -26,7 +26,7 @@ from .runs import OpenMLRun
 from .tasks import OpenMLTask, OpenMLSplit
 from .flows import OpenMLFlow
 
-__version__ = "0.3.0"
+__version__ = "0.4.0dev"
 
 
 def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None,

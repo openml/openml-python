@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import unittest
+import warnings
 
 if sys.version_info[0] >= 3:
     from unittest import mock
@@ -24,8 +25,8 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
 
+import openml
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
-
 from openml.flows.functions import assert_flows_equal
 from openml.flows.sklearn_converter import _format_external_version, \
     _check_dependencies, _check_n_jobs
@@ -63,7 +64,8 @@ class TestSklearn(unittest.TestCase):
 
         fixture_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_description = 'Automatically created scikit-learn flow.'
-        version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' % sklearn.__version__
+        version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9\nopenml==%s' \
+                          '' % (sklearn.__version__, openml.__version__)
         fixture_parameters = \
             OrderedDict((('class_weight', 'null'),
                          ('criterion', '"entropy"'),
@@ -524,10 +526,18 @@ class TestSklearn(unittest.TestCase):
             _format_external_version('sklearn', sklearn.__version__),
             _format_external_version('tests', '0.1')))
 
-    def test_check_dependencies(self):
+    @mock.patch('warnings.warn')
+    def test_check_dependencies(self, warnings_mock):
         dependencies = ['sklearn==0.1', 'sklearn>=99.99.99', 'sklearn>99.99.99']
         for dependency in dependencies:
             self.assertRaises(ValueError, _check_dependencies, dependency)
+        dependency = 'openml==0.0.12345'
+        _check_dependencies(dependency)
+        self.assertEqual(warnings_mock.call_count, 1)
+        self.assertEqual(warnings_mock.call_args[0][0],
+                         'De-serializing a flow which was created with '
+                         'openml==%s, this is openml==%s.' % (
+                             openml.__version__, '0.0.12345'))
 
     def test_illegal_parameter_names(self):
         # illegal name: estimators

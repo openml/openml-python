@@ -19,6 +19,7 @@ import sklearn.model_selection
 # Necessary to have signature available in python 2.7
 from sklearn.utils.fixes import signature
 
+import openml
 from openml.flows import OpenMLFlow
 from openml.exceptions import PyOpenMLError
 
@@ -30,7 +31,7 @@ else:
 
 
 DEPENDENCIES_PATTERN = re.compile(
-    '^(?P<name>[\w\-]+)((?P<operation>==|>=|>)(?P<version>(\d+\.)?(\d+\.)?(\d+)))?$')
+    '^(?P<name>[\w\-]+)((?P<operation>==|>=|>)(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?))?$')
 
 
 def sklearn_to_flow(o, parent_model=None):
@@ -197,7 +198,8 @@ def _serialize_model(model):
     external_version = _get_external_version_string(model, sub_components)
 
     dependencies = [_format_external_version('sklearn', sklearn.__version__),
-                    'numpy>=1.6.1', 'scipy>=0.9']
+                    'numpy>=1.6.1', 'scipy>=0.9',
+                    _format_external_version('openml', openml.__version__)]
     dependencies = '\n'.join(dependencies)
 
     flow = OpenMLFlow(name=name,
@@ -427,8 +429,13 @@ def _check_dependencies(dependencies):
             raise NotImplementedError(
                 'operation \'%s\' is not supported' % operation)
         if not check:
-            raise ValueError('Trying to deserialize a model with dependency '
-                             '%s not satisfied.' % dependency_string)
+            if dependency_name == 'openml':
+                warnings.warn('De-serializing a flow which was created with '
+                              'openml==%s, this is openml==%s.' %
+                              (openml.__version__, version))
+            else:
+                raise ValueError('Trying to deserialize a model with dependency '
+                                 '%s not satisfied.' % dependency_string)
 
 
 def serialize_type(o):
