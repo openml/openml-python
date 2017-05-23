@@ -105,7 +105,7 @@ class OpenMLFlow(object):
         keys_parameters = set(parameters.keys())
         keys_parameters_meta_info = set(parameters_meta_info.keys())
         if len(keys_parameters.difference(keys_parameters_meta_info)) > 0:
-            raise ValueError('Parameter %s only in parameters, but not in'
+            raise ValueError('Parameter %s only in parameters, but not in '
                              'parameters_meta_info.' %
                              str(keys_parameters.difference(
                                  keys_parameters_meta_info)))
