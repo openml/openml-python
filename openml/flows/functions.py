@@ -175,7 +175,10 @@ def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None,
 
     # TODO as they are actually now saved during publish, it might be good to
     # check for the equality of these as well.
-    generated_by_the_server = ['flow_id', 'uploader', 'version', 'upload_date']
+    generated_by_the_server = ['flow_id', 'uploader', 'version', 'upload_date',
+                               # Tags aren't directly created by the server,
+                               # but the uploader has no control over them!
+                               'tags']
     ignored_by_python_API = ['binary_url', 'binary_format', 'binary_md5',
                              'model']
 

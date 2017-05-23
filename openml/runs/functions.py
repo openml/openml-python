@@ -12,6 +12,7 @@ import six
 import xmltodict
 
 import openml
+import openml.utils
 from ..exceptions import PyOpenMLError
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
@@ -578,10 +579,13 @@ def _create_run_from_xml(xml):
             # only one result.. probably due to an upload error
             file_dict = run['oml:output_data']['oml:file']
             files[file_dict['oml:name']] = int(file_dict['oml:file_id'])
-        else:
+        elif isinstance(run['oml:output_data']['oml:file'], list):
             # multiple files, the normal case
             for file_dict in run['oml:output_data']['oml:file']:
                 files[file_dict['oml:name']] = int(file_dict['oml:file_id'])
+        else:
+            raise TypeError(type(run['oml:output_data']['oml:file']))
+
         if 'oml:evaluation' in run['oml:output_data']:
             # in normal cases there should be evaluations, but in case there
             # was an error these could be absent
@@ -614,14 +618,7 @@ def _create_run_from_xml(xml):
         raise ValueError('No prediction files for run %d in run '
                          'description XML' % run_id)
 
-    tags = None
-    if 'oml:tag' in run:
-        if isinstance(run['oml:tag'], str):
-            tags = [run['oml:tag']]
-        elif isinstance(run['oml:tag'], list):
-            tags = run['oml:tag']
-        else:
-            raise ValueError('Received not string and non list as tag item')
+    tags = openml.utils.extract_xml_tags('oml:tag', run)
 
     return OpenMLRun(run_id=run_id, uploader=uploader,
                      uploader_name=uploader_name, task_id=task_id,

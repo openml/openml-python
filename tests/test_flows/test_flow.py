@@ -27,12 +27,12 @@ import xmltodict
 from openml.testing import TestBase
 from openml._api_calls import _perform_api_call
 import openml
+import openml.utils
 from openml.flows.sklearn_converter import _format_external_version
 import openml.exceptions
 
 
 class TestFlow(TestBase):
-
 
     def test_get_flow(self):
         # We need to use the production server here because 4024 is not the test
@@ -276,7 +276,14 @@ class TestFlow(TestBase):
             estimator=model, param_distributions=parameter_grid, cv=cv)
         rs.fit(X, y)
         flow = openml.flows.sklearn_to_flow(rs)
-        flow.tags.extend(['openml-python', 'unittest'])
+        # Tags may be sorted in any order (by the server). Just using one tag
+        # makes sure that the xml comparison does not fail because of that.
+        subflows = [flow]
+        while len(subflows) > 0:
+            f = subflows.pop()
+            f.tags = []
+            subflows.extend(list(f.components.values()))
+
         flow, sentinel = self._add_sentinel_to_flow_name(flow, None)
 
         flow.publish()
@@ -317,6 +324,16 @@ class TestFlow(TestBase):
                         % sentinel
 
         self.assertEqual(new_flow.name, fixture_name)
-        self.assertTrue('openml-python' in new_flow.tags)
-        self.assertTrue('unittest' in new_flow.tags)
         new_flow.model.fit(X, y)
+
+    def test_extract_tags(self):
+        flow_xml = "<oml:tag>study_14</oml:tag>"
+        flow_dict = xmltodict.parse(flow_xml)
+        tags = openml.utils.extract_xml_tags('oml:tag', flow_dict)
+        self.assertEqual(tags, ['study_14'])
+
+        flow_xml = "<oml:flow><oml:tag>OpenmlWeka</oml:tag>\n" \
+                   "<oml:tag>weka</oml:tag></oml:flow>"
+        flow_dict = xmltodict.parse(flow_xml)
+        tags = openml.utils.extract_xml_tags('oml:tag', flow_dict['oml:flow'])
+        self.assertEqual(tags, ['OpenmlWeka', 'weka'])

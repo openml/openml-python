@@ -4,6 +4,7 @@ import six
 import xmltodict
 
 from .._api_calls import _perform_api_call
+from ..utils import extract_xml_tags
 
 
 class OpenMLFlow(object):
@@ -278,10 +279,8 @@ class OpenMLFlow(object):
         if 'oml:parameter' in dic:
             # In case of a single parameter, xmltodict returns a dictionary,
             # otherwise a list.
-            if isinstance(dic['oml:parameter'], dict):
-                oml_parameters = [dic['oml:parameter']]
-            else:
-                oml_parameters = dic['oml:parameter']
+            oml_parameters = extract_xml_tags('oml:parameter', dic,
+                                              allow_none=False)
 
             for oml_parameter in oml_parameters:
                 parameter_name = oml_parameter['oml:name']
@@ -299,27 +298,14 @@ class OpenMLFlow(object):
         if 'oml:component' in dic:
             # In case of a single component xmltodict returns a dict,
             # otherwise a list.
-            if isinstance(dic['oml:component'], dict):
-                oml_components = [dic['oml:component']]
-            else:
-                oml_components = dic['oml:component']
+            oml_components = extract_xml_tags('oml:component', dic,
+                                              allow_none=False)
 
             for component in oml_components:
                 flow = OpenMLFlow._from_dict(component)
                 components[component['oml:identifier']] = flow
         arguments['components'] = components
-
-        tags = []
-        if 'oml:tag' in dic and dic['oml:tag'] is not None:
-            # In case of a single tag xmltodict returns a dict, otherwise a list
-            if isinstance(dic['oml:tag'], dict):
-                oml_tags = [dic['oml:tag']]
-            else:
-                oml_tags = dic['oml:tag']
-
-            for tag in oml_tags:
-                tags.append(tag)
-        arguments['tags'] = tags
+        arguments['tags'] = extract_xml_tags('oml:tag', dic)
 
         arguments['model'] = None
         flow = cls(**arguments)
@@ -384,4 +370,5 @@ def _copy_server_fields(source_flow, target_flow):
 def _add_if_nonempty(dic, key, value):
     if value is not None:
         dic[key] = value
+
 
