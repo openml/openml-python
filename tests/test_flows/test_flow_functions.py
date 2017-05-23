@@ -63,7 +63,6 @@ class TestFlowFunctions(unittest.TestCase):
         for attribute, new_value in [('name', 'Tes'),
                                      ('description', 'Test flo'),
                                      ('external_version', '2'),
-                                     ('tags', ['abc', 'de']),
                                      ('language', 'english'),
                                      ('dependencies', 'ab'),
                                      ('class_name', 'Tes'),
@@ -83,7 +82,8 @@ class TestFlowFunctions(unittest.TestCase):
                                      ('binary_url', 'openml.org'),
                                      ('binary_format', 'gzip'),
                                      ('binary_md5', '12345'),
-                                     ('model', [])]:
+                                     ('model', []),
+                                     ('tags', ['abc', 'de'])]:
             new_flow = copy.deepcopy(flow)
             setattr(new_flow, attribute, new_value)
             self.assertNotEqual(getattr(flow, attribute), getattr(new_flow, attribute))

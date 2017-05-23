@@ -175,7 +175,10 @@ def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None,
 
     # TODO as they are actually now saved during publish, it might be good to
     # check for the equality of these as well.
-    generated_by_the_server = ['flow_id', 'uploader', 'version', 'upload_date']
+    generated_by_the_server = ['flow_id', 'uploader', 'version', 'upload_date',
+                               # Tags aren't directly created by the server,
+                               # but the uploader has no control over them!
+                               'tags']
     ignored_by_python_API = ['binary_url', 'binary_format', 'binary_md5',
                              'model']
 
@@ -208,15 +211,7 @@ def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None,
                 elif ignore_parameters:
                     continue
 
-            if key == 'tags':
-                if set(attr1) != set(attr2):
-                    raise ValueError(
-                        "Flow %s: values for attribute '%s' differ: "
-                        "'%s' vs '%s'." %
-                        (str(flow1.name), str(key), str(set(attr1)),
-                         str(set(attr2))))
-
-            elif attr1 != attr2:
+            if attr1 != attr2:
                 raise ValueError("Flow %s: values for attribute '%s' differ: "
                                  "'%s' vs '%s'." %
                                  (str(flow1.name), str(key), str(attr1), str(attr2)))
