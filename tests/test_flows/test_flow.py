@@ -276,7 +276,14 @@ class TestFlow(TestBase):
             estimator=model, param_distributions=parameter_grid, cv=cv)
         rs.fit(X, y)
         flow = openml.flows.sklearn_to_flow(rs)
-        flow.tags.extend(['openml-python', 'unittest'])
+        # Tags may be sorted in any order (by the server). Just using one tag
+        # makes sure that the xml comparison does not fail because of that.
+        subflows = [flow]
+        while len(subflows) > 0:
+            f = subflows.pop()
+            f.tags = []
+            subflows.extend(list(f.components.values()))
+
         flow, sentinel = self._add_sentinel_to_flow_name(flow, None)
 
         flow.publish()
@@ -317,8 +324,6 @@ class TestFlow(TestBase):
                         % sentinel
 
         self.assertEqual(new_flow.name, fixture_name)
-        self.assertTrue('openml-python' in new_flow.tags)
-        self.assertTrue('unittest' in new_flow.tags)
         new_flow.model.fit(X, y)
 
     def test_extract_tags(self):

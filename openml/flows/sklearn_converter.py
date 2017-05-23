@@ -208,7 +208,15 @@ def _serialize_model(model):
                       parameters=parameters,
                       parameters_meta_info=parameters_meta_info,
                       external_version=external_version,
-                      tags=[],
+                      tags=['openml-python', 'sklearn', 'scikit-learn',
+                            'python',
+                            _format_external_version('sklearn',
+                                                     sklearn.__version__).replace('==', '_'),
+                            # TODO: add more tags based on the scikit-learn
+                            # module a flow is in? For example automatically
+                            # annotate a class of sklearn.svm.SVC() with the
+                            # tag svm?
+                            ],
                       language='English',
                       # TODO fill in dependencies!
                       dependencies=dependencies)

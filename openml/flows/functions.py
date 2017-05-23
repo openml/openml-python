@@ -208,7 +208,15 @@ def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None,
                 elif ignore_parameters:
                     continue
 
-            if attr1 != attr2:
+            if key == 'tags':
+                if set(attr1) != set(attr2):
+                    raise ValueError(
+                        "Flow %s: values for attribute '%s' differ: "
+                        "'%s' vs '%s'." %
+                        (str(flow1.name), str(key), str(set(attr1)),
+                         str(set(attr2))))
+
+            elif attr1 != attr2:
                 raise ValueError("Flow %s: values for attribute '%s' differ: "
                                  "'%s' vs '%s'." %
                                  (str(flow1.name), str(key), str(attr1), str(attr2)))
