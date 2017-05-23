@@ -111,3 +111,85 @@ class TestFlowFunctions(unittest.TestCase):
         self.assertRaises(ValueError,
                           openml.flows.functions.assert_flows_equal,
                           parent_flow, new_flow)
+
+    def test_are_flows_equal_ignore_parameter_values(self):
+        paramaters = OrderedDict((('a', 5), ('b', 6)))
+        parameters_meta_info = OrderedDict((('a', None), ('b', None)))
+
+        flow = openml.flows.OpenMLFlow(name='Test',
+                                       description='Test flow',
+                                       model=None,
+                                       components=OrderedDict(),
+                                       parameters=paramaters,
+                                       parameters_meta_info=parameters_meta_info,
+                                       external_version='1',
+                                       tags=['abc', 'def'],
+                                       language='English',
+                                       dependencies='abc',
+                                       class_name='Test',
+                                       custom_name='Test')
+
+        openml.flows.functions.assert_flows_equal(flow, flow)
+        openml.flows.functions.assert_flows_equal(flow, flow,
+                                                  ignore_parameter_values=True)
+
+        new_flow = copy.deepcopy(flow)
+        new_flow.parameters['a'] = 7
+        self.assertRaisesRegexp(ValueError, "values for attribute 'parameters' "
+                                            "differ: 'OrderedDict\(\[\('a', "
+                                            "5\), \('b', 6\)\]\)'\nvs\n"
+                                            "'OrderedDict\(\[\('a', 7\), "
+                                            "\('b', 6\)\]\)'",
+                                openml.flows.functions.assert_flows_equal,
+                                flow, new_flow)
+        openml.flows.functions.assert_flows_equal(flow, new_flow,
+                                                  ignore_parameter_values=True)
+
+        del new_flow.parameters['a']
+        self.assertRaisesRegexp(ValueError, "values for attribute 'parameters' "
+                                            "differ: 'OrderedDict\(\[\('a', "
+                                            "5\), \('b', 6\)\]\)'\nvs\n"
+                                            "'OrderedDict\(\[\('b', 6\)\]\)'",
+                                openml.flows.functions.assert_flows_equal,
+                                flow, new_flow)
+        self.assertRaisesRegexp(ValueError, "Flow Test: parameter set of flow "
+                                            "differs from the parameters stored "
+                                            "on the server.",
+                                openml.flows.functions.assert_flows_equal,
+                                flow, new_flow, ignore_parameter_values=True)
+
+    def test_are_flows_equal_ignore_if_older(self):
+        paramaters = OrderedDict((('a', 5), ('b', 6)))
+        parameters_meta_info = OrderedDict((('a', None), ('b', None)))
+
+        flow = openml.flows.OpenMLFlow(name='Test',
+                                       description='Test flow',
+                                       model=None,
+                                       components=OrderedDict(),
+                                       parameters=paramaters,
+                                       parameters_meta_info=parameters_meta_info,
+                                       external_version='1',
+                                       tags=['abc', 'def'],
+                                       language='English',
+                                       dependencies='abc',
+                                       class_name='Test',
+                                       custom_name='Test',
+                                       upload_date='2017-01-31T12-01-01')
+
+        openml.flows.functions.assert_flows_equal(flow, flow,
+                                                  ignore_parameter_values_on_older_children='2017-01-31T12-01-01')
+        openml.flows.functions.assert_flows_equal(flow, flow,
+                                                  ignore_parameter_values_on_older_children=None)
+        new_flow = copy.deepcopy(flow)
+        new_flow.parameters['a'] = 7
+        self.assertRaises(ValueError, openml.flows.functions.assert_flows_equal,
+                          flow, new_flow, ignore_parameter_values_on_older_children='2017-01-31T12-01-01')
+        self.assertRaises(ValueError, openml.flows.functions.assert_flows_equal,
+                          flow, new_flow, ignore_parameter_values_on_older_children=None)
+
+        new_flow.upload_date = '2016-01-31T12-01-01'
+        self.assertRaises(ValueError, openml.flows.functions.assert_flows_equal,
+                          flow, new_flow,
+                          ignore_parameter_values_on_older_children='2017-01-31T12-01-01')
+        openml.flows.functions.assert_flows_equal(flow, flow,
+                                                  ignore_parameter_values_on_older_children=None)

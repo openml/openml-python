@@ -127,7 +127,7 @@ def _publish_flow_if_necessary(flow):
                 server_flow = get_flow(flow_id)
                 openml.flows.flow._copy_server_fields(server_flow, flow)
                 openml.flows.assert_flows_equal(flow, server_flow,
-                                                ignore_parameters=True)
+                                                ignore_parameter_values=True)
             else:
                 raise e
 

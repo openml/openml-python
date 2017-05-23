@@ -205,7 +205,8 @@ class TestFlow(TestBase):
                   "New flow ID is 1. Please check manually and remove " \
                   "the flow if necessary! Error is:\n" \
                   "'Flow sklearn.ensemble.forest.RandomForestClassifier: values for attribute 'name' differ: " \
-                  "'sklearn.ensemble.forest.RandomForestClassifier' vs 'sklearn.ensemble.forest.RandomForestClassifie'.'"
+                  "'sklearn.ensemble.forest.RandomForestClassifier'" \
+                  "\nvs\n'sklearn.ensemble.forest.RandomForestClassifie'.'"
 
         self.assertEqual(context_manager.exception.args[0], fixture)
         self.assertEqual(api_call_mock.call_count, 2)
