@@ -145,7 +145,8 @@ def _check_flow_for_server_id(flow):
                 stack.append(component)
 
 
-def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None,
+def assert_flows_equal(flow1, flow2,
+                       ignore_parameter_values_on_older_children=None,
                        ignore_parameter_values=False):
     """Check equality of two flows.
 
@@ -158,7 +159,7 @@ def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None,
 
     flow2 : OpenMLFlow
 
-    ignore_parameters_on_older_children : str
+    ignore_parameter_values_on_older_children : str
         If set to ``OpenMLFlow.upload_date``, ignores parameters in a child
         flow if it's upload date predates the upload date of the parent flow.
 
@@ -196,19 +197,13 @@ def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None,
                     raise ValueError('Component %s only available in '
                                      'argument2, but not in argument1.' % name)
                 assert_flows_equal(attr1[name], attr2[name],
-                                   ignore_parameters_on_older_children,
+                                   ignore_parameter_values_on_older_children,
                                    ignore_parameter_values)
 
         else:
             if key == 'parameters':
-                if ignore_parameters_on_older_children:
-                    upload_date_current_flow = dateutil.parser.parse(
-                        flow1.upload_date)
-                    upload_date_parent_flow = dateutil.parser.parse(
-                        ignore_parameters_on_older_children)
-                    if upload_date_current_flow < upload_date_parent_flow:
-                        continue
-                elif ignore_parameter_values:
+                if ignore_parameter_values or \
+                        ignore_parameter_values_on_older_children:
                     parameters_flow_1 = set(flow1.parameters.keys())
                     parameters_flow_2 = set(flow2.parameters.keys())
                     symmetric_difference = parameters_flow_1 ^ parameters_flow_2
@@ -216,9 +211,21 @@ def assert_flows_equal(flow1, flow2, ignore_parameters_on_older_children=None,
                         raise ValueError('Flow %s: parameter set of flow '
                                          'differs from the parameters stored '
                                          'on the server.' % flow1.name)
+
+                if ignore_parameter_values_on_older_children:
+                    upload_date_current_flow = dateutil.parser.parse(
+                        flow1.upload_date)
+                    upload_date_parent_flow = dateutil.parser.parse(
+                        ignore_parameter_values_on_older_children)
+                    if upload_date_current_flow < upload_date_parent_flow:
+                        continue
+
+                if ignore_parameter_values:
+                    # Continue needs to be done here as the first if
+                    # statement triggers in both special cases
                     continue
 
             if attr1 != attr2:
                 raise ValueError("Flow %s: values for attribute '%s' differ: "
-                                 "'%s' vs '%s'." %
+                                 "'%s'\nvs\n'%s'." %
                                  (str(flow1.name), str(key), str(attr1), str(attr2)))
