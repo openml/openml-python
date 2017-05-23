@@ -67,7 +67,7 @@ class TestRun(TestBase):
         try:
             model_prime = openml.runs.initialize_model_from_trace(run_id, 0, 0)
         except openml.exceptions.OpenMLServerException as e:
-            e.additional += '; run_id: ' + str(run_id)
+            e.additional = str(e.additional) + '; run_id: ' + str(run_id)
             raise e
         
         run_prime = openml.runs.run_model_on_task(task, model_prime,
