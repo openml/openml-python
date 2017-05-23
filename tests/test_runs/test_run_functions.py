@@ -63,9 +63,13 @@ class TestRun(TestBase):
         # downloads the best model based on the optimization trace
         # suboptimal (slow), and not guaranteed to work if evaluation
         # engine is behind. TODO: mock this? We have the arff already on the server
-        self._wait_for_processed_run(run_id, 80)
-        model_prime = openml.runs.initialize_model_from_trace(run_id, 0, 0)
-
+        self._wait_for_processed_run(run_id, 200)
+        try:
+            model_prime = openml.runs.initialize_model_from_trace(run_id, 0, 0)
+        except openml.exceptions.OpenMLServerException as e:
+            e.additional += '; run_id: ' + run_id
+            raise e
+        
         run_prime = openml.runs.run_model_on_task(task, model_prime,
                                                   avoid_duplicate_runs=False,
                                                   seed=1)
@@ -357,7 +361,7 @@ class TestRun(TestBase):
             # in case the run did not exists yet
             run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=True)
             run = run.publish()
-            self._wait_for_processed_run(run.run_id, 80)
+            self._wait_for_processed_run(run.run_id, 200)
             run_id = run.run_id
         except openml.exceptions.PyOpenMLError:
             # run was already
