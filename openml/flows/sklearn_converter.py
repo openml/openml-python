@@ -19,6 +19,7 @@ import sklearn.model_selection
 # Necessary to have signature available in python 2.7
 from sklearn.utils.fixes import signature
 
+import openml
 from openml.flows import OpenMLFlow
 from openml.exceptions import PyOpenMLError
 
@@ -30,7 +31,7 @@ else:
 
 
 DEPENDENCIES_PATTERN = re.compile(
-    '^(?P<name>[\w\-]+)((?P<operation>==|>=|>)(?P<version>(\d+\.)?(\d+\.)?(\d+)))?$')
+    '^(?P<name>[\w\-]+)((?P<operation>==|>=|>)(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?))?$')
 
 
 def sklearn_to_flow(o, parent_model=None):
@@ -235,8 +236,10 @@ def _get_external_version_string(model, sub_components):
     model_package_version_number = module.__version__
     external_version = _format_external_version(model_package_name,
                                                 model_package_version_number)
+    openml_version = _format_external_version('openml', openml.__version__)
     external_versions = set()
     external_versions.add(external_version)
+    external_versions.add(openml_version)
     for visitee in sub_components.values():
         for external_version in visitee.external_version.split(','):
             external_versions.add(external_version)
