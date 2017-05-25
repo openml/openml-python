@@ -14,10 +14,6 @@ from openml.testing import TestBase
 
 class OpenMLTaskTest(TestBase):
 
-    def test_get_clustering_task(self):
-        self.assertRaisesRegexp(KeyError, 'oml:target_feature',
-                                openml.tasks.get_task, 10128)
-
     @mock.patch('openml.datasets.get_dataset', autospec=True)
     def test_get_dataset(self, patch):
         patch.return_value = mock.MagicMock()
@@ -40,11 +36,11 @@ class OpenMLTaskTest(TestBase):
         self.assertEqual(Y.dtype, int)
 
         # Regression task
-        task = openml.tasks.get_task(2280)
+        task = openml.tasks.get_task(631)
         X, Y = task.get_X_and_y()
-        self.assertEqual((8192, 8), X.shape)
+        self.assertEqual((52, 2), X.shape)
         self.assertIsInstance(X, np.ndarray)
-        self.assertEqual((8192,), Y.shape)
+        self.assertEqual((52,), Y.shape)
         self.assertIsInstance(Y, np.ndarray)
         self.assertEqual(Y.dtype, float)
 

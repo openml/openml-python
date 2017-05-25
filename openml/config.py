@@ -1,9 +1,12 @@
 """
 Stores module level information like the API key, cache directory and the server.
 """
-import os
-import sys
 import logging
+import os
+
+from six import StringIO
+from six.moves import configparser
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -15,12 +18,7 @@ apikey = ""
 cachedir = ""
 
 
-if sys.version_info[0] < 3:
-    import ConfigParser as configparser
-    from StringIO import StringIO
-else:
-    import configparser
-    from io import StringIO
+
 
 
 def _setup():
@@ -36,6 +34,7 @@ def _setup():
     """
     global apikey
     global server
+    global avoid_duplicate_runs
     # read config file, create cache directory
     try:
         os.mkdir(os.path.expanduser('~/.openml'))
@@ -46,6 +45,7 @@ def _setup():
     apikey = config.get('FAKE_SECTION', 'apikey')
     server = config.get('FAKE_SECTION', 'server')
     cache_dir = config.get('FAKE_SECTION', 'cachedir')
+    avoid_duplicate_runs = config.getboolean('FAKE_SECTION', 'avoid_duplicate_runs')
     set_cache_directory(cache_dir)
 
 
@@ -84,7 +84,8 @@ def _parse_config():
     defaults = {'apikey': apikey,
                 'server': server,
                 'verbosity': 0,
-                'cachedir': os.path.expanduser('~/.openml/cache')}
+                'cachedir': os.path.expanduser('~/.openml/cache'),
+                'avoid_duplicate_runs': 'True'}
 
     config_file = os.path.expanduser('~/.openml/config')
     config = configparser.RawConfigParser(defaults=defaults)

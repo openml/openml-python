@@ -3,9 +3,9 @@ import unittest
 import os
 
 import numpy as np
+import six
 
 from openml import OpenMLDataset
-from openml.util import is_string
 
 
 class OpenMLDatasetTest(unittest.TestCase):
@@ -64,7 +64,8 @@ class OpenMLDatasetTest(unittest.TestCase):
         rval, attribute_names = self.dataset.get_data(
             return_attribute_names=True)
         self.assertEqual(len(attribute_names), 39)
-        self.assertTrue(all([is_string(att) for att in attribute_names]))
+        self.assertTrue(all([isinstance(att, six.string_types)
+                             for att in attribute_names]))
 
     def test_get_sparse_dataset(self):
         rval = self.sparse_dataset.get_data()
@@ -80,7 +81,8 @@ class OpenMLDatasetTest(unittest.TestCase):
             return_attribute_names=True)
         self.assertIsInstance(rval, np.ndarray)
         self.assertEqual(len(attribute_names), 20001)
-        self.assertTrue(all([is_string(att) for att in attribute_names]))
+        self.assertTrue(all([isinstance(att, six.string_types)
+                             for att in attribute_names]))
 
     def test_get_data_with_target(self):
         X, y = self.dataset.get_data(target="class")
@@ -127,7 +129,7 @@ class OpenMLDatasetTest(unittest.TestCase):
         #rval = self.dataset.get_pandas(include_row_id=False)
 
     def test_get_sparse_dataset_with_rowid(self):
-        self.sparse_dataset.row_id_attribute = "a_0"
+        self.sparse_dataset.row_id_attribute = ["a_0"]
         rval, categorical = self.sparse_dataset.get_data(
             include_row_id=True, return_categorical_indicator=True)
         self.assertIsInstance(rval, np.ndarray)
@@ -147,7 +149,7 @@ class OpenMLDatasetTest(unittest.TestCase):
         #rval = self.dataset.get_pandas(include_row_id=False)
 
     def test_get_data_with_ignore_attributes(self):
-        self.dataset.ignore_attributes = "condition"
+        self.dataset.ignore_attributes = ["condition"]
         rval = self.dataset.get_data(include_ignore_attributes=True)
         self.assertEqual(rval.dtype, np.float32)
         self.assertEqual(rval.shape, (898, 39))
@@ -163,7 +165,7 @@ class OpenMLDatasetTest(unittest.TestCase):
         # TODO test multiple ignore attributes!
 
     def test_get_sparse_dataset_with_ignore_attributes(self):
-        self.sparse_dataset.ignore_attributes = "a_0"
+        self.sparse_dataset.ignore_attributes = ["a_0"]
         rval = self.sparse_dataset.get_data(include_ignore_attributes=True)
         self.assertIsInstance(rval, np.ndarray)
         self.assertEqual(rval.dtype, np.float32)
@@ -183,8 +185,8 @@ class OpenMLDatasetTest(unittest.TestCase):
         # TODO test multiple ignore attributes!
 
     def test_get_data_rowid_and_ignore_and_target(self):
-        self.dataset.ignore_attributes = "condition"
-        self.dataset.row_id_attribute = "hardness"
+        self.dataset.ignore_attributes = ["condition"]
+        self.dataset.row_id_attribute = ["hardness"]
         X, y = self.dataset.get_data(target="class", include_row_id=False,
                                      include_ignore_attributes=False)
         self.assertEqual(X.dtype, np.float32)
@@ -198,8 +200,8 @@ class OpenMLDatasetTest(unittest.TestCase):
         self.assertEqual(y.shape, (898, ))
 
     def test_get_sparse_dataset_rowid_and_ignore_and_target(self):
-        self.sparse_dataset.ignore_attributes = "a_0"
-        self.sparse_dataset.row_id_attribute = "a_1"
+        self.sparse_dataset.ignore_attributes = ["a_0"]
+        self.sparse_dataset.row_id_attribute = ["a_1"]
         X, y = self.sparse_dataset.get_data(
             target="class", include_row_id=False,
             include_ignore_attributes=False)

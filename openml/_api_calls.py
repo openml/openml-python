@@ -1,11 +1,13 @@
 import io
 import os
 import requests
-import arff
 import warnings
 
+import arff
+import xmltodict
+
 from . import config
-from .exceptions import OpenMLServerError
+from .exceptions import OpenMLServerError, OpenMLServerException
 
 
 def _perform_api_call(call, data=None, file_dictionary=None,
@@ -50,6 +52,18 @@ def _perform_api_call(call, data=None, file_dictionary=None,
     return _read_url(url, data)
 
 
+def _file_id_to_url(file_id, filename=None):
+    '''
+     Presents the URL how to download a given file id
+     filename is optional
+    '''
+    openml_url = config.server.split('/api/')
+    url = openml_url[0] + '/data/download/%s' %file_id
+    if filename is not None:
+        url += '/' + filename
+    return url
+
+
 def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
     """do a post request to url with data, file content of
     file_dictionary and sending file_elements as files"""
@@ -80,7 +94,7 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
     # 'gzip,deflate'
     response = requests.post(url, data=data, files=file_elements)
     if response.status_code != 200:
-        raise OpenMLServerError(('Status code: %d\n' % response.status_code) + response.text)
+        raise _parse_server_exception(response)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
@@ -97,8 +111,25 @@ def _read_url(url, data=None):
     response = requests.post(url, data=data)
 
     if response.status_code != 200:
-        raise OpenMLServerError(('Status code: %d\n' % response.status_code) + response.text)
+        raise _parse_server_exception(response)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
     return response.text
+
+def _parse_server_exception(response):
+    # OpenML has a sopisticated error system
+    # where information about failures is provided. try to parse this
+    try:
+        server_exception = xmltodict.parse(response.text)
+    except:
+        raise OpenMLServerError(('Unexpected server error. Please '
+                                 'contact the developers!\nStatus code: '
+                                 '%d\n' % response.status_code) + response.text)
+
+    code = int(server_exception['oml:error']['oml:code'])
+    message = server_exception['oml:error']['oml:message']
+    additional = None
+    if 'oml:additional_information' in server_exception['oml:error']:
+        additional = server_exception['oml:error']['oml:additional_information']
+    return OpenMLServerException(code, message, additional)

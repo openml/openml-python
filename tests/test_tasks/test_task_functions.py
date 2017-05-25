@@ -1,12 +1,13 @@
 import os
 import sys
 
+import six
+
 if sys.version_info[0] >= 3:
     from unittest import mock
 else:
     import mock
 
-from openml.util import is_string
 from openml.testing import TestBase
 from openml import OpenMLSplit, OpenMLTask
 from openml.exceptions import OpenMLCacheException
@@ -45,7 +46,7 @@ class TestTask(TestBase):
         self.assertIn('did', task)
         self.assertIsInstance(task['did'], int)
         self.assertIn('status', task)
-        self.assertTrue(is_string(task['status']))
+        self.assertIsInstance(task['status'], six.string_types)
         self.assertIn(task['status'],
                       ['in_preparation', 'active', 'deactivated'])
 
@@ -59,15 +60,15 @@ class TestTask(TestBase):
             self._check_task(tasks[tid])
 
     def test_list_tasks_by_tag(self):
-        num_basic_tasks = 54 # number is flexible, check server if fails
-        tasks = openml.tasks.list_tasks(tag='basic')
+        num_basic_tasks = 100 # number is flexible, check server if fails
+        tasks = openml.tasks.list_tasks(tag='study_14')
         self.assertGreaterEqual(len(tasks), num_basic_tasks)
         for tid in tasks:
             self._check_task(tasks[tid])
 
     def test_list_tasks(self):
         tasks = openml.tasks.list_tasks()
-        self.assertGreaterEqual(len(tasks), 2000)
+        self.assertGreaterEqual(len(tasks), 900)
         for tid in tasks:
             self._check_task(tasks[tid])
 
@@ -83,7 +84,7 @@ class TestTask(TestBase):
     def test_list_tasks_per_type_paginate(self):
         size = 10
         max = 100
-        task_types = 5
+        task_types = 4
         for j in range(1,task_types):
             for i in range(0, max, size):
                 tasks = openml.tasks.list_tasks(task_type_id=j, offset=i, size=size)

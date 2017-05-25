@@ -19,7 +19,9 @@ import sklearn.model_selection
 # Necessary to have signature available in python 2.7
 from sklearn.utils.fixes import signature
 
-from .flow import OpenMLFlow
+import openml
+from openml.flows import OpenMLFlow
+from openml.exceptions import PyOpenMLError
 
 
 if sys.version_info >= (3, 5):
@@ -29,31 +31,40 @@ else:
 
 
 DEPENDENCIES_PATTERN = re.compile(
-    '^(?P<name>[\w\-]+)((?P<operation>==|>=|>)(?P<version>(\d+\.)?(\d+\.)?(\d+)))?$')
+    '^(?P<name>[\w\-]+)((?P<operation>==|>=|>)(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?))?$')
 
 
-def sklearn_to_flow(o):
+def sklearn_to_flow(o, parent_model=None):
+    # TODO: assert that only on first recursion lvl `parent_model` can be None
 
     if _is_estimator(o):
+        # is the main model or a submodel
         rval = _serialize_model(o)
     elif isinstance(o, (list, tuple)):
-        rval = [sklearn_to_flow(element) for element in o]
+        # TODO: explain what type of parameter is here
+        rval = [sklearn_to_flow(element, parent_model) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
     elif isinstance(o, (bool, int, float, six.string_types)) or o is None:
+        # base parameter values
         rval = o
     elif isinstance(o, dict):
+        # TODO: explain what type of parameter is here
+        if not isinstance(o, OrderedDict):
+            o = OrderedDict([(key, value) for key, value in sorted(o.items())])
+
         rval = OrderedDict()
         for key, value in o.items():
             if not isinstance(key, six.string_types):
                 raise TypeError('Can only use string as keys, you passed '
                                 'type %s for value %s.' %
                                 (type(key), str(key)))
-            key = sklearn_to_flow(key)
-            value = sklearn_to_flow(value)
+            key = sklearn_to_flow(key, parent_model)
+            value = sklearn_to_flow(value, parent_model)
             rval[key] = value
         rval = rval
     elif isinstance(o, type):
+        # TODO: explain what type of parameter is here
         rval = serialize_type(o)
     elif isinstance(o, scipy.stats.distributions.rv_frozen):
         rval = serialize_rv_frozen(o)
@@ -61,8 +72,10 @@ def sklearn_to_flow(o):
     # I think this is exactly what we want here as there shouldn't be any
     # built-in or functool.partials in a pipeline
     elif inspect.isfunction(o):
+        # TODO: explain what type of parameter is here
         rval = serialize_function(o)
     elif _is_cross_validator(o):
+        # TODO: explain what type of parameter is here
         rval = _serialize_cross_validator(o)
     else:
         raise TypeError(o, type(o))
@@ -122,10 +135,9 @@ def flow_to_sklearn(o, **kwargs):
                 raise ValueError('Cannot flow_to_sklearn %s' % serialized_type)
 
         else:
-            # Regular dictionary
             rval = OrderedDict((flow_to_sklearn(key, **kwargs),
                                 flow_to_sklearn(value, **kwargs))
-                               for key, value in o.items())
+                               for key, value in sorted(o.items()))
     elif isinstance(o, (list, tuple)):
         rval = [flow_to_sklearn(element, **kwargs) for element in o]
         if isinstance(o, tuple):
@@ -197,7 +209,15 @@ def _serialize_model(model):
                       parameters=parameters,
                       parameters_meta_info=parameters_meta_info,
                       external_version=external_version,
-                      tags=[],
+                      tags=['openml-python', 'sklearn', 'scikit-learn',
+                            'python',
+                            _format_external_version('sklearn',
+                                                     sklearn.__version__).replace('==', '_'),
+                            # TODO: add more tags based on the scikit-learn
+                            # module a flow is in? For example automatically
+                            # annotate a class of sklearn.svm.SVC() with the
+                            # tag svm?
+                            ],
                       language='English',
                       # TODO fill in dependencies!
                       dependencies=dependencies)
@@ -216,8 +236,10 @@ def _get_external_version_string(model, sub_components):
     model_package_version_number = module.__version__
     external_version = _format_external_version(model_package_name,
                                                 model_package_version_number)
+    openml_version = _format_external_version('openml', openml.__version__)
     external_versions = set()
     external_versions.add(external_version)
+    external_versions.add(openml_version)
     for visitee in sub_components.values():
         for external_version in visitee.external_version.split(','):
             external_versions.add(external_version)
@@ -256,17 +278,25 @@ def _extract_information_from_model(model):
 
     model_parameters = model.get_params(deep=False)
     for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
-        rval = sklearn_to_flow(v)
+        rval = sklearn_to_flow(v, model)
 
         if (isinstance(rval, (list, tuple)) and len(rval) > 0 and
                 isinstance(rval[0], (list, tuple)) and
                 [type(rval[0]) == type(rval[i]) for i in range(len(rval))]):
 
-            # Steps in a pipeline or feature union
+            # Steps in a pipeline or feature union, or base classifiers in voting classifier
             parameter_value = list()
+            reserved_keywords = set(model.get_params(deep=False).keys())
+
             for sub_component_tuple in rval:
                 identifier, sub_component = sub_component_tuple
                 sub_component_type = type(sub_component_tuple)
+
+                if identifier in reserved_keywords:
+                    parent_model_name = model.__module__ + "." + \
+                                        model.__class__.__name__
+                    raise PyOpenMLError('Found element shadowing official ' + \
+                                        'parameter for %s: %s' % (parent_model_name, identifier))
 
                 if sub_component is None:
                     # In a FeatureUnion it is legal to have a None step
@@ -286,8 +316,10 @@ def _extract_information_from_model(model):
                     component_reference = OrderedDict()
                     component_reference[
                         'oml-python:serialized_object'] = 'component_reference'
-                    component_reference['value'] = OrderedDict(
-                        key=identifier, step_name=identifier)
+                    cr_value = OrderedDict()
+                    cr_value['key'] = identifier
+                    cr_value['step_name'] = identifier
+                    component_reference['value'] = cr_value
                     parameter_value.append(component_reference)
 
             if isinstance(rval, tuple):
@@ -309,8 +341,11 @@ def _extract_information_from_model(model):
             component_reference = OrderedDict()
             component_reference[
                 'oml-python:serialized_object'] = 'component_reference'
-            component_reference['value'] = OrderedDict(key=k, step_name=None)
-            component_reference = sklearn_to_flow(component_reference)
+            cr_value = OrderedDict()
+            cr_value['key'] = k
+            cr_value['step_name'] = None
+            component_reference['value'] = cr_value
+            component_reference = sklearn_to_flow(component_reference, model)
             parameters[k] = json.dumps(component_reference)
 
         else:
@@ -370,6 +405,9 @@ def _deserialize_model(flow, **kwargs):
 
 
 def _check_dependencies(dependencies):
+    if not dependencies:
+        return
+
     dependencies = dependencies.split('\n')
     for dependency_string in dependencies:
         match = DEPENDENCIES_PATTERN.match(dependency_string)
@@ -431,7 +469,8 @@ def serialize_rv_frozen(o):
     dist = o.dist.__class__.__module__ + '.' + o.dist.__class__.__name__
     ret = OrderedDict()
     ret['oml-python:serialized_object'] = 'rv_frozen'
-    ret['value'] = OrderedDict(dist=dist, a=a, b=b, args=args, kwds=kwds)
+    ret['value'] = OrderedDict((('dist', dist), ('a', a), ('b', b),
+                                ('args', args), ('kwds', kwds)))
     return ret
 
 def deserialize_rv_frozen(o, **kwargs):
@@ -519,6 +558,44 @@ def _serialize_cross_validator(o):
 
     return ret
 
+def _check_n_jobs(model):
+    '''
+    Returns True if the parameter settings of model are chosen s.t. the model
+     will run on a single core (in that case, openml-python can measure runtimes)
+    '''
+    def check(param_dict, disallow_parameter=False):
+        for param, value in param_dict.items():
+            # n_jobs is scikitlearn parameter for paralizing jobs
+            if param.split('__')[-1] == 'n_jobs':
+                # 0 = illegal value (?), 1 = use one core,  n = use n cores
+                # -1 = use all available cores -> this makes it hard to
+                # measure runtime in a fair way
+                if value != 1 or disallow_parameter:
+                    return False
+        return True
+
+    if not (isinstance(model, sklearn.base.BaseEstimator) or
+            isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
+        raise ValueError('model should be BaseEstimator or BaseSearchCV')
+
+    # make sure that n_jobs is not in the parameter grid of optimization procedure
+    if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
+        param_distributions = None
+        if isinstance(model, sklearn.model_selection.GridSearchCV):
+            param_distributions = model.param_grid
+        elif isinstance(model, sklearn.model_selection.RandomizedSearchCV):
+            param_distributions = model.param_distributions
+        else:
+            print('Warning! Using subclass BaseSearchCV other than ' \
+                  '{GridSearchCV, RandomizedSearchCV}. Should implement param check. ')
+            pass
+
+        if not check(param_distributions, True):
+            raise PyOpenMLError('openml-python should not be used to '
+                                'optimize the n_jobs parameter.')
+
+    # check the parameters for n_jobs
+    return check(model.get_params(), False)
 
 def _deserialize_cross_validator(value, **kwargs):
     model_name = value['name']

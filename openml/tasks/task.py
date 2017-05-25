@@ -3,7 +3,6 @@ import os
 
 from .. import config
 from .. import datasets
-from ..util import URLError
 from .split import OpenMLSplit
 from .._api_calls import _read_url
 
@@ -70,11 +69,7 @@ class OpenMLTask(object):
                 pass
         except (OSError, IOError):
             split_url = self.estimation_procedure["data_splits_url"]
-            try:
-                split_arff = _read_url(split_url)
-            except (URLError, UnicodeEncodeError) as e:
-                print(e, split_url)
-                raise e
+            split_arff = _read_url(split_url)
 
             with io.open(cache_file, "w", encoding='utf8') as fh:
                 fh.write(split_arff)
@@ -82,11 +77,6 @@ class OpenMLTask(object):
 
     def download_split(self):
         """Download the OpenML split for a given task.
-
-        Parameters
-        ----------
-        task_id : Task
-            An entity of :class:`openml.OpenMLTask`.
         """
         cached_split_file = os.path.join(
             _create_task_cache_dir(self.task_id), "datasplits.arff")

@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import unittest
+import warnings
 
 if sys.version_info[0] >= 3:
     from unittest import mock
@@ -26,11 +27,13 @@ import sklearn.tree
 
 import openml
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
-from openml.flows.sklearn_converter import _format_external_version, _check_dependencies
+from openml.flows.functions import assert_flows_equal
+from openml.flows.sklearn_converter import _format_external_version, \
+    _check_dependencies, _check_n_jobs
+from openml.exceptions import PyOpenMLError
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(this_directory)
-from test_flow import are_flows_equal
 
 
 __version__ = 0.1
@@ -61,7 +64,8 @@ class TestSklearn(unittest.TestCase):
 
         fixture_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_description = 'Automatically created scikit-learn flow.'
-        version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' % sklearn.__version__
+        version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
+                          % sklearn.__version__
         fixture_parameters = \
             OrderedDict((('class_weight', 'null'),
                          ('criterion', '"entropy"'),
@@ -294,8 +298,8 @@ class TestSklearn(unittest.TestCase):
         # Checks that sklearn_to_flow is idempotent.
         serialized2 = sklearn_to_flow(deserialized)
         self.assertNotEqual(rs, deserialized)
-        self.assertTrue(are_flows_equal(serialized, serialized2),
-                         msg='%s\n%s' % (serialized, serialized2))
+        # Would raise an exception if the flows would be unequal
+        assert_flows_equal(serialized, serialized2)
 
     def test_serialize_type(self):
         supported_types = [float, np.float, np.float32, np.float64,
@@ -459,6 +463,8 @@ class TestSklearn(unittest.TestCase):
                                 sklearn_to_flow, gp)
 
     def test_error_on_adding_component_multiple_times_to_flow(self):
+        # this function implicitly checks
+        # - openml.flows._check_multiple_occurence_of_component_in_flow()
         pca = sklearn.decomposition.PCA()
         pca2 = sklearn.decomposition.PCA()
         pipeline = sklearn.pipeline.Pipeline((('pca1', pca), ('pca2', pca2)))
@@ -516,11 +522,77 @@ class TestSklearn(unittest.TestCase):
         # I put the alternative travis-ci answer here as well. While it has a
         # different value, it is still correct as it is a propagation of the
         # subclasses' module name
-        self.assertEqual(flow.external_version, '%s,%s' % (
+        self.assertEqual(flow.external_version, '%s,%s,%s' % (
+            _format_external_version('openml', openml.__version__),
             _format_external_version('sklearn', sklearn.__version__),
             _format_external_version('tests', '0.1')))
 
-    def test_check_dependencies(self):
+    @mock.patch('warnings.warn')
+    def test_check_dependencies(self, warnings_mock):
         dependencies = ['sklearn==0.1', 'sklearn>=99.99.99', 'sklearn>99.99.99']
         for dependency in dependencies:
             self.assertRaises(ValueError, _check_dependencies, dependency)
+
+    def test_illegal_parameter_names(self):
+        # illegal name: estimators
+        clf1 = sklearn.ensemble.VotingClassifier(
+            estimators=[('estimators', sklearn.ensemble.RandomForestClassifier()),
+                        ('whatevs', sklearn.ensemble.ExtraTreesClassifier())])
+        clf2 = sklearn.ensemble.VotingClassifier(
+            estimators=[('whatevs', sklearn.ensemble.RandomForestClassifier()),
+                        ('estimators', sklearn.ensemble.ExtraTreesClassifier())])
+        cases = [clf1, clf2]
+
+        for case in cases:
+            self.assertRaises(PyOpenMLError, sklearn_to_flow, case)
+
+    def test_illegal_parameter_names_pipeline(self):
+        # illegal name: steps
+        steps = [
+            ('Imputer', sklearn.preprocessing.Imputer(strategy='median')),
+            ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore')),
+            ('steps', sklearn.ensemble.BaggingClassifier(base_estimator=sklearn.tree.DecisionTreeClassifier))
+        ]
+        self.assertRaises(ValueError, sklearn.pipeline.Pipeline, steps=steps)
+
+
+    def test_illegal_parameter_names_featureunion(self):
+        # illegal name: transformer_list
+        transformer_list = [
+            ('transformer_list', sklearn.preprocessing.Imputer(strategy='median')),
+            ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore'))
+        ]
+        self.assertRaises(ValueError, sklearn.pipeline.FeatureUnion, transformer_list=transformer_list)
+
+    def test_paralizable_check(self):
+        # using this model should pass the test (if param distribution is legal)
+        singlecore_bagging = sklearn.ensemble.BaggingClassifier()
+        # using this model should return false (if param distribution is legal)
+        multicore_bagging = sklearn.ensemble.BaggingClassifier(n_jobs=5)
+        # using this param distribution should raise an exception
+        illegal_param_dist = {"base__n_jobs": [-1, 0, 1] }
+        # using this param distribution should not raise an exception
+        legal_param_dist = {"base__max_depth": [2, 3, 4]}
+
+        legal_models = [
+            sklearn.ensemble.RandomForestClassifier(),
+            sklearn.ensemble.RandomForestClassifier(n_jobs=5),
+            sklearn.ensemble.RandomForestClassifier(n_jobs=-1),
+            sklearn.pipeline.Pipeline(steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=1))]),
+            sklearn.pipeline.Pipeline(steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=5))]),
+            sklearn.pipeline.Pipeline(steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=-1))]),
+            sklearn.model_selection.GridSearchCV(singlecore_bagging, legal_param_dist),
+            sklearn.model_selection.GridSearchCV(multicore_bagging, legal_param_dist)
+        ]
+        illegal_models = [
+            sklearn.model_selection.GridSearchCV(singlecore_bagging, illegal_param_dist),
+            sklearn.model_selection.GridSearchCV(multicore_bagging, illegal_param_dist)
+        ]
+
+        answers = [True, False, False, True, False, False, True, False]
+
+        for i in range(len(legal_models)):
+            self.assertTrue(_check_n_jobs(legal_models[i]) == answers[i])
+
+        for i in range(len(illegal_models)):
+            self.assertRaises(PyOpenMLError, _check_n_jobs, illegal_models[i])

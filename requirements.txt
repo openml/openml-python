@@ -5,5 +5,6 @@ liac-arff>=2.1.1dev
 xmltodict
 nose
 requests
-scikit-learn
+scikit-learn>=0.18
 nbformat
+python-dateutil
