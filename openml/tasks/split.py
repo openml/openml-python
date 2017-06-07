@@ -22,13 +22,16 @@ class OpenMLSplit(object):
             repetition = int(repetition)
             self.split[repetition] = OrderedDict()
             for fold in split[repetition]:
-                self.split[repetition][fold] = split[repetition][fold]
+                self.split[repetition][fold] = OrderedDict()
+                for sample in split[repetition][fold]:
+                    self.split[repetition][fold][sample] = split[repetition][fold][sample]
 
         self.repeats = len(self.split)
         if any([len(self.split[0]) != len(self.split[i])
                 for i in range(self.repeats)]):
             raise ValueError('')
         self.folds = len(self.split[0])
+        self.samples = len(self.split[0][0])
 
     def __eq__(self, other):
         if type(self) != type(other):
@@ -71,29 +74,42 @@ class OpenMLSplit(object):
             name = meta.name
 
             repetitions = OrderedDict()
+
+            type_idx = meta._attrnames.index('type')
+            rowid_idx = meta._attrnames.index('rowid')
+            repeat_idx = meta._attrnames.index('repeat')
+            fold_idx = meta._attrnames.index('fold')
+            sample_idx = (meta._attrnames.index('sample') if 'sample' in meta._attrnames else None) # can be None
+
             for line in splits:
                 # A line looks like type, rowid, repeat, fold
-                repetition = int(line[2])
-                fold = int(line[3])
+                repetition = int(line[repeat_idx])
+                fold = int(line[fold_idx])
+                sample = 0
+                if sample_idx is not None:
+                    sample = int(line[sample_idx])
 
                 if repetition not in repetitions:
                     repetitions[repetition] = OrderedDict()
                 if fold not in repetitions[repetition]:
-                    repetitions[repetition][fold] = ([], [])
+                    repetitions[repetition][fold] = OrderedDict()
+                if sample not in repetitions[repetition][fold]:
+                    repetitions[repetition][fold][sample] = ([], [])
 
-                type_ = line[0].decode('utf-8')
+                type_ = line[type_idx].decode('utf-8')
                 if type_ == 'TRAIN':
-                    repetitions[repetition][fold][0].append(line[1])
+                    repetitions[repetition][fold][sample][0].append(line[rowid_idx])
                 elif type_ == 'TEST':
-                    repetitions[repetition][fold][1].append(line[1])
+                    repetitions[repetition][fold][sample][1].append(line[rowid_idx])
                 else:
                     raise ValueError(type_)
 
             for repetition in repetitions:
                 for fold in repetitions[repetition]:
-                    repetitions[repetition][fold] = Split(
-                        np.array(repetitions[repetition][fold][0], dtype=np.int32),
-                        np.array(repetitions[repetition][fold][1], dtype=np.int32))
+                    for sample in repetitions[repetition][fold]:
+                        repetitions[repetition][fold][sample] = Split(
+                            np.array(repetitions[repetition][fold][sample][0], dtype=np.int32),
+                            np.array(repetitions[repetition][fold][sample][1], dtype=np.int32))
 
             if cache:
                 with open(pkl_filename, "wb") as fh:
@@ -105,13 +121,11 @@ class OpenMLSplit(object):
     def from_dataset(self, X, Y, folds, repeats):
         raise NotImplementedError()
 
-    def get(self, repeat=0, fold=0):
+    def get(self, repeat=0, fold=0, sample=0):
         if repeat not in self.split:
             raise ValueError("Repeat %s not known" % str(repeat))
         if fold not in self.split[repeat]:
             raise ValueError("Fold %s not known" % str(fold))
-        return self.split[repeat][fold]
-
-    def iterate_splits(self):
-        for rep in range(self.repeats):
-            yield (self.get(repeat=rep, fold=fold) for fold in range(self.folds))
+        if sample not in self.split[repeat][fold]:
+            raise ValueError("Sample %s not known" % str(sample))
+        return self.split[repeat][fold][sample]
