@@ -594,7 +594,8 @@ def _create_run_from_xml(xml):
 
     files = dict()
     evaluations = dict()
-    detailed_evaluations = defaultdict(lambda: defaultdict(dict))
+    fold_evaluations = defaultdict(lambda: defaultdict(dict))
+    sample_evaluations = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
     if 'oml:output_data' not in run:
         raise ValueError('Run does not contain output_data (OpenML server error?)')
     else:
@@ -621,11 +622,18 @@ def _create_run_from_xml(xml):
                 else:
                     raise ValueError('Could not find keys "value" or "array_data" '
                                      'in %s' % str(evaluation_dict.keys()))
-
-                if '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
+                if '@repeat' in evaluation_dict and '@fold' in evaluation_dict and '@sample' in evaluation_dict:
                     repeat = int(evaluation_dict['@repeat'])
                     fold = int(evaluation_dict['@fold'])
-                    repeat_dict = detailed_evaluations[key]
+                    sample = int(evaluation_dict['@sample'])
+                    repeat_dict = sample_evaluations[key]
+                    fold_dict = repeat_dict[repeat]
+                    sample_dict = fold_dict[fold]
+                    sample_dict[sample] = value
+                elif '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
+                    repeat = int(evaluation_dict['@repeat'])
+                    fold = int(evaluation_dict['@fold'])
+                    repeat_dict = fold_evaluations[key]
                     fold_dict = repeat_dict[repeat]
                     fold_dict[fold] = value
                 else:
@@ -652,7 +660,9 @@ def _create_run_from_xml(xml):
                      parameter_settings=parameters,
                      dataset_id=dataset_id, output_files=files,
                      evaluations=evaluations,
-                     detailed_evaluations=detailed_evaluations, tags=tags)
+                     fold_evaluations=fold_evaluations,
+                     sample_evaluations=sample_evaluations,
+                     tags=tags)
 
 def _create_trace_from_description(xml):
     result_dict = xmltodict.parse(xml)['oml:trace']

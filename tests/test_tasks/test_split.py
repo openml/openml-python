@@ -46,18 +46,19 @@ class OpenMLSplitTest(unittest.TestCase):
         split = OpenMLSplit._from_arff_file(self.arff_filename)
         self.assertIsInstance(split.split, dict)
         self.assertIsInstance(split.split[0], dict)
-        self.assertIsInstance(split.split[0][0][0], np.ndarray)
-        self.assertIsInstance(split.split[0][0].train, np.ndarray)
-        self.assertIsInstance(split.split[0][0].train, np.ndarray)
-        self.assertIsInstance(split.split[0][0][1], np.ndarray)
-        self.assertIsInstance(split.split[0][0].test, np.ndarray)
-        self.assertIsInstance(split.split[0][0].test, np.ndarray)
+        self.assertIsInstance(split.split[0][0], dict)
+        self.assertIsInstance(split.split[0][0][0][0], np.ndarray)
+        self.assertIsInstance(split.split[0][0][0].train, np.ndarray)
+        self.assertIsInstance(split.split[0][0][0].train, np.ndarray)
+        self.assertIsInstance(split.split[0][0][0][1], np.ndarray)
+        self.assertIsInstance(split.split[0][0][0].test, np.ndarray)
+        self.assertIsInstance(split.split[0][0][0].test, np.ndarray)
         for i in range(10):
             for j in range(10):
-                self.assertGreaterEqual(split.split[i][j].train.shape[0], 808)
-                self.assertGreaterEqual(split.split[i][j].test.shape[0], 89)
-                self.assertEqual(split.split[i][j].train.shape[0] +
-                                 split.split[i][j].test.shape[0], 898)
+                self.assertGreaterEqual(split.split[i][j][0].train.shape[0], 808)
+                self.assertGreaterEqual(split.split[i][j][0].test.shape[0], 89)
+                self.assertEqual(split.split[i][j][0].train.shape[0] +
+                                 split.split[i][j][0].test.shape[0], 898)
 
     def test_get_split(self):
         split = OpenMLSplit._from_arff_file(self.arff_filename)
