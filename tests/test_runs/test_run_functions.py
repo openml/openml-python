@@ -157,7 +157,6 @@ class TestRun(TestBase):
 
         return run
 
-
     def _check_fold_evaluations(self, fold_evaluations, num_repeats, num_folds, max_time_allowed=60000):
         '''
         Checks whether the right timing measures are attached to the run (before upload).
@@ -183,6 +182,36 @@ class TestRun(TestBase):
                         self.assertIsInstance(evaluation, float)
                         self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
                         self.assertLess(evaluation, max_time_allowed)
+
+
+    def _check_sample_evaluations(self, sample_evaluations, num_repeats, num_folds, num_samples, max_time_allowed=60000):
+        '''
+        Checks whether the right timing measures are attached to the run (before upload).
+        Test is only performed for versions >= Python3.3
+
+        In case of check_n_jobs(clf) == false, please do not perform this check (check this
+        condition outside of this function. )
+        default max_time_allowed (per fold, in milli seconds) = 1 minute, quite pessimistic
+        '''
+        timing_measures = {'usercpu_time_millis_testing', 'usercpu_time_millis_training', 'usercpu_time_millis'}
+
+        self.assertIsInstance(sample_evaluations, dict)
+        if sys.version_info[:2] >= (3, 3):
+            self.assertEquals(set(sample_evaluations.keys()), timing_measures)
+            for measure in timing_measures:
+                num_rep_entrees = len(sample_evaluations[measure])
+                self.assertEquals(num_rep_entrees, num_repeats)
+                for rep in range(num_rep_entrees):
+                    num_fold_entrees = len(sample_evaluations[measure][rep])
+                    self.assertEquals(num_fold_entrees, num_folds)
+                    for fold in range(num_fold_entrees):
+                        num_sample_entrees = len(sample_evaluations[measure][rep][fold])
+                        self.assertEquals(num_sample_entrees, num_samples)
+                        for sample in range(num_sample_entrees):
+                            evaluation = sample_evaluations[measure][rep][fold][sample]
+                            self.assertIsInstance(evaluation, float)
+                            self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
+                            self.assertLess(evaluation, max_time_allowed)
 
     def test_run_regression_on_classif_task(self):
         task_id = 115
@@ -294,6 +323,43 @@ class TestRun(TestBase):
             # todo: check if runtime is present
             self._check_fold_evaluations(run.fold_evaluations, 1, num_folds)
             pass
+
+    def test_learning_curve_task(self):
+        task_id = 801  # diabates dataset
+        num_test_instances = 6144 # for learning curve
+        num_repeats = 1
+        num_folds = 10
+        num_samples = 8
+
+        clfs = []
+        random_state_fixtures = []
+
+        #nb = GaussianNB()
+        #clfs.append(nb)
+        #random_state_fixtures.append('62501')
+
+        pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
+                                    ('dummy', DummyClassifier(strategy='prior'))])
+        clfs.append(pipeline1)
+        random_state_fixtures.append('62501')
+
+        pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+                                    ('VarianceThreshold', VarianceThreshold()),
+                                    ('Estimator', RandomizedSearchCV(
+                                        DecisionTreeClassifier(),
+                                        {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
+                                         'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
+                                        cv=3, n_iter=10))])
+        clfs.append(pipeline2)
+        random_state_fixtures.append('62501')
+
+
+        for clf, rsv in zip(clfs, random_state_fixtures):
+            run = self._perform_run(task_id, num_test_instances, clf,
+                                    random_state_value=rsv)
+
+            # todo: check if runtime is present
+            self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
     def test_initialize_cv_from_run(self):
         randomsearch = RandomizedSearchCV(
