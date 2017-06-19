@@ -6,7 +6,7 @@ from ..evaluations import OpenMLEvaluation
 def list_evaluations(function, task_id):
     """Helper function to parse API calls which are lists of runs"""
 
-    xml_string = _perform_api_call("evaluation/list/funtion/%s/task_id/%d" %(function, task_id))
+    xml_string = _perform_api_call("evaluation/list/function/%s/task_id/%d" %(function, task_id))
 
     evals_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
