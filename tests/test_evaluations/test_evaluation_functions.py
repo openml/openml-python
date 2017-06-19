@@ -27,3 +27,10 @@ class TestEvaluationFunctions(TestBase):
         self.assertGreater(len(evaluations), 100)
         # for run_id in evaluations.keys():
         #     self.assertEquals(evaluations[run_id].uploader, uploader_id)
+
+
+    def test_evaluation_list_limit(self):
+        openml.config.server = self.production_server
+
+        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", size=100, offset=100)
+        self.assertEquals(len(evaluations), 100)
