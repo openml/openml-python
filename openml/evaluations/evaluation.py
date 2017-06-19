@@ -2,7 +2,7 @@
 class OpenMLEvaluation(object):
 
     def __init__(self, run_id, task_id, setup_id, flow_id, flow_name,
-                 data_name, function, upload_time, value, array_data):
+                 data_name, function, upload_time, value, array_data=None):
         self.run_id = run_id
         self.task_id = task_id
         self.setup_id = setup_id
