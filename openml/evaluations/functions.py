@@ -3,10 +3,64 @@ import xmltodict
 from .._api_calls import _perform_api_call
 from ..evaluations import OpenMLEvaluation
 
-def list_evaluations(function, task_id):
+def list_runs(function, offset=None, size=None, id=None, task=None, setup=None,
+              flow=None, uploader=None, tag=None):
+    """List all run-evaluation pairs matching all of the given filters.
+
+        Perform API call `/evaluation/function{function}/{filters} 
+        
+        Parameters
+        ----------
+        function : str 
+            the evaluation function. e.g., predictive_accuracy
+        offset : int, optional
+            the number of runs to skip, starting from the first
+        size : int, optional
+            the maximum number of runs to show
+
+        id : list, optional
+
+        task : list, optional
+
+        setup: list, optional
+
+        flow : list, optional
+
+        uploader : list, optional
+
+        tag : str, optional
+
+        Returns
+        -------
+        list
+            List of found evaluations.
+        """
+
+    api_call = "evaluation/list/function/%s" %function
+    if offset is not None:
+        api_call += "/offset/%d" % int(offset)
+    if size is not None:
+        api_call += "/limit/%d" % int(size)
+    if id is not None:
+        api_call += "/run/%s" % ','.join([str(int(i)) for i in id])
+    if task is not None:
+        api_call += "/task/%s" % ','.join([str(int(i)) for i in task])
+    if setup is not None:
+        api_call += "/setup/%s" % ','.join([str(int(i)) for i in setup])
+    if flow is not None:
+        api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
+    if uploader is not None:
+        api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
+    if tag is not None:
+        api_call += "/tag/%s" % tag
+
+    return _list_evaluations(api_call)
+
+
+def _list_evaluations(api_call):
     """Helper function to parse API calls which are lists of runs"""
 
-    xml_string = _perform_api_call("evaluation/list/function/%s/task/%d" %(function, task_id))
+    xml_string = _perform_api_call(api_call)
 
     evals_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
