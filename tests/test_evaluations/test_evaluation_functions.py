@@ -1,4 +1,3 @@
-import unittest
 import openml
 import openml.evaluations
 from openml.testing import TestBase
