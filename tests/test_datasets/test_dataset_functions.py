@@ -250,6 +250,6 @@ class TestOpenMLDataset(TestBase):
         dataset = OpenMLDataset(
             name="UploadTestWithURL", version=1, description="test",
             format="ARFF",
-            url="http://expdb.cs.kuleuven.be/expdb/data/uci/nominal/iris.arff")
+            url="http://www.cs.umb.edu/~rickb/files/UCI/anneal.arff")
         dataset.publish()
         self.assertIsInstance(dataset.dataset_id, int)
