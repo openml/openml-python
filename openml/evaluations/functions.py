@@ -71,7 +71,7 @@ def _list_evaluations(api_call):
     if isinstance(evals_dict['oml:evaluations']['oml:evaluation'], list):
         evals_list = evals_dict['oml:evaluations']['oml:evaluation']
     elif isinstance(evals_dict['oml:evaluations']['oml:evaluation'], dict):
-        evals_list = [evals_dict['oml:runs']['oml:run']]
+        evals_list = [evals_dict['oml:evaluations']['oml:evaluation']]
     else:
         raise TypeError()
 
