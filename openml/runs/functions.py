@@ -361,7 +361,14 @@ def _run_task_get_arffcontent(model, task, class_labels):
     X, Y = task.get_X_and_y()
     arff_datacontent = []
     arff_tracecontent = []
+    # stores fold-based evaluation measures. In case of a sample based task,
+    # this information is multiple times overwritten, but due to the ordering
+    # of tne loops, eventually it contains the information based on the full
+    # dataset size
     user_defined_measures_fold = defaultdict(lambda: defaultdict(dict))
+    # stores sample-based evaluation measures (sublevel of fold-based)
+    # will also be filled on a non sample-based task, but the information
+    # is the same as the fold-based measures, and disregarded in that case
     user_defined_measures_sample = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
 
     # sys.version_info returns a tuple, the following line compares the entry of tuples
