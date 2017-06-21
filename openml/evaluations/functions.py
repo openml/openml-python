@@ -84,9 +84,10 @@ def _list_evaluations(api_call):
 
         evaluation = OpenMLEvaluation(int(eval_['oml:run_id']), int(eval_['oml:task_id']),
                                       int(eval_['oml:setup_id']), int(eval_['oml:flow_id']),
-                                      eval_['oml:flow_name'], eval_['oml:data_name'],
-                                      eval_['oml:function'], eval_['oml:upload_time'],
-                                      float(eval_['oml:value']), array_data)
+                                      eval_['oml:flow_name'], eval_['oml:data_id'],
+                                      eval_['oml:data_name'], eval_['oml:function'],
+                                      eval_['oml:upload_time'], float(eval_['oml:value']),
+                                      array_data)
         evals[run_id] = evaluation
     return evals
 
