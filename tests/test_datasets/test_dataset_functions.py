@@ -169,6 +169,9 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(os.path.exists(os.path.join(
             openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
 
+        self.assertGreater(len(dataset.features), 1)
+        self.assertGreater(len(dataset.qualities), 4)
+
     def test_get_dataset_with_string(self):
         dataset = openml.datasets.get_dataset(101)
         self.assertRaises(PyOpenMLError, dataset._get_arff, 'arff')
