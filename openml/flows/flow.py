@@ -4,6 +4,7 @@ import six
 import xmltodict
 
 from .._api_calls import _perform_api_call
+from ..utils import extract_xml_tags
 
 
 class OpenMLFlow(object):
@@ -104,7 +105,7 @@ class OpenMLFlow(object):
         keys_parameters = set(parameters.keys())
         keys_parameters_meta_info = set(parameters_meta_info.keys())
         if len(keys_parameters.difference(keys_parameters_meta_info)) > 0:
-            raise ValueError('Parameter %s only in parameters, but not in'
+            raise ValueError('Parameter %s only in parameters, but not in '
                              'parameters_meta_info.' %
                              str(keys_parameters.difference(
                                  keys_parameters_meta_info)))
@@ -278,10 +279,8 @@ class OpenMLFlow(object):
         if 'oml:parameter' in dic:
             # In case of a single parameter, xmltodict returns a dictionary,
             # otherwise a list.
-            if isinstance(dic['oml:parameter'], dict):
-                oml_parameters = [dic['oml:parameter']]
-            else:
-                oml_parameters = dic['oml:parameter']
+            oml_parameters = extract_xml_tags('oml:parameter', dic,
+                                              allow_none=False)
 
             for oml_parameter in oml_parameters:
                 parameter_name = oml_parameter['oml:name']
@@ -299,30 +298,31 @@ class OpenMLFlow(object):
         if 'oml:component' in dic:
             # In case of a single component xmltodict returns a dict,
             # otherwise a list.
-            if isinstance(dic['oml:component'], dict):
-                oml_components = [dic['oml:component']]
-            else:
-                oml_components = dic['oml:component']
+            oml_components = extract_xml_tags('oml:component', dic,
+                                              allow_none=False)
 
             for component in oml_components:
                 flow = OpenMLFlow._from_dict(component)
                 components[component['oml:identifier']] = flow
         arguments['components'] = components
-
-        tags = []
-        if 'oml:tag' in dic and dic['oml:tag'] is not None:
-            # In case of a single tag xmltodict returns a dict, otherwise a list
-            if isinstance(dic['oml:tag'], dict):
-                oml_tags = [dic['oml:tag']]
-            else:
-                oml_tags = dic['oml:tag']
-
-            for tag in oml_tags:
-                tags.append(tag)
-        arguments['tags'] = tags
+        arguments['tags'] = extract_xml_tags('oml:tag', dic)
 
         arguments['model'] = None
-        return cls(**arguments)
+        flow = cls(**arguments)
+
+        # try to parse to a model because not everything that can be
+        # deserialized has to come from scikit-learn. If it can't be
+        # serialized, but comes from scikit-learn this is worth an exception
+        try:
+            from .sklearn_converter import flow_to_sklearn
+            model = flow_to_sklearn(flow)
+        except Exception as e:
+            if arguments['external_version'].startswith('sklearn'):
+                raise e
+            model = None
+        flow.model = model
+
+        return flow
 
     def publish(self):
         """Publish flow to OpenML server.
@@ -332,15 +332,43 @@ class OpenMLFlow(object):
         self : OpenMLFlow
 
         """
+        # Import at top not possible because of cyclic dependencies. In
+        # particular, flow.py tries to import functions.py in order to call
+        # get_flow(), while functions.py tries to import flow.py in order to
+        # instantiate an OpenMLFlow.
+        import openml.flows.functions
 
         xml_description = self._to_xml()
 
         file_elements = {'description': xml_description}
         return_value = _perform_api_call("flow/", file_elements=file_elements)
-        self.flow_id = int(xmltodict.parse(return_value)['oml:upload_flow']['oml:id'])
+        flow_id = int(xmltodict.parse(return_value)['oml:upload_flow']['oml:id'])
+        flow = openml.flows.functions.get_flow(flow_id)
+        _copy_server_fields(flow, self)
+        try:
+            openml.flows.functions.assert_flows_equal(self, flow, flow.upload_date)
+        except ValueError as e:
+            message = e.args[0]
+            raise ValueError("Flow was not stored correctly on the server. "
+                             "New flow ID is %d. Please check manually and "
+                             "remove the flow if necessary! Error is:\n'%s'" %
+                             (flow_id, message))
         return self
+
+
+def _copy_server_fields(source_flow, target_flow):
+    fields_added_by_the_server = ['flow_id', 'uploader', 'version',
+                                  'upload_date']
+    for field in fields_added_by_the_server:
+        setattr(target_flow, field, getattr(source_flow, field))
+
+    for name, component in source_flow.components.items():
+        assert name in target_flow.components
+        _copy_server_fields(component, target_flow.components[name])
 
 
 def _add_if_nonempty(dic, key, value):
     if value is not None:
         dic[key] = value
+
+

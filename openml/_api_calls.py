@@ -1,8 +1,9 @@
 import io
 import os
 import requests
-import arff
 import warnings
+
+import arff
 import xmltodict
 
 from . import config
@@ -49,6 +50,18 @@ def _perform_api_call(call, data=None, file_dictionary=None,
         return _read_url_files(url, data=data, file_dictionary=file_dictionary,
                                file_elements=file_elements)
     return _read_url(url, data)
+
+
+def _file_id_to_url(file_id, filename=None):
+    '''
+     Presents the URL how to download a given file id
+     filename is optional
+    '''
+    openml_url = config.server.split('/api/')
+    url = openml_url[0] + '/data/download/%s' %file_id
+    if filename is not None:
+        url += '/' + filename
+    return url
 
 
 def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
@@ -110,7 +123,9 @@ def _parse_server_exception(response):
     try:
         server_exception = xmltodict.parse(response.text)
     except:
-        raise OpenMLServerError(('Status code: %d\n' % response.status_code) + response.text)
+        raise OpenMLServerError(('Unexpected server error. Please '
+                                 'contact the developers!\nStatus code: '
+                                 '%d\n' % response.status_code) + response.text)
 
     code = int(server_exception['oml:error']['oml:code'])
     message = server_exception['oml:error']['oml:message']

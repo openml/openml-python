@@ -3,9 +3,9 @@ import unittest
 import os
 
 import numpy as np
+import six
 
 from openml import OpenMLDataset
-from openml.util import is_string
 
 
 class OpenMLDatasetTest(unittest.TestCase):
@@ -64,7 +64,8 @@ class OpenMLDatasetTest(unittest.TestCase):
         rval, attribute_names = self.dataset.get_data(
             return_attribute_names=True)
         self.assertEqual(len(attribute_names), 39)
-        self.assertTrue(all([is_string(att) for att in attribute_names]))
+        self.assertTrue(all([isinstance(att, six.string_types)
+                             for att in attribute_names]))
 
     def test_get_sparse_dataset(self):
         rval = self.sparse_dataset.get_data()
@@ -80,7 +81,8 @@ class OpenMLDatasetTest(unittest.TestCase):
             return_attribute_names=True)
         self.assertIsInstance(rval, np.ndarray)
         self.assertEqual(len(attribute_names), 20001)
-        self.assertTrue(all([is_string(att) for att in attribute_names]))
+        self.assertTrue(all([isinstance(att, six.string_types)
+                             for att in attribute_names]))
 
     def test_get_data_with_target(self):
         X, y = self.dataset.get_data(target="class")

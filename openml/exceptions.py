@@ -1,13 +1,14 @@
 class PyOpenMLError(Exception):
     def __init__(self, message):
+        self.message = message
         super(PyOpenMLError, self).__init__(message)
+
 
 class OpenMLServerError(PyOpenMLError):
     """class for when something is really wrong on the server
        (result did not parse to dict), contains unparsed error."""
 
     def __init__(self, message):
-        message = "OpenML Server error: " + message
         super(OpenMLServerError, self).__init__(message)
 
 #
@@ -18,7 +19,6 @@ class OpenMLServerException(OpenMLServerError):
     def __init__(self, code, message, additional=None):
         self.code = code
         self.additional = additional
-        message = "OpenML Server exception: " + message
         super(OpenMLServerException, self).__init__(message)
 
 

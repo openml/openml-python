@@ -1,16 +1,10 @@
 from collections import namedtuple, OrderedDict
 import os
 import sys
+
 import numpy as np
 import scipy.io.arff
-
-if sys.version_info[0] > 3:
-    import pickle
-else:
-    try:
-        import cPickle as pickle
-    except:
-        import pickle
+from six.moves import cPickle as pickle
 
 
 Split = namedtuple("Split", ["train", "test"])
