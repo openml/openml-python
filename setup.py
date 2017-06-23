@@ -2,6 +2,9 @@ import os
 import setuptools
 import sys
 
+with open("openml/__version__.py") as fh:
+    version = fh.readlines()[-1].split()[-1].strip("\"'")
+
 
 requirements_file = os.path.join(os.path.dirname(__file__), 'requirements.txt')
 requirements = []
@@ -44,7 +47,7 @@ setuptools.setup(name="openml",
                  description="Python API for OpenML",
                  license="GPLv3",
                  url="http://openml.org/",
-                 version="0.3.0",
+                 version=version,
                  packages=setuptools.find_packages(),
                  package_data={'': ['*.txt', '*.md']},
                  install_requires=requirements,
