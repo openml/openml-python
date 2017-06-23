@@ -20,11 +20,6 @@ with open(requirements_file) as fh:
             url = '/'.join(split[:-1])
             requirement = split[-1]
             requirements.append(requirement)
-            # Add the rest of the URL to the dependency links to allow
-            # setup.py test to work
-            if 'git+https' in url:
-                dependency_links.append(line.replace('git+', ''))
-
 
 try:
     import numpy
@@ -66,7 +61,4 @@ setuptools.setup(name="openml",
                               'Programming Language :: Python :: 3',
                               'Programming Language :: Python :: 3.4',
                               'Programming Language :: Python :: 3.5',
-                 ],
-                 dependency_links=[
-                     "http://github.com/mfeurer/liac-arff/archive/master.zip"
-                     "#egg=liac-arff-2.1.1dev"])
+                              'Programming Language :: Python :: 3.6'])
