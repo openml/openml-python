@@ -13,6 +13,11 @@ def _multitag_to_list(result_dict, tag):
 
 
 def get_study(study_id):
+    '''
+    Retrieves all relevant information of an OpenML study from the server
+    Note that some of the (data, tasks, flows, setups) fields can be empty
+    (depending on information on the server)
+    '''
     xml_string = _perform_api_call("study/%d" %(study_id))
     result_dict = xmltodict.parse(xml_string)['oml:study']
     id = int(result_dict['oml:id'])
