@@ -18,6 +18,7 @@ from openml.testing import TestBase
 
 from openml.datasets.functions import (_get_cached_dataset,
                                        _get_cached_dataset_features,
+                                       _get_cached_dataset_qualities,
                                        _get_cached_datasets,
                                        _get_dataset_description,
                                        _get_dataset_arff,
@@ -63,11 +64,13 @@ class TestOpenMLDataset(TestBase):
         openml.config.set_cache_directory(self.static_cache_dir)
         dataset = _get_cached_dataset(2)
         features = _get_cached_dataset_features(2)
+        qualities = _get_cached_dataset_qualities(2)
         self.assertIsInstance(dataset, OpenMLDataset)
         self.assertTrue(len(dataset.features) > 0)
         self.assertTrue(len(dataset.features) == len(features['oml:feature']))
+        self.assertTrue(len(dataset.qualities) == len(qualities['oml:quality']))
 
-    def test_get_chached_dataset_description(self):
+    def test_get_cached_dataset_description(self):
         openml.config.set_cache_directory(self.static_cache_dir)
         description = openml.datasets.functions._get_cached_dataset_description(2)
         self.assertIsInstance(description, dict)
