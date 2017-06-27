@@ -157,8 +157,7 @@ class TestRun(TestBase):
 
         return run
 
-
-    def _check_detailed_evaluations(self, detailed_evaluations, num_repeats, num_folds, max_time_allowed=60000):
+    def _check_fold_evaluations(self, fold_evaluations, num_repeats, num_folds, max_time_allowed=60000):
         '''
         Checks whether the right timing measures are attached to the run (before upload).
         Test is only performed for versions >= Python3.3
@@ -169,20 +168,50 @@ class TestRun(TestBase):
         '''
         timing_measures = {'usercpu_time_millis_testing', 'usercpu_time_millis_training', 'usercpu_time_millis'}
 
-        self.assertIsInstance(detailed_evaluations, dict)
+        self.assertIsInstance(fold_evaluations, dict)
         if sys.version_info[:2] >= (3, 3):
-            self.assertEquals(set(detailed_evaluations.keys()), timing_measures)
+            self.assertEquals(set(fold_evaluations.keys()), timing_measures)
             for measure in timing_measures:
-                num_rep_entrees = len(detailed_evaluations[measure])
+                num_rep_entrees = len(fold_evaluations[measure])
                 self.assertEquals(num_rep_entrees, num_repeats)
                 for rep in range(num_rep_entrees):
-                    num_fold_entrees = len(detailed_evaluations[measure][rep])
+                    num_fold_entrees = len(fold_evaluations[measure][rep])
                     self.assertEquals(num_fold_entrees, num_folds)
                     for fold in range(num_fold_entrees):
-                        evaluation = detailed_evaluations[measure][rep][fold]
+                        evaluation = fold_evaluations[measure][rep][fold]
                         self.assertIsInstance(evaluation, float)
                         self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
                         self.assertLess(evaluation, max_time_allowed)
+
+
+    def _check_sample_evaluations(self, sample_evaluations, num_repeats, num_folds, num_samples, max_time_allowed=60000):
+        '''
+        Checks whether the right timing measures are attached to the run (before upload).
+        Test is only performed for versions >= Python3.3
+
+        In case of check_n_jobs(clf) == false, please do not perform this check (check this
+        condition outside of this function. )
+        default max_time_allowed (per fold, in milli seconds) = 1 minute, quite pessimistic
+        '''
+        timing_measures = {'usercpu_time_millis_testing', 'usercpu_time_millis_training', 'usercpu_time_millis'}
+
+        self.assertIsInstance(sample_evaluations, dict)
+        if sys.version_info[:2] >= (3, 3):
+            self.assertEquals(set(sample_evaluations.keys()), timing_measures)
+            for measure in timing_measures:
+                num_rep_entrees = len(sample_evaluations[measure])
+                self.assertEquals(num_rep_entrees, num_repeats)
+                for rep in range(num_rep_entrees):
+                    num_fold_entrees = len(sample_evaluations[measure][rep])
+                    self.assertEquals(num_fold_entrees, num_folds)
+                    for fold in range(num_fold_entrees):
+                        num_sample_entrees = len(sample_evaluations[measure][rep][fold])
+                        self.assertEquals(num_sample_entrees, num_samples)
+                        for sample in range(num_sample_entrees):
+                            evaluation = sample_evaluations[measure][rep][fold][sample]
+                            self.assertIsInstance(evaluation, float)
+                            self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
+                            self.assertLess(evaluation, max_time_allowed)
 
     def test_run_regression_on_classif_task(self):
         task_id = 115
@@ -292,8 +321,45 @@ class TestRun(TestBase):
                 self.assertTrue(check_res)
 
             # todo: check if runtime is present
-            self._check_detailed_evaluations(run.detailed_evaluations, 1, num_folds)
+            self._check_fold_evaluations(run.fold_evaluations, 1, num_folds)
             pass
+
+    def test_learning_curve_task(self):
+        task_id = 801  # diabates dataset
+        num_test_instances = 6144 # for learning curve
+        num_repeats = 1
+        num_folds = 10
+        num_samples = 8
+
+        clfs = []
+        random_state_fixtures = []
+
+        #nb = GaussianNB()
+        #clfs.append(nb)
+        #random_state_fixtures.append('62501')
+
+        pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
+                                    ('dummy', DummyClassifier(strategy='prior'))])
+        clfs.append(pipeline1)
+        random_state_fixtures.append('62501')
+
+        pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+                                    ('VarianceThreshold', VarianceThreshold()),
+                                    ('Estimator', RandomizedSearchCV(
+                                        DecisionTreeClassifier(),
+                                        {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
+                                         'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
+                                        cv=3, n_iter=10))])
+        clfs.append(pipeline2)
+        random_state_fixtures.append('62501')
+
+
+        for clf, rsv in zip(clfs, random_state_fixtures):
+            run = self._perform_run(task_id, num_test_instances, clf,
+                                    random_state_value=rsv)
+
+            # todo: check if runtime is present
+            self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
     def test_initialize_cv_from_run(self):
         randomsearch = RandomizedSearchCV(
@@ -523,18 +589,20 @@ class TestRun(TestBase):
 
         probaY = clf.predict_proba(test_X)
         predY = clf.predict(test_X)
+        sample_nr = 0 # default for this task
         for idx in range(0, len(test_X)):
-            arff_line = _prediction_to_row(repeat_nr, fold_nr, idx,
+            arff_line = _prediction_to_row(repeat_nr, fold_nr, sample_nr, idx,
                                            task.class_labels[test_y[idx]],
                                            predY[idx], probaY[idx], task.class_labels, clf.classes_)
 
             self.assertIsInstance(arff_line, list)
-            self.assertEqual(len(arff_line), 5 + len(task.class_labels))
+            self.assertEqual(len(arff_line), 6 + len(task.class_labels))
             self.assertEqual(arff_line[0], repeat_nr)
             self.assertEqual(arff_line[1], fold_nr)
-            self.assertEqual(arff_line[2], idx)
+            self.assertEqual(arff_line[2], sample_nr)
+            self.assertEqual(arff_line[3], idx)
             sum = 0.0
-            for att_idx in range(3, 3 + len(task.class_labels)):
+            for att_idx in range(4, 4 + len(task.class_labels)):
                 self.assertIsInstance(arff_line[att_idx], float)
                 self.assertGreaterEqual(arff_line[att_idx], 0.0)
                 self.assertLessEqual(arff_line[att_idx], 1.0)
@@ -572,19 +640,19 @@ class TestRun(TestBase):
 
         clf = SGDClassifier(loss='log', random_state=1)
         res = openml.runs.functions._run_task_get_arffcontent(clf, task, class_labels)
-        arff_datacontent, arff_tracecontent, _, detailed_evaluations = res
+        arff_datacontent, arff_tracecontent, _, fold_evaluations, sample_evaluations = res
         # predictions
         self.assertIsInstance(arff_datacontent, list)
         # trace. SGD does not produce any
         self.assertIsInstance(arff_tracecontent, type(None))
 
-        self._check_detailed_evaluations(detailed_evaluations, num_repeats, num_folds)
+        self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds)
 
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
         for arff_line in arff_datacontent:
             # check number columns
-            self.assertEqual(len(arff_line), 7)
+            self.assertEqual(len(arff_line), 8)
             # check repeat
             self.assertGreaterEqual(arff_line[0], 0)
             self.assertLessEqual(arff_line[0], num_repeats - 1)
@@ -595,9 +663,9 @@ class TestRun(TestBase):
             self.assertGreaterEqual(arff_line[2], 0)
             self.assertLessEqual(arff_line[2], num_instances - 1)
             # check confidences
-            self.assertAlmostEqual(sum(arff_line[3:5]), 1.0)
-            self.assertIn(arff_line[5], ['won', 'nowin'])
+            self.assertAlmostEqual(sum(arff_line[4:6]), 1.0)
             self.assertIn(arff_line[6], ['won', 'nowin'])
+            self.assertIn(arff_line[7], ['won', 'nowin'])
 
     def test_get_run(self):
         # this run is not available on test
@@ -615,7 +683,7 @@ class TestRun(TestBase):
                          (7, 0.666365),
                          (8, 0.56759),
                          (9, 0.64621)]:
-            self.assertEqual(run.detailed_evaluations['f_measure'][0][i], value)
+            self.assertEqual(run.fold_evaluations['f_measure'][0][i], value)
         assert('weka' in run.tags)
         assert('stacking' in run.tags)
 
@@ -742,11 +810,11 @@ class TestRun(TestBase):
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content, _, _, _ = _run_task_get_arffcontent(model, task, class_labels)
+        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task, class_labels)
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)
         for row in data_content:
             # repeat, fold, row_id, 6 confidences, prediction and correct label
-            self.assertEqual(len(row), 11)
+            self.assertEqual(len(row), 12)
 
