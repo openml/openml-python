@@ -117,3 +117,16 @@ class TestRun(TestBase):
                 self.assertIsNone(current.parameters)
             else:
                 self.assertEquals(len(current.parameters), num_params[idx])
+
+
+    def test_setup_list_filter_flow(self):
+        # TODO: please remove for better test
+        # openml.config.server = self.production_server
+
+        flow_id = 31 # TODO please change
+
+        setups = openml.setups.setup_list(flow=31)
+
+        self.assertGreater(len(setups), 0) # TODO: please adjust 0
+        for setup_id in setups.keys():
+            self.assertEquals(setups[setup_id].flow_id, flow_id)
