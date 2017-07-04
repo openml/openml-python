@@ -2,6 +2,7 @@ from collections import OrderedDict, defaultdict
 import json
 import sys
 import time
+import numpy as np
 
 import arff
 import xmltodict
@@ -181,7 +182,7 @@ class OpenMLRun(object):
                 y_pred = values_predict[rep][fold][last_sample]
                 y_true = values_correct[rep][fold][last_sample]
                 scores.append(sklearn_fn(y_true, y_pred, **kwargs))
-        return scores
+        return np.array(scores)
 
     def publish(self):
         """Publish a run to the OpenML server.
