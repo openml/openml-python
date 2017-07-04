@@ -10,6 +10,7 @@ import numpy as np
 import sklearn.pipeline
 import six
 import xmltodict
+import sklearn.metrics
 
 import openml
 import openml.utils
@@ -112,7 +113,6 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
         run.sample_evaluations = sample_evaluations
     else:
         run.fold_evaluations = fold_evaluations
-
 
     config.logger.info('Executed Task %d with Flow id: %d' % (task.task_id, run.flow_id))
 
@@ -427,6 +427,16 @@ def _run_task_get_arffcontent(model, task, class_labels):
 
                 ProbaY = model_fold.predict_proba(testX)
                 PredY = model_fold.predict(testX)
+
+                # add client-side calculated metrics. These might be used on the server as consistency check
+                def _calculate_local_measure(sklearn_fn, openml_name):
+                    user_defined_measures_fold[openml_name][rep_no][fold_no] = \
+                        sklearn_fn(testY, PredY)
+                    user_defined_measures_sample[openml_name][rep_no][fold_no][sample_no] = \
+                        sklearn_fn(testY, PredY)
+
+                _calculate_local_measure(sklearn.metrics.accuracy_score, 'predictive_accuracy')
+
                 if can_measure_runtime:
                     modelpredict_duration = (time.process_time() - modelpredict_starttime) * 1000
                     user_defined_measures_fold['usercpu_time_millis_testing'][rep_no][fold_no] = modelpredict_duration
@@ -455,6 +465,7 @@ def _run_task_get_arffcontent(model, task, class_labels):
            arff_trace_attributes, \
            user_defined_measures_fold, \
            user_defined_measures_sample
+
 
 
 def _extract_arfftrace(model, rep_no, fold_no):
