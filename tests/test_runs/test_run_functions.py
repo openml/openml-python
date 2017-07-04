@@ -327,6 +327,16 @@ class TestRun(TestBase):
         for clf, rsv in zip(clfs, random_state_fixtures):
             run = self._perform_run(task_id, num_test_instances, clf,
                                     random_state_value=rsv)
+
+            # obtain accuracy scores using get_metric_score:
+            accuracy_scores = run.get_metric_score(sklearn.metrics.accuracy_score)
+            # compare with the scores in user defined measures
+            accuracy_scores_provided = []
+            for rep in run.fold_evaluations['predictive_accuracy'].keys():
+                for fold in run.fold_evaluations['predictive_accuracy'][rep].keys():
+                    accuracy_scores_provided.append(run.fold_evaluations['predictive_accuracy'][rep][fold])
+            self.assertEquals(sum(accuracy_scores_provided), sum(accuracy_scores))
+
             if isinstance(clf, BaseSearchCV):
                 if isinstance(clf, GridSearchCV):
                     grid_iterations = 1
@@ -402,6 +412,40 @@ class TestRun(TestBase):
 
         self.assertEquals(modelS.cv.random_state, 62501)
         self.assertEqual(modelR.cv.random_state, 62501)
+
+    def test_get_run_metric_score(self):
+
+        # construct sci-kit learn classifier
+        clf = Pipeline(steps=[('imputer', Imputer(strategy='median')), ('estimator', RandomForestClassifier())])
+
+
+        # download task
+        task = openml.tasks.get_task(7)
+
+        # invoke OpenML run
+        run = openml.runs.run_model_on_task(task, clf)
+
+        # compare with the scores in user defined measures
+        accuracy_scores_provided = []
+        for rep in run.fold_evaluations['predictive_accuracy'].keys():
+            for fold in run.fold_evaluations['predictive_accuracy'][rep].keys():
+                accuracy_scores_provided.append(run.fold_evaluations['predictive_accuracy'][rep][fold])
+        accuracy_scores = run.get_metric_score(sklearn.metrics.accuracy_score)
+        self.assertEquals(sum(accuracy_scores_provided), sum(accuracy_scores))
+
+        # also check if we can obtain some other scores: # TODO: how to do AUC?
+        tests = [(sklearn.metrics.cohen_kappa_score, {'weights': None}),
+                 (sklearn.metrics.auc, {}),
+                 (sklearn.metrics.average_precision_score, {}),
+                 (sklearn.metrics.jaccard_similarity_score, {}),
+                 (sklearn.metrics.precision_score, {'average': 'macro'}),
+                 (sklearn.metrics.brier_score_loss, {})]
+        for test_idx, test in enumerate(tests):
+            alt_scores = run.get_metric_score(test[0], test[1])
+            self.assertEquals(len(alt_scores), 10)
+            for idx in range(len(alt_scores)):
+                self.assertGreaterEqual(alt_scores[idx], 0)
+                self.assertLessEqual(alt_scores[idx], 1)
 
     def test_initialize_model_from_run(self):
         clf = sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='median')),
