@@ -74,7 +74,7 @@ def get_setup(setup_id):
     return _create_setup_from_xml(result_dict)
 
 
-def setup_list(flow=None, tag=None, offset=None, size=None):
+def list_setups(flow=None, tag=None, offset=None, size=None):
     """List all setups matching all of the given filters.
 
         Perform API call `/setup/list/{filters}
@@ -120,11 +120,11 @@ def _list_setups(api_call):
                          % str(setups_dict))
     elif '@xmlns:oml' not in setups_dict['oml:setups']:
         raise ValueError('Error in return XML, does not contain '
-                         '"oml:runs"/@xmlns:oml: %s'
+                         '"oml:setups"/@xmlns:oml: %s'
                          % str(setups_dict))
     elif setups_dict['oml:setups']['@xmlns:oml'] != 'http://openml.org/openml':
         raise ValueError('Error in return XML, value of  '
-                         '"oml:runs"/@xmlns:oml is not '
+                         '"oml:seyups"/@xmlns:oml is not '
                          '"http://openml.org/openml": %s'
                          % str(setups_dict))
 

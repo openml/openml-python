@@ -239,17 +239,26 @@ class TestFlow(TestBase):
     def test_existing_flow_exists(self):
         # create a flow
         nb = sklearn.naive_bayes.GaussianNB()
-        flow = openml.flows.sklearn_to_flow(nb)
-        flow, _ = self._add_sentinel_to_flow_name(flow, None)
-        #publish the flow
-        flow = flow.publish()
-        #redownload the flow
-        flow = openml.flows.get_flow(flow.flow_id)
 
-        # check if flow exists can find it
-        flow = openml.flows.get_flow(flow.flow_id)
-        downloaded_flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
-        self.assertEquals(downloaded_flow_id, flow.flow_id)
+        steps = [('imputation', sklearn.preprocessing.Imputer(strategy='median')),
+                 ('hotencoding', sklearn.preprocessing.OneHotEncoder(sparse=False,
+                                                                     handle_unknown='ignore')),
+                 ('variencethreshold', sklearn.feature_selection.VarianceThreshold()),
+                 ('classifier', sklearn.tree.DecisionTreeClassifier())]
+        complicated = sklearn.pipeline.Pipeline(steps=steps)
+
+        for classifier in [nb, complicated]:
+            flow = openml.flows.sklearn_to_flow(classifier)
+            flow, _ = self._add_sentinel_to_flow_name(flow, None)
+            #publish the flow
+            flow = flow.publish()
+            #redownload the flow
+            flow = openml.flows.get_flow(flow.flow_id)
+
+            # check if flow exists can find it
+            flow = openml.flows.get_flow(flow.flow_id)
+            downloaded_flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
+            self.assertEquals(downloaded_flow_id, flow.flow_id)
 
     def test_sklearn_to_upload_to_flow(self):
         iris = sklearn.datasets.load_iris()
