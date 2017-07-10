@@ -4,7 +4,7 @@ import openml
 import xmltodict
 
 from .setup import OpenMLSetup, OpenMLParameter
-from openml.flows import sklearn_to_flow, flow_exists
+from openml.flows import flow_exists
 
 
 def setup_exists(flow, model=None):
