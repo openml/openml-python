@@ -120,12 +120,11 @@ class TestRun(TestBase):
 
 
     def test_setup_list_filter_flow(self):
-        # TODO: please remove for better test
-        # openml.config.server = self.production_server
+        openml.config.server = self.production_server
 
-        flow_id = 31 # TODO please change
+        flow_id = 5873
 
-        setups = openml.setups.setup_list(flow=31)
+        setups = openml.setups.list_setups(flow=flow_id)
 
         self.assertGreater(len(setups), 0) # TODO: please adjust 0
         for setup_id in setups.keys():
