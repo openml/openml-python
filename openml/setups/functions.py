@@ -74,7 +74,7 @@ def get_setup(setup_id):
     return _create_setup_from_xml(result_dict)
 
 
-def list_setups(flow=None, tag=None, offset=None, size=None):
+def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
     """List all setups matching all of the given filters.
 
         Perform API call `/setup/list/{filters}
@@ -84,6 +84,8 @@ def list_setups(flow=None, tag=None, offset=None, size=None):
         flow : int, optional
 
         tag : str, optional
+
+        setup : list(int), optional
 
         offset : int, optional
 
@@ -100,6 +102,8 @@ def list_setups(flow=None, tag=None, offset=None, size=None):
         api_call += "/offset/%d" % int(offset)
     if size is not None:
         api_call += "/limit/%d" % int(size)
+    if size is not None:
+        api_call += "/setup/%s" % ','.join([str(int(i)) for i in setup])
     if flow is not None:
         api_call += "/flow/%s" % flow
     if tag is not None:
