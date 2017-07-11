@@ -47,7 +47,6 @@ class ParameterFreeClassifier(BaseEstimator, ClassifierMixin):
         return {}
 
 
-
 class TestRun(TestBase):
 
     def test_nonexisting_setup_exists(self):
@@ -118,7 +117,6 @@ class TestRun(TestBase):
             else:
                 self.assertEquals(len(current.parameters), num_params[idx])
 
-
     def test_setup_list_filter_flow(self):
         openml.config.server = self.production_server
 
@@ -129,3 +127,17 @@ class TestRun(TestBase):
         self.assertGreater(len(setups), 0) # TODO: please adjust 0
         for setup_id in setups.keys():
             self.assertEquals(setups[setup_id].flow_id, flow_id)
+
+    def test_setuplist_offset(self):
+        # TODO: remove after pull on live for better testing
+        # openml.config.server = self.production_server
+
+        size = 100
+        setups = openml.setups.list_setups(offset=0, size=size)
+        self.assertEquals(len(setups), size)
+        setups2 = openml.setups.list_setups(offset=size, size=size)
+        self.assertEquals(len(setups), size)
+
+        all = set(setups.keys()).union(setups2.keys())
+
+        self.assertEqual(len(all), size * 2)
