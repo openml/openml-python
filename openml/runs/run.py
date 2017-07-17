@@ -127,7 +127,9 @@ class OpenMLRun(object):
         if self.data_content is not None:
             predictions_arff = self._generate_arff_dict()
         elif 'predictions' in self.output_files:
-            raise ValueError('Not Implemented Yet: Function can currently only be used on locally executed runs (contributor needed!)')
+            predictions_file_url = _file_id_to_url(self.output_files['predictions'], 'predictions.arff')
+            predictions_arff = arff.loads(openml._api_calls._read_url(predictions_file_url))
+            # TODO: make this a stream reader
         else:
             raise ValueError('Run should have been locally executed.')
 

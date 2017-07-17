@@ -102,7 +102,7 @@ def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
         api_call += "/offset/%d" % int(offset)
     if size is not None:
         api_call += "/limit/%d" % int(size)
-    if size is not None:
+    if setup is not None:
         api_call += "/setup/%s" % ','.join([str(int(i)) for i in setup])
     if flow is not None:
         api_call += "/flow/%s" % flow
