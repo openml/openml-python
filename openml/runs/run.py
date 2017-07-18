@@ -134,9 +134,10 @@ class OpenMLRun(object):
         else:
             raise ValueError('Run should have been locally executed.')
 
-        if 'correct' not in predictions_arff['attributes']:
+        attribute_names = [att[0] for att in predictions_arff['attributes']]
+        if 'correct' not in attribute_names:
             raise ValueError('Attribute "correct" should be set')
-        if 'predict' not in predictions_arff['attributes']:
+        if 'prediction' not in attribute_names:
             raise ValueError('Attribute "predict" should be set')
 
         def _attribute_list_to_dict(attribute_list):
