@@ -412,7 +412,7 @@ class TestRun(TestBase):
 
         self.assertEquals(modelS.cv.random_state, 62501)
         self.assertEqual(modelR.cv.random_state, 62501)
-    
+
     def _test_local_evaluations(self, run):
 
         # compare with the scores in user defined measures
@@ -420,7 +420,7 @@ class TestRun(TestBase):
         for rep in run.fold_evaluations['predictive_accuracy'].keys():
             for fold in run.fold_evaluations['predictive_accuracy'][rep].keys():
                 accuracy_scores_provided.append(run.fold_evaluations['predictive_accuracy'][rep][fold])
-        accuracy_scores = run.get_metric_score(sklearn.metrics.accuracy_score)
+        accuracy_scores = run.get_metric_fn(sklearn.metrics.accuracy_score)
         np.testing.assert_array_almost_equal(accuracy_scores_provided, accuracy_scores)
 
         # also check if we can obtain some other scores: # TODO: how to do AUC?
@@ -431,7 +431,7 @@ class TestRun(TestBase):
                  (sklearn.metrics.precision_score, {'average': 'macro'}),
                  (sklearn.metrics.brier_score_loss, {})]
         for test_idx, test in enumerate(tests):
-            alt_scores = run.get_metric_score(test[0], test[1])
+            alt_scores = run.get_metric_fn(test[0], test[1])
             self.assertEquals(len(alt_scores), 10)
             for idx in range(len(alt_scores)):
                 self.assertGreaterEqual(alt_scores[idx], 0)
