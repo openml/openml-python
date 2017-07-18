@@ -166,22 +166,32 @@ class TestRun(TestBase):
         condition outside of this function. )
         default max_time_allowed (per fold, in milli seconds) = 1 minute, quite pessimistic
         '''
-        timing_measures = {'usercpu_time_millis_testing', 'usercpu_time_millis_training', 'usercpu_time_millis'}
+
+        # a dict mapping from openml measure to a tuple with the minimum and maximum allowed value
+        check_measures = {'usercpu_time_millis_testing': (0, max_time_allowed),
+                          'usercpu_time_millis_training': (0, max_time_allowed),  # should take at least one millisecond (?)
+                          'usercpu_time_millis': (0, max_time_allowed),
+                          'predictive_accuracy': (0, 1)}
 
         self.assertIsInstance(fold_evaluations, dict)
         if sys.version_info[:2] >= (3, 3):
-            self.assertEquals(set(fold_evaluations.keys()), timing_measures)
-            for measure in timing_measures:
+            # this only holds if we are allowed to record time (otherwise some are missing)
+            self.assertEquals(set(fold_evaluations.keys()), set(check_measures.keys()))
+
+        for measure in check_measures.keys():
+            if measure in fold_evaluations:
                 num_rep_entrees = len(fold_evaluations[measure])
                 self.assertEquals(num_rep_entrees, num_repeats)
+                min_val = check_measures[measure][0]
+                max_val = check_measures[measure][1]
                 for rep in range(num_rep_entrees):
                     num_fold_entrees = len(fold_evaluations[measure][rep])
                     self.assertEquals(num_fold_entrees, num_folds)
                     for fold in range(num_fold_entrees):
                         evaluation = fold_evaluations[measure][rep][fold]
                         self.assertIsInstance(evaluation, float)
-                        self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
-                        self.assertLess(evaluation, max_time_allowed)
+                        self.assertGreaterEqual(evaluation, min_val)
+                        self.assertLessEqual(evaluation, max_val)
 
 
     def _check_sample_evaluations(self, sample_evaluations, num_repeats, num_folds, num_samples, max_time_allowed=60000):
@@ -193,12 +203,20 @@ class TestRun(TestBase):
         condition outside of this function. )
         default max_time_allowed (per fold, in milli seconds) = 1 minute, quite pessimistic
         '''
-        timing_measures = {'usercpu_time_millis_testing', 'usercpu_time_millis_training', 'usercpu_time_millis'}
+
+        # a dict mapping from openml measure to a tuple with the minimum and maximum allowed value
+        check_measures = {'usercpu_time_millis_testing': (0, max_time_allowed),
+                          'usercpu_time_millis_training': (0, max_time_allowed),  # should take at least one millisecond (?)
+                          'usercpu_time_millis': (0, max_time_allowed),
+                          'predictive_accuracy': (0, 1)}
 
         self.assertIsInstance(sample_evaluations, dict)
         if sys.version_info[:2] >= (3, 3):
-            self.assertEquals(set(sample_evaluations.keys()), timing_measures)
-            for measure in timing_measures:
+            # this only holds if we are allowed to record time (otherwise some are missing)
+            self.assertEquals(set(sample_evaluations.keys()), set(check_measures.keys()))
+
+        for measure in check_measures.keys():
+            if measure in sample_evaluations:
                 num_rep_entrees = len(sample_evaluations[measure])
                 self.assertEquals(num_rep_entrees, num_repeats)
                 for rep in range(num_rep_entrees):
@@ -309,6 +327,16 @@ class TestRun(TestBase):
         for clf, rsv in zip(clfs, random_state_fixtures):
             run = self._perform_run(task_id, num_test_instances, clf,
                                     random_state_value=rsv)
+
+            # obtain accuracy scores using get_metric_score:
+            accuracy_scores = run.get_metric_fn(sklearn.metrics.accuracy_score)
+            # compare with the scores in user defined measures
+            accuracy_scores_provided = []
+            for rep in run.fold_evaluations['predictive_accuracy'].keys():
+                for fold in run.fold_evaluations['predictive_accuracy'][rep].keys():
+                    accuracy_scores_provided.append(run.fold_evaluations['predictive_accuracy'][rep][fold])
+            self.assertEquals(sum(accuracy_scores_provided), sum(accuracy_scores))
+
             if isinstance(clf, BaseSearchCV):
                 if isinstance(clf, GridSearchCV):
                     grid_iterations = 1
@@ -384,6 +412,49 @@ class TestRun(TestBase):
 
         self.assertEquals(modelS.cv.random_state, 62501)
         self.assertEqual(modelR.cv.random_state, 62501)
+
+    def _test_local_evaluations(self, run):
+
+        # compare with the scores in user defined measures
+        accuracy_scores_provided = []
+        for rep in run.fold_evaluations['predictive_accuracy'].keys():
+            for fold in run.fold_evaluations['predictive_accuracy'][rep].keys():
+                accuracy_scores_provided.append(run.fold_evaluations['predictive_accuracy'][rep][fold])
+        accuracy_scores = run.get_metric_fn(sklearn.metrics.accuracy_score)
+        np.testing.assert_array_almost_equal(accuracy_scores_provided, accuracy_scores)
+
+        # also check if we can obtain some other scores: # TODO: how to do AUC?
+        tests = [(sklearn.metrics.cohen_kappa_score, {'weights': None}),
+                 (sklearn.metrics.auc, {'reorder': True}),
+                 (sklearn.metrics.average_precision_score, {}),
+                 (sklearn.metrics.jaccard_similarity_score, {}),
+                 (sklearn.metrics.precision_score, {'average': 'macro'}),
+                 (sklearn.metrics.brier_score_loss, {})]
+        for test_idx, test in enumerate(tests):
+            alt_scores = run.get_metric_fn(test[0], test[1])
+            self.assertEquals(len(alt_scores), 10)
+            for idx in range(len(alt_scores)):
+                self.assertGreaterEqual(alt_scores[idx], 0)
+                self.assertLessEqual(alt_scores[idx], 1)
+
+    def test_local_run_metric_score(self):
+
+        # construct sci-kit learn classifier
+        clf = Pipeline(steps=[('imputer', Imputer(strategy='median')), ('estimator', RandomForestClassifier())])
+
+        # download task
+        task = openml.tasks.get_task(7)
+
+        # invoke OpenML run
+        run = openml.runs.run_model_on_task(task, clf)
+
+        self._test_local_evaluations(run)
+
+    def test_online_run_metric_score(self):
+        openml.config.server = self.production_server
+        run = openml.runs.get_run(5965513) # important to use binary classification task, due to assertions
+        self._test_local_evaluations(run)
+
 
     def test_initialize_model_from_run(self):
         clf = sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='median')),
