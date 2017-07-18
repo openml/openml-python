@@ -329,7 +329,7 @@ class TestRun(TestBase):
                                     random_state_value=rsv)
 
             # obtain accuracy scores using get_metric_score:
-            accuracy_scores = run.get_metric_score(sklearn.metrics.accuracy_score)
+            accuracy_scores = run.get_metric_fn(sklearn.metrics.accuracy_score)
             # compare with the scores in user defined measures
             accuracy_scores_provided = []
             for rep in run.fold_evaluations['predictive_accuracy'].keys():
@@ -425,7 +425,7 @@ class TestRun(TestBase):
 
         # also check if we can obtain some other scores: # TODO: how to do AUC?
         tests = [(sklearn.metrics.cohen_kappa_score, {'weights': None}),
-                 (sklearn.metrics.auc, {}),
+                 (sklearn.metrics.auc, {'reorder': True}),
                  (sklearn.metrics.average_precision_score, {}),
                  (sklearn.metrics.jaccard_similarity_score, {}),
                  (sklearn.metrics.precision_score, {'average': 'macro'}),
@@ -452,7 +452,7 @@ class TestRun(TestBase):
 
     def test_online_run_metric_score(self):
         openml.config.server = self.production_server
-        run = openml.runs.get_run(5572567)
+        run = openml.runs.get_run(5965513) # important to use binary classification task, due to assertions
         self._test_local_evaluations(run)
 
 
