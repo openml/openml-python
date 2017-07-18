@@ -27,9 +27,11 @@ def get_study(study_id):
     creator = result_dict['oml:creator']
     tags = []
     for tag in _multitag_to_list(result_dict, 'oml:tag'):
-        tags.append({'name': tag['oml:name'],
-                     'window_start': tag['oml:window_start'],
-                     'write_access': tag['oml:write_access']})
+        current_tag = {'name': tag['oml:name'],
+                       'write_access': tag['oml:write_access']}
+        if 'oml:window_start' in tag:
+            current_tag['window_start'] = tag['oml:window_start']
+        tags.append(current_tag)
 
     datasets = None
     tasks = None
