@@ -412,18 +412,8 @@ class TestRun(TestBase):
 
         self.assertEquals(modelS.cv.random_state, 62501)
         self.assertEqual(modelR.cv.random_state, 62501)
-
-    def test_get_run_metric_score(self):
-
-        # construct sci-kit learn classifier
-        clf = Pipeline(steps=[('imputer', Imputer(strategy='median')), ('estimator', RandomForestClassifier())])
-
-
-        # download task
-        task = openml.tasks.get_task(7)
-
-        # invoke OpenML run
-        run = openml.runs.run_model_on_task(task, clf)
+    
+    def _test_local_evaluations(self, run):
 
         # compare with the scores in user defined measures
         accuracy_scores_provided = []
@@ -431,7 +421,7 @@ class TestRun(TestBase):
             for fold in run.fold_evaluations['predictive_accuracy'][rep].keys():
                 accuracy_scores_provided.append(run.fold_evaluations['predictive_accuracy'][rep][fold])
         accuracy_scores = run.get_metric_score(sklearn.metrics.accuracy_score)
-        self.assertEquals(sum(accuracy_scores_provided), sum(accuracy_scores))
+        np.testing.assert_array_almost_equal(accuracy_scores_provided, accuracy_scores)
 
         # also check if we can obtain some other scores: # TODO: how to do AUC?
         tests = [(sklearn.metrics.cohen_kappa_score, {'weights': None}),
@@ -446,6 +436,25 @@ class TestRun(TestBase):
             for idx in range(len(alt_scores)):
                 self.assertGreaterEqual(alt_scores[idx], 0)
                 self.assertLessEqual(alt_scores[idx], 1)
+
+    def test_local_run_metric_score(self):
+
+        # construct sci-kit learn classifier
+        clf = Pipeline(steps=[('imputer', Imputer(strategy='median')), ('estimator', RandomForestClassifier())])
+
+        # download task
+        task = openml.tasks.get_task(7)
+
+        # invoke OpenML run
+        run = openml.runs.run_model_on_task(task, clf)
+
+        self._test_local_evaluations(run)
+
+    def test_online_run_metric_score(self):
+        openml.config.server = self.production_server
+        run = openml.runs.get_run(5572567)
+        self._test_local_evaluations(run)
+
 
     def test_initialize_model_from_run(self):
         clf = sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='median')),

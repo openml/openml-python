@@ -107,11 +107,12 @@ class OpenMLRun(object):
 
         return arff_dict
 
-    def get_metric_score(self, sklearn_fn, kwargs={}):
+    def get_metric_fn(self, sklearn_fn, kwargs={}):
         '''Calculates metric scores based on predicted values. Assumes the
-        run has been executed locally (and contans run_data). Furthermore,
-        it assumes that the 'correct' field has been set (which is
-        automatically the case for local runs)
+        run has been executed locally (and contains run_data). Furthermore,
+        it assumes that the 'correct' attribute is specified in the arff
+        (which is an optional field, but always the case for openml-python
+        runs)
 
         Parameters
         -------
@@ -133,8 +134,15 @@ class OpenMLRun(object):
         else:
             raise ValueError('Run should have been locally executed.')
 
+        if 'correct' not in predictions_arff['attributes']:
+            raise ValueError('Attribute "correct" should be set')
+        if 'predict' not in predictions_arff['attributes']:
+            raise ValueError('Attribute "predict" should be set')
+
         def _attribute_list_to_dict(attribute_list):
-            # convenience function
+            # convenience function: Creates a mapping to map from the name of attributes
+            # present in the arff prediction file to their index. This is necessary
+            # because the number of classes can be different for different tasks.
             res = dict()
             for idx in range(len(attribute_list)):
                 res[attribute_list[idx][0]] = idx

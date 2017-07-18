@@ -25,7 +25,7 @@ class TestFlowFunctions(unittest.TestCase):
         # data from the internet...
         flows = openml.flows.list_flows()
         # 3000 as the number of flows on openml.org
-        self.assertGreaterEqual(len(flows), 3000)
+        self.assertGreaterEqual(len(flows), 1500)
         for fid in flows:
             self._check_flow(flows[fid])
 
