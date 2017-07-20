@@ -81,7 +81,7 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
     flow_id = flow_exists(flow.name, flow.external_version)
     if avoid_duplicate_runs and flow_id:
         flow_from_server = get_flow(flow_id)
-        setup_id = setup_exists(flow_from_server)
+        setup_id = setup_exists(flow_from_server, flow.model)
         ids = _run_exists(task.task_id, setup_id)
         if ids:
             raise PyOpenMLError("Run already exists in server. Run id(s): %s" %str(ids))
