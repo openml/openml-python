@@ -38,3 +38,32 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
         else:
             raise ValueError("Could not find tag '%s' in node '%s'" %
                              (xml_tag_name, str(node)))
+            
+def list_all(listing_call, *args, **filters):
+    """Helper to handle paged listing requests.
+    Example usage: evaluations = list_all(list_evaluations, "predictive_accuracy", task=mytask)
+    Note: I wanted to make this a generator, but this is not possible since all listing calls return dicts
+    
+    Parameters
+    ----------
+    listing_call : object
+        Name of the listing call, e.g. list_evaluations
+    *args : Variable length argument list
+        Any required arguments for the listing call
+    **filters : Arbitrary keyword arguments
+        Any filters that need to be applied
+        
+    Returns
+    -------
+    object
+    """
+    batch_size = 10000
+    page = 0
+    has_more = 1
+    result = {}
+    while has_more:
+        new_batch = listing_call(*args, size=batch_size, offset=batch_size*page, **filters)
+        result.update(new_batch)
+        page += 1
+        has_more = (len(new_batch) == batch_size)
+    return result
