@@ -106,9 +106,13 @@ def _read_url(url, data=None):
     data = {} if data is None else data
     data['api_key'] = config.apikey
 
-    # Using requests.post sets header 'Accept-encoding' automatically to
-    # 'gzip,deflate'
-    response = requests.post(url, data=data)
+    if len(data) <= 1:
+        # do a GET
+        response = requests.get(url, params=data)
+    else: # an actual post request
+        # Using requests.post sets header 'Accept-encoding' automatically to
+        #  'gzip,deflate'
+        response = requests.post(url, data=data)
 
     if response.status_code != 200:
         raise _parse_server_exception(response)
