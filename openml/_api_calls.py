@@ -104,9 +104,10 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
 def _read_url(url, data=None):
 
     data = {} if data is None else data
-    data['api_key'] = config.apikey
+    if config.apikey is not None:
+        data['api_key'] = config.apikey
 
-    if len(data) <= 1:
+    if len(data) == 0 or (len(data) == 1 and 'api_key' in data):
         # do a GET
         response = requests.get(url, params=data)
     else: # an actual post request
