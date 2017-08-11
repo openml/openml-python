@@ -62,26 +62,3 @@ class OpenMLTaskTest(TestBase):
         self.assertRaisesRegexp(ValueError, "Repeat 10 not known",
                                 task.get_train_test_split_indices, 0, 10)
 
-    def test_iterate_repeats(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
-        task = openml.tasks.get_task(1882)
-
-        num_repeats = 0
-        for rep in task.iterate_repeats():
-            num_repeats += 1
-            self.assertIsInstance(rep, types.GeneratorType)
-        self.assertEqual(num_repeats, 10)
-
-    def test_iterate_all_splits(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
-        task = openml.tasks.get_task(1882)
-
-        num_splits = 0
-        for split in task.iterate_all_splits():
-            num_splits += 1
-            self.assertIsInstance(split[0], np.ndarray)
-            self.assertIsInstance(split[1], np.ndarray)
-            self.assertEqual(split[0].shape[0] + split[1].shape[0], 898)
-        self.assertEqual(num_splits, 100)
-
-

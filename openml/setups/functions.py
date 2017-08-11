@@ -4,7 +4,7 @@ import openml
 import xmltodict
 
 from .setup import OpenMLSetup, OpenMLParameter
-from openml.flows import sklearn_to_flow, flow_exists
+from openml.flows import flow_exists
 
 
 def setup_exists(flow, model=None):
@@ -72,6 +72,80 @@ def get_setup(setup_id):
     result = openml._api_calls._perform_api_call('/setup/%d' %setup_id)
     result_dict = xmltodict.parse(result)
     return _create_setup_from_xml(result_dict)
+
+
+def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
+    """List all setups matching all of the given filters.
+
+        Perform API call `/setup/list/{filters}
+
+        Parameters
+        ----------
+        flow : int, optional
+
+        tag : str, optional
+
+        setup : list(int), optional
+
+        offset : int, optional
+
+        size : int, optional
+
+        Returns
+        -------
+        list
+            List of found setups.
+        """
+
+    api_call = "setup/list"
+    if offset is not None:
+        api_call += "/offset/%d" % int(offset)
+    if size is not None:
+        api_call += "/limit/%d" % int(size)
+    if setup is not None:
+        api_call += "/setup/%s" % ','.join([str(int(i)) for i in setup])
+    if flow is not None:
+        api_call += "/flow/%s" % flow
+    if tag is not None:
+        api_call += "/tag/%s" % tag
+
+    return _list_setups(api_call)
+
+
+def _list_setups(api_call):
+    """Helper function to parse API calls which are lists of setups"""
+
+    xml_string = openml._api_calls._perform_api_call(api_call)
+
+    setups_dict = xmltodict.parse(xml_string)
+    # Minimalistic check if the XML is useful
+    if 'oml:setups' not in setups_dict:
+        raise ValueError('Error in return XML, does not contain "oml:setups": %s'
+                         % str(setups_dict))
+    elif '@xmlns:oml' not in setups_dict['oml:setups']:
+        raise ValueError('Error in return XML, does not contain '
+                         '"oml:setups"/@xmlns:oml: %s'
+                         % str(setups_dict))
+    elif setups_dict['oml:setups']['@xmlns:oml'] != 'http://openml.org/openml':
+        raise ValueError('Error in return XML, value of  '
+                         '"oml:seyups"/@xmlns:oml is not '
+                         '"http://openml.org/openml": %s'
+                         % str(setups_dict))
+
+    if isinstance(setups_dict['oml:setups']['oml:setup'], list):
+        setups_list = setups_dict['oml:setups']['oml:setup']
+    elif isinstance(setups_dict['oml:setups']['oml:setup'], dict):
+        setups_list = [setups_dict['oml:setups']['oml:setup']]
+    else:
+        raise TypeError()
+
+    setups = dict()
+    for setup_ in setups_list:
+        # making it a dict to give it the right format
+        current = _create_setup_from_xml({'oml:setup_parameters': setup_})
+        setups[current.setup_id] = current
+
+    return setups
 
 
 def initialize_model(setup_id):
@@ -147,6 +221,7 @@ def _create_setup_from_xml(result_dict):
     '''
      Turns an API xml result into a OpenMLSetup object
     '''
+    setup_id = int(result_dict['oml:setup_parameters']['oml:setup_id'])
     flow_id = int(result_dict['oml:setup_parameters']['oml:flow_id'])
     parameters = {}
     if 'oml:parameter' not in result_dict['oml:setup_parameters']:
@@ -164,7 +239,7 @@ def _create_setup_from_xml(result_dict):
         else:
             raise ValueError('Expected None, list or dict, received someting else: %s' %str(type(xml_parameters)))
 
-    return OpenMLSetup(flow_id, parameters)
+    return OpenMLSetup(setup_id, flow_id, parameters)
 
 def _create_setup_parameter_from_xml(result_dict):
     return OpenMLParameter(int(result_dict['oml:id']),

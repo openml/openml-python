@@ -39,7 +39,7 @@ class OpenMLDataset(object):
                  row_id_attribute=None, ignore_attribute=None,
                  version_label=None, citation=None, tag=None, visibility=None,
                  original_data_url=None, paper_url=None, update_comment=None,
-                 md5_checksum=None, data_file=None, features=None):
+                 md5_checksum=None, data_file=None, features=None, qualities=None):
         # Attributes received by querying the RESTful API
         self.dataset_id = int(dataset_id) if dataset_id is not None else None
         self.name = name
@@ -74,6 +74,7 @@ class OpenMLDataset(object):
         self.md5_cheksum = md5_checksum
         self.data_file = data_file
         self.features = None
+        self.qualities = None
 
         if features is not None:
             self.features = {}
@@ -87,6 +88,12 @@ class OpenMLDataset(object):
                     raise ValueError('Data features not provided in right order')
                 self.features[feature.index] = feature
 
+        if qualities is not None:
+            self.qualities = {}
+            for idx, xmlquality in enumerate(qualities['oml:quality']):
+                name = xmlquality['oml:name']
+                value = xmlquality['oml:value']
+                self.qualities[name] = value
 
         if data_file is not None:
             if self._data_features_supported():

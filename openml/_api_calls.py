@@ -117,6 +117,7 @@ def _read_url(url, data=None):
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
     return response.text
 
+
 def _parse_server_exception(response):
     # OpenML has a sopisticated error system
     # where information about failures is provided. try to parse this
