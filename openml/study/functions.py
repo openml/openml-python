@@ -18,7 +18,7 @@ def get_study(study_id):
     Note that some of the (data, tasks, flows, setups) fields can be empty
     (depending on information on the server)
     '''
-    xml_string = _perform_api_call("study/%d" %(study_id))
+    xml_string = _perform_api_call("study/%s" %str(study_id))
     result_dict = xmltodict.parse(xml_string)['oml:study']
     id = int(result_dict['oml:id'])
     name = result_dict['oml:name']
