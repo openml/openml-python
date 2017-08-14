@@ -8,7 +8,7 @@ from .._api_calls import _read_url
 
 
 class OpenMLTask(object):
-    def __init__(self, task_id, task_type_id, task_type, data_set_id,
+    def __init__(self, task_id, task_type, data_set_id,
                  target_name, estimation_procedure_type, data_splits_url,
                  estimation_parameters, evaluation_measure, cost_matrix,
                  class_labels=None):
