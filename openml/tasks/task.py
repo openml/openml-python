@@ -8,12 +8,13 @@ from .._api_calls import _read_url
 
 
 class OpenMLTask(object):
-    def __init__(self, task_id, task_type, data_set_id,
+    def __init__(self, task_id, task_type_id, task_type, data_set_id,
                  target_name, estimation_procedure_type, data_splits_url,
                  estimation_parameters, evaluation_measure, cost_matrix,
                  class_labels=None):
         self.task_id = int(task_id)
         self.task_type = task_type
+        self.task_type_id = task_type_id
         self.dataset_id = int(data_set_id)
         self.target_name = target_name
         self.estimation_procedure = dict()
