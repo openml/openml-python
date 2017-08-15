@@ -12,13 +12,16 @@ def _multitag_to_list(result_dict, tag):
         raise TypeError()
 
 
-def get_study(study_id):
+def get_study(study_id, type=None):
     '''
     Retrieves all relevant information of an OpenML study from the server
     Note that some of the (data, tasks, flows, setups) fields can be empty
     (depending on information on the server)
     '''
-    xml_string = _perform_api_call("study/%s" %str(study_id))
+    call_suffix = "study/%s" %str(study_id)
+    if type is not None:
+        call_suffix += "/" + type
+    xml_string = _perform_api_call(call_suffix)
     result_dict = xmltodict.parse(xml_string)['oml:study']
     id = int(result_dict['oml:id'])
     name = result_dict['oml:name']
