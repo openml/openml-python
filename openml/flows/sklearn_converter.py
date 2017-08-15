@@ -586,10 +586,13 @@ def _check_n_jobs(model):
         elif isinstance(model, sklearn.model_selection.RandomizedSearchCV):
             param_distributions = model.param_distributions
         else:
+            if hasattr(model, 'param_distributions'):
+                param_distributions = model.param_distributions
+            else:
+                raise AttributeError('Using subclass BaseSearchCV other than {GridSearchCV, RandomizedSearchCV}. Could not find attribute param_distributions. ')
             print('Warning! Using subclass BaseSearchCV other than ' \
                   '{GridSearchCV, RandomizedSearchCV}. Should implement param check. ')
-            pass
-
+            
         if not check(param_distributions, True):
             raise PyOpenMLError('openml-python should not be used to '
                                 'optimize the n_jobs parameter.')
