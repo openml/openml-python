@@ -104,11 +104,16 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
 def _read_url(url, data=None):
 
     data = {} if data is None else data
-    data['api_key'] = config.apikey
+    if config.apikey is not None:
+        data['api_key'] = config.apikey
 
-    # Using requests.post sets header 'Accept-encoding' automatically to
-    # 'gzip,deflate'
-    response = requests.post(url, data=data)
+    if len(data) == 0 or (len(data) == 1 and 'api_key' in data):
+        # do a GET
+        response = requests.get(url, params=data)
+    else: # an actual post request
+        # Using requests.post sets header 'Accept-encoding' automatically to
+        #  'gzip,deflate'
+        response = requests.post(url, data=data)
 
     if response.status_code != 200:
         raise _parse_server_exception(response)
