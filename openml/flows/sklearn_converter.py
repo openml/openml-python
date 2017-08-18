@@ -11,6 +11,7 @@ import re
 import six
 import warnings
 import sys
+import inspect
 
 import numpy as np
 import scipy.stats.distributions
@@ -93,10 +94,32 @@ def _is_cross_validator(o):
 
 
 def flow_to_sklearn(o, **kwargs):
+    """Initializes a sklearn model based on a flow.
+
+    Parameters
+    ----------
+    o : mixed
+    the object to deserialize (can be flow object, or any serialzied
+    parameter value that is accepted by)
+
+    components : dict
+    TODO
+
+    keep_defaults : bool
+    If this flag is set, the hyperparameter values of flows will be
+    ignored and a flow with its defaults is returned.
+
+    Returns
+    -------
+    mixed
+
+    """
+
     # First, we need to check whether the presented object is a json string.
     # JSON strings are used to encoder parameter values. By passing around
     # json strings for parameters, we make sure that we can flow_to_sklearn
     # the parameter values to the correct type.
+
     if isinstance(o, six.string_types):
         try:
             o = json.loads(o)
@@ -120,7 +143,9 @@ def flow_to_sklearn(o, **kwargs):
                 value = flow_to_sklearn(value)
                 step_name = value['step_name']
                 key = value['key']
-                component = flow_to_sklearn(kwargs['components'][key])
+                kwcopy = copy.deepcopy(kwargs)
+                del kwcopy['components']
+                component = flow_to_sklearn(kwargs['components'][key], **kwcopy)
                 # The component is now added to where it should be used
                 # later. It should not be passed to the constructor of the
                 # main flow object.
@@ -381,7 +406,7 @@ def _deserialize_model(flow, **kwargs):
 
     for name in parameters:
         value = parameters.get(name)
-        rval = flow_to_sklearn(value, components=components_)
+        rval = flow_to_sklearn(value, components=components_, **kwargs)
         parameter_dict[name] = rval
 
     for name in components:
@@ -390,7 +415,7 @@ def _deserialize_model(flow, **kwargs):
         if name not in components_:
             continue
         value = components[name]
-        rval = flow_to_sklearn(value)
+        rval = flow_to_sklearn(value, **kwargs)
         parameter_dict[name] = rval
 
     module_name = model_name.rsplit('.', 1)
@@ -401,6 +426,15 @@ def _deserialize_model(flow, **kwargs):
         warnings.warn('Cannot create model %s for flow.' % model_name)
         return None
 
+    if 'keep_defaults' in kwargs and kwargs['keep_defaults'] is True:
+        signature = inspect.signature(model_class.__init__)
+        for idx, key in enumerate(signature.parameters):
+            if idx == 0:
+                # since we are talking about classes, first is always 'self'
+                continue
+            parameter = signature.parameters[key]
+            if parameter.default != inspect._empty:
+                del parameter_dict[key]
     return model_class(**parameter_dict)
 
 
@@ -473,6 +507,7 @@ def serialize_rv_frozen(o):
                                 ('args', args), ('kwds', kwds)))
     return ret
 
+
 def deserialize_rv_frozen(o, **kwargs):
     args = o['args']
     kwds = o['kwds']
@@ -512,6 +547,7 @@ def deserialize_function(name, **kwargs):
         warnings.warn('Cannot load function %s due to %s.' % (name, e))
         return None
     return function_handle
+
 
 def _serialize_cross_validator(o):
     ret = OrderedDict()
@@ -558,6 +594,7 @@ def _serialize_cross_validator(o):
 
     return ret
 
+
 def _check_n_jobs(model):
     '''
     Returns True if the parameter settings of model are chosen s.t. the model
@@ -599,6 +636,7 @@ def _check_n_jobs(model):
 
     # check the parameters for n_jobs
     return check(model.get_params(), False)
+
 
 def _deserialize_cross_validator(value, **kwargs):
     model_name = value['name']

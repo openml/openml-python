@@ -596,3 +596,20 @@ class TestSklearn(unittest.TestCase):
 
         for i in range(len(illegal_models)):
             self.assertRaises(PyOpenMLError, _check_n_jobs, illegal_models[i])
+
+    def test_deserialize_with_defaults(self):
+        # used the 'keep defaults' flag of the deserialization method to return a flow that
+        # contains default hyperparameter settings.
+        steps = [('Imputer', sklearn.preprocessing.Imputer()),
+                 ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
+                 ('Estimator', sklearn.tree.DecisionTreeClassifier())]
+        pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
+
+        pipe_adjusted = sklearn.clone(pipe_orig)
+        params = {'Imputer__strategy': 'median', 'OneHotEncoder__sparse': False, 'Estimator__min_samples_leaf': 42}
+        pipe_adjusted.set_params(**params)
+        flow = openml.flows.sklearn_to_flow(pipe_adjusted)
+        pipe_deserialized = openml.flows.flow_to_sklearn(flow, keep_defaults=True)
+
+        # we want to compare pipe_deserialized and pipe_orig. We use the flow equals function for this
+        assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig), openml.flows.sklearn_to_flow(pipe_deserialized))
