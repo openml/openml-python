@@ -497,6 +497,8 @@ class TestRun(TestBase):
         try:
             # in case the run did not exists yet
             run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=True)
+            trace = openml.runs.functions._create_trace_from_arff(run._generate_trace_arff_dict())
+            self.assertEquals(len(trace['data']), num_iterations * num_folds)
             run = run.publish()
             self._wait_for_processed_run(run.run_id, 200)
             run_id = run.run_id
@@ -683,7 +685,6 @@ class TestRun(TestBase):
             self.assertIn(arff_line[-1], task.class_labels)
             self.assertIn(arff_line[-2], task.class_labels)
         pass
-    
 
     def test_run_with_classifiers_in_param_grid(self):
         task = openml.tasks.get_task(115)
@@ -737,6 +738,12 @@ class TestRun(TestBase):
             self.assertAlmostEqual(sum(arff_line[4:6]), 1.0)
             self.assertIn(arff_line[6], ['won', 'nowin'])
             self.assertIn(arff_line[7], ['won', 'nowin'])
+
+    def test__create_trace_from_arff(self):
+        with open(self.static_cache_dir + '/misc/trace.arff', 'r') as arff_file:
+            trace_arff = arff.load(arff_file)
+        trace = openml.runs.functions._create_trace_from_arff(trace_arff)
+
 
     def test_get_run(self):
         # this run is not available on test
