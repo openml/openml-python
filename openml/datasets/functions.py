@@ -33,8 +33,8 @@ def _list_cached_datasets():
     # Find all dataset ids for which we have downloaded the dataset
     # description
     for directory_name in directory_content:
-        # First check if the directory name could be an OpenML dataset id
-        if not re.match(r"[0-9]*", directory_name):
+        # First check if the directory name could be an OpenML dataset id, but exclude -1
+        if re.match(r"[0-9]*", directory_name).group() == "":
             continue
 
         dataset_id = int(directory_name)
