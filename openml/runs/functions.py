@@ -588,20 +588,20 @@ def _create_run_from_xml(xml):
         New run object representing run_xml.
     """
     run = xmltodict.parse(xml)["oml:run"]
-    run_id = int(run['oml:run_id'])
-    uploader = int(run['oml:uploader'])
-    uploader_name = run['oml:uploader_name']
+    run_id = int(run['oml:run_id']) if 'oml:run_id' in run else None
+    uploader = int(run['oml:uploader']) if 'oml:uploader' in run else None
+    uploader_name = run['oml:uploader_name'] if 'oml:uploader_name' in run else None
     task_id = int(run['oml:task_id'])
-    task_type = run['oml:task_type']
+    task_type = run['oml:task_type'] if 'oml:task_type' in run else None
     if 'oml:task_evaluation_measure' in run:
         task_evaluation_measure = run['oml:task_evaluation_measure']
     else:
         task_evaluation_measure = None
 
     flow_id = int(run['oml:flow_id'])
-    flow_name = run['oml:flow_name']
-    setup_id = int(run['oml:setup_id'])
-    setup_string = run['oml:setup_string']
+    flow_name = run['oml:flow_name'] if 'oml:flow_name' in run else None
+    setup_id = int(run['oml:setup_id']) if 'oml:setup_id' in run else None
+    setup_string = run['oml:setup_string'] if 'oml:setup_string' in run else None
 
     parameters = dict()
     if 'oml:parameter_settings' in run:
@@ -611,7 +611,7 @@ def _create_run_from_xml(xml):
             value = parameter_dict['oml:value']
             parameters[key] = value
 
-    dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
+    dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did']) if 'oml:input_data' in run else None
 
     files = dict()
     evaluations = dict()
@@ -619,7 +619,8 @@ def _create_run_from_xml(xml):
     sample_evaluations = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
     if 'oml:output_data' not in run:
         raise ValueError('Run does not contain output_data (OpenML server error?)')
-    else:
+
+    if 'oml:file' in 'oml:output_data':
         if isinstance(run['oml:output_data']['oml:file'], dict):
             # only one result.. probably due to an upload error
             file_dict = run['oml:output_data']['oml:file']
@@ -631,40 +632,40 @@ def _create_run_from_xml(xml):
         else:
             raise TypeError(type(run['oml:output_data']['oml:file']))
 
-        if 'oml:evaluation' in run['oml:output_data']:
-            # in normal cases there should be evaluations, but in case there
-            # was an error these could be absent
-            for evaluation_dict in run['oml:output_data']['oml:evaluation']:
-                key = evaluation_dict['oml:name']
-                if 'oml:value' in evaluation_dict:
-                    value = float(evaluation_dict['oml:value'])
-                elif 'oml:array_data' in evaluation_dict:
-                    value = evaluation_dict['oml:array_data']
-                else:
-                    raise ValueError('Could not find keys "value" or "array_data" '
-                                     'in %s' % str(evaluation_dict.keys()))
-                if '@repeat' in evaluation_dict and '@fold' in evaluation_dict and '@sample' in evaluation_dict:
-                    repeat = int(evaluation_dict['@repeat'])
-                    fold = int(evaluation_dict['@fold'])
-                    sample = int(evaluation_dict['@sample'])
-                    repeat_dict = sample_evaluations[key]
-                    fold_dict = repeat_dict[repeat]
-                    sample_dict = fold_dict[fold]
-                    sample_dict[sample] = value
-                elif '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
-                    repeat = int(evaluation_dict['@repeat'])
-                    fold = int(evaluation_dict['@fold'])
-                    repeat_dict = fold_evaluations[key]
-                    fold_dict = repeat_dict[repeat]
-                    fold_dict[fold] = value
-                else:
-                    evaluations[key] = value
+    if 'oml:evaluation' in run['oml:output_data']:
+        # in normal cases there should be evaluations, but in case there
+        # was an error these could be absent
+        for evaluation_dict in run['oml:output_data']['oml:evaluation']:
+            key = evaluation_dict['oml:name']
+            if 'oml:value' in evaluation_dict:
+                value = float(evaluation_dict['oml:value'])
+            elif 'oml:array_data' in evaluation_dict:
+                value = evaluation_dict['oml:array_data']
+            else:
+                raise ValueError('Could not find keys "value" or "array_data" '
+                                 'in %s' % str(evaluation_dict.keys()))
+            if '@repeat' in evaluation_dict and '@fold' in evaluation_dict and '@sample' in evaluation_dict:
+                repeat = int(evaluation_dict['@repeat'])
+                fold = int(evaluation_dict['@fold'])
+                sample = int(evaluation_dict['@sample'])
+                repeat_dict = sample_evaluations[key]
+                fold_dict = repeat_dict[repeat]
+                sample_dict = fold_dict[fold]
+                sample_dict[sample] = value
+            elif '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
+                repeat = int(evaluation_dict['@repeat'])
+                fold = int(evaluation_dict['@fold'])
+                repeat_dict = fold_evaluations[key]
+                fold_dict = repeat_dict[repeat]
+                fold_dict[fold] = value
+            else:
+                evaluations[key] = value
 
-    if 'description' not in files:
+    if 'description' not in files and run_id is not None:
         raise ValueError('No description file for run %d in run '
                          'description XML' % run_id)
 
-    if 'predictions' not in files:
+    if 'predictions' not in files and run_id is not None:
         # JvR: actually, I am not sure whether this error should be raised.
         # a run can consist without predictions. But for now let's keep it
         raise ValueError('No prediction files for run %d in run '
