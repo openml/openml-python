@@ -4,13 +4,24 @@ class OpenMLSetup(object):
 
        Parameters
        ----------
+       setup_id : int
+            The OpenML setup id
        flow_id : int
             The flow that it is build upon
         parameters : dict
             The setting of the parameters
            """
 
-    def __init__(self, flow_id, parameters):
+    def __init__(self, setup_id, flow_id, parameters):
+        if not isinstance(setup_id, int):
+            raise ValueError('setup id should be int')
+        if not isinstance(flow_id, int):
+            raise ValueError('flow id should be int')
+        if parameters is not None:
+            if not isinstance(parameters, dict):
+                raise ValueError('parameters should be dict')
+
+        self.setup_id = setup_id
         self.flow_id = flow_id
         self.parameters = parameters
 
