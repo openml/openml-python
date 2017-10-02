@@ -21,11 +21,14 @@ from . import datasets
 from . import tasks
 from . import runs
 from . import flows
+from . import setups
+from . import study
+from . import evaluations
 from .runs import OpenMLRun
 from .tasks import OpenMLTask, OpenMLSplit
 from .flows import OpenMLFlow
 
-__version__ = "0.3.0"
+from .__version__ import __version__
 
 
 def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None,
@@ -65,5 +68,6 @@ def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None,
 
 
 __all__ = ['OpenMLDataset', 'OpenMLDataFeature', 'OpenMLRun',
-           'OpenMLSplit', 'datasets', 'OpenMLTask', 'OpenMLFlow',
-           'config', 'runs', 'flows', 'tasks']
+           'OpenMLSplit', 'OpenMLEvaluation', 'OpenMLSetup',
+           'OpenMLTask', 'OpenMLFlow', 'datasets', 'evaluations',
+           'config', 'runs', 'flows', 'tasks', 'setups']

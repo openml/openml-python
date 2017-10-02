@@ -1,9 +1,10 @@
 mock
 numpy>=1.6.2
 scipy>=0.13.3
-liac-arff>=2.1.1dev
+liac-arff>=2.1.1
 xmltodict
 nose
 requests
 scikit-learn>=0.18
 nbformat
+python-dateutil

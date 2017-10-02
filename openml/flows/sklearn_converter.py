@@ -18,6 +18,7 @@ import sklearn.model_selection
 # Necessary to have signature available in python 2.7
 from sklearn.utils.fixes import signature
 
+import openml
 from openml.flows import OpenMLFlow
 from openml.exceptions import PyOpenMLError
 
@@ -27,7 +28,7 @@ else:
     JSONDecodeError = ValueError
 
 DEPENDENCIES_PATTERN = re.compile(
-    '^(?P<name>[\w\-]+)((?P<operation>==|>=|>)(?P<version>(\d+\.)?(\d+\.)?(\d+)))?$')
+    '^(?P<name>[\w\-]+)((?P<operation>==|>=|>)(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?))?$')
 
 
 def sklearn_to_flow(o, parent_model=None):
@@ -185,7 +186,15 @@ def _serialize_model(model):
                       parameters=parameters,
                       parameters_meta_info=parameters_meta_info,
                       external_version=external_version,
-                      tags=[],
+                      tags=['openml-python', 'sklearn', 'scikit-learn',
+                            'python',
+                            _format_external_version('sklearn',
+                                                     sklearn.__version__).replace('==', '_'),
+                            # TODO: add more tags based on the scikit-learn
+                            # module a flow is in? For example automatically
+                            # annotate a class of sklearn.svm.SVC() with the
+                            # tag svm?
+                            ],
                       language='English',
                       # TODO fill in dependencies!
                       dependencies=dependencies)
@@ -204,8 +213,10 @@ def _get_external_version_string(model, sub_components):
     model_package_version_number = module.__version__
     external_version = _format_external_version(model_package_name,
                                                 model_package_version_number)
+    openml_version = _format_external_version('openml', openml.__version__)
     external_versions = set()
     external_versions.add(external_version)
+    external_versions.add(openml_version)
     for visitee in sub_components.values():
         for external_version in visitee.external_version.split(','):
             external_versions.add(external_version)
@@ -573,11 +584,12 @@ def _check_n_jobs(model):
         elif isinstance(model, sklearn.model_selection.RandomizedSearchCV):
             param_distributions = model.param_distributions
         else:
+            if hasattr(model, 'param_distributions'):
+                param_distributions = model.param_distributions
+            else:
+                raise AttributeError('Using subclass BaseSearchCV other than {GridSearchCV, RandomizedSearchCV}. Could not find attribute param_distributions. ')
             print('Warning! Using subclass BaseSearchCV other than ' \
                   '{GridSearchCV, RandomizedSearchCV}. Should implement param check. ')
-
-            # Return false if we can't determine the param_distributions
-            return False
 
         if not check(param_distributions, True):
             raise PyOpenMLError('openml-python should not be used to '

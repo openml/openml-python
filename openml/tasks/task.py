@@ -3,7 +3,6 @@ import os
 
 from .. import config
 from .. import datasets
-from ..util import URLError
 from .split import OpenMLSplit
 from .._api_calls import _read_url
 
@@ -14,6 +13,7 @@ class OpenMLTask(object):
                  estimation_parameters, evaluation_measure, cost_matrix,
                  class_labels=None):
         self.task_id = int(task_id)
+        self.task_type_id = int(task_type_id)
         self.task_type = task_type
         self.dataset_id = int(data_set_id)
         self.target_name = target_name
@@ -26,6 +26,7 @@ class OpenMLTask(object):
         self.evaluation_measure = evaluation_measure
         self.cost_matrix = cost_matrix
         self.class_labels = class_labels
+        self.split = None
 
         if cost_matrix is not None:
             raise NotImplementedError("Costmatrix")
@@ -37,32 +38,28 @@ class OpenMLTask(object):
     def get_X_and_y(self):
         dataset = self.get_dataset()
         # Replace with retrieve from cache
-        if 'Supervised Classification'.lower() in self.task_type.lower():
+        if self.task_type_id == 1:
+        # if 'Supervised Classification'.lower() in self.task_type.lower():
             target_dtype = int
-        elif 'Supervised Regression'.lower() in self.task_type.lower():
+        # elif 'Supervised Regression'.lower() in self.task_type.lower():
+        elif self.task_type_id == 2:
             target_dtype = float
+        # elif ''.lower('Learning Curve') in self.task_type.lower():
+        elif self.task_type_id == 3:
+            target_dtype = int
         else:
             raise NotImplementedError(self.task_type)
         X_and_y = dataset.get_data(target=self.target_name,
                                    target_dtype=target_dtype)
         return X_and_y
 
-    def get_train_test_split_indices(self, fold=0, repeat=0):
+    def get_train_test_split_indices(self, fold=0, repeat=0, sample=0):
         # Replace with retrieve from cache
-        split = self.download_split()
-        train_indices, test_indices = split.get(repeat=repeat, fold=fold)
+        if self.split is None:
+            self.split = self.download_split()
+
+        train_indices, test_indices = self.split.get(repeat=repeat, fold=fold, sample=sample)
         return train_indices, test_indices
-
-    def iterate_repeats(self):
-        split = self.download_split()
-        for rep in split.iterate_splits():
-            yield rep
-
-    def iterate_all_splits(self):
-        split = self.download_split()
-        for rep in split.iterate_splits():
-            for fold in rep:
-                yield fold
 
     def _download_split(self, cache_file):
         try:
@@ -70,11 +67,7 @@ class OpenMLTask(object):
                 pass
         except (OSError, IOError):
             split_url = self.estimation_procedure["data_splits_url"]
-            try:
-                split_arff = _read_url(split_url)
-            except (URLError, UnicodeEncodeError) as e:
-                print(e, split_url)
-                raise e
+            split_arff = _read_url(split_url)
 
             with io.open(cache_file, "w", encoding='utf8') as fh:
                 fh.write(split_arff)
@@ -82,11 +75,6 @@ class OpenMLTask(object):
 
     def download_split(self):
         """Download the OpenML split for a given task.
-
-        Parameters
-        ----------
-        task_id : Task
-            An entity of :class:`openml.OpenMLTask`.
         """
         cached_split_file = os.path.join(
             _create_task_cache_dir(self.task_id), "datasplits.arff")
@@ -101,6 +89,12 @@ class OpenMLTask(object):
             split = OpenMLSplit._from_arff_file(cached_split_file)
 
         return split
+
+    def get_split_dimensions(self):
+        if self.split is None:
+            self.split = self.download_split()
+
+        return self.split.repeats, self.split.folds, self.split.samples
 
 
 def _create_task_cache_dir(task_id):

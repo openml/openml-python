@@ -1,9 +1,11 @@
+from collections import OrderedDict
 import io
 import os
 import re
 import shutil
-from collections import OrderedDict
+
 import xmltodict
+
 from .dataset import OpenMLDataset
 from ..exceptions import OpenMLCacheException
 from .. import config
@@ -73,7 +75,8 @@ def _get_cached_dataset(dataset_id):
     description = _get_cached_dataset_description(dataset_id)
     arff_file = _get_cached_dataset_arff(dataset_id)
     features = _get_cached_dataset_features(dataset_id)
-    dataset = _create_dataset_from_description(description, features, arff_file)
+    qualities = _get_cached_dataset_qualities(dataset_id)
+    dataset = _create_dataset_from_description(description, features, qualities, arff_file)
 
     return dataset
 
@@ -102,6 +105,19 @@ def _get_cached_dataset_features(dataset_id):
             return xmltodict.parse(features_xml)["oml:data_features"]
     except (IOError, OSError):
         raise OpenMLCacheException("Dataset features for dataset id %d not "
+                                   "cached" % dataset_id)
+
+
+def _get_cached_dataset_qualities(dataset_id):
+    cache_dir = config.get_cache_directory()
+    did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
+    qualities_file = os.path.join(did_cache_dir, "qualities.xml")
+    try:
+        with io.open(qualities_file, encoding='utf8') as fh:
+            qualities_xml = fh.read()
+            return xmltodict.parse(qualities_xml)["oml:data_qualities"]
+    except (IOError, OSError):
+        raise OpenMLCacheException("Dataset qualities for dataset id %d not "
                                    "cached" % dataset_id)
 
 
@@ -270,7 +286,7 @@ def get_dataset(dataset_id):
         _remove_dataset_cache_dir(did_cache_dir)
         raise e
 
-    dataset = _create_dataset_from_description(description, features, arff_file)
+    dataset = _create_dataset_from_description(description, features, qualities, arff_file)
     return dataset
 
 
@@ -468,7 +484,7 @@ def _remove_dataset_cache_dir(did_cache_dir):
                              'Please do this manually!' % did_cache_dir)
 
 
-def _create_dataset_from_description(description, features, arff_file):
+def _create_dataset_from_description(description, features, qualities, arff_file):
     """Create a dataset object from a description dict.
 
     Parameters
@@ -508,5 +524,6 @@ def _create_dataset_from_description(description, features, arff_file):
         description.get("oml:update_comment"),
         description.get("oml:md5_checksum"),
         data_file=arff_file,
-        features=features)
+        features=features,
+        qualities=qualities)
     return dataset

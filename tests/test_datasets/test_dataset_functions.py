@@ -8,16 +8,17 @@ if sys.version_info[0] >= 3:
 else:
     import mock
 
+import six
 import scipy.sparse
 
 import openml
 from openml import OpenMLDataset
 from openml.exceptions import OpenMLCacheException, PyOpenMLError
-from openml.util import is_string
 from openml.testing import TestBase
 
 from openml.datasets.functions import (_get_cached_dataset,
                                        _get_cached_dataset_features,
+                                       _get_cached_dataset_qualities,
                                        _get_cached_datasets,
                                        _get_dataset_description,
                                        _get_dataset_arff,
@@ -63,11 +64,13 @@ class TestOpenMLDataset(TestBase):
         openml.config.set_cache_directory(self.static_cache_dir)
         dataset = _get_cached_dataset(2)
         features = _get_cached_dataset_features(2)
+        qualities = _get_cached_dataset_qualities(2)
         self.assertIsInstance(dataset, OpenMLDataset)
         self.assertTrue(len(dataset.features) > 0)
         self.assertTrue(len(dataset.features) == len(features['oml:feature']))
+        self.assertTrue(len(dataset.qualities) == len(qualities['oml:quality']))
 
-    def test_get_chached_dataset_description(self):
+    def test_get_cached_dataset_description(self):
         openml.config.set_cache_directory(self.static_cache_dir)
         description = openml.datasets.functions._get_cached_dataset_description(2)
         self.assertIsInstance(description, dict)
@@ -98,7 +101,7 @@ class TestOpenMLDataset(TestBase):
             self.assertIn('did', dataset)
             self.assertIsInstance(dataset['did'], int)
             self.assertIn('status', dataset)
-            self.assertTrue(is_string(dataset['status']))
+            self.assertIsInstance(dataset['status'], six.string_types)
             self.assertIn(dataset['status'], ['in_preparation', 'active',
                                               'deactivated'])
 
@@ -168,6 +171,9 @@ class TestOpenMLDataset(TestBase):
             openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
         self.assertTrue(os.path.exists(os.path.join(
             openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
+
+        self.assertGreater(len(dataset.features), 1)
+        self.assertGreater(len(dataset.qualities), 4)
 
     def test_get_dataset_with_string(self):
         dataset = openml.datasets.get_dataset(101)
@@ -250,6 +256,6 @@ class TestOpenMLDataset(TestBase):
         dataset = OpenMLDataset(
             name="UploadTestWithURL", version=1, description="test",
             format="ARFF",
-            url="http://expdb.cs.kuleuven.be/expdb/data/uci/nominal/iris.arff")
+            url="https://www.openml.org/data/download/61/dataset_61_iris.arff")
         dataset.publish()
         self.assertIsInstance(dataset.dataset_id, int)
