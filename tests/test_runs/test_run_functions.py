@@ -498,7 +498,10 @@ class TestRun(TestBase):
             # in case the run did not exists yet
             run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=True)
             trace = openml.runs.functions._create_trace_from_arff(run._generate_trace_arff_dict())
-            self.assertEquals(len(trace['data']), num_iterations * num_folds)
+            self.assertEquals(
+                len(trace.trace_iterations),
+                num_iterations * num_folds,
+            )
             run = run.publish()
             self._wait_for_processed_run(run.run_id, 200)
             run_id = run.run_id
@@ -744,11 +747,10 @@ class TestRun(TestBase):
             trace_arff = arff.load(arff_file)
         trace = openml.runs.functions._create_trace_from_arff(trace_arff)
 
-
     def test_get_run(self):
         # this run is not available on test
         openml.config.server = self.production_server
-        run = openml.runs.get_run(473350)
+        run = openml.runs.get_run(473344)
         self.assertEqual(run.dataset_id, 1167)
         self.assertEqual(run.evaluations['f_measure'], 0.624668)
         for i, value in [(0, 0.66233),
