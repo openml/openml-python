@@ -361,6 +361,18 @@ def _prediction_to_row(rep_no, fold_no, sample_no, row_id, correct_label,
 
 # JvR: why is class labels a parameter? could be removed and taken from task object, right?
 def _run_task_get_arffcontent(model, task, class_labels):
+
+    def _prediction_to_probabilities(y, model_classes):
+        # y: list or numpy array of predictions
+        # model_classes: sklearn classifier mapping from original array id to prediction index id
+        if not isinstance(model_classes, list):
+            raise ValueError('please convert model classes to list prior to calling this fn')
+        result = np.zeros((len(y), len(model_classes)), dtype=np.float32)
+        for obs, prediction_idx in enumerate(y):
+            array_idx = model_classes.index(prediction_idx)
+            result[obs][array_idx] = 1.0
+        return result
+
     X, Y = task.get_X_and_y()
     arff_datacontent = []
     arff_tracecontent = []
@@ -428,8 +440,11 @@ def _run_task_get_arffcontent(model, task, class_labels):
                 if can_measure_runtime:
                     modelpredict_starttime = time.process_time()
 
-                ProbaY = model_fold.predict_proba(testX)
                 PredY = model_fold.predict(testX)
+                try:
+                    ProbaY = model_fold.predict_proba(testX)
+                except AttributeError:
+                    ProbaY = _prediction_to_probabilities(PredY, list(model_classes))
 
                 # add client-side calculated metrics. These might be used on the server as consistency check
                 def _calculate_local_measure(sklearn_fn, openml_name):

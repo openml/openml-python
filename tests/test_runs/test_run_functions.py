@@ -27,10 +27,19 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.linear_model import LogisticRegression, SGDClassifier, \
     LinearRegression
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
-from sklearn.svm import SVC
+from sklearn.svm import SVC, LinearSVC
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
     StratifiedKFold
 from sklearn.pipeline import Pipeline
+
+
+class HardNaiveBayes(GaussianNB):
+    # class for testing a naive bayes classifier that does not allow soft predictions
+    def __init__(self, priors=None):
+        super(HardNaiveBayes, self).__init__(priors)
+
+    def predict_proba(*args, **kwargs):
+        raise AttributeError('predict_proba is not available when  probability=False')
 
 
 class TestRun(TestBase):
@@ -898,3 +907,25 @@ class TestRun(TestBase):
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             self.assertEqual(len(row), 12)
 
+    def test_predict_proba_hardclassifier(self):
+        # task 1 (test server) is important, as it is a task with an unused class
+        tasks = [1, 3, 115]
+
+        for task_id in tasks:
+            task = openml.tasks.get_task(task_id)
+            clf1 = sklearn.pipeline.Pipeline(steps=[
+                ('imputer', sklearn.preprocessing.Imputer()), ('estimator', GaussianNB())
+            ])
+            clf2 = sklearn.pipeline.Pipeline(steps=[
+                ('imputer', sklearn.preprocessing.Imputer()), ('estimator', HardNaiveBayes())
+            ])
+
+            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task, task.class_labels)
+            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task, task.class_labels)
+
+            # verifies last two arff indices (predict and correct)
+            # TODO: programmatically check wether these are indeed features (predict, correct)
+            predictionsA = np.array(arff_content1)[:, -2:-1]
+            predictionsB = np.array(arff_content2)[:, -2:-1]
+
+            np.testing.assert_array_equal(predictionsA, predictionsB)
