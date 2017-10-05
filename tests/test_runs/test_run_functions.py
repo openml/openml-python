@@ -716,12 +716,6 @@ class TestRun(TestBase):
         num_folds = 10
         num_repeats = 1
 
-        clf = SGDClassifier(loss='hinge', random_state=1)
-        self.assertRaisesRegexp(AttributeError,
-                                "probability estimates are not available for loss='hinge'",
-                                openml.runs.functions._run_task_get_arffcontent,
-                                clf, task, class_labels)
-
         clf = SGDClassifier(loss='log', random_state=1)
         res = openml.runs.functions._run_task_get_arffcontent(clf, task, class_labels)
         arff_datacontent, arff_tracecontent, _, fold_evaluations, sample_evaluations = res
