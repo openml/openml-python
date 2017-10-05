@@ -1,5 +1,7 @@
 import six
 
+from openml.exceptions import OpenMLServerException
+
 
 def extract_xml_tags(xml_tag_name, node, allow_none=True):
     """Helper to extract xml tags from xmltodict.
@@ -39,31 +41,48 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
             raise ValueError("Could not find tag '%s' in node '%s'" %
                              (xml_tag_name, str(node)))
             
-def list_all(listing_call, *args, **filters):
+def list_all(listing_call, batch_size=10000, *args, **filters):
     """Helper to handle paged listing requests.
-    Example usage: evaluations = list_all(list_evaluations, "predictive_accuracy", task=mytask)
-    Note: I wanted to make this a generator, but this is not possible since all listing calls return dicts
+
+    Example usage:
+
+    ``evaluations = list_all(list_evaluations, "predictive_accuracy", task=mytask)``
+
+    Note: I wanted to make this a generator, but this is not possible since all
+    listing calls return dicts
     
     Parameters
     ----------
-    listing_call : object
-        Name of the listing call, e.g. list_evaluations
+    listing_call : callable
+        Call listing, e.g. list_evaluations.
+    batch_size : int (default: 10000)
+        Batch size for paging.
     *args : Variable length argument list
-        Any required arguments for the listing call
+        Any required arguments for the listing call.
     **filters : Arbitrary keyword arguments
-        Any filters that need to be applied
+        Any filters that can be applied to the listing function.
         
     Returns
     -------
-    object
+    dict
     """
-    batch_size = 10000
     page = 0
-    has_more = 1
     result = {}
-    while has_more:
-        new_batch = listing_call(*args, size=batch_size, offset=batch_size*page, **filters)
+
+    while True:
+        try:
+            new_batch = listing_call(
+                *args,
+                size=batch_size,
+                offset=batch_size*page,
+                **filters
+            )
+        except OpenMLServerException as e:
+            if page == 0 and e.args[0] == 'No results':
+                raise e
+            else:
+                break
         result.update(new_batch)
         page += 1
-        has_more = (len(new_batch) == batch_size)
+
     return result
