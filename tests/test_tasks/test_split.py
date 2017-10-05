@@ -8,6 +8,9 @@ from openml import OpenMLSplit
 
 
 class OpenMLSplitTest(unittest.TestCase):
+    # Splitting not helpful, these test's don't rely on the server and take less
+    # than 5 seconds + rebuilding the test would potentially be costly
+
     def setUp(self):
         __file__ = inspect.getfile(OpenMLSplitTest)
         self.directory = os.path.dirname(__file__)
