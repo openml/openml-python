@@ -19,7 +19,7 @@ class TestBase(unittest.TestCase):
     Hopefully soon allows using a test server, not the production server.
     """
 
-    def setUp(self):
+    def setUp(self, tmp_dir_name=None):
         # This cache directory is checked in to git to simulate a populated
         # cache
         self.maxDiff = None
@@ -36,7 +36,9 @@ class TestBase(unittest.TestCase):
 
         self.cwd = os.getcwd()
         workdir = os.path.dirname(os.path.abspath(__file__))
-        self.workdir = os.path.join(workdir, "tmp")
+        if tmp_dir_name is None:
+            tmp_dir_name = 'tmp'
+        self.workdir = os.path.join(workdir, tmp_dir_name)
         try:
             shutil.rmtree(self.workdir)
         except:

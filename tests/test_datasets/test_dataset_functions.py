@@ -27,9 +27,12 @@ from openml.datasets.functions import (_get_cached_dataset,
 
 
 class TestOpenMLDataset(TestBase):
+    _multiprocess_can_split_ = True
 
-    def setUp(self):
-        super(TestOpenMLDataset, self).setUp()
+    def setUp(self, tmp_dir_name=None):
+        tmp_dir_name = self.id()
+        print(tmp_dir_name)
+        super(TestOpenMLDataset, self).setUp(tmp_dir_name=tmp_dir_name)
         self._remove_did1()
 
     def tearDown(self):
