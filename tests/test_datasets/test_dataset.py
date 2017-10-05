@@ -9,6 +9,8 @@ from openml import OpenMLDataset
 
 
 class OpenMLDatasetTest(unittest.TestCase):
+    # Splitting not helpful, these test's don't rely on the server and take less
+    # than 5 seconds.
 
     def setUp(self):
         # Load dataset id 1
