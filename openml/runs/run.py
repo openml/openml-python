@@ -51,6 +51,7 @@ class OpenMLRun(object):
         self.run_id = run_id
         self.model = model
         self.tags = tags
+        self.predictions_url = predictions_url
 
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the server.
