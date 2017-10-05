@@ -24,6 +24,7 @@ from . import flows
 from . import setups
 from . import study
 from . import evaluations
+from . import utils
 from .runs import OpenMLRun
 from .tasks import OpenMLTask, OpenMLSplit
 from .flows import OpenMLFlow

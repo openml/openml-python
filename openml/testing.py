@@ -5,6 +5,8 @@ import shutil
 import time
 import unittest
 
+import six
+
 import openml
 
 
@@ -77,6 +79,16 @@ class TestBase(unittest.TestCase):
                 flows_to_visit.append(subflow)
 
         return flow, sentinel
+
+    def _check_dataset(self, dataset):
+        self.assertEqual(type(dataset), dict)
+        self.assertGreaterEqual(len(dataset), 2)
+        self.assertIn('did', dataset)
+        self.assertIsInstance(dataset['did'], int)
+        self.assertIn('status', dataset)
+        self.assertIsInstance(dataset['status'], six.string_types)
+        self.assertIn(dataset['status'], ['in_preparation', 'active',
+                                          'deactivated'])
 
 
 __all__ = ['TestBase']
