@@ -34,6 +34,7 @@ from sklearn.pipeline import Pipeline
 
 
 class TestRun(TestBase):
+    _multiprocess_can_split_ = True
 
     def _wait_for_processed_run(self, run_id, max_waiting_time_seconds):
         # it can take a while for a run to be processed on the OpenML (test) server
@@ -267,30 +268,65 @@ class TestRun(TestBase):
         openml.runs.functions._publish_flow_if_necessary(flow2)
         self.assertEqual(flow2.flow_id, flow.flow_id)
 
-    def test_run_and_upload(self):
-        # This unit test is ment to test the following functions, using a varity of flows:
-        # - openml.runs.run_task()
-        # - openml.runs.OpenMLRun.publish()
-        # - openml.runs.initialize_model()
-        # - [implicitly] openml.setups.initialize_model()
-        # - openml.runs.initialize_model_from_trace()
-        task_id = 119 # diabates dataset
-        num_test_instances = 253 # 33% holdout task
-        num_folds = 1 # because of holdout
-        num_iterations = 5 # for base search classifiers
+    ############################################################################
+    # These unit tests are ment to test the following functions, using a varity
+    #  of flows:
+    # - openml.runs.run_task()
+    # - openml.runs.OpenMLRun.publish()
+    # - openml.runs.initialize_model()
+    # - [implicitly] openml.setups.initialize_model()
+    # - openml.runs.initialize_model_from_trace()
+    # They're split among several actual functions to allow for parallel
+    # execution of the unit tests without the need to add an additional module
+    # like unittest2
 
-        clfs = []
-        random_state_fixtures = []
+    def _run_and_upload(self, clf, rsv):
+        task_id = 119  # diabates dataset
+        num_test_instances = 253  # 33% holdout task
+        num_folds = 1  # because of holdout
+        num_iterations = 5  # for base search classifiers
 
+        run = self._perform_run(task_id, num_test_instances, clf,
+                                random_state_value=rsv)
+
+        # obtain accuracy scores using get_metric_score:
+        accuracy_scores = run.get_metric_fn(sklearn.metrics.accuracy_score)
+        # compare with the scores in user defined measures
+        accuracy_scores_provided = []
+        for rep in run.fold_evaluations['predictive_accuracy'].keys():
+            for fold in run.fold_evaluations['predictive_accuracy'][rep].keys():
+                accuracy_scores_provided.append(
+                    run.fold_evaluations['predictive_accuracy'][rep][fold])
+        self.assertEquals(sum(accuracy_scores_provided), sum(accuracy_scores))
+
+        if isinstance(clf, BaseSearchCV):
+            if isinstance(clf, GridSearchCV):
+                grid_iterations = 1
+                for param in clf.param_grid:
+                    grid_iterations *= len(clf.param_grid[param])
+                self.assertEqual(len(run.trace_content),
+                                 grid_iterations * num_folds)
+            else:
+                self.assertEqual(len(run.trace_content),
+                                 num_iterations * num_folds)
+            check_res = self._check_serialized_optimized_run(run.run_id)
+            self.assertTrue(check_res)
+
+        # todo: check if runtime is present
+        self._check_fold_evaluations(run.fold_evaluations, 1, num_folds)
+        pass
+
+    def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression()
-        clfs.append(lr)
-        random_state_fixtures.append('62501')
+        self._run_and_upload(lr, '62501')
+
+    def test_run_and_upload_pipeline1(self):
 
         pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
                                     ('dummy', DummyClassifier(strategy='prior'))])
-        clfs.append(pipeline1)
-        random_state_fixtures.append('62501')
+        self._run_and_upload(pipeline1, '62501')
 
+    def test_run_and_upload_pipeline2(self):
         pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                     ('VarianceThreshold', VarianceThreshold()),
                                     ('Estimator', RandomizedSearchCV(
@@ -298,15 +334,15 @@ class TestRun(TestBase):
                                         {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
                                          'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
                                         cv=3, n_iter=10))])
-        clfs.append(pipeline2)
-        random_state_fixtures.append('62501')
+        self._run_and_upload(pipeline2, '62501')
 
+    def test_run_and_upload_gridsearch(self):
         gridsearch = GridSearchCV(BaggingClassifier(base_estimator=SVC()),
                                   {"base_estimator__C": [0.01, 0.1, 10],
                                    "base_estimator__gamma": [0.01, 0.1, 10]})
-        clfs.append(gridsearch)
-        random_state_fixtures.append('62501')
+        self._run_and_upload(gridsearch, '62501')
 
+    def test_run_and_upload_randomsearch(self):
         randomsearch = RandomizedSearchCV(
             RandomForestClassifier(n_estimators=5),
             {"max_depth": [3, None],
@@ -316,60 +352,34 @@ class TestRun(TestBase):
              "bootstrap": [True, False],
              "criterion": ["gini", "entropy"]},
             cv=StratifiedKFold(n_splits=2, shuffle=True),
-            n_iter=num_iterations)
-
-        clfs.append(randomsearch)
+            n_iter=5)
         # The random states for the RandomizedSearchCV is set after the
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
-        random_state_fixtures.append('12172')
+        self._run_and_upload(randomsearch, '12172')
 
-        for clf, rsv in zip(clfs, random_state_fixtures):
-            run = self._perform_run(task_id, num_test_instances, clf,
-                                    random_state_value=rsv)
+    ############################################################################
 
-            # obtain accuracy scores using get_metric_score:
-            accuracy_scores = run.get_metric_fn(sklearn.metrics.accuracy_score)
-            # compare with the scores in user defined measures
-            accuracy_scores_provided = []
-            for rep in run.fold_evaluations['predictive_accuracy'].keys():
-                for fold in run.fold_evaluations['predictive_accuracy'][rep].keys():
-                    accuracy_scores_provided.append(run.fold_evaluations['predictive_accuracy'][rep][fold])
-            self.assertEquals(sum(accuracy_scores_provided), sum(accuracy_scores))
-
-            if isinstance(clf, BaseSearchCV):
-                if isinstance(clf, GridSearchCV):
-                    grid_iterations = 1
-                    for param in clf.param_grid:
-                        grid_iterations *= len(clf.param_grid[param])
-                    self.assertEqual(len(run.trace_content), grid_iterations * num_folds)
-                else:
-                    self.assertEqual(len(run.trace_content), num_iterations * num_folds)
-                check_res = self._check_serialized_optimized_run(run.run_id)
-                self.assertTrue(check_res)
-
-            # todo: check if runtime is present
-            self._check_fold_evaluations(run.fold_evaluations, 1, num_folds)
-            pass
-
-    def test_learning_curve_task(self):
+    def test_learning_curve_task_1(self):
         task_id = 801  # diabates dataset
         num_test_instances = 6144 # for learning curve
         num_repeats = 1
         num_folds = 10
         num_samples = 8
 
-        clfs = []
-        random_state_fixtures = []
-
-        #nb = GaussianNB()
-        #clfs.append(nb)
-        #random_state_fixtures.append('62501')
-
         pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
                                     ('dummy', DummyClassifier(strategy='prior'))])
-        clfs.append(pipeline1)
-        random_state_fixtures.append('62501')
+        run = self._perform_run(task_id, num_test_instances, pipeline1,
+                                random_state_value='62501')
+        self._check_sample_evaluations(run.sample_evaluations, num_repeats,
+                                       num_folds, num_samples)
+
+    def test_learning_curve_task_2(self):
+        task_id = 801  # diabates dataset
+        num_test_instances = 6144  # for learning curve
+        num_repeats = 1
+        num_folds = 10
+        num_samples = 8
 
         pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                     ('VarianceThreshold', VarianceThreshold()),
@@ -378,16 +388,10 @@ class TestRun(TestBase):
                                         {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
                                          'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
                                         cv=3, n_iter=10))])
-        clfs.append(pipeline2)
-        random_state_fixtures.append('62501')
-
-
-        for clf, rsv in zip(clfs, random_state_fixtures):
-            run = self._perform_run(task_id, num_test_instances, clf,
-                                    random_state_value=rsv)
-
-            # todo: check if runtime is present
-            self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
+        run = self._perform_run(task_id, num_test_instances, pipeline2,
+                                random_state_value='62501')
+        self._check_sample_evaluations(run.sample_evaluations, num_repeats,
+                                       num_folds, num_samples)
 
     def test_initialize_cv_from_run(self):
         randomsearch = RandomizedSearchCV(
@@ -454,7 +458,6 @@ class TestRun(TestBase):
         openml.config.server = self.production_server
         run = openml.runs.get_run(5965513) # important to use binary classification task, due to assertions
         self._test_local_evaluations(run)
-
 
     def test_initialize_model_from_run(self):
         clf = sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='median')),
