@@ -28,11 +28,8 @@ conda create -n testenv --yes python=$PYTHON_VERSION pip
 source activate testenv
 pip install nose numpy scipy cython scikit-learn==$SKLEARN_VERSION pandas \
     matplotlib jupyter notebook nbconvert nbformat jupyter_client ipython \
-    ipykernel
+    ipykernel oslo.concurrency
 
-pip install oslo.concurrency
-
-pip install matplotlib jupyter notebook nbconvert nbformat jupyter_client ipython ipykernel
 if [[ "$COVERAGE" == "true" ]]; then
     pip install codecov
 fi
