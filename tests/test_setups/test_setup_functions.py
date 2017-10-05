@@ -47,7 +47,8 @@ class ParameterFreeClassifier(BaseEstimator, ClassifierMixin):
         return {}
 
 
-class TestRun(TestBase):
+class TestSetupFunctions(TestBase):
+    _multiprocess_can_split_ = True
 
     def test_nonexisting_setup_exists(self):
         # first publish a non-existing flow
@@ -64,41 +65,49 @@ class TestRun(TestBase):
         setup_id = openml.setups.setup_exists(flow)
         self.assertFalse(setup_id)
 
-    def test_existing_setup_exists(self):
-        clfs = [ParameterFreeClassifier(),           # zero hyperparemeters
-                GaussianNB(),                        # one hyperparameter
-                DecisionTreeClassifier(max_depth=5,  # many hyperparameters
-                                       min_samples_split=3,
-                                       # Not setting the random state will
-                                       # make this flow fail as running it
-                                       # will add a random random_state.
-                                       random_state=1)]
+    def _existing_setup_exists(self, classif):
+        flow = openml.flows.sklearn_to_flow(classif)
+        flow.name = 'TEST%s%s' % (get_sentinel(), flow.name)
+        flow.publish()
 
-        for classif in clfs:
-            # first publish a nonexiting flow
-            flow = openml.flows.sklearn_to_flow(classif)
-            flow.name = 'TEST%s%s' % (get_sentinel(), flow.name)
-            flow.publish()
+        # although the flow exists, we can be sure there are no
+        # setups (yet) as it hasn't been ran
+        setup_id = openml.setups.setup_exists(flow)
+        self.assertFalse(setup_id)
+        setup_id = openml.setups.setup_exists(flow, classif)
+        self.assertFalse(setup_id)
 
-            # although the flow exists, we can be sure there are no
-            # setups (yet) as it hasn't been ran
-            setup_id = openml.setups.setup_exists(flow)
-            self.assertFalse(setup_id)
-            setup_id = openml.setups.setup_exists(flow, classif)
-            self.assertFalse(setup_id)
+        # now run the flow on an easy task:
+        task = openml.tasks.get_task(115)  # diabetes
+        run = openml.runs.run_flow_on_task(task, flow)
+        # spoof flow id, otherwise the sentinel is ignored
+        run.flow_id = flow.flow_id
+        run.publish()
+        # download the run, as it contains the right setup id
+        run = openml.runs.get_run(run.run_id)
 
-            # now run the flow on an easy task:
-            task = openml.tasks.get_task(115)  # diabetes
-            run = openml.runs.run_flow_on_task(task, flow)
-            # spoof flow id, otherwise the sentinel is ignored
-            run.flow_id = flow.flow_id
-            run.publish()
-            # download the run, as it contains the right setup id
-            run = openml.runs.get_run(run.run_id)
+        # execute the function we are interested in
+        setup_id = openml.setups.setup_exists(flow)
+        self.assertEquals(setup_id, run.setup_id)
 
-            # execute the function we are interested in
-            setup_id = openml.setups.setup_exists(flow)
-            self.assertEquals(setup_id, run.setup_id)
+    def test_existing_setup_exists_1(self):
+        # Check a flow with zero hyperparameters
+        self._existing_setup_exists(ParameterFreeClassifier())
+
+    def test_exisiting_setup_exists_2(self):
+        # Check a flow with one hyperparameter
+        self._existing_setup_exists(GaussianNB())
+
+    def test_existing_setup_exists_3(self):
+        # Check a flow with many hyperparameters
+        self._existing_setup_exists(
+            DecisionTreeClassifier(max_depth=5,  # many hyperparameters
+                                   min_samples_split=3,
+                                   # Not setting the random state will
+                                   # make this flow fail as running it
+                                   # will add a random random_state.
+                                   random_state=1)
+        )
 
     def test_get_setup(self):
         # no setups in default test server
