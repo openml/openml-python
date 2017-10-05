@@ -329,13 +329,13 @@ class TestRun(TestBase):
         lr = LogisticRegression()
         self._run_and_upload(lr, '62501')
 
-    def test_run_and_upload_pipeline1(self):
+    def test_run_and_upload_pipeline_dummy_pipeline(self):
 
         pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
                                     ('dummy', DummyClassifier(strategy='prior'))])
         self._run_and_upload(pipeline1, '62501')
 
-    def test_run_and_upload_pipeline2(self):
+    def test_run_and_upload_decision_tree_pipeline(self):
         pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                     ('VarianceThreshold', VarianceThreshold()),
                                     ('Estimator', RandomizedSearchCV(

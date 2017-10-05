@@ -141,11 +141,11 @@ class TestSetupFunctions(TestBase):
         # TODO: remove after pull on live for better testing
         # openml.config.server = self.production_server
 
-        size = 100
+        size = 10
         setups = openml.setups.list_setups(offset=0, size=size)
         self.assertEquals(len(setups), size)
         setups2 = openml.setups.list_setups(offset=size, size=size)
-        self.assertEquals(len(setups), size)
+        self.assertEquals(len(setups2), size)
 
         all = set(setups.keys()).union(setups2.keys())
 

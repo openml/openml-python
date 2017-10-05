@@ -16,7 +16,7 @@ class TestEvaluationFunctions(TestBase):
         for run_id in evaluations.keys():
             self.assertEquals(evaluations[run_id].task_id, task_id)
 
-    def test_evaluation_list_filter_uploader(self):
+    def test_evaluation_list_filter_uploader_ID_16(self):
         openml.config.server = self.production_server
 
         uploader_id = 16
@@ -25,7 +25,7 @@ class TestEvaluationFunctions(TestBase):
 
         self.assertGreater(len(evaluations), 100)
 
-    def test_evaluation_list_filter_uploader_2(self):
+    def test_evaluation_list_filter_uploader_ID_10(self):
         openml.config.server = self.production_server
 
         setup_id = 10
