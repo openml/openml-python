@@ -919,7 +919,7 @@ class TestRun(TestBase):
 
             # verifies last two arff indices (predict and correct)
             # TODO: programmatically check wether these are indeed features (predict, correct)
-            predictionsA = np.array(arff_content1)[:, -2:-1]
-            predictionsB = np.array(arff_content2)[:, -2:-1]
+            predictionsA = np.array(arff_content1)[:, -2:]
+            predictionsB = np.array(arff_content2)[:, -2:]
 
             np.testing.assert_array_equal(predictionsA, predictionsB)
