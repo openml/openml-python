@@ -8,7 +8,6 @@ if sys.version_info[0] >= 3:
 else:
     import mock
 
-import six
 import scipy.sparse
 
 import openml
@@ -27,6 +26,7 @@ from openml.datasets.functions import (_get_cached_dataset,
 
 
 class TestOpenMLDataset(TestBase):
+    _multiprocess_can_split_ = True
 
     def setUp(self):
         super(TestOpenMLDataset, self).setUp()

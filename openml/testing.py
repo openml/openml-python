@@ -36,7 +36,8 @@ class TestBase(unittest.TestCase):
 
         self.cwd = os.getcwd()
         workdir = os.path.dirname(os.path.abspath(__file__))
-        self.workdir = os.path.join(workdir, "tmp")
+        tmp_dir_name = self.id()
+        self.workdir = os.path.join(workdir, tmp_dir_name)
         try:
             shutil.rmtree(self.workdir)
         except:

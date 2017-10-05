@@ -18,9 +18,6 @@ apikey = ""
 cachedir = ""
 
 
-
-
-
 def _setup():
     """Setup openml package. Called on first import.
 
@@ -71,7 +68,7 @@ def set_cache_directory(cachedir):
     dataset_cache_dir = os.path.join(cachedir, "datasets")
     task_cache_dir = os.path.join(cachedir, "tasks")
     run_cache_dir = os.path.join(cachedir, 'runs')
-
+    lock_dir = os.path.join(cachedir, 'locks')
 
     for dir_ in [cachedir, dataset_cache_dir, task_cache_dir, run_cache_dir]:
         if not os.path.exists(dir_) and not os.path.isdir(dir_):

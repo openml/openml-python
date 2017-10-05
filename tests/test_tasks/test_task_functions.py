@@ -1,12 +1,6 @@
 import os
-import sys
 
 import six
-
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
 
 from openml.testing import TestBase
 from openml import OpenMLSplit, OpenMLTask
@@ -15,6 +9,8 @@ import openml
 
 
 class TestTask(TestBase):
+    _multiprocess_can_split_ = True
+
     def test__get_cached_tasks(self):
         openml.config.set_cache_directory(self.static_cache_dir)
         tasks = openml.tasks.functions._get_cached_tasks()

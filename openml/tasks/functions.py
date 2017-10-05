@@ -3,6 +3,7 @@ import io
 import re
 import os
 
+from oslo_concurrency import lockutils
 import xmltodict
 
 from ..exceptions import OpenMLCacheException
@@ -195,26 +196,30 @@ def get_task(task_id):
     xml_file = os.path.join(_create_task_cache_dir(task_id),
                             "task.xml")
 
-    try:
-        with io.open(xml_file, encoding='utf8') as fh:
-            task = _create_task_from_xml(fh.read())
+    with lockutils.external_lock(
+            name='datasets.functions.get_dataset:%d' % task_id,
+            lock_path=os.path.join(config.get_cache_directory(), 'locks'),
+    ):
+        try:
+            with io.open(xml_file, encoding='utf8') as fh:
+                task = _create_task_from_xml(fh.read())
 
-    except (OSError, IOError):
-        task_xml = _perform_api_call("task/%d" % task_id)
+        except (OSError, IOError):
+            task_xml = _perform_api_call("task/%d" % task_id)
 
-        with io.open(xml_file, "w", encoding='utf8') as fh:
-            fh.write(task_xml)
+            with io.open(xml_file, "w", encoding='utf8') as fh:
+                fh.write(task_xml)
 
-        task = _create_task_from_xml(task_xml)
+            task = _create_task_from_xml(task_xml)
 
-    # TODO extract this to a function
-    task.download_split()
-    dataset = datasets.get_dataset(task.dataset_id)
+        # TODO extract this to a function
+        task.download_split()
+        dataset = datasets.get_dataset(task.dataset_id)
 
-    # TODO look into either adding the class labels to task xml, or other
-    # way of reading it.
-    class_labels = dataset.retrieve_class_labels(task.target_name)
-    task.class_labels = class_labels
+        # TODO look into either adding the class labels to task xml, or other
+        # way of reading it.
+        class_labels = dataset.retrieve_class_labels(task.target_name)
+        task.class_labels = class_labels
     return task
 
 

@@ -205,7 +205,7 @@ class OpenMLDataset(object):
 
         path = self.data_pickle_file
         if not os.path.exists(path):
-            raise ValueError("Cannot find a ndarray file for dataset %s at"
+            raise ValueError("Cannot find a ndarray file for dataset %s at "
                              "location %s " % (self.name, path))
         else:
             with open(path, "rb") as fh:
