@@ -8,3 +8,4 @@ requests
 scikit-learn>=0.18
 nbformat
 python-dateutil
+oslo.concurrency
