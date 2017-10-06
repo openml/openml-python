@@ -27,7 +27,6 @@ class OpenMLDemoTest(unittest.TestCase):
             pass
 
     def _test_notebook(self, notebook_name):
-        notebook_name = 'OpenMLDemo.ipynb'
 
         notebook_filename = os.path.abspath(os.path.join(
             self.this_file_directory, '..', '..', 'examples', notebook_name))
@@ -38,6 +37,7 @@ class OpenMLDemoTest(unittest.TestCase):
             nb = nbformat.read(f, as_version=4)
             nb.metadata.get('kernelspec', {})['name'] = self.kernel_name
             ep = ExecutePreprocessor(kernel_name=self.kernel_name)
+            ep.timeout = 60
 
             try:
                 ep.preprocess(nb, {'metadata': {'path': self.this_file_directory}})
@@ -50,10 +50,8 @@ class OpenMLDemoTest(unittest.TestCase):
                 with open(notebook_filename_out, mode='wt') as f:
                     nbformat.write(nb, f)
 
-    @unittest.skip('SKIP for now until tests work again.')
-    def test_OpenMLDemo(self):
-        self._test_notebook('OpenMLDemo.ipynb')
+    def test_tutorial(self):
+        self._test_notebook('OpenML_Tutorial.ipynb')
 
-    @unittest.skip('SKIP for now until tests work again.')
-    def test_PyOpenML(self):
-        self._test_notebook('PyOpenML.ipynb')
+    def test_eeg_example(self):
+        self._test_notebook('EEG Example.ipynb')
