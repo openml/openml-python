@@ -150,12 +150,14 @@ def list_datasets(offset=None, size=None, tag=None):
 
     Returns
     -------
-    datasets : list of dicts
-        A list of datasets having the given tag (if applicable).
+    datasets : dict of dicts
+        A mapping from dataset ID to dict.
 
         Every dataset is represented by a dictionary containing
         the following information:
         - dataset id
+        - name
+        - format
         - status
 
         If qualities are calculated for the dataset, some of
