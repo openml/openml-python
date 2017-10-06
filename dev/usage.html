@@ -1,44 +1,38 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Basic Usage &#8212; OpenML 0.2.1 documentation</title>
-    
-    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootswatch-3.3.6/flatly/bootstrap.min.css" type="text/css" />
+    <title>Basic Usage &#8212; OpenML 0.6.0dev documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
-    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.2.1',
+        VERSION:     '0.6.0dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="OpenML 0.2.1 documentation" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body role="document">
+  <body>
   
   <a href="https://github.com/openml/openml-python"
      class="visible-desktop hidden-xs"><img
@@ -66,7 +60,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.2.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.6.0dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -155,7 +149,7 @@ in the OpenML Python API. Throughout this document, we will use
 <div class="section" id="connecting-to-the-openml-server">
 <h2>Connecting to the OpenML server<a class="headerlink" href="#connecting-to-the-openml-server" title="Permalink to this headline">¶</a></h2>
 <p>The OpenML server can only be accessed by users who have signed up on the OpenML
-platform. If you don&#8217;t have an account yet,
+platform. If you don’t have an account yet,
 <a class="reference external" href="http://openml.org/register">sign up now</a>. You will receive an API key, which
 will authenticate you to the server and allow you to download and upload
 datasets, tasks, runs and flows. There are two ways of providing the API key
@@ -164,7 +158,7 @@ programmatically after loading the package:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">openml</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">apikey</span> <span class="o">=</span> <span class="s1">&#39;Your API key&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">openml</span><span class="o">.</span><span class="n">apikey</span> <span class="o">=</span> <span class="n">apikey</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">apikey</span> <span class="o">=</span> <span class="n">apikey</span>
 </pre></div>
 </div>
 <p>The second option is to create a config file:</p>
@@ -265,7 +259,7 @@ to have better visualization:</p>
 </div>
 <div class="section" id="downloading-datasets">
 <h3>Downloading datasets<a class="headerlink" href="#downloading-datasets" title="Permalink to this headline">¶</a></h3>
-<p>We can now use the dataset IDs to download all datasets by their IDs. Let&#8217;s
+<p>We can now use the dataset IDs to download all datasets by their IDs. Let’s
 first look at how to download a single dataset and what can be done with the
 dataset object:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset_id</span> <span class="o">=</span> <span class="mi">23</span>
@@ -273,7 +267,7 @@ dataset object:</p>
 </pre></div>
 </div>
 <p>Properties of the dataset are stored as member variables:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)</span>                                               
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>                                               
 <span class="go">{&#39;upload_date&#39;: u&#39;2014-04-06 23:21:03&#39;, &#39;md5_cheksum&#39;: u&#39;3149646ecff276abac3e892d1556655f&#39;, &#39;creator&#39;: None, &#39;citation&#39;: None, &#39;tag&#39;: [u&#39;study_1&#39;, u&#39;study_7&#39;, u&#39;uci&#39;], &#39;version_label&#39;: u&#39;1&#39;, &#39;contributor&#39;: None, &#39;paper_url&#39;: None, &#39;original_data_url&#39;: None, &#39;id&#39;: 23, &#39;collection_date&#39;: None, &#39;row_id_attribute&#39;: None, &#39;version&#39;: 1, &#39;data_pickle_file&#39;: &#39;/home/matthias/.openml/cache/datasets/23/dataset.pkl&#39;, &#39;default_target_attribute&#39;: u&#39;Contraceptive_method_used&#39;, &#39;description&#39;: u&quot;**Author**:   \n**Source**: Unknown -   \n**Please cite**:   \n\n1. Title: Contraceptive Method Choice\n \n 2. Sources:\n    (a) Origin:  This dataset is a subset of the 1987 National Indonesia\n                 Contraceptive Prevalence Survey\n    (b) Creator: Tjen-Sien Lim (limt@stat.wisc.edu)\n    (c) Donor:   Tjen-Sien Lim (limt@stat.wisc.edu)\n    (c) Date:    June 7, 1997\n \n 3. Past Usage:\n    Lim, T.-S., Loh, W.-Y. &amp; Shih, Y.-S. (1999). A Comparison of\n    Prediction Accuracy, Complexity, and Training Time of Thirty-three\n    Old and New Classification Algorithms. Machine Learning. Forthcoming.\n    (ftp://ftp.stat.wisc.edu/pub/loh/treeprogs/quest1.7/mach1317.pdf or\n    (http://www.stat.wisc.edu/~limt/mach1317.pdf)\n \n 4. Relevant Information:\n    This dataset is a subset of the 1987 National Indonesia Contraceptive\n    Prevalence Survey. The samples are married women who were either not \n    pregnant or do not know if they were at the time of interview. The \n    problem is to predict the current contraceptive method choice \n    (no use, long-term methods, or short-term methods) of a woman based \n    on her demographic and socio-economic characteristics.\n \n 5. Number of Instances: 1473\n \n 6. Number of Attributes: 10 (including the class attribute)\n \n 7. Attribute Information:\n \n    1. Wife&#39;s age                     (numerical)\n    2. Wife&#39;s education               (categorical)      1=low, 2, 3, 4=high\n    3. Husband&#39;s education            (categorical)      1=low, 2, 3, 4=high\n    4. Number of children ever born   (numerical)\n    5. Wife&#39;s religion                (binary)           0=Non-Islam, 1=Islam\n    6. Wife&#39;s now working?            (binary)           0=Yes, 1=No\n    7. Husband&#39;s occupation           (categorical)      1, 2, 3, 4\n    8. Standard-of-living index       (categorical)      1=low, 2, 3, 4=high\n    9. Media exposure                 (binary)           0=Good, 1=Not good\n    10. Contraceptive method used     (class attribute)  1=No-use \n                                                         2=Long-term\n                                                         3=Short-term\n \n 8. Missing Attribute Values: None\n\n Information about the dataset\n CLASSTYPE: nominal\n CLASSINDEX: last&quot;, &#39;format&#39;: u&#39;ARFF&#39;, &#39;visibility&#39;: u&#39;public&#39;, &#39;update_comment&#39;: None, &#39;licence&#39;: u&#39;Public&#39;, &#39;name&#39;: u&#39;cmc&#39;, &#39;language&#39;: None, &#39;url&#39;: u&#39;http://www.openml.org/data/download/23/dataset_23_cmc.arff&#39;, &#39;data_file&#39;: &#39;~/.openml/cache/datasets/23/dataset.arff&#39;, &#39;ignore_attributes&#39;: None}</span>
 </pre></div>
 </div>
@@ -375,7 +369,7 @@ classification task (task type <code class="code python docutils literal"><span 
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks_by_type</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Let&#8217;s find out more about the datasets:</p>
+<p>Let’s find out more about the datasets:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;tid&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -419,7 +413,7 @@ to have better visualization:</p>
 <p>As before, we have to check whether there is a task for each dataset that we
 want to work with. In addition, we have to make sure to use only tasks with the
 desired task type:</p>
-<p>#TODO this doesn&#8217;t look nice, we should have a constant for each known task,
+<p>#TODO this doesn’t look nice, we should have a constant for each known task,
 dynamically created by the task type available (but when do we know that we
 can savely use the api connector? what to do if we do not have an internet
 connection? Maybe have this statically in the program and check from time to
@@ -448,7 +442,7 @@ and one which takes a list of IDs and downloads all of these tasks:</p>
 </pre></div>
 </div>
 <p>Properties of the task are stored as member variables:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
 <span class="go">{&#39;target_feature&#39;: u&#39;class&#39;, &#39;task_type&#39;: u&#39;Supervised Classification&#39;, &#39;task_id&#39;: 1, &#39;estimation_procedure&#39;: {&#39;type&#39;: u&#39;crossvalidation&#39;, &#39;data_splits_url&#39;: u&#39;http://www.openml.org/api_splits/get/1/Task_1_splits.arff&#39;, &#39;parameters&#39;: {u&#39;number_repeats&#39;: u&#39;1&#39;, u&#39;percentage&#39;: &#39;&#39;, u&#39;stratified_sampling&#39;: u&#39;true&#39;, u&#39;number_folds&#39;: u&#39;10&#39;}}, &#39;class_labels&#39;: [u&#39;1&#39;, u&#39;2&#39;, u&#39;3&#39;, u&#39;4&#39;, u&#39;5&#39;, u&#39;U&#39;], &#39;cost_matrix&#39;: None, &#39;evaluation_measure&#39;: u&#39;predictive_accuracy&#39;, &#39;dataset_id&#39;: 1, &#39;estimation_parameters&#39;: {u&#39;number_repeats&#39;: u&#39;1&#39;, u&#39;percentage&#39;: &#39;&#39;, u&#39;stratified_sampling&#39;: u&#39;true&#39;, u&#39;number_folds&#39;: u&#39;10&#39;}}</span>
 </pre></div>
 </div>
@@ -477,10 +471,10 @@ This allows the python package to cache datasets, tasks, splits and runs locally
 for fast retrieval. Another benefit is that the API can be used normally on a
 compute cluster without internet access (<span class="xref std std-ref">see below</span>).</p>
 <p>Currently, the following objects are cached:</p>
-<ul>
+<ul class="simple">
 <li><dl class="first docutils">
 <dt>datasets</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>dataset arff. In order to reduce parsing time, the data is serialized to
 disk in a binary format (using the <a class="reference external" href="https://docs.python.org/2/library/pickle.html">pickle library</a>.</li>
 <li>dataset descriptions</li>
@@ -491,7 +485,7 @@ disk in a binary format (using the <a class="reference external" href="https://d
 </li>
 <li><dl class="first docutils">
 <dt>tasks</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>task description</li>
 <li>split arff. TODO are they cached?</li>
 </ul>
@@ -500,7 +494,7 @@ disk in a binary format (using the <a class="reference external" href="https://d
 </li>
 <li><dl class="first docutils">
 <dt>runs</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>run description</li>
 </ul>
 </dd>
@@ -582,7 +576,7 @@ flow gets assigned a flow ID.</p>
 <h3>Running a flow on a task<a class="headerlink" href="#running-a-flow-on-a-task" title="Permalink to this headline">¶</a></h3>
 <p>We can now use the created flow fo finally run a machine learning model on a
 task and upload the results to the OpenML website. For that we use the function
-<a class="reference internal" href="generated/openml.runs.run_task.html#openml.runs.run_task" title="openml.runs.run_task"><code class="xref py py-meth docutils literal"><span class="pre">openml.runs.run_task()</span></code></a>. It only accepts two arguments and does what the
+<code class="xref py py-meth docutils literal"><span class="pre">openml.runs.run_task()</span></code>. It only accepts two arguments and does what the
 name suggests.</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">12</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
@@ -615,7 +609,7 @@ OpenML:</p>
     </p>
     <p>
         &copy; Copyright 2014-2016, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.4.<br/>
     </p>
   </div>
 </footer>
