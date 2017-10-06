@@ -51,6 +51,7 @@ class OpenMLRun(object):
         self.run_id = run_id
         self.model = model
         self.tags = tags
+        self.predictions_url = predictions_url
 
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the server.
@@ -125,14 +126,14 @@ class OpenMLRun(object):
         scores : list
             a list of floats, of length num_folds * num_repeats
         '''
-        if self.data_content is not None:
+        if self.data_content is not None and self.task_id is not None:
             predictions_arff = self._generate_arff_dict()
         elif 'predictions' in self.output_files:
             predictions_file_url = _file_id_to_url(self.output_files['predictions'], 'predictions.arff')
             predictions_arff = arff.loads(openml._api_calls._read_url(predictions_file_url))
             # TODO: make this a stream reader
         else:
-            raise ValueError('Run should have been locally executed.')
+            raise ValueError('Run should have been locally executed or contain outputfile reference.')
 
         attribute_names = [att[0] for att in predictions_arff['attributes']]
         if 'correct' not in attribute_names:

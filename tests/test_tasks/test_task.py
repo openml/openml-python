@@ -13,6 +13,7 @@ from openml.testing import TestBase
 
 
 class OpenMLTaskTest(TestBase):
+    _multiprocess_can_split_ = True
 
     @mock.patch('openml.datasets.get_dataset', autospec=True)
     def test_get_dataset(self, patch):

@@ -10,7 +10,7 @@ test_dir=$cwd/tests
 cd $TEST_DIR
 
 if [[ "$COVERAGE" == "true" ]]; then
-    nosetests -sv --with-coverage --cover-package=$MODULE $test_dir
+    nosetests --processes=4 --process-timeout=600 -sv --with-coverage --cover-package=$MODULE $test_dir
 else
-    nosetests -sv $test_dir
+    nosetests --processes=4 --process-timeout=600 -sv $test_dir
 fi

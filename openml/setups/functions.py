@@ -93,8 +93,7 @@ def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
 
         Returns
         -------
-        list
-            List of found setups.
+        dict
         """
 
     api_call = "setup/list"

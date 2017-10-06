@@ -32,8 +32,7 @@ def list_evaluations(function, offset=None, size=None, id=None, task=None, setup
 
         Returns
         -------
-        list
-            List of found evaluations.
+        dict
         """
 
     api_call = "evaluation/list/function/%s" %function

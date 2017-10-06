@@ -4,6 +4,7 @@ import os
 import re
 import shutil
 
+from oslo_concurrency import lockutils
 import xmltodict
 
 from .dataset import OpenMLDataset
@@ -259,6 +260,8 @@ def get_dataset(dataset_id):
 
     TODO: explain caching!
 
+    This function is thread/multiprocessing safe.
+
     Parameters
     ----------
     ddataset_id : int
@@ -274,24 +277,32 @@ def get_dataset(dataset_id):
         raise ValueError("Dataset ID is neither an Integer nor can be "
                          "cast to an Integer.")
 
-    did_cache_dir = _create_dataset_cache_directory(dataset_id)
+    with lockutils.external_lock(
+        name='datasets.functions.get_dataset:%d' % dataset_id,
+        lock_path=os.path.join(config.get_cache_directory(), 'locks'),
+    ):
+        did_cache_dir = _create_dataset_cache_directory(dataset_id)
 
-    try:
-        description = _get_dataset_description(did_cache_dir, dataset_id)
-        arff_file = _get_dataset_arff(did_cache_dir, description)
-        features = _get_dataset_features(did_cache_dir, dataset_id)
-        # TODO not used yet, figure out what to do with this...
-        qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
-    except Exception as e:
-        _remove_dataset_cache_dir(did_cache_dir)
-        raise e
+        try:
+            description = _get_dataset_description(did_cache_dir, dataset_id)
+            arff_file = _get_dataset_arff(did_cache_dir, description)
+            features = _get_dataset_features(did_cache_dir, dataset_id)
+            # TODO not used yet, figure out what to do with this...
+            qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
+        except Exception as e:
+            _remove_dataset_cache_dir(did_cache_dir)
+            raise e
 
-    dataset = _create_dataset_from_description(description, features, qualities, arff_file)
+        dataset = _create_dataset_from_description(
+            description, features, qualities, arff_file
+        )
     return dataset
 
 
 def _get_dataset_description(did_cache_dir, dataset_id):
-    """Get the dataset description as xml dictionary
+    """Get the dataset description as xml dictionary.
+
+    This function is NOT thread/multiprocessing safe.
 
     Parameters
     ----------
@@ -337,6 +348,8 @@ def _get_dataset_arff(did_cache_dir, description):
     Checks if the file is in the cache, if yes, return the path to the file. If
     not, downloads the file and caches it, then returns the file path.
 
+    This function is NOT thread/multiprocessing safe.
+
     Parameters
     ----------
     did_cache_dir : str
@@ -377,6 +390,8 @@ def _get_dataset_features(did_cache_dir, dataset_id):
     Features are feature descriptions for each column.
     (name, index, categorical, ...)
 
+    This function is NOT thread/multiprocessing safe.
+
     Parameters
     ----------
     did_cache_dir : str
@@ -411,6 +426,8 @@ def _get_dataset_qualities(did_cache_dir, dataset_id):
     """API call to get dataset qualities (cached)
 
     Features are metafeatures (number of features, number of classes, ...)
+
+    This function is NOT thread/multiprocessing safe.
 
     Parameters
     ----------
@@ -449,6 +466,8 @@ def _create_dataset_cache_directory(dataset_id):
     is a directory for each dataset witch the dataset ID being the directory
     name. This function creates this cache directory.
 
+    This function is NOT thread/multiprocessing safe.
+
     Parameters
     ----------
     did : int
@@ -470,6 +489,8 @@ def _create_dataset_cache_directory(dataset_id):
 
 def _remove_dataset_cache_dir(did_cache_dir):
     """Remove the dataset cache directory
+
+    This function is NOT thread/multiprocessing safe.
 
     Parameters
     ----------

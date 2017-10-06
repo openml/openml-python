@@ -8,6 +8,8 @@ import openml
 
 
 class TestFlowFunctions(unittest.TestCase):
+    _multiprocess_can_split_ = True
+
     def _check_flow(self, flow):
         self.assertEqual(type(flow), dict)
         self.assertEqual(len(flow), 6)

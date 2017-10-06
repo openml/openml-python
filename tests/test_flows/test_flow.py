@@ -33,6 +33,7 @@ import openml.exceptions
 
 
 class TestFlow(TestBase):
+    _multiprocess_can_split_ = True
 
     def test_get_flow(self):
         # We need to use the production server here because 4024 is not the test

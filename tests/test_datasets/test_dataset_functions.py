@@ -8,7 +8,6 @@ if sys.version_info[0] >= 3:
 else:
     import mock
 
-import six
 import scipy.sparse
 
 import openml
@@ -27,6 +26,7 @@ from openml.datasets.functions import (_get_cached_dataset,
 
 
 class TestOpenMLDataset(TestBase):
+    _multiprocess_can_split_ = True
 
     def setUp(self):
         super(TestOpenMLDataset, self).setUp()
@@ -94,16 +94,6 @@ class TestOpenMLDataset(TestBase):
                                                       "dataset id 3 not cached",
                                 openml.datasets.functions._get_cached_dataset_arff,
                                 3)
-
-    def _check_dataset(self, dataset):
-            self.assertEqual(type(dataset), dict)
-            self.assertGreaterEqual(len(dataset), 2)
-            self.assertIn('did', dataset)
-            self.assertIsInstance(dataset['did'], int)
-            self.assertIn('status', dataset)
-            self.assertIsInstance(dataset['status'], six.string_types)
-            self.assertIn(dataset['status'], ['in_preparation', 'active',
-                                              'deactivated'])
 
     def test_list_datasets(self):
         # We can only perform a smoke test here because we test on dynamic
