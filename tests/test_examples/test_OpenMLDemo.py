@@ -40,7 +40,7 @@ class OpenMLDemoTest(TestBase):
             nb = nbformat.read(f, as_version=4)
             nb.metadata.get('kernelspec', {})['name'] = self.kernel_name
             ep = ExecutePreprocessor(kernel_name=self.kernel_name)
-            ep.timeout = 180
+            ep.timeout = 60
 
             try:
                 ep.preprocess(nb, {'metadata': {'path': self.this_file_directory}})
@@ -55,6 +55,3 @@ class OpenMLDemoTest(TestBase):
 
     def test_tutorial(self):
         self._test_notebook('OpenML_Tutorial.ipynb')
-
-    def test_eeg_example(self):
-        self._test_notebook('EEG Example.ipynb')
