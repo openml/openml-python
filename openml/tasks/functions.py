@@ -192,6 +192,26 @@ def _list_tasks(api_call):
     return tasks
 
 
+def get_tasks(task_ids):
+    """Download tasks.
+
+    This function iterates :meth:`openml.tasks.get_task`.
+
+    Parameters
+    ----------
+    task_ids : iterable
+        Integers representing task ids.
+
+    Returns
+    -------
+    list
+    """
+    tasks = []
+    for task_id in task_ids:
+        tasks.append(get_task(task_id))
+    return tasks
+
+
 def get_task(task_id):
     """Download the OpenML task for a given task ID.
 
