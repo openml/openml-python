@@ -128,8 +128,7 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#working-with-flows-and-runs">Working with Flows and Runs</a><ul>
-<li><a class="reference internal" href="#creating-a-flow">Creating a flow</a></li>
-<li><a class="reference internal" href="#running-a-flow-on-a-task">Running a flow on a task</a></li>
+<li><a class="reference internal" href="#running-a-model">Running a model</a></li>
 <li><a class="reference internal" href="#retrieving-results-from-openml">Retrieving results from OpenML</a></li>
 </ul>
 </li>
@@ -171,7 +170,8 @@ exist prior to importing the openml module.</p>
 retrieve them without calling the server later. As with the API key, the cache
 directory can be either specified through the API or through the config file:</p>
 <p>API:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set_cache_directory</span><span class="p">(</span><span class="s1">&#39;~/.openml/cache&#39;</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set_cache_directory</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/.openml/cache&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Config file:</p>
@@ -181,8 +181,8 @@ directory can be either specified through the API or through the config file:</p
 </div>
 <div class="section" id="working-with-datasets">
 <h2>Working with datasets<a class="headerlink" href="#working-with-datasets" title="Permalink to this headline">¶</a></h2>
-<p># TODO mention third, searching for tags
-Datasets are a key concept in OpenML (see <a class="reference external" href="openml.org/guide">OpenML documentation</a>).
+<p># TODO mention third, searching for tags</p>
+<p>Datasets are a key concept in OpenML (see <a class="reference external" href="openml.org/guide">OpenML documentation</a>).
 Datasets are identified by IDs and can be accessed in two different ways:</p>
 <ol class="arabic simple">
 <li>In a list providing basic information on all datasets available on OpenML.
@@ -200,50 +200,41 @@ data points and at least five features.</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">datasets</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">()</span>
 </pre></div>
 </div>
-<p><a class="reference internal" href="generated/openml.datasets.list_datasets.html#openml.datasets.list_datasets" title="openml.datasets.list_datasets"><code class="xref py py-meth docutils literal"><span class="pre">openml.datasets.list_datasets()</span></code></a> returns a list of dictionaries, we will
-convert it into a <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html">pandas dataframe</a>
-to have better visualization:</p>
+<p><a class="reference internal" href="generated/openml.datasets.list_datasets.html#openml.datasets.list_datasets" title="openml.datasets.list_datasets"><code class="xref py py-meth docutils literal"><span class="pre">openml.datasets.list_datasets()</span></code></a> returns a dictionary of dictionaries, we
+will convert it into a
+<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html">pandas dataframe</a>
+to have better visualization and easier access:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">datasets</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">datasets</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;did&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datasets</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We have access to the following properties of the datasets:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">datasets</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
-<span class="go">Index([                 u&#39;MajorityClassSize&#39;,</span>
-<span class="go">              u&#39;MaxNominalAttDistinctValues&#39;,</span>
-<span class="go">                        u&#39;MinorityClassSize&#39;,</span>
-<span class="go">                            u&#39;NumBinaryAtts&#39;,</span>
-<span class="go">                          u&#39;NumberOfClasses&#39;,</span>
-<span class="go">                         u&#39;NumberOfFeatures&#39;,</span>
-<span class="go">                        u&#39;NumberOfInstances&#39;,</span>
-<span class="go">       u&#39;NumberOfInstancesWithMissingValues&#39;,</span>
-<span class="go">                    u&#39;NumberOfMissingValues&#39;,</span>
-<span class="go">                  u&#39;NumberOfNumericFeatures&#39;,</span>
-<span class="go">                 u&#39;NumberOfSymbolicFeatures&#39;,</span>
-<span class="go">                                   u&#39;format&#39;,</span>
-<span class="go">                                     u&#39;name&#39;,</span>
-<span class="go">                                   u&#39;status&#39;],</span>
+<span class="go">Index([&#39;did&#39;, &#39;name&#39;, &#39;format&#39;, &#39;status&#39;, &#39;MajorityClassSize&#39;,</span>
+<span class="go">       &#39;MaxNominalAttDistinctValues&#39;, &#39;MinorityClassSize&#39;, &#39;NumberOfClasses&#39;,</span>
+<span class="go">       &#39;NumberOfFeatures&#39;, &#39;NumberOfInstances&#39;,</span>
+<span class="go">       &#39;NumberOfInstancesWithMissingValues&#39;, &#39;NumberOfMissingValues&#39;,</span>
+<span class="go">       &#39;NumberOfNumericFeatures&#39;, &#39;NumberOfSymbolicFeatures&#39;],</span>
 <span class="go">      dtype=&#39;object&#39;)</span>
 </pre></div>
 </div>
 <p>and can see the first data point:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">datasets</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">did                                        2</span>
+<span class="go">name                                  anneal</span>
+<span class="go">format                                  ARFF</span>
+<span class="go">status                                active</span>
 <span class="go">MajorityClassSize                        684</span>
-<span class="go">MaxNominalAttDistinctValues               10</span>
-<span class="go">MinorityClassSize                          0</span>
-<span class="go">NumBinaryAtts                             14</span>
-<span class="go">NumberOfClasses                            6</span>
+<span class="go">MaxNominalAttDistinctValues                7</span>
+<span class="go">MinorityClassSize                          8</span>
+<span class="go">NumberOfClasses                            5</span>
 <span class="go">NumberOfFeatures                          39</span>
 <span class="go">NumberOfInstances                        898</span>
-<span class="go">NumberOfInstancesWithMissingValues         0</span>
-<span class="go">NumberOfMissingValues                      0</span>
+<span class="go">NumberOfInstancesWithMissingValues       898</span>
+<span class="go">NumberOfMissingValues                  22175</span>
 <span class="go">NumberOfNumericFeatures                    6</span>
-<span class="go">NumberOfSymbolicFeatures                  32</span>
-<span class="go">format                                  ARFF</span>
-<span class="go">name                                  anneal</span>
-<span class="go">status                                active</span>
-<span class="go">Name: 1, dtype: object</span>
+<span class="go">NumberOfSymbolicFeatures                  33</span>
+<span class="go">Name: 2, dtype: object</span>
 </pre></div>
 </div>
 <p>We can now filter the data:</p>
@@ -274,7 +265,7 @@ dataset object:</p>
 <p>Next, to obtain the data matrix:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-<span class="go">((1473, 10), dtype(&#39;float32&#39;))</span>
+<span class="go">(1473, 10) float32</span>
 </pre></div>
 </div>
 <p>which returns the dataset as a np.ndarray with dtype <code class="code python docutils literal"><span class="name"><span class="pre">np</span></span><span class="operator"><span class="pre">.</span></span><span class="name"><span class="pre">float32</span></span></code>.
@@ -282,7 +273,7 @@ In case the data is sparse, a scipy.sparse.csr matrix is returned. All nominal
 variables are encoded as integers, the inverse encoding can be retrieved via:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">return_attribute_names</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
-<span class="go">[u&#39;Wifes_age&#39;, u&#39;Wifes_education&#39;, u&#39;Husbands_education&#39;, u&#39;Number_of_children_ever_born&#39;, u&#39;Wifes_religion&#39;, u&#39;Wifes_now_working%3F&#39;, u&#39;Husbands_occupation&#39;, u&#39;Standard-of-living_index&#39;, u&#39;Media_exposure&#39;, u&#39;Contraceptive_method_used&#39;]</span>
+<span class="go">[&#39;Wifes_age&#39;, &#39;Wifes_education&#39;, &#39;Husbands_education&#39;, &#39;Number_of_children_ever_born&#39;, &#39;Wifes_religion&#39;, &#39;Wifes_now_working%3F&#39;, &#39;Husbands_occupation&#39;, &#39;Standard-of-living_index&#39;, &#39;Media_exposure&#39;, &#39;Contraceptive_method_used&#39;]</span>
 </pre></div>
 </div>
 <p>Most times, having a single data matrix <code class="code python docutils literal"><span class="name"><span class="pre">X</span></span></code> is not enough. Two
@@ -296,7 +287,7 @@ which attributes are categorical (and should be one hot encoded if necessary.)</
 <span class="gp">... </span><span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="p">,</span>
 <span class="gp">... </span><span class="n">return_categorical_indicator</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="go">((1473, 9), (1473,))</span>
+<span class="go">(1473, 9) (1473,)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">categorical</span><span class="p">)</span>
 <span class="go">[False, True, True, False, True, True, True, True, True]</span>
 </pre></div>
@@ -306,17 +297,17 @@ which attributes are categorical (and should be one hot encoded if necessary.)</
 <span class="gp">&gt;&gt;&gt; </span><span class="n">enc</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">categorical_features</span><span class="o">=</span><span class="n">categorical</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span>
 <span class="go">OneHotEncoder(categorical_features=[False, True, True, False, True, True, True, True, True],</span>
-<span class="go">       dtype=&lt;type &#39;float&#39;&gt;, handle_unknown=&#39;error&#39;, n_values=&#39;auto&#39;,</span>
-<span class="go">       sparse=True)</span>
+<span class="go">       dtype=&lt;class &#39;numpy.float64&#39;&gt;, handle_unknown=&#39;error&#39;,</span>
+<span class="go">       n_values=&#39;auto&#39;, sparse=True)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">enc</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">clf</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">RandomForestClassifier</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="go">RandomForestClassifier(bootstrap=True, class_weight=None, criterion=&#39;gini&#39;,</span>
 <span class="go">            max_depth=None, max_features=&#39;auto&#39;, max_leaf_nodes=None,</span>
-<span class="go">            min_samples_leaf=1, min_samples_split=2,</span>
-<span class="go">            min_weight_fraction_leaf=0.0, n_estimators=10, n_jobs=1,</span>
-<span class="go">            oob_score=False, random_state=None, verbose=0,</span>
-<span class="go">            warm_start=False)</span>
+<span class="go">            min_impurity_split=1e-07, min_samples_leaf=1,</span>
+<span class="go">            min_samples_split=2, min_weight_fraction_leaf=0.0,</span>
+<span class="go">            n_estimators=10, n_jobs=1, oob_score=False, random_state=None,</span>
+<span class="go">            verbose=0, warm_start=False)</span>
 </pre></div>
 </div>
 <p>When you have to retrieve several datasets, you can use the convenience function
@@ -366,31 +357,25 @@ types.</p>
 <p>The most natural way to retrieve tasks is by their task type. In this example
 we will use the most commonly studied machine learning supervised
 classification task (task type <code class="code python docutils literal"><span class="literal number integer"><span class="pre">1</span></span></code>):</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks_by_type</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">task_type_id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Let’s find out more about the datasets:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;tid&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
-<span class="go">Index([         u&#39;cost_matrix&#39;,                  u&#39;did&#39;,</span>
-<span class="go">       u&#39;estimation_procedure&#39;,  u&#39;evaluation_measures&#39;,</span>
-<span class="go">                       u&#39;name&#39;,          u&#39;source_data&#39;,</span>
-<span class="go">                     u&#39;status&#39;,       u&#39;target_feature&#39;,</span>
-<span class="go">                  u&#39;task_type&#39;],</span>
+<span class="go">Index([&#39;tid&#39;, &#39;ttid&#39;, &#39;did&#39;, &#39;name&#39;, &#39;task_type&#39;, &#39;status&#39;,</span>
+<span class="go">       &#39;estimation_procedure&#39;, &#39;evaluation_measures&#39;, &#39;source_data&#39;,</span>
+<span class="go">       &#39;target_feature&#39;, &#39;MajorityClassSize&#39;, &#39;MaxNominalAttDistinctValues&#39;,</span>
+<span class="go">       &#39;MinorityClassSize&#39;, &#39;NumberOfClasses&#39;, &#39;NumberOfFeatures&#39;,</span>
+<span class="go">       &#39;NumberOfInstances&#39;, &#39;NumberOfInstancesWithMissingValues&#39;,</span>
+<span class="go">       &#39;NumberOfMissingValues&#39;, &#39;NumberOfNumericFeatures&#39;,</span>
+<span class="go">       &#39;NumberOfSymbolicFeatures&#39;, &#39;cost_matrix&#39;],</span>
 <span class="go">      dtype=&#39;object&#39;)</span>
 </pre></div>
 </div>
 <p>Now we can restrict the tasks to all tasks with the desired resampling strategy:</p>
 <p># TODO add something about the different resampling strategies implemented!</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">filter</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">estimation_procedure</span> <span class="o">==</span> <span class="s1">&#39;10-fold Crossvalidation&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">filtered_tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="p">[</span><span class="nb">filter</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">filtered_tasks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="p">)</span>                               
-<span class="go">[1, 2, 3, 4, 5, 6, 7, 8, 9, ... 10105, 10106, 10107, 10109, 10111, 13907, 13918]</span>
-</pre></div>
-</div>
 <p>Resampling strategies can be found on the <a class="reference external" href="http://www.openml.org/search?type=measure&amp;q=estimation%20procedure">OpenML Website</a>
 or programatically as described in <a class="reference internal" href="#finding-out-evaluation-strategies-and-target-metrics">Finding out evaluation strategies and target metrics</a>.</p>
 <p>Finally, we can check whether there is a task for each dataset that we want to
@@ -399,15 +384,14 @@ use in our study. If this is not the case, tasks can be created on the
 <p>The rest of this subsection deals with accessing a list of tasks by tags and
 without any restriction.</p>
 <p>A list of tasks, filtered tags, can be retrieved via:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks_by_tag</span><span class="p">(</span><span class="s1">&#39;study_1&#39;</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s1">&#39;study_1&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><code class="xref py py-meth docutils literal"><span class="pre">openml.tasks.list_tasks_by_tag()</span></code> returns a list of dictionaries, we will
+<p><a class="reference internal" href="generated/openml.tasks.list_tasks.html#openml.tasks.list_tasks" title="openml.tasks.list_tasks"><code class="xref py py-meth docutils literal"><span class="pre">openml.tasks.list_tasks()</span></code></a> returns a dict of dictionaries, we will
 convert it into a <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html">pandas dataframe</a>
 to have better visualization:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;tid&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>As before, we have to check whether there is a task for each dataset that we
@@ -437,19 +421,38 @@ the resampling strategies available!)</p>
 <p>Downloading tasks works similar to downloading datasets. We provide two
 functions for this, one which downloads only a single task by its ID,
 and one which takes a list of IDs and downloads all of these tasks:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">1</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Properties of the task are stored as member variables:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
-<span class="go">{&#39;target_feature&#39;: u&#39;class&#39;, &#39;task_type&#39;: u&#39;Supervised Classification&#39;, &#39;task_id&#39;: 1, &#39;estimation_procedure&#39;: {&#39;type&#39;: u&#39;crossvalidation&#39;, &#39;data_splits_url&#39;: u&#39;http://www.openml.org/api_splits/get/1/Task_1_splits.arff&#39;, &#39;parameters&#39;: {u&#39;number_repeats&#39;: u&#39;1&#39;, u&#39;percentage&#39;: &#39;&#39;, u&#39;stratified_sampling&#39;: u&#39;true&#39;, u&#39;number_folds&#39;: u&#39;10&#39;}}, &#39;class_labels&#39;: [u&#39;1&#39;, u&#39;2&#39;, u&#39;3&#39;, u&#39;4&#39;, u&#39;5&#39;, u&#39;U&#39;], &#39;cost_matrix&#39;: None, &#39;evaluation_measure&#39;: u&#39;predictive_accuracy&#39;, &#39;dataset_id&#39;: 1, &#39;estimation_parameters&#39;: {u&#39;number_repeats&#39;: u&#39;1&#39;, u&#39;percentage&#39;: &#39;&#39;, u&#39;stratified_sampling&#39;: u&#39;true&#39;, u&#39;number_folds&#39;: u&#39;10&#39;}}</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pprint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">task</span><span class="p">))</span>
+<span class="go">{&#39;class_labels&#39;: [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;, &#39;4&#39;, &#39;5&#39;, &#39;U&#39;],</span>
+<span class="go"> &#39;cost_matrix&#39;: None,</span>
+<span class="go"> &#39;dataset_id&#39;: 2,</span>
+<span class="go"> &#39;estimation_parameters&#39;: {&#39;number_folds&#39;: &#39;10&#39;,</span>
+<span class="go">                           &#39;number_repeats&#39;: &#39;1&#39;,</span>
+<span class="go">                           &#39;percentage&#39;: &#39;&#39;,</span>
+<span class="go">                           &#39;stratified_sampling&#39;: &#39;true&#39;},</span>
+<span class="go"> &#39;estimation_procedure&#39;: {&#39;data_splits_url&#39;: &#39;https://www.openml.org/api_splits/get/2/Task_2_splits.arff&#39;,</span>
+<span class="go">                          &#39;parameters&#39;: {&#39;number_folds&#39;: &#39;10&#39;,</span>
+<span class="go">                                         &#39;number_repeats&#39;: &#39;1&#39;,</span>
+<span class="go">                                         &#39;percentage&#39;: &#39;&#39;,</span>
+<span class="go">                                         &#39;stratified_sampling&#39;: &#39;true&#39;},</span>
+<span class="go">                          &#39;type&#39;: &#39;crossvalidation&#39;},</span>
+<span class="go"> &#39;evaluation_measure&#39;: &#39;predictive_accuracy&#39;,</span>
+<span class="go"> &#39;split&#39;: None,</span>
+<span class="go"> &#39;target_name&#39;: &#39;class&#39;,</span>
+<span class="go"> &#39;task_id&#39;: 2,</span>
+<span class="go"> &#39;task_type&#39;: &#39;Supervised Classification&#39;,</span>
+<span class="go"> &#39;task_type_id&#39;: 1}</span>
 </pre></div>
 </div>
 <p>And with a list of task IDs:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">22</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_tasks</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>                           
 </pre></div>
 </div>
 </div>
@@ -507,7 +510,7 @@ therefore not cached.</p>
 <h3>Configuring the cache<a class="headerlink" href="#configuring-the-cache" title="Permalink to this headline">¶</a></h3>
 <p>Configuring the cache works as described in the subsection <a class="reference internal" href="#connecting-to-the-openml-server">Connecting to the OpenML server</a>:
 It can be done either through the API:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set_cache_directory</span><span class="p">(</span><span class="s1">&#39;~/.openml/cache&#39;</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set_cache_directory</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/.openml/cache&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>or the config file:</p>
@@ -539,59 +542,62 @@ settings for the flow, a setup string (most likely a command line call) and all
 predictions of that run. When a run is uploaded to the server, the server
 automatically calculates several metrics which can be used to compare the
 performance of different flows to each other.</p>
-<div class="section" id="creating-a-flow">
-<h3>Creating a flow<a class="headerlink" href="#creating-a-flow" title="Permalink to this headline">¶</a></h3>
-<p>So far, a flow in the OpenML python API is expected to be an estimator object
-following the <a class="reference external" href="http://scikit-learn.org/dev/developers/contributing.html#apis-of-scikit-learn-objects">scikit-learn estimator API</a>.
-Thus, it needs to implement a <code class="code python docutils literal"><span class="name"><span class="pre">fit</span></span><span class="punctuation"><span class="pre">()</span></span></code>, <code class="code python docutils literal"><span class="name"><span class="pre">predict</span></span><span class="punctuation"><span class="pre">()</span></span></code>,
-<code class="code python docutils literal"><span class="name"><span class="pre">set_params</span></span><span class="punctuation"><span class="pre">()</span></span></code> and <code class="code python docutils literal"><span class="name"><span class="pre">get_params</span></span><span class="punctuation"><span class="pre">()</span></span></code> method.</p>
-<p>The only mandatory argument to construct a flow is an estimator object. It is of
-course possible and also useful to pass other arguments to the constructor, for
-example a description or the name of the creator:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openml</span> <span class="k">import</span> <span class="n">OpenMLFlow</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">RandomForestClassifier</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">flow</span> <span class="o">=</span> <span class="n">OpenMLFlow</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Out-of-the-box scikit-learn &#39;</span>
-<span class="gp">... </span>                                     <span class="s1">&#39;random forest classifier&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                  <span class="n">creator</span><span class="o">=</span><span class="s1">&#39;Matthias Feurer&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">flow</span><span class="p">)</span>
-<span class="go">{&#39;description&#39;: &#39;Out-of-the-box scikit-learn random forest classifier&#39;, &#39;creator&#39;: &#39;Matthias Feurer&#39;, &#39;external_version&#39;: &#39;sklearn_0.16.1&#39;, &#39;source&#39;: &#39;FIXME DEFINE PYTHON FLOW&#39;, &#39;tag&#39;: None, &#39;upoader&#39;: None, &#39;model&#39;: RandomForestClassifier(bootstrap=True, class_weight=None, criterion=&#39;gini&#39;,</span>
-<span class="go">        max_depth=None, max_features=&#39;auto&#39;, max_leaf_nodes=None,</span>
-<span class="go">        min_samples_leaf=1, min_samples_split=2,</span>
-<span class="go">        min_weight_fraction_leaf=0.0, n_estimators=10, n_jobs=1,</span>
-<span class="go">        oob_score=False, random_state=None, verbose=0,</span>
-<span class="go">        warm_start=False), &#39;id&#39;: None, &#39;name&#39;: &#39;sklearn.ensemble.forest.RandomForestClassifier&#39;}</span>
+<p>So far, the OpenML python connector works only with estimator objects following
+the <a class="reference external" href="http://scikit-learn.org/dev/developers/contributing.html#apis-of-scikit-learn-objects">scikit-learn estimator API</a>.
+Those can be directly run on a task, and a flow will automatically be created or
+downloaded from the server if it already exists.</p>
+<div class="section" id="running-a-model">
+<h3>Running a model<a class="headerlink" href="#running-a-model" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">RandomForestClassifier</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">run</span><span class="p">),</span> <span class="n">depth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>                             
 </pre></div>
 </div>
-<p>Prior to using a flow in experiments, it has to be pushed to the OpenML
-website. The python OpenML API uses methods named <code class="code python docutils literal"><span class="name"><span class="pre">publish</span></span><span class="punctuation"><span class="pre">()</span></span></code> for this.
-It takes no arguments, but uses information from the estimator object to
-obtain all necessary information. The information is pushed to OpenML, and the
-flow gets assigned a flow ID.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">flow</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+<p>So far the run is only available locally. By calling the publish function, the
+run is send to the OpenML server:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>                                          
 <span class="go"># What happens here? What should it return?</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="running-a-flow-on-a-task">
-<h3>Running a flow on a task<a class="headerlink" href="#running-a-flow-on-a-task" title="Permalink to this headline">¶</a></h3>
-<p>We can now use the created flow fo finally run a machine learning model on a
-task and upload the results to the OpenML website. For that we use the function
-<code class="xref py py-meth docutils literal"><span class="pre">openml.runs.run_task()</span></code>. It only accepts two arguments and does what the
-name suggests.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">12</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">run</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>As for flows, the run must be published so that it can be used by others on
-OpenML:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="go"># What happens here? What should it return?</span>
+<p>We can now also inspect the flow object which was automatically created:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">flow</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">flow_id</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">flow</span><span class="p">),</span> <span class="n">depth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">{&#39;binary_format&#39;: None,</span>
+<span class="go"> &#39;binary_md5&#39;: None,</span>
+<span class="go"> &#39;binary_url&#39;: None,</span>
+<span class="go"> &#39;class_name&#39;: &#39;sklearn.ensemble.forest.RandomForestClassifier&#39;,</span>
+<span class="go"> &#39;components&#39;: OrderedDict(),</span>
+<span class="go"> &#39;custom_name&#39;: None,</span>
+<span class="go"> &#39;dependencies&#39;: &#39;sklearn==0.18.2\nnumpy&gt;=1.6.1\nscipy&gt;=0.9&#39;,</span>
+<span class="go"> &#39;description&#39;: &#39;Automatically created scikit-learn flow.&#39;,</span>
+<span class="go"> &#39;external_version&#39;: &#39;openml==0.6.0dev,sklearn==0.18.2&#39;,</span>
+<span class="go"> &#39;flow_id&#39;: 7245,</span>
+<span class="go"> &#39;language&#39;: &#39;English&#39;,</span>
+<span class="go"> &#39;model&#39;: RandomForestClassifier(bootstrap=True, class_weight=None, criterion=&#39;gini&#39;,</span>
+<span class="go">            max_depth=None, max_features=&#39;auto&#39;, max_leaf_nodes=None,</span>
+<span class="go">            min_impurity_split=1e-07, min_samples_leaf=1,</span>
+<span class="go">            min_samples_split=2, min_weight_fraction_leaf=0.0,</span>
+<span class="go">            n_estimators=10, n_jobs=1, oob_score=False, random_state=None,</span>
+<span class="go">            verbose=0, warm_start=False),</span>
+<span class="go"> &#39;name&#39;: &#39;sklearn.ensemble.forest.RandomForestClassifier&#39;,</span>
+<span class="go"> &#39;parameters&#39;: OrderedDict([...]),</span>
+<span class="go"> &#39;parameters_meta_info&#39;: OrderedDict([...]),</span>
+<span class="go"> &#39;tags&#39;: [&#39;openml-python&#39;,</span>
+<span class="go">          &#39;python&#39;,</span>
+<span class="go">          &#39;scikit-learn&#39;,</span>
+<span class="go">          &#39;sklearn&#39;,</span>
+<span class="go">          &#39;sklearn_0.18.2&#39;],</span>
+<span class="go"> &#39;upload_date&#39;: &#39;2017-10-06T14:54:38&#39;,</span>
+<span class="go"> &#39;uploader&#39;: &#39;86&#39;,</span>
+<span class="go"> &#39;version&#39;: &#39;28&#39;}</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="retrieving-results-from-openml">
 <h3>Retrieving results from OpenML<a class="headerlink" href="#retrieving-results-from-openml" title="Permalink to this headline">¶</a></h3>
+<p># TODO</p>
 </div>
 </div>
 </div>

@@ -139,12 +139,14 @@
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>datasets</strong> : list of dicts</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>datasets</strong> : dict of dicts</p>
 <blockquote class="last">
-<div><p>A list of datasets having the given tag (if applicable).</p>
+<div><p>A mapping from dataset ID to dict.</p>
 <p>Every dataset is represented by a dictionary containing
 the following information:
 - dataset id
+- name
+- format
 - status</p>
 <p>If qualities are calculated for the dataset, some of
 these are also returned.</p>
