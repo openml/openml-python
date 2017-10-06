@@ -1,5 +1,4 @@
 import os
-import unittest
 import shutil
 import sys
 
@@ -7,9 +6,13 @@ import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor
 from nbconvert.preprocessors.execute import CellExecutionError
 
+from openml.testing import TestBase
 
-class OpenMLDemoTest(unittest.TestCase):
+
+class OpenMLDemoTest(TestBase):
     def setUp(self):
+        super(OpenMLDemoTest, self).setUp()
+
         python_version = sys.version_info[0]
         self.kernel_name = 'python%d' % python_version
         self.this_file_directory = os.path.dirname(__file__)
@@ -37,7 +40,7 @@ class OpenMLDemoTest(unittest.TestCase):
             nb = nbformat.read(f, as_version=4)
             nb.metadata.get('kernelspec', {})['name'] = self.kernel_name
             ep = ExecutePreprocessor(kernel_name=self.kernel_name)
-            ep.timeout = 60
+            ep.timeout = 180
 
             try:
                 ep.preprocess(nb, {'metadata': {'path': self.this_file_directory}})

@@ -28,9 +28,9 @@ conda create -n testenv --yes python=$PYTHON_VERSION pip
 source activate testenv
 pip install nose numpy scipy cython scikit-learn==$SKLEARN_VERSION oslo.concurrency
 
-if [[ "EXAMPLES" == "true" ]]; then
-    pip install matplotlib jupyter notebook nbconvert nbformat jupyter_client ipython \
-        ipykernel pandas seaborn
+if [[ "$EXAMPLES" == "true" ]]; then
+    pip install matplotlib jupyter notebook nbconvert nbformat jupyter_client \
+        ipython ipykernel pandas seaborn
 fi
 
 if [[ "$COVERAGE" == "true" ]]; then
