@@ -756,22 +756,22 @@ class TestRun(TestBase):
     def test_get_run(self):
         # this run is not available on test
         openml.config.server = self.production_server
-        run = openml.runs.get_run(473344)
-        self.assertEqual(run.dataset_id, 1167)
-        self.assertEqual(run.evaluations['f_measure'], 0.624668)
-        for i, value in [(0, 0.66233),
-                         (1, 0.639286),
-                         (2, 0.567143),
-                         (3, 0.745833),
-                         (4, 0.599638),
-                         (5, 0.588801),
-                         (6, 0.527976),
-                         (7, 0.666365),
-                         (8, 0.56759),
-                         (9, 0.64621)]:
+        run = openml.runs.get_run(473351)
+        self.assertEqual(run.dataset_id, 357)
+        self.assertEqual(run.evaluations['f_measure'], 0.841225)
+        for i, value in [(0, 0.840918),
+                         (1, 0.839458),
+                         (2, 0.839613),
+                         (3, 0.842571),
+                         (4, 0.839567),
+                         (5, 0.840922),
+                         (6, 0.840985),
+                         (7, 0.847129),
+                         (8, 0.84218),
+                         (9, 0.844014)]:
             self.assertEqual(run.fold_evaluations['f_measure'][0][i], value)
         assert('weka' in run.tags)
-        assert('stacking' in run.tags)
+        assert('weka_3.7.12' in run.tags)
 
     def _check_run(self, run):
         self.assertIsInstance(run, dict)

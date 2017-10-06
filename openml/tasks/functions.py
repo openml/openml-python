@@ -145,11 +145,13 @@ def _list_tasks(api_call):
                          '"http://openml.org/openml": %s'
                          % str(tasks_dict))
 
-    try:
-        tasks = dict()
-        procs = _get_estimation_procedure_list()
-        proc_dict = dict((x['id'], x) for x in procs)
-        for task_ in tasks_dict['oml:tasks']['oml:task']:
+    tasks = dict()
+    procs = _get_estimation_procedure_list()
+    proc_dict = dict((x['id'], x) for x in procs)
+
+    for task_ in tasks_dict['oml:tasks']['oml:task']:
+        tid = None
+        try:
             tid = int(task_['oml:task_id'])
             task = {'tid': tid,
                     'ttid': int(task_['oml:task_type_id']),
@@ -168,13 +170,24 @@ def _list_tasks(api_call):
 
             # The number of qualities can range from 0 to infinity
             for quality in task_.get('oml:quality', list()):
-                quality['#text'] = float(quality['#text'])
-                if abs(int(quality['#text']) - quality['#text']) < 0.0000001:
-                    quality['#text'] = int(quality['#text'])
-                task[quality['@name']] = quality['#text']
+                if '#text' not in quality:
+                    quality_value = 0.0
+                else:
+                    quality['#text'] = float(quality['#text'])
+                    if abs(int(quality['#text']) - quality['#text']) < 0.0000001:
+                        quality['#text'] = int(quality['#text'])
+                    quality_value = quality['#text']
+                task[quality['@name']] = quality_value
             tasks[tid] = task
-    except KeyError as e:
-        raise KeyError("Invalid xml for task: %s" % e)
+        except KeyError as e:
+            if tid is not None:
+                raise KeyError(
+                    "Invalid xml for task %d: %s\nFrom %s" % (
+                        tid, e, task_
+                    )
+                )
+            else:
+                raise KeyError('Could not find key %s in %s!' % (e, task_))
 
     return tasks
 

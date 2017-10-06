@@ -13,6 +13,7 @@ logging.basicConfig(
     format='[%(levelname)s] [%(asctime)s:%(name)s] %('
            'message)s', datefmt='%H:%M:%S')
 
+config_file = os.path.expanduser('~/.openml/config')
 server = "https://www.openml.org/api/v1/xml"
 apikey = ""
 cachedir = ""
@@ -70,7 +71,9 @@ def set_cache_directory(cachedir):
     run_cache_dir = os.path.join(cachedir, 'runs')
     lock_dir = os.path.join(cachedir, 'locks')
 
-    for dir_ in [cachedir, dataset_cache_dir, task_cache_dir, run_cache_dir]:
+    for dir_ in [
+        cachedir, dataset_cache_dir, task_cache_dir, run_cache_dir, lock_dir,
+    ]:
         if not os.path.exists(dir_) and not os.path.isdir(dir_):
             os.mkdir(dir_)
 
@@ -84,7 +87,6 @@ def _parse_config():
                 'cachedir': os.path.expanduser('~/.openml/cache'),
                 'avoid_duplicate_runs': 'True'}
 
-    config_file = os.path.expanduser('~/.openml/config')
     config = configparser.RawConfigParser(defaults=defaults)
 
     if not os.path.exists(config_file):

@@ -9,8 +9,10 @@ test_dir=$cwd/tests
 
 cd $TEST_DIR
 
-if [[ "$COVERAGE" == "true" ]]; then
-    nosetests --processes=4 --process-timeout=600 -sv --with-coverage --cover-package=$MODULE $test_dir
+if [[ "$EXAMPLES" == "true" ]]; then
+    nosetests -sv $test_dir/test_examples/
+elif [[ "$COVERAGE" == "true" ]]; then
+    nosetests --processes=4 --process-timeout=600 -sv --ignore-files="test_OpenMLDemo\.py" --with-coverage --cover-package=$MODULE $test_dir
 else
-    nosetests --processes=4 --process-timeout=600 -sv $test_dir
+    nosetests --processes=4 --process-timeout=600 -sv --ignore-files="test_OpenMLDemo\.py" $test_dir
 fi
