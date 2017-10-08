@@ -338,9 +338,6 @@ def _get_dataset_description(did_cache_dir, dataset_id):
     description = xmltodict.parse(dataset_xml)[
         "oml:data_set_description"]
 
-    with io.open(description_file, "w", encoding='utf8') as fh:
-        fh.write(dataset_xml)
-
     return description
 
 
