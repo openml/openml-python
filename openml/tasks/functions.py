@@ -128,8 +128,6 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
 
 def _list_tasks(api_call):
     xml_string = _perform_api_call(api_call)
-    with open('/tmp/list_tasks.xml', 'w') as fh:
-        fh.write(xml_string)
     tasks_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:
