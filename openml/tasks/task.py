@@ -15,6 +15,7 @@ class OpenMLTask(object):
         self.task_id = int(task_id)
         self.task_type_id = int(task_type_id)
         self.task_type = task_type
+        self.task_type_id = task_type_id
         self.dataset_id = int(data_set_id)
         self.target_name = target_name
         self.estimation_procedure = dict()
