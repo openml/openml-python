@@ -583,9 +583,6 @@ def get_run(run_id):
 
     run = _create_run_from_xml(run_xml)
 
-    with io.open(run_file, "w", encoding='utf8') as fh:
-        fh.write(run_xml)
-
     return run
 
 
