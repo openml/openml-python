@@ -129,7 +129,7 @@ def _list_tasks(api_call):
     xml_string = _perform_api_call(api_call)
     with open('/tmp/list_tasks.xml', 'w') as fh:
         fh.write(xml_string)
-    tasks_dict = xmltodict.parse(xml_string)
+    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task'))
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s'
