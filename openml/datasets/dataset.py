@@ -83,7 +83,7 @@ class OpenMLDataset(object):
                                             xmlfeature['oml:name'],
                                             xmlfeature['oml:data_type'],
                                             None, #todo add nominal values (currently not in database)
-                                            int(xmlfeature['oml:number_of_missing_values']))
+                                            int(xmlfeature.get('oml:number_of_missing_values', 0)))
                 if idx != feature.index:
                     raise ValueError('Data features not provided in right order')
                 self.features[feature.index] = feature

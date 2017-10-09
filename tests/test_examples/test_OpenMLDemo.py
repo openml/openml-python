@@ -1,5 +1,4 @@
 import os
-import unittest
 import shutil
 import sys
 
@@ -7,9 +6,13 @@ import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor
 from nbconvert.preprocessors.execute import CellExecutionError
 
+from openml.testing import TestBase
 
-class OpenMLDemoTest(unittest.TestCase):
+
+class OpenMLDemoTest(TestBase):
     def setUp(self):
+        super(OpenMLDemoTest, self).setUp()
+
         python_version = sys.version_info[0]
         self.kernel_name = 'python%d' % python_version
         self.this_file_directory = os.path.dirname(__file__)
@@ -27,7 +30,6 @@ class OpenMLDemoTest(unittest.TestCase):
             pass
 
     def _test_notebook(self, notebook_name):
-        notebook_name = 'OpenMLDemo.ipynb'
 
         notebook_filename = os.path.abspath(os.path.join(
             self.this_file_directory, '..', '..', 'examples', notebook_name))
@@ -38,6 +40,7 @@ class OpenMLDemoTest(unittest.TestCase):
             nb = nbformat.read(f, as_version=4)
             nb.metadata.get('kernelspec', {})['name'] = self.kernel_name
             ep = ExecutePreprocessor(kernel_name=self.kernel_name)
+            ep.timeout = 60
 
             try:
                 ep.preprocess(nb, {'metadata': {'path': self.this_file_directory}})
@@ -50,10 +53,5 @@ class OpenMLDemoTest(unittest.TestCase):
                 with open(notebook_filename_out, mode='wt') as f:
                     nbformat.write(nb, f)
 
-    @unittest.skip('SKIP for now until tests work again.')
-    def test_OpenMLDemo(self):
-        self._test_notebook('OpenMLDemo.ipynb')
-
-    @unittest.skip('SKIP for now until tests work again.')
-    def test_PyOpenML(self):
-        self._test_notebook('PyOpenML.ipynb')
+    def test_tutorial(self):
+        self._test_notebook('OpenML_Tutorial.ipynb')

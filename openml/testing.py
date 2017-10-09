@@ -5,6 +5,7 @@ import shutil
 import time
 import unittest
 
+from oslo_concurrency import lockutils
 import six
 
 import openml
@@ -55,6 +56,13 @@ class TestBase(unittest.TestCase):
         openml.config.avoid_duplicate_runs = False
 
         openml.config.set_cache_directory(self.workdir)
+
+        # If we're on travis, we save the api key in the config file to allow
+        # the notebook tests to read them.
+        if os.environ.get('TRAVIS'):
+            with lockutils.external_lock('config', lock_path=self.workdir):
+                with open(openml.config.config_file, 'w') as fh:
+                    fh.write('apikey = %s' % openml.config.apikey)
 
     def tearDown(self):
         os.chdir(self.cwd)

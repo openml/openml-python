@@ -26,10 +26,16 @@ popd
 # provided versions
 conda create -n testenv --yes python=$PYTHON_VERSION pip
 source activate testenv
-pip install nose numpy scipy cython scikit-learn==$SKLEARN_VERSION pandas \
-    matplotlib jupyter notebook nbconvert nbformat jupyter_client ipython \
-    ipykernel oslo.concurrency
+pip install nose numpy scipy cython scikit-learn==$SKLEARN_VERSION \
+    oslo.concurrency
 
+if [[ "$EXAMPLES" == "true" ]]; then
+    pip install matplotlib jupyter notebook nbconvert nbformat jupyter_client \
+        ipython ipykernel pandas seaborn
+fi
+if [[ "$DOCTEST" == "true" ]]; then
+    pip install pandas sphinx_bootstrap_theme
+fi
 if [[ "$COVERAGE" == "true" ]]; then
     pip install codecov
 fi
