@@ -2,12 +2,13 @@ from collections import OrderedDict
 import io
 import re
 import os
+import shutil
 
 from oslo_concurrency import lockutils
 import xmltodict
 
 from ..exceptions import OpenMLCacheException
-from .. import datasets
+from ..datasets import get_dataset
 from .task import OpenMLTask, _create_task_cache_dir
 from .. import config
 from .._api_calls import _perform_api_call
@@ -224,34 +225,88 @@ def get_task(task_id):
         raise ValueError("Task ID is neither an Integer nor can be "
                          "cast to an Integer.")
 
-    xml_file = os.path.join(_create_task_cache_dir(task_id),
-                            "task.xml")
+    tid_cache_dir = _create_task_cache_dir(task_id)
 
     with lockutils.external_lock(
             name='datasets.functions.get_dataset:%d' % task_id,
             lock_path=os.path.join(config.get_cache_directory(), 'locks'),
     ):
         try:
-            with io.open(xml_file, encoding='utf8') as fh:
-                task = _create_task_from_xml(fh.read())
+            task = _get_task_description(task_id)
+            dataset = get_dataset(task.dataset_id)
+            class_labels = dataset.retrieve_class_labels(task.target_name)
+            task.class_labels = class_labels
+            task.download_split()
 
-        except (OSError, IOError):
-            task_xml = _perform_api_call("task/%d" % task_id)
+        except Exception as e:
+            _remove_task_cache_dir(tid_cache_dir)
+            raise e
 
-            with io.open(xml_file, "w", encoding='utf8') as fh:
-                fh.write(task_xml)
-
-            task = _create_task_from_xml(task_xml)
-
-        # TODO extract this to a function
-        task.download_split()
-        dataset = datasets.get_dataset(task.dataset_id)
-
-        # TODO look into either adding the class labels to task xml, or other
-        # way of reading it.
-        class_labels = dataset.retrieve_class_labels(task.target_name)
-        task.class_labels = class_labels
     return task
+
+
+def _get_task_description(task_id):
+
+    try:
+        return _get_cached_task(task_id)
+    except OpenMLCacheException:
+        xml_file = os.path.join(_create_task_cache_dir(task_id), "task.xml")
+        task_xml = _perform_api_call("task/%d" % task_id)
+
+        with io.open(xml_file, "w", encoding='utf8') as fh:
+            fh.write(task_xml)
+        task = _create_task_from_xml(task_xml)
+
+    return task
+
+
+def _create_task_cache_directory(task_id):
+    """Create a task cache directory
+
+    In order to have a clearer cache structure and because every task
+    is cached in several files (description, split), there
+    is a directory for each task witch the task ID being the directory
+    name. This function creates this cache directory.
+
+    This function is NOT thread/multiprocessing safe.
+
+    Parameters
+    ----------
+    tid : int
+        Task ID
+
+    Returns
+    -------
+    str
+        Path of the created dataset cache directory.
+    """
+    task_cache_dir = os.path.join(
+        config.get_cache_directory(), "tasks", str(task_id)
+    )
+    try:
+        os.makedirs(task_cache_dir)
+    except (OSError, IOError):
+        # TODO add debug information!
+        pass
+    return task_cache_dir
+
+
+def _remove_task_cache_dir(tid_cache_dir):
+    """Remove the task cache directory
+
+    This function is NOT thread/multiprocessing safe.
+
+    Parameters
+    ----------
+    """
+    try:
+        os.rmdir(tid_cache_dir)
+    except (OSError, IOError):
+        try:
+            shutil.rmtree(tid_cache_dir)
+        except (OSError, IOError):
+            raise ValueError('Cannot remove faulty task cache directory %s.'
+                             'Please do this manually!' % tid_cache_dir)
 
 
 def _create_task_from_xml(xml):
