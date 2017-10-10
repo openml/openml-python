@@ -179,7 +179,7 @@ def list_datasets(offset=None, size=None, tag=None):
 def _list_datasets(api_call):
     # TODO add proper error handling here!
     xml_string = _perform_api_call(api_call)
-    datasets_dict = xmltodict.parse(xml_string)
+    datasets_dict = xmltodict.parse(xml_string, force_list=('oml:dataset',))
 
     # Minimalistic check if the XML is useful
     assert type(datasets_dict['oml:data']['oml:dataset']) == list, \
@@ -416,7 +416,7 @@ def _get_dataset_features(did_cache_dir, dataset_id):
         with io.open(features_file, "w", encoding='utf8') as fh:
             fh.write(features_xml)
 
-    features = xmltodict.parse(features_xml)["oml:data_features"]
+    features = xmltodict.parse(features_xml, force_list=('oml:feature',))["oml:data_features"]
 
     return features
 
@@ -452,7 +452,7 @@ def _get_dataset_qualities(did_cache_dir, dataset_id):
         with io.open(qualities_file, "w", encoding='utf8') as fh:
             fh.write(qualities_xml)
 
-    qualities = xmltodict.parse(qualities_xml)['oml:data_qualities']
+    qualities = xmltodict.parse(qualities_xml, force_list=('oml:quality',))['oml:data_qualities']
 
     return qualities
 

@@ -699,13 +699,16 @@ def _create_run_from_xml(xml):
 
 
 def _create_trace_from_description(xml):
-    result_dict = xmltodict.parse(xml)['oml:trace']
+    result_dict = xmltodict.parse(xml, force_list=('oml:trace_iteration',))['oml:trace']
 
     run_id = result_dict['oml:run_id']
     trace = dict()
 
     if 'oml:trace_iteration' not in result_dict:
         raise ValueError('Run does not contain valid trace. ')
+
+    assert type(result_dict['oml:trace_iteration']) == list, \
+        type(result_dict['oml:trace_iteration'])
 
     for itt in result_dict['oml:trace_iteration']:
         repeat = int(itt['oml:repeat'])
@@ -854,7 +857,7 @@ def _list_runs(api_call):
 
     xml_string = _perform_api_call(api_call)
 
-    runs_dict = xmltodict.parse(xml_string)
+    runs_dict = xmltodict.parse(xml_string, force_list=('oml:run',))
     # Minimalistic check if the XML is useful
     if 'oml:runs' not in runs_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s'
@@ -869,15 +872,11 @@ def _list_runs(api_call):
                          '"http://openml.org/openml": %s'
                          % str(runs_dict))
 
-    if isinstance(runs_dict['oml:runs']['oml:run'], list):
-        runs_list = runs_dict['oml:runs']['oml:run']
-    elif isinstance(runs_dict['oml:runs']['oml:run'], dict):
-        runs_list = [runs_dict['oml:runs']['oml:run']]
-    else:
-        raise TypeError()
+    assert type(runs_dict['oml:runs']['oml:run']) == list, \
+        type(runs_dict['oml:runs'])
 
     runs = dict()
-    for run_ in runs_list:
+    for run_ in runs_dict['oml:runs']['oml:run']:
         run_id = int(run_['oml:run_id'])
         run = {'run_id': run_id,
                'task_id': int(run_['oml:task_id']),

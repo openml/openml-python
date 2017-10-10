@@ -128,7 +128,7 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
 
 def _list_tasks(api_call):
     xml_string = _perform_api_call(api_call)
-    tasks_dict = xmltodict.parse(xml_string)
+    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task',))
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s'
@@ -142,6 +142,9 @@ def _list_tasks(api_call):
                          '"oml:runs"/@xmlns:oml is not '
                          '"http://openml.org/openml": %s'
                          % str(tasks_dict))
+
+    assert type(tasks_dict['oml:tasks']['oml:task']) == list, \
+        type(tasks_dict['oml:tasks'])
 
     tasks = dict()
     procs = _get_estimation_procedure_list()
