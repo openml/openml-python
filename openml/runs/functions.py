@@ -699,13 +699,16 @@ def _create_run_from_xml(xml):
 
 
 def _create_trace_from_description(xml):
-    result_dict = xmltodict.parse(xml)['oml:trace']
+    result_dict = xmltodict.parse(xml, force_list=('oml:trace_iteration',))['oml:trace']
 
     run_id = result_dict['oml:run_id']
     trace = dict()
 
     if 'oml:trace_iteration' not in result_dict:
         raise ValueError('Run does not contain valid trace. ')
+
+    assert type(result_dict['oml:trace_iteration']) == list, \
+        type(result_dict['oml:trace_iteration'])
 
     for itt in result_dict['oml:trace_iteration']:
         repeat = int(itt['oml:repeat'])
