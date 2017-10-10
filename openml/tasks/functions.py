@@ -283,11 +283,12 @@ def _create_task_cache_directory(task_id):
     task_cache_dir = os.path.join(
         config.get_cache_directory(), "tasks", str(task_id)
     )
-    try:
-        os.makedirs(task_cache_dir)
-    except (OSError, IOError):
-        # TODO add debug information!
+    if os.path.exists(task_cache_dir) and os.path.isdir(task_cache_dir):
         pass
+    elif os.path.exists(task_cache_dir) and not os.path.isdir(task_cache_dir):
+        raise ValueError('Task cache dir exists but is not a directory!')
+    else:
+        os.makedirs(task_cache_dir)
     return task_cache_dir
 
 
@@ -300,13 +301,10 @@ def _remove_task_cache_dir(tid_cache_dir):
     ----------
     """
     try:
-        os.rmdir(tid_cache_dir)
+        shutil.rmtree(tid_cache_dir)
     except (OSError, IOError):
-        try:
-            shutil.rmtree(tid_cache_dir)
-        except (OSError, IOError):
-            raise ValueError('Cannot remove faulty task cache directory %s.'
-                             'Please do this manually!' % tid_cache_dir)
+        raise ValueError('Cannot remove faulty task cache directory %s.'
+                         'Please do this manually!' % tid_cache_dir)
 
 
 def _create_task_from_xml(xml):
