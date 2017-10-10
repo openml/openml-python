@@ -73,6 +73,3 @@ target/
 # IDE
 .idea
 *.swp
-
-# Other
-*.pkl

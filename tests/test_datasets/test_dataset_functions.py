@@ -1,6 +1,6 @@
 import unittest
 import os
-import shutil
+import os
 import sys
 
 if sys.version_info[0] >= 3:
@@ -22,7 +22,7 @@ from openml.datasets.functions import (_get_cached_dataset,
                                        _get_dataset_description,
                                        _get_dataset_arff,
                                        _get_dataset_features,
-                                       _get_dataset_qualities, get_dataset)
+                                       _get_dataset_qualities)
 
 
 class TestOpenMLDataset(TestBase):
@@ -30,19 +30,20 @@ class TestOpenMLDataset(TestBase):
 
     def setUp(self):
         super(TestOpenMLDataset, self).setUp()
-        self._remove_did1()
 
     def tearDown(self):
         super(TestOpenMLDataset, self).tearDown()
-        self._remove_did1()
+        self._remove_pickle_files()
 
-    def _remove_did1(self):
+    def _remove_pickle_files(self):
         cache_dir = self.static_cache_dir
-        did_1_dir = os.path.join(cache_dir, 'datasets', '1')
-        try:
-            shutil.rmtree(did_1_dir)
-        except:
-            pass
+        for did in ['-1', '2']:
+            pickle_path = os.path.join(cache_dir, 'datasets', did,
+                                       'dataset.pkl')
+            try:
+                os.remove(pickle_path)
+            except:
+                pass
 
     def test__list_cached_datasets(self):
         openml.config.set_cache_directory(self.static_cache_dir)
