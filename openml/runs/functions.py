@@ -677,10 +677,18 @@ def _create_run_from_xml(xml):
                          'description XML' % run_id)
 
     if 'predictions' not in files:
-        # JvR: actually, I am not sure whether this error should be raised.
-        # a run can consist without predictions. But for now let's keep it
-        raise ValueError('No prediction files for run %d in run '
-                         'description XML' % run_id)
+        task = openml.tasks.get_task(task_id)
+        if task.task_type_id == 8:
+            raise NotImplementedError(
+                'Subgroup discovery tasks are not yet supported.'
+            )
+        else:
+            # JvR: actually, I am not sure whether this error should be raised.
+            # a run can consist without predictions. But for now let's keep it
+            # Matthias: yes, it should stay as long as we do not really handle
+            # this stuff
+            raise ValueError('No prediction files for run %d in run '
+                             'description XML' % run_id)
 
     tags = openml.utils.extract_xml_tags('oml:tag', run)
 
