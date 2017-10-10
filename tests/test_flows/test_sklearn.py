@@ -24,6 +24,7 @@ import sklearn.model_selection
 import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
+import sklearn.cluster
 
 import openml
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
@@ -97,6 +98,47 @@ class TestSklearn(unittest.TestCase):
         new_model.fit(self.X, self.y)
 
         self.assertEqual(check_dependencies_mock.call_count, 1)
+
+
+    @mock.patch('openml.flows.sklearn_converter._check_dependencies')
+    def test_serialize_model_clustering(self, check_dependencies_mock):
+        model = sklearn.cluster.KMeans()
+
+        fixture_name = 'sklearn.cluster.k_means_.KMeans'
+        fixture_description = 'Automatically created scikit-learn flow.'
+        version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
+                          % sklearn.__version__
+        fixture_parameters = \
+            OrderedDict((('algorithm', '"auto"'),
+                         ('copy_x', 'true'),
+                         ('init', '"k-means++"'),
+                         ('max_iter', '300'),
+                         ('n_clusters', '8'),
+                         ('n_init', '10'),
+                         ('n_jobs', '1'),
+                         ('precompute_distances', '"auto"'),
+                         ('random_state', 'null'),
+                         ('tol', '0.0001'),
+                         ('verbose', '0')))
+
+        serialization = sklearn_to_flow(model)
+
+        self.assertEqual(serialization.name, fixture_name)
+        self.assertEqual(serialization.class_name, fixture_name)
+        self.assertEqual(serialization.description, fixture_description)
+        self.assertEqual(serialization.parameters, fixture_parameters)
+        self.assertEqual(serialization.dependencies, version_fixture)
+
+        new_model = flow_to_sklearn(serialization)
+
+        self.assertEqual(type(new_model), type(model))
+        self.assertIsNot(new_model, model)
+
+        self.assertEqual(new_model.get_params(), model.get_params())
+        new_model.fit(self.X)
+
+        self.assertEqual(check_dependencies_mock.call_count, 1)
+
 
     def test_serialize_model_with_subcomponent(self):
         model = sklearn.ensemble.AdaBoostClassifier(
