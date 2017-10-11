@@ -8,6 +8,7 @@ if sys.version_info[0] >= 3:
 else:
     import mock
 
+from oslo_concurrency import lockutils
 import scipy.sparse
 
 import openml
@@ -32,18 +33,22 @@ class TestOpenMLDataset(TestBase):
         super(TestOpenMLDataset, self).setUp()
 
     def tearDown(self):
-        super(TestOpenMLDataset, self).tearDown()
         self._remove_pickle_files()
+        super(TestOpenMLDataset, self).tearDown()
 
     def _remove_pickle_files(self):
         cache_dir = self.static_cache_dir
         for did in ['-1', '2']:
-            pickle_path = os.path.join(cache_dir, 'datasets', did,
-                                       'dataset.pkl')
-            try:
-                os.remove(pickle_path)
-            except:
-                pass
+            with lockutils.external_lock(
+                    name='datasets.functions.get_dataset:%s' % did,
+                    lock_path=os.path.join(openml.config.get_cache_directory(), 'locks'),
+            ):
+                pickle_path = os.path.join(cache_dir, 'datasets', did,
+                                           'dataset.pkl')
+                try:
+                    os.remove(pickle_path)
+                except:
+                    pass
 
     def test__list_cached_datasets(self):
         openml.config.set_cache_directory(self.static_cache_dir)
