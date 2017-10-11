@@ -477,12 +477,17 @@ def _create_dataset_cache_directory(dataset_id):
     str
         Path of the created dataset cache directory.
     """
-    dataset_cache_dir = os.path.join(config.get_cache_directory(), "datasets", str(dataset_id))
-    try:
-        os.makedirs(dataset_cache_dir)
-    except (OSError, IOError):
-        # TODO add debug information!
+    dataset_cache_dir = os.path.join(
+        config.get_cache_directory(),
+        "datasets",
+        str(dataset_id),
+    )
+    if os.path.exists(dataset_cache_dir) and os.path.isdir(dataset_cache_dir):
         pass
+    elif os.path.exists(dataset_cache_dir) and not os.path.isdir(dataset_cache_dir):
+        raise ValueError('Dataset cache dir exists but is not a directory!')
+    else:
+        os.makedirs(dataset_cache_dir)
     return dataset_cache_dir
 
 
@@ -495,13 +500,10 @@ def _remove_dataset_cache_dir(did_cache_dir):
     ----------
     """
     try:
-        os.rmdir(did_cache_dir)
+        shutil.rmtree(did_cache_dir)
     except (OSError, IOError):
-        try:
-            shutil.rmtree(did_cache_dir)
-        except (OSError, IOError):
-            raise ValueError('Cannot remove faulty dataset cache directory %s.'
-                             'Please do this manually!' % did_cache_dir)
+        raise ValueError('Cannot remove faulty dataset cache directory %s.'
+                         'Please do this manually!' % did_cache_dir)
 
 
 def _create_dataset_from_description(description, features, qualities, arff_file):
