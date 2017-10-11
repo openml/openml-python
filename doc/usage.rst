@@ -513,7 +513,7 @@ We can now also inspect the flow object which was automatically created:
 .. code:: python
 
     >>> flow = openml.flows.get_flow(run.flow_id)
-    >>> pprint(vars(flow), depth=2)
+    >>> pprint(vars(flow), depth=2)                             # doctest: +SKIP
     {'binary_format': None,
      'binary_md5': None,
      'binary_url': None,
@@ -522,7 +522,7 @@ We can now also inspect the flow object which was automatically created:
      'custom_name': None,
      'dependencies': 'sklearn==0.18.2\nnumpy>=1.6.1\nscipy>=0.9',
      'description': 'Automatically created scikit-learn flow.',
-     'external_version': 'openml==0.6.0dev,sklearn==0.18.2',
+     'external_version': 'openml==0.6.0,sklearn==0.18.2',
      'flow_id': 7245,
      'language': 'English',
      'model': RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
