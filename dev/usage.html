@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Basic Usage &#8212; OpenML 0.6.0dev documentation</title>
+    <title>Basic Usage &#8212; OpenML 0.6.0 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.6.0dev',
+        VERSION:     '0.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -60,7 +60,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.6.0dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.6.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -563,7 +563,7 @@ run is send to the OpenML server:</p>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">flow</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">flow_id</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">flow</span><span class="p">),</span> <span class="n">depth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">flow</span><span class="p">),</span> <span class="n">depth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>                             
 <span class="go">{&#39;binary_format&#39;: None,</span>
 <span class="go"> &#39;binary_md5&#39;: None,</span>
 <span class="go"> &#39;binary_url&#39;: None,</span>
@@ -572,7 +572,7 @@ run is send to the OpenML server:</p>
 <span class="go"> &#39;custom_name&#39;: None,</span>
 <span class="go"> &#39;dependencies&#39;: &#39;sklearn==0.18.2\nnumpy&gt;=1.6.1\nscipy&gt;=0.9&#39;,</span>
 <span class="go"> &#39;description&#39;: &#39;Automatically created scikit-learn flow.&#39;,</span>
-<span class="go"> &#39;external_version&#39;: &#39;openml==0.6.0dev,sklearn==0.18.2&#39;,</span>
+<span class="go"> &#39;external_version&#39;: &#39;openml==0.6.0,sklearn==0.18.2&#39;,</span>
 <span class="go"> &#39;flow_id&#39;: 7245,</span>
 <span class="go"> &#39;language&#39;: &#39;English&#39;,</span>
 <span class="go"> &#39;model&#39;: RandomForestClassifier(bootstrap=True, class_weight=None, criterion=&#39;gini&#39;,</span>
@@ -614,7 +614,7 @@ run is send to the OpenML server:</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2016, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren and Pieter Gijsbers.<br/>
+        &copy; Copyright 2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers.<br/>
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.4.<br/>
     </p>
   </div>
