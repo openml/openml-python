@@ -1,4 +1,4 @@
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 import json
 import sys
 import time
@@ -11,6 +11,7 @@ import openml
 from ..tasks import get_task
 from .._api_calls import _perform_api_call, _file_id_to_url, _read_url_files
 from ..exceptions import PyOpenMLError
+
 
 class OpenMLRun(object):
     """OpenML Run: result of running a model on an openml dataset.
@@ -348,6 +349,28 @@ class OpenMLRun(object):
                                         True, flow.flow_id)
 
         return parameters
+
+    def push_tag(self, tag):
+        """Annotates this run with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the run.
+        """
+        data = {'run_id': self.run_id, 'tag': tag}
+        _perform_api_call("/run/tag", data=data)
+
+    def remove_tag(self, tag):
+        """Removes a tag from this run on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the run.
+        """
+        data = {'run_id': self.run_id, 'tag': tag}
+        _perform_api_call("/run/untag", data=data)
 
 
 ################################################################################

@@ -14,7 +14,7 @@ import sklearn.metrics
 
 import openml
 import openml.utils
-from ..exceptions import PyOpenMLError
+from ..exceptions import PyOpenMLError, OpenMLServerNoResult
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
     _copy_server_fields
@@ -862,8 +862,10 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
 
 def _list_runs(api_call):
     """Helper function to parse API calls which are lists of runs"""
-
-    xml_string = _perform_api_call(api_call)
+    try:
+        xml_string = _perform_api_call(api_call)
+    except OpenMLServerNoResult:
+        return []
 
     runs_dict = xmltodict.parse(xml_string, force_list=('oml:run',))
     # Minimalistic check if the XML is useful
