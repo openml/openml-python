@@ -69,33 +69,36 @@ Key concepts
 ~~~~~~~~~~~~
 
 OpenML contains several key concepts which it needs to make machine learning
-research shareable. A machine learning experiment consists of several runs,
-which describe the performance of an algorithm (called a flow in OpenML) on a
-task. Task is the combination of a dataset, a split and an evaluation metric. In
-this user guide we will go through listing and exploring existing tasks to
-actually running machine learning algorithms on them. In a further user guide
-we will examine how to search through datasets in order to curate a list of
-tasks.
+research shareable. A machine learning experiment consists of one or several
+**runs**, which describe the performance of an algorithm (called a **flow** in
+OpenML), its hyperparameter settings (called a **setup**) on a **task**. A
+**Task** is the combination of a **dataset**, a split and an evaluation
+metric. In this user guide we will go through listing and exploring existing
+**tasks** to actually running machine learning algorithms on them. In a further
+user guide we will examine how to search through **datasets** in order to curate
+a list of **tasks**.
 
 ~~~~~~~~~~~~~~~~~~
 Working with tasks
 ~~~~~~~~~~~~~~~~~~
 
-Tasks are containers, defining how to split the dataset into a train and test
-set, whether to use several disjoint train and test splits (cross-validation)
-and whether this should be repeated several times. Also, the task defines a
-target metric for which a flow should be optimized. You can think of a task as
-an experimentation protocol, describing how to apply a machine learning model
-to a dataset in a way that it is comparable with the results of others (more
-on how to do that further down).
+You can think of a task as an experimentation protocol, describing how to apply
+a machine learning model to a dataset in a way that it is comparable with the
+results of others (more on how to do that further down).Tasks are containers,
+defining which dataset to use, what kind of task we're solving (regression,
+classification, clustering, etc...) and which column to predict. Furthermore,
+it also describes how to split the dataset into a train and test set, whether
+to use several disjoint train and test splits (cross-validation) and whether
+this should be repeated several times. Also, the task defines a target metric
+for which a flow should be optimized.
 
 Tasks are identified by IDs and can be accessed in two different ways:
 
 1. In a list providing basic information on all tasks available on OpenML.
    This function will not download the actual tasks, but will instead download
    meta data that can be used to filter the tasks and retrieve a set of IDs.
-   We can filter this list, for example, we can only list
-   *supervised classification* tasks or tasks having a special tag.
+   We can filter this list, for example, we can only list tasks having a special
+   tag or only tasks for a specific target such as *supervised classification*.
 
 2. A single task by its ID. It contains all meta information, the target metric,
    the splits and an iterator which can be used to access the splits in a
@@ -132,28 +135,29 @@ to have better visualization and easier access:
            'NumberOfSymbolicFeatures', 'cost_matrix'],
           dtype='object')
 
-Now we can restrict the tasks to all tasks with the desired resampling strategy:
-
-.. code:: python
-
-    >>> filtered_tasks = tasks.query('estimation_procedure == "10-fold Crossvalidation"')
-    >>> print(list(filtered_tasks.index))                               # doctest: +SKIP
-    [2, 3, 4, 5, 6, 7, 8, 9, ..., 146606, 146607, 146690]
-    >>> print(len(filtered_tasks))                                      # doctest: +SKIP
-    1697
-
-Resampling strategies can be found on the `OpenML Website <http://www.openml.org/search?type=measure&q=estimation%20procedure>`_.
-
-We can further filter the list of tasks to only contain datasets with more than
+We can filter the list of tasks to only contain datasets with more than
 500 samples, but less than 1000 samples:
 
 .. code:: python
 
-    >>> filtered_tasks = filtered_tasks.query('NumberOfInstances > 500 and NumberOfInstances < 1000')
+    >>> filtered_tasks = tasks.query('NumberOfInstances > 500 and NumberOfInstances < 1000')
+    >>> print(list(filtered_tasks.index))                               # doctest: +SKIP
+    [2, 11, 15, 29, 37, 41, 49, 53, ..., 146597, 146600, 146605]
+    >>> print(len(filtered_tasks))
+    210
+
+Then, we can further restrict the tasks to all have the same resampling
+strategy:
+
+.. code:: python
+
+    >>> filtered_tasks = filtered_tasks.query('estimation_procedure == "10-fold Crossvalidation"')
     >>> print(list(filtered_tasks.index))                               # doctest: +SKIP
     [2, 11, 15, 29, 37, 41, 49, 53, ..., 146231, 146238, 146241]
-    >>> print(len(filtered_tasks))
+    >>> print(len(filtered_tasks))                                      # doctest: +SKIP
     107
+
+Resampling strategies can be found on the `OpenML Website <http://www.openml.org/search?type=measure&q=estimation%20procedure>`_.
 
 Similar to listing tasks by task type, we can list tasks by tags:
 
@@ -219,7 +223,7 @@ And:
 
 .. code:: python
 
-    >>> ids = [12, 14, 16, 18, 20, 22]
+    >>> ids = [2, 11, 15, 29, 37, 41, 49, 53]
     >>> tasks = openml.tasks.get_tasks(ids)
     >>> pprint(tasks[0])                           # doctest: +SKIP
 
@@ -229,8 +233,9 @@ Creating runs
 
 In order to upload and share results of running a machine learning algorithm
 on a task, we need to create an :class:`~openml.OpenMLRun`. A run object can
-be created by running a :class:`~openml.OpenMLFlow` or a scikit-learn model on
-a task. We will focus on the simpler example of running a scikit-learn model.
+be created by running a :class:`~openml.OpenMLFlow` or a scikit-learn compatible
+model on a task. We will focus on the simpler example of running a
+scikit-learn model.
 
 Flows are descriptions of something runable which does the machine learning.
 A flow contains all information to set up the necessary machine learning

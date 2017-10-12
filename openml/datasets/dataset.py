@@ -242,7 +242,7 @@ class OpenMLDataset(object):
         else:
             if isinstance(target, six.string_types):
                 target = [target]
-            legal_target_types = (int, float)
+            legal_target_types = (int, float, np.float32, np.float64)
             if target_dtype not in legal_target_types:
                 raise ValueError(
                     "%s is not a legal target type. Legal target types are %s" %
