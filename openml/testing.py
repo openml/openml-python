@@ -5,6 +5,9 @@ import shutil
 import time
 import unittest
 
+from oslo_concurrency import lockutils
+import six
+
 import openml
 
 
@@ -34,7 +37,8 @@ class TestBase(unittest.TestCase):
 
         self.cwd = os.getcwd()
         workdir = os.path.dirname(os.path.abspath(__file__))
-        self.workdir = os.path.join(workdir, "tmp")
+        tmp_dir_name = self.id()
+        self.workdir = os.path.join(workdir, tmp_dir_name)
         try:
             shutil.rmtree(self.workdir)
         except:
@@ -52,6 +56,13 @@ class TestBase(unittest.TestCase):
         openml.config.avoid_duplicate_runs = False
 
         openml.config.set_cache_directory(self.workdir)
+
+        # If we're on travis, we save the api key in the config file to allow
+        # the notebook tests to read them.
+        if os.environ.get('TRAVIS'):
+            with lockutils.external_lock('config', lock_path=self.workdir):
+                with open(openml.config.config_file, 'w') as fh:
+                    fh.write('apikey = %s' % openml.config.apikey)
 
     def tearDown(self):
         os.chdir(self.cwd)
@@ -77,6 +88,16 @@ class TestBase(unittest.TestCase):
                 flows_to_visit.append(subflow)
 
         return flow, sentinel
+
+    def _check_dataset(self, dataset):
+        self.assertEqual(type(dataset), dict)
+        self.assertGreaterEqual(len(dataset), 2)
+        self.assertIn('did', dataset)
+        self.assertIsInstance(dataset['did'], int)
+        self.assertIn('status', dataset)
+        self.assertIsInstance(dataset['status'], six.string_types)
+        self.assertIn(dataset['status'], ['in_preparation', 'active',
+                                          'deactivated'])
 
 
 __all__ = ['TestBase']

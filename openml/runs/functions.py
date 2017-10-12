@@ -221,6 +221,7 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
     base_estimator.set_params(**current.get_parameters())
     return base_estimator
 
+
 def _run_exists(task_id, setup_id):
     '''
     Checks whether a task/setup combination is already present on the server.
@@ -243,6 +244,7 @@ def _run_exists(task_id, setup_id):
         # error code 512 implies no results. This means the run does not exist yet
         assert(exception.code == 512)
         return False
+
 
 def _get_seeded_model(model, seed=None):
     '''Sets all the non-seeded components of a model with a seed.
@@ -356,8 +358,21 @@ def _prediction_to_row(rep_no, fold_no, sample_no, row_id, correct_label,
     arff_line.append(correct_label)
     return arff_line
 
+
 # JvR: why is class labels a parameter? could be removed and taken from task object, right?
 def _run_task_get_arffcontent(model, task, class_labels):
+
+    def _prediction_to_probabilities(y, model_classes):
+        # y: list or numpy array of predictions
+        # model_classes: sklearn classifier mapping from original array id to prediction index id
+        if not isinstance(model_classes, list):
+            raise ValueError('please convert model classes to list prior to calling this fn')
+        result = np.zeros((len(y), len(model_classes)), dtype=np.float32)
+        for obs, prediction_idx in enumerate(y):
+            array_idx = model_classes.index(prediction_idx)
+            result[obs][array_idx] = 1.0
+        return result
+
     X, Y = task.get_X_and_y()
     arff_datacontent = []
     arff_tracecontent = []
@@ -425,8 +440,11 @@ def _run_task_get_arffcontent(model, task, class_labels):
                 if can_measure_runtime:
                     modelpredict_starttime = time.process_time()
 
-                ProbaY = model_fold.predict_proba(testX)
                 PredY = model_fold.predict(testX)
+                try:
+                    ProbaY = model_fold.predict_proba(testX)
+                except AttributeError:
+                    ProbaY = _prediction_to_probabilities(PredY, list(model_classes))
 
                 # add client-side calculated metrics. These might be used on the server as consistency check
                 def _calculate_local_measure(sklearn_fn, openml_name):
@@ -467,7 +485,6 @@ def _run_task_get_arffcontent(model, task, class_labels):
            user_defined_measures_sample
 
 
-
 def _extract_arfftrace(model, rep_no, fold_no):
     if not isinstance(model, sklearn.model_selection._search.BaseSearchCV):
         raise ValueError('model should be instance of'\
@@ -489,6 +506,7 @@ def _extract_arfftrace(model, rep_no, fold_no):
                 arff_line.append(serialized_value)
         arff_tracecontent.append(arff_line)
     return arff_tracecontent
+
 
 def _extract_arfftrace_attributes(model):
     if not isinstance(model, sklearn.model_selection._search.BaseSearchCV):
@@ -564,9 +582,6 @@ def get_run(run_id):
             fh.write(run_xml)
 
     run = _create_run_from_xml(run_xml)
-
-    with io.open(run_file, "w", encoding='utf8') as fh:
-        fh.write(run_xml)
 
     return run
 
@@ -662,10 +677,18 @@ def _create_run_from_xml(xml):
                          'description XML' % run_id)
 
     if 'predictions' not in files:
-        # JvR: actually, I am not sure whether this error should be raised.
-        # a run can consist without predictions. But for now let's keep it
-        raise ValueError('No prediction files for run %d in run '
-                         'description XML' % run_id)
+        task = openml.tasks.get_task(task_id)
+        if task.task_type_id == 8:
+            raise NotImplementedError(
+                'Subgroup discovery tasks are not yet supported.'
+            )
+        else:
+            # JvR: actually, I am not sure whether this error should be raised.
+            # a run can consist without predictions. But for now let's keep it
+            # Matthias: yes, it should stay as long as we do not really handle
+            # this stuff
+            raise ValueError('No prediction files for run %d in run '
+                             'description XML' % run_id)
 
     tags = openml.utils.extract_xml_tags('oml:tag', run)
 
@@ -682,14 +705,18 @@ def _create_run_from_xml(xml):
                      sample_evaluations=sample_evaluations,
                      tags=tags)
 
+
 def _create_trace_from_description(xml):
-    result_dict = xmltodict.parse(xml)['oml:trace']
+    result_dict = xmltodict.parse(xml, force_list=('oml:trace_iteration',))['oml:trace']
 
     run_id = result_dict['oml:run_id']
     trace = dict()
 
     if 'oml:trace_iteration' not in result_dict:
         raise ValueError('Run does not contain valid trace. ')
+
+    assert type(result_dict['oml:trace_iteration']) == list, \
+        type(result_dict['oml:trace_iteration'])
 
     for itt in result_dict['oml:trace_iteration']:
         repeat = int(itt['oml:repeat'])
@@ -714,6 +741,52 @@ def _create_trace_from_description(xml):
 
     return OpenMLRunTrace(run_id, trace)
 
+
+def _create_trace_from_arff(arff_obj):
+    """
+    Creates a trace file from arff obj (for example, generated by a local run)
+
+    Parameters
+    ----------
+    arff_obj : dict
+        LIAC arff obj, dict containing attributes, relation, data and description
+
+    Returns
+    -------
+    run : OpenMLRunTrace
+        Object containing None for run id and a dict containing the trace iterations
+    """
+    trace = dict()
+    attribute_idx = {att[0]: idx for idx, att in enumerate(arff_obj['attributes'])}
+    for required_attribute in ['repeat', 'fold', 'iteration', 'evaluation', 'selected']:
+        if required_attribute not in attribute_idx:
+            raise ValueError('arff misses required attribute: %s' %required_attribute)
+
+    for itt in arff_obj['data']:
+        repeat = int(itt[attribute_idx['repeat']])
+        fold = int(itt[attribute_idx['fold']])
+        iteration = int(itt[attribute_idx['iteration']])
+        evaluation = float(itt[attribute_idx['evaluation']])
+        selectedValue = itt[attribute_idx['selected']]
+        if selectedValue == 'true':
+            selected = True
+        elif selectedValue == 'false':
+            selected = False
+        else:
+            raise ValueError('expected {"true", "false"} value for selected field, received: %s' % selectedValue)
+
+        # TODO: if someone needs it, he can use the parameter
+        # fields to revive the setup_string as well
+        # However, this is usually done by the OpenML server
+        # and if we are going to duplicate this functionality
+        # it needs proper testing
+
+        current = OpenMLTraceIteration(repeat, fold, iteration, None, evaluation, selected)
+        trace[(repeat, fold, iteration)] = current
+
+    return OpenMLRunTrace(None, trace)
+
+
 def _get_cached_run(run_id):
     """Load a run from the cache."""
     cache_dir = config.get_cache_directory()
@@ -731,7 +804,7 @@ def _get_cached_run(run_id):
 
 
 def list_runs(offset=None, size=None, id=None, task=None, setup=None,
-              flow=None, uploader=None, tag=None):
+              flow=None, uploader=None, tag=None, display_errors=False):
     """List all runs matching all of the given filters.
 
     Perform API call `/run/list/{filters} <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`_
@@ -755,6 +828,9 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
 
     tag : str, optional
 
+    display_errors : bool, optional (default=None)
+        Whether to list runs which have an error (for example a missing
+        prediction file).
     Returns
     -------
     list
@@ -778,6 +854,8 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
     if tag is not None:
         api_call += "/tag/%s" % tag
+    if display_errors:
+        api_call += "/show_errors/true"
 
     return _list_runs(api_call)
 
@@ -787,7 +865,7 @@ def _list_runs(api_call):
 
     xml_string = _perform_api_call(api_call)
 
-    runs_dict = xmltodict.parse(xml_string)
+    runs_dict = xmltodict.parse(xml_string, force_list=('oml:run',))
     # Minimalistic check if the XML is useful
     if 'oml:runs' not in runs_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s'
@@ -802,15 +880,11 @@ def _list_runs(api_call):
                          '"http://openml.org/openml": %s'
                          % str(runs_dict))
 
-    if isinstance(runs_dict['oml:runs']['oml:run'], list):
-        runs_list = runs_dict['oml:runs']['oml:run']
-    elif isinstance(runs_dict['oml:runs']['oml:run'], dict):
-        runs_list = [runs_dict['oml:runs']['oml:run']]
-    else:
-        raise TypeError()
+    assert type(runs_dict['oml:runs']['oml:run']) == list, \
+        type(runs_dict['oml:runs'])
 
     runs = dict()
-    for run_ in runs_list:
+    for run_ in runs_dict['oml:runs']['oml:run']:
         run_id = int(run_['oml:run_id'])
         run = {'run_id': run_id,
                'task_id': int(run_['oml:task_id']),

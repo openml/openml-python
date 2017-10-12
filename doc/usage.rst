@@ -44,6 +44,9 @@ The second option is to create a config file:
 The config file must be in the directory :bash:`~/.openml/config` and 
 exist prior to importing the openml module.
 
+..
+    >>> openml.config.apikey = '610344db6388d9ba34f6db45a3cf71de'
+
 When downloading datasets, tasks, runs and flows, they will be cached to
 retrieve them without calling the server later. As with the API key, the cache
 directory can be either specified through the API or through the config file:
@@ -52,7 +55,8 @@ API:
 
 .. code:: python
 
-    >>> openml.config.set_cache_directory('~/.openml/cache')
+    >>> import os
+    >>> openml.config.set_cache_directory(os.path.expanduser('~/.openml/cache'))
 
 Config file:
 
@@ -65,6 +69,7 @@ Working with datasets
 ~~~~~~~~~~~~~~~~~~~~~
 
 # TODO mention third, searching for tags
+
 Datasets are a key concept in OpenML (see `OpenML documentation <openml.org/guide>`_).
 Datasets are identified by IDs and can be accessed in two different ways:
 
@@ -86,53 +91,44 @@ data points and at least five features.
 
     >>> datasets = openml.datasets.list_datasets()
 
-:meth:`openml.datasets.list_datasets` returns a list of dictionaries, we will
-convert it into a `pandas dataframe <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
-to have better visualization:
+:meth:`openml.datasets.list_datasets` returns a dictionary of dictionaries, we
+will convert it into a
+`pandas dataframe <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
+to have better visualization and easier access:
 
 .. code:: python
 
     >>> import pandas as pd
-    >>> datasets = pd.DataFrame(datasets)
-    >>> datasets.set_index('did', inplace=True)
+    >>> datasets = pd.DataFrame.from_dict(datasets, orient='index')
 
 We have access to the following properties of the datasets:
 
     >>> print(datasets.columns)
-    Index([                 u'MajorityClassSize',
-                  u'MaxNominalAttDistinctValues',
-                            u'MinorityClassSize',
-                                u'NumBinaryAtts',
-                              u'NumberOfClasses',
-                             u'NumberOfFeatures',
-                            u'NumberOfInstances',
-           u'NumberOfInstancesWithMissingValues',
-                        u'NumberOfMissingValues',
-                      u'NumberOfNumericFeatures',
-                     u'NumberOfSymbolicFeatures',
-                                       u'format',
-                                         u'name',
-                                       u'status'],
+    Index(['did', 'name', 'format', 'status', 'MajorityClassSize',
+           'MaxNominalAttDistinctValues', 'MinorityClassSize', 'NumberOfClasses',
+           'NumberOfFeatures', 'NumberOfInstances',
+           'NumberOfInstancesWithMissingValues', 'NumberOfMissingValues',
+           'NumberOfNumericFeatures', 'NumberOfSymbolicFeatures'],
           dtype='object')
 
 and can see the first data point:
 
     >>> print(datasets.iloc[0])
+    did                                        2
+    name                                  anneal
+    format                                  ARFF
+    status                                active
     MajorityClassSize                        684
-    MaxNominalAttDistinctValues               10
-    MinorityClassSize                          0
-    NumBinaryAtts                             14
-    NumberOfClasses                            6
+    MaxNominalAttDistinctValues                7
+    MinorityClassSize                          8
+    NumberOfClasses                            5
     NumberOfFeatures                          39
     NumberOfInstances                        898
-    NumberOfInstancesWithMissingValues         0
-    NumberOfMissingValues                      0
+    NumberOfInstancesWithMissingValues       898
+    NumberOfMissingValues                  22175
     NumberOfNumericFeatures                    6
-    NumberOfSymbolicFeatures                  32
-    format                                  ARFF
-    name                                  anneal
-    status                                active
-    Name: 1, dtype: object
+    NumberOfSymbolicFeatures                  33
+    Name: 2, dtype: object
 
 We can now filter the data:
 
@@ -170,7 +166,7 @@ Next, to obtain the data matrix:
 
     >>> X = dataset.get_data()
     >>> print(X.shape, X.dtype)
-    ((1473, 10), dtype('float32'))
+    (1473, 10) float32
 
 which returns the dataset as a np.ndarray with dtype :python:`np.float32`.
 In case the data is sparse, a scipy.sparse.csr matrix is returned. All nominal
@@ -180,7 +176,7 @@ variables are encoded as integers, the inverse encoding can be retrieved via:
 
     >>> X, names = dataset.get_data(return_attribute_names=True)
     >>> print(names)
-    [u'Wifes_age', u'Wifes_education', u'Husbands_education', u'Number_of_children_ever_born', u'Wifes_religion', u'Wifes_now_working%3F', u'Husbands_occupation', u'Standard-of-living_index', u'Media_exposure', u'Contraceptive_method_used']
+    ['Wifes_age', 'Wifes_education', 'Husbands_education', 'Number_of_children_ever_born', 'Wifes_religion', 'Wifes_now_working%3F', 'Husbands_occupation', 'Standard-of-living_index', 'Media_exposure', 'Contraceptive_method_used']
 
 Most times, having a single data matrix :python:`X` is not enough. Two 
 useful arguments are :python:`target` and
@@ -196,7 +192,7 @@ which attributes are categorical (and should be one hot encoded if necessary.)
     ... target=dataset.default_target_attribute,
     ... return_categorical_indicator=True)
     >>> print(X.shape, y.shape)
-    ((1473, 9), (1473,))
+    (1473, 9) (1473,)
     >>> print(categorical)
     [False, True, True, False, True, True, True, True, True]
 
@@ -209,17 +205,17 @@ In case you are working with `scikit-learn
     >>> enc = preprocessing.OneHotEncoder(categorical_features=categorical)
     >>> print(enc)
     OneHotEncoder(categorical_features=[False, True, True, False, True, True, True, True, True],
-           dtype=<type 'float'>, handle_unknown='error', n_values='auto',
-           sparse=True)
+           dtype=<class 'numpy.float64'>, handle_unknown='error',
+           n_values='auto', sparse=True)
     >>> X = enc.fit_transform(X).todense()
     >>> clf = ensemble.RandomForestClassifier()
     >>> clf.fit(X, y)
     RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
                 max_depth=None, max_features='auto', max_leaf_nodes=None,
-                min_samples_leaf=1, min_samples_split=2,
-                min_weight_fraction_leaf=0.0, n_estimators=10, n_jobs=1,
-                oob_score=False, random_state=None, verbose=0,
-                warm_start=False)
+                min_impurity_split=1e-07, min_samples_leaf=1,
+                min_samples_split=2, min_weight_fraction_leaf=0.0,
+                n_estimators=10, n_jobs=1, oob_score=False, random_state=None,
+                verbose=0, warm_start=False)
 
 When you have to retrieve several datasets, you can use the convenience function
 :meth:`openml.datasets.get_datasets()`, which downloads all datasets given by
@@ -277,21 +273,22 @@ classification task (task type :python:`1`):
 
 .. code:: python
 
-    >>> tasks = openml.tasks.list_tasks_by_type(1)
+    >>> tasks = openml.tasks.list_tasks(task_type_id=1)
 
 Let's find out more about the datasets:
 
 .. code:: python
 
     >>> import pandas as pd
-    >>> tasks = pd.DataFrame(tasks)
-    >>> tasks.set_index('tid', inplace=True)
+    >>> tasks = pd.DataFrame.from_dict(tasks, orient='index')
     >>> print(tasks.columns)
-    Index([         u'cost_matrix',                  u'did',
-           u'estimation_procedure',  u'evaluation_measures',
-                           u'name',          u'source_data',
-                         u'status',       u'target_feature',
-                      u'task_type'],
+    Index(['tid', 'ttid', 'did', 'name', 'task_type', 'status',
+           'estimation_procedure', 'evaluation_measures', 'source_data',
+           'target_feature', 'MajorityClassSize', 'MaxNominalAttDistinctValues',
+           'MinorityClassSize', 'NumberOfClasses', 'NumberOfFeatures',
+           'NumberOfInstances', 'NumberOfInstancesWithMissingValues',
+           'NumberOfMissingValues', 'NumberOfNumericFeatures',
+           'NumberOfSymbolicFeatures', 'cost_matrix'],
           dtype='object')
 
 Now we can restrict the tasks to all tasks with the desired resampling strategy:
@@ -299,9 +296,7 @@ Now we can restrict the tasks to all tasks with the desired resampling strategy:
 # TODO add something about the different resampling strategies implemented!
 
 .. code:: python
-
-    >>> filter = tasks.estimation_procedure == '10-fold Crossvalidation'
-    >>> filtered_tasks = tasks[filter]
+    >>> filtered_tasks = tasks.query('estimation_procedure == "10-fold Crossvalidation"')
     >>> filtered_tasks = list(filtered_tasks.index)
     >>> print(filtered_tasks)                               # doctest: +SKIP
     [1, 2, 3, 4, 5, 6, 7, 8, 9, ... 10105, 10106, 10107, 10109, 10111, 13907, 13918]
@@ -320,17 +315,16 @@ A list of tasks, filtered tags, can be retrieved via:
 
 .. code:: python
 
-    >>> tasks = openml.tasks.list_tasks_by_tag('study_1')
+    >>> tasks = openml.tasks.list_tasks(tag='study_1')
 
-:meth:`openml.tasks.list_tasks_by_tag` returns a list of dictionaries, we will
+:meth:`openml.tasks.list_tasks` returns a dict of dictionaries, we will
 convert it into a `pandas dataframe <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
 to have better visualization:
 
 .. code:: python
 
     >>> import pandas as pd
-    >>> tasks = pd.DataFrame(tasks)
-    >>> tasks.set_index('tid', inplace=True)
+    >>> tasks = pd.DataFrame.from_dict(tasks, orient='index')
 
 As before, we have to check whether there is a task for each dataset that we
 want to work with. In addition, we have to make sure to use only tasks with the
@@ -367,15 +361,34 @@ and one which takes a list of IDs and downloads all of these tasks:
 
 .. code:: python
 
-    >>> task_id = 1
+    >>> task_id = 2
     >>> task = openml.tasks.get_task(task_id)
 
 Properties of the task are stored as member variables:
 
 .. code:: python
 
-    >>> print(task.__dict__)
-    {'target_feature': u'class', 'task_type': u'Supervised Classification', 'task_id': 1, 'estimation_procedure': {'type': u'crossvalidation', 'data_splits_url': u'http://www.openml.org/api_splits/get/1/Task_1_splits.arff', 'parameters': {u'number_repeats': u'1', u'percentage': '', u'stratified_sampling': u'true', u'number_folds': u'10'}}, 'class_labels': [u'1', u'2', u'3', u'4', u'5', u'U'], 'cost_matrix': None, 'evaluation_measure': u'predictive_accuracy', 'dataset_id': 1, 'estimation_parameters': {u'number_repeats': u'1', u'percentage': '', u'stratified_sampling': u'true', u'number_folds': u'10'}}
+    >>> from pprint import pprint
+    >>> pprint(vars(task))
+    {'class_labels': ['1', '2', '3', '4', '5', 'U'],
+     'cost_matrix': None,
+     'dataset_id': 2,
+     'estimation_parameters': {'number_folds': '10',
+                               'number_repeats': '1',
+                               'percentage': '',
+                               'stratified_sampling': 'true'},
+     'estimation_procedure': {'data_splits_url': 'https://www.openml.org/api_splits/get/2/Task_2_splits.arff',
+                              'parameters': {'number_folds': '10',
+                                             'number_repeats': '1',
+                                             'percentage': '',
+                                             'stratified_sampling': 'true'},
+                              'type': 'crossvalidation'},
+     'evaluation_measure': 'predictive_accuracy',
+     'split': None,
+     'target_name': 'class',
+     'task_id': 2,
+     'task_type': 'Supervised Classification',
+     'task_type_id': 1}
 
 And with a list of task IDs:
 
@@ -383,7 +396,7 @@ And with a list of task IDs:
 
     >>> ids = [12, 14, 16, 18, 20, 22]
     >>> tasks = openml.tasks.get_tasks(ids)
-    >>> print(tasks[0])
+    >>> pprint(tasks[0])                           # doctest: +SKIP
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Finding out tasks types
@@ -432,7 +445,7 @@ It can be done either through the API:
 
 .. code:: python
 
-    >>> openml.config.set_cache_directory('~/.openml/cache')
+    >>> openml.config.set_cache_directory(os.path.expanduser('~/.openml/cache'))
 
 or the config file:
 
@@ -471,70 +484,69 @@ predictions of that run. When a run is uploaded to the server, the server
 automatically calculates several metrics which can be used to compare the
 performance of different flows to each other.
 
-Creating a flow
+So far, the OpenML python connector works only with estimator objects following
+the `scikit-learn estimator API <http://scikit-learn.org/dev/developers/contributing.html#apis-of-scikit-learn-objects>`_.
+Those can be directly run on a task, and a flow will automatically be created or
+downloaded from the server if it already exists.
+
+Running a model
 ~~~~~~~~~~~~~~~
 
-So far, a flow in the OpenML python API is expected to be an estimator object
-following the `scikit-learn estimator API <http://scikit-learn.org/dev/developers/contributing.html#apis-of-scikit-learn-objects>`_.
-Thus, it needs to implement a :python:`fit()`, :python:`predict()`,
-:python:`set_params()` and :python:`get_params()` method.
+.. code:: python
 
-The only mandatory argument to construct a flow is an estimator object. It is of
-course possible and also useful to pass other arguments to the constructor, for
-example a description or the name of the creator:
+    >>> from sklearn.ensemble import RandomForestClassifier
+    >>> model = RandomForestClassifier()
+    >>> task = openml.tasks.get_task(12)
+    >>> run = openml.runs.run_model_on_task(task, model)
+    >>> pprint(vars(run), depth=2)                             # doctest: +SKIP
+
+So far the run is only available locally. By calling the publish function, the
+run is send to the OpenML server:
 
 .. code:: python
 
-    >>> from openml import OpenMLFlow
-    >>> model = ensemble.RandomForestClassifier()
-    >>> flow = OpenMLFlow(model, description='Out-of-the-box scikit-learn '
-    ...                                      'random forest classifier',
-    ...                   creator='Matthias Feurer')
-    >>> print(flow)
-    {'description': 'Out-of-the-box scikit-learn random forest classifier', 'creator': 'Matthias Feurer', 'external_version': 'sklearn_0.16.1', 'source': 'FIXME DEFINE PYTHON FLOW', 'tag': None, 'upoader': None, 'model': RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
-            max_depth=None, max_features='auto', max_leaf_nodes=None,
-            min_samples_leaf=1, min_samples_split=2,
-            min_weight_fraction_leaf=0.0, n_estimators=10, n_jobs=1,
-            oob_score=False, random_state=None, verbose=0,
-            warm_start=False), 'id': None, 'name': 'sklearn.ensemble.forest.RandomForestClassifier'}
-
-Prior to using a flow in experiments, it has to be pushed to the OpenML
-website. The python OpenML API uses methods named :python:`publish()` for this.
-It takes no arguments, but uses information from the estimator object to
-obtain all necessary information. The information is pushed to OpenML, and the
-flow gets assigned a flow ID.
-
-.. code:: python
-
-    >>> flow.publish()
+    >>> run.publish()                                          # doctest: +SKIP
     # What happens here? What should it return?
 
-Running a flow on a task
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-We can now use the created flow fo finally run a machine learning model on a
-task and upload the results to the OpenML website. For that we use the function
-:meth:`openml.runs.run_task`. It only accepts two arguments and does what the
-name suggests.
+We can now also inspect the flow object which was automatically created:
 
 .. code:: python
 
-    >>> task_id = 12
-    >>> run = openml.runs.run_task(task_id, model)
-    >>> print(run)
-
-As for flows, the run must be published so that it can be used by others on
-OpenML:
-
-.. code:: python
-
-    >>> run.publish()
-    # What happens here? What should it return?
+    >>> flow = openml.flows.get_flow(run.flow_id)
+    >>> pprint(vars(flow), depth=2)                             # doctest: +SKIP
+    {'binary_format': None,
+     'binary_md5': None,
+     'binary_url': None,
+     'class_name': 'sklearn.ensemble.forest.RandomForestClassifier',
+     'components': OrderedDict(),
+     'custom_name': None,
+     'dependencies': 'sklearn==0.18.2\nnumpy>=1.6.1\nscipy>=0.9',
+     'description': 'Automatically created scikit-learn flow.',
+     'external_version': 'openml==0.6.0,sklearn==0.18.2',
+     'flow_id': 7245,
+     'language': 'English',
+     'model': RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+                max_depth=None, max_features='auto', max_leaf_nodes=None,
+                min_impurity_split=1e-07, min_samples_leaf=1,
+                min_samples_split=2, min_weight_fraction_leaf=0.0,
+                n_estimators=10, n_jobs=1, oob_score=False, random_state=None,
+                verbose=0, warm_start=False),
+     'name': 'sklearn.ensemble.forest.RandomForestClassifier',
+     'parameters': OrderedDict([...]),
+     'parameters_meta_info': OrderedDict([...]),
+     'tags': ['openml-python',
+              'python',
+              'scikit-learn',
+              'sklearn',
+              'sklearn_0.18.2'],
+     'upload_date': '2017-10-06T14:54:38',
+     'uploader': '86',
+     'version': '28'}
 
 Retrieving results from OpenML
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+# TODO
 
 
 

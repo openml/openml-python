@@ -3,6 +3,7 @@ import openml.study
 from openml.testing import TestBase
 
 class TestStudyFunctions(TestBase):
+    _multiprocess_can_split_ = True
 
     def test_get_study(self):
         openml.config.server = self.production_server

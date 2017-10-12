@@ -8,6 +8,8 @@ from openml import OpenMLRun
 
 
 class TestRun(TestBase):
+    # Splitting not helpful, these test's don't rely on the server and take less
+    # than 1 seconds
 
     def test_parse_parameters_flow_not_on_server(self):
 

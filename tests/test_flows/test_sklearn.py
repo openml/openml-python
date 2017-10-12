@@ -50,6 +50,8 @@ class Model(sklearn.base.BaseEstimator):
 
 
 class TestSklearn(unittest.TestCase):
+    # Splitting not helpful, these test's don't rely on the server and take less
+    # than 1 seconds
     
     def setUp(self):
         iris = sklearn.datasets.load_iris()
