@@ -184,7 +184,7 @@ class OpenMLDataset(object):
             with io.open(filename, encoding='utf8') as fh:
                 return decode_arff(fh)
 
-    def get_data(self, target=None, target_dtype=int, include_row_id=False,
+    def get_data(self, target=None, target_dtype=None, include_row_id=False,
                  include_ignore_attributes=False,
                  return_categorical_indicator=False,
                  return_attribute_names=False):
@@ -242,6 +242,12 @@ class OpenMLDataset(object):
         else:
             if isinstance(target, six.string_types):
                 target = [target]
+            legal_target_types = (int, float)
+            if target_dtype not in legal_target_types:
+                raise ValueError(
+                    "%s is not a legal target type. Legal target types are %s" %
+                    (target_dtype, legal_target_types)
+                )
             targets = np.array([True if column in target else False
                                 for column in attribute_names])
 

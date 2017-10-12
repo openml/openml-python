@@ -47,13 +47,16 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual(len(categorical), 38)
 
     def test_get_data_with_target(self):
-        X, y = self.dataset.get_data(target="class")
+        X, y = self.dataset.get_data(target="class", target_dtype=int)
         self.assertIsInstance(X, np.ndarray)
         self.assertEqual(X.dtype, np.float32)
         self.assertIn(y.dtype, [np.int32, np.int64])
         self.assertEqual(X.shape, (898, 38))
         X, y, attribute_names = self.dataset.get_data(
-            target="class", return_attribute_names=True)
+            target="class",
+            target_dtype=int,
+            return_attribute_names=True
+        )
         self.assertEqual(len(attribute_names), 38)
         self.assertNotIn("class", attribute_names)
         self.assertEqual(y.shape, (898, ))
@@ -61,13 +64,20 @@ class OpenMLDatasetTest(TestBase):
     def test_get_data_rowid_and_ignore_and_target(self):
         self.dataset.ignore_attributes = ["condition"]
         self.dataset.row_id_attribute = ["hardness"]
-        X, y = self.dataset.get_data(target="class", include_row_id=False,
-                                     include_ignore_attributes=False)
+        X, y = self.dataset.get_data(
+            target="class",
+            target_dtype=int,
+            include_row_id=False,
+            include_ignore_attributes=False
+        )
         self.assertEqual(X.dtype, np.float32)
         self.assertIn(y.dtype, [np.int32, np.int64])
         self.assertEqual(X.shape, (898, 36))
         X, y, categorical = self.dataset.get_data(
-            target="class", return_categorical_indicator=True)
+            target="class",
+            target_dtype=int,
+            return_categorical_indicator=True,
+        )
         self.assertEqual(len(categorical), 36)
         self.assertListEqual(categorical, [True] * 3 + [False] + [True] * 2 + [
             False] + [True] * 23 + [False] * 3 + [True] * 3)
@@ -100,14 +110,17 @@ class OpenMLDatasetTestSparse(TestBase):
         self.sparse_dataset = openml.datasets.get_dataset(4136)
 
     def test_get_sparse_dataset_with_target(self):
-        X, y = self.sparse_dataset.get_data(target="class")
+        X, y = self.sparse_dataset.get_data(target="class", target_dtype=int)
         self.assertTrue(sparse.issparse(X))
         self.assertEqual(X.dtype, np.float32)
         self.assertIsInstance(y, np.ndarray)
         self.assertIn(y.dtype, [np.int32, np.int64])
         self.assertEqual(X.shape, (600, 20000))
         X, y, attribute_names = self.sparse_dataset.get_data(
-            target="class", return_attribute_names=True)
+            target="class",
+            target_dtype=int,
+            return_attribute_names=True,
+        )
         self.assertTrue(sparse.issparse(X))
         self.assertEqual(len(attribute_names), 20000)
         self.assertNotIn("class", attribute_names)
@@ -170,14 +183,20 @@ class OpenMLDatasetTestSparse(TestBase):
         self.sparse_dataset.ignore_attributes = ["V256"]
         self.sparse_dataset.row_id_attribute = ["V512"]
         X, y = self.sparse_dataset.get_data(
-            target="class", include_row_id=False,
-            include_ignore_attributes=False)
+            target="class",
+            target_dtype=int,
+            include_row_id=False,
+            include_ignore_attributes=False,
+        )
         self.assertTrue(sparse.issparse(X))
         self.assertEqual(X.dtype, np.float32)
         self.assertIn(y.dtype, [np.int32, np.int64])
         self.assertEqual(X.shape, (600, 19998))
         X, y, categorical = self.sparse_dataset.get_data(
-            target="class", return_categorical_indicator=True)
+            target="class",
+            target_dtype=int,
+            return_categorical_indicator=True,
+        )
         self.assertTrue(sparse.issparse(X))
         self.assertEqual(len(categorical), 19998)
         self.assertListEqual(categorical, [False] * 19998)
