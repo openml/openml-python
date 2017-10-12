@@ -44,8 +44,8 @@ def _list_cached_datasets():
                                       directory_name)
         dataset_directory_content = os.listdir(directory_name)
 
-        if "dataset.arff" in dataset_directory_content and \
-                        "description.xml" in dataset_directory_content:
+        if ("dataset.arff" in dataset_directory_content and
+                "description.xml" in dataset_directory_content):
             if dataset_id not in datasets:
                 datasets.append(dataset_id)
 
@@ -142,11 +142,11 @@ def list_datasets(offset=None, size=None, tag=None):
     Parameters
     ----------
     offset : int, optional
-        the number of datasets to skip, starting from the first
+        The number of datasets to skip, starting from the first.
     size : int, optional
-        the maximum datasets of tasks to show
+        The maximum number of datasets to show.
     tag : str, optional
-        the tag to include
+        Only include datasets matching this tag.
 
     Returns
     -------
@@ -168,7 +168,7 @@ def list_datasets(offset=None, size=None, tag=None):
         api_call += "/offset/%d" % int(offset)
 
     if size is not None:
-       api_call += "/limit/%d" % int(size)
+        api_call += "/limit/%d" % int(size)
 
     if tag is not None:
         api_call += "/tag/%s" % tag
@@ -185,7 +185,7 @@ def _list_datasets(api_call):
     assert type(datasets_dict['oml:data']['oml:dataset']) == list, \
         type(datasets_dict['oml:data'])
     assert datasets_dict['oml:data']['@xmlns:oml'] == \
-           'http://openml.org/openml', datasets_dict['oml:data']['@xmlns:oml']
+        'http://openml.org/openml', datasets_dict['oml:data']['@xmlns:oml']
 
     datasets = dict()
     for dataset_ in datasets_dict['oml:data']['oml:dataset']:
@@ -289,7 +289,6 @@ def get_dataset(dataset_id):
             description = _get_dataset_description(did_cache_dir, dataset_id)
             arff_file = _get_dataset_arff(did_cache_dir, description)
             features = _get_dataset_features(did_cache_dir, dataset_id)
-            # TODO not used yet, figure out what to do with this...
             qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
         except Exception as e:
             _remove_dataset_cache_dir(did_cache_dir)
@@ -480,7 +479,8 @@ def _create_dataset_cache_directory(dataset_id):
     str
         Path of the created dataset cache directory.
     """
-    dataset_cache_dir = os.path.join(config.get_cache_directory(), "datasets", str(dataset_id))
+    dataset_cache_dir = os.path.join(config.get_cache_directory(), "datasets",
+                                     str(dataset_id))
     try:
         os.makedirs(dataset_cache_dir)
     except (OSError, IOError):
