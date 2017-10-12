@@ -126,11 +126,11 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : string</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str</p>
 <blockquote>
 <div><p>Name of the dataset</p>
 </div></blockquote>
-<p><strong>description</strong> : string</p>
+<p><strong>description</strong> : str</p>
 <blockquote>
 <div><p>Description of the dataset</p>
 </div></blockquote>
@@ -197,13 +197,41 @@ return values as if these indices are not present)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>return_code</strong> : int</p>
-<blockquote>
-<div><p>Return code from server</p>
-</div></blockquote>
-<p><strong>return_value</strong> : string</p>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLDataset.push_tag">
+<code class="descname">push_tag</code><span class="sig-paren">(</span><em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.push_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotates this data set with a tag on the server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tag</strong> : str</p>
 <blockquote class="last">
-<div><p>xml return from server</p>
+<div><p>Tag to attach to the dataset.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLDataset.remove_tag">
+<code class="descname">remove_tag</code><span class="sig-paren">(</span><em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.remove_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a tag from this dataset on the server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tag</strong> : str</p>
+<blockquote class="last">
+<div><p>Tag to attach to the dataset.</p>
 </div></blockquote>
 </td>
 </tr>
