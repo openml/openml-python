@@ -244,6 +244,64 @@ class TestSklearn(unittest.TestCase):
         self.assertEqual(new_model_params, fu_params)
         new_model.fit(self.X, self.y)
 
+    def test_serialize_pipeline_clustering(self):
+        scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
+        km = sklearn.cluster.KMeans()
+        model = sklearn.pipeline.Pipeline(steps=(
+            ('scaler', scaler), ('clusterer', km)))
+
+        fixture_name = 'sklearn.pipeline.Pipeline(' \
+                       'scaler=sklearn.preprocessing.data.StandardScaler,' \
+                       'clusterer=sklearn.cluster.k_means_.KMeans)'
+        fixture_description = 'Automatically created scikit-learn flow.'
+
+        serialization = sklearn_to_flow(model)
+
+        self.assertEqual(serialization.name, fixture_name)
+        self.assertEqual(serialization.description, fixture_description)
+
+        # Comparing the pipeline
+        # The parameters only have the name of base objects(not the whole flow)
+        # as value
+        self.assertEqual(len(serialization.parameters), 1)
+        # Hard to compare two representations of a dict due to possibly
+        # different sorting. Making a json makes it easier
+        self.assertEqual(json.loads(serialization.parameters['steps']),
+                         [{'oml-python:serialized_object':
+                               'component_reference', 'value': {'key': 'scaler', 'step_name': 'scaler'}},
+                          {'oml-python:serialized_object':
+                               'component_reference', 'value': {'key': 'clusterer', 'step_name': 'clusterer'}}])
+
+        # Checking the sub-component
+        self.assertEqual(len(serialization.components), 2)
+        self.assertIsInstance(serialization.components['scaler'],
+                              OpenMLFlow)
+        self.assertIsInstance(serialization.components['clusterer'],
+                              OpenMLFlow)
+
+        # del serialization.model
+        new_model = flow_to_sklearn(serialization)
+
+        self.assertEqual(type(new_model), type(model))
+        self.assertIsNot(new_model, model)
+
+        self.assertEqual([step[0] for step in new_model.steps],
+                         [step[0] for step in model.steps])
+        self.assertIsNot(new_model.steps[0][1], model.steps[0][1])
+        self.assertIsNot(new_model.steps[1][1], model.steps[1][1])
+
+        new_model_params = new_model.get_params()
+        del new_model_params['scaler']
+        del new_model_params['clusterer']
+        del new_model_params['steps']
+        fu_params = model.get_params()
+        del fu_params['scaler']
+        del fu_params['clusterer']
+        del fu_params['steps']
+
+        self.assertEqual(new_model_params, fu_params)
+        new_model.fit(self.X, self.y)
+
     def test_serialize_feature_union(self):
         ohe = sklearn.preprocessing.OneHotEncoder(sparse=False)
         scaler = sklearn.preprocessing.StandardScaler()
