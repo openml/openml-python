@@ -94,6 +94,16 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
     task_type_id : int, optional
         ID of the task type as detailed
         `here <https://www.openml.org/search?type=task_type>`_.
+
+        - Supervised classification: 1
+        - Supervised regression: 2
+        - Learning curve: 3
+        - Supervised data stream classification: 4
+        - Clustering: 5
+        - Machine Learning Challenge: 6
+        - Survival Analysis: 7
+        - Subgroup Discovery: 8
+
     offset : int, optional
         the number of tasks to skip, starting from the first
     size : int, optional
