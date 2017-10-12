@@ -90,6 +90,25 @@ class OpenMLDatasetTest(TestBase):
         # TODO test multiple ignore attributes!
 
 
+class OpenMLDatasetTestOnTestServer(TestBase):
+    def setUp(self):
+        super(OpenMLDatasetTestOnTestServer, self).setUp()
+        # longley, really small dataset
+        self.dataset = openml.datasets.get_dataset(125)
+
+    def test_tagging(self):
+        tag = "testing_tag{}".format(self.id)
+        ds_list = openml.datasets.list_datasets(tag=tag)
+        self.assertEqual(len(ds_list), 0)
+        self.dataset.push_tag(tag)
+        ds_list = openml.datasets.list_datasets(tag=tag)
+        self.assertEqual(len(ds_list), 1)
+        self.assertEqual(ds_list[0]['did'], 125)
+        self.dataset.remove_tag(tag)
+        ds_list = openml.datasets.list_datasets(tag=tag)
+        self.assertEqual(len(ds_list), 0)
+
+
 class OpenMLDatasetTestSparse(TestBase):
     _multiprocess_can_split_ = True
 

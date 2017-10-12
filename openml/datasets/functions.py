@@ -8,7 +8,7 @@ from oslo_concurrency import lockutils
 import xmltodict
 
 from .dataset import OpenMLDataset
-from ..exceptions import OpenMLCacheException
+from ..exceptions import OpenMLCacheException, OpenMLServerNoResult
 from .. import config
 from .._api_calls import _perform_api_call, _read_url
 
@@ -178,7 +178,10 @@ def list_datasets(offset=None, size=None, tag=None):
 
 def _list_datasets(api_call):
     # TODO add proper error handling here!
-    xml_string = _perform_api_call(api_call)
+    try:
+        xml_string = _perform_api_call(api_call)
+    except OpenMLServerNoResult:
+        return []
     datasets_dict = xmltodict.parse(xml_string, force_list=('oml:dataset',))
 
     # Minimalistic check if the XML is useful

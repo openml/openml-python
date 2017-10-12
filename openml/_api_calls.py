@@ -7,7 +7,8 @@ import arff
 import xmltodict
 
 from . import config
-from .exceptions import OpenMLServerError, OpenMLServerException
+from .exceptions import (OpenMLServerError, OpenMLServerException,
+                         OpenMLServerNoResult)
 
 
 def _perform_api_call(call, data=None, file_dictionary=None,
@@ -138,4 +139,6 @@ def _parse_server_exception(response):
     additional = None
     if 'oml:additional_information' in server_exception['oml:error']:
         additional = server_exception['oml:error']['oml:additional_information']
+    if code in [370, 372]:
+        return OpenMLServerNoResult(code, message, additional)
     return OpenMLServerException(code, message, additional)
