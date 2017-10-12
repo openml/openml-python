@@ -74,7 +74,7 @@ class TestOpenMLDataset(TestBase):
         self.assertIsInstance(dataset, OpenMLDataset)
         self.assertTrue(len(dataset.features) > 0)
         self.assertTrue(len(dataset.features) == len(features['oml:feature']))
-        self.assertTrue(len(dataset.qualities) == len(qualities['oml:quality']))
+        self.assertTrue(len(dataset.qualities) == len(qualities))
 
     def test_get_cached_dataset_description(self):
         openml.config.set_cache_directory(self.static_cache_dir)
@@ -210,7 +210,7 @@ class TestOpenMLDataset(TestBase):
     def test__get_dataset_qualities(self):
         # Only a smoke check
         qualities = _get_dataset_qualities(self.workdir, 2)
-        self.assertIsInstance(qualities, dict)
+        self.assertIsInstance(qualities, list)
 
     def test_deletion_of_cache_dir(self):
         # Simple removal

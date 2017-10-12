@@ -182,3 +182,18 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertEqual(len(categorical), 19998)
         self.assertListEqual(categorical, [False] * 19998)
         self.assertEqual(y.shape, (600, ))
+
+
+class OpenMLDatasetQualityTest(TestBase):
+    def test__check_qualities(self):
+        qualities = [{'oml:name': 'a', 'oml:value': '0.5'}]
+        qualities = openml.datasets.dataset._check_qualities(qualities)
+        self.assertEqual(qualities['a'], 0.5)
+
+        qualities = [{'oml:name': 'a', 'oml:value': 'null'}]
+        qualities = openml.datasets.dataset._check_qualities(qualities)
+        self.assertNotEqual(qualities['a'], qualities['a'])
+
+        qualities = [{'oml:name': 'a', 'oml:value': None}]
+        qualities = openml.datasets.dataset._check_qualities(qualities)
+        self.assertNotEqual(qualities['a'], qualities['a'])

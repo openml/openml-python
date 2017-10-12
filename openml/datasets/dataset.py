@@ -88,12 +88,7 @@ class OpenMLDataset(object):
                     raise ValueError('Data features not provided in right order')
                 self.features[feature.index] = feature
 
-        if qualities is not None:
-            self.qualities = {}
-            for idx, xmlquality in enumerate(qualities['oml:quality']):
-                name = xmlquality['oml:name']
-                value = xmlquality['oml:value']
-                self.qualities[name] = value
+        self.qualities = _check_qualities(qualities)
 
         if data_file is not None:
             if self._data_features_supported():
@@ -426,3 +421,21 @@ class OpenMLDataset(object):
                     return False
             return True
         return True
+
+
+
+def _check_qualities(qualities):
+    if qualities is not None:
+        qualities_ = {}
+        for xmlquality in qualities:
+            name = xmlquality['oml:name']
+            if xmlquality['oml:value'] is None:
+                value = float('NaN')
+            elif xmlquality['oml:value'] == 'null':
+                value = float('NaN')
+            else:
+                value = float(xmlquality['oml:value'])
+            qualities_[name] = value
+        return qualities_
+    else:
+        return None
