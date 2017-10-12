@@ -44,17 +44,9 @@ class OpenMLTask(object):
 
         """
         dataset = self.get_dataset()
-        # Replace with retrieve from cache
-        if self.task_type_id == 1:  # Supervised classification
-            target_dtype = int
-        elif self.task_type_id == 2:  # Supervised regression
-            target_dtype = float
-        elif self.task_type_id == 3:  # Learning curves task for classification
-            target_dtype = int
-        else:
+        if self.task_type_id not in (1, 2, 3):
             raise NotImplementedError(self.task_type)
-        X_and_y = dataset.get_data(target=self.target_name,
-                                   target_dtype=target_dtype)
+        X_and_y = dataset.get_data(target=self.target_name)
         return X_and_y
 
     def get_train_test_split_indices(self, fold=0, repeat=0, sample=0):
