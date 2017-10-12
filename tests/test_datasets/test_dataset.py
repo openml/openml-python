@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import sparse
 import six
+from time import time
 
 from openml.testing import TestBase
 import openml
@@ -97,13 +98,13 @@ class OpenMLDatasetTestOnTestServer(TestBase):
         self.dataset = openml.datasets.get_dataset(125)
 
     def test_tagging(self):
-        tag = "testing_tag{}".format(self.id)
+        tag = "testing_tag_{}_{}".format(self.id(), time())
         ds_list = openml.datasets.list_datasets(tag=tag)
         self.assertEqual(len(ds_list), 0)
         self.dataset.push_tag(tag)
         ds_list = openml.datasets.list_datasets(tag=tag)
         self.assertEqual(len(ds_list), 1)
-        self.assertEqual(ds_list[0]['did'], 125)
+        self.assertIn(125, ds_list)
         self.dataset.remove_tag(tag)
         ds_list = openml.datasets.list_datasets(tag=tag)
         self.assertEqual(len(ds_list), 0)
