@@ -1,21 +1,15 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>openml.OpenMLTask &#8212; OpenML 0.2.1 documentation</title>
-    
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootswatch-3.3.6/flatly/bootstrap.min.css" type="text/css" />
+    <title>openml.OpenMLTask &#8212; OpenML 0.6.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
-    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2.1',
+        VERSION:     '0.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -25,10 +19,10 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -38,7 +32,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body role="document">
+  <body>
   
   <a href="https://github.com/openml/openml-python"
      class="visible-desktop hidden-xs"><img
@@ -66,7 +60,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.2.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.6.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -125,23 +119,11 @@
 <h1><code class="xref py py-mod docutils literal"><span class="pre">openml</span></code>.OpenMLTask<a class="headerlink" href="#openml-openmltask" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="openml.OpenMLTask">
-<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLTask</code><span class="sig-paren">(</span><em>task_id</em>, <em>task_type</em>, <em>data_set_id</em>, <em>target_name</em>, <em>estimation_procedure_type</em>, <em>data_splits_url</em>, <em>estimation_parameters</em>, <em>evaluation_measure</em>, <em>cost_matrix</em>, <em>class_labels=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLTask</code><span class="sig-paren">(</span><em>task_id</em>, <em>task_type_id</em>, <em>task_type</em>, <em>data_set_id</em>, <em>target_name</em>, <em>estimation_procedure_type</em>, <em>data_splits_url</em>, <em>estimation_parameters</em>, <em>evaluation_measure</em>, <em>cost_matrix</em>, <em>class_labels=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="openml.OpenMLTask.download_split">
 <code class="descname">download_split</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask.download_split" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download the OpenML split for a given task.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>task_id</strong> : Task</p>
-<blockquote class="last">
-<div><p>An entity of <a class="reference internal" href="#openml.OpenMLTask" title="openml.OpenMLTask"><code class="xref py py-class docutils literal"><span class="pre">openml.OpenMLTask</span></code></a>.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="method">
@@ -166,8 +148,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2014-2016, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.<br/>
+        &copy; Copyright 2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.4.<br/>
     </p>
   </div>
 </footer>

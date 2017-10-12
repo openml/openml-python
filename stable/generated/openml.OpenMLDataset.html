@@ -1,21 +1,15 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>openml.OpenMLDataset &#8212; OpenML 0.2.1 documentation</title>
-    
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootswatch-3.3.6/flatly/bootstrap.min.css" type="text/css" />
+    <title>openml.OpenMLDataset &#8212; OpenML 0.6.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
-    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2.1',
+        VERSION:     '0.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -25,10 +19,10 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -38,7 +32,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body role="document">
+  <body>
   
   <a href="https://github.com/openml/openml-python"
      class="visible-desktop hidden-xs"><img
@@ -66,7 +60,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.2.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.6.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -125,7 +119,7 @@
 <h1><code class="xref py py-mod docutils literal"><span class="pre">openml</span></code>.OpenMLDataset<a class="headerlink" href="#openml-openmldataset" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="openml.OpenMLDataset">
-<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLDataset</code><span class="sig-paren">(</span><em>dataset_id=None</em>, <em>name=None</em>, <em>version=None</em>, <em>description=None</em>, <em>format=None</em>, <em>creator=None</em>, <em>contributor=None</em>, <em>collection_date=None</em>, <em>upload_date=None</em>, <em>language=None</em>, <em>licence=None</em>, <em>url=None</em>, <em>default_target_attribute=None</em>, <em>row_id_attribute=None</em>, <em>ignore_attribute=None</em>, <em>version_label=None</em>, <em>citation=None</em>, <em>tag=None</em>, <em>visibility=None</em>, <em>original_data_url=None</em>, <em>paper_url=None</em>, <em>update_comment=None</em>, <em>md5_checksum=None</em>, <em>data_file=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLDataset</code><span class="sig-paren">(</span><em>dataset_id=None</em>, <em>name=None</em>, <em>version=None</em>, <em>description=None</em>, <em>format=None</em>, <em>creator=None</em>, <em>contributor=None</em>, <em>collection_date=None</em>, <em>upload_date=None</em>, <em>language=None</em>, <em>licence=None</em>, <em>url=None</em>, <em>default_target_attribute=None</em>, <em>row_id_attribute=None</em>, <em>ignore_attribute=None</em>, <em>version_label=None</em>, <em>citation=None</em>, <em>tag=None</em>, <em>visibility=None</em>, <em>original_data_url=None</em>, <em>paper_url=None</em>, <em>update_comment=None</em>, <em>md5_checksum=None</em>, <em>data_file=None</em>, <em>features=None</em>, <em>qualities=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dataset object.</p>
 <p>Allows fetching and uploading datasets to OpenML.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -149,6 +143,49 @@
 <dt id="openml.OpenMLDataset.get_data">
 <code class="descname">get_data</code><span class="sig-paren">(</span><em>target=None</em>, <em>target_dtype=&lt;type 'int'&gt;</em>, <em>include_row_id=False</em>, <em>include_ignore_attributes=False</em>, <em>return_categorical_indicator=False</em>, <em>return_attribute_names=False</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns dataset content as numpy arrays / sparse matrices.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLDataset.get_features_by_type">
+<code class="descname">get_features_by_type</code><span class="sig-paren">(</span><em>data_type</em>, <em>exclude=None</em>, <em>exclude_ignore_attributes=True</em>, <em>exclude_row_id_attribute=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_features_by_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns indices of features of a given type, e.g., all nominal features.
+Can use additional parameters to exclude various features by index or ontology.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data_type</strong> : str</p>
+<blockquote>
+<div><p>The data type to return (e.g., nominal, numeric, date, string)</p>
+</div></blockquote>
+<p><strong>exclude</strong> : list(int)</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Indices to exclude (and adapt the return values as if these indices</dt>
+<dd><p class="first last">are not present)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>exclude_ignore_attributes</strong> : bool</p>
+<blockquote>
+<div><p>Whether to exclude the defined ignore attributes (and adapt the
+return values as if these indices are not present)</p>
+</div></blockquote>
+<p><strong>exclude_row_id_attribute</strong> : bool</p>
+<blockquote>
+<div><p>Whether to exclude the defined row id attributes (and adapt the
+return values as if these indices are not present)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>result</strong> : list</p>
+<blockquote class="last">
+<div><p>a list of indices that have the specified data type</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -215,8 +252,8 @@ classname when uploading the results of a run.</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2016, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.<br/>
+        &copy; Copyright 2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.4.<br/>
     </p>
   </div>
 </footer>
