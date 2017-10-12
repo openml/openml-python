@@ -3,7 +3,6 @@ import io
 import logging
 import os
 import six
-import sys
 
 import arff
 
@@ -26,9 +25,9 @@ class OpenMLDataset(object):
 
     Parameters
     ----------
-    name : string
+    name : str
         Name of the dataset
-    description : string
+    description : str
         Description of the dataset
     FIXME : which of these do we actually nee?
     """
@@ -82,7 +81,7 @@ class OpenMLDataset(object):
                 feature = OpenMLDataFeature(int(xmlfeature['oml:index']),
                                             xmlfeature['oml:name'],
                                             xmlfeature['oml:data_type'],
-                                            None, #todo add nominal values (currently not in database)
+                                            None,  # todo add nominal values (currently not in database)
                                             int(xmlfeature.get('oml:number_of_missing_values', 0)))
                 if idx != feature.index:
                     raise ValueError('Data features not provided in right order')
@@ -123,6 +122,28 @@ class OpenMLDataset(object):
                         pickle.dump((X, categorical, attribute_names), fh, -1)
                     logger.debug("Saved dataset %d: %s to file %s" %
                                  (self.dataset_id, self.name, self.data_pickle_file))
+
+    def push_tag(self, tag):
+        """Annotates this data set with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the dataset.
+        """
+        data = {'data_id': self.dataset_id, 'tag': tag}
+        _perform_api_call("/data/tag", data=data)
+
+    def remove_tag(self, tag):
+        """Removes a tag from this dataset on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the dataset.
+        """
+        data = {'data_id': self.dataset_id, 'tag': tag}
+        _perform_api_call("/data/untag", data=data)
 
     def __eq__(self, other):
         if type(other) != OpenMLDataset:
@@ -310,7 +331,6 @@ class OpenMLDataset(object):
         else:
             return None
 
-
     def get_features_by_type(self, data_type, exclude=None,
                              exclude_ignore_attributes=True,
                              exclude_row_id_attribute=True):
@@ -372,11 +392,7 @@ class OpenMLDataset(object):
 
         Returns
         -------
-        return_code : int
-            Return code from server
-
-        return_value : string
-            xml return from server
+        self
         """
 
         file_elements = {'description': self._to_xml()}
@@ -396,7 +412,7 @@ class OpenMLDataset(object):
 
         Returns
         -------
-        xml_dataset : string
+        xml_dataset : str
             XML description of the data.
         """
         xml_dataset = ('<oml:data_set_description '
