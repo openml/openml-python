@@ -25,9 +25,9 @@ class OpenMLDataset(object):
 
     Parameters
     ----------
-    name : string
+    name : str
         Name of the dataset
-    description : string
+    description : str
         Description of the dataset
     FIXME : which of these do we actually nee?
     """
@@ -133,7 +133,7 @@ class OpenMLDataset(object):
 
         Parameters
         ----------
-        tag : string
+        tag : str
             Tag to attach to the dataset.
         """
         data = {'data_id': self.dataset_id, 'tag': tag}
@@ -144,7 +144,7 @@ class OpenMLDataset(object):
 
         Parameters
         ----------
-        tag : string
+        tag : str
             Tag to attach to the dataset.
         """
         data = {'data_id': self.dataset_id, 'tag': tag}
@@ -417,7 +417,7 @@ class OpenMLDataset(object):
 
         Returns
         -------
-        xml_dataset : string
+        xml_dataset : str
             XML description of the data.
         """
         xml_dataset = ('<oml:data_set_description '
