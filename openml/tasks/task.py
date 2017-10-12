@@ -4,7 +4,7 @@ import os
 from .. import config
 from .. import datasets
 from .split import OpenMLSplit
-from .._api_calls import _read_url
+from .._api_calls import _read_url, _perform_api_call
 
 
 class OpenMLTask(object):
@@ -95,6 +95,28 @@ class OpenMLTask(object):
             self.split = self.download_split()
 
         return self.split.repeats, self.split.folds, self.split.samples
+
+    def push_tag(self, tag):
+        """Annotates this flow with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the flow.
+        """
+        data = {'flow_id': self.flow_id, 'tag': tag}
+        _perform_api_call("/flow/tag", data=data)
+
+    def remove_tag(self, tag):
+        """Removes a tag from this flow on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the flow.
+        """
+        data = {'flow_id': self.flow_id, 'tag': tag}
+        _perform_api_call("/flow/untag", data=data)
 
 
 def _create_task_cache_dir(task_id):
