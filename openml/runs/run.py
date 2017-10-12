@@ -110,23 +110,23 @@ class OpenMLRun(object):
         return arff_dict
 
     def get_metric_fn(self, sklearn_fn, kwargs={}):
-        '''Calculates metric scores based on predicted values. Assumes the
+        """Calculates metric scores based on predicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
         it assumes that the 'correct' attribute is specified in the arff
         (which is an optional field, but always the case for openml-python
         runs)
 
         Parameters
-        -------
+        ----------
         sklearn_fn : function
             a function pointer to a sklearn function that
-            accepts y_true, y_pred and *kwargs
+            accepts ``y_true``, ``y_pred`` and ``**kwargs``
 
         Returns
         -------
         scores : list
             a list of floats, of length num_folds * num_repeats
-        '''
+        """
         if self.data_content is not None and self.task_id is not None:
             predictions_arff = self._generate_arff_dict()
         elif 'predictions' in self.output_files:

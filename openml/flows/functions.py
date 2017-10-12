@@ -75,8 +75,8 @@ def flow_exists(name, external_version):
 
     A flow is uniquely identified by name + external_version.
 
-    Parameter
-    ---------
+    Parameters
+    ----------
     name : string
         Name of the flow
     version : string

@@ -31,7 +31,7 @@ from .trace import OpenMLRunTrace, OpenMLTraceIteration
 
 def run_model_on_task(task, model, avoid_duplicate_runs=True, flow_tags=None,
                       seed=None):
-    """See ``run_flow_on_task for a documentation."""
+    """See ``run_flow_on_task for a documentation``."""
 
     flow = sklearn_to_flow(model)
 

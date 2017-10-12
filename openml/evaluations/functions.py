@@ -8,33 +8,33 @@ def list_evaluations(function, offset=None, size=None, id=None, task=None,
                      setup=None, flow=None, uploader=None, tag=None):
     """List all run-evaluation pairs matching all of the given filters.
 
-        Perform API call `/evaluation/function{function}/{filters} 
-        
-        Parameters
-        ----------
-        function : str 
-            the evaluation function. e.g., predictive_accuracy
-        offset : int, optional
-            the number of runs to skip, starting from the first
-        size : int, optional
-            the maximum number of runs to show
+    Perform API call ``/evaluation/function{function}/{filters}``
+    
+    Parameters
+    ----------
+    function : str 
+        the evaluation function. e.g., predictive_accuracy
+    offset : int, optional
+        the number of runs to skip, starting from the first
+    size : int, optional
+        the maximum number of runs to show
 
-        id : list, optional
+    id : list, optional
 
-        task : list, optional
+    task : list, optional
 
-        setup: list, optional
+    setup: list, optional
 
-        flow : list, optional
+    flow : list, optional
 
-        uploader : list, optional
+    uploader : list, optional
 
-        tag : str, optional
+    tag : str, optional
 
-        Returns
-        -------
-        dict
-        """
+    Returns
+    -------
+    dict
+    """
 
     api_call = "evaluation/list/function/%s" %function
     if offset is not None:
