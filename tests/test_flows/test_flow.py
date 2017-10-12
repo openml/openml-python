@@ -3,7 +3,7 @@ import copy
 import hashlib
 import re
 import sys
-import time
+from time import time
 
 if sys.version_info[0] >= 3:
     from unittest import mock
@@ -66,6 +66,19 @@ class TestFlow(TestBase):
         self.assertEqual(len(subflow_3.parameters), 11)
         self.assertEqual(subflow_3.parameters['L'], '-1')
         self.assertEqual(len(subflow_3.components), 0)
+
+    def test_tagging(self):
+        flow = openml.flows.get_flow(4024)
+        tag = "testing_tag_{}_{}".format(self.id(), time())
+        flow_list = openml.flows.list_flows(tag=tag)
+        self.assertEqual(len(flow_list), 0)
+        flow.push_tag(tag)
+        flow_list = openml.flows.list_flows(tag=tag)
+        self.assertEqual(len(flow_list), 1)
+        self.assertIn(4024, flow_list)
+        flow.remove_tag(tag)
+        flow_list = openml.flows.list_flows(tag=tag)
+        self.assertEqual(len(flow_list), 0)
 
     def test_from_xml_to_xml(self):
         # Get the raw xml thing
