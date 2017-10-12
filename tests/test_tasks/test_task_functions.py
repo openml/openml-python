@@ -1,6 +1,12 @@
 import os
+import sys
 
 import six
+
+if sys.version_info[0] >= 3:
+    from unittest import mock
+else:
+    import mock
 
 from openml.testing import TestBase
 from openml import OpenMLSplit, OpenMLTask
@@ -103,6 +109,25 @@ class TestTask(TestBase):
         self.assertTrue(os.path.exists(
             os.path.join(os.getcwd(), "datasets", "1", "dataset.arff")))
 
+    @mock.patch('openml.tasks.functions.get_dataset')
+    def test_removal_upon_download_failure(self, get_dataset):
+        class WeirdException(Exception):
+            pass
+        def assert_and_raise(*args, **kwargs):
+            # Make sure that the file was created!
+            assert os.path.join(os.getcwd(), "tasks", "1", "tasks.xml")
+            raise WeirdException()
+        get_dataset.side_effect = assert_and_raise
+        try:
+            openml.tasks.get_task(1)
+        except WeirdException:
+            pass
+        # Now the file should no longer exist
+        self.assertFalse(os.path.exists(
+            os.path.join(os.getcwd(), "tasks", "1", "tasks.xml")
+        ))
+
+
     def test_get_task_with_cache(self):
         openml.config.set_cache_directory(self.static_cache_dir)
         task = openml.tasks.get_task(1)
@@ -114,3 +139,11 @@ class TestTask(TestBase):
         self.assertEqual(type(split), OpenMLSplit)
         self.assertTrue(os.path.exists(
             os.path.join(os.getcwd(), "tasks", "1", "datasplits.arff")))
+
+    def test_deletion_of_cache_dir(self):
+        # Simple removal
+        tid_cache_dir = openml.tasks.functions.\
+            _create_task_cache_directory(1)
+        self.assertTrue(os.path.exists(tid_cache_dir))
+        openml.tasks.functions._remove_task_cache_dir(tid_cache_dir)
+        self.assertFalse(os.path.exists(tid_cache_dir))

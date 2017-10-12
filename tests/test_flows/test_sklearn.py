@@ -24,6 +24,7 @@ import sklearn.model_selection
 import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
+import sklearn.cluster
 
 import openml
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
@@ -99,6 +100,47 @@ class TestSklearn(unittest.TestCase):
         new_model.fit(self.X, self.y)
 
         self.assertEqual(check_dependencies_mock.call_count, 1)
+
+
+    @mock.patch('openml.flows.sklearn_converter._check_dependencies')
+    def test_serialize_model_clustering(self, check_dependencies_mock):
+        model = sklearn.cluster.KMeans()
+
+        fixture_name = 'sklearn.cluster.k_means_.KMeans'
+        fixture_description = 'Automatically created scikit-learn flow.'
+        version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
+                          % sklearn.__version__
+        fixture_parameters = \
+            OrderedDict((('algorithm', '"auto"'),
+                         ('copy_x', 'true'),
+                         ('init', '"k-means++"'),
+                         ('max_iter', '300'),
+                         ('n_clusters', '8'),
+                         ('n_init', '10'),
+                         ('n_jobs', '1'),
+                         ('precompute_distances', '"auto"'),
+                         ('random_state', 'null'),
+                         ('tol', '0.0001'),
+                         ('verbose', '0')))
+
+        serialization = sklearn_to_flow(model)
+
+        self.assertEqual(serialization.name, fixture_name)
+        self.assertEqual(serialization.class_name, fixture_name)
+        self.assertEqual(serialization.description, fixture_description)
+        self.assertEqual(serialization.parameters, fixture_parameters)
+        self.assertEqual(serialization.dependencies, version_fixture)
+
+        new_model = flow_to_sklearn(serialization)
+
+        self.assertEqual(type(new_model), type(model))
+        self.assertIsNot(new_model, model)
+
+        self.assertEqual(new_model.get_params(), model.get_params())
+        new_model.fit(self.X)
+
+        self.assertEqual(check_dependencies_mock.call_count, 1)
+
 
     def test_serialize_model_with_subcomponent(self):
         model = sklearn.ensemble.AdaBoostClassifier(
@@ -197,6 +239,64 @@ class TestSklearn(unittest.TestCase):
         fu_params = model.get_params()
         del fu_params['scaler']
         del fu_params['dummy']
+        del fu_params['steps']
+
+        self.assertEqual(new_model_params, fu_params)
+        new_model.fit(self.X, self.y)
+
+    def test_serialize_pipeline_clustering(self):
+        scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
+        km = sklearn.cluster.KMeans()
+        model = sklearn.pipeline.Pipeline(steps=(
+            ('scaler', scaler), ('clusterer', km)))
+
+        fixture_name = 'sklearn.pipeline.Pipeline(' \
+                       'scaler=sklearn.preprocessing.data.StandardScaler,' \
+                       'clusterer=sklearn.cluster.k_means_.KMeans)'
+        fixture_description = 'Automatically created scikit-learn flow.'
+
+        serialization = sklearn_to_flow(model)
+
+        self.assertEqual(serialization.name, fixture_name)
+        self.assertEqual(serialization.description, fixture_description)
+
+        # Comparing the pipeline
+        # The parameters only have the name of base objects(not the whole flow)
+        # as value
+        self.assertEqual(len(serialization.parameters), 1)
+        # Hard to compare two representations of a dict due to possibly
+        # different sorting. Making a json makes it easier
+        self.assertEqual(json.loads(serialization.parameters['steps']),
+                         [{'oml-python:serialized_object':
+                               'component_reference', 'value': {'key': 'scaler', 'step_name': 'scaler'}},
+                          {'oml-python:serialized_object':
+                               'component_reference', 'value': {'key': 'clusterer', 'step_name': 'clusterer'}}])
+
+        # Checking the sub-component
+        self.assertEqual(len(serialization.components), 2)
+        self.assertIsInstance(serialization.components['scaler'],
+                              OpenMLFlow)
+        self.assertIsInstance(serialization.components['clusterer'],
+                              OpenMLFlow)
+
+        # del serialization.model
+        new_model = flow_to_sklearn(serialization)
+
+        self.assertEqual(type(new_model), type(model))
+        self.assertIsNot(new_model, model)
+
+        self.assertEqual([step[0] for step in new_model.steps],
+                         [step[0] for step in model.steps])
+        self.assertIsNot(new_model.steps[0][1], model.steps[0][1])
+        self.assertIsNot(new_model.steps[1][1], model.steps[1][1])
+
+        new_model_params = new_model.get_params()
+        del new_model_params['scaler']
+        del new_model_params['clusterer']
+        del new_model_params['steps']
+        fu_params = model.get_params()
+        del fu_params['scaler']
+        del fu_params['clusterer']
         del fu_params['steps']
 
         self.assertEqual(new_model_params, fu_params)

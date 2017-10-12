@@ -348,3 +348,29 @@ class TestFlow(TestBase):
         flow_dict = xmltodict.parse(flow_xml)
         tags = openml.utils.extract_xml_tags('oml:tag', flow_dict['oml:flow'])
         self.assertEqual(tags, ['OpenmlWeka', 'weka'])
+
+    def test_download_non_scikit_learn_flows(self):
+        openml.config.server = self.production_server
+
+        flow = openml.flows.get_flow(6742)
+        self.assertIsInstance(flow, openml.OpenMLFlow)
+        self.assertEqual(flow.flow_id, 6742)
+        self.assertEqual(len(flow.parameters), 19)
+        self.assertEqual(len(flow.components), 1)
+        self.assertIsNone(flow.model)
+
+        subflow_1 = list(flow.components.values())[0]
+        self.assertIsInstance(subflow_1, openml.OpenMLFlow)
+        self.assertEqual(subflow_1.flow_id, 6743)
+        self.assertEqual(len(subflow_1.parameters), 8)
+        self.assertEqual(subflow_1.parameters['U'], '0')
+        self.assertEqual(len(subflow_1.components), 1)
+        self.assertIsNone(subflow_1.model)
+
+        subflow_2 = list(subflow_1.components.values())[0]
+        self.assertIsInstance(subflow_2, openml.OpenMLFlow)
+        self.assertEqual(subflow_2.flow_id, 5888)
+        self.assertEqual(len(subflow_2.parameters), 4)
+        self.assertIsNone(subflow_2.parameters['batch-size'])
+        self.assertEqual(len(subflow_2.components), 0)
+        self.assertIsNone(subflow_2.model)

@@ -61,21 +61,17 @@ def _list_evaluations(api_call):
 
     xml_string = _perform_api_call(api_call)
 
-    evals_dict = xmltodict.parse(xml_string)
+    evals_dict = xmltodict.parse(xml_string, force_list=('oml:evaluation',))
     # Minimalistic check if the XML is useful
     if 'oml:evaluations' not in evals_dict:
         raise ValueError('Error in return XML, does not contain "oml:evaluations": %s'
                          % str(evals_dict))
 
-    if isinstance(evals_dict['oml:evaluations']['oml:evaluation'], list):
-        evals_list = evals_dict['oml:evaluations']['oml:evaluation']
-    elif isinstance(evals_dict['oml:evaluations']['oml:evaluation'], dict):
-        evals_list = [evals_dict['oml:evaluations']['oml:evaluation']]
-    else:
-        raise TypeError()
+    assert type(evals_dict['oml:evaluations']['oml:evaluation']) == list, \
+        type(evals_dict['oml:evaluations'])
 
     evals = dict()
-    for eval_ in evals_list:
+    for eval_ in evals_dict['oml:evaluations']['oml:evaluation']:
         run_id = int(eval_['oml:run_id'])
         array_data = None
         if 'oml:array_data' in eval_:

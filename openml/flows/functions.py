@@ -107,7 +107,7 @@ def flow_exists(name, external_version):
 def _list_flows(api_call):
     # TODO add proper error handling here!
     xml_string = _perform_api_call(api_call)
-    flows_dict = xmltodict.parse(xml_string)
+    flows_dict = xmltodict.parse(xml_string, force_list=('oml:flow',))
 
     # Minimalistic check if the XML is useful
     assert type(flows_dict['oml:flows']['oml:flow']) == list, \

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import setuptools
 import sys
@@ -35,7 +37,8 @@ except ImportError:
 
 
 setuptools.setup(name="openml",
-                 author="Matthias Feurer",
+                 author="Matthias Feurer, Andreas Müller, Farzan Majdani, "
+                        "Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers",
                  author_email="feurerm@informatik.uni-freiburg.de",
                  maintainer="Matthias Feurer",
                  maintainer_email="feurerm@informatik.uni-freiburg.de",
