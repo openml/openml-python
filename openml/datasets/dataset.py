@@ -196,20 +196,44 @@ class OpenMLDataset(object):
             with io.open(filename, encoding='utf8') as fh:
                 return decode_arff(fh)
 
-    def get_data(self, target=None,
-                 include_row_id=False,
+    def get_data(self, target=None, include_row_id=False,
                  include_ignore_attributes=False,
                  return_categorical_indicator=False,
-                 return_attribute_names=False
-    ):
-        """Returns dataset content as numpy arrays / sparse matrices.
+                 return_attribute_names=False):
+        """Returns dataset content as dataframes or sparse matrices.
 
         Parameters
         ----------
+        target : string, list of strings or None (default=None)
+            Name of target column(s) to separate from the data.
+
+        include_row_id : boolean (default=False)
+            Whether to include row ids in the returned dataset.
+
+        include_ignore_attributes : boolean (default=False)
+            Whether to include columns that are marked as "ignore"
+            on the server in the dataset.
+
+        return_categorical_indicator : boolean (default=False)
+            Whether to return a boolean mask indicating which features are
+            categorical.
+
+        return_attribute_names : boolean (default=False)
+            Whether to return attribute names.
 
 
         Returns
         -------
+        X : dataframe or sparse matrix, shape (n_samples, n_columns)
+            Dataset
+        y : numpy array or pandas series, shape (n_samples,)
+            Target column(s). Only returned if target is not None.
+        categorical_indicator : boolean ndarray
+            Mask that indicate categorical features. Only returned if
+            return_categorical_indicator is True.
+        return_attribute_names : list of strings
+            List of attribute names. Returned only if return_attribute_names is
+            True.
 
         """
         rval = []
@@ -341,8 +365,9 @@ class OpenMLDataset(object):
                              exclude_ignore_attributes=True,
                              exclude_row_id_attribute=True):
         '''
-        Returns indices of features of a given type, e.g., all nominal features.
-        Can use additional parameters to exclude various features by index or ontology.
+        Returns indices of features of a given type, e.g., all nominal
+        features.  Can use additional parameters to exclude various features by
+        index or ontology.
 
         Parameters
         ----------
