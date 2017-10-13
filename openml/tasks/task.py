@@ -97,26 +97,26 @@ class OpenMLTask(object):
         return self.split.repeats, self.split.folds, self.split.samples
 
     def push_tag(self, tag):
-        """Annotates this flow with a tag on the server.
+        """Annotates this task with a tag on the server.
 
         Parameters
         ----------
         tag : str
-            Tag to attach to the flow.
+            Tag to attach to the task.
         """
-        data = {'flow_id': self.flow_id, 'tag': tag}
-        _perform_api_call("/flow/tag", data=data)
+        data = {'task_id': self.task_id, 'tag': tag}
+        _perform_api_call("/task/tag", data=data)
 
     def remove_tag(self, tag):
-        """Removes a tag from this flow on the server.
+        """Removes a tag from this task on the server.
 
         Parameters
         ----------
         tag : str
-            Tag to attach to the flow.
+            Tag to attach to the task.
         """
-        data = {'flow_id': self.flow_id, 'tag': tag}
-        _perform_api_call("/flow/untag", data=data)
+        data = {'task_id': self.task_id, 'tag': tag}
+        _perform_api_call("/task/untag", data=data)
 
 
 def _create_task_cache_dir(task_id):
