@@ -3,8 +3,9 @@ import xmltodict
 from .._api_calls import _perform_api_call
 from ..evaluations import OpenMLEvaluation
 
-def list_evaluations(function, offset=None, size=None, id=None, task=None, setup=None,
-              flow=None, uploader=None, tag=None):
+
+def list_evaluations(function, offset=None, size=None, id=None, task=None,
+                     setup=None, flow=None, uploader=None, tag=None):
     """List all run-evaluation pairs matching all of the given filters.
 
         Perform API call `/evaluation/function{function}/{filters} 
