@@ -270,7 +270,10 @@ class OpenMLDataset(object):
                         " %s" % to_exclude)
             keep = np.array([True if column not in to_exclude else False
                              for column in attribute_names])
-            data = data[:, keep]
+            if isinstance(data, pd.DataFrame):
+                data = data.iloc[:, keep]
+            else:
+                data = data[:, keep]
             categorical = [cat for cat, k in zip(categorical, keep) if k]
             attribute_names = [att for att, k in
                                zip(attribute_names, keep) if k]
