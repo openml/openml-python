@@ -18,6 +18,7 @@ Top-level Classes
    OpenMLTask
    OpenMLSplit
    OpenMLFlow
+   OpenMLEvaluation
 
 
 :mod:`openml.datasets`: Dataset Functions
@@ -43,12 +44,18 @@ Top-level Classes
 
    run_task
    get_run
+   get_runs
    list_runs
    list_runs_by_flow
    list_runs_by_tag
    list_runs_by_task
    list_runs_by_uploader
    list_runs_by_filters
+   run_model_on_task
+   run_flow_on_task
+   get_run_trace
+   initialize_model_from_run
+   initialize_model_from_trace
 
 :mod:`openml.tasks`: Task Functions
 -----------------------------------
@@ -59,6 +66,7 @@ Top-level Classes
    :template: function.rst
 
     get_task
+    get_tasks
     list_tasks
 
 :mod:`openml.flows`: Flow Functions
@@ -68,4 +76,18 @@ Top-level Classes
 .. autosummary::
    :toctree: generated/
    :template: function.rst
+
+    get_flow
+    list_flows
+    flow_exists
+ 
+:mod:`openml.flows`: Evaluation Functions
+-----------------------------------------
+.. currentmodule:: openml.evaluation
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+    list_evaluations
  
