@@ -254,21 +254,16 @@ class OpenMLDataset(object):
             targets = np.array([True if column in target else False
                                 for column in attribute_names])
 
-            try:
-                x = data[:, ~targets]
-                y = data[:, targets].astype(target_dtype)
+            x = data[:, ~targets]
+            y = data[:, targets].astype(target_dtype)
 
-                if len(y.shape) == 2 and y.shape[1] == 1:
-                    y = y[:, 0]
+            if len(y.shape) == 2 and y.shape[1] == 1:
+                y = y[:, 0]
 
-                categorical = [cat for cat, t in
-                               zip(categorical, targets) if not t]
-                attribute_names = [att for att, k in
-                                   zip(attribute_names, targets) if not k]
-            except KeyError as e:
-                import sys
-                sys.stdout.flush()
-                raise e
+            categorical = [cat for cat, t in
+                           zip(categorical, targets) if not t]
+            attribute_names = [att for att, k in
+                               zip(attribute_names, targets) if not k]
 
             if scipy.sparse.issparse(y):
                 y = np.asarray(y.todense()).astype(target_dtype).flatten()
