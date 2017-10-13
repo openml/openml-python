@@ -113,7 +113,7 @@ class OpenMLDataset(object):
                         (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
                     X = X.tocsr()
                 elif isinstance(data['data'], list):
-                    X = pd.DataFrame(data['data'])
+                    X = pd.DataFrame(data['data'], columns=attribute_names)
                 else:
                     raise Exception()
 
@@ -263,18 +263,20 @@ class OpenMLDataset(object):
                     "Number of requested targets %d is not implemented." %
                     np.sum(targets)
                 )
-            target_categorical = [
-                cat for cat, column in
-                six.moves.zip(categorical, attribute_names)
-                if column in target
-            ]
-            target_dtype = int if target_categorical[0] else float
+            if isinstance(data, pd.DataFrame):
+                x = data.iloc[:, ~targets]
+                y = data.iloc[:, targets]
+            else:
+                target_categorical = [
+                    cat for cat, column in
+                    six.moves.zip(categorical, attribute_names)
+                    if column in target
+                ]
+                target_dtype = int if target_categorical[0] else float
+                x = data[:, ~targets]
+                y = data[:, targets].astype(target_dtype)
 
-            x = data[:, ~targets]
-            y = data[:, targets].astype(target_dtype)
-
-            if len(y.shape) == 2 and y.shape[1] == 1:
-                y = y[:, 0]
+            y = y.squeeze()
 
             categorical = [cat for cat, t in
                            zip(categorical, targets) if not t]
