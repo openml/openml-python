@@ -455,13 +455,12 @@ class OpenMLDataset(object):
         return True
 
 
-
 def _check_qualities(qualities):
     if qualities is not None:
         qualities_ = {}
         for xmlquality in qualities:
             name = xmlquality['oml:name']
-            if xmlquality['oml:value'] is None:
+            if xmlquality.get('oml:value', None) is None:
                 value = float('NaN')
             elif xmlquality['oml:value'] == 'null':
                 value = float('NaN')
