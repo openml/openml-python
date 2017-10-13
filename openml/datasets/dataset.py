@@ -200,10 +200,12 @@ class OpenMLDataset(object):
             with io.open(filename, encoding='utf8') as fh:
                 return decode_arff(fh)
 
-    def get_data(self, target=None, target_dtype=int, include_row_id=False,
+    def get_data(self, target=None,
+                 include_row_id=False,
                  include_ignore_attributes=False,
                  return_categorical_indicator=False,
-                 return_attribute_names=False):
+                 return_attribute_names=False
+    ):
         """Returns dataset content as numpy arrays / sparse matrices.
 
         Parameters
@@ -241,7 +243,10 @@ class OpenMLDataset(object):
             if not self.ignore_attributes:
                 pass
             else:
-                to_exclude.extend(self.ignore_attributes)
+                if isinstance(self.ignore_attributes, six.string_types):
+                    to_exclude.append(self.ignore_attributes)
+                else:
+                    to_exclude.extend(self.ignore_attributes)
 
         if len(to_exclude) > 0:
             logger.info("Going to remove the following attributes:"
@@ -260,6 +265,17 @@ class OpenMLDataset(object):
                 target = [target]
             targets = np.array([True if column in target else False
                                 for column in attribute_names])
+            if np.sum(targets) > 1:
+                raise NotImplementedError(
+                    "Number of requested targets %d is not implemented." %
+                    np.sum(targets)
+                )
+            target_categorical = [
+                cat for cat, column in
+                six.moves.zip(categorical, attribute_names)
+                if column in target
+            ]
+            target_dtype = int if target_categorical[0] else float
 
             try:
                 x = data[:, ~targets]
