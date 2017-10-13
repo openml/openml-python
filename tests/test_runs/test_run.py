@@ -20,14 +20,14 @@ class TestRun(TestBase):
         flow = sklearn_to_flow(model)
         self.assertRaisesRegexp(
             ValueError, 'Flow sklearn.linear_model.logistic.LogisticRegression'
-            'has no flow_id!', OpenMLRun._parse_parameters, flow)
+            ' has no flow_id!', OpenMLRun._parse_parameters, flow)
 
         model = AdaBoostClassifier(base_estimator=LogisticRegression())
         flow = sklearn_to_flow(model)
         flow.flow_id = 1
         self.assertRaisesRegexp(
             ValueError, 'Flow sklearn.linear_model.logistic.LogisticRegression'
-            'has no flow_id!', OpenMLRun._parse_parameters, flow)
+            ' has no flow_id!', OpenMLRun._parse_parameters, flow)
 
     def test_parse_parameters(self):
 
