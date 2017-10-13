@@ -460,10 +460,7 @@ def _check_qualities(qualities):
         qualities_ = {}
         for xmlquality in qualities:
             name = xmlquality['oml:name']
-
             if xmlquality.get('oml:value', None) is None:
-                value = float('NaN')
-            elif 'oml:value' not in xmlquality:
                 value = float('NaN')
             elif xmlquality['oml:value'] == 'null':
                 value = float('NaN')
