@@ -3,7 +3,7 @@ import copy
 import hashlib
 import re
 import sys
-from time import time
+import time
 
 if sys.version_info[0] >= 3:
     from unittest import mock
@@ -71,7 +71,7 @@ class TestFlow(TestBase):
         flow_list = openml.flows.list_flows(size=1)
         flow_id = list(flow_list.keys())[0]
         flow = openml.flows.get_flow(flow_id)
-        tag = "testing_tag_{}_{}".format(self.id(), time())
+        tag = "testing_tag_{}_{}".format(self.id(), time.time())
         flow_list = openml.flows.list_flows(tag=tag)
         self.assertEqual(len(flow_list), 0)
         flow.push_tag(tag)
