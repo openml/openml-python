@@ -137,16 +137,18 @@ run has been executed locally (and contains run_data). Furthermore,
 it assumes that the ‘correct’ attribute is specified in the arff
 (which is an optional field, but always the case for openml-python
 runs)</p>
-<dl class="docutils">
-<dt>sklearn_fn <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
-<dd>a function pointer to a sklearn function that
-accepts y_true, y_pred and <a href="#id1"><span class="problematic" id="id2">*</span></a>kwargs</dd>
-</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>scores</strong> : list</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>sklearn_fn</strong> : function</p>
+<blockquote>
+<div><p>a function pointer to a sklearn function that
+accepts <code class="docutils literal"><span class="pre">y_true</span></code>, <code class="docutils literal"><span class="pre">y_pred</span></code> and <code class="docutils literal"><span class="pre">**kwargs</span></code></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>scores</strong> : list</p>
 <blockquote class="last">
 <div><p>a list of floats, of length num_folds * num_repeats</p>
 </div></blockquote>

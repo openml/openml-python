@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>openml.runs.run_model_on_task &#8212; OpenML 0.6.0 documentation</title>
+    <title>openml.setups.get_setup &#8212; OpenML 0.6.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -108,19 +108,39 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.runs</span></code>.run_model_on_task</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.setups</span></code>.get_setup</a></li>
 </ul>
 
         </div>
       </div>
     <div class="col-md-9 content">
       
-  <div class="section" id="openml-runs-run-model-on-task">
-<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.runs</span></code>.run_model_on_task<a class="headerlink" href="#openml-runs-run-model-on-task" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="openml-setups-get-setup">
+<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.setups</span></code>.get_setup<a class="headerlink" href="#openml-setups-get-setup" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="openml.runs.run_model_on_task">
-<code class="descclassname">openml.runs.</code><code class="descname">run_model_on_task</code><span class="sig-paren">(</span><em>task</em>, <em>model</em>, <em>avoid_duplicate_runs=True</em>, <em>flow_tags=None</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.run_model_on_task" title="Permalink to this definition">¶</a></dt>
-<dd><p>See <code class="docutils literal"><span class="pre">run_flow_on_task</span> <span class="pre">for</span> <span class="pre">a</span> <span class="pre">documentation</span></code>.</p>
+<dt id="openml.setups.get_setup">
+<code class="descclassname">openml.setups.</code><code class="descname">get_setup</code><span class="sig-paren">(</span><em>setup_id</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.setups.get_setup" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Downloads the setup (configuration) description from OpenML
+and returns a structured object</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>setup_id</strong> : int</p>
+<blockquote>
+<div><p>The Openml setup_id</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">OpenMLSetup</p>
+<blockquote class="last">
+<div><p>an initialized openml setup object</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <div class="clearer"></div></div>
