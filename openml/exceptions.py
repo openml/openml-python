@@ -11,7 +11,7 @@ class OpenMLServerError(PyOpenMLError):
     def __init__(self, message):
         super(OpenMLServerError, self).__init__(message)
 
-#
+
 class OpenMLServerException(OpenMLServerError):
     """exception for when the result of the server was
        not 200 (e.g., listing call w/o results). """
@@ -20,6 +20,11 @@ class OpenMLServerException(OpenMLServerError):
         self.code = code
         self.additional = additional
         super(OpenMLServerException, self).__init__(message)
+
+
+class OpenMLServerNoResult(OpenMLServerException):
+    """exception for when the result of the server is empty. """
+    pass
 
 
 class OpenMLCacheException(PyOpenMLError):

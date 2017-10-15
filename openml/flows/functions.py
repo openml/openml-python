@@ -4,6 +4,7 @@ import xmltodict
 import six
 
 from openml._api_calls import _perform_api_call
+from openml.exceptions import OpenMLServerNoResult
 from . import OpenMLFlow
 
 
@@ -70,10 +71,12 @@ def list_flows(offset=None, size=None, tag=None):
 
 
 def flow_exists(name, external_version):
-    """Retrieves the flow id of the flow uniquely identified by name + external_version.
+    """Retrieves the flow id.
 
-    Parameter
-    ---------
+    A flow is uniquely identified by name + external_version.
+
+    Parameters
+    ----------
     name : string
         Name of the flow
     version : string
@@ -93,8 +96,9 @@ def flow_exists(name, external_version):
     if not (isinstance(name, six.string_types) and len(external_version) > 0):
         raise ValueError('Argument \'version\' should be a non-empty string')
 
-    xml_response = _perform_api_call("flow/exists",
-                                     data={'name': name, 'external_version': external_version})
+    xml_response = _perform_api_call(
+        "flow/exists", data={'name': name, 'external_version':
+                             external_version})
 
     result_dict = xmltodict.parse(xml_response)
     flow_id = int(result_dict['oml:flow_exists']['oml:id'])
@@ -105,15 +109,17 @@ def flow_exists(name, external_version):
 
 
 def _list_flows(api_call):
-    # TODO add proper error handling here!
-    xml_string = _perform_api_call(api_call)
-    flows_dict = xmltodict.parse(xml_string)
+    try:
+        xml_string = _perform_api_call(api_call)
+    except OpenMLServerNoResult:
+        return []
+    flows_dict = xmltodict.parse(xml_string, force_list=('oml:flow',))
 
     # Minimalistic check if the XML is useful
     assert type(flows_dict['oml:flows']['oml:flow']) == list, \
         type(flows_dict['oml:flows'])
     assert flows_dict['oml:flows']['@xmlns:oml'] == \
-           'http://openml.org/openml', flows_dict['oml:flows']['@xmlns:oml']
+        'http://openml.org/openml', flows_dict['oml:flows']['@xmlns:oml']
 
     flows = dict()
     for flow_ in flows_dict['oml:flows']['oml:flow']:
@@ -190,10 +196,10 @@ def assert_flows_equal(flow1, flow2,
         attr2 = getattr(flow2, key, None)
         if key == 'components':
             for name in set(attr1.keys()).union(attr2.keys()):
-                if not name in attr1:
+                if name not in attr1:
                     raise ValueError('Component %s only available in '
                                      'argument2, but not in argument1.' % name)
-                if not name in attr2:
+                if name not in attr2:
                     raise ValueError('Component %s only available in '
                                      'argument2, but not in argument1.' % name)
                 assert_flows_equal(attr1[name], attr2[name],
