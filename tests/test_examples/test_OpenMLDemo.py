@@ -55,3 +55,6 @@ class OpenMLDemoTest(TestBase):
 
     def test_tutorial(self):
         self._test_notebook('OpenML_Tutorial.ipynb')
+
+    def test_cheat_sheet(self):
+        self._test_notebook('OpenML_Cheat_Sheet.ipynb')
