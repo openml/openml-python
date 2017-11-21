@@ -917,8 +917,8 @@ class TestRun(TestBase):
                 ('imputer', sklearn.preprocessing.Imputer()), ('estimator', HardNaiveBayes())
             ])
 
-            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task, task.class_labels)
-            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task, task.class_labels)
+            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task)
+            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task)
 
             # verifies last two arff indices (predict and correct)
             # TODO: programmatically check wether these are indeed features (predict, correct)

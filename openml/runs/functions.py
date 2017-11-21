@@ -404,10 +404,11 @@ def _run_task_get_arffcontent(model, task):
                     user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[measure]
                     user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = user_defined_measures_fold[measure]
 
-
-    if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
+    # Note that we need to use a fitted model (i.e., model_fold, and not model) here,
+    # to ensure it contains the hyperparameter data (in cv_results_)
+    if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
         # arff_tracecontent is already set
-        arff_trace_attributes = _extract_arfftrace_attributes(model)
+        arff_trace_attributes = _extract_arfftrace_attributes(model_fold)
     else:
         arff_tracecontent = None
         arff_trace_attributes = None
