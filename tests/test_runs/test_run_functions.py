@@ -720,7 +720,7 @@ class TestRun(TestBase):
         num_repeats = 1
 
         clf = SGDClassifier(loss='log', random_state=1)
-        res = openml.runs.functions._run_task_get_arffcontent(clf, task, class_labels)
+        res = openml.runs.functions._run_task_get_arffcontent(clf, task)
         arff_datacontent, arff_tracecontent, _, fold_evaluations, sample_evaluations = res
         # predictions
         self.assertIsInstance(arff_datacontent, list)
