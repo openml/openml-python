@@ -896,7 +896,7 @@ class TestRun(TestBase):
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task, class_labels)
+        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task)
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)
