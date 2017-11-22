@@ -100,7 +100,7 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
     res = _run_task_get_arffcontent(flow.model, task)
 
     # in case the flow not exists, we will get a "False" back (which can be seen as an int instance)
-    if not isinstance(flow.flow_id, int) or flow_id == False:
+    if not isinstance(flow.flow_id, int) or flow_id is False:
         _publish_flow_if_necessary(flow)
 
     run = OpenMLRun(task_id=task.task_id, flow_id=flow.flow_id,
