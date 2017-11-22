@@ -99,7 +99,7 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
     # execute the run
     res = _run_task_get_arffcontent(flow.model, task)
 
-    if flow.flow_id is None:
+    if not isinstance(flow.flow_id, int):
         _publish_flow_if_necessary(flow)
 
     run = OpenMLRun(task_id=task.task_id, flow_id=flow.flow_id,
@@ -222,13 +222,17 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
 
 
 def _run_exists(task_id, setup_id):
-    '''
-    Checks whether a task/setup combination is already present on the server.
+    """Checks whether a task/setup combination is already present on the server.
 
-    :param task_id: int
-    :param setup_id: int
-    :return: List of run ids iff these already exists on the server, False otherwise
-    '''
+    Parameters
+    ----------
+    task_id: int
+    setup_id: int
+
+    Returns
+    -------
+        List of run ids iff these already exists on the server, False otherwise
+    """
     if setup_id <= 0:
         # openml setups are in range 1-inf
         return False
@@ -246,7 +250,7 @@ def _run_exists(task_id, setup_id):
 
 
 def _get_seeded_model(model, seed=None):
-    '''Sets all the non-seeded components of a model with a seed.
+    """Sets all the non-seeded components of a model with a seed.
        Models that are already seeded will maintain the seed. In
        this case, only integer seeds are allowed (An exception
        is thrown when a RandomState was used as seed)
@@ -264,7 +268,7 @@ def _get_seeded_model(model, seed=None):
         model : sklearn model
             a version of the model where all (sub)components have
             a seed
-    '''
+    """
 
     def _seed_current_object(current_value):
         if isinstance(current_value, int):  # acceptable behaviour
@@ -525,21 +529,19 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
     except AttributeError:
         ProbaY = _prediction_to_probabilities(PredY, list(model_classes))
 
-    # add client-side calculated metrics. These might be used on the server as consistency check
-    def _calculate_local_measure(sklearn_fn, openml_name):
-        user_defined_measures[openml_name] = sklearn_fn(testY, PredY)
-
-    _calculate_local_measure(sklearn.metrics.accuracy_score, 'predictive_accuracy')
-
     if can_measure_runtime:
         modelpredict_duration = (time.process_time() - modelpredict_starttime) * 1000
         user_defined_measures['usercpu_time_millis_testing'] = modelpredict_duration
         user_defined_measures['usercpu_time_millis'] = modelfit_duration + modelpredict_duration
 
-
     if ProbaY.shape[1] != len(task.class_labels):
-        warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" % (
-        rep_no, fold_no, ProbaY.shape[1], len(task.class_labels)))
+        warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" % (rep_no, fold_no, ProbaY.shape[1], len(task.class_labels)))
+
+    # add client-side calculated metrics. These might be used on the server as consistency check
+    def _calculate_local_measure(sklearn_fn, openml_name):
+        user_defined_measures[openml_name] = sklearn_fn(testY, PredY)
+
+    _calculate_local_measure(sklearn.metrics.accuracy_score, 'predictive_accuracy')
 
     arff_datacontent = []
     for i in range(0, len(test_indices)):
