@@ -99,8 +99,8 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
     # execute the run
     res = _run_task_get_arffcontent(flow.model, task)
 
-    # in case the flow not exists, we will get a "False" back (which can be seen as an int instance)
-    if not isinstance(flow.flow_id, int) or flow_id is False:
+    # in case the flow not exists, we will get a "False" back (which can be
+    if not isinstance(flow.flow_id, int) or flow_id == False:
         _publish_flow_if_necessary(flow)
 
     run = OpenMLRun(task_id=task.task_id, flow_id=flow.flow_id,
@@ -654,7 +654,7 @@ def get_run(run_id):
     return run
 
 
-def _create_run_from_xml(xml):
+def _create_run_from_xml(xml, from_server=True):
     """Create a run object from xml returned from server.
 
     Parameters
@@ -667,21 +667,35 @@ def _create_run_from_xml(xml):
     run : OpenMLRun
         New run object representing run_xml.
     """
+
+    def obtain_field(xml_obj, fieldname, from_server, cast=None):
+        if fieldname in xml_obj:
+            if cast is not None:
+                return cast(xml_obj[fieldname])
+            return xml_obj[fieldname]
+        elif not from_server:
+            return None
+        else:
+            raise AttributeError('Run XML does not contain required (server) field: ', fieldname)
+
     run = xmltodict.parse(xml)["oml:run"]
-    run_id = int(run['oml:run_id'])
-    uploader = int(run['oml:uploader'])
-    uploader_name = run['oml:uploader_name']
+    run_id = obtain_field(run, 'oml:run_id', from_server, cast=int)
+    uploader = obtain_field(run, 'oml:uploader', from_server, cast=int)
+    uploader_name = obtain_field(run, 'oml:uploader_name', from_server)
     task_id = int(run['oml:task_id'])
-    task_type = run['oml:task_type']
+    task_type = obtain_field(run, 'oml:task_type', from_server)
+
+    # even with the server requirement this field may be empty. 
     if 'oml:task_evaluation_measure' in run:
         task_evaluation_measure = run['oml:task_evaluation_measure']
     else:
         task_evaluation_measure = None
 
+
     flow_id = int(run['oml:flow_id'])
-    flow_name = run['oml:flow_name']
-    setup_id = int(run['oml:setup_id'])
-    setup_string = run['oml:setup_string']
+    flow_name = obtain_field(run, 'oml:flow_name', from_server)
+    setup_id = obtain_field(run, 'oml:setup_id', from_server, cast=int)
+    setup_string = obtain_field(run, 'oml:setup_string', from_server)
 
     parameters = dict()
     if 'oml:parameter_settings' in run:
@@ -691,7 +705,10 @@ def _create_run_from_xml(xml):
             value = parameter_dict['oml:value']
             parameters[key] = value
 
-    dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
+    if 'oml:input_data' in run:
+        dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
+    elif not from_server:
+        dataset_id = None
 
     files = dict()
     evaluations = dict()
@@ -700,21 +717,23 @@ def _create_run_from_xml(xml):
     if 'oml:output_data' not in run:
         raise ValueError('Run does not contain output_data (OpenML server error?)')
     else:
-        if isinstance(run['oml:output_data']['oml:file'], dict):
-            # only one result.. probably due to an upload error
-            file_dict = run['oml:output_data']['oml:file']
-            files[file_dict['oml:name']] = int(file_dict['oml:file_id'])
-        elif isinstance(run['oml:output_data']['oml:file'], list):
-            # multiple files, the normal case
-            for file_dict in run['oml:output_data']['oml:file']:
+        output_data = run['oml:output_data']
+        if 'oml:file' in output_data:
+            if isinstance(output_data['oml:file'], dict):
+                # only one result.. probably due to an upload error
+                file_dict = output_data['oml:file']
                 files[file_dict['oml:name']] = int(file_dict['oml:file_id'])
-        else:
-            raise TypeError(type(run['oml:output_data']['oml:file']))
+            elif isinstance(output_data['oml:file'], list):
+                # multiple files, the normal case
+                for file_dict in output_data['oml:file']:
+                    files[file_dict['oml:name']] = int(file_dict['oml:file_id'])
+            else:
+                raise TypeError(type(output_data['oml:file']))
 
-        if 'oml:evaluation' in run['oml:output_data']:
+        if 'oml:evaluation' in output_data:
             # in normal cases there should be evaluations, but in case there
             # was an error these could be absent
-            for evaluation_dict in run['oml:output_data']['oml:evaluation']:
+            for evaluation_dict in output_data['oml:evaluation']:
                 key = evaluation_dict['oml:name']
                 if 'oml:value' in evaluation_dict:
                     value = float(evaluation_dict['oml:value'])
@@ -740,11 +759,11 @@ def _create_run_from_xml(xml):
                 else:
                     evaluations[key] = value
 
-    if 'description' not in files:
+    if 'description' not in files and from_server is True:
         raise ValueError('No description file for run %d in run '
                          'description XML' % run_id)
 
-    if 'predictions' not in files:
+    if 'predictions' not in files and from_server is True:
         task = openml.tasks.get_task(task_id)
         if task.task_type_id == 8:
             raise NotImplementedError(
