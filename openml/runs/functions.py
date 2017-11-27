@@ -669,6 +669,9 @@ def _create_run_from_xml(xml, from_server=True):
     """
 
     def obtain_field(xml_obj, fieldname, from_server, cast=None):
+        # this function can be used to check whether a field is present in an object.
+        # if it is not present, either returns None or throws an error (this is
+        # usually done if the xml comes from the server)
         if fieldname in xml_obj:
             if cast is not None:
                 return cast(xml_obj[fieldname])
