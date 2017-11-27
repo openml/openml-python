@@ -176,7 +176,11 @@ def _list_tasks(api_call):
                     'status': task_['oml:status']}
 
             # Other task inputs
-            for input in task_.get('oml:input', list()):
+            task_inputs = task_.get('oml:input')
+            if isinstance(task_inputs, dict):
+                task_inputs = [task_inputs]
+
+            for input in task_inputs:
                 if input['@name'] == 'estimation_procedure':
                     task[input['@name']] = proc_dict[int(input['#text'])]['name']
                 else:
