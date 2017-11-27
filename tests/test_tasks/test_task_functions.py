@@ -42,6 +42,12 @@ class TestTask(TestBase):
         self.assertIsInstance(estimation_procedures[0], dict)
         self.assertEqual(estimation_procedures[0]['task_type_id'], 1)
 
+
+    def test_list_clustering_task(self):
+        # as shown by #383, clustering tasks can give problems to server
+        openml.config.server = self.production_server
+        openml.tasks.list_tasks(task_type_id=5, size=10)
+
     def _check_task(self, task):
         self.assertEqual(type(task), dict)
         self.assertGreaterEqual(len(task), 2)
