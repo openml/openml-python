@@ -142,7 +142,7 @@ def _list_tasks(api_call):
         xml_string = _perform_api_call(api_call)
     except OpenMLServerNoResult:
         return []
-    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task',))
+    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task','oml:input'))
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s'
@@ -176,11 +176,7 @@ def _list_tasks(api_call):
                     'status': task_['oml:status']}
 
             # Other task inputs
-            task_inputs = task_.get('oml:input')
-            if isinstance(task_inputs, dict):
-                task_inputs = [task_inputs]
-
-            for input in task_inputs:
+            for input in task_.get('oml:input', list()):
                 if input['@name'] == 'estimation_procedure':
                     task[input['@name']] = proc_dict[int(input['#text'])]['name']
                 else:
