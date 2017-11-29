@@ -1,4 +1,5 @@
 import arff
+import collections
 import json
 import random
 import time
@@ -714,9 +715,49 @@ class TestRun(TestBase):
 
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(7)
-        class_labels = task.class_labels
+        num_instances = 320
+        num_folds = 1
+        num_repeats = 1
+
+        clf = SGDClassifier(loss='log', random_state=1)
+        res = openml.runs.functions._run_model_on_fold(clf, task, 0, 0, 0, True)
+
+        arff_datacontent, arff_tracecontent, user_defined_measures, model = res
+        # predictions
+        self.assertIsInstance(arff_datacontent, list)
+        # trace. SGD does not produce any
+        self.assertIsInstance(arff_tracecontent, list)
+        self.assertEquals(len(arff_tracecontent), 0)
+
+        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        for measure in user_defined_measures:
+            fold_evaluations[measure][0][0] = user_defined_measures[measure]
+
+        self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds)
+
+        # 10 times 10 fold CV of 150 samples
+        self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
+        for arff_line in arff_datacontent:
+            # check number columns
+            self.assertEqual(len(arff_line), 8)
+            # check repeat
+            self.assertGreaterEqual(arff_line[0], 0)
+            self.assertLessEqual(arff_line[0], num_repeats - 1)
+            # check fold
+            self.assertGreaterEqual(arff_line[1], 0)
+            self.assertLessEqual(arff_line[1], num_folds - 1)
+            # check row id
+            self.assertGreaterEqual(arff_line[2], 0)
+            self.assertLessEqual(arff_line[2], num_instances - 1)
+            # check confidences
+            self.assertAlmostEqual(sum(arff_line[4:6]), 1.0)
+            self.assertIn(arff_line[6], ['won', 'nowin'])
+            self.assertIn(arff_line[7], ['won', 'nowin'])
+
+    def test__run_model_on_fold(self):
+        task = openml.tasks.get_task(11)
         num_instances = 3196
-        num_folds = 10
+        num_folds = 1
         num_repeats = 1
 
         clf = SGDClassifier(loss='log', random_state=1)
@@ -747,6 +788,7 @@ class TestRun(TestBase):
             self.assertAlmostEqual(sum(arff_line[4:6]), 1.0)
             self.assertIn(arff_line[6], ['won', 'nowin'])
             self.assertIn(arff_line[7], ['won', 'nowin'])
+
 
     def test__create_trace_from_arff(self):
         with open(self.static_cache_dir + '/misc/trace.arff', 'r') as arff_file:

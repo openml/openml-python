@@ -681,7 +681,7 @@ def _create_run_from_xml(xml, from_server=True):
         else:
             raise AttributeError('Run XML does not contain required (server) field: ', fieldname)
 
-    run = xmltodict.parse(xml)["oml:run"]
+    run = xmltodict.parse(xml, force_dict=['oml:file', 'oml:evaluation'])["oml:run"]
     run_id = obtain_field(run, 'oml:run_id', from_server, cast=int)
     uploader = obtain_field(run, 'oml:uploader', from_server, cast=int)
     uploader_name = obtain_field(run, 'oml:uploader_name', from_server)
@@ -722,17 +722,9 @@ def _create_run_from_xml(xml, from_server=True):
     else:
         output_data = run['oml:output_data']
         if 'oml:file' in output_data:
-            if isinstance(output_data['oml:file'], dict):
-                # only one result.. probably due to an upload error
-                file_dict = output_data['oml:file']
-                files[file_dict['oml:name']] = int(file_dict['oml:file_id'])
-            elif isinstance(output_data['oml:file'], list):
-                # multiple files, the normal case
-                for file_dict in output_data['oml:file']:
+            # multiple files, the normal case
+            for file_dict in output_data['oml:file']:
                     files[file_dict['oml:name']] = int(file_dict['oml:file_id'])
-            else:
-                raise TypeError(type(output_data['oml:file']))
-
         if 'oml:evaluation' in output_data:
             # in normal cases there should be evaluations, but in case there
             # was an error these could be absent
