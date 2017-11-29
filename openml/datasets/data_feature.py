@@ -16,11 +16,13 @@ class OpenMLDataFeature(object):
        """
     LEGAL_DATA_TYPES = ['nominal', 'numeric', 'string', 'date']
 
-    def __init__(self, index, name, data_type, nominal_values, number_missing_values):
+    def __init__(self, index, name, data_type, nominal_values,
+                 number_missing_values):
         if type(index) != int:
             raise ValueError('Index is of wrong datatype')
         if data_type not in self.LEGAL_DATA_TYPES:
-            raise ValueError('data type should be in %s, found: %s' %(str(self.LEGAL_DATA_TYPES),data_type))
+            raise ValueError('data type should be in %s, found: %s' %
+                             (str(self.LEGAL_DATA_TYPES), data_type))
         if nominal_values is not None and type(nominal_values) != list:
             raise ValueError('Nominal_values is of wrong datatype')
         if type(number_missing_values) != int:
@@ -33,4 +35,7 @@ class OpenMLDataFeature(object):
         self.number_missing_values = number_missing_values
 
     def __str__(self):
-        return "[%d - %s (%s)]" %(self.index, self.name, self.data_type)
+        return "[%d - %s (%s)]" % (self.index, self.name, self.data_type)
+
+    def _repr_pretty_(self, pp, cycle):
+        pp.text(str(self))
