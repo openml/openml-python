@@ -755,7 +755,8 @@ class TestRun(TestBase):
         num_repeats = 1
 
         clf = SGDClassifier(loss='log', random_state=1)
-        res = openml.runs.functions._run_model_on_fold(clf, task, 0, 0, 0, True)
+        can_measure_runtime = sys.version_info[:2] >= (3, 3)
+        res = openml.runs.functions._run_model_on_fold(clf, task, 0, 0, 0, can_measure_runtime)
 
         arff_datacontent, arff_tracecontent, user_defined_measures, model = res
         # predictions
