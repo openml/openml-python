@@ -681,7 +681,7 @@ def _create_run_from_xml(xml, from_server=True):
         else:
             raise AttributeError('Run XML does not contain required (server) field: ', fieldname)
 
-    run = xmltodict.parse(xml, force_dict=['oml:file', 'oml:evaluation'])["oml:run"]
+    run = xmltodict.parse(xml, force_list=['oml:file', 'oml:evaluation'])["oml:run"]
     run_id = obtain_field(run, 'oml:run_id', from_server, cast=int)
     uploader = obtain_field(run, 'oml:uploader', from_server, cast=int)
     uploader_name = obtain_field(run, 'oml:uploader_name', from_server)
