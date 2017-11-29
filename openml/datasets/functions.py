@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import hashlib
 import io
 import os
 import re
@@ -365,6 +366,8 @@ def _get_dataset_arff(did_cache_dir, description):
         Location of arff file.
     """
     output_file_path = os.path.join(did_cache_dir, "dataset.arff")
+    md5_checksum_fixture = description.get("oml:md5_checksum")
+    did = description.get("oml:id")
 
     # This means the file is still there; whether it is useful is up to
     # the user and not checked by the program.
@@ -377,6 +380,14 @@ def _get_dataset_arff(did_cache_dir, description):
 
     url = description['oml:url']
     arff_string = _read_url(url)
+    md5 = hashlib.md5()
+    md5.update(arff_string.encode('utf8'))
+    md5_checksum = md5.hexdigest()
+    if md5_checksum != md5_checksum_fixture:
+        raise ValueError(
+            'Checksum %s of downloaded dataset %d is unequal to the checksum '
+            '%s sent by the server.' % (md5_checksum, did, md5_checksum_fixture)
+        )
 
     with io.open(output_file_path, "w", encoding='utf8') as fh:
         fh.write(arff_string)
