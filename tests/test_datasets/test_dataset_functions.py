@@ -200,6 +200,20 @@ class TestOpenMLDataset(TestBase):
         self.assertIsInstance(arff_path, str)
         self.assertTrue(os.path.exists(arff_path))
 
+    def test__getarff_md5_issue(self):
+        description = {
+            'oml:id': 5,
+            'oml:md5_checksum': 'abc',
+            'oml:url': 'https://www.openml.org/data/download/61',
+        }
+        self.assertRaisesRegexp(
+            ValueError,
+            'Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded dataset 5 '
+            'is unequal to the checksum abc sent by the server.',
+            _get_dataset_arff,
+            self.workdir, description,
+        )
+
     def test__get_dataset_features(self):
         features = _get_dataset_features(self.workdir, 2)
         self.assertIsInstance(features, dict)
