@@ -714,7 +714,7 @@ class TestRun(TestBase):
                           task=task, model=clf, avoid_duplicate_runs=False)
 
     def test__run_task_get_arffcontent(self):
-        task = openml.tasks.get_task(11)
+        task = openml.tasks.get_task(7)
         num_instances = 3196
         num_folds = 10
         num_repeats = 1
@@ -750,7 +750,7 @@ class TestRun(TestBase):
 
     def test__run_model_on_fold(self):
         task = openml.tasks.get_task(7)
-        num_instances = 1054
+        num_instances = 320
         num_folds = 1
         num_repeats = 1
 
