@@ -7,7 +7,7 @@ import shutil
 from oslo_concurrency import lockutils
 import xmltodict
 
-from ..exceptions import OpenMLCacheException
+from ..exceptions import OpenMLCacheException, OpenMLServerNoResult
 from ..datasets import get_dataset
 from .task import OpenMLTask, _create_task_cache_dir
 from .. import config
@@ -55,9 +55,9 @@ def _get_estimation_procedure_list():
     Returns
     -------
     procedures : list
-        A list of all estimation procedures. Every procedure is represented by a
-        dictionary containing the following information: id,
-        task type id, name, type, repeats, folds, stratified.
+        A list of all estimation procedures. Every procedure is represented by
+        a dictionary containing the following information: id, task type id,
+        name, type, repeats, folds, stratified.
     """
 
     xml_string = _perform_api_call("estimationprocedure/list")
@@ -138,8 +138,11 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
 
 
 def _list_tasks(api_call):
-    xml_string = _perform_api_call(api_call)
-    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task',))
+    try:
+        xml_string = _perform_api_call(api_call)
+    except OpenMLServerNoResult:
+        return []
+    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task','oml:input'))
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s'

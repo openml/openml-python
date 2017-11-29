@@ -373,13 +373,17 @@ class OpenMLDataset(object):
         result : list
             a list of indices that have the specified data type
         '''
-        assert data_type in OpenMLDataFeature.LEGAL_DATA_TYPES, "Illegal feature type requested"
+        if data_type not in OpenMLDataFeature.LEGAL_DATA_TYPES:
+            raise TypeError("Illegal feature type requested")
         if self.ignore_attributes is not None:
-            assert type(self.ignore_attributes) is list, "ignore_attributes should be a list"
+            if not isinstance(self.ignore_attributes, list):
+                raise TypeError("ignore_attributes should be a list")
         if self.row_id_attribute is not None:
-            assert type(self.row_id_attribute) is str, "row id attribute should be a str"
+            if not isinstance(self.row_id_attribute, six.string_types):
+                raise TypeError("row id attribute should be a str")
         if exclude is not None:
-            assert type(exclude) is list, "Exclude should be a list"
+            if not isinstance(exclude, list):
+                raise TypeError("Exclude should be a list")
             # assert all(isinstance(elem, str) for elem in exclude), "Exclude should be a list of strings"
         to_exclude = []
         if exclude is not None:
@@ -455,13 +459,12 @@ class OpenMLDataset(object):
         return True
 
 
-
 def _check_qualities(qualities):
     if qualities is not None:
         qualities_ = {}
         for xmlquality in qualities:
             name = xmlquality['oml:name']
-            if xmlquality['oml:value'] is None:
+            if xmlquality.get('oml:value', None) is None:
                 value = float('NaN')
             elif xmlquality['oml:value'] == 'null':
                 value = float('NaN')

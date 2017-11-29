@@ -36,8 +36,8 @@ class TestFlow(TestBase):
     _multiprocess_can_split_ = True
 
     def test_get_flow(self):
-        # We need to use the production server here because 4024 is not the test
-        # server
+        # We need to use the production server here because 4024 is not the
+        # test server
         openml.config.server = self.production_server
 
         flow = openml.flows.get_flow(4024)
@@ -66,6 +66,21 @@ class TestFlow(TestBase):
         self.assertEqual(len(subflow_3.parameters), 11)
         self.assertEqual(subflow_3.parameters['L'], '-1')
         self.assertEqual(len(subflow_3.components), 0)
+
+    def test_tagging(self):
+        flow_list = openml.flows.list_flows(size=1)
+        flow_id = list(flow_list.keys())[0]
+        flow = openml.flows.get_flow(flow_id)
+        tag = "testing_tag_{}_{}".format(self.id(), time.time())
+        flow_list = openml.flows.list_flows(tag=tag)
+        self.assertEqual(len(flow_list), 0)
+        flow.push_tag(tag)
+        flow_list = openml.flows.list_flows(tag=tag)
+        self.assertEqual(len(flow_list), 1)
+        self.assertIn(flow_id, flow_list)
+        flow.remove_tag(tag)
+        flow_list = openml.flows.list_flows(tag=tag)
+        self.assertEqual(len(flow_list), 0)
 
     def test_from_xml_to_xml(self):
         # Get the raw xml thing

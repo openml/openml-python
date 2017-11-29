@@ -11,8 +11,8 @@ def setup_exists(flow, model=None):
     '''
     Checks whether a hyperparameter configuration already exists on the server.
 
-    Parameter
-    ---------
+    Parameters
+    ----------
 
     flow : flow
         The openml flow object.
@@ -77,23 +77,23 @@ def get_setup(setup_id):
 def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
     """List all setups matching all of the given filters.
 
-        Perform API call `/setup/list/{filters}
+    Perform API call `/setup/list/{filters}`
 
-        Parameters
-        ----------
-        flow : int, optional
+    Parameters
+    ----------
+    flow : int, optional
 
-        tag : str, optional
+    tag : str, optional
 
-        setup : list(int), optional
+    setup : list(int), optional
 
-        offset : int, optional
+    offset : int, optional
 
-        size : int, optional
+    size : int, optional
 
-        Returns
-        -------
-        dict
+    Returns
+    -------
+    dict
         """
 
     api_call = "setup/list"
