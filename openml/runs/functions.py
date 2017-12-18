@@ -594,7 +594,7 @@ def _extract_arfftrace_attributes(model):
     for key in model.cv_results_:
         if key.startswith('param_'):
             # supported types should include all types, including bool, int float
-            supported_types = (bool, int, float, six.string_types)
+            supported_types = (bool, int, float, six.string_types, tuple)
             if all(isinstance(i, supported_types) or i is None for i in model.cv_results_[key]):
                 type = 'STRING'
             else:
