@@ -67,9 +67,10 @@ def list_all(listing_call, batch_size=10000, *args, **filters):
     dict
     """
     page = 0
+    has_more = 1
     result = {}
 
-    while True:
+    while has_more:
         try:
             new_batch = listing_call(
                 *args,
@@ -84,5 +85,6 @@ def list_all(listing_call, batch_size=10000, *args, **filters):
                 break
         result.update(new_batch)
         page += 1
+        has_more = (len(new_batch) == batch_size)
 
     return result
