@@ -10,7 +10,8 @@ import xmltodict
 
 import openml.utils
 from .dataset import OpenMLDataset
-from ..exceptions import OpenMLCacheException, OpenMLServerNoResult
+from ..exceptions import OpenMLCacheException, OpenMLServerNoResult, \
+    OpenMLHashException
 from .. import config
 from .._api_calls import _perform_api_call, _read_url
 
@@ -404,12 +405,14 @@ def _get_dataset_arff(did_cache_dir, description):
     url = description['oml:url']
     arff_string = _read_url(url)
     md5 = hashlib.md5()
-    md5.update(arff_string.encode('utf8'))
+    md5.update(arff_string.encode('utf-8'))
     md5_checksum = md5.hexdigest()
     if md5_checksum != md5_checksum_fixture:
-        raise ValueError(
+        raise OpenMLHashException(
             'Checksum %s of downloaded dataset %d is unequal to the checksum '
-            '%s sent by the server.' % (md5_checksum, did, md5_checksum_fixture)
+            '%s sent by the server.' % (
+                md5_checksum, int(did), md5_checksum_fixture
+            )
         )
 
     with io.open(output_file_path, "w", encoding='utf8') as fh:
