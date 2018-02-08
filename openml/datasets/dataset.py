@@ -265,7 +265,10 @@ class OpenMLDataset(object):
             rval.append(data)
         else:
             if isinstance(target, six.string_types):
-                target = [target]
+                if ',' in target:
+                    target = target.split(',')
+                else:
+                    target = [target]
             targets = np.array([True if column in target else False
                                 for column in attribute_names])
             if np.sum(targets) > 1:
