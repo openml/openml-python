@@ -620,7 +620,7 @@ def _create_run_from_xml(xml):
     if 'oml:output_data' not in run:
         raise ValueError('Run does not contain output_data (OpenML server error?)')
 
-    if 'oml:file' in 'oml:output_data':
+    if 'oml:file' in run['oml:output_data']:
         if isinstance(run['oml:output_data']['oml:file'], dict):
             # only one result.. probably due to an upload error
             file_dict = run['oml:output_data']['oml:file']

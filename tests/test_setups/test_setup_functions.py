@@ -141,3 +141,13 @@ class TestRun(TestBase):
         all = set(setups.keys()).union(setups2.keys())
 
         self.assertEqual(len(all), size * 2)
+
+    def test_get_cached_setup(self):
+        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.setups.functions._get_cached_setup(1)
+
+
+    def test_get_uncached_setup(self):
+        openml.config.set_cache_directory(self.static_cache_dir)
+        with self.assertRaises(openml.exceptions.OpenMLCacheException):
+            openml.setups.functions._get_cached_setup(10)

@@ -1,8 +1,11 @@
 from collections import OrderedDict
 
+import io
 import openml
+import os
 import xmltodict
 
+from .. import config
 from .setup import OpenMLSetup, OpenMLParameter
 from openml.flows import flow_exists
 
@@ -54,8 +57,23 @@ def setup_exists(flow, model=None):
         return False
 
 
+def _get_cached_setup(setup_id):
+    """Load a run from the cache."""
+    cache_dir = config.get_cache_directory()
+    setup_cache_dir = os.path.join(cache_dir, "setups")
+    try:
+        setup_file = os.path.join(setup_cache_dir, "setup_%d.xml" % int(setup_id))
+        with io.open(setup_file, encoding='utf8') as fh:
+            setup_xml = xmltodict.parse(fh.read())
+            setup = _create_setup_from_xml(setup_xml)
+        return setup
+
+    except (OSError, IOError):
+        raise openml.exceptions.OpenMLCacheException("Setup file for setup id %d not cached" % setup_id)
+
+
 def get_setup(setup_id):
-    '''
+    """
      Downloads the setup (configuration) description from OpenML
      and returns a structured object
 
@@ -68,9 +86,18 @@ def get_setup(setup_id):
         -------
         OpenMLSetup
             an initialized openml setup object
-    '''
-    result = openml._api_calls._perform_api_call('/setup/%d' %setup_id)
-    result_dict = xmltodict.parse(result)
+    """
+    run_file = os.path.join(config.get_cache_directory(), "setups", "setup_%d.xml" % setup_id)
+
+    try:
+        return _get_cached_setup(setup_id)
+
+    except (openml.exceptions.OpenMLCacheException):
+        setup_xml = openml._api_calls._perform_api_call('/setup/%d' % setup_id)
+        with io.open(run_file, "w", encoding='utf8') as fh:
+            fh.write(setup_xml)
+
+    result_dict = xmltodict.parse(setup_xml)
     return _create_setup_from_xml(result_dict)
 
 
@@ -216,6 +243,7 @@ def _to_dict(flow_id, openml_parameter_settings):
     xml['oml:run']['oml:parameter_setting'] = openml_parameter_settings
 
     return xml
+
 
 def _create_setup_from_xml(result_dict):
     '''
