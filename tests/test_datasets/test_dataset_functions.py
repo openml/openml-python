@@ -8,6 +8,7 @@ if sys.version_info[0] >= 3:
 else:
     import mock
 
+import random
 import six
 import scipy.sparse
 
@@ -15,6 +16,7 @@ import openml
 from openml import OpenMLDataset
 from openml.exceptions import OpenMLCacheException, PyOpenMLError
 from openml.testing import TestBase
+from openml.utils import _tag_entity
 
 from openml.datasets.functions import (_get_cached_dataset,
                                        _get_cached_dataset_features,
@@ -104,6 +106,15 @@ class TestOpenMLDataset(TestBase):
             self.assertIsInstance(dataset['status'], six.string_types)
             self.assertIn(dataset['status'], ['in_preparation', 'active',
                                               'deactivated'])
+
+    def test_tag_untag_dataset(self):
+        tag = 'test_tag_%d' %random.randint(1, 1000000)
+        all_tags = _tag_entity('data', 1, tag)
+        self.assertTrue(tag in all_tags)
+        all_tags = _tag_entity('data', 1, tag, untag=True)
+        self.assertTrue(tag not in all_tags)
+
+
 
     def test_list_datasets(self):
         # We can only perform a smoke test here because we test on dynamic
