@@ -92,7 +92,10 @@ class OpenMLDataset(object):
             self.qualities = {}
             for idx, xmlquality in enumerate(qualities['oml:quality']):
                 name = xmlquality['oml:name']
-                value = xmlquality['oml:value']
+                if 'oml:value' in xmlquality:
+                    value = xmlquality['oml:value']
+                else:
+                    value = None
                 self.qualities[name] = value
 
         if data_file is not None:
