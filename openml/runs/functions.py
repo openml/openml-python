@@ -555,7 +555,7 @@ def get_run(run_id):
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    run_dir = config.get_cache_directory(), "runs", run_id
+    run_dir = os.path.join(config.get_cache_directory(), "runs", str(run_id))
     run_file = os.path.join(run_dir, "description.xml")
 
     try:

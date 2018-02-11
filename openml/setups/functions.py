@@ -87,7 +87,7 @@ def get_setup(setup_id):
         OpenMLSetup
             an initialized openml setup object
     """
-    setup_dir = config.get_cache_directory(), "runs", setup_id
+    setup_dir = os.path.join(config.get_cache_directory(), "setups", str(setup_id))
     setup_file = os.path.join(setup_dir, "description.xml")
 
     try:
