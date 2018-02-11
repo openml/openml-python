@@ -87,14 +87,20 @@ def get_setup(setup_id):
         OpenMLSetup
             an initialized openml setup object
     """
-    run_file = os.path.join(config.get_cache_directory(), "setups", "setup_%d.xml" % setup_id)
+    setup_dir = config.get_cache_directory(), "runs", setup_id
+    setup_file = os.path.join(setup_dir, "description.xml")
+
+    try:
+        os.makedirs(setup_dir)
+    except FileExistsError:
+        pass
 
     try:
         return _get_cached_setup(setup_id)
 
     except (openml.exceptions.OpenMLCacheException):
         setup_xml = openml._api_calls._perform_api_call('/setup/%d' % setup_id)
-        with io.open(run_file, "w", encoding='utf8') as fh:
+        with io.open(setup_file, "w", encoding='utf8') as fh:
             fh.write(setup_xml)
 
     result_dict = xmltodict.parse(setup_xml)
