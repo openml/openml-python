@@ -641,10 +641,8 @@ def get_run(run_id):
     run_dir = os.path.join(config.get_cache_directory(), "runs", str(run_id))
     run_file = os.path.join(run_dir, "description.xml")
 
-    try:
+    if not os.path.exists(run_dir):
         os.makedirs(run_dir)
-    except FileExistsError:
-        pass
 
     try:
         return _get_cached_run(run_id)

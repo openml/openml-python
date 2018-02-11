@@ -90,10 +90,8 @@ def get_setup(setup_id):
     setup_dir = os.path.join(config.get_cache_directory(), "setups", str(setup_id))
     setup_file = os.path.join(setup_dir, "description.xml")
 
-    try:
+    if not os.path.exists(setup_dir):
         os.makedirs(setup_dir)
-    except FileExistsError:
-        pass
 
     try:
         return _get_cached_setup(setup_id)
