@@ -699,7 +699,6 @@ def _create_run_from_xml(xml, from_server=True):
     else:
         task_evaluation_measure = None
 
-
     flow_id = int(run['oml:flow_id'])
     flow_name = obtain_field(run, 'oml:flow_name', from_server)
     setup_id = obtain_field(run, 'oml:setup_id', from_server, cast=int)
@@ -714,7 +713,7 @@ def _create_run_from_xml(xml, from_server=True):
             parameters[key] = value
 
     if 'oml:input_data' in run:
-        dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
+        dataset_id = int(run['oml:input_data']['oml:dataset'][0]['oml:did'])
     elif not from_server:
         dataset_id = None
 
@@ -877,10 +876,9 @@ def _create_trace_from_arff(arff_obj):
 def _get_cached_run(run_id):
     """Load a run from the cache."""
     cache_dir = config.get_cache_directory()
-    run_cache_dir = os.path.join(cache_dir, "runs")
+    run_cache_dir = os.path.join(cache_dir, "runs", str(run_id))
     try:
-        run_file = os.path.join(run_cache_dir,
-                                "run_%d.xml" % int(run_id))
+        run_file = os.path.join(run_cache_dir, "description.xml")
         with io.open(run_file, encoding='utf8') as fh:
             run = _create_run_from_xml(xml=fh.read())
         return run

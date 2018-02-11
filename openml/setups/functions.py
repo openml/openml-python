@@ -60,9 +60,9 @@ def setup_exists(flow, model=None):
 def _get_cached_setup(setup_id):
     """Load a run from the cache."""
     cache_dir = config.get_cache_directory()
-    setup_cache_dir = os.path.join(cache_dir, "setups")
+    setup_cache_dir = os.path.join(cache_dir, "setups", str(setup_id))
     try:
-        setup_file = os.path.join(setup_cache_dir, "setup_%d.xml" % int(setup_id))
+        setup_file = os.path.join(setup_cache_dir, "description.xml" % int(setup_id))
         with io.open(setup_file, encoding='utf8') as fh:
             setup_xml = xmltodict.parse(fh.read())
             setup = _create_setup_from_xml(setup_xml)
