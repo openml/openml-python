@@ -713,7 +713,7 @@ def _create_run_from_xml(xml, from_server=True):
             parameters[key] = value
 
     if 'oml:input_data' in run:
-        dataset_id = int(run['oml:input_data']['oml:dataset'][0]['oml:did'])
+        dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
     elif not from_server:
         dataset_id = None
 
