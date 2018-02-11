@@ -3,38 +3,38 @@ import xmltodict
 from .._api_calls import _perform_api_call
 from ..evaluations import OpenMLEvaluation
 
-def list_evaluations(function, offset=None, size=None, id=None, task=None, setup=None,
-              flow=None, uploader=None, tag=None):
+
+def list_evaluations(function, offset=None, size=None, id=None, task=None,
+                     setup=None, flow=None, uploader=None, tag=None):
     """List all run-evaluation pairs matching all of the given filters.
 
-        Perform API call `/evaluation/function{function}/{filters} 
-        
-        Parameters
-        ----------
-        function : str 
-            the evaluation function. e.g., predictive_accuracy
-        offset : int, optional
-            the number of runs to skip, starting from the first
-        size : int, optional
-            the maximum number of runs to show
+    Perform API call ``/evaluation/function{function}/{filters}``
+    
+    Parameters
+    ----------
+    function : str 
+        the evaluation function. e.g., predictive_accuracy
+    offset : int, optional
+        the number of runs to skip, starting from the first
+    size : int, optional
+        the maximum number of runs to show
 
-        id : list, optional
+    id : list, optional
 
-        task : list, optional
+    task : list, optional
 
-        setup: list, optional
+    setup: list, optional
 
-        flow : list, optional
+    flow : list, optional
 
-        uploader : list, optional
+    uploader : list, optional
 
-        tag : str, optional
+    tag : str, optional
 
-        Returns
-        -------
-        list
-            List of found evaluations.
-        """
+    Returns
+    -------
+    dict
+    """
 
     api_call = "evaluation/list/function/%s" %function
     if offset is not None:
@@ -62,21 +62,17 @@ def _list_evaluations(api_call):
 
     xml_string = _perform_api_call(api_call)
 
-    evals_dict = xmltodict.parse(xml_string)
+    evals_dict = xmltodict.parse(xml_string, force_list=('oml:evaluation',))
     # Minimalistic check if the XML is useful
     if 'oml:evaluations' not in evals_dict:
         raise ValueError('Error in return XML, does not contain "oml:evaluations": %s'
                          % str(evals_dict))
 
-    if isinstance(evals_dict['oml:evaluations']['oml:evaluation'], list):
-        evals_list = evals_dict['oml:evaluations']['oml:evaluation']
-    elif isinstance(evals_dict['oml:evaluations']['oml:evaluation'], dict):
-        evals_list = [evals_dict['oml:evaluations']['oml:evaluation']]
-    else:
-        raise TypeError()
+    assert type(evals_dict['oml:evaluations']['oml:evaluation']) == list, \
+        type(evals_dict['oml:evaluations'])
 
     evals = dict()
-    for eval_ in evals_list:
+    for eval_ in evals_dict['oml:evaluations']['oml:evaluation']:
         run_id = int(eval_['oml:run_id'])
         array_data = None
         if 'oml:array_data' in eval_:

@@ -1,13 +1,15 @@
 from collections import OrderedDict
+import hashlib
 import io
 import os
 import re
 import shutil
 
+from oslo_concurrency import lockutils
 import xmltodict
 
 from .dataset import OpenMLDataset
-from ..exceptions import OpenMLCacheException
+from ..exceptions import OpenMLCacheException, OpenMLServerNoResult
 from .. import config
 from .._api_calls import _perform_api_call, _read_url
 
@@ -43,8 +45,8 @@ def _list_cached_datasets():
                                       directory_name)
         dataset_directory_content = os.listdir(directory_name)
 
-        if "dataset.arff" in dataset_directory_content and \
-                        "description.xml" in dataset_directory_content:
+        if ("dataset.arff" in dataset_directory_content and
+                "description.xml" in dataset_directory_content):
             if dataset_id not in datasets:
                 datasets.append(dataset_id)
 
@@ -115,7 +117,7 @@ def _get_cached_dataset_qualities(dataset_id):
     try:
         with io.open(qualities_file, encoding='utf8') as fh:
             qualities_xml = fh.read()
-            return xmltodict.parse(qualities_xml)["oml:data_qualities"]
+            return xmltodict.parse(qualities_xml)["oml:data_qualities"]['oml:quality']
     except (IOError, OSError):
         raise OpenMLCacheException("Dataset qualities for dataset id %d not "
                                    "cached" % dataset_id)
@@ -141,20 +143,22 @@ def list_datasets(offset=None, size=None, tag=None):
     Parameters
     ----------
     offset : int, optional
-        the number of datasets to skip, starting from the first
+        The number of datasets to skip, starting from the first.
     size : int, optional
-        the maximum datasets of tasks to show
+        The maximum number of datasets to show.
     tag : str, optional
-        the tag to include
+        Only include datasets matching this tag.
 
     Returns
     -------
-    datasets : list of dicts
-        A list of datasets having the given tag (if applicable).
+    datasets : dict of dicts
+        A mapping from dataset ID to dict.
 
         Every dataset is represented by a dictionary containing
         the following information:
         - dataset id
+        - name
+        - format
         - status
 
         If qualities are calculated for the dataset, some of
@@ -165,7 +169,7 @@ def list_datasets(offset=None, size=None, tag=None):
         api_call += "/offset/%d" % int(offset)
 
     if size is not None:
-       api_call += "/limit/%d" % int(size)
+        api_call += "/limit/%d" % int(size)
 
     if tag is not None:
         api_call += "/tag/%s" % tag
@@ -175,14 +179,17 @@ def list_datasets(offset=None, size=None, tag=None):
 
 def _list_datasets(api_call):
     # TODO add proper error handling here!
-    xml_string = _perform_api_call(api_call)
-    datasets_dict = xmltodict.parse(xml_string)
+    try:
+        xml_string = _perform_api_call(api_call)
+    except OpenMLServerNoResult:
+        return []
+    datasets_dict = xmltodict.parse(xml_string, force_list=('oml:dataset',))
 
     # Minimalistic check if the XML is useful
     assert type(datasets_dict['oml:data']['oml:dataset']) == list, \
         type(datasets_dict['oml:data'])
     assert datasets_dict['oml:data']['@xmlns:oml'] == \
-           'http://openml.org/openml', datasets_dict['oml:data']['@xmlns:oml']
+        'http://openml.org/openml', datasets_dict['oml:data']['@xmlns:oml']
 
     datasets = dict()
     for dataset_ in datasets_dict['oml:data']['oml:dataset']:
@@ -259,6 +266,8 @@ def get_dataset(dataset_id):
 
     TODO: explain caching!
 
+    This function is thread/multiprocessing safe.
+
     Parameters
     ----------
     ddataset_id : int
@@ -274,24 +283,31 @@ def get_dataset(dataset_id):
         raise ValueError("Dataset ID is neither an Integer nor can be "
                          "cast to an Integer.")
 
-    did_cache_dir = _create_dataset_cache_directory(dataset_id)
+    with lockutils.external_lock(
+        name='datasets.functions.get_dataset:%d' % dataset_id,
+        lock_path=os.path.join(config.get_cache_directory(), 'locks'),
+    ):
+        did_cache_dir = _create_dataset_cache_directory(dataset_id)
 
-    try:
-        description = _get_dataset_description(did_cache_dir, dataset_id)
-        arff_file = _get_dataset_arff(did_cache_dir, description)
-        features = _get_dataset_features(did_cache_dir, dataset_id)
-        # TODO not used yet, figure out what to do with this...
-        qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
-    except Exception as e:
-        _remove_dataset_cache_dir(did_cache_dir)
-        raise e
+        try:
+            description = _get_dataset_description(did_cache_dir, dataset_id)
+            arff_file = _get_dataset_arff(did_cache_dir, description)
+            features = _get_dataset_features(did_cache_dir, dataset_id)
+            qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
+        except Exception as e:
+            _remove_dataset_cache_dir(did_cache_dir)
+            raise e
 
-    dataset = _create_dataset_from_description(description, features, qualities, arff_file)
+        dataset = _create_dataset_from_description(
+            description, features, qualities, arff_file
+        )
     return dataset
 
 
 def _get_dataset_description(did_cache_dir, dataset_id):
-    """Get the dataset description as xml dictionary
+    """Get the dataset description as xml dictionary.
+
+    This function is NOT thread/multiprocessing safe.
 
     Parameters
     ----------
@@ -325,9 +341,6 @@ def _get_dataset_description(did_cache_dir, dataset_id):
     description = xmltodict.parse(dataset_xml)[
         "oml:data_set_description"]
 
-    with io.open(description_file, "w", encoding='utf8') as fh:
-        fh.write(dataset_xml)
-
     return description
 
 
@@ -336,6 +349,8 @@ def _get_dataset_arff(did_cache_dir, description):
 
     Checks if the file is in the cache, if yes, return the path to the file. If
     not, downloads the file and caches it, then returns the file path.
+
+    This function is NOT thread/multiprocessing safe.
 
     Parameters
     ----------
@@ -351,6 +366,8 @@ def _get_dataset_arff(did_cache_dir, description):
         Location of arff file.
     """
     output_file_path = os.path.join(did_cache_dir, "dataset.arff")
+    md5_checksum_fixture = description.get("oml:md5_checksum")
+    did = description.get("oml:id")
 
     # This means the file is still there; whether it is useful is up to
     # the user and not checked by the program.
@@ -363,6 +380,14 @@ def _get_dataset_arff(did_cache_dir, description):
 
     url = description['oml:url']
     arff_string = _read_url(url)
+    md5 = hashlib.md5()
+    md5.update(arff_string.encode('utf8'))
+    md5_checksum = md5.hexdigest()
+    if md5_checksum != md5_checksum_fixture:
+        raise ValueError(
+            'Checksum %s of downloaded dataset %d is unequal to the checksum '
+            '%s sent by the server.' % (md5_checksum, did, md5_checksum_fixture)
+        )
 
     with io.open(output_file_path, "w", encoding='utf8') as fh:
         fh.write(arff_string)
@@ -376,6 +401,8 @@ def _get_dataset_features(did_cache_dir, dataset_id):
 
     Features are feature descriptions for each column.
     (name, index, categorical, ...)
+
+    This function is NOT thread/multiprocessing safe.
 
     Parameters
     ----------
@@ -402,7 +429,7 @@ def _get_dataset_features(did_cache_dir, dataset_id):
         with io.open(features_file, "w", encoding='utf8') as fh:
             fh.write(features_xml)
 
-    features = xmltodict.parse(features_xml)["oml:data_features"]
+    features = xmltodict.parse(features_xml, force_list=('oml:feature',))["oml:data_features"]
 
     return features
 
@@ -411,6 +438,8 @@ def _get_dataset_qualities(did_cache_dir, dataset_id):
     """API call to get dataset qualities (cached)
 
     Features are metafeatures (number of features, number of classes, ...)
+
+    This function is NOT thread/multiprocessing safe.
 
     Parameters
     ----------
@@ -436,7 +465,7 @@ def _get_dataset_qualities(did_cache_dir, dataset_id):
         with io.open(qualities_file, "w", encoding='utf8') as fh:
             fh.write(qualities_xml)
 
-    qualities = xmltodict.parse(qualities_xml)['oml:data_qualities']
+    qualities = xmltodict.parse(qualities_xml, force_list=('oml:quality',))['oml:data_qualities']['oml:quality']
 
     return qualities
 
@@ -449,6 +478,8 @@ def _create_dataset_cache_directory(dataset_id):
     is a directory for each dataset witch the dataset ID being the directory
     name. This function creates this cache directory.
 
+    This function is NOT thread/multiprocessing safe.
+
     Parameters
     ----------
     did : int
@@ -459,29 +490,33 @@ def _create_dataset_cache_directory(dataset_id):
     str
         Path of the created dataset cache directory.
     """
-    dataset_cache_dir = os.path.join(config.get_cache_directory(), "datasets", str(dataset_id))
-    try:
-        os.makedirs(dataset_cache_dir)
-    except (OSError, IOError):
-        # TODO add debug information!
+    dataset_cache_dir = os.path.join(
+        config.get_cache_directory(),
+        "datasets",
+        str(dataset_id),
+    )
+    if os.path.exists(dataset_cache_dir) and os.path.isdir(dataset_cache_dir):
         pass
+    elif os.path.exists(dataset_cache_dir) and not os.path.isdir(dataset_cache_dir):
+        raise ValueError('Dataset cache dir exists but is not a directory!')
+    else:
+        os.makedirs(dataset_cache_dir)
     return dataset_cache_dir
 
 
 def _remove_dataset_cache_dir(did_cache_dir):
     """Remove the dataset cache directory
 
+    This function is NOT thread/multiprocessing safe.
+
     Parameters
     ----------
     """
     try:
-        os.rmdir(did_cache_dir)
+        shutil.rmtree(did_cache_dir)
     except (OSError, IOError):
-        try:
-            shutil.rmtree(did_cache_dir)
-        except (OSError, IOError):
-            raise ValueError('Cannot remove faulty dataset cache directory %s.'
-                             'Please do this manually!' % did_cache_dir)
+        raise ValueError('Cannot remove faulty dataset cache directory %s.'
+                         'Please do this manually!' % did_cache_dir)
 
 
 def _create_dataset_from_description(description, features, qualities, arff_file):

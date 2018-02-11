@@ -14,8 +14,8 @@ def setup_exists(flow, model=None):
     '''
     Checks whether a hyperparameter configuration already exists on the server.
 
-    Parameter
-    ---------
+    Parameters
+    ----------
 
     flow : flow
         The openml flow object.
@@ -110,24 +110,23 @@ def get_setup(setup_id):
 def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
     """List all setups matching all of the given filters.
 
-        Perform API call `/setup/list/{filters}
+    Perform API call `/setup/list/{filters}`
 
-        Parameters
-        ----------
-        flow : int, optional
+    Parameters
+    ----------
+    flow : int, optional
 
-        tag : str, optional
+    tag : str, optional
 
-        setup : list(int), optional
+    setup : list(int), optional
 
-        offset : int, optional
+    offset : int, optional
 
-        size : int, optional
+    size : int, optional
 
-        Returns
-        -------
-        list
-            List of found setups.
+    Returns
+    -------
+    dict
         """
 
     api_call = "setup/list"
@@ -150,7 +149,7 @@ def _list_setups(api_call):
 
     xml_string = openml._api_calls._perform_api_call(api_call)
 
-    setups_dict = xmltodict.parse(xml_string)
+    setups_dict = xmltodict.parse(xml_string, force_list=('oml:setup',))
     # Minimalistic check if the XML is useful
     if 'oml:setups' not in setups_dict:
         raise ValueError('Error in return XML, does not contain "oml:setups": %s'
@@ -165,15 +164,11 @@ def _list_setups(api_call):
                          '"http://openml.org/openml": %s'
                          % str(setups_dict))
 
-    if isinstance(setups_dict['oml:setups']['oml:setup'], list):
-        setups_list = setups_dict['oml:setups']['oml:setup']
-    elif isinstance(setups_dict['oml:setups']['oml:setup'], dict):
-        setups_list = [setups_dict['oml:setups']['oml:setup']]
-    else:
-        raise TypeError()
+    assert type(setups_dict['oml:setups']['oml:setup']) == list, \
+        type(setups_dict['oml:setups'])
 
     setups = dict()
-    for setup_ in setups_list:
+    for setup_ in setups_dict['oml:setups']['oml:setup']:
         # making it a dict to give it the right format
         current = _create_setup_from_xml({'oml:setup_parameters': setup_})
         setups[current.setup_id] = current

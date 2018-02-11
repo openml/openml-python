@@ -11,15 +11,24 @@ class OpenMLServerError(PyOpenMLError):
     def __init__(self, message):
         super(OpenMLServerError, self).__init__(message)
 
-#
+
 class OpenMLServerException(OpenMLServerError):
     """exception for when the result of the server was
        not 200 (e.g., listing call w/o results). """
 
-    def __init__(self, code, message, additional=None):
+    # Code needs to be optional to allow the exceptino to be picklable:
+    # https://stackoverflow.com/questions/16244923/how-to-make-a-custom-exception-class-with-multiple-init-args-pickleable
+    def __init__(self, message, code=None, additional=None, url=None):
+        self.message = message
         self.code = code
         self.additional = additional
+        self.url = url
         super(OpenMLServerException, self).__init__(message)
+
+
+class OpenMLServerNoResult(OpenMLServerException):
+    """exception for when the result of the server is empty. """
+    pass
 
 
 class OpenMLCacheException(PyOpenMLError):

@@ -1,4 +1,4 @@
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 import json
 import sys
 import time
@@ -11,6 +11,7 @@ import openml
 from ..tasks import get_task
 from .._api_calls import _perform_api_call, _file_id_to_url, _read_url_files
 from ..exceptions import PyOpenMLError
+
 
 class OpenMLRun(object):
     """OpenML Run: result of running a model on an openml dataset.
@@ -51,6 +52,7 @@ class OpenMLRun(object):
         self.run_id = run_id
         self.model = model
         self.tags = tags
+        self.predictions_url = predictions_url
 
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the server.
@@ -108,31 +110,31 @@ class OpenMLRun(object):
         return arff_dict
 
     def get_metric_fn(self, sklearn_fn, kwargs={}):
-        '''Calculates metric scores based on predicted values. Assumes the
+        """Calculates metric scores based on predicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
         it assumes that the 'correct' attribute is specified in the arff
         (which is an optional field, but always the case for openml-python
         runs)
 
         Parameters
-        -------
+        ----------
         sklearn_fn : function
             a function pointer to a sklearn function that
-            accepts y_true, y_pred and *kwargs
+            accepts ``y_true``, ``y_pred`` and ``**kwargs``
 
         Returns
         -------
         scores : list
             a list of floats, of length num_folds * num_repeats
-        '''
-        if self.data_content is not None:
+        """
+        if self.data_content is not None and self.task_id is not None:
             predictions_arff = self._generate_arff_dict()
         elif 'predictions' in self.output_files:
             predictions_file_url = _file_id_to_url(self.output_files['predictions'], 'predictions.arff')
             predictions_arff = arff.loads(openml._api_calls._read_url(predictions_file_url))
             # TODO: make this a stream reader
         else:
-            raise ValueError('Run should have been locally executed.')
+            raise ValueError('Run should have been locally executed or contain outputfile reference.')
 
         attribute_names = [att[0] for att in predictions_arff['attributes']]
         if 'correct' not in attribute_names:
@@ -347,6 +349,28 @@ class OpenMLRun(object):
                                         True, flow.flow_id)
 
         return parameters
+
+    def push_tag(self, tag):
+        """Annotates this run with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the run.
+        """
+        data = {'run_id': self.run_id, 'tag': tag}
+        _perform_api_call("/run/tag", data=data)
+
+    def remove_tag(self, tag):
+        """Removes a tag from this run on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the run.
+        """
+        data = {'run_id': self.run_id, 'tag': tag}
+        _perform_api_call("/run/untag", data=data)
 
 
 ################################################################################

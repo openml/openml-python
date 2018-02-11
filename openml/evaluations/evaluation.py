@@ -21,7 +21,8 @@ class OpenMLEvaluation(object):
         value : float
             the value of this evaluation
         array_data : str
-            list of information per class (e.g., in case of precision, auroc, recall)
+            list of information per class (e.g., in case of precision, auroc,
+            recall)
     '''
     def __init__(self, run_id, task_id, setup_id, flow_id, flow_name,
                  data_id, data_name, function, upload_time, value,
@@ -37,4 +38,3 @@ class OpenMLEvaluation(object):
         self.upload_time = upload_time
         self.value = value
         self.array_data = array_data
-

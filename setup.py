@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import setuptools
 import sys
@@ -35,12 +37,13 @@ except ImportError:
 
 
 setuptools.setup(name="openml",
-                 author="Matthias Feurer",
+                 author="Matthias Feurer, Andreas Müller, Farzan Majdani, "
+                        "Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers",
                  author_email="feurerm@informatik.uni-freiburg.de",
                  maintainer="Matthias Feurer",
                  maintainer_email="feurerm@informatik.uni-freiburg.de",
                  description="Python API for OpenML",
-                 license="GPLv3",
+                 license="BSD 3-clause",
                  url="http://openml.org/",
                  version=version,
                  packages=setuptools.find_packages(),
@@ -49,7 +52,7 @@ setuptools.setup(name="openml",
                  test_suite="nose.collector",
                  classifiers=['Intended Audience :: Science/Research',
                               'Intended Audience :: Developers',
-                              'License :: GPLv3',
+                              'License :: OSI Approved :: BSD License',
                               'Programming Language :: Python',
                               'Topic :: Software Development',
                               'Topic :: Scientific/Engineering',

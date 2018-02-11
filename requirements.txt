@@ -6,5 +6,7 @@ xmltodict
 nose
 requests
 scikit-learn>=0.18
+nbconvert
 nbformat
 python-dateutil
+oslo.concurrency

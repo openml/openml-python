@@ -1,6 +1,5 @@
 import unittest
 import os
-import shutil
 import sys
 
 if sys.version_info[0] >= 3:
@@ -8,8 +7,12 @@ if sys.version_info[0] >= 3:
 else:
     import mock
 
+
 import random
 import six
+
+from oslo_concurrency import lockutils
+
 import scipy.sparse
 
 import openml
@@ -25,26 +28,32 @@ from openml.datasets.functions import (_get_cached_dataset,
                                        _get_dataset_description,
                                        _get_dataset_arff,
                                        _get_dataset_features,
-                                       _get_dataset_qualities, get_dataset)
+                                       _get_dataset_qualities)
 
 
 class TestOpenMLDataset(TestBase):
+    _multiprocess_can_split_ = True
 
     def setUp(self):
         super(TestOpenMLDataset, self).setUp()
-        self._remove_did1()
 
     def tearDown(self):
+        self._remove_pickle_files()
         super(TestOpenMLDataset, self).tearDown()
-        self._remove_did1()
 
-    def _remove_did1(self):
+    def _remove_pickle_files(self):
         cache_dir = self.static_cache_dir
-        did_1_dir = os.path.join(cache_dir, 'datasets', '1')
-        try:
-            shutil.rmtree(did_1_dir)
-        except:
-            pass
+        for did in ['-1', '2']:
+            with lockutils.external_lock(
+                    name='datasets.functions.get_dataset:%s' % did,
+                    lock_path=os.path.join(openml.config.get_cache_directory(), 'locks'),
+            ):
+                pickle_path = os.path.join(cache_dir, 'datasets', did,
+                                           'dataset.pkl')
+                try:
+                    os.remove(pickle_path)
+                except:
+                    pass
 
     def test__list_cached_datasets(self):
         openml.config.set_cache_directory(self.static_cache_dir)
@@ -70,7 +79,7 @@ class TestOpenMLDataset(TestBase):
         self.assertIsInstance(dataset, OpenMLDataset)
         self.assertTrue(len(dataset.features) > 0)
         self.assertTrue(len(dataset.features) == len(features['oml:feature']))
-        self.assertTrue(len(dataset.qualities) == len(qualities['oml:quality']))
+        self.assertTrue(len(dataset.qualities) == len(qualities))
 
     def test_get_cached_dataset_description(self):
         openml.config.set_cache_directory(self.static_cache_dir)
@@ -113,8 +122,6 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(tag in all_tags)
         all_tags = _tag_entity('data', 1, tag, untag=True)
         self.assertTrue(tag not in all_tags)
-
-
 
     def test_list_datasets(self):
         # We can only perform a smoke test here because we test on dynamic
@@ -216,6 +223,20 @@ class TestOpenMLDataset(TestBase):
         self.assertIsInstance(arff_path, str)
         self.assertTrue(os.path.exists(arff_path))
 
+    def test__getarff_md5_issue(self):
+        description = {
+            'oml:id': 5,
+            'oml:md5_checksum': 'abc',
+            'oml:url': 'https://www.openml.org/data/download/61',
+        }
+        self.assertRaisesRegexp(
+            ValueError,
+            'Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded dataset 5 '
+            'is unequal to the checksum abc sent by the server.',
+            _get_dataset_arff,
+            self.workdir, description,
+        )
+
     def test__get_dataset_features(self):
         features = _get_dataset_features(self.workdir, 2)
         self.assertIsInstance(features, dict)
@@ -225,7 +246,7 @@ class TestOpenMLDataset(TestBase):
     def test__get_dataset_qualities(self):
         # Only a smoke check
         qualities = _get_dataset_qualities(self.workdir, 2)
-        self.assertIsInstance(qualities, dict)
+        self.assertIsInstance(qualities, list)
 
     def test_deletion_of_cache_dir(self):
         # Simple removal

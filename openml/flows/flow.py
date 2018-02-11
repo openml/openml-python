@@ -355,6 +355,28 @@ class OpenMLFlow(object):
                              (flow_id, message))
         return self
 
+    def push_tag(self, tag):
+        """Annotates this flow with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the flow.
+        """
+        data = {'flow_id': self.flow_id, 'tag': tag}
+        _perform_api_call("/flow/tag", data=data)
+
+    def remove_tag(self, tag):
+        """Removes a tag from this flow on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the flow.
+        """
+        data = {'flow_id': self.flow_id, 'tag': tag}
+        _perform_api_call("/flow/untag", data=data)
+
 
 def _copy_server_fields(source_flow, target_flow):
     fields_added_by_the_server = ['flow_id', 'uploader', 'version',
@@ -370,5 +392,3 @@ def _copy_server_fields(source_flow, target_flow):
 def _add_if_nonempty(dic, key, value):
     if value is not None:
         dic[key] = value
-
-
