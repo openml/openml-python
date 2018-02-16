@@ -45,8 +45,10 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
 
 
 def _tag_entity(entity_type, entity_id, tag, untag=False):
-    """Abstract function that can be used as a partial for tagging entities
-       on OpenML
+    """Function that tags or untags a given entity on OpenML. As the OpenML
+       API tag functions all consist of the same format, this function covers
+       all entity types (currently: dataset, task, flow, setup, run). Could
+       be used in a partial to provide dataset_tag, dataset_untag, etc.
 
         Parameters
         ----------
@@ -65,7 +67,7 @@ def _tag_entity(entity_type, entity_id, tag, untag=False):
         Returns
         -------
         tags : list
-            List of tags that the entity is still tagged with
+            List of tags that the entity is (still) tagged with
         """
     legal_entities = {'data', 'task', 'flow', 'setup', 'run'}
     if entity_type not in legal_entities:
