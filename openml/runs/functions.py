@@ -638,8 +638,11 @@ def get_run(run_id):
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    run_file = os.path.join(config.get_cache_directory(), "runs",
-                            "run_%d.xml" % run_id)
+    run_dir = os.path.join(config.get_cache_directory(), "runs", str(run_id))
+    run_file = os.path.join(run_dir, "description.xml")
+
+    if not os.path.exists(run_dir):
+        os.makedirs(run_dir)
 
     try:
         return _get_cached_run(run_id)
@@ -667,7 +670,7 @@ def _create_run_from_xml(xml, from_server=True):
     run : OpenMLRun
         New run object representing run_xml.
     """
-
+    
     def obtain_field(xml_obj, fieldname, from_server, cast=None):
         # this function can be used to check whether a field is present in an object.
         # if it is not present, either returns None or throws an error (this is
@@ -693,7 +696,6 @@ def _create_run_from_xml(xml, from_server=True):
         task_evaluation_measure = run['oml:task_evaluation_measure']
     else:
         task_evaluation_measure = None
-
 
     flow_id = int(run['oml:flow_id'])
     flow_name = obtain_field(run, 'oml:flow_name', from_server)
@@ -872,10 +874,9 @@ def _create_trace_from_arff(arff_obj):
 def _get_cached_run(run_id):
     """Load a run from the cache."""
     cache_dir = config.get_cache_directory()
-    run_cache_dir = os.path.join(cache_dir, "runs")
+    run_cache_dir = os.path.join(cache_dir, "runs", str(run_id))
     try:
-        run_file = os.path.join(run_cache_dir,
-                                "run_%d.xml" % int(run_id))
+        run_file = os.path.join(run_cache_dir, "description.xml")
         with io.open(run_file, encoding='utf8') as fh:
             run = _create_run_from_xml(xml=fh.read())
         return run
