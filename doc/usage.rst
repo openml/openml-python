@@ -143,7 +143,7 @@ We can filter the list of tasks to only contain datasets with more than
     >>> filtered_tasks = tasks.query('NumberOfInstances > 500 and NumberOfInstances < 1000')
     >>> print(list(filtered_tasks.index))                               # doctest: +SKIP
     [2, 11, 15, 29, 37, 41, 49, 53, ..., 146597, 146600, 146605]
-    >>> print(len(filtered_tasks))
+    >>> print(len(filtered_tasks))                                      # doctest: +SKIP
     210
 
 Then, we can further restrict the tasks to all have the same resampling
