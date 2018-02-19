@@ -615,7 +615,7 @@ class TestRun(TestBase):
             self.assertRaises(ValueError, _get_seeded_model, model=clf, seed=42)
 
     def test__extract_arfftrace(self):
-        param_grid = {"hidden_layer_sizes": [(5, 5), (10, 10), (20, 20)],
+        param_grid = {"hidden_layer_sizes": [[5, 5], [10, 10], [20, 20]],
                       "activation" : ['identity', 'logistic', 'tanh', 'relu'],
                       "learning_rate_init": [0.1, 0.01, 0.001, 0.0001],
                       "max_iter": [10, 20, 40, 80]}
@@ -626,6 +626,9 @@ class TestRun(TestBase):
         train, _ = task.get_train_test_split_indices(0, 0)
         X, y = task.get_X_and_y()
         clf.fit(X[train], y[train])
+
+        # check num layers of MLP
+        self.assertIn(clf.best_estimator_.hidden_layer_sizes, param_grid['hidden_layer_sizes'])
 
         trace_attribute_list = _extract_arfftrace_attributes(clf)
         trace_list = _extract_arfftrace(clf, 0, 0)
@@ -659,7 +662,6 @@ class TestRun(TestBase):
                         self.assertIsInstance(trace_list[line_idx][att_idx], int)
                     else: # att_type = real
                         self.assertIsInstance(trace_list[line_idx][att_idx], float)
-
 
         self.assertEqual(set(param_grid.keys()), optimized_params)
 
