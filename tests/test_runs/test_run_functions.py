@@ -518,7 +518,10 @@ class TestRun(TestBase):
             run = run.publish()
             self._wait_for_processed_run(run.run_id, 200)
             run_id = run.run_id
-        except openml.exceptions.PyOpenMLError:
+        except openml.exceptions.PyOpenMLError as e:
+            if 'Run already exists in server' not in e.message:
+                # in this case the error was not the one we expected
+                raise e
             # run was already
             flow = openml.flows.sklearn_to_flow(clf)
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
