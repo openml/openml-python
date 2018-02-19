@@ -518,7 +518,10 @@ class TestRun(TestBase):
             run = run.publish()
             self._wait_for_processed_run(run.run_id, 200)
             run_id = run.run_id
-        except openml.exceptions.PyOpenMLError:
+        except openml.exceptions.PyOpenMLError as e:
+            if 'Run already exists in server' not in e.message:
+                # in this case the error was not the one we expected
+                raise e
             # run was already
             flow = openml.flows.sklearn_to_flow(clf)
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
@@ -968,3 +971,12 @@ class TestRun(TestBase):
             predictionsB = np.array(arff_content2)[:, -2:]
 
             np.testing.assert_array_equal(predictionsA, predictionsB)
+
+    def test_get_cached_run(self):
+        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.runs.functions._get_cached_run(1)
+
+    def test_get_uncached_run(self):
+        openml.config.set_cache_directory(self.static_cache_dir)
+        with self.assertRaises(openml.exceptions.OpenMLCacheException):
+            openml.runs.functions._get_cached_run(10)

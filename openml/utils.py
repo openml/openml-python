@@ -1,4 +1,6 @@
+import xmltodict
 import six
+from ._api_calls import _perform_api_call
 
 from openml.exceptions import OpenMLServerException
 
@@ -40,6 +42,55 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
         else:
             raise ValueError("Could not find tag '%s' in node '%s'" %
                              (xml_tag_name, str(node)))
+
+
+def _tag_entity(entity_type, entity_id, tag, untag=False):
+    """Function that tags or untags a given entity on OpenML. As the OpenML
+       API tag functions all consist of the same format, this function covers
+       all entity types (currently: dataset, task, flow, setup, run). Could
+       be used in a partial to provide dataset_tag, dataset_untag, etc.
+
+        Parameters
+        ----------
+        entity_type : str
+            Name of the entity to tag (e.g., run, flow, data)
+
+        entity_id : int
+            OpenML id of the entity
+
+        tag : str
+            The tag
+
+        untag : bool
+            Set to true if needed to untag, rather than tag
+
+        Returns
+        -------
+        tags : list
+            List of tags that the entity is (still) tagged with
+        """
+    legal_entities = {'data', 'task', 'flow', 'setup', 'run'}
+    if entity_type not in legal_entities:
+        raise ValueError('Can\'t tag a %s' %entity_type)
+
+    uri = '%s/tag' %entity_type
+    main_tag = 'oml:%s_tag' %entity_type
+    if untag:
+        uri = '%s/untag' %entity_type
+        main_tag = 'oml:%s_untag' %entity_type
+
+
+    post_variables = {'%s_id'%entity_type: entity_id, 'tag': tag}
+    result_xml = _perform_api_call(uri, post_variables)
+
+    result = xmltodict.parse(result_xml, force_list={'oml:tag'})[main_tag]
+
+    if 'oml:tag' in result:
+        return result['oml:tag']
+    else:
+        # no tags, return empty list
+        return []
+
             
 def list_all(listing_call, batch_size=10000, *args, **filters):
     """Helper to handle paged listing requests.
