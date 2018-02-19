@@ -95,7 +95,7 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
     # 'gzip,deflate'
     response = requests.post(url, data=data, files=file_elements)
     if response.status_code != 200:
-        raise _parse_server_exception(response)
+        raise _parse_server_exception(response, url=url)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
@@ -117,14 +117,14 @@ def _read_url(url, data=None):
         response = requests.post(url, data=data)
 
     if response.status_code != 200:
-        raise _parse_server_exception(response)
+        raise _parse_server_exception(response, url=url)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
     return response.text
 
 
-def _parse_server_exception(response):
+def _parse_server_exception(response, url=None):
     # OpenML has a sopisticated error system
     # where information about failures is provided. try to parse this
     try:
@@ -143,4 +143,9 @@ def _parse_server_exception(response):
         # 512 for runs, 370 for datasets (should be 372), 500 for flows
         # 482 for tasks
         return OpenMLServerNoResult(code, message, additional)
-    return OpenMLServerException(code, message, additional)
+    return OpenMLServerException(
+        code=code,
+        message=message,
+        additional=additional,
+        url=url
+    )

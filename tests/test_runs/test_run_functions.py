@@ -1,4 +1,5 @@
 import arff
+import collections
 import json
 import random
 import time
@@ -517,7 +518,10 @@ class TestRun(TestBase):
             run = run.publish()
             self._wait_for_processed_run(run.run_id, 200)
             run_id = run.run_id
-        except openml.exceptions.PyOpenMLError:
+        except openml.exceptions.PyOpenMLError as e:
+            if 'Run already exists in server' not in e.message:
+                # in this case the error was not the one we expected
+                raise e
             # run was already
             flow = openml.flows.sklearn_to_flow(clf)
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
@@ -714,18 +718,59 @@ class TestRun(TestBase):
 
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(7)
-        class_labels = task.class_labels
         num_instances = 3196
         num_folds = 10
         num_repeats = 1
 
         clf = SGDClassifier(loss='log', random_state=1)
-        res = openml.runs.functions._run_task_get_arffcontent(clf, task, class_labels)
+        res = openml.runs.functions._run_task_get_arffcontent(clf, task)
         arff_datacontent, arff_tracecontent, _, fold_evaluations, sample_evaluations = res
         # predictions
         self.assertIsInstance(arff_datacontent, list)
         # trace. SGD does not produce any
         self.assertIsInstance(arff_tracecontent, type(None))
+
+        self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds)
+
+        # 10 times 10 fold CV of 150 samples
+        self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
+        for arff_line in arff_datacontent:
+            # check number columns
+            self.assertEqual(len(arff_line), 8)
+            # check repeat
+            self.assertGreaterEqual(arff_line[0], 0)
+            self.assertLessEqual(arff_line[0], num_repeats - 1)
+            # check fold
+            self.assertGreaterEqual(arff_line[1], 0)
+            self.assertLessEqual(arff_line[1], num_folds - 1)
+            # check row id
+            self.assertGreaterEqual(arff_line[2], 0)
+            self.assertLessEqual(arff_line[2], num_instances - 1)
+            # check confidences
+            self.assertAlmostEqual(sum(arff_line[4:6]), 1.0)
+            self.assertIn(arff_line[6], ['won', 'nowin'])
+            self.assertIn(arff_line[7], ['won', 'nowin'])
+
+    def test__run_model_on_fold(self):
+        task = openml.tasks.get_task(7)
+        num_instances = 320
+        num_folds = 1
+        num_repeats = 1
+
+        clf = SGDClassifier(loss='log', random_state=1)
+        can_measure_runtime = sys.version_info[:2] >= (3, 3)
+        res = openml.runs.functions._run_model_on_fold(clf, task, 0, 0, 0, can_measure_runtime)
+
+        arff_datacontent, arff_tracecontent, user_defined_measures, model = res
+        # predictions
+        self.assertIsInstance(arff_datacontent, list)
+        # trace. SGD does not produce any
+        self.assertIsInstance(arff_tracecontent, list)
+        self.assertEquals(len(arff_tracecontent), 0)
+
+        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        for measure in user_defined_measures:
+            fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
         self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds)
 
@@ -896,7 +941,7 @@ class TestRun(TestBase):
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task, class_labels)
+        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task)
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)
@@ -917,8 +962,8 @@ class TestRun(TestBase):
                 ('imputer', sklearn.preprocessing.Imputer()), ('estimator', HardNaiveBayes())
             ])
 
-            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task, task.class_labels)
-            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task, task.class_labels)
+            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task)
+            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task)
 
             # verifies last two arff indices (predict and correct)
             # TODO: programmatically check wether these are indeed features (predict, correct)
@@ -926,3 +971,12 @@ class TestRun(TestBase):
             predictionsB = np.array(arff_content2)[:, -2:]
 
             np.testing.assert_array_equal(predictionsA, predictionsB)
+
+    def test_get_cached_run(self):
+        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.runs.functions._get_cached_run(1)
+
+    def test_get_uncached_run(self):
+        openml.config.set_cache_directory(self.static_cache_dir)
+        with self.assertRaises(openml.exceptions.OpenMLCacheException):
+            openml.runs.functions._get_cached_run(10)

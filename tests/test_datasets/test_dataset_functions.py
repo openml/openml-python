@@ -7,13 +7,19 @@ if sys.version_info[0] >= 3:
 else:
     import mock
 
+
+import random
+import six
+
 from oslo_concurrency import lockutils
+
 import scipy.sparse
 
 import openml
 from openml import OpenMLDataset
 from openml.exceptions import OpenMLCacheException, PyOpenMLError
 from openml.testing import TestBase
+from openml.utils import _tag_entity
 
 from openml.datasets.functions import (_get_cached_dataset,
                                        _get_cached_dataset_features,
@@ -99,6 +105,23 @@ class TestOpenMLDataset(TestBase):
                                                       "dataset id 3 not cached",
                                 openml.datasets.functions._get_cached_dataset_arff,
                                 3)
+
+    def _check_dataset(self, dataset):
+            self.assertEqual(type(dataset), dict)
+            self.assertGreaterEqual(len(dataset), 2)
+            self.assertIn('did', dataset)
+            self.assertIsInstance(dataset['did'], int)
+            self.assertIn('status', dataset)
+            self.assertIsInstance(dataset['status'], six.string_types)
+            self.assertIn(dataset['status'], ['in_preparation', 'active',
+                                              'deactivated'])
+
+    def test_tag_untag_dataset(self):
+        tag = 'test_tag_%d' %random.randint(1, 1000000)
+        all_tags = _tag_entity('data', 1, tag)
+        self.assertTrue(tag in all_tags)
+        all_tags = _tag_entity('data', 1, tag, untag=True)
+        self.assertTrue(tag not in all_tags)
 
     def test_list_datasets(self):
         # We can only perform a smoke test here because we test on dynamic
@@ -199,6 +222,20 @@ class TestOpenMLDataset(TestBase):
         arff_path = _get_dataset_arff(self.workdir, description)
         self.assertIsInstance(arff_path, str)
         self.assertTrue(os.path.exists(arff_path))
+
+    def test__getarff_md5_issue(self):
+        description = {
+            'oml:id': 5,
+            'oml:md5_checksum': 'abc',
+            'oml:url': 'https://www.openml.org/data/download/61',
+        }
+        self.assertRaisesRegexp(
+            ValueError,
+            'Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded dataset 5 '
+            'is unequal to the checksum abc sent by the server.',
+            _get_dataset_arff,
+            self.workdir, description,
+        )
 
     def test__get_dataset_features(self):
         features = _get_dataset_features(self.workdir, 2)
