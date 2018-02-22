@@ -147,6 +147,14 @@ class TestOpenMLDataset(TestBase):
             for did in datasets:
                 self._check_dataset(datasets[did])
 
+    def test_list_datasets_empty(self):
+        datasets = openml.datasets.list_datasets(tag='NoOneWouldUseThisTagAnyway')
+        if len(datasets) > 0:
+            raise ValueError('UnitTest Outdated, tag was already used (please remove)')
+
+        self.assertIsInstance(datasets, dict)
+
+
     @unittest.skip('See https://github.com/openml/openml-python/issues/149')
     def test_check_datasets_active(self):
         active = openml.datasets.check_datasets_active([1, 17])

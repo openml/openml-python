@@ -830,6 +830,13 @@ class TestRun(TestBase):
         for rid in runs:
             self._check_run(runs[rid])
 
+    def test_list_runs_empty(self):
+        runs = openml.runs.list_runs(task=[-1])
+        if len(runs) > 0:
+            raise ValueError('UnitTest Outdated, got somehow results')
+
+        self.assertIsInstance(runs, dict)
+
     def test_get_runs_list_by_task(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server

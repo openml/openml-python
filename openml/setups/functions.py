@@ -8,6 +8,7 @@ import xmltodict
 from .. import config
 from .setup import OpenMLSetup, OpenMLParameter
 from openml.flows import flow_exists
+from openml.exceptions import OpenMLServerNoResult
 
 
 def setup_exists(flow, model=None):
@@ -145,7 +146,10 @@ def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
 def _list_setups(api_call):
     """Helper function to parse API calls which are lists of setups"""
 
-    xml_string = openml._api_calls._perform_api_call(api_call)
+    try:
+        xml_string = openml._api_calls._perform_api_call(api_call)
+    except OpenMLServerNoResult:
+        return dict()
 
     setups_dict = xmltodict.parse(xml_string, force_list=('oml:setup',))
     # Minimalistic check if the XML is useful

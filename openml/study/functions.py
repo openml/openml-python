@@ -3,6 +3,7 @@ import xmltodict
 from openml.study import OpenMLStudy
 from .._api_calls import _perform_api_call
 
+
 def _multitag_to_list(result_dict, tag):
     if isinstance(result_dict[tag], list):
         return result_dict[tag]
