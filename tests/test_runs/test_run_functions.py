@@ -475,6 +475,7 @@ class TestRun(TestBase):
                                                ('Estimator', GaussianNB())])
         task = openml.tasks.get_task(11)
         run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=False)
+        openml.config.server = self.test_server
         run_ = run.publish()
         run = openml.runs.get_run(run_.run_id)
 
