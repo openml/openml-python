@@ -189,7 +189,7 @@ def _list_datasets(api_call):
     try:
         xml_string = _perform_api_call(api_call)
     except OpenMLServerNoResult:
-        return []
+        return dict()
     datasets_dict = xmltodict.parse(xml_string, force_list=('oml:dataset',))
 
     # Minimalistic check if the XML is useful

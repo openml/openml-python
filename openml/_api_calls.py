@@ -139,9 +139,9 @@ def _parse_server_exception(response, url=None):
     additional = None
     if 'oml:additional_information' in server_exception['oml:error']:
         additional = server_exception['oml:error']['oml:additional_information']
-    if code in [370, 372, 512, 500, 482]:
-        # 512 for runs, 370 for datasets (should be 372), 500 for flows
-        # 482 for tasks
+    if code in [372, 512, 500, 482, 542, 674]: # datasets,
+        # 512 for runs, 372 for datasets, 500 for flows
+        # 482 for tasks, 542 for evaluations, 674 for setups
         return OpenMLServerNoResult(code, message, additional)
     return OpenMLServerException(
         code=code,

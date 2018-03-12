@@ -1,5 +1,6 @@
 import xmltodict
 
+from openml.exceptions import OpenMLServerNoResult
 from .._api_calls import _perform_api_call
 from ..evaluations import OpenMLEvaluation
 
@@ -59,8 +60,10 @@ def list_evaluations(function, offset=None, size=None, id=None, task=None,
 
 def _list_evaluations(api_call):
     """Helper function to parse API calls which are lists of runs"""
-
-    xml_string = _perform_api_call(api_call)
+    try:
+        xml_string = _perform_api_call(api_call)
+    except OpenMLServerNoResult:
+        return dict()
 
     evals_dict = xmltodict.parse(xml_string, force_list=('oml:evaluation',))
     # Minimalistic check if the XML is useful
