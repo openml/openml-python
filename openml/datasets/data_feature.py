@@ -1,4 +1,4 @@
-import sys
+import six
 
 class OpenMLDataFeature(object):
     """Data Feature (a.k.a. Attribute) object.
@@ -31,7 +31,7 @@ class OpenMLDataFeature(object):
 
         self.index = index
         # In case of python version lower than 3, change the default ASCII encoder.
-        if sys.version_info[0] < 3:
+        if six.PY2:
             self.name = str(name.encode('utf8'))
         else:
             self.name = str(name)

@@ -91,7 +91,10 @@ class OpenMLDataset(object):
 
         if data_file is not None:
             if self._data_features_supported():
-                self.data_pickle_file = data_file.replace('.arff', '.pkl')
+                if six.PY2:
+                    self.data_pickle_file = data_file.replace('.arff', '.pkl.py2')
+                else:
+                    self.data_pickle_file = data_file.replace('.arff', '.pkl.py3')
 
                 if os.path.exists(self.data_pickle_file):
                     logger.debug("Data pickle file already exists.")

@@ -1,6 +1,6 @@
 from collections import namedtuple, OrderedDict
 import os
-import sys
+import six
 
 import numpy as np
 import scipy.io.arff
@@ -60,7 +60,10 @@ class OpenMLSplit(object):
     @classmethod
     def _from_arff_file(cls, filename, cache=True):
         repetitions = None
-        pkl_filename = filename.replace(".arff", ".pkl")
+        if six.PY2:
+            pkl_filename = filename.replace(".arff", ".pkl.py2")
+        else:
+            pkl_filename = filename.replace(".arff", ".pkl.py3")
         if cache:
             if os.path.exists(pkl_filename):
                 try:
