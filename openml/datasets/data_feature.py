@@ -1,3 +1,4 @@
+import sys
 
 class OpenMLDataFeature(object):
     """Data Feature (a.k.a. Attribute) object.
@@ -29,7 +30,11 @@ class OpenMLDataFeature(object):
             raise ValueError('number_missing_values is of wrong datatype')
 
         self.index = index
-        self.name = str(name)
+        # In case of python version lower than 3, change the default ASCII encoder.
+        if sys.version_info[0] < 3:
+            self.name = str(name.encode('utf8'))
+        else:
+            self.name = str(name)
         self.data_type = str(data_type)
         self.nominal_values = nominal_values
         self.number_missing_values = number_missing_values
