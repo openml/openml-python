@@ -148,8 +148,10 @@ class OpenMLDataset(object):
     def __eq__(self, other):
         if type(other) != OpenMLDataset:
             return False
-        elif self.id == other._id or \
-                (self.name == other._name and self.version == other._version):
+        elif (
+            self.dataset_id == other.dataset_id
+            or (self.name == other._name and self.version == other._version)
+        ):
             return True
         else:
             return False
@@ -219,7 +221,10 @@ class OpenMLDataset(object):
         rval = []
 
         if not self._data_features_supported():
-            raise PyOpenMLError('Dataset not compatible, PyOpenML cannot handle string features')
+            raise PyOpenMLError(
+                'Dataset %d not compatible, PyOpenML cannot handle string '
+                'features' % self.dataset_id
+            )
 
         path = self.data_pickle_file
         if not os.path.exists(path):
