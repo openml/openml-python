@@ -112,6 +112,7 @@ class TestTask(TestBase):
         openml.config.set_cache_directory(self.static_cache_dir)
         task = openml.tasks.get_task(1882)
         # Test the following task as it used to throw an Unicode Error.
+        # https://github.com/openml/openml-python/issues/378
         openml.config.server = self.production_server
         production_task = openml.tasks.get_task(34536)
 
