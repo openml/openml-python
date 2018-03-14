@@ -138,7 +138,7 @@ class TestSetupFunctions(TestBase):
             self.assertEquals(setups[setup_id].flow_id, flow_id)
 
     def test_list_setups_empty(self):
-        setups = openml.setups.list_setups(setup=[-1])
+        setups = openml.setups.list_setups(setup=[0])
         if len(setups) > 0:
             raise ValueError('UnitTest Outdated, got somehow results')
 
