@@ -594,11 +594,16 @@ def _extract_arfftrace_attributes(model):
     for key in model.cv_results_:
         if key.startswith('param_'):
             # supported types should include all types, including bool, int float
-            supported_types = (bool, int, float, six.string_types)
-            if all(isinstance(i, supported_types) or i is None for i in model.cv_results_[key]):
-                type = 'STRING'
-            else:
-                raise TypeError('Unsupported param type in param grid')
+            supported_basic_types = (bool, int, float, six.string_types)
+            for param_value in model.cv_results_[key]:
+                if isinstance(param_value, supported_basic_types) or param_value is None:
+                    # basic string values
+                    type = 'STRING'
+                elif isinstance(param_value, list) and all(isinstance(i, int) for i in param_value):
+                    # list of integers
+                    type = 'STRING'
+                else:
+                    raise TypeError('Unsupported param type in param grid: %s' %key)
 
             # we renamed the attribute param to parameter, as this is a required
             # OpenML convention
@@ -948,7 +953,7 @@ def _list_runs(api_call):
     try:
         xml_string = _perform_api_call(api_call)
     except OpenMLServerNoResult:
-        return []
+        return dict()
 
     runs_dict = xmltodict.parse(xml_string, force_list=('oml:run',))
     # Minimalistic check if the XML is useful

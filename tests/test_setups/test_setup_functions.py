@@ -137,6 +137,13 @@ class TestSetupFunctions(TestBase):
         for setup_id in setups.keys():
             self.assertEquals(setups[setup_id].flow_id, flow_id)
 
+    def test_list_setups_empty(self):
+        setups = openml.setups.list_setups(setup=[0])
+        if len(setups) > 0:
+            raise ValueError('UnitTest Outdated, got somehow results')
+
+        self.assertIsInstance(setups, dict)
+
     def test_setuplist_offset(self):
         # TODO: remove after pull on live for better testing
         # openml.config.server = self.production_server

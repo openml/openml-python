@@ -137,7 +137,7 @@ def _get_cached_dataset_arff(dataset_id):
                                    "cached" % dataset_id)
 
 
-def list_datasets(offset=None, size=None, tag=None):
+def list_datasets(offset=None, size=None, tag=None, status=None):
     """Return a list of all dataset which are on OpenML.
 
     Parameters
@@ -148,6 +148,10 @@ def list_datasets(offset=None, size=None, tag=None):
         The maximum number of datasets to show.
     tag : str, optional
         Only include datasets matching this tag.
+    status : str, optional
+        Should be {active, in_preparation, deactivated}. By
+        default active datasets are returned, but also datasets
+        from another status can be requested. 
 
     Returns
     -------
@@ -174,6 +178,9 @@ def list_datasets(offset=None, size=None, tag=None):
     if tag is not None:
         api_call += "/tag/%s" % tag
 
+    if status is not None:
+        api_call += "/status/%s" %status
+
     return _list_datasets(api_call)
 
 
@@ -182,7 +189,7 @@ def _list_datasets(api_call):
     try:
         xml_string = _perform_api_call(api_call)
     except OpenMLServerNoResult:
-        return []
+        return dict()
     datasets_dict = xmltodict.parse(xml_string, force_list=('oml:dataset',))
 
     # Minimalistic check if the XML is useful
