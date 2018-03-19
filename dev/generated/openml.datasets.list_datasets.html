@@ -110,7 +110,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.list_datasets<a class="headerlink" href="#openml-datasets-list-datasets" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.datasets.list_datasets">
-<code class="descclassname">openml.datasets.</code><code class="descname">list_datasets</code><span class="sig-paren">(</span><em>offset=None</em>, <em>size=None</em>, <em>tag=None</em>, <em>status=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.list_datasets" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.datasets.</code><code class="descname">list_datasets</code><span class="sig-paren">(</span><em>offset=None</em>, <em>size=None</em>, <em>status=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.list_datasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of all dataset which are on OpenML.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -124,15 +124,16 @@
 <blockquote>
 <div><p>The maximum number of datasets to show.</p>
 </div></blockquote>
-<p><strong>tag</strong> : str, optional</p>
-<blockquote>
-<div><p>Only include datasets matching this tag.</p>
-</div></blockquote>
 <p><strong>status</strong> : str, optional</p>
 <blockquote>
 <div><p>Should be {active, in_preparation, deactivated}. By
 default active datasets are returned, but also datasets
 from another status can be requested.</p>
+</div></blockquote>
+<p><strong>kwargs</strong> : dict, optional</p>
+<blockquote>
+<div><p>Legal filter operators (keys in the dict):
+{tag, status, limit, offset, data_name, data_version, number_instances, number_features, number_classes, number_missing_values}.</p>
 </div></blockquote>
 </td>
 </tr>
