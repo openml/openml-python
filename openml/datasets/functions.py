@@ -151,7 +151,8 @@ def list_datasets(offset=None, size=None, status=None, **kwargs):
         default active datasets are returned, but also datasets
         from another status can be requested.
     kwargs : dict, optional
-        .
+        Legal filter operators (keys in the dict):
+        {tag, status, limit, offset, data_name, data_version, number_instances, number_features, number_classes, number_missing_values}.
 
     Returns
     -------
