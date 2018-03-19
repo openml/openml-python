@@ -137,7 +137,7 @@ def _get_cached_dataset_arff(dataset_id):
                                    "cached" % dataset_id)
 
 
-def list_datasets(offset=None, size=None, tag=None, status=None):
+def list_datasets(offset=None, size=None, status=None, **kwargs):
     """Return a list of all dataset which are on OpenML.
 
     Parameters
@@ -146,12 +146,13 @@ def list_datasets(offset=None, size=None, tag=None, status=None):
         The number of datasets to skip, starting from the first.
     size : int, optional
         The maximum number of datasets to show.
-    tag : str, optional
-        Only include datasets matching this tag.
     status : str, optional
         Should be {active, in_preparation, deactivated}. By
         default active datasets are returned, but also datasets
-        from another status can be requested. 
+        from another status can be requested.
+    kwargs : dict, optional
+        Legal filter operators (keys in the dict):
+        {tag, status, limit, offset, data_name, data_version, number_instances, number_features, number_classes, number_missing_values}.
 
     Returns
     -------
@@ -175,11 +176,12 @@ def list_datasets(offset=None, size=None, tag=None, status=None):
     if size is not None:
         api_call += "/limit/%d" % int(size)
 
-    if tag is not None:
-        api_call += "/tag/%s" % tag
-
     if status is not None:
         api_call += "/status/%s" %status
+
+    if kwargs is not None:
+        for filter, value in kwargs.items():
+            api_call += "/%s/%s" % (filter, value)
 
     return _list_datasets(api_call)
 
