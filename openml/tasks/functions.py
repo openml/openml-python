@@ -12,7 +12,7 @@ from ..datasets import get_dataset
 from .task import OpenMLTask, _create_task_cache_dir
 from .. import config
 from .._api_calls import _perform_api_call
-
+import openml.utils
 
 def _get_cached_tasks():
     tasks = OrderedDict()
@@ -87,9 +87,9 @@ def _get_estimation_procedure_list():
 
     return procs
 
-
 def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
-    """Return a number of tasks having the given tag and task_type_id
+    """
+    Return a number of tasks having the given tag and task_type_id
 
     Parameters
     ----------
@@ -121,6 +121,16 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
         task id, dataset id, task_type and status. If qualities are calculated
         for the associated dataset, some of these are also returned.
     """
+    return openml.utils(_list_tasks, task_type_id, offset, size, tag)
+
+def _list_tasks(task_type_id=None, offset=None, size=None, tag=None):
+    """
+    Perform the api call to return a number of tasks having the given filters
+
+    Returns
+    -------
+    dict
+    """
     api_call = "task/list"
     if task_type_id is not None:
         api_call += "/type/%d" % int(task_type_id)
@@ -134,10 +144,10 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
     if tag is not None:
         api_call += "/tag/%s" % tag
 
-    return _list_tasks(api_call)
+    return __list_tasks(api_call)
 
 
-def _list_tasks(api_call):
+def __list_tasks(api_call):
     try:
         xml_string = _perform_api_call(api_call)
     except OpenMLServerNoResult:

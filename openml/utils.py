@@ -4,7 +4,6 @@ from ._api_calls import _perform_api_call
 
 from openml.exceptions import OpenMLServerException
 
-
 def extract_xml_tags(xml_tag_name, node, allow_none=True):
     """Helper to extract xml tags from xmltodict.
 
@@ -42,7 +41,6 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
         else:
             raise ValueError("Could not find tag '%s' in node '%s'" %
                              (xml_tag_name, str(node)))
-
 
 def _tag_entity(entity_type, entity_id, tag, untag=False):
     """Function that tags or untags a given entity on OpenML. As the OpenML
@@ -91,8 +89,7 @@ def _tag_entity(entity_type, entity_id, tag, untag=False):
         # no tags, return empty list
         return []
 
-            
-def list_all(listing_call, batch_size=10000, *args, **filters):
+def list_all(listing_call, batch_size=10000, *args, **kwargs):
     """Helper to handle paged listing requests.
 
     Example usage:
@@ -110,7 +107,7 @@ def list_all(listing_call, batch_size=10000, *args, **filters):
         Batch size for paging.
     *args : Variable length argument list
         Any required arguments for the listing call.
-    **filters : Arbitrary keyword arguments
+    **kwargs : Arbitrary keyword arguments
         Any filters that can be applied to the listing function.
         
     Returns
@@ -118,16 +115,15 @@ def list_all(listing_call, batch_size=10000, *args, **filters):
     dict
     """
     page = 0
-    has_more = 1
     result = {}
 
-    while has_more:
+    while True:
         try:
             new_batch = listing_call(
                 *args,
                 size=batch_size,
                 offset=batch_size*page,
-                **filters
+                **kwargs
             )
         except OpenMLServerException as e:
             if page == 0 and e.args[0] == 'No results':
@@ -136,6 +132,5 @@ def list_all(listing_call, batch_size=10000, *args, **filters):
                 break
         result.update(new_batch)
         page += 1
-        has_more = (len(new_batch) == batch_size)
 
     return result

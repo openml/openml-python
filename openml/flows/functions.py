@@ -6,6 +6,7 @@ import six
 from openml._api_calls import _perform_api_call
 from openml.exceptions import OpenMLServerNoResult
 from . import OpenMLFlow
+import openml.utils
 
 
 def get_flow(flow_id):
@@ -31,6 +32,7 @@ def get_flow(flow_id):
 
 
 def list_flows(offset=None, size=None, tag=None):
+
     """Return a list of all flows which are on OpenML.
 
     Parameters
@@ -57,6 +59,16 @@ def list_flows(offset=None, size=None, tag=None):
         - external version
         - uploader
     """
+    return openml.utils.list_all(_list_flows(offset, tag, size))
+
+def _list_flows(offset=None, size=None, tag=None):
+    """
+    Perform the api call that return a list of all flows.
+
+    Returns
+    -------
+    flows : dict
+    """
     api_call = "flow/list"
     if offset is not None:
         api_call += "/offset/%d" % int(offset)
@@ -67,8 +79,7 @@ def list_flows(offset=None, size=None, tag=None):
     if tag is not None:
         api_call += "/tag/%s" % tag
 
-    return _list_flows(api_call)
-
+    return __list_flows(api_call)
 
 def flow_exists(name, external_version):
     """Retrieves the flow id.
@@ -108,7 +119,7 @@ def flow_exists(name, external_version):
         return False
 
 
-def _list_flows(api_call):
+def __list_flows(api_call):
     try:
         xml_string = _perform_api_call(api_call)
     except OpenMLServerNoResult:

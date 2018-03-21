@@ -1,19 +1,18 @@
 import xmltodict
 
 from openml.exceptions import OpenMLServerNoResult
+import openml.utils
 from .._api_calls import _perform_api_call
 from ..evaluations import OpenMLEvaluation
 
-
 def list_evaluations(function, offset=None, size=None, id=None, task=None,
-                     setup=None, flow=None, uploader=None, tag=None):
-    """List all run-evaluation pairs matching all of the given filters.
+                      setup=None, flow=None, uploader=None, tag=None):
+    """
+    List all run-evaluation pairs matching all of the given filters.
 
-    Perform API call ``/evaluation/function{function}/{filters}``
-    
     Parameters
     ----------
-    function : str 
+    function : str
         the evaluation function. e.g., predictive_accuracy
     offset : int, optional
         the number of runs to skip, starting from the first
@@ -31,6 +30,20 @@ def list_evaluations(function, offset=None, size=None, id=None, task=None,
     uploader : list, optional
 
     tag : str, optional
+
+    Returns
+    -------
+    dict
+    """
+
+    return openml.utils(_list_evaluations, function, offset, id, task,
+                        setup, flow, uploader, tag, size)
+
+def _list_evaluations(function, offset=None, size=None, id=None, task=None,
+                      setup=None, flow=None, uploader=None, tag=None):
+
+    """
+    Perform API call ``/evaluation/function{function}/{filters}``
 
     Returns
     -------
@@ -55,10 +68,9 @@ def list_evaluations(function, offset=None, size=None, id=None, task=None,
     if tag is not None:
         api_call += "/tag/%s" % tag
 
-    return _list_evaluations(api_call)
+    return __list_evaluations(api_call)
 
-
-def _list_evaluations(api_call):
+def __list_evaluations(api_call):
     """Helper function to parse API calls which are lists of runs"""
     try:
         xml_string = _perform_api_call(api_call)
@@ -89,4 +101,3 @@ def _list_evaluations(api_call):
                                       array_data)
         evals[run_id] = evaluation
     return evals
-

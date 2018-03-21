@@ -8,6 +8,7 @@ import shutil
 from oslo_concurrency import lockutils
 import xmltodict
 
+import openml.utils
 from .dataset import OpenMLDataset
 from ..exceptions import OpenMLCacheException, OpenMLServerNoResult
 from .. import config
@@ -136,9 +137,10 @@ def _get_cached_dataset_arff(dataset_id):
         raise OpenMLCacheException("ARFF file for dataset id %d not "
                                    "cached" % dataset_id)
 
-
 def list_datasets(offset=None, size=None, status=None, **kwargs):
-    """Return a list of all dataset which are on OpenML.
+
+    """
+    Return a list of all dataset which are on OpenML.
 
     Parameters
     ----------
@@ -169,6 +171,18 @@ def list_datasets(offset=None, size=None, status=None, **kwargs):
         If qualities are calculated for the dataset, some of
         these are also returned.
     """
+    return openml.utils(_list_datasets(offset, status, size, **kwargs))
+
+def _list_datasets(offset=None, size=None, status=None, **kwargs):
+
+    """
+    Perform api call to return a list of all datasets.
+
+    Returns
+    -------
+    datasets : dict of dicts
+    """
+
     api_call = "data/list"
     if offset is not None:
         api_call += "/offset/%d" % int(offset)
@@ -183,10 +197,9 @@ def list_datasets(offset=None, size=None, status=None, **kwargs):
         for filter, value in kwargs.items():
             api_call += "/%s/%s" % (filter, value)
 
-    return _list_datasets(api_call)
+    return __list_datasets(api_call)
 
-
-def _list_datasets(api_call):
+def __list_datasets(api_call):
     # TODO add proper error handling here!
     try:
         xml_string = _perform_api_call(api_call)
@@ -217,7 +230,6 @@ def _list_datasets(api_call):
         datasets[did] = dataset
 
     return datasets
-
 
 def check_datasets_active(dataset_ids):
     """Check if the dataset ids provided are active.

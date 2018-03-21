@@ -9,6 +9,7 @@ from .. import config
 from .setup import OpenMLSetup, OpenMLParameter
 from openml.flows import flow_exists
 from openml.exceptions import OpenMLServerNoResult
+import openml.utils
 
 
 def setup_exists(flow, model=None):
@@ -105,11 +106,9 @@ def get_setup(setup_id):
     result_dict = xmltodict.parse(setup_xml)
     return _create_setup_from_xml(result_dict)
 
-
 def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
-    """List all setups matching all of the given filters.
-
-    Perform API call `/setup/list/{filters}`
+    """
+    List all setups matching all of the given filters.
 
     Parameters
     ----------
@@ -128,6 +127,17 @@ def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
     dict
         """
 
+    return openml.utils.list_all(_list_setups, flow, tag, setup, offset, size)
+
+def _list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
+    """
+    Perform API call `/setup/list/{filters}`
+
+    Returns
+    -------
+    dict
+        """
+
     api_call = "setup/list"
     if offset is not None:
         api_call += "/offset/%d" % int(offset)
@@ -140,10 +150,9 @@ def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
     if tag is not None:
         api_call += "/tag/%s" % tag
 
-    return _list_setups(api_call)
+    return __list_setups(api_call)
 
-
-def _list_setups(api_call):
+def __list_setups(api_call):
     """Helper function to parse API calls which are lists of setups"""
 
     try:

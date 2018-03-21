@@ -890,12 +890,12 @@ def _get_cached_run(run_id):
         raise OpenMLCacheException("Run file for run id %d not "
                                    "cached" % run_id)
 
-
 def list_runs(offset=None, size=None, id=None, task=None, setup=None,
               flow=None, uploader=None, tag=None, display_errors=False):
-    """List all runs matching all of the given filters.
 
-    Perform API call `/run/list/{filters} <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`_
+    """
+    List all runs matching all of the given filters.
+    Call utils.list_all with the _list_runs function and the above parameters.
 
     Parameters
     ----------
@@ -921,7 +921,22 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         prediction file).
     Returns
     -------
-    list
+    dict
+        List of found runs.
+    """
+
+    return openml.utils.list_all(_list_runs, offset, id, task, setup,
+                                 flow, uploader, tag, display_errors, size)
+
+def _list_runs(offset=None, size=None, id=None, task=None, setup=None,
+               flow=None, uploader=None, tag=None, display_errors=False):
+
+    """
+    Perform API call `/run/list/{filters} <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`_
+
+    Returns
+    -------
+    dict
         List of found runs.
     """
 
@@ -945,10 +960,9 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
     if display_errors:
         api_call += "/show_errors/true"
 
-    return _list_runs(api_call)
+    return __list_runs(api_call)
 
-
-def _list_runs(api_call):
+def __list_runs(api_call):
     """Helper function to parse API calls which are lists of runs"""
     try:
         xml_string = _perform_api_call(api_call)
