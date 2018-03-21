@@ -171,9 +171,19 @@ def list_datasets(offset=None, size=None, status=None, **kwargs):
         If qualities are calculated for the dataset, some of
         these are also returned.
     """
-    return openml.utils(_list_datasets(offset, status, size, **kwargs))
+    param_dict = {}
+    if offset is not None:
+        param_dict["offset"] = offset
+    if size is not None:
+        param_dict["size"] = size
+    if status is not None:
+        param_dict["status"] = status
+    if kwargs is not None:
+        param_dict.update(kwargs)
 
-def _list_datasets(offset=None, size=None, status=None, **kwargs):
+    return openml.utils(**param_dict)
+
+def _list_datasets(**kwargs):
 
     """
     Perform api call to return a list of all datasets.
@@ -184,14 +194,6 @@ def _list_datasets(offset=None, size=None, status=None, **kwargs):
     """
 
     api_call = "data/list"
-    if offset is not None:
-        api_call += "/offset/%d" % int(offset)
-
-    if size is not None:
-        api_call += "/limit/%d" % int(size)
-
-    if status is not None:
-        api_call += "/status/%s" %status
 
     if kwargs is not None:
         for filter, value in kwargs.items():
