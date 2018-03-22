@@ -114,16 +114,25 @@ def list_all(listing_call, batch_size=10000, *args, **kwargs):
     -------
     dict
     """
+
+    # eliminate filters that have a None value
+    active_filters = {key : value for key, value in kwargs if value is not None}
     page = 0
     result = {}
-
-    while True:
+    max = None
+    cycle = True
+    if 'size' in active_filters:
+        max = active_filters['size']
+    if max is not None:
+        if batch_size > max:
+            batch_size = max
+    while cycle:
         try:
             new_batch = listing_call(
                 *args,
                 size=batch_size,
                 offset=batch_size*page,
-                **kwargs
+                **active_filters
             )
         except OpenMLServerException as e:
             if page == 0 and e.args[0] == 'No results':
@@ -132,5 +141,11 @@ def list_all(listing_call, batch_size=10000, *args, **kwargs):
                 break
         result.update(new_batch)
         page += 1
+        if max is not None:
+            max -= batch_size
+            if max == 0:
+                break
+            if max < batch_size:
+                batch_size = max
 
     return result
