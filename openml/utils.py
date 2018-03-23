@@ -89,7 +89,7 @@ def _tag_entity(entity_type, entity_id, tag, untag=False):
         # no tags, return empty list
         return []
 
-def list_all(listing_call, batch_size=10000, *args, **kwargs):
+def list_all(listing_call, *args, batch_size=10000,  **kwargs):
     """Helper to handle paged listing requests.
 
     Example usage:
@@ -121,6 +121,7 @@ def list_all(listing_call, batch_size=10000, *args, **kwargs):
     result = {}
     # max number of results to be shown
     limit = None
+    offset = 0
     cycle = True
     if 'size' in active_filters:
         limit = active_filters['size']
@@ -128,13 +129,14 @@ def list_all(listing_call, batch_size=10000, *args, **kwargs):
     if limit is not None:
         if batch_size > limit:
             batch_size = limit
-
+    if 'offset' in active_filters:
+        offset = active_filters['offset']
     while cycle:
         try:
             new_batch = listing_call(
                 *args,
                 limit=batch_size,
-                offset=batch_size*page,
+                offset=offset + batch_size * page,
                 **active_filters
             )
         except OpenMLServerException as e:
