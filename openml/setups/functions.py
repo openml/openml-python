@@ -127,9 +127,9 @@ def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
     dict
         """
 
-    return openml.utils.list_all(_list_setups, flow, tag, setup, offset, size)
+    return openml.utils.list_all(_list_setups, flow=flow, tag=tag, setup=setup, offset=offset, size=size)
 
-def _list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
+def _list_setups(setup=None, **kwargs):
     """
     Perform API call `/setup/list/{filters}`
 
@@ -139,16 +139,11 @@ def _list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
         """
 
     api_call = "setup/list"
-    if offset is not None:
-        api_call += "/offset/%d" % int(offset)
-    if size is not None:
-        api_call += "/limit/%d" % int(size)
     if setup is not None:
         api_call += "/setup/%s" % ','.join([str(int(i)) for i in setup])
-    if flow is not None:
-        api_call += "/flow/%s" % flow
-    if tag is not None:
-        api_call += "/tag/%s" % tag
+    if kwargs is not None:
+        for filter, value in kwargs.items():
+            api_call += "/%s/%s" % (filter, value)
 
     return __list_setups(api_call)
 
@@ -157,8 +152,8 @@ def __list_setups(api_call):
 
     try:
         xml_string = openml._api_calls._perform_api_call(api_call)
-    except OpenMLServerNoResult:
-        return dict()
+    except OpenMLServerNoResult as e:
+        raise e
 
     setups_dict = xmltodict.parse(xml_string, force_list=('oml:setup',))
     # Minimalistic check if the XML is useful

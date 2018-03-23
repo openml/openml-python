@@ -925,11 +925,11 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         List of found runs.
     """
 
-    return openml.utils.list_all(_list_runs, offset, id, task, setup,
-                                 flow, uploader, tag, display_errors, size)
+    return openml.utils.list_all(_list_runs, offset=offset, id=id, task=task, setup=setup,
+                                 flow=flow, uploader=uploader, tag=tag, display_errors=display_errors, size=size)
 
-def _list_runs(offset=None, size=None, id=None, task=None, setup=None,
-               flow=None, uploader=None, tag=None, display_errors=False):
+def _list_runs(id=None, task=None, setup=None,
+               flow=None, uploader=None, display_errors=False, **kwargs):
 
     """
     Perform API call `/run/list/{filters} <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`_
@@ -941,10 +941,9 @@ def _list_runs(offset=None, size=None, id=None, task=None, setup=None,
     """
 
     api_call = "run/list"
-    if offset is not None:
-        api_call += "/offset/%d" % int(offset)
-    if size is not None:
-       api_call += "/limit/%d" % int(size)
+    if kwargs is not None:
+        for filter, value in kwargs.items():
+            api_call += "/%s/%s" % (filter, value)
     if id is not None:
         api_call += "/run/%s" % ','.join([str(int(i)) for i in id])
     if task is not None:
@@ -955,8 +954,6 @@ def _list_runs(offset=None, size=None, id=None, task=None, setup=None,
         api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
     if uploader is not None:
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
-    if tag is not None:
-        api_call += "/tag/%s" % tag
     if display_errors:
         api_call += "/show_errors/true"
 
@@ -966,8 +963,8 @@ def __list_runs(api_call):
     """Helper function to parse API calls which are lists of runs"""
     try:
         xml_string = _perform_api_call(api_call)
-    except OpenMLServerNoResult:
-        return dict()
+    except OpenMLServerNoResult as e:
+        raise e
 
     runs_dict = xmltodict.parse(xml_string, force_list=('oml:run',))
     # Minimalistic check if the XML is useful

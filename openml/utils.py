@@ -116,21 +116,24 @@ def list_all(listing_call, batch_size=10000, *args, **kwargs):
     """
 
     # eliminate filters that have a None value
-    active_filters = {key : value for key, value in kwargs if value is not None}
+    active_filters = {key : value for key, value in kwargs.items() if value is not None}
     page = 0
     result = {}
-    max = None
+    # max number of results to be shown
+    limit = None
     cycle = True
     if 'size' in active_filters:
-        max = active_filters['size']
-    if max is not None:
-        if batch_size > max:
-            batch_size = max
+        limit = active_filters['size']
+    # check if the batch size is greater than the number of results that need to be returned.
+    if limit is not None:
+        if batch_size > limit:
+            batch_size = limit
+
     while cycle:
         try:
             new_batch = listing_call(
                 *args,
-                size=batch_size,
+                limit=batch_size,
                 offset=batch_size*page,
                 **active_filters
             )
@@ -141,11 +144,13 @@ def list_all(listing_call, batch_size=10000, *args, **kwargs):
                 break
         result.update(new_batch)
         page += 1
-        if max is not None:
-            max -= batch_size
-            if max == 0:
+        if limit is not None:
+            limit -= batch_size
+            # check if the number of required results has been achieved
+            if limit == 0:
                 break
-            if max < batch_size:
-                batch_size = max
+            # check if there are enough results to fulfill a batch
+            if limit < batch_size:
+                batch_size = limit
 
     return result

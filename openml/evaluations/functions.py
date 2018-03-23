@@ -6,7 +6,7 @@ from .._api_calls import _perform_api_call
 from ..evaluations import OpenMLEvaluation
 
 def list_evaluations(function, offset=None, size=None, id=None, task=None,
-                      setup=None, flow=None, uploader=None, tag=None):
+                     setup=None, flow=None, uploader=None, tag=None):
     """
     List all run-evaluation pairs matching all of the given filters.
 
@@ -36,11 +36,10 @@ def list_evaluations(function, offset=None, size=None, id=None, task=None,
     dict
     """
 
-    return openml.utils(_list_evaluations, function, offset, id, task,
-                        setup, flow, uploader, tag, size)
+    return openml.utils.list_all(_list_evaluations, function, offset=offset, size=size, id=id, task=task,
+                        setup=setup, flow=flow, uploader=uploader, tag=tag)
 
-def _list_evaluations(function, offset=None, size=None, id=None, task=None,
-                      setup=None, flow=None, uploader=None, tag=None):
+def _list_evaluations(function, id=None, task=None, setup=None, flow=None, uploader=None, **kwargs):
 
     """
     Perform API call ``/evaluation/function{function}/{filters}``
@@ -51,10 +50,9 @@ def _list_evaluations(function, offset=None, size=None, id=None, task=None,
     """
 
     api_call = "evaluation/list/function/%s" %function
-    if offset is not None:
-        api_call += "/offset/%d" % int(offset)
-    if size is not None:
-        api_call += "/limit/%d" % int(size)
+    if kwargs is not None:
+        for filter, value in kwargs.items():
+            api_call += "/%s/%s" % (filter, value)
     if id is not None:
         api_call += "/run/%s" % ','.join([str(int(i)) for i in id])
     if task is not None:
@@ -65,8 +63,6 @@ def _list_evaluations(function, offset=None, size=None, id=None, task=None,
         api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
     if uploader is not None:
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
-    if tag is not None:
-        api_call += "/tag/%s" % tag
 
     return __list_evaluations(api_call)
 
@@ -74,8 +70,8 @@ def __list_evaluations(api_call):
     """Helper function to parse API calls which are lists of runs"""
     try:
         xml_string = _perform_api_call(api_call)
-    except OpenMLServerNoResult:
-        return dict()
+    except OpenMLServerNoResult as e:
+        raise e
 
     evals_dict = xmltodict.parse(xml_string, force_list=('oml:evaluation',))
     # Minimalistic check if the XML is useful

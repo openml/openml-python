@@ -121,9 +121,9 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
         task id, dataset id, task_type and status. If qualities are calculated
         for the associated dataset, some of these are also returned.
     """
-    return openml.utils(_list_tasks, task_type_id, offset, size, tag)
+    return openml.utils.list_all(_list_tasks, task_type_id=task_type_id, offset=offset, size=size, tag=tag)
 
-def _list_tasks(task_type_id=None, offset=None, size=None, tag=None):
+def _list_tasks(**kwargs):
     """
     Perform the api call to return a number of tasks having the given filters
 
@@ -132,17 +132,9 @@ def _list_tasks(task_type_id=None, offset=None, size=None, tag=None):
     dict
     """
     api_call = "task/list"
-    if task_type_id is not None:
-        api_call += "/type/%d" % int(task_type_id)
-
-    if offset is not None:
-        api_call += "/offset/%d" % int(offset)
-
-    if size is not None:
-        api_call += "/limit/%d" % int(size)
-
-    if tag is not None:
-        api_call += "/tag/%s" % tag
+    if kwargs is not None:
+        for filter, value in kwargs.items():
+            api_call += "/%s/%s" % (filter, value)
 
     return __list_tasks(api_call)
 
@@ -150,8 +142,8 @@ def _list_tasks(task_type_id=None, offset=None, size=None, tag=None):
 def __list_tasks(api_call):
     try:
         xml_string = _perform_api_call(api_call)
-    except OpenMLServerNoResult:
-        return dict()
+    except OpenMLServerNoResult as e:
+        raise e
     tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task','oml:input'))
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:

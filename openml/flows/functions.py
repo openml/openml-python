@@ -59,9 +59,9 @@ def list_flows(offset=None, size=None, tag=None):
         - external version
         - uploader
     """
-    return openml.utils.list_all(_list_flows(offset, tag, size))
+    return openml.utils.list_all(_list_flows, offset=offset, size=size, tag=tag)
 
-def _list_flows(offset=None, size=None, tag=None):
+def _list_flows(**kwargs):
     """
     Perform the api call that return a list of all flows.
 
@@ -70,14 +70,10 @@ def _list_flows(offset=None, size=None, tag=None):
     flows : dict
     """
     api_call = "flow/list"
-    if offset is not None:
-        api_call += "/offset/%d" % int(offset)
 
-    if size is not None:
-        api_call += "/limit/%d" % int(size)
-
-    if tag is not None:
-        api_call += "/tag/%s" % tag
+    if kwargs is not None:
+        for filter, value in kwargs.items():
+            api_call += "/%s/%s" % (filter, value)
 
     return __list_flows(api_call)
 
@@ -122,8 +118,8 @@ def flow_exists(name, external_version):
 def __list_flows(api_call):
     try:
         xml_string = _perform_api_call(api_call)
-    except OpenMLServerNoResult:
-        return dict()
+    except OpenMLServerNoResult as e:
+        raise e
     flows_dict = xmltodict.parse(xml_string, force_list=('oml:flow',))
 
     # Minimalistic check if the XML is useful

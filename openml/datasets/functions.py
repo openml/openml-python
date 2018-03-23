@@ -171,17 +171,8 @@ def list_datasets(offset=None, size=None, status=None, **kwargs):
         If qualities are calculated for the dataset, some of
         these are also returned.
     """
-    param_dict = {}
-    if offset is not None:
-        param_dict["offset"] = offset
-    if size is not None:
-        param_dict["size"] = size
-    if status is not None:
-        param_dict["status"] = status
-    if kwargs is not None:
-        param_dict.update(kwargs)
 
-    return openml.utils(**param_dict)
+    return openml.utils.list_all(_list_datasets, offset=offset, size=size, status=status, **kwargs)
 
 def _list_datasets(**kwargs):
 
@@ -198,15 +189,14 @@ def _list_datasets(**kwargs):
     if kwargs is not None:
         for filter, value in kwargs.items():
             api_call += "/%s/%s" % (filter, value)
-
     return __list_datasets(api_call)
 
 def __list_datasets(api_call):
     # TODO add proper error handling here!
     try:
         xml_string = _perform_api_call(api_call)
-    except OpenMLServerNoResult:
-        return dict()
+    except OpenMLServerNoResult as e:
+        raise e
     datasets_dict = xmltodict.parse(xml_string, force_list=('oml:dataset',))
 
     # Minimalistic check if the XML is useful
