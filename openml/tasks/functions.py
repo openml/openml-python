@@ -87,13 +87,13 @@ def _get_estimation_procedure_list():
 
     return procs
 
-def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
+def list_tasks(type=None, offset=None, size=None, tag=None):
     """
     Return a number of tasks having the given tag and task_type_id
 
     Parameters
     ----------
-    task_type_id : int, optional
+    type : int, optional
         ID of the task type as detailed
         `here <https://www.openml.org/search?type=task_type>`_.
 
@@ -121,7 +121,7 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
         task id, dataset id, task_type and status. If qualities are calculated
         for the associated dataset, some of these are also returned.
     """
-    return openml.utils.list_all(_list_tasks, task_type_id=task_type_id, offset=offset, size=size, tag=tag)
+    return openml.utils.list_all(_list_tasks, type=type, offset=offset, size=size, tag=tag)
 
 def _list_tasks(**kwargs):
     """
@@ -135,7 +135,6 @@ def _list_tasks(**kwargs):
     if kwargs is not None:
         for filter, value in kwargs.items():
             api_call += "/%s/%s" % (filter, value)
-
     return __list_tasks(api_call)
 
 
