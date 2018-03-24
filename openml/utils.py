@@ -125,12 +125,14 @@ def list_all(listing_call, *args, batch_size=10000,  **kwargs):
     cycle = True
     if 'size' in active_filters:
         limit = active_filters['size']
+        del active_filters['size']
     # check if the batch size is greater than the number of results that need to be returned.
     if limit is not None:
         if batch_size > limit:
             batch_size = limit
     if 'offset' in active_filters:
         offset = active_filters['offset']
+        del active_filters['offset']
     while cycle:
         try:
             new_batch = listing_call(
