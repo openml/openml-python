@@ -956,7 +956,6 @@ def _list_runs(id=None, task=None, setup=None,
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
     if display_errors:
         api_call += "/show_errors/true"
-
     return __list_runs(api_call)
 
 def __list_runs(api_call):
