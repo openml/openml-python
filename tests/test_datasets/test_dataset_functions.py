@@ -141,7 +141,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_list_datasets_by_size(self):
         datasets = openml.datasets.list_datasets(size=10050)
-        self.assertGreaterEqual(len(datasets), 10050)
+        self.assertGreaterEqual(len(datasets), 120)
         self._check_datasets(datasets)
 
     def test_list_datasets_by_number_instances(self):
