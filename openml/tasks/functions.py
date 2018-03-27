@@ -87,12 +87,17 @@ def _get_estimation_procedure_list():
 
     return procs
 
-def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
+
+def list_tasks(task_type_id=None, **kwargs):
     """
     Return a number of tasks having the given tag and task_type_id
 
     Parameters
     ----------
+    Filter task_type_id is separated from the other filters because
+    it is used as task_type_id in the task description, but it is named
+    type when used as a filter in list tasks call.
+
     task_type_id : int, optional
         ID of the task type as detailed
         `here <https://www.openml.org/search?type=task_type>`_.
@@ -106,12 +111,10 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
         - Survival Analysis: 7
         - Subgroup Discovery: 8
 
-    offset : int, optional
-        the number of tasks to skip, starting from the first
-    size : int, optional
-        the maximum number of tasks to show
-    tag : str, optional
-        the tag to include
+    kwargs: dict, optional
+        Legal filter operators: tag, data_tag, status, limit,
+        offset, data_id, data_name, number_instances, number_features,
+        number_classes, number_missing_values.
 
     Returns
     -------
@@ -121,11 +124,36 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
         task id, dataset id, task_type and status. If qualities are calculated
         for the associated dataset, some of these are also returned.
     """
-    return openml.utils.list_all(_list_tasks, task_type_id=task_type_id, offset=offset, size=size, tag=tag)
+    return openml.utils.list_all(_list_tasks, task_type_id=task_type_id, **kwargs)
+
 
 def _list_tasks(task_type_id=None, **kwargs):
     """
-    Perform the api call to return a number of tasks having the given filters
+    Perform the api call to return a number of tasks having the given filters.
+
+    Parameters
+    ----------
+    Filter task_type_id is separated from the other filters because
+    it is used as task_type_id in the task description, but it is named
+    type when used as a filter in list tasks call.
+
+    task_type_id : int, optional
+        ID of the task type as detailed
+        `here <https://www.openml.org/search?type=task_type>`_.
+
+        - Supervised classification: 1
+        - Supervised regression: 2
+        - Learning curve: 3
+        - Supervised data stream classification: 4
+        - Clustering: 5
+        - Machine Learning Challenge: 6
+        - Survival Analysis: 7
+        - Subgroup Discovery: 8
+
+    kwargs: dict, optional
+        Legal filter operators: tag, data_tag, status, limit,
+        offset, data_id, data_name, number_instances, number_features,
+        number_classes, number_missing_values.
 
     Returns
     -------
@@ -135,17 +163,15 @@ def _list_tasks(task_type_id=None, **kwargs):
     if task_type_id is not None:
         api_call += "/type/%d" % int(task_type_id)
     if kwargs is not None:
-        for filter, value in kwargs.items():
-            api_call += "/%s/%s" % (filter, value)
+        for operator, value in kwargs.items():
+            api_call += "/%s/%s" % (operator, value)
     return __list_tasks(api_call)
 
 
 def __list_tasks(api_call):
-    try:
-        xml_string = _perform_api_call(api_call)
-    except OpenMLServerNoResult as e:
-        raise e
-    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task','oml:input'))
+
+    xml_string = _perform_api_call(api_call)
+    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task', 'oml:input'))
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s'

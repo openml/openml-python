@@ -31,18 +31,16 @@ def get_flow(flow_id):
     return flow
 
 
-def list_flows(offset=None, size=None, tag=None):
+def list_flows(**kwargs):
 
-    """Return a list of all flows which are on OpenML.
+    """
+    Return a list of all flows which are on OpenML.
+    (Supports large amount of results)
 
     Parameters
     ----------
-    offset : int, optional
-        the number of flows to skip, starting from the first
-    size : int, optional
-        the maximum number of flows to return
-    tag : str, optional
-        the tag to include
+    kwargs: dict, optional
+        Legal filter operators: uploader, tag, limit, offset.
 
     Returns
     -------
@@ -59,11 +57,17 @@ def list_flows(offset=None, size=None, tag=None):
         - external version
         - uploader
     """
-    return openml.utils.list_all(_list_flows, offset=offset, size=size, tag=tag)
+    return openml.utils.list_all(_list_flows, **kwargs)
+
 
 def _list_flows(**kwargs):
     """
     Perform the api call that return a list of all flows.
+
+    Parameters
+    ----------
+    kwargs: dict, optional
+        Legal filter operators: uploader, tag, limit, offset.
 
     Returns
     -------
@@ -72,10 +76,11 @@ def _list_flows(**kwargs):
     api_call = "flow/list"
 
     if kwargs is not None:
-        for filter, value in kwargs.items():
-            api_call += "/%s/%s" % (filter, value)
+        for operator, value in kwargs.items():
+            api_call += "/%s/%s" % (operator, value)
 
     return __list_flows(api_call)
+
 
 def flow_exists(name, external_version):
     """Retrieves the flow id.
@@ -86,7 +91,7 @@ def flow_exists(name, external_version):
     ----------
     name : string
         Name of the flow
-    version : string
+    external_version : string
         Version information associated with flow.
 
     Returns
@@ -116,10 +121,8 @@ def flow_exists(name, external_version):
 
 
 def __list_flows(api_call):
-    try:
-        xml_string = _perform_api_call(api_call)
-    except OpenMLServerNoResult as e:
-        raise e
+
+    xml_string = _perform_api_call(api_call)
     flows_dict = xmltodict.parse(xml_string, force_list=('oml:flow',))
 
     # Minimalistic check if the XML is useful
@@ -193,11 +196,11 @@ def assert_flows_equal(flow1, flow2,
                                # Tags aren't directly created by the server,
                                # but the uploader has no control over them!
                                'tags']
-    ignored_by_python_API = ['binary_url', 'binary_format', 'binary_md5',
+    ignored_by_python_api = ['binary_url', 'binary_format', 'binary_md5',
                              'model']
 
     for key in set(flow1.__dict__.keys()).union(flow2.__dict__.keys()):
-        if key in generated_by_the_server + ignored_by_python_API:
+        if key in generated_by_the_server + ignored_by_python_api:
             continue
         attr1 = getattr(flow1, key, None)
         attr2 = getattr(flow2, key, None)

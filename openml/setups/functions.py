@@ -106,32 +106,42 @@ def get_setup(setup_id):
     result_dict = xmltodict.parse(setup_xml)
     return _create_setup_from_xml(result_dict)
 
-def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
+
+def list_setups(setup=None, **kwargs):
     """
     List all setups matching all of the given filters.
 
     Parameters
     ----------
-    flow : int, optional
-
-    tag : str, optional
+    The setup argument that is a list is separated from the single value
+    filters which are put into the kwargs.
 
     setup : list(int), optional
 
-    offset : int, optional
-
-    size : int, optional
+    kwargs: dict, optional
+        Legal filter operators: flow, limit, offset, tag.
 
     Returns
     -------
     dict
         """
 
-    return openml.utils.list_all(_list_setups, flow=flow, tag=tag, setup=setup, offset=offset, size=size)
+    return openml.utils.list_all(_list_setups, setup=setup, **kwargs)
+
 
 def _list_setups(setup=None, **kwargs):
     """
     Perform API call `/setup/list/{filters}`
+
+    Parameters
+    ----------
+    The setup argument that is a list is separated from the single value
+    filters which are put into the kwargs.
+
+    setup : list(int), optional
+
+    kwargs: dict, optional
+        Legal filter operators: flow, setup, limit, offset, tag.
 
     Returns
     -------
@@ -142,19 +152,15 @@ def _list_setups(setup=None, **kwargs):
     if setup is not None:
         api_call += "/setup/%s" % ','.join([str(int(i)) for i in setup])
     if kwargs is not None:
-        for filter, value in kwargs.items():
-            api_call += "/%s/%s" % (filter, value)
+        for operator, value in kwargs.items():
+            api_call += "/%s/%s" % (operator, value)
 
     return __list_setups(api_call)
 
+
 def __list_setups(api_call):
     """Helper function to parse API calls which are lists of setups"""
-
-    try:
-        xml_string = openml._api_calls._perform_api_call(api_call)
-    except OpenMLServerNoResult as e:
-        raise e
-
+    xml_string = openml._api_calls._perform_api_call(api_call)
     setups_dict = xmltodict.parse(xml_string, force_list=('oml:setup',))
     # Minimalistic check if the XML is useful
     if 'oml:setups' not in setups_dict:

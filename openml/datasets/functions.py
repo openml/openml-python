@@ -137,24 +137,18 @@ def _get_cached_dataset_arff(dataset_id):
         raise OpenMLCacheException("ARFF file for dataset id %d not "
                                    "cached" % dataset_id)
 
-def list_datasets(offset=None, size=None, status=None, **kwargs):
+
+def list_datasets(**kwargs):
 
     """
-    Return a list of all dataset which are on OpenML.
+    Return a list of all dataset which are on OpenML. (Supports large amount of results)
 
     Parameters
     ----------
-    offset : int, optional
-        The number of datasets to skip, starting from the first.
-    size : int, optional
-        The maximum number of datasets to show.
-    status : str, optional
-        Should be {active, in_preparation, deactivated}. By
-        default active datasets are returned, but also datasets
-        from another status can be requested.
     kwargs : dict, optional
         Legal filter operators (keys in the dict):
-        {tag, status, limit, offset, data_name, data_version, number_instances, number_features, number_classes, number_missing_values}.
+        tag, status, limit, offset, data_name, data_version, number_instances,
+        number_features, number_classes, number_missing_values.
 
     Returns
     -------
@@ -172,12 +166,20 @@ def list_datasets(offset=None, size=None, status=None, **kwargs):
         these are also returned.
     """
 
-    return openml.utils.list_all(_list_datasets, offset=offset, size=size, status=status, **kwargs)
+    return openml.utils.list_all(_list_datasets, **kwargs)
+
 
 def _list_datasets(**kwargs):
 
     """
     Perform api call to return a list of all datasets.
+
+    Parameters
+    ----------
+    kwargs : dict, optional
+        Legal filter operators (keys in the dict):
+        {tag, status, limit, offset, data_name, data_version, number_instances,
+        number_features, number_classes, number_missing_values.
 
     Returns
     -------
@@ -187,16 +189,14 @@ def _list_datasets(**kwargs):
     api_call = "data/list"
 
     if kwargs is not None:
-        for filter, value in kwargs.items():
-            api_call += "/%s/%s" % (filter, value)
+        for operator, value in kwargs.items():
+            api_call += "/%s/%s" % (operator, value)
     return __list_datasets(api_call)
 
+
 def __list_datasets(api_call):
-    # TODO add proper error handling here!
-    try:
-        xml_string = _perform_api_call(api_call)
-    except OpenMLServerNoResult as e:
-        raise e
+
+    xml_string = _perform_api_call(api_call)
     datasets_dict = xmltodict.parse(xml_string, force_list=('oml:dataset',))
 
     # Minimalistic check if the XML is useful
@@ -223,12 +223,13 @@ def __list_datasets(api_call):
 
     return datasets
 
+
 def check_datasets_active(dataset_ids):
     """Check if the dataset ids provided are active.
 
     Parameters
     ----------
-    dataset_id : iterable
+    dataset_ids : iterable
         Integers representing dataset ids.
 
     Returns
@@ -283,7 +284,7 @@ def get_dataset(dataset_id):
 
     Parameters
     ----------
-    ddataset_id : int
+    dataset_id : int
         Dataset ID of the dataset to download
 
     Returns

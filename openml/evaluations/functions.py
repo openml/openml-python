@@ -5,19 +5,19 @@ import openml.utils
 from .._api_calls import _perform_api_call
 from ..evaluations import OpenMLEvaluation
 
-def list_evaluations(function, offset=None, size=None, id=None, task=None,
-                     setup=None, flow=None, uploader=None, tag=None):
+def list_evaluations(function, id=None, task=None,
+                     setup=None, flow=None, uploader=None, **kwargs):
     """
     List all run-evaluation pairs matching all of the given filters.
+    (Supports large amount of results)
 
     Parameters
     ----------
+    The arguments that are lists are separated from the single value
+    ones which are put into the kwargs.
+
     function : str
         the evaluation function. e.g., predictive_accuracy
-    offset : int, optional
-        the number of runs to skip, starting from the first
-    size : int, optional
-        the maximum number of runs to show
 
     id : list, optional
 
@@ -29,30 +29,53 @@ def list_evaluations(function, offset=None, size=None, id=None, task=None,
 
     uploader : list, optional
 
-    tag : str, optional
+    kwargs: dict, optional
+        Legal filter operators: tag, limit, offset.
 
     Returns
     -------
     dict
     """
 
-    return openml.utils.list_all(_list_evaluations, function, offset=offset, size=size, id=id, task=task,
-                        setup=setup, flow=flow, uploader=uploader, tag=tag)
+    return openml.utils.list_all(_list_evaluations, function, id=id, task=task,
+                                 setup=setup, flow=flow, uploader=uploader, **kwargs)
 
-def _list_evaluations(function, id=None, task=None, setup=None, flow=None, uploader=None, **kwargs):
 
+def _list_evaluations(function, id=None, task=None,
+                      setup=None, flow=None, uploader=None, **kwargs):
     """
     Perform API call ``/evaluation/function{function}/{filters}``
 
+    Parameters
+    ----------
+    The arguments that are lists are separated from the single value
+    ones which are put into the kwargs.
+
+    function : str
+        the evaluation function. e.g., predictive_accuracy
+
+    id : list, optional
+
+    task : list, optional
+
+    setup: list, optional
+
+    flow : list, optional
+
+    uploader : list, optional
+
+    kwargs: dict, optional
+        Legal filter operators: tag, limit, offset.
+
     Returns
     -------
     dict
     """
 
-    api_call = "evaluation/list/function/%s" %function
+    api_call = "evaluation/list/function/%s" % function
     if kwargs is not None:
-        for filter, value in kwargs.items():
-            api_call += "/%s/%s" % (filter, value)
+        for operator, value in kwargs.items():
+            api_call += "/%s/%s" % (operator, value)
     if id is not None:
         api_call += "/run/%s" % ','.join([str(int(i)) for i in id])
     if task is not None:
@@ -66,13 +89,10 @@ def _list_evaluations(function, id=None, task=None, setup=None, flow=None, uploa
 
     return __list_evaluations(api_call)
 
+
 def __list_evaluations(api_call):
     """Helper function to parse API calls which are lists of runs"""
-    try:
-        xml_string = _perform_api_call(api_call)
-    except OpenMLServerNoResult as e:
-        raise e
-
+    xml_string = _perform_api_call(api_call)
     evals_dict = xmltodict.parse(xml_string, force_list=('oml:evaluation',))
     # Minimalistic check if the XML is useful
     if 'oml:evaluations' not in evals_dict:
