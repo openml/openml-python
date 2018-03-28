@@ -9,7 +9,7 @@ import xmltodict
 
 import openml
 from ..tasks import get_task
-from .._api_calls import _perform_api_call, _file_id_to_url, _read_url_files
+from .._api_calls import _perform_api_call, _file_id_to_url
 from ..exceptions import PyOpenMLError
 
 
@@ -53,6 +53,17 @@ class OpenMLRun(object):
         self.model = model
         self.tags = tags
         self.predictions_url = predictions_url
+
+    def __str__(self):
+        flow_name = self.flow_name
+        if len(flow_name) > 26:
+            # long enough to show sklearn.pipeline.Pipeline
+            flow_name = flow_name[:26] + "..."
+        return "[run id: {}, task id: {}, flow id: {}, flow name: {}]".format(
+            self.run_id, self.task_id, self.flow_id, flow_name)
+
+    def _repr_pretty_(self, pp, cycle):
+        pp.text(str(self))
 
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the server.

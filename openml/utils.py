@@ -4,7 +4,6 @@ from ._api_calls import _perform_api_call
 
 from openml.exceptions import OpenMLServerException
 
-
 def extract_xml_tags(xml_tag_name, node, allow_none=True):
     """Helper to extract xml tags from xmltodict.
 
@@ -42,7 +41,6 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
         else:
             raise ValueError("Could not find tag '%s' in node '%s'" %
                              (xml_tag_name, str(node)))
-
 
 def _tag_entity(entity_type, entity_id, tag, untag=False):
     """Function that tags or untags a given entity on OpenML. As the OpenML
@@ -91,8 +89,8 @@ def _tag_entity(entity_type, entity_id, tag, untag=False):
         # no tags, return empty list
         return []
 
-            
-def list_all(listing_call, batch_size=10000, *args, **filters):
+
+def list_all(listing_call, *args, **filters):
     """Helper to handle paged listing requests.
 
     Example usage:
@@ -106,8 +104,6 @@ def list_all(listing_call, batch_size=10000, *args, **filters):
     ----------
     listing_call : callable
         Call listing, e.g. list_evaluations.
-    batch_size : int (default: 10000)
-        Batch size for paging.
     *args : Variable length argument list
         Any required arguments for the listing call.
     **filters : Arbitrary keyword arguments
@@ -117,17 +113,34 @@ def list_all(listing_call, batch_size=10000, *args, **filters):
     -------
     dict
     """
-    page = 0
-    has_more = 1
-    result = {}
 
-    while has_more:
+    # default batch size per paging.
+    batch_size = 10000
+    # eliminate filters that have a None value
+    active_filters = {key: value for key, value in filters.items() if value is not None}
+    page = 0
+    result = {}
+    # max number of results to be shown
+    limit = None
+    offset = 0
+    cycle = True
+    if 'size' in active_filters:
+        limit = active_filters['size']
+        del active_filters['size']
+    # check if the batch size is greater than the number of results that need to be returned.
+    if limit is not None:
+        if batch_size > limit:
+            batch_size = limit
+    if 'offset' in active_filters:
+        offset = active_filters['offset']
+        del active_filters['offset']
+    while cycle:
         try:
             new_batch = listing_call(
                 *args,
-                size=batch_size,
-                offset=batch_size*page,
-                **filters
+                limit=batch_size,
+                offset=offset + batch_size * page,
+                **active_filters
             )
         except OpenMLServerException as e:
             if page == 0 and e.args[0] == 'No results':
@@ -136,6 +149,13 @@ def list_all(listing_call, batch_size=10000, *args, **filters):
                 break
         result.update(new_batch)
         page += 1
-        has_more = (len(new_batch) == batch_size)
+        if limit is not None:
+            limit -= batch_size
+            # check if the number of required results has been achieved
+            if limit == 0:
+                break
+            # check if there are enough results to fulfill a batch
+            if limit < batch_size:
+                batch_size = limit
 
     return result
