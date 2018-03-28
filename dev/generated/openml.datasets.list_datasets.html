@@ -110,8 +110,8 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.list_datasets<a class="headerlink" href="#openml-datasets-list-datasets" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.datasets.list_datasets">
-<code class="descclassname">openml.datasets.</code><code class="descname">list_datasets</code><span class="sig-paren">(</span><em>offset=None</em>, <em>size=None</em>, <em>status=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.list_datasets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of all dataset which are on OpenML.</p>
+<code class="descclassname">openml.datasets.</code><code class="descname">list_datasets</code><span class="sig-paren">(</span><em>offset=None</em>, <em>size=None</em>, <em>status=None</em>, <em>tag=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.list_datasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all dataset which are on OpenML. (Supports large amount of results)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -130,10 +130,12 @@
 default active datasets are returned, but also datasets
 from another status can be requested.</p>
 </div></blockquote>
+<p><strong>tag</strong> : str, optional</p>
 <p><strong>kwargs</strong> : dict, optional</p>
 <blockquote>
 <div><p>Legal filter operators (keys in the dict):
-{tag, status, limit, offset, data_name, data_version, number_instances, number_features, number_classes, number_missing_values}.</p>
+data_name, data_version, number_instances,
+number_features, number_classes, number_missing_values.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -170,7 +172,7 @@ these are also returned.</p>
     </p>
     <p>
         &copy; Copyright 2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.<br/>
     </p>
   </div>
 </footer>

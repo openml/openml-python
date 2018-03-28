@@ -164,7 +164,7 @@
 <tr class="row-odd"><td><a class="reference internal" href="generated/openml.datasets.get_datasets.html#openml.datasets.get_datasets" title="openml.datasets.get_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_datasets</span></code></a>(dataset_ids)</td>
 <td>Download datasets.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/openml.datasets.list_datasets.html#openml.datasets.list_datasets" title="openml.datasets.list_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_datasets</span></code></a>([offset,&nbsp;size,&nbsp;status])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.datasets.list_datasets.html#openml.datasets.list_datasets" title="openml.datasets.list_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_datasets</span></code></a>([offset,&nbsp;size,&nbsp;status,&nbsp;tag])</td>
 <td>Return a list of all dataset which are on OpenML.</td>
 </tr>
 </tbody>
@@ -228,10 +228,10 @@
 <td>Get the optimization trace object for a given run id.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.initialize_model_from_run.html#openml.runs.initialize_model_from_run" title="openml.runs.initialize_model_from_run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_model_from_run</span></code></a>(run_id)</td>
-<td>Initialized a model based on a run_id (i.</td>
+<td>Initialized a model based on a run_id (i.e., using the exact same parameter settings)</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/openml.runs.initialize_model_from_trace.html#openml.runs.initialize_model_from_trace" title="openml.runs.initialize_model_from_trace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_model_from_trace</span></code></a>(run_id,&nbsp;repeat,&nbsp;fold)</td>
-<td>Initialize a model based on the parameters that were set by an optimization procedure (i.</td>
+<td>Initialize a model based on the parameters that were set by an optimization procedure (i.e., using the exact same parameter settings)</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.list_runs.html#openml.runs.list_runs" title="openml.runs.list_runs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_runs</span></code></a>([offset,&nbsp;size,&nbsp;id,&nbsp;task,&nbsp;setup,&nbsp;…])</td>
 <td>List all runs matching all of the given filters.</td>
@@ -257,9 +257,9 @@
 <td>Downloads the setup (configuration) description from OpenML  and returns a structured object</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/openml.setups.initialize_model.html#openml.setups.initialize_model" title="openml.setups.initialize_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_model</span></code></a>(setup_id)</td>
-<td>Initialized a model based on a setup_id (i.</td>
+<td>Initialized a model based on a setup_id (i.e., using the exact same parameter settings)</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/openml.setups.list_setups.html#openml.setups.list_setups" title="openml.setups.list_setups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_setups</span></code></a>([flow,&nbsp;tag,&nbsp;setup,&nbsp;offset,&nbsp;size])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.setups.list_setups.html#openml.setups.list_setups" title="openml.setups.list_setups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_setups</span></code></a>([offset,&nbsp;size,&nbsp;flow,&nbsp;tag,&nbsp;setup])</td>
 <td>List all setups matching all of the given filters.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/openml.setups.setup_exists.html#openml.setups.setup_exists" title="openml.setups.setup_exists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_exists</span></code></a>(flow[,&nbsp;model])</td>
@@ -317,7 +317,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.<br/>
     </p>
   </div>
 </footer>

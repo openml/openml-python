@@ -110,8 +110,9 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>.list_flows<a class="headerlink" href="#openml-flows-list-flows" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.flows.list_flows">
-<code class="descclassname">openml.flows.</code><code class="descname">list_flows</code><span class="sig-paren">(</span><em>offset=None</em>, <em>size=None</em>, <em>tag=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.flows.list_flows" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of all flows which are on OpenML.</p>
+<code class="descclassname">openml.flows.</code><code class="descname">list_flows</code><span class="sig-paren">(</span><em>offset=None</em>, <em>size=None</em>, <em>tag=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.flows.list_flows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all flows which are on OpenML.
+(Supports large amount of results)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -127,6 +128,10 @@
 <p><strong>tag</strong> : str, optional</p>
 <blockquote>
 <div><p>the tag to include</p>
+</div></blockquote>
+<p><strong>kwargs: dict, optional</strong></p>
+<blockquote>
+<div><p>Legal filter operators: uploader.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -164,7 +169,7 @@ the following information:
     </p>
     <p>
         &copy; Copyright 2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.<br/>
     </p>
   </div>
 </footer>

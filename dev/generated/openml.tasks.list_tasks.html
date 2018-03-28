@@ -110,13 +110,16 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>.list_tasks<a class="headerlink" href="#openml-tasks-list-tasks" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.tasks.list_tasks">
-<code class="descclassname">openml.tasks.</code><code class="descname">list_tasks</code><span class="sig-paren">(</span><em>task_type_id=None</em>, <em>offset=None</em>, <em>size=None</em>, <em>tag=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.list_tasks" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.tasks.</code><code class="descname">list_tasks</code><span class="sig-paren">(</span><em>task_type_id=None</em>, <em>offset=None</em>, <em>size=None</em>, <em>tag=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.list_tasks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a number of tasks having the given tag and task_type_id</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>task_type_id</strong> : int, optional</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>Filter task_type_id is separated from the other filters because</strong></p>
+<p><strong>it is used as task_type_id in the task description, but it is named</strong></p>
+<p><strong>type when used as a filter in list tasks call.</strong></p>
+<p><strong>task_type_id</strong> : int, optional</p>
 <blockquote>
 <div><p>ID of the task type as detailed
 <a class="reference external" href="https://www.openml.org/search?type=task_type">here</a>.</p>
@@ -142,6 +145,11 @@
 <p><strong>tag</strong> : str, optional</p>
 <blockquote>
 <div><p>the tag to include</p>
+</div></blockquote>
+<p><strong>kwargs: dict, optional</strong></p>
+<blockquote>
+<div><p>Legal filter operators: data_tag, status, data_id, data_name, number_instances, number_features,
+number_classes, number_missing_values.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -173,7 +181,7 @@ for the associated dataset, some of these are also returned.</p>
     </p>
     <p>
         &copy; Copyright 2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.<br/>
     </p>
   </div>
 </footer>
