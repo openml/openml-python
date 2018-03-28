@@ -89,7 +89,8 @@ def _tag_entity(entity_type, entity_id, tag, untag=False):
         # no tags, return empty list
         return []
 
-def list_all(listing_call, *args, **kwargs):
+
+def list_all(listing_call, *args, **filters):
     """Helper to handle paged listing requests.
 
     Example usage:
@@ -105,7 +106,7 @@ def list_all(listing_call, *args, **kwargs):
         Call listing, e.g. list_evaluations.
     *args : Variable length argument list
         Any required arguments for the listing call.
-    **kwargs : Arbitrary keyword arguments
+    **filters : Arbitrary keyword arguments
         Any filters that can be applied to the listing function.
         
     Returns
@@ -116,7 +117,7 @@ def list_all(listing_call, *args, **kwargs):
     # default batch size per paging.
     batch_size = 10000
     # eliminate filters that have a None value
-    active_filters = {key : value for key, value in kwargs.items() if value is not None}
+    active_filters = {key: value for key, value in filters.items() if value is not None}
     page = 0
     result = {}
     # max number of results to be shown

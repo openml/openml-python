@@ -88,7 +88,7 @@ def _get_estimation_procedure_list():
     return procs
 
 
-def list_tasks(task_type_id=None, **kwargs):
+def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
     """
     Return a number of tasks having the given tag and task_type_id
 
@@ -110,10 +110,15 @@ def list_tasks(task_type_id=None, **kwargs):
         - Machine Learning Challenge: 6
         - Survival Analysis: 7
         - Subgroup Discovery: 8
+    offset : int, optional
+        the number of tasks to skip, starting from the first
+    size : int, optional
+        the maximum number of tasks to show
+    tag : str, optional
+        the tag to include
 
     kwargs: dict, optional
-        Legal filter operators: tag, data_tag, status, limit,
-        offset, data_id, data_name, number_instances, number_features,
+        Legal filter operators: data_tag, status, data_id, data_name, number_instances, number_features,
         number_classes, number_missing_values.
 
     Returns
@@ -124,7 +129,7 @@ def list_tasks(task_type_id=None, **kwargs):
         task id, dataset id, task_type and status. If qualities are calculated
         for the associated dataset, some of these are also returned.
     """
-    return openml.utils.list_all(_list_tasks, task_type_id=task_type_id, **kwargs)
+    return openml.utils.list_all(_list_tasks, task_type_id=task_type_id, offset=offset, size=size, tag=tag, **kwargs)
 
 
 def _list_tasks(task_type_id=None, **kwargs):

@@ -107,26 +107,25 @@ def get_setup(setup_id):
     return _create_setup_from_xml(result_dict)
 
 
-def list_setups(setup=None, **kwargs):
+def list_setups(offset=None, size=None, flow=None, tag=None, setup=None):
     """
     List all setups matching all of the given filters.
 
     Parameters
     ----------
-    The setup argument that is a list is separated from the single value
-    filters which are put into the kwargs.
-
+    offset : int, optional
+    size : int, optional
+    flow : int, optional
+    tag : str, optional
     setup : list(int), optional
-
-    kwargs: dict, optional
-        Legal filter operators: flow, limit, offset, tag.
 
     Returns
     -------
     dict
         """
 
-    return openml.utils.list_all(_list_setups, setup=setup, **kwargs)
+    return openml.utils.list_all(_list_setups, offset=offset, size=size,
+                                 flow=flow, tag=tag, setup=setup)
 
 
 def _list_setups(setup=None, **kwargs):

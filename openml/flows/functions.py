@@ -31,7 +31,7 @@ def get_flow(flow_id):
     return flow
 
 
-def list_flows(**kwargs):
+def list_flows(offset=None, size=None, tag=None, **kwargs):
 
     """
     Return a list of all flows which are on OpenML.
@@ -39,8 +39,14 @@ def list_flows(**kwargs):
 
     Parameters
     ----------
+    offset : int, optional
+        the number of flows to skip, starting from the first
+    size : int, optional
+        the maximum number of flows to return
+    tag : str, optional
+        the tag to include
     kwargs: dict, optional
-        Legal filter operators: uploader, tag, limit, offset.
+        Legal filter operators: uploader.
 
     Returns
     -------
@@ -57,7 +63,7 @@ def list_flows(**kwargs):
         - external version
         - uploader
     """
-    return openml.utils.list_all(_list_flows, **kwargs)
+    return openml.utils.list_all(_list_flows, offset=offset, size=size, tag=tag, **kwargs)
 
 
 def _list_flows(**kwargs):

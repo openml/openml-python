@@ -891,8 +891,8 @@ def _get_cached_run(run_id):
                                    "cached" % run_id)
 
 
-def list_runs(id=None, task=None, setup=None, display_errors=False,
-              flow=None, uploader=None, **kwargs):
+def list_runs(offset=None, size=None, id=None, task=None, setup=None,
+              flow=None, uploader=None, tag=None, display_errors=False, **kwargs):
 
     """
     List all runs matching all of the given filters.
@@ -900,10 +900,10 @@ def list_runs(id=None, task=None, setup=None, display_errors=False,
 
     Parameters
     ----------
-    The arguments that are lists are separated from the single value
-    ones which are put into the kwargs.
-    display_errors is also separated from the kwargs since it has a
-    default value.
+    offset : int, optional
+        the number of runs to skip, starting from the first
+    size : int, optional
+        the maximum number of runs to show
 
     id : list, optional
 
@@ -915,12 +915,14 @@ def list_runs(id=None, task=None, setup=None, display_errors=False,
 
     uploader : list, optional
 
+    tag : str, optional
+
     display_errors : bool, optional (default=None)
         Whether to list runs which have an error (for example a missing
         prediction file).
 
     kwargs: dict, optional
-        Legal filter operators: tag, limit, offset, task_type, show_errors.
+        Legal filter operators: task_type.
 
     Returns
     -------
@@ -928,8 +930,8 @@ def list_runs(id=None, task=None, setup=None, display_errors=False,
         List of found runs.
     """
 
-    return openml.utils.list_all(_list_runs, id=id, task=task, setup=setup,
-                                 flow=flow, uploader=uploader, display_errors=display_errors, **kwargs)
+    return openml.utils.list_all(_list_runs, offset=offset, size=size, id=id, task=task, setup=setup,
+                                 flow=flow, uploader=uploader, tag=tag, display_errors=display_errors, **kwargs)
 
 
 def _list_runs(id=None, task=None, setup=None,
@@ -961,7 +963,7 @@ def _list_runs(id=None, task=None, setup=None,
         prediction file).
 
     kwargs: dict, optional
-        Legal filter operators: tag, limit, offset, task_type, show_errors.
+        Legal filter operators: task_type.
 
     Returns
     -------
