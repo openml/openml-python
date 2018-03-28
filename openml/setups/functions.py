@@ -9,6 +9,7 @@ from .. import config
 from .setup import OpenMLSetup, OpenMLParameter
 from openml.flows import flow_exists
 from openml.exceptions import OpenMLServerNoResult
+import openml.utils
 
 
 def setup_exists(flow, model=None):
@@ -106,22 +107,40 @@ def get_setup(setup_id):
     return _create_setup_from_xml(result_dict)
 
 
-def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
-    """List all setups matching all of the given filters.
+def list_setups(offset=None, size=None, flow=None, tag=None, setup=None):
+    """
+    List all setups matching all of the given filters.
 
+    Parameters
+    ----------
+    offset : int, optional
+    size : int, optional
+    flow : int, optional
+    tag : str, optional
+    setup : list(int), optional
+
+    Returns
+    -------
+    dict
+        """
+
+    return openml.utils.list_all(_list_setups, offset=offset, size=size,
+                                 flow=flow, tag=tag, setup=setup)
+
+
+def _list_setups(setup=None, **kwargs):
+    """
     Perform API call `/setup/list/{filters}`
 
     Parameters
     ----------
-    flow : int, optional
-
-    tag : str, optional
+    The setup argument that is a list is separated from the single value
+    filters which are put into the kwargs.
 
     setup : list(int), optional
 
-    offset : int, optional
-
-    size : int, optional
+    kwargs: dict, optional
+        Legal filter operators: flow, setup, limit, offset, tag.
 
     Returns
     -------
@@ -129,28 +148,18 @@ def list_setups(flow=None, tag=None, setup=None, offset=None, size=None):
         """
 
     api_call = "setup/list"
-    if offset is not None:
-        api_call += "/offset/%d" % int(offset)
-    if size is not None:
-        api_call += "/limit/%d" % int(size)
     if setup is not None:
         api_call += "/setup/%s" % ','.join([str(int(i)) for i in setup])
-    if flow is not None:
-        api_call += "/flow/%s" % flow
-    if tag is not None:
-        api_call += "/tag/%s" % tag
+    if kwargs is not None:
+        for operator, value in kwargs.items():
+            api_call += "/%s/%s" % (operator, value)
 
-    return _list_setups(api_call)
+    return __list_setups(api_call)
 
 
-def _list_setups(api_call):
+def __list_setups(api_call):
     """Helper function to parse API calls which are lists of setups"""
-
-    try:
-        xml_string = openml._api_calls._perform_api_call(api_call)
-    except OpenMLServerNoResult:
-        return dict()
-
+    xml_string = openml._api_calls._perform_api_call(api_call)
     setups_dict = xmltodict.parse(xml_string, force_list=('oml:setup',))
     # Minimalistic check if the XML is useful
     if 'oml:setups' not in setups_dict:

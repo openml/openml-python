@@ -139,6 +139,11 @@ class TestOpenMLDataset(TestBase):
         self.assertGreaterEqual(len(datasets), 100)
         self._check_datasets(datasets)
 
+    def test_list_datasets_by_size(self):
+        datasets = openml.datasets.list_datasets(size=10050)
+        self.assertGreaterEqual(len(datasets), 120)
+        self._check_datasets(datasets)
+
     def test_list_datasets_by_number_instances(self):
         datasets = openml.datasets.list_datasets(number_instances="5..100")
         self.assertGreaterEqual(len(datasets), 4)
@@ -169,7 +174,7 @@ class TestOpenMLDataset(TestBase):
         max = 100
         for i in range(0, max, size):
             datasets = openml.datasets.list_datasets(offset=i, size=size)
-            self.assertGreaterEqual(size, len(datasets))
+            self.assertEqual(size, len(datasets))
             self._check_datasets(datasets)
 
     def test_list_datasets_empty(self):
