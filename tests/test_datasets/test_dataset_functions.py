@@ -115,6 +115,9 @@ class TestOpenMLDataset(TestBase):
             self.assertIsInstance(dataset['status'], six.string_types)
             self.assertIn(dataset['status'], ['in_preparation', 'active',
                                               'deactivated'])
+    def _check_datasets(self, datasets):
+        for did in datasets:
+            self._check_dataset(datasets[did])
 
     def test_tag_untag_dataset(self):
         tag = 'test_tag_%d' %random.randint(1, 1000000)
@@ -129,23 +132,50 @@ class TestOpenMLDataset(TestBase):
         datasets = openml.datasets.list_datasets()
         # 1087 as the number of datasets on openml.org
         self.assertGreaterEqual(len(datasets), 100)
-        for did in datasets:
-            self._check_dataset(datasets[did])
+        self._check_datasets(datasets)
 
     def test_list_datasets_by_tag(self):
         datasets = openml.datasets.list_datasets(tag='study_14')
         self.assertGreaterEqual(len(datasets), 100)
-        for did in datasets:
-            self._check_dataset(datasets[did])
+        self._check_datasets(datasets)
+
+    def test_list_datasets_by_size(self):
+        datasets = openml.datasets.list_datasets(size=10050)
+        self.assertGreaterEqual(len(datasets), 120)
+        self._check_datasets(datasets)
+
+    def test_list_datasets_by_number_instances(self):
+        datasets = openml.datasets.list_datasets(number_instances="5..100")
+        self.assertGreaterEqual(len(datasets), 4)
+        self._check_datasets(datasets)
+
+    def test_list_datasets_by_number_features(self):
+        datasets = openml.datasets.list_datasets(number_features="50..100")
+        self.assertGreaterEqual(len(datasets), 8)
+        self._check_datasets(datasets)
+
+    def test_list_datasets_by_number_classes(self):
+        datasets = openml.datasets.list_datasets(number_classes="5")
+        self.assertGreaterEqual(len(datasets), 3)
+        self._check_datasets(datasets)
+
+    def test_list_datasets_by_number_missing_values(self):
+        datasets = openml.datasets.list_datasets(number_missing_values="5..100")
+        self.assertGreaterEqual(len(datasets), 5)
+        self._check_datasets(datasets)
+
+    def test_list_datasets_combined_filters(self):
+        datasets = openml.datasets.list_datasets(tag='study_14', number_instances="100..1000", number_missing_values="800..1000")
+        self.assertGreaterEqual(len(datasets), 1)
+        self._check_datasets(datasets)
 
     def test_list_datasets_paginate(self):
         size = 10
         max = 100
         for i in range(0, max, size):
             datasets = openml.datasets.list_datasets(offset=i, size=size)
-            self.assertGreaterEqual(size, len(datasets))
-            for did in datasets:
-                self._check_dataset(datasets[did])
+            self.assertEqual(size, len(datasets))
+            self._check_datasets(datasets)
 
     def test_list_datasets_empty(self):
         datasets = openml.datasets.list_datasets(tag='NoOneWouldUseThisTagAnyway')
