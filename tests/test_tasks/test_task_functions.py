@@ -67,6 +67,13 @@ class TestTask(TestBase):
             self.assertEquals(ttid, tasks[tid]["ttid"])
             self._check_task(tasks[tid])
 
+    def test_list_tasks_empty(self):
+        tasks = openml.tasks.list_tasks(tag='NoOneWillEverUseThisTag')
+        if len(tasks) > 0:
+            raise ValueError('UnitTest Outdated, got somehow results (tag is used, please adapt)')
+
+        self.assertIsInstance(tasks, dict)
+
     def test_list_tasks_by_tag(self):
         num_basic_tasks = 100 # number is flexible, check server if fails
         tasks = openml.tasks.list_tasks(tag='study_14')
@@ -104,6 +111,10 @@ class TestTask(TestBase):
     def test__get_task(self):
         openml.config.set_cache_directory(self.static_cache_dir)
         task = openml.tasks.get_task(1882)
+        # Test the following task as it used to throw an Unicode Error.
+        # https://github.com/openml/openml-python/issues/378
+        openml.config.server = self.production_server
+        production_task = openml.tasks.get_task(34536)
 
     def test_get_task(self):
         task = openml.tasks.get_task(1)

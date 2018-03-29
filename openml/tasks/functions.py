@@ -12,7 +12,7 @@ from ..datasets import get_dataset
 from .task import OpenMLTask, _create_task_cache_dir
 from .. import config
 from .._api_calls import _perform_api_call
-
+import openml.utils
 
 def _get_cached_tasks():
     tasks = OrderedDict()
@@ -88,11 +88,60 @@ def _get_estimation_procedure_list():
     return procs
 
 
-def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
-    """Return a number of tasks having the given tag and task_type_id
+def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
+    """
+    Return a number of tasks having the given tag and task_type_id
 
     Parameters
     ----------
+    Filter task_type_id is separated from the other filters because
+    it is used as task_type_id in the task description, but it is named
+    type when used as a filter in list tasks call.
+
+    task_type_id : int, optional
+        ID of the task type as detailed
+        `here <https://www.openml.org/search?type=task_type>`_.
+
+        - Supervised classification: 1
+        - Supervised regression: 2
+        - Learning curve: 3
+        - Supervised data stream classification: 4
+        - Clustering: 5
+        - Machine Learning Challenge: 6
+        - Survival Analysis: 7
+        - Subgroup Discovery: 8
+    offset : int, optional
+        the number of tasks to skip, starting from the first
+    size : int, optional
+        the maximum number of tasks to show
+    tag : str, optional
+        the tag to include
+
+    kwargs: dict, optional
+        Legal filter operators: data_tag, status, data_id, data_name, number_instances, number_features,
+        number_classes, number_missing_values.
+
+    Returns
+    -------
+    dict
+        All tasks having the given task_type_id and the give tag. Every task is
+        represented by a dictionary containing the following information:
+        task id, dataset id, task_type and status. If qualities are calculated
+        for the associated dataset, some of these are also returned.
+    """
+    return openml.utils.list_all(_list_tasks, task_type_id=task_type_id, offset=offset, size=size, tag=tag, **kwargs)
+
+
+def _list_tasks(task_type_id=None, **kwargs):
+    """
+    Perform the api call to return a number of tasks having the given filters.
+
+    Parameters
+    ----------
+    Filter task_type_id is separated from the other filters because
+    it is used as task_type_id in the task description, but it is named
+    type when used as a filter in list tasks call.
+
     task_type_id : int, optional
         ID of the task type as detailed
         `here <https://www.openml.org/search?type=task_type>`_.
@@ -106,43 +155,28 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None):
         - Survival Analysis: 7
         - Subgroup Discovery: 8
 
-    offset : int, optional
-        the number of tasks to skip, starting from the first
-    size : int, optional
-        the maximum number of tasks to show
-    tag : str, optional
-        the tag to include
+    kwargs: dict, optional
+        Legal filter operators: tag, data_tag, status, limit,
+        offset, data_id, data_name, number_instances, number_features,
+        number_classes, number_missing_values.
 
     Returns
     -------
     dict
-        All tasks having the given task_type_id and the give tag. Every task is
-        represented by a dictionary containing the following information:
-        task id, dataset id, task_type and status. If qualities are calculated
-        for the associated dataset, some of these are also returned.
     """
     api_call = "task/list"
     if task_type_id is not None:
         api_call += "/type/%d" % int(task_type_id)
-
-    if offset is not None:
-        api_call += "/offset/%d" % int(offset)
-
-    if size is not None:
-        api_call += "/limit/%d" % int(size)
-
-    if tag is not None:
-        api_call += "/tag/%s" % tag
-
-    return _list_tasks(api_call)
+    if kwargs is not None:
+        for operator, value in kwargs.items():
+            api_call += "/%s/%s" % (operator, value)
+    return __list_tasks(api_call)
 
 
-def _list_tasks(api_call):
-    try:
-        xml_string = _perform_api_call(api_call)
-    except OpenMLServerNoResult:
-        return []
-    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task','oml:input'))
+def __list_tasks(api_call):
+
+    xml_string = _perform_api_call(api_call)
+    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task', 'oml:input'))
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s'

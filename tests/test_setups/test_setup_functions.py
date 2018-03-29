@@ -137,6 +137,13 @@ class TestSetupFunctions(TestBase):
         for setup_id in setups.keys():
             self.assertEquals(setups[setup_id].flow_id, flow_id)
 
+    def test_list_setups_empty(self):
+        setups = openml.setups.list_setups(setup=[0])
+        if len(setups) > 0:
+            raise ValueError('UnitTest Outdated, got somehow results')
+
+        self.assertIsInstance(setups, dict)
+
     def test_setuplist_offset(self):
         # TODO: remove after pull on live for better testing
         # openml.config.server = self.production_server
@@ -150,3 +157,13 @@ class TestSetupFunctions(TestBase):
         all = set(setups.keys()).union(setups2.keys())
 
         self.assertEqual(len(all), size * 2)
+
+    def test_get_cached_setup(self):
+        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.setups.functions._get_cached_setup(1)
+
+
+    def test_get_uncached_setup(self):
+        openml.config.set_cache_directory(self.static_cache_dir)
+        with self.assertRaises(openml.exceptions.OpenMLCacheException):
+            openml.setups.functions._get_cached_setup(10)
