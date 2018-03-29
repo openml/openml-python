@@ -6,7 +6,11 @@ class TestStudyFunctions(TestBase):
     """Test the example code of Bischl et al. (2018)"""
 
     def test_Figure1a(self):
-        """Test listing in Figure 1a on a single task and the old OpenML100 study
+        """Test listing in Figure 1a on a single task and the old OpenML100 study.
+        
+        The original listing is pasted into the comment below because it the 
+        actual unit test differs a bit, as for example it does not run for all tasks, 
+        but only a single one.
 
         import openml
         import sklearn.tree, sklearn.preprocessing
