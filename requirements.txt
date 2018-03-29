@@ -1,7 +1,7 @@
 mock
 numpy>=1.6.2
 scipy>=0.13.3
-liac-arff>=2.2.0
+liac-arff>=2.2.1
 xmltodict
 nose
 requests
