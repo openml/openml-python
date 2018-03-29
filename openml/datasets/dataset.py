@@ -91,7 +91,10 @@ class OpenMLDataset(object):
 
         if data_file is not None:
             if self._data_features_supported():
-                self.data_pickle_file = data_file.replace('.arff', '.pkl')
+                if six.PY2:
+                    self.data_pickle_file = data_file.replace('.arff', '.pkl.py2')
+                else:
+                    self.data_pickle_file = data_file.replace('.arff', '.pkl.py3')
 
                 if os.path.exists(self.data_pickle_file):
                     logger.debug("Data pickle file already exists.")
@@ -121,7 +124,7 @@ class OpenMLDataset(object):
                     with open(self.data_pickle_file, "wb") as fh:
                         pickle.dump((X, categorical, attribute_names), fh, -1)
                     logger.debug("Saved dataset %d: %s to file %s" %
-                                 (self.dataset_id, self.name, self.data_pickle_file))
+                                 (int(self.dataset_id or -1), self.name, self.data_pickle_file))
 
     def push_tag(self, tag):
         """Annotates this data set with a tag on the server.
@@ -446,7 +449,11 @@ class OpenMLDataset(object):
         for prop in props:
             content = getattr(self, prop, None)
             if content is not None:
-                xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, content)
+                if isinstance(content, (list,set)):
+                    for item in content:
+                        xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, item)
+                else:
+                    xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, content)
         xml_dataset += "</oml:data_set_description>"
         return xml_dataset
 

@@ -594,11 +594,16 @@ def _extract_arfftrace_attributes(model):
     for key in model.cv_results_:
         if key.startswith('param_'):
             # supported types should include all types, including bool, int float
-            supported_types = (bool, int, float, six.string_types)
-            if all(isinstance(i, supported_types) or i is None for i in model.cv_results_[key]):
-                type = 'STRING'
-            else:
-                raise TypeError('Unsupported param type in param grid')
+            supported_basic_types = (bool, int, float, six.string_types)
+            for param_value in model.cv_results_[key]:
+                if isinstance(param_value, supported_basic_types) or param_value is None:
+                    # basic string values
+                    type = 'STRING'
+                elif isinstance(param_value, list) and all(isinstance(i, int) for i in param_value):
+                    # list of integers
+                    type = 'STRING'
+                else:
+                    raise TypeError('Unsupported param type in param grid: %s' %key)
 
             # we renamed the attribute param to parameter, as this is a required
             # OpenML convention
@@ -638,8 +643,11 @@ def get_run(run_id):
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    run_file = os.path.join(config.get_cache_directory(), "runs",
-                            "run_%d.xml" % run_id)
+    run_dir = os.path.join(config.get_cache_directory(), "runs", str(run_id))
+    run_file = os.path.join(run_dir, "description.xml")
+
+    if not os.path.exists(run_dir):
+        os.makedirs(run_dir)
 
     try:
         return _get_cached_run(run_id)
@@ -667,7 +675,7 @@ def _create_run_from_xml(xml, from_server=True):
     run : OpenMLRun
         New run object representing run_xml.
     """
-
+    
     def obtain_field(xml_obj, fieldname, from_server, cast=None):
         # this function can be used to check whether a field is present in an object.
         # if it is not present, either returns None or throws an error (this is
@@ -693,7 +701,6 @@ def _create_run_from_xml(xml, from_server=True):
         task_evaluation_measure = run['oml:task_evaluation_measure']
     else:
         task_evaluation_measure = None
-
 
     flow_id = int(run['oml:flow_id'])
     flow_name = obtain_field(run, 'oml:flow_name', from_server)
@@ -872,10 +879,9 @@ def _create_trace_from_arff(arff_obj):
 def _get_cached_run(run_id):
     """Load a run from the cache."""
     cache_dir = config.get_cache_directory()
-    run_cache_dir = os.path.join(cache_dir, "runs")
+    run_cache_dir = os.path.join(cache_dir, "runs", str(run_id))
     try:
-        run_file = os.path.join(run_cache_dir,
-                                "run_%d.xml" % int(run_id))
+        run_file = os.path.join(run_cache_dir, "description.xml")
         with io.open(run_file, encoding='utf8') as fh:
             run = _create_run_from_xml(xml=fh.read())
         return run
@@ -886,10 +892,11 @@ def _get_cached_run(run_id):
 
 
 def list_runs(offset=None, size=None, id=None, task=None, setup=None,
-              flow=None, uploader=None, tag=None, display_errors=False):
-    """List all runs matching all of the given filters.
+              flow=None, uploader=None, tag=None, display_errors=False, **kwargs):
 
-    Perform API call `/run/list/{filters} <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`_
+    """
+    List all runs matching all of the given filters.
+    (Supports large amount of results)
 
     Parameters
     ----------
@@ -913,17 +920,61 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
     display_errors : bool, optional (default=None)
         Whether to list runs which have an error (for example a missing
         prediction file).
+
+    kwargs: dict, optional
+        Legal filter operators: task_type.
+
     Returns
     -------
-    list
+    dict
+        List of found runs.
+    """
+
+    return openml.utils.list_all(_list_runs, offset=offset, size=size, id=id, task=task, setup=setup,
+                                 flow=flow, uploader=uploader, tag=tag, display_errors=display_errors, **kwargs)
+
+
+def _list_runs(id=None, task=None, setup=None,
+               flow=None, uploader=None, display_errors=False, **kwargs):
+
+    """
+    Perform API call `/run/list/{filters}'
+    <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`
+
+    Parameters
+    ----------
+    The arguments that are lists are separated from the single value
+    ones which are put into the kwargs.
+    display_errors is also separated from the kwargs since it has a
+    default value.
+
+    id : list, optional
+
+    task : list, optional
+
+    setup: list, optional
+
+    flow : list, optional
+
+    uploader : list, optional
+
+    display_errors : bool, optional (default=None)
+        Whether to list runs which have an error (for example a missing
+        prediction file).
+
+    kwargs: dict, optional
+        Legal filter operators: task_type.
+
+    Returns
+    -------
+    dict
         List of found runs.
     """
 
     api_call = "run/list"
-    if offset is not None:
-        api_call += "/offset/%d" % int(offset)
-    if size is not None:
-       api_call += "/limit/%d" % int(size)
+    if kwargs is not None:
+        for operator, value in kwargs.items():
+            api_call += "/%s/%s" % (operator, value)
     if id is not None:
         api_call += "/run/%s" % ','.join([str(int(i)) for i in id])
     if task is not None:
@@ -934,21 +985,14 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
     if uploader is not None:
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
-    if tag is not None:
-        api_call += "/tag/%s" % tag
     if display_errors:
         api_call += "/show_errors/true"
+    return __list_runs(api_call)
 
-    return _list_runs(api_call)
 
-
-def _list_runs(api_call):
+def __list_runs(api_call):
     """Helper function to parse API calls which are lists of runs"""
-    try:
-        xml_string = _perform_api_call(api_call)
-    except OpenMLServerNoResult:
-        return []
-
+    xml_string = _perform_api_call(api_call)
     runs_dict = xmltodict.parse(xml_string, force_list=('oml:run',))
     # Minimalistic check if the XML is useful
     if 'oml:runs' not in runs_dict:

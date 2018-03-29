@@ -63,3 +63,10 @@ class TestEvaluationFunctions(TestBase):
 
         evaluations = openml.evaluations.list_evaluations("predictive_accuracy", size=100, offset=100)
         self.assertEquals(len(evaluations), 100)
+
+    def test_list_evaluations_empty(self):
+        evaluations = openml.evaluations.list_evaluations('unexisting_measure')
+        if len(evaluations) > 0:
+            raise ValueError('UnitTest Outdated, got somehow results')
+
+        self.assertIsInstance(evaluations, dict)

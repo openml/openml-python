@@ -27,6 +27,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.linear_model import LogisticRegression, SGDClassifier, \
     LinearRegression
+from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.svm import SVC, LinearSVC
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
@@ -518,7 +519,10 @@ class TestRun(TestBase):
             run = run.publish()
             self._wait_for_processed_run(run.run_id, 200)
             run_id = run.run_id
-        except openml.exceptions.PyOpenMLError:
+        except openml.exceptions.PyOpenMLError as e:
+            if 'Run already exists in server' not in e.message:
+                # in this case the error was not the one we expected
+                raise e
             # run was already
             flow = openml.flows.sklearn_to_flow(clf)
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
@@ -614,17 +618,20 @@ class TestRun(TestBase):
             self.assertRaises(ValueError, _get_seeded_model, model=clf, seed=42)
 
     def test__extract_arfftrace(self):
-        param_grid = {"max_depth": [3, None],
-                      "max_features": [1, 2, 3, 4],
-                      "bootstrap": [True, False],
-                      "criterion": ["gini", "entropy"]}
+        param_grid = {"hidden_layer_sizes": [[5, 5], [10, 10], [20, 20]],
+                      "activation" : ['identity', 'logistic', 'tanh', 'relu'],
+                      "learning_rate_init": [0.1, 0.01, 0.001, 0.0001],
+                      "max_iter": [10, 20, 40, 80]}
         num_iters = 10
         task = openml.tasks.get_task(20)
-        clf = RandomizedSearchCV(RandomForestClassifier(), param_grid, num_iters)
+        clf = RandomizedSearchCV(MLPClassifier(), param_grid, num_iters)
         # just run the task
         train, _ = task.get_train_test_split_indices(0, 0)
         X, y = task.get_X_and_y()
         clf.fit(X[train], y[train])
+
+        # check num layers of MLP
+        self.assertIn(clf.best_estimator_.hidden_layer_sizes, param_grid['hidden_layer_sizes'])
 
         trace_attribute_list = _extract_arfftrace_attributes(clf)
         trace_list = _extract_arfftrace(clf, 0, 0)
@@ -658,7 +665,6 @@ class TestRun(TestBase):
                         self.assertIsInstance(trace_list[line_idx][att_idx], int)
                     else: # att_type = real
                         self.assertIsInstance(trace_list[line_idx][att_idx], float)
-
 
         self.assertEqual(set(param_grid.keys()), optimized_params)
 
@@ -827,6 +833,13 @@ class TestRun(TestBase):
         for rid in runs:
             self._check_run(runs[rid])
 
+    def test_list_runs_empty(self):
+        runs = openml.runs.list_runs(task=[-1])
+        if len(runs) > 0:
+            raise ValueError('UnitTest Outdated, got somehow results')
+
+        self.assertIsInstance(runs, dict)
+
     def test_get_runs_list_by_task(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
@@ -905,7 +918,11 @@ class TestRun(TestBase):
         uploaders_2 = [29, 274]
         flows = [74, 1718]
 
-        self.assertRaises(openml.exceptions.OpenMLServerError, openml.runs.list_runs)
+        '''
+        Since the results are taken by batch size, the function does not throw an OpenMLServerError anymore. 
+        Instead it throws a TimeOutException. For the moment commented out.
+        '''
+        #self.assertRaises(openml.exceptions.OpenMLServerError, openml.runs.list_runs)
 
         runs = openml.runs.list_runs(id=ids)
         self.assertEqual(len(runs), 2)
@@ -968,3 +985,12 @@ class TestRun(TestBase):
             predictionsB = np.array(arff_content2)[:, -2:]
 
             np.testing.assert_array_equal(predictionsA, predictionsB)
+
+    def test_get_cached_run(self):
+        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.runs.functions._get_cached_run(1)
+
+    def test_get_uncached_run(self):
+        openml.config.set_cache_directory(self.static_cache_dir)
+        with self.assertRaises(openml.exceptions.OpenMLCacheException):
+            openml.runs.functions._get_cached_run(10)

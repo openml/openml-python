@@ -7,13 +7,19 @@ if sys.version_info[0] >= 3:
 else:
     import mock
 
+
+import random
+import six
+
 from oslo_concurrency import lockutils
+
 import scipy.sparse
 
 import openml
 from openml import OpenMLDataset
 from openml.exceptions import OpenMLCacheException, PyOpenMLError
 from openml.testing import TestBase
+from openml.utils import _tag_entity
 
 from openml.datasets.functions import (_get_cached_dataset,
                                        _get_cached_dataset_features,
@@ -100,29 +106,84 @@ class TestOpenMLDataset(TestBase):
                                 openml.datasets.functions._get_cached_dataset_arff,
                                 3)
 
+    def _check_dataset(self, dataset):
+            self.assertEqual(type(dataset), dict)
+            self.assertGreaterEqual(len(dataset), 2)
+            self.assertIn('did', dataset)
+            self.assertIsInstance(dataset['did'], int)
+            self.assertIn('status', dataset)
+            self.assertIsInstance(dataset['status'], six.string_types)
+            self.assertIn(dataset['status'], ['in_preparation', 'active',
+                                              'deactivated'])
+    def _check_datasets(self, datasets):
+        for did in datasets:
+            self._check_dataset(datasets[did])
+
+    def test_tag_untag_dataset(self):
+        tag = 'test_tag_%d' %random.randint(1, 1000000)
+        all_tags = _tag_entity('data', 1, tag)
+        self.assertTrue(tag in all_tags)
+        all_tags = _tag_entity('data', 1, tag, untag=True)
+        self.assertTrue(tag not in all_tags)
+
     def test_list_datasets(self):
         # We can only perform a smoke test here because we test on dynamic
         # data from the internet...
         datasets = openml.datasets.list_datasets()
         # 1087 as the number of datasets on openml.org
         self.assertGreaterEqual(len(datasets), 100)
-        for did in datasets:
-            self._check_dataset(datasets[did])
+        self._check_datasets(datasets)
 
     def test_list_datasets_by_tag(self):
         datasets = openml.datasets.list_datasets(tag='study_14')
         self.assertGreaterEqual(len(datasets), 100)
-        for did in datasets:
-            self._check_dataset(datasets[did])
+        self._check_datasets(datasets)
+
+    def test_list_datasets_by_size(self):
+        datasets = openml.datasets.list_datasets(size=10050)
+        self.assertGreaterEqual(len(datasets), 120)
+        self._check_datasets(datasets)
+
+    def test_list_datasets_by_number_instances(self):
+        datasets = openml.datasets.list_datasets(number_instances="5..100")
+        self.assertGreaterEqual(len(datasets), 4)
+        self._check_datasets(datasets)
+
+    def test_list_datasets_by_number_features(self):
+        datasets = openml.datasets.list_datasets(number_features="50..100")
+        self.assertGreaterEqual(len(datasets), 8)
+        self._check_datasets(datasets)
+
+    def test_list_datasets_by_number_classes(self):
+        datasets = openml.datasets.list_datasets(number_classes="5")
+        self.assertGreaterEqual(len(datasets), 3)
+        self._check_datasets(datasets)
+
+    def test_list_datasets_by_number_missing_values(self):
+        datasets = openml.datasets.list_datasets(number_missing_values="5..100")
+        self.assertGreaterEqual(len(datasets), 5)
+        self._check_datasets(datasets)
+
+    def test_list_datasets_combined_filters(self):
+        datasets = openml.datasets.list_datasets(tag='study_14', number_instances="100..1000", number_missing_values="800..1000")
+        self.assertGreaterEqual(len(datasets), 1)
+        self._check_datasets(datasets)
 
     def test_list_datasets_paginate(self):
         size = 10
         max = 100
         for i in range(0, max, size):
             datasets = openml.datasets.list_datasets(offset=i, size=size)
-            self.assertGreaterEqual(size, len(datasets))
-            for did in datasets:
-                self._check_dataset(datasets[did])
+            self.assertEqual(size, len(datasets))
+            self._check_datasets(datasets)
+
+    def test_list_datasets_empty(self):
+        datasets = openml.datasets.list_datasets(tag='NoOneWouldUseThisTagAnyway')
+        if len(datasets) > 0:
+            raise ValueError('UnitTest Outdated, tag was already used (please remove)')
+
+        self.assertIsInstance(datasets, dict)
+
 
     @unittest.skip('See https://github.com/openml/openml-python/issues/149')
     def test_check_datasets_active(self):
