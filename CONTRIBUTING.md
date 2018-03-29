@@ -28,10 +28,10 @@ local disk:
 3. Create a ``feature`` branch to hold your development changes:
 
    ```bash
-   $ git checkout -b my-feature
+   $ git checkout -b feature/my-feature
    ```
 
-   Always use a ``feature`` branch. It's good practice to never work on the ``master`` or ``develop`` branch!
+   Always use a ``feature`` branch. It's good practice to never work on the ``master`` or ``develop`` branch! To make the nature of your pull request easily visible, please perpend the name of the branch with the type of changes you want to merge, such as ``feature`` if it contains a new feature, ``fix`` for a bugfix, ``doc`` for documentation and ``maint`` for other maintenance on the package.
 
 4. Develop the feature on your feature branch. Add changed files using ``git add`` and then ``git commit`` files:
 
