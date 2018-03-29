@@ -1,0 +1,52 @@
+
+environment:
+ global:
+     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\scikit-learn-contrib\\run_with_env.cmd"
+
+ matrix:
+    - PYTHON: "C:\\Python35-x64"
+      PYTHON_VERSION: "3.5"
+      PYTHON_ARCH: "64"
+      MINICONDA: "C:\\Miniconda35-x64"
+      
+    - PYTHON: "C:\\Python35"
+      PYTHON_VERSION: "3.5"
+      PYTHON_ARCH: "32"
+      MINICONDA: "C:\\Miniconda35"
+
+matrix:
+    fast_finish: true
+
+
+install:
+  # Miniconda is pre-installed in the worker build
+  - "SET PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
+  - "python -m pip install -U pip"
+
+  # Check that we have the expected version and architecture for Python
+  - "python --version"
+  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
+  - "pip --version"
+
+  # Remove cygwin because it clashes with conda
+  # see http://help.appveyor.com/discussions/problems/3712-git-remote-https-seems-to-be-broken
+  - rmdir C:\\cygwin /s /q
+
+  # Update previous packages and install the build and runtime dependencies of the project.
+  # XXX: setuptools>23 is currently broken on Win+py3 with numpy
+  # (https://github.com/pypa/setuptools/issues/728)
+  - conda update --all --yes setuptools=23
+
+  # Install the build and runtime dependencies of the project.
+  - "cd C:\\projects\\openml-python"
+  - conda install --quiet --yes mock numpy scipy nose requests scikit-learn nbformat python-dateutil nbconvert
+  - pip install liac-arff xmltodict oslo.concurrency
+  - "%CMD_IN_ENV% python setup.py install"
+  
+
+# Not a .NET project, we build scikit-learn in the install step instead
+build: false
+
+test_script:
+  - "cd C:\\projects\\openml-python"
+  - "%CMD_IN_ENV% python setup.py test"
