@@ -8,11 +8,6 @@ environment:
       PYTHON_VERSION: "3.5"
       PYTHON_ARCH: "64"
       MINICONDA: "C:\\Miniconda35-x64"
-      
-    - PYTHON: "C:\\Python35"
-      PYTHON_VERSION: "3.5"
-      PYTHON_ARCH: "32"
-      MINICONDA: "C:\\Miniconda35"
 
 matrix:
     fast_finish: true
