@@ -8,8 +8,9 @@ import arff
 import xmltodict
 
 import openml
+import openml._api_calls
 from ..tasks import get_task
-from .._api_calls import _perform_api_call, _file_id_to_url
+from .._api_calls import _file_id_to_url
 from ..exceptions import PyOpenMLError
 
 
@@ -234,7 +235,7 @@ class OpenMLRun(object):
             trace_arff = arff.dumps(self._generate_trace_arff_dict())
             file_elements['trace'] = ("trace.arff", trace_arff)
 
-        return_value = _perform_api_call("/run/", file_elements=file_elements)
+        return_value = openml._api_calls._perform_api_call("/run/", file_elements=file_elements)
         run_id = int(xmltodict.parse(return_value)['oml:upload_run']['oml:run_id'])
         self.run_id = run_id
         return self
@@ -370,7 +371,7 @@ class OpenMLRun(object):
             Tag to attach to the run.
         """
         data = {'run_id': self.run_id, 'tag': tag}
-        _perform_api_call("/run/tag", data=data)
+        openml._api_calls._perform_api_call("/run/tag", data=data)
 
     def remove_tag(self, tag):
         """Removes a tag from this run on the server.
@@ -381,7 +382,7 @@ class OpenMLRun(object):
             Tag to attach to the run.
         """
         data = {'run_id': self.run_id, 'tag': tag}
-        _perform_api_call("/run/untag", data=data)
+        openml._api_calls._perform_api_call("/run/untag", data=data)
 
 
 ################################################################################

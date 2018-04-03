@@ -2,15 +2,21 @@ import os
 import shutil
 import sys
 
-from IPython import get_ipython
 import nbformat
 from nbconvert.exporters import export
 from nbconvert.exporters.python import PythonExporter
-from nbconvert.preprocessors import ExecutePreprocessor
-from nbconvert.preprocessors.execute import CellExecutionError
+import six
 
+if six.PY2:
+    import mock
+else:
+    import unittest.mock as mock
+
+import openml._api_calls
 import openml.config
 from openml.testing import TestBase
+
+_perform_api_call = openml._api_calls._perform_api_call
 
 
 class OpenMLDemoTest(TestBase):
@@ -48,10 +54,24 @@ class OpenMLDemoTest(TestBase):
             line for line in python_nb.split('\n')
             if 'get_ipython().run_line_magic(' not in line
         ])
-        print(type(python_nb), python_nb)
 
         exec(python_nb)
 
-    def test_tutorial(self):
+    @mock.patch('openml._api_calls._perform_api_call')
+    def test_tutorial(self, patch):
+        def side_effect(*args, **kwargs):
+            if (
+                args[0].endswith('/run/')
+                and kwargs['file_elements'] is not None
+            ):
+                return """<oml:upload_run>
+    <oml:run_id>1</oml:run_id>
+</oml:upload_run>
+                """
+            else:
+                return _perform_api_call(*args, **kwargs)
+        patch.side_effect = side_effect
+
         openml.config.server = self.production_server
         self._tst_notebook('OpenML_Tutorial.ipynb')
+        self.assertGreater(patch.call_count, 100)

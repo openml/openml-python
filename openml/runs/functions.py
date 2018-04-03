@@ -14,13 +14,13 @@ import sklearn.metrics
 
 import openml
 import openml.utils
+import openml._api_calls
 from ..exceptions import PyOpenMLError, OpenMLServerNoResult
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
     _copy_server_fields
 from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException
-from .._api_calls import _perform_api_call
 from .run import OpenMLRun, _get_version_information
 from .trace import OpenMLRunTrace, OpenMLTraceIteration
 
@@ -150,7 +150,7 @@ def get_run_trace(run_id):
      openml.runs.OpenMLTrace
     """
 
-    trace_xml = _perform_api_call('run/trace/%d' % run_id)
+    trace_xml = openml._api_calls._perform_api_call('run/trace/%d' % run_id)
     run_trace = _create_trace_from_description(trace_xml)
     return run_trace
 
@@ -653,7 +653,7 @@ def get_run(run_id):
         return _get_cached_run(run_id)
 
     except (OpenMLCacheException):
-        run_xml = _perform_api_call("run/%d" % run_id)
+        run_xml = openml._api_calls._perform_api_call("run/%d" % run_id)
         with io.open(run_file, "w", encoding='utf8') as fh:
             fh.write(run_xml)
 
@@ -992,7 +992,7 @@ def _list_runs(id=None, task=None, setup=None,
 
 def __list_runs(api_call):
     """Helper function to parse API calls which are lists of runs"""
-    xml_string = _perform_api_call(api_call)
+    xml_string = openml._api_calls._perform_api_call(api_call)
     runs_dict = xmltodict.parse(xml_string, force_list=('oml:run',))
     # Minimalistic check if the XML is useful
     if 'oml:runs' not in runs_dict:
