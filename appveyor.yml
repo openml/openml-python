@@ -1,3 +1,4 @@
+clone_folder: C:\\projects\\openml-python
 
 environment:
  global:
