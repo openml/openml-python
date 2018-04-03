@@ -25,6 +25,10 @@ class OpenMLServerException(OpenMLServerError):
         self.url = url
         super(OpenMLServerException, self).__init__(message)
 
+    def __str__(self):
+        return '%s returned code %s: %s' % (
+            self.url, self.code, self.message,
+        )
 
 class OpenMLServerNoResult(OpenMLServerException):
     """exception for when the result of the server is empty. """
