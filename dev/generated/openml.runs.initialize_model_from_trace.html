@@ -118,32 +118,31 @@ parameter settings)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>run_id</strong> : int</p>
-<blockquote>
-<div><p>The Openml run_id. Should contain a trace file, 
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>run_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">The Openml run_id. Should contain a trace file, 
 otherwise a OpenMLServerException is raised</p>
-</div></blockquote>
-<p><strong>repeat: int</strong></p>
-<blockquote>
-<div><p>The repeat nr (column in trace file)</p>
-</div></blockquote>
-<p><strong>fold: int</strong></p>
-<blockquote>
-<div><p>The fold nr (column in trace file)</p>
-</div></blockquote>
-<p><strong>iteration: int</strong></p>
-<blockquote>
-<div><p>The iteration nr (column in trace file). If None, the
+</dd>
+<dt><strong>repeat: int</strong></dt>
+<dd><p class="first last">The repeat nr (column in trace file)</p>
+</dd>
+<dt><strong>fold: int</strong></dt>
+<dd><p class="first last">The fold nr (column in trace file)</p>
+</dd>
+<dt><strong>iteration: int</strong></dt>
+<dd><p class="first last">The iteration nr (column in trace file). If None, the
 best (selected) iteration will be searched (slow), 
 according to the selection criteria implemented in
 OpenMLRunTrace.get_selected_iteration</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> : sklearn model</p>
-<blockquote class="last">
-<div><p>the scikit-learn model with all parameters initailized</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>model</strong> <span class="classifier-delimiter">:</span> <span class="classifier">sklearn model</span></dt>
+<dd><p class="first last">the scikit-learn model with all parameters initailized</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>

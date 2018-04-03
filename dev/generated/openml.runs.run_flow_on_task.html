@@ -119,37 +119,35 @@ internet connection).</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>task</strong> : OpenMLTask</p>
-<blockquote>
-<div><p>Task to perform.</p>
-</div></blockquote>
-<p><strong>model</strong> : sklearn model</p>
-<blockquote>
-<div><p>A model which has a function fit(X,Y) and predict(X),
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>task</strong> <span class="classifier-delimiter">:</span> <span class="classifier">OpenMLTask</span></dt>
+<dd><p class="first last">Task to perform.</p>
+</dd>
+<dt><strong>model</strong> <span class="classifier-delimiter">:</span> <span class="classifier">sklearn model</span></dt>
+<dd><p class="first last">A model which has a function fit(X,Y) and predict(X),
 all supervised estimators of scikit learn follow this definition of a model [1]
 [1](<a class="reference external" href="http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html">http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html</a>)</p>
-</div></blockquote>
-<p><strong>avoid_duplicate_runs</strong> : bool</p>
-<blockquote>
-<div><p>If this flag is set to True, the run will throw an error if the
+</dd>
+<dt><strong>avoid_duplicate_runs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If this flag is set to True, the run will throw an error if the
 setup/task combination is already present on the server. Works only
 if the flow is already published on the server. This feature requires an
 internet connection.</p>
-</div></blockquote>
-<p><strong>flow_tags</strong> : list(str)</p>
-<blockquote>
-<div><p>A list of tags that the flow should have at creation.</p>
-</div></blockquote>
-<p><strong>seed: int</strong></p>
-<blockquote>
-<div><p>Models that are not seeded will get this seed.</p>
-</div></blockquote>
+</dd>
+<dt><strong>flow_tags</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list(str)</span></dt>
+<dd><p class="first last">A list of tags that the flow should have at creation.</p>
+</dd>
+<dt><strong>seed: int</strong></dt>
+<dd><p class="first last">Models that are not seeded will get this seed.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>run</strong> : OpenMLRun</p>
-<blockquote class="last">
-<div><p>Result of the run.</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>run</strong> <span class="classifier-delimiter">:</span> <span class="classifier">OpenMLRun</span></dt>
+<dd><p class="first last">Result of the run.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>

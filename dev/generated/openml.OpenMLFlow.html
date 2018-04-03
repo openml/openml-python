@@ -120,102 +120,85 @@ ensures that all relevant fields are filled in.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str</p>
-<blockquote>
-<div><p>Name of the flow. Is used together with the attribute
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Name of the flow. Is used together with the attribute
 <cite>external_version</cite> as a unique identifier of the flow.</p>
-</div></blockquote>
-<p><strong>description</strong> : str</p>
-<blockquote>
-<div><p>Human-readable description of the flow (free text).</p>
-</div></blockquote>
-<p><strong>model</strong> : object</p>
-<blockquote>
-<div><p>ML model which is described by this flow.</p>
-</div></blockquote>
-<p><strong>components</strong> : OrderedDict</p>
-<blockquote>
-<div><p>Mapping from component identifier to an OpenMLFlow object. Components
+</dd>
+<dt><strong>description</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Human-readable description of the flow (free text).</p>
+</dd>
+<dt><strong>model</strong> <span class="classifier-delimiter">:</span> <span class="classifier">object</span></dt>
+<dd><p class="first last">ML model which is described by this flow.</p>
+</dd>
+<dt><strong>components</strong> <span class="classifier-delimiter">:</span> <span class="classifier">OrderedDict</span></dt>
+<dd><p class="first last">Mapping from component identifier to an OpenMLFlow object. Components
 are usually subfunctions of an algorithm (e.g. kernels), base learners
 in ensemble algorithms (decision tree in adaboost) or building blocks
 of a machine learning pipeline. Components are modeled as independent
 flows and can be shared between flows (different pipelines can use
 the same components).</p>
-</div></blockquote>
-<p><strong>parameters</strong> : OrderedDict</p>
-<blockquote>
-<div><p>Mapping from parameter name to the parameter default value. The
+</dd>
+<dt><strong>parameters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">OrderedDict</span></dt>
+<dd><p class="first last">Mapping from parameter name to the parameter default value. The
 parameter default value must be of type <cite>str</cite>, so that the respective
 toolbox plugin can take care of casting the parameter default value to
 the correct type.</p>
-</div></blockquote>
-<p><strong>parameters_meta_info</strong> : OrderedDict</p>
-<blockquote>
-<div><p>Mapping from parameter name to <cite>dict</cite>. Stores additional information
+</dd>
+<dt><strong>parameters_meta_info</strong> <span class="classifier-delimiter">:</span> <span class="classifier">OrderedDict</span></dt>
+<dd><p class="first last">Mapping from parameter name to <cite>dict</cite>. Stores additional information
 for each parameter. Required keys are <cite>data_type</cite> and <cite>description</cite>.</p>
-</div></blockquote>
-<p><strong>external_version</strong> : str</p>
-<blockquote>
-<div><p>Version number of the software the flow is implemented in. Is used
+</dd>
+<dt><strong>external_version</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Version number of the software the flow is implemented in. Is used
 together with the attribute <cite>name</cite> as a uniquer identifier of the flow.</p>
-</div></blockquote>
-<p><strong>tags</strong> : list</p>
-<blockquote>
-<div><p>List of tags. Created on the server by other API calls.</p>
-</div></blockquote>
-<p><strong>language</strong> : str</p>
-<blockquote>
-<div><p>Natural language the flow is described in (not the programming
+</dd>
+<dt><strong>tags</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><p class="first last">List of tags. Created on the server by other API calls.</p>
+</dd>
+<dt><strong>language</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Natural language the flow is described in (not the programming
 language).</p>
-</div></blockquote>
-<p><strong>dependencies</strong> : str</p>
-<blockquote>
-<div><p>A list of dependencies necessary to run the flow. This field should
+</dd>
+<dt><strong>dependencies</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">A list of dependencies necessary to run the flow. This field should
 contain all libraries the flow depends on. To allow reproducibility
 it should also specify the exact version numbers.</p>
-</div></blockquote>
-<p><strong>class_name</strong> : str</p>
-<blockquote>
-<div><p>The development language name of the class which is described by this
+</dd>
+<dt><strong>class_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">The development language name of the class which is described by this
 flow.</p>
-</div></blockquote>
-<p><strong>custom_name</strong> : str</p>
-<blockquote>
-<div><p>Custom name of the flow given by the owner.</p>
-</div></blockquote>
-<p><strong>binary_url</strong> : str, optional</p>
-<blockquote>
-<div><p>Url from which the binary can be downloaded. Added by the server.
+</dd>
+<dt><strong>custom_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Custom name of the flow given by the owner.</p>
+</dd>
+<dt><strong>binary_url</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Url from which the binary can be downloaded. Added by the server.
 Ignored when uploaded manually. Will not be used by the python API
 because binaries aren’t compatible across machines.</p>
-</div></blockquote>
-<p><strong>binary_format</strong> : str, optional</p>
-<blockquote>
-<div><p>Format in which the binary code was uploaded. Will not be used by the
+</dd>
+<dt><strong>binary_format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Format in which the binary code was uploaded. Will not be used by the
 python API because binaries aren’t compatible across machines.</p>
-</div></blockquote>
-<p><strong>binary_md5</strong> : str, optional</p>
-<blockquote>
-<div><p>MD5 checksum to check if the binary code was correctly downloaded. Will
+</dd>
+<dt><strong>binary_md5</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">MD5 checksum to check if the binary code was correctly downloaded. Will
 not be used by the python API because binaries aren’t compatible across
 machines.</p>
-</div></blockquote>
-<p><strong>uploader</strong> : str, optional</p>
-<blockquote>
-<div><p>OpenML user ID of the uploader. Filled in by the server.</p>
-</div></blockquote>
-<p><strong>upload_date</strong> : str, optional</p>
-<blockquote>
-<div><p>Date the flow was uploaded. Filled in by the server.</p>
-</div></blockquote>
-<p><strong>flow_id</strong> : int, optional</p>
-<blockquote>
-<div><p>Flow ID. Assigned by the server.</p>
-</div></blockquote>
-<p><strong>version</strong> : str, optional</p>
-<blockquote class="last">
-<div><p>OpenML version of the flow. Assigned by the server.</p>
-</div></blockquote>
+</dd>
+<dt><strong>uploader</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">OpenML user ID of the uploader. Filled in by the server.</p>
+</dd>
+<dt><strong>upload_date</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Date the flow was uploaded. Filled in by the server.</p>
+</dd>
+<dt><strong>flow_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">Flow ID. Assigned by the server.</p>
+</dd>
+<dt><strong>version</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">OpenML version of the flow. Assigned by the server.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -228,7 +211,11 @@ machines.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>self</strong> : OpenMLFlow</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>self</strong> <span class="classifier-delimiter">:</span> <span class="classifier">OpenMLFlow</span></dt>
+<dd></dd>
+</dl>
+</td>
 </tr>
 </tbody>
 </table>
@@ -242,10 +229,11 @@ machines.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tag</strong> : str</p>
-<blockquote class="last">
-<div><p>Tag to attach to the flow.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Tag to attach to the flow.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -260,10 +248,11 @@ machines.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tag</strong> : str</p>
-<blockquote class="last">
-<div><p>Tag to attach to the flow.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Tag to attach to the flow.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>

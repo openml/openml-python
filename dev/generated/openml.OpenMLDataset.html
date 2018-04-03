@@ -117,15 +117,16 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str</p>
-<blockquote>
-<div><p>Name of the dataset</p>
-</div></blockquote>
-<p><strong>description</strong> : str</p>
-<blockquote>
-<div><p>Description of the dataset</p>
-</div></blockquote>
-<p class="last"><strong>FIXME</strong> : which of these do we actually nee?</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Name of the dataset</p>
+</dd>
+<dt><strong>description</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Description of the dataset</p>
+</dd>
+<dt><strong>FIXME</strong> <span class="classifier-delimiter">:</span> <span class="classifier">which of these do we actually nee?</span></dt>
+<dd></dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -145,34 +146,33 @@ Can use additional parameters to exclude various features by index or ontology.<
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data_type</strong> : str</p>
-<blockquote>
-<div><p>The data type to return (e.g., nominal, numeric, date, string)</p>
-</div></blockquote>
-<p><strong>exclude</strong> : list(int)</p>
-<blockquote>
-<div><dl class="docutils">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>data_type</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">The data type to return (e.g., nominal, numeric, date, string)</p>
+</dd>
+<dt><strong>exclude</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list(int)</span></dt>
+<dd><dl class="first last docutils">
 <dt>Indices to exclude (and adapt the return values as if these indices</dt>
 <dd><p class="first last">are not present)</p>
 </dd>
 </dl>
-</div></blockquote>
-<p><strong>exclude_ignore_attributes</strong> : bool</p>
-<blockquote>
-<div><p>Whether to exclude the defined ignore attributes (and adapt the
+</dd>
+<dt><strong>exclude_ignore_attributes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">Whether to exclude the defined ignore attributes (and adapt the
 return values as if these indices are not present)</p>
-</div></blockquote>
-<p><strong>exclude_row_id_attribute</strong> : bool</p>
-<blockquote>
-<div><p>Whether to exclude the defined row id attributes (and adapt the
+</dd>
+<dt><strong>exclude_row_id_attribute</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">Whether to exclude the defined row id attributes (and adapt the
 return values as if these indices are not present)</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>result</strong> : list</p>
-<blockquote class="last">
-<div><p>a list of indices that have the specified data type</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>result</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><p class="first last">a list of indices that have the specified data type</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -188,7 +188,11 @@ return values as if these indices are not present)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>self</strong></dt>
+<dd></dd>
+</dl>
+</td>
 </tr>
 </tbody>
 </table>
@@ -202,10 +206,11 @@ return values as if these indices are not present)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tag</strong> : str</p>
-<blockquote class="last">
-<div><p>Tag to attach to the dataset.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Tag to attach to the dataset.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -220,10 +225,11 @@ return values as if these indices are not present)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tag</strong> : str</p>
-<blockquote class="last">
-<div><p>Tag to attach to the dataset.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Tag to attach to the dataset.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -242,13 +248,17 @@ classname when uploading the results of a run.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>target_name</strong> : str</p>
-<blockquote>
-<div><p>Name of the target attribute</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>target_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Name of the target attribute</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list</strong></dt>
+<dd></dd>
+</dl>
 </td>
 </tr>
 </tbody>

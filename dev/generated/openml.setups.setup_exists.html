@@ -116,22 +116,23 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>flow</strong> : flow</p>
-<blockquote>
-<div><p>The openml flow object.</p>
-</div></blockquote>
-<p><strong>sklearn_model</strong> : BaseEstimator, optional</p>
-<blockquote>
-<div><p>If given, the parameters are parsed from this model instead of the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>flow</strong> <span class="classifier-delimiter">:</span> <span class="classifier">flow</span></dt>
+<dd><p class="first last">The openml flow object.</p>
+</dd>
+<dt><strong>sklearn_model</strong> <span class="classifier-delimiter">:</span> <span class="classifier">BaseEstimator, optional</span></dt>
+<dd><p class="first last">If given, the parameters are parsed from this model instead of the
 model in the flow. If not given, parameters are parsed from
 <code class="docutils literal notranslate"><span class="pre">flow.model</span></code>.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>setup_id</strong> : int</p>
-<blockquote class="last">
-<div><p>setup id iff exists, False otherwise</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>setup_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">setup id iff exists, False otherwise</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>

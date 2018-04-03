@@ -116,14 +116,17 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>Filter task_type_id is separated from the other filters because</strong></p>
-<p><strong>it is used as task_type_id in the task description, but it is named</strong></p>
-<p><strong>type when used as a filter in list tasks call.</strong></p>
-<p><strong>task_type_id</strong> : int, optional</p>
-<blockquote>
-<div><p>ID of the task type as detailed
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>Filter task_type_id is separated from the other filters because</strong></dt>
+<dd></dd>
+<dt><strong>it is used as task_type_id in the task description, but it is named</strong></dt>
+<dd></dd>
+<dt><strong>type when used as a filter in list tasks call.</strong></dt>
+<dd></dd>
+<dt><strong>task_type_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first">ID of the task type as detailed
 <a class="reference external" href="https://www.openml.org/search?type=task_type">here</a>.</p>
-<ul class="simple">
+<ul class="last simple">
 <li>Supervised classification: 1</li>
 <li>Supervised regression: 2</li>
 <li>Learning curve: 3</li>
@@ -133,33 +136,31 @@
 <li>Survival Analysis: 7</li>
 <li>Subgroup Discovery: 8</li>
 </ul>
-</div></blockquote>
-<p><strong>offset</strong> : int, optional</p>
-<blockquote>
-<div><p>the number of tasks to skip, starting from the first</p>
-</div></blockquote>
-<p><strong>size</strong> : int, optional</p>
-<blockquote>
-<div><p>the maximum number of tasks to show</p>
-</div></blockquote>
-<p><strong>tag</strong> : str, optional</p>
-<blockquote>
-<div><p>the tag to include</p>
-</div></blockquote>
-<p><strong>kwargs: dict, optional</strong></p>
-<blockquote>
-<div><p>Legal filter operators: data_tag, status, data_id, data_name, number_instances, number_features,
+</dd>
+<dt><strong>offset</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">the number of tasks to skip, starting from the first</p>
+</dd>
+<dt><strong>size</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">the maximum number of tasks to show</p>
+</dd>
+<dt><strong>tag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">the tag to include</p>
+</dd>
+<dt><strong>kwargs: dict, optional</strong></dt>
+<dd><p class="first last">Legal filter operators: data_tag, status, data_id, data_name, number_instances, number_features,
 number_classes, number_missing_values.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
-<blockquote class="last">
-<div><p>All tasks having the given task_type_id and the give tag. Every task is
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict</strong></dt>
+<dd><p class="first last">All tasks having the given task_type_id and the give tag. Every task is
 represented by a dictionary containing the following information:
 task id, dataset id, task_type and status. If qualities are calculated
 for the associated dataset, some of these are also returned.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>

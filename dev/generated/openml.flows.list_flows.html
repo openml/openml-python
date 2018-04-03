@@ -117,29 +117,27 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>offset</strong> : int, optional</p>
-<blockquote>
-<div><p>the number of flows to skip, starting from the first</p>
-</div></blockquote>
-<p><strong>size</strong> : int, optional</p>
-<blockquote>
-<div><p>the maximum number of flows to return</p>
-</div></blockquote>
-<p><strong>tag</strong> : str, optional</p>
-<blockquote>
-<div><p>the tag to include</p>
-</div></blockquote>
-<p><strong>kwargs: dict, optional</strong></p>
-<blockquote>
-<div><p>Legal filter operators: uploader.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>offset</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">the number of flows to skip, starting from the first</p>
+</dd>
+<dt><strong>size</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">the maximum number of flows to return</p>
+</dd>
+<dt><strong>tag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">the tag to include</p>
+</dd>
+<dt><strong>kwargs: dict, optional</strong></dt>
+<dd><p class="first last">Legal filter operators: uploader.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>flows</strong> : dict</p>
-<blockquote class="last">
-<div><p>A mapping from flow_id to a dict giving a brief overview of the
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>flows</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first">A mapping from flow_id to a dict giving a brief overview of the
 respective flow.</p>
-<p>Every flow is represented by a dictionary containing
+<p class="last">Every flow is represented by a dictionary containing
 the following information:
 - flow id
 - full name
@@ -147,7 +145,8 @@ the following information:
 - version
 - external version
 - uploader</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
