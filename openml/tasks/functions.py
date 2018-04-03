@@ -278,7 +278,7 @@ def get_task(task_id):
     tid_cache_dir = _create_task_cache_dir(task_id)
 
     with lockutils.external_lock(
-            name='datasets.functions.get_dataset:%d' % task_id,
+            name='task.functions.get_task:%d' % task_id,
             lock_path=os.path.join(config.get_cache_directory(), 'locks'),
     ):
         try:
