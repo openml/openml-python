@@ -1,8 +1,8 @@
 clone_folder: C:\\projects\\openml-python
 
 environment:
- global:
-     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\scikit-learn-contrib\\run_with_env.cmd"
+ #global:
+ #    CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\scikit-learn-contrib\\run_with_env.cmd"
 
  matrix:
     - PYTHON: "C:\\Python35-x64"
@@ -45,4 +45,4 @@ build: false
 
 test_script:
   - "cd C:\\projects\\openml-python"
-  - "%CMD_IN_ENV% python setup.py test"
+  - "python setup.py test"
