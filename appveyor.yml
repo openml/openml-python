@@ -32,7 +32,7 @@ install:
   # XXX: setuptools>23 is currently broken on Win+py3 with numpy
   # (https://github.com/pypa/setuptools/issues/728)
   - conda update --all --yes setuptools=23
-  - conda update nb_conda nb_conda_kernels
+  - conda install nb_conda nb_conda_kernels
 
   # Install the build and runtime dependencies of the project.
   - "cd C:\\projects\\openml-python"
