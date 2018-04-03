@@ -80,6 +80,8 @@ following rules before you submit a pull request:
       ```bash
       $ nosetests
       ```
+   
+   For Windows systems, execute the command from an Anaconda Prompt or add `nosetests` to PATH before executing the command.
 
 -  Documentation and high-coverage tests are necessary for enhancements to be
    accepted. Bug-fixes or new features should be provided with
@@ -132,7 +134,7 @@ following rules before submitting:
    See [Creating and highlighting code blocks](https://help.github.com/articles/creating-and-highlighting-code-blocks).
 
 -  Please include your operating system type and version number, as well
-   as your Python, scikit-learn, numpy, and scipy versions. This information
+   as your Python, openml, scikit-learn, numpy, and scipy versions. This information
    can be found by running the following code snippet:
 
   ```python
