@@ -17,7 +17,7 @@ import scipy.sparse
 
 import openml
 from openml import OpenMLDataset
-from openml.exceptions import OpenMLCacheException, PyOpenMLError
+from openml.exceptions import OpenMLCacheException, PyOpenMLError, OpenMLHashException
 from openml.testing import TestBase
 from openml.utils import _tag_entity
 
@@ -268,7 +268,7 @@ class TestOpenMLDataset(TestBase):
             'oml:url': 'https://www.openml.org/data/download/61',
         }
         self.assertRaisesRegexp(
-            ValueError,
+            OpenMLHashException,
             'Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded dataset 5 '
             'is unequal to the checksum abc sent by the server.',
             _get_dataset_arff,
