@@ -98,7 +98,7 @@ def get_cache_directory():
         _cachedir = _defaults(cache_dir)
     else:
         _cachedir = cache_dir
-    _cachedir = os.path.join(cache_dir, reversed_url_suffix)
+    _cachedir = os.path.join(_cachedir, reversed_url_suffix)
     return _cachedir
 
 

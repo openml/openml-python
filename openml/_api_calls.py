@@ -58,7 +58,7 @@ def _file_id_to_url(file_id, filename=None):
      Presents the URL how to download a given file id
      filename is optional
     '''
-    openml_url = config._server.split('/api/')
+    openml_url = config.server.split('/api/')
     url = openml_url[0] + '/data/download/%s' %file_id
     if filename is not None:
         url += '/' + filename
