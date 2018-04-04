@@ -2,6 +2,7 @@ from collections import defaultdict
 import io
 import json
 import os
+import shutil
 import sys
 import time
 import warnings
@@ -27,6 +28,8 @@ from .trace import OpenMLRunTrace, OpenMLTraceIteration
 
 # _get_version_info, _get_dict and _create_setup_string are in run.py to avoid
 # circular imports
+
+RUNS_CACHE_DIR_NAME = 'runs'
 
 
 def run_model_on_task(task, model, avoid_duplicate_runs=True, flow_tags=None,
@@ -643,7 +646,7 @@ def get_run(run_id):
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    run_dir = os.path.join(config.get_cache_directory(), "runs", str(run_id))
+    run_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id)
     run_file = os.path.join(run_dir, "description.xml")
 
     if not os.path.exists(run_dir):
@@ -878,8 +881,9 @@ def _create_trace_from_arff(arff_obj):
 
 def _get_cached_run(run_id):
     """Load a run from the cache."""
-    cache_dir = config.get_cache_directory()
-    run_cache_dir = os.path.join(cache_dir, "runs", str(run_id))
+    run_cache_dir = openml.utils._create_cache_directory_for_id(
+        RUNS_CACHE_DIR_NAME, run_id,
+    )
     try:
         run_file = os.path.join(run_cache_dir, "description.xml")
         with io.open(run_file, encoding='utf8') as fh:

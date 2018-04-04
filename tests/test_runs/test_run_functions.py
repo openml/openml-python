@@ -466,7 +466,7 @@ class TestRun(TestBase):
         self._test_local_evaluations(run)
 
     def test_online_run_metric_score(self):
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
         run = openml.runs.get_run(5965513) # important to use binary classification task, due to assertions
         self._test_local_evaluations(run)
 
@@ -803,7 +803,7 @@ class TestRun(TestBase):
 
     def test_get_run(self):
         # this run is not available on test
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
         run = openml.runs.get_run(473351)
         self.assertEqual(run.dataset_id, 357)
         self.assertEqual(run.evaluations['f_measure'], 0.841225)
@@ -827,7 +827,7 @@ class TestRun(TestBase):
 
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
         runs = openml.runs.list_runs(id=[2])
         self.assertEqual(len(runs), 1)
         for rid in runs:
@@ -842,7 +842,7 @@ class TestRun(TestBase):
 
     def test_get_runs_list_by_task(self):
         # TODO: comes from live, no such lists on test
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
         task_ids = [20]
         runs = openml.runs.list_runs(task=task_ids)
         self.assertGreaterEqual(len(runs), 590)
@@ -860,7 +860,7 @@ class TestRun(TestBase):
 
     def test_get_runs_list_by_uploader(self):
         # TODO: comes from live, no such lists on test
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
         # 29 is Dominik Kirchhoff - Joaquin and Jan have too many runs right now
         uploader_ids = [29]
 
@@ -881,7 +881,7 @@ class TestRun(TestBase):
 
     def test_get_runs_list_by_flow(self):
         # TODO: comes from live, no such lists on test
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
         flow_ids = [1154]
         runs = openml.runs.list_runs(flow=flow_ids)
         self.assertGreaterEqual(len(runs), 1)
@@ -899,7 +899,7 @@ class TestRun(TestBase):
 
     def test_get_runs_pagination(self):
         # TODO: comes from live, no such lists on test
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
         uploader_ids = [1]
         size = 10
         max = 100
@@ -911,7 +911,7 @@ class TestRun(TestBase):
 
     def test_get_runs_list_by_filters(self):
         # TODO: comes from live, no such lists on test
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
         ids = [505212, 6100]
         tasks = [2974, 339]
         uploaders_1 = [1, 2]
@@ -940,7 +940,7 @@ class TestRun(TestBase):
 
     def test_get_runs_list_by_tag(self):
         # TODO: comes from live, no such lists on test
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
         runs = openml.runs.list_runs(tag='curves')
         self.assertGreaterEqual(len(runs), 1)
 
@@ -987,10 +987,10 @@ class TestRun(TestBase):
             np.testing.assert_array_equal(predictionsA, predictionsB)
 
     def test_get_cached_run(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.config.cache_dir = self.static_cache_dir
         openml.runs.functions._get_cached_run(1)
 
     def test_get_uncached_run(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.config.cache_dir = self.static_cache_dir
         with self.assertRaises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)

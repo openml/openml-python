@@ -12,7 +12,7 @@ class OpenMLDatasetTest(TestBase):
 
     def setUp(self):
         super(OpenMLDatasetTest, self).setUp()
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
 
         # Load dataset id 2 - dataset 2 is interesting because it contains
         # missing values, categorical features etc.
@@ -122,7 +122,7 @@ class OpenMLDatasetTestSparse(TestBase):
 
     def setUp(self):
         super(OpenMLDatasetTestSparse, self).setUp()
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
 
         self.sparse_dataset = openml.datasets.get_dataset(4136)
 

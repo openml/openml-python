@@ -6,6 +6,7 @@ from .. import datasets
 from .split import OpenMLSplit
 from .._api_calls import _read_url
 import openml._api_calls
+from ..utils import _create_cache_directory_for_id
 
 
 class OpenMLTask(object):
@@ -74,7 +75,9 @@ class OpenMLTask(object):
         """Download the OpenML split for a given task.
         """
         cached_split_file = os.path.join(
-            _create_task_cache_dir(self.task_id), "datasplits.arff")
+            _create_cache_directory_for_id('tasks', self.task_id),
+            "datasplits.arff",
+        )
 
         try:
             split = OpenMLSplit._from_arff_file(cached_split_file)

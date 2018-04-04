@@ -6,7 +6,7 @@ class TestStudyFunctions(TestBase):
     _multiprocess_can_split_ = True
 
     def test_get_study(self):
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
 
         study_id = 34
 

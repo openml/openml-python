@@ -18,19 +18,19 @@ class TestTask(TestBase):
     _multiprocess_can_split_ = True
 
     def test__get_cached_tasks(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.config.cache_dir = self.static_cache_dir
         tasks = openml.tasks.functions._get_cached_tasks()
         self.assertIsInstance(tasks, dict)
         self.assertEqual(len(tasks), 3)
         self.assertIsInstance(list(tasks.values())[0], OpenMLTask)
 
     def test__get_cached_task(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.config.cache_dir = self.static_cache_dir
         task = openml.tasks.functions._get_cached_task(1)
         self.assertIsInstance(task, OpenMLTask)
 
     def test__get_cached_task_not_cached(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.config.cache_dir = self.static_cache_dir
         self.assertRaisesRegexp(OpenMLCacheException,
                                 'Task file for tid 2 not cached',
                                 openml.tasks.functions._get_cached_task, 2)
@@ -44,7 +44,7 @@ class TestTask(TestBase):
 
     def test_list_clustering_task(self):
         # as shown by #383, clustering tasks can give list/dict casting problems
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
         openml.tasks.list_tasks(task_type_id=5, size=10)
         # the expected outcome is that it doesn't crash. No assertions.
 
@@ -109,11 +109,11 @@ class TestTask(TestBase):
                     self._check_task(tasks[tid])
 
     def test__get_task(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.config.cache_dir = self.static_cache_dir
         task = openml.tasks.get_task(1882)
         # Test the following task as it used to throw an Unicode Error.
         # https://github.com/openml/openml-python/issues/378
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
         production_task = openml.tasks.get_task(34536)
 
     def test_get_task(self):
@@ -148,7 +148,7 @@ class TestTask(TestBase):
         ))
 
     def test_get_task_with_cache(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.config.cache_dir = self.static_cache_dir
         task = openml.tasks.get_task(1)
         self.assertIsInstance(task, OpenMLTask)
 
@@ -162,8 +162,9 @@ class TestTask(TestBase):
 
     def test_deletion_of_cache_dir(self):
         # Simple removal
-        tid_cache_dir = openml.tasks.functions.\
-            _create_task_cache_directory(1)
+        tid_cache_dir = openml.utils._create_cache_directory_for_id(
+            'tasks', 1,
+        )
         self.assertTrue(os.path.exists(tid_cache_dir))
-        openml.tasks.functions._remove_task_cache_dir(tid_cache_dir)
+        openml.utils._remove_cache_dir_for_id('tasks', tid_cache_dir)
         self.assertFalse(os.path.exists(tid_cache_dir))

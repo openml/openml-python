@@ -15,10 +15,20 @@ from ..exceptions import OpenMLCacheException, OpenMLServerNoResult, \
     OpenMLHashException
 from .. import config
 from .._api_calls import _read_url
+from ..utils import (
+    _create_cache_directory,
+    _remove_cache_dir_for_id,
+    _create_cache_directory_for_id,
+    _create_lockfiles_dir,
+)
+
+
+DATASETS_CACHE_DIR_NAME = 'datasets'
 
 
 ############################################################################
 # Local getters/accessors to the cache directory
+
 
 def _list_cached_datasets():
     """Return list with ids of all cached datasets
@@ -30,8 +40,7 @@ def _list_cached_datasets():
     """
     datasets = []
 
-    dataset_cache = config.get_cache_directory()
-    dataset_cache_dir = os.path.join(dataset_cache, "datasets")
+    dataset_cache_dir = _create_cache_directory(DATASETS_CACHE_DIR_NAME)
     directory_content = os.listdir(dataset_cache_dir)
     directory_content.sort()
 
@@ -87,8 +96,9 @@ def _get_cached_dataset(dataset_id):
 
 
 def _get_cached_dataset_description(dataset_id):
-    cache_dir = config.get_cache_directory()
-    did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
+    did_cache_dir = _create_cache_directory_for_id(
+        DATASETS_CACHE_DIR_NAME, dataset_id,
+    )
     description_file = os.path.join(did_cache_dir, "description.xml")
     try:
         with io.open(description_file, encoding='utf8') as fh:
@@ -101,8 +111,9 @@ def _get_cached_dataset_description(dataset_id):
 
 
 def _get_cached_dataset_features(dataset_id):
-    cache_dir = config.get_cache_directory()
-    did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
+    did_cache_dir = _create_cache_directory_for_id(
+        DATASETS_CACHE_DIR_NAME, dataset_id,
+    )
     features_file = os.path.join(did_cache_dir, "features.xml")
     try:
         with io.open(features_file, encoding='utf8') as fh:
@@ -114,8 +125,9 @@ def _get_cached_dataset_features(dataset_id):
 
 
 def _get_cached_dataset_qualities(dataset_id):
-    cache_dir = config.get_cache_directory()
-    did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
+    did_cache_dir = _create_cache_directory_for_id(
+        DATASETS_CACHE_DIR_NAME, dataset_id,
+    )
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")
     try:
         with io.open(qualities_file, encoding='utf8') as fh:
@@ -127,8 +139,9 @@ def _get_cached_dataset_qualities(dataset_id):
 
 
 def _get_cached_dataset_arff(dataset_id):
-    cache_dir = config.get_cache_directory()
-    did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
+    did_cache_dir = _create_cache_directory_for_id(
+        DATASETS_CACHE_DIR_NAME, dataset_id,
+    )
     output_file = os.path.join(did_cache_dir, "dataset.arff")
 
     try:
@@ -310,9 +323,11 @@ def get_dataset(dataset_id):
 
     with lockutils.external_lock(
         name='datasets.functions.get_dataset:%d' % dataset_id,
-        lock_path=os.path.join(config.get_cache_directory(), 'locks'),
+        lock_path=_create_lockfiles_dir(),
     ):
-        did_cache_dir = _create_dataset_cache_directory(dataset_id)
+        did_cache_dir = _create_cache_directory_for_id(
+            DATASETS_CACHE_DIR_NAME, dataset_id,
+        )
 
         try:
             description = _get_dataset_description(did_cache_dir, dataset_id)
@@ -320,7 +335,7 @@ def get_dataset(dataset_id):
             features = _get_dataset_features(did_cache_dir, dataset_id)
             qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
         except Exception as e:
-            _remove_dataset_cache_dir(did_cache_dir)
+            _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, did_cache_dir)
             raise e
 
         dataset = _create_dataset_from_description(
@@ -495,55 +510,6 @@ def _get_dataset_qualities(did_cache_dir, dataset_id):
     qualities = xmltodict.parse(qualities_xml, force_list=('oml:quality',))['oml:data_qualities']['oml:quality']
 
     return qualities
-
-
-def _create_dataset_cache_directory(dataset_id):
-    """Create a dataset cache directory
-
-    In order to have a clearer cache structure and because every dataset
-    is cached in several files (description, arff, features, qualities), there
-    is a directory for each dataset witch the dataset ID being the directory
-    name. This function creates this cache directory.
-
-    This function is NOT thread/multiprocessing safe.
-
-    Parameters
-    ----------
-    did : int
-        Dataset ID
-
-    Returns
-    -------
-    str
-        Path of the created dataset cache directory.
-    """
-    dataset_cache_dir = os.path.join(
-        config.get_cache_directory(),
-        "datasets",
-        str(dataset_id),
-    )
-    if os.path.exists(dataset_cache_dir) and os.path.isdir(dataset_cache_dir):
-        pass
-    elif os.path.exists(dataset_cache_dir) and not os.path.isdir(dataset_cache_dir):
-        raise ValueError('Dataset cache dir exists but is not a directory!')
-    else:
-        os.makedirs(dataset_cache_dir)
-    return dataset_cache_dir
-
-
-def _remove_dataset_cache_dir(did_cache_dir):
-    """Remove the dataset cache directory
-
-    This function is NOT thread/multiprocessing safe.
-
-    Parameters
-    ----------
-    """
-    try:
-        shutil.rmtree(did_cache_dir)
-    except (OSError, IOError):
-        raise ValueError('Cannot remove faulty dataset cache directory %s.'
-                         'Please do this manually!' % did_cache_dir)
 
 
 def _create_dataset_from_description(description, features, qualities, arff_file):

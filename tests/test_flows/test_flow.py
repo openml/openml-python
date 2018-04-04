@@ -38,7 +38,7 @@ class TestFlow(TestBase):
     def test_get_flow(self):
         # We need to use the production server here because 4024 is not the
         # test server
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
 
         flow = openml.flows.get_flow(4024)
         self.assertIsInstance(flow, openml.OpenMLFlow)
@@ -365,7 +365,7 @@ class TestFlow(TestBase):
         self.assertEqual(tags, ['OpenmlWeka', 'weka'])
 
     def test_download_non_scikit_learn_flows(self):
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
 
         flow = openml.flows.get_flow(6742)
         self.assertIsInstance(flow, openml.OpenMLFlow)

@@ -127,7 +127,7 @@ class TestSetupFunctions(TestBase):
                 self.assertEquals(len(current.parameters), num_params[idx])
 
     def test_setup_list_filter_flow(self):
-        openml.config.set_server_url(self.production_server)
+        openml.config.server = self.production_server
 
         flow_id = 5873
 
@@ -146,7 +146,7 @@ class TestSetupFunctions(TestBase):
 
     def test_setuplist_offset(self):
         # TODO: remove after pull on live for better testing
-        # openml.config.set_server_url(self.production_server)
+        # openml.config.server = self.production_server
 
         size = 10
         setups = openml.setups.list_setups(offset=0, size=size)
@@ -159,11 +159,11 @@ class TestSetupFunctions(TestBase):
         self.assertEqual(len(all), size * 2)
 
     def test_get_cached_setup(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.config.cache_dir = self.static_cache_dir
         openml.setups.functions._get_cached_setup(1)
 
 
     def test_get_uncached_setup(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.config.cache_dir = self.static_cache_dir
         with self.assertRaises(openml.exceptions.OpenMLCacheException):
             openml.setups.functions._get_cached_setup(10)
