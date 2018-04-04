@@ -35,3 +35,8 @@ class OpenMLCacheException(PyOpenMLError):
     """Dataset / task etc not found in cache"""
     def __init__(self, message):
         super(OpenMLCacheException, self).__init__(message)
+
+
+class OpenMLHashException(PyOpenMLError):
+    """Locally computed hash is different than hash announced by the server."""
+    pass
