@@ -2,6 +2,8 @@ import os
 import shutil
 import sys
 
+import matplotlib
+matplotlib.use('AGG')
 import nbformat
 from nbconvert.exporters import export
 from nbconvert.exporters.python import PythonExporter
