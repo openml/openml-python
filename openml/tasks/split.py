@@ -78,6 +78,8 @@ class OpenMLSplit(object):
         # Cache miss
         if repetitions is None:
             # Faster than liac-arff and sufficient in this situation!
+            if not os.path.exists(filename):
+                raise FileNotFoundError('Split arff %s does not exist!' % filename)
             splits, meta = scipy.io.arff.loadarff(filename)
             name = meta.name
 

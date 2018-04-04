@@ -44,7 +44,7 @@ class TestTask(TestBase):
 
     def test_list_clustering_task(self):
         # as shown by #383, clustering tasks can give list/dict casting problems
-        openml.config.server = self.production_server
+        openml.config.set_server_url(self.production_server)
         openml.tasks.list_tasks(task_type_id=5, size=10)
         # the expected outcome is that it doesn't crash. No assertions.
 
@@ -113,18 +113,21 @@ class TestTask(TestBase):
         task = openml.tasks.get_task(1882)
         # Test the following task as it used to throw an Unicode Error.
         # https://github.com/openml/openml-python/issues/378
-        openml.config.server = self.production_server
+        openml.config.set_server_url(self.production_server)
         production_task = openml.tasks.get_task(34536)
 
     def test_get_task(self):
         task = openml.tasks.get_task(1)
         self.assertIsInstance(task, OpenMLTask)
-        self.assertTrue(os.path.exists(
-            os.path.join(os.getcwd(), "tasks", "1", "task.xml")))
-        self.assertTrue(os.path.exists(
-            os.path.join(os.getcwd(), "tasks", "1", "datasplits.arff")))
-        self.assertTrue(os.path.exists(
-            os.path.join(os.getcwd(), "datasets", "1", "dataset.arff")))
+        self.assertTrue(os.path.exists(os.path.join(
+            self.workdir, 'org', 'openml', 'test', "tasks", "1", "task.xml",
+        )))
+        self.assertTrue(os.path.exists(os.path.join(
+            self.workdir, 'org', 'openml', 'test', "tasks", "1", "datasplits.arff"
+        )))
+        self.assertTrue(os.path.exists(os.path.join(
+            self.workdir, 'org', 'openml', 'test', "datasets", "1", "dataset.arff"
+        )))
 
     @mock.patch('openml.tasks.functions.get_dataset')
     def test_removal_upon_download_failure(self, get_dataset):
@@ -153,8 +156,9 @@ class TestTask(TestBase):
         task = openml.tasks.get_task(1)
         split = task.download_split()
         self.assertEqual(type(split), OpenMLSplit)
-        self.assertTrue(os.path.exists(
-            os.path.join(os.getcwd(), "tasks", "1", "datasplits.arff")))
+        self.assertTrue(os.path.exists(os.path.join(
+            self.workdir, 'org', 'openml', 'test', "tasks", "1", "datasplits.arff"
+        )))
 
     def test_deletion_of_cache_dir(self):
         # Simple removal

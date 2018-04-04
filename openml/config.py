@@ -6,6 +6,7 @@ import os
 
 from six import StringIO
 from six.moves import configparser
+from six.moves.urllib_parse import urlparse
 
 
 logger = logging.getLogger(__name__)
@@ -13,10 +14,23 @@ logging.basicConfig(
     format='[%(levelname)s] [%(asctime)s:%(name)s] %('
            'message)s', datefmt='%H:%M:%S')
 
+# Default values!
+_defaults = {
+    'apikey': None,
+    'server': "https://www.openml.org/api/v1/xml",
+    'verbosity': 0,
+    'cachedir': os.path.expanduser('~/.openml/cache'),
+    'avoid_duplicate_runs': 'True',
+}
+
 config_file = os.path.expanduser('~/.openml/config')
-server = "https://www.openml.org/api/v1/xml"
-apikey = ""
-cachedir = ""
+_server = ""
+_apikey = ""
+# The current cache directory - will be set by set_cache_dir
+# will contain the server name.
+_cachedir = ""
+# The base cache directory without the server suffix
+_cachedir_wo_server_suffix = ""
 
 
 def _setup():
@@ -30,9 +44,9 @@ def _setup():
     because it needs some setup.
     We could also make it a property but that's less clear.
     """
-    global apikey
-    global server
-    global avoid_duplicate_runs
+    global _apikey
+    global _server
+    global _avoid_duplicate_runs
     # read config file, create cache directory
     try:
         os.mkdir(os.path.expanduser('~/.openml'))
@@ -40,17 +54,46 @@ def _setup():
         # TODO add debug information
         pass
     config = _parse_config()
-    apikey = config.get('FAKE_SECTION', 'apikey')
-    server = config.get('FAKE_SECTION', 'server')
+    _apikey = config.get('FAKE_SECTION', 'apikey')
+    _server = config.get('FAKE_SECTION', 'server')
     cache_dir = config.get('FAKE_SECTION', 'cachedir')
-    avoid_duplicate_runs = config.getboolean('FAKE_SECTION', 'avoid_duplicate_runs')
+    _avoid_duplicate_runs = config.getboolean('FAKE_SECTION', 'avoid_duplicate_runs')
     set_cache_directory(cache_dir)
 
 
-def set_cache_directory(cachedir):
+def set_server_url(url):
+    """Change the server URL
+    
+    Parameters
+    ----------
+    url : str
+        Server url (needs to contain the protocol)
+    """
+    parsed_url = urlparse(url)
+    if parsed_url.netloc == 0:
+        raise ValueError('%s is not a valid url!' % url)
+    global _server
+    _server = url
+
+
+def get_server_url():
+    """Return the current server url
+    
+    Returns
+    -------
+    str
+    """
+    return _server
+
+
+def set_cache_directory(cachedir=None):
     """Set module-wide cache directory.
 
-    Sets the cache directory into which to download datasets, tasks etc.
+    Sets the cache directory into which to download datasets, tasks etc. 
+    Automatically adds the reversed server name to the directory structure. 
+    ``/home/example/.openml/cache`` will become 
+    ``/home/example/.openml/cache/org/openml/www`` for the default OpenML
+     server.
 
     Parameters
     ----------
@@ -61,33 +104,34 @@ def set_cache_directory(cachedir):
     --------
     get_cache_directory
     """
+    if cachedir is None:
+        cachedir = _defaults['cachedir']
 
     global _cachedir
-    _cachedir = cachedir
+    global _cachedir_wo_server_suffix
+    _cachedir_wo_server_suffix = cachedir
+    url_suffix = urlparse(_server).netloc
+    reversed_url_suffix = '/'.join(url_suffix.split('.')[::-1])
+    _cachedir = os.path.join(cachedir, reversed_url_suffix)
 
     # Set up the cache directories
-    dataset_cache_dir = os.path.join(cachedir, "datasets")
-    task_cache_dir = os.path.join(cachedir, "tasks")
-    run_cache_dir = os.path.join(cachedir, 'runs')
-    lock_dir = os.path.join(cachedir, 'locks')
+    dataset_cache_dir = os.path.join(_cachedir, "datasets")
+    task_cache_dir = os.path.join(_cachedir, "tasks")
+    run_cache_dir = os.path.join(_cachedir, 'runs')
+    lock_dir = os.path.join(_cachedir, 'locks')
 
     for dir_ in [
-        cachedir, dataset_cache_dir, task_cache_dir, run_cache_dir, lock_dir,
+        _cachedir, dataset_cache_dir, task_cache_dir, run_cache_dir, lock_dir,
     ]:
         if not os.path.exists(dir_) and not os.path.isdir(dir_):
-            os.mkdir(dir_)
+            os.makedirs(dir_, exist_ok=True)
 
 
 def _parse_config():
     """Parse the config file, set up defaults.
     """
-    defaults = {'apikey': apikey,
-                'server': server,
-                'verbosity': 0,
-                'cachedir': os.path.expanduser('~/.openml/cache'),
-                'avoid_duplicate_runs': 'True'}
 
-    config = configparser.RawConfigParser(defaults=defaults)
+    config = configparser.RawConfigParser(defaults=_defaults)
 
     if not os.path.exists(config_file):
         # Create an empty config file if there was none so far
@@ -106,8 +150,7 @@ def _parse_config():
         config_file_.seek(0)
         config.readfp(config_file_)
     except OSError as e:
-        logging.info("Error opening file %s: %s" %
-                     config_file, e.message)
+        logging.info("Error opening file %s: %s", config_file, e.message)
     return config
 
 
@@ -126,6 +169,11 @@ def get_cache_directory():
     return _cachedir
 
 
-__all__ = ["set_cache_directory", 'get_cache_directory']
+__all__ = [
+    'set_cache_directory',
+    'get_cache_directory',
+    'set_server_url',
+    'get_server_url',
+]
 
 _setup()

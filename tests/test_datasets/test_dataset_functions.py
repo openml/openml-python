@@ -184,7 +184,6 @@ class TestOpenMLDataset(TestBase):
 
         self.assertIsInstance(datasets, dict)
 
-
     @unittest.skip('See https://github.com/openml/openml-python/issues/149')
     def test_check_datasets_active(self):
         active = openml.datasets.check_datasets_active([1, 17])
@@ -301,7 +300,9 @@ class TestOpenMLDataset(TestBase):
         patch.side_effect = Exception('Boom!')
         self.assertRaisesRegexp(Exception, 'Boom!', openml.datasets.get_dataset,
                                 1)
-        datasets_cache_dir = os.path.join(self.workdir, 'datasets')
+        datasets_cache_dir = os.path.join(
+            self.workdir, 'org', 'openml', 'test', 'datasets'
+        )
         self.assertEqual(len(os.listdir(datasets_cache_dir)), 0)
 
     def test_publish_dataset(self):

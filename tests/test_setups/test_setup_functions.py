@@ -111,7 +111,7 @@ class TestSetupFunctions(TestBase):
 
     def test_get_setup(self):
         # no setups in default test server
-        openml.config.server = 'https://www.openml.org/api/v1/xml/'
+        openml.config.set_server_url('https://www.openml.org/api/v1/xml/')
 
         # contains all special cases, 0 params, 1 param, n params.
         # Non scikitlearn flows.
@@ -127,7 +127,7 @@ class TestSetupFunctions(TestBase):
                 self.assertEquals(len(current.parameters), num_params[idx])
 
     def test_setup_list_filter_flow(self):
-        openml.config.server = self.production_server
+        openml.config.set_server_url(self.production_server)
 
         flow_id = 5873
 
@@ -146,7 +146,7 @@ class TestSetupFunctions(TestBase):
 
     def test_setuplist_offset(self):
         # TODO: remove after pull on live for better testing
-        # openml.config.server = self.production_server
+        # openml.config.set_server_url(self.production_server)
 
         size = 10
         setups = openml.setups.list_setups(offset=0, size=size)

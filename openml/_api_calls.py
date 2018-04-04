@@ -40,7 +40,7 @@ def _perform_api_call(call, data=None, file_dictionary=None,
     return_value : str
         Return value of the OpenML server
     """
-    url = config.server
+    url = config.get_server_url()
     if not url.endswith("/"):
         url += "/"
     url += call
@@ -58,7 +58,7 @@ def _file_id_to_url(file_id, filename=None):
      Presents the URL how to download a given file id
      filename is optional
     '''
-    openml_url = config.server.split('/api/')
+    openml_url = config._server.split('/api/')
     url = openml_url[0] + '/data/download/%s' %file_id
     if filename is not None:
         url += '/' + filename
@@ -105,8 +105,8 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
 def _read_url(url, data=None):
 
     data = {} if data is None else data
-    if config.apikey is not None:
-        data['api_key'] = config.apikey
+    if config._apikey is not None:
+        data['api_key'] = config._apikey
 
     if len(data) == 0 or (len(data) == 1 and 'api_key' in data):
         # do a GET

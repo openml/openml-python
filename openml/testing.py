@@ -50,9 +50,10 @@ class TestBase(unittest.TestCase):
         self.cached = True
         # amueller's read/write key that he will throw away later
         openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
-        self.production_server = openml.config.server
+        self.production_server = openml.config.get_server_url()
         self.test_server = "https://test.openml.org/api/v1/xml"
-        openml.config.server = self.test_server
+        openml.config.set_cache_directory()
+        openml.config.set_server_url(self.test_server)
         openml.config.avoid_duplicate_runs = False
 
         openml.config.set_cache_directory(self.workdir)
@@ -66,8 +67,14 @@ class TestBase(unittest.TestCase):
 
     def tearDown(self):
         os.chdir(self.cwd)
-        shutil.rmtree(self.workdir)
-        openml.config.server = self.production_server
+        for i in range(10):
+            try:
+                shutil.rmtree(self.workdir)
+            except:
+                time.sleep(0.1)
+        openml.config.set_server_url(self.production_server)
+        if os.path.exists(self.workdir):
+            raise ValueError(self.workdir)
 
     def _add_sentinel_to_flow_name(self, flow, sentinel=None):
         if sentinel is None:
