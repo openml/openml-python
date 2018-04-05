@@ -27,7 +27,7 @@ config_file = os.path.expanduser('~/.openml/config')
 server = ""
 apikey = ""
 # The current cache directory (without the server name)
-cache_dir = ""
+cache_directory = ""
 
 
 def _setup():
@@ -41,7 +41,7 @@ def _setup():
     """
     global apikey
     global server
-    global cache_dir
+    global cache_directory
     global avoid_duplicate_runs
     # read config file, create cache directory
     try:
@@ -52,7 +52,7 @@ def _setup():
     config = _parse_config()
     apikey = config.get('FAKE_SECTION', 'apikey')
     server = config.get('FAKE_SECTION', 'server')
-    cache_dir = config.get('FAKE_SECTION', 'cachedir')
+    cache_directory = config.get('FAKE_SECTION', 'cachedir')
     avoid_duplicate_runs = config.getboolean('FAKE_SECTION', 'avoid_duplicate_runs')
 
 
@@ -94,10 +94,10 @@ def get_cache_directory():
     """
     url_suffix = urlparse(server).netloc
     reversed_url_suffix = '/'.join(url_suffix.split('.')[::-1])
-    if not cache_dir:
-        _cachedir = _defaults(cache_dir)
+    if not cache_directory:
+        _cachedir = _defaults(cache_directory)
     else:
-        _cachedir = cache_dir
+        _cachedir = cache_directory
     _cachedir = os.path.join(_cachedir, reversed_url_suffix)
     return _cachedir
 

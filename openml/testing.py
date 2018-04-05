@@ -52,12 +52,12 @@ class TestBase(unittest.TestCase):
         openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
         self.production_server = openml.config.server
         self.test_server = "https://test.openml.org/api/v1/xml"
-        openml.config.cache_dir = None
+        openml.config.cache_directory = None
 
         openml.config.server = self.test_server
         openml.config.avoid_duplicate_runs = False
 
-        openml.config.cache_dir = self.workdir
+        openml.config.cache_directory = self.workdir
 
         # If we're on travis, we save the api key in the config file to allow
         # the notebook tests to read them.

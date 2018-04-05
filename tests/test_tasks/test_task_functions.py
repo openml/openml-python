@@ -18,19 +18,19 @@ class TestTask(TestBase):
     _multiprocess_can_split_ = True
 
     def test__get_cached_tasks(self):
-        openml.config.cache_dir = self.static_cache_dir
+        openml.config.cache_directory = self.static_cache_dir
         tasks = openml.tasks.functions._get_cached_tasks()
         self.assertIsInstance(tasks, dict)
         self.assertEqual(len(tasks), 3)
         self.assertIsInstance(list(tasks.values())[0], OpenMLTask)
 
     def test__get_cached_task(self):
-        openml.config.cache_dir = self.static_cache_dir
+        openml.config.cache_directory = self.static_cache_dir
         task = openml.tasks.functions._get_cached_task(1)
         self.assertIsInstance(task, OpenMLTask)
 
     def test__get_cached_task_not_cached(self):
-        openml.config.cache_dir = self.static_cache_dir
+        openml.config.cache_directory = self.static_cache_dir
         self.assertRaisesRegexp(OpenMLCacheException,
                                 'Task file for tid 2 not cached',
                                 openml.tasks.functions._get_cached_task, 2)
@@ -109,7 +109,7 @@ class TestTask(TestBase):
                     self._check_task(tasks[tid])
 
     def test__get_task(self):
-        openml.config.cache_dir = self.static_cache_dir
+        openml.config.cache_directory = self.static_cache_dir
         task = openml.tasks.get_task(1882)
         # Test the following task as it used to throw an Unicode Error.
         # https://github.com/openml/openml-python/issues/378
@@ -148,7 +148,7 @@ class TestTask(TestBase):
         ))
 
     def test_get_task_with_cache(self):
-        openml.config.cache_dir = self.static_cache_dir
+        openml.config.cache_directory = self.static_cache_dir
         task = openml.tasks.get_task(1)
         self.assertIsInstance(task, OpenMLTask)
 
