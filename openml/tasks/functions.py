@@ -2,17 +2,18 @@ from collections import OrderedDict
 import io
 import re
 import os
-import shutil
 
 from oslo_concurrency import lockutils
 import xmltodict
 
-from ..exceptions import OpenMLCacheException, OpenMLServerNoResult
+from ..exceptions import OpenMLCacheException
 from ..datasets import get_dataset
 from .task import OpenMLTask
-from .. import config
 import openml.utils
 import openml._api_calls
+
+TASKS_CACHE_DIR_NAME = 'tasks'
+
 
 def _get_cached_tasks():
     tasks = OrderedDict()

@@ -11,10 +11,7 @@ import xmltodict
 import openml.utils
 import openml._api_calls
 from .dataset import OpenMLDataset
-from ..exceptions import OpenMLCacheException, OpenMLServerNoResult, \
-    OpenMLHashException
-from .. import config
-from .._api_calls import _read_url
+from ..exceptions import OpenMLCacheException, OpenMLHashException
 from ..utils import (
     _create_cache_directory,
     _remove_cache_dir_for_id,
@@ -419,7 +416,7 @@ def _get_dataset_arff(did_cache_dir, description):
         pass
 
     url = description['oml:url']
-    arff_string = _read_url(url)
+    arff_string = openml._api_calls._read_url(url)
     md5 = hashlib.md5()
     md5.update(arff_string.encode('utf-8'))
     md5_checksum = md5.hexdigest()

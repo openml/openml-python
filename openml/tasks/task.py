@@ -4,7 +4,6 @@ import os
 from .. import config
 from .. import datasets
 from .split import OpenMLSplit
-from .._api_calls import _read_url
 import openml._api_calls
 from ..utils import _create_cache_directory_for_id
 
@@ -65,7 +64,7 @@ class OpenMLTask(object):
                 pass
         except (OSError, IOError):
             split_url = self.estimation_procedure["data_splits_url"]
-            split_arff = _read_url(split_url)
+            split_arff = openml._api_calls._read_url(split_url)
 
             with io.open(cache_file, "w", encoding='utf8') as fh:
                 fh.write(split_arff)

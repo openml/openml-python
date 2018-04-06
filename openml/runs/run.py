@@ -10,7 +10,6 @@ import xmltodict
 import openml
 import openml._api_calls
 from ..tasks import get_task
-from .._api_calls import _file_id_to_url
 from ..exceptions import PyOpenMLError
 
 
@@ -142,7 +141,9 @@ class OpenMLRun(object):
         if self.data_content is not None and self.task_id is not None:
             predictions_arff = self._generate_arff_dict()
         elif 'predictions' in self.output_files:
-            predictions_file_url = _file_id_to_url(self.output_files['predictions'], 'predictions.arff')
+            predictions_file_url = openml._api_calls._file_id_to_url(
+                self.output_files['predictions'], 'predictions.arff',
+            )
             predictions_arff = arff.loads(openml._api_calls._read_url(predictions_file_url))
             # TODO: make this a stream reader
         else:
