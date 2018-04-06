@@ -9,11 +9,12 @@ from oslo_concurrency import lockutils
 import xmltodict
 
 import openml.utils
+import openml._api_calls
 from .dataset import OpenMLDataset
 from ..exceptions import OpenMLCacheException, OpenMLServerNoResult, \
     OpenMLHashException
 from .. import config
-from .._api_calls import _perform_api_call, _read_url
+from .._api_calls import _read_url
 
 
 ############################################################################
@@ -206,7 +207,7 @@ def _list_datasets(**kwargs):
 
 def __list_datasets(api_call):
 
-    xml_string = _perform_api_call(api_call)
+    xml_string = openml._api_calls._perform_api_call(api_call)
     datasets_dict = xmltodict.parse(xml_string, force_list=('oml:dataset',))
 
     # Minimalistic check if the XML is useful
@@ -357,7 +358,7 @@ def _get_dataset_description(did_cache_dir, dataset_id):
     try:
         return _get_cached_dataset_description(dataset_id)
     except (OpenMLCacheException):
-        dataset_xml = _perform_api_call("data/%d" % dataset_id)
+        dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id)
 
         with io.open(description_file, "w", encoding='utf8') as fh:
             fh.write(dataset_xml)
@@ -450,7 +451,7 @@ def _get_dataset_features(did_cache_dir, dataset_id):
         with io.open(features_file, encoding='utf8') as fh:
             features_xml = fh.read()
     except (OSError, IOError):
-        features_xml = _perform_api_call("data/features/%d" % dataset_id)
+        features_xml = openml._api_calls._perform_api_call("data/features/%d" % dataset_id)
 
         with io.open(features_file, "w", encoding='utf8') as fh:
             fh.write(features_xml)
@@ -486,7 +487,7 @@ def _get_dataset_qualities(did_cache_dir, dataset_id):
         with io.open(qualities_file, encoding='utf8') as fh:
             qualities_xml = fh.read()
     except (OSError, IOError):
-        qualities_xml = _perform_api_call("data/qualities/%d" % dataset_id)
+        qualities_xml = openml._api_calls._perform_api_call("data/qualities/%d" % dataset_id)
 
         with io.open(qualities_file, "w", encoding='utf8') as fh:
             fh.write(qualities_xml)

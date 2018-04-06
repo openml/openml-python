@@ -3,8 +3,7 @@ import dateutil.parser
 import xmltodict
 import six
 
-from openml._api_calls import _perform_api_call
-from openml.exceptions import OpenMLServerNoResult
+import openml._api_calls
 from . import OpenMLFlow
 import openml.utils
 
@@ -23,7 +22,7 @@ def get_flow(flow_id):
     except:
         raise ValueError("Flow ID must be an int, got %s." % str(flow_id))
 
-    flow_xml = _perform_api_call("flow/%d" % flow_id)
+    flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id)
 
     flow_dict = xmltodict.parse(flow_xml)
     flow = OpenMLFlow._from_dict(flow_dict)
@@ -114,9 +113,10 @@ def flow_exists(name, external_version):
     if not (isinstance(name, six.string_types) and len(external_version) > 0):
         raise ValueError('Argument \'version\' should be a non-empty string')
 
-    xml_response = _perform_api_call(
-        "flow/exists", data={'name': name, 'external_version':
-                             external_version})
+    xml_response = openml._api_calls._perform_api_call(
+        "flow/exists",
+        data={'name': name, 'external_version': external_version},
+    )
 
     result_dict = xmltodict.parse(xml_response)
     flow_id = int(result_dict['oml:flow_exists']['oml:id'])
@@ -128,7 +128,7 @@ def flow_exists(name, external_version):
 
 def __list_flows(api_call):
 
-    xml_string = _perform_api_call(api_call)
+    xml_string = openml._api_calls._perform_api_call(api_call)
     flows_dict = xmltodict.parse(xml_string, force_list=('oml:flow',))
 
     # Minimalistic check if the XML is useful

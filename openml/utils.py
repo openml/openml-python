@@ -1,6 +1,6 @@
 import xmltodict
 import six
-from ._api_calls import _perform_api_call
+import openml._api_calls
 
 from openml.exceptions import OpenMLServerException
 
@@ -79,7 +79,7 @@ def _tag_entity(entity_type, entity_id, tag, untag=False):
 
 
     post_variables = {'%s_id'%entity_type: entity_id, 'tag': tag}
-    result_xml = _perform_api_call(uri, post_variables)
+    result_xml = openml._api_calls._perform_api_call(uri, post_variables)
 
     result = xmltodict.parse(result_xml, force_list={'oml:tag'})[main_tag]
 

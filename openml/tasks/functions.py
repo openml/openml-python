@@ -11,8 +11,8 @@ from ..exceptions import OpenMLCacheException, OpenMLServerNoResult
 from ..datasets import get_dataset
 from .task import OpenMLTask, _create_task_cache_dir
 from .. import config
-from .._api_calls import _perform_api_call
 import openml.utils
+import openml._api_calls
 
 def _get_cached_tasks():
     tasks = OrderedDict()
@@ -60,7 +60,7 @@ def _get_estimation_procedure_list():
         name, type, repeats, folds, stratified.
     """
 
-    xml_string = _perform_api_call("estimationprocedure/list")
+    xml_string = openml._api_calls._perform_api_call("estimationprocedure/list")
     procs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
     if 'oml:estimationprocedures' not in procs_dict:
@@ -175,7 +175,7 @@ def _list_tasks(task_type_id=None, **kwargs):
 
 def __list_tasks(api_call):
 
-    xml_string = _perform_api_call(api_call)
+    xml_string = openml._api_calls._perform_api_call(api_call)
     tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task', 'oml:input'))
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:
@@ -301,7 +301,7 @@ def _get_task_description(task_id):
         return _get_cached_task(task_id)
     except OpenMLCacheException:
         xml_file = os.path.join(_create_task_cache_dir(task_id), "task.xml")
-        task_xml = _perform_api_call("task/%d" % task_id)
+        task_xml = openml._api_calls._perform_api_call("task/%d" % task_id)
 
         with io.open(xml_file, "w", encoding='utf8') as fh:
             fh.write(task_xml)
