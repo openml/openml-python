@@ -226,7 +226,7 @@ class TestRun(TestBase):
         if sys.version_info[:2] >= (3, 3):
             # this only holds if we are allowed to record time (otherwise some are missing)
             self.assertEquals(set(sample_evaluations.keys()), set(check_measures.keys()))
-
+        
         for measure in check_measures.keys():
             if measure in sample_evaluations:
                 num_rep_entrees = len(sample_evaluations[measure])
@@ -378,10 +378,17 @@ class TestRun(TestBase):
         num_folds = 10
         num_samples = 8
 
+
+        
         pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
                                     ('dummy', DummyClassifier(strategy='prior'))])
         run = self._perform_run(task_id, num_test_instances, pipeline1,
                                 random_state_value='62501')
+        
+        print('=====FINDME=======')
+        print(_check_n_jobs(pipeline1))
+        print(_check_n_jobs(pipeline1) == False)
+        print('==================')
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
                                        num_folds, num_samples)
 
@@ -401,6 +408,11 @@ class TestRun(TestBase):
                                         cv=3, n_iter=10))])
         run = self._perform_run(task_id, num_test_instances, pipeline2,
                                 random_state_value='62501')
+        
+        print('=====FINDME=======')
+        print(_check_n_jobs(pipeline2))
+        print(_check_n_jobs(pipeline2) == False)
+        print('==================')
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
                                        num_folds, num_samples)
 
