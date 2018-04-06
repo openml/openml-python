@@ -497,16 +497,16 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
         # for measuring runtime. Only available since Python 3.3
         if can_measure_runtime:
             modelfit_starttime = time.process_time()
-            start = time.time()
-            print(time.time(), time.process_time())
+            start = time.perf_counter()
+            print(time.perf_counter(), time.process_time())
         model.fit(trainX, trainY)
 
         if can_measure_runtime:
             modelfit_duration = (time.process_time() - modelfit_starttime) * 1000
             user_defined_measures['usercpu_time_millis_training'] = modelfit_duration
             print('====FINDME:TIME1=====')
-            print(time.time(), time.process_time())
-            print(user_defined_measures['usercpu_time_millis_training'], (time.time()-start) * 1000)
+            print(time.perf_counter(), time.process_time())
+            print(user_defined_measures['usercpu_time_millis_training'], (time.perf_counter()-start) * 1000)
     except AttributeError as e:
         # typically happens when training a regressor on classification task
         raise PyOpenMLError(str(e))
@@ -532,7 +532,7 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
 
     if can_measure_runtime:
         modelpredict_starttime = time.process_time()
-        start = time.time()
+        start = time.perf_counter()
 
     PredY = model.predict(testX)
     try:
@@ -544,8 +544,8 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
         modelpredict_duration = (time.process_time() - modelpredict_starttime) * 1000
         user_defined_measures['usercpu_time_millis_testing'] = modelpredict_duration
         user_defined_measures['usercpu_time_millis'] = modelfit_duration + modelpredict_duration
-        print(time.time(), time.process_time())
-        print(user_defined_measures['usercpu_time_millis_testing'], (time.time() - start) * 1000)
+        print(time.perf_counter(), time.process_time())
+        print(user_defined_measures['usercpu_time_millis_testing'], (time.perf_counter() - start) * 1000)
 
     if ProbaY.shape[1] != len(task.class_labels):
         warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" % (rep_no, fold_no, ProbaY.shape[1], len(task.class_labels)))
