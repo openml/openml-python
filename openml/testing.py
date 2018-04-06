@@ -63,7 +63,7 @@ class TestBase(unittest.TestCase):
         print('\n\n============FINDME===================')
         print(os.environ.keys())
         print('\n===========================================\n')
-        if os.environ.get('TRAVIS'):
+        if os.environ.get('TRAVIS') or os.environ.get('APPVEYOR'):
             with lockutils.external_lock('config', lock_path=self.workdir):
                 with open(openml.config.config_file, 'w') as fh:
                     fh.write('apikey = %s' % openml.config.apikey)
