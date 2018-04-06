@@ -123,19 +123,18 @@ def _publish_flow_if_necessary(flow):
     # try publishing the flow if one has to assume it doesn't exist yet. It
     # might fail because it already exists, then the flow is currently not
     # reused
-
-        try:
-            flow.publish()
-        except OpenMLServerException as e:
-            if e.message == "flow already exists":
-                flow_id = openml.flows.flow_exists(flow.name,
-                                                   flow.external_version)
-                server_flow = get_flow(flow_id)
-                openml.flows.flow._copy_server_fields(server_flow, flow)
-                openml.flows.assert_flows_equal(flow, server_flow,
-                                                ignore_parameter_values=True)
-            else:
-                raise e
+    try:
+        flow.publish()
+    except OpenMLServerException as e:
+        if e.message == "flow already exists":
+            flow_id = openml.flows.flow_exists(flow.name,
+                                               flow.external_version)
+            server_flow = get_flow(flow_id)
+            openml.flows.flow._copy_server_fields(server_flow, flow)
+            openml.flows.assert_flows_equal(flow, server_flow,
+                                            ignore_parameter_values=True)
+        else:
+            raise e
 
 
 def get_run_trace(run_id):
@@ -494,12 +493,14 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
         if can_measure_runtime:
             modelfit_starttime = time.process_time()
             start = time.time()
+            print(time.time(), time.process_time())
         model.fit(trainX, trainY)
 
         if can_measure_runtime:
             modelfit_duration = (time.process_time() - modelfit_starttime) * 1000
             user_defined_measures['usercpu_time_millis_training'] = modelfit_duration
             print('====FINDME:TIME1=====')
+            print(time.time(), time.process_time())
             print(user_defined_measures['usercpu_time_millis_training'], (time.time()-start) * 1000)
     except AttributeError as e:
         # typically happens when training a regressor on classification task
@@ -538,6 +539,7 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
         modelpredict_duration = (time.process_time() - modelpredict_starttime) * 1000
         user_defined_measures['usercpu_time_millis_testing'] = modelpredict_duration
         user_defined_measures['usercpu_time_millis'] = modelfit_duration + modelpredict_duration
+        print(time.time(), time.process_time())
         print(user_defined_measures['usercpu_time_millis_testing'], (time.time() - start) * 1000)
 
     if ProbaY.shape[1] != len(task.class_labels):
