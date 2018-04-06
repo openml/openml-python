@@ -542,8 +542,8 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
         modelpredict_duration = (time.process_time() - modelpredict_starttime) * 1000
         user_defined_measures['usercpu_time_millis_testing'] = modelpredict_duration
         user_defined_measures['usercpu_time_millis'] = modelfit_duration + modelpredict_duration
-            user_defined_measures['usercpu_time_millis_testing_debug'] = (time.time() - start) * 1000
-            user_defined_measures['usercpu_time_millis_debug'] = user_defined_measures['usercpu_time_millis_training_debug'] + user_defined_measures['usercpu_time_millis_testing_debug']
+        user_defined_measures['usercpu_time_millis_testing_debug'] = (time.time() - start) * 1000
+        user_defined_measures['usercpu_time_millis_debug'] = user_defined_measures['usercpu_time_millis_training_debug'] + user_defined_measures['usercpu_time_millis_testing_debug']
 
     if ProbaY.shape[1] != len(task.class_labels):
         warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" % (rep_no, fold_no, ProbaY.shape[1], len(task.class_labels)))
