@@ -385,10 +385,6 @@ class TestRun(TestBase):
         run = self._perform_run(task_id, num_test_instances, pipeline1,
                                 random_state_value='62501')
         
-        print('=====FINDME=======')
-        print(_check_n_jobs(pipeline1))
-        print(_check_n_jobs(pipeline1) == False)
-        print('==================')
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
                                        num_folds, num_samples)
 
@@ -409,10 +405,6 @@ class TestRun(TestBase):
         run = self._perform_run(task_id, num_test_instances, pipeline2,
                                 random_state_value='62501')
         
-        print('=====FINDME=======')
-        print(_check_n_jobs(pipeline2))
-        print(_check_n_jobs(pipeline2) == False)
-        print('==================')
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
                                        num_folds, num_samples)
 
