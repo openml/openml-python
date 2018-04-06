@@ -10,6 +10,10 @@ from six.moves import cPickle as pickle
 Split = namedtuple("Split", ["train", "test"])
 
 
+if six.PY2:
+    FileNotFoundError = IOError
+
+
 class OpenMLSplit(object):
 
     def __init__(self, name, description, split):

@@ -111,7 +111,7 @@ class TestSetupFunctions(TestBase):
 
     def test_get_setup(self):
         # no setups in default test server
-        openml.config.set_server_url('https://www.openml.org/api/v1/xml/')
+        openml.config.server = 'https://www.openml.org/api/v1/xml/'
 
         # contains all special cases, 0 params, 1 param, n params.
         # Non scikitlearn flows.

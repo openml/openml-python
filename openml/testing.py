@@ -68,14 +68,8 @@ class TestBase(unittest.TestCase):
 
     def tearDown(self):
         os.chdir(self.cwd)
-        for i in range(10):
-            try:
-                shutil.rmtree(self.workdir)
-            except:
-                time.sleep(0.1)
+        shutil.rmtree(self.workdir)
         openml.config.server = self.production_server
-        if os.path.exists(self.workdir):
-            raise ValueError(self.workdir)
 
     def _add_sentinel_to_flow_name(self, flow, sentinel=None):
         if sentinel is None:
