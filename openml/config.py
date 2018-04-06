@@ -24,6 +24,9 @@ _defaults = {
 }
 
 config_file = os.path.expanduser('~/.openml/config')
+
+# Default values are actually added here in the _setup() function which is
+# called at the end of this module
 server = ""
 apikey = ""
 # The current cache directory (without the server name)
