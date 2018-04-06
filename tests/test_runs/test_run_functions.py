@@ -229,6 +229,7 @@ class TestRun(TestBase):
         
         for measure in check_measures.keys():
             if measure in sample_evaluations:
+                print('===measure===')
                 print(measure)
                 num_rep_entrees = len(sample_evaluations[measure])
                 self.assertEquals(num_rep_entrees, num_repeats)
