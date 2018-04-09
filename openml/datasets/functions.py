@@ -316,11 +316,12 @@ def get_dataset(dataset_id):
         did_cache_dir = _create_dataset_cache_directory(dataset_id)
 
         try:
+            remove_dataset_cache = True
             description = _get_dataset_description(did_cache_dir, dataset_id)
             arff_file = _get_dataset_arff(did_cache_dir, description)
             features = _get_dataset_features(did_cache_dir, dataset_id)
             qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
-            remove_dataset_cache = True
+            remove_dataset_cache = False
         except OpenMLServerException as e:
             # if there was an exception, check if the user had access to the dataset
             if e.code == 112:
