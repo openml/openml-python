@@ -326,7 +326,6 @@ def get_dataset(dataset_id):
                 six.raise_from(PrivateDatasetError(e.message), None)
             else:
                 raise e
-        finally:
             _remove_dataset_cache_dir(did_cache_dir)
 
         dataset = _create_dataset_from_description(
