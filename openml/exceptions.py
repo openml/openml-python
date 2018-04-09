@@ -44,3 +44,9 @@ class OpenMLCacheException(PyOpenMLError):
 class OpenMLHashException(PyOpenMLError):
     """Locally computed hash is different than hash announced by the server."""
     pass
+
+
+class PrivateDatasetError(PyOpenMLError):
+    "Exception thrown when the user has no rights to access the dataset"
+    def __init__(self, message):
+        super(PrivateDatasetError, self).__init__(message)

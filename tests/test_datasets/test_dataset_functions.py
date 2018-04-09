@@ -17,7 +17,8 @@ import scipy.sparse
 
 import openml
 from openml import OpenMLDataset
-from openml.exceptions import OpenMLCacheException, PyOpenMLError, OpenMLHashException
+from openml.exceptions import OpenMLCacheException, PyOpenMLError, \
+    OpenMLHashException, PrivateDatasetError
 from openml.testing import TestBase
 from openml.utils import _tag_entity
 
@@ -230,6 +231,11 @@ class TestOpenMLDataset(TestBase):
 
         self.assertGreater(len(dataset.features), 1)
         self.assertGreater(len(dataset.qualities), 4)
+
+        # Issue324 Properly handle private datasets when trying to access them
+        openml.config.server = self.production_server
+        self.assertRaises(PrivateDatasetError, openml.datasets.get_dataset(45))
+
 
     def test_get_dataset_with_string(self):
         dataset = openml.datasets.get_dataset(101)
