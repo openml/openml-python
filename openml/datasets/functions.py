@@ -320,13 +320,16 @@ def get_dataset(dataset_id):
             arff_file = _get_dataset_arff(did_cache_dir, description)
             features = _get_dataset_features(did_cache_dir, dataset_id)
             qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
+            remove_dataset_cache = True
         except OpenMLServerException as e:
             # if there was an exception, check if the user had access to the dataset
             if e.code == 112:
                 six.raise_from(PrivateDatasetError(e.message), None)
             else:
                 raise e
-            _remove_dataset_cache_dir(did_cache_dir)
+        finally:
+            if remove_dataset_cache:
+                _remove_dataset_cache_dir(did_cache_dir)
 
         dataset = _create_dataset_from_description(
             description, features, qualities, arff_file
