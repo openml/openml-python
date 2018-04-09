@@ -234,7 +234,7 @@ class TestOpenMLDataset(TestBase):
 
         # Issue324 Properly handle private datasets when trying to access them
         openml.config.server = self.production_server
-        self.assertRaises(PrivateDatasetError, openml.datasets.get_dataset(45))
+        self.assertRaises(PrivateDatasetError, openml.datasets.get_dataset, 45)
 
 
     def test_get_dataset_with_string(self):
