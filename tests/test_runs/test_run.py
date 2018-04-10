@@ -62,7 +62,7 @@ class TestRun(TestBase):
         run.push_tag(tag)
         run_list = openml.runs.list_runs(tag=tag)
         self.assertEqual(len(run_list), 1)
-        self.assertIn(1, run_list)
+        self.assertIn(run_id, run_list)
         run.remove_tag(tag)
         run_list = openml.runs.list_runs(tag=tag)
         self.assertEqual(len(run_list), 0)
