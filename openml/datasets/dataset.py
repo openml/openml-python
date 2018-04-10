@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import gzip
 import io
 import logging
@@ -39,10 +40,12 @@ class OpenMLDataset(object):
                  version_label=None, citation=None, tag=None, visibility=None,
                  original_data_url=None, paper_url=None, update_comment=None,
                  md5_checksum=None, data_file=None, features=None, qualities=None):
+        # TODO add function to check if the name is casual_string128
+
         # Attributes received by querying the RESTful API
         self.dataset_id = int(dataset_id) if dataset_id is not None else None
         self.name = name
-        self.version = int(version)
+        self.version = int(version) if version else None
         self.description = description
         self.format = format
         self.creator = creator
@@ -454,16 +457,29 @@ class OpenMLDataset(object):
                  'row_id_attribute', 'ignore_attribute', 'version_label',
                  'citation', 'tag', 'visibility', 'original_data_url',
                  'paper_url', 'update_comment', 'md5_checksum']  # , 'data_file']
+
+        data_container = OrderedDict()
+        data_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])
+        data_container['oml:data_set_description'] = data_dict
+
         for prop in props:
             content = getattr(self, prop, None)
             if content is not None:
-                if isinstance(content, (list,set)):
-                    for item in content:
-                        xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, item)
-                else:
-                    xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, content)
-        xml_dataset += "</oml:data_set_description>"
-        return xml_dataset
+                #if isinstance(content, (list,set)):
+                #    for item in content:
+                #        xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, item)
+                #else:
+                #    xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, content)
+                data_dict[prop] = content
+        #xml_dataset += "</oml:data_set_description>"
+        xml_string = xmltodict.unparse(
+            input_dict=data_container,
+            pretty=True,
+        )
+        # A flow may not be uploaded with the xml encoding specification:
+        # <?xml version="1.0" encoding="utf-8"?>
+        xml_string = xml_string.split('\n', 1)[-1]
+        return xml_string
 
     def _data_features_supported(self):
         if self.features is not None:
