@@ -19,9 +19,10 @@ def _get_cached_tasks():
     tasks = OrderedDict()
 
     task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
+    print(task_cache_dir)
     directory_content = os.listdir(task_cache_dir)
     directory_content.sort()
-
+    print(directory_content)
     # Find all dataset ids for which we have downloaded the dataset
     # description
 
