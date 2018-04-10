@@ -7,7 +7,7 @@ import shutil
 from oslo_concurrency import lockutils
 import xmltodict
 
-from ..exceptions import OpenMLCacheException, OpenMLServerNoResult
+from ..exceptions import OpenMLCacheException
 from ..datasets import get_dataset
 from .task import OpenMLTask, _create_task_cache_dir
 from .. import config

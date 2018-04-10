@@ -4,6 +4,7 @@ import io
 import os
 import re
 import shutil
+import six
 
 from oslo_concurrency import lockutils
 import xmltodict
@@ -11,8 +12,8 @@ import xmltodict
 import openml.utils
 import openml._api_calls
 from .dataset import OpenMLDataset
-from ..exceptions import OpenMLCacheException, OpenMLServerNoResult, \
-    OpenMLHashException
+from ..exceptions import OpenMLCacheException, OpenMLServerException, \
+    OpenMLHashException, PrivateDatasetError
 from .. import config
 from .._api_calls import _read_url
 
@@ -315,13 +316,21 @@ def get_dataset(dataset_id):
         did_cache_dir = _create_dataset_cache_directory(dataset_id)
 
         try:
+            remove_dataset_cache = True
             description = _get_dataset_description(did_cache_dir, dataset_id)
             arff_file = _get_dataset_arff(did_cache_dir, description)
             features = _get_dataset_features(did_cache_dir, dataset_id)
             qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
-        except Exception as e:
-            _remove_dataset_cache_dir(did_cache_dir)
-            raise e
+            remove_dataset_cache = False
+        except OpenMLServerException as e:
+            # if there was an exception, check if the user had access to the dataset
+            if e.code == 112:
+                six.raise_from(PrivateDatasetError(e.message), None)
+            else:
+                raise e
+        finally:
+            if remove_dataset_cache:
+                _remove_dataset_cache_dir(did_cache_dir)
 
         dataset = _create_dataset_from_description(
             description, features, qualities, arff_file
@@ -357,9 +366,8 @@ def _get_dataset_description(did_cache_dir, dataset_id):
 
     try:
         return _get_cached_dataset_description(dataset_id)
-    except (OpenMLCacheException):
+    except OpenMLCacheException:
         dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id)
-
         with io.open(description_file, "w", encoding='utf8') as fh:
             fh.write(dataset_xml)
 
