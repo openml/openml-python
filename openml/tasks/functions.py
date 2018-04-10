@@ -19,10 +19,8 @@ def _get_cached_tasks():
     tasks = OrderedDict()
 
     task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
-    print(task_cache_dir)
     directory_content = os.listdir(task_cache_dir)
     directory_content.sort()
-    print(directory_content)
     # Find all dataset ids for which we have downloaded the dataset
     # description
 
@@ -37,16 +35,19 @@ def _get_cached_tasks():
 
 
 def _get_cached_task(tid):
-    task_file = os.path.join(
-        openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, tid),
-        "task.xml",
+
+    tid_cache_dir = openml.utils._create_cache_directory_for_id(
+        TASKS_CACHE_DIR_NAME,
+        tid
     )
+    task_file = os.path.join(tid_cache_dir, "task.xml")
 
     try:
         with io.open(task_file, encoding='utf8') as fh:
             task = _create_task_from_xml(xml=fh.read())
         return task
     except (OSError, IOError):
+        openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
         raise OpenMLCacheException("Task file for tid %d not "
                                    "cached" % tid)
 
