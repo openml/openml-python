@@ -379,11 +379,11 @@ class TestRun(TestBase):
     ############################################################################
 
     def test_learning_curve_task_1(self):
-        task_id = 837  # pendigits dataset
+        task_id = 801  # diabates dataset
         num_repeats = 1
         num_folds = 10
         num_samples = 8
-        num_test_instances = 9961*num_samples  # for learning curve (768*8)
+        num_test_instances = 768*num_samples 
 
 
         
@@ -396,11 +396,11 @@ class TestRun(TestBase):
                                        num_folds, num_samples)
 
     def test_learning_curve_task_2(self):
-        task_id = 837  # diabates dataset
+        task_id = 801  # diabates dataset
         num_repeats = 1
         num_folds = 10
-        num_samples = 8        
-        num_test_instances = 9961*num_samples 
+        num_samples = 8
+        num_test_instances = 768*num_samples 
 
         pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                     ('VarianceThreshold', VarianceThreshold()),
