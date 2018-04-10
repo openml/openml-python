@@ -493,7 +493,7 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
         if can_measure_runtime:
             modelfit_starttime = time.process_time()
             start = time.perf_counter()
-            print(time.perf_counter(), time.process_time())
+            #print(time.perf_counter(), time.process_time())
         model.fit(trainX, trainY)
 
         if can_measure_runtime:
