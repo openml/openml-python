@@ -52,7 +52,10 @@ class TestRun(TestBase):
                 self.assertEqual(parameter['oml:component'], 2)
 
     def test_tagging(self):
-        run = openml.runs.get_run(1)
+
+        runs = openml.runs.list_runs(size=1)
+        run_id = list(runs.keys())[0]
+        run = openml.runs.get_run(run_id)
         tag = "testing_tag_{}_{}".format(self.id(), time())
         run_list = openml.runs.list_runs(tag=tag)
         self.assertEqual(len(run_list), 0)
