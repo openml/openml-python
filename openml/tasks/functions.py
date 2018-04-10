@@ -292,7 +292,6 @@ def get_task(task_id):
             class_labels = dataset.retrieve_class_labels(task.target_name)
             task.class_labels = class_labels
             task.download_split()
-
         except Exception as e:
             openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
             raise e

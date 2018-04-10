@@ -80,9 +80,7 @@ class OpenMLTask(object):
 
         try:
             split = OpenMLSplit._from_arff_file(cached_split_file)
-        # Add FileNotFoundError in python3 version (which should be a
-        # subclass of OSError.
-        except (OSError, IOError, FileNotFoundError):
+        except (OSError, IOError):
             # Next, download and cache the associated split file
             self._download_split(cached_split_file)
             split = OpenMLSplit._from_arff_file(cached_split_file)
