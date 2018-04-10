@@ -344,7 +344,7 @@ def get_dataset(dataset_id):
                 raise e
         finally:
             if remove_dataset_cache:
-                _remove_dataset_cache_dir(did_cache_dir)
+                _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, did_cache_dir)
 
         dataset = _create_dataset_from_description(
             description, features, qualities, arff_file
