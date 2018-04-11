@@ -4,8 +4,8 @@ import os
 from .. import config
 from .. import datasets
 from .split import OpenMLSplit
-from .._api_calls import _read_url
 import openml._api_calls
+from ..utils import _create_cache_directory_for_id
 
 
 class OpenMLTask(object):
@@ -64,7 +64,7 @@ class OpenMLTask(object):
                 pass
         except (OSError, IOError):
             split_url = self.estimation_procedure["data_splits_url"]
-            split_arff = _read_url(split_url)
+            split_arff = openml._api_calls._read_url(split_url)
 
             with io.open(cache_file, "w", encoding='utf8') as fh:
                 fh.write(split_arff)
@@ -74,12 +74,12 @@ class OpenMLTask(object):
         """Download the OpenML split for a given task.
         """
         cached_split_file = os.path.join(
-            _create_task_cache_dir(self.task_id), "datasplits.arff")
+            _create_cache_directory_for_id('tasks', self.task_id),
+            "datasplits.arff",
+        )
 
         try:
             split = OpenMLSplit._from_arff_file(cached_split_file)
-        # Add FileNotFoundError in python3 version (which should be a
-        # subclass of OSError.
         except (OSError, IOError):
             # Next, download and cache the associated split file
             self._download_split(cached_split_file)

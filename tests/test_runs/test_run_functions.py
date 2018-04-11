@@ -987,10 +987,10 @@ class TestRun(TestBase):
             np.testing.assert_array_equal(predictionsA, predictionsB)
 
     def test_get_cached_run(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.config.cache_directory = self.static_cache_dir
         openml.runs.functions._get_cached_run(1)
 
     def test_get_uncached_run(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.config.cache_directory = self.static_cache_dir
         with self.assertRaises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)

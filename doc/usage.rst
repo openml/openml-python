@@ -55,7 +55,7 @@ API:
 .. code:: python
 
     >>> import os
-    >>> openml.config.set_cache_directory(os.path.expanduser('~/.openml/cache'))
+    >>> openml.config.cache_directory = os.path.expanduser('~/.openml/cache')
 
 Config file:
 
