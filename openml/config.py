@@ -55,7 +55,7 @@ def _setup():
     config = _parse_config()
     apikey = config.get('FAKE_SECTION', 'apikey')
     server = config.get('FAKE_SECTION', 'server')
-    cache_directory = config.get('FAKE_SECTION', 'cachedir')
+    cache_directory = os.path.expanduser(config.get('FAKE_SECTION', 'cachedir'))
     avoid_duplicate_runs = config.getboolean('FAKE_SECTION', 'avoid_duplicate_runs')
 
 
