@@ -105,8 +105,27 @@ def get_cache_directory():
     return _cachedir
 
 
+def set_cache_directory(cachedir):
+    """Set module-wide cache directory.
+
+    Sets the cache directory into which to download datasets, tasks etc.
+
+    Parameters
+    ----------
+    cachedir : string
+         Path to use as cache directory.
+
+    See also
+    --------
+    get_cache_directory
+    """
+
+    global cache_directory
+    cache_directory = cachedir
+
+
 __all__ = [
-    'get_cache_directory',
+    'get_cache_directory', 'set_cache_directory'
 ]
 
 _setup()
