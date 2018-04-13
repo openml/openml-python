@@ -45,7 +45,7 @@ class OpenMLDataset(object):
         # Attributes received by querying the RESTful API
         self.dataset_id = int(dataset_id) if dataset_id is not None else None
         self.name = name
-        self.version = int(version) if version else None
+        self.version = int(version) if version is not None else None
         self.description = description
         self.format = format
         self.creator = creator
@@ -435,9 +435,8 @@ class OpenMLDataset(object):
         if self.data_file is not None:
             file_dictionary['dataset'] = self.data_file
 
-        return_value = _perform_api_call("/data/", file_dictionary=file_dictionary,
+        return_value = _perform_api_call("data/", file_dictionary=file_dictionary,
                                          file_elements=file_elements)
-
         self.dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])
         return self
 
@@ -470,7 +469,7 @@ class OpenMLDataset(object):
                 #        xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, item)
                 #else:
                 #    xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, content)
-                data_dict[prop] = content
+                data_dict["oml:" + prop] = content
         #xml_dataset += "</oml:data_set_description>"
         xml_string = xmltodict.unparse(
             input_dict=data_container,
