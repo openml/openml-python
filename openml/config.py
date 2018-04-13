@@ -55,7 +55,7 @@ def _setup():
     config = _parse_config()
     apikey = config.get('FAKE_SECTION', 'apikey')
     server = config.get('FAKE_SECTION', 'server')
-    cache_directory = config.get('FAKE_SECTION', 'cachedir')
+    cache_directory = os.path.expanduser(config.get('FAKE_SECTION', 'cachedir'))
     avoid_duplicate_runs = config.getboolean('FAKE_SECTION', 'avoid_duplicate_runs')
 
 
@@ -105,8 +105,27 @@ def get_cache_directory():
     return _cachedir
 
 
+def set_cache_directory(cachedir):
+    """Set module-wide cache directory.
+
+    Sets the cache directory into which to download datasets, tasks etc.
+
+    Parameters
+    ----------
+    cachedir : string
+         Path to use as cache directory.
+
+    See also
+    --------
+    get_cache_directory
+    """
+
+    global cache_directory
+    cache_directory = cachedir
+
+
 __all__ = [
-    'get_cache_directory',
+    'get_cache_directory', 'set_cache_directory'
 ]
 
 _setup()
