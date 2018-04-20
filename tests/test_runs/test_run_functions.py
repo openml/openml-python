@@ -527,10 +527,13 @@ class TestRun(TestBase):
             flow = openml.flows.sklearn_to_flow(clf)
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
             self.assertIsInstance(flow_exists, int)
+            self.assertGreater(flow_exists, 0)
             downloaded_flow = openml.flows.get_flow(flow_exists)
             setup_exists = openml.setups.setup_exists(downloaded_flow)
             self.assertIsInstance(setup_exists, int)
+            self.assertGreater(setup_exists, 0)
             run_ids = _run_exists(task.task_id, setup_exists)
+            self.assertGreater(len(run_ids), 0)
             run_id = random.choice(list(run_ids))
 
         # now the actual unit test ...
