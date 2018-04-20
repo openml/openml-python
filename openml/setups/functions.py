@@ -47,7 +47,6 @@ def setup_exists(flow, model=None):
     description = xmltodict.unparse(_to_dict(flow.flow_id,
                                              openml_param_settings),
                                     pretty=True)
-    print(description)
     file_elements = {'description': ('description.arff', description)}
 
     result = openml._api_calls._perform_api_call('/setup/exists/',
