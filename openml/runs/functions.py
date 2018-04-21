@@ -231,26 +231,28 @@ def _run_exists(task_id, setup_id):
     Parameters
     ----------
     task_id: int
+
     setup_id: int
 
     Returns
     -------
-        List of run ids iff these already exists on the server, False otherwise
+        Set run ids for runs where flow setup_id was run on task_id. Empty
+        set if it wasn't run yet.
     """
     if setup_id <= 0:
         # openml setups are in range 1-inf
-        return False
+        return set()
 
     try:
         result = list_runs(task=[task_id], setup=[setup_id])
         if len(result) > 0:
             return set(result.keys())
         else:
-            return False
+            return set()
     except OpenMLServerException as exception:
         # error code 512 implies no results. This means the run does not exist yet
         assert(exception.code == 512)
-        return False
+        return set()
 
 
 def _get_seeded_model(model, seed=None):
