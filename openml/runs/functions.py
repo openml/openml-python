@@ -19,9 +19,10 @@ import openml._api_calls
 from ..exceptions import PyOpenMLError, OpenMLServerNoResult
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
-    _copy_server_fields
+    _copy_server_fields, OpenMLFlow
 from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException
+from ..tasks import OpenMLTask
 from .run import OpenMLRun, _get_version_information
 from .trace import OpenMLRunTrace, OpenMLTraceIteration
 
@@ -54,7 +55,7 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
     Parameters
     ----------
     task : OpenMLTask
-        Task to perform.
+        Task to perform. This may be a model instead if the second argument is a task.
     model : sklearn model
         A model which has a function fit(X,Y) and predict(X),
         all supervised estimators of scikit learn follow this definition of a model [1]
@@ -64,6 +65,7 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
         setup/task combination is already present on the server. Works only
         if the flow is already published on the server. This feature requires an
         internet connection.
+        This may be a task instead if the first argument is the flow.
     flow_tags : list(str)
         A list of tags that the flow should have at creation.
     seed: int
@@ -76,6 +78,9 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
     """
     if flow_tags is not None and not isinstance(flow_tags, list):
         raise ValueError("flow_tags should be list")
+
+    if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
+        task, flow = flow, task
 
     flow.model = _get_seeded_model(flow.model, seed=seed)
 
