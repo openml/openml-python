@@ -504,6 +504,9 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
         if can_measure_runtime:
             modelfit_duration = (time.process_time() - modelfit_starttime) * 1000
             user_defined_measures['usercpu_time_millis_training'] = modelfit_duration
+            #print('====FINDME:TIME1=====')
+            #print(time.perf_counter(), time.process_time())
+            #print(user_defined_measures['usercpu_time_millis_training'], (time.perf_counter()-start) * 1000)
     except AttributeError as e:
         # typically happens when training a regressor on classification task
         raise PyOpenMLError(str(e))
@@ -541,6 +544,8 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
         modelpredict_duration = (time.process_time() - modelpredict_starttime) * 1000
         user_defined_measures['usercpu_time_millis_testing'] = modelpredict_duration
         user_defined_measures['usercpu_time_millis'] = modelfit_duration + modelpredict_duration
+        #print(time.perf_counter(), time.process_time())
+        #print(user_defined_measures['usercpu_time_millis_testing'], (time.perf_counter() - start) * 1000)
 
     if ProbaY.shape[1] != len(task.class_labels):
         warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" % (rep_no, fold_no, ProbaY.shape[1], len(task.class_labels)))

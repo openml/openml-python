@@ -384,8 +384,6 @@ class TestRun(TestBase):
         num_folds = 10
         num_samples = 8
         num_test_instances = 768*num_samples 
-
-
         
         pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
                                     ('dummy', DummyClassifier(strategy='prior'))])
