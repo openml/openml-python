@@ -1,6 +1,7 @@
 import arff
 import collections
 import json
+import os
 import random
 import time
 import sys
@@ -226,9 +227,11 @@ class TestRun(TestBase):
         if sys.version_info[:2] >= (3, 3):
             # this only holds if we are allowed to record time (otherwise some are missing)
             self.assertEquals(set(sample_evaluations.keys()), set(check_measures.keys()))
-
+        
         for measure in check_measures.keys():
             if measure in sample_evaluations:
+                #print('===measure===')
+                #print(measure)
                 num_rep_entrees = len(sample_evaluations[measure])
                 self.assertEquals(num_rep_entrees, num_repeats)
                 for rep in range(num_rep_entrees):
@@ -240,7 +243,11 @@ class TestRun(TestBase):
                         for sample in range(num_sample_entrees):
                             evaluation = sample_evaluations[measure][rep][fold][sample]
                             self.assertIsInstance(evaluation, float)
-                            self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
+                            if not os.environ.get('CI_WINDOWS'):
+                                # Either Appveyor is much faster than Travis,
+                                # and/or measurements are not as accurate.
+                                # Either way, windows seems to get eval time of 0 sometimes.
+                                self.assertGreater(evaluation, 0) 
                             self.assertLess(evaluation, max_time_allowed)
 
     def test_run_regression_on_classif_task(self):
@@ -373,24 +380,25 @@ class TestRun(TestBase):
 
     def test_learning_curve_task_1(self):
         task_id = 801  # diabates dataset
-        num_test_instances = 6144 # for learning curve
         num_repeats = 1
         num_folds = 10
         num_samples = 8
-
+        num_test_instances = 768*num_samples 
+        
         pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
                                     ('dummy', DummyClassifier(strategy='prior'))])
         run = self._perform_run(task_id, num_test_instances, pipeline1,
                                 random_state_value='62501')
+        
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
                                        num_folds, num_samples)
 
     def test_learning_curve_task_2(self):
         task_id = 801  # diabates dataset
-        num_test_instances = 6144  # for learning curve
         num_repeats = 1
         num_folds = 10
         num_samples = 8
+        num_test_instances = 768*num_samples 
 
         pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                     ('VarianceThreshold', VarianceThreshold()),
@@ -401,6 +409,7 @@ class TestRun(TestBase):
                                         cv=3, n_iter=10))])
         run = self._perform_run(task_id, num_test_instances, pipeline2,
                                 random_state_value='62501')
+        
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
                                        num_folds, num_samples)
 
