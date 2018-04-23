@@ -150,7 +150,7 @@ retrieve them without calling the server later. As with the API key, the cache
 directory can be either specified through the API or through the config file:</p>
 <p>API:</p>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set_cache_directory</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/.openml/cache&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">cache_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/.openml/cache&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Config file:</p>
@@ -460,7 +460,7 @@ run is send to the OpenML server:</p>
     </p>
     <p>
         &copy; Copyright 2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
     </p>
   </div>
 </footer>

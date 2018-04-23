@@ -3,11 +3,39 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to OpenML's documentation!
-==================================
+======
+OpenML
+======
 
-The OpenML module is still under development. You can watch its progress
-:ref:`here <progress>`.
+Welcome to the documentation of the OpenML Python API, a connector to the
+collaborative machine learning platform `OpenML.org <https://www.openml.org>`_.
+The OpenML Python package allows to use datasets and tasks from OpenML together
+with scikit-learn and share the results online.
+
+-------
+Example
+-------
+
+.. code:: python
+
+    # Define a scikit-learn pipeline
+    clf = sklearn.pipeline.Pipeline(
+        steps=[
+            ('imputer', sklearn.preprocessing.Imputer()),
+            ('estimator', sklearn.tree.DecisionTreeClassifier())
+        ]
+    )
+    # Download the OpenML task for the german credit card dataset with 10-fold
+    # cross-validation.
+    task = openml.tasks.get_task(31)
+    # Set the OpenML API Key which is required to upload the runs.
+    # You can get your own API by signing up to OpenML.org.
+    openml.config.apikey = 'ABC'
+    # Run the scikit-learn model on the task (requires an API key).
+    run = openml.runs.run_model_on_task(task, clf)
+    # Publish the experiment on OpenML (optional, requires an API key).
+    run.publish()
+    print('URL for run: %s/run/%d' % (openml.config.server, run.run_id))
 
 
 ------------

@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>openml.tasks.get_task &#8212; OpenML 0.6.0 documentation</title>
+    <title>openml.OpenMLEvaluation &#8212; OpenML 0.6.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -99,26 +99,51 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">openml.tasks</span></code>.get_task</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLEvaluation</a></li>
 </ul>
 
         </div>
       </div>
     <div class="col-md-9 content">
       
-  <div class="section" id="openml-tasks-get-task">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>.get_task<a class="headerlink" href="#openml-tasks-get-task" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
-<dt id="openml.tasks.get_task">
-<code class="descclassname">openml.tasks.</code><code class="descname">get_task</code><span class="sig-paren">(</span><em>task_id</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.get_task" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download the OpenML task for a given task ID.</p>
+  <div class="section" id="openml-openmlevaluation">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLEvaluation<a class="headerlink" href="#openml-openmlevaluation" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="openml.OpenMLEvaluation">
+<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLEvaluation</code><span class="sig-paren">(</span><em>run_id</em>, <em>task_id</em>, <em>setup_id</em>, <em>flow_id</em>, <em>flow_name</em>, <em>data_id</em>, <em>data_name</em>, <em>function</em>, <em>upload_time</em>, <em>value</em>, <em>array_data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLEvaluation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains all meta-information about a run / evaluation combination,
+according to the evaluation/list function</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>run_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd></dd>
 <dt><strong>task_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">The OpenML task id.</p>
+<dd></dd>
+<dt><strong>setup_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd></dd>
+<dt><strong>flow_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd></dd>
+<dt><strong>flow_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd></dd>
+<dt><strong>data_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd></dd>
+<dt><strong>data_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">the name of the dataset</p>
+</dd>
+<dt><strong>function</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">the evaluation function of this item (e.g., accuracy)</p>
+</dd>
+<dt><strong>upload_time</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">the time of evaluation</p>
+</dd>
+<dt><strong>value</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">the value of this evaluation</p>
+</dd>
+<dt><strong>array_data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">list of information per class (e.g., in case of precision, auroc, recall)</p>
 </dd>
 </dl>
 </td>
@@ -127,7 +152,7 @@
 </table>
 </dd></dl>
 
-<div class="clearer"></div></div>
+</div>
 
 
     </div>
