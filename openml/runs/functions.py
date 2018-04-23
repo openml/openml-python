@@ -36,6 +36,8 @@ RUNS_CACHE_DIR_NAME = 'runs'
 def run_model_on_task(task, model, avoid_duplicate_runs=True, flow_tags=None,
                       seed=None):
     """See ``run_flow_on_task for a documentation``."""
+    if isinstance(model, OpenMLTask) and hasattr(task, 'fit') and hasattr(task, 'predict'):
+        task, model = model, task
 
     flow = sklearn_to_flow(model)
 
@@ -55,7 +57,7 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
     Parameters
     ----------
     task : OpenMLTask
-        Task to perform. This may be a model instead if the second argument is a task.
+        Task to perform. This may be an OpenMLFlow instead if the second argument is an OpenMLTask.
     model : sklearn model
         A model which has a function fit(X,Y) and predict(X),
         all supervised estimators of scikit learn follow this definition of a model [1]
@@ -65,7 +67,7 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
         setup/task combination is already present on the server. Works only
         if the flow is already published on the server. This feature requires an
         internet connection.
-        This may be a task instead if the first argument is the flow.
+        This may be an OpenMLTask instead if the first argument is the OpenMLFlow.
     flow_tags : list(str)
         A list of tags that the flow should have at creation.
     seed: int
@@ -80,6 +82,7 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
         raise ValueError("flow_tags should be list")
 
     if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
+        # We want to allow either order of argument (to avoid confusion).
         task, flow = flow, task
 
     flow.model = _get_seeded_model(flow.model, seed=seed)
