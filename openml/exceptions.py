@@ -11,18 +11,42 @@ class OpenMLServerError(PyOpenMLError):
     def __init__(self, message):
         super(OpenMLServerError, self).__init__(message)
 
-#
+
 class OpenMLServerException(OpenMLServerError):
     """exception for when the result of the server was
        not 200 (e.g., listing call w/o results). """
 
-    def __init__(self, code, message, additional=None):
+    # Code needs to be optional to allow the exceptino to be picklable:
+    # https://stackoverflow.com/questions/16244923/how-to-make-a-custom-exception-class-with-multiple-init-args-pickleable
+    def __init__(self, message, code=None, additional=None, url=None):
+        self.message = message
         self.code = code
         self.additional = additional
+        self.url = url
         super(OpenMLServerException, self).__init__(message)
+
+    def __str__(self):
+        return '%s returned code %s: %s' % (
+            self.url, self.code, self.message,
+        )
+
+class OpenMLServerNoResult(OpenMLServerException):
+    """exception for when the result of the server is empty. """
+    pass
 
 
 class OpenMLCacheException(PyOpenMLError):
     """Dataset / task etc not found in cache"""
     def __init__(self, message):
         super(OpenMLCacheException, self).__init__(message)
+
+
+class OpenMLHashException(PyOpenMLError):
+    """Locally computed hash is different than hash announced by the server."""
+    pass
+
+
+class PrivateDatasetError(PyOpenMLError):
+    "Exception thrown when the user has no rights to access the dataset"
+    def __init__(self, message):
+        super(PrivateDatasetError, self).__init__(message)

@@ -1,6 +1,6 @@
 from collections import namedtuple, OrderedDict
 import os
-import sys
+import six
 
 import numpy as np
 import scipy.io.arff
@@ -8,6 +8,10 @@ from six.moves import cPickle as pickle
 
 
 Split = namedtuple("Split", ["train", "test"])
+
+
+if six.PY2:
+    FileNotFoundError = IOError
 
 
 class OpenMLSplit(object):
@@ -60,17 +64,26 @@ class OpenMLSplit(object):
     @classmethod
     def _from_arff_file(cls, filename, cache=True):
         repetitions = None
-        pkl_filename = filename.replace(".arff", ".pkl")
+        if six.PY2:
+            pkl_filename = filename.replace(".arff", ".pkl.py2")
+        else:
+            pkl_filename = filename.replace(".arff", ".pkl.py3")
         if cache:
             if os.path.exists(pkl_filename):
-                with open(pkl_filename, "rb") as fh:
-                    _ = pickle.load(fh)
+                try:
+                    with open(pkl_filename, "rb") as fh:
+                        _ = pickle.load(fh)
+                except UnicodeDecodeError as e:
+                    # Possibly pickle file was created with python2 and python3 is being used to load the data
+                    raise e
                 repetitions = _["repetitions"]
                 name = _["name"]
 
         # Cache miss
         if repetitions is None:
             # Faster than liac-arff and sufficient in this situation!
+            if not os.path.exists(filename):
+                raise FileNotFoundError('Split arff %s does not exist!' % filename)
             splits, meta = scipy.io.arff.loadarff(filename)
             name = meta.name
 

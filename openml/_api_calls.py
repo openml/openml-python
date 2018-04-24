@@ -7,7 +7,8 @@ import arff
 import xmltodict
 
 from . import config
-from .exceptions import OpenMLServerError, OpenMLServerException
+from .exceptions import (OpenMLServerError, OpenMLServerException,
+                         OpenMLServerNoResult)
 
 
 def _perform_api_call(call, data=None, file_dictionary=None,
@@ -94,7 +95,7 @@ def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
     # 'gzip,deflate'
     response = requests.post(url, data=data, files=file_elements)
     if response.status_code != 200:
-        raise _parse_server_exception(response)
+        raise _parse_server_exception(response, url=url)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
@@ -116,14 +117,14 @@ def _read_url(url, data=None):
         response = requests.post(url, data=data)
 
     if response.status_code != 200:
-        raise _parse_server_exception(response)
+        raise _parse_server_exception(response, url=url)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
     return response.text
 
 
-def _parse_server_exception(response):
+def _parse_server_exception(response, url=None):
     # OpenML has a sopisticated error system
     # where information about failures is provided. try to parse this
     try:
@@ -138,4 +139,13 @@ def _parse_server_exception(response):
     additional = None
     if 'oml:additional_information' in server_exception['oml:error']:
         additional = server_exception['oml:error']['oml:additional_information']
-    return OpenMLServerException(code, message, additional)
+    if code in [372, 512, 500, 482, 542, 674]: # datasets,
+        # 512 for runs, 372 for datasets, 500 for flows
+        # 482 for tasks, 542 for evaluations, 674 for setups
+        return OpenMLServerNoResult(code, message, additional)
+    return OpenMLServerException(
+        code=code,
+        message=message,
+        additional=additional,
+        url=url
+    )

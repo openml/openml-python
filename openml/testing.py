@@ -26,7 +26,6 @@ class TestBase(unittest.TestCase):
         self.maxDiff = None
         self.static_cache_dir = None
         static_cache_dir = os.path.dirname(os.path.abspath(inspect.getfile(self.__class__)))
-
         static_cache_dir = os.path.abspath(os.path.join(static_cache_dir, '..'))
         content = os.listdir(static_cache_dir)
         if 'files' in content:
@@ -52,10 +51,12 @@ class TestBase(unittest.TestCase):
         openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
         self.production_server = openml.config.server
         self.test_server = "https://test.openml.org/api/v1/xml"
+        openml.config.cache_directory = None
+
         openml.config.server = self.test_server
         openml.config.avoid_duplicate_runs = False
 
-        openml.config.set_cache_directory(self.workdir)
+        openml.config.cache_directory = self.workdir
 
         # If we're on travis, we save the api key in the config file to allow
         # the notebook tests to read them.

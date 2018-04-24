@@ -3,7 +3,6 @@ import io
 import logging
 import os
 import six
-import sys
 
 import arff
 
@@ -14,7 +13,7 @@ import xmltodict
 
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
-from .._api_calls import _perform_api_call
+import openml._api_calls
 
 logger = logging.getLogger(__name__)
 
@@ -26,9 +25,9 @@ class OpenMLDataset(object):
 
     Parameters
     ----------
-    name : string
+    name : str
         Name of the dataset
-    description : string
+    description : str
         Description of the dataset
     FIXME : which of these do we actually nee?
     """
@@ -82,22 +81,20 @@ class OpenMLDataset(object):
                 feature = OpenMLDataFeature(int(xmlfeature['oml:index']),
                                             xmlfeature['oml:name'],
                                             xmlfeature['oml:data_type'],
-                                            None, #todo add nominal values (currently not in database)
+                                            None,  # todo add nominal values (currently not in database)
                                             int(xmlfeature.get('oml:number_of_missing_values', 0)))
                 if idx != feature.index:
                     raise ValueError('Data features not provided in right order')
                 self.features[feature.index] = feature
 
-        if qualities is not None:
-            self.qualities = {}
-            for idx, xmlquality in enumerate(qualities['oml:quality']):
-                name = xmlquality['oml:name']
-                value = xmlquality['oml:value']
-                self.qualities[name] = value
+        self.qualities = _check_qualities(qualities)
 
         if data_file is not None:
             if self._data_features_supported():
-                self.data_pickle_file = data_file.replace('.arff', '.pkl')
+                if six.PY2:
+                    self.data_pickle_file = data_file.replace('.arff', '.pkl.py2')
+                else:
+                    self.data_pickle_file = data_file.replace('.arff', '.pkl.py3')
 
                 if os.path.exists(self.data_pickle_file):
                     logger.debug("Data pickle file already exists.")
@@ -127,13 +124,37 @@ class OpenMLDataset(object):
                     with open(self.data_pickle_file, "wb") as fh:
                         pickle.dump((X, categorical, attribute_names), fh, -1)
                     logger.debug("Saved dataset %d: %s to file %s" %
-                                 (self.dataset_id, self.name, self.data_pickle_file))
+                                 (int(self.dataset_id or -1), self.name, self.data_pickle_file))
+
+    def push_tag(self, tag):
+        """Annotates this data set with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the dataset.
+        """
+        data = {'data_id': self.dataset_id, 'tag': tag}
+        openml._api_calls._perform_api_call("/data/tag", data=data)
+
+    def remove_tag(self, tag):
+        """Removes a tag from this dataset on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the dataset.
+        """
+        data = {'data_id': self.dataset_id, 'tag': tag}
+        openml._api_calls._perform_api_call("/data/untag", data=data)
 
     def __eq__(self, other):
         if type(other) != OpenMLDataset:
             return False
-        elif self.id == other._id or \
-                (self.name == other._name and self.version == other._version):
+        elif (
+            self.dataset_id == other.dataset_id
+            or (self.name == other._name and self.version == other._version)
+        ):
             return True
         else:
             return False
@@ -184,10 +205,12 @@ class OpenMLDataset(object):
             with io.open(filename, encoding='utf8') as fh:
                 return decode_arff(fh)
 
-    def get_data(self, target=None, target_dtype=int, include_row_id=False,
+    def get_data(self, target=None,
+                 include_row_id=False,
                  include_ignore_attributes=False,
                  return_categorical_indicator=False,
-                 return_attribute_names=False):
+                 return_attribute_names=False
+    ):
         """Returns dataset content as numpy arrays / sparse matrices.
 
         Parameters
@@ -201,7 +224,10 @@ class OpenMLDataset(object):
         rval = []
 
         if not self._data_features_supported():
-            raise PyOpenMLError('Dataset not compatible, PyOpenML cannot handle string features')
+            raise PyOpenMLError(
+                'Dataset %d not compatible, PyOpenML cannot handle string '
+                'features' % self.dataset_id
+            )
 
         path = self.data_pickle_file
         if not os.path.exists(path):
@@ -225,7 +251,10 @@ class OpenMLDataset(object):
             if not self.ignore_attributes:
                 pass
             else:
-                to_exclude.extend(self.ignore_attributes)
+                if isinstance(self.ignore_attributes, six.string_types):
+                    to_exclude.append(self.ignore_attributes)
+                else:
+                    to_exclude.extend(self.ignore_attributes)
 
         if len(to_exclude) > 0:
             logger.info("Going to remove the following attributes:"
@@ -241,9 +270,23 @@ class OpenMLDataset(object):
             rval.append(data)
         else:
             if isinstance(target, six.string_types):
-                target = [target]
+                if ',' in target:
+                    target = target.split(',')
+                else:
+                    target = [target]
             targets = np.array([True if column in target else False
                                 for column in attribute_names])
+            if np.sum(targets) > 1:
+                raise NotImplementedError(
+                    "Number of requested targets %d is not implemented." %
+                    np.sum(targets)
+                )
+            target_categorical = [
+                cat for cat, column in
+                six.moves.zip(categorical, attribute_names)
+                if column in target
+            ]
+            target_dtype = int if target_categorical[0] else float
 
             try:
                 x = data[:, ~targets]
@@ -315,7 +358,6 @@ class OpenMLDataset(object):
         else:
             return None
 
-
     def get_features_by_type(self, data_type, exclude=None,
                              exclude_ignore_attributes=True,
                              exclude_row_id_attribute=True):
@@ -342,13 +384,17 @@ class OpenMLDataset(object):
         result : list
             a list of indices that have the specified data type
         '''
-        assert data_type in OpenMLDataFeature.LEGAL_DATA_TYPES, "Illegal feature type requested"
+        if data_type not in OpenMLDataFeature.LEGAL_DATA_TYPES:
+            raise TypeError("Illegal feature type requested")
         if self.ignore_attributes is not None:
-            assert type(self.ignore_attributes) is list, "ignore_attributes should be a list"
+            if not isinstance(self.ignore_attributes, list):
+                raise TypeError("ignore_attributes should be a list")
         if self.row_id_attribute is not None:
-            assert type(self.row_id_attribute) is str, "row id attribute should be a str"
+            if not isinstance(self.row_id_attribute, six.string_types):
+                raise TypeError("row id attribute should be a str")
         if exclude is not None:
-            assert type(exclude) is list, "Exclude should be a list"
+            if not isinstance(exclude, list):
+                raise TypeError("Exclude should be a list")
             # assert all(isinstance(elem, str) for elem in exclude), "Exclude should be a list of strings"
         to_exclude = []
         if exclude is not None:
@@ -377,11 +423,7 @@ class OpenMLDataset(object):
 
         Returns
         -------
-        return_code : int
-            Return code from server
-
-        return_value : string
-            xml return from server
+        self
         """
 
         file_elements = {'description': self._to_xml()}
@@ -390,8 +432,11 @@ class OpenMLDataset(object):
         if self.data_file is not None:
             file_dictionary['dataset'] = self.data_file
 
-        return_value = _perform_api_call("/data/", file_dictionary=file_dictionary,
-                                         file_elements=file_elements)
+        return_value = openml._api_calls._perform_api_call(
+            "/data/",
+            file_dictionary=file_dictionary,
+            file_elements=file_elements,
+        )
 
         self.dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])
         return self
@@ -401,7 +446,7 @@ class OpenMLDataset(object):
 
         Returns
         -------
-        xml_dataset : string
+        xml_dataset : str
             XML description of the data.
         """
         xml_dataset = ('<oml:data_set_description '
@@ -415,7 +460,11 @@ class OpenMLDataset(object):
         for prop in props:
             content = getattr(self, prop, None)
             if content is not None:
-                xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, content)
+                if isinstance(content, (list,set)):
+                    for item in content:
+                        xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, item)
+                else:
+                    xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, content)
         xml_dataset += "</oml:data_set_description>"
         return xml_dataset
 
@@ -426,3 +475,20 @@ class OpenMLDataset(object):
                     return False
             return True
         return True
+
+
+def _check_qualities(qualities):
+    if qualities is not None:
+        qualities_ = {}
+        for xmlquality in qualities:
+            name = xmlquality['oml:name']
+            if xmlquality.get('oml:value', None) is None:
+                value = float('NaN')
+            elif xmlquality['oml:value'] == 'null':
+                value = float('NaN')
+            else:
+                value = float(xmlquality['oml:value'])
+            qualities_[name] = value
+        return qualities_
+    else:
+        return None

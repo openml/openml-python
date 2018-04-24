@@ -1,4 +1,4 @@
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 import json
 import sys
 import time
@@ -8,9 +8,10 @@ import arff
 import xmltodict
 
 import openml
+import openml._api_calls
 from ..tasks import get_task
-from .._api_calls import _perform_api_call, _file_id_to_url, _read_url_files
 from ..exceptions import PyOpenMLError
+
 
 class OpenMLRun(object):
     """OpenML Run: result of running a model on an openml dataset.
@@ -52,6 +53,17 @@ class OpenMLRun(object):
         self.model = model
         self.tags = tags
         self.predictions_url = predictions_url
+
+    def __str__(self):
+        flow_name = self.flow_name
+        if len(flow_name) > 26:
+            # long enough to show sklearn.pipeline.Pipeline
+            flow_name = flow_name[:26] + "..."
+        return "[run id: {}, task id: {}, flow id: {}, flow name: {}]".format(
+            self.run_id, self.task_id, self.flow_id, flow_name)
+
+    def _repr_pretty_(self, pp, cycle):
+        pp.text(str(self))
 
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the server.
@@ -109,27 +121,29 @@ class OpenMLRun(object):
         return arff_dict
 
     def get_metric_fn(self, sklearn_fn, kwargs={}):
-        '''Calculates metric scores based on predicted values. Assumes the
+        """Calculates metric scores based on predicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
         it assumes that the 'correct' attribute is specified in the arff
         (which is an optional field, but always the case for openml-python
         runs)
 
         Parameters
-        -------
+        ----------
         sklearn_fn : function
             a function pointer to a sklearn function that
-            accepts y_true, y_pred and *kwargs
+            accepts ``y_true``, ``y_pred`` and ``**kwargs``
 
         Returns
         -------
         scores : list
             a list of floats, of length num_folds * num_repeats
-        '''
+        """
         if self.data_content is not None and self.task_id is not None:
             predictions_arff = self._generate_arff_dict()
         elif 'predictions' in self.output_files:
-            predictions_file_url = _file_id_to_url(self.output_files['predictions'], 'predictions.arff')
+            predictions_file_url = openml._api_calls._file_id_to_url(
+                self.output_files['predictions'], 'predictions.arff',
+            )
             predictions_arff = arff.loads(openml._api_calls._read_url(predictions_file_url))
             # TODO: make this a stream reader
         else:
@@ -222,7 +236,7 @@ class OpenMLRun(object):
             trace_arff = arff.dumps(self._generate_trace_arff_dict())
             file_elements['trace'] = ("trace.arff", trace_arff)
 
-        return_value = _perform_api_call("/run/", file_elements=file_elements)
+        return_value = openml._api_calls._perform_api_call("/run/", file_elements=file_elements)
         run_id = int(xmltodict.parse(return_value)['oml:upload_run']['oml:run_id'])
         self.run_id = run_id
         return self
@@ -348,6 +362,28 @@ class OpenMLRun(object):
                                         True, flow.flow_id)
 
         return parameters
+
+    def push_tag(self, tag):
+        """Annotates this run with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the run.
+        """
+        data = {'run_id': self.run_id, 'tag': tag}
+        openml._api_calls._perform_api_call("/run/tag", data=data)
+
+    def remove_tag(self, tag):
+        """Removes a tag from this run on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the run.
+        """
+        data = {'run_id': self.run_id, 'tag': tag}
+        openml._api_calls._perform_api_call("/run/untag", data=data)
 
 
 ################################################################################

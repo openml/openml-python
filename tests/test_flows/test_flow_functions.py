@@ -31,6 +31,13 @@ class TestFlowFunctions(unittest.TestCase):
         for fid in flows:
             self._check_flow(flows[fid])
 
+    def test_list_flows_empty(self):
+        flows = openml.flows.list_flows(tag='NoOneEverUsesThisTag123')
+        if len(flows) > 0:
+            raise ValueError('UnitTest Outdated, got somehow results (please adapt)')
+
+        self.assertIsInstance(flows, dict)
+
     def test_list_flows_by_tag(self):
         flows = openml.flows.list_flows(tag='weka')
         self.assertGreaterEqual(len(flows), 5)
