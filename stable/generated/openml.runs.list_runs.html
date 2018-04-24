@@ -2,20 +2,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>openml.runs.list_runs &#8212; OpenML 0.6.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.6.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body>
+  </head><body>
   
   <a href="https://github.com/openml/openml-python"
      class="visible-desktop hidden-xs"><img
@@ -108,7 +99,7 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml.runs</span></code>.list_runs</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">openml.runs</span></code>.list_runs</a></li>
 </ul>
 
         </div>
@@ -116,41 +107,50 @@
     <div class="col-md-9 content">
       
   <div class="section" id="openml-runs-list-runs">
-<h1><code class="xref py py-mod docutils literal"><span class="pre">openml.runs</span></code>.list_runs<a class="headerlink" href="#openml-runs-list-runs" title="Permalink to this headline">¶</a></h1>
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>.list_runs<a class="headerlink" href="#openml-runs-list-runs" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.runs.list_runs">
-<code class="descclassname">openml.runs.</code><code class="descname">list_runs</code><span class="sig-paren">(</span><em>offset=None</em>, <em>size=None</em>, <em>id=None</em>, <em>task=None</em>, <em>setup=None</em>, <em>flow=None</em>, <em>uploader=None</em>, <em>tag=None</em>, <em>display_errors=False</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.list_runs" title="Permalink to this definition">¶</a></dt>
-<dd><p>List all runs matching all of the given filters.</p>
-<p>Perform API call <a class="reference external" href="https://www.openml.org/api_docs/#!/run/get_run_list_filters">/run/list/{filters}</a></p>
+<code class="descclassname">openml.runs.</code><code class="descname">list_runs</code><span class="sig-paren">(</span><em>offset=None</em>, <em>size=None</em>, <em>id=None</em>, <em>task=None</em>, <em>setup=None</em>, <em>flow=None</em>, <em>uploader=None</em>, <em>tag=None</em>, <em>display_errors=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.list_runs" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all runs matching all of the given filters.
+(Supports large amount of results)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>offset</strong> : int, optional</p>
-<blockquote>
-<div><p>the number of runs to skip, starting from the first</p>
-</div></blockquote>
-<p><strong>size</strong> : int, optional</p>
-<blockquote>
-<div><p>the maximum number of runs to show</p>
-</div></blockquote>
-<p><strong>id</strong> : list, optional</p>
-<p><strong>task</strong> : list, optional</p>
-<p><strong>setup: list, optional</strong></p>
-<p><strong>flow</strong> : list, optional</p>
-<p><strong>uploader</strong> : list, optional</p>
-<p><strong>tag</strong> : str, optional</p>
-<p><strong>display_errors</strong> : bool, optional (default=None)</p>
-<blockquote>
-<div><p>Whether to list runs which have an error (for example a missing
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>offset</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">the number of runs to skip, starting from the first</p>
+</dd>
+<dt><strong>size</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">the maximum number of runs to show</p>
+</dd>
+<dt><strong>id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list, optional</span></dt>
+<dd></dd>
+<dt><strong>task</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list, optional</span></dt>
+<dd></dd>
+<dt><strong>setup: list, optional</strong></dt>
+<dd></dd>
+<dt><strong>flow</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list, optional</span></dt>
+<dd></dd>
+<dt><strong>uploader</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list, optional</span></dt>
+<dd></dd>
+<dt><strong>tag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd></dd>
+<dt><strong>display_errors</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=None)</span></dt>
+<dd><p class="first last">Whether to list runs which have an error (for example a missing
 prediction file).</p>
-</div></blockquote>
-<p><strong>Returns</strong></p>
-<p><strong>——-</strong></p>
-<p><strong>list</strong></p>
-<blockquote class="last">
-<div><p>List of found runs.</p>
-</div></blockquote>
+</dd>
+<dt><strong>kwargs: dict, optional</strong></dt>
+<dd><p class="first last">Legal filter operators: task_type.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict</strong></dt>
+<dd><p class="first last">List of found runs.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -172,7 +172,7 @@ prediction file).</p>
     </p>
     <p>
         &copy; Copyright 2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
     </p>
   </div>
 </footer>

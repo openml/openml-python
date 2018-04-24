@@ -1,0 +1,10 @@
+:mod:`openml.flows`.flow_to_sklearn
+================================================
+
+.. currentmodule:: openml.flows
+
+.. autofunction:: flow_to_sklearn
+
+.. raw:: html
+
+    <div class="clearer"></div>

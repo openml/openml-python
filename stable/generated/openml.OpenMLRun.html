@@ -2,20 +2,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>openml.OpenMLRun &#8212; OpenML 0.6.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.6.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body>
+  </head><body>
   
   <a href="https://github.com/openml/openml-python"
      class="visible-desktop hidden-xs"><img
@@ -108,7 +99,7 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">openml</span></code>.OpenMLRun</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLRun</a></li>
 </ul>
 
         </div>
@@ -116,7 +107,7 @@
     <div class="col-md-9 content">
       
   <div class="section" id="openml-openmlrun">
-<h1><code class="xref py py-mod docutils literal"><span class="pre">openml</span></code>.OpenMLRun<a class="headerlink" href="#openml-openmlrun" title="Permalink to this headline">¶</a></h1>
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLRun<a class="headerlink" href="#openml-openmlrun" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="openml.OpenMLRun">
 <em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLRun</code><span class="sig-paren">(</span><em>task_id</em>, <em>flow_id</em>, <em>dataset_id</em>, <em>setup_string=None</em>, <em>output_files=None</em>, <em>setup_id=None</em>, <em>tags=None</em>, <em>uploader=None</em>, <em>uploader_name=None</em>, <em>evaluations=None</em>, <em>fold_evaluations=None</em>, <em>sample_evaluations=None</em>, <em>data_content=None</em>, <em>trace_attributes=None</em>, <em>trace_content=None</em>, <em>model=None</em>, <em>task_type=None</em>, <em>task_evaluation_measure=None</em>, <em>flow_name=None</em>, <em>parameter_settings=None</em>, <em>predictions_url=None</em>, <em>task=None</em>, <em>flow=None</em>, <em>run_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun" title="Permalink to this definition">¶</a></dt>
@@ -125,7 +116,11 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>FIXME</strong></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>FIXME</strong></dt>
+<dd></dd>
+</dl>
+</td>
 </tr>
 </tbody>
 </table>
@@ -137,19 +132,23 @@ run has been executed locally (and contains run_data). Furthermore,
 it assumes that the ‘correct’ attribute is specified in the arff
 (which is an optional field, but always the case for openml-python
 runs)</p>
-<dl class="docutils">
-<dt>sklearn_fn <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
-<dd>a function pointer to a sklearn function that
-accepts y_true, y_pred and <a href="#id1"><span class="problematic" id="id2">*</span></a>kwargs</dd>
-</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>scores</strong> : list</p>
-<blockquote class="last">
-<div><p>a list of floats, of length num_folds * num_repeats</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>sklearn_fn</strong> <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd><p class="first last">a function pointer to a sklearn function that
+accepts <code class="docutils literal notranslate"><span class="pre">y_true</span></code>, <code class="docutils literal notranslate"><span class="pre">y_pred</span></code> and <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code></p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>scores</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><p class="first last">a list of floats, of length num_folds * num_repeats</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -166,7 +165,49 @@ Sets the run_id on self</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>self</strong> : OpenMLRun</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>self</strong> <span class="classifier-delimiter">:</span> <span class="classifier">OpenMLRun</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLRun.push_tag">
+<code class="descname">push_tag</code><span class="sig-paren">(</span><em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.push_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotates this run with a tag on the server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Tag to attach to the run.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLRun.remove_tag">
+<code class="descname">remove_tag</code><span class="sig-paren">(</span><em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.remove_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a tag from this run on the server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Tag to attach to the run.</p>
+</dd>
+</dl>
+</td>
 </tr>
 </tbody>
 </table>
@@ -189,7 +230,7 @@ Sets the run_id on self</p>
     </p>
     <p>
         &copy; Copyright 2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
     </p>
   </div>
 </footer>

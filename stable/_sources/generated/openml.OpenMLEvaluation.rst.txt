@@ -1,0 +1,6 @@
+:mod:`openml`.OpenMLEvaluation
+=====================================
+
+.. currentmodule:: openml
+
+.. autoclass:: OpenMLEvaluation
