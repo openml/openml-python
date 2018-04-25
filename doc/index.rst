@@ -44,16 +44,22 @@ Introduction
 
 How to get OpenML for python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You can install the OpenML package via `pip`:
 
-Currently, the OpenML package for python is only available from
+.. code:: bash
+
+    pip install openml
+    
+
+Installation via GitHub (for developers)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The package source code is available from
 `github <https://github.com/openml/openml-python>`_.
 
 .. code:: bash
 
     git clone https://github.com/openml/openml-python.git
 
-Installation
-~~~~~~~~~~~~
 
 Once you cloned the package, change into the new directory ``python`` and
 execute
