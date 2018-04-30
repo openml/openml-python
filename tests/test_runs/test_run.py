@@ -95,8 +95,10 @@ class TestRun(TestBase):
             string_part = np.array(run.trace_content)[:, -2:]
             string_part_prime = np.array(run_prime.trace_content)[:, -2:]
             # JvR: Python 2.7 requires an almost equal check, rather than an equals check
-            np.testing.assert_array_almost_equal(numeric_part,numeric_part_prime)
+            np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
             np.testing.assert_array_equal(string_part, string_part_prime)
+        else:
+            self.assertIsNone(run_prime.trace_content)
 
     def test_to_from_filesystem_vanilla(self):
         model = DecisionTreeClassifier(max_depth=1)
@@ -104,7 +106,6 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(task, model)
 
         cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
-        os.makedirs(cache_path)
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
@@ -117,7 +118,6 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(task, model)
 
         cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
-        os.makedirs(cache_path)
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)

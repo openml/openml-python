@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import errno
 import json
 import sys
 import time
@@ -68,6 +69,21 @@ class OpenMLRun(object):
 
     @classmethod
     def from_filesystem(cls, folder):
+        """
+        The inverse of the to_filesystem method. Initiates a run based
+        on files stored on the file system.
+
+        Parameters
+        ----------
+        folder : str
+            a path leading to the folder where the results
+            are stored
+
+        Returns
+        -------
+        run : OpenMLRun
+            the re-instantiated run object
+        """
         if not os.path.isdir(folder):
             raise ValueError('Could not find folder')
 
@@ -96,17 +112,38 @@ class OpenMLRun(object):
         return run
 
     def to_filesystem(self, output_directory):
+        """
+        The inverse of the from_filesystem method. Serializes a run
+        on the filesystem, to be uploaded later.
+
+        Parameters
+        ----------
+        folder : str
+            a path leading to the folder where the results
+            will be stored. Should be empty
+        """
+        try:
+            os.makedirs(output_directory)
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                pass
+            else:
+                raise e
+
+        if not os.listdir(output_directory) == []:
+            raise ValueError('Output directory should be empty')
+
         run_xml = self._create_description_xml()
         predictions_arff = arff.dumps(self._generate_arff_dict())
 
-        with open(output_directory + '/description.xml', 'w') as f:
+        with open(os.path.join(output_directory, 'description.xml'), 'w') as f:
             f.write(run_xml)
-        with open(output_directory + '/predictions.arff', 'w') as f:
+        with open(os.path.join(output_directory, 'predictions.arff'), 'w') as f:
             f.write(predictions_arff)
 
         if self.trace_content is not None:
             trace_arff = arff.dumps(self._generate_trace_arff_dict())
-            with open(output_directory + '/trace.arff', 'w') as f:
+            with open(os.path.join(output_directory, 'trace.arff'), 'w') as f:
                 f.write(trace_arff)
 
     def _generate_arff_dict(self):
