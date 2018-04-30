@@ -103,7 +103,7 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(task, model)
 
         cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
-        os.makedirs(cache_path, exist_ok=True)
+        os.makedirs(cache_path)
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
@@ -116,7 +116,7 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(task, model)
 
         cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
-        os.makedirs(cache_path, exist_ok=True)
+        os.makedirs(cache_path)
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
