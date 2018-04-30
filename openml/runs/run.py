@@ -5,6 +5,7 @@ import time
 import numpy as np
 
 import arff
+import os
 import xmltodict
 
 import openml
@@ -65,6 +66,49 @@ class OpenMLRun(object):
     def _repr_pretty_(self, pp, cycle):
         pp.text(str(self))
 
+    @classmethod
+    def from_filesystem(cls, folder):
+        if not os.path.isdir(folder):
+            raise ValueError('Could not find folder')
+
+        description_path = os.path.join(folder, 'description.xml')
+        predictions_path = os.path.join(folder, 'predictions.arff')
+        trace_path = os.path.join(folder, 'trace.arff')
+
+        if not os.path.isfile(description_path):
+            raise ValueError('Could not find description.xml')
+        if not os.path.isfile(predictions_path):
+            raise ValueError('Could not find predictions.arff')
+
+        with open(description_path, 'r') as fp:
+            run = openml.runs.functions._create_run_from_xml(fp.read(), from_server=False)
+
+        with open(predictions_path, 'r') as fp:
+            predictions = arff.load(fp)
+            run.data_content = predictions['data']
+
+        if os.path.isfile(trace_path):
+            with open(trace_path, 'r') as fp:
+                trace = arff.load(fp)
+                run.trace_attributes = trace['attributes']
+                run.trace_content = trace['data']
+
+        return run
+
+    def to_filesystem(self, output_directory):
+        run_xml = self._create_description_xml()
+        predictions_arff = arff.dumps(self._generate_arff_dict())
+
+        with open(output_directory + '/description.xml', 'w') as f:
+            f.write(run_xml)
+        with open(output_directory + '/predictions.arff', 'w') as f:
+            f.write(predictions_arff)
+
+        if self.trace_content is not None:
+            trace_arff = arff.dumps(self._generate_trace_arff_dict())
+            with open(output_directory + '/trace.arff', 'w') as f:
+                f.write(trace_arff)
+
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the server.
 
@@ -109,11 +153,11 @@ class OpenMLRun(object):
             Contains information about the optimization trace.
         """
         if self.trace_content is None or len(self.trace_content) == 0:
-            raise ValueError('No trace content avaiable.')
+            raise ValueError('No trace content available.')
         if len(self.trace_attributes) != len(self.trace_content[0]):
             raise ValueError('Trace_attributes and trace_content not compatible')
 
-        arff_dict = {}
+        arff_dict = dict()
         arff_dict['attributes'] = self.trace_attributes
         arff_dict['data'] = self.trace_content
         arff_dict['relation'] = 'openml_task_' + str(self.task_id) + '_predictions'
