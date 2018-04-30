@@ -81,21 +81,22 @@ class TestRun(TestBase):
                 if other is not None:
                     self.assertDictEqual(other, dict())
 
-        numeric_part = np.array(run.data_content)[:, 0:-2]
-        numeric_part_prime = np.array(run_prime.data_content)[:, 0:-2]
+        numeric_part = np.array(np.array(run.data_content)[:, 0:-2], dtype=float)
+        numeric_part_prime = np.array(np.array(run_prime.data_content)[:, 0:-2], dtype=float)
         string_part = np.array(run.data_content)[:, -2:]
         string_part_prime = np.array(run_prime.data_content)[:, -2:]
-        np.testing.assert_array_equal(np.array(numeric_part, dtype=float), np.array(numeric_part_prime, dtype=float))
-        np.testing.assert_array_equal(np.array(string_part), np.array(string_part_prime))
+        # JvR: Python 2.7 requires an almost equal check, rather than an equals check
+        np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
+        np.testing.assert_array_equal(string_part, string_part_prime)
 
         if run.trace_content is not None:
-            numeric_part = np.array(run.trace_content)[:, 0:-2]
-            numeric_part_prime = np.array(run_prime.trace_content)[:, 0:-2]
+            numeric_part = np.array(np.array(run.trace_content)[:, 0:-2], dtype=float)
+            numeric_part_prime = np.array(np.array(run_prime.trace_content)[:, 0:-2], dtype=float)
             string_part = np.array(run.trace_content)[:, -2:]
             string_part_prime = np.array(run_prime.trace_content)[:, -2:]
-            np.testing.assert_array_equal(np.array(numeric_part, dtype=float),
-                                          np.array(numeric_part_prime, dtype=float))
-            np.testing.assert_array_equal(np.array(string_part), np.array(string_part_prime))
+            # JvR: Python 2.7 requires an almost equal check, rather than an equals check
+            np.testing.assert_array_almost_equal(numeric_part,numeric_part_prime)
+            np.testing.assert_array_equal(string_part, string_part_prime)
 
     def test_to_from_filesystem_vanilla(self):
         model = DecisionTreeClassifier(max_depth=1)
