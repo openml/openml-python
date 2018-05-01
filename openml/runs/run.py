@@ -70,8 +70,8 @@ class OpenMLRun(object):
     @classmethod
     def from_filesystem(cls, folder):
         """
-        The inverse of the to_filesystem method. Initiates a run based
-        on files stored on the file system.
+        The inverse of the to_filesystem method. Instantiates an OpenMLRun
+        object based on files stored on the file system.
 
         Parameters
         ----------
