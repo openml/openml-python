@@ -729,7 +729,7 @@ class TestRun(TestBase):
         num_repeats = 1
 
         clf = SGDClassifier(loss='log', random_state=1)
-        res = openml.runs.functions._run_task_get_arffcontent(clf, task)
+        res = openml.runs.functions._run_task_get_arffcontent(clf, task, add_local_measures=True)
         arff_datacontent, arff_tracecontent, _, fold_evaluations, sample_evaluations = res
         # predictions
         self.assertIsInstance(arff_datacontent, list)
@@ -765,7 +765,9 @@ class TestRun(TestBase):
 
         clf = SGDClassifier(loss='log', random_state=1)
         can_measure_runtime = sys.version_info[:2] >= (3, 3)
-        res = openml.runs.functions._run_model_on_fold(clf, task, 0, 0, 0, can_measure_runtime)
+        res = openml.runs.functions._run_model_on_fold(clf, task, 0, 0, 0,
+                                                       can_measure_runtime=can_measure_runtime,
+                                                       add_local_measures=True)
 
         arff_datacontent, arff_tracecontent, user_defined_measures, model = res
         # predictions
@@ -958,7 +960,7 @@ class TestRun(TestBase):
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task)
+        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task, add_local_measures=True)
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)
@@ -979,8 +981,8 @@ class TestRun(TestBase):
                 ('imputer', sklearn.preprocessing.Imputer()), ('estimator', HardNaiveBayes())
             ])
 
-            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task)
-            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task)
+            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task, add_local_measures=True)
+            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task, add_local_measures=True)
 
             # verifies last two arff indices (predict and correct)
             # TODO: programmatically check wether these are indeed features (predict, correct)

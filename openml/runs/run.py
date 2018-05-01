@@ -1,6 +1,7 @@
 from collections import OrderedDict
 import errno
 import json
+import pickle
 import sys
 import time
 import numpy as np
@@ -90,11 +91,14 @@ class OpenMLRun(object):
         description_path = os.path.join(folder, 'description.xml')
         predictions_path = os.path.join(folder, 'predictions.arff')
         trace_path = os.path.join(folder, 'trace.arff')
+        model_path = os.path.join(folder, 'model.pkl')
 
         if not os.path.isfile(description_path):
             raise ValueError('Could not find description.xml')
         if not os.path.isfile(predictions_path):
             raise ValueError('Could not find predictions.arff')
+        if not os.path.isfile(model_path):
+            raise ValueError('Could not find model.pkl')
 
         with open(description_path, 'r') as fp:
             run = openml.runs.functions._create_run_from_xml(fp.read(), from_server=False)
@@ -102,6 +106,9 @@ class OpenMLRun(object):
         with open(predictions_path, 'r') as fp:
             predictions = arff.load(fp)
             run.data_content = predictions['data']
+
+        with open(model_path, 'rb') as fp:
+            run.model = pickle.load(fp)
 
         if os.path.isfile(trace_path):
             with open(trace_path, 'r') as fp:
@@ -122,6 +129,9 @@ class OpenMLRun(object):
             a path leading to the folder where the results
             will be stored. Should be empty
         """
+        if self.data_content is None or self.model is None:
+            raise ValueError('Run should have been executed (and contain model / predictions)')
+
         try:
             os.makedirs(output_directory)
         except OSError as e:
@@ -140,6 +150,8 @@ class OpenMLRun(object):
             f.write(run_xml)
         with open(os.path.join(output_directory, 'predictions.arff'), 'w') as f:
             f.write(predictions_arff)
+        with open(os.path.join(output_directory, 'model.pkl'), 'wb') as f:
+            pickle.dump(self.model, f)
 
         if self.trace_content is not None:
             trace_arff = arff.dumps(self._generate_trace_arff_dict())
@@ -528,7 +540,8 @@ def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
     description['oml:run']['oml:parameter_setting'] = parameter_settings
     if tags is not None:
         description['oml:run']['oml:tag'] = tags  # Tags describing the run
-    if fold_evaluations is not None or sample_evaluations is not None:
+    if (fold_evaluations is not None and len(fold_evaluations) > 0) or \
+       (sample_evaluations is not None and len(sample_evaluations) > 0):
         description['oml:run']['oml:output_data'] = dict()
         description['oml:run']['oml:output_data']['oml:evaluation'] = list()
     if fold_evaluations is not None:

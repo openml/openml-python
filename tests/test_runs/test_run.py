@@ -80,6 +80,7 @@ class TestRun(TestBase):
                 other = getattr(run_prime, dictionary)
                 if other is not None:
                     self.assertDictEqual(other, dict())
+        self.assertEqual(run._create_description_xml(), run_prime._create_description_xml())
 
         numeric_part = np.array(np.array(run.data_content)[:, 0:-2], dtype=float)
         numeric_part_prime = np.array(np.array(run_prime.data_content)[:, 0:-2], dtype=float)
@@ -103,22 +104,24 @@ class TestRun(TestBase):
     def test_to_from_filesystem_vanilla(self):
         model = DecisionTreeClassifier(max_depth=1)
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(task, model)
+        run = openml.runs.run_model_on_task(task, model, add_local_measures=False)
 
         cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
         self._test_run_obj_equals(run, run_prime)
+        run_prime.publish()
 
     def test_to_from_filesystem_search(self):
         model = GridSearchCV(estimator=DecisionTreeClassifier(), param_grid={"max_depth": [1, 2, 3, 4, 5]})
 
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(task, model)
+        run = openml.runs.run_model_on_task(task, model, add_local_measures=False)
 
         cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
         self._test_run_obj_equals(run, run_prime)
+        run_prime.publish()
