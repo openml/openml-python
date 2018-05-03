@@ -125,7 +125,7 @@ def list_setups(offset=None, size=None, flow=None, tag=None, setup=None):
         """
 
     return openml.utils._list_all(_list_setups, offset=offset, size=size,
-                                  flow=flow, tag=tag, setup=setup)
+                                  flow=flow, tag=tag, setup=setup, batch_size=1000)  #batch size for setups is lower
 
 
 def _list_setups(setup=None, **kwargs):
