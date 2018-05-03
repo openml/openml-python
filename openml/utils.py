@@ -46,6 +46,7 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
             raise ValueError("Could not find tag '%s' in node '%s'" %
                              (xml_tag_name, str(node)))
 
+
 def _tag_entity(entity_type, entity_id, tag, untag=False):
     """Function that tags or untags a given entity on OpenML. As the OpenML
        API tag functions all consist of the same format, this function covers
@@ -94,7 +95,7 @@ def _tag_entity(entity_type, entity_id, tag, untag=False):
         return []
 
 
-def list_all(listing_call, *args, **filters):
+def _list_all(listing_call, *args, **filters):
     """Helper to handle paged listing requests.
 
     Example usage:

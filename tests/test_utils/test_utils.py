@@ -8,8 +8,8 @@ class OpenMLTaskTest(TestBase):
 
     def test_list_all(self):
         required_size = 127  # default test server reset value
-        datasets = openml.utils.list_all(openml.datasets._list_datasets,
-                                         batch_size=self._batch_size, size=required_size)
+        datasets = openml.utils._list_all(openml.datasets.functions._list_datasets,
+                                          batch_size=self._batch_size, size=required_size)
 
         self.assertEquals(len(datasets), required_size)
         for did in datasets:

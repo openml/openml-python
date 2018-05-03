@@ -124,8 +124,8 @@ def list_setups(offset=None, size=None, flow=None, tag=None, setup=None):
     dict
         """
 
-    return openml.utils.list_all(_list_setups, offset=offset, size=size,
-                                 flow=flow, tag=tag, setup=setup)
+    return openml.utils._list_all(_list_setups, offset=offset, size=size,
+                                  flow=flow, tag=tag, setup=setup)
 
 
 def _list_setups(setup=None, **kwargs):

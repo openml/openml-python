@@ -132,7 +132,7 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
         task id, dataset id, task_type and status. If qualities are calculated
         for the associated dataset, some of these are also returned.
     """
-    return openml.utils.list_all(_list_tasks, task_type_id=task_type_id, offset=offset, size=size, tag=tag, **kwargs)
+    return openml.utils._list_all(_list_tasks, task_type_id=task_type_id, offset=offset, size=size, tag=tag, **kwargs)
 
 
 def _list_tasks(task_type_id=None, **kwargs):
