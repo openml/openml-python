@@ -1,4 +1,5 @@
 from openml.testing import TestBase
+import numpy as np
 import openml
 
 
@@ -7,13 +8,7 @@ class OpenMLTaskTest(TestBase):
     _batch_size = 25
 
     def test_list_all(self):
-        required_size = 127  # default test server reset value
-        datasets = openml.utils._list_all(openml.datasets.functions._list_datasets,
-                                          batch_size=self._batch_size, size=required_size)
-
-        self.assertEquals(len(datasets), required_size)
-        for did in datasets:
-            self._check_dataset(datasets[did])
+        openml.utils._list_all(openml.tasks.functions._list_tasks)
 
     def test_list_all_for_datasets(self):
         required_size = 127  # default test server reset value
@@ -22,6 +17,12 @@ class OpenMLTaskTest(TestBase):
         self.assertEquals(len(datasets), required_size)
         for did in datasets:
             self._check_dataset(datasets[did])
+
+    def test_list_datasets_with_high_size_parameter(self):
+        datasets_a = openml.datasets.list_datasets()
+        datasets_b = openml.datasets.list_datasets(size=np.inf)
+
+        self.assertEquals(len(datasets_a), len(datasets_b))
 
     def test_list_all_for_tasks(self):
         required_size = 1068  # default test server reset value

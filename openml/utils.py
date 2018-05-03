@@ -131,7 +131,6 @@ def _list_all(listing_call, *args, **filters):
     # max number of results to be shown
     LIMIT = None
     offset = 0
-    cycle = True
     if 'size' in active_filters:
         LIMIT = active_filters['size']
         del active_filters['size']
@@ -142,7 +141,7 @@ def _list_all(listing_call, *args, **filters):
     if 'offset' in active_filters:
         offset = active_filters['offset']
         del active_filters['offset']
-    while cycle:
+    while True:
         try:
             new_batch = listing_call(
                 *args,
