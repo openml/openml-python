@@ -5,7 +5,6 @@ import shutil
 
 import openml._api_calls
 from . import config
-from openml.exceptions import OpenMLServerException
 
 
 def extract_xml_tags(xml_tag_name, node, allow_none=True):
@@ -82,7 +81,6 @@ def _tag_entity(entity_type, entity_id, tag, untag=False):
         uri = '%s/untag' %entity_type
         main_tag = 'oml:%s_untag' %entity_type
 
-
     post_variables = {'%s_id'%entity_type: entity_id, 'tag': tag}
     result_xml = openml._api_calls._perform_api_call(uri, post_variables)
 
@@ -152,8 +150,8 @@ def _list_all(listing_call, *args, **filters):
                 offset=offset + BATCH_SIZE_ORIG * page,
                 **active_filters
             )
-        except OpenMLServerException as e:
-            if page > 0 and e.args[0] == 'No results':
+        except openml.exceptions.OpenMLServerNoResult as e:
+            if page > 0:
                 # exceptional case, as it can happen that we request a new page,
                 # already got results but there are no more results to obtain
                 break
