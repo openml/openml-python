@@ -150,13 +150,9 @@ def _list_all(listing_call, *args, **filters):
                 offset=offset + BATCH_SIZE_ORIG * page,
                 **active_filters
             )
-        except openml.exceptions.OpenMLServerNoResult as e:
-            if page > 0:
-                # exceptional case, as it can happen that we request a new page,
-                # already got results but there are no more results to obtain
-                break
-            else:
-                raise e
+        except openml.exceptions.OpenMLServerNoResult:
+            # we want to return an empty dict in this case
+            break
         result.update(new_batch)
         page += 1
         if LIMIT is not None:
