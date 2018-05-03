@@ -60,7 +60,7 @@ class TestBase(unittest.TestCase):
 
         # If we're on travis, we save the api key in the config file to allow
         # the notebook tests to read them.
-        if os.environ.get('TRAVIS'):
+        if os.environ.get('TRAVIS') or os.environ.get('APPVEYOR'):
             with lockutils.external_lock('config', lock_path=self.workdir):
                 with open(openml.config.config_file, 'w') as fh:
                     fh.write('apikey = %s' % openml.config.apikey)
