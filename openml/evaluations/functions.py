@@ -38,8 +38,8 @@ def list_evaluations(function, offset=None, size=None, id=None, task=None,
     dict
     """
 
-    return openml.utils.list_all(_list_evaluations, function, offset=offset, size=size,
-                                 id=id, task=task, setup=setup, flow=flow, uploader=uploader, tag=tag)
+    return openml.utils._list_all(_list_evaluations, function, offset=offset, size=size,
+                                  id=id, task=task, setup=setup, flow=flow, uploader=uploader, tag=tag)
 
 
 def _list_evaluations(function, id=None, task=None,

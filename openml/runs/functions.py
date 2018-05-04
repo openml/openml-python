@@ -936,8 +936,8 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         List of found runs.
     """
 
-    return openml.utils.list_all(_list_runs, offset=offset, size=size, id=id, task=task, setup=setup,
-                                 flow=flow, uploader=uploader, tag=tag, display_errors=display_errors, **kwargs)
+    return openml.utils._list_all(_list_runs, offset=offset, size=size, id=id, task=task, setup=setup,
+                                  flow=flow, uploader=uploader, tag=tag, display_errors=display_errors, **kwargs)
 
 
 def _list_runs(id=None, task=None, setup=None,
