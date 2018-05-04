@@ -110,7 +110,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>.run_flow_on_task<a class="headerlink" href="#openml-runs-run-flow-on-task" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.runs.run_flow_on_task">
-<code class="descclassname">openml.runs.</code><code class="descname">run_flow_on_task</code><span class="sig-paren">(</span><em>task</em>, <em>flow</em>, <em>avoid_duplicate_runs=True</em>, <em>flow_tags=None</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.run_flow_on_task" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.runs.</code><code class="descname">run_flow_on_task</code><span class="sig-paren">(</span><em>task</em>, <em>flow</em>, <em>avoid_duplicate_runs=True</em>, <em>flow_tags=None</em>, <em>seed=None</em>, <em>add_local_measures=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.run_flow_on_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the model provided by the flow on the dataset defined by task.</p>
 <p>Takes the flow and repeat information into account. In case a flow is not
 yet published, it is published after executing the run (requires
@@ -139,6 +139,10 @@ internet connection.</p>
 </dd>
 <dt><strong>seed: int</strong></dt>
 <dd><p class="first last">Models that are not seeded will get this seed.</p>
+</dd>
+<dt><strong>add_local_measures</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">Determines whether to calculate a set of evaluation measures locally,
+to later verify server behaviour. Defaults to True</p>
 </dd>
 </dl>
 </td>
