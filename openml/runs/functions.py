@@ -391,11 +391,11 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
     # this information is multiple times overwritten, but due to the ordering
     # of tne loops, eventually it contains the information based on the full
     # dataset size
-    user_defined_measures_per_fold = collections.defaultdict(lambda: collections.defaultdict(dict))
+    user_defined_measures_per_fold = dict()
     # stores sample-based evaluation measures (sublevel of fold-based)
     # will also be filled on a non sample-based task, but the information
     # is the same as the fold-based measures, and disregarded in that case
-    user_defined_measures_per_sample = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(dict)))
+    user_defined_measures_per_sample = dict()
 
     # sys.version_info returns a tuple, the following line compares the entry of tuples
     # https://docs.python.org/3.6/reference/expressions.html#value-comparisons
@@ -417,6 +417,18 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
                 arff_tracecontent.extend(arff_tracecontent_fold)
 
                 for measure in user_defined_measures_fold:
+                    # instantiate the dicts. Can not use default dicts, due to pickle
+                    if measure not in user_defined_measures_per_fold:
+                        user_defined_measures_per_fold[measure] = dict()
+                    if measure not in user_defined_measures_per_sample:
+                        user_defined_measures_per_sample[measure] = dict()
+                    if rep_no not in user_defined_measures_per_fold[measure]:
+                        user_defined_measures_per_fold[measure][rep_no] = dict()
+                    if rep_no not in user_defined_measures_per_sample[measure]:
+                        user_defined_measures_per_sample[measure][rep_no] = dict()
+                    if fold_no not in user_defined_measures_per_sample[measure][rep_no]:
+                        user_defined_measures_per_sample[measure][rep_no][fold_no] = dict()
+
                     user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[measure]
                     user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = user_defined_measures_fold[measure]
 

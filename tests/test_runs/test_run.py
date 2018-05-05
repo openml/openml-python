@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import os
+import unittest
 from time import time
 
 from sklearn.tree import DecisionTreeClassifier
@@ -91,10 +92,12 @@ class TestRun(TestBase):
         np.testing.assert_array_equal(string_part, string_part_prime)
 
         if run.trace_content is not None:
-            numeric_part = np.array(np.array(run.trace_content)[:, 0:-2], dtype=float)
-            numeric_part_prime = np.array(np.array(run_prime.trace_content)[:, 0:-2], dtype=float)
-            string_part = np.array(run.trace_content)[:, -2:]
-            string_part_prime = np.array(run_prime.trace_content)[:, -2:]
+            # 0 - 4 is the range of numeric part (repeat, fold, iteration, score)
+            # the rest is boolean selected and hyperparameters
+            numeric_part = np.array(np.array(run.trace_content)[:, 0:4], dtype=float)
+            numeric_part_prime = np.array(np.array(run_prime.trace_content)[:, 0:4], dtype=float)
+            string_part = np.array(run.trace_content)[:, 4:]
+            string_part_prime = np.array(run_prime.trace_content)[:, 4:]
             # JvR: Python 2.7 requires an almost equal check, rather than an equals check
             np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
             np.testing.assert_array_equal(string_part, string_part_prime)
@@ -114,7 +117,8 @@ class TestRun(TestBase):
         run_prime.publish()
 
     def test_to_from_filesystem_search(self):
-        model = GridSearchCV(estimator=DecisionTreeClassifier(), param_grid={"max_depth": [1, 2, 3, 4, 5]})
+        model = GridSearchCV(estimator=DecisionTreeClassifier(),
+                             param_grid={'max_depth': [1, 2, 3], 'criterion': ['gini', 'entropy']})
 
         task = openml.tasks.get_task(119)
         run = openml.runs.run_model_on_task(task, model, add_local_measures=False)
