@@ -96,7 +96,7 @@ class OpenMLRun(object):
         if not os.path.isfile(model_path):
             raise ValueError('Could not find model.pkl')
 
-        with open(run_path, 'r') as fp:
+        with open(run_path, 'rb') as fp:
             run = pickle.load(fp)
         if not isinstance(run, OpenMLRun):
             raise ValueError('obtained run not instance of OpenMLRun')
