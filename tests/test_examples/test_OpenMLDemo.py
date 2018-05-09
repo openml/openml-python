@@ -53,5 +53,6 @@ class OpenMLDemoTest(TestBase):
                 with open(notebook_filename_out, mode='wt') as f:
                     nbformat.write(nb, f)
 
-    def test_tutorial(self):
+    def test_tutorials(self):
         self._test_notebook('OpenML_Tutorial.ipynb')
+        self._test_notebook('Dataset_import.ipynb')

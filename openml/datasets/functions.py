@@ -328,6 +328,33 @@ def get_dataset(dataset_id):
     return dataset
 
 
+def upload_dataset(dataset_description, file):
+    """Upload a dataset to OpenMl.
+
+    This function uploads a dataset to the OpenMl server.
+    It returns an id if the dataset uploads successfully.
+
+    Parameters
+    ----------
+    dataset_description : OpenMLDataset
+        OpenMLDataset which contains the description of the dataset.
+    file : str
+        String representation of an ARFF object.
+
+    Returns
+    -------
+    int
+        Id of the uploaded dataset.
+
+    """
+
+    file_elements = {'description': dataset_description._to_xml(), 'dataset': file}
+    return_value = _perform_api_call("data/", file_elements=file_elements)
+    dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])
+
+    return dataset_id
+
+
 def _get_dataset_description(did_cache_dir, dataset_id):
     """Get the dataset description as xml dictionary.
 
@@ -561,11 +588,11 @@ def _create_dataset_from_description(description, features, qualities, arff_file
         Dataset object from dict and arff.
     """
     dataset = OpenMLDataset(
-        description["oml:id"],
         description["oml:name"],
-        description["oml:version"],
         description.get("oml:description"),
         description["oml:format"],
+        description["oml:id"],
+        description["oml:version"],
         description.get("oml:creator"),
         description.get("oml:contributor"),
         description.get("oml:collection_date"),
