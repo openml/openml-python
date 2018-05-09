@@ -527,10 +527,13 @@ class TestRun(TestBase):
             flow = openml.flows.sklearn_to_flow(clf)
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
             self.assertIsInstance(flow_exists, int)
+            self.assertGreater(flow_exists, 0)
             downloaded_flow = openml.flows.get_flow(flow_exists)
             setup_exists = openml.setups.setup_exists(downloaded_flow)
             self.assertIsInstance(setup_exists, int)
+            self.assertGreater(setup_exists, 0)
             run_ids = _run_exists(task.task_id, setup_exists)
+            self.assertGreater(len(run_ids), 0)
             run_id = random.choice(list(run_ids))
 
         # now the actual unit test ...
@@ -726,7 +729,7 @@ class TestRun(TestBase):
         num_repeats = 1
 
         clf = SGDClassifier(loss='log', random_state=1)
-        res = openml.runs.functions._run_task_get_arffcontent(clf, task)
+        res = openml.runs.functions._run_task_get_arffcontent(clf, task, add_local_measures=True)
         arff_datacontent, arff_tracecontent, _, fold_evaluations, sample_evaluations = res
         # predictions
         self.assertIsInstance(arff_datacontent, list)
@@ -762,7 +765,9 @@ class TestRun(TestBase):
 
         clf = SGDClassifier(loss='log', random_state=1)
         can_measure_runtime = sys.version_info[:2] >= (3, 3)
-        res = openml.runs.functions._run_model_on_fold(clf, task, 0, 0, 0, can_measure_runtime)
+        res = openml.runs.functions._run_model_on_fold(clf, task, 0, 0, 0,
+                                                       can_measure_runtime=can_measure_runtime,
+                                                       add_local_measures=True)
 
         arff_datacontent, arff_tracecontent, user_defined_measures, model = res
         # predictions
@@ -834,7 +839,7 @@ class TestRun(TestBase):
             self._check_run(runs[rid])
 
     def test_list_runs_empty(self):
-        runs = openml.runs.list_runs(task=[-1])
+        runs = openml.runs.list_runs(task=[0])
         if len(runs) > 0:
             raise ValueError('UnitTest Outdated, got somehow results')
 
@@ -955,7 +960,7 @@ class TestRun(TestBase):
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task)
+        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task, add_local_measures=True)
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)
@@ -976,8 +981,8 @@ class TestRun(TestBase):
                 ('imputer', sklearn.preprocessing.Imputer()), ('estimator', HardNaiveBayes())
             ])
 
-            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task)
-            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task)
+            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task, add_local_measures=True)
+            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task, add_local_measures=True)
 
             # verifies last two arff indices (predict and correct)
             # TODO: programmatically check wether these are indeed features (predict, correct)
@@ -987,10 +992,10 @@ class TestRun(TestBase):
             np.testing.assert_array_equal(predictionsA, predictionsB)
 
     def test_get_cached_run(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.config.cache_directory = self.static_cache_dir
         openml.runs.functions._get_cached_run(1)
 
     def test_get_uncached_run(self):
-        openml.config.set_cache_directory(self.static_cache_dir)
+        openml.config.cache_directory = self.static_cache_dir
         with self.assertRaises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)

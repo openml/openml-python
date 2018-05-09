@@ -2,26 +2,25 @@ from collections import OrderedDict
 import io
 import re
 import os
-import shutil
 
 from oslo_concurrency import lockutils
 import xmltodict
 
-from ..exceptions import OpenMLCacheException, OpenMLServerNoResult
+from ..exceptions import OpenMLCacheException
 from ..datasets import get_dataset
-from .task import OpenMLTask, _create_task_cache_dir
-from .. import config
-from .._api_calls import _perform_api_call
+from .task import OpenMLTask
 import openml.utils
+import openml._api_calls
+
+TASKS_CACHE_DIR_NAME = 'tasks'
+
 
 def _get_cached_tasks():
     tasks = OrderedDict()
-    cache_dir = config.get_cache_directory()
 
-    task_cache_dir = os.path.join(cache_dir, "tasks")
+    task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
     directory_content = os.listdir(task_cache_dir)
     directory_content.sort()
-
     # Find all dataset ids for which we have downloaded the dataset
     # description
 
@@ -36,15 +35,19 @@ def _get_cached_tasks():
 
 
 def _get_cached_task(tid):
-    cache_dir = config.get_cache_directory()
-    task_cache_dir = os.path.join(cache_dir, "tasks")
-    task_file = os.path.join(task_cache_dir, str(tid), "task.xml")
+
+    tid_cache_dir = openml.utils._create_cache_directory_for_id(
+        TASKS_CACHE_DIR_NAME,
+        tid
+    )
+    task_file = os.path.join(tid_cache_dir, "task.xml")
 
     try:
         with io.open(task_file, encoding='utf8') as fh:
             task = _create_task_from_xml(xml=fh.read())
         return task
     except (OSError, IOError):
+        openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
         raise OpenMLCacheException("Task file for tid %d not "
                                    "cached" % tid)
 
@@ -60,7 +63,7 @@ def _get_estimation_procedure_list():
         name, type, repeats, folds, stratified.
     """
 
-    xml_string = _perform_api_call("estimationprocedure/list")
+    xml_string = openml._api_calls._perform_api_call("estimationprocedure/list")
     procs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
     if 'oml:estimationprocedures' not in procs_dict:
@@ -129,7 +132,7 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
         task id, dataset id, task_type and status. If qualities are calculated
         for the associated dataset, some of these are also returned.
     """
-    return openml.utils.list_all(_list_tasks, task_type_id=task_type_id, offset=offset, size=size, tag=tag, **kwargs)
+    return openml.utils._list_all(_list_tasks, task_type_id=task_type_id, offset=offset, size=size, tag=tag, **kwargs)
 
 
 def _list_tasks(task_type_id=None, **kwargs):
@@ -175,7 +178,7 @@ def _list_tasks(task_type_id=None, **kwargs):
 
 def __list_tasks(api_call):
 
-    xml_string = _perform_api_call(api_call)
+    xml_string = openml._api_calls._perform_api_call(api_call)
     tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task', 'oml:input'))
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:
@@ -275,11 +278,13 @@ def get_task(task_id):
         raise ValueError("Task ID is neither an Integer nor can be "
                          "cast to an Integer.")
 
-    tid_cache_dir = _create_task_cache_dir(task_id)
+    tid_cache_dir = openml.utils._create_cache_directory_for_id(
+        TASKS_CACHE_DIR_NAME, task_id,
+    )
 
     with lockutils.external_lock(
             name='task.functions.get_task:%d' % task_id,
-            lock_path=os.path.join(config.get_cache_directory(), 'locks'),
+            lock_path=openml.utils._create_lockfiles_dir(),
     ):
         try:
             task = _get_task_description(task_id)
@@ -287,9 +292,8 @@ def get_task(task_id):
             class_labels = dataset.retrieve_class_labels(task.target_name)
             task.class_labels = class_labels
             task.download_split()
-
         except Exception as e:
-            _remove_task_cache_dir(tid_cache_dir)
+            openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
             raise e
 
     return task
@@ -300,61 +304,17 @@ def _get_task_description(task_id):
     try:
         return _get_cached_task(task_id)
     except OpenMLCacheException:
-        xml_file = os.path.join(_create_task_cache_dir(task_id), "task.xml")
-        task_xml = _perform_api_call("task/%d" % task_id)
+        xml_file = os.path.join(
+            openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id),
+            "task.xml",
+        )
+        task_xml = openml._api_calls._perform_api_call("task/%d" % task_id)
 
         with io.open(xml_file, "w", encoding='utf8') as fh:
             fh.write(task_xml)
         task = _create_task_from_xml(task_xml)
 
     return task
-
-
-def _create_task_cache_directory(task_id):
-    """Create a task cache directory
-
-    In order to have a clearer cache structure and because every task
-    is cached in several files (description, split), there
-    is a directory for each task witch the task ID being the directory
-    name. This function creates this cache directory.
-
-    This function is NOT thread/multiprocessing safe.
-
-    Parameters
-    ----------
-    tid : int
-        Task ID
-
-    Returns
-    -------
-    str
-        Path of the created dataset cache directory.
-    """
-    task_cache_dir = os.path.join(
-        config.get_cache_directory(), "tasks", str(task_id)
-    )
-    if os.path.exists(task_cache_dir) and os.path.isdir(task_cache_dir):
-        pass
-    elif os.path.exists(task_cache_dir) and not os.path.isdir(task_cache_dir):
-        raise ValueError('Task cache dir exists but is not a directory!')
-    else:
-        os.makedirs(task_cache_dir)
-    return task_cache_dir
-
-
-def _remove_task_cache_dir(tid_cache_dir):
-    """Remove the task cache directory
-
-    This function is NOT thread/multiprocessing safe.
-
-    Parameters
-    ----------
-    """
-    try:
-        shutil.rmtree(tid_cache_dir)
-    except (OSError, IOError):
-        raise ValueError('Cannot remove faulty task cache directory %s.'
-                         'Please do this manually!' % tid_cache_dir)
 
 
 def _create_task_from_xml(xml):

@@ -1,7 +1,8 @@
-from collections import defaultdict
+import collections
 import io
 import json
 import os
+import shutil
 import sys
 import time
 import warnings
@@ -14,13 +15,13 @@ import sklearn.metrics
 
 import openml
 import openml.utils
+import openml._api_calls
 from ..exceptions import PyOpenMLError, OpenMLServerNoResult
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
     _copy_server_fields
 from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException
-from .._api_calls import _perform_api_call
 from .run import OpenMLRun, _get_version_information
 from .trace import OpenMLRunTrace, OpenMLTraceIteration
 
@@ -28,20 +29,23 @@ from .trace import OpenMLRunTrace, OpenMLTraceIteration
 # _get_version_info, _get_dict and _create_setup_string are in run.py to avoid
 # circular imports
 
+RUNS_CACHE_DIR_NAME = 'runs'
+
 
 def run_model_on_task(task, model, avoid_duplicate_runs=True, flow_tags=None,
-                      seed=None):
+                      seed=None, add_local_measures=True):
     """See ``run_flow_on_task for a documentation``."""
 
     flow = sklearn_to_flow(model)
 
     return run_flow_on_task(task=task, flow=flow,
                             avoid_duplicate_runs=avoid_duplicate_runs,
-                            flow_tags=flow_tags, seed=seed)
+                            flow_tags=flow_tags, seed=seed,
+                            add_local_measures=add_local_measures)
 
 
 def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
-                     seed=None):
+                     seed=None, add_local_measures=True):
     """Run the model provided by the flow on the dataset defined by task.
 
     Takes the flow and repeat information into account. In case a flow is not
@@ -65,6 +69,9 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
         A list of tags that the flow should have at creation.
     seed: int
         Models that are not seeded will get this seed.
+    add_local_measures : bool
+        Determines whether to calculate a set of evaluation measures locally,
+        to later verify server behaviour. Defaults to True
 
     Returns
     -------
@@ -97,7 +104,7 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
     tags = ['openml-python', run_environment[1]]
 
     # execute the run
-    res = _run_task_get_arffcontent(flow.model, task)
+    res = _run_task_get_arffcontent(flow.model, task, add_local_measures=add_local_measures)
 
     # in case the flow not exists, we will get a "False" back (which can be
     if not isinstance(flow.flow_id, int) or flow_id == False:
@@ -150,7 +157,7 @@ def get_run_trace(run_id):
      openml.runs.OpenMLTrace
     """
 
-    trace_xml = _perform_api_call('run/trace/%d' % run_id)
+    trace_xml = openml._api_calls._perform_api_call('run/trace/%d' % run_id)
     run_trace = _create_trace_from_description(trace_xml)
     return run_trace
 
@@ -228,26 +235,28 @@ def _run_exists(task_id, setup_id):
     Parameters
     ----------
     task_id: int
+
     setup_id: int
 
     Returns
     -------
-        List of run ids iff these already exists on the server, False otherwise
+        Set run ids for runs where flow setup_id was run on task_id. Empty
+        set if it wasn't run yet.
     """
     if setup_id <= 0:
         # openml setups are in range 1-inf
-        return False
+        return set()
 
     try:
         result = list_runs(task=[task_id], setup=[setup_id])
         if len(result) > 0:
             return set(result.keys())
         else:
-            return False
+            return set()
     except OpenMLServerException as exception:
         # error code 512 implies no results. This means the run does not exist yet
         assert(exception.code == 512)
-        return False
+        return set()
 
 
 def _get_seeded_model(model, seed=None):
@@ -363,7 +372,7 @@ def _prediction_to_row(rep_no, fold_no, sample_no, row_id, correct_label,
     return arff_line
 
 
-def _run_task_get_arffcontent(model, task):
+def _run_task_get_arffcontent(model, task, add_local_measures):
 
     def _prediction_to_probabilities(y, model_classes):
         # y: list or numpy array of predictions
@@ -382,11 +391,11 @@ def _run_task_get_arffcontent(model, task):
     # this information is multiple times overwritten, but due to the ordering
     # of tne loops, eventually it contains the information based on the full
     # dataset size
-    user_defined_measures_per_fold = defaultdict(lambda: defaultdict(dict))
+    user_defined_measures_per_fold = collections.defaultdict(lambda: collections.defaultdict(dict))
     # stores sample-based evaluation measures (sublevel of fold-based)
     # will also be filled on a non sample-based task, but the information
     # is the same as the fold-based measures, and disregarded in that case
-    user_defined_measures_per_sample = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
+    user_defined_measures_per_sample = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(dict)))
 
     # sys.version_info returns a tuple, the following line compares the entry of tuples
     # https://docs.python.org/3.6/reference/expressions.html#value-comparisons
@@ -399,7 +408,9 @@ def _run_task_get_arffcontent(model, task):
         for fold_no in range(num_folds):
             for sample_no in range(num_samples):
                 model_fold = sklearn.base.clone(model, safe=True)
-                res =_run_model_on_fold(model_fold, task, rep_no, fold_no, sample_no, can_measure_runtime)
+                res = _run_model_on_fold(model_fold, task, rep_no, fold_no, sample_no,
+                                         can_measure_runtime=can_measure_runtime,
+                                         add_local_measures=add_local_measures)
                 arff_datacontent_fold, arff_tracecontent_fold, user_defined_measures_fold, model_fold = res
 
                 arff_datacontent.extend(arff_datacontent_fold)
@@ -425,7 +436,7 @@ def _run_task_get_arffcontent(model, task):
            user_defined_measures_per_sample
 
 
-def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runtime):
+def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runtime, add_local_measures):
     """Internal function that executes a model on a fold (and possibly
        subsample) of the dataset. It returns the data that is necessary
        to construct the OpenML Run object (potentially over more than
@@ -450,6 +461,9 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
         can_measure_runtime : bool
             Wether we are allowed to measure runtime (requires: Single node
             computation and Python >= 3.3)
+        add_local_measures : bool
+            Determines whether to calculate a set of measures (i.e., predictive
+            accuracy) locally, to later verify server behaviour
 
         Returns
         -------
@@ -542,7 +556,8 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
     def _calculate_local_measure(sklearn_fn, openml_name):
         user_defined_measures[openml_name] = sklearn_fn(testY, PredY)
 
-    _calculate_local_measure(sklearn.metrics.accuracy_score, 'predictive_accuracy')
+    if add_local_measures:
+        _calculate_local_measure(sklearn.metrics.accuracy_score, 'predictive_accuracy')
 
     arff_datacontent = []
     for i in range(0, len(test_indices)):
@@ -643,7 +658,7 @@ def get_run(run_id):
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    run_dir = os.path.join(config.get_cache_directory(), "runs", str(run_id))
+    run_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id)
     run_file = os.path.join(run_dir, "description.xml")
 
     if not os.path.exists(run_dir):
@@ -653,7 +668,7 @@ def get_run(run_id):
         return _get_cached_run(run_id)
 
     except (OpenMLCacheException):
-        run_xml = _perform_api_call("run/%d" % run_id)
+        run_xml = openml._api_calls._perform_api_call("run/%d" % run_id)
         with io.open(run_file, "w", encoding='utf8') as fh:
             fh.write(run_xml)
 
@@ -689,7 +704,7 @@ def _create_run_from_xml(xml, from_server=True):
         else:
             raise AttributeError('Run XML does not contain required (server) field: ', fieldname)
 
-    run = xmltodict.parse(xml, force_list=['oml:file', 'oml:evaluation'])["oml:run"]
+    run = xmltodict.parse(xml, force_list=['oml:file', 'oml:evaluation', 'oml:parameter_setting'])["oml:run"]
     run_id = obtain_field(run, 'oml:run_id', from_server, cast=int)
     uploader = obtain_field(run, 'oml:uploader', from_server, cast=int)
     uploader_name = obtain_field(run, 'oml:uploader_name', from_server)
@@ -707,13 +722,16 @@ def _create_run_from_xml(xml, from_server=True):
     setup_id = obtain_field(run, 'oml:setup_id', from_server, cast=int)
     setup_string = obtain_field(run, 'oml:setup_string', from_server)
 
-    parameters = dict()
-    if 'oml:parameter_settings' in run:
-        parameter_settings = run['oml:parameter_settings']
-        for parameter_dict in parameter_settings:
-            key = parameter_dict['oml:name']
-            value = parameter_dict['oml:value']
-            parameters[key] = value
+    parameters = []
+    if 'oml:parameter_setting' in run:
+        obtained_parameter_settings = run['oml:parameter_setting']
+        for parameter_dict in obtained_parameter_settings:
+            current_parameter = collections.OrderedDict()
+            current_parameter['oml:name'] = parameter_dict['oml:name']
+            current_parameter['oml:value'] = parameter_dict['oml:value']
+            if 'oml:component' in parameter_dict:
+                current_parameter['oml:component'] = parameter_dict['oml:component']
+            parameters.append(current_parameter)
 
     if 'oml:input_data' in run:
         dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
@@ -722,10 +740,11 @@ def _create_run_from_xml(xml, from_server=True):
 
     files = dict()
     evaluations = dict()
-    fold_evaluations = defaultdict(lambda: defaultdict(dict))
-    sample_evaluations = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
+    fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+    sample_evaluations = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(dict)))
     if 'oml:output_data' not in run:
-        raise ValueError('Run does not contain output_data (OpenML server error?)')
+        if from_server:
+            raise ValueError('Run does not contain output_data (OpenML server error?)')
     else:
         output_data = run['oml:output_data']
         if 'oml:file' in output_data:
@@ -878,8 +897,9 @@ def _create_trace_from_arff(arff_obj):
 
 def _get_cached_run(run_id):
     """Load a run from the cache."""
-    cache_dir = config.get_cache_directory()
-    run_cache_dir = os.path.join(cache_dir, "runs", str(run_id))
+    run_cache_dir = openml.utils._create_cache_directory_for_id(
+        RUNS_CACHE_DIR_NAME, run_id,
+    )
     try:
         run_file = os.path.join(run_cache_dir, "description.xml")
         with io.open(run_file, encoding='utf8') as fh:
@@ -930,8 +950,8 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         List of found runs.
     """
 
-    return openml.utils.list_all(_list_runs, offset=offset, size=size, id=id, task=task, setup=setup,
-                                 flow=flow, uploader=uploader, tag=tag, display_errors=display_errors, **kwargs)
+    return openml.utils._list_all(_list_runs, offset=offset, size=size, id=id, task=task, setup=setup,
+                                  flow=flow, uploader=uploader, tag=tag, display_errors=display_errors, **kwargs)
 
 
 def _list_runs(id=None, task=None, setup=None,
@@ -992,7 +1012,7 @@ def _list_runs(id=None, task=None, setup=None,
 
 def __list_runs(api_call):
     """Helper function to parse API calls which are lists of runs"""
-    xml_string = _perform_api_call(api_call)
+    xml_string = openml._api_calls._perform_api_call(api_call)
     runs_dict = xmltodict.parse(xml_string, force_list=('oml:run',))
     # Minimalistic check if the XML is useful
     if 'oml:runs' not in runs_dict:

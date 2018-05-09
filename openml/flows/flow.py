@@ -3,7 +3,7 @@ from collections import OrderedDict
 import six
 import xmltodict
 
-from .._api_calls import _perform_api_call
+import openml._api_calls
 from ..utils import extract_xml_tags
 
 
@@ -341,7 +341,10 @@ class OpenMLFlow(object):
         xml_description = self._to_xml()
 
         file_elements = {'description': xml_description}
-        return_value = _perform_api_call("flow/", file_elements=file_elements)
+        return_value = openml._api_calls._perform_api_call(
+            "flow/",
+            file_elements=file_elements,
+        )
         flow_id = int(xmltodict.parse(return_value)['oml:upload_flow']['oml:id'])
         flow = openml.flows.functions.get_flow(flow_id)
         _copy_server_fields(flow, self)
@@ -364,7 +367,7 @@ class OpenMLFlow(object):
             Tag to attach to the flow.
         """
         data = {'flow_id': self.flow_id, 'tag': tag}
-        _perform_api_call("/flow/tag", data=data)
+        openml._api_calls._perform_api_call("/flow/tag", data=data)
 
     def remove_tag(self, tag):
         """Removes a tag from this flow on the server.
@@ -375,7 +378,7 @@ class OpenMLFlow(object):
             Tag to attach to the flow.
         """
         data = {'flow_id': self.flow_id, 'tag': tag}
-        _perform_api_call("/flow/untag", data=data)
+        openml._api_calls._perform_api_call("/flow/untag", data=data)
 
 
 def _copy_server_fields(source_flow, target_flow):

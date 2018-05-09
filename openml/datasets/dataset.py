@@ -14,7 +14,7 @@ import xmltodict
 
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
-from .._api_calls import _perform_api_call
+import openml._api_calls
 
 logger = logging.getLogger(__name__)
 
@@ -191,7 +191,7 @@ class OpenMLDataset(object):
             Tag to attach to the dataset.
         """
         data = {'data_id': self.dataset_id, 'tag': tag}
-        _perform_api_call("/data/tag", data=data)
+        openml._api_calls._perform_api_call("/data/tag", data=data)
 
     def remove_tag(self, tag):
         """Removes a tag from this dataset on the server.
@@ -202,7 +202,7 @@ class OpenMLDataset(object):
             Tag to attach to the dataset.
         """
         data = {'data_id': self.dataset_id, 'tag': tag}
-        _perform_api_call("/data/untag", data=data)
+        openml._api_calls._perform_api_call("/data/untag", data=data)
 
     def __eq__(self, other):
         if type(other) != OpenMLDataset:
@@ -487,8 +487,11 @@ class OpenMLDataset(object):
         if self.data_file is not None:
             file_dictionary['dataset'] = self.data_file
 
-        return_value = _perform_api_call("data/", file_dictionary=file_dictionary,
-                                         file_elements=file_elements)
+        return_value = openml._api_calls._perform_api_call(
+            "/data/",
+            file_dictionary=file_dictionary,
+            file_elements=file_elements,
+        )
         self.dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])
         return self
 

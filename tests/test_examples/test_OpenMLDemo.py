@@ -2,11 +2,23 @@ import os
 import shutil
 import sys
 
+import matplotlib
+matplotlib.use('AGG')
 import nbformat
-from nbconvert.preprocessors import ExecutePreprocessor
-from nbconvert.preprocessors.execute import CellExecutionError
+from nbconvert.exporters import export
+from nbconvert.exporters.python import PythonExporter
+import six
 
+if six.PY2:
+    import mock
+else:
+    import unittest.mock as mock
+
+import openml._api_calls
+import openml.config
 from openml.testing import TestBase
+
+_perform_api_call = openml._api_calls._perform_api_call
 
 
 class OpenMLDemoTest(TestBase):
@@ -29,30 +41,39 @@ class OpenMLDemoTest(TestBase):
         except:
             pass
 
-    def _test_notebook(self, notebook_name):
+    def _tst_notebook(self, notebook_name):
 
         notebook_filename = os.path.abspath(os.path.join(
             self.this_file_directory, '..', '..', 'examples', notebook_name))
-        notebook_filename_out = os.path.join(
-            self.notebook_output_directory, notebook_name)
 
         with open(notebook_filename) as f:
             nb = nbformat.read(f, as_version=4)
-            nb.metadata.get('kernelspec', {})['name'] = self.kernel_name
-            ep = ExecutePreprocessor(kernel_name=self.kernel_name)
-            ep.timeout = 60
 
-            try:
-                ep.preprocess(nb, {'metadata': {'path': self.this_file_directory}})
-            except CellExecutionError as e:
-                msg = 'Error executing the notebook "%s". ' % notebook_filename
-                msg += 'See notebook "%s" for the traceback.\n\n' % notebook_filename_out
-                msg += e.traceback
-                self.fail(msg)
-            finally:
-                with open(notebook_filename_out, mode='wt') as f:
-                    nbformat.write(nb, f)
+        python_nb, metadata = export(PythonExporter, nb)
 
-    def test_tutorials(self):
-        self._test_notebook('OpenML_Tutorial.ipynb')
-        self._test_notebook('Dataset_import.ipynb')
+        # Remove magic lines manually
+        python_nb = '\n'.join([
+            line for line in python_nb.split('\n')
+            if 'get_ipython().run_line_magic(' not in line
+        ])
+
+        exec(python_nb)
+
+    @mock.patch('openml._api_calls._perform_api_call')
+    def test_tutorial(self, patch):
+        def side_effect(*args, **kwargs):
+            if (
+                args[0].endswith('/run/')
+                and kwargs['file_elements'] is not None
+            ):
+                return """<oml:upload_run>
+    <oml:run_id>1</oml:run_id>
+</oml:upload_run>
+                """
+            else:
+                return _perform_api_call(*args, **kwargs)
+        patch.side_effect = side_effect
+
+        openml.config.server = self.production_server
+        self._tst_notebook('OpenML_Tutorial.ipynb')
+        self.assertGreater(patch.call_count, 100)

@@ -25,6 +25,10 @@ class OpenMLServerException(OpenMLServerError):
         self.url = url
         super(OpenMLServerException, self).__init__(message)
 
+    def __str__(self):
+        return '%s returned code %s: %s' % (
+            self.url, self.code, self.message,
+        )
 
 class OpenMLServerNoResult(OpenMLServerException):
     """exception for when the result of the server is empty. """
@@ -40,3 +44,9 @@ class OpenMLCacheException(PyOpenMLError):
 class OpenMLHashException(PyOpenMLError):
     """Locally computed hash is different than hash announced by the server."""
     pass
+
+
+class PrivateDatasetError(PyOpenMLError):
+    "Exception thrown when the user has no rights to access the dataset"
+    def __init__(self, message):
+        super(PrivateDatasetError, self).__init__(message)
