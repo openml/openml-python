@@ -373,7 +373,7 @@ def upload_dataset(dataset_description, file):
     """
 
     file_elements = {'description': dataset_description._to_xml(), 'dataset': file}
-    return_value = _perform_api_call("data/", file_elements=file_elements)
+    return_value = openml._api_calls._perform_api_call("data/", file_elements=file_elements)
     dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])
 
     return dataset_id
