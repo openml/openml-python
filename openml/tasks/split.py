@@ -125,11 +125,12 @@ class OpenMLSplit(object):
                             np.array(repetitions[repetition][fold][sample][0], dtype=np.int32),
                             np.array(repetitions[repetition][fold][sample][1], dtype=np.int32))
 
+            '''
             if cache:
                 with open(pkl_filename, "wb") as fh:
                     pickle.dump({"name": name, "repetitions": repetitions}, fh,
                                 protocol=2)
-
+            '''
         return cls(name, '', repetitions)
 
     def from_dataset(self, X, Y, folds, repeats):
