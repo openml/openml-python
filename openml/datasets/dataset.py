@@ -520,13 +520,8 @@ class OpenMLDataset(object):
         for prop in props:
             content = getattr(self, prop, None)
             if content is not None:
-                #if isinstance(content, (list,set)):
-                #    for item in content:
-                #        xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, item)
-                #else:
-                #    xml_dataset += "<oml:{0}>{1}</oml:{0}>\n".format(prop, content)
                 data_dict["oml:" + prop] = content
-        #xml_dataset += "</oml:data_set_description>"
+
         xml_string = xmltodict.unparse(
             input_dict=data_container,
             pretty=True,

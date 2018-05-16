@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import six
+import arff
 
 from oslo_concurrency import lockutils
 import xmltodict
@@ -352,8 +353,8 @@ def get_dataset(dataset_id):
     return dataset
 
 
-def upload_dataset(dataset_description, file):
-    """Upload a dataset to OpenMl.
+def upload_dataset(dataset_description, data, attributes):
+    """Upload a dataset to OpenML.
 
     This function uploads a dataset to the OpenMl server.
     It returns an id if the dataset uploads successfully.
@@ -362,8 +363,11 @@ def upload_dataset(dataset_description, file):
     ----------
     dataset_description : OpenMLDataset
         OpenMLDataset which contains the description of the dataset.
-    file : str
-        String representation of an ARFF object.
+    data : numpy.matrix
+        A matrix that contains both the attributes and targets.
+        The target feature is indicated as meta-data of the dataset.
+    attributes: list
+        A list of tuples. Each tuple consists of the attribute name and type.
 
     Returns
     -------
@@ -372,7 +376,15 @@ def upload_dataset(dataset_description, file):
 
     """
 
-    file_elements = {'description': dataset_description._to_xml(), 'dataset': file}
+    arff_object = {
+        'relation': dataset_description.name,
+        'description': dataset_description.description,
+        'attributes': attributes,
+        'data': data
+    }
+
+    arff_dataset = arff.dumps(arff_object)
+    file_elements = {'description': dataset_description._to_xml(), 'dataset': arff_dataset}
     return_value = openml._api_calls._perform_api_call("data/", file_elements=file_elements)
     dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])
 
