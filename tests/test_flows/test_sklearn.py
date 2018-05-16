@@ -604,7 +604,7 @@ class TestSklearn(unittest.TestCase):
                   " n_components=None, random_state=None,\n"  \
                   "  svd_solver='auto', tol=0.0, whiten=False\)\), " \
                   "\('fs', SelectKBest\(k=10, score_func=<function " \
-                  "f_classif at 0x[a-z0-9]+>\)\)\),\n" \
+                  "f_classif at 0x[a-fA-F0-9]+>\)\)\),\n" \
                   "       transformer_weights=None\)\), \('pca2', " \
                   "PCA\(copy=True, iterated_power='auto'," \
                   " n_components=None, random_state=None,\n" \

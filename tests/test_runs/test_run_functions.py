@@ -1,6 +1,7 @@
 import arff
 import collections
 import json
+import os
 import random
 import time
 import sys
@@ -240,7 +241,11 @@ class TestRun(TestBase):
                         for sample in range(num_sample_entrees):
                             evaluation = sample_evaluations[measure][rep][fold][sample]
                             self.assertIsInstance(evaluation, float)
-                            self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
+                            if not os.environ.get('CI_WINDOWS'):
+                                # Either Appveyor is much faster than Travis
+                                # and/or measurements are not as accurate.
+                                # Either way, windows seems to get an eval-time of 0 sometimes.
+                                self.assertGreater(evaluation, 0)
                             self.assertLess(evaluation, max_time_allowed)
 
     def test_run_regression_on_classif_task(self):
