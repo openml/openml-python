@@ -72,14 +72,10 @@ class OpenMLSplit(object):
             pkl_filename = filename.replace(".arff", ".pkl.py3")
 
         if os.path.exists(pkl_filename):
-            try:
-                with open(pkl_filename, "rb") as fh:
-                    _ = pickle.load(fh)
-                repetitions = _["repetitions"]
-                name = _["name"]
-            except UnicodeDecodeError as e:
-                # Possibly pickle file was created with python2 and python3 is being used to load the data.
-                raise e
+            with open(pkl_filename, "rb") as fh:
+                _ = pickle.load(fh)
+            repetitions = _["repetitions"]
+            name = _["name"]
 
         # Cache miss
         if repetitions is None:
