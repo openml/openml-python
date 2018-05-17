@@ -62,7 +62,7 @@ class OpenMLSplit(object):
         return True
 
     @classmethod
-    def _from_arff_file(cls, filename, cache=True):
+    def _from_arff_file(cls, filename):
 
         repetitions = None
 
@@ -71,16 +71,15 @@ class OpenMLSplit(object):
         else:
             pkl_filename = filename.replace(".arff", ".pkl.py3")
 
-        if cache:
-            if os.path.exists(pkl_filename):
-                try:
-                    with open(pkl_filename, "rb") as fh:
-                        _ = pickle.load(fh)
-                    repetitions = _["repetitions"]
-                    name = _["name"]
-                except UnicodeDecodeError as e:
-                    # Possibly pickle file was created with python2 and python3 is being used to load the data.
-                    raise e
+        if os.path.exists(pkl_filename):
+            try:
+                with open(pkl_filename, "rb") as fh:
+                    _ = pickle.load(fh)
+                repetitions = _["repetitions"]
+                name = _["name"]
+            except UnicodeDecodeError as e:
+                # Possibly pickle file was created with python2 and python3 is being used to load the data.
+                raise e
 
         # Cache miss
         if repetitions is None:
