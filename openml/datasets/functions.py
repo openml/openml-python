@@ -353,7 +353,107 @@ def get_dataset(dataset_id):
     return dataset
 
 
-def upload_dataset(dataset_description, data, attributes):
+def create_dataset_description(name, description, creator, contributor, collection_date,
+                               language, licence, default_target_attribute, row_id_attribute,
+                               ignore_attribute, citation, format="arff", version_label=None,
+                               original_data_url=None, paper_url=None, update_comment=None):
+    """Create a dataset description.
+
+    This function creates an OpenMLDataset object.
+    The OpenMLDataset object can be used to generate a xml
+    dataset description.
+
+    Parameters
+    ----------
+    name : str
+        Name of the dataset.
+    description : str
+        Description of the dataset.
+    creator : str
+        The person who created the dataset.
+    contributor : str
+        People who contributed to the current version of the dataset.
+    collection_date : str
+        The date the data was originally collected, given by the uploader.
+    language : str
+        Language in which the data is represented.
+        Starts with 1 upper case letter, rest lower case, e.g. 'English'.
+    licence : str
+        License of the data.
+    default_target_attribute : str
+        The default target attribute, if it exists. Can have multiple values, comma separated.
+    row_id_attribute : str
+        The attribute that represents the row-id column, if present in the dataset.
+    ignore_attribute : str | list
+        Attributes that should be excluded in modelling, such as identifiers and indexes.
+    citation : str
+        Reference(s) that should be cited when building on this data.
+    format : str, optional
+        Format of the dataset. Only 'arff' for now.
+    version_label : str, optional
+        Version label provided by user, can be a date, hash, or some other type of id.
+    original_data_url : str, optional
+        For derived data, the url to the original dataset.
+    paper_url : str, optional
+        Link to a paper describing the dataset.
+    update_comment : str, optional
+        An explanation for when the dataset is uploaded.
+
+    Returns
+    -------
+    class:`openml.OpenMLDataset
+        Dataset description.`
+    """
+    return OpenMLDataset(name, description, format, creator=creator,
+                         contributor=contributor, collection_date=collection_date,
+                         language=language, licence=licence, default_target_attribute=default_target_attribute,
+                         row_id_attribute=row_id_attribute, ignore_attribute=ignore_attribute, citation=citation,
+                         version_label=version_label, original_data_url=original_data_url, paper_url=paper_url,
+                         update_comment=update_comment)
+
+
+def create_dataset_arff(relation, description, attributes, data):
+    """Creates an arff dataset string representation.
+
+    This function creates an object representing the ARFF document,
+    serializes it and  returns a string.
+
+    Parameters
+    ----------
+    relation: string
+        Dataset name.
+    description: string
+        Dataset description.
+    attributes: list
+        A list of tuples. Each tuple consists of the attribute name and type.
+    data : numpy.matrix
+        A matrix that contains both the attributes and targets.
+        The target feature is indicated as meta-data of the dataset.
+
+    Returns
+    -------
+    arff_dataset: string
+        Dataset ARFF string.
+    """
+    arff_object = {
+        'relation': relation,
+        'description': description,
+        'attributes': attributes,
+        'data': data
+    }
+
+    arff_dataset = arff.dumps(arff_object)
+    try:
+        # check if arff is valid?
+        decoder = arff.ArffDecoder()
+        decoder.decode(arff_dataset, encode_nominal=True)
+    except:
+        raise ValueError("The file you have provided is not a valid arff file")
+
+    return arff_dataset
+
+
+def upload_dataset(dataset_description, arff_dataset):
     """Upload a dataset to OpenML.
 
     This function uploads a dataset to the OpenMl server.
@@ -363,27 +463,15 @@ def upload_dataset(dataset_description, data, attributes):
     ----------
     dataset_description : OpenMLDataset
         OpenMLDataset which contains the description of the dataset.
-    data : numpy.matrix
-        A matrix that contains both the attributes and targets.
-        The target feature is indicated as meta-data of the dataset.
-    attributes: list
-        A list of tuples. Each tuple consists of the attribute name and type.
+    arff_dataset: string
+        Dataset ARFF string.
 
     Returns
     -------
-    int
+    dataset_id: int
         Id of the uploaded dataset.
-
     """
 
-    arff_object = {
-        'relation': dataset_description.name,
-        'description': dataset_description.description,
-        'attributes': attributes,
-        'data': data
-    }
-
-    arff_dataset = arff.dumps(arff_object)
     file_elements = {'description': dataset_description._to_xml(), 'dataset': arff_dataset}
     return_value = openml._api_calls._perform_api_call("data/", file_elements=file_elements)
     dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])

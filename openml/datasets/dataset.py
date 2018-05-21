@@ -47,7 +47,7 @@ class OpenMLDataset(object):
     language : str, optional
         Language in which the data is represented.
         Starts with 1 upper case letter, rest lower case, e.g. 'English'.
-    license : str, optional
+    licence : str, optional
         License of the data.
     url : str, optional
         Valid URL, points to actual data file, on the OpenML server or another dataset repository.
@@ -83,7 +83,6 @@ class OpenMLDataset(object):
         A dictionary of dataset features which maps a feature index to a OpenMLDataFeature.
     qualities : dict, optional
         A dictionary of dataset qualities which maps a quality name to a quality value.
-    FIXME : which of these do we actually need?
     """
     def __init__(self, name, description, format, dataset_id=None,
                  version=None, creator=None, contributor=None,
