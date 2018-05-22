@@ -496,7 +496,8 @@ class OpenMLDataset(object):
 
                 file_elements['dataset'] = open(path, 'rb')
         else:
-            raise ValueError("No path to the dataset file")
+            if self.url is None:
+                raise ValueError("No path/url to the dataset file was given")
 
         return_value = openml._api_calls._perform_api_call(
             "/data/",
