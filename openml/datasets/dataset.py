@@ -478,21 +478,32 @@ class OpenMLDataset(object):
 
         Returns
         -------
-        self
+        dataset_id: int
+            Id of the dataset uploaded to the server.
         """
         file_elements = {'description': self._to_xml()}
-        file_dictionary = {}
 
         if self.data_file is not None:
-            file_dictionary['dataset'] = self.data_file
+            path = os.path.abspath(self.data_file)
+            if os.path.exists(path):
+                try:
+                    # check if arff is valid
+                    decoder = arff.ArffDecoder()
+                    with io.open(path, encoding='utf8') as fh:
+                        decoder.decode(fh, encode_nominal=True)
+                except arff.ArffException:
+                    raise ValueError("The file you have provided is not a valid arff file")
+
+                file_elements['dataset'] = open(path, 'rb')
+        else:
+            raise ValueError("No path to the dataset file")
 
         return_value = openml._api_calls._perform_api_call(
             "/data/",
-            file_dictionary=file_dictionary,
             file_elements=file_elements,
         )
         self.dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])
-        return self
+        return self.dataset_id
 
 
     def _to_xml(self):

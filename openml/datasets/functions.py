@@ -447,8 +447,9 @@ def create_dataset_arff(relation, description, attributes, data):
         # check if arff is valid?
         decoder = arff.ArffDecoder()
         decoder.decode(arff_dataset, encode_nominal=True)
-    except:
-        raise ValueError("The file you have provided is not a valid arff file")
+    except arff.ArffException:
+        raise ValueError("The arguments you have provided \
+                         do not construct a valid arff file")
 
     return arff_dataset
 
