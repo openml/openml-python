@@ -1,11 +1,16 @@
+"""
+OpenML Run Example
+==================
+
+An example of an automated machine learning experiment using run_task
+"""
+
 from openml.apiconnector import APIConnector
 from openml.autorun import run_task
 from sklearn import ensemble
 import xmltodict
 import os
-"""
-An example of an automated machine learning experiment using run_task
-"""
+
 
 key_file_path = "apikey.txt"
 with open(key_file_path, 'r') as fh:
