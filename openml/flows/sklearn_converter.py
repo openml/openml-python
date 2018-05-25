@@ -7,6 +7,7 @@ import importlib
 import inspect
 import json
 import json.decoder
+import keras
 import re
 import six
 import warnings
@@ -187,7 +188,14 @@ def _serialize_model(model):
             sub_components_names += "," + key + "=" + sub_components[key].name
         else:
             sub_components_names += "," + sub_components[key].name
-
+    
+    # Assign layer name as Flow name for Keras model
+    if('build_fn' in parameters):
+        number_of_layer=len(parameters)-4
+        for layer_number in range(number_of_layer):
+                layer_name="layer"+str(layer_number)
+                sub_components_names += "," + json.loads(parameters[layer_name])['class_name']    
+                
     if sub_components_names:
         # slice operation on string in order to get rid of leading comma
         name = '%s(%s)' % (class_name, sub_components_names[1:])
@@ -277,6 +285,14 @@ def _extract_information_from_model(model):
     parameters_meta_info = OrderedDict()
 
     model_parameters = model.get_params(deep=False)
+    
+    #Add Keras layer as additional model parameters
+    if(isinstance(model,keras.wrappers.scikit_learn.KerasClassifier)):
+        keras_model=model.build_fn()
+        for layer_id,layer in enumerate(keras_model.get_config()):
+            layer_name="layer"+str(layer_id)
+            model_parameters[layer_name]=layer
+    
     for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
         rval = sklearn_to_flow(v, model)
 
@@ -573,9 +589,10 @@ def _check_n_jobs(model):
                 if value != 1 or disallow_parameter:
                     return False
         return True
-
     if not (isinstance(model, sklearn.base.BaseEstimator) or
-            isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
+            isinstance(model, sklearn.model_selection._search.BaseSearchCV) or
+            isinstance(model, keras.wrappers.scikit_learn.KerasClassifier)
+            ):
         raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
     # make sure that n_jobs is not in the parameter grid of optimization procedure
