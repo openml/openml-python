@@ -190,7 +190,7 @@ def list_datasets(offset=None, size=None, status=None, tag=None, **kwargs):
         these are also returned.
     """
 
-    return openml.utils.list_all(_list_datasets, offset=offset, size=size, status=status, tag=tag, **kwargs)
+    return openml.utils._list_all(_list_datasets, offset=offset, size=size, status=status, tag=tag, **kwargs)
 
 
 def _list_datasets(**kwargs):
