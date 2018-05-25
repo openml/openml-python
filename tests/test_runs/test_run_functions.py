@@ -1,6 +1,7 @@
 import arff
 import collections
 import json
+import os
 import random
 import time
 import sys
@@ -240,7 +241,11 @@ class TestRun(TestBase):
                         for sample in range(num_sample_entrees):
                             evaluation = sample_evaluations[measure][rep][fold][sample]
                             self.assertIsInstance(evaluation, float)
-                            self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
+                            if not os.environ.get('CI_WINDOWS'):
+                                # Either Appveyor is much faster than Travis
+                                # and/or measurements are not as accurate.
+                                # Either way, windows seems to get an eval-time of 0 sometimes.
+                                self.assertGreater(evaluation, 0)
                             self.assertLess(evaluation, max_time_allowed)
 
     def test_run_regression_on_classif_task(self):
@@ -729,7 +734,7 @@ class TestRun(TestBase):
         num_repeats = 1
 
         clf = SGDClassifier(loss='log', random_state=1)
-        res = openml.runs.functions._run_task_get_arffcontent(clf, task)
+        res = openml.runs.functions._run_task_get_arffcontent(clf, task, add_local_measures=True)
         arff_datacontent, arff_tracecontent, _, fold_evaluations, sample_evaluations = res
         # predictions
         self.assertIsInstance(arff_datacontent, list)
@@ -765,7 +770,9 @@ class TestRun(TestBase):
 
         clf = SGDClassifier(loss='log', random_state=1)
         can_measure_runtime = sys.version_info[:2] >= (3, 3)
-        res = openml.runs.functions._run_model_on_fold(clf, task, 0, 0, 0, can_measure_runtime)
+        res = openml.runs.functions._run_model_on_fold(clf, task, 0, 0, 0,
+                                                       can_measure_runtime=can_measure_runtime,
+                                                       add_local_measures=True)
 
         arff_datacontent, arff_tracecontent, user_defined_measures, model = res
         # predictions
@@ -837,7 +844,7 @@ class TestRun(TestBase):
             self._check_run(runs[rid])
 
     def test_list_runs_empty(self):
-        runs = openml.runs.list_runs(task=[-1])
+        runs = openml.runs.list_runs(task=[0])
         if len(runs) > 0:
             raise ValueError('UnitTest Outdated, got somehow results')
 
@@ -958,7 +965,7 @@ class TestRun(TestBase):
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task)
+        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task, add_local_measures=True)
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)
@@ -979,8 +986,8 @@ class TestRun(TestBase):
                 ('imputer', sklearn.preprocessing.Imputer()), ('estimator', HardNaiveBayes())
             ])
 
-            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task)
-            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task)
+            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task, add_local_measures=True)
+            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task, add_local_measures=True)
 
             # verifies last two arff indices (predict and correct)
             # TODO: programmatically check wether these are indeed features (predict, correct)
