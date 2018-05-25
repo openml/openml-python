@@ -23,7 +23,7 @@ from sklearn.utils.fixes import signature
 import openml
 from openml.flows import OpenMLFlow
 from openml.exceptions import PyOpenMLError
-
+from keras.wrappers.scikit_learn import KerasClassifier
 
 if sys.version_info >= (3, 5):
     from json.decoder import JSONDecodeError
