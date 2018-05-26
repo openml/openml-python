@@ -194,7 +194,7 @@ def _serialize_model(model):
         number_of_layer=len(parameters)-4
         for layer_number in range(number_of_layer):
                 layer_name="layer"+str(layer_number)
-                sub_components_names += "," + json.loads(parameters[layer_name])['class_name']    
+				sub_components_names += "," + json.loads(parameters[layer_name])['class_name']    
                 
     if sub_components_names:
         # slice operation on string in order to get rid of leading comma
@@ -289,9 +289,14 @@ def _extract_information_from_model(model):
     #Add Keras layer as additional model parameters
     if(isinstance(model,keras.wrappers.scikit_learn.KerasClassifier)):
         keras_model=model.build_fn()
-        for layer_id,layer in enumerate(keras_model.get_config()):
-            layer_name="layer"+str(layer_id)
-            model_parameters[layer_name]=layer
+        if(isinstance(keras_model,keras.models.Model)):
+            for layer_id,layer in enumerate(keras_model.get_config()['layers']):
+                layer_name="layer"+str(layer_id)
+                model_parameters[layer_name]=layer
+        elif(isinstance(keras_model,keras.models.Sequential)):
+            for layer_id,layer in enumerate(keras_model.get_config()):
+                layer_name="layer"+str(layer_id)
+                model_parameters[layer_name]=layer
     
     for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
         rval = sklearn_to_flow(v, model)
