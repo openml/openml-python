@@ -194,7 +194,7 @@ def _serialize_model(model):
         number_of_layer=len(parameters)-4
         for layer_number in range(number_of_layer):
                 layer_name="layer"+str(layer_number)
-				sub_components_names += "," + json.loads(parameters[layer_name])['class_name']    
+                sub_components_names += "," + json.loads(parameters[layer_name])['class_name']    
                 
     if sub_components_names:
         # slice operation on string in order to get rid of leading comma
