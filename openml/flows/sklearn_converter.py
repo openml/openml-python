@@ -289,14 +289,15 @@ def _extract_information_from_model(model):
     #Add Keras layer as additional model parameters
     if(isinstance(model,keras.wrappers.scikit_learn.KerasClassifier)):
         keras_model=model.build_fn()
-        if(isinstance(keras_model,keras.models.Model)):
-            for layer_id,layer in enumerate(keras_model.get_config()['layers']):
-                layer_name="layer"+str(layer_id)
-                model_parameters[layer_name]=layer
-        elif(isinstance(keras_model,keras.models.Sequential)):
+        if(isinstance(keras_model,keras.models.Sequential)):
             for layer_id,layer in enumerate(keras_model.get_config()):
                 layer_name="layer"+str(layer_id)
                 model_parameters[layer_name]=layer
+        elif(isinstance(keras_model,keras.models.Model)):
+            for layer_id,layer in enumerate(keras_model.get_config()['layers']):
+                layer_name="layer"+str(layer_id)
+                model_parameters[layer_name]=layer
+        
     
     for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
         rval = sklearn_to_flow(v, model)
