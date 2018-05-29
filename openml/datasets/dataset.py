@@ -83,6 +83,8 @@ class OpenMLDataset(object):
         A dictionary of dataset features which maps a feature index to a OpenMLDataFeature.
     qualities : dict, optional
         A dictionary of dataset qualities which maps a quality name to a quality value.
+    dataset: string, optional
+        Serialized arff dataset string.
     """
     def __init__(self, name, description, format, dataset_id=None,
                  version=None, creator=None, contributor=None,
@@ -91,7 +93,8 @@ class OpenMLDataset(object):
                  row_id_attribute=None, ignore_attribute=None,
                  version_label=None, citation=None, tag=None, visibility=None,
                  original_data_url=None, paper_url=None, update_comment=None,
-                 md5_checksum=None, data_file=None, features=None, qualities=None):
+                 md5_checksum=None, data_file=None, features=None, qualities=None,
+                 dataset=None):
         # TODO add function to check if the name is casual_string128
 
         # Attributes received by querying the RESTful API
@@ -129,6 +132,7 @@ class OpenMLDataset(object):
         self.data_file = data_file
         self.features = None
         self.qualities = None
+        self._dataset = dataset
 
         if features is not None:
             self.features = {}
@@ -483,21 +487,26 @@ class OpenMLDataset(object):
         """
         file_elements = {'description': self._to_xml()}
 
-        if self.data_file is not None:
-            path = os.path.abspath(self.data_file)
-            if os.path.exists(path):
-                try:
-                    # check if arff is valid
-                    decoder = arff.ArffDecoder()
-                    with io.open(path, encoding='utf8') as fh:
-                        decoder.decode(fh, encode_nominal=True)
-                except arff.ArffException:
-                    raise ValueError("The file you have provided is not a valid arff file")
-
-                file_elements['dataset'] = open(path, 'rb')
+        # the arff dataset string is available
+        if self._dataset is not None:
+            file_elements['dataset'] = self._dataset
         else:
-            if self.url is None:
-                raise ValueError("No path/url to the dataset file was given")
+            # the path to the arff dataset is given
+            if self.data_file is not None:
+                path = os.path.abspath(self.data_file)
+                if os.path.exists(path):
+                    try:
+                        # check if arff is valid
+                        decoder = arff.ArffDecoder()
+                        with io.open(path, encoding='utf8') as fh:
+                            decoder.decode(fh, encode_nominal=True)
+                    except arff.ArffException:
+                        raise ValueError("The file you have provided is not a valid arff file")
+
+                    file_elements['dataset'] = open(path, 'rb')
+            else:
+                if self.url is None:
+                    raise ValueError("No path/url to the dataset file was given")
 
         return_value = openml._api_calls._perform_api_call(
             "/data/",
