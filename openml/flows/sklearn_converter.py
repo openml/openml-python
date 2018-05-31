@@ -191,6 +191,14 @@ def _serialize_model(model):
         else:
             sub_components_names += "," + sub_components[key].name    
     
+    #Adding layer name as Flow's name (only for KerasClassifier model)
+    if(class_name=="keras.wrappers.scikit_learn.KerasClassifier"):
+        #get layer length, which is length of params-4 since we want to exclude build_fn, epochs, verbose, batch_size
+        numberoflayer=len(parameters)-4
+        for layernumber in range(numberoflayer):
+                layername="layer"+str(layernumber)
+                sub_components_names += "," + json.loads(parameters[layername])['class_name']  
+    
     if sub_components_names:
         # slice operation on string in order to get rid of leading comma
         name = '%s(%s)' % (class_name, sub_components_names[1:])
