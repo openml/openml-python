@@ -7,7 +7,6 @@ import importlib
 import inspect
 import json
 import json.decoder
-import keras
 import re
 import six
 import warnings
@@ -23,7 +22,7 @@ from sklearn.utils.fixes import signature
 import openml
 from openml.flows import OpenMLFlow
 from openml.exceptions import PyOpenMLError
-from keras.wrappers.scikit_learn import KerasClassifier
+from openml.extras import extensions
 
 if sys.version_info >= (3, 5):
     from json.decoder import JSONDecodeError
@@ -33,12 +32,14 @@ else:
 
 DEPENDENCIES_PATTERN = re.compile(
     '^(?P<name>[\w\-]+)((?P<operation>==|>=|>)(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?[0-9]*))?$')
-
+        
 
 def sklearn_to_flow(o, parent_model=None):
     # TODO: assert that only on first recursion lvl `parent_model` can be None
-
-    if _is_estimator(o):
+    
+    if _is_keras_estimator(o):
+        rval = _serialize_model(extensions.KerasClassifierWrapper.convert_from_sklearn(o))
+    elif _is_estimator(o):
         # is the main model or a submodel
         rval = _serialize_model(o)
     elif isinstance(o, (list, tuple)):
@@ -82,8 +83,10 @@ def sklearn_to_flow(o, parent_model=None):
         raise TypeError(o, type(o))
 
     return rval
-
-
+            
+def _is_keras_estimator(o):
+    return isinstance(o, extensions.keras.wrappers.scikit_learn.KerasClassifier)
+    
 def _is_estimator(o):
     return (hasattr(o, 'fit') and hasattr(o, 'get_params') and
             hasattr(o, 'set_params'))
@@ -152,7 +155,6 @@ def flow_to_sklearn(o, **kwargs):
 
     return rval
 
-
 def _serialize_model(model):
     """Create an OpenMLFlow.
 
@@ -180,22 +182,15 @@ def _serialize_model(model):
     # Create a flow name, which contains all components in brackets, for
     # example RandomizedSearchCV(Pipeline(StandardScaler,AdaBoostClassifier(DecisionTreeClassifier)),StandardScaler,AdaBoostClassifier(DecisionTreeClassifier))
     class_name = model.__module__ + "." + model.__class__.__name__
-
+    
     # will be part of the name (in brackets)
     sub_components_names = ""
     for key in sub_components:
         if key in sub_components_explicit:
             sub_components_names += "," + key + "=" + sub_components[key].name
         else:
-            sub_components_names += "," + sub_components[key].name
+            sub_components_names += "," + sub_components[key].name    
     
-    # Assign layer name as Flow name for Keras model
-    if('build_fn' in parameters):
-        number_of_layer=len(parameters)-4
-        for layer_number in range(number_of_layer):
-                layer_name="layer"+str(layer_number)
-                sub_components_names += "," + json.loads(parameters[layer_name])['class_name']    
-                
     if sub_components_names:
         # slice operation on string in order to get rid of leading comma
         name = '%s(%s)' % (class_name, sub_components_names[1:])
@@ -285,18 +280,6 @@ def _extract_information_from_model(model):
     parameters_meta_info = OrderedDict()
 
     model_parameters = model.get_params(deep=False)
-    
-    #Add Keras layer as additional model parameters
-    if(isinstance(model,keras.wrappers.scikit_learn.KerasClassifier)):
-        keras_model=model.build_fn()
-        if(isinstance(keras_model,keras.models.Sequential)):
-            for layer_id,layer in enumerate(keras_model.get_config()):
-                layer_name="layer"+str(layer_id)
-                model_parameters[layer_name]=layer
-        elif(isinstance(keras_model,keras.models.Model)):
-            for layer_id,layer in enumerate(keras_model.get_config()['layers']):
-                layer_name="layer"+str(layer_id)
-                model_parameters[layer_name]=layer
         
     
     for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
@@ -597,7 +580,7 @@ def _check_n_jobs(model):
         return True
     if not (isinstance(model, sklearn.base.BaseEstimator) or
             isinstance(model, sklearn.model_selection._search.BaseSearchCV) or
-            isinstance(model, keras.wrappers.scikit_learn.KerasClassifier)
+            isinstance(model, extensions.KerasClassifier)
             ):
         raise ValueError('model should be BaseEstimator or BaseSearchCV')
 

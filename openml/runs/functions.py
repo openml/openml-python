@@ -16,6 +16,7 @@ import sklearn.metrics
 import openml
 import openml.utils
 import openml._api_calls
+from openml.extras import extensions
 from ..exceptions import PyOpenMLError, OpenMLServerNoResult
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
@@ -407,7 +408,11 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
     for rep_no in range(num_reps):
         for fold_no in range(num_folds):
             for sample_no in range(num_samples):
-                model_fold = sklearn.base.clone(model, safe=True)
+                if(extensions.KerasClassifierWrapper.is_sklearn_wrapper(model)):
+                    #model_fold = extensions.KerasClassifierWrapper(**model.get_params())
+                    model_fold = extensions.KerasClassifierWrapper.convert_from_sklearn(model)
+                else:
+                    model_fold = sklearn.base.clone(model, safe=True)
                 res = _run_model_on_fold(model_fold, task, rep_no, fold_no, sample_no,
                                          can_measure_runtime=can_measure_runtime,
                                          add_local_measures=add_local_measures)
