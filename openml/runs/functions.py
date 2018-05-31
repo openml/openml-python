@@ -409,7 +409,6 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
         for fold_no in range(num_folds):
             for sample_no in range(num_samples):
                 if(extensions.KerasClassifierWrapper.is_sklearn_wrapper(model)):
-                    #model_fold = extensions.KerasClassifierWrapper(**model.get_params())
                     model_fold = extensions.KerasClassifierWrapper.convert_from_sklearn(model)
                 else:
                     model_fold = sklearn.base.clone(model, safe=True)

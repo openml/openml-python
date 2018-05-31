@@ -16,14 +16,7 @@ class KerasClassifierWrapper(KerasClassifier):
         if(isinstance(keras_model,keras.models.Sequential)):
             keras_model_config=keras_model.get_config()
         elif(isinstance(keras_model,keras.models.Model)):
-            keras_model_config=keras_model.get_config()['layers']
-                
-        #for layer_id,layer in enumerate(keras_model_config):
-        #    if(layer_id>0):
-        #        self.__class__.__name__+=","+layer['class_name']
-        #    else:
-        #        self.__class__.__name__+=layer['class_name']
-        #self.__class__.__name__+=')'
+            keras_model_config=keras_model.get_config()['layers']        
             
     def get_params(self,deep=False):
         if(self.build_fn is None):
