@@ -381,13 +381,15 @@ def create_dataset(name, description, creator, contributor, collection_date,
         Starts with 1 upper case letter, rest lower case, e.g. 'English'.
     licence : str
         License of the data.
-    attributes: list
+    attributes : list
         A list of tuples. Each tuple consists of the attribute name and type.
-    data : numpy.matrix
-        A matrix that contains both the attributes and targets.
+    data : numpy.ndarray
+        An array that contains both the attributes and the targets, with
+        shape=(n_samples, n_features).
         The target feature is indicated as meta-data of the dataset.
     default_target_attribute : str
-        The default target attribute, if it exists. Can have multiple values, comma separated.
+        The default target attribute, if it exists.
+        Can have multiple values, comma separated.
     row_id_attribute : str
         The attribute that represents the row-id column, if present in the dataset.
     ignore_attribute : str | list
@@ -407,9 +409,8 @@ def create_dataset(name, description, creator, contributor, collection_date,
 
     Returns
     -------
-    class:`openml.OpenMLDataset
-        Dataset description.`
-    """
+    class:`openml.OpenMLDataset`
+        Dataset description."""
     arff_object = {
         'relation': name,
         'description': description,
