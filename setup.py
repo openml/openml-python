@@ -52,7 +52,8 @@ setuptools.setup(name="openml",
                          'nbconvert',
                          'jupyter_client'
                      ],
-                     'tf': 'tensorflow'
+                     "tf": ["tensorflow>=1.0.0"],
+                     "tf_gpu": ["tensorflow-gpu>=1.0.0"],
                  },
                  test_suite="nose.collector",
                  classifiers=['Intended Audience :: Science/Research',
