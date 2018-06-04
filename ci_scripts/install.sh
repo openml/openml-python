@@ -31,7 +31,7 @@ pip install nose numpy scipy cython scikit-learn==$SKLEARN_VERSION \
 
 if [[ "$EXAMPLES" == "true" ]]; then
     pip install matplotlib jupyter notebook nbconvert nbformat jupyter_client \
-        ipython ipykernel pandas seaborn
+        ipython ipykernel pandas seaborn tensorflow keras
 fi
 if [[ "$DOCTEST" == "true" ]]; then
     pip install pandas sphinx_bootstrap_theme
