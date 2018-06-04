@@ -60,7 +60,7 @@ class OpenMLDemoTest(TestBase):
         exec(python_nb)
 
     @mock.patch('openml._api_calls._perform_api_call')
-    def test_tutorial(self, patch):
+    def test_tutorial_openml(self, patch):
         def side_effect(*args, **kwargs):
             if (
                 args[0].endswith('/run/')
@@ -77,3 +77,8 @@ class OpenMLDemoTest(TestBase):
         openml.config.server = self.production_server
         self._tst_notebook('OpenML_Tutorial.ipynb')
         self.assertGreater(patch.call_count, 100)
+
+
+    def test_tutorial_dataset(self):
+
+        self._tst_notebook('Dataset_import.ipynb')
