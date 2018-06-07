@@ -340,9 +340,10 @@ texinfo_documents = [
 # prefix each section label with the name of the document it is in, in order to avoid
 # ambiguity when there are multiple same section labels in different documents.
 autosectionlabel_prefix_document = True
-backreferences_dir: False
 # Sphinx-gallery configuration.
 sphinx_gallery_conf = {
+    # disable mini galleries clustered by the used functions
+    'backreferences_dir': False,
     # path to the examples
     'examples_dirs': '../examples',
     # path where to save gallery generated examples
