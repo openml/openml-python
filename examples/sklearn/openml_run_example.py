@@ -2,7 +2,7 @@
 OpenML Run Example
 ==================
 
-An example of an automated machine learning experiment using run_task
+An example of an automated machine learning experiment using run_task.
 """
 
 from openml.apiconnector import APIConnector

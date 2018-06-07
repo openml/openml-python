@@ -2,7 +2,7 @@
 OpenML Introduction
 ===================
 
-A simple tutorial on how to get started on using OpenML.
+A tutorial on how to get started on using OpenML.
 """
 
 # coding: utf-8
