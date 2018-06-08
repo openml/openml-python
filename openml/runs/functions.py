@@ -19,9 +19,10 @@ import openml._api_calls
 from ..exceptions import PyOpenMLError, OpenMLServerNoResult
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
-    _copy_server_fields
+    _copy_server_fields, OpenMLFlow
 from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException
+from ..tasks import OpenMLTask
 from .run import OpenMLRun, _get_version_information
 from .trace import OpenMLRunTrace, OpenMLTraceIteration
 
@@ -32,9 +33,14 @@ from .trace import OpenMLRunTrace, OpenMLTraceIteration
 RUNS_CACHE_DIR_NAME = 'runs'
 
 
-def run_model_on_task(task, model, avoid_duplicate_runs=True, flow_tags=None,
+def run_model_on_task(model, task, avoid_duplicate_runs=True, flow_tags=None,
                       seed=None, add_local_measures=True):
     """See ``run_flow_on_task for a documentation``."""
+    # TODO: At some point in the future do not allow for arguments in old order (order changed 6-2018).
+    if isinstance(model, OpenMLTask) and hasattr(task, 'fit') and hasattr(task, 'predict'):
+        warnings.warn("The old argument order (task, model) is deprecated and will not be supported in the future. "
+                      "Please use the order (model, task).", DeprecationWarning)
+        task, model = model, task
 
     flow = sklearn_to_flow(model)
 
@@ -44,7 +50,7 @@ def run_model_on_task(task, model, avoid_duplicate_runs=True, flow_tags=None,
                             add_local_measures=add_local_measures)
 
 
-def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
+def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
                      seed=None, add_local_measures=True):
     """Run the model provided by the flow on the dataset defined by task.
 
@@ -54,17 +60,18 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
 
     Parameters
     ----------
-    task : OpenMLTask
-        Task to perform.
     model : sklearn model
         A model which has a function fit(X,Y) and predict(X),
         all supervised estimators of scikit learn follow this definition of a model [1]
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
+    task : OpenMLTask
+        Task to perform. This may be an OpenMLFlow instead if the second argument is an OpenMLTask.
     avoid_duplicate_runs : bool
         If this flag is set to True, the run will throw an error if the
         setup/task combination is already present on the server. Works only
         if the flow is already published on the server. This feature requires an
         internet connection.
+        This may be an OpenMLTask instead if the first argument is the OpenMLFlow.
     flow_tags : list(str)
         A list of tags that the flow should have at creation.
     seed: int
@@ -80,6 +87,13 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
     """
     if flow_tags is not None and not isinstance(flow_tags, list):
         raise ValueError("flow_tags should be list")
+
+    # TODO: At some point in the future do not allow for arguments in old order (order changed 6-2018).
+    if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
+        # We want to allow either order of argument (to avoid confusion).
+        warnings.warn("The old argument order (Flow, model) is deprecated and will not be supported in the future. "
+                      "Please use the order (model, Flow).", DeprecationWarning)
+        task, flow = flow, task
 
     flow.model = _get_seeded_model(flow.model, seed=seed)
 
