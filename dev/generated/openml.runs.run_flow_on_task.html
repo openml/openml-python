@@ -110,7 +110,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>.run_flow_on_task<a class="headerlink" href="#openml-runs-run-flow-on-task" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.runs.run_flow_on_task">
-<code class="descclassname">openml.runs.</code><code class="descname">run_flow_on_task</code><span class="sig-paren">(</span><em>task</em>, <em>flow</em>, <em>avoid_duplicate_runs=True</em>, <em>flow_tags=None</em>, <em>seed=None</em>, <em>add_local_measures=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.run_flow_on_task" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.runs.</code><code class="descname">run_flow_on_task</code><span class="sig-paren">(</span><em>flow</em>, <em>task</em>, <em>avoid_duplicate_runs=True</em>, <em>flow_tags=None</em>, <em>seed=None</em>, <em>add_local_measures=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.run_flow_on_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the model provided by the flow on the dataset defined by task.</p>
 <p>Takes the flow and repeat information into account. In case a flow is not
 yet published, it is published after executing the run (requires
@@ -120,19 +120,20 @@ internet connection).</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>task</strong> <span class="classifier-delimiter">:</span> <span class="classifier">OpenMLTask</span></dt>
-<dd><p class="first last">Task to perform.</p>
-</dd>
 <dt><strong>model</strong> <span class="classifier-delimiter">:</span> <span class="classifier">sklearn model</span></dt>
 <dd><p class="first last">A model which has a function fit(X,Y) and predict(X),
 all supervised estimators of scikit learn follow this definition of a model [1]
 [1](<a class="reference external" href="http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html">http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html</a>)</p>
 </dd>
+<dt><strong>task</strong> <span class="classifier-delimiter">:</span> <span class="classifier">OpenMLTask</span></dt>
+<dd><p class="first last">Task to perform. This may be an OpenMLFlow instead if the second argument is an OpenMLTask.</p>
+</dd>
 <dt><strong>avoid_duplicate_runs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
 <dd><p class="first last">If this flag is set to True, the run will throw an error if the
 setup/task combination is already present on the server. Works only
 if the flow is already published on the server. This feature requires an
-internet connection.</p>
+internet connection.
+This may be an OpenMLTask instead if the first argument is the OpenMLFlow.</p>
 </dd>
 <dt><strong>flow_tags</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list(str)</span></dt>
 <dd><p class="first last">A list of tags that the flow should have at creation.</p>
