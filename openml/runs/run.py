@@ -88,33 +88,21 @@ class OpenMLRun(object):
         if not os.path.isdir(folder):
             raise ValueError('Could not find folder')
 
-        description_path = os.path.join(folder, 'description.xml')
-        predictions_path = os.path.join(folder, 'predictions.arff')
-        trace_path = os.path.join(folder, 'trace.arff')
+        run_path = os.path.join(folder, 'OpenMLRun.pkl')
         model_path = os.path.join(folder, 'model.pkl')
 
-        if not os.path.isfile(description_path):
-            raise ValueError('Could not find description.xml')
-        if not os.path.isfile(predictions_path):
-            raise ValueError('Could not find predictions.arff')
+        if not os.path.isfile(run_path):
+            raise ValueError('Could not find OpenMLRun.pkl')
         if not os.path.isfile(model_path):
             raise ValueError('Could not find model.pkl')
 
-        with open(description_path, 'r') as fp:
-            run = openml.runs.functions._create_run_from_xml(fp.read(), from_server=False)
-
-        with open(predictions_path, 'r') as fp:
-            predictions = arff.load(fp)
-            run.data_content = predictions['data']
+        with open(run_path, 'rb') as fp:
+            run = pickle.load(fp)
+        if not isinstance(run, OpenMLRun):
+            raise ValueError('obtained run not instance of OpenMLRun')
 
         with open(model_path, 'rb') as fp:
             run.model = pickle.load(fp)
-
-        if os.path.isfile(trace_path):
-            with open(trace_path, 'r') as fp:
-                trace = arff.load(fp)
-                run.trace_attributes = trace['attributes']
-                run.trace_content = trace['data']
 
         return run
 
@@ -143,20 +131,10 @@ class OpenMLRun(object):
         if not os.listdir(output_directory) == []:
             raise ValueError('Output directory should be empty')
 
-        run_xml = self._create_description_xml()
-        predictions_arff = arff.dumps(self._generate_arff_dict())
-
-        with open(os.path.join(output_directory, 'description.xml'), 'w') as f:
-            f.write(run_xml)
-        with open(os.path.join(output_directory, 'predictions.arff'), 'w') as f:
-            f.write(predictions_arff)
+        with open(os.path.join(output_directory, 'OpenMLRun.pkl'), 'wb') as fp:
+            pickle.dump(self, fp)
         with open(os.path.join(output_directory, 'model.pkl'), 'wb') as f:
             pickle.dump(self.model, f)
-
-        if self.trace_content is not None:
-            trace_arff = arff.dumps(self._generate_trace_arff_dict())
-            with open(os.path.join(output_directory, 'trace.arff'), 'w') as f:
-                f.write(trace_arff)
 
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the server.

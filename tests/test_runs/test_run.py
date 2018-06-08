@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import os
+import unittest
 from time import time
 
 from sklearn.tree import DecisionTreeClassifier
@@ -91,10 +92,12 @@ class TestRun(TestBase):
         np.testing.assert_array_equal(string_part, string_part_prime)
 
         if run.trace_content is not None:
-            numeric_part = np.array(np.array(run.trace_content)[:, 0:-2], dtype=float)
-            numeric_part_prime = np.array(np.array(run_prime.trace_content)[:, 0:-2], dtype=float)
-            string_part = np.array(run.trace_content)[:, -2:]
-            string_part_prime = np.array(run_prime.trace_content)[:, -2:]
+            # 0 - 4 is the range of numeric part (repeat, fold, iteration, score)
+            # the rest is boolean selected and hyperparameters
+            numeric_part = np.array(np.array(run.trace_content)[:, 0:4], dtype=float)
+            numeric_part_prime = np.array(np.array(run_prime.trace_content)[:, 0:4], dtype=float)
+            string_part = np.array(run.trace_content)[:, 4:]
+            string_part_prime = np.array(run_prime.trace_content)[:, 4:]
             # JvR: Python 2.7 requires an almost equal check, rather than an equals check
             np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
             np.testing.assert_array_equal(string_part, string_part_prime)
@@ -104,7 +107,7 @@ class TestRun(TestBase):
     def test_to_from_filesystem_vanilla(self):
         model = DecisionTreeClassifier(max_depth=1)
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(task, model, add_local_measures=False)
+        run = openml.runs.run_model_on_task(task, model)
 
         cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
         run.to_filesystem(cache_path)
@@ -114,10 +117,11 @@ class TestRun(TestBase):
         run_prime.publish()
 
     def test_to_from_filesystem_search(self):
-        model = GridSearchCV(estimator=DecisionTreeClassifier(), param_grid={"max_depth": [1, 2, 3, 4, 5]})
+        model = GridSearchCV(estimator=DecisionTreeClassifier(),
+                             param_grid={'max_depth': [1, 2, 3], 'criterion': ['gini', 'entropy']})
 
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(task, model, add_local_measures=False)
+        run = openml.runs.run_model_on_task(task, model)
 
         cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
         run.to_filesystem(cache_path)
@@ -125,3 +129,33 @@ class TestRun(TestBase):
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
         self._test_run_obj_equals(run, run_prime)
         run_prime.publish()
+
+    @unittest.skip('Function _create_description_xml does not write server fields yet.')
+    def test_run_description_deserialize_serialize(self):
+        openml.config.server = self.production_server
+        run_id = list(openml.evaluations.list_evaluations(function='predictive_accuracy',
+                                                          flow=[7707], size=1).keys())[0]
+
+        run_xml_orig = openml._api_calls._perform_api_call('run/%d' %run_id)
+        run_obj_orig = openml.runs.functions._create_run_from_xml(run_xml_orig)
+        run_xml_prime = run_obj_orig._create_description_xml()
+        # TODO: _create_description_xml does not add run id, uploader, etc
+        self.assertEqual(run_xml_orig, run_xml_prime)
+
+    def test_run_description_deserialize_serialize(self):
+        model = DecisionTreeClassifier(max_depth=1)
+        task = openml.tasks.get_task(119)
+        run_orig = openml.runs.run_model_on_task(task, model)
+        run_orig = run_orig.publish()
+        run_new = openml.runs.get_run(run_orig.run_id)
+
+        # evaluations might not be aligned (original run has some locally generated measures,
+        # downloaded run might have or have not obtained server evals)
+        run_orig.evaluations = None
+        run_new.evaluations = None
+        run_orig.fold_evaluations = None
+        run_new.fold_evaluations = None
+        run_orig.sample_evaluations = None
+        run_new.sample_evaluations = None
+
+        self.assertEqual(run_orig._create_description_xml(), run_new._create_description_xml())
