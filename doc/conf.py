@@ -348,5 +348,7 @@ sphinx_gallery_conf = {
     'examples_dirs': '../examples',
     # path where to save gallery generated examples
     'gallery_dirs': 'examples',
+    # compile execute examples in the examples dir
+    'filename_pattern': '.*example.py$|.*tutorial.py$',
     #TODO: fix back/forward references for the examples.
 }

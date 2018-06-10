@@ -1,32 +1,18 @@
 """
-Dataset Tutorial
-================
+Dataset upload tutorial
+=======================
 
 A tutorial on how to create and upload a dataset to OpenML.
 """
-
-# coding: utf-8
-
-# In[1]:
-
-
-import arff
 import numpy as np
 import openml
 import sklearn.datasets
 
 
-# In[2]:
-
-
-# For this example we will upload to the test server to not
+# We will upload to the test server to not
 # pollute the live server with countless copies of the same
 # dataset
 openml.config.server = 'https://test.openml.org/api/v1/xml'
-
-
-# In[3]:
-
 
 # Load an example dataset from scikit-learn which we will 
 # upload to OpenML.org via the API
@@ -38,10 +24,6 @@ attribute_names = breast_cancer.feature_names
 targets = breast_cancer.target_names
 description = breast_cancer.DESCR
 
-
-# In[4]:
-
-
 # OpenML does not distinguish between the attributes and
 # targets on the data level and stores all data in a 
 # single matrix. The target feature is indicated as 
@@ -51,10 +33,6 @@ attribute_names = list(attribute_names)
 attributes = [
     (attribute_name, 'REAL') for attribute_name in attribute_names
 ] + [('class', 'REAL')]
-
-
-# In[5]:
-
 
 # Create the dataset object. 
 # The definition of all fields can be found in the XSD files
@@ -102,10 +80,5 @@ dataset = openml.datasets.functions.create_dataset(
     paper_url='https://www.spiedigitallibrary.org/conference-proceedings-of-spie/1905/0000/Nuclear-feature-extraction-for-breast-tumor-diagnosis/10.1117/12.148698.short?SSO=1'
 )
 
-
-# In[6]:
-
-
 upload_id = dataset.publish()
 print(upload_id)
-

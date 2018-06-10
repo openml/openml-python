@@ -1,4 +1,4 @@
-Sklearn Examples
-================
+Experiment Examples
+===================
 
-OpenML experiment examples.
+OpenML experiment examples using a sklearn classifier/pipeline.
