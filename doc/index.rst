@@ -42,60 +42,43 @@ Example
     print('URL for run: %s/run/%d' % (openml.config.server, run.run_id))
     print('View the run online: https://www.openml.org/r/%d' % run.run_id)
 
-------------
-Introduction
-------------
-
+----------------------------
 How to get OpenML for python
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 You can install the OpenML package via `pip`:
 
 .. code:: bash
 
     pip install openml
-    
 
-Installation via GitHub (for developers)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The package source code is available from
-`github <https://github.com/openml/openml-python>`_.
+For more advanced installation information, please see the
+:ref:`installation` section.
 
-.. code:: bash
-
-    git clone https://github.com/openml/openml-python.git
-
-
-Once you cloned the package, change into the new directory ``python`` and
-execute
-
-.. code:: bash
-
-    python setup.py install
-
-Testing
-~~~~~~~
-
-From within the directory of the cloned package, execute
-
-.. code:: bash
-
-    python setup.py test
-
+-----
 Usage
-~~~~~
+-----
 
 * :ref:`usage`
 * :ref:`api`
-* :ref:`developing`
+* :ref:`contributing`
 
+-------------------
+Further information
+-------------------
+
+* `OpenML documentation <https://docs.openml.org/>`_
+* `OpenML client APIs <https://docs.openml.org/APIs/>`_
+* `OpenML developer guide <https://docs.openml.org/developers/>`_
+* `Contact information <https://www.openml.org/contact>`_
+* `Citation request <https://www.openml.org/cite>`_
+* `OpenML blog <https://medium.com/open-machine-learning>`_
+* `OpenML twitter account <https://twitter.com/open_ml>`_
+
+------------
 Contributing
-~~~~~~~~~~~~
+------------
 
-Contribution to the OpenML package is highly appreciated. Currently,
-there is a lot of work left on implementing API calls,
-testing them and providing examples to allow new users to easily use the
-OpenML package. See the :ref:`progress` page for open tasks.
-
-Please contact `Matthias <http://aad.informatik.uni-freiburg.de/people/feurer/index.html>`_
-prior to start working on an issue or missing feature to avoid duplicate work
-. Please check the current implementations of the API calls and the method
+Contribution to the OpenML package is highly appreciated. The OpenML package
+currently has a 1/4 position for the development and all help possible is
+needed to extend and maintain the package, create new examples and improve
+the usability. Please see the :ref:`contributing` page for more information.
