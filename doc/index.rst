@@ -39,8 +39,7 @@ Example
     run = openml.runs.run_model_on_task(task, clf)
     # Publish the experiment on OpenML (optional, requires an API key).
     run.publish()
-    print('URL for run: %s/run/%d' % (openml.config.server, run.run_id))
-    print('View the run online: https://www.openml.org/r/%d' % run.run_id)
+    print('View the run online: %s/run/%d' % (openml.config.server, run.run_id))
 
 ----------------------------
 How to get OpenML for python
