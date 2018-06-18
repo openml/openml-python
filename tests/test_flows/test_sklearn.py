@@ -699,6 +699,23 @@ class TestSklearn(unittest.TestCase):
         for i in range(len(illegal_models)):
             self.assertRaises(PyOpenMLError, _check_n_jobs, illegal_models[i])
 
+    def test__get_fn_arguments_with_defaults(self):
+        fns = [
+            sklearn.ensemble.RandomForestRegressor.__init__,
+            sklearn.tree.DecisionTreeClassifier.__init__,
+            sklearn.pipeline.Pipeline.__init__
+        ]
+
+        for fn in fns:
+            defaults, defaultless = openml.flows.sklearn_converter._get_fn_arguments_with_defaults(fn)
+            self.assertIsInstance(defaults, dict)
+            self.assertIsInstance(defaultless, set)
+            # check whether we have both defaults and defaultless params
+            self.assertGreater(len(defaults), 0)
+            self.assertGreater(len(defaultless), 0)
+            # check no overlap
+            self.assertSetEqual(set(defaults.keys()), set(defaults.keys()) - defaultless)
+            self.assertSetEqual(defaultless, defaultless - set(defaults.keys()))
 
     def test_deserialize_with_defaults(self):
         # used the 'keep defaults' flag of the deserialization method to return a flow that

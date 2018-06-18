@@ -388,6 +388,36 @@ def _extract_information_from_model(model):
     return parameters, parameters_meta_info, sub_components, sub_components_explicit
 
 
+def _get_fn_arguments_with_defaults(fn_name):
+    """
+    Returns i) a dict with all parameter names (as key) that have a default value (as value) and ii) a set with all
+    parameter names that do not have a default
+
+    Parameters
+    ----------
+    fn_name : callable
+        The function of which we want to obtain the defaults
+
+    Returns
+    -------
+    params_with_defaults: dict
+        a dict mapping parameter name to the default value
+    params_without_defaults: dict
+        a set with all parameters that do not have a default value
+    """
+    if sys.version_info[0] >= 3:
+        signature = inspect.getfullargspec(fn_name)
+    else:
+        signature = inspect.getargspec(fn_name)
+
+    # len(signature.defaults) <= len(signature.args). Thus, by definition, the last entrees of signature.args
+    # actually have defaults. Iterate backwards over both arrays to keep them in sync
+    params_with_defaults = {signature.args[-1*i]: signature.defaults[-1*i] for i in range(1, len(signature.defaults) + 1)}
+    # retrieve the params without defaults
+    params_without_defaults = {signature.args[i] for i in range(len(signature.args) - len(signature.defaults))}
+    return params_with_defaults, params_without_defaults
+
+
 def _deserialize_model(flow, **kwargs):
 
     model_name = flow.class_name
@@ -427,14 +457,12 @@ def _deserialize_model(flow, **kwargs):
         return None
 
     if 'keep_defaults' in kwargs and kwargs['keep_defaults'] is True:
-        signature = inspect.signature(model_class.__init__)
-        for idx, key in enumerate(signature.parameters):
-            if idx == 0:
-                # since we are talking about classes, first is always 'self'
-                continue
-            parameter = signature.parameters[key]
-            if parameter.default != inspect._empty:
-                del parameter_dict[key]
+        # obtain all params with a default
+        param_defaults, _ = _get_fn_arguments_with_defaults(model_class.__init__)
+
+        # delete all params that have a default from the dict, so they get initialized with their default value
+        for param in param_defaults:
+            del parameter_dict[param]
     return model_class(**parameter_dict)
 
 
