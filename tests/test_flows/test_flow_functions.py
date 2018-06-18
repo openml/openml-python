@@ -8,6 +8,8 @@ import openml
 
 
 class TestFlowFunctions(unittest.TestCase):
+    _multiprocess_can_split_ = True
+
     def _check_flow(self, flow):
         self.assertEqual(type(flow), dict)
         self.assertEqual(len(flow), 6)
@@ -28,6 +30,13 @@ class TestFlowFunctions(unittest.TestCase):
         self.assertGreaterEqual(len(flows), 1500)
         for fid in flows:
             self._check_flow(flows[fid])
+
+    def test_list_flows_empty(self):
+        flows = openml.flows.list_flows(tag='NoOneEverUsesThisTag123')
+        if len(flows) > 0:
+            raise ValueError('UnitTest Outdated, got somehow results (please adapt)')
+
+        self.assertIsInstance(flows, dict)
 
     def test_list_flows_by_tag(self):
         flows = openml.flows.list_flows(tag='weka')

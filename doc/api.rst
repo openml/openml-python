@@ -18,6 +18,7 @@ Top-level Classes
    OpenMLTask
    OpenMLSplit
    OpenMLFlow
+   OpenMLEvaluation
 
 
 :mod:`openml.datasets`: Dataset Functions
@@ -33,6 +34,30 @@ Top-level Classes
     get_datasets
     list_datasets
 
+:mod:`openml.evaluations`: Evaluation Functions
+-----------------------------------------------
+.. currentmodule:: openml.evaluations
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+    list_evaluations
+
+:mod:`openml.flows`: Flow Functions
+-----------------------------------
+.. currentmodule:: openml.flows
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+    flow_exists
+    flow_to_sklearn
+    get_flow
+    list_flows
+    sklearn_to_flow
+
 :mod:`openml.runs`: Run Functions
 ----------------------------------
 .. currentmodule:: openml.runs
@@ -41,14 +66,37 @@ Top-level Classes
    :toctree: generated/
    :template: function.rst
 
-   run_task
-   get_run
-   list_runs
-   list_runs_by_flow
-   list_runs_by_tag
-   list_runs_by_task
-   list_runs_by_uploader
-   list_runs_by_filters
+    get_run
+    get_runs
+    get_run_trace
+    initialize_model_from_run
+    initialize_model_from_trace
+    list_runs
+    run_model_on_task
+    run_flow_on_task
+
+:mod:`openml.setups`: Setup Functions
+-------------------------------------
+.. currentmodule:: openml.setups
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+    get_setup
+    initialize_model
+    list_setups
+    setup_exists
+
+:mod:`openml.study`: Study Functions
+------------------------------------
+.. currentmodule:: openml.study
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+    get_study
 
 :mod:`openml.tasks`: Task Functions
 -----------------------------------
@@ -59,13 +107,8 @@ Top-level Classes
    :template: function.rst
 
     get_task
+    get_tasks
     list_tasks
 
-:mod:`openml.flows`: Flow Functions
------------------------------------
-.. currentmodule:: openml.flow
 
-.. autosummary::
-   :toctree: generated/
-   :template: function.rst
  

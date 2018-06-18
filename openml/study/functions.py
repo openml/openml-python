@@ -1,7 +1,8 @@
 import xmltodict
 
 from openml.study import OpenMLStudy
-from .._api_calls import _perform_api_call
+import openml._api_calls
+
 
 def _multitag_to_list(result_dict, tag):
     if isinstance(result_dict[tag], list):
@@ -21,7 +22,7 @@ def get_study(study_id, type=None):
     call_suffix = "study/%s" %str(study_id)
     if type is not None:
         call_suffix += "/" + type
-    xml_string = _perform_api_call(call_suffix)
+    xml_string = openml._api_calls._perform_api_call(call_suffix)
     result_dict = xmltodict.parse(xml_string)['oml:study']
     id = int(result_dict['oml:id'])
     name = result_dict['oml:name']

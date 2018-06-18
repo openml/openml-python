@@ -1,25 +1,12 @@
-import os
+# -*- coding: utf-8 -*-
+
 import setuptools
 import sys
 
 with open("openml/__version__.py") as fh:
     version = fh.readlines()[-1].split()[-1].strip("\"'")
 
-
-requirements_file = os.path.join(os.path.dirname(__file__), 'requirements.txt')
-requirements = []
 dependency_links = []
-with open(requirements_file) as fh:
-    for line in fh:
-        line = line.strip()
-        if line:
-            # Make sure the github URLs work here as well
-            split = line.split('@')
-            split = split[0]
-            split = split.split('/')
-            url = '/'.join(split[:-1])
-            requirement = split[-1]
-            requirements.append(requirement)
 
 try:
     import numpy
@@ -35,21 +22,40 @@ except ImportError:
 
 
 setuptools.setup(name="openml",
-                 author="Matthias Feurer",
+                 author="Matthias Feurer, Andreas Müller, Farzan Majdani, "
+                        "Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers",
                  author_email="feurerm@informatik.uni-freiburg.de",
                  maintainer="Matthias Feurer",
                  maintainer_email="feurerm@informatik.uni-freiburg.de",
                  description="Python API for OpenML",
-                 license="GPLv3",
+                 license="BSD 3-clause",
                  url="http://openml.org/",
                  version=version,
                  packages=setuptools.find_packages(),
                  package_data={'': ['*.txt', '*.md']},
-                 install_requires=requirements,
+                 install_requires=[
+                     'mock',
+                     'numpy>=1.6.2',
+                     'scipy>=0.13.3',
+                     'liac-arff>=2.2.1',
+                     'xmltodict',
+                     'nose',
+                     'requests',
+                     'scikit-learn>=0.18',
+                     'nbformat',
+                     'python-dateutil',
+                     'oslo.concurrency',
+                 ],
+                 extras_require={
+                     'test': [
+                         'nbconvert',
+                         'jupyter_client'
+                     ]
+                 },
                  test_suite="nose.collector",
                  classifiers=['Intended Audience :: Science/Research',
                               'Intended Audience :: Developers',
-                              'License :: GPLv3',
+                              'License :: OSI Approved :: BSD License',
                               'Programming Language :: Python',
                               'Topic :: Software Development',
                               'Topic :: Scientific/Engineering',

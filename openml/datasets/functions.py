@@ -1,19 +1,35 @@
 from collections import OrderedDict
+import hashlib
 import io
 import os
 import re
 import shutil
+import six
+import arff
 
+from oslo_concurrency import lockutils
 import xmltodict
 
+import openml.utils
+import openml._api_calls
 from .dataset import OpenMLDataset
-from ..exceptions import OpenMLCacheException
-from .. import config
-from .._api_calls import _perform_api_call, _read_url
+from ..exceptions import OpenMLCacheException, OpenMLServerException, \
+    OpenMLHashException, PrivateDatasetError
+from ..utils import (
+    _create_cache_directory,
+    _remove_cache_dir_for_id,
+    _create_cache_directory_for_id,
+    _create_lockfiles_dir,
+)
+
+
+DATASETS_CACHE_DIR_NAME = 'datasets'
+
 
 
 ############################################################################
 # Local getters/accessors to the cache directory
+
 
 def _list_cached_datasets():
     """Return list with ids of all cached datasets
@@ -25,8 +41,7 @@ def _list_cached_datasets():
     """
     datasets = []
 
-    dataset_cache = config.get_cache_directory()
-    dataset_cache_dir = os.path.join(dataset_cache, "datasets")
+    dataset_cache_dir = _create_cache_directory(DATASETS_CACHE_DIR_NAME)
     directory_content = os.listdir(dataset_cache_dir)
     directory_content.sort()
 
@@ -43,8 +58,8 @@ def _list_cached_datasets():
                                       directory_name)
         dataset_directory_content = os.listdir(directory_name)
 
-        if "dataset.arff" in dataset_directory_content and \
-                        "description.xml" in dataset_directory_content:
+        if ("dataset.arff" in dataset_directory_content and
+                "description.xml" in dataset_directory_content):
             if dataset_id not in datasets:
                 datasets.append(dataset_id)
 
@@ -82,8 +97,9 @@ def _get_cached_dataset(dataset_id):
 
 
 def _get_cached_dataset_description(dataset_id):
-    cache_dir = config.get_cache_directory()
-    did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
+    did_cache_dir = _create_cache_directory_for_id(
+        DATASETS_CACHE_DIR_NAME, dataset_id,
+    )
     description_file = os.path.join(did_cache_dir, "description.xml")
     try:
         with io.open(description_file, encoding='utf8') as fh:
@@ -96,8 +112,9 @@ def _get_cached_dataset_description(dataset_id):
 
 
 def _get_cached_dataset_features(dataset_id):
-    cache_dir = config.get_cache_directory()
-    did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
+    did_cache_dir = _create_cache_directory_for_id(
+        DATASETS_CACHE_DIR_NAME, dataset_id,
+    )
     features_file = os.path.join(did_cache_dir, "features.xml")
     try:
         with io.open(features_file, encoding='utf8') as fh:
@@ -109,21 +126,23 @@ def _get_cached_dataset_features(dataset_id):
 
 
 def _get_cached_dataset_qualities(dataset_id):
-    cache_dir = config.get_cache_directory()
-    did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
+    did_cache_dir = _create_cache_directory_for_id(
+        DATASETS_CACHE_DIR_NAME, dataset_id,
+    )
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")
     try:
         with io.open(qualities_file, encoding='utf8') as fh:
             qualities_xml = fh.read()
-            return xmltodict.parse(qualities_xml)["oml:data_qualities"]
+            return xmltodict.parse(qualities_xml)["oml:data_qualities"]['oml:quality']
     except (IOError, OSError):
         raise OpenMLCacheException("Dataset qualities for dataset id %d not "
                                    "cached" % dataset_id)
 
 
 def _get_cached_dataset_arff(dataset_id):
-    cache_dir = config.get_cache_directory()
-    did_cache_dir = os.path.join(cache_dir, "datasets", str(dataset_id))
+    did_cache_dir = _create_cache_directory_for_id(
+        DATASETS_CACHE_DIR_NAME, dataset_id,
+    )
     output_file = os.path.join(did_cache_dir, "dataset.arff")
 
     try:
@@ -135,54 +154,81 @@ def _get_cached_dataset_arff(dataset_id):
                                    "cached" % dataset_id)
 
 
-def list_datasets(offset=None, size=None, tag=None):
-    """Return a list of all dataset which are on OpenML.
+def list_datasets(offset=None, size=None, status=None, tag=None, **kwargs):
+
+    """
+    Return a list of all dataset which are on OpenML. (Supports large amount of results)
 
     Parameters
     ----------
     offset : int, optional
-        the number of datasets to skip, starting from the first
+        The number of datasets to skip, starting from the first.
     size : int, optional
-        the maximum datasets of tasks to show
+        The maximum number of datasets to show.
+    status : str, optional
+        Should be {active, in_preparation, deactivated}. By
+        default active datasets are returned, but also datasets
+        from another status can be requested.
     tag : str, optional
-        the tag to include
+    kwargs : dict, optional
+        Legal filter operators (keys in the dict):
+        data_name, data_version, number_instances,
+        number_features, number_classes, number_missing_values.
 
     Returns
     -------
-    datasets : list of dicts
-        A list of datasets having the given tag (if applicable).
+    datasets : dict of dicts
+        A mapping from dataset ID to dict.
 
         Every dataset is represented by a dictionary containing
         the following information:
         - dataset id
+        - name
+        - format
         - status
 
         If qualities are calculated for the dataset, some of
         these are also returned.
     """
+
+    return openml.utils._list_all(_list_datasets, offset=offset, size=size, status=status, tag=tag, **kwargs)
+
+
+def _list_datasets(**kwargs):
+
+    """
+    Perform api call to return a list of all datasets.
+
+    Parameters
+    ----------
+    kwargs : dict, optional
+        Legal filter operators (keys in the dict):
+        {tag, status, limit, offset, data_name, data_version, number_instances,
+        number_features, number_classes, number_missing_values.
+
+    Returns
+    -------
+    datasets : dict of dicts
+    """
+
     api_call = "data/list"
-    if offset is not None:
-        api_call += "/offset/%d" % int(offset)
 
-    if size is not None:
-       api_call += "/limit/%d" % int(size)
-
-    if tag is not None:
-        api_call += "/tag/%s" % tag
-
-    return _list_datasets(api_call)
+    if kwargs is not None:
+        for operator, value in kwargs.items():
+            api_call += "/%s/%s" % (operator, value)
+    return __list_datasets(api_call)
 
 
-def _list_datasets(api_call):
-    # TODO add proper error handling here!
-    xml_string = _perform_api_call(api_call)
-    datasets_dict = xmltodict.parse(xml_string)
+def __list_datasets(api_call):
+
+    xml_string = openml._api_calls._perform_api_call(api_call)
+    datasets_dict = xmltodict.parse(xml_string, force_list=('oml:dataset',))
 
     # Minimalistic check if the XML is useful
     assert type(datasets_dict['oml:data']['oml:dataset']) == list, \
         type(datasets_dict['oml:data'])
     assert datasets_dict['oml:data']['@xmlns:oml'] == \
-           'http://openml.org/openml', datasets_dict['oml:data']['@xmlns:oml']
+        'http://openml.org/openml', datasets_dict['oml:data']['@xmlns:oml']
 
     datasets = dict()
     for dataset_ in datasets_dict['oml:data']['oml:dataset']:
@@ -208,7 +254,7 @@ def check_datasets_active(dataset_ids):
 
     Parameters
     ----------
-    dataset_id : iterable
+    dataset_ids : iterable
         Integers representing dataset ids.
 
     Returns
@@ -259,9 +305,11 @@ def get_dataset(dataset_id):
 
     TODO: explain caching!
 
+    This function is thread/multiprocessing safe.
+
     Parameters
     ----------
-    ddataset_id : int
+    dataset_id : int
         Dataset ID of the dataset to download
 
     Returns
@@ -274,24 +322,124 @@ def get_dataset(dataset_id):
         raise ValueError("Dataset ID is neither an Integer nor can be "
                          "cast to an Integer.")
 
-    did_cache_dir = _create_dataset_cache_directory(dataset_id)
+    with lockutils.external_lock(
+        name='datasets.functions.get_dataset:%d' % dataset_id,
+        lock_path=_create_lockfiles_dir(),
+    ):
+        did_cache_dir = _create_cache_directory_for_id(
+            DATASETS_CACHE_DIR_NAME, dataset_id,
+        )
 
-    try:
-        description = _get_dataset_description(did_cache_dir, dataset_id)
-        arff_file = _get_dataset_arff(did_cache_dir, description)
-        features = _get_dataset_features(did_cache_dir, dataset_id)
-        # TODO not used yet, figure out what to do with this...
-        qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
-    except Exception as e:
-        _remove_dataset_cache_dir(did_cache_dir)
-        raise e
+        try:
+            remove_dataset_cache = True
+            description = _get_dataset_description(did_cache_dir, dataset_id)
+            arff_file = _get_dataset_arff(did_cache_dir, description)
+            features = _get_dataset_features(did_cache_dir, dataset_id)
+            qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
+            remove_dataset_cache = False
+        except OpenMLServerException as e:
+            # if there was an exception, check if the user had access to the dataset
+            if e.code == 112:
+                six.raise_from(PrivateDatasetError(e.message), None)
+            else:
+                raise e
+        finally:
+            if remove_dataset_cache:
+                _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, did_cache_dir)
 
-    dataset = _create_dataset_from_description(description, features, qualities, arff_file)
+        dataset = _create_dataset_from_description(
+            description, features, qualities, arff_file
+        )
     return dataset
 
 
+def create_dataset(name, description, creator, contributor, collection_date,
+                   language, licence, attributes, data, default_target_attribute,
+                   row_id_attribute, ignore_attribute, citation, format="arff",
+                   original_data_url=None, paper_url=None, update_comment=None,
+                   version_label=None):
+    """Create a dataset.
+
+    This function creates an OpenMLDataset object.
+    The OpenMLDataset object contains information related to the dataset
+    and the actual data file.
+
+    Parameters
+    ----------
+    name : str
+        Name of the dataset.
+    description : str
+        Description of the dataset.
+    creator : str
+        The person who created the dataset.
+    contributor : str
+        People who contributed to the current version of the dataset.
+    collection_date : str
+        The date the data was originally collected, given by the uploader.
+    language : str
+        Language in which the data is represented.
+        Starts with 1 upper case letter, rest lower case, e.g. 'English'.
+    licence : str
+        License of the data.
+    attributes : list
+        A list of tuples. Each tuple consists of the attribute name and type.
+    data : numpy.ndarray
+        An array that contains both the attributes and the targets, with
+        shape=(n_samples, n_features).
+        The target feature is indicated as meta-data of the dataset.
+    default_target_attribute : str
+        The default target attribute, if it exists.
+        Can have multiple values, comma separated.
+    row_id_attribute : str
+        The attribute that represents the row-id column, if present in the dataset.
+    ignore_attribute : str | list
+        Attributes that should be excluded in modelling, such as identifiers and indexes.
+    citation : str
+        Reference(s) that should be cited when building on this data.
+    format : str, optional
+        Format of the dataset. Only 'arff' for now.
+    version_label : str, optional
+        Version label provided by user, can be a date, hash, or some other type of id.
+    original_data_url : str, optional
+        For derived data, the url to the original dataset.
+    paper_url : str, optional
+        Link to a paper describing the dataset.
+    update_comment : str, optional
+        An explanation for when the dataset is uploaded.
+
+    Returns
+    -------
+    class:`openml.OpenMLDataset`
+        Dataset description."""
+    arff_object = {
+        'relation': name,
+        'description': description,
+        'attributes': attributes,
+        'data': data
+    }
+
+    # serializes the arff dataset object and returns a string
+    arff_dataset = arff.dumps(arff_object)
+    try:
+        # check if arff is valid
+        decoder = arff.ArffDecoder()
+        decoder.decode(arff_dataset, encode_nominal=True)
+    except arff.ArffException:
+        raise ValueError("The arguments you have provided \
+                             do not construct a valid arff file")
+
+    return OpenMLDataset(name, description, format, creator=creator,
+                         contributor=contributor, collection_date=collection_date,
+                         language=language, licence=licence, default_target_attribute=default_target_attribute,
+                         row_id_attribute=row_id_attribute, ignore_attribute=ignore_attribute, citation=citation,
+                         version_label=version_label, original_data_url=original_data_url, paper_url=paper_url,
+                         update_comment=update_comment, dataset=arff_dataset)
+
+
 def _get_dataset_description(did_cache_dir, dataset_id):
-    """Get the dataset description as xml dictionary
+    """Get the dataset description as xml dictionary.
+
+    This function is NOT thread/multiprocessing safe.
 
     Parameters
     ----------
@@ -316,17 +464,13 @@ def _get_dataset_description(did_cache_dir, dataset_id):
 
     try:
         return _get_cached_dataset_description(dataset_id)
-    except (OpenMLCacheException):
-        dataset_xml = _perform_api_call("data/%d" % dataset_id)
-
+    except OpenMLCacheException:
+        dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id)
         with io.open(description_file, "w", encoding='utf8') as fh:
             fh.write(dataset_xml)
 
     description = xmltodict.parse(dataset_xml)[
         "oml:data_set_description"]
-
-    with io.open(description_file, "w", encoding='utf8') as fh:
-        fh.write(dataset_xml)
 
     return description
 
@@ -336,6 +480,8 @@ def _get_dataset_arff(did_cache_dir, description):
 
     Checks if the file is in the cache, if yes, return the path to the file. If
     not, downloads the file and caches it, then returns the file path.
+
+    This function is NOT thread/multiprocessing safe.
 
     Parameters
     ----------
@@ -351,6 +497,8 @@ def _get_dataset_arff(did_cache_dir, description):
         Location of arff file.
     """
     output_file_path = os.path.join(did_cache_dir, "dataset.arff")
+    md5_checksum_fixture = description.get("oml:md5_checksum")
+    did = description.get("oml:id")
 
     # This means the file is still there; whether it is useful is up to
     # the user and not checked by the program.
@@ -362,7 +510,17 @@ def _get_dataset_arff(did_cache_dir, description):
         pass
 
     url = description['oml:url']
-    arff_string = _read_url(url)
+    arff_string = openml._api_calls._read_url(url)
+    md5 = hashlib.md5()
+    md5.update(arff_string.encode('utf-8'))
+    md5_checksum = md5.hexdigest()
+    if md5_checksum != md5_checksum_fixture:
+        raise OpenMLHashException(
+            'Checksum %s of downloaded dataset %d is unequal to the checksum '
+            '%s sent by the server.' % (
+                md5_checksum, int(did), md5_checksum_fixture
+            )
+        )
 
     with io.open(output_file_path, "w", encoding='utf8') as fh:
         fh.write(arff_string)
@@ -376,6 +534,8 @@ def _get_dataset_features(did_cache_dir, dataset_id):
 
     Features are feature descriptions for each column.
     (name, index, categorical, ...)
+
+    This function is NOT thread/multiprocessing safe.
 
     Parameters
     ----------
@@ -397,12 +557,12 @@ def _get_dataset_features(did_cache_dir, dataset_id):
         with io.open(features_file, encoding='utf8') as fh:
             features_xml = fh.read()
     except (OSError, IOError):
-        features_xml = _perform_api_call("data/features/%d" % dataset_id)
+        features_xml = openml._api_calls._perform_api_call("data/features/%d" % dataset_id)
 
         with io.open(features_file, "w", encoding='utf8') as fh:
             fh.write(features_xml)
 
-    features = xmltodict.parse(features_xml)["oml:data_features"]
+    features = xmltodict.parse(features_xml, force_list=('oml:feature',))["oml:data_features"]
 
     return features
 
@@ -411,6 +571,8 @@ def _get_dataset_qualities(did_cache_dir, dataset_id):
     """API call to get dataset qualities (cached)
 
     Features are metafeatures (number of features, number of classes, ...)
+
+    This function is NOT thread/multiprocessing safe.
 
     Parameters
     ----------
@@ -431,57 +593,14 @@ def _get_dataset_qualities(did_cache_dir, dataset_id):
         with io.open(qualities_file, encoding='utf8') as fh:
             qualities_xml = fh.read()
     except (OSError, IOError):
-        qualities_xml = _perform_api_call("data/qualities/%d" % dataset_id)
+        qualities_xml = openml._api_calls._perform_api_call("data/qualities/%d" % dataset_id)
 
         with io.open(qualities_file, "w", encoding='utf8') as fh:
             fh.write(qualities_xml)
 
-    qualities = xmltodict.parse(qualities_xml)['oml:data_qualities']
+    qualities = xmltodict.parse(qualities_xml, force_list=('oml:quality',))['oml:data_qualities']['oml:quality']
 
     return qualities
-
-
-def _create_dataset_cache_directory(dataset_id):
-    """Create a dataset cache directory
-
-    In order to have a clearer cache structure and because every dataset
-    is cached in several files (description, arff, features, qualities), there
-    is a directory for each dataset witch the dataset ID being the directory
-    name. This function creates this cache directory.
-
-    Parameters
-    ----------
-    did : int
-        Dataset ID
-
-    Returns
-    -------
-    str
-        Path of the created dataset cache directory.
-    """
-    dataset_cache_dir = os.path.join(config.get_cache_directory(), "datasets", str(dataset_id))
-    try:
-        os.makedirs(dataset_cache_dir)
-    except (OSError, IOError):
-        # TODO add debug information!
-        pass
-    return dataset_cache_dir
-
-
-def _remove_dataset_cache_dir(did_cache_dir):
-    """Remove the dataset cache directory
-
-    Parameters
-    ----------
-    """
-    try:
-        os.rmdir(did_cache_dir)
-    except (OSError, IOError):
-        try:
-            shutil.rmtree(did_cache_dir)
-        except (OSError, IOError):
-            raise ValueError('Cannot remove faulty dataset cache directory %s.'
-                             'Please do this manually!' % did_cache_dir)
 
 
 def _create_dataset_from_description(description, features, qualities, arff_file):
@@ -500,11 +619,11 @@ def _create_dataset_from_description(description, features, qualities, arff_file
         Dataset object from dict and arff.
     """
     dataset = OpenMLDataset(
-        description["oml:id"],
         description["oml:name"],
-        description["oml:version"],
         description.get("oml:description"),
         description["oml:format"],
+        description["oml:id"],
+        description["oml:version"],
         description.get("oml:creator"),
         description.get("oml:contributor"),
         description.get("oml:collection_date"),

@@ -12,6 +12,8 @@ import openml
 
 
 class TestInit(TestBase):
+    # Splitting not helpful, these test's don't rely on the server and take less
+    # than 1 seconds
 
     @mock.patch('openml.tasks.functions.get_task')
     @mock.patch('openml.datasets.functions.get_dataset')

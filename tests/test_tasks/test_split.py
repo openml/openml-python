@@ -8,12 +8,18 @@ from openml import OpenMLSplit
 
 
 class OpenMLSplitTest(unittest.TestCase):
+    # Splitting not helpful, these test's don't rely on the server and take less
+    # than 5 seconds + rebuilding the test would potentially be costly
+
     def setUp(self):
         __file__ = inspect.getfile(OpenMLSplitTest)
         self.directory = os.path.dirname(__file__)
         # This is for dataset
         self.arff_filename = os.path.join(
-            self.directory, "..", "files", "tasks", "1882", "datasplits.arff")
+            self.directory, "..", "files", "org", "openml", "test",
+            "tasks", "1882", "datasplits.arff"
+        )
+        # TODO Needs to be adapted regarding the python version
         self.pd_filename = self.arff_filename.replace(".arff", ".pkl")
 
     def tearDown(self):

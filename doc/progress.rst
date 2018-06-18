@@ -9,6 +9,12 @@ Progress
 Changelog
 =========
 
+0.8.0
+~~~~~
+* Added serialize run / deserialize run function (for saving runs on disk before uploading)
+* FIX: fixed bug related to listing functions (returns correct listing size)
+* made openml.utils.list_all a hidden function (should be accessed only by the respective listing functions)
+
 0.3.0
 ~~~~~
 

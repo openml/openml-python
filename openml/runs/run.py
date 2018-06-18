@@ -1,16 +1,20 @@
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
+import errno
 import json
+import pickle
 import sys
 import time
 import numpy as np
 
 import arff
+import os
 import xmltodict
 
 import openml
+import openml._api_calls
 from ..tasks import get_task
-from .._api_calls import _perform_api_call, _file_id_to_url, _read_url_files
 from ..exceptions import PyOpenMLError
+
 
 class OpenMLRun(object):
     """OpenML Run: result of running a model on an openml dataset.
@@ -51,6 +55,108 @@ class OpenMLRun(object):
         self.run_id = run_id
         self.model = model
         self.tags = tags
+        self.predictions_url = predictions_url
+
+    def __str__(self):
+        flow_name = self.flow_name
+        if len(flow_name) > 26:
+            # long enough to show sklearn.pipeline.Pipeline
+            flow_name = flow_name[:26] + "..."
+        return "[run id: {}, task id: {}, flow id: {}, flow name: {}]".format(
+            self.run_id, self.task_id, self.flow_id, flow_name)
+
+    def _repr_pretty_(self, pp, cycle):
+        pp.text(str(self))
+
+    @classmethod
+    def from_filesystem(cls, folder):
+        """
+        The inverse of the to_filesystem method. Instantiates an OpenMLRun
+        object based on files stored on the file system.
+
+        Parameters
+        ----------
+        folder : str
+            a path leading to the folder where the results
+            are stored
+
+        Returns
+        -------
+        run : OpenMLRun
+            the re-instantiated run object
+        """
+        if not os.path.isdir(folder):
+            raise ValueError('Could not find folder')
+
+        description_path = os.path.join(folder, 'description.xml')
+        predictions_path = os.path.join(folder, 'predictions.arff')
+        trace_path = os.path.join(folder, 'trace.arff')
+        model_path = os.path.join(folder, 'model.pkl')
+
+        if not os.path.isfile(description_path):
+            raise ValueError('Could not find description.xml')
+        if not os.path.isfile(predictions_path):
+            raise ValueError('Could not find predictions.arff')
+        if not os.path.isfile(model_path):
+            raise ValueError('Could not find model.pkl')
+
+        with open(description_path, 'r') as fp:
+            run = openml.runs.functions._create_run_from_xml(fp.read(), from_server=False)
+
+        with open(predictions_path, 'r') as fp:
+            predictions = arff.load(fp)
+            run.data_content = predictions['data']
+
+        with open(model_path, 'rb') as fp:
+            run.model = pickle.load(fp)
+
+        if os.path.isfile(trace_path):
+            with open(trace_path, 'r') as fp:
+                trace = arff.load(fp)
+                run.trace_attributes = trace['attributes']
+                run.trace_content = trace['data']
+
+        return run
+
+    def to_filesystem(self, output_directory):
+        """
+        The inverse of the from_filesystem method. Serializes a run
+        on the filesystem, to be uploaded later.
+
+        Parameters
+        ----------
+        folder : str
+            a path leading to the folder where the results
+            will be stored. Should be empty
+        """
+        if self.data_content is None or self.model is None:
+            raise ValueError('Run should have been executed (and contain model / predictions)')
+
+        try:
+            os.makedirs(output_directory)
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                pass
+            else:
+                raise e
+
+        if not os.listdir(output_directory) == []:
+            raise ValueError('Output directory should be empty')
+
+        run_xml = self._create_description_xml()
+        predictions_arff = arff.dumps(self._generate_arff_dict())
+
+        with open(os.path.join(output_directory, 'description.xml'), 'w') as f:
+            f.write(run_xml)
+        with open(os.path.join(output_directory, 'predictions.arff'), 'w') as f:
+            f.write(predictions_arff)
+        with open(os.path.join(output_directory, 'model.pkl'), 'wb') as f:
+            pickle.dump(self.model, f)
+
+        if self.trace_content is not None:
+            trace_arff = arff.dumps(self._generate_trace_arff_dict())
+            with open(os.path.join(output_directory, 'trace.arff'), 'w') as f:
+                f.write(trace_arff)
 
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the server.
@@ -96,11 +202,11 @@ class OpenMLRun(object):
             Contains information about the optimization trace.
         """
         if self.trace_content is None or len(self.trace_content) == 0:
-            raise ValueError('No trace content avaiable.')
+            raise ValueError('No trace content available.')
         if len(self.trace_attributes) != len(self.trace_content[0]):
             raise ValueError('Trace_attributes and trace_content not compatible')
 
-        arff_dict = {}
+        arff_dict = dict()
         arff_dict['attributes'] = self.trace_attributes
         arff_dict['data'] = self.trace_content
         arff_dict['relation'] = 'openml_task_' + str(self.task_id) + '_predictions'
@@ -108,31 +214,33 @@ class OpenMLRun(object):
         return arff_dict
 
     def get_metric_fn(self, sklearn_fn, kwargs={}):
-        '''Calculates metric scores based on predicted values. Assumes the
+        """Calculates metric scores based on predicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
         it assumes that the 'correct' attribute is specified in the arff
         (which is an optional field, but always the case for openml-python
         runs)
 
         Parameters
-        -------
+        ----------
         sklearn_fn : function
             a function pointer to a sklearn function that
-            accepts y_true, y_pred and *kwargs
+            accepts ``y_true``, ``y_pred`` and ``**kwargs``
 
         Returns
         -------
         scores : list
             a list of floats, of length num_folds * num_repeats
-        '''
-        if self.data_content is not None:
+        """
+        if self.data_content is not None and self.task_id is not None:
             predictions_arff = self._generate_arff_dict()
         elif 'predictions' in self.output_files:
-            predictions_file_url = _file_id_to_url(self.output_files['predictions'], 'predictions.arff')
+            predictions_file_url = openml._api_calls._file_id_to_url(
+                self.output_files['predictions'], 'predictions.arff',
+            )
             predictions_arff = arff.loads(openml._api_calls._read_url(predictions_file_url))
             # TODO: make this a stream reader
         else:
-            raise ValueError('Run should have been locally executed.')
+            raise ValueError('Run should have been locally executed or contain outputfile reference.')
 
         attribute_names = [att[0] for att in predictions_arff['attributes']]
         if 'correct' not in attribute_names:
@@ -221,7 +329,7 @@ class OpenMLRun(object):
             trace_arff = arff.dumps(self._generate_trace_arff_dict())
             file_elements['trace'] = ("trace.arff", trace_arff)
 
-        return_value = _perform_api_call("/run/", file_elements=file_elements)
+        return_value = openml._api_calls._perform_api_call("/run/", file_elements=file_elements)
         run_id = int(xmltodict.parse(return_value)['oml:upload_run']['oml:run_id'])
         self.run_id = run_id
         return self
@@ -348,6 +456,28 @@ class OpenMLRun(object):
 
         return parameters
 
+    def push_tag(self, tag):
+        """Annotates this run with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the run.
+        """
+        data = {'run_id': self.run_id, 'tag': tag}
+        openml._api_calls._perform_api_call("/run/tag", data=data)
+
+    def remove_tag(self, tag):
+        """Removes a tag from this run on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the run.
+        """
+        data = {'run_id': self.run_id, 'tag': tag}
+        openml._api_calls._perform_api_call("/run/untag", data=data)
+
 
 ################################################################################
 # Functions which cannot be in runs/functions due to circular imports
@@ -410,7 +540,8 @@ def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
     description['oml:run']['oml:parameter_setting'] = parameter_settings
     if tags is not None:
         description['oml:run']['oml:tag'] = tags  # Tags describing the run
-    if fold_evaluations is not None or sample_evaluations is not None:
+    if (fold_evaluations is not None and len(fold_evaluations) > 0) or \
+       (sample_evaluations is not None and len(sample_evaluations) > 0):
         description['oml:run']['oml:output_data'] = dict()
         description['oml:run']['oml:output_data']['oml:evaluation'] = list()
     if fold_evaluations is not None:

@@ -1,3 +1,4 @@
+*~
 doc/generated
 examples/.ipynb_checkpoints
 # Byte-compiled / optimized / DLL files
@@ -73,6 +74,3 @@ target/
 # IDE
 .idea
 *.swp
-
-# Other
-*.pkl
