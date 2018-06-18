@@ -412,9 +412,10 @@ def _get_fn_arguments_with_defaults(fn_name):
 
     # len(signature.defaults) <= len(signature.args). Thus, by definition, the last entrees of signature.args
     # actually have defaults. Iterate backwards over both arrays to keep them in sync
-    params_with_defaults = {signature.args[-1*i]: signature.defaults[-1*i] for i in range(1, len(signature.defaults) + 1)}
+    len_defaults = len(signature.defaults) if signature.defaults is not None else 0
+    params_with_defaults = {signature.args[-1*i]: signature.defaults[-1*i] for i in range(1, len_defaults + 1)}
     # retrieve the params without defaults
-    params_without_defaults = {signature.args[i] for i in range(len(signature.args) - len(signature.defaults))}
+    params_without_defaults = {signature.args[i] for i in range(len(signature.args) - len_defaults)}
     return params_with_defaults, params_without_defaults
 
 

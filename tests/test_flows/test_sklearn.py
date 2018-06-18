@@ -701,17 +701,17 @@ class TestSklearn(unittest.TestCase):
 
     def test__get_fn_arguments_with_defaults(self):
         fns = [
-            sklearn.ensemble.RandomForestRegressor.__init__,
-            sklearn.tree.DecisionTreeClassifier.__init__,
-            sklearn.pipeline.Pipeline.__init__
+            (sklearn.ensemble.RandomForestRegressor.__init__, 15),
+            (sklearn.tree.DecisionTreeClassifier.__init__, 12),
+            (sklearn.pipeline.Pipeline.__init__, 0)
         ]
 
-        for fn in fns:
+        for fn, num_params_with_defaults in fns:
             defaults, defaultless = openml.flows.sklearn_converter._get_fn_arguments_with_defaults(fn)
             self.assertIsInstance(defaults, dict)
             self.assertIsInstance(defaultless, set)
             # check whether we have both defaults and defaultless params
-            self.assertGreater(len(defaults), 0)
+            self.assertEquals(len(defaults), num_params_with_defaults)
             self.assertGreater(len(defaultless), 0)
             # check no overlap
             self.assertSetEqual(set(defaults.keys()), set(defaults.keys()) - defaultless)
