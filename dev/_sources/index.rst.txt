@@ -18,74 +18,66 @@ Example
 
 .. code:: python
 
-    # Define a scikit-learn pipeline
-    clf = sklearn.pipeline.Pipeline(
+   import openml
+   from sklearn import preprocessing, tree, pipeline
+   
+    # Set the OpenML API Key which is required to upload your runs.
+    # You can get your own API by signing up to OpenML.org.
+    openml.config.apikey = 'ABC'
+    
+    # Define a scikit-learn classifier or pipeline
+    clf = pipeline.Pipeline(
         steps=[
-            ('imputer', sklearn.preprocessing.Imputer()),
-            ('estimator', sklearn.tree.DecisionTreeClassifier())
+            ('imputer', preprocessing.Imputer()),
+            ('estimator', tree.DecisionTreeClassifier())
         ]
     )
     # Download the OpenML task for the german credit card dataset with 10-fold
     # cross-validation.
     task = openml.tasks.get_task(31)
-    # Set the OpenML API Key which is required to upload the runs.
-    # You can get your own API by signing up to OpenML.org.
-    openml.config.apikey = 'ABC'
     # Run the scikit-learn model on the task (requires an API key).
     run = openml.runs.run_model_on_task(task, clf)
     # Publish the experiment on OpenML (optional, requires an API key).
     run.publish()
-    print('URL for run: %s/run/%d' % (openml.config.server, run.run_id))
+    print('View the run online: %s/run/%d' % (openml.config.server, run.run_id))
 
-
-------------
-Introduction
-------------
-
+----------------------------
 How to get OpenML for python
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Currently, the OpenML package for python is only available from
-`github <https://github.com/openml/openml-python>`_.
+----------------------------
+You can install the OpenML package via `pip`:
 
 .. code:: bash
 
-    git clone https://github.com/openml/openml-python.git
+    pip install openml
 
-Installation
-~~~~~~~~~~~~
+For more advanced installation information, please see the
+:ref:`installation` section.
 
-Once you cloned the package, change into the new directory ``python`` and
-execute
-
-.. code:: bash
-
-    python setup.py install
-
-Testing
-~~~~~~~
-
-From within the directory of the cloned package, execute
-
-.. code:: bash
-
-    python setup.py test
-
+-----
 Usage
-~~~~~
+-----
 
 * :ref:`usage`
 * :ref:`api`
-* :ref:`developing`
+* :ref:`contributing`
 
+-------------------
+Further information
+-------------------
+
+* `OpenML documentation <https://docs.openml.org/>`_
+* `OpenML client APIs <https://docs.openml.org/APIs/>`_
+* `OpenML developer guide <https://docs.openml.org/developers/>`_
+* `Contact information <https://www.openml.org/contact>`_
+* `Citation request <https://www.openml.org/cite>`_
+* `OpenML blog <https://medium.com/open-machine-learning>`_
+* `OpenML twitter account <https://twitter.com/open_ml>`_
+
+------------
 Contributing
-~~~~~~~~~~~~
+------------
 
-Contribution to the OpenML package is highly appreciated. Currently,
-there is a lot of work left on implementing API calls,
-testing them and providing examples to allow new users to easily use the
-OpenML package. See the :ref:`progress` page for open tasks.
-
-Please contact `Matthias <http://aad.informatik.uni-freiburg.de/people/feurer/index.html>`_
-prior to start working on an issue or missing feature to avoid duplicate work
-. Please check the current implementations of the API calls and the method
+Contribution to the OpenML package is highly appreciated. The OpenML package
+currently has a 1/4 position for the development and all help possible is
+needed to extend and maintain the package, create new examples and improve
+the usability. Please see the :ref:`contributing` page for more information.

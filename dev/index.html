@@ -60,7 +60,8 @@
                 <li><a href="#">Start</a></li>
                 <li><a href="api.html">API</a></li>
                 <li><a href="usage.html">User Guide</a></li>
-                <li><a href="progress.html">Progress</a></li>
+                <li><a href="progress.html">Changelog</a></li>
+                <li><a href="contributing.html">Contributing</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -101,14 +102,10 @@
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
 <li><a class="reference internal" href="#">OpenML</a><ul>
 <li><a class="reference internal" href="#example">Example</a></li>
-<li><a class="reference internal" href="#introduction">Introduction</a><ul>
 <li><a class="reference internal" href="#how-to-get-openml-for-python">How to get OpenML for python</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#testing">Testing</a></li>
 <li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#further-information">Further information</a></li>
 <li><a class="reference internal" href="#contributing">Contributing</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -125,70 +122,66 @@ The OpenML Python package allows to use datasets and tasks from OpenML together
 with scikit-learn and share the results online.</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define a scikit-learn pipeline</span>
-<span class="n">clf</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
-    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;imputer&#39;</span><span class="p">,</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">Imputer</span><span class="p">()),</span>
-        <span class="p">(</span><span class="s1">&#39;estimator&#39;</span><span class="p">,</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">())</span>
-    <span class="p">]</span>
-<span class="p">)</span>
-<span class="c1"># Download the OpenML task for the german credit card dataset with 10-fold</span>
-<span class="c1"># cross-validation.</span>
-<span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">31</span><span class="p">)</span>
-<span class="c1"># Set the OpenML API Key which is required to upload the runs.</span>
-<span class="c1"># You can get your own API by signing up to OpenML.org.</span>
-<span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">apikey</span> <span class="o">=</span> <span class="s1">&#39;ABC&#39;</span>
-<span class="c1"># Run the scikit-learn model on the task (requires an API key).</span>
-<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">clf</span><span class="p">)</span>
-<span class="c1"># Publish the experiment on OpenML (optional, requires an API key).</span>
-<span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;URL for run: </span><span class="si">%s</span><span class="s1">/run/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">run</span><span class="o">.</span><span class="n">run_id</span><span class="p">))</span>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="k">import</span> <span class="n">preprocessing</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">pipeline</span>
+
+ <span class="c1"># Set the OpenML API Key which is required to upload your runs.</span>
+ <span class="c1"># You can get your own API by signing up to OpenML.org.</span>
+ <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">apikey</span> <span class="o">=</span> <span class="s1">&#39;ABC&#39;</span>
+
+ <span class="c1"># Define a scikit-learn classifier or pipeline</span>
+ <span class="n">clf</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
+     <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+         <span class="p">(</span><span class="s1">&#39;imputer&#39;</span><span class="p">,</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">Imputer</span><span class="p">()),</span>
+         <span class="p">(</span><span class="s1">&#39;estimator&#39;</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">())</span>
+     <span class="p">]</span>
+ <span class="p">)</span>
+ <span class="c1"># Download the OpenML task for the german credit card dataset with 10-fold</span>
+ <span class="c1"># cross-validation.</span>
+ <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">31</span><span class="p">)</span>
+ <span class="c1"># Run the scikit-learn model on the task (requires an API key).</span>
+ <span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">clf</span><span class="p">)</span>
+ <span class="c1"># Publish the experiment on OpenML (optional, requires an API key).</span>
+ <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+ <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;View the run online: </span><span class="si">%s</span><span class="s1">/run/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">run</span><span class="o">.</span><span class="n">run_id</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="how-to-get-openml-for-python">
-<h3>How to get OpenML for python<a class="headerlink" href="#how-to-get-openml-for-python" title="Permalink to this headline">¶</a></h3>
-<p>Currently, the OpenML package for python is only available from
-<a class="reference external" href="https://github.com/openml/openml-python">github</a>.</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">openml</span><span class="o">/</span><span class="n">openml</span><span class="o">-</span><span class="n">python</span><span class="o">.</span><span class="n">git</span>
+<h2>How to get OpenML for python<a class="headerlink" href="#how-to-get-openml-for-python" title="Permalink to this headline">¶</a></h2>
+<p>You can install the OpenML package via <cite>pip</cite>:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">openml</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="installation">
-<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
-<p>Once you cloned the package, change into the new directory <code class="docutils literal notranslate"><span class="pre">python</span></code> and
-execute</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="testing">
-<h3>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
-<p>From within the directory of the cloned package, execute</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">test</span>
-</pre></div>
-</div>
+<p>For more advanced installation information, please see the
+<a class="reference internal" href="contributing.html#installation"><span class="std std-ref">Installation</span></a> section.</p>
 </div>
 <div class="section" id="usage">
-<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><a class="reference internal" href="usage.html#usage"><span class="std std-ref">Basic Usage</span></a></li>
 <li><a class="reference internal" href="api.html#api"><span class="std std-ref">APIs</span></a></li>
-<li><a class="reference internal" href="developing.html#developing"><span class="std std-ref">Updating the API key for travis-ci</span></a></li>
+<li><a class="reference internal" href="contributing.html#contributing"><span class="std std-ref">Contributing</span></a></li>
+</ul>
+</div>
+<div class="section" id="further-information">
+<h2>Further information<a class="headerlink" href="#further-information" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.openml.org/">OpenML documentation</a></li>
+<li><a class="reference external" href="https://docs.openml.org/APIs/">OpenML client APIs</a></li>
+<li><a class="reference external" href="https://docs.openml.org/developers/">OpenML developer guide</a></li>
+<li><a class="reference external" href="https://www.openml.org/contact">Contact information</a></li>
+<li><a class="reference external" href="https://www.openml.org/cite">Citation request</a></li>
+<li><a class="reference external" href="https://medium.com/open-machine-learning">OpenML blog</a></li>
+<li><a class="reference external" href="https://twitter.com/open_ml">OpenML twitter account</a></li>
 </ul>
 </div>
 <div class="section" id="contributing">
-<h3>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h3>
-<p>Contribution to the OpenML package is highly appreciated. Currently,
-there is a lot of work left on implementing API calls,
-testing them and providing examples to allow new users to easily use the
-OpenML package. See the <a class="reference internal" href="progress.html#progress"><span class="std std-ref">Progress</span></a> page for open tasks.</p>
-<p>Please contact <a class="reference external" href="http://aad.informatik.uni-freiburg.de/people/feurer/index.html">Matthias</a>
-prior to start working on an issue or missing feature to avoid duplicate work
-. Please check the current implementations of the API calls and the method</p>
-</div>
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
+<p>Contribution to the OpenML package is highly appreciated. The OpenML package
+currently has a 1/4 position for the development and all help possible is
+needed to extend and maintain the package, create new examples and improve
+the usability. Please see the <a class="reference internal" href="contributing.html#contributing"><span class="std std-ref">Contributing</span></a> page for more information.</p>
 </div>
 </div>
 
