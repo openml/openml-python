@@ -11,6 +11,7 @@ import re
 import six
 import warnings
 import sys
+import inspect
 
 import numpy as np
 import scipy.stats.distributions
@@ -92,11 +93,33 @@ def _is_cross_validator(o):
     return isinstance(o, sklearn.model_selection.BaseCrossValidator)
 
 
-def flow_to_sklearn(o, **kwargs):
+def flow_to_sklearn(o, components=None, initialize_with_defaults=False):
+    """Initializes a sklearn model based on a flow.
+
+    Parameters
+    ----------
+    o : mixed
+        the object to deserialize (can be flow object, or any serialzied
+        parameter value that is accepted by)
+
+    components : dict
+    
+
+    initialize_with_defaults : bool, optional (default=False)
+        If this flag is set, the hyperparameter values of flows will be
+        ignored and a flow with its defaults is returned.
+
+    Returns
+    -------
+    mixed
+
+    """
+
     # First, we need to check whether the presented object is a json string.
     # JSON strings are used to encoder parameter values. By passing around
     # json strings for parameters, we make sure that we can flow_to_sklearn
     # the parameter values to the correct type.
+
     if isinstance(o, six.string_types):
         try:
             o = json.loads(o)
@@ -111,41 +134,41 @@ def flow_to_sklearn(o, **kwargs):
             serialized_type = o['oml-python:serialized_object']
             value = o['value']
             if serialized_type == 'type':
-                rval = deserialize_type(value, **kwargs)
+                rval = deserialize_type(value)
             elif serialized_type == 'rv_frozen':
-                rval = deserialize_rv_frozen(value, **kwargs)
+                rval = deserialize_rv_frozen(value)
             elif serialized_type == 'function':
-                rval = deserialize_function(value, **kwargs)
+                rval = deserialize_function(value)
             elif serialized_type == 'component_reference':
                 value = flow_to_sklearn(value)
                 step_name = value['step_name']
                 key = value['key']
-                component = flow_to_sklearn(kwargs['components'][key])
+                component = flow_to_sklearn(components[key], initialize_with_defaults=initialize_with_defaults)
                 # The component is now added to where it should be used
                 # later. It should not be passed to the constructor of the
                 # main flow object.
-                del kwargs['components'][key]
+                del components[key]
                 if step_name is None:
                     rval = component
                 else:
                     rval = (step_name, component)
             elif serialized_type == 'cv_object':
-                rval = _deserialize_cross_validator(value, **kwargs)
+                rval = _deserialize_cross_validator(value)
             else:
                 raise ValueError('Cannot flow_to_sklearn %s' % serialized_type)
 
         else:
-            rval = OrderedDict((flow_to_sklearn(key, **kwargs),
-                                flow_to_sklearn(value, **kwargs))
+            rval = OrderedDict((flow_to_sklearn(key, components, initialize_with_defaults),
+                                flow_to_sklearn(value, components, initialize_with_defaults))
                                for key, value in sorted(o.items()))
     elif isinstance(o, (list, tuple)):
-        rval = [flow_to_sklearn(element, **kwargs) for element in o]
+        rval = [flow_to_sklearn(element, components, initialize_with_defaults) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
     elif isinstance(o, (bool, int, float, six.string_types)) or o is None:
         rval = o
     elif isinstance(o, OpenMLFlow):
-        rval = _deserialize_model(o, **kwargs)
+        rval = _deserialize_model(o, initialize_with_defaults)
     else:
         raise TypeError(o)
 
@@ -363,7 +386,38 @@ def _extract_information_from_model(model):
     return parameters, parameters_meta_info, sub_components, sub_components_explicit
 
 
-def _deserialize_model(flow, **kwargs):
+def _get_fn_arguments_with_defaults(fn_name):
+    """
+    Returns i) a dict with all parameter names (as key) that have a default value (as value) and ii) a set with all
+    parameter names that do not have a default
+
+    Parameters
+    ----------
+    fn_name : callable
+        The function of which we want to obtain the defaults
+
+    Returns
+    -------
+    params_with_defaults: dict
+        a dict mapping parameter name to the default value
+    params_without_defaults: dict
+        a set with all parameters that do not have a default value
+    """
+    if sys.version_info[0] >= 3:
+        signature = inspect.getfullargspec(fn_name)
+    else:
+        signature = inspect.getargspec(fn_name)
+
+    # len(signature.defaults) <= len(signature.args). Thus, by definition, the last entrees of signature.args
+    # actually have defaults. Iterate backwards over both arrays to keep them in sync
+    len_defaults = len(signature.defaults) if signature.defaults is not None else 0
+    params_with_defaults = {signature.args[-1*i]: signature.defaults[-1*i] for i in range(1, len_defaults + 1)}
+    # retrieve the params without defaults
+    params_without_defaults = {signature.args[i] for i in range(len(signature.args) - len_defaults)}
+    return params_with_defaults, params_without_defaults
+
+
+def _deserialize_model(flow, keep_defaults):
 
     model_name = flow.class_name
     _check_dependencies(flow.dependencies)
@@ -381,7 +435,7 @@ def _deserialize_model(flow, **kwargs):
 
     for name in parameters:
         value = parameters.get(name)
-        rval = flow_to_sklearn(value, components=components_)
+        rval = flow_to_sklearn(value, components=components_, initialize_with_defaults=keep_defaults)
         parameter_dict[name] = rval
 
     for name in components:
@@ -390,13 +444,20 @@ def _deserialize_model(flow, **kwargs):
         if name not in components_:
             continue
         value = components[name]
-        rval = flow_to_sklearn(value)
+        rval = flow_to_sklearn(value, **kwargs)
         parameter_dict[name] = rval
 
     module_name = model_name.rsplit('.', 1)
     model_class = getattr(importlib.import_module(module_name[0]),
                           module_name[1])
 
+    if keep_defaults:
+        # obtain all params with a default
+        param_defaults, _ = _get_fn_arguments_with_defaults(model_class.__init__)
+
+        # delete all params that have a default from the dict, so they get initialized with their default value
+        for param in param_defaults:
+            del parameter_dict[param]
     return model_class(**parameter_dict)
 
 
@@ -445,7 +506,7 @@ def serialize_type(o):
     return ret
 
 
-def deserialize_type(o, **kwargs):
+def deserialize_type(o):
     mapping = {'float': float,
                'np.float': np.float,
                'np.float32': np.float32,
@@ -469,7 +530,8 @@ def serialize_rv_frozen(o):
                                 ('args', args), ('kwds', kwds)))
     return ret
 
-def deserialize_rv_frozen(o, **kwargs):
+
+def deserialize_rv_frozen(o):
     args = o['args']
     kwds = o['kwds']
     a = o['a']
@@ -499,7 +561,7 @@ def serialize_function(o):
     return ret
 
 
-def deserialize_function(name, **kwargs):
+def deserialize_function(name):
     module_name = name.rsplit('.', 1)
     try:
         function_handle = getattr(importlib.import_module(module_name[0]),
@@ -508,6 +570,7 @@ def deserialize_function(name, **kwargs):
         warnings.warn('Cannot load function %s due to %s.' % (name, e))
         return None
     return function_handle
+
 
 def _serialize_cross_validator(o):
     ret = OrderedDict()
@@ -554,6 +617,7 @@ def _serialize_cross_validator(o):
 
     return ret
 
+
 def _check_n_jobs(model):
     '''
     Returns True if the parameter settings of model are chosen s.t. the model
@@ -596,7 +660,8 @@ def _check_n_jobs(model):
     # check the parameters for n_jobs
     return check(model.get_params(), False)
 
-def _deserialize_cross_validator(value, **kwargs):
+
+def _deserialize_cross_validator(value):
     model_name = value['name']
     parameters = value['parameters']
 
