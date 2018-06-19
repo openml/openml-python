@@ -14,6 +14,9 @@ Changelog
 * Added serialize run / deserialize run function (for saving runs on disk before uploading)
 * FIX: fixed bug related to listing functions (returns correct listing size)
 * made openml.utils.list_all a hidden function (should be accessed only by the respective listing functions)
+* Improve error handling for issue `#479 <https://github.com/openml/openml-python/pull/479>`_:
+  the OpenML connector fails earlier and with a better error message when
+  failing to create a flow from the OpenML description.
 
 0.3.0
 ~~~~~
