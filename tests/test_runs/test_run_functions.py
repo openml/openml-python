@@ -122,6 +122,9 @@ class TestRun(TestBase):
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
 
+        run_xml = run._create_description_xml()
+        run_trace = run._generate_trace_arff_dict()
+
         # check arff output
         self.assertEqual(len(run.data_content), num_instances)
 
@@ -167,6 +170,12 @@ class TestRun(TestBase):
 
         downloaded = openml.runs.get_run(run_.run_id)
         assert('openml-python' in downloaded.tags)
+
+        # TODO make sure that these attributes are instantiated when downloading a run?
+        # Or make sure that the trace object is created when running a flow on a task (and not
+        # only the arff object is created, so that the two objects can actually be compared).
+        #downloaded_run_trace = downloaded._generate_trace_arff_dict()
+        #self.assertEqual(run_trace, downloaded_run_trace)
 
         return run
 
