@@ -2,7 +2,6 @@ import collections
 import io
 import json
 import os
-import shutil
 import sys
 import time
 import warnings
@@ -16,7 +15,7 @@ import sklearn.metrics
 import openml
 import openml.utils
 import openml._api_calls
-from ..exceptions import PyOpenMLError, OpenMLServerNoResult
+from ..exceptions import PyOpenMLError
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
     _copy_server_fields, OpenMLFlow
@@ -405,11 +404,11 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
     # this information is multiple times overwritten, but due to the ordering
     # of tne loops, eventually it contains the information based on the full
     # dataset size
-    user_defined_measures_per_fold = collections.defaultdict(lambda: collections.defaultdict(dict))
+    user_defined_measures_per_fold = collections.OrderedDict()
     # stores sample-based evaluation measures (sublevel of fold-based)
     # will also be filled on a non sample-based task, but the information
     # is the same as the fold-based measures, and disregarded in that case
-    user_defined_measures_per_sample = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(dict)))
+    user_defined_measures_per_sample = collections.OrderedDict()
 
     # sys.version_info returns a tuple, the following line compares the entry of tuples
     # https://docs.python.org/3.6/reference/expressions.html#value-comparisons
@@ -431,6 +430,16 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
                 arff_tracecontent.extend(arff_tracecontent_fold)
 
                 for measure in user_defined_measures_fold:
+                    if measure not in user_defined_measures_per_fold:
+                        user_defined_measures_per_fold[measure] = collections.OrderedDict()
+                    if rep_no not in user_defined_measures_per_fold:
+                        user_defined_measures_per_fold[measure][rep_no] = collections.OrderedDict()
+                    if measure not in user_defined_measures_per_sample:
+                        user_defined_measures_per_sample[measure] = collections.OrderedDict()
+                    if rep_no not in user_defined_measures_per_sample:
+                        user_defined_measures_per_sample[measure][rep_no] = collections.OrderedDict()
+                    if fold_no not in user_defined_measures_per_sample:
+                        user_defined_measures_per_sample[measure][rep_no][fold_no] = collections.OrderedDict()
                     user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[measure]
                     user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = user_defined_measures_fold[measure]
 
@@ -515,7 +524,7 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
     trainY = Y[train_indices]
     testX = X[test_indices]
     testY = Y[test_indices]
-    user_defined_measures = dict()
+    user_defined_measures = collections.OrderedDict()
 
     try:
         # for measuring runtime. Only available since Python 3.3
@@ -752,10 +761,10 @@ def _create_run_from_xml(xml, from_server=True):
     elif not from_server:
         dataset_id = None
 
-    files = dict()
-    evaluations = dict()
-    fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
-    sample_evaluations = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(dict)))
+    files = collections.OrderedDict()
+    evaluations = collections.OrderedDict()
+    fold_evaluations = collections.OrderedDict()
+    sample_evaluations = collections.OrderedDict()
     if 'oml:output_data' not in run:
         if from_server:
             raise ValueError('Run does not contain output_data (OpenML server error?)')
@@ -781,16 +790,23 @@ def _create_run_from_xml(xml, from_server=True):
                     repeat = int(evaluation_dict['@repeat'])
                     fold = int(evaluation_dict['@fold'])
                     sample = int(evaluation_dict['@sample'])
-                    repeat_dict = sample_evaluations[key]
-                    fold_dict = repeat_dict[repeat]
-                    sample_dict = fold_dict[fold]
-                    sample_dict[sample] = value
+                    if key not in sample_evaluations:
+                        sample_evaluations[key] = collections.OrderedDict()
+                    if repeat not in sample_evaluations[key]:
+                        sample_evaluations[key][repeat] = collections.OrderedDict()
+                    if fold not in sample_evaluations[key][repeat]:
+                        sample_evaluations[key][repeat][fold] = collections.OrderedDict()
+                    sample_evaluations[key][repeat][fold][sample] = value
                 elif '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
                     repeat = int(evaluation_dict['@repeat'])
                     fold = int(evaluation_dict['@fold'])
-                    repeat_dict = fold_evaluations[key]
-                    fold_dict = repeat_dict[repeat]
-                    fold_dict[fold] = value
+                    if key not in fold_evaluations:
+                        fold_evaluations[key] = collections.OrderedDict()
+                    if repeat not in fold_evaluations[key]:
+                        fold_evaluations[key][repeat] = collections.OrderedDict()
+                    if fold not in fold_evaluations[key][repeat]:
+                        fold_evaluations[key][repeat][fold] = collections.OrderedDict()
+                    fold_evaluations[key][repeat][fold] = value
                 else:
                     evaluations[key] = value
 
@@ -832,7 +848,7 @@ def _create_trace_from_description(xml):
     result_dict = xmltodict.parse(xml, force_list=('oml:trace_iteration',))['oml:trace']
 
     run_id = result_dict['oml:run_id']
-    trace = dict()
+    trace = collections.OrderedDict()
 
     if 'oml:trace_iteration' not in result_dict:
         raise ValueError('Run does not contain valid trace. ')
@@ -878,7 +894,7 @@ def _create_trace_from_arff(arff_obj):
     run : OpenMLRunTrace
         Object containing None for run id and a dict containing the trace iterations
     """
-    trace = dict()
+    trace = collections.OrderedDict()
     attribute_idx = {att[0]: idx for idx, att in enumerate(arff_obj['attributes'])}
     for required_attribute in ['repeat', 'fold', 'iteration', 'evaluation', 'selected']:
         if required_attribute not in attribute_idx:
@@ -1045,7 +1061,7 @@ def __list_runs(api_call):
     assert type(runs_dict['oml:runs']['oml:run']) == list, \
         type(runs_dict['oml:runs'])
 
-    runs = dict()
+    runs = collections.OrderedDict()
     for run_ in runs_dict['oml:runs']['oml:run']:
         run_id = int(run_['oml:run_id'])
         run = {'run_id': run_id,

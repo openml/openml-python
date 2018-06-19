@@ -101,7 +101,8 @@ class OpenMLRun(object):
             raise ValueError('Could not find model.pkl')
 
         with open(description_path, 'r') as fp:
-            run = openml.runs.functions._create_run_from_xml(fp.read(), from_server=False)
+            xml_string = fp.read()
+            run = openml.runs.functions._create_run_from_xml(xml_string, from_server=False)
 
         with open(predictions_path, 'r') as fp:
             predictions = arff.load(fp)
@@ -114,7 +115,14 @@ class OpenMLRun(object):
             with open(trace_path, 'r') as fp:
                 trace = arff.load(fp)
                 run.trace_attributes = trace['attributes']
-                run.trace_content = trace['data']
+                data_tmp = trace['data']
+                # TODO move this functionality to trace.py and serialize/deserialize the trace
+                # via the according class!
+                for line in data_tmp:
+                    for i in range(3):
+                        line[i] = int(line[i])
+                    line[3] = float(line[3])
+                run.trace_content = data_tmp
 
         return run
 
@@ -177,7 +185,7 @@ class OpenMLRun(object):
         task = get_task(self.task_id)
         class_labels = task.class_labels
 
-        arff_dict = {}
+        arff_dict = OrderedDict()
         arff_dict['attributes'] = [('repeat', 'NUMERIC'),  # lowercase 'numeric' gives an error
                                    ('fold', 'NUMERIC'),
                                    ('sample', 'NUMERIC'),
@@ -206,7 +214,7 @@ class OpenMLRun(object):
         if len(self.trace_attributes) != len(self.trace_content[0]):
             raise ValueError('Trace_attributes and trace_content not compatible')
 
-        arff_dict = dict()
+        arff_dict = OrderedDict()
         arff_dict['attributes'] = self.trace_attributes
         arff_dict['data'] = self.trace_content
         arff_dict['relation'] = 'openml_task_' + str(self.task_id) + '_predictions'
@@ -252,7 +260,7 @@ class OpenMLRun(object):
             # convenience function: Creates a mapping to map from the name of attributes
             # present in the arff prediction file to their index. This is necessary
             # because the number of classes can be different for different tasks.
-            res = dict()
+            res = OrderedDict()
             for idx in range(len(attribute_list)):
                 res[attribute_list[idx][0]] = idx
             return res
@@ -282,11 +290,11 @@ class OpenMLRun(object):
             prediction = predictions_arff['attributes'][predicted_idx][1].index(line[predicted_idx])
             correct = predictions_arff['attributes'][predicted_idx][1].index(line[correct_idx])
             if rep not in values_predict:
-                values_predict[rep] = dict()
-                values_correct[rep] = dict()
+                values_predict[rep] = OrderedDict()
+                values_correct[rep] = OrderedDict()
             if fold not in values_predict[rep]:
-                values_predict[rep][fold] = dict()
-                values_correct[rep][fold] = dict()
+                values_predict[rep][fold] = OrderedDict()
+                values_correct[rep][fold] = OrderedDict()
             if samp not in values_predict[rep][fold]:
                 values_predict[rep][fold][samp] = []
                 values_correct[rep][fold][samp] = []
@@ -542,7 +550,7 @@ def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
         description['oml:run']['oml:tag'] = tags  # Tags describing the run
     if (fold_evaluations is not None and len(fold_evaluations) > 0) or \
        (sample_evaluations is not None and len(sample_evaluations) > 0):
-        description['oml:run']['oml:output_data'] = dict()
+        description['oml:run']['oml:output_data'] = OrderedDict()
         description['oml:run']['oml:output_data']['oml:evaluation'] = list()
     if fold_evaluations is not None:
         for measure in fold_evaluations:

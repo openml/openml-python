@@ -7,6 +7,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, StratifiedKFold
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import Imputer
 
 from openml.testing import TestBase
 from openml.flows.sklearn_converter import sklearn_to_flow
@@ -91,18 +93,38 @@ class TestRun(TestBase):
         np.testing.assert_array_equal(string_part, string_part_prime)
 
         if run.trace_content is not None:
-            numeric_part = np.array(np.array(run.trace_content)[:, 0:-2], dtype=float)
-            numeric_part_prime = np.array(np.array(run_prime.trace_content)[:, 0:-2], dtype=float)
-            string_part = np.array(run.trace_content)[:, -2:]
-            string_part_prime = np.array(run_prime.trace_content)[:, -2:]
+            def _check_array(array, type_):
+                for line in array:
+                    for entry in line:
+                        self.assertIsInstance(entry, type_)
+
+            int_part = [line[:3] for line in run.trace_content]
+            _check_array(int_part, int)
+            int_part_prime = [line[:3] for line in run_prime.trace_content]
+            _check_array(int_part_prime, int)
+
+            float_part = np.array(np.array(run.trace_content)[:, 3:4], dtype=float)
+            float_part_prime = np.array(np.array(run_prime.trace_content)[:, 3:4], dtype=float)
+            bool_part = [line[4] for line in run.trace_content]
+            bool_part_prime = [line[4] for line in run_prime.trace_content]
+            for bp, bpp in zip(bool_part, bool_part_prime):
+                self.assertIn(bp, ['true', 'false'])
+                self.assertIn(bpp, ['true', 'false'])
+            string_part = np.array(run.trace_content)[:, 5:]
+            string_part_prime = np.array(run_prime.trace_content)[:, 5:]
             # JvR: Python 2.7 requires an almost equal check, rather than an equals check
-            np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
+            np.testing.assert_array_almost_equal(int_part, int_part_prime)
+            np.testing.assert_array_almost_equal(float_part, float_part_prime)
+            self.assertEqual(bool_part, bool_part_prime)
             np.testing.assert_array_equal(string_part, string_part_prime)
         else:
             self.assertIsNone(run_prime.trace_content)
 
     def test_to_from_filesystem_vanilla(self):
-        model = DecisionTreeClassifier(max_depth=1)
+        model = Pipeline([
+            ('imputer', Imputer(strategy='mean')),
+            ('classifier', DecisionTreeClassifier(max_depth=1)),
+        ])
         task = openml.tasks.get_task(119)
         run = openml.runs.run_model_on_task(task, model, add_local_measures=False)
 
@@ -114,7 +136,17 @@ class TestRun(TestBase):
         run_prime.publish()
 
     def test_to_from_filesystem_search(self):
-        model = GridSearchCV(estimator=DecisionTreeClassifier(), param_grid={"max_depth": [1, 2, 3, 4, 5]})
+        model = Pipeline([
+            ('imputer', Imputer(strategy='mean')),
+            ('classifier', DecisionTreeClassifier(max_depth=1)),
+        ])
+        model = GridSearchCV(
+            estimator=model,
+            param_grid={
+                "classifier__max_depth": [1, 2, 3, 4, 5],
+                "imputer__strategy": ['mean', 'median'],
+            }
+        )
 
         task = openml.tasks.get_task(119)
         run = openml.runs.run_model_on_task(task, model, add_local_measures=False)
