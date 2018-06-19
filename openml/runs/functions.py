@@ -430,16 +430,19 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
                 arff_tracecontent.extend(arff_tracecontent_fold)
 
                 for measure in user_defined_measures_fold:
+
                     if measure not in user_defined_measures_per_fold:
                         user_defined_measures_per_fold[measure] = collections.OrderedDict()
-                    if rep_no not in user_defined_measures_per_fold:
+                    if rep_no not in user_defined_measures_per_fold[measure]:
                         user_defined_measures_per_fold[measure][rep_no] = collections.OrderedDict()
+
                     if measure not in user_defined_measures_per_sample:
                         user_defined_measures_per_sample[measure] = collections.OrderedDict()
-                    if rep_no not in user_defined_measures_per_sample:
+                    if rep_no not in user_defined_measures_per_sample[measure]:
                         user_defined_measures_per_sample[measure][rep_no] = collections.OrderedDict()
-                    if fold_no not in user_defined_measures_per_sample:
+                    if fold_no not in user_defined_measures_per_sample[measure][rep_no]:
                         user_defined_measures_per_sample[measure][rep_no][fold_no] = collections.OrderedDict()
+
                     user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[measure]
                     user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = user_defined_measures_fold[measure]
 
@@ -804,8 +807,6 @@ def _create_run_from_xml(xml, from_server=True):
                         fold_evaluations[key] = collections.OrderedDict()
                     if repeat not in fold_evaluations[key]:
                         fold_evaluations[key][repeat] = collections.OrderedDict()
-                    if fold not in fold_evaluations[key][repeat]:
-                        fold_evaluations[key][repeat][fold] = collections.OrderedDict()
                     fold_evaluations[key][repeat][fold] = value
                 else:
                     evaluations[key] = value
