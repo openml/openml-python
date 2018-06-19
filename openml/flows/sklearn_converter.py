@@ -394,12 +394,8 @@ def _deserialize_model(flow, **kwargs):
         parameter_dict[name] = rval
 
     module_name = model_name.rsplit('.', 1)
-    try:
-        model_class = getattr(importlib.import_module(module_name[0]),
-                              module_name[1])
-    except:
-        warnings.warn('Cannot create model %s for flow.' % model_name)
-        return None
+    model_class = getattr(importlib.import_module(module_name[0]),
+                          module_name[1])
 
     return model_class(**parameter_dict)
 
