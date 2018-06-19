@@ -111,8 +111,35 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>.flow_to_sklearn<a class="headerlink" href="#openml-flows-flow-to-sklearn" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.flows.flow_to_sklearn">
-<code class="descclassname">openml.flows.</code><code class="descname">flow_to_sklearn</code><span class="sig-paren">(</span><em>o</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.flows.flow_to_sklearn" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">openml.flows.</code><code class="descname">flow_to_sklearn</code><span class="sig-paren">(</span><em>o</em>, <em>components=None</em>, <em>initialize_with_defaults=False</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.flows.flow_to_sklearn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a sklearn model based on a flow.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>o</strong> <span class="classifier-delimiter">:</span> <span class="classifier">mixed</span></dt>
+<dd><p class="first last">the object to deserialize (can be flow object, or any serialzied
+parameter value that is accepted by)</p>
+</dd>
+<dt><strong>components</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd></dd>
+<dt><strong>initialize_with_defaults</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=False)</span></dt>
+<dd><p class="first last">If this flag is set, the hyperparameter values of flows will be
+ignored and a flow with its defaults is returned.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>mixed</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <div class="clearer"></div></div>
 
