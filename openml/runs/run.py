@@ -111,18 +111,10 @@ class OpenMLRun(object):
         with open(model_path, 'rb') as fp:
             run.model = pickle.load(fp)
 
-        if os.path.isfile(trace_path):
-            with open(trace_path, 'r') as fp:
-                trace = arff.load(fp)
-                run.trace_attributes = trace['attributes']
-                data_tmp = trace['data']
-                # TODO move this functionality to trace.py and serialize/deserialize the trace
-                # via the according class!
-                for line in data_tmp:
-                    for i in range(3):
-                        line[i] = int(line[i])
-                    line[3] = float(line[3])
-                run.trace_content = data_tmp
+        trace_arff = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
+
+        run.trace_attributes = trace_arff['attributes']
+        run.trace_content = trace_arff['data']
 
         return run
 

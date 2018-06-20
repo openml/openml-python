@@ -1,4 +1,6 @@
+import arff
 import json
+import os
 
 
 class OpenMLRunTrace(object):
@@ -40,7 +42,37 @@ class OpenMLRunTrace(object):
         for (r, f, i) in self.trace_iterations:
             if r == repeat and f == fold and self.trace_iterations[(r, f, i)].selected is True:
                 return i
-        raise ValueError('Could not find the selected iteration for rep/fold %d/%d' %(repeat,fold))
+        raise ValueError('Could not find the selected iteration for rep/fold %d/%d' % (repeat, fold))
+
+    @staticmethod
+    def _from_filesystem(file_path):
+        """
+        Logic to deserialize the trace from the filesystem
+
+        Parameters
+        ----------
+        file_path: str
+            File path where the trace is stored
+
+        Returns
+        ----------
+        trace: dict
+            a dict in the liac-arff style that contains trace information
+        """
+        if not os.path.isfile(file_path):
+            raise ValueError('Trace file doesn\'t exist')
+
+        with open(file_path, 'r') as fp:
+            trace = arff.load(fp)
+
+        # TODO probably we want to integrate the trace object with the run object, rather than the current
+        # situation (which stores the arff)
+        for trace_idx in range(len(trace['data'])):
+            # iterate over first three entrees of a trace row (fold, repeat, trace_iteration) these should be int
+            for line_idx in range(3):
+                value = trace['data'][trace_idx][line_idx]
+                trace['data'][trace_idx][line_idx] = int(trace['data'][trace_idx][line_idx])
+        return trace
 
     def __str__(self):
         return '[Run id: %d, %d trace iterations]' % (self.run_id, len(self.trace_iterations))
@@ -92,9 +124,9 @@ class OpenMLTraceIteration(object):
         return result
 
     def __str__(self):
-        '''
+        """
         tmp string representation, will be changed in the near future 
-        '''
+        """
         return '[(%d,%d,%d): %f (%r)]' %(self.repeat, self.fold, self.iteration,
-                                          self.evaluation, self.selected)
+                                         self.evaluation, self.selected)
 
