@@ -8,14 +8,12 @@ import numpy as np
 import openml
 import sklearn.datasets
 
-
-# We will upload to the test server to not
-# pollute the live server with countless copies of the same
-# dataset
+############################################################################
+# For this example we will upload to the test server to not  pollute the live server with countless copies of the same dataset.
 openml.config.server = 'https://test.openml.org/api/v1/xml'
 
-# Load an example dataset from scikit-learn which we will 
-# upload to OpenML.org via the API
+############################################################################
+# Load an example dataset from scikit-learn which we will upload to OpenML.org via the API.
 breast_cancer = sklearn.datasets.load_breast_cancer()
 name = 'BreastCancer(scikit-learn)'
 X = breast_cancer.data
@@ -24,19 +22,17 @@ attribute_names = breast_cancer.feature_names
 targets = breast_cancer.target_names
 description = breast_cancer.DESCR
 
-# OpenML does not distinguish between the attributes and
-# targets on the data level and stores all data in a 
-# single matrix. The target feature is indicated as 
-# meta-data of the dataset (and tasks on that data)
+############################################################################
+# OpenML does not distinguish between the attributes and targets on the data level and stores all data in a
+# single matrix. The target feature is indicated as meta-data of the dataset (and tasks on that data).
 data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
 attributes = [
     (attribute_name, 'REAL') for attribute_name in attribute_names
 ] + [('class', 'REAL')]
 
-# Create the dataset object. 
-# The definition of all fields can be found in the XSD files
-# describing the expected format:
+############################################################################
+# Create the dataset object. The definition of all fields can be found in the XSD files describing the expected format:
 # https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd
 dataset = openml.datasets.functions.create_dataset(
     # The name of the dataset (needs to be unique). 
@@ -80,5 +76,6 @@ dataset = openml.datasets.functions.create_dataset(
     paper_url='https://www.spiedigitallibrary.org/conference-proceedings-of-spie/1905/0000/Nuclear-feature-extraction-for-breast-tumor-diagnosis/10.1117/12.148698.short?SSO=1'
 )
 
+############################################################################
 upload_id = dataset.publish()
 print(upload_id)
