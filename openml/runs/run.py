@@ -111,10 +111,11 @@ class OpenMLRun(object):
         with open(model_path, 'rb') as fp:
             run.model = pickle.load(fp)
 
-        trace_arff = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
+        if os.path.isfile(trace_path):
+            trace_arff = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
 
-        run.trace_attributes = trace_arff['attributes']
-        run.trace_content = trace_arff['data']
+            run.trace_attributes = trace_arff['attributes']
+            run.trace_content = trace_arff['data']
 
         return run
 
