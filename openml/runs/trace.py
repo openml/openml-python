@@ -1,5 +1,6 @@
 import json
 
+
 class OpenMLRunTrace(object):
     """OpenML Run Trace: parsed output from Run Trace call
 
@@ -19,18 +20,30 @@ class OpenMLRunTrace(object):
         self.trace_iterations = trace_iterations
 
     def get_selected_iteration(self, fold, repeat):
-        '''
+        """
         Returns the trace iteration that was marked as selected. In
         case multiple are marked as selected (should not happen) the
         first of these is returned
-        '''
+        
+        Parameters
+        ----------
+        fold: int
+        
+        repeat: int
+        
+        Returns
+        ----------
+        OpenMLTraceIteration
+            The trace iteration from the given fold and repeat that was
+            selected as the best iteration by the search procedure
+        """
         for (r, f, i) in self.trace_iterations:
             if r == repeat and f == fold and self.trace_iterations[(r, f, i)].selected is True:
                 return i
         raise ValueError('Could not find the selected iteration for rep/fold %d/%d' %(repeat,fold))
 
     def __str__(self):
-        return '[Run id: %d, %d trace iterations]' %(self.run_id, len(self.trace_iterations))
+        return '[Run id: %d, %d trace iterations]' % (self.run_id, len(self.trace_iterations))
 
 
 class OpenMLTraceIteration(object):
