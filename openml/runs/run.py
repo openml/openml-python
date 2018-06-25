@@ -12,6 +12,7 @@ import xmltodict
 
 import openml
 import openml._api_calls
+from .trace import OpenMLRunTrace, OpenMLTraceIteration
 from ..tasks import get_task
 from ..exceptions import PyOpenMLError
 
@@ -49,6 +50,7 @@ class OpenMLRun(object):
         self.output_files = output_files
         self.trace_attributes = trace_attributes
         self.trace_content = trace_content
+        self.trace = self._generate_trace()
         self.error_message = None
         self.task = task
         self.flow = flow
@@ -112,10 +114,8 @@ class OpenMLRun(object):
             run.model = pickle.load(fp)
 
         if os.path.isfile(trace_path):
-            trace_arff = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
-
-            run.trace_attributes = trace_arff['attributes']
-            run.trace_content = trace_arff['data']
+            trace = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
+            run.trace = trace
 
         return run
 
@@ -156,6 +156,7 @@ class OpenMLRun(object):
 
         if self.trace_content is not None:
             trace_arff = arff.dumps(self._generate_trace_arff_dict())
+
             with open(os.path.join(output_directory, 'trace.arff'), 'w') as f:
                 f.write(trace_arff)
 
@@ -213,6 +214,43 @@ class OpenMLRun(object):
         arff_dict['relation'] = 'openml_task_' + str(self.task_id) + '_predictions'
 
         return arff_dict
+
+    def _generate_trace(self):
+
+        if self.trace_content is None or len(self.trace_content) == 0:
+            raise ValueError('No trace content available.')
+        if len(self.trace_attributes) != len(self.trace_content[0]):
+            raise ValueError('Trace_attributes and trace_content not compatible')
+
+        trace = OrderedDict()
+        attribute_idx = {att[0]: idx for idx, att in enumerate(self.trace_attributes)}
+        for required_attribute in ['repeat', 'fold', 'iteration', 'evaluation', 'selected']:
+            if required_attribute not in attribute_idx:
+                raise ValueError('arff misses required attribute: %s' % required_attribute)
+
+        for itt in self.trace_content:
+            repeat = int(itt[attribute_idx['repeat']])
+            fold = int(itt[attribute_idx['fold']])
+            iteration = int(itt[attribute_idx['iteration']])
+            evaluation = float(itt[attribute_idx['evaluation']])
+            selectedValue = itt[attribute_idx['selected']]
+            if selectedValue == 'true':
+                selected = True
+            elif selectedValue == 'false':
+                selected = False
+            else:
+                raise ValueError('expected {"true", "false"} value for selected field, received: %s' % selectedValue)
+
+            # TODO: if someone needs it, he can use the parameter
+            # fields to revive the setup_string as well
+            # However, this is usually done by the OpenML server
+            # and if we are going to duplicate this functionality
+            # it needs proper testing
+
+            current = OpenMLTraceIteration(repeat, fold, iteration, None, evaluation, selected)
+            trace[(repeat, fold, iteration)] = current
+
+        return OpenMLRunTrace(None, trace)
 
     def get_metric_fn(self, sklearn_fn, kwargs={}):
         """Calculates metric scores based on predicted values. Assumes the

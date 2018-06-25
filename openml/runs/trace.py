@@ -1,6 +1,8 @@
 import arff
 import json
 import os
+from openml.runs.functions import _create_trace_from_arff
+from collections import OrderedDict
 
 
 class OpenMLRunTrace(object):
@@ -52,27 +54,66 @@ class OpenMLRunTrace(object):
         Parameters
         ----------
         file_path: str
-            File path where the trace is stored
+            File path where the trace arff is stored.
 
         Returns
         ----------
-        trace: dict
-            a dict in the liac-arff style that contains trace information
+        OpenMLRunTrace
         """
         if not os.path.isfile(file_path):
             raise ValueError('Trace file doesn\'t exist')
 
         with open(file_path, 'r') as fp:
-            trace = arff.load(fp)
+            trace_arff = arff.load(fp)
 
         # TODO probably we want to integrate the trace object with the run object, rather than the current
         # situation (which stores the arff)
-        for trace_idx in range(len(trace['data'])):
+        for trace_idx in range(len(trace_arff['data'])):
             # iterate over first three entrees of a trace row (fold, repeat, trace_iteration) these should be int
             for line_idx in range(3):
-                value = trace['data'][trace_idx][line_idx]
-                trace['data'][trace_idx][line_idx] = int(trace['data'][trace_idx][line_idx])
-        return trace
+                trace_arff['data'][trace_idx][line_idx] = int(trace_arff['data'][trace_idx][line_idx])
+
+        return _create_trace_from_arff(trace_arff)
+
+    @staticmethod
+    def _to_filesystem(self, file_path):
+
+        if self.trace_iterations is not None:
+            trace_arff = arff.dumps(self._generate_trace_arff_dict())
+            with open(os.path.join(output_directory, 'trace.arff'), 'w') as f:
+                f.write(trace_arff)
+
+    def _generate_trace_arff_dict(self):
+        """Generates the arff dictionary for uploading predictions to the server.
+
+        Assumes that the run has been executed.
+
+        Returns
+        -------
+        arf_dict : dict
+            Dictionary representation of the ARFF file that will be uploaded.
+            Contains information about the optimization trace.
+        """
+
+        for trace_iteration in self.trace_iterations.values():
+            for attrib, value in vars(trace_iteration).items():
+                if attrib is not None:
+
+
+
+        if self.trace_content is None or len(self.trace_content) == 0:
+            raise ValueError('No trace content available.')
+        if len(self.trace_attributes) != len(self.trace_content[0]):
+            raise ValueError('Trace_attributes and trace_content not compatible')
+
+        arff_dict = OrderedDict()
+        arff_dict['attributes'] = self.trace_attributes
+        arff_dict['data'] = self.trace_content
+        arff_dict['relation'] = 'openml_task_' + str(self.task_id) + '_predictions'
+
+        return arff_dict
+
+
 
     def __str__(self):
         return '[Run id: %d, %d trace iterations]' % (self.run_id, len(self.trace_iterations))
