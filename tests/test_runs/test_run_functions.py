@@ -18,6 +18,7 @@ from openml.runs.functions import _run_task_get_arffcontent, \
     _get_seeded_model, _run_exists, _extract_arfftrace, \
     _extract_arfftrace_attributes, _prediction_to_row, _check_n_jobs
 from openml.flows.sklearn_converter import sklearn_to_flow
+from openml.runs.trace import OpenMLRunTrace
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
@@ -123,7 +124,7 @@ class TestRun(TestBase):
         self.assertIsInstance(run.dataset_id, int)
 
         run_xml = run._create_description_xml()
-        run_trace = run._generate_trace_arff_dict()
+        run_trace = run.trace._trace_to_arff()
 
         # check arff output
         self.assertEqual(len(run.data_content), num_instances)
@@ -845,7 +846,7 @@ class TestRun(TestBase):
     def test__create_trace_from_arff(self):
         with open(self.static_cache_dir + '/misc/trace.arff', 'r') as arff_file:
             trace_arff = arff.load(arff_file)
-        openml.runs.trace.trace_from_arff(trace_arff)
+        OpenMLRunTrace.trace_from_arff(trace_arff)
 
     def test_get_run(self):
         # this run is not available on test

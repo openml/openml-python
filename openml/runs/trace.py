@@ -83,12 +83,10 @@ class OpenMLRunTrace(object):
         file_path: str
             File path where the trace arff will be stored.
         """
-        if self.trace_iterations is not None:
-            trace_arff = arff.dumps(self._trace_to_arff())
-            with open(os.path.join(file_path, 'trace.arff'), 'w') as f:
-                f.write(trace_arff)
-        else:
-            raise ValueError("trace_iterations missing from the trace object")
+
+        trace_arff = arff.dumps(self._trace_to_arff())
+        with open(os.path.join(file_path, 'trace.arff'), 'w') as f:
+            f.write(trace_arff)
 
     def _trace_to_arff(self):
         """Generates the arff dictionary for uploading predictions to the server.
@@ -101,6 +99,8 @@ class OpenMLRunTrace(object):
             Dictionary representation of the ARFF file that will be uploaded.
             Contains information about the optimization trace.
         """
+        if self.trace_iterations is None:
+            raise ValueError("trace_iterations missing from the trace object")
         # attributes that will be in trace arff
         trace_attributes = [('repeat', 'NUMERIC'),
                             ('fold', 'NUMERIC'),
@@ -126,6 +126,7 @@ class OpenMLRunTrace(object):
 
         arff_dict['attributes'] = trace_attributes
         arff_dict['data'] = data
+        arff_dict['relation'] = "Trace"
 
         return arff_dict
 

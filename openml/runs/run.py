@@ -338,8 +338,8 @@ class OpenMLRun(object):
             predictions = arff.dumps(self._generate_arff_dict())
             file_elements['predictions'] = ("predictions.arff", predictions)
 
-        if self.trace_content is not None:
-            trace_arff = arff.dumps(self._generate_trace_arff_dict())
+        if self.trace is not None:
+            trace_arff = self.trace._trace_to_arff()
             file_elements['trace'] = ("trace.arff", trace_arff)
 
         return_value = openml._api_calls._perform_api_call("/run/", file_elements=file_elements)

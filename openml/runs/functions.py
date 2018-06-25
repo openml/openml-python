@@ -23,7 +23,7 @@ from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..tasks import OpenMLTask
 from .run import OpenMLRun, _get_version_information
-
+from .trace import OpenMLRunTrace
 
 # _get_version_info, _get_dict and _create_setup_string are in run.py to avoid
 # circular imports
@@ -170,7 +170,7 @@ def get_run_trace(run_id):
     """
 
     trace_xml = openml._api_calls._perform_api_call('run/trace/%d' % run_id)
-    run_trace = _create_trace_from_description(trace_xml)
+    run_trace = OpenMLRunTrace._trace_from_xml(trace_xml)
     return run_trace
 
 
