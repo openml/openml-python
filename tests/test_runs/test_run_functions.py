@@ -552,7 +552,7 @@ class TestRun(TestBase):
         try:
             # in case the run did not exists yet
             run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=True)
-            trace = openml.runs.functions._create_trace_from_arff(run._generate_trace_arff_dict())
+            trace = openml.runs.trace.trace_from_arff(run._generate_trace_arff_dict())
             self.assertEquals(
                 len(trace.trace_iterations),
                 num_iterations * num_folds,
@@ -845,7 +845,7 @@ class TestRun(TestBase):
     def test__create_trace_from_arff(self):
         with open(self.static_cache_dir + '/misc/trace.arff', 'r') as arff_file:
             trace_arff = arff.load(arff_file)
-        trace = openml.runs.functions._create_trace_from_arff(trace_arff)
+        openml.runs.trace.trace_from_arff(trace_arff)
 
     def test_get_run(self):
         # this run is not available on test
