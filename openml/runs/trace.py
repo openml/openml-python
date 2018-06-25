@@ -146,17 +146,24 @@ class OpenMLRunTrace(object):
         OpenMLRunTrace
         """
         trace = OrderedDict()
+        # flag if setup string is in attributes
+        flag_ss = False
         attribute_idx = {att[0]: idx for idx, att in enumerate(arff_obj['attributes'])}
         for required_attribute in ['repeat', 'fold', 'iteration', 'evaluation', 'selected']:
             if required_attribute not in attribute_idx:
                 raise ValueError('arff misses required attribute: %s' % required_attribute)
+        if 'setup_string' in attribute_idx:
+            flag_ss = True
 
         for itt in arff_obj['data']:
             repeat = int(itt[attribute_idx['repeat']])
             fold = int(itt[attribute_idx['fold']])
             iteration = int(itt[attribute_idx['iteration']])
             evaluation = float(itt[attribute_idx['evaluation']])
-            setup_string = str(itt[attribute_idx['setup_string']])
+            if flag_ss:
+                setup_string = str(itt[attribute_idx['setup_string']])
+            else:
+                setup_string = None
             selected_value = itt[attribute_idx['selected']]
             if selected_value == 'true':
                 selected = True

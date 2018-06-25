@@ -91,8 +91,17 @@ class TestRun(TestBase):
         # JvR: Python 2.7 requires an almost equal check, rather than an equals check
         np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
         np.testing.assert_array_equal(string_part, string_part_prime)
-        run_trace_content = run.trace.__trace_to_arff()['data']
-        run_prime_trace_content = run_prime.trace.__trace_to_arff()['data']
+
+        if run.trace is not None:
+            run_trace_content = run.trace._trace_to_arff()['data']
+        else:
+            run_trace_content = None
+
+        if run_prime.trace is not None:
+            run_prime_trace_content = run_prime.trace._trace_to_arff()['data']
+        else:
+            run_prime_trace_content = None
+
         if run_trace_content is not None:
             def _check_array(array, type_):
                 for line in array:
