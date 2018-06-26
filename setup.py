@@ -37,8 +37,7 @@ setuptools.setup(name="openml",
                      'mock',
                      'numpy>=1.6.2',
                      'scipy>=0.13.3',
-                     'keras',
-					 'liac-arff>=2.2.1',
+                     'liac-arff>=2.2.1',
                      'xmltodict',
                      'nose',
                      'requests',
@@ -46,6 +45,7 @@ setuptools.setup(name="openml",
                      'nbformat',
                      'python-dateutil',
                      'oslo.concurrency',
+                     'keras'
                  ],
                  extras_require={
                      'test': [

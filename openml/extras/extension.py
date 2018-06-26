@@ -9,9 +9,11 @@ from openml.flows import OpenMLFlow
 def is_extension_model(model):
     #currently only support keras model. extension={keras, ...}
     return isinstance(model,keras.wrappers.scikit_learn.KerasClassifier)
+    #return model.__class__=="keras.wrappers.scikit_learn.KerasClassifier"
 
 def _is_keras_model(model):
     return isinstance(model,keras.wrappers.scikit_learn.KerasClassifier)
+    #return model.__class__=="keras.wrappers.scikit_learn.KerasClassifier"
 
 def extension_to_flow(o):
     if(_is_keras_model(o)):
