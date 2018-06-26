@@ -313,12 +313,13 @@ class OpenMLFlow(object):
         # try to parse to a model because not everything that can be
         # deserialized has to come from scikit-learn. If it can't be
         # serialized, but comes from scikit-learn this is worth an exception
-        try:
+        if (
+            arguments['external_version'].startswith('sklearn==')
+            or ',sklearn==' in arguments['external_version']
+        ):
             from .sklearn_converter import flow_to_sklearn
             model = flow_to_sklearn(flow)
-        except Exception as e:
-            if arguments['external_version'].startswith('sklearn'):
-                raise e
+        else:
             model = None
         flow.model = model
 

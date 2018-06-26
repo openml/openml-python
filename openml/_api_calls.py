@@ -11,8 +11,8 @@ from .exceptions import (OpenMLServerError, OpenMLServerException,
                          OpenMLServerNoResult)
 
 
-def _perform_api_call(call, data=None, file_dictionary=None,
-                      file_elements=None, add_authentication=True):
+def _perform_api_call(call, data=None, file_elements=None,
+                      add_authentication=True):
     """
     Perform an API call at the OpenML server.
     return self._read_url(url, data=data, filePath=filePath,
@@ -24,9 +24,6 @@ def _perform_api_call(call, data=None, file_dictionary=None,
         The API call. For example data/list
     data : dict
         Dictionary with post-request payload.
-    file_dictionary : dict
-        Mapping of {filename: path} of files which should be uploaded to the
-        server.
     file_elements : dict
         Mapping of {filename: str} of strings which should be uploaded as
         files to the server.
@@ -47,9 +44,8 @@ def _perform_api_call(call, data=None, file_dictionary=None,
 
     url = url.replace('=', '%3d')
 
-    if file_dictionary is not None or file_elements is not None:
-        return _read_url_files(url, data=data, file_dictionary=file_dictionary,
-                               file_elements=file_elements)
+    if file_elements is not None:
+        return _read_url_files(url, data=data, file_elements=file_elements)
     return _read_url(url, data)
 
 
@@ -65,32 +61,14 @@ def _file_id_to_url(file_id, filename=None):
     return url
 
 
-def _read_url_files(url, data=None, file_dictionary=None, file_elements=None):
-    """do a post request to url with data, file content of
-    file_dictionary and sending file_elements as files"""
+def _read_url_files(url, data=None, file_elements=None):
+    """do a post request to url with data
+    and sending file_elements as files"""
 
     data = {} if data is None else data
     data['api_key'] = config.apikey
     if file_elements is None:
         file_elements = {}
-    if file_dictionary is not None:
-        for key, path in file_dictionary.items():
-            path = os.path.abspath(path)
-            if os.path.exists(path):
-                try:
-                    if key is 'dataset':
-                        # check if arff is valid?
-                        decoder = arff.ArffDecoder()
-                        with io.open(path, encoding='utf8') as fh:
-                            decoder.decode(fh, encode_nominal=True)
-                except:
-                    raise ValueError("The file you have provided is not a valid arff file")
-
-                file_elements[key] = open(path, 'rb')
-
-            else:
-                raise ValueError("File doesn't exist")
-
     # Using requests.post sets header 'Accept-encoding' automatically to
     # 'gzip,deflate'
     response = requests.post(url, data=data, files=file_elements)
