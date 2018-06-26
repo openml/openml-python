@@ -16,8 +16,9 @@ import sklearn.metrics
 import openml
 import openml.utils
 import openml._api_calls
-from openml.extras import extensions
-from ..exceptions import PyOpenMLError, OpenMLServerNoResult
+from ..extras import extension
+from ..extras.extension import is_extension_model, extension_to_flow
+from ..exceptions import PyOpenMLError
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
     _copy_server_fields
@@ -36,8 +37,10 @@ RUNS_CACHE_DIR_NAME = 'runs'
 def run_model_on_task(task, model, avoid_duplicate_runs=True, flow_tags=None,
                       seed=None, add_local_measures=True):
     """See ``run_flow_on_task for a documentation``."""
-
-    flow = sklearn_to_flow(model)
+    if(is_extension_model(model)):
+        flow = extension_to_flow(model)
+    else:
+        flow = sklearn_to_flow(model)
 
     return run_flow_on_task(task=task, flow=flow,
                             avoid_duplicate_runs=avoid_duplicate_runs,
@@ -191,7 +194,7 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
     Parameters
     ----------
     run_id : int
-        The Openml run_id. Should contain a trace file, 
+        The Openml run_id. Should contain a trace file,
         otherwise a OpenMLServerException is raised
 
     repeat: int
@@ -202,7 +205,7 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
 
     iteration: int
         The iteration nr (column in trace file). If None, the
-        best (selected) iteration will be searched (slow), 
+        best (selected) iteration will be searched (slow),
         according to the selection criteria implemented in
         OpenMLRunTrace.get_selected_iteration
 
@@ -408,8 +411,8 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
     for rep_no in range(num_reps):
         for fold_no in range(num_folds):
             for sample_no in range(num_samples):
-                if(extensions.KerasClassifierWrapper.is_sklearn_wrapper(model)):
-                    model_fold = extensions.KerasClassifierWrapper.convert_from_sklearn(model)
+                if(extension.KerasClassifierWrapper.is_sklearn_wrapper(model)):
+                    model_fold = extension.KerasClassifierWrapper.convert_from_sklearn(model)
                 else:
                     model_fold = sklearn.base.clone(model, safe=True)
                 res = _run_model_on_fold(model_fold, task, rep_no, fold_no, sample_no,
@@ -694,7 +697,7 @@ def _create_run_from_xml(xml, from_server=True):
     run : OpenMLRun
         New run object representing run_xml.
     """
-    
+
     def obtain_field(xml_obj, fieldname, from_server, cast=None):
         # this function can be used to check whether a field is present in an object.
         # if it is not present, either returns None or throws an error (this is
@@ -715,7 +718,7 @@ def _create_run_from_xml(xml, from_server=True):
     task_id = int(run['oml:task_id'])
     task_type = obtain_field(run, 'oml:task_type', from_server)
 
-    # even with the server requirement this field may be empty. 
+    # even with the server requirement this field may be empty.
     if 'oml:task_evaluation_measure' in run:
         task_evaluation_measure = run['oml:task_evaluation_measure']
     else:

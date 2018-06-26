@@ -1,7 +1,6 @@
 from collections import OrderedDict
 import errno
 import json
-import keras
 import pickle
 import sys
 import time
@@ -15,7 +14,7 @@ import openml
 import openml._api_calls
 from ..tasks import get_task
 from ..exceptions import PyOpenMLError
-
+from ..extras import extension
 
 class OpenMLRun(object):
     """OpenML Run: result of running a model on an openml dataset.
@@ -395,7 +394,7 @@ class OpenMLRun(object):
             expected_components = set(_flow.components)
             model_parameters = set([mp for mp in component_model.get_params()
                                     if '__' not in mp])
-            if(not isinstance(model,keras.wrappers.scikit_learn.KerasClassifier) and len((expected_parameters | expected_components) ^ model_parameters) != 0):
+            if(not extension.is_extension_model(model) and len((expected_parameters | expected_components) ^ model_parameters) != 0):
                 raise ValueError('Parameters of the model do not match the '
                                  'parameters expected by the '
                                  'flow:\nexpected flow parameters: '
