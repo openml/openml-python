@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import six
+import arff
 
 from oslo_concurrency import lockutils
 import xmltodict
@@ -352,6 +353,89 @@ def get_dataset(dataset_id):
     return dataset
 
 
+def create_dataset(name, description, creator, contributor, collection_date,
+                   language, licence, attributes, data, default_target_attribute,
+                   row_id_attribute, ignore_attribute, citation, format="arff",
+                   original_data_url=None, paper_url=None, update_comment=None,
+                   version_label=None):
+    """Create a dataset.
+
+    This function creates an OpenMLDataset object.
+    The OpenMLDataset object contains information related to the dataset
+    and the actual data file.
+
+    Parameters
+    ----------
+    name : str
+        Name of the dataset.
+    description : str
+        Description of the dataset.
+    creator : str
+        The person who created the dataset.
+    contributor : str
+        People who contributed to the current version of the dataset.
+    collection_date : str
+        The date the data was originally collected, given by the uploader.
+    language : str
+        Language in which the data is represented.
+        Starts with 1 upper case letter, rest lower case, e.g. 'English'.
+    licence : str
+        License of the data.
+    attributes : list
+        A list of tuples. Each tuple consists of the attribute name and type.
+    data : numpy.ndarray
+        An array that contains both the attributes and the targets, with
+        shape=(n_samples, n_features).
+        The target feature is indicated as meta-data of the dataset.
+    default_target_attribute : str
+        The default target attribute, if it exists.
+        Can have multiple values, comma separated.
+    row_id_attribute : str
+        The attribute that represents the row-id column, if present in the dataset.
+    ignore_attribute : str | list
+        Attributes that should be excluded in modelling, such as identifiers and indexes.
+    citation : str
+        Reference(s) that should be cited when building on this data.
+    format : str, optional
+        Format of the dataset. Only 'arff' for now.
+    version_label : str, optional
+        Version label provided by user, can be a date, hash, or some other type of id.
+    original_data_url : str, optional
+        For derived data, the url to the original dataset.
+    paper_url : str, optional
+        Link to a paper describing the dataset.
+    update_comment : str, optional
+        An explanation for when the dataset is uploaded.
+
+    Returns
+    -------
+    class:`openml.OpenMLDataset`
+        Dataset description."""
+    arff_object = {
+        'relation': name,
+        'description': description,
+        'attributes': attributes,
+        'data': data
+    }
+
+    # serializes the arff dataset object and returns a string
+    arff_dataset = arff.dumps(arff_object)
+    try:
+        # check if arff is valid
+        decoder = arff.ArffDecoder()
+        decoder.decode(arff_dataset, encode_nominal=True)
+    except arff.ArffException:
+        raise ValueError("The arguments you have provided \
+                             do not construct a valid arff file")
+
+    return OpenMLDataset(name, description, format, creator=creator,
+                         contributor=contributor, collection_date=collection_date,
+                         language=language, licence=licence, default_target_attribute=default_target_attribute,
+                         row_id_attribute=row_id_attribute, ignore_attribute=ignore_attribute, citation=citation,
+                         version_label=version_label, original_data_url=original_data_url, paper_url=paper_url,
+                         update_comment=update_comment, dataset=arff_dataset)
+
+
 def _get_dataset_description(did_cache_dir, dataset_id):
     """Get the dataset description as xml dictionary.
 
@@ -535,11 +619,11 @@ def _create_dataset_from_description(description, features, qualities, arff_file
         Dataset object from dict and arff.
     """
     dataset = OpenMLDataset(
-        description["oml:id"],
         description["oml:name"],
-        description["oml:version"],
         description.get("oml:description"),
         description["oml:format"],
+        description["oml:id"],
+        description["oml:version"],
         description.get("oml:creator"),
         description.get("oml:contributor"),
         description.get("oml:collection_date"),

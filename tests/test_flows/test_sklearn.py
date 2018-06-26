@@ -698,3 +698,38 @@ class TestSklearn(unittest.TestCase):
 
         for i in range(len(illegal_models)):
             self.assertRaises(PyOpenMLError, _check_n_jobs, illegal_models[i])
+
+    def test__get_fn_arguments_with_defaults(self):
+        fns = [
+            (sklearn.ensemble.RandomForestRegressor.__init__, 15),
+            (sklearn.tree.DecisionTreeClassifier.__init__, 12),
+            (sklearn.pipeline.Pipeline.__init__, 0)
+        ]
+
+        for fn, num_params_with_defaults in fns:
+            defaults, defaultless = openml.flows.sklearn_converter._get_fn_arguments_with_defaults(fn)
+            self.assertIsInstance(defaults, dict)
+            self.assertIsInstance(defaultless, set)
+            # check whether we have both defaults and defaultless params
+            self.assertEquals(len(defaults), num_params_with_defaults)
+            self.assertGreater(len(defaultless), 0)
+            # check no overlap
+            self.assertSetEqual(set(defaults.keys()), set(defaults.keys()) - defaultless)
+            self.assertSetEqual(defaultless, defaultless - set(defaults.keys()))
+
+    def test_deserialize_with_defaults(self):
+        # used the 'initialize_with_defaults' flag of the deserialization method to return a flow
+        # that contains default hyperparameter settings.
+        steps = [('Imputer', sklearn.preprocessing.Imputer()),
+                 ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
+                 ('Estimator', sklearn.tree.DecisionTreeClassifier())]
+        pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
+
+        pipe_adjusted = sklearn.clone(pipe_orig)
+        params = {'Imputer__strategy': 'median', 'OneHotEncoder__sparse': False, 'Estimator__min_samples_leaf': 42}
+        pipe_adjusted.set_params(**params)
+        flow = openml.flows.sklearn_to_flow(pipe_adjusted)
+        pipe_deserialized = openml.flows.flow_to_sklearn(flow, initialize_with_defaults=True)
+
+        # we want to compare pipe_deserialized and pipe_orig. We use the flow equals function for this
+        assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig), openml.flows.sklearn_to_flow(pipe_deserialized))

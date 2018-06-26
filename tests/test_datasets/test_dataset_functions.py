@@ -316,12 +316,12 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(len(os.listdir(datasets_cache_dir)), 0)
 
     def test_publish_dataset(self):
-        dataset = openml.datasets.get_dataset(3)
+        openml.datasets.get_dataset(3)
         file_path = os.path.join(openml.config.get_cache_directory(),
                                  "datasets", "3", "dataset.arff")
         dataset = OpenMLDataset(
-            name="anneal", version=1, description="test",
-            format="ARFF", licence="public", default_target_attribute="class", data_file=file_path)
+            "anneal", "test", "ARFF",
+            version=1, licence="public", default_target_attribute="class", data_file=file_path)
         dataset.publish()
         self.assertIsInstance(dataset.dataset_id, int)
 
@@ -335,8 +335,8 @@ class TestOpenMLDataset(TestBase):
 
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
-            name="UploadTestWithURL", version=1, description="test",
-            format="ARFF",
+            "UploadTestWithURL", "test", "ARFF",
+            version=1,
             url="https://www.openml.org/data/download/61/dataset_61_iris.arff")
         dataset.publish()
         self.assertIsInstance(dataset.dataset_id, int)
