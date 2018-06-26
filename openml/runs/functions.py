@@ -43,7 +43,7 @@ def run_model_on_task(model, task, avoid_duplicate_runs=True, flow_tags=None,
         warnings.warn("The old argument order (task, model) is deprecated and will not be supported in the future. "
                       "Please use the order (model, task).", DeprecationWarning)
         task, model = model, task
-        
+
     if(is_extension_model(model)):
         flow = extension_to_flow(model)
     else:

@@ -14,7 +14,6 @@ import openml
 import openml._api_calls
 from ..tasks import get_task
 from ..exceptions import PyOpenMLError
-from ..extras import extension
 
 class OpenMLRun(object):
     """OpenML Run: result of running a model on an openml dataset.
@@ -395,7 +394,7 @@ class OpenMLRun(object):
             expected_components = set(_flow.components)
             model_parameters = set([mp for mp in component_model.get_params()
                                     if '__' not in mp])
-            if(not extension.is_extension_model(model) and len((expected_parameters | expected_components) ^ model_parameters) != 0):
+            if(len((expected_parameters | expected_components) ^ model_parameters) != 0):
                 raise ValueError('Parameters of the model do not match the '
                                  'parameters expected by the '
                                  'flow:\nexpected flow parameters: '
@@ -406,11 +405,9 @@ class OpenMLRun(object):
             for _param_name in _flow.parameters:
                 _current = OrderedDict()
                 _current['oml:name'] = _param_name
-                if("layer" in _param_name):
-                    _tmp = openml.flows.sklearn_to_flow(json.loads(_flow.parameters[_param_name]))
-                else:
-                    _tmp = openml.flows.sklearn_to_flow(
-                        component_model.get_params()[_param_name])
+
+                _tmp = openml.flows.sklearn_to_flow(
+                    component_model.get_params()[_param_name])
 
                 # Try to filter out components (a.k.a. subflows) which are
                 # handled further down in the code (by recursively calling
