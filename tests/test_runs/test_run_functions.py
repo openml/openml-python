@@ -325,8 +325,8 @@ class TestRun(TestBase):
                 accuracy_scores_provided.append(
                     run.fold_evaluations['predictive_accuracy'][rep][fold])
         self.assertEquals(sum(accuracy_scores_provided), sum(accuracy_scores))
-        trace_content = run.trace._trace_to_arff()['data']
         if isinstance(clf, BaseSearchCV):
+            trace_content = run.trace._trace_to_arff()['data']
             if isinstance(clf, GridSearchCV):
                 grid_iterations = 1
                 for param in clf.param_grid:
