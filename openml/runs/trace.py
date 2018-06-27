@@ -160,11 +160,10 @@ class OpenMLRunTrace(object):
             fold = int(itt[attribute_idx['fold']])
             iteration = int(itt[attribute_idx['iteration']])
             evaluation = float(itt[attribute_idx['evaluation']])
+            setup_string = None
             if flag_ss:
-                if setup_string != 'None':
+                if itt[attribute_idx['setup_string']] != None:
                     setup_string = str(itt[attribute_idx['setup_string']])
-            else:
-                setup_string = None
             selected_value = itt[attribute_idx['selected']]
             if selected_value == 'true':
                 selected = True
