@@ -2,7 +2,6 @@ import json
 import inspect
 import sklearn.base
 from ..flows.sklearn_converter import sklearn_to_flow, _extract_information_from_model, _check_multiple_occurence_of_component_in_flow, _get_external_version_string, _format_external_version
-from keras.wrappers.scikit_learn import KerasClassifier
 from openml.flows import OpenMLFlow
 
 def is_extension_model(model):
