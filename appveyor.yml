@@ -38,7 +38,7 @@ install:
   - "cd C:\\projects\\openml-python"
   - conda install --quiet --yes scikit-learn=0.18.2
   - conda install --quiet --yes mock numpy scipy nose requests nbformat python-dateutil nbconvert pandas matplotlib seaborn
-  - pip install liac-arff xmltodict oslo.concurrency tensorflow keras
+  - pip install liac-arff xmltodict oslo.concurrency
   - "python setup.py install" #%CMD_IN_ENV%
 
 
