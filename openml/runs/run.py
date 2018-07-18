@@ -48,10 +48,7 @@ class OpenMLRun(object):
         self.sample_evaluations = sample_evaluations
         self.data_content = data_content
         self.output_files = output_files
-        try:
-            self.trace = self._generate_trace(trace_attributes, trace_content)
-        except ValueError:
-            self.trace = None
+        self.trace = self._generate_trace(trace_attributes, trace_content)
         self.error_message = None
         self.task = task
         self.flow = flow
@@ -189,39 +186,53 @@ class OpenMLRun(object):
         arff_dict['relation'] = 'openml_task_' + str(task.task_id) + '_predictions'
         return arff_dict
 
-    def _generate_trace(self, trace_attributes, trace_content):
+    def _generate_trace(self, attributes, content):
+        """Generates an OpenMLRunTrace.
 
-        if trace_content is None or len(trace_content) == 0:
-            raise ValueError('No trace content available.')
-        if trace_attributes is None or len(trace_attributes) != len(trace_content[0]):
-            raise ValueError('Trace_attributes and trace_content not compatible')
+        Generates the trace object from the attributes and content.
+
+        Returns
+        -------
+        OpenMLRunTrace
+        """
+
+        if content is None:
+            if attributes is None:
+                return None
+            else:
+                raise ValueError('Trace content not available.')
+        if len(content) == 0:
+            raise ValueError('Trace content is empty.')
+        if attributes is not None:
+            if len(attributes) != len(content[0]):
+                raise ValueError('Trace_attributes and trace_content not compatible')
+        else:
+            raise ValueError('No trace attributes available')
 
         trace = OrderedDict()
-        attribute_idx = {att[0]: idx for idx, att in enumerate(trace_attributes)}
+        attribute_idx = {att[0]: idx for idx, att in enumerate(attributes)}
         for required_attribute in ['repeat', 'fold', 'iteration', 'evaluation', 'selected']:
             if required_attribute not in attribute_idx:
                 raise ValueError('arff misses required attribute: %s' % required_attribute)
 
-        for itt in trace_content:
+        for itt in content:
             repeat = int(itt[attribute_idx['repeat']])
             fold = int(itt[attribute_idx['fold']])
             iteration = int(itt[attribute_idx['iteration']])
             evaluation = float(itt[attribute_idx['evaluation']])
-            selectedValue = itt[attribute_idx['selected']]
-            if selectedValue == 'true':
+            selected_value = itt[attribute_idx['selected']]
+            if 'setup_string' in attribute_idx:
+                setup_string = json.dumps(itt[attribute_idx['setup_string']])
+            else:
+                setup_string = None
+            if selected_value == 'true':
                 selected = True
-            elif selectedValue == 'false':
+            elif selected_value == 'false':
                 selected = False
             else:
-                raise ValueError('expected {"true", "false"} value for selected field, received: %s' % selectedValue)
+                raise ValueError('expected {"true", "false"} value for selected field, received: %s' % selected_value)
 
-            # TODO: if someone needs it, he can use the parameter
-            # fields to revive the setup_string as well
-            # However, this is usually done by the OpenML server
-            # and if we are going to duplicate this functionality
-            # it needs proper testing
-
-            current = OpenMLTraceIteration(repeat, fold, iteration, None, evaluation, selected)
+            current = OpenMLTraceIteration(repeat, fold, iteration, setup_string, evaluation, selected)
             trace[(repeat, fold, iteration)] = current
 
         return OpenMLRunTrace(None, trace)
