@@ -147,16 +147,48 @@ class OpenMLRunTrace(object):
         -------
         OpenMLRunTrace
         """
+        trace = OrderedDict()
         # flag if setup string is in attributes
-        flag_ss = True
+        flag_ss = False
         attribute_idx = {att[0]: idx for idx, att in enumerate(arff_obj['attributes'])}
         for required_attribute in ['repeat', 'fold', 'iteration', 'evaluation', 'selected']:
             if required_attribute not in attribute_idx:
                 raise ValueError('arff misses required attribute: %s' % required_attribute)
-        if 'setup_string' not in attribute_idx:
-            flag_ss = False
+        if 'setup_string' in attribute_idx:
+            flag_ss = True
 
-        trace = cls._trace_from_iterations_dict(arff_obj['data'], flag_ss)
+        for itt in arff_obj['data']:
+            repeat = int(itt[attribute_idx['repeat']])
+            fold = int(itt[attribute_idx['fold']])
+            iteration = int(itt[attribute_idx['iteration']])
+            evaluation = float(itt[attribute_idx['evaluation']])
+            setup_string = None
+            if flag_ss:
+                if itt[attribute_idx['setup_string']] != None:
+                    setup_string = json.loads(itt[attribute_idx['setup_string']])
+            selected_value = itt[attribute_idx['selected']]
+            if selected_value == 'true':
+                selected = True
+            elif selected_value == 'false':
+                selected = False
+            else:
+                raise ValueError('expected {"true", "false"} value for selected field, received: %s' % selected_value)
+
+            # if someone needs it, he can use the parameter
+            # fields to revive the setup_string as well
+            # However, this is usually done by the OpenML server
+            # and if we are going to duplicate this functionality
+            # it needs proper testing
+
+            current = OpenMLTraceIteration(
+                repeat,
+                fold,
+                iteration,
+                setup_string,
+                evaluation,
+                selected,
+            )
+            trace[(repeat, fold, iteration)] = current
 
         return cls(None, trace)
 
@@ -179,7 +211,7 @@ class OpenMLRunTrace(object):
         result_dict = xmltodict.parse(xml, force_list=('oml:trace_iteration',))['oml:trace']
 
         run_id = result_dict['oml:run_id']
-
+        trace = OrderedDict()
 
         if 'oml:trace_iteration' not in result_dict:
             raise ValueError('Run does not contain valid trace. ')
@@ -187,39 +219,13 @@ class OpenMLRunTrace(object):
         assert type(result_dict['oml:trace_iteration']) == list, \
             type(result_dict['oml:trace_iteration'])
 
-        trace = cls._trace_from_iterations_dict(result_dict['oml:trace_iteration'])
-
-        return cls(run_id, trace)
-
-    @staticmethod
-    def _trace_from_iterations_dict(trace_iterations, setup_flag=True):
-        """Creates a trace dictionary.
-
-        Create a dictionary that includes multiple trace iterations.
-
-        Parameters
-        ----------
-        trace_iterations : list
-            List of dicts containing trace_iteration information.
-
-        Returns
-        -------
-        trace : OrderedDict
-            Mapping from key ``(repeat, fold, iteration)`` to an object of
-            OpenMLTraceIteration.
-        """
-        trace = OrderedDict()
-
-        for itt in trace_iterations:
-
+        for itt in result_dict['oml:trace_iteration']:
             repeat = int(itt['oml:repeat'])
             fold = int(itt['oml:fold'])
             iteration = int(itt['oml:iteration'])
-            if setup_flag:
-                setup_string = json.loads(itt['oml:setup_string'])
+            setup_string = json.loads(itt['oml:setup_string'])
             evaluation = float(itt['oml:evaluation'])
             selected_value = itt['oml:selected']
-
             if selected_value == 'true':
                 selected = True
             elif selected_value == 'false':
@@ -228,7 +234,7 @@ class OpenMLRunTrace(object):
                 raise ValueError('expected {"true", "false"} value for '
                                  'selected field, received: %s' % selected_value)
 
-            trace_iteration = OpenMLTraceIteration(
+            current = OpenMLTraceIteration(
                 repeat,
                 fold,
                 iteration,
@@ -236,10 +242,9 @@ class OpenMLRunTrace(object):
                 evaluation,
                 selected,
             )
+            trace[(repeat, fold, iteration)] = current
 
-            trace[(repeat, fold, iteration)] = trace_iteration
-
-        return trace
+        return cls(run_id, trace)
 
     def __str__(self):
         return '[Run id: %d, %d trace iterations]' % (self.run_id, len(self.trace_iterations))

@@ -179,7 +179,7 @@ def get_run_trace(run_id):
     """
 
     trace_xml = openml._api_calls._perform_api_call('run/trace/%d' % run_id)
-    run_trace = OpenMLRunTrace._trace_from_xml(trace_xml)
+    run_trace = OpenMLRunTrace.trace_from_xml(trace_xml)
     return run_trace
 
 
