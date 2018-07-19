@@ -169,13 +169,13 @@ class OpenMLDataset(object):
                                    for name, type_ in data['attributes']]
                     attribute_names = [name for name, type_ in data['attributes']]
 
-                    if isinstance(data['data'], tuple):
+                    if format.lower() == 'sparse_arff':
                         X = data['data']
                         X_shape = (max(X[1]) + 1, max(X[2]) + 1)
                         X = scipy.sparse.coo_matrix(
                             (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
                         X = X.tocsr()
-                    elif isinstance(data['data'], list):
+                    elif format.lower() == 'arff':
                         X = np.array(data['data'], dtype=np.float32)
                     else:
                         raise Exception()
