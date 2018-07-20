@@ -760,12 +760,16 @@ class TestSklearn(unittest.TestCase):
                  ('Estimator', sklearn.ensemble.AdaBoostClassifier(
                      sklearn.ensemble.BaggingClassifier(
                         sklearn.ensemble.GradientBoostingClassifier(
-                            sklearn.ensemble.GradientBoostingRegressor(
-                                sklearn.naive_bayes.GaussianNB())))))]
+                            sklearn.neighbors.KNeighborsClassifier()))))]
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
 
         pipe_adjusted = sklearn.clone(pipe_orig)
-        params = {'Imputer__strategy': 'median', 'OneHotEncoder__sparse': False, 'Estimator__n_estimators': 10}
+        params = {'Imputer__strategy': 'median',
+                  'OneHotEncoder__sparse': False,
+                  'Estimator__n_estimators': 10,
+                  'Estimator__base_estimator__n_estimators': 10,
+                  'Estimator__base_estimator__base_estimator__learning_rate': 0.1,
+                  'Estimator__base_estimator__base_estimator__loss__n_neighbors': 13}
         pipe_adjusted.set_params(**params)
         flow = openml.flows.sklearn_to_flow(pipe_adjusted)
         pipe_deserialized = openml.flows.flow_to_sklearn(flow, initialize_with_defaults=True)
