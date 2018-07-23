@@ -21,6 +21,7 @@ import sklearn.ensemble
 import sklearn.feature_selection
 import sklearn.gaussian_process
 import sklearn.model_selection
+import sklearn.naive_bayes
 import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
@@ -727,6 +728,48 @@ class TestSklearn(unittest.TestCase):
 
         pipe_adjusted = sklearn.clone(pipe_orig)
         params = {'Imputer__strategy': 'median', 'OneHotEncoder__sparse': False, 'Estimator__min_samples_leaf': 42}
+        pipe_adjusted.set_params(**params)
+        flow = openml.flows.sklearn_to_flow(pipe_adjusted)
+        pipe_deserialized = openml.flows.flow_to_sklearn(flow, initialize_with_defaults=True)
+
+        # we want to compare pipe_deserialized and pipe_orig. We use the flow equals function for this
+        assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig), openml.flows.sklearn_to_flow(pipe_deserialized))
+
+    def test_deserialize_adaboost_with_defaults(self):
+        # used the 'initialize_with_defaults' flag of the deserialization method to return a flow
+        # that contains default hyperparameter settings.
+        steps = [('Imputer', sklearn.preprocessing.Imputer()),
+                 ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
+                 ('Estimator', sklearn.ensemble.AdaBoostClassifier(sklearn.tree.DecisionTreeClassifier()))]
+        pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
+
+        pipe_adjusted = sklearn.clone(pipe_orig)
+        params = {'Imputer__strategy': 'median', 'OneHotEncoder__sparse': False, 'Estimator__n_estimators': 10}
+        pipe_adjusted.set_params(**params)
+        flow = openml.flows.sklearn_to_flow(pipe_adjusted)
+        pipe_deserialized = openml.flows.flow_to_sklearn(flow, initialize_with_defaults=True)
+
+        # we want to compare pipe_deserialized and pipe_orig. We use the flow equals function for this
+        assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig), openml.flows.sklearn_to_flow(pipe_deserialized))
+
+    def test_deserialize_complex_with_defaults(self):
+        # used the 'initialize_with_defaults' flag of the deserialization method to return a flow
+        # that contains default hyperparameter settings.
+        steps = [('Imputer', sklearn.preprocessing.Imputer()),
+                 ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
+                 ('Estimator', sklearn.ensemble.AdaBoostClassifier(
+                     sklearn.ensemble.BaggingClassifier(
+                        sklearn.ensemble.GradientBoostingClassifier(
+                            sklearn.neighbors.KNeighborsClassifier()))))]
+        pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
+
+        pipe_adjusted = sklearn.clone(pipe_orig)
+        params = {'Imputer__strategy': 'median',
+                  'OneHotEncoder__sparse': False,
+                  'Estimator__n_estimators': 10,
+                  'Estimator__base_estimator__n_estimators': 10,
+                  'Estimator__base_estimator__base_estimator__learning_rate': 0.1,
+                  'Estimator__base_estimator__base_estimator__loss__n_neighbors': 13}
         pipe_adjusted.set_params(**params)
         flow = openml.flows.sklearn_to_flow(pipe_adjusted)
         pipe_deserialized = openml.flows.flow_to_sklearn(flow, initialize_with_defaults=True)
