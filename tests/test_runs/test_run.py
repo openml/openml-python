@@ -3,6 +3,7 @@ import random
 import os
 from time import time
 
+from sklearn.dummy import DummyClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.linear_model import LogisticRegression
@@ -157,3 +158,20 @@ class TestRun(TestBase):
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
         self._test_run_obj_equals(run, run_prime)
         run_prime.publish()
+
+    def test_to_from_filesystem_no_model(self):
+        model = Pipeline([
+            ('imputer', Imputer(strategy='mean')),
+            ('classifier', DummyClassifier()),
+        ])
+        task = openml.tasks.get_task(119)
+        run = openml.runs.run_model_on_task(task, model, add_local_measures=False)
+
+        cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
+        run.to_filesystem(cache_path, store_model=False)
+        # obtain run from filesystem
+        openml.runs.OpenMLRun.from_filesystem(cache_path, expect_model=False)
+        # assert default behaviour is throwing an error
+        with self.assertRaises(ValueError, msg='Could not find model.pkl'):
+            openml.runs.OpenMLRun.from_filesystem(cache_path)
+            
