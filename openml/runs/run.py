@@ -69,7 +69,7 @@ class OpenMLRun(object):
         pp.text(str(self))
 
     @classmethod
-    def from_filesystem(cls, folder):
+    def from_filesystem(cls, folder, expect_model=True):
         """
         The inverse of the to_filesystem method. Instantiates an OpenMLRun
         object based on files stored on the file system.
@@ -79,6 +79,11 @@ class OpenMLRun(object):
         folder : str
             a path leading to the folder where the results
             are stored
+
+        expect_model : bool
+            if True, it requires the model pickle to be present, and an error
+            will be thrown if not. Otherwise, the model might or might not
+            be present.
 
         Returns
         -------
@@ -97,7 +102,7 @@ class OpenMLRun(object):
             raise ValueError('Could not find description.xml')
         if not os.path.isfile(predictions_path):
             raise ValueError('Could not find predictions.arff')
-        if not os.path.isfile(model_path):
+        if not os.path.isfile(model_path) and expect_model:
             raise ValueError('Could not find model.pkl')
 
         with open(description_path, 'r') as fp:
@@ -108,8 +113,10 @@ class OpenMLRun(object):
             predictions = arff.load(fp)
             run.data_content = predictions['data']
 
-        with open(model_path, 'rb') as fp:
-            run.model = pickle.load(fp)
+        if os.path.isfile(model_path):
+            # note that it will load the model if the file exists, even if expect_model is False
+            with open(model_path, 'rb') as fp:
+                run.model = pickle.load(fp)
 
         if os.path.isfile(trace_path):
             trace_arff = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
@@ -119,16 +126,21 @@ class OpenMLRun(object):
 
         return run
 
-    def to_filesystem(self, output_directory):
+    def to_filesystem(self, output_directory, store_model=True):
         """
         The inverse of the from_filesystem method. Serializes a run
         on the filesystem, to be uploaded later.
 
         Parameters
         ----------
-        folder : str
+        output_directory : str
             a path leading to the folder where the results
             will be stored. Should be empty
+
+        store_model : bool
+            if True, a model will be pickled as well. As this is the most
+            storage expensive part, it is often desirable to not store the
+            model.
         """
         if self.data_content is None or self.model is None:
             raise ValueError('Run should have been executed (and contain model / predictions)')
@@ -151,8 +163,9 @@ class OpenMLRun(object):
             f.write(run_xml)
         with open(os.path.join(output_directory, 'predictions.arff'), 'w') as f:
             f.write(predictions_arff)
-        with open(os.path.join(output_directory, 'model.pkl'), 'wb') as f:
-            pickle.dump(self.model, f)
+        if store_model:
+            with open(os.path.join(output_directory, 'model.pkl'), 'wb') as f:
+                pickle.dump(self.model, f)
 
         if self.trace_content is not None:
             trace_arff = arff.dumps(self._generate_trace_arff_dict())
