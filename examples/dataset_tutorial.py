@@ -1,81 +1,75 @@
 """
-Dataset upload tutorial
-=======================
+Datasets
+========
 
-A tutorial on how to create and upload a dataset to OpenML.
+How to list and download datasets.
 """
-import numpy as np
+
 import openml
-import sklearn.datasets
+import pandas as pd
 
 ############################################################################
-# For this example we will upload to the test server to not  pollute the live server with countless copies of the same dataset.
-openml.config.server = 'https://test.openml.org/api/v1/xml'
+# List datasets
+# #############
+openml_list = openml.datasets.list_datasets()  # returns a dict
+
+# Show a nice table with some key data properties
+datalist = pd.DataFrame.from_dict(openml_list, orient='index')
+datalist = datalist[[
+    'did', 'name', 'NumberOfInstances',
+    'NumberOfFeatures', 'NumberOfClasses'
+]]
+
+print("First 10 of %s datasets..." % len(datalist))
+datalist.head(n=10)
 
 ############################################################################
-# Load an example dataset from scikit-learn which we will upload to OpenML.org via the API.
-breast_cancer = sklearn.datasets.load_breast_cancer()
-name = 'BreastCancer(scikit-learn)'
-X = breast_cancer.data
-y = breast_cancer.target
-attribute_names = breast_cancer.feature_names
-targets = breast_cancer.target_names
-description = breast_cancer.DESCR
+# Exercise
+# ########
+# * Find datasets with more than 10000 examples.
+# * Find a dataset called 'eeg_eye_state'.
+# * Find all datasets with more than 50 classes.
+datalist[datalist.NumberOfInstances > 10000
+         ].sort_values(['NumberOfInstances']).head(n=20)
+############################################################################
+datalist.query('name == "eeg-eye-state"')
+############################################################################
+datalist.query('NumberOfClasses > 50')
 
 ############################################################################
-# OpenML does not distinguish between the attributes and targets on the data level and stores all data in a
-# single matrix. The target feature is indicated as meta-data of the dataset (and tasks on that data).
-data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
-attribute_names = list(attribute_names)
-attributes = [
-    (attribute_name, 'REAL') for attribute_name in attribute_names
-] + [('class', 'REAL')]
+# Download datasets
+# #################
+# This is done based on the dataset ID ('did').
+dataset = openml.datasets.get_dataset(68)
+
+# Print a summary
+print("This is dataset '%s', the target feature is '%s'" %
+      (dataset.name, dataset.default_target_attribute))
+print("URL: %s" % dataset.url)
+print(dataset.description[:500])
 
 ############################################################################
-# Create the dataset object. The definition of all fields can be found in the XSD files describing the expected format:
-# https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd
-dataset = openml.datasets.functions.create_dataset(
-    # The name of the dataset (needs to be unique). 
-    # Must not be longer than 128 characters and only contain
-    # a-z, A-Z, 0-9 and the following special characters: _\-\.(),
-    name=name,
-    # Textual description of the dataset.
-    description=description,
-    # The person who created the dataset.
-    creator='Dr. William H. Wolberg, W. Nick Street, Olvi L. Mangasarian',
-    # People who contributed to the current version of the dataset.
-    contributor=None,
-    # The date the data was originally collected, given by the uploader.
-    collection_date='01-11-1995',
-    # Language in which the data is represented.
-    # Starts with 1 upper case letter, rest lower case, e.g. 'English'.
-    language='English',
-    # License under which the data is/will be distributed.
-    licence='BSD (from scikit-learn)',
-    # Name of the target. Can also have multiple values (comma-separated).
-    default_target_attribute='class',
-    # The attribute that represents the row-id column, if present in the dataset.
-    row_id_attribute=None,
-    # Attributes that should be excluded in modelling, such as identifiers and indexes.
-    ignore_attribute=None,
-    # How to cite the paper.
-    citation=(
-        "W.N. Street, W.H. Wolberg and O.L. Mangasarian. "
-        "Nuclear feature extraction for breast tumor diagnosis. "
-        "IS&T/SPIE 1993 International Symposium on Electronic Imaging: Science and Technology, "
-        "volume 1905, pages 861-870, San Jose, CA, 1993."
-    ),
-    # Attributes of the data
-    attributes=attributes,
-    data=data,
-    # Format of the dataset. Only 'arff' for now.
-    format='arff',
-    # A version label which is provided by the user.
-    version_label='test',
-    original_data_url='https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Diagnostic)',
-    paper_url='https://www.spiedigitallibrary.org/conference-proceedings-of-spie/1905/0000/Nuclear-feature-extraction-for-breast-tumor-diagnosis/10.1117/12.148698.short?SSO=1'
+# Get the actual data.
+# Returned as numpy array, with meta-info (e.g. target feature, feature names,...)
+X, y, attribute_names = dataset.get_data(
+    target=dataset.default_target_attribute,
+    return_attribute_names=True,
 )
+eeg = pd.DataFrame(X, columns=attribute_names)
+eeg['class'] = y
+print(eeg[:10])
 
 ############################################################################
-upload_id = dataset.publish()
-print(upload_id)
+# Exercise
+# ########
+# * Explore the data visually.
+eegs = eeg.sample(n=1000)
+_ = pd.plotting.scatter_matrix(
+    eegs.iloc[:100, :4],
+    c=eegs[:100]['class'],
+    figsize=(10, 10),
+    marker='o',
+    hist_kwds={'bins': 20},
+    alpha=.8,
+    cmap='plasma'
+)
