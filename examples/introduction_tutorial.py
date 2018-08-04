@@ -1,5 +1,5 @@
 """
-OpenML introduction
+OpenML Introduction
 ===================
 
 An introduction to OpenML, followed up by a simple example.
@@ -8,8 +8,8 @@ import openml
 from sklearn import neighbors
 
 ############################################################################
-# OpenML in Python
-# ################
+# **OpenML in Python**
+#
 # OpenML is an online collaboration platform for machine learning:
 #
 # * Find or share interesting, well-documented datasets
@@ -19,15 +19,15 @@ from sklearn import neighbors
 # * Works seamlessly with scikit-learn and other libraries
 # * Large scale benchmarking, compare to state of the art
 #
-# Installation
-# ############
+# **Installation**
+#
 #
 # * Up to now: pip install git+https://github.com/openml/openml-python.git@develop
 # * In the future: pip install openml
 # * Check out the installation guide: https://openml.github.io/openml-python/stable/#installation
 #
-# Authentication
-# ##############
+# **Authentication**
+#
 #
 # * Create an OpenML account (free) on http://www.openml.org.
 # * After logging in, open your account page (avatar on the top right)
@@ -39,9 +39,13 @@ from sklearn import neighbors
 # * Run the code below, replacing 'YOURKEY' with your API key.
 
 ############################################################################
+
 # Uncomment and set your OpenML key. Don't share your key with others.
-# oml.config.apikey = 'YOURKEY'
+# openml.config.apikey = 'YOURKEY'
+
 ############################################################################
+# **Simple Example**
+
 # Download the OpenML task for the eeg-eye-state.
 task = openml.tasks.get_task(403)
 data = openml.datasets.get_dataset(task.dataset_id)

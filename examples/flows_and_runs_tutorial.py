@@ -11,8 +11,8 @@ import seaborn as sns
 from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
 
 ############################################################################
-# Train machine learning models
-# #############################
+# **Train machine learning models**
+#
 # Train a scikit-learn model on the data manually.
 dataset = openml.datasets.get_dataset(68)
 X, y = dataset.get_data(target=dataset.default_target_attribute)
@@ -34,8 +34,8 @@ X = enc.fit_transform(X)
 clf.fit(X, y)
 
 ############################################################################
-# Runs: Easily explore models by running them on tasks
-# ####################################################
+# **Runs: Easily explore models by running them on tasks**
+#
 # We can run (many) scikit-learn algorithms on (many) OpenML tasks.
 
 # Get a task
@@ -52,14 +52,15 @@ run = openml.runs.run_flow_on_task(flow, task)
 
 ############################################################################
 # Share the run on the OpenML server
+
 myrun = run.publish()
 # For this tutorial, our configuration publishes to the test server
 # as to not pollute the main server.
 print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 
 ############################################################################
-# It also works with pipelines
-# ############################
+# **It also works with pipelines**
+#
 # When you need to handle 'dirty' data, build pipelines to model then automatically.
 task = openml.tasks.get_task(115)
 pipe = pipeline.Pipeline(steps=[
@@ -74,8 +75,8 @@ myrun = run.publish()
 print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 
 ############################################################################
-# Download previous results
-# #########################
+# **Download previous results**
+#
 # You can download all your results anytime, as well as everybody else's.
 #
 # List runs by uploader, flow, task, tag, id, ...
@@ -92,8 +93,8 @@ for id, _ in myruns.items():
 sns.violinplot(x="score", y="flow", data=pd.DataFrame(scores), scale="width", palette="Set3")
 
 ############################################################################
-# A Challenge:
-# ############
+# **A Challenge:**
+#
 # Try to build the best possible models on several OpenML tasks,
 # compare your results with the rest of the class and learn from
 # them. Some tasks you could try (or browse openml.org):
@@ -103,9 +104,9 @@ sns.violinplot(x="score", y="flow", data=pd.DataFrame(scores), scale="width", pa
 # * Walking activity: data_id:`1509 <http://www.openml.org/d/1509>`_, task_id:`9945 <http://www.openml.org/t/9945>`_, 150k instances.
 # * Covertype (Satellite): data_id:`150 <http://www.openml.org/d/150>`_, task_id:`218 <http://www.openml.org/t/218>`_, 500k instances.
 # * Higgs (Physics): data_id:`23512 <http://www.openml.org/d/23512>`_, task_id:`52950 <http://www.openml.org/t/52950>`_, 100k instances, missing values.
-#
+
 # Easy benchmarking:
-for task_id in [1, ]:  # Add further tasks. Disclaimer: they might take some time
+for task_id in [115, ]:  # Add further tasks. Disclaimer: they might take some time
     task = openml.tasks.get_task(task_id)
     data = openml.datasets.get_dataset(task.dataset_id)
     clf = neighbors.KNeighborsClassifier(n_neighbors=5)

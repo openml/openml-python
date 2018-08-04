@@ -14,6 +14,7 @@ if six.PY2:
 else:
     import unittest.mock as mock
 
+import unittest.skip
 import openml._api_calls
 import openml.config
 from openml.testing import TestBase
@@ -59,6 +60,7 @@ class OpenMLDemoTest(TestBase):
 
         exec(python_nb)
 
+    @unittest.skip("Deleted tutorial")
     @mock.patch('openml._api_calls._perform_api_call')
     def test_tutorial_openml(self, patch):
         def side_effect(*args, **kwargs):
@@ -78,7 +80,7 @@ class OpenMLDemoTest(TestBase):
         self._tst_notebook('OpenML_Tutorial.ipynb')
         self.assertGreater(patch.call_count, 100)
 
-
+    @unittest.skip("Deleted tutorial")
     def test_tutorial_dataset(self):
 
         self._tst_notebook('Dataset_import.ipynb')

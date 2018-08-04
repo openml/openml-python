@@ -10,16 +10,14 @@ import pandas as pd
 from pprint import pprint
 
 ############################################################################
-# Tasks: set your own goals
-# #########################
-# and invite others to work on the same problem.
+# **Set your own goals and invite others to work on the same problem**
 #
 # Note: tasks are typically created in the web interface
 #
-# Listing tasks
-# #############
+# **Listing tasks**
+
 # we are going to pull
-task_list = openml.tasks.list_tasks(size=5000)  # Get first 5000 tasks
+task_list = openml.tasks.list_tasks(size=1000)  # Get first 1000 tasks
 mytasks = pd.DataFrame.from_dict(task_list, orient='index')
 mytasks = mytasks[['tid', 'did', 'name', 'task_type',
                    'estimation_procedure']]
@@ -27,13 +25,13 @@ print("First 5 of %s tasks:" % len(mytasks))
 mytasks.head()
 
 ############################################################################
-# Exercise
-# ########
+# **Exercise**
+#
 # * Search for the tasks on the 'eeg-eye-state' dataset.
 mytasks.query('name=="eeg-eye-state"')
 
 ############################################################################
-# Download tasks
-# ##############
+# **Download tasks**
+
 task = openml.tasks.get_task(1)
 pprint(vars(task))

@@ -77,5 +77,8 @@ dataset = openml.datasets.functions.create_dataset(
 )
 
 ############################################################################
-upload_id = dataset.publish()
-print(upload_id)
+try:
+    upload_id = dataset.publish()
+    print('URL for dataset: %s/data/%d' % (openml.config.server, upload_id))
+except openml.exceptions.PyOpenMLError as err:
+    print("OpenML: {0}".format(err))
