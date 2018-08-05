@@ -60,7 +60,7 @@ class OpenMLDemoTest(TestBase):
 
         exec(python_nb)
 
-    skip("Deleted tutorial file")
+    @skip
     @mock.patch('openml._api_calls._perform_api_call')
     def test_tutorial_openml(self, patch):
         def side_effect(*args, **kwargs):
@@ -80,7 +80,7 @@ class OpenMLDemoTest(TestBase):
         self._tst_notebook('OpenML_Tutorial.ipynb')
         self.assertGreater(patch.call_count, 100)
 
-    skip("Deleted tutorial file")
+    @skip("Deleted tutorial file")
     def test_tutorial_dataset(self):
 
         self._tst_notebook('Dataset_import.ipynb')
