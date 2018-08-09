@@ -754,6 +754,35 @@ class TestRun(TestBase):
         self.assertRaises(TypeError, openml.runs.run_model_on_task,
                           task=task, model=clf, avoid_duplicate_runs=False)
 
+    def test_run_with_illegal_flow_id(self):
+        # check the case where the user adds an illegal flow id to a non-existing flow
+        task = openml.tasks.get_task(1)
+        clf = DecisionTreeClassifier()
+        flow = sklearn_to_flow(clf)
+        flow, _ = self._add_sentinel_to_flow_name(flow, None)
+        flow.flow_id = -1
+
+        self.assertRaises(ValueError, openml.runs.run_flow_on_task,
+                          task=task, flow=flow, avoid_duplicate_runs=False)
+
+    def test_run_with_illegal_flow_id_1(self):
+        # check the case where the user adds an illegal flow id to an existing flow
+        # comes to a different value error than the previous test
+        task = openml.tasks.get_task(1)
+        clf = DecisionTreeClassifier()
+        flow_orig = sklearn_to_flow(clf)
+        try:
+            flow_orig.publish()  # ensures flow exist on server
+        except openml.exceptions.OpenMLServerException:
+            # flow already exists
+            pass
+        flow_new = sklearn_to_flow(clf)
+
+        flow_new.flow_id = -1
+
+        self.assertRaises(ValueError, openml.runs.run_flow_on_task,
+                          task=task, flow=flow_new, avoid_duplicate_runs=False)
+
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(7)
         num_instances = 3196
