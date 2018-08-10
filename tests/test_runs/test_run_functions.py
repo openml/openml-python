@@ -756,19 +756,21 @@ class TestRun(TestBase):
 
     def test_run_with_illegal_flow_id(self):
         # check the case where the user adds an illegal flow id to a non-existing flow
-        task = openml.tasks.get_task(1)
+        task = openml.tasks.get_task(115)
         clf = DecisionTreeClassifier()
         flow = sklearn_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.flow_id = -1
-
-        self.assertRaises(ValueError, openml.runs.run_flow_on_task,
-                          task=task, flow=flow, avoid_duplicate_runs=False)
+        expected_message_regex = 'flow.flow_id is not None, but the flow does not' \
+                                 'exist on the server according to flow_exists'
+        self.assertRaisesRegexp(ValueError, expected_message_regex,
+                                openml.runs.run_flow_on_task,
+                                task=task, flow=flow, avoid_duplicate_runs=False)
 
     def test_run_with_illegal_flow_id_1(self):
         # check the case where the user adds an illegal flow id to an existing flow
         # comes to a different value error than the previous test
-        task = openml.tasks.get_task(1)
+        task = openml.tasks.get_task(115)
         clf = DecisionTreeClassifier()
         flow_orig = sklearn_to_flow(clf)
         try:
@@ -779,9 +781,10 @@ class TestRun(TestBase):
         flow_new = sklearn_to_flow(clf)
 
         flow_new.flow_id = -1
-
-        self.assertRaises(ValueError, openml.runs.run_flow_on_task,
-                          task=task, flow=flow_new, avoid_duplicate_runs=False)
+        expected_message_regex = "Result flow_exists and flow.flow_id are not same."
+        self.assertRaisesRegexp(ValueError, expected_message_regex,
+                                openml.runs.run_flow_on_task, task=task, flow=flow_new,
+                                avoid_duplicate_runs=False)
 
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(7)
