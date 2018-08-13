@@ -12,6 +12,7 @@ from openml.testing import TestBase
 from openml import OpenMLSplit, OpenMLTask
 from openml.exceptions import OpenMLCacheException
 import openml
+import unittest
 
 
 class TestTask(TestBase):
@@ -110,11 +111,14 @@ class TestTask(TestBase):
 
     def test__get_task(self):
         openml.config.cache_directory = self.static_cache_dir
-        task = openml.tasks.get_task(1882)
+        openml.tasks.get_task(1882)
+
+    @unittest.skip("Please await outcome of discussion: https://github.com/openml/OpenML/issues/776")
+    def test__get_task_live(self):
         # Test the following task as it used to throw an Unicode Error.
         # https://github.com/openml/openml-python/issues/378
         openml.config.server = self.production_server
-        production_task = openml.tasks.get_task(34536)
+        openml.tasks.get_task(34536)
 
     def test_get_task(self):
         task = openml.tasks.get_task(1)

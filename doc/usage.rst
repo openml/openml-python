@@ -125,7 +125,7 @@ to have better visualization and easier access:
 
     >>> import pandas as pd
     >>> tasks = pd.DataFrame.from_dict(tasks, orient='index')
-    >>> print(tasks.columns)
+    >>> print(tasks.columns)                                            # doctest: +SKIP
     Index(['tid', 'ttid', 'did', 'name', 'task_type', 'status',
            'estimation_procedure', 'evaluation_measures', 'source_data',
            'target_feature', 'MajorityClassSize', 'MaxNominalAttDistinctValues',
