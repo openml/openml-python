@@ -40,7 +40,7 @@ install:
   - conda install --quiet --yes mock numpy scipy nose requests nbformat python-dateutil nbconvert pandas matplotlib seaborn
   - pip install liac-arff xmltodict oslo.concurrency
   - "python setup.py install" #%CMD_IN_ENV%
-
+  
 
 # Not a .NET project, we build scikit-learn in the install step instead
 build: false

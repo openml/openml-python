@@ -44,15 +44,13 @@ setuptools.setup(name="openml",
                      'scikit-learn>=0.18',
                      'nbformat',
                      'python-dateutil',
-                     'oslo.concurrency'
+                     'oslo.concurrency',
                  ],
                  extras_require={
                      'test': [
                          'nbconvert',
                          'jupyter_client'
-                     ],
-                     'tf':'tensorflow',
-                     'tf-gpu':'tensorflow-gpu'
+                     ]
                  },
                  test_suite="nose.collector",
                  classifiers=['Intended Audience :: Science/Research',

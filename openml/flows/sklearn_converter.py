@@ -24,6 +24,7 @@ import openml
 from openml.flows import OpenMLFlow
 from openml.exceptions import PyOpenMLError
 
+
 if sys.version_info >= (3, 5):
     from json.decoder import JSONDecodeError
 else:
@@ -81,6 +82,7 @@ def sklearn_to_flow(o, parent_model=None):
         raise TypeError(o, type(o))
 
     return rval
+
 
 def _is_estimator(o):
     return (hasattr(o, 'fit') and hasattr(o, 'get_params') and
@@ -171,6 +173,7 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False):
         raise TypeError(o)
 
     return rval
+
 
 def _serialize_model(model):
     """Create an OpenMLFlow.
@@ -297,8 +300,6 @@ def _extract_information_from_model(model):
     parameters_meta_info = OrderedDict()
 
     model_parameters = model.get_params(deep=False)
-
-
     for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
         rval = sklearn_to_flow(v, model)
 
@@ -632,9 +633,9 @@ def _check_n_jobs(model):
                 if value != 1 or disallow_parameter:
                     return False
         return True
+
     if not (isinstance(model, sklearn.base.BaseEstimator) or
-            isinstance(model, sklearn.model_selection._search.BaseSearchCV)
-            ):
+            isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
         raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
     # make sure that n_jobs is not in the parameter grid of optimization procedure
@@ -651,7 +652,7 @@ def _check_n_jobs(model):
                 raise AttributeError('Using subclass BaseSearchCV other than {GridSearchCV, RandomizedSearchCV}. Could not find attribute param_distributions. ')
             print('Warning! Using subclass BaseSearchCV other than ' \
                   '{GridSearchCV, RandomizedSearchCV}. Should implement param check. ')
-
+          
         if not check(param_distributions, True):
             raise PyOpenMLError('openml-python should not be used to '
                                 'optimize the n_jobs parameter.')

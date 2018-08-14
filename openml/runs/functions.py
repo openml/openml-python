@@ -37,7 +37,6 @@ RUNS_CACHE_DIR_NAME = 'runs'
 def run_model_on_task(model, task, avoid_duplicate_runs=True, flow_tags=None,
                       seed=None, add_local_measures=True):
     """See ``run_flow_on_task for a documentation``."""
-
     # TODO: At some point in the future do not allow for arguments in old order (order changed 6-2018).
     if isinstance(model, OpenMLTask) and hasattr(task, 'fit') and hasattr(task, 'predict'):
         warnings.warn("The old argument order (task, model) is deprecated and will not be supported in the future. "
@@ -209,7 +208,7 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
     Parameters
     ----------
     run_id : int
-        The Openml run_id. Should contain a trace file,
+        The Openml run_id. Should contain a trace file, 
         otherwise a OpenMLServerException is raised
 
     repeat: int
@@ -220,7 +219,7 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
 
     iteration: int
         The iteration nr (column in trace file). If None, the
-        best (selected) iteration will be searched (slow),
+        best (selected) iteration will be searched (slow), 
         according to the selection criteria implemented in
         OpenMLRunTrace.get_selected_iteration
 
@@ -725,7 +724,7 @@ def _create_run_from_xml(xml, from_server=True):
     run : OpenMLRun
         New run object representing run_xml.
     """
-
+    
     def obtain_field(xml_obj, fieldname, from_server, cast=None):
         # this function can be used to check whether a field is present in an object.
         # if it is not present, either returns None or throws an error (this is
@@ -746,7 +745,7 @@ def _create_run_from_xml(xml, from_server=True):
     task_id = int(run['oml:task_id'])
     task_type = obtain_field(run, 'oml:task_type', from_server)
 
-    # even with the server requirement this field may be empty.
+    # even with the server requirement this field may be empty. 
     if 'oml:task_evaluation_measure' in run:
         task_evaluation_measure = run['oml:task_evaluation_measure']
     else:

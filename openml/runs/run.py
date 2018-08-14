@@ -15,6 +15,7 @@ import openml._api_calls
 from ..tasks import get_task
 from ..exceptions import PyOpenMLError
 
+
 class OpenMLRun(object):
     """OpenML Run: result of running a model on an openml dataset.
 
@@ -394,7 +395,7 @@ class OpenMLRun(object):
             expected_components = set(_flow.components)
             model_parameters = set([mp for mp in component_model.get_params()
                                     if '__' not in mp])
-            if(len((expected_parameters | expected_components) ^ model_parameters) != 0):
+            if len((expected_parameters | expected_components) ^ model_parameters) != 0:
                 raise ValueError('Parameters of the model do not match the '
                                  'parameters expected by the '
                                  'flow:\nexpected flow parameters: '
