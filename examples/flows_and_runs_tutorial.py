@@ -11,7 +11,8 @@ import seaborn as sns
 from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
 
 ############################################################################
-# **Train machine learning models**
+# Train machine learning models
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # Train a scikit-learn model on the data manually.
 dataset = openml.datasets.get_dataset(68)
@@ -34,8 +35,8 @@ X = enc.fit_transform(X)
 clf.fit(X, y)
 
 ############################################################################
-# **Runs: Easily explore models by running them on tasks**
-#
+# Runs: Easily explore models
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # We can run (many) scikit-learn algorithms on (many) OpenML tasks.
 
 # Get a task
@@ -59,7 +60,8 @@ myrun = run.publish()
 print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 
 ############################################################################
-# **It also works with pipelines**
+# It also works with pipelines
+# ############################
 #
 # When you need to handle 'dirty' data, build pipelines to model then automatically.
 task = openml.tasks.get_task(115)
@@ -75,7 +77,8 @@ myrun = run.publish()
 print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 
 ############################################################################
-# **Download previous results**
+# Download previous results
+# ^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # You can download all your results anytime, as well as everybody else's.
 #
@@ -93,7 +96,8 @@ for id, _ in myruns.items():
 sns.violinplot(x="score", y="flow", data=pd.DataFrame(scores), scale="width", palette="Set3")
 
 ############################################################################
-# **A Challenge:**
+# Challenge
+# ^^^^^^^^^
 #
 # Try to build the best possible models on several OpenML tasks,
 # compare your results with the rest of the class and learn from

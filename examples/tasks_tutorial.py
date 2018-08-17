@@ -14,7 +14,8 @@ from pprint import pprint
 #
 # Note: tasks are typically created in the web interface
 #
-# **Listing tasks**
+# Listing tasks
+# ^^^^^^^^^^^^^
 
 # we are going to pull
 task_list = openml.tasks.list_tasks(size=1000)  # Get first 1000 tasks
@@ -25,13 +26,15 @@ print("First 5 of %s tasks:" % len(mytasks))
 mytasks.head()
 
 ############################################################################
-# **Exercise**
+# Exercise
+# ########
 #
 # * Search for the tasks on the 'eeg-eye-state' dataset.
 mytasks.query('name=="eeg-eye-state"')
 
 ############################################################################
-# **Download tasks**
+# Download tasks
+# ^^^^^^^^^^^^^^
 
 task = openml.tasks.get_task(1)
 pprint(vars(task))

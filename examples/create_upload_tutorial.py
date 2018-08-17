@@ -13,6 +13,8 @@ import sklearn.datasets
 openml.config.server = 'https://test.openml.org/api/v1/xml'
 
 ############################################################################
+# Prepare the data
+# ^^^^^^^^^^^^^^^^
 # Load an example dataset from scikit-learn which we will upload to OpenML.org via the API.
 breast_cancer = sklearn.datasets.load_breast_cancer()
 name = 'BreastCancer(scikit-learn)'
@@ -32,7 +34,10 @@ attributes = [
 ] + [('class', 'REAL')]
 
 ############################################################################
-# Create the dataset object. The definition of all fields can be found in the XSD files describing the expected format:
+# Create the dataset object
+# ^^^^^^^^^^^^^^^^^^^^^^^^^
+# The definition of all fields can be found in the XSD files describing the expected format:
+#
 # https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd
 dataset = openml.datasets.functions.create_dataset(
     # The name of the dataset (needs to be unique). 

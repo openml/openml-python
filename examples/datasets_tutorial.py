@@ -9,7 +9,8 @@ import openml
 import pandas as pd
 
 ############################################################################
-# **List datasets**
+# List datasets
+# ^^^^^^^^^^^^^
 
 openml_list = openml.datasets.list_datasets()  # returns a dict
 
@@ -24,7 +25,8 @@ print("First 10 of %s datasets..." % len(datalist))
 datalist.head(n=10)
 
 ############################################################################
-# **Exercise**
+# Exercise
+# ########
 #
 # * Find datasets with more than 10000 examples.
 # * Find a dataset called 'eeg_eye_state'.
@@ -37,7 +39,8 @@ datalist.query('name == "eeg-eye-state"')
 datalist.query('NumberOfClasses > 50')
 
 ############################################################################
-# **Download datasets**
+# Download datasets
+# ^^^^^^^^^^^^^^^^^
 
 # This is done based on the dataset ID ('did').
 dataset = openml.datasets.get_dataset(68)
@@ -61,8 +64,8 @@ eeg['class'] = y
 print(eeg[:10])
 
 ############################################################################
-# **Exercise**
-#
+# Exercise
+# ########
 # * Explore the data visually.
 eegs = eeg.sample(n=1000)
 _ = pd.plotting.scatter_matrix(
