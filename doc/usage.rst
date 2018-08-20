@@ -16,52 +16,13 @@ This document will guide you through the most important functions and classes
 in the OpenML Python API. Throughout this document, we will use
 `pandas <http://pandas.pydata.org/>`_ to format and filter tables.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Connecting to the OpenML server
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+Installing & Setting up
+~~~~~~~~~~~~~~~~~~~~~~~
 
-The OpenML server can only be accessed by users who have signed up on the OpenML
-platform. If you don't have an account yet,
-`sign up now <http://openml.org/register>`_. You will receive an API key, which
-will authenticate you to the server and allow you to download and upload
-datasets, tasks, runs and flows. There are two ways of providing the API key
-to the OpenML API package. The first option is to specify the API key
-programmatically after loading the package:
+The following tutorial makes a quick introduction on how to install and set up the OpenML python connector.
 
-.. code:: python
-
-    >>> import openml
-    >>> apikey = 'Your API key'
-    >>> openml.config.apikey = apikey
-
-The second option is to create a config file:
-
-.. code:: bash
-
-    apikey = qxlfpbeaudtprb23985hcqlfoebairtd
-
-The config file must be in the directory :bash:`~/.openml/config` and 
-exist prior to importing the openml module.
-
-..
-    >>> openml.config.apikey = '610344db6388d9ba34f6db45a3cf71de'
-
-When downloading datasets, tasks, runs and flows, they will be cached to
-retrieve them without calling the server later. As with the API key, the cache
-directory can be either specified through the API or through the config file:
-
-API:
-
-.. code:: python
-
-    >>> import os
-    >>> openml.config.cache_directory = os.path.expanduser('~/.openml/cache')
-
-Config file:
-
-.. code:: bash
-
-    cachedir = '~/.openml/cache'
+* `Introduction <examples/introduction_tutorial.html>`_
 
 
 ~~~~~~~~~~~~

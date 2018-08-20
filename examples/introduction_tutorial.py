@@ -24,13 +24,16 @@ An introduction to OpenML, followed up by a simple example.
 # Authentication
 # ^^^^^^^^^^^^^^
 #
+# The OpenML server can only be accessed by users who have signed up on the OpenML platform. If you don’t have an account yet, sign up now.
+# You will receive an API key, which will authenticate you to the server and allow you to download and upload datasets, tasks, runs and flows.
+#
 # * Create an OpenML account (free) on http://www.openml.org.
 # * After logging in, open your account page (avatar on the top right)
 # * Open 'Account Settings', then 'API authentication' to find your API key.
 #
 # There are two ways to authenticate:
 #
-# * Create a plain text file ~/.openml/config with the line 'apikey=MYKEY', replacing MYKEY with your API key.
+# * Create a plain text file **~/.openml/config** with the line **'apikey=MYKEY'**, replacing **MYKEY** with your API key. The config file must be in the directory ~/.openml/config and exist prior to importing the openml module
 # * Run the code below, replacing 'YOURKEY' with your API key.
 
 ############################################################################
@@ -39,6 +42,18 @@ from sklearn import neighbors
 
 # Uncomment and set your OpenML key. Don't share your key with others.
 # openml.config.apikey = 'YOURKEY'
+
+############################################################################
+# Caching
+# ^^^^^^^
+# When downloading datasets, tasks, runs and flows, they will be cached to retrieve them without calling the server later. As with the API key, the cache directory can be either specified through the config file or through the API:
+#
+# * Add the  line **cachedir = 'MYDIR'** to the config file, replacing 'MYDIR' with the path to the cache directory. By default, OpenML will use **~/.openml/cache** as the cache directory.
+# * Run the code below, replacing 'YOURDIR' with the path to the cache directory.
+
+import os
+# Uncomment and set your OpenML cache directory
+# openml.config.cache_directory = os.path.expanduser('YOURDIR')
 
 ############################################################################
 # Simple Example
