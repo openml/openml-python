@@ -2,12 +2,13 @@
 Flows and Runs
 ==============
 
-How to train/run a model and how to upload/download the information that follows.
+How to train/run a model and how to upload/download the results.
 """
 
 import openml
 import pandas as pd
 import seaborn as sns
+from pprint import pprint
 from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
 
 ############################################################################
@@ -15,8 +16,11 @@ from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # Train a scikit-learn model on the data manually.
+
 dataset = openml.datasets.get_dataset(68)
-X, y = dataset.get_data(target=dataset.default_target_attribute)
+X, y = dataset.get_data(
+    target=dataset.default_target_attribute
+)
 clf = neighbors.KNeighborsClassifier(n_neighbors=1)
 clf.fit(X, y)
 
@@ -51,13 +55,23 @@ flow = openml.flows.sklearn_to_flow(clf)
 # Run the flow
 run = openml.runs.run_flow_on_task(flow, task)
 
+# pprint(vars(run), depth=2)
+
 ############################################################################
 # Share the run on the OpenML server
+#
+# So far the run is only available locally. By calling the publish function, the run is send to the OpenML server:
 
 myrun = run.publish()
 # For this tutorial, our configuration publishes to the test server
 # as to not pollute the main server.
 print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
+
+############################################################################
+# We can now also inspect the flow object which was automatically created:
+
+flow = openml.flows.get_flow(run.flow_id)
+pprint(vars(flow), depth=1)
 
 ############################################################################
 # It also works with pipelines
