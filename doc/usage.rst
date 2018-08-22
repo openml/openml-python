@@ -57,7 +57,7 @@ this should be repeated several times. Also, the task defines a target metric
 for which a flow should be optimized.
 
 
-Below you can find our tutorial regarding tasks and if you want to know more you can read the `OpenML guide <http://www.openml.org/guide>`_.
+Below you can find our tutorial regarding tasks and if you want to know more you can read the `OpenML guide <https://docs.openml.org/#tasks>`_.
 
 * `Tasks <examples/tasks_tutorial.html>`_
 
@@ -90,6 +90,25 @@ The next tutorial shows how to train and run different machine learning models o
 
 * `Flows and Runs <examples/flows_and_runs_tutorial.html>`_
 
+~~~~~~~~
+Datasets
+~~~~~~~~
+
+OpenML provides a large collection of datasets and the benchmark "`OpenML100 <https://www.openml.org/guide/benchmark>`_" which consists of a curated list of datasets.
+
+You can find the dataset that best fits your requirements by making use of the available metadata. The tutorial which follows explains how to get a list of datasets, how to filter the list to find the dataset that suits your requirements and how to download a dataset.
+
+* `Datasets <examples/datasets_tutorial.html>`_
+
+Uploading datasets
+~~~~~~~~~~~~~~~~~~
+
+If you want to contribute to OpenML by adding a dataset, take a look at our tutorial on how to create and upload a dataset.
+
+* `Upload Dataset <examples/create_upload_tutorial.html>`_
+
+
+~~~~~~~~~~~~~~~
 Advanced topics
 ~~~~~~~~~~~~~~~
 

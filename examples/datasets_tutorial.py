@@ -25,8 +25,9 @@ print("First 10 of %s datasets..." % len(datalist))
 datalist.head(n=10)
 
 ############################################################################
+
 # Exercise
-# ########
+# ********
 #
 # * Find datasets with more than 10000 examples.
 # * Find a dataset called 'eeg_eye_state'.
@@ -64,8 +65,9 @@ eeg['class'] = y
 print(eeg[:10])
 
 ############################################################################
+
 # Exercise
-# ########
+# ********
 # * Explore the data visually.
 eegs = eeg.sample(n=1000)
 _ = pd.plotting.scatter_matrix(
