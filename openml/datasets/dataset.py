@@ -509,7 +509,7 @@ class OpenMLDataset(object):
                     raise ValueError("No path/url to the dataset file was given")
 
         return_value = openml._api_calls._perform_api_call(
-            "/data/",
+            "data/",
             file_elements=file_elements,
         )
         self.dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])

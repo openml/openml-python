@@ -15,6 +15,7 @@
 import os
 import sys
 import sphinx_bootstrap_theme
+from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
 import openml
 
 
@@ -41,6 +42,8 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.ifconfig',
+    'sphinx.ext.autosectionlabel',
+    'sphinx_gallery.gen_gallery',
     'numpydoc'
 ]
 
@@ -63,8 +66,10 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'OpenML'
-copyright = u'2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, ' \
-            u'Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers'
+copyright = (
+    u'2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, '
+    u'Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers'
+)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -131,10 +136,11 @@ html_theme_options = {
     # be in the form [(name, page), ..]
     'navbar_links': [
         ('Start', 'index'),
-        ('API', 'api'),
         ('User Guide', 'usage'),
+        ('API', 'api'),
         ('Changelog', 'progress'),
-        ('Contributing', 'contributing')
+        ('Contributing', 'contributing'),
+        ('Progress', 'progress'),
     ],
 
     # Render the next and previous page links in navbar. (Default: true)
@@ -331,3 +337,19 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+# prefix each section label with the name of the document it is in, in order to avoid
+# ambiguity when there are multiple same section labels in different documents.
+autosectionlabel_prefix_document = True
+# Sphinx-gallery configuration.
+sphinx_gallery_conf = {
+    # disable mini galleries clustered by the used functions
+    'backreferences_dir': False,
+    # path to the examples
+    'examples_dirs': '../examples',
+    # path where to save gallery generated examples
+    'gallery_dirs': 'examples',
+    # compile execute examples in the examples dir
+    'filename_pattern': '.*example.py$|.*tutorial.py$',
+    #TODO: fix back/forward references for the examples.
+}
