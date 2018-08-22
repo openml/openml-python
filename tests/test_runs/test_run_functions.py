@@ -35,6 +35,7 @@ from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
     StratifiedKFold
 from sklearn.pipeline import Pipeline
 
+__version__ = '0.0.1' # neccessary for serialization of dummy estimators
 
 class HardNaiveBayes(GaussianNB):
     # class for testing a naive bayes classifier that does not allow soft predictions
@@ -43,6 +44,39 @@ class HardNaiveBayes(GaussianNB):
 
     def predict_proba(*args, **kwargs):
         raise AttributeError('predict_proba is not available when  probability=False')
+
+class DefaultSearchCV(BaseSearchCV):
+
+    def __init__(self, estimator, defaults, scoring=None,
+                 fit_params=None, n_jobs=1, iid='warn', refit=True, cv=None,
+                 verbose=0, pre_dispatch='2*n_jobs',
+                 error_score='raise', return_train_score="warn"):
+        self.defaults = defaults
+        self.param_distributions = DefaultSearchCV._determine_param_distributions(defaults)
+        super(DefaultSearchCV, self).__init__(
+            estimator=estimator, scoring=scoring, fit_params=fit_params,
+            n_jobs=n_jobs, iid=iid, refit=refit, cv=cv, verbose=verbose,
+            pre_dispatch=pre_dispatch, error_score=error_score,
+            return_train_score=return_train_score)
+
+    @staticmethod
+    def _determine_param_distributions(defaults):
+        result = {}
+        for default in defaults:
+            for param, value in default.items():
+                if param not in result:
+                    result[param] = list()
+                if value not in result[param]:
+                    result[param].append(value)
+        return result
+
+    # For sklearn version 0.19.0 and up
+    # def _get_param_iterator(self):
+    #     """Return ParameterSampler instance for the given distributions"""
+    #     return self.defaults
+
+    def fit(self, X, y=None, groups=None):
+        return self._fit(X, y, groups, self.defaults)
 
 
 class TestRun(TestBase):
@@ -136,7 +170,8 @@ class TestRun(TestBase):
 
             if flow.class_name not in \
                     ['sklearn.model_selection._search.GridSearchCV',
-                     'sklearn.pipeline.Pipeline']:
+                     'sklearn.pipeline.Pipeline',
+                     'test_run_functions.DefaultSearchCV']:
                 # If the flow is initialized from a model without a random state,
                 # the flow is on the server without any random state
                 self.assertEqual(flow.parameters['random_state'], 'null')
@@ -155,7 +190,8 @@ class TestRun(TestBase):
             flow_server2 = openml.flows.sklearn_to_flow(clf_server2)
             if flow.class_name not in \
                     ['sklearn.model_selection._search.GridSearchCV',
-                     'sklearn.pipeline.Pipeline']:
+                     'sklearn.pipeline.Pipeline',
+                     'test_run_functions.DefaultSearchCV']:
                 self.assertEqual(flow_server2.parameters['random_state'],
                                  random_state_value)
 
@@ -373,6 +409,22 @@ class TestRun(TestBase):
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
         self._run_and_upload(randomsearch, '12172')
+
+
+    def test_run_and_upload_defaultsearch(self):
+        # more complicated, as it can have hierarchical parameters
+        defaultsearch = DefaultSearchCV(
+            RandomForestClassifier(n_estimators=5),
+            [{'max_features': 4},
+             {'min_samples_leaf': 1},
+             {'min_samples_leaf': 2},
+             {'min_samples_leaf': 3},
+             {'max_features': 4, 'min_samples_leaf': 3}],
+            cv=StratifiedKFold(n_splits=2, shuffle=True))
+        # The random states for the RandomizedSearchCV is set after the
+        # random state of the RandomForestClassifier is set, therefore,
+        # it has a different value than the other examples before
+        self._run_and_upload(defaultsearch, '12172')
 
     ############################################################################
 

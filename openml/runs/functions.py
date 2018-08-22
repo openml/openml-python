@@ -639,7 +639,11 @@ def _extract_arfftrace(model, rep_no, fold_no):
         arff_line = [rep_no, fold_no, itt_no, test_score, selected]
         for key in model.cv_results_:
             if key.startswith('param_'):
-                serialized_value = json.dumps(model.cv_results_[key][itt_no])
+                value = model.cv_results_[key][itt_no]
+                if value is not np.ma.masked:
+                    serialized_value = json.dumps(value)
+                else:
+                    serialized_value = np.nan
                 arff_line.append(serialized_value)
         arff_tracecontent.append(arff_line)
     return arff_tracecontent
@@ -665,7 +669,7 @@ def _extract_arfftrace_attributes(model):
             # supported types should include all types, including bool, int float
             supported_basic_types = (bool, int, float, six.string_types)
             for param_value in model.cv_results_[key]:
-                if isinstance(param_value, supported_basic_types) or param_value is None:
+                if isinstance(param_value, supported_basic_types) or param_value is None or param_value is np.ma.masked:
                     # basic string values
                     type = 'STRING'
                 elif isinstance(param_value, list) and all(isinstance(i, int) for i in param_value):
