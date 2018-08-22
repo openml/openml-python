@@ -2,7 +2,7 @@
 Flows and Runs
 ==============
 
-How to train/run a model and how to upload/download the results.
+How to train/run a model and how to upload the results.
 """
 
 import openml

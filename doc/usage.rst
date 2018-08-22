@@ -53,7 +53,7 @@ Working with tasks
 
 You can think of a task as an experimentation protocol, describing how to apply
 a machine learning model to a dataset in a way that it is comparable with the
-results of others (more on how to do that further down).Tasks are containers,
+results of others (more on how to do that further down). Tasks are containers,
 defining which dataset to use, what kind of task we're solving (regression,
 classification, clustering, etc...) and which column to predict. Furthermore,
 it also describes how to split the dataset into a train and test set, whether
@@ -91,9 +91,8 @@ the `scikit-learn estimator API <http://scikit-learn.org/dev/developers/contribu
 Those can be directly run on a task, and a flow will automatically be created or
 downloaded from the server if it already exists.
 
-The next tutorial shows how to train and run different machine learning models
-on OpenML data. It covers how to upload the results and download information
-from previous runs:
+The next tutorial covers how to train different machine learning models,
+how to run machine learning models on OpenML data and how to share the results:
 
 * `Flows and Runs <examples/flows_and_runs_tutorial.html>`_
 
