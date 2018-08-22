@@ -66,8 +66,10 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'OpenML'
-copyright = u'2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, ' \
-            u'Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers'
+copyright = (
+    u'2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, '
+    u'Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers'
+)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -134,8 +136,8 @@ html_theme_options = {
     # be in the form [(name, page), ..]
     'navbar_links': [
         ('Start', 'index'),
-        ('API', 'api'),
         ('User Guide', 'usage'),
+        ('API', 'api'),
         ('Changelog', 'progress'),
         ('Contributing', 'contributing'),
         ('Progress', 'progress'),

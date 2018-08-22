@@ -91,25 +91,6 @@ myrun = run.publish()
 print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 
 ############################################################################
-# Download previous results
-# ^^^^^^^^^^^^^^^^^^^^^^^^^
-#
-# You can download all your results anytime, as well as everybody else's.
-#
-# List runs by uploader, flow, task, tag, id, ...
-
-# Get the list of runs for task 115
-myruns = openml.runs.list_runs(task=[115], size=100)
-
-# Download the tasks and plot the scores
-scores = []
-for id, _ in myruns.items():
-    run = openml.runs.get_run(id)
-    scores.append({"flow": run.flow_name, "score": run.evaluations['area_under_roc_curve']})
-
-sns.violinplot(x="score", y="flow", data=pd.DataFrame(scores), scale="width", palette="Set3")
-
-############################################################################
 # Challenge
 # ^^^^^^^^^
 #
@@ -130,9 +111,6 @@ for task_id in [115, ]:  # Add further tasks. Disclaimer: they might take some t
     clf = neighbors.KNeighborsClassifier(n_neighbors=5)
     flow = openml.flows.sklearn_to_flow(clf)
 
-    try:
-        run = openml.runs.run_flow_on_task(flow, task)
-        myrun = run.publish()
-        print("kNN on %s: http://test.openml.org/r/%d" % (data.name, myrun.run_id))
-    except openml.exceptions.PyOpenMLError as err:
-        print("OpenML: {0}".format(err))
+    run = openml.runs.run_flow_on_task(flow, task, avoid_duplicate_runs=False)
+    myrun = run.publish()
+    print("kNN on %s: http://test.openml.org/r/%d" % (data.name, myrun.run_id))

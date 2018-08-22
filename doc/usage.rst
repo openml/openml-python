@@ -12,18 +12,20 @@
 Basic Usage
 ***********
 
-This document will guide you through the most important functions and classes
-in the OpenML Python API. Throughout this document, we will use
+This document will guide you through the most important use cases, functions
+and classes in the OpenML Python API. Throughout this document, we will use
 `pandas <http://pandas.pydata.org/>`_ to format and filter tables.
 
-~~~~~~~~~~~~~~~~~~~~~~~
-Installing & Setting up
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+Installation & Set up
+~~~~~~~~~~~~~~~~~~~~~~
 
-The OpenML Python package is a connector to `OpenML <https://www.openml.org/>`_. It allows to use datasets/tasks together with
-machine learning algorithms and share the results online.
+The OpenML Python package is a connector to `OpenML <https://www.openml.org/>`_.
+It allows to use and share datasets and tasks, run
+machine learning algorithms on them and then share the results online.
 
-The following tutorial makes a short introduction on how to install and set up the OpenML python connector, followed up by a simple example.
+The following tutorial gives a short introduction on how to install and set up
+the OpenML python connector, followed up by a simple example.
 
 * `Introduction <examples/introduction_tutorial.html>`_
 
@@ -42,6 +44,9 @@ metric. In this user guide we will go through listing and exploring existing
 user guide we will examine how to search through **datasets** in order to curate
 a list of **tasks**.
 
+A further explanation is given in the
+`OpenML user guide <https://openml.github.io/OpenML/#concepts>`_.
+
 ~~~~~~~~~~~~~~~~~~
 Working with tasks
 ~~~~~~~~~~~~~~~~~~
@@ -56,14 +61,14 @@ to use several disjoint train and test splits (cross-validation) and whether
 this should be repeated several times. Also, the task defines a target metric
 for which a flow should be optimized.
 
-
-Below you can find our tutorial regarding tasks and if you want to know more you can read the `OpenML guide <https://docs.openml.org/#tasks>`_.
+Below you can find our tutorial regarding tasks and if you want to know more
+you can read the `OpenML guide <https://docs.openml.org/#tasks>`_:
 
 * `Tasks <examples/tasks_tutorial.html>`_
 
-~~~~~~~~~~~~~
-Creating runs
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Running machine learning algorithms and uploading results
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to upload and share results of running a machine learning algorithm
 on a task, we need to create an :class:`~openml.OpenMLRun`. A run object can
@@ -86,7 +91,9 @@ the `scikit-learn estimator API <http://scikit-learn.org/dev/developers/contribu
 Those can be directly run on a task, and a flow will automatically be created or
 downloaded from the server if it already exists.
 
-The next tutorial shows how to train and run different machine learning models on OpenML data. It covers how to upload the results and download information from previous runs.
+The next tutorial shows how to train and run different machine learning models
+on OpenML data. It covers how to upload the results and download information
+from previous runs:
 
 * `Flows and Runs <examples/flows_and_runs_tutorial.html>`_
 
@@ -94,18 +101,21 @@ The next tutorial shows how to train and run different machine learning models o
 Datasets
 ~~~~~~~~
 
-OpenML provides a large collection of datasets and the benchmark "`OpenML100 <https://www.openml.org/guide/benchmark>`_" which consists of a curated list of datasets.
+OpenML provides a large collection of datasets and the benchmark
+"`OpenML100 <https://docs.openml.org/benchmark/>`_" which consists of a curated
+list of datasets.
 
-You can find the dataset that best fits your requirements by making use of the available metadata. The tutorial which follows explains how to get a list of datasets, how to filter the list to find the dataset that suits your requirements and how to download a dataset.
+You can find the dataset that best fits your requirements by making use of the
+available metadata. The tutorial which follows explains how to get a list of
+datasets, how to filter the list to find the dataset that suits your
+requirements and how to download a dataset:
 
-* `Datasets <examples/datasets_tutorial.html>`_
+* `Filter and explore datasets <examples/datasets_tutorial.html>`_
 
-Uploading datasets
-~~~~~~~~~~~~~~~~~~
+OpenML is about sharing machine learning results and the datasets they were
+obtained on. Learn how to share your datasets in the following tutorial:
 
-If you want to contribute to OpenML by adding a dataset, take a look at our tutorial on how to create and upload a dataset.
-
-* `Upload Dataset <examples/create_upload_tutorial.html>`_
+* `Upload a dataset <examples/create_upload_tutorial.html>`_
 
 
 ~~~~~~~~~~~~~~~
@@ -115,7 +125,6 @@ Advanced topics
 We are working on tutorials for the following topics:
 
 * Querying datasets (TODO)
-* Uploading datasets (TODO)
-* Creating tasks
-* Working offline
-* Analyzing large amounts of results
+* Creating tasks (TODO)
+* Working offline (TODO)
+* Analyzing large amounts of results (TODO)

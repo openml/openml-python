@@ -10,7 +10,6 @@ import pandas as pd
 from pprint import pprint
 
 ############################################################################
-# **Note: tasks are typically created in the web interface**
 #
 # Tasks are identified by IDs and can be accessed in two different ways:
 #
@@ -87,7 +86,7 @@ print(len(tasks))
 # Exercise
 # ########
 #
-# * Search for the tasks on the 'eeg-eye-state' dataset.
+# Search for the tasks on the 'eeg-eye-state' dataset.
 
 tasks.query('name=="eeg-eye-state"')
 

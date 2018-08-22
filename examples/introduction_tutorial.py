@@ -5,7 +5,8 @@ Introduction
 An introduction to OpenML, followed up by a simple example.
 """
 ############################################################################
-# OpenML is an online collaboration platform for machine learning:
+# OpenML is an online collaboration platform for machine learning which allows
+# you to:
 #
 # * Find or share interesting, well-documented datasets
 # * Define research / modelling goals (tasks)
@@ -16,10 +17,13 @@ An introduction to OpenML, followed up by a simple example.
 #
 # Installation
 # ^^^^^^^^^^^^
+# Installation is done via ``pip``:
 #
-# * Up to now: pip install git+https://github.com/openml/openml-python.git@develop
-# * In the future: pip install openml
-# * Check out the installation guide: https://openml.github.io/openml-python/stable/#installation
+# .. code:: bash
+#
+#     pip install openml
+#
+# For further information, please check out the installation guide at https://openml.github.io/openml-python/stable/contributing.html#installation
 #
 # Authentication
 # ^^^^^^^^^^^^^^
@@ -63,12 +67,9 @@ task = openml.tasks.get_task(403)
 data = openml.datasets.get_dataset(task.dataset_id)
 clf = neighbors.KNeighborsClassifier(n_neighbors=5)
 flow = openml.flows.sklearn_to_flow(clf)
-try:
-    run = openml.runs.run_flow_on_task(flow, task)
-    # Publish the experiment on OpenML (optional, requires an API key).
-    # For this tutorial, our configuration publishes to the test server
-    # as to not pollute the main server.
-    myrun = run.publish()
-    print("kNN on %s: http://test.openml.org/r/%d" % (data.name, myrun.run_id))
-except openml.exceptions.PyOpenMLError as err:
-    print("OpenML: {0}".format(err))
+run = openml.runs.run_flow_on_task(flow, task, avoid_duplicate_runs=False)
+# Publish the experiment on OpenML (optional, requires an API key).
+# For this tutorial, our configuration publishes to the test server
+# as to not pollute the main server.
+myrun = run.publish()
+print("kNN on %s: http://test.openml.org/r/%d" % (data.name, myrun.run_id))
