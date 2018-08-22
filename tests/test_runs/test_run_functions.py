@@ -172,7 +172,7 @@ class TestRun(TestBase):
                     ['sklearn.model_selection._search.GridSearchCV',
                      'sklearn.pipeline.Pipeline',
                      'test_run_functions.DefaultSearchCV']:
-                error_msg = 'Flow %s (id=%d) does not have a random state parameter' % (flow.name, flow.flow_id)
+                error_msg = 'Flow class %s (id=%d) does not have a random state parameter' % (flow.class_name, flow.flow_id)
                 self.assertIn('random_state', flow.parameters, error_msg)
                 # If the flow is initialized from a model without a random state,
                 # the flow is on the server without any random state
