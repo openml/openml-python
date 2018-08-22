@@ -138,7 +138,12 @@ class TestRun(TestBase):
 
     def _perform_run(self, task_id, num_instances, clf,
                      random_state_value=None, check_setup=True):
-
+        # last case (DefaultSearchCV) relies on where the test is invoked from
+        # TODO: move it to a 'permanent' place?
+        classes_without_random_state = \
+            ['sklearn.model_selection._search.GridSearchCV',
+             'sklearn.pipeline.Pipeline',
+             'tests.test_runs.test_run_functions.DefaultSearchCV']
         def _remove_random_state(flow):
             if 'random_state' in flow.parameters:
                 del flow.parameters['random_state']
@@ -168,10 +173,7 @@ class TestRun(TestBase):
             flow_local = openml.flows.sklearn_to_flow(clf)
             flow_server = openml.flows.sklearn_to_flow(clf_server)
 
-            if flow.class_name not in \
-                    ['sklearn.model_selection._search.GridSearchCV',
-                     'sklearn.pipeline.Pipeline',
-                     'test_run_functions.DefaultSearchCV']:
+            if flow.class_name not in classes_without_random_state:
                 error_msg = 'Flow class %s (id=%d) does not have a random state parameter' % (flow.class_name, flow.flow_id)
                 self.assertIn('random_state', flow.parameters, error_msg)
                 # If the flow is initialized from a model without a random state,
@@ -190,10 +192,7 @@ class TestRun(TestBase):
             # and test the initialize setup from run function
             clf_server2 = openml.runs.initialize_model_from_run(run_server.run_id)
             flow_server2 = openml.flows.sklearn_to_flow(clf_server2)
-            if flow.class_name not in \
-                    ['sklearn.model_selection._search.GridSearchCV',
-                     'sklearn.pipeline.Pipeline',
-                     'test_run_functions.DefaultSearchCV']:
+            if flow.class_name not in classes_without_random_state:
                 self.assertEqual(flow_server2.parameters['random_state'],
                                  random_state_value)
 
