@@ -149,11 +149,24 @@ to have better visualization and easier access:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;name&#39;, &#39;tid&#39;, &#39;status&#39;, &#39;MajorityClassSize&#39;, &#39;estimation_procedure&#39;,
-       &#39;ttid&#39;, &#39;NumberOfMissingValues&#39;, &#39;NumberOfInstancesWithMissingValues&#39;,
-       &#39;NumberOfNumericFeatures&#39;, &#39;NumberOfSymbolicFeatures&#39;,
-       &#39;MinorityClassSize&#39;, &#39;source_data&#39;, &#39;did&#39;, &#39;NumberOfFeatures&#39;,
-       &#39;NumberOfClasses&#39;, &#39;target_feature&#39;, &#39;task_type&#39;, &#39;NumberOfInstances&#39;],
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Index([                            u&#39;status&#39;,
+                           u&#39;target_feature&#39;,
+                                u&#39;task_type&#39;,
+       u&#39;NumberOfInstancesWithMissingValues&#39;,
+                                     u&#39;name&#39;,
+                     u&#39;estimation_procedure&#39;,
+                                      u&#39;did&#39;,
+                 u&#39;NumberOfSymbolicFeatures&#39;,
+                    u&#39;NumberOfMissingValues&#39;,
+                        u&#39;MajorityClassSize&#39;,
+                        u&#39;NumberOfInstances&#39;,
+                              u&#39;source_data&#39;,
+                                     u&#39;ttid&#39;,
+                          u&#39;NumberOfClasses&#39;,
+                                      u&#39;tid&#39;,
+                        u&#39;MinorityClassSize&#39;,
+                         u&#39;NumberOfFeatures&#39;,
+                  u&#39;NumberOfNumericFeatures&#39;],
       dtype=&#39;object&#39;)
 First 5 of 612 tasks:
 </pre></div>
@@ -235,24 +248,24 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;class_labels&#39;: [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;, &#39;4&#39;, &#39;5&#39;, &#39;U&#39;],
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;class_labels&#39;: [u&#39;1&#39;, u&#39;2&#39;, u&#39;3&#39;, u&#39;4&#39;, u&#39;5&#39;, u&#39;U&#39;],
  &#39;cost_matrix&#39;: None,
  &#39;dataset_id&#39;: 1,
- &#39;estimation_parameters&#39;: {&#39;number_folds&#39;: &#39;10&#39;,
-                           &#39;number_repeats&#39;: &#39;1&#39;,
-                           &#39;percentage&#39;: &#39;&#39;,
-                           &#39;stratified_sampling&#39;: &#39;true&#39;},
- &#39;estimation_procedure&#39;: {&#39;data_splits_url&#39;: &#39;https://test.openml.org/api_splits/get/1/Task_1_splits.arff&#39;,
-                          &#39;parameters&#39;: {&#39;number_folds&#39;: &#39;10&#39;,
-                                         &#39;number_repeats&#39;: &#39;1&#39;,
-                                         &#39;percentage&#39;: &#39;&#39;,
-                                         &#39;stratified_sampling&#39;: &#39;true&#39;},
-                          &#39;type&#39;: &#39;crossvalidation&#39;},
+ &#39;estimation_parameters&#39;: {u&#39;number_folds&#39;: u&#39;10&#39;,
+                           u&#39;number_repeats&#39;: u&#39;1&#39;,
+                           u&#39;percentage&#39;: &#39;&#39;,
+                           u&#39;stratified_sampling&#39;: u&#39;true&#39;},
+ &#39;estimation_procedure&#39;: {&#39;data_splits_url&#39;: u&#39;https://test.openml.org/api_splits/get/1/Task_1_splits.arff&#39;,
+                          &#39;parameters&#39;: {u&#39;number_folds&#39;: u&#39;10&#39;,
+                                         u&#39;number_repeats&#39;: u&#39;1&#39;,
+                                         u&#39;percentage&#39;: &#39;&#39;,
+                                         u&#39;stratified_sampling&#39;: u&#39;true&#39;},
+                          &#39;type&#39;: u&#39;crossvalidation&#39;},
  &#39;evaluation_measure&#39;: None,
  &#39;split&#39;: None,
- &#39;target_name&#39;: &#39;class&#39;,
+ &#39;target_name&#39;: u&#39;class&#39;,
  &#39;task_id&#39;: 1,
- &#39;task_type&#39;: &#39;Supervised Classification&#39;,
+ &#39;task_type&#39;: u&#39;Supervised Classification&#39;,
  &#39;task_type_id&#39;: 1}
 </pre></div>
 </div>
@@ -263,10 +276,10 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLTask object at 0x2b013fcd75c0&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLTask object at 0x2b35e3eec910&gt;
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  15.844 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  17.874 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-tasks-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../_downloads/tasks_tutorial.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></div>
