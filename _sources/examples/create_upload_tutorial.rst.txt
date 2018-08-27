@@ -1,0 +1,191 @@
+.. note::
+    :class: sphx-glr-download-link-note
+
+    Click :ref:`here <sphx_glr_download_examples_create_upload_tutorial.py>` to download the full example code
+.. rst-class:: sphx-glr-example-title
+
+.. _sphx_glr_examples_create_upload_tutorial.py:
+
+
+Dataset upload tutorial
+=======================
+
+A tutorial on how to create and upload a dataset to OpenML.
+
+
+
+.. code-block:: python
+
+    import numpy as np
+    import openml
+    import sklearn.datasets
+
+
+
+
+
+
+
+For this example we will upload to the test server to not  pollute the live server with countless copies of the same dataset.
+
+
+
+.. code-block:: python
+
+    openml.config.server = 'https://test.openml.org/api/v1/xml'
+
+
+
+
+
+
+
+Prepare the data
+^^^^^^^^^^^^^^^^
+Load an example dataset from scikit-learn which we will upload to OpenML.org via the API.
+
+
+
+.. code-block:: python
+
+    breast_cancer = sklearn.datasets.load_breast_cancer()
+    name = 'BreastCancer(scikit-learn)'
+    X = breast_cancer.data
+    y = breast_cancer.target
+    attribute_names = breast_cancer.feature_names
+    targets = breast_cancer.target_names
+    description = breast_cancer.DESCR
+
+
+
+
+
+
+
+OpenML does not distinguish between the attributes and targets on the data level and stores all data in a
+single matrix. The target feature is indicated as meta-data of the dataset (and tasks on that data).
+
+
+
+.. code-block:: python
+
+    data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
+    attribute_names = list(attribute_names)
+    attributes = [
+        (attribute_name, 'REAL') for attribute_name in attribute_names
+    ] + [('class', 'REAL')]
+
+
+
+
+
+
+
+Create the dataset object
+^^^^^^^^^^^^^^^^^^^^^^^^^
+The definition of all fields can be found in the XSD files describing the expected format:
+
+https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd
+
+
+
+.. code-block:: python
+
+    dataset = openml.datasets.functions.create_dataset(
+        # The name of the dataset (needs to be unique). 
+        # Must not be longer than 128 characters and only contain
+        # a-z, A-Z, 0-9 and the following special characters: _\-\.(),
+        name=name,
+        # Textual description of the dataset.
+        description=description,
+        # The person who created the dataset.
+        creator='Dr. William H. Wolberg, W. Nick Street, Olvi L. Mangasarian',
+        # People who contributed to the current version of the dataset.
+        contributor=None,
+        # The date the data was originally collected, given by the uploader.
+        collection_date='01-11-1995',
+        # Language in which the data is represented.
+        # Starts with 1 upper case letter, rest lower case, e.g. 'English'.
+        language='English',
+        # License under which the data is/will be distributed.
+        licence='BSD (from scikit-learn)',
+        # Name of the target. Can also have multiple values (comma-separated).
+        default_target_attribute='class',
+        # The attribute that represents the row-id column, if present in the dataset.
+        row_id_attribute=None,
+        # Attributes that should be excluded in modelling, such as identifiers and indexes.
+        ignore_attribute=None,
+        # How to cite the paper.
+        citation=(
+            "W.N. Street, W.H. Wolberg and O.L. Mangasarian. "
+            "Nuclear feature extraction for breast tumor diagnosis. "
+            "IS&T/SPIE 1993 International Symposium on Electronic Imaging: Science and Technology, "
+            "volume 1905, pages 861-870, San Jose, CA, 1993."
+        ),
+        # Attributes of the data
+        attributes=attributes,
+        data=data,
+        # Format of the dataset. Only 'arff' for now.
+        format='arff',
+        # A version label which is provided by the user.
+        version_label='test',
+        original_data_url='https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Diagnostic)',
+        paper_url='https://www.spiedigitallibrary.org/conference-proceedings-of-spie/1905/0000/Nuclear-feature-extraction-for-breast-tumor-diagnosis/10.1117/12.148698.short?SSO=1'
+    )
+
+
+
+
+
+
+
+
+.. code-block:: python
+
+    try:
+        upload_id = dataset.publish()
+        print('URL for dataset: %s/data/%d' % (openml.config.server, upload_id))
+    except openml.exceptions.PyOpenMLError as err:
+        print("OpenML: {0}".format(err))
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    URL for dataset: https://test.openml.org/api/v1/xml/data/960
+
+
+**Total running time of the script:** ( 0 minutes  1.408 seconds)
+
+
+.. _sphx_glr_download_examples_create_upload_tutorial.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Python source code: create_upload_tutorial.py <create_upload_tutorial.py>`
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Jupyter notebook: create_upload_tutorial.ipynb <create_upload_tutorial.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.readthedocs.io>`_
