@@ -136,7 +136,7 @@ So far the run is only available locally. By calling the publish function, the r
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/5385
+    Uploaded to http://test.openml.org/r/5390
 
 
 We can now also inspect the flow object which was automatically created:
@@ -162,26 +162,26 @@ We can now also inspect the flow object which was automatically created:
     {'binary_format': None,
      'binary_md5': None,
      'binary_url': None,
-     'class_name': u'sklearn.tree.tree.ExtraTreeClassifier',
+     'class_name': 'sklearn.tree.tree.ExtraTreeClassifier',
      'components': OrderedDict(),
      'custom_name': None,
-     'dependencies': u'sklearn==0.18.2\nnumpy>=1.6.1\nscipy>=0.9',
-     'description': u'Automatically created scikit-learn flow.',
-     'external_version': u'openml==0.8.0dev,sklearn==0.18.2',
+     'dependencies': 'sklearn==0.18.2\nnumpy>=1.6.1\nscipy>=0.9',
+     'description': 'Automatically created scikit-learn flow.',
+     'external_version': 'openml==0.8.0dev,sklearn==0.18.2',
      'flow_id': 15009,
-     'language': u'English',
-     'model': ExtraTreeClassifier(class_weight=None, criterion=u'gini', max_depth=None,
-              max_features=u'auto', max_leaf_nodes=None,
+     'language': 'English',
+     'model': ExtraTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
+              max_features='auto', max_leaf_nodes=None,
               min_impurity_split=1e-07, min_samples_leaf=1,
               min_samples_split=2, min_weight_fraction_leaf=0.0,
-              random_state=None, splitter=u'random'),
-     'name': u'sklearn.tree.tree.ExtraTreeClassifier',
-     'parameters': OrderedDict([(u'class_weight', u'null'), (u'criterion', u'"gini"'), (u'max_depth', u'null'), (u'max_features', u'"auto"'), (u'max_leaf_nodes', u'null'), (u'min_impurity_split', u'1e-07'), (u'min_samples_leaf', u'1'), (u'min_samples_split', u'2'), (u'min_weight_fraction_leaf', u'0.0'), (u'random_state', u'null'), (u'splitter', u'"random"')]),
-     'parameters_meta_info': OrderedDict([(u'class_weight', OrderedDict([('description', None), ('data_type', None)])), (u'criterion', OrderedDict([('description', None), ('data_type', None)])), (u'max_depth', OrderedDict([('description', None), ('data_type', None)])), (u'max_features', OrderedDict([('description', None), ('data_type', None)])), (u'max_leaf_nodes', OrderedDict([('description', None), ('data_type', None)])), (u'min_impurity_split', OrderedDict([('description', None), ('data_type', None)])), (u'min_samples_leaf', OrderedDict([('description', None), ('data_type', None)])), (u'min_samples_split', OrderedDict([('description', None), ('data_type', None)])), (u'min_weight_fraction_leaf', OrderedDict([('description', None), ('data_type', None)])), (u'random_state', OrderedDict([('description', None), ('data_type', None)])), (u'splitter', OrderedDict([('description', None), ('data_type', None)]))]),
+              random_state=None, splitter='random'),
+     'name': 'sklearn.tree.tree.ExtraTreeClassifier',
+     'parameters': OrderedDict([...]),
+     'parameters_meta_info': OrderedDict([...]),
      'tags': [...],
-     'upload_date': u'2018-08-27T14:48:03',
-     'uploader': u'1159',
-     'version': u'2'}
+     'upload_date': '2018-08-27T14:48:03',
+     'uploader': '1159',
+     'version': '2'}
 
 
 It also works with pipelines
@@ -215,7 +215,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/5386
+    Uploaded to http://test.openml.org/r/5391
 
 
 Challenge
@@ -256,10 +256,10 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/5387
+    kNN on diabetes: http://test.openml.org/r/5392
 
 
-**Total running time of the script:** ( 0 minutes  14.006 seconds)
+**Total running time of the script:** ( 0 minutes  14.869 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:
