@@ -14,7 +14,7 @@ fi
 cd doc && make html 2>&1 | tee ~/log.txt
 
 # create directory with branch name
-mkdir $1
+mkdir -p $1/$1
 
 # copy content
 cp -r build/html/* $1
