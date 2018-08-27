@@ -86,7 +86,7 @@ pipe = pipeline.Pipeline(steps=[
 ])
 flow = openml.flows.sklearn_to_flow(pipe)
 
-run = openml.runs.run_flow_on_task(flow, task)
+run = openml.runs.run_flow_on_task(flow, task, avoid_duplicate_runs=False)
 myrun = run.publish()
 print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 

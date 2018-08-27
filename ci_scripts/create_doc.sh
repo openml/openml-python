@@ -17,4 +17,4 @@ cd doc && make html 2>&1 | tee ~/log.txt
 mkdir $1
 
 # copy content
-cp - r build/html/* $1
+cp -r build/html/* $1
