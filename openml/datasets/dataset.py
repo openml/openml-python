@@ -78,10 +78,16 @@ class OpenMLDataset(object):
         if features is not None:
             self.features = {}
             for idx, xmlfeature in enumerate(features['oml:feature']):
+                # split string of nominal values into type list if feature is nominal
+                # otherwise passing none for nominal values
+                try:
+                    nom_vals = [str(x[1:-1]) for x in xmlfeature['oml:nominal_values'][1:-1].split(',')]
+                except KeyError:
+                    nom_vals = None
                 feature = OpenMLDataFeature(int(xmlfeature['oml:index']),
                                             xmlfeature['oml:name'],
                                             xmlfeature['oml:data_type'],
-                                            xmlfeature['oml:nominal_values'] ######## This must pass nominal values for feature
+                                            nom_vals,
                                             int(xmlfeature.get('oml:number_of_missing_values', 0)))
                 if idx != feature.index:
                     raise ValueError('Data features not provided in right order')
