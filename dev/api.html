@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>APIs &#8212; OpenML 0.8.0dev documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.8.0dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="index.html">Start</a></li>
+                <li><a href="#">API</a></li>
+                <li><a href="usage.html">User Guide</a></li>
+                <li><a href="progress.html">Changelog</a></li>
+                <li><a href="contributing.html">Contributing</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">APIs</a><ul>
+<li><a class="reference internal" href="#top-level-classes">Top-level Classes</a></li>
+<li><a class="reference internal" href="#openml-datasets-dataset-functions"><code class="docutils literal notranslate"><span class="pre">openml.datasets</span></code>: Dataset Functions</a></li>
+<li><a class="reference internal" href="#openml-evaluations-evaluation-functions"><code class="docutils literal notranslate"><span class="pre">openml.evaluations</span></code>: Evaluation Functions</a></li>
+<li><a class="reference internal" href="#openml-flows-flow-functions"><code class="docutils literal notranslate"><span class="pre">openml.flows</span></code>: Flow Functions</a></li>
+<li><a class="reference internal" href="#openml-runs-run-functions"><code class="docutils literal notranslate"><span class="pre">openml.runs</span></code>: Run Functions</a></li>
+<li><a class="reference internal" href="#openml-setups-setup-functions"><code class="docutils literal notranslate"><span class="pre">openml.setups</span></code>: Setup Functions</a></li>
+<li><a class="reference internal" href="#openml-study-study-functions"><code class="docutils literal notranslate"><span class="pre">openml.study</span></code>: Study Functions</a></li>
+<li><a class="reference internal" href="#openml-tasks-task-functions"><code class="docutils literal notranslate"><span class="pre">openml.tasks</span></code>: Task Functions</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <div class="section" id="apis">
+<span id="api"></span><h1>APIs<a class="headerlink" href="#apis" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="top-level-classes">
+<h2>Top-level Classes<a class="headerlink" href="#top-level-classes" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset" title="openml.OpenMLDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLDataset</span></code></a>(name,&nbsp;description,&nbsp;format[,&nbsp;…])</td>
+<td>Dataset object.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.OpenMLRun.html#openml.OpenMLRun" title="openml.OpenMLRun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLRun</span></code></a>(task_id,&nbsp;flow_id,&nbsp;dataset_id[,&nbsp;…])</td>
+<td>OpenML Run: result of running a model on an openml dataset.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.OpenMLTask.html#openml.OpenMLTask" title="openml.OpenMLTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLTask</span></code></a>(task_id,&nbsp;task_type_id,&nbsp;task_type,&nbsp;…)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.OpenMLSplit.html#openml.OpenMLSplit" title="openml.OpenMLSplit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLSplit</span></code></a>(name,&nbsp;description,&nbsp;split)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow" title="openml.OpenMLFlow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLFlow</span></code></a>(name,&nbsp;description,&nbsp;model,&nbsp;…[,&nbsp;…])</td>
+<td>OpenML Flow.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.OpenMLEvaluation.html#openml.OpenMLEvaluation" title="openml.OpenMLEvaluation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLEvaluation</span></code></a>(run_id,&nbsp;task_id,&nbsp;setup_id,&nbsp;…)</td>
+<td>Contains all meta-information about a run / evaluation combination, according to the evaluation/list function</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="openml-datasets-dataset-functions">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>: Dataset Functions<a class="headerlink" href="#openml-datasets-dataset-functions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.datasets.check_datasets_active.html#openml.datasets.check_datasets_active" title="openml.datasets.check_datasets_active"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_datasets_active</span></code></a>(dataset_ids)</td>
+<td>Check if the dataset ids provided are active.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.datasets.get_dataset.html#openml.datasets.get_dataset" title="openml.datasets.get_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dataset</span></code></a>(dataset_id)</td>
+<td>Download a dataset.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.datasets.get_datasets.html#openml.datasets.get_datasets" title="openml.datasets.get_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_datasets</span></code></a>(dataset_ids)</td>
+<td>Download datasets.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.datasets.list_datasets.html#openml.datasets.list_datasets" title="openml.datasets.list_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_datasets</span></code></a>([offset,&nbsp;size,&nbsp;status,&nbsp;tag])</td>
+<td>Return a list of all dataset which are on OpenML.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="openml-evaluations-evaluation-functions">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.evaluations</span></code>: Evaluation Functions<a class="headerlink" href="#openml-evaluations-evaluation-functions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.evaluations.list_evaluations.html#openml.evaluations.list_evaluations" title="openml.evaluations.list_evaluations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_evaluations</span></code></a>(function[,&nbsp;offset,&nbsp;size,&nbsp;…])</td>
+<td>List all run-evaluation pairs matching all of the given filters.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="openml-flows-flow-functions">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>: Flow Functions<a class="headerlink" href="#openml-flows-flow-functions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.flows.flow_exists.html#openml.flows.flow_exists" title="openml.flows.flow_exists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flow_exists</span></code></a>(name,&nbsp;external_version)</td>
+<td>Retrieves the flow id.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.flows.flow_to_sklearn.html#openml.flows.flow_to_sklearn" title="openml.flows.flow_to_sklearn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flow_to_sklearn</span></code></a>(o[,&nbsp;components,&nbsp;…])</td>
+<td>Initializes a sklearn model based on a flow.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.flows.get_flow.html#openml.flows.get_flow" title="openml.flows.get_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_flow</span></code></a>(flow_id)</td>
+<td>Download the OpenML flow for a given flow ID.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.flows.list_flows.html#openml.flows.list_flows" title="openml.flows.list_flows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_flows</span></code></a>([offset,&nbsp;size,&nbsp;tag])</td>
+<td>Return a list of all flows which are on OpenML.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.flows.sklearn_to_flow.html#openml.flows.sklearn_to_flow" title="openml.flows.sklearn_to_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn_to_flow</span></code></a>(o[,&nbsp;parent_model])</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="openml-runs-run-functions">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>: Run Functions<a class="headerlink" href="#openml-runs-run-functions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.runs.get_run.html#openml.runs.get_run" title="openml.runs.get_run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_run</span></code></a>(run_id)</td>
+<td>Gets run corresponding to run_id.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.get_runs.html#openml.runs.get_runs" title="openml.runs.get_runs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_runs</span></code></a>(run_ids)</td>
+<td>Gets all runs in run_ids list.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.runs.get_run_trace.html#openml.runs.get_run_trace" title="openml.runs.get_run_trace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_run_trace</span></code></a>(run_id)</td>
+<td>Get the optimization trace object for a given run id.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.initialize_model_from_run.html#openml.runs.initialize_model_from_run" title="openml.runs.initialize_model_from_run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_model_from_run</span></code></a>(run_id)</td>
+<td>Initialized a model based on a run_id (i.e., using the exact same parameter settings)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.runs.initialize_model_from_trace.html#openml.runs.initialize_model_from_trace" title="openml.runs.initialize_model_from_trace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_model_from_trace</span></code></a>(run_id,&nbsp;repeat,&nbsp;fold)</td>
+<td>Initialize a model based on the parameters that were set by an optimization procedure (i.e., using the exact same parameter settings)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.list_runs.html#openml.runs.list_runs" title="openml.runs.list_runs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_runs</span></code></a>([offset,&nbsp;size,&nbsp;id,&nbsp;task,&nbsp;setup,&nbsp;…])</td>
+<td>List all runs matching all of the given filters.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.runs.run_model_on_task.html#openml.runs.run_model_on_task" title="openml.runs.run_model_on_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_model_on_task</span></code></a>(model,&nbsp;task[,&nbsp;…])</td>
+<td>See <code class="docutils literal notranslate"><span class="pre">run_flow_on_task</span> <span class="pre">for</span> <span class="pre">a</span> <span class="pre">documentation</span></code>.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.run_flow_on_task.html#openml.runs.run_flow_on_task" title="openml.runs.run_flow_on_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow_on_task</span></code></a>(flow,&nbsp;task[,&nbsp;…])</td>
+<td>Run the model provided by the flow on the dataset defined by task.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="openml-setups-setup-functions">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.setups</span></code>: Setup Functions<a class="headerlink" href="#openml-setups-setup-functions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.setups.get_setup.html#openml.setups.get_setup" title="openml.setups.get_setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_setup</span></code></a>(setup_id)</td>
+<td>Downloads the setup (configuration) description from OpenML  and returns a structured object</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.setups.initialize_model.html#openml.setups.initialize_model" title="openml.setups.initialize_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_model</span></code></a>(setup_id)</td>
+<td>Initialized a model based on a setup_id (i.e., using the exact same parameter settings)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.setups.list_setups.html#openml.setups.list_setups" title="openml.setups.list_setups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_setups</span></code></a>([offset,&nbsp;size,&nbsp;flow,&nbsp;tag,&nbsp;setup])</td>
+<td>List all setups matching all of the given filters.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.setups.setup_exists.html#openml.setups.setup_exists" title="openml.setups.setup_exists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_exists</span></code></a>(flow[,&nbsp;model])</td>
+<td>Checks whether a hyperparameter configuration already exists on the server.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="openml-study-study-functions">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.study</span></code>: Study Functions<a class="headerlink" href="#openml-study-study-functions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.study.get_study.html#openml.study.get_study" title="openml.study.get_study"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_study</span></code></a>(study_id[,&nbsp;type])</td>
+<td>Retrieves all relevant information of an OpenML study from the server Note that some of the (data, tasks, flows, setups) fields can be empty (depending on information on the server)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="openml-tasks-task-functions">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>: Task Functions<a class="headerlink" href="#openml-tasks-task-functions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.tasks.get_task.html#openml.tasks.get_task" title="openml.tasks.get_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_task</span></code></a>(task_id)</td>
+<td>Download the OpenML task for a given task ID.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.tasks.get_tasks.html#openml.tasks.get_tasks" title="openml.tasks.get_tasks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tasks</span></code></a>(task_ids)</td>
+<td>Download tasks.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.tasks.list_tasks.html#openml.tasks.list_tasks" title="openml.tasks.list_tasks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_tasks</span></code></a>([task_type_id,&nbsp;offset,&nbsp;size,&nbsp;tag])</td>
+<td>Return a number of tasks having the given tag and task_type_id</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
