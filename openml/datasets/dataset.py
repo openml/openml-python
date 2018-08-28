@@ -81,7 +81,7 @@ class OpenMLDataset(object):
                 feature = OpenMLDataFeature(int(xmlfeature['oml:index']),
                                             xmlfeature['oml:name'],
                                             xmlfeature['oml:data_type'],
-                                            None,  # todo add nominal values (currently not in database)
+                                            xmlfeature['oml:nominal_values'] ######## This must pass nominal values for feature
                                             int(xmlfeature.get('oml:number_of_missing_values', 0)))
                 if idx != feature.index:
                     raise ValueError('Data features not provided in right order')
