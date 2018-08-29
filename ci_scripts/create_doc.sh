@@ -3,18 +3,31 @@ set -o pipefail
 # install documentation building dependencies
 pip install --upgrade matplotlib seaborn setuptools nose coverage sphinx pillow sphinx-gallery sphinx_bootstrap_theme cython numpydoc nbformat nbconvert
 
-# delete any previous documentation folder for the branch
-# if it exists
+# $1 is the branch name
+# delete any previous documentation folder
 if [ -d doc/$1 ]; then
     rm -rf doc/$1
 fi
-
 
 # create the documentation
 cd doc && make html 2>&1 | tee ~/log.txt
 
 # create directory with branch name
-mkdir -p $1/$1
+# the documentation for dev/stable from git will be stored here
+mkdir $1
 
-# copy content
+# get previous documentation from github
+git clone https://github.com/openml/openml-python.git --branch gh-pages --single-branch
+
+# copy previous documentation
+cp -r openml-python/* $1
+rm -rf openml-python
+
+# if the documentation for the branch exists, remove it
+if [ -d $1/$1 ]; then
+    rm -rf $1/$1
+fi
+
+# copy the updated documentation for this branch
+mkdir $1/$1
 cp -r build/html/* $1/$1

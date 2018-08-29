@@ -32,5 +32,5 @@ deploy:
   github_token: $BOT
   keep-history: true
   on:
-    branch: circle_drop
+    branch: develop, circle_drop
   local_dir: doc/$TRAVIS_BRANCH
