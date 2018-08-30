@@ -1,9 +1,15 @@
-set -o pipefail
+set -eo pipefail
 
 # install documentation building dependencies
 pip install --upgrade matplotlib seaborn setuptools nose coverage sphinx pillow sphinx-gallery sphinx_bootstrap_theme cython numpydoc nbformat nbconvert
 
 # $1 is the branch name
+
+if ! { [ $1 = "master" ] || [ $1 = "develop" ]; }; then
+    exit 1
+
+fi
+
 # delete any previous documentation folder
 if [ -d doc/$1 ]; then
     rm -rf doc/$1

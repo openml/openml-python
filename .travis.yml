@@ -24,7 +24,7 @@ env:
 
 install: source ci_scripts/install.sh
 script: bash ci_scripts/test.sh
-after_success: source ci_scripts/success.sh && source ci_scripts/create_doc.sh $TRAVIS_BRANCH
+after_success: source ci_scripts/success.sh
 
 deploy:
   provider: pages
@@ -32,5 +32,5 @@ deploy:
   github_token: $BOT
   keep-history: true
   on:
-    branch: develop, circle_drop
+    condition: bash ci_scripts/create_doc.sh $TRAVIS_BRANCH
   local_dir: doc/$TRAVIS_BRANCH
