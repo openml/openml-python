@@ -5,7 +5,7 @@ pip install --upgrade matplotlib seaborn setuptools nose coverage sphinx pillow 
 
 # $1 is the branch name
 
-if ! { [ $1 = "master" ] || [ $1 = "develop" ]; }; then
+if ! { [ $1 = "master" ] || [ $1 = "develop" ] || [ $1 = "circle_drop" ]; }; then
     echo "fail"
 fi
 
