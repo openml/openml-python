@@ -6,8 +6,7 @@ pip install --upgrade matplotlib seaborn setuptools nose coverage sphinx pillow 
 # $1 is the branch name
 
 if ! { [ $1 = "master" ] || [ $1 = "develop" ]; }; then
-    exit 1
-
+    echo "fail"
 fi
 
 # delete any previous documentation folder
@@ -37,3 +36,5 @@ fi
 # copy the updated documentation for this branch
 mkdir $1/$1
 cp -r build/html/* $1/$1
+
+echo "success"

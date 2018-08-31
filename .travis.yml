@@ -33,5 +33,5 @@ deploy:
   keep-history: true
   on:
     all_branches: true
-    condition: bash ci_scripts/create_doc.sh $TRAVIS_BRANCH
+    condition: $(bash ci_scripts/create_doc.sh $TRAVIS_BRANCH) = success
   local_dir: doc/$TRAVIS_BRANCH
