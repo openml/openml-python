@@ -12,6 +12,7 @@ import six
 import warnings
 import sys
 import inspect
+import skopt
 
 import numpy as np
 import scipy.stats.distributions
@@ -78,6 +79,8 @@ def sklearn_to_flow(o, parent_model=None):
     elif _is_cross_validator(o):
         # TODO: explain what type of parameter is here
         rval = _serialize_cross_validator(o)
+    elif _is_skopt_space(o):
+        rval = _serialize_skopt_space(o)
     else:
         raise TypeError(o, type(o))
 
@@ -139,6 +142,8 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False):
                 rval = deserialize_rv_frozen(value)
             elif serialized_type == 'function':
                 rval = deserialize_function(value)
+            elif serialized_type == 'skopt_space':
+                rval = _deserialize_skopt_space(value)
             elif serialized_type == 'component_reference':
                 value = flow_to_sklearn(value)
                 step_name = value['step_name']
@@ -559,6 +564,34 @@ def deserialize_rv_frozen(o):
     return dist
 
 
+def _is_skopt_space(operator):
+    supported_operators = (
+        skopt.space.Categorical,
+        skopt.space.Real,
+        skopt.space.Integer
+    )
+    return isinstance(operator, supported_operators)
+
+
+def _serialize_skopt_space(operator):
+    # if isinstance(operator, skopt.space.Categorical):
+    #     keys = {'categories', 'prior', 'transform'}
+    # elif isinstance(operator, skopt.space.Real):
+    #     keys = {'low', 'high', 'prior', 'transform'}
+    # elif isinstance(operator, skopt.space.Integer):
+    #     keys = {'low', 'high', 'transform'}
+    # else:
+    #     raise NotImplementedError()
+    ret = OrderedDict()
+    ret['oml-python:serialized_object'] = 'skopt_space'
+    ret['value'] = operator.__module__ + '.' + operator.__repr__()
+    return ret
+
+
+def _deserialize_skopt_space(representation):
+    return eval(representation)
+
+
 def serialize_function(o):
     name = o.__module__ + '.' + o.__name__
     ret = OrderedDict()
@@ -651,6 +684,8 @@ def _check_n_jobs(model):
             param_distributions = model.param_grid
         elif isinstance(model, sklearn.model_selection.RandomizedSearchCV):
             param_distributions = model.param_distributions
+        elif isinstance(model, skopt.BayesSearchCV):
+            param_distributions = model.search_spaces
         else:
             if hasattr(model, 'param_distributions'):
                 param_distributions = model.param_distributions
