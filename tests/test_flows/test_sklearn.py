@@ -26,6 +26,7 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
 import sklearn.cluster
+import skopt
 
 import openml
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
@@ -776,3 +777,17 @@ class TestSklearn(unittest.TestCase):
 
         # we want to compare pipe_deserialized and pipe_orig. We use the flow equals function for this
         assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig), openml.flows.sklearn_to_flow(pipe_deserialized))
+
+    def test_skopt_bayessearch(self):
+        param_grid = {'max_leaf_nodes': skopt.space.Integer(1, 20),
+                      'max_features': skopt.space.Real(0.1, 0.9, prior='log-uniform'),
+                      'criterion': skopt.space.Categorical(['gini', 'entropy'])}
+        
+        orig = skopt.BayesSearchCV(estimator=sklearn.ensemble.RandomForestClassifier(),
+                                   search_spaces=param_grid,
+                                   n_iter=5,
+                                   optimizer_kwargs={'base_estimator': 'RF'})
+        flow = openml.flows.sklearn_to_flow(orig)
+        deserialized = openml.flows.flow_to_sklearn(flow)
+        assert_flows_equal(openml.flows.sklearn_to_flow(orig),
+                           openml.flows.sklearn_to_flow(deserialized))
