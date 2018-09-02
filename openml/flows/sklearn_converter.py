@@ -47,7 +47,8 @@ def sklearn_to_flow(o, parent_model=None):
         rval = [sklearn_to_flow(element, parent_model) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif isinstance(o, (bool, int, float, six.string_types)) or o is None:
+    elif isinstance(o, (bool, int, float, six.string_types)) or o is None or \
+            np.issubdtype(o, np.integer) or np.issubdtype(o, np.float):
         # base parameter values
         rval = o
     elif isinstance(o, dict):
