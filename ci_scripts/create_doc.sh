@@ -4,9 +4,10 @@ set -eo pipefail
 pip install --upgrade matplotlib seaborn setuptools nose coverage sphinx pillow sphinx-gallery sphinx_bootstrap_theme cython numpydoc nbformat nbconvert
 
 # $1 is the branch name
+# $2 is the global variable where we set the script status
 
 if ! { [ $1 = "master" ] || [ $1 = "develop" ] || [ $1 = "circle_drop" ]; }; then
-    echo "fail"
+    { echo "fail"; exit 1; }
 fi
 
 # delete any previous documentation folder
@@ -37,4 +38,10 @@ fi
 mkdir $1/$1
 cp -r build/html/* $1/$1
 
-echo "success"
+function set_return() {
+    local __result=$2
+    local  status='success'
+    eval $__result="$status"
+}
+
+set_return
