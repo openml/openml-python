@@ -679,6 +679,8 @@ def _extract_arfftrace_attributes(model):
                 elif isinstance(param_value, list) and all(isinstance(i, int) for i in param_value):
                     # list of integers
                     type = 'STRING'
+                elif isinstance(param_value, (np.ndarray, np.generic)) and (np.issubdtype(param_value, np.float) or np.issubdtype(param_value, np.int)):
+                    type = 'NUMERIC'
                 else:
                     raise TypeError('Unsupported param type in param grid: %s' %key)
 
