@@ -640,10 +640,14 @@ def _extract_arfftrace(model, rep_no, fold_no):
         for key in model.cv_results_:
             if key.startswith('param_'):
                 value = model.cv_results_[key][itt_no]
-                if value is not np.ma.masked:
-                    serialized_value = json.dumps(value)
-                else:
+                if value is np.ma.masked:
                     serialized_value = np.nan
+                elif isinstance(value, (np.ndarray, np.generic)) and np.issubdtype(value, np.int):
+                    serialized_value = json.dumps(int(value))
+                elif isinstance(value, (np.ndarray, np.generic)) and np.issubdtype(value, np.float):
+                    serialized_value = json.dumps(float(value))
+                else:
+                    serialized_value = json.dumps(value)
                 arff_line.append(serialized_value)
         arff_tracecontent.append(arff_line)
     return arff_tracecontent

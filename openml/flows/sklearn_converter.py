@@ -47,8 +47,7 @@ def sklearn_to_flow(o, parent_model=None):
         rval = [sklearn_to_flow(element, parent_model) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif isinstance(o, (bool, int, float, six.string_types)) or o is None or \
-            np.issubdtype(o, np.integer) or np.issubdtype(o, np.float):
+    elif isinstance(o, (bool, int, float, six.string_types)) or o is None:
         # base parameter values
         rval = o
     elif isinstance(o, dict):
@@ -82,6 +81,12 @@ def sklearn_to_flow(o, parent_model=None):
         rval = _serialize_cross_validator(o)
     elif _is_skopt_space(o):
         rval = _serialize_skopt_space(o)
+    elif isinstance(o, (np.ndarray, np.generic)) and np.issubdtype(o, np.integer):
+        # should be after 'type' (?)
+        rval = int(o)
+    elif isinstance(o, (np.ndarray, np.generic)) and np.issubdtype(o, np.float):
+        # should be after 'type' (?)
+        rval = float(o)
     else:
         raise TypeError(o, type(o))
 
@@ -377,14 +382,17 @@ def _extract_information_from_model(model):
             component_reference = sklearn_to_flow(component_reference, model)
             parameters[k] = json.dumps(component_reference)
 
-        else:
-
-            # a regular hyperparameter
-            if not (hasattr(rval, '__len__') and len(rval) == 0):
+        elif hasattr(rval, '__len__'):
+            # a iteratable hyperparameter
+            if len(rval) > 0:
                 rval = json.dumps(rval)
                 parameters[k] = rval
             else:
                 parameters[k] = None
+        else:
+            # a regular hyperparameter
+            rval = json.dumps(rval)
+            parameters[k] = rval
 
         parameters_meta_info[k] = OrderedDict((('description', None),
                                                ('data_type', None)))
