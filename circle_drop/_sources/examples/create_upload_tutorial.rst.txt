@@ -157,10 +157,10 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/1304
+    URL for dataset: https://test.openml.org/api/v1/xml/data/1305
 
 
-**Total running time of the script:** ( 0 minutes  1.631 seconds)
+**Total running time of the script:** ( 0 minutes  1.772 seconds)
 
 
 .. _sphx_glr_download_examples_create_upload_tutorial.py:
