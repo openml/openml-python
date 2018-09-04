@@ -35,5 +35,5 @@ deploy:
   committer-from-gh: true
   on:
     all_branches: true
-    condition: "$doc_result" = "success"
+    condition: $doc_result = "success"
   local_dir: doc/$TRAVIS_BRANCH
