@@ -25,8 +25,8 @@ env:
 install: source ci_scripts/install.sh
 script: bash ci_scripts/test.sh
 after_success: source ci_scripts/success.sh
-before_deploy: source ci_scripts/create_doc.sh $TRAVIS_BRANCH "script_result"
 
+before_deploy: source ci_scripts/create_doc.sh $TRAVIS_BRANCH "script_result"
 deploy:
   provider: pages
   skip_cleanup: true
@@ -35,5 +35,5 @@ deploy:
   committer-from-gh: true
   on:
     all_branches: true
-    condition: "$script_result" = "success"
+    condition: $script_result = "success"
   local_dir: doc/$TRAVIS_BRANCH
