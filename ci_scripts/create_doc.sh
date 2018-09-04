@@ -39,9 +39,11 @@ mkdir $1/$1
 cp -r build/html/* $1/$1
 
 function set_return() {
-    local __result=$2
+    # $1 is the variable where we save the script outcome
+    local __result=$1
     local  status='success'
-    eval $__result="$status"
+    eval $__result="'$status'"
+
 }
 
-set_return
+set_return "$2"
