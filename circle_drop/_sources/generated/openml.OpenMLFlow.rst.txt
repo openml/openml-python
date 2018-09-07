@@ -1,6 +1,0 @@
-:mod:`openml`.OpenMLFlow
-===============================
-
-.. currentmodule:: openml
-
-.. autoclass:: OpenMLFlow
