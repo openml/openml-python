@@ -1,4 +1,4 @@
-set -eo pipefail
+set -euo pipefail
 
 if [[ "$DOCPUSH" == "true" ]]; then
 
@@ -18,7 +18,7 @@ if [[ "$DOCPUSH" == "true" ]]; then
     fi
 
     # create the documentation
-    cd doc && make html 2>&1 | tee ~/log.txt
+    cd doc && make html 2>&1
 
     # create directory with branch name
     # the documentation for dev/stable from git will be stored here
@@ -28,7 +28,7 @@ if [[ "$DOCPUSH" == "true" ]]; then
     git clone https://github.com/openml/openml-python.git --branch gh-pages --single-branch
 
     # copy previous documentation
-    cp -r openml-python/ $1
+    cp -r openml-python/. $1
     rm -rf openml-python
 
     # if the documentation for the branch exists, remove it
@@ -38,7 +38,7 @@ if [[ "$DOCPUSH" == "true" ]]; then
 
     # copy the updated documentation for this branch
     mkdir $1/$1
-    cp -r build/html/* $1/$1
+    cp -r build/html/. $1/$1
 
     function set_return() {
         # $1 is the variable where we save the script outcome
