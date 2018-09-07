@@ -76,12 +76,12 @@ to have better visualization and easier access:
 
  .. code-block:: none
 
-    Index(['MajorityClassSize', 'NumberOfSymbolicFeatures', 'status', 'tid',
-           'source_data', 'MinorityClassSize', 'NumberOfNumericFeatures', 'name',
-           'NumberOfFeatures', 'did', 'NumberOfClasses', 'ttid',
+    Index(['tid', 'ttid', 'did', 'name', 'task_type', 'status',
+           'estimation_procedure', 'source_data', 'target_feature',
+           'MajorityClassSize', 'MinorityClassSize', 'NumberOfClasses',
+           'NumberOfFeatures', 'NumberOfInstances',
            'NumberOfInstancesWithMissingValues', 'NumberOfMissingValues',
-           'NumberOfInstances', 'task_type', 'estimation_procedure',
-           'target_feature'],
+           'NumberOfNumericFeatures', 'NumberOfSymbolicFeatures'],
           dtype='object')
     First 5 of 612 tasks:
 
@@ -320,10 +320,10 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLTask object at 0x2b16db4bbcc0>
+    <openml.tasks.task.OpenMLTask object at 0x2b03981f59e8>
 
 
-**Total running time of the script:** ( 0 minutes  15.960 seconds)
+**Total running time of the script:** ( 0 minutes  15.931 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:
