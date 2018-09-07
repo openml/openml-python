@@ -76,12 +76,24 @@ to have better visualization and easier access:
 
  .. code-block:: none
 
-    Index(['tid', 'ttid', 'did', 'name', 'task_type', 'status',
-           'estimation_procedure', 'source_data', 'target_feature',
-           'MajorityClassSize', 'MinorityClassSize', 'NumberOfClasses',
-           'NumberOfFeatures', 'NumberOfInstances',
-           'NumberOfInstancesWithMissingValues', 'NumberOfMissingValues',
-           'NumberOfNumericFeatures', 'NumberOfSymbolicFeatures'],
+    Index([                            u'status',
+                               u'target_feature',
+                                    u'task_type',
+           u'NumberOfInstancesWithMissingValues',
+                                         u'name',
+                         u'estimation_procedure',
+                                          u'did',
+                     u'NumberOfSymbolicFeatures',
+                        u'NumberOfMissingValues',
+                            u'MajorityClassSize',
+                            u'NumberOfInstances',
+                                  u'source_data',
+                                         u'ttid',
+                              u'NumberOfClasses',
+                                          u'tid',
+                            u'MinorityClassSize',
+                             u'NumberOfFeatures',
+                      u'NumberOfNumericFeatures'],
           dtype='object')
     First 5 of 612 tasks:
 
@@ -277,24 +289,24 @@ Properties of the task are stored as member variables:
 
  .. code-block:: none
 
-    {'class_labels': ['1', '2', '3', '4', '5', 'U'],
+    {'class_labels': [u'1', u'2', u'3', u'4', u'5', u'U'],
      'cost_matrix': None,
      'dataset_id': 1,
-     'estimation_parameters': {'number_folds': '10',
-                               'number_repeats': '1',
-                               'percentage': '',
-                               'stratified_sampling': 'true'},
-     'estimation_procedure': {'data_splits_url': 'https://test.openml.org/api_splits/get/1/Task_1_splits.arff',
-                              'parameters': {'number_folds': '10',
-                                             'number_repeats': '1',
-                                             'percentage': '',
-                                             'stratified_sampling': 'true'},
-                              'type': 'crossvalidation'},
+     'estimation_parameters': {u'number_folds': u'10',
+                               u'number_repeats': u'1',
+                               u'percentage': '',
+                               u'stratified_sampling': u'true'},
+     'estimation_procedure': {'data_splits_url': u'https://test.openml.org/api_splits/get/1/Task_1_splits.arff',
+                              'parameters': {u'number_folds': u'10',
+                                             u'number_repeats': u'1',
+                                             u'percentage': '',
+                                             u'stratified_sampling': u'true'},
+                              'type': u'crossvalidation'},
      'evaluation_measure': None,
      'split': None,
-     'target_name': 'class',
+     'target_name': u'class',
      'task_id': 1,
-     'task_type': 'Supervised Classification',
+     'task_type': u'Supervised Classification',
      'task_type_id': 1}
 
 
@@ -320,10 +332,10 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLTask object at 0x2b03981f59e8>
+    <openml.tasks.task.OpenMLTask object at 0x2b1d4b82c690>
 
 
-**Total running time of the script:** ( 0 minutes  15.931 seconds)
+**Total running time of the script:** ( 0 minutes  17.696 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:
