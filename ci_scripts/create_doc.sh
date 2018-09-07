@@ -43,7 +43,6 @@ function set_return() {
     local __result=$1
     local  status='success'
     eval $__result="'$status'"
-
 }
 
 set_return "$2"
