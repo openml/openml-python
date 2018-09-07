@@ -13,7 +13,7 @@ if [[ "$DOCPUSH" == "true" ]]; then
     # $1 is the branch name
     # $2 is the global variable where we set the script status
 
-    if ! { [ $1 = "master" ] || [ $1 = "develop" ] || [ $1 = "circle_drop" ]; }; then
+    if ! { [ $1 = "master" ] || [ $1 = "develop" ]; }; then
         { echo "fail"; exit 1; }
     fi
 
