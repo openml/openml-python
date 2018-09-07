@@ -1,0 +1,6 @@
+:mod:`openml`.OpenMLSplit
+================================
+
+.. currentmodule:: openml
+
+.. autoclass:: OpenMLSplit
