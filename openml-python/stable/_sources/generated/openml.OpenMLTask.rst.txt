@@ -1,6 +1,0 @@
-:mod:`openml`.OpenMLTask
-===============================
-
-.. currentmodule:: openml
-
-.. autoclass:: OpenMLTask
