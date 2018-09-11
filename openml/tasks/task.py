@@ -114,14 +114,3 @@ class OpenMLTask(object):
         """
         data = {'task_id': self.task_id, 'tag': tag}
         openml._api_calls._perform_api_call("/task/untag", data=data)
-
-
-def _create_task_cache_dir(task_id):
-    task_cache_dir = os.path.join(config.get_cache_directory(), "tasks", str(task_id))
-
-    try:
-        os.makedirs(task_cache_dir)
-    except (IOError, OSError):
-        # TODO add debug information!
-        pass
-    return task_cache_dir
