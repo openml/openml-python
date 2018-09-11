@@ -34,7 +34,35 @@ RUNS_CACHE_DIR_NAME = 'runs'
 
 def run_model_on_task(model, task, avoid_duplicate_runs=True, flow_tags=None,
                       seed=None, add_local_measures=True):
-    """See ``run_flow_on_task for a documentation``."""
+    """Run the model on the dataset defined by the task.
+
+    Parameters
+    ----------
+    model : sklearn model
+        A model which has a function fit(X,Y) and predict(X),
+        all supervised estimators of scikit learn follow this definition of a model [1]
+        [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
+    task : OpenMLTask
+        Task to perform. This may be a model instead if the first argument is an OpenMLTask.
+    avoid_duplicate_runs : bool
+        If this flag is set to True, the run will throw an error if the
+        setup/task combination is already present on the server. Works only
+        if the flow is already published on the server. This feature requires an
+        internet connection.
+        This may be an OpenMLTask instead if the first argument is the OpenMLFlow.
+    flow_tags : list(str)
+        A list of tags that the flow should have at creation.
+    seed: int
+        Models that are not seeded will get this seed.
+    add_local_measures : bool
+        Determines whether to calculate a set of evaluation measures locally,
+        to later verify server behaviour. Defaults to True
+
+    Returns
+    -------
+    run : OpenMLRun
+        Result of the run.
+    """
     # TODO: At some point in the future do not allow for arguments in old order (order changed 6-2018).
     if isinstance(model, OpenMLTask) and hasattr(task, 'fit') and hasattr(task, 'predict'):
         warnings.warn("The old argument order (task, model) is deprecated and will not be supported in the future. "
