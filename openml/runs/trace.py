@@ -117,10 +117,10 @@ class OpenMLTraceIteration(object):
         result = {}
         # parameters have prefix 'parameter_'
         prefix = 'parameter_'
-
         for param in self.setup_string:
             key = param[len(prefix):]
-            result[key] = json.loads(self.setup_string[param])
+            value = self.setup_string[param]
+            result[key] = json.loads(value)
         return result
 
     def __str__(self):

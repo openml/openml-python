@@ -35,7 +35,6 @@ from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
     StratifiedKFold
 from sklearn.pipeline import Pipeline
 
-__version__ = '0.0.1' # neccessary for serialization of dummy estimators
 
 class HardNaiveBayes(GaussianNB):
     # class for testing a naive bayes classifier that does not allow soft predictions
@@ -44,39 +43,6 @@ class HardNaiveBayes(GaussianNB):
 
     def predict_proba(*args, **kwargs):
         raise AttributeError('predict_proba is not available when  probability=False')
-
-class DefaultSearchCV(BaseSearchCV):
-
-    def __init__(self, estimator, defaults, scoring=None,
-                 fit_params=None, n_jobs=1, iid='warn', refit=True, cv=None,
-                 verbose=0, pre_dispatch='2*n_jobs',
-                 error_score='raise', return_train_score="warn"):
-        self.defaults = defaults
-        self.param_distributions = DefaultSearchCV._determine_param_distributions(defaults)
-        super(DefaultSearchCV, self).__init__(
-            estimator=estimator, scoring=scoring, fit_params=fit_params,
-            n_jobs=n_jobs, iid=iid, refit=refit, cv=cv, verbose=verbose,
-            pre_dispatch=pre_dispatch, error_score=error_score,
-            return_train_score=return_train_score)
-
-    @staticmethod
-    def _determine_param_distributions(defaults):
-        result = {}
-        for default in defaults:
-            for param, value in default.items():
-                if param not in result:
-                    result[param] = list()
-                if value not in result[param]:
-                    result[param].append(value)
-        return result
-
-    # For sklearn version 0.19.0 and up
-    # def _get_param_iterator(self):
-    #     """Return ParameterSampler instance for the given distributions"""
-    #     return self.defaults
-
-    def fit(self, X, y=None, groups=None):
-        return self._fit(X, y, groups, self.defaults)
 
 
 class TestRun(TestBase):
@@ -142,8 +108,8 @@ class TestRun(TestBase):
         # TODO: move it to a 'permanent' place?
         classes_without_random_state = \
             ['sklearn.model_selection._search.GridSearchCV',
-             'sklearn.pipeline.Pipeline',
-             'tests.test_runs.test_run_functions.DefaultSearchCV']
+             'sklearn.pipeline.Pipeline']
+
         def _remove_random_state(flow):
             if 'random_state' in flow.parameters:
                 del flow.parameters['random_state']
@@ -199,7 +165,7 @@ class TestRun(TestBase):
             _remove_random_state(flow_server2)
             openml.flows.assert_flows_equal(flow_local, flow_server2)
 
-            #self.assertEquals(clf.get_params(), clf_prime.get_params())
+            # self.assertEquals(clf.get_params(), clf_prime.get_params())
             # self.assertEquals(clf, clf_prime)
 
         downloaded = openml.runs.get_run(run_.run_id)
@@ -208,14 +174,14 @@ class TestRun(TestBase):
         return run
 
     def _check_fold_evaluations(self, fold_evaluations, num_repeats, num_folds, max_time_allowed=60000):
-        '''
+        """
         Checks whether the right timing measures are attached to the run (before upload).
         Test is only performed for versions >= Python3.3
 
         In case of check_n_jobs(clf) == false, please do not perform this check (check this
         condition outside of this function. )
         default max_time_allowed (per fold, in milli seconds) = 1 minute, quite pessimistic
-        '''
+        """
 
         # a dict mapping from openml measure to a tuple with the minimum and maximum allowed value
         check_measures = {'usercpu_time_millis_testing': (0, max_time_allowed),
@@ -243,16 +209,15 @@ class TestRun(TestBase):
                         self.assertGreaterEqual(evaluation, min_val)
                         self.assertLessEqual(evaluation, max_val)
 
-
     def _check_sample_evaluations(self, sample_evaluations, num_repeats, num_folds, num_samples, max_time_allowed=60000):
-        '''
+        """
         Checks whether the right timing measures are attached to the run (before upload).
         Test is only performed for versions >= Python3.3
 
         In case of check_n_jobs(clf) == false, please do not perform this check (check this
         condition outside of this function. )
         default max_time_allowed (per fold, in milli seconds) = 1 minute, quite pessimistic
-        '''
+        """
 
         # a dict mapping from openml measure to a tuple with the minimum and maximum allowed value
         check_measures = {'usercpu_time_millis_testing': (0, max_time_allowed),
@@ -334,6 +299,20 @@ class TestRun(TestBase):
     # like unittest2
 
     def _run_and_upload(self, clf, rsv):
+        def determine_grid_size(param_grid):
+            if isinstance(param_grid, dict):
+                grid_iterations = 1
+                for param in param_grid:
+                    grid_iterations *= len(param_grid[param])
+                return grid_iterations
+            elif isinstance(param_grid, list):
+                grid_iterations = 0
+                for sub_grid in param_grid:
+                    grid_iterations += determine_grid_size(sub_grid)
+                return grid_iterations
+            else:
+                raise TypeError('Param Grid should be of type list (GridSearch only) or dict')
+
         task_id = 119  # diabates dataset
         num_test_instances = 253  # 33% holdout task
         num_folds = 1  # because of holdout
@@ -354,9 +333,7 @@ class TestRun(TestBase):
 
         if isinstance(clf, BaseSearchCV):
             if isinstance(clf, GridSearchCV):
-                grid_iterations = 1
-                for param in clf.param_grid:
-                    grid_iterations *= len(clf.param_grid[param])
+                grid_iterations = determine_grid_size(clf.param_grid)
                 self.assertEqual(len(run.trace_content),
                                  grid_iterations * num_folds)
             else:
@@ -411,21 +388,22 @@ class TestRun(TestBase):
         # it has a different value than the other examples before
         self._run_and_upload(randomsearch, '12172')
 
-
-    def test_run_and_upload_defaultsearch(self):
-        # more complicated, as it can have hierarchical parameters
-        defaultsearch = DefaultSearchCV(
+    def test_run_and_upload_maskedarrays(self):
+        # This testcase is important for 2 reasons:
+        # 1) it verifies the correct handling of masked arrays (not all parameters are active)
+        # 2) it verifies the correct handling of a 2-layered grid search
+        gridsearch = GridSearchCV(
             RandomForestClassifier(n_estimators=5),
-            [{'max_features': 4},
-             {'min_samples_leaf': 1},
-             {'min_samples_leaf': 2},
-             {'min_samples_leaf': 3},
-             {'max_features': 4, 'min_samples_leaf': 3}],
-            cv=StratifiedKFold(n_splits=2, shuffle=True))
-        # The random states for the RandomizedSearchCV is set after the
+            [
+                {'max_features': [2, 4]},
+                {'min_samples_leaf': [1, 10]}
+            ],
+            cv=StratifiedKFold(n_splits=2, shuffle=True)
+        )
+        # The random states for the GridSearchCV is set after the
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
-        self._run_and_upload(defaultsearch, '12172')
+        self._run_and_upload(gridsearch, '12172')
 
     ############################################################################
 
