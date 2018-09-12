@@ -187,24 +187,24 @@ def _publish_flow_if_necessary(flow):
 
 
 def get_run_trace(run_id):
-    """Get the optimization trace object for a given run id.
-
-     Parameters
-     ----------
-     run_id : int
-
-     Returns
-     -------
-     openml.runs.OpenMLTrace
     """
+    Get the optimization trace object for a given run id.
 
+    Parameters
+    ----------
+    run_id : int
+
+    Returns
+    -------
+    openml.runs.OpenMLTrace
+    """
     trace_xml = openml._api_calls._perform_api_call('run/trace/%d' % run_id)
     run_trace = _create_trace_from_description(trace_xml)
     return run_trace
 
 
 def initialize_model_from_run(run_id):
-    '''
+    """
     Initialized a model based on a run_id (i.e., using the exact
     same parameter settings)
 
@@ -217,7 +217,7 @@ def initialize_model_from_run(run_id):
         -------
         model : sklearn model
             the scikitlearn model with all parameters initailized
-    '''
+    """
     run = get_run(run_id)
     return initialize_model(run.setup_id)
 
