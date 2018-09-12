@@ -30,10 +30,13 @@ after_success: source ci_scripts/success.sh && source ci_scripts/create_doc.sh $
 # travis will check the deploy on condition, before actually running before_deploy
 # before_deploy: source ci_scripts/create_doc.sh $TRAVIS_BRANCH "doc_result"
 
+# For more info regarding the deploy process and the github token look at:
+# https://docs.travis-ci.com/user/deployment/pages/
+
 deploy:
   provider: pages
   skip_cleanup: true
-  github_token: $BOT
+  github_token: $GITHUB_TOKEN
   keep-history: true
   committer-from-gh: true
   on:

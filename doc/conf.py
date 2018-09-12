@@ -19,7 +19,7 @@ from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
 import openml
 
 
-
+# amueller's read/write key
 openml.config.server = "https://test.openml.org/api/v1/xml"
 openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
 

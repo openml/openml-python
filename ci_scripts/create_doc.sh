@@ -43,6 +43,8 @@ if ! [[ -z ${DOCPUSH+x} ]]; then
         mkdir $1/$1
         cp -r build/html/. $1/$1
 
+        # takes a variable name as an argument and assigns the script outcome to a
+        # variable with the given name. If it got this far, the script was successful
         function set_return() {
             # $1 is the variable where we save the script outcome
             local __result=$1
