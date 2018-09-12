@@ -12,7 +12,6 @@ import six
 import warnings
 import sys
 import inspect
-import skopt
 
 import numpy as np
 import scipy.stats.distributions
@@ -574,6 +573,7 @@ def deserialize_rv_frozen(o):
 
 
 def _is_skopt_space(operator):
+    import skopt
     supported_operators = (
         skopt.space.Categorical,
         skopt.space.Real,
@@ -583,14 +583,6 @@ def _is_skopt_space(operator):
 
 
 def _serialize_skopt_space(operator):
-    # if isinstance(operator, skopt.space.Categorical):
-    #     keys = {'categories', 'prior', 'transform'}
-    # elif isinstance(operator, skopt.space.Real):
-    #     keys = {'low', 'high', 'prior', 'transform'}
-    # elif isinstance(operator, skopt.space.Integer):
-    #     keys = {'low', 'high', 'transform'}
-    # else:
-    #     raise NotImplementedError()
     ret = OrderedDict()
     ret['oml-python:serialized_object'] = 'skopt_space'
     ret['value'] = operator.__module__ + '.' + operator.__repr__()
