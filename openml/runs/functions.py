@@ -223,7 +223,7 @@ def initialize_model_from_run(run_id):
 
 
 def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
-    '''
+    """
     Initialize a model based on the parameters that were set
     by an optimization procedure (i.e., using the exact same
     parameter settings)
@@ -250,7 +250,7 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
     -------
     model : sklearn model
         the scikit-learn model with all parameters initailized
-    '''
+    """
     run_trace = get_run_trace(run_id)
 
     if iteration is None:
