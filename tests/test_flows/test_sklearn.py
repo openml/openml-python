@@ -14,6 +14,7 @@ import numpy as np
 import scipy.optimize
 import scipy.stats
 import sklearn.base
+import sklearn.compose
 import sklearn.datasets
 import sklearn.decomposition
 import sklearn.dummy
@@ -101,7 +102,6 @@ class TestSklearn(unittest.TestCase):
 
         self.assertEqual(check_dependencies_mock.call_count, 1)
 
-
     @mock.patch('openml.flows.sklearn_converter._check_dependencies')
     def test_serialize_model_clustering(self, check_dependencies_mock):
         model = sklearn.cluster.KMeans()
@@ -140,7 +140,6 @@ class TestSklearn(unittest.TestCase):
         new_model.fit(self.X)
 
         self.assertEqual(check_dependencies_mock.call_count, 1)
-
 
     def test_serialize_model_with_subcomponent(self):
         model = sklearn.ensemble.AdaBoostClassifier(
@@ -189,8 +188,8 @@ class TestSklearn(unittest.TestCase):
     def test_serialize_pipeline(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         dummy = sklearn.dummy.DummyClassifier(strategy='prior')
-        model = sklearn.pipeline.Pipeline(steps=(
-            ('scaler', scaler), ('dummy', dummy)))
+        model = sklearn.pipeline.Pipeline(steps=[
+            ('scaler', scaler), ('dummy', dummy)])
 
         fixture_name = 'sklearn.pipeline.Pipeline(' \
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
@@ -244,11 +243,43 @@ class TestSklearn(unittest.TestCase):
         self.assertEqual(new_model_params, fu_params)
         new_model.fit(self.X, self.y)
 
+    def test_serialize_column_transformer(self):
+        # electricity does not have missing values, but does have nominal and numeric values
+        # task id 168 and dataset id 28
+        task = openml.tasks.get_task(168)
+        nominal_indices = task.get_dataset().get_features_by_type('nominal', [task.target_name])
+        numeric_indices = task.get_dataset().get_features_by_type('numeric', [task.target_name])
+
+        model = sklearn.compose.ColumnTransformer(
+            transformers=[
+                ('numeric', sklearn.preprocessing.StandardScaler(), numeric_indices),
+                ('nominal', sklearn.preprocessing.OneHotEncoder(handle_unknown='ignore'), nominal_indices)],
+            remainder='passthrough')
+
+        fixture_name = 'sklearn.compose.ColumnTransformer(' \
+                       'numeric=sklearn.preprocessing.StandardScaler,' \
+                       'nominal=sklearn.preprocessing.OneHotEncoder)'
+        fixture_description = 'Automatically created scikit-learn flow.'
+
+        serialization = sklearn_to_flow(model)
+
+        self.assertEqual(serialization.name, fixture_name)
+        self.assertEqual(serialization.description, fixture_description)
+
+        # del serialization.model
+        new_model = flow_to_sklearn(serialization)
+
+        self.assertEqual(type(new_model), type(model))
+        self.assertIsNot(new_model, model)
+
+        serialization2 = sklearn_to_flow(new_model)
+        assert_flows_equal(serialization, serialization2)
+
     def test_serialize_pipeline_clustering(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         km = sklearn.cluster.KMeans()
-        model = sklearn.pipeline.Pipeline(steps=(
-            ('scaler', scaler), ('clusterer', km)))
+        model = sklearn.pipeline.Pipeline(steps=[
+            ('scaler', scaler), ('clusterer', km)])
 
         fixture_name = 'sklearn.pipeline.Pipeline(' \
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
