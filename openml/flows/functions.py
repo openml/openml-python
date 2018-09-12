@@ -1,11 +1,54 @@
 import dateutil.parser
-
+from collections import OrderedDict
+import os
+import io
+import re
 import xmltodict
 import six
 
+from ..exceptions import OpenMLCacheException
 import openml._api_calls
 from . import OpenMLFlow
 import openml.utils
+
+FLOW_CACHE_DIR_NAME = 'flows'
+
+
+def _get_cached_flows():
+
+    flows = OrderedDict()
+
+    flow_cache_dir = openml.utils._create_cache_directory(FLOW_CACHE_DIR_NAME)
+    directory_content = os.listdir(flow_cache_dir)
+    directory_content.sort()
+    # Find all flow ids for which we have downloaded the flow
+    # description
+
+    for filename in directory_content:
+        if not re.match(r"[0-9]*", filename):
+            continue
+
+        fid = int(filename)
+        flows[fid] = _get_cached_flow(fid)
+
+    return flows
+
+
+def _get_cached_flow(fid):
+
+    fid_cache_dir = openml.utils._create_cache_directory_for_id(
+        FLOW_CACHE_DIR_NAME,
+        fid
+    )
+    flow_file = os.path.join(fid_cache_dir, "flow.xml")
+
+    try:
+        with io.open(flow_file, encoding='utf8') as fh:
+            return _create_flow_from_xml(xml=fh.read())
+    except (OSError, IOError):
+        openml.utils._remove_cache_dir_for_id(FLOW_CACHE_DIR_NAME, fid_cache_dir)
+        raise OpenMLCacheException("Flow file for fid %d not "
+                                   "cached" % fid)
 
 
 def get_flow(flow_id):
@@ -15,6 +58,10 @@ def get_flow(flow_id):
     ----------
     flow_id : int
         The OpenML flow id.
+
+    Returns
+    -------
+    OpenMLFlow
     """
     # TODO add caching here!
     try:
@@ -24,10 +71,7 @@ def get_flow(flow_id):
 
     flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id)
 
-    flow_dict = xmltodict.parse(flow_xml)
-    flow = OpenMLFlow._from_dict(flow_dict)
-
-    return flow
+    return _create_flow_from_xml(flow_xml)
 
 
 def list_flows(offset=None, size=None, tag=None, **kwargs):
@@ -251,3 +295,18 @@ def assert_flows_equal(flow1, flow2,
                 raise ValueError("Flow %s: values for attribute '%s' differ: "
                                  "'%s'\nvs\n'%s'." %
                                  (str(flow1.name), str(key), str(attr1), str(attr2)))
+
+
+def _create_flow_from_xml(flow_xml):
+    """Create flow object from xml
+
+    Parameters
+    ----------
+    flow_xml: xml representation of a flow
+
+    Returns
+    -------
+    OpenMLFlow
+    """
+
+    return OpenMLFlow._from_dict(xmltodict.parse(flow_xml))
