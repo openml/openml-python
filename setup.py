@@ -50,7 +50,7 @@ setuptools.setup(name="openml",
                      'test': [
                          'nbconvert',
                          'jupyter_client',
-                         'skopt',
+                         'scikit-optimize',
                      ]
                  },
                  test_suite="nose.collector",
