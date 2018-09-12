@@ -88,7 +88,7 @@ class TestRun(TestBase):
                                                   seed=1)
         predictions_prime = run_prime._generate_arff_dict()
 
-        self.assertEquals(len(predictions_prime['data']), len(predictions['data']))
+        self.assertEqual(len(predictions_prime['data']), len(predictions['data']))
 
         # The original search model does not submit confidence bounds,
         # so we can not compare the arff line
@@ -98,7 +98,7 @@ class TestRun(TestBase):
             # that does not necessarily hold.
             # But with the current code base, it holds.
             for col_idx in compare_slice:
-                self.assertEquals(predictions['data'][idx][col_idx], predictions_prime['data'][idx][col_idx])
+                self.assertEqual(predictions['data'][idx][col_idx], predictions_prime['data'][idx][col_idx])
 
         return True
 
@@ -165,8 +165,8 @@ class TestRun(TestBase):
             _remove_random_state(flow_server2)
             openml.flows.assert_flows_equal(flow_local, flow_server2)
 
-            # self.assertEquals(clf.get_params(), clf_prime.get_params())
-            # self.assertEquals(clf, clf_prime)
+            # self.assertEqual(clf.get_params(), clf_prime.get_params())
+            # self.assertEqual(clf, clf_prime)
 
         downloaded = openml.runs.get_run(run_.run_id)
         assert('openml-python' in downloaded.tags)
@@ -192,17 +192,17 @@ class TestRun(TestBase):
         self.assertIsInstance(fold_evaluations, dict)
         if sys.version_info[:2] >= (3, 3):
             # this only holds if we are allowed to record time (otherwise some are missing)
-            self.assertEquals(set(fold_evaluations.keys()), set(check_measures.keys()))
+            self.assertEqual(set(fold_evaluations.keys()), set(check_measures.keys()))
 
         for measure in check_measures.keys():
             if measure in fold_evaluations:
                 num_rep_entrees = len(fold_evaluations[measure])
-                self.assertEquals(num_rep_entrees, num_repeats)
+                self.assertEqual(num_rep_entrees, num_repeats)
                 min_val = check_measures[measure][0]
                 max_val = check_measures[measure][1]
                 for rep in range(num_rep_entrees):
                     num_fold_entrees = len(fold_evaluations[measure][rep])
-                    self.assertEquals(num_fold_entrees, num_folds)
+                    self.assertEqual(num_fold_entrees, num_folds)
                     for fold in range(num_fold_entrees):
                         evaluation = fold_evaluations[measure][rep][fold]
                         self.assertIsInstance(evaluation, float)
@@ -228,18 +228,18 @@ class TestRun(TestBase):
         self.assertIsInstance(sample_evaluations, dict)
         if sys.version_info[:2] >= (3, 3):
             # this only holds if we are allowed to record time (otherwise some are missing)
-            self.assertEquals(set(sample_evaluations.keys()), set(check_measures.keys()))
+            self.assertEqual(set(sample_evaluations.keys()), set(check_measures.keys()))
 
         for measure in check_measures.keys():
             if measure in sample_evaluations:
                 num_rep_entrees = len(sample_evaluations[measure])
-                self.assertEquals(num_rep_entrees, num_repeats)
+                self.assertEqual(num_rep_entrees, num_repeats)
                 for rep in range(num_rep_entrees):
                     num_fold_entrees = len(sample_evaluations[measure][rep])
-                    self.assertEquals(num_fold_entrees, num_folds)
+                    self.assertEqual(num_fold_entrees, num_folds)
                     for fold in range(num_fold_entrees):
                         num_sample_entrees = len(sample_evaluations[measure][rep][fold])
-                        self.assertEquals(num_sample_entrees, num_samples)
+                        self.assertEqual(num_sample_entrees, num_samples)
                         for sample in range(num_sample_entrees):
                             evaluation = sample_evaluations[measure][rep][fold][sample]
                             self.assertIsInstance(evaluation, float)
@@ -329,7 +329,7 @@ class TestRun(TestBase):
             for fold in run.fold_evaluations['predictive_accuracy'][rep].keys():
                 accuracy_scores_provided.append(
                     run.fold_evaluations['predictive_accuracy'][rep][fold])
-        self.assertEquals(sum(accuracy_scores_provided), sum(accuracy_scores))
+        self.assertEqual(sum(accuracy_scores_provided), sum(accuracy_scores))
 
         if isinstance(clf, BaseSearchCV):
             if isinstance(clf, GridSearchCV):
@@ -461,7 +461,7 @@ class TestRun(TestBase):
         modelR = openml.runs.initialize_model_from_run(run.run_id)
         modelS = openml.setups.initialize_model(run.setup_id)
 
-        self.assertEquals(modelS.cv.random_state, 62501)
+        self.assertEqual(modelS.cv.random_state, 62501)
         self.assertEqual(modelR.cv.random_state, 62501)
 
     def _test_local_evaluations(self, run):
@@ -483,7 +483,7 @@ class TestRun(TestBase):
                  (sklearn.metrics.brier_score_loss, {})]
         for test_idx, test in enumerate(tests):
             alt_scores = run.get_metric_fn(test[0], test[1])
-            self.assertEquals(len(alt_scores), 10)
+            self.assertEqual(len(alt_scores), 10)
             for idx in range(len(alt_scores)):
                 self.assertGreaterEqual(alt_scores[idx], 0)
                 self.assertLessEqual(alt_scores[idx], 1)
@@ -551,8 +551,8 @@ class TestRun(TestBase):
         openml.flows.assert_flows_equal(flowR, flowL)
         openml.flows.assert_flows_equal(flowS, flowL)
 
-        self.assertEquals(flowS.components['Imputer'].parameters['strategy'], '"median"')
-        self.assertEquals(flowS.components['VarianceThreshold'].parameters['threshold'], '0.05')
+        self.assertEqual(flowS.components['Imputer'].parameters['strategy'], '"median"')
+        self.assertEqual(flowS.components['VarianceThreshold'].parameters['threshold'], '0.05')
 
     def test_get_run_trace(self):
         # get_run_trace is already tested implicitly in test_run_and_publish
@@ -575,7 +575,7 @@ class TestRun(TestBase):
             # in case the run did not exists yet
             run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=True)
             trace = openml.runs.functions._create_trace_from_arff(run._generate_trace_arff_dict())
-            self.assertEquals(
+            self.assertEqual(
                 len(trace.trace_iterations),
                 num_iterations * num_folds,
             )
@@ -702,9 +702,9 @@ class TestRun(TestBase):
         trace_attribute_list = _extract_arfftrace_attributes(clf)
         trace_list = _extract_arfftrace(clf, 0, 0)
         self.assertIsInstance(trace_attribute_list, list)
-        self.assertEquals(len(trace_attribute_list), 5 + len(param_grid))
+        self.assertEqual(len(trace_attribute_list), 5 + len(param_grid))
         self.assertIsInstance(trace_list, list)
-        self.assertEquals(len(trace_list), num_iters)
+        self.assertEqual(len(trace_list), num_iters)
 
         # found parameters
         optimized_params = set()
@@ -869,7 +869,7 @@ class TestRun(TestBase):
         self.assertIsInstance(arff_datacontent, list)
         # trace. SGD does not produce any
         self.assertIsInstance(arff_tracecontent, list)
-        self.assertEquals(len(arff_tracecontent), 0)
+        self.assertEqual(len(arff_tracecontent), 0)
 
         fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
         for measure in user_defined_measures:
