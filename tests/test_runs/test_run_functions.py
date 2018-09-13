@@ -125,7 +125,7 @@ class TestRun(TestBase):
 
         run_xml = run._create_description_xml()
         if run.trace is not None:
-            run_trace = run.trace._trace_to_arff()
+            run_trace = run.trace.trace_to_arff()
 
         # check arff output
         self.assertEqual(len(run.data_content), num_instances)
@@ -326,7 +326,7 @@ class TestRun(TestBase):
                     run.fold_evaluations['predictive_accuracy'][rep][fold])
         self.assertEquals(sum(accuracy_scores_provided), sum(accuracy_scores))
         if isinstance(clf, BaseSearchCV):
-            trace_content = run.trace._trace_to_arff()['data']
+            trace_content = run.trace.trace_to_arff()['data']
             if isinstance(clf, GridSearchCV):
                 grid_iterations = 1
                 for param in clf.param_grid:
@@ -554,7 +554,9 @@ class TestRun(TestBase):
         try:
             # in case the run did not exists yet
             run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=True)
-            trace = openml.runs.trace.trace_from_arff(run._generate_trace_arff_dict())
+            trace = openml.runs.trace.OpenMLRunTrace.trace_from_arff(
+                run.trace.trace_to_arff()
+            )
             self.assertEquals(
                 len(trace.trace_iterations),
                 num_iterations * num_folds,
@@ -692,6 +694,7 @@ class TestRun(TestBase):
         for att_idx in range(len(trace_attribute_list)):
             att_type = trace_attribute_list[att_idx][1]
             att_name = trace_attribute_list[att_idx][0]
+            # They no longer start with parameter_ if they come from extract_arff_trace!
             if att_name.startswith("parameter_"):
                 # add this to the found parameters
                 param_name = att_name[len("parameter_"):]
@@ -707,10 +710,25 @@ class TestRun(TestBase):
                     val = trace_list[line_idx][att_idx]
                     if isinstance(att_type, list):
                         self.assertIn(val, att_type)
+                    elif att_name in ['hidden_layer_sizes', 'activation', 'learning_rate_init', 'max_iter']:
+                        self.assertIsInstance(
+                            trace_list[line_idx][att_idx],
+                            str,
+                            msg=att_name
+                        )
+                        optimized_params.add(att_name)
                     elif att_name in ['repeat', 'fold', 'iteration']:
-                        self.assertIsInstance(trace_list[line_idx][att_idx], int)
+                        self.assertIsInstance(
+                            trace_list[line_idx][att_idx],
+                            int,
+                            msg=att_name
+                        )
                     else: # att_type = real
-                        self.assertIsInstance(trace_list[line_idx][att_idx], float)
+                        self.assertIsInstance(
+                            trace_list[line_idx][att_idx],
+                            float,
+                            msg=att_name
+                        )
 
         self.assertEqual(set(param_grid.keys()), optimized_params)
 

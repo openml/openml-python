@@ -202,7 +202,8 @@ class OpenMLRun(object):
     def _generate_trace(self, attributes, content):
         """Generates an OpenMLRunTrace.
 
-        Generates the trace object from the attributes and content.
+        Generates the trace object from the attributes and content extracted
+        while running the underlying flow.
 
         Returns
         -------
@@ -224,9 +225,15 @@ class OpenMLRun(object):
 
         trace = OrderedDict()
         attribute_idx = {att[0]: idx for idx, att in enumerate(attributes)}
-        for required_attribute in ['repeat', 'fold', 'iteration', 'evaluation', 'selected']:
+
+        required_attributes = ['repeat', 'fold', 'iteration', 'evaluation', 'selected']
+        for required_attribute in required_attributes:
             if required_attribute not in attribute_idx:
                 raise ValueError('arff misses required attribute: %s' % required_attribute)
+        parameter_attributes = []
+        for attribute in attribute_idx:
+            if attribute not in required_attributes and attribute != 'setup_string':
+                parameter_attributes.append(attribute)
 
         for itt in content:
             repeat = int(itt[attribute_idx['repeat']])
@@ -235,17 +242,30 @@ class OpenMLRun(object):
             evaluation = float(itt[attribute_idx['evaluation']])
             selected_value = itt[attribute_idx['selected']]
             if 'setup_string' in attribute_idx:
-                setup_string = json.dumps(itt[attribute_idx['setup_string']])
-            else:
-                setup_string = None
+                raise ValueError(
+                    'setup_string not allowed when constructing a trace object'
+                    ' run results.'
+                )
+            setup_string = None
             if selected_value == 'true':
                 selected = True
             elif selected_value == 'false':
                 selected = False
             else:
                 raise ValueError('expected {"true", "false"} value for selected field, received: %s' % selected_value)
+            parameters = OrderedDict()
+            for attribute in parameter_attributes:
+                parameters[attribute] = itt[attribute_idx[attribute]]
 
-            current = OpenMLTraceIteration(repeat, fold, iteration, setup_string, evaluation, selected)
+            current = OpenMLTraceIteration(
+                repeat,
+                fold,
+                iteration,
+                setup_string,
+                evaluation,
+                selected,
+                paramaters=parameters
+            )
             trace[(repeat, fold, iteration)] = current
 
         return OpenMLRunTrace(None, trace)
@@ -363,7 +383,7 @@ class OpenMLRun(object):
             file_elements['predictions'] = ("predictions.arff", predictions)
 
         if self.trace is not None:
-            trace_arff = arff.dumps(self.trace._trace_to_arff())
+            trace_arff = arff.dumps(self.trace.trace_to_arff())
             file_elements['trace'] = ("trace.arff", trace_arff)
 
         return_value = openml._api_calls._perform_api_call("/run/", file_elements=file_elements)

@@ -84,11 +84,11 @@ class OpenMLRunTrace(object):
             File path where the trace arff will be stored.
         """
 
-        trace_arff = arff.dumps(self._trace_to_arff())
+        trace_arff = arff.dumps(self.trace_to_arff())
         with open(os.path.join(file_path, 'trace.arff'), 'w') as f:
             f.write(trace_arff)
 
-    def _trace_to_arff(self):
+    def trace_to_arff(self):
         """Generates the arff dictionary for uploading predictions to the server.
 
         Uses the trace object to generate an arff dictionary representation.
@@ -109,14 +109,20 @@ class OpenMLRunTrace(object):
             ('iteration', 'NUMERIC'),
             ('evaluation', 'NUMERIC'),
             ('selected', ['true', 'false']),
-            ('setup_string', 'STRING'),
         ]
+        for parameter in next(iter(self.trace_iterations.values())).get_parameters():
+            trace_attributes.append(('parameter_' + parameter, 'STRING'))
+
         arff_dict = OrderedDict()
         data = []
         for trace_iteration in self.trace_iterations.values():
             tit_list = []
             for attr, attr_type in trace_attributes:
-                value = getattr(trace_iteration, attr)
+                if attr.startswith('parameter_'):
+                    attr = attr[len('parameter_'):]
+                    value = trace_iteration.get_parameters()[attr]
+                else:
+                    value = getattr(trace_iteration, attr)
                 if attr == 'selected':
                     if value:
                         tit_list.append('true')
@@ -129,7 +135,6 @@ class OpenMLRunTrace(object):
         arff_dict['attributes'] = trace_attributes
         arff_dict['data'] = data
         arff_dict['relation'] = "Trace"
-
         return arff_dict
 
     @classmethod
@@ -155,6 +160,7 @@ class OpenMLRunTrace(object):
             if required_attribute not in attribute_idx:
                 raise ValueError('arff misses required attribute: %s' % required_attribute)
         if 'setup_string' in attribute_idx:
+            raise ValueError('setup_string not supported for arff serialization')
             flag_ss = True
 
         for itt in arff_obj['data']:
@@ -164,7 +170,7 @@ class OpenMLRunTrace(object):
             evaluation = float(itt[attribute_idx['evaluation']])
             setup_string = None
             if flag_ss:
-                if itt[attribute_idx['setup_string']] != None:
+                if itt[attribute_idx['setup_string']] is not None:
                     setup_string = json.loads(itt[attribute_idx['setup_string']])
             selected_value = itt[attribute_idx['selected']]
             if selected_value == 'true':
@@ -275,17 +281,44 @@ class OpenMLTraceIteration(object):
         Whether this was the best of all iterations, and hence 
         selected for making predictions. Per fold/repeat there
         should be only one iteration selected
+
+    parameters : OrderedDict
     """
 
-    def __init__(self, repeat, fold, iteration, setup_string, evaluation, selected):
+    def __init__(
+        self,
+        repeat,
+        fold,
+        iteration,
+        setup_string,
+        evaluation,
+        selected,
+        paramaters=None,
+    ):
+
+        if setup_string and paramaters:
+            raise ValueError(
+                'Can only be instantiated with either '
+                'setup_string or parameters argument.'
+            )
+        if paramaters is not None and not isinstance(paramaters, OrderedDict):
+            raise TypeError(
+                'argument parameters is not an instance of OrderedDict, but %s'
+                % str(type(paramaters))
+            )
+
         self.repeat = repeat
         self.fold = fold
         self.iteration = iteration
         self.setup_string = setup_string
         self.evaluation = evaluation
         self.selected = selected
+        self.parameters = paramaters
 
     def get_parameters(self):
+        if self.parameters:
+            return self.parameters
+
         result = {}
         # parameters have prefix 'parameter_'
         prefix = 'parameter_'

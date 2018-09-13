@@ -678,7 +678,7 @@ def _extract_arfftrace_attributes(model):
 
             # we renamed the attribute param to parameter, as this is a required
             # OpenML convention
-            attribute = ("parameter_" + key[6:], type)
+            attribute = (key[6:], type)
             trace_attributes.append(attribute)
     return trace_attributes
 
