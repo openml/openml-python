@@ -429,7 +429,7 @@ def _get_fn_arguments_with_defaults(fn_name):
 def _deserialize_model(flow, keep_defaults):
 
     model_name = flow.class_name
-    #_check_dependencies(flow.dependencies)
+    _check_dependencies(flow.dependencies)
 
     parameters = flow.parameters
     components = flow.components
