@@ -150,8 +150,10 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False):
                 del components[key]
                 if step_name is None:
                     rval = component
-                else:
+                elif 'param_1' not in value:
                     rval = (step_name, component)
+                else:
+                    rval = (step_name, component, value['param_1'])
             elif serialized_type == 'cv_object':
                 rval = _deserialize_cross_validator(value)
             else:
