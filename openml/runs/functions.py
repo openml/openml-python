@@ -141,7 +141,10 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
         # through "run_model_on_task"
         if flow.flow_id != flow_id:
             # This should never happen, unless user made a flow-creation fault
-            raise ValueError('Result flow_exists and flow.flow_id are not same. ')
+            raise ValueError(
+                "Result from API call flow_exists and flow.flow_id are not "
+                "same: '%s' vs '%s'" % (str(flow.flow_id), str(flow_id))
+            )
 
     run = OpenMLRun(
         task_id=task.task_id,

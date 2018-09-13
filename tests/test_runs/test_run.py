@@ -94,12 +94,12 @@ class TestRun(TestBase):
         np.testing.assert_array_equal(string_part, string_part_prime)
 
         if run.trace is not None:
-            run_trace_content = run.trace._trace_to_arff()['data']
+            run_trace_content = run.trace.trace_to_arff()['data']
         else:
             run_trace_content = None
 
         if run_prime.trace is not None:
-            run_prime_trace_content = run_prime.trace._trace_to_arff()['data']
+            run_prime_trace_content = run_prime.trace.trace_to_arff()['data']
         else:
             run_prime_trace_content = None
 
