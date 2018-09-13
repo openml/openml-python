@@ -16,6 +16,15 @@ TASKS_CACHE_DIR_NAME = 'tasks'
 
 
 def _get_cached_tasks():
+    """Return a dict of all the tasks which are cached locally.
+
+    Returns
+    -------
+    tasks : OrderedDict
+        A dict of all the cached tasks. Each task is an instance of
+        OpenMLTask.
+    """
+
     tasks = OrderedDict()
 
     task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
@@ -35,17 +44,25 @@ def _get_cached_tasks():
 
 
 def _get_cached_task(tid):
+    """Return a cached task based on the given id.
 
+    Parameters
+    ----------
+    tid : int
+        Id of the task.
+
+    Returns
+    -------
+    OpenMLTask
+    """
     tid_cache_dir = openml.utils._create_cache_directory_for_id(
         TASKS_CACHE_DIR_NAME,
         tid
     )
-    task_file = os.path.join(tid_cache_dir, "task.xml")
 
     try:
-        with io.open(task_file, encoding='utf8') as fh:
-            task = _create_task_from_xml(xml=fh.read())
-        return task
+        with io.open(os.path.join(tid_cache_dir, "task.xml"), encoding='utf8') as fh:
+            return _create_task_from_xml(xml=fh.read())
     except (OSError, IOError):
         openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
         raise OpenMLCacheException("Task file for tid %d not "
@@ -81,12 +98,14 @@ def _get_estimation_procedure_list():
 
     procs = []
     for proc_ in procs_dict['oml:estimationprocedures']['oml:estimationprocedure']:
-        proc = {'id': int(proc_['oml:id']),
+        procs.append(
+            {
+                'id': int(proc_['oml:id']),
                 'task_type_id': int(proc_['oml:ttid']),
                 'name': proc_['oml:name'],
-                'type': proc_['oml:type']}
-
-        procs.append(proc)
+                'type': proc_['oml:type'],
+            }
+        )
 
     return procs
 
@@ -312,12 +331,21 @@ def _get_task_description(task_id):
 
         with io.open(xml_file, "w", encoding='utf8') as fh:
             fh.write(task_xml)
-        task = _create_task_from_xml(task_xml)
-
-    return task
+        return _create_task_from_xml(task_xml)
 
 
 def _create_task_from_xml(xml):
+    """Create a task given a xml string.
+
+    Parameters
+    ----------
+    xml : string
+        Task xml representation.
+
+    Returns
+    -------
+    OpenMLTask
+    """
     dic = xmltodict.parse(xml)["oml:task"]
 
     estimation_parameters = dict()
