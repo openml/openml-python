@@ -305,21 +305,15 @@ def _extract_information_from_model(model):
 
         if (isinstance(rval, (list, tuple)) and len(rval) > 0 and
                 isinstance(rval[0], (list, tuple)) and
-                all([type(rval[0]) == type(rval[i]) for i in range(len(rval))])):
+                [type(rval[0]) == type(rval[i]) for i in range(len(rval))]):
 
             # Steps in a pipeline or feature union, or base classifiers in voting classifier
             parameter_value = list()
             reserved_keywords = set(model.get_params(deep=False).keys())
 
             for sub_component_tuple in rval:
-                identifier = sub_component_tuple[0]
-                sub_component = sub_component_tuple[1]
+                identifier, sub_component = sub_component_tuple
                 sub_component_type = type(sub_component_tuple)
-                if not 2 <= len(sub_component_tuple) <= 3:
-                    # length is 2 for {VotingClassifier.estimators, Pipeline.steps, FeatureUnion.transformer_list}
-                    raise ValueError('Length of tuple does not match assumptions')
-                if not isinstance(sub_component, OpenMLFlow):
-                    raise ValueError('Second item of tuple does not match assumptions')
 
                 if identifier in reserved_keywords:
                     parent_model_name = model.__module__ + "." + \
@@ -348,8 +342,6 @@ def _extract_information_from_model(model):
                     cr_value = OrderedDict()
                     cr_value['key'] = identifier
                     cr_value['step_name'] = identifier
-                    if len(sub_component_tuple) == 3:
-                        cr_value['param_1'] = sub_component_tuple[2]
                     component_reference['value'] = cr_value
                     parameter_value.append(component_reference)
 
@@ -428,7 +420,7 @@ def _get_fn_arguments_with_defaults(fn_name):
 def _deserialize_model(flow, keep_defaults):
 
     model_name = flow.class_name
-    # _check_dependencies(flow.dependencies)
+    _check_dependencies(flow.dependencies)
 
     parameters = flow.parameters
     components = flow.components
