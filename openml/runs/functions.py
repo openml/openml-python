@@ -103,7 +103,7 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
         setup_id = setup_exists(flow_from_server, flow.model)
         ids = _run_exists(task.task_id, setup_id)
         if ids:
-            raise PyOpenMLError("Run already exists in server. Run id(s): %s" %str(ids))
+            raise PyOpenMLError("Run already exists in server. Run id(s): %s" % str(ids))
         _copy_server_fields(flow_from_server, flow)
 
     dataset = task.get_dataset()
@@ -118,17 +118,37 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
     # execute the run
     res = _run_task_get_arffcontent(flow.model, task, add_local_measures=add_local_measures)
 
-    # in case the flow not exists, we will get a "False" back (which can be
-    if not isinstance(flow.flow_id, int) or flow_id == False:
+    # in case the flow not exists, flow_id will be False (as returned by
+    # flow_exists). Also check whether there are no illegal flow.flow_id values
+    # (compared to result of openml.flows.flow_exists)
+    if flow_id is False:
+        if flow.flow_id is not None:
+            raise ValueError('flow.flow_id is not None, but the flow does not'
+                             'exist on the server according to flow_exists')
         _publish_flow_if_necessary(flow)
 
     data_content, trace_content, trace_attributes, fold_evaluations, sample_evaluations = res
+    if not isinstance(flow.flow_id, int):
+        # This is the usual behaviour, where the flow object was initiated off
+        # line and requires some additional information (flow_id, input_id for
+        # each hyperparameter) to be usable by this library
+        server_flow = get_flow(flow_id)
+        openml.flows.flow._copy_server_fields(server_flow, flow)
+        openml.flows.assert_flows_equal(flow, server_flow,
+                                        ignore_parameter_values=True)
+    else:
+        # This can only happen when the function is called directly, and not
+        # through "run_model_on_task"
+        if flow.flow_id != flow_id:
+            # This should never happen, unless user made a flow-creation fault
+            raise ValueError('Result flow_exists and flow.flow_id are not same. ')
 
     run = OpenMLRun(
         task_id=task.task_id,
         flow_id=flow.flow_id,
         dataset_id=dataset.dataset_id,
         model=flow.model,
+        flow_name=flow.name,
         tags=tags,
         trace_content=trace_content,
         trace_attributes=trace_attributes,
@@ -151,19 +171,21 @@ def _publish_flow_if_necessary(flow):
     # try publishing the flow if one has to assume it doesn't exist yet. It
     # might fail because it already exists, then the flow is currently not
     # reused
-
-        try:
-            flow.publish()
-        except OpenMLServerException as e:
-            if e.message == "flow already exists":
-                flow_id = openml.flows.flow_exists(flow.name,
-                                                   flow.external_version)
-                server_flow = get_flow(flow_id)
-                openml.flows.flow._copy_server_fields(server_flow, flow)
-                openml.flows.assert_flows_equal(flow, server_flow,
-                                                ignore_parameter_values=True)
-            else:
-                raise e
+    try:
+        flow.publish()
+    except OpenMLServerException as e:
+        if e.message == "flow already exists":
+            # TODO: JvR: the following lines of code can be replaced by
+            # a pass (after changing the unit test) as run_flow_on_task does
+            # not longer rely on it
+            flow_id = openml.flows.flow_exists(flow.name,
+                                               flow.external_version)
+            server_flow = get_flow(flow_id)
+            openml.flows.flow._copy_server_fields(server_flow, flow)
+            openml.flows.assert_flows_equal(flow, server_flow,
+                                            ignore_parameter_values=True)
+        else:
+            raise e
 
 
 def get_run_trace(run_id):

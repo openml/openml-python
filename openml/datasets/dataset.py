@@ -420,7 +420,7 @@ class OpenMLDataset(object):
     def get_features_by_type(self, data_type, exclude=None,
                              exclude_ignore_attributes=True,
                              exclude_row_id_attribute=True):
-        '''
+        """
         Returns indices of features of a given type, e.g., all nominal features.
         Can use additional parameters to exclude various features by index or ontology.
 
@@ -442,7 +442,7 @@ class OpenMLDataset(object):
         -------
         result : list
             a list of indices that have the specified data type
-        '''
+        """
         if data_type not in OpenMLDataFeature.LEGAL_DATA_TYPES:
             raise TypeError("Illegal feature type requested")
         if self.ignore_attributes is not None:
@@ -509,7 +509,7 @@ class OpenMLDataset(object):
                     raise ValueError("No path/url to the dataset file was given")
 
         return_value = openml._api_calls._perform_api_call(
-            "/data/",
+            "data/",
             file_elements=file_elements,
         )
         self.dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])

@@ -455,9 +455,15 @@ def _deserialize_model(flow, keep_defaults):
         # obtain all params with a default
         param_defaults, _ = _get_fn_arguments_with_defaults(model_class.__init__)
 
-        # delete all params that have a default from the dict, so they get initialized with their default value
+        # delete the params that have a default from the dict,
+        # so they get initialized with their default value
+        # except [...]
         for param in param_defaults:
-            del parameter_dict[param]
+            # [...] the ones that also have a key in the components dict. As OpenML stores different flows for ensembles
+            # with different (base-)components, in OpenML terms, these are not considered hyperparameters but rather
+            # constants (i.e., changing them would result in a different flow)
+            if param not in components.keys():
+                del parameter_dict[param]
     return model_class(**parameter_dict)
 
 

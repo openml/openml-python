@@ -25,8 +25,11 @@ dependencies:
     - pip install --upgrade pip
     - pip install --upgrade numpy
     - pip install --upgrade scipy
+    - pip install --upgrade pandas
+    - pip install --upgrade cython
+    - pip install --upgrade nose scikit-learn oslo.concurrency
     # install documentation building dependencies
-    - pip install --upgrade matplotlib setuptools nose coverage sphinx pillow sphinx-gallery sphinx_bootstrap_theme cython numpydoc scikit-learn nbformat nbconvert
+    - pip install --upgrade matplotlib seaborn setuptools nose coverage sphinx pillow sphinx-gallery sphinx_bootstrap_theme cython numpydoc nbformat nbconvert
     # Installing required packages for `make -C doc check command` to work.
     - sudo -E apt-get -yq update
     - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install dvipng texlive-latex-base texlive-latex-extra
