@@ -5,24 +5,31 @@ import io
 import re
 import xmltodict
 import six
+from oslo_concurrency import lockutils
 
 from ..exceptions import OpenMLCacheException
 import openml._api_calls
 from . import OpenMLFlow
 import openml.utils
 
-FLOW_CACHE_DIR_NAME = 'flows'
+FLOWS_CACHE_DIR_NAME = 'flows'
 
 
 def _get_cached_flows():
+    """Return all the cached flows.
 
+    Returns
+    -------
+    flows : OrderedDict
+        Dictionary with flows. Each flow is an instance of OpenMLFlow.
+    """
     flows = OrderedDict()
 
-    flow_cache_dir = openml.utils._create_cache_directory(FLOW_CACHE_DIR_NAME)
+    flow_cache_dir = openml.utils._create_cache_directory(FLOWS_CACHE_DIR_NAME)
     directory_content = os.listdir(flow_cache_dir)
     directory_content.sort()
-    # Find all flow ids for which we have downloaded the flow
-    # description
+    # Find all flow ids for which we have downloaded
+    # the flow description
 
     for filename in directory_content:
         if not re.match(r"[0-9]*", filename):
@@ -35,24 +42,35 @@ def _get_cached_flows():
 
 
 def _get_cached_flow(fid):
+    """Get the cached flow with the given id.
+
+    Parameters
+    ----------
+    fid : int
+        Flow id.
+
+    Returns
+    -------
+    OpenMLFlow.
+    """
 
     fid_cache_dir = openml.utils._create_cache_directory_for_id(
-        FLOW_CACHE_DIR_NAME,
+        FLOWS_CACHE_DIR_NAME,
         fid
     )
     flow_file = os.path.join(fid_cache_dir, "flow.xml")
 
     try:
         with io.open(flow_file, encoding='utf8') as fh:
-            return _create_flow_from_xml(xml=fh.read())
+            return _create_flow_from_xml(fh.read())
     except (OSError, IOError):
-        openml.utils._remove_cache_dir_for_id(FLOW_CACHE_DIR_NAME, fid_cache_dir)
+        openml.utils._remove_cache_dir_for_id(FLOWS_CACHE_DIR_NAME, fid_cache_dir)
         raise OpenMLCacheException("Flow file for fid %d not "
                                    "cached" % fid)
 
 
 def get_flow(flow_id):
-    """Download the OpenML flow for a given flow ID.
+    """Get the Flow for a given ID.
 
     Parameters
     ----------
@@ -63,15 +81,45 @@ def get_flow(flow_id):
     -------
     OpenMLFlow
     """
-    # TODO add caching here!
+    flow_id = int(flow_id)
+    with lockutils.external_lock(
+            name='flows.functions.get_flow:%d' % flow_id,
+            lock_path=openml.utils._create_lockfiles_dir(),
+    ):
+        return _get_flow_description(flow_id)
+
+
+def _get_flow_description(flow_id):
+    """Get the Flow for a given  ID.
+
+    Does the real work for get_flow. It returns a cached flow
+    instance if the flow exists locally, otherwise it downloads the
+    flow and returns an instance created from the xml representation.
+
+    Parameters
+    ----------
+    flow_id : int
+        The OpenML flow id.
+
+    Returns
+    -------
+    OpenMLFlow
+    """
     try:
-        flow_id = int(flow_id)
-    except:
-        raise ValueError("Flow ID must be an int, got %s." % str(flow_id))
+        return _get_cached_flow(flow_id)
+    except OpenMLCacheException:
 
-    flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id)
+        xml_file = os.path.join(
+            openml.utils._create_cache_directory_for_id(FLOWS_CACHE_DIR_NAME, flow_id),
+            "flow.xml",
+        )
 
-    return _create_flow_from_xml(flow_xml)
+        flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id)
+        with io.open(xml_file, "w", encoding='utf8') as fh:
+            fh.write(flow_xml)
+
+
+        return _create_flow_from_xml(flow_xml)
 
 
 def list_flows(offset=None, size=None, tag=None, **kwargs):

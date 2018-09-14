@@ -98,8 +98,7 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
         If this flag is set to True, the run will throw an error if the
         setup/task combination is already present on the server. Works only
         if the flow is already published on the server. This feature requires an
-        internet connection.
-        This may be an OpenMLTask instead if the first argument is the OpenMLFlow.
+        internet connection..
     flow_tags : list(str)
         A list of tags that the flow should have at creation.
     seed: int
