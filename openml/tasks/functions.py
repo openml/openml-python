@@ -62,7 +62,7 @@ def _get_cached_task(tid):
 
     try:
         with io.open(os.path.join(tid_cache_dir, "task.xml"), encoding='utf8') as fh:
-            return _create_task_from_xml(xml=fh.read())
+            return _create_task_from_xml(fh.read())
     except (OSError, IOError):
         openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
         raise OpenMLCacheException("Task file for tid %d not "
