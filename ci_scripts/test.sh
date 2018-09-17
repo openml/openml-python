@@ -11,11 +11,12 @@ doctest_dir=$cwd/doc
 cd $TEST_DIR
 
 if [[ "$EXAMPLES" == "true" ]]; then
-    nosetests -sv $test_dir/test_examples/
+    pytest -sv $test_dir/test_examples/
 elif [[ "$DOCTEST" == "true" ]]; then
     python -m doctest $doctest_dir/usage.rst
-elif [[ "$COVERAGE" == "true" ]]; then
-    nosetests --processes=4 --process-timeout=600 -sv --ignore-files="test_OpenMLDemo\.py" --with-coverage --cover-package=$MODULE $test_dir
-else
-    nosetests --processes=4 --process-timeout=600 -sv --ignore-files="test_OpenMLDemo\.py" $test_dir
+if [[ "$COVERAGE" == "true" ]]; then
+    PYTEST_ARGS="--cov=."
+else;
+    PYTEST_ARGS=""
 fi
+pytest -n 4 --timeout=600 --timeout-method=thread -sv --ignore='test_OpenMLDemo.py' $PYTEST_ARGS $test_dir

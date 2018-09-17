@@ -37,7 +37,7 @@ install:
   # Install the build and runtime dependencies of the project.
   - "cd C:\\projects\\openml-python"
   - conda install --quiet --yes scikit-learn=0.18.2
-  - conda install --quiet --yes mock numpy scipy nose requests nbformat python-dateutil nbconvert pandas matplotlib seaborn
+  - conda install --quiet --yes mock numpy scipy pytest requests nbformat python-dateutil nbconvert pandas matplotlib seaborn
   - pip install liac-arff xmltodict oslo.concurrency
   - "python setup.py install" #%CMD_IN_ENV%
   
@@ -47,4 +47,4 @@ build: false
 
 test_script:
   - "cd C:\\projects\\openml-python"
-  - "%CMD_IN_ENV% python setup.py test"
+  - "%CMD_IN_ENV% pytest"

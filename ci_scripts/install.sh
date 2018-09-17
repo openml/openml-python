@@ -26,7 +26,7 @@ popd
 # provided versions
 conda create -n testenv --yes python=$PYTHON_VERSION pip
 source activate testenv
-pip install nose numpy scipy cython scikit-learn==$SKLEARN_VERSION \
+pip install pytest pytest-xdist pytest-timeout numpy scipy cython scikit-learn==$SKLEARN_VERSION \
     oslo.concurrency
 
 if [[ "$EXAMPLES" == "true" ]]; then

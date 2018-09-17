@@ -2,7 +2,7 @@
 
 PYTHON ?= python
 CYTHON ?= cython
-NOSETESTS ?= nosetests
+PYTEST ?= pytest
 CTAGS ?= ctags
 
 all: clean inplace test
@@ -16,12 +16,12 @@ inplace:
 	$(PYTHON) setup.py build_ext -i
 
 test-code: in
-	$(NOSETESTS) -s -v tests
+	$(PYTEST) -s -v tests
 test-doc:
-	$(NOSETESTS) -s -v doc/*.rst
+	$(PYTEST) -s -v doc/*.rst
 
 test-coverage:
 	rm -rf coverage .coverage
-	$(NOSETESTS) -s -v --with-coverage tests
+	$(PYTEST) -s -v --cov=. tests
 
 test: test-code test-sphinxext test-doc
