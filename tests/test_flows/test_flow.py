@@ -149,7 +149,7 @@ class TestFlow(TestBase):
         flow = openml.flows.sklearn_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.publish()
-        self.assertRaisesRegex(openml.exceptions.OpenMLServerException,
+        self.assertRaisesRegexp(openml.exceptions.OpenMLServerException,
                                 'flow already exists', flow.publish)
 
     def test_publish_flow_with_similar_components(self):

@@ -608,9 +608,9 @@ class TestSklearn(unittest.TestCase):
         kernel = sklearn.gaussian_process.kernels.Matern()
         gp = sklearn.gaussian_process.GaussianProcessClassifier(
             kernel=kernel, optimizer=opt)
-        self.assertRaisesRegex(TypeError, "Matern\(length_scale=1, nu=1.5\), "
-                                          "<class 'sklearn.gaussian_process.kernels.Matern'>",
-                               sklearn_to_flow, gp)
+        self.assertRaisesRegexp(TypeError, "Matern\(length_scale=1, nu=1.5\), "
+                                           "<class 'sklearn.gaussian_process.kernels.Matern'>",
+                                sklearn_to_flow, gp)
 
     def test_error_on_adding_component_multiple_times_to_flow(self):
         # this function implicitly checks
@@ -620,19 +620,19 @@ class TestSklearn(unittest.TestCase):
         pipeline = sklearn.pipeline.Pipeline((('pca1', pca), ('pca2', pca2)))
         fixture = "Found a second occurence of component .*.PCA when trying " \
                   "to serialize Pipeline"
-        self.assertRaisesRegex(ValueError, fixture, sklearn_to_flow, pipeline)
+        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline)
 
         fu = sklearn.pipeline.FeatureUnion((('pca1', pca), ('pca2', pca2)))
         fixture = "Found a second occurence of component .*.PCA when trying " \
                   "to serialize FeatureUnion"
-        self.assertRaisesRegex(ValueError, fixture, sklearn_to_flow, fu)
+        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, fu)
 
         fs = sklearn.feature_selection.SelectKBest()
         fu2 = sklearn.pipeline.FeatureUnion((('pca1', pca), ('fs', fs)))
         pipeline2 = sklearn.pipeline.Pipeline((('fu', fu2), ('pca2', pca2)))
         fixture = "Found a second occurence of component .*.PCA when trying " \
                   "to serialize Pipeline"
-        self.assertRaisesRegex(ValueError, fixture, sklearn_to_flow, pipeline2)
+        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline2)
 
     def test_subflow_version_propagated(self):
         this_directory = os.path.dirname(os.path.abspath(__file__))
