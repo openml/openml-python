@@ -636,7 +636,8 @@ class TestSklearn(unittest.TestCase):
 
     def test_subflow_version_propagated(self):
         this_directory = os.path.dirname(os.path.abspath(__file__))
-        tests_directory = os.path.abspath(os.path.join(this_directory, '..', '..'))
+        tests_directory = os.path.abspath(os.path.join(this_directory,
+                                                       '..', '..'))
         sys.path.append(tests_directory)
         import tests.test_flows.dummy_learn.dummy_forest
         pca = sklearn.decomposition.PCA()
@@ -654,18 +655,21 @@ class TestSklearn(unittest.TestCase):
 
     @mock.patch('warnings.warn')
     def test_check_dependencies(self, warnings_mock):
-        dependencies = ['sklearn==0.1', 'sklearn>=99.99.99', 'sklearn>99.99.99']
+        dependencies = ['sklearn==0.1', 'sklearn>=99.99.99',
+                        'sklearn>99.99.99']
         for dependency in dependencies:
             self.assertRaises(ValueError, _check_dependencies, dependency)
 
     def test_illegal_parameter_names(self):
         # illegal name: estimators
         clf1 = sklearn.ensemble.VotingClassifier(
-            estimators=[('estimators', sklearn.ensemble.RandomForestClassifier()),
-                        ('whatevs', sklearn.ensemble.ExtraTreesClassifier())])
+            estimators=[
+                ('estimators', sklearn.ensemble.RandomForestClassifier()),
+                ('whatevs', sklearn.ensemble.ExtraTreesClassifier())])
         clf2 = sklearn.ensemble.VotingClassifier(
-            estimators=[('whatevs', sklearn.ensemble.RandomForestClassifier()),
-                        ('estimators', sklearn.ensemble.ExtraTreesClassifier())])
+            estimators=[
+                ('whatevs', sklearn.ensemble.RandomForestClassifier()),
+                ('estimators', sklearn.ensemble.ExtraTreesClassifier())])
         cases = [clf1, clf2]
 
         for case in cases:
@@ -739,9 +743,9 @@ class TestSklearn(unittest.TestCase):
 
     def test__get_fn_arguments_with_defaults(self):
         fns = [
-            (sklearn.ensemble.RandomForestRegressor.__init__, 15),
-            (sklearn.tree.DecisionTreeClassifier.__init__, 12),
-            (sklearn.pipeline.Pipeline.__init__, 0)
+            (sklearn.ensemble.RandomForestRegressor.__init__, 16),
+            (sklearn.tree.DecisionTreeClassifier.__init__, 13),
+            (sklearn.pipeline.Pipeline.__init__, 1)
         ]
 
         for fn, num_params_with_defaults in fns:
@@ -749,50 +753,66 @@ class TestSklearn(unittest.TestCase):
             self.assertIsInstance(defaults, dict)
             self.assertIsInstance(defaultless, set)
             # check whether we have both defaults and defaultless params
-            self.assertEquals(len(defaults), num_params_with_defaults)
+            self.assertEqual(len(defaults), num_params_with_defaults)
             self.assertGreater(len(defaultless), 0)
             # check no overlap
-            self.assertSetEqual(set(defaults.keys()), set(defaults.keys()) - defaultless)
-            self.assertSetEqual(defaultless, defaultless - set(defaults.keys()))
+            self.assertSetEqual(set(defaults.keys()),
+                                set(defaults.keys()) - defaultless)
+            self.assertSetEqual(defaultless,
+                                defaultless - set(defaults.keys()))
 
     def test_deserialize_with_defaults(self):
-        # used the 'initialize_with_defaults' flag of the deserialization method to return a flow
-        # that contains default hyperparameter settings.
-        steps = [('Imputer', sklearn.preprocessing.Imputer()),
+        # used the 'initialize_with_defaults' flag of the deserialization
+        # method to return a flow that contains default hyperparameter
+        # settings.
+        steps = [('Imputer', Imputer()),
                  ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
                  ('Estimator', sklearn.tree.DecisionTreeClassifier())]
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
 
         pipe_adjusted = sklearn.clone(pipe_orig)
-        params = {'Imputer__strategy': 'median', 'OneHotEncoder__sparse': False, 'Estimator__min_samples_leaf': 42}
+        params = {'Imputer__strategy': 'median',
+                  'OneHotEncoder__sparse': False,
+                  'Estimator__min_samples_leaf': 42}
         pipe_adjusted.set_params(**params)
         flow = openml.flows.sklearn_to_flow(pipe_adjusted)
-        pipe_deserialized = openml.flows.flow_to_sklearn(flow, initialize_with_defaults=True)
+        pipe_deserialized = openml.flows.flow_to_sklearn(
+            flow, initialize_with_defaults=True)
 
-        # we want to compare pipe_deserialized and pipe_orig. We use the flow equals function for this
-        assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig), openml.flows.sklearn_to_flow(pipe_deserialized))
+        # we want to compare pipe_deserialized and pipe_orig. We use the flow
+        # equals function for this
+        assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig),
+                           openml.flows.sklearn_to_flow(pipe_deserialized))
 
     def test_deserialize_adaboost_with_defaults(self):
-        # used the 'initialize_with_defaults' flag of the deserialization method to return a flow
-        # that contains default hyperparameter settings.
-        steps = [('Imputer', sklearn.preprocessing.Imputer()),
+        # used the 'initialize_with_defaults' flag of the deserialization
+        # method to return a flow that contains default hyperparameter
+        # settings.
+        steps = [('Imputer', Imputer()),
                  ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
-                 ('Estimator', sklearn.ensemble.AdaBoostClassifier(sklearn.tree.DecisionTreeClassifier()))]
+                 ('Estimator', sklearn.ensemble.AdaBoostClassifier(
+                     sklearn.tree.DecisionTreeClassifier()))]
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
 
         pipe_adjusted = sklearn.clone(pipe_orig)
-        params = {'Imputer__strategy': 'median', 'OneHotEncoder__sparse': False, 'Estimator__n_estimators': 10}
+        params = {'Imputer__strategy': 'median',
+                  'OneHotEncoder__sparse': False,
+                  'Estimator__n_estimators': 10}
         pipe_adjusted.set_params(**params)
         flow = openml.flows.sklearn_to_flow(pipe_adjusted)
-        pipe_deserialized = openml.flows.flow_to_sklearn(flow, initialize_with_defaults=True)
+        pipe_deserialized = openml.flows.flow_to_sklearn(
+            flow, initialize_with_defaults=True)
 
-        # we want to compare pipe_deserialized and pipe_orig. We use the flow equals function for this
-        assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig), openml.flows.sklearn_to_flow(pipe_deserialized))
+        # we want to compare pipe_deserialized and pipe_orig. We use the flow
+        # equals function for this
+        assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig),
+                           openml.flows.sklearn_to_flow(pipe_deserialized))
 
     def test_deserialize_complex_with_defaults(self):
-        # used the 'initialize_with_defaults' flag of the deserialization method to return a flow
-        # that contains default hyperparameter settings.
-        steps = [('Imputer', sklearn.preprocessing.Imputer()),
+        # used the 'initialize_with_defaults' flag of the deserialization
+        # method to return a flow that contains default hyperparameter
+        # settings.
+        steps = [('Imputer', Imputer()),
                  ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
                  ('Estimator', sklearn.ensemble.AdaBoostClassifier(
                      sklearn.ensemble.BaggingClassifier(
@@ -811,5 +831,7 @@ class TestSklearn(unittest.TestCase):
         flow = openml.flows.sklearn_to_flow(pipe_adjusted)
         pipe_deserialized = openml.flows.flow_to_sklearn(flow, initialize_with_defaults=True)
 
-        # we want to compare pipe_deserialized and pipe_orig. We use the flow equals function for this
-        assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig), openml.flows.sklearn_to_flow(pipe_deserialized))
+        # we want to compare pipe_deserialized and pipe_orig. We use the flow
+        # equals function for this
+        assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig),
+                           openml.flows.sklearn_to_flow(pipe_deserialized))
