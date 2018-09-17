@@ -16,12 +16,29 @@ env:
   - MODULE=openml
   matrix:
   - DISTRIB="conda" PYTHON_VERSION="2.7" SKLEARN_VERSION="0.18.2"
-  - DISTRIB="conda" PYTHON_VERSION="3.4" SKLEARN_VERSION="0.18.2"
   - DISTRIB="conda" PYTHON_VERSION="3.5" SKLEARN_VERSION="0.18.2"
-  - DISTRIB="conda" PYTHON_VERSION="3.6" COVERAGE="true" SKLEARN_VERSION="0.18.2"
+  - DISTRIB="conda" PYTHON_VERSION="3.6" COVERAGE="true" DOCPUSH="true" SKLEARN_VERSION="0.18.2"
   - DISTRIB="conda" PYTHON_VERSION="3.6" EXAMPLES="true" SKLEARN_VERSION="0.18.2"
   - DISTRIB="conda" PYTHON_VERSION="3.6" DOCTEST="true" SKLEARN_VERSION="0.18.2"
+#  - DISTRIB="conda" PYTHON_VERSION="3.7" SKLEARN_VERSION="0.18.2"
 
 install: source ci_scripts/install.sh
 script: bash ci_scripts/test.sh
-after_success: source ci_scripts/success.sh
+after_success: source ci_scripts/success.sh && source ci_scripts/create_doc.sh $TRAVIS_BRANCH "doc_result"
+
+# travis will check the deploy on condition, before actually running before_deploy
+# before_deploy: source ci_scripts/create_doc.sh $TRAVIS_BRANCH "doc_result"
+
+# For more info regarding the deploy process and the github token look at:
+# https://docs.travis-ci.com/user/deployment/pages/
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep-history: true
+  committer-from-gh: true
+  on:
+    all_branches: true
+    condition: $doc_result = "success"
+  local_dir: doc/$TRAVIS_BRANCH

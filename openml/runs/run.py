@@ -1,10 +1,13 @@
 from collections import OrderedDict
+import errno
 import json
+import pickle
 import sys
 import time
 import numpy as np
 
 import arff
+import os
 import xmltodict
 
 import openml
@@ -65,6 +68,110 @@ class OpenMLRun(object):
     def _repr_pretty_(self, pp, cycle):
         pp.text(str(self))
 
+    @classmethod
+    def from_filesystem(cls, folder, expect_model=True):
+        """
+        The inverse of the to_filesystem method. Instantiates an OpenMLRun
+        object based on files stored on the file system.
+
+        Parameters
+        ----------
+        folder : str
+            a path leading to the folder where the results
+            are stored
+
+        expect_model : bool
+            if True, it requires the model pickle to be present, and an error
+            will be thrown if not. Otherwise, the model might or might not
+            be present.
+
+        Returns
+        -------
+        run : OpenMLRun
+            the re-instantiated run object
+        """
+        if not os.path.isdir(folder):
+            raise ValueError('Could not find folder')
+
+        description_path = os.path.join(folder, 'description.xml')
+        predictions_path = os.path.join(folder, 'predictions.arff')
+        trace_path = os.path.join(folder, 'trace.arff')
+        model_path = os.path.join(folder, 'model.pkl')
+
+        if not os.path.isfile(description_path):
+            raise ValueError('Could not find description.xml')
+        if not os.path.isfile(predictions_path):
+            raise ValueError('Could not find predictions.arff')
+        if not os.path.isfile(model_path) and expect_model:
+            raise ValueError('Could not find model.pkl')
+
+        with open(description_path, 'r') as fp:
+            xml_string = fp.read()
+            run = openml.runs.functions._create_run_from_xml(xml_string, from_server=False)
+
+        with open(predictions_path, 'r') as fp:
+            predictions = arff.load(fp)
+            run.data_content = predictions['data']
+
+        if os.path.isfile(model_path):
+            # note that it will load the model if the file exists, even if expect_model is False
+            with open(model_path, 'rb') as fp:
+                run.model = pickle.load(fp)
+
+        if os.path.isfile(trace_path):
+            trace_arff = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
+
+            run.trace_attributes = trace_arff['attributes']
+            run.trace_content = trace_arff['data']
+
+        return run
+
+    def to_filesystem(self, output_directory, store_model=True):
+        """
+        The inverse of the from_filesystem method. Serializes a run
+        on the filesystem, to be uploaded later.
+
+        Parameters
+        ----------
+        output_directory : str
+            a path leading to the folder where the results
+            will be stored. Should be empty
+
+        store_model : bool
+            if True, a model will be pickled as well. As this is the most
+            storage expensive part, it is often desirable to not store the
+            model.
+        """
+        if self.data_content is None or self.model is None:
+            raise ValueError('Run should have been executed (and contain model / predictions)')
+
+        try:
+            os.makedirs(output_directory)
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                pass
+            else:
+                raise e
+
+        if not os.listdir(output_directory) == []:
+            raise ValueError('Output directory should be empty')
+
+        run_xml = self._create_description_xml()
+        predictions_arff = arff.dumps(self._generate_arff_dict())
+
+        with open(os.path.join(output_directory, 'description.xml'), 'w') as f:
+            f.write(run_xml)
+        with open(os.path.join(output_directory, 'predictions.arff'), 'w') as f:
+            f.write(predictions_arff)
+        if store_model:
+            with open(os.path.join(output_directory, 'model.pkl'), 'wb') as f:
+                pickle.dump(self.model, f)
+
+        if self.trace_content is not None:
+            trace_arff = arff.dumps(self._generate_trace_arff_dict())
+            with open(os.path.join(output_directory, 'trace.arff'), 'w') as f:
+                f.write(trace_arff)
+
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the server.
 
@@ -84,7 +191,7 @@ class OpenMLRun(object):
         task = get_task(self.task_id)
         class_labels = task.class_labels
 
-        arff_dict = {}
+        arff_dict = OrderedDict()
         arff_dict['attributes'] = [('repeat', 'NUMERIC'),  # lowercase 'numeric' gives an error
                                    ('fold', 'NUMERIC'),
                                    ('sample', 'NUMERIC'),
@@ -109,11 +216,11 @@ class OpenMLRun(object):
             Contains information about the optimization trace.
         """
         if self.trace_content is None or len(self.trace_content) == 0:
-            raise ValueError('No trace content avaiable.')
+            raise ValueError('No trace content available.')
         if len(self.trace_attributes) != len(self.trace_content[0]):
             raise ValueError('Trace_attributes and trace_content not compatible')
 
-        arff_dict = {}
+        arff_dict = OrderedDict()
         arff_dict['attributes'] = self.trace_attributes
         arff_dict['data'] = self.trace_content
         arff_dict['relation'] = 'openml_task_' + str(self.task_id) + '_predictions'
@@ -159,7 +266,7 @@ class OpenMLRun(object):
             # convenience function: Creates a mapping to map from the name of attributes
             # present in the arff prediction file to their index. This is necessary
             # because the number of classes can be different for different tasks.
-            res = dict()
+            res = OrderedDict()
             for idx in range(len(attribute_list)):
                 res[attribute_list[idx][0]] = idx
             return res
@@ -189,11 +296,11 @@ class OpenMLRun(object):
             prediction = predictions_arff['attributes'][predicted_idx][1].index(line[predicted_idx])
             correct = predictions_arff['attributes'][predicted_idx][1].index(line[correct_idx])
             if rep not in values_predict:
-                values_predict[rep] = dict()
-                values_correct[rep] = dict()
+                values_predict[rep] = OrderedDict()
+                values_correct[rep] = OrderedDict()
             if fold not in values_predict[rep]:
-                values_predict[rep][fold] = dict()
-                values_correct[rep][fold] = dict()
+                values_predict[rep][fold] = OrderedDict()
+                values_correct[rep][fold] = OrderedDict()
             if samp not in values_predict[rep][fold]:
                 values_predict[rep][fold][samp] = []
                 values_correct[rep][fold][samp] = []
@@ -447,8 +554,9 @@ def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
     description['oml:run']['oml:parameter_setting'] = parameter_settings
     if tags is not None:
         description['oml:run']['oml:tag'] = tags  # Tags describing the run
-    if fold_evaluations is not None or sample_evaluations is not None:
-        description['oml:run']['oml:output_data'] = dict()
+    if (fold_evaluations is not None and len(fold_evaluations) > 0) or \
+       (sample_evaluations is not None and len(sample_evaluations) > 0):
+        description['oml:run']['oml:output_data'] = OrderedDict()
         description['oml:run']['oml:output_data']['oml:evaluation'] = list()
     if fold_evaluations is not None:
         for measure in fold_evaluations:

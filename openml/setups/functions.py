@@ -13,7 +13,7 @@ import openml.utils
 
 
 def setup_exists(flow, model=None):
-    '''
+    """
     Checks whether a hyperparameter configuration already exists on the server.
 
     Parameters
@@ -31,8 +31,7 @@ def setup_exists(flow, model=None):
     -------
     setup_id : int
         setup id iff exists, False otherwise
-    '''
-
+    """
     # sadly, this api call relies on a run object
     openml.flows.functions._check_flow_for_server_id(flow)
 
@@ -48,7 +47,6 @@ def setup_exists(flow, model=None):
                                              openml_param_settings),
                                     pretty=True)
     file_elements = {'description': ('description.arff', description)}
-
     result = openml._api_calls._perform_api_call('/setup/exists/',
                                                  file_elements=file_elements)
     result_dict = xmltodict.parse(result)
@@ -80,14 +78,14 @@ def get_setup(setup_id):
      and returns a structured object
 
     Parameters
-        ----------
-        setup_id : int
-            The Openml setup_id
+    ----------
+    setup_id : int
+        The Openml setup_id
 
-        Returns
-        -------
-        OpenMLSetup
-            an initialized openml setup object
+    Returns
+    -------
+    OpenMLSetup
+        an initialized openml setup object
     """
     setup_dir = os.path.join(config.get_cache_directory(), "setups", str(setup_id))
     setup_file = os.path.join(setup_dir, "description.xml")
@@ -124,8 +122,8 @@ def list_setups(offset=None, size=None, flow=None, tag=None, setup=None):
     dict
         """
 
-    return openml.utils.list_all(_list_setups, offset=offset, size=size,
-                                 flow=flow, tag=tag, setup=setup)
+    return openml.utils._list_all(_list_setups, offset=offset, size=size,
+                                  flow=flow, tag=tag, setup=setup, batch_size=1000)  #batch size for setups is lower
 
 
 def _list_setups(setup=None, **kwargs):

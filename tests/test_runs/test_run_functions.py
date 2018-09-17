@@ -1,6 +1,7 @@
 import arff
 import collections
 import json
+import os
 import random
 import time
 import sys
@@ -240,7 +241,11 @@ class TestRun(TestBase):
                         for sample in range(num_sample_entrees):
                             evaluation = sample_evaluations[measure][rep][fold][sample]
                             self.assertIsInstance(evaluation, float)
-                            self.assertGreater(evaluation, 0) # should take at least one millisecond (?)
+                            if not os.environ.get('CI_WINDOWS'):
+                                # Either Appveyor is much faster than Travis
+                                # and/or measurements are not as accurate.
+                                # Either way, windows seems to get an eval-time of 0 sometimes.
+                                self.assertGreater(evaluation, 0)
                             self.assertLess(evaluation, max_time_allowed)
 
     def test_run_regression_on_classif_task(self):
@@ -451,6 +456,33 @@ class TestRun(TestBase):
             for idx in range(len(alt_scores)):
                 self.assertGreaterEqual(alt_scores[idx], 0)
                 self.assertLessEqual(alt_scores[idx], 1)
+
+    def test_local_run_metric_score_swapped_parameter_order_model(self):
+
+        # construct sci-kit learn classifier
+        clf = Pipeline(steps=[('imputer', Imputer(strategy='median')), ('estimator', RandomForestClassifier())])
+
+        # download task
+        task = openml.tasks.get_task(7)
+
+        # invoke OpenML run
+        run = openml.runs.run_model_on_task(clf, task)
+
+        self._test_local_evaluations(run)
+
+    def test_local_run_metric_score_swapped_parameter_order_flow(self):
+
+        # construct sci-kit learn classifier
+        clf = Pipeline(steps=[('imputer', Imputer(strategy='median')), ('estimator', RandomForestClassifier())])
+
+        flow = sklearn_to_flow(clf)
+        # download task
+        task = openml.tasks.get_task(7)
+
+        # invoke OpenML run
+        run = openml.runs.run_flow_on_task(flow, task)
+
+        self._test_local_evaluations(run)
 
     def test_local_run_metric_score(self):
 
@@ -722,6 +754,38 @@ class TestRun(TestBase):
         self.assertRaises(TypeError, openml.runs.run_model_on_task,
                           task=task, model=clf, avoid_duplicate_runs=False)
 
+    def test_run_with_illegal_flow_id(self):
+        # check the case where the user adds an illegal flow id to a non-existing flow
+        task = openml.tasks.get_task(115)
+        clf = DecisionTreeClassifier()
+        flow = sklearn_to_flow(clf)
+        flow, _ = self._add_sentinel_to_flow_name(flow, None)
+        flow.flow_id = -1
+        expected_message_regex = 'flow.flow_id is not None, but the flow does not' \
+                                 'exist on the server according to flow_exists'
+        self.assertRaisesRegexp(ValueError, expected_message_regex,
+                                openml.runs.run_flow_on_task,
+                                task=task, flow=flow, avoid_duplicate_runs=False)
+
+    def test_run_with_illegal_flow_id_1(self):
+        # check the case where the user adds an illegal flow id to an existing flow
+        # comes to a different value error than the previous test
+        task = openml.tasks.get_task(115)
+        clf = DecisionTreeClassifier()
+        flow_orig = sklearn_to_flow(clf)
+        try:
+            flow_orig.publish()  # ensures flow exist on server
+        except openml.exceptions.OpenMLServerException:
+            # flow already exists
+            pass
+        flow_new = sklearn_to_flow(clf)
+
+        flow_new.flow_id = -1
+        expected_message_regex = "Result flow_exists and flow.flow_id are not same."
+        self.assertRaisesRegexp(ValueError, expected_message_regex,
+                                openml.runs.run_flow_on_task, task=task, flow=flow_new,
+                                avoid_duplicate_runs=False)
+
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(7)
         num_instances = 3196
@@ -729,7 +793,7 @@ class TestRun(TestBase):
         num_repeats = 1
 
         clf = SGDClassifier(loss='log', random_state=1)
-        res = openml.runs.functions._run_task_get_arffcontent(clf, task)
+        res = openml.runs.functions._run_task_get_arffcontent(clf, task, add_local_measures=True)
         arff_datacontent, arff_tracecontent, _, fold_evaluations, sample_evaluations = res
         # predictions
         self.assertIsInstance(arff_datacontent, list)
@@ -765,7 +829,9 @@ class TestRun(TestBase):
 
         clf = SGDClassifier(loss='log', random_state=1)
         can_measure_runtime = sys.version_info[:2] >= (3, 3)
-        res = openml.runs.functions._run_model_on_fold(clf, task, 0, 0, 0, can_measure_runtime)
+        res = openml.runs.functions._run_model_on_fold(clf, task, 0, 0, 0,
+                                                       can_measure_runtime=can_measure_runtime,
+                                                       add_local_measures=True)
 
         arff_datacontent, arff_tracecontent, user_defined_measures, model = res
         # predictions
@@ -837,7 +903,7 @@ class TestRun(TestBase):
             self._check_run(runs[rid])
 
     def test_list_runs_empty(self):
-        runs = openml.runs.list_runs(task=[-1])
+        runs = openml.runs.list_runs(task=[0])
         if len(runs) > 0:
             raise ValueError('UnitTest Outdated, got somehow results')
 
@@ -958,7 +1024,7 @@ class TestRun(TestBase):
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task)
+        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task, add_local_measures=True)
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)
@@ -979,8 +1045,8 @@ class TestRun(TestBase):
                 ('imputer', sklearn.preprocessing.Imputer()), ('estimator', HardNaiveBayes())
             ])
 
-            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task)
-            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task)
+            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task, add_local_measures=True)
+            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task, add_local_measures=True)
 
             # verifies last two arff indices (predict and correct)
             # TODO: programmatically check wether these are indeed features (predict, correct)

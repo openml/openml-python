@@ -92,6 +92,8 @@ following rules before you submit a pull request:
    For the Bug-fixes case, at the time of the PR, this tests should fail for
    the code base in develop and pass for the PR code.
 
+ - Add your changes to the changelog in the file doc/progress.rst.
+
 
 You can also check for common programming errors with the following
 tools:

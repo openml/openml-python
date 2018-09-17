@@ -62,7 +62,7 @@ def list_flows(offset=None, size=None, tag=None, **kwargs):
         - external version
         - uploader
     """
-    return openml.utils.list_all(_list_flows, offset=offset, size=size, tag=tag, **kwargs)
+    return openml.utils._list_all(_list_flows, offset=offset, size=size, tag=tag, **kwargs)
 
 
 def _list_flows(**kwargs):

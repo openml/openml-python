@@ -1,8 +1,7 @@
-from collections import defaultdict
+import collections
 import io
 import json
 import os
-import shutil
 import sys
 import time
 import warnings
@@ -16,12 +15,13 @@ import sklearn.metrics
 import openml
 import openml.utils
 import openml._api_calls
-from ..exceptions import PyOpenMLError, OpenMLServerNoResult
+from ..exceptions import PyOpenMLError
 from .. import config
 from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
-    _copy_server_fields
+    _copy_server_fields, OpenMLFlow
 from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException
+from ..tasks import OpenMLTask
 from .run import OpenMLRun, _get_version_information
 from .trace import OpenMLRunTrace, OpenMLTraceIteration
 
@@ -32,19 +32,25 @@ from .trace import OpenMLRunTrace, OpenMLTraceIteration
 RUNS_CACHE_DIR_NAME = 'runs'
 
 
-def run_model_on_task(task, model, avoid_duplicate_runs=True, flow_tags=None,
-                      seed=None):
+def run_model_on_task(model, task, avoid_duplicate_runs=True, flow_tags=None,
+                      seed=None, add_local_measures=True):
     """See ``run_flow_on_task for a documentation``."""
+    # TODO: At some point in the future do not allow for arguments in old order (order changed 6-2018).
+    if isinstance(model, OpenMLTask) and hasattr(task, 'fit') and hasattr(task, 'predict'):
+        warnings.warn("The old argument order (task, model) is deprecated and will not be supported in the future. "
+                      "Please use the order (model, task).", DeprecationWarning)
+        task, model = model, task
 
     flow = sklearn_to_flow(model)
 
     return run_flow_on_task(task=task, flow=flow,
                             avoid_duplicate_runs=avoid_duplicate_runs,
-                            flow_tags=flow_tags, seed=seed)
+                            flow_tags=flow_tags, seed=seed,
+                            add_local_measures=add_local_measures)
 
 
-def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
-                     seed=None):
+def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
+                     seed=None, add_local_measures=True):
     """Run the model provided by the flow on the dataset defined by task.
 
     Takes the flow and repeat information into account. In case a flow is not
@@ -53,21 +59,25 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
 
     Parameters
     ----------
-    task : OpenMLTask
-        Task to perform.
     model : sklearn model
         A model which has a function fit(X,Y) and predict(X),
         all supervised estimators of scikit learn follow this definition of a model [1]
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
+    task : OpenMLTask
+        Task to perform. This may be an OpenMLFlow instead if the second argument is an OpenMLTask.
     avoid_duplicate_runs : bool
         If this flag is set to True, the run will throw an error if the
         setup/task combination is already present on the server. Works only
         if the flow is already published on the server. This feature requires an
         internet connection.
+        This may be an OpenMLTask instead if the first argument is the OpenMLFlow.
     flow_tags : list(str)
         A list of tags that the flow should have at creation.
     seed: int
         Models that are not seeded will get this seed.
+    add_local_measures : bool
+        Determines whether to calculate a set of evaluation measures locally,
+        to later verify server behaviour. Defaults to True
 
     Returns
     -------
@@ -76,6 +86,13 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
     """
     if flow_tags is not None and not isinstance(flow_tags, list):
         raise ValueError("flow_tags should be list")
+
+    # TODO: At some point in the future do not allow for arguments in old order (order changed 6-2018).
+    if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
+        # We want to allow either order of argument (to avoid confusion).
+        warnings.warn("The old argument order (Flow, model) is deprecated and will not be supported in the future. "
+                      "Please use the order (model, Flow).", DeprecationWarning)
+        task, flow = flow, task
 
     flow.model = _get_seeded_model(flow.model, seed=seed)
 
@@ -87,7 +104,7 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
         setup_id = setup_exists(flow_from_server, flow.model)
         ids = _run_exists(task.task_id, setup_id)
         if ids:
-            raise PyOpenMLError("Run already exists in server. Run id(s): %s" %str(ids))
+            raise PyOpenMLError("Run already exists in server. Run id(s): %s" % str(ids))
         _copy_server_fields(flow_from_server, flow)
 
     dataset = task.get_dataset()
@@ -100,14 +117,40 @@ def run_flow_on_task(task, flow, avoid_duplicate_runs=True, flow_tags=None,
     tags = ['openml-python', run_environment[1]]
 
     # execute the run
-    res = _run_task_get_arffcontent(flow.model, task)
+    res = _run_task_get_arffcontent(flow.model, task, add_local_measures=add_local_measures)
 
-    # in case the flow not exists, we will get a "False" back (which can be
-    if not isinstance(flow.flow_id, int) or flow_id == False:
+    # in case the flow not exists, flow_id will be False (as returned by
+    # flow_exists). Also check whether there are no illegal flow.flow_id values
+    # (compared to result of openml.flows.flow_exists)
+    if flow_id is False:
+        if flow.flow_id is not None:
+            raise ValueError('flow.flow_id is not None, but the flow does not'
+                             'exist on the server according to flow_exists')
         _publish_flow_if_necessary(flow)
 
-    run = OpenMLRun(task_id=task.task_id, flow_id=flow.flow_id,
-                    dataset_id=dataset.dataset_id, model=flow.model, tags=tags)
+    if not isinstance(flow.flow_id, int):
+        # This is the usual behaviour, where the flow object was initiated off
+        # line and requires some additional information (flow_id, input_id for
+        # each hyperparameter) to be usable by this library
+        server_flow = get_flow(flow_id)
+        openml.flows.flow._copy_server_fields(server_flow, flow)
+        openml.flows.assert_flows_equal(flow, server_flow,
+                                        ignore_parameter_values=True)
+    else:
+        # This can only happen when the function is called directly, and not
+        # through "run_model_on_task"
+        if flow.flow_id != flow_id:
+            # This should never happen, unless user made a flow-creation fault
+            raise ValueError('Result flow_exists and flow.flow_id are not same. ')
+
+    run = OpenMLRun(
+        task_id=task.task_id,
+        flow_id=flow.flow_id,
+        dataset_id=dataset.dataset_id,
+        model=flow.model,
+        tags=tags,
+        flow_name=flow.name,
+    )
     run.parameter_settings = OpenMLRun._parse_parameters(flow)
 
     run.data_content, run.trace_content, run.trace_attributes, fold_evaluations, sample_evaluations = res
@@ -126,19 +169,21 @@ def _publish_flow_if_necessary(flow):
     # try publishing the flow if one has to assume it doesn't exist yet. It
     # might fail because it already exists, then the flow is currently not
     # reused
-
-        try:
-            flow.publish()
-        except OpenMLServerException as e:
-            if e.message == "flow already exists":
-                flow_id = openml.flows.flow_exists(flow.name,
-                                                   flow.external_version)
-                server_flow = get_flow(flow_id)
-                openml.flows.flow._copy_server_fields(server_flow, flow)
-                openml.flows.assert_flows_equal(flow, server_flow,
-                                                ignore_parameter_values=True)
-            else:
-                raise e
+    try:
+        flow.publish()
+    except OpenMLServerException as e:
+        if e.message == "flow already exists":
+            # TODO: JvR: the following lines of code can be replaced by
+            # a pass (after changing the unit test) as run_flow_on_task does
+            # not longer rely on it
+            flow_id = openml.flows.flow_exists(flow.name,
+                                               flow.external_version)
+            server_flow = get_flow(flow_id)
+            openml.flows.flow._copy_server_fields(server_flow, flow)
+            openml.flows.assert_flows_equal(flow, server_flow,
+                                            ignore_parameter_values=True)
+        else:
+            raise e
 
 
 def get_run_trace(run_id):
@@ -368,7 +413,7 @@ def _prediction_to_row(rep_no, fold_no, sample_no, row_id, correct_label,
     return arff_line
 
 
-def _run_task_get_arffcontent(model, task):
+def _run_task_get_arffcontent(model, task, add_local_measures):
 
     def _prediction_to_probabilities(y, model_classes):
         # y: list or numpy array of predictions
@@ -387,11 +432,11 @@ def _run_task_get_arffcontent(model, task):
     # this information is multiple times overwritten, but due to the ordering
     # of tne loops, eventually it contains the information based on the full
     # dataset size
-    user_defined_measures_per_fold = defaultdict(lambda: defaultdict(dict))
+    user_defined_measures_per_fold = collections.OrderedDict()
     # stores sample-based evaluation measures (sublevel of fold-based)
     # will also be filled on a non sample-based task, but the information
     # is the same as the fold-based measures, and disregarded in that case
-    user_defined_measures_per_sample = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
+    user_defined_measures_per_sample = collections.OrderedDict()
 
     # sys.version_info returns a tuple, the following line compares the entry of tuples
     # https://docs.python.org/3.6/reference/expressions.html#value-comparisons
@@ -404,13 +449,28 @@ def _run_task_get_arffcontent(model, task):
         for fold_no in range(num_folds):
             for sample_no in range(num_samples):
                 model_fold = sklearn.base.clone(model, safe=True)
-                res =_run_model_on_fold(model_fold, task, rep_no, fold_no, sample_no, can_measure_runtime)
+                res = _run_model_on_fold(model_fold, task, rep_no, fold_no, sample_no,
+                                         can_measure_runtime=can_measure_runtime,
+                                         add_local_measures=add_local_measures)
                 arff_datacontent_fold, arff_tracecontent_fold, user_defined_measures_fold, model_fold = res
 
                 arff_datacontent.extend(arff_datacontent_fold)
                 arff_tracecontent.extend(arff_tracecontent_fold)
 
                 for measure in user_defined_measures_fold:
+
+                    if measure not in user_defined_measures_per_fold:
+                        user_defined_measures_per_fold[measure] = collections.OrderedDict()
+                    if rep_no not in user_defined_measures_per_fold[measure]:
+                        user_defined_measures_per_fold[measure][rep_no] = collections.OrderedDict()
+
+                    if measure not in user_defined_measures_per_sample:
+                        user_defined_measures_per_sample[measure] = collections.OrderedDict()
+                    if rep_no not in user_defined_measures_per_sample[measure]:
+                        user_defined_measures_per_sample[measure][rep_no] = collections.OrderedDict()
+                    if fold_no not in user_defined_measures_per_sample[measure][rep_no]:
+                        user_defined_measures_per_sample[measure][rep_no][fold_no] = collections.OrderedDict()
+
                     user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[measure]
                     user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = user_defined_measures_fold[measure]
 
@@ -430,7 +490,7 @@ def _run_task_get_arffcontent(model, task):
            user_defined_measures_per_sample
 
 
-def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runtime):
+def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runtime, add_local_measures):
     """Internal function that executes a model on a fold (and possibly
        subsample) of the dataset. It returns the data that is necessary
        to construct the OpenML Run object (potentially over more than
@@ -455,6 +515,9 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
         can_measure_runtime : bool
             Wether we are allowed to measure runtime (requires: Single node
             computation and Python >= 3.3)
+        add_local_measures : bool
+            Determines whether to calculate a set of measures (i.e., predictive
+            accuracy) locally, to later verify server behaviour
 
         Returns
         -------
@@ -492,7 +555,7 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
     trainY = Y[train_indices]
     testX = X[test_indices]
     testY = Y[test_indices]
-    user_defined_measures = dict()
+    user_defined_measures = collections.OrderedDict()
 
     try:
         # for measuring runtime. Only available since Python 3.3
@@ -547,7 +610,8 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
     def _calculate_local_measure(sklearn_fn, openml_name):
         user_defined_measures[openml_name] = sklearn_fn(testY, PredY)
 
-    _calculate_local_measure(sklearn.metrics.accuracy_score, 'predictive_accuracy')
+    if add_local_measures:
+        _calculate_local_measure(sklearn.metrics.accuracy_score, 'predictive_accuracy')
 
     arff_datacontent = []
     for i in range(0, len(test_indices)):
@@ -694,7 +758,7 @@ def _create_run_from_xml(xml, from_server=True):
         else:
             raise AttributeError('Run XML does not contain required (server) field: ', fieldname)
 
-    run = xmltodict.parse(xml, force_list=['oml:file', 'oml:evaluation'])["oml:run"]
+    run = xmltodict.parse(xml, force_list=['oml:file', 'oml:evaluation', 'oml:parameter_setting'])["oml:run"]
     run_id = obtain_field(run, 'oml:run_id', from_server, cast=int)
     uploader = obtain_field(run, 'oml:uploader', from_server, cast=int)
     uploader_name = obtain_field(run, 'oml:uploader_name', from_server)
@@ -712,25 +776,29 @@ def _create_run_from_xml(xml, from_server=True):
     setup_id = obtain_field(run, 'oml:setup_id', from_server, cast=int)
     setup_string = obtain_field(run, 'oml:setup_string', from_server)
 
-    parameters = dict()
-    if 'oml:parameter_settings' in run:
-        parameter_settings = run['oml:parameter_settings']
-        for parameter_dict in parameter_settings:
-            key = parameter_dict['oml:name']
-            value = parameter_dict['oml:value']
-            parameters[key] = value
+    parameters = []
+    if 'oml:parameter_setting' in run:
+        obtained_parameter_settings = run['oml:parameter_setting']
+        for parameter_dict in obtained_parameter_settings:
+            current_parameter = collections.OrderedDict()
+            current_parameter['oml:name'] = parameter_dict['oml:name']
+            current_parameter['oml:value'] = parameter_dict['oml:value']
+            if 'oml:component' in parameter_dict:
+                current_parameter['oml:component'] = parameter_dict['oml:component']
+            parameters.append(current_parameter)
 
     if 'oml:input_data' in run:
         dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
     elif not from_server:
         dataset_id = None
 
-    files = dict()
-    evaluations = dict()
-    fold_evaluations = defaultdict(lambda: defaultdict(dict))
-    sample_evaluations = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
+    files = collections.OrderedDict()
+    evaluations = collections.OrderedDict()
+    fold_evaluations = collections.OrderedDict()
+    sample_evaluations = collections.OrderedDict()
     if 'oml:output_data' not in run:
-        raise ValueError('Run does not contain output_data (OpenML server error?)')
+        if from_server:
+            raise ValueError('Run does not contain output_data (OpenML server error?)')
     else:
         output_data = run['oml:output_data']
         if 'oml:file' in output_data:
@@ -753,16 +821,21 @@ def _create_run_from_xml(xml, from_server=True):
                     repeat = int(evaluation_dict['@repeat'])
                     fold = int(evaluation_dict['@fold'])
                     sample = int(evaluation_dict['@sample'])
-                    repeat_dict = sample_evaluations[key]
-                    fold_dict = repeat_dict[repeat]
-                    sample_dict = fold_dict[fold]
-                    sample_dict[sample] = value
+                    if key not in sample_evaluations:
+                        sample_evaluations[key] = collections.OrderedDict()
+                    if repeat not in sample_evaluations[key]:
+                        sample_evaluations[key][repeat] = collections.OrderedDict()
+                    if fold not in sample_evaluations[key][repeat]:
+                        sample_evaluations[key][repeat][fold] = collections.OrderedDict()
+                    sample_evaluations[key][repeat][fold][sample] = value
                 elif '@repeat' in evaluation_dict and '@fold' in evaluation_dict:
                     repeat = int(evaluation_dict['@repeat'])
                     fold = int(evaluation_dict['@fold'])
-                    repeat_dict = fold_evaluations[key]
-                    fold_dict = repeat_dict[repeat]
-                    fold_dict[fold] = value
+                    if key not in fold_evaluations:
+                        fold_evaluations[key] = collections.OrderedDict()
+                    if repeat not in fold_evaluations[key]:
+                        fold_evaluations[key][repeat] = collections.OrderedDict()
+                    fold_evaluations[key][repeat][fold] = value
                 else:
                     evaluations[key] = value
 
@@ -804,7 +877,7 @@ def _create_trace_from_description(xml):
     result_dict = xmltodict.parse(xml, force_list=('oml:trace_iteration',))['oml:trace']
 
     run_id = result_dict['oml:run_id']
-    trace = dict()
+    trace = collections.OrderedDict()
 
     if 'oml:trace_iteration' not in result_dict:
         raise ValueError('Run does not contain valid trace. ')
@@ -850,7 +923,7 @@ def _create_trace_from_arff(arff_obj):
     run : OpenMLRunTrace
         Object containing None for run id and a dict containing the trace iterations
     """
-    trace = dict()
+    trace = collections.OrderedDict()
     attribute_idx = {att[0]: idx for idx, att in enumerate(arff_obj['attributes'])}
     for required_attribute in ['repeat', 'fold', 'iteration', 'evaluation', 'selected']:
         if required_attribute not in attribute_idx:
@@ -936,8 +1009,8 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         List of found runs.
     """
 
-    return openml.utils.list_all(_list_runs, offset=offset, size=size, id=id, task=task, setup=setup,
-                                 flow=flow, uploader=uploader, tag=tag, display_errors=display_errors, **kwargs)
+    return openml.utils._list_all(_list_runs, offset=offset, size=size, id=id, task=task, setup=setup,
+                                  flow=flow, uploader=uploader, tag=tag, display_errors=display_errors, **kwargs)
 
 
 def _list_runs(id=None, task=None, setup=None,
@@ -1017,7 +1090,7 @@ def __list_runs(api_call):
     assert type(runs_dict['oml:runs']['oml:run']) == list, \
         type(runs_dict['oml:runs'])
 
-    runs = dict()
+    runs = collections.OrderedDict()
     for run_ in runs_dict['oml:runs']['oml:run']:
         run_id = int(run_['oml:run_id'])
         run = {'run_id': run_id,
