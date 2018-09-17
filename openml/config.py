@@ -80,7 +80,7 @@ def _parse_config():
             for line in fh:
                 config_file_.write(line)
         config_file_.seek(0)
-        config.readfp(config_file_)
+        config.read_file(config_file_)
     except OSError as e:
         logging.info("Error opening file %s: %s", config_file, e.message)
     return config

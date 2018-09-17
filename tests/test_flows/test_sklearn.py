@@ -1,9 +1,9 @@
-from collections import OrderedDict
 import json
 import os
 import sys
 import unittest
-import warnings
+from distutils.version import LooseVersion
+from collections import OrderedDict
 
 if sys.version_info[0] >= 3:
     from unittest import mock
@@ -26,6 +26,11 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
 import sklearn.cluster
+
+if LooseVersion(sklearn.__version__) < "0.20":
+    from sklearn.preprocessing import Imputer
+else:
+    from sklearn.impute import SimpleImputer as Imputer
 
 import openml
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
@@ -54,7 +59,7 @@ class Model(sklearn.base.BaseEstimator):
 class TestSklearn(unittest.TestCase):
     # Splitting not helpful, these test's don't rely on the server and take less
     # than 1 seconds
-    
+
     def setUp(self):
         iris = sklearn.datasets.load_iris()
         self.X = iris.data
@@ -70,19 +75,37 @@ class TestSklearn(unittest.TestCase):
         fixture_description = 'Automatically created scikit-learn flow.'
         version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
                           % sklearn.__version__
-        fixture_parameters = \
-            OrderedDict((('class_weight', 'null'),
-                         ('criterion', '"entropy"'),
-                         ('max_depth', 'null'),
-                         ('max_features', '"auto"'),
-                         ('max_leaf_nodes', '2000'),
-                         ('min_impurity_split', '1e-07'),
-                         ('min_samples_leaf', '1'),
-                         ('min_samples_split', '2'),
-                         ('min_weight_fraction_leaf', '0.0'),
-                         ('presort', 'false'),
-                         ('random_state', 'null'),
-                         ('splitter', '"best"')))
+        # min_impurity_decrease has been introduced in 0.20
+        # min_impurity_split has been deprecated in 0.20
+        if LooseVersion(sklearn.__version__) < "0.20":
+            fixture_parameters = \
+                OrderedDict((('class_weight', 'null'),
+                            ('criterion', '"entropy"'),
+                            ('max_depth', 'null'),
+                            ('max_features', '"auto"'),
+                            ('max_leaf_nodes', '2000'),
+                            ('min_impurity_split', '1e-07'),
+                            ('min_samples_leaf', '1'),
+                            ('min_samples_split', '2'),
+                            ('min_weight_fraction_leaf', '0.0'),
+                            ('presort', 'false'),
+                            ('random_state', 'null'),
+                            ('splitter', '"best"')))
+        else:
+            fixture_parameters = \
+                OrderedDict((('class_weight', 'null'),
+                            ('criterion', '"entropy"'),
+                            ('max_depth', 'null'),
+                            ('max_features', '"auto"'),
+                            ('max_leaf_nodes', '2000'),
+                            ('min_impurity_decrease', '0.0'),
+                            ('min_impurity_split', 'null'),
+                            ('min_samples_leaf', '1'),
+                            ('min_samples_split', '2'),
+                            ('min_weight_fraction_leaf', '0.0'),
+                            ('presort', 'false'),
+                            ('random_state', 'null'),
+                            ('splitter', '"best"')))
 
         serialization = sklearn_to_flow(model)
 
@@ -111,18 +134,33 @@ class TestSklearn(unittest.TestCase):
         fixture_description = 'Automatically created scikit-learn flow.'
         version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
                           % sklearn.__version__
-        fixture_parameters = \
-            OrderedDict((('algorithm', '"auto"'),
-                         ('copy_x', 'true'),
-                         ('init', '"k-means++"'),
-                         ('max_iter', '300'),
-                         ('n_clusters', '8'),
-                         ('n_init', '10'),
-                         ('n_jobs', '1'),
-                         ('precompute_distances', '"auto"'),
-                         ('random_state', 'null'),
-                         ('tol', '0.0001'),
-                         ('verbose', '0')))
+        # n_jobs default has changed to None in 0.20
+        if LooseVersion(sklearn.__version__) < "0.20":
+            fixture_parameters = \
+                OrderedDict((('algorithm', '"auto"'),
+                            ('copy_x', 'true'),
+                            ('init', '"k-means++"'),
+                            ('max_iter', '300'),
+                            ('n_clusters', '8'),
+                            ('n_init', '10'),
+                            ('n_jobs', '1'),
+                            ('precompute_distances', '"auto"'),
+                            ('random_state', 'null'),
+                            ('tol', '0.0001'),
+                            ('verbose', '0')))
+        else:
+            fixture_parameters = \
+                OrderedDict((('algorithm', '"auto"'),
+                            ('copy_x', 'true'),
+                            ('init', '"k-means++"'),
+                            ('max_iter', '300'),
+                            ('n_clusters', '8'),
+                            ('n_init', '10'),
+                            ('n_jobs', 'null'),
+                            ('precompute_distances', '"auto"'),
+                            ('random_state', 'null'),
+                            ('tol', '0.0001'),
+                            ('verbose', '0')))
 
         serialization = sklearn_to_flow(model)
 
@@ -198,7 +236,7 @@ class TestSklearn(unittest.TestCase):
                        'dummy=sklearn.dummy.DummyClassifier)'
         fixture_description = 'Automatically created scikit-learn flow.'
 
-        serialization =  sklearn_to_flow(model)
+        serialization = sklearn_to_flow(model)
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
@@ -206,7 +244,11 @@ class TestSklearn(unittest.TestCase):
         # Comparing the pipeline
         # The parameters only have the name of base objects(not the whole flow)
         # as value
-        self.assertEqual(len(serialization.parameters), 1)
+        # memory parameter has been added in 0.19
+        if LooseVersion(sklearn.__version__) < "0.19.0":
+            self.assertEqual(len(serialization.parameters), 1)
+        else:
+            self.assertEqual(len(serialization.parameters), 2)
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
         self.assertEqual(json.loads(serialization.parameters['steps']),
@@ -264,7 +306,11 @@ class TestSklearn(unittest.TestCase):
         # Comparing the pipeline
         # The parameters only have the name of base objects(not the whole flow)
         # as value
-        self.assertEqual(len(serialization.parameters), 1)
+        # memory parameter has been added in 0.19
+        if LooseVersion(sklearn.__version__) < "0.19.0":
+            self.assertEqual(len(serialization.parameters), 1)
+        else:
+            self.assertEqual(len(serialization.parameters), 2)
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
         self.assertEqual(json.loads(serialization.parameters['steps']),
@@ -304,15 +350,17 @@ class TestSklearn(unittest.TestCase):
         new_model.fit(self.X, self.y)
 
     def test_serialize_feature_union(self):
-        ohe = sklearn.preprocessing.OneHotEncoder(sparse=False)
+        ohe_params = {'sparse': False}
+        if LooseVersion(sklearn.__version__) >= "0.20":
+            ohe_params['categories'] = 'auto'
+        ohe = sklearn.preprocessing.OneHotEncoder(**ohe_params)
         scaler = sklearn.preprocessing.StandardScaler()
-        fu = sklearn.pipeline.FeatureUnion(transformer_list=[('ohe', ohe),
-                                                             ('scaler', scaler)])
-        serialization =  sklearn_to_flow(fu)
-        self.assertEqual(serialization.name,
-                         'sklearn.pipeline.FeatureUnion('
-                         'ohe=sklearn.preprocessing.data.OneHotEncoder,'
-                         'scaler=sklearn.preprocessing.data.StandardScaler)')
+        fu = sklearn.pipeline.FeatureUnion(
+            transformer_list=[('ohe', ohe), ('scaler', scaler)])
+        serialization = sklearn_to_flow(fu)
+        estimators_names = ('FeatureUnion', 'OneHotEncoder', 'StandardScaler')
+        for keyword in estimators_names:
+            self.assertTrue(keyword in serialization.name)
         new_model = flow_to_sklearn(serialization)
 
         self.assertEqual(type(new_model), type(fu))
@@ -328,8 +376,10 @@ class TestSklearn(unittest.TestCase):
 
         self.assertEqual([step[0] for step in new_model.transformer_list],
                          [step[0] for step in fu.transformer_list])
-        self.assertIsNot(new_model.transformer_list[0][1], fu.transformer_list[0][1])
-        self.assertIsNot(new_model.transformer_list[1][1], fu.transformer_list[1][1])
+        self.assertIsNot(new_model.transformer_list[0][1],
+                         fu.transformer_list[0][1])
+        self.assertIsNot(new_model.transformer_list[1][1],
+                         fu.transformer_list[1][1])
 
         new_model_params = new_model.get_params()
         del new_model_params['ohe']
@@ -345,31 +395,29 @@ class TestSklearn(unittest.TestCase):
 
         fu.set_params(scaler=None)
         serialization = sklearn_to_flow(fu)
-        self.assertEqual(serialization.name,
-                         'sklearn.pipeline.FeatureUnion('
-                         'ohe=sklearn.preprocessing.data.OneHotEncoder)')
+        estimators_names = ('FeatureUnion', 'OneHotEncoder')
+        for keyword in estimators_names:
+            self.assertTrue(keyword in estimators_names)
         new_model = flow_to_sklearn(serialization)
         self.assertEqual(type(new_model), type(fu))
         self.assertIsNot(new_model, fu)
         self.assertIs(new_model.transformer_list[1][1], None)
 
     def test_serialize_feature_union_switched_names(self):
-        ohe = sklearn.preprocessing.OneHotEncoder()
+        ohe_params = ({'categories': 'auto'}
+                      if LooseVersion(sklearn.__version__) >= "0.20" else {})
+        ohe = sklearn.preprocessing.OneHotEncoder(**ohe_params)
         scaler = sklearn.preprocessing.StandardScaler()
-        fu1 = sklearn.pipeline.FeatureUnion(transformer_list=[('ohe', ohe), ('scaler', scaler)])
-        fu2 = sklearn.pipeline.FeatureUnion(transformer_list=[('scaler', ohe), ('ohe', scaler)])
+        fu1 = sklearn.pipeline.FeatureUnion(
+            transformer_list=[('ohe', ohe), ('scaler', scaler)])
+        fu2 = sklearn.pipeline.FeatureUnion(
+            transformer_list=[('scaler', ohe), ('ohe', scaler)])
         fu1_serialization = sklearn_to_flow(fu1)
         fu2_serialization = sklearn_to_flow(fu2)
-        self.assertEqual(
-            fu1_serialization.name,
-            "sklearn.pipeline.FeatureUnion("
-            "ohe=sklearn.preprocessing.data.OneHotEncoder,"
-            "scaler=sklearn.preprocessing.data.StandardScaler)")
-        self.assertEqual(
-            fu2_serialization.name,
-            "sklearn.pipeline.FeatureUnion("
-            "scaler=sklearn.preprocessing.data.OneHotEncoder,"
-            "ohe=sklearn.preprocessing.data.StandardScaler)")
+        estimators_names = ('FeatureUnion', 'OneHotEncoder', 'StandardScaler')
+        for keyword in estimators_names:
+            self.assertTrue(keyword in fu1_serialization.name)
+            self.assertTrue(keyword in fu2_serialization.name)
 
     def test_serialize_complex_flow(self):
         ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[0])
@@ -378,22 +426,21 @@ class TestSklearn(unittest.TestCase):
             base_estimator=sklearn.tree.DecisionTreeClassifier())
         model = sklearn.pipeline.Pipeline(steps=(
             ('ohe', ohe), ('scaler', scaler), ('boosting', boosting)))
-        parameter_grid = {'n_estimators': [1, 5, 10, 100],
-                          'learning_rate': scipy.stats.uniform(0.01, 0.99),
-                          'base_estimator__max_depth': scipy.stats.randint(1,
-                                                                           10)}
+        parameter_grid = {
+            'n_estimators': [1, 5, 10, 100],
+            'learning_rate': scipy.stats.uniform(0.01, 0.99),
+            'base_estimator__max_depth': scipy.stats.randint(1, 10)}
         cv = sklearn.model_selection.StratifiedKFold(n_splits=5, shuffle=True)
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
         serialized = sklearn_to_flow(rs)
 
-        fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV(' \
-                       'estimator=sklearn.pipeline.Pipeline(' \
-                       'ohe=sklearn.preprocessing.data.OneHotEncoder,' \
-                       'scaler=sklearn.preprocessing.data.StandardScaler,' \
-                       'boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
-                       'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))'
-        self.assertEqual(serialized.name, fixture_name)
+        # check that the name of the estimator occur in the name of the flow
+        estimator_names = ('RandomizedSearchCV', 'Pipeline', 'OneHotEncoder',
+                           'StandardScaler', 'AdaBoostClassifier',
+                           'DecisionTreeClassifier')
+        for keyword in estimator_names:
+            self.assertTrue(keyword in serialized.name)
 
         # now do deserialization
         deserialized = flow_to_sklearn(serialized)
@@ -561,9 +608,9 @@ class TestSklearn(unittest.TestCase):
         kernel = sklearn.gaussian_process.kernels.Matern()
         gp = sklearn.gaussian_process.GaussianProcessClassifier(
             kernel=kernel, optimizer=opt)
-        self.assertRaisesRegexp(TypeError, "Matern\(length_scale=1, nu=1.5\), "
-                                           "<class 'sklearn.gaussian_process.kernels.Matern'>",
-                                sklearn_to_flow, gp)
+        self.assertRaisesRegex(TypeError, "Matern\(length_scale=1, nu=1.5\), "
+                                          "<class 'sklearn.gaussian_process.kernels.Matern'>",
+                               sklearn_to_flow, gp)
 
     def test_error_on_adding_component_multiple_times_to_flow(self):
         # this function implicitly checks
@@ -571,46 +618,21 @@ class TestSklearn(unittest.TestCase):
         pca = sklearn.decomposition.PCA()
         pca2 = sklearn.decomposition.PCA()
         pipeline = sklearn.pipeline.Pipeline((('pca1', pca), ('pca2', pca2)))
-        fixture = "Found a second occurence of component sklearn.decomposition.pca.PCA" \
-                  " when trying to serialize Pipeline\(steps=\(\('pca1', " \
-                  "PCA\(copy=True, iterated_power='auto', n_components=None, " \
-                  "random_state=None,\n" \
-                  "  svd_solver='auto', tol=0.0, whiten=False\)\), " \
-                  "\('pca2', PCA\(copy=True, iterated_power='auto', " \
-                  "n_components=None, random_state=None,\n" \
-                  "  svd_solver='auto', tol=0.0, whiten=False\)\)\)\)."
-        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline)
+        fixture = "Found a second occurence of component .*.PCA when trying " \
+                  "to serialize Pipeline"
+        self.assertRaisesRegex(ValueError, fixture, sklearn_to_flow, pipeline)
 
         fu = sklearn.pipeline.FeatureUnion((('pca1', pca), ('pca2', pca2)))
-        fixture = "Found a second occurence of component sklearn.decomposition.pca.PCA when trying to serialize " \
-                  "FeatureUnion\(n_jobs=1,\n" \
-                  "       transformer_list=\(\('pca1', PCA\(copy=True, " \
-                  "iterated_power='auto'," \
-                  " n_components=None, random_state=None,\n" \
-                  "  svd_solver='auto', tol=0.0, whiten=False\)\), \('pca2', " \
-                  "PCA\(copy=True, iterated_power='auto'," \
-                  " n_components=None, random_state=None,\n" \
-                  "  svd_solver='auto', tol=0.0, whiten=False\)\)\),\n" \
-                  "       transformer_weights=None\)."
-        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, fu)
+        fixture = "Found a second occurence of component .*.PCA when trying " \
+                  "to serialize FeatureUnion"
+        self.assertRaisesRegex(ValueError, fixture, sklearn_to_flow, fu)
 
         fs = sklearn.feature_selection.SelectKBest()
         fu2 = sklearn.pipeline.FeatureUnion((('pca1', pca), ('fs', fs)))
         pipeline2 = sklearn.pipeline.Pipeline((('fu', fu2), ('pca2', pca2)))
-        fixture = "Found a second occurence of component " \
-                  "sklearn.decomposition.pca.PCA when trying to serialize " \
-                  "Pipeline\(steps=\(\('fu', FeatureUnion\(n_jobs=1,\n" \
-                  "       transformer_list=\(\('pca1', PCA\(copy=True, " \
-                  "iterated_power='auto'," \
-                  " n_components=None, random_state=None,\n"  \
-                  "  svd_solver='auto', tol=0.0, whiten=False\)\), " \
-                  "\('fs', SelectKBest\(k=10, score_func=<function " \
-                  "f_classif at 0x[a-fA-F0-9]+>\)\)\),\n" \
-                  "       transformer_weights=None\)\), \('pca2', " \
-                  "PCA\(copy=True, iterated_power='auto'," \
-                  " n_components=None, random_state=None,\n" \
-                  "  svd_solver='auto', tol=0.0, whiten=False\)\)\)\)."
-        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline2)
+        fixture = "Found a second occurence of component .*.PCA when trying " \
+                  "to serialize Pipeline"
+        self.assertRaisesRegex(ValueError, fixture, sklearn_to_flow, pipeline2)
 
     def test_subflow_version_propagated(self):
         this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -652,9 +674,12 @@ class TestSklearn(unittest.TestCase):
     def test_illegal_parameter_names_pipeline(self):
         # illegal name: steps
         steps = [
-            ('Imputer', sklearn.preprocessing.Imputer(strategy='median')),
-            ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore')),
-            ('steps', sklearn.ensemble.BaggingClassifier(base_estimator=sklearn.tree.DecisionTreeClassifier))
+            ('Imputer', Imputer(strategy='median')),
+            ('OneHotEncoder',
+             sklearn.preprocessing.OneHotEncoder(sparse=False,
+                                                 handle_unknown='ignore')),
+            ('steps', sklearn.ensemble.BaggingClassifier(
+                base_estimator=sklearn.tree.DecisionTreeClassifier))
         ]
         self.assertRaises(ValueError, sklearn.pipeline.Pipeline, steps=steps)
 
@@ -662,18 +687,23 @@ class TestSklearn(unittest.TestCase):
     def test_illegal_parameter_names_featureunion(self):
         # illegal name: transformer_list
         transformer_list = [
-            ('transformer_list', sklearn.preprocessing.Imputer(strategy='median')),
-            ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore'))
+            ('transformer_list',
+             Imputer(strategy='median')),
+            ('OneHotEncoder',
+             sklearn.preprocessing.OneHotEncoder(sparse=False,
+                                                 handle_unknown='ignore'))
         ]
-        self.assertRaises(ValueError, sklearn.pipeline.FeatureUnion, transformer_list=transformer_list)
+        self.assertRaises(ValueError, sklearn.pipeline.FeatureUnion,
+                          transformer_list=transformer_list)
 
     def test_paralizable_check(self):
-        # using this model should pass the test (if param distribution is legal)
+        # using this model should pass the test (if param distribution is
+        # legal)
         singlecore_bagging = sklearn.ensemble.BaggingClassifier()
         # using this model should return false (if param distribution is legal)
         multicore_bagging = sklearn.ensemble.BaggingClassifier(n_jobs=5)
         # using this param distribution should raise an exception
-        illegal_param_dist = {"base__n_jobs": [-1, 0, 1] }
+        illegal_param_dist = {"base__n_jobs": [-1, 0, 1]}
         # using this param distribution should not raise an exception
         legal_param_dist = {"base__max_depth": [2, 3, 4]}
 
@@ -681,24 +711,31 @@ class TestSklearn(unittest.TestCase):
             sklearn.ensemble.RandomForestClassifier(),
             sklearn.ensemble.RandomForestClassifier(n_jobs=5),
             sklearn.ensemble.RandomForestClassifier(n_jobs=-1),
-            sklearn.pipeline.Pipeline(steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=1))]),
-            sklearn.pipeline.Pipeline(steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=5))]),
-            sklearn.pipeline.Pipeline(steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=-1))]),
-            sklearn.model_selection.GridSearchCV(singlecore_bagging, legal_param_dist),
-            sklearn.model_selection.GridSearchCV(multicore_bagging, legal_param_dist)
+            sklearn.pipeline.Pipeline(
+                steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=1))]),
+            sklearn.pipeline.Pipeline(
+                steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=5))]),
+            sklearn.pipeline.Pipeline(
+                steps=[('bag', sklearn.ensemble.BaggingClassifier(n_jobs=-1))]),
+            sklearn.model_selection.GridSearchCV(singlecore_bagging,
+                                                 legal_param_dist),
+            sklearn.model_selection.GridSearchCV(multicore_bagging,
+                                                 legal_param_dist)
         ]
         illegal_models = [
-            sklearn.model_selection.GridSearchCV(singlecore_bagging, illegal_param_dist),
-            sklearn.model_selection.GridSearchCV(multicore_bagging, illegal_param_dist)
+            sklearn.model_selection.GridSearchCV(singlecore_bagging,
+                                                 illegal_param_dist),
+            sklearn.model_selection.GridSearchCV(multicore_bagging,
+                                                 illegal_param_dist)
         ]
 
         answers = [True, False, False, True, False, False, True, False]
 
-        for i in range(len(legal_models)):
-            self.assertTrue(_check_n_jobs(legal_models[i]) == answers[i])
+        for model, expected_answer in zip(legal_models, answers):
+            self.assertTrue(_check_n_jobs(model) == expected_answer)
 
-        for i in range(len(illegal_models)):
-            self.assertRaises(PyOpenMLError, _check_n_jobs, illegal_models[i])
+        for model in illegal_models:
+            self.assertRaises(PyOpenMLError, _check_n_jobs, model)
 
     def test__get_fn_arguments_with_defaults(self):
         fns = [

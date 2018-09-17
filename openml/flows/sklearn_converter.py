@@ -633,10 +633,10 @@ def _check_n_jobs(model):
         for param, value in param_dict.items():
             # n_jobs is scikitlearn parameter for paralizing jobs
             if param.split('__')[-1] == 'n_jobs':
-                # 0 = illegal value (?), 1 = use one core,  n = use n cores
+                # 0 = illegal value (?), 1/None = use one core, n = use n cores
                 # -1 = use all available cores -> this makes it hard to
                 # measure runtime in a fair way
-                if value != 1 or disallow_parameter:
+                if value not in (1, None) or disallow_parameter:
                     return False
         return True
 
@@ -644,7 +644,8 @@ def _check_n_jobs(model):
             isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
         raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
-    # make sure that n_jobs is not in the parameter grid of optimization procedure
+    # make sure that n_jobs is not in the parameter grid of optimization
+    # procedure
     if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
         param_distributions = None
         if isinstance(model, sklearn.model_selection.GridSearchCV):
