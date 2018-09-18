@@ -14,9 +14,12 @@ if [[ "$EXAMPLES" == "true" ]]; then
     pytest -sv $test_dir/test_examples/
 elif [[ "$DOCTEST" == "true" ]]; then
     python -m doctest $doctest_dir/usage.rst
-if [[ "$COVERAGE" == "true" ]]; then
-    PYTEST_ARGS="--cov=."
-else;
-    PYTEST_ARGS=""
 fi
+
+if [[ "$COVERAGE" == "true" ]]; then
+    PYTEST_ARGS='--cov=.'
+else
+    PYTEST_ARGS=''
+fi
+
 pytest -n 4 --timeout=600 --timeout-method=thread -sv --ignore='test_OpenMLDemo.py' $PYTEST_ARGS $test_dir
