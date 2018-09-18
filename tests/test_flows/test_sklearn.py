@@ -742,11 +742,18 @@ class TestSklearn(unittest.TestCase):
             self.assertRaises(PyOpenMLError, _check_n_jobs, model)
 
     def test__get_fn_arguments_with_defaults(self):
-        fns = [
-            (sklearn.ensemble.RandomForestRegressor.__init__, 16),
-            (sklearn.tree.DecisionTreeClassifier.__init__, 13),
-            (sklearn.pipeline.Pipeline.__init__, 1)
-        ]
+        if LooseVersion(sklearn.__version__) < "0.20":
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 16),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 13),
+                (sklearn.pipeline.Pipeline.__init__, 1)
+            ]
+        else:
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 15),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 12),
+                (sklearn.pipeline.Pipeline.__init__, 0)
+            ]
 
         for fn, num_params_with_defaults in fns:
             defaults, defaultless = openml.flows.sklearn_converter._get_fn_arguments_with_defaults(fn)
