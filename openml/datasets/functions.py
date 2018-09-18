@@ -436,6 +436,31 @@ def create_dataset(name, description, creator, contributor, collection_date,
                          update_comment=update_comment, dataset=arff_dataset)
 
 
+def status_update(data_id, status):
+    """
+    Updates the status of a dataset to either 'active' or 'deactivated'. Please
+    see the OpenML API documentation for a description of the status and all
+    legal status transitions.
+
+    Parameters
+    ----------
+    data_id : int
+        The data id of the dataset
+    status : str,
+        'active' or 'deactivated'
+    """
+    legal_status = {'active', 'deactivated'}
+    if status not in legal_status:
+        raise ValueError('Illegal status value. Legal values: %s' % legal_status)
+    data = {'data_id': data_id, 'status': status}
+    result_xml = openml._api_calls._perform_api_call("data/status/update", data=data)
+    result = xmltodict.parse(result_xml)
+    server_data_id = result['oml:data_status_update']['oml:id']
+    server_status = result['oml:data_status_update']['oml:status']
+    if status != server_status or int(data_id) != int(server_data_id):
+        raise ValueError('Data id/status does not collide (This should never happen)')
+
+
 def _get_dataset_description(did_cache_dir, dataset_id):
     """Get the dataset description as xml dictionary.
 

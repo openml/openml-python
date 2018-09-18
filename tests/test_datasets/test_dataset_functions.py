@@ -340,3 +340,17 @@ class TestOpenMLDataset(TestBase):
             url="https://www.openml.org/data/download/61/dataset_61_iris.arff")
         dataset.publish()
         self.assertIsInstance(dataset.dataset_id, int)
+
+    def test_data_status(self):
+        dataset = OpenMLDataset(
+            "UploadTestWithURL", "test", "ARFF",
+            version=1,
+            url="https://www.openml.org/data/download/61/dataset_61_iris.arff")
+        dataset.publish()
+        did = dataset.dataset_id
+
+        openml.datasets.status_update(did, 'active')
+        openml.datasets.status_update(did, 'deactivated')
+        openml.datasets.status_update(did, 'active')
+        with self.assertRaises(ValueError):
+            openml.datasets.status_update(did, 'in_preparation')
