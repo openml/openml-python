@@ -291,12 +291,7 @@ def get_task(task_id):
     task_id : int
         The OpenML task id.
     """
-    try:
-        task_id = int(task_id)
-    except:
-        raise ValueError("Task ID is neither an Integer nor can be "
-                         "cast to an Integer.")
-
+    task_id = int(task_id)
     tid_cache_dir = openml.utils._create_cache_directory_for_id(
         TASKS_CACHE_DIR_NAME, task_id,
     )
