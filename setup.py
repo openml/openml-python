@@ -49,7 +49,8 @@ setuptools.setup(name="openml",
                  extras_require={
                      'test': [
                          'nbconvert',
-                         'jupyter_client'
+                         'jupyter_client',
+                         'matplotlib'
                      ]
                  },
                  test_suite="pytest",
