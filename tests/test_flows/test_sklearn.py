@@ -77,7 +77,7 @@ class TestSklearn(unittest.TestCase):
                           % sklearn.__version__
         # min_impurity_decrease has been introduced in 0.20
         # min_impurity_split has been deprecated in 0.20
-        if LooseVersion(sklearn.__version__) < "0.20":
+        if LooseVersion(sklearn.__version__) < "0.19":
             fixture_parameters = \
                 OrderedDict((('class_weight', 'null'),
                             ('criterion', '"entropy"'),
@@ -138,29 +138,29 @@ class TestSklearn(unittest.TestCase):
         if LooseVersion(sklearn.__version__) < "0.20":
             fixture_parameters = \
                 OrderedDict((('algorithm', '"auto"'),
-                            ('copy_x', 'true'),
-                            ('init', '"k-means++"'),
-                            ('max_iter', '300'),
-                            ('n_clusters', '8'),
-                            ('n_init', '10'),
-                            ('n_jobs', '1'),
-                            ('precompute_distances', '"auto"'),
-                            ('random_state', 'null'),
-                            ('tol', '0.0001'),
-                            ('verbose', '0')))
+                             ('copy_x', 'true'),
+                             ('init', '"k-means++"'),
+                             ('max_iter', '300'),
+                             ('n_clusters', '8'),
+                             ('n_init', '10'),
+                             ('n_jobs', '1'),
+                             ('precompute_distances', '"auto"'),
+                             ('random_state', 'null'),
+                             ('tol', '0.0001'),
+                             ('verbose', '0')))
         else:
             fixture_parameters = \
                 OrderedDict((('algorithm', '"auto"'),
-                            ('copy_x', 'true'),
-                            ('init', '"k-means++"'),
-                            ('max_iter', '300'),
-                            ('n_clusters', '8'),
-                            ('n_init', '10'),
-                            ('n_jobs', 'null'),
-                            ('precompute_distances', '"auto"'),
-                            ('random_state', 'null'),
-                            ('tol', '0.0001'),
-                            ('verbose', '0')))
+                             ('copy_x', 'true'),
+                             ('init', '"k-means++"'),
+                             ('max_iter', '300'),
+                             ('n_clusters', '8'),
+                             ('n_init', '10'),
+                             ('n_jobs', 'null'),
+                             ('precompute_distances', '"auto"'),
+                             ('random_state', 'null'),
+                             ('tol', '0.0001'),
+                             ('verbose', '0')))
 
         serialization = sklearn_to_flow(model)
 
@@ -245,7 +245,7 @@ class TestSklearn(unittest.TestCase):
         # The parameters only have the name of base objects(not the whole flow)
         # as value
         # memory parameter has been added in 0.19
-        if LooseVersion(sklearn.__version__) < "0.19.0":
+        if LooseVersion(sklearn.__version__) < "0.19":
             self.assertEqual(len(serialization.parameters), 1)
         else:
             self.assertEqual(len(serialization.parameters), 2)
@@ -307,7 +307,7 @@ class TestSklearn(unittest.TestCase):
         # The parameters only have the name of base objects(not the whole flow)
         # as value
         # memory parameter has been added in 0.19
-        if LooseVersion(sklearn.__version__) < "0.19.0":
+        if LooseVersion(sklearn.__version__) < "0.19":
             self.assertEqual(len(serialization.parameters), 1)
         else:
             self.assertEqual(len(serialization.parameters), 2)
@@ -742,7 +742,7 @@ class TestSklearn(unittest.TestCase):
             self.assertRaises(PyOpenMLError, _check_n_jobs, model)
 
     def test__get_fn_arguments_with_defaults(self):
-        if LooseVersion(sklearn.__version__) < "0.20":
+        if LooseVersion(sklearn.__version__) < "0.19":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 15),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 12),
