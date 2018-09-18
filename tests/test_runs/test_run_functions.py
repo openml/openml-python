@@ -390,6 +390,7 @@ class TestRun(TestBase):
         # This testcase is important for 2 reasons:
         # 1) it verifies the correct handling of masked arrays (not all parameters are active)
         # 2) it verifies the correct handling of a 2-layered grid search
+        # Note that this is a list of dictionaries, all containing 1 hyperparameter.
         gridsearch = GridSearchCV(
             RandomForestClassifier(n_estimators=5),
             [
