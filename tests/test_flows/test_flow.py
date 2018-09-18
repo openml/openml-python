@@ -278,7 +278,7 @@ class TestFlow(TestBase):
             #publish the flow
             flow = flow.publish()
             #redownload the flow
-            print(flow.flow_id)
+            print(flow)
             flow = openml.flows.get_flow(flow.flow_id)
 
             # check if flow exists can find it
