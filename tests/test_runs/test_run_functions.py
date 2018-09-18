@@ -104,8 +104,6 @@ class TestRun(TestBase):
 
     def _perform_run(self, task_id, num_instances, clf,
                      random_state_value=None, check_setup=True):
-        # last case (DefaultSearchCV) relies on where the test is invoked from
-        # TODO: move it to a 'permanent' place?
         classes_without_random_state = \
             ['sklearn.model_selection._search.GridSearchCV',
              'sklearn.pipeline.Pipeline']
