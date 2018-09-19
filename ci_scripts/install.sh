@@ -37,7 +37,7 @@ if [[ "$DOCTEST" == "true" ]]; then
     pip install pandas sphinx_bootstrap_theme
 fi
 if [[ "$COVERAGE" == "true" ]]; then
-    pip install codecov
+    pip install codecov pytest-cov
 fi
 
 python --version
