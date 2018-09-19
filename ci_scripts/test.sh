@@ -17,7 +17,7 @@ elif [[ "$DOCTEST" == "true" ]]; then
 fi
 
 if [[ "$COVERAGE" == "true" ]]; then
-    PYTEST_ARGS='--cov=.'
+    PYTEST_ARGS='--cov=openml'
 else
     PYTEST_ARGS=''
 fi
