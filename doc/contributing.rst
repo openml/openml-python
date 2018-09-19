@@ -104,7 +104,7 @@ From within the directory of the cloned package, execute:
 
 .. code:: bash
 
-    nosetests tests/
+    pytest tests/
 
 .. _extending:
 
