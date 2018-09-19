@@ -145,7 +145,7 @@ to have better visualization and easier access:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s2">&quot;First 5 of </span><span class="si">%s</span><span class="s2"> tasks:&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
-<span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -157,6 +157,14 @@ to have better visualization and easier access:</p>
        &#39;NumberOfNumericFeatures&#39;, &#39;NumberOfSymbolicFeatures&#39;],
       dtype=&#39;object&#39;)
 First 5 of 612 tasks:
+   tid            ...             NumberOfSymbolicFeatures
+1    1            ...                                 33.0
+2    2            ...                                 33.0
+3    3            ...                                 33.0
+4    4            ...                                 33.0
+5    5            ...                                 33.0
+
+[5 rows x 18 columns]
 </pre></div>
 </div>
 <p>We can filter the list of tasks to only contain datasets with more than 500 samples, but less than 1000 samples:</p>
@@ -197,6 +205,56 @@ First 5 of 612 tasks:
 <p>Similar to listing tasks by task type, we can list tasks by tags:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s1">&#39;OpenML100&#39;</span><span class="p">)</span>
 <span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;First 5 of </span><span class="si">%s</span><span class="s2"> tasks:&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 5 of 0 tasks:
+Empty DataFrame
+Columns: []
+Index: []
+</pre></div>
+</div>
+<p>Furthermore, we can list tasks based on the dataset id:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="mi">61</span><span class="p">)</span>
+<span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;First 5 of </span><span class="si">%s</span><span class="s2"> tasks:&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 5 of 9 tasks:
+     tid            ...             NumberOfSymbolicFeatures
+361  361            ...                                    1
+362  362            ...                                    1
+363  363            ...                                    1
+364  364            ...                                    1
+365  365            ...                                    1
+
+[5 rows x 18 columns]
+</pre></div>
+</div>
+<p>In addition, a size limit and an offset can be applied both separately and simultaneously:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tid            ...             NumberOfSymbolicFeatures
+51   51            ...                                    1
+52   52            ...                                    1
+53   53            ...                                    1
+54   54            ...                                    1
+55   55            ...                                  241
+56   56            ...                                  241
+57   57            ...                                  241
+58   58            ...                                  241
+59   59            ...                                  241
+60   60            ...                                  241
+
+[10 rows x 18 columns]
 </pre></div>
 </div>
 <p><strong>OpenML 100</strong>
@@ -264,10 +322,10 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLTask object at 0x14f56d1f36a0&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLTask object at 0x2add0149fb38&gt;
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  17.841 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  18.164 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-tasks-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/204148be48b3a7d6b2cc72a9fc63c69e/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></div>

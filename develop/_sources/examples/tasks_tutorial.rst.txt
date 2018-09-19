@@ -64,7 +64,7 @@ to have better visualization and easier access:
     tasks = pd.DataFrame.from_dict(tasks, orient='index')
     print(tasks.columns)
     print("First 5 of %s tasks:" % len(tasks))
-    tasks.head()
+    pprint(tasks.head())
 
 
 
@@ -84,6 +84,14 @@ to have better visualization and easier access:
            'NumberOfNumericFeatures', 'NumberOfSymbolicFeatures'],
           dtype='object')
     First 5 of 612 tasks:
+       tid            ...             NumberOfSymbolicFeatures
+    1    1            ...                                 33.0
+    2    2            ...                                 33.0
+    3    3            ...                                 33.0
+    4    4            ...                                 33.0
+    5    5            ...                                 33.0
+
+    [5 rows x 18 columns]
 
 
 We can filter the list of tasks to only contain datasets with more than 500 samples, but less than 1000 samples:
@@ -183,11 +191,92 @@ Similar to listing tasks by task type, we can list tasks by tags:
 
     tasks = openml.tasks.list_tasks(tag='OpenML100')
     tasks = pd.DataFrame.from_dict(tasks, orient='index')
+    print("First 5 of %s tasks:" % len(tasks))
+    pprint(tasks.head())
 
 
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    First 5 of 0 tasks:
+    Empty DataFrame
+    Columns: []
+    Index: []
+
+
+Furthermore, we can list tasks based on the dataset id:
+
+
+
+.. code-block:: python
+
+
+    tasks = openml.tasks.list_tasks(data_id=61)
+    tasks = pd.DataFrame.from_dict(tasks, orient='index')
+    print("First 5 of %s tasks:" % len(tasks))
+    pprint(tasks.head())
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    First 5 of 9 tasks:
+         tid            ...             NumberOfSymbolicFeatures
+    361  361            ...                                    1
+    362  362            ...                                    1
+    363  363            ...                                    1
+    364  364            ...                                    1
+    365  365            ...                                    1
+
+    [5 rows x 18 columns]
+
+
+In addition, a size limit and an offset can be applied both separately and simultaneously:
+
+
+
+.. code-block:: python
+
+
+    tasks = openml.tasks.list_tasks(size=10, offset=50)
+    tasks = pd.DataFrame.from_dict(tasks, orient='index')
+    pprint(tasks)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    tid            ...             NumberOfSymbolicFeatures
+    51   51            ...                                    1
+    52   52            ...                                    1
+    53   53            ...                                    1
+    54   54            ...                                    1
+    55   55            ...                                  241
+    56   56            ...                                  241
+    57   57            ...                                  241
+    58   58            ...                                  241
+    59   59            ...                                  241
+    60   60            ...                                  241
+
+    [10 rows x 18 columns]
 
 
 **OpenML 100**
@@ -320,10 +409,10 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLTask object at 0x14f56d1f36a0>
+    <openml.tasks.task.OpenMLTask object at 0x2add0149fb38>
 
 
-**Total running time of the script:** ( 0 minutes  17.841 seconds)
+**Total running time of the script:** ( 0 minutes  18.164 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:

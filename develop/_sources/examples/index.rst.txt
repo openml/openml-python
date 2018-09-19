@@ -29,26 +29,6 @@ General examples for OpenML usage.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to list and download tasks. ">
-
-.. only:: html
-
-    .. figure:: /examples/images/thumb/sphx_glr_tasks_tutorial_thumb.png
-
-        :ref:`sphx_glr_examples_tasks_tutorial.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /examples/tasks_tutorial
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="How to list and download datasets. ">
 
 .. only:: html
@@ -66,6 +46,26 @@ General examples for OpenML usage.
    :hidden:
 
    /examples/datasets_tutorial
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to list and download tasks. ">
+
+.. only:: html
+
+    .. figure:: /examples/images/thumb/sphx_glr_tasks_tutorial_thumb.png
+
+        :ref:`sphx_glr_examples_tasks_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/tasks_tutorial
 
 .. raw:: html
 
