@@ -2,34 +2,28 @@ from collections import OrderedDict
 import io
 import re
 import os
+import shutil
 
 from oslo_concurrency import lockutils
 import xmltodict
 
 from ..exceptions import OpenMLCacheException
 from ..datasets import get_dataset
-from .task import OpenMLTask
+from .task import ClassificationTask, RegressionTask, ClusteringTask
+from .. import config
+from .._api_calls import _perform_api_call
+from ..utils import _create_cache_directory_for_id
 import openml.utils
-import openml._api_calls
-
-TASKS_CACHE_DIR_NAME = 'tasks'
 
 
 def _get_cached_tasks():
-    """Return a dict of all the tasks which are cached locally.
-
-    Returns
-    -------
-    tasks : OrderedDict
-        A dict of all the cached tasks. Each task is an instance of
-        OpenMLTask.
-    """
-
     tasks = OrderedDict()
+    cache_dir = config.get_cache_directory()
 
-    task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
+    task_cache_dir = os.path.join(cache_dir, "tasks")
     directory_content = os.listdir(task_cache_dir)
     directory_content.sort()
+
     # Find all dataset ids for which we have downloaded the dataset
     # description
 
@@ -44,27 +38,15 @@ def _get_cached_tasks():
 
 
 def _get_cached_task(tid):
-    """Return a cached task based on the given id.
-
-    Parameters
-    ----------
-    tid : int
-        Id of the task.
-
-    Returns
-    -------
-    OpenMLTask
-    """
-    tid_cache_dir = openml.utils._create_cache_directory_for_id(
-        TASKS_CACHE_DIR_NAME,
-        tid
-    )
+    cache_dir = config.get_cache_directory()
+    task_cache_dir = os.path.join(cache_dir, "tasks")
+    task_file = os.path.join(task_cache_dir, str(tid), "task.xml")
 
     try:
-        with io.open(os.path.join(tid_cache_dir, "task.xml"), encoding='utf8') as fh:
-            return _create_task_from_xml(fh.read())
+        with io.open(task_file, encoding='utf8') as fh:
+            task = _create_task_from_xml(xml=fh.read())
+        return task
     except (OSError, IOError):
-        openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
         raise OpenMLCacheException("Task file for tid %d not "
                                    "cached" % tid)
 
@@ -80,7 +62,7 @@ def _get_estimation_procedure_list():
         name, type, repeats, folds, stratified.
     """
 
-    xml_string = openml._api_calls._perform_api_call("estimationprocedure/list")
+    xml_string = _perform_api_call("estimationprocedure/list")
     procs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
     if 'oml:estimationprocedures' not in procs_dict:
@@ -98,14 +80,12 @@ def _get_estimation_procedure_list():
 
     procs = []
     for proc_ in procs_dict['oml:estimationprocedures']['oml:estimationprocedure']:
-        procs.append(
-            {
-                'id': int(proc_['oml:id']),
+        proc = {'id': int(proc_['oml:id']),
                 'task_type_id': int(proc_['oml:ttid']),
                 'name': proc_['oml:name'],
-                'type': proc_['oml:type'],
-            }
-        )
+                'type': proc_['oml:type']}
+
+        procs.append(proc)
 
     return procs
 
@@ -151,7 +131,7 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
         task id, dataset id, task_type and status. If qualities are calculated
         for the associated dataset, some of these are also returned.
     """
-    return openml.utils._list_all(_list_tasks, task_type_id=task_type_id, offset=offset, size=size, tag=tag, **kwargs)
+    return openml.utils.list_all(_list_tasks, task_type_id=task_type_id, offset=offset, size=size, tag=tag, **kwargs)
 
 
 def _list_tasks(task_type_id=None, **kwargs):
@@ -197,29 +177,27 @@ def _list_tasks(task_type_id=None, **kwargs):
 
 def __list_tasks(api_call):
 
-    xml_string = openml._api_calls._perform_api_call(api_call)
+    xml_string = _perform_api_call(api_call)
     tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task', 'oml:input'))
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s'
                          % str(tasks_dict))
     elif '@xmlns:oml' not in tasks_dict['oml:tasks']:
-        raise ValueError('Error in return XML, does not contain '
+        raise ValueError('Error in return XML, does not contain '	
                          '"oml:runs"/@xmlns:oml: %s'
                          % str(tasks_dict))
     elif tasks_dict['oml:tasks']['@xmlns:oml'] != 'http://openml.org/openml':
-        raise ValueError('Error in return XML, value of  '
-                         '"oml:runs"/@xmlns:oml is not '
+        raise ValueError('Error in return XML, value of  '	
+                         '"oml:runs"/@xmlns:oml is not '	
                          '"http://openml.org/openml": %s'
                          % str(tasks_dict))
-
     assert type(tasks_dict['oml:tasks']['oml:task']) == list, \
         type(tasks_dict['oml:tasks'])
 
     tasks = dict()
     procs = _get_estimation_procedure_list()
     proc_dict = dict((x['id'], x) for x in procs)
-
     for task_ in tasks_dict['oml:tasks']['oml:task']:
         tid = None
         try:
@@ -230,7 +208,6 @@ def __list_tasks(api_call):
                     'name': task_['oml:name'],
                     'task_type': task_['oml:task_type'],
                     'status': task_['oml:status']}
-
             # Other task inputs
             for input in task_.get('oml:input', list()):
                 if input['@name'] == 'estimation_procedure':
@@ -238,7 +215,6 @@ def __list_tasks(api_call):
                 else:
                     value = input.get('#text')
                     task[input['@name']] = value
-
             # The number of qualities can range from 0 to infinity
             for quality in task_.get('oml:quality', list()):
                 if '#text' not in quality:
@@ -259,7 +235,6 @@ def __list_tasks(api_call):
                 )
             else:
                 raise KeyError('Could not find key %s in %s!' % (e, task_))
-
     return tasks
 
 
@@ -291,14 +266,17 @@ def get_task(task_id):
     task_id : int
         The OpenML task id.
     """
-    task_id = int(task_id)
-    tid_cache_dir = openml.utils._create_cache_directory_for_id(
-        TASKS_CACHE_DIR_NAME, task_id,
-    )
+    try:
+        task_id = int(task_id)
+    except:
+        raise ValueError("Task ID is neither an Integer nor can be "
+                         "cast to an Integer.")
+
+    tid_cache_dir = _create_task_cache_dir(task_id)
 
     with lockutils.external_lock(
             name='task.functions.get_task:%d' % task_id,
-            lock_path=openml.utils._create_lockfiles_dir(),
+            lock_path=os.path.join(config.get_cache_directory(), 'locks'),
     ):
         try:
             task = _get_task_description(task_id)
@@ -306,8 +284,9 @@ def get_task(task_id):
             class_labels = dataset.retrieve_class_labels(task.target_name)
             task.class_labels = class_labels
             task.download_split()
+
         except Exception as e:
-            openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
+            _remove_task_cache_dir(tid_cache_dir)
             raise e
 
     return task
@@ -318,29 +297,64 @@ def _get_task_description(task_id):
     try:
         return _get_cached_task(task_id)
     except OpenMLCacheException:
-        xml_file = os.path.join(
-            openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id),
-            "task.xml",
-        )
-        task_xml = openml._api_calls._perform_api_call("task/%d" % task_id)
+        xml_file = os.path.join(_create_task_cache_dir(task_id), "task.xml")
+        task_xml = _perform_api_call("task/%d" % task_id)
 
         with io.open(xml_file, "w", encoding='utf8') as fh:
             fh.write(task_xml)
-        return _create_task_from_xml(task_xml)
+        task = _create_task_from_xml(task_xml)
+
+    return task
 
 
-def _create_task_from_xml(xml):
-    """Create a task given a xml string.
+def _create_task_cache_directory(task_id):
+    """Create a task cache directory
+
+    In order to have a clearer cache structure and because every task
+    is cached in several files (description, split), there
+    is a directory for each task witch the task ID being the directory
+    name. This function creates this cache directory.
+
+    This function is NOT thread/multiprocessing safe.
 
     Parameters
     ----------
-    xml : string
-        Task xml representation.
+    task_id : int
+        Task ID
 
     Returns
     -------
-    OpenMLTask
+    str
+        Path of the created dataset cache directory.
     """
+    task_cache_dir = os.path.join(
+        config.get_cache_directory(), "tasks", str(task_id)
+    )
+    if os.path.exists(task_cache_dir) and os.path.isdir(task_cache_dir):
+        pass
+    elif os.path.exists(task_cache_dir) and not os.path.isdir(task_cache_dir):
+        raise ValueError('Task cache dir exists but is not a directory!')
+    else:
+        os.makedirs(task_cache_dir)
+    return task_cache_dir
+
+
+def _remove_task_cache_dir(tid_cache_dir):
+    """Remove the task cache directory
+
+    This function is NOT thread/multiprocessing safe.
+
+    Parameters
+    ----------
+    """
+    try:
+        shutil.rmtree(tid_cache_dir)
+    except (OSError, IOError):
+        raise ValueError('Cannot remove faulty task cache directory %s.'
+                         'Please do this manually!' % tid_cache_dir)
+
+
+def _create_task_from_xml(xml):
     dic = xmltodict.parse(xml)["oml:task"]
 
     estimation_parameters = dict()
@@ -356,7 +370,6 @@ def _create_task_from_xml(xml):
     if 'evaluation_measures' in inputs:
         evaluation_measures = inputs["evaluation_measures"]["oml:evaluation_measures"]["oml:evaluation_measure"]
 
-
     # Convert some more parameters
     for parameter in \
             inputs["estimation_procedure"]["oml:estimation_procedure"][
@@ -365,12 +378,40 @@ def _create_task_from_xml(xml):
         text = parameter.get("#text", "")
         estimation_parameters[name] = text
 
-    return OpenMLTask(
-        dic["oml:task_id"], dic['oml:task_type_id'], dic["oml:task_type"],
-        inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
-        inputs["source_data"]["oml:data_set"]["oml:target_feature"],
-        inputs["estimation_procedure"]["oml:estimation_procedure"][
-            "oml:type"],
-        inputs["estimation_procedure"]["oml:estimation_procedure"][
-            "oml:data_splits_url"], estimation_parameters,
-        evaluation_measures, None)
+    task_type = dic["oml:task_type"]
+    if task_type == "Supervised Classification":
+        return ClassificationTask(
+            dic["oml:task_id"],
+            dic["oml:task_type_id"],
+            task_type,
+            inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
+            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:type"],
+            estimation_parameters,
+            evaluation_measures,
+            inputs["source_data"]["oml:data_set"]["oml:target_feature"],
+            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:data_splits_url"])
+
+    elif task_type == "Supervised Regression":
+        return RegressionTask(
+            dic["oml:task_id"],
+            dic["oml:task_type_id"],
+            task_type,
+            inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
+            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:type"],
+            estimation_parameters,
+            evaluation_measures,
+            inputs["source_data"]["oml:data_set"]["oml:target_feature"],
+            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:data_splits_url"])
+
+    elif task_type == "Clustering":
+        return ClusteringTask(
+            dic["oml:task_id"],
+            dic["oml:task_type_id"],
+            task_type,
+            inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
+            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:type"],
+            estimation_parameters,
+            evaluation_measures)
+
+    else:
+        raise NotImplementedError(task_type)
