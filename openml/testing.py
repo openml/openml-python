@@ -67,7 +67,14 @@ class TestBase(unittest.TestCase):
 
     def tearDown(self):
         os.chdir(self.cwd)
-        shutil.rmtree(self.workdir)
+        try:
+            shutil.rmtree(self.workdir)
+        except PermissionError:
+            if os.name == 'nt':
+                # one of the files may still be used by another process
+                pass
+            else:
+                raise
         openml.config.server = self.production_server
 
     def _add_sentinel_to_flow_name(self, flow, sentinel=None):

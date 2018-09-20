@@ -26,7 +26,7 @@ popd
 # provided versions
 conda create -n testenv --yes python=$PYTHON_VERSION pip
 source activate testenv
-pip install nose numpy scipy cython scikit-learn==$SKLEARN_VERSION \
+pip install pytest pytest-xdist pytest-timeout numpy scipy cython scikit-learn==$SKLEARN_VERSION \
     oslo.concurrency
 
 if [[ "$EXAMPLES" == "true" ]]; then
@@ -37,10 +37,10 @@ if [[ "$DOCTEST" == "true" ]]; then
     pip install pandas sphinx_bootstrap_theme
 fi
 if [[ "$COVERAGE" == "true" ]]; then
-    pip install codecov
+    pip install codecov pytest-cov
 fi
 
 python --version
 python -c "import numpy; print('numpy %s' % numpy.__version__)"
 python -c "import scipy; print('scipy %s' % scipy.__version__)"
-python setup.py develop
+pip install -e '.[test]'
