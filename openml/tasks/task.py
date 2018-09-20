@@ -120,6 +120,9 @@ class SupervisedTask(OpenMLTask):
         if self.split is None:
             self.split = self.download_split()
 
+        return self.split.repeats, self.split.folds, self.split.samples
+
+
 
 class ClassificationTask(SupervisedTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
