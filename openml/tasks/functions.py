@@ -14,7 +14,6 @@ import openml._api_calls
 
 TASKS_CACHE_DIR_NAME = 'tasks'
 
-
 def _get_cached_tasks():
     """Return a dict of all the tasks which are cached locally.
     Returns
@@ -23,7 +22,6 @@ def _get_cached_tasks():
         A dict of all the cached tasks. Each task is an instance of
         OpenMLTask.
     """
-
     tasks = OrderedDict()
 
     task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
@@ -42,12 +40,15 @@ def _get_cached_tasks():
     return tasks
 
 
+
 def _get_cached_task(tid):
     """Return a cached task based on the given id.
+
     Parameters
     ----------
     tid : int
         Id of the task.
+
     Returns
     -------
     OpenMLTask
@@ -311,6 +312,17 @@ def _get_task_description(task_id):
         return _create_task_from_xml(task_xml)
 
 def _create_task_from_xml(xml):
+    """Create a task given a xml string.
+
+    Parameters
+    ----------
+    xml : string
+        Task xml representation.
+
+    Returns
+    -------
+    OpenMLTask
+    """
     dic = xmltodict.parse(xml)["oml:task"]
 
     estimation_parameters = dict()

@@ -25,6 +25,37 @@ class OpenMLTask(object):
         """Download dataset associated with task"""
         return datasets.get_dataset(self.dataset_id)
 
+    def push_tag(self, tag):
+        """Annotates this task with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the task.
+        """
+        data = {'task_id': self.task_id, 'tag': tag}
+        openml._api_calls._perform_api_call("/task/tag", data=data)
+
+    def remove_tag(self, tag):
+        """Removes a tag from this task on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the task.
+        """
+        data = {'task_id': self.task_id, 'tag': tag}
+        openml._api_calls._perform_api_call("/task/untag", data=data)
+
+class SupervisedTask(OpenMLTask):
+    def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
+                 estimation_parameters, evaluation_measure, target_name, data_splits_url):
+        super().__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
+                 estimation_parameters, evaluation_measure)
+        self.target_name = target_name
+        self.estimation_procedure["data_splits_url"] = data_splits_url
+        self.split = None
+
     def get_X_and_y(self):
         """Get data associated with the current task.
 
@@ -62,14 +93,13 @@ class OpenMLTask(object):
     def download_split(self):
         """Download the OpenML split for a given task.
         """
+        cached_split_file = os.path.join(
+            _create_cache_directory_for_id('tasks', self.task_id),
+            "datasplits.arff",
+        )
 
         # Not all tasks come with a split, e.g. in clustering the full dataset is always used
         if self.estimation_procedure["data_splits_url"]:
-
-            cached_split_file = os.path.join(
-                _create_cache_directory_for_id('tasks', self.task_id),
-                "datasplits.arff",
-            )
 
             try:
                 split = OpenMLSplit._from_arff_file(cached_split_file)
@@ -90,33 +120,12 @@ class OpenMLTask(object):
         if self.split is None:
             self.split = self.download_split()
 
-        return self.split.repeats, self.split.folds, self.split.samples
 
-    def push_tag(self, tag):
-        """Annotates this task with a tag on the server.
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the task.
-        """
-        data = {'task_id': self.task_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/task/tag", data=data)
-
-    def remove_tag(self, tag):
-        """Removes a tag from this task on the server.
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the task.
-        """
-        data = {'task_id': self.task_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/task/untag", data=data)
-
-class ClassificationTask(OpenMLTask):
+class ClassificationTask(SupervisedTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
                  estimation_parameters, evaluation_measure, target_name, data_splits_url, class_labels=None, cost_matrix=None):
         super().__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
-                 estimation_parameters, evaluation_measure)
+                 estimation_parameters, evaluation_measure, target_name, data_splits_url)
         self.target_name = target_name
         self.class_labels = class_labels
         self.cost_matrix = cost_matrix
@@ -126,14 +135,12 @@ class ClassificationTask(OpenMLTask):
         if cost_matrix is not None:
             raise NotImplementedError("Costmatrix")
 
-class RegressionTask(OpenMLTask):
+class RegressionTask(SupervisedTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
                  estimation_parameters, evaluation_measure, target_name, data_splits_url):
         super().__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
-                 estimation_parameters, evaluation_measure)
-        self.target_name = target_name
-        self.estimation_procedure["data_splits_url"] = data_splits_url
-        self.split = None
+                 estimation_parameters, evaluation_measure, target_name, data_splits_url)
+
 
 class ClusteringTask(OpenMLTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
@@ -141,7 +148,6 @@ class ClusteringTask(OpenMLTask):
         super().__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
                  estimation_parameters, evaluation_measure)
         self.number_of_clusters = number_of_clusters
-
 
 
 
