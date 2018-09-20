@@ -4,6 +4,8 @@ import os
 import xmltodict
 from collections import OrderedDict
 
+PREFIX = 'parameter_'
+
 
 class OpenMLRunTrace(object):
     """OpenML Run Trace: parsed output from Run Trace call
@@ -154,24 +156,19 @@ class OpenMLRunTrace(object):
         """
         trace = OrderedDict()
         # flag if setup string is in attributes
-        flag_ss = False
         attribute_idx = {att[0]: idx for idx, att in enumerate(arff_obj['attributes'])}
-        for required_attribute in ['repeat', 'fold', 'iteration', 'evaluation', 'selected']:
+        required_attributes = ['repeat', 'fold', 'iteration', 'evaluation', 'selected']
+        for required_attribute in required_attributes:
             if required_attribute not in attribute_idx:
                 raise ValueError('arff misses required attribute: %s' % required_attribute)
         if 'setup_string' in attribute_idx:
             raise ValueError('setup_string not supported for arff serialization')
-            flag_ss = True
 
         for itt in arff_obj['data']:
             repeat = int(itt[attribute_idx['repeat']])
             fold = int(itt[attribute_idx['fold']])
             iteration = int(itt[attribute_idx['iteration']])
             evaluation = float(itt[attribute_idx['evaluation']])
-            setup_string = None
-            if flag_ss:
-                if itt[attribute_idx['setup_string']] is not None:
-                    setup_string = json.loads(itt[attribute_idx['setup_string']])
             selected_value = itt[attribute_idx['selected']]
             if selected_value == 'true':
                 selected = True
@@ -180,19 +177,22 @@ class OpenMLRunTrace(object):
             else:
                 raise ValueError('expected {"true", "false"} value for selected field, received: %s' % selected_value)
 
-            # if someone needs it, he can use the parameter
-            # fields to revive the setup_string as well
-            # However, this is usually done by the OpenML server
-            # and if we are going to duplicate this functionality
-            # it needs proper testing
+            parameters = OrderedDict()
+            for attribute_name, idx in attribute_idx.items():
+                if attribute_name in required_attributes:
+                    continue
+                if attribute_name.startswith(PREFIX):
+                    parameters[attribute_name] = itt[idx]
+
 
             current = OpenMLTraceIteration(
-                repeat,
-                fold,
-                iteration,
-                setup_string,
-                evaluation,
-                selected,
+                repeat=repeat,
+                fold=fold,
+                iteration=iteration,
+                setup_string=None,
+                evaluation=evaluation,
+                selected=selected,
+                paramaters=parameters,
             )
             trace[(repeat, fold, iteration)] = current
 
@@ -301,6 +301,11 @@ class OpenMLTraceIteration(object):
                 'Can only be instantiated with either '
                 'setup_string or parameters argument.'
             )
+        elif not setup_string and not paramaters:
+            raise ValueError(
+                'Either setup_string or parameters needs to be paased as '
+                'argument.'
+            )
         if paramaters is not None and not isinstance(paramaters, OrderedDict):
             raise TypeError(
                 'argument parameters is not an instance of OrderedDict, but %s'
@@ -321,10 +326,10 @@ class OpenMLTraceIteration(object):
 
         result = {}
         # parameters have prefix 'parameter_'
-        prefix = 'parameter_'
+        PREFIX = 'parameter_'
 
         for param in self.setup_string:
-            key = param[len(prefix):]
+            key = param[len(PREFIX):]
             result[key] = json.loads(self.setup_string[param])
         return result
 
