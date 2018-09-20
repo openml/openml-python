@@ -349,7 +349,7 @@ class TestRun(TestBase):
             trace_content = run.trace.trace_to_arff()['data']
             if isinstance(clf, GridSearchCV):
                 grid_iterations = determine_grid_size(clf.param_grid)
-                self.assertEqual(len(run.trace_content),
+                self.assertEqual(len(trace_content),
                                  grid_iterations * num_folds)
             else:
                 self.assertEqual(len(trace_content),
