@@ -15,7 +15,13 @@
 import os
 import sys
 import sphinx_bootstrap_theme
+from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
 import openml
+
+
+# amueller's read/write key
+openml.config.server = "https://test.openml.org/api/v1/xml"
+openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -41,6 +47,8 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.ifconfig',
+    'sphinx.ext.autosectionlabel',
+    'sphinx_gallery.gen_gallery',
     'numpydoc'
 ]
 
@@ -63,8 +71,10 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'OpenML'
-copyright = u'2014-2017, Matthias Feurer, Andreas Müller, Farzan Majdani, ' \
-            u'Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers'
+copyright = (
+    u'2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, '
+    u'Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers'
+)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -131,10 +141,11 @@ html_theme_options = {
     # be in the form [(name, page), ..]
     'navbar_links': [
         ('Start', 'index'),
-        ('API', 'api'),
         ('User Guide', 'usage'),
+        ('API', 'api'),
         ('Changelog', 'progress'),
-        ('Contributing', 'contributing')
+        ('Contributing', 'contributing'),
+        ('Progress', 'progress'),
     ],
 
     # Render the next and previous page links in navbar. (Default: true)
@@ -204,7 +215,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = []
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -331,3 +342,19 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+# prefix each section label with the name of the document it is in, in order to avoid
+# ambiguity when there are multiple same section labels in different documents.
+autosectionlabel_prefix_document = True
+# Sphinx-gallery configuration.
+sphinx_gallery_conf = {
+    # disable mini galleries clustered by the used functions
+    'backreferences_dir': False,
+    # path to the examples
+    'examples_dirs': '../examples',
+    # path where to save gallery generated examples
+    'gallery_dirs': 'examples',
+    # compile execute examples in the examples dir
+    'filename_pattern': '.*example.py$|.*tutorial.py$',
+    #TODO: fix back/forward references for the examples.
+}

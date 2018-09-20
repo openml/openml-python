@@ -7,6 +7,8 @@
 OpenML
 ======
 
+**Collaborative Machine Learning in Python**
+
 Welcome to the documentation of the OpenML Python API, a connector to the
 collaborative machine learning platform `OpenML.org <https://www.openml.org>`_.
 The OpenML Python package allows to use datasets and tasks from OpenML together
@@ -18,8 +20,8 @@ Example
 
 .. code:: python
 
-   import openml
-   from sklearn import preprocessing, tree, pipeline
+    import openml
+    from sklearn import preprocessing, tree, pipeline
    
     # Set the OpenML API Key which is required to upload your runs.
     # You can get your own API by signing up to OpenML.org.

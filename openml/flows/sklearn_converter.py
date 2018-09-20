@@ -645,7 +645,8 @@ def _check_n_jobs(model):
             for param, value in param_grid.items():
                 # n_jobs is scikitlearn parameter for paralizing jobs
                 if param.split('__')[-1] == restricted_parameter_name:
-                    # 0 = illegal value (?), 1 = use one core,  n = use n cores
+                    # 0 = illegal value (?), 1 / None = use one core,
+                    # n = use n cores,
                     # -1 = use all available cores -> this makes it hard to
                     # measure runtime in a fair way
                     if legal_values is None or value not in legal_values:
@@ -661,7 +662,8 @@ def _check_n_jobs(model):
             isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
         raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
-    # make sure that n_jobs is not in the parameter grid of optimization procedure
+    # make sure that n_jobs is not in the parameter grid of optimization
+    # procedure
     if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
         if isinstance(model, sklearn.model_selection.GridSearchCV):
             param_distributions = model.param_grid
@@ -674,13 +676,13 @@ def _check_n_jobs(model):
                 raise AttributeError('Using subclass BaseSearchCV other than {GridSearchCV, RandomizedSearchCV}. Could not find attribute param_distributions. ')
             print('Warning! Using subclass BaseSearchCV other than ' \
                   '{GridSearchCV, RandomizedSearchCV}. Should implement param check. ')
-            
+
         if not check(param_distributions, 'n_jobs', None):
             raise PyOpenMLError('openml-python should not be used to '
                                 'optimize the n_jobs parameter.')
 
     # check the parameters for n_jobs
-    return check(model.get_params(), 'n_jobs', [1])
+    return check(model.get_params(), 'n_jobs', [1, None])
 
 
 def _deserialize_cross_validator(value):

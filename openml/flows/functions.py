@@ -16,12 +16,7 @@ def get_flow(flow_id):
     flow_id : int
         The OpenML flow id.
     """
-    # TODO add caching here!
-    try:
-        flow_id = int(flow_id)
-    except:
-        raise ValueError("Flow ID must be an int, got %s." % str(flow_id))
-
+    flow_id = int(flow_id)
     flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id)
 
     flow_dict = xmltodict.parse(flow_xml)
