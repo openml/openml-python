@@ -2,6 +2,7 @@ from collections import OrderedDict
 import io
 import re
 import os
+import six
 
 from oslo_concurrency import lockutils
 import xmltodict
@@ -336,15 +337,21 @@ def _create_task_from_xml(xml):
     OpenMLTask
     """
     dic = xmltodict.parse(xml)["oml:task"]
-
     estimation_parameters = dict()
     inputs = dict()
     # Due to the unordered structure we obtain, we first have to extract
     # the possible keys of oml:input; dic["oml:input"] is a list of
     # OrderedDicts
-    for input_ in dic["oml:input"]:
-        name = input_["@name"]
-        inputs[name] = input_
+    # Check if there is a list of inputs
+    if type(dic["oml:input"]) is list:
+        for input_ in dic["oml:input"]:
+            name = input_["@name"]
+            inputs[name] = input_
+    # https://github.com/openml/openml-python/issues/538
+    # TODO Single input. The case where there is no estimation procedure should be handled.
+    elif isinstance(dic["oml:input"], six.string_types):
+        name = dic["oml:input"]["@name"]
+        inputs[name] = dic["oml:input"]
 
     evaluation_measures = None
     if 'evaluation_measures' in inputs:
