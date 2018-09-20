@@ -343,7 +343,7 @@ def _create_task_from_xml(xml):
     # the possible keys of oml:input; dic["oml:input"] is a list of
     # OrderedDicts
     # Check if there is a list of inputs
-    if type(dic["oml:input"]) is list:
+    if isinstance(dic["oml:input"], list):
         for input_ in dic["oml:input"]:
             name = input_["@name"]
             inputs[name] = input_
