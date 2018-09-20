@@ -349,12 +349,21 @@ class TestFlow(TestBase):
         openml.flows.functions.assert_flows_equal(new_flow, flow)
         self.assertIsNot(new_flow, flow)
 
-        estimators_names = (sentinel, 'RandomizedSearchCV', 'Pipeline',
-                            'OneHotEncoder', 'StandardScaler', 'FeatureUnion',
-                            'TruncatedSVD', 'SelectPercentile',
-                            'AdaBoostClassifier', 'DecisionTreeClassifier')
-        for keyword in estimators_names:
-            self.assertTrue(keyword in new_flow.name)
+        # OneHotEncoder was moved to _encoders module in 0.20
+        module_name_encoder = ('_encoders'
+                               if LooseVersion(sklearn.__version__) >= "0.20"
+                               else 'data')
+        fixture_name = '%ssklearn.model_selection._search.RandomizedSearchCV(' \
+                       'estimator=sklearn.pipeline.Pipeline(' \
+                       'ohe=sklearn.preprocessing.%s.OneHotEncoder,' \
+                       'scaler=sklearn.preprocessing.data.StandardScaler,' \
+                       'fu=sklearn.pipeline.FeatureUnion(' \
+                       'pca=sklearn.decomposition.truncated_svd.TruncatedSVD,' \
+                       'fs=sklearn.feature_selection.univariate_selection.SelectPercentile),' \
+                       'boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
+                       'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))' \
+                        % (sentinel, module_name_encoder)
+        self.assertEqual(new_flow.name, fixture_name)
         new_flow.model.fit(X, y)
 
     def test_extract_tags(self):

@@ -358,9 +358,15 @@ class TestSklearn(unittest.TestCase):
         fu = sklearn.pipeline.FeatureUnion(
             transformer_list=[('ohe', ohe), ('scaler', scaler)])
         serialization = sklearn_to_flow(fu)
-        estimators_names = ('FeatureUnion', 'OneHotEncoder', 'StandardScaler')
-        for keyword in estimators_names:
-            self.assertTrue(keyword in serialization.name)
+        # OneHotEncoder was moved to _encoders module in 0.20
+        module_name_encoder = ('_encoders'
+                               if LooseVersion(sklearn.__version__) >= "0.20"
+                               else 'data')
+        self.assertEqual(serialization.name,
+                         'sklearn.pipeline.FeatureUnion('
+                         'ohe=sklearn.preprocessing.{}.OneHotEncoder,'
+                         'scaler=sklearn.preprocessing.data.StandardScaler)'
+                         .format(module_name_encoder))
         new_model = flow_to_sklearn(serialization)
 
         self.assertEqual(type(new_model), type(fu))
@@ -395,9 +401,10 @@ class TestSklearn(unittest.TestCase):
 
         fu.set_params(scaler=None)
         serialization = sklearn_to_flow(fu)
-        estimators_names = ('FeatureUnion', 'OneHotEncoder')
-        for keyword in estimators_names:
-            self.assertTrue(keyword in estimators_names)
+        self.assertEqual(serialization.name,
+                         'sklearn.pipeline.FeatureUnion('
+                         'ohe=sklearn.preprocessing.{}.OneHotEncoder)'
+                         .format(module_name_encoder))
         new_model = flow_to_sklearn(serialization)
         self.assertEqual(type(new_model), type(fu))
         self.assertIsNot(new_model, fu)
@@ -414,10 +421,22 @@ class TestSklearn(unittest.TestCase):
             transformer_list=[('scaler', ohe), ('ohe', scaler)])
         fu1_serialization = sklearn_to_flow(fu1)
         fu2_serialization = sklearn_to_flow(fu2)
-        estimators_names = ('FeatureUnion', 'OneHotEncoder', 'StandardScaler')
-        for keyword in estimators_names:
-            self.assertTrue(keyword in fu1_serialization.name)
-            self.assertTrue(keyword in fu2_serialization.name)
+        # OneHotEncoder was moved to _encoders module in 0.20
+        module_name_encoder = ('_encoders'
+                               if LooseVersion(sklearn.__version__) >= "0.20"
+                               else 'data')
+        self.assertEqual(
+            fu1_serialization.name,
+            "sklearn.pipeline.FeatureUnion("
+            "ohe=sklearn.preprocessing.{}.OneHotEncoder,"
+            "scaler=sklearn.preprocessing.data.StandardScaler)"
+            .format(module_name_encoder))
+        self.assertEqual(
+            fu2_serialization.name,
+            "sklearn.pipeline.FeatureUnion("
+            "scaler=sklearn.preprocessing.{}.OneHotEncoder,"
+            "ohe=sklearn.preprocessing.data.StandardScaler)"
+            .format(module_name_encoder))
 
     def test_serialize_complex_flow(self):
         ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[0])
@@ -434,13 +453,18 @@ class TestSklearn(unittest.TestCase):
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
         serialized = sklearn_to_flow(rs)
-
-        # check that the name of the estimator occur in the name of the flow
-        estimator_names = ('RandomizedSearchCV', 'Pipeline', 'OneHotEncoder',
-                           'StandardScaler', 'AdaBoostClassifier',
-                           'DecisionTreeClassifier')
-        for keyword in estimator_names:
-            self.assertTrue(keyword in serialized.name)
+        # OneHotEncoder was moved to _encoders module in 0.20
+        module_name_encoder = ('_encoders'
+                               if LooseVersion(sklearn.__version__) >= "0.20"
+                               else 'data')
+        fixture_name = ('sklearn.model_selection._search.RandomizedSearchCV(' \
+                        'estimator=sklearn.pipeline.Pipeline(' \
+                        'ohe=sklearn.preprocessing.{}.OneHotEncoder,' \
+                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
+                        'boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
+                        'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))'
+                       .format(module_name_encoder))
+        self.assertEqual(serialized.name, fixture_name)
 
         # now do deserialization
         deserialized = flow_to_sklearn(serialized)
