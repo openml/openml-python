@@ -7,12 +7,13 @@ if sys.version_info[0] >= 3:
 else:
     import mock
 
-
 import random
 import six
+import pytest
 
 from oslo_concurrency import lockutils
 
+import numpy as np
 import scipy.sparse
 
 import openml
@@ -22,7 +23,8 @@ from openml.exceptions import OpenMLCacheException, PyOpenMLError, \
 from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 
-from openml.datasets.functions import (_get_cached_dataset,
+from openml.datasets.functions import (create_dataset,
+                                       _get_cached_dataset,
                                        _get_cached_dataset_features,
                                        _get_cached_dataset_qualities,
                                        _get_cached_datasets,
@@ -340,3 +342,41 @@ class TestOpenMLDataset(TestBase):
             url="https://www.openml.org/data/download/61/dataset_61_iris.arff")
         dataset.publish()
         self.assertIsInstance(dataset.dataset_id, int)
+
+    def test_create_dataset_numpy(self):
+        data = np.array([[1, 2, 3],
+                         [1.2, 2.5, 3.8],
+                         [2, 5, 8],
+                         [0, 1, 0]]).T
+        attributes = [('col_{}'.format(i), 'REAL')
+                      for i in range(data.shape[1])]
+        name = 'NumPy_testing_dataset'
+        description = 'Synthetic dataset created from a NumPy array'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'col_{}'.format(data.shape[1] - 1)
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=citation,
+            attributes=attributes,
+            data=data,
+            format='arff',
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        dataset.publish()
