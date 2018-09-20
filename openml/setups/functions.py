@@ -7,7 +7,7 @@ import xmltodict
 
 from .. import config
 from .setup import OpenMLSetup, OpenMLParameter
-from openml.flows import flow_exists
+from openml.flows import flow_exists, SKLearnConverter
 from openml.exceptions import OpenMLServerNoResult
 import openml.utils
 
@@ -185,7 +185,7 @@ def __list_setups(api_call):
     return setups
 
 
-def initialize_model(setup_id):
+def initialize_model(setup_id, converter=SKLearnConverter):
     '''
     Initialized a model based on a setup_id (i.e., using the exact
     same parameter settings)
@@ -197,8 +197,8 @@ def initialize_model(setup_id):
 
         Returns
         -------
-        model : sklearn model
-            the scikitlearn model with all parameters initailized
+        model : an ml model
+            the model with all parameters initailized
     '''
 
     # transform an openml setup object into
@@ -240,8 +240,7 @@ def initialize_model(setup_id):
     # parameters obtained from the setup
     flow = openml.flows.get_flow(setup.flow_id)
     flow = _reconstruct_flow(flow, parameters)
-
-    return openml.flows.flow_to_sklearn(flow)
+    return converter.from_flow(flow)
 
 
 def _to_dict(flow_id, openml_parameter_settings):
