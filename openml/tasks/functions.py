@@ -381,5 +381,17 @@ def _create_task_from_xml(xml):
             estimation_parameters,
             evaluation_measures)
 
+    elif task_type == "Learning Curve":
+        return LearningCurveTask(
+            dic["oml:task_id"],
+            dic["oml:task_type_id"],
+            task_type,
+            inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
+            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:type"],
+            estimation_parameters,
+            evaluation_measures,
+            inputs["source_data"]["oml:data_set"]["oml:target_feature"],
+            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:data_splits_url"])
+
     else:
         raise NotImplementedError(task_type)

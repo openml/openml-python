@@ -152,6 +152,20 @@ class ClusteringTask(OpenMLTask):
                  estimation_parameters, evaluation_measure)
         self.number_of_clusters = number_of_clusters
 
+class LearningCurveTask(SupervisedTask):
+    def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
+                 estimation_parameters, evaluation_measure, target_name, data_splits_url, class_labels=None,
+                 cost_matrix=None):
+        super().__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
+                         estimation_parameters, evaluation_measure, target_name, data_splits_url)
+        self.target_name = target_name
+        self.class_labels = class_labels
+        self.cost_matrix = cost_matrix
+        self.estimation_procedure["data_splits_url"] = data_splits_url
+        self.split = None
+
+        if cost_matrix is not None:
+            raise NotImplementedError("Costmatrix")
 
 
 
