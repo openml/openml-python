@@ -127,7 +127,7 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
                              'exist on the server according to flow_exists')
         _publish_flow_if_necessary(flow)
 
-    data_content, trace_content, trace_attributes, fold_evaluations, sample_evaluations = res
+    data_content, trace, fold_evaluations, sample_evaluations = res
     if not isinstance(flow.flow_id, int):
         # This is the usual behaviour, where the flow object was initiated off
         # line and requires some additional information (flow_id, input_id for
@@ -153,8 +153,7 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
         model=flow.model,
         flow_name=flow.name,
         tags=tags,
-        trace_content=trace_content,
-        trace_attributes=trace_attributes,
+        trace=trace,
         data_content=data_content,
     )
     run.parameter_settings = OpenMLRun._parse_parameters(flow)
@@ -484,15 +483,16 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
     if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
         # arff_tracecontent is already set
         arff_trace_attributes = _extract_arfftrace_attributes(model_fold)
+        trace = OpenMLRunTrace.generate(arff_trace_attributes, arff_tracecontent)
     else:
-        arff_tracecontent = None
-        arff_trace_attributes = None
+        trace = None
 
-    return arff_datacontent, \
-           arff_tracecontent, \
-           arff_trace_attributes, \
-           user_defined_measures_per_fold, \
-           user_defined_measures_per_sample
+    return (
+        arff_datacontent,
+        trace,
+        user_defined_measures_per_fold,
+        user_defined_measures_per_sample,
+    )
 
 
 def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runtime, add_local_measures):

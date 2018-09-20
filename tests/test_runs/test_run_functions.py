@@ -84,7 +84,7 @@ class TestRun(TestBase):
             e.additional = str(e.additional) + '; run_id: ' + str(run_id)
             raise e
         
-        run_prime = openml.runs.run_model_on_task(task, model_prime,
+        run_prime = openml.runs.run_model_on_task(model_prime, task,
                                                   avoid_duplicate_runs=False,
                                                   seed=1)
         predictions_prime = run_prime._generate_arff_dict()
@@ -269,7 +269,7 @@ class TestRun(TestBase):
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
         self.assertRaises(AttributeError, openml.runs.run_model_on_task,
-                          task=task, model=clf, avoid_duplicate_runs=False)
+                          model=clf, task=task, avoid_duplicate_runs=False)
 
     def test_check_erronous_sklearn_flow_fails(self):
         task_id = 115
@@ -866,12 +866,16 @@ class TestRun(TestBase):
         num_repeats = 1
 
         clf = SGDClassifier(loss='log', random_state=1)
-        res = openml.runs.functions._run_task_get_arffcontent(clf, task, add_local_measures=True)
-        arff_datacontent, arff_tracecontent, _, fold_evaluations, sample_evaluations = res
+        res = openml.runs.functions._run_task_get_arffcontent(
+            clf,
+            task,
+            add_local_measures=True,
+        )
+        arff_datacontent, trace, fold_evaluations, sample_evaluations = res
         # predictions
         self.assertIsInstance(arff_datacontent, list)
         # trace. SGD does not produce any
-        self.assertIsInstance(arff_tracecontent, type(None))
+        self.assertIsInstance(trace, type(None))
 
         self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds)
 
@@ -1097,7 +1101,7 @@ class TestRun(TestBase):
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task, add_local_measures=True)
+        data_content,  _, _, _ = _run_task_get_arffcontent(model, task, add_local_measures=True)
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)
@@ -1118,8 +1122,16 @@ class TestRun(TestBase):
                 ('imputer', sklearn.preprocessing.Imputer()), ('estimator', HardNaiveBayes())
             ])
 
-            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task, add_local_measures=True)
-            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task, add_local_measures=True)
+            arff_content1, _, _, _ = _run_task_get_arffcontent(
+                clf1,
+                task,
+                add_local_measures=True,
+            )
+            arff_content2, _, _, _ = _run_task_get_arffcontent(
+                clf2,
+                task,
+                add_local_measures=True,
+            )
 
             # verifies last two arff indices (predict and correct)
             # TODO: programmatically check wether these are indeed features (predict, correct)

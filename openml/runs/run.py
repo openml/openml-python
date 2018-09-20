@@ -12,7 +12,7 @@ import xmltodict
 
 import openml
 import openml._api_calls
-from .trace import OpenMLRunTrace, OpenMLTraceIteration
+from .trace import OpenMLRunTrace
 from ..tasks import get_task
 from ..exceptions import PyOpenMLError
 
@@ -28,7 +28,7 @@ class OpenMLRun(object):
     def __init__(self, task_id, flow_id, dataset_id, setup_string=None,
                  output_files=None, setup_id=None, tags=None, uploader=None, uploader_name=None,
                  evaluations=None, fold_evaluations=None, sample_evaluations=None,
-                 data_content=None, trace_attributes=None, trace_content=None,
+                 data_content=None, trace=None,
                  model=None, task_type=None, task_evaluation_measure=None, flow_name=None,
                  parameter_settings=None, predictions_url=None, task=None,
                  flow=None, run_id=None):
@@ -48,7 +48,7 @@ class OpenMLRun(object):
         self.sample_evaluations = sample_evaluations
         self.data_content = data_content
         self.output_files = output_files
-        self.trace = self._generate_trace(trace_attributes, trace_content)
+        self.trace = trace
         self.error_message = None
         self.task = task
         self.flow = flow
@@ -198,78 +198,6 @@ class OpenMLRun(object):
         arff_dict['description'] = "\n".join(run_environment)
         arff_dict['relation'] = 'openml_task_' + str(task.task_id) + '_predictions'
         return arff_dict
-
-    @staticmethod
-    def _generate_trace(attributes, content):
-        """Generates an OpenMLRunTrace.
-
-        Generates the trace object from the attributes and content extracted
-        while running the underlying flow.
-
-        Returns
-        -------
-        OpenMLRunTrace
-        """
-
-        if content is None:
-            if attributes is None:
-                return None
-            else:
-                raise ValueError('Trace content not available.')
-        if len(content) == 0:
-            raise ValueError('Trace content is empty.')
-        if attributes is not None:
-            if len(attributes) != len(content[0]):
-                raise ValueError('Trace_attributes and trace_content not compatible')
-        else:
-            raise ValueError('No trace attributes available')
-
-        trace = OrderedDict()
-        attribute_idx = {att[0]: idx for idx, att in enumerate(attributes)}
-
-        required_attributes = ['repeat', 'fold', 'iteration', 'evaluation', 'selected']
-        for required_attribute in required_attributes:
-            if required_attribute not in attribute_idx:
-                raise ValueError('arff misses required attribute: %s' % required_attribute)
-        parameter_attributes = []
-        for attribute in attribute_idx:
-            if attribute not in required_attributes and attribute != 'setup_string':
-                parameter_attributes.append(attribute)
-
-        for itt in content:
-            repeat = int(itt[attribute_idx['repeat']])
-            fold = int(itt[attribute_idx['fold']])
-            iteration = int(itt[attribute_idx['iteration']])
-            evaluation = float(itt[attribute_idx['evaluation']])
-            selected_value = itt[attribute_idx['selected']]
-            if 'setup_string' in attribute_idx:
-                raise ValueError(
-                    'setup_string not allowed when constructing a trace object'
-                    ' run results.'
-                )
-            setup_string = None
-            if selected_value == 'true':
-                selected = True
-            elif selected_value == 'false':
-                selected = False
-            else:
-                raise ValueError('expected {"true", "false"} value for selected field, received: %s' % selected_value)
-            parameters = OrderedDict()
-            for attribute in parameter_attributes:
-                parameters[attribute] = itt[attribute_idx[attribute]]
-
-            current = OpenMLTraceIteration(
-                repeat,
-                fold,
-                iteration,
-                setup_string,
-                evaluation,
-                selected,
-                paramaters=parameters
-            )
-            trace[(repeat, fold, iteration)] = current
-
-        return OpenMLRunTrace(None, trace)
 
     def get_metric_fn(self, sklearn_fn, kwargs={}):
         """Calculates metric scores based on predicted values. Assumes the
