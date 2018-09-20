@@ -33,7 +33,7 @@ tasks = openml.tasks.list_tasks(task_type_id=1)
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
 print(tasks.columns)
 print("First 5 of %s tasks:" % len(tasks))
-tasks.head()
+pprint(tasks.head())
 
 ############################################################################
 # We can filter the list of tasks to only contain datasets with more than 500 samples, but less than 1000 samples:
@@ -64,6 +64,23 @@ print(len(filtered_tasks))
 
 tasks = openml.tasks.list_tasks(tag='OpenML100')
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
+print("First 5 of %s tasks:" % len(tasks))
+pprint(tasks.head())
+
+############################################################################
+# Furthermore, we can list tasks based on the dataset id:
+
+tasks = openml.tasks.list_tasks(data_id=61)
+tasks = pd.DataFrame.from_dict(tasks, orient='index')
+print("First 5 of %s tasks:" % len(tasks))
+pprint(tasks.head())
+
+############################################################################
+# In addition, a size limit and an offset can be applied both separately and simultaneously:
+
+tasks = openml.tasks.list_tasks(size=10, offset=50)
+tasks = pd.DataFrame.from_dict(tasks, orient='index')
+pprint(tasks)
 
 ############################################################################
 #

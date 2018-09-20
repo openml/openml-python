@@ -192,24 +192,24 @@ def _publish_flow_if_necessary(flow):
 
 
 def get_run_trace(run_id):
-    """Get the optimization trace object for a given run id.
-
-     Parameters
-     ----------
-     run_id : int
-
-     Returns
-     -------
-     openml.runs.OpenMLTrace
     """
+    Get the optimization trace object for a given run id.
 
+    Parameters
+    ----------
+    run_id : int
+
+    Returns
+    -------
+    openml.runs.OpenMLTrace
+    """
     trace_xml = openml._api_calls._perform_api_call('run/trace/%d' % run_id)
     run_trace = OpenMLRunTrace.trace_from_xml(trace_xml)
     return run_trace
 
 
 def initialize_model_from_run(run_id):
-    '''
+    """
     Initialized a model based on a run_id (i.e., using the exact
     same parameter settings)
 
@@ -222,13 +222,13 @@ def initialize_model_from_run(run_id):
         -------
         model : sklearn model
             the scikitlearn model with all parameters initailized
-    '''
+    """
     run = get_run(run_id)
     return initialize_model(run.setup_id)
 
 
 def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
-    '''
+    """
     Initialize a model based on the parameters that were set
     by an optimization procedure (i.e., using the exact same
     parameter settings)
@@ -255,7 +255,7 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
     -------
     model : sklearn model
         the scikit-learn model with all parameters initailized
-    '''
+    """
     run_trace = get_run_trace(run_id)
 
     if iteration is None:
@@ -644,7 +644,11 @@ def _extract_arfftrace(model, rep_no, fold_no):
         arff_line = [rep_no, fold_no, itt_no, test_score, selected]
         for key in model.cv_results_:
             if key.startswith('param_'):
-                serialized_value = json.dumps(model.cv_results_[key][itt_no])
+                value = model.cv_results_[key][itt_no]
+                if value is not np.ma.masked:
+                    serialized_value = json.dumps(value)
+                else:
+                    serialized_value = np.nan
                 arff_line.append(serialized_value)
         arff_tracecontent.append(arff_line)
     return arff_tracecontent
@@ -670,7 +674,7 @@ def _extract_arfftrace_attributes(model):
             # supported types should include all types, including bool, int float
             supported_basic_types = (bool, int, float, six.string_types)
             for param_value in model.cv_results_[key]:
-                if isinstance(param_value, supported_basic_types) or param_value is None:
+                if isinstance(param_value, supported_basic_types) or param_value is None or param_value is np.ma.masked:
                     # basic string values
                     type = 'STRING'
                 elif isinstance(param_value, list) and all(isinstance(i, int) for i in param_value):
