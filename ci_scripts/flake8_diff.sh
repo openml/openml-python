@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Inspired from https://github.com/scikit-learn/scikit-learn/blob/master/build_tools/travis/flake8_diff.sh
+
 # This script is used in Travis to check that PRs do not add obvious
 # flake8 violations. It relies on two things:
 #   - find common ancestor between branch and
@@ -10,7 +12,7 @@
 # Additional features:
 #   - the line numbers in Travis match the local branch on the PR
 #     author machine.
-#   - ./build_tools/travis/flake8_diff.sh can be run locally for quick
+#   - ./ci_scripts/flake8_diff.sh can be run locally for quick
 #     turn-around
 
 set -e
@@ -112,16 +114,9 @@ fi
 echo -e '\nRunning flake8 on the diff in the range' "$COMMIT_RANGE" \
      "($(git rev-list $COMMIT_RANGE | wc -l) commit(s)):"
 echo '--------------------------------------------------------------------------------'
-
-# We ignore files from sklearn/externals. Unfortunately there is no
-# way to do it with flake8 directly (the --exclude does not seem to
-# work with --diff). We could use the exclude magic in the git pathspec
-# ':!sklearn/externals' but it is only available on git 1.9 and Travis
-# uses git 1.8.
 # We need the following command to exit with 0 hence the echo in case
 # there is no match
-MODIFIED_FILES="$(git diff --name-only $COMMIT_RANGE | \
-                     grep -v 'doc/sphinxext/sphinx_gallery' || echo "no_match")"
+MODIFIED_FILES="$(git diff --name-only $COMMIT_RANGE || echo "no_match")"
 
 check_files() {
     files="$1"
@@ -135,7 +130,7 @@ check_files() {
 }
 
 if [[ "$MODIFIED_FILES" == "no_match" ]]; then
-    echo "No file outside sklearn/externals and doc/sphinxext/sphinx_gallery has been modified"
+    echo "No file has been modified"
 else
 
     check_files "$(echo "$MODIFIED_FILES" | grep -v ^examples)"
