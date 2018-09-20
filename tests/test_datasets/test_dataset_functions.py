@@ -12,6 +12,7 @@ import six
 
 from oslo_concurrency import lockutils
 
+import numpy as np
 import scipy.sparse
 
 import openml
