@@ -348,7 +348,7 @@ def _create_task_from_xml(xml):
             name = input_["@name"]
             inputs[name] = input_
     # https://github.com/openml/openml-python/issues/538
-    # TODO Single input. The case where there is no estimation procedure should be handled.
+    # TODO Handle single input and no estimation procedure.
     elif isinstance(dic["oml:input"], six.string_types):
         name = dic["oml:input"]["@name"]
         inputs[name] = dic["oml:input"]
