@@ -16,17 +16,17 @@ TASKS_CACHE_DIR_NAME = 'tasks'
 
 def _get_cached_tasks():
     """Return a dict of all the tasks which are cached locally.
-     Returns
+    Returns
     -------
     tasks : OrderedDict
         A dict of all the cached tasks. Each task is an instance of
         OpenMLTask.
     """
     tasks = OrderedDict()
+
     task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
     directory_content = os.listdir(task_cache_dir)
     directory_content.sort()
-
     # Find all dataset ids for which we have downloaded the dataset
     # description
 
@@ -69,7 +69,6 @@ def _get_cached_task(tid):
 
 def _get_estimation_procedure_list():
     """Return a list of all estimation procedures which are on OpenML.
-
     Returns
     -------
     procedures : list
@@ -111,17 +110,14 @@ def _get_estimation_procedure_list():
 def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
     """
     Return a number of tasks having the given tag and task_type_id
-
     Parameters
     ----------
     Filter task_type_id is separated from the other filters because
     it is used as task_type_id in the task description, but it is named
     type when used as a filter in list tasks call.
-
     task_type_id : int, optional
         ID of the task type as detailed
         `here <https://www.openml.org/search?type=task_type>`_.
-
         - Supervised classification: 1
         - Supervised regression: 2
         - Learning curve: 3
@@ -136,11 +132,9 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
         the maximum number of tasks to show
     tag : str, optional
         the tag to include
-
     kwargs: dict, optional
         Legal filter operators: data_tag, status, data_id, data_name, number_instances, number_features,
         number_classes, number_missing_values.
-
     Returns
     -------
     dict
@@ -155,17 +149,14 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
 def _list_tasks(task_type_id=None, **kwargs):
     """
     Perform the api call to return a number of tasks having the given filters.
-
     Parameters
     ----------
     Filter task_type_id is separated from the other filters because
     it is used as task_type_id in the task description, but it is named
     type when used as a filter in list tasks call.
-
     task_type_id : int, optional
         ID of the task type as detailed
         `here <https://www.openml.org/search?type=task_type>`_.
-
         - Supervised classification: 1
         - Supervised regression: 2
         - Learning curve: 3
@@ -174,12 +165,10 @@ def _list_tasks(task_type_id=None, **kwargs):
         - Machine Learning Challenge: 6
         - Survival Analysis: 7
         - Subgroup Discovery: 8
-
     kwargs: dict, optional
         Legal filter operators: tag, data_tag, status, limit,
         offset, data_id, data_name, number_instances, number_features,
         number_classes, number_missing_values.
-
     Returns
     -------
     dict
@@ -263,14 +252,11 @@ def __list_tasks(api_call):
 
 def get_tasks(task_ids):
     """Download tasks.
-
     This function iterates :meth:`openml.tasks.get_task`.
-
     Parameters
     ----------
     task_ids : iterable
         Integers representing task ids.
-
     Returns
     -------
     list
@@ -283,7 +269,6 @@ def get_tasks(task_ids):
 
 def get_task(task_id):
     """Download the OpenML task for a given task ID.
-
     Parameters
     ----------
     task_id : int
