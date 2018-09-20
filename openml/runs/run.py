@@ -199,7 +199,8 @@ class OpenMLRun(object):
         arff_dict['relation'] = 'openml_task_' + str(task.task_id) + '_predictions'
         return arff_dict
 
-    def _generate_trace(self, attributes, content):
+    @staticmethod
+    def _generate_trace(attributes, content):
         """Generates an OpenMLRunTrace.
 
         Generates the trace object from the attributes and content extracted

@@ -119,7 +119,7 @@ class OpenMLRunTrace(object):
         data = []
         for trace_iteration in self.trace_iterations.values():
             tit_list = []
-            for attr, attr_type in trace_attributes:
+            for attr, _ in trace_attributes:
                 if attr.startswith('parameter_'):
                     attr = attr[len('parameter_'):]
                     value = trace_iteration.get_parameters()[attr]
@@ -221,9 +221,8 @@ class OpenMLRunTrace(object):
 
         if 'oml:trace_iteration' not in result_dict:
             raise ValueError('Run does not contain valid trace. ')
-
-        assert type(result_dict['oml:trace_iteration']) == list, \
-            type(result_dict['oml:trace_iteration'])
+        if not isinstance(result_dict['oml:trace_iteration'], list):
+            raise TypeError(type(result_dict['oml:trace_iteration']))
 
         for itt in result_dict['oml:trace_iteration']:
             repeat = int(itt['oml:repeat'])

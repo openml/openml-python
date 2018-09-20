@@ -123,9 +123,13 @@ class TestRun(TestBase):
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
 
-        run_xml = run._create_description_xml()
+        # This is only a smoke check right now
+        # TODO add a few asserts here
+        run._create_description_xml()
         if run.trace is not None:
-            run_trace = run.trace.trace_to_arff()
+            # This is only a smoke check right now
+            # TODO add a few asserts here
+            run.trace.trace_to_arff()
 
         # check arff output
         self.assertEqual(len(run.data_content), num_instances)
