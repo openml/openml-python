@@ -12,7 +12,6 @@ import xmltodict
 
 import openml
 import openml._api_calls
-from .trace import OpenMLRunTrace
 from ..tasks import get_task
 from ..exceptions import PyOpenMLError
 

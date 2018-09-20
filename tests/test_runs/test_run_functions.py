@@ -871,7 +871,7 @@ class TestRun(TestBase):
             task,
             add_local_measures=True,
         )
-        arff_datacontent, trace, fold_evaluations, sample_evaluations = res
+        arff_datacontent, trace, fold_evaluations, _ = res
         # predictions
         self.assertIsInstance(arff_datacontent, list)
         # trace. SGD does not produce any
