@@ -14,7 +14,6 @@ import numpy as np
 import scipy.optimize
 import scipy.stats
 import sklearn.base
-import sklearn.compose
 import sklearn.datasets
 import sklearn.decomposition
 import sklearn.dummy
@@ -27,6 +26,7 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
 import sklearn.cluster
+import pytest
 
 if LooseVersion(sklearn.__version__) < "0.20":
     from sklearn.preprocessing import Imputer
@@ -348,15 +348,48 @@ class TestSklearn(unittest.TestCase):
         self.assertEqual(new_model_params, fu_params)
         new_model.fit(self.X, self.y)
 
+    @pytest.mark.skipif(LooseVersion(sklearn.__version__) < "0.20",
+                        reason="columntransformer introduction in 0.20.0")
     def test_serialize_column_transformer(self):
+        # temporary local import, dependend on version 0.20
+        import sklearn.compose
         model = sklearn.compose.ColumnTransformer(
             transformers=[
                 ('numeric', sklearn.preprocessing.StandardScaler(), [0, 1, 2]),
                 ('nominal', sklearn.preprocessing.OneHotEncoder(handle_unknown='ignore'), [3, 4, 5])],
             remainder='passthrough')
-        fixture_name = 'sklearn.compose.ColumnTransformer(' \
-                       'numeric=sklearn.preprocessing.StandardScaler,' \
-                       'nominal=sklearn.preprocessing.OneHotEncoder)'
+        fixture_name = 'sklearn.compose._column_transformer.ColumnTransformer(' \
+                       'numeric=sklearn.preprocessing.data.StandardScaler,' \
+                       'nominal=sklearn.preprocessing._encoders.OneHotEncoder)'
+        fixture_description = 'Automatically created scikit-learn flow.'
+        serialization = sklearn_to_flow(model)
+        self.assertEqual(serialization.name, fixture_name)
+        self.assertEqual(serialization.description, fixture_description)
+        # del serialization.model
+        new_model = flow_to_sklearn(serialization)
+        self.assertEqual(type(new_model), type(model))
+        self.assertIsNot(new_model, model)
+        serialization2 = sklearn_to_flow(new_model)
+        assert_flows_equal(serialization, serialization2)
+
+    @pytest.mark.skipif(LooseVersion(sklearn.__version__) < "0.20",
+                        reason="columntransformer introduction in 0.20.0")
+    def test_serialize_column_transformer_pipeline(self):
+        # temporary local import, dependend on version 0.20
+        import sklearn.compose
+        inner = sklearn.compose.ColumnTransformer(
+            transformers=[
+                ('numeric', sklearn.preprocessing.StandardScaler(), [0, 1, 2]),
+                ('nominal', sklearn.preprocessing.OneHotEncoder(handle_unknown='ignore'), [3, 4, 5])],
+            remainder='passthrough')
+        model = sklearn.pipeline.Pipeline(steps=[('transformer', inner),
+                                                 ('classifier', sklearn.tree.DecisionTreeClassifier())])
+        fixture_name = 'sklearn.pipeline.Pipeline('\
+                       'transformer=sklearn.compose._column_transformer.ColumnTransformer('\
+                       'numeric=sklearn.preprocessing.data.StandardScaler,'\
+                       'nominal=sklearn.preprocessing._encoders.OneHotEncoder),'\
+                       'classifier=sklearn.tree.tree.DecisionTreeClassifier)'
+
         fixture_description = 'Automatically created scikit-learn flow.'
         serialization = sklearn_to_flow(model)
         self.assertEqual(serialization.name, fixture_name)
