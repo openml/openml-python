@@ -73,8 +73,6 @@ dataset = openml.datasets.functions.create_dataset(
     # Attributes of the data
     attributes=attributes,
     data=data,
-    # Format of the dataset. Only 'arff' for now.
-    format='arff',
     # A version label which is provided by the user.
     version_label='test',
     original_data_url='https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Diagnostic)',
