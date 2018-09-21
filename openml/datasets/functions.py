@@ -353,6 +353,29 @@ def get_dataset(dataset_id):
     return dataset
 
 
+def _pandas_dtype_to_arff_dtype(df, column_name, column_dtype):
+    """Map Pandas dtype to ARFF dtype
+
+    Arguments:
+        df : DataFrame, shape (n_samples, n_features)
+            The dataframe containing the data.
+        column_name : str
+            The name of the column for which we want to infer the dtype.
+        column_dtype : dtype
+            The Pandas data type of the column of interest.
+
+    Returns:
+        arff_dtype : str
+            The ARFF dtype for the given column.
+    """
+    if column_dtype.name == 'category':
+        return df[column_name].unique().tolist()
+    elif column_dtype.name == 'object':
+        return 'STRING'
+    else:
+        return 'NUMERIC'
+
+
 def create_dataset(name, description, creator, contributor, collection_date,
                    language, licence, attributes, data, default_target_attribute,
                    row_id_attribute, ignore_attribute, citation, format="arff",
@@ -381,8 +404,10 @@ def create_dataset(name, description, creator, contributor, collection_date,
         Starts with 1 upper case letter, rest lower case, e.g. 'English'.
     licence : str
         License of the data.
-    attributes : list
+    attributes : list or 'auto'
         A list of tuples. Each tuple consists of the attribute name and type.
+        If passing a pandas DataFrame, the attributes can be automatically
+        inferred by passing ``'auto'``.
     data : numpy.ndarray
         An array that contains both the attributes and the targets, with
         shape=(n_samples, n_features).
@@ -411,10 +436,25 @@ def create_dataset(name, description, creator, contributor, collection_date,
     -------
     class:`openml.OpenMLDataset`
         Dataset description."""
+
+    if attributes == 'auto':
+        if not hasattr(data, "columns"):
+            raise ValueError("Automatically inferring the attributes required "
+                             "a pandas DataFrame. A {!r} was given instead."
+                             .format(data))
+        # infer the type of data for each column of the DataFrame
+        attributes_ = [(col_name,
+                        _pandas_dtype_to_arff_dtype(data, col_name, col_dtype))
+                       for col_name, col_dtype in data.dtypes.iteritems()]
+    else:
+        attributes_ = attributes
+
+    data = data.values if hasattr(data, "columns") else data
+
     arff_object = {
         'relation': name,
         'description': description,
-        'attributes': attributes,
+        'attributes': attributes_,
         'data': data
     }
 

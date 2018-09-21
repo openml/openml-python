@@ -12,6 +12,7 @@ import six
 
 from oslo_concurrency import lockutils
 
+import pytest
 import numpy as np
 import scipy.sparse
 
@@ -373,6 +374,65 @@ class TestOpenMLDataset(TestBase):
             citation=citation,
             attributes=attributes,
             data=data,
+            format='arff',
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        dataset.publish()
+
+    def test_create_dataset_pandas(self):
+        # pandas is only a optional dependency and we need to skip the test if
+        # it is not installed.
+        pd = pytest.importorskip('pandas')
+        data = [
+            ['a', 'sunny', 85.0, 85.0, 'FALSE', 'no'],
+            ['b', 'sunny', 80.0, 90.0, 'TRUE', 'no'],
+            ['c', 'overcast', 83.0, 86.0, 'FALSE', 'yes'],
+            ['d', 'rainy', 70.0, 96.0, 'FALSE', 'yes'],
+            ['e', 'rainy', 68.0, 80.0, 'FALSE', 'yes'],
+            ['f', 'rainy', 65.0, 70.0, 'TRUE', 'no'],
+            ['g', 'overcast', 64.0, 65.0, 'TRUE', 'yes'],
+            ['h', 'sunny', 72.0, 95.0, 'FALSE', 'no'],
+            ['i', 'sunny', 69.0, 70.0, 'FALSE', 'yes'],
+            ['j', 'rainy', 75.0, 80.0, 'FALSE', 'yes'],
+            ['k', 'sunny', 75.0, 70.0, 'TRUE', 'yes'],
+            ['l', 'overcast', 72.0, 90.0, 'TRUE', 'yes'],
+            ['m', 'overcast', 81.0, 75.0, 'FALSE', 'yes'],
+            ['n', 'rainy', 71.0, 91.0, 'TRUE', 'no']
+        ]
+        column_names = ['rnd_str', 'outlook', 'temperature', 'humidity',
+                        'windy', 'play']
+        df = pd.DataFrame(data, columns=column_names)
+        # enforce the type of each column
+        df['outlook'] = df['outlook'].astype('category')
+        df['windy'] = df['windy'].astype('category')
+        df['play'] = df['play'].astype('category')
+        # meta-information
+        name = 'Pandas_testing_dataset'
+        description = 'Synthetic dataset created from a Pandas DataFrame'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'play'
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=citation,
+            attributes='auto',
+            data=df,
             format='arff',
             version_label='test',
             original_data_url=original_data_url,
