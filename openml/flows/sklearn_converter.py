@@ -321,8 +321,9 @@ def _extract_information_from_model(model):
                     # length 2 is for {VotingClassifier.estimators, Pipeline.steps, FeatureUnion.transformer_list}
                     # length 3 is for ColumnTransformer
                     raise ValueError('Length of tuple does not match assumptions')
-                if not isinstance(sub_component, OpenMLFlow):
-                    raise ValueError('Second item of tuple does not match assumptions')
+                if not isinstance(sub_component, (OpenMLFlow, type(None))):
+                    raise ValueError('Second item of tuple does not match assumptions. '\
+                                     'Expected OpenMLFlow, got %s' % type(sub_component))
 
                 if identifier in reserved_keywords:
                     parent_model_name = model.__module__ + "." + \
