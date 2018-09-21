@@ -126,7 +126,7 @@ class OpenMLDataset(object):
         self.original_data_url = original_data_url
         self.paper_url = paper_url
         self.update_comment = update_comment
-        self.md5_cheksum = md5_checksum
+        self.md5_checksum = md5_checksum
         self.data_file = data_file
         self.features = None
         self.qualities = None
