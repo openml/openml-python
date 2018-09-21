@@ -50,7 +50,7 @@ class OpenMLTask(object):
 class SupervisedTask(OpenMLTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
                  estimation_parameters, evaluation_measure, target_name, data_splits_url):
-        super().__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
+        super(SupervisedTask, self).__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
                  estimation_parameters, evaluation_measure)
         self.target_name = target_name
         self.estimation_procedure["data_splits_url"] = data_splits_url
