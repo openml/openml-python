@@ -112,35 +112,14 @@ class SupervisedTask(OpenMLTask):
             "datasplits.arff",
         )
 
-        # Not all tasks come with a split, e.g. in clustering the full
-        # dataset is always used
-        if self.estimation_procedure["data_splits_url"]:
+        try:
+            split = OpenMLSplit._from_arff_file(cached_split_file)
+        except (OSError, IOError):
+            # Next, download and cache the associated split file
+            self._download_split(cached_split_file)
+            split = OpenMLSplit._from_arff_file(cached_split_file)
 
-            try:
-                split = OpenMLSplit._from_arff_file(cached_split_file)
-            except (OSError, IOError):
-                # Next, download and cache the associated split file
-                self._download_split(cached_split_file)
-                split = OpenMLSplit._from_arff_file(cached_split_file)
-
-            return split
-
-        else:  # if no data splits are used
-            no_split = {
-                0: {
-                    0: {
-                        0: (
-                            list(range(self.get_dataset().get_data().shape[0])),
-                            list(range(self.get_dataset().get_data().shape[0])))
-                    }
-                }
-            }
-            split = OpenMLSplit(
-                'no_split',
-                'no actual split, all points in train and test',
-                no_split,
-            )
-            return split
+        return split
 
     def get_split_dimensions(self):
         if self.split is None:

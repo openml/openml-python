@@ -359,62 +359,32 @@ def _create_task_from_xml(xml):
         estimation_parameters[name] = text
 
     task_type = dic["oml:task_type"]
-    if task_type == "Supervised Classification":
-        return ClassificationTask(
-            dic["oml:task_id"],
-            dic["oml:task_type_id"],
-            task_type,
-            inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
-            inputs["estimation_procedure"][
+    common_kwargs = {
+        'task_id': dic["oml:task_id"],
+        'task_type': task_type,
+        'task_type_id': dic["oml:task_type_id"],
+        'data_set_id': inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
+        'estimation_procedure_type': inputs["estimation_procedure"][
                 "oml:estimation_procedure"]["oml:type"],
-            estimation_parameters,
-            evaluation_measures,
-            inputs["source_data"]["oml:data_set"]["oml:target_feature"],
-            inputs["estimation_procedure"][
-                "oml:estimation_procedure"]["oml:data_splits_url"],
-        )
+        'estimation_parameters': estimation_parameters,
+        'evaluation_measure': evaluation_measures,
+    }
+    if task_type in (
+        "Supervised Classification",
+        "Supervised Regression",
+        "Learning Curve"
+    ):
+        common_kwargs['target_name'] = inputs[
+                "source_data"]["oml:data_set"]["oml:target_feature"]
+        common_kwargs['data_splits_url'] = inputs["estimation_procedure"][
+                "oml:estimation_procedure"]["oml:data_splits_url"]
 
-    elif task_type == "Supervised Regression":
-        return RegressionTask(
-            dic["oml:task_id"],
-            dic["oml:task_type_id"],
-            task_type,
-            inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
-            inputs["estimation_procedure"][
-                "oml:estimation_procedure"]["oml:type"],
-            estimation_parameters,
-            evaluation_measures,
-            inputs["source_data"]["oml:data_set"]["oml:target_feature"],
-            inputs["estimation_procedure"][
-                "oml:estimation_procedure"]["oml:data_splits_url"],
-        )
-
-    elif task_type == "Clustering":
-        return ClusteringTask(
-            dic["oml:task_id"],
-            dic["oml:task_type_id"],
-            task_type,
-            inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
-            inputs["estimation_procedure"][
-                "oml:estimation_procedure"]["oml:type"],
-            estimation_parameters,
-            evaluation_measures,
-        )
-
-    elif task_type == "Learning Curve":
-        return LearningCurveTask(
-            dic["oml:task_id"],
-            dic["oml:task_type_id"],
-            task_type,
-            inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
-            inputs["estimation_procedure"][
-                "oml:estimation_procedure"]["oml:type"],
-            estimation_parameters,
-            evaluation_measures,
-            inputs["source_data"]["oml:data_set"]["oml:target_feature"],
-            inputs["estimation_procedure"][
-                "oml:estimation_procedure"]["oml:data_splits_url"],
-        )
-
-    else:
-        raise NotImplementedError(task_type)
+    cls = {
+        "Supervised Classification": ClassificationTask,
+        "Supervised Regression": RegressionTask,
+        "Clustering": ClassificationTask,
+        "Learning Curve": LearningCurveTask,
+    }.get(task_type)
+    if cls is None:
+        raise NotImplementedError('Task type %s not supported.')
+    return cls(**common_kwargs)
