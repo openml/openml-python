@@ -91,7 +91,8 @@ def _get_cached_dataset(dataset_id):
     arff_file = _get_cached_dataset_arff(dataset_id)
     features = _get_cached_dataset_features(dataset_id)
     qualities = _get_cached_dataset_qualities(dataset_id)
-    dataset = _create_dataset_from_description(description, features, qualities, arff_file)
+    dataset = _create_dataset_from_description(description, features,
+                                               qualities, arff_file)
 
     return dataset
 
