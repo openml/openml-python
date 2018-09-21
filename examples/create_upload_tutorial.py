@@ -136,7 +136,7 @@ data = [
     ['n', 'rainy', 71.0, 91.0, 'TRUE', 'no']
 ]
 column_names = ['rnd_str', 'outlook', 'temperature', 'humidity',
-            'windy', 'play']
+                'windy', 'play']
 df = pd.DataFrame(data, columns=column_names)
 # enforce the categorical column to have a categorical dtype
 df['outlook'] = df['outlook'].astype('category')
