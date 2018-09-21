@@ -44,7 +44,8 @@ setuptools.setup(name="openml",
                      'scikit-learn>=0.18',
                      'nbformat',
                      'python-dateutil',
-                     'oslo.concurrency',
+                     'oslo.concurrency'
+                     'pandas',
                  ],
                  extras_require={
                      'test': [
