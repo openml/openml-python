@@ -237,12 +237,6 @@ class TestOpenMLDataset(TestBase):
         openml.config.server = self.production_server
         self.assertRaises(PrivateDatasetError, openml.datasets.get_dataset, 45)
 
-
-    def test_get_dataset_with_string(self):
-        dataset = openml.datasets.get_dataset(101)
-        self.assertRaises(PyOpenMLError, dataset._get_arff, 'arff')
-        self.assertRaises(PyOpenMLError, dataset.get_data)
-
     def test_get_dataset_sparse(self):
         dataset = openml.datasets.get_dataset(102)
         X = dataset.get_data()
