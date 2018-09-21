@@ -9,9 +9,10 @@ import xmltodict
 from ..exceptions import OpenMLCacheException
 from ..datasets import get_dataset
 from .task import (
-    ClassificationTaskOpenML,
-    RegressionTaskOpenML,
-    LearningCurveTaskOpenML,
+    OpenMLClassificationTask,
+    OpenMLRegressionTask,
+    OpenMLClusteringTask,
+    OpenMLLearningCurveTask,
 )
 import openml.utils
 import openml._api_calls
@@ -379,10 +380,10 @@ def _create_task_from_xml(xml):
                 "oml:estimation_procedure"]["oml:data_splits_url"]
 
     cls = {
-        "Supervised Classification": ClassificationTaskOpenML,
-        "Supervised Regression": RegressionTaskOpenML,
-        "Clustering": ClassificationTaskOpenML,
-        "Learning Curve": LearningCurveTaskOpenML,
+        "Supervised Classification": OpenMLClassificationTask,
+        "Supervised Regression": OpenMLRegressionTask,
+        "Clustering": OpenMLClusteringTask,
+        "Learning Curve": OpenMLLearningCurveTask,
     }.get(task_type)
     if cls is None:
         raise NotImplementedError('Task type %s not supported.')
