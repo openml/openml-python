@@ -428,6 +428,7 @@ class OpenMLDataset(object):
             if scipy.sparse.issparse(y):
                 y = np.asarray(y.todense()).astype(target_dtype).flatten()
             y = self._convert_array_format(y, dataset_format, attribute_names)
+            y = y.astype(target_dtype) if dataset_format == 'array' else y
 
             rval.append(x)
             rval.append(y)
