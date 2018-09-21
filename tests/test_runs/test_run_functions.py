@@ -1,5 +1,6 @@
 import arff
 import collections
+from distutils.version import LooseVersion
 import json
 import os
 import random
@@ -12,6 +13,7 @@ import openml
 import openml.exceptions
 import openml._api_calls
 import sklearn
+import pytest
 
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent, \
@@ -353,6 +355,20 @@ class TestRun(TestBase):
         pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
                                     ('dummy', DummyClassifier(strategy='prior'))])
         self._run_and_upload(pipeline1, '62501')
+
+    @pytest.mark.skipif(LooseVersion(sklearn.__version__) < "0.20",
+                        reason="columntransformer introduction in 0.20.0")
+    def test_run_and_upload_column_transformer_pipeline(self):
+        import sklearn.compose
+        inner = sklearn.compose.ColumnTransformer(
+            transformers=[
+                ('numeric', sklearn.preprocessing.StandardScaler(), [0, 1, 2]),
+                ('nominal', sklearn.preprocessing.OneHotEncoder(handle_unknown='ignore'), [3, 4, 5])],
+            remainder='passthrough')
+        pipeline = sklearn.pipeline.Pipeline(
+            steps=[('transformer', inner),
+                   ('classifier', sklearn.tree.DecisionTreeClassifier())])
+        self._run_and_upload(pipeline, '62501')
 
     def test_run_and_upload_decision_tree_pipeline(self):
         pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),

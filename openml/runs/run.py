@@ -442,7 +442,9 @@ class OpenMLRun(object):
                         # inside a feature union or pipeline
                         if not isinstance(_tmp, (list, tuple)):
                             raise e
-                        for step_name, step in _tmp:
+                        for _temp_step in _tmp:
+                            step_name = _temp_step[0]
+                            step = _temp_step[1]
                             if isinstance(step_name, openml.flows.OpenMLFlow):
                                 raise e
                             elif not isinstance(step, openml.flows.OpenMLFlow):
