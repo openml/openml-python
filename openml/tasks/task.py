@@ -141,14 +141,14 @@ class ClassificationTask(SupervisedTask):
 class RegressionTask(SupervisedTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
                  estimation_parameters, evaluation_measure, target_name, data_splits_url):
-        super(RegressionTask, self)).__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
+        super(RegressionTask, self).__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
                  estimation_parameters, evaluation_measure, target_name, data_splits_url)
 
 
 class ClusteringTask(OpenMLTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
                  estimation_parameters, evaluation_measure, number_of_clusters=None):
-        super(ClusteringTask, self)).__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
+        super(ClusteringTask, self).__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
                  estimation_parameters, evaluation_measure)
         self.number_of_clusters = number_of_clusters
 
@@ -156,7 +156,7 @@ class LearningCurveTask(SupervisedTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
                  estimation_parameters, evaluation_measure, target_name, data_splits_url, class_labels=None,
                  cost_matrix=None):
-        super(LearningCurveTask, self)).__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
+        super(LearningCurveTask, self).__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
                          estimation_parameters, evaluation_measure, target_name, data_splits_url)
         self.target_name = target_name
         self.class_labels = class_labels
