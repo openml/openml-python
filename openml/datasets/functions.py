@@ -374,10 +374,11 @@ def _pandas_dtype_to_arff_dtype(df, column_name, column_dtype):
         # categorical column can contain mixed type and we should therefore
         # raise an error asking to convert all enties to string.
         if not all([isinstance(cat, six.string_types) for cat in arff_dtype]):
-            raise ValueError("The column '{}' of the dataframe is of 'category' "
-                             "dtype. Therefore, all values in this columns "
-                             "should be string. Please convert the entries "
-                             "which are not string.".format(column_name))
+            raise ValueError("The column '{}' of the dataframe is of "
+                             "'category' dtype. Therefore, all values in this "
+                             "columns should be string. Please convert the "
+                             "entries which are not string."
+                             .format(column_name))
     elif column_dtype.name == 'object':
         arff_dtype = 'STRING'
     else:
