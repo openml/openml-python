@@ -619,7 +619,6 @@ def _create_dataset_from_description(description, features, qualities, arff_file
     dataset = OpenMLDataset(
         description["oml:name"],
         description.get("oml:description"),
-        description["oml:format"],
         description["oml:id"],
         description["oml:version"],
         description.get("oml:creator"),
@@ -642,5 +641,7 @@ def _create_dataset_from_description(description, features, qualities, arff_file
         description.get("oml:md5_checksum"),
         data_file=arff_file,
         features=features,
-        qualities=qualities)
+        qualities=qualities,
+        format=description["oml:format"],
+    )
     return dataset
