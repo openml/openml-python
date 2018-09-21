@@ -192,16 +192,31 @@ class OpenMLRun(object):
         class_labels = task.class_labels
 
         arff_dict = OrderedDict()
-        arff_dict['attributes'] = [('repeat', 'NUMERIC'),  # lowercase 'numeric' gives an error
-                                   ('fold', 'NUMERIC'),
-                                   ('sample', 'NUMERIC'),
-                                   ('row_id', 'NUMERIC')] + \
-            [('confidence.' + class_labels[i], 'NUMERIC') for i in range(len(class_labels))] +\
-            [('prediction', class_labels),
-             ('correct', class_labels)]
         arff_dict['data'] = self.data_content
         arff_dict['description'] = "\n".join(run_environment)
         arff_dict['relation'] = 'openml_task_' + str(task.task_id) + '_predictions'
+
+        # Separate these out? Normal classification doesn't need 'sample'
+        if task.task_type in ['Supervised Classification', 'Learning Curve']:
+            arff_dict['attributes'] = [('repeat', 'NUMERIC'),  # lowercase 'numeric' gives an error
+                                       ('fold', 'NUMERIC'),
+                                       ('sample', 'NUMERIC'),
+                                       ('row_id', 'NUMERIC')] + \
+                [('confidence.' + class_labels[i], 'NUMERIC') for i in range(len(class_labels))] +\
+               [('prediction', class_labels),
+                 ('correct', class_labels)]
+
+        elif task.task_type == 'Supervised Regression':
+            arff_dict['attributes'] = [('repeat', 'NUMERIC'),
+                                       ('fold', 'NUMERIC'),
+                                       ('row_id', 'NUMERIC')] + \
+               [('prediction', class_labels),
+                 ('truth', class_labels)]
+
+        elif task.task_type == 'Clustering':
+            arff_dict['attributes'] = [('row_id', 'NUMERIC'),
+                                       ('cluster', 'NUMERIC')]
+
         return arff_dict
 
     def _generate_trace_arff_dict(self):
@@ -328,9 +343,9 @@ class OpenMLRun(object):
         self : OpenMLRun
         """
         if self.model is None:
-            raise PyOpenMLError("OpenMLRun obj does not contain a model. (This should never happen.) ");
+            raise PyOpenMLError("OpenMLRun obj does not contain a model. (This should never happen.) ")
         if self.flow_id is None:
-            raise PyOpenMLError("OpenMLRun obj does not contain a flow id. (Should have been added while executing the task.) ");
+            raise PyOpenMLError("OpenMLRun obj does not contain a flow id. (Should have been added while executing the task.) ")
 
         description_xml = self._create_description_xml()
         file_elements = {'description': ("description.xml", description_xml)}

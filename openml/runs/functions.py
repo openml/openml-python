@@ -85,7 +85,7 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
         Result of the run.
     """
     if flow_tags is not None and not isinstance(flow_tags, list):
-        raise ValueError("flow_tags should be list")
+        raise ValueError("flow_tags should be a list")
 
     # TODO: At some point in the future do not allow for arguments in old order (order changed 6-2018).
     if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
@@ -108,10 +108,6 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
         _copy_server_fields(flow_from_server, flow)
 
     dataset = task.get_dataset()
-
-    if task.class_labels is None:
-        raise ValueError('The task has no class labels. This method currently '
-                         'only works for tasks with class labels.')
 
     run_environment = _get_version_information()
     tags = ['openml-python', run_environment[1]]
@@ -415,17 +411,6 @@ def _prediction_to_row(rep_no, fold_no, sample_no, row_id, correct_label,
 
 def _run_task_get_arffcontent(model, task, add_local_measures):
 
-    def _prediction_to_probabilities(y, model_classes):
-        # y: list or numpy array of predictions
-        # model_classes: sklearn classifier mapping from original array id to prediction index id
-        if not isinstance(model_classes, list):
-            raise ValueError('please convert model classes to list prior to calling this fn')
-        result = np.zeros((len(y), len(model_classes)), dtype=np.float32)
-        for obs, prediction_idx in enumerate(y):
-            array_idx = model_classes.index(prediction_idx)
-            result[obs][array_idx] = 1.0
-        return result
-
     arff_datacontent = []
     arff_tracecontent = []
     # stores fold-based evaluation measures. In case of a sample based task,
@@ -593,32 +578,51 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
         modelpredict_starttime = time.process_time()
 
     PredY = model.predict(testX)
-    try:
-        ProbaY = model.predict_proba(testX)
-    except AttributeError:
-        ProbaY = _prediction_to_probabilities(PredY, list(model_classes))
+
+    # TODO: do we want predict_proba included in the runtime measurement?
+    # That would count prediction time twice? Moved it after the time measurement now
 
     if can_measure_runtime:
         modelpredict_duration = (time.process_time() - modelpredict_starttime) * 1000
         user_defined_measures['usercpu_time_millis_testing'] = modelpredict_duration
         user_defined_measures['usercpu_time_millis'] = modelfit_duration + modelpredict_duration
 
-    if ProbaY.shape[1] != len(task.class_labels):
-        warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" % (rep_no, fold_no, ProbaY.shape[1], len(task.class_labels)))
-
     # add client-side calculated metrics. These might be used on the server as consistency check
     def _calculate_local_measure(sklearn_fn, openml_name):
         user_defined_measures[openml_name] = sklearn_fn(testY, PredY)
 
-    if add_local_measures:
-        _calculate_local_measure(sklearn.metrics.accuracy_score, 'predictive_accuracy')
-
+    # Task type specific outputs
     arff_datacontent = []
-    for i in range(0, len(test_indices)):
-        arff_line = _prediction_to_row(rep_no, fold_no, sample_no,
-                                       test_indices[i], task.class_labels[testY[i]],
-                                       PredY[i], ProbaY[i], task.class_labels, model_classes)
-        arff_datacontent.append(arff_line)
+
+    if task.task_type in ['Supervised Classification', 'Learning Curve']:
+        try:
+            ProbaY = model.predict_proba(testX)
+        except AttributeError:
+            ProbaY = _prediction_to_probabilities(PredY, list(model_classes))
+
+        if ProbaY.shape[1] != len(task.class_labels):
+            warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" % (
+            rep_no, fold_no, ProbaY.shape[1], len(task.class_labels)))
+
+        if add_local_measures:
+            _calculate_local_measure(sklearn.metrics.accuracy_score, 'predictive_accuracy')
+
+        for i in range(0, len(test_indices)):
+            arff_line = _prediction_to_row(rep_no, fold_no, sample_no,
+                                           test_indices[i], task.class_labels[testY[i]],
+                                           PredY[i], ProbaY[i], task.class_labels, model_classes)
+            arff_datacontent.append(arff_line)
+
+    elif task.task_type == 'Supervised Regression':
+        for i in range(0, len(test_indices)):
+            arff_line = [rep_no, fold_no, row_id, PredY[i], testY[i]]
+            arff_datacontent.append(arff_line)
+
+    elif task.task_type == 'Clustering':
+        for i in range(0, len(test_indices)):
+            arff_line = [row_id, PredY[i]]
+            arff_datacontent.append(arff_line)
+
     return arff_datacontent, arff_tracecontent, user_defined_measures, model
 
 
