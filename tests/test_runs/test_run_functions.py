@@ -363,7 +363,8 @@ class TestRun(TestBase):
         inner = sklearn.compose.ColumnTransformer(
             transformers=[
                 ('numeric', sklearn.preprocessing.StandardScaler(), [0, 1, 2]),
-                ('nominal', sklearn.preprocessing.OneHotEncoder(handle_unknown='ignore'), [3, 4, 5])],
+                ('nominal', sklearn.preprocessing.OneHotEncoder(
+                    handle_unknown='ignore'), [3, 4, 5])],
             remainder='passthrough')
         pipeline = sklearn.pipeline.Pipeline(
             steps=[('transformer', inner),
