@@ -355,7 +355,7 @@ def get_dataset(dataset_id):
 
 def create_dataset(name, description, creator, contributor, collection_date,
                    language, licence, attributes, data, default_target_attribute,
-                   row_id_attribute, ignore_attribute, citation, format="arff",
+                   row_id_attribute, ignore_attribute, citation,
                    original_data_url=None, paper_url=None, update_comment=None,
                    version_label=None):
     """Create a dataset.
@@ -396,8 +396,6 @@ def create_dataset(name, description, creator, contributor, collection_date,
         Attributes that should be excluded in modelling, such as identifiers and indexes.
     citation : str
         Reference(s) that should be cited when building on this data.
-    format : str, optional
-        Format of the dataset. Only 'arff' for now.
     version_label : str, optional
         Version label provided by user, can be a date, hash, or some other type of id.
     original_data_url : str, optional
@@ -428,7 +426,7 @@ def create_dataset(name, description, creator, contributor, collection_date,
         raise ValueError("The arguments you have provided \
                              do not construct a valid arff file")
 
-    return OpenMLDataset(name, description, format, creator=creator,
+    return OpenMLDataset(name, description, creator=creator,
                          contributor=contributor, collection_date=collection_date,
                          language=language, licence=licence, default_target_attribute=default_target_attribute,
                          row_id_attribute=row_id_attribute, ignore_attribute=ignore_attribute, citation=citation,
