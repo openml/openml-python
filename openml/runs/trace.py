@@ -323,7 +323,8 @@ class OpenMLRunTrace(object):
         Returns
         -------
         run : OpenMLRunTrace
-            Object containing run id and a dict containing the trace iterations.
+            Object containing the run id and a dict containing the trace
+            iterations.
         """
         result_dict = xmltodict.parse(
             xml, force_list=('oml:trace_iteration',)
