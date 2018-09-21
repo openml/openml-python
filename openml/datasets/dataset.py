@@ -207,8 +207,8 @@ class OpenMLDataset(object):
                 with open(self.data_pickle_file, "wb") as fh:
                     pickle.dump((X, categorical, attribute_names), fh, -1)
                 logger.debug("Saved dataset %d: %s to file %s" %
-                                (int(self.dataset_id or -1),
-                                 self.name, self.data_pickle_file))
+                             (int(self.dataset_id or -1), self.name,
+                              self.data_pickle_file))
 
     def push_tag(self, tag):
         """Annotates this data set with a tag on the server.
@@ -405,9 +405,10 @@ class OpenMLDataset(object):
                     "Number of requested targets %d is not implemented." %
                     np.sum(targets)
                 )
-            target_categorical = [cat
-            for cat, column in six.moves.zip(categorical, attribute_names)
-            if column in target
+            target_categorical = [
+                cat for cat, column in six.moves.zip(categorical,
+                                                     attribute_names)
+                if column in target
             ]
             target_dtype = int if target_categorical[0] else float
 
@@ -417,16 +418,16 @@ class OpenMLDataset(object):
             else:
                 x = data[:, ~targets]
                 y = data[:, targets].astype(target_dtype)
-            y = y.squeeze()
 
-            categorical = [cat for cat, t in
-                            zip(categorical, targets) if not t]
-            attribute_names = [att for att, k in
-                                zip(attribute_names, targets) if not k]
+            categorical = [cat for cat, t in zip(categorical, targets)
+                           if not t]
+            attribute_names = [att for att, k in zip(attribute_names, targets)
+                               if not k]
 
             x = self._convert_array_format(x, dataset_format, attribute_names)
             if scipy.sparse.issparse(y):
                 y = np.asarray(y.todense()).astype(target_dtype).flatten()
+            y = y.squeeze()
             y = self._convert_array_format(y, dataset_format, attribute_names)
             y = y.astype(target_dtype) if dataset_format == 'array' else y
 
