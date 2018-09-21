@@ -369,11 +369,20 @@ def _pandas_dtype_to_arff_dtype(df, column_name, column_dtype):
             The ARFF dtype for the given column.
     """
     if column_dtype.name == 'category':
-        return df[column_name].unique().tolist()
+        arff_dtype = df[column_name].unique().tolist()
+        # for categorical feature, arff expects a list string. However, a
+        # categorical column can contain mixed type and we should therefore
+        # raise an error asking to convert all enties to string.
+        if not all([isinstance(cat, six.string_types) for cat in arff_dtype]):
+            raise ValueError("The column '{}' of the dataframe is of 'category' "
+                             "dtype. Therefore, all values in this columns "
+                             "should be string. Please convert the entries "
+                             "which are not string.".format(column_name))
     elif column_dtype.name == 'object':
-        return 'STRING'
+        arff_dtype = 'STRING'
     else:
-        return 'NUMERIC'
+        arff_dtype = 'NUMERIC'
+    return arff_dtype
 
 
 def create_dataset(name, description, creator, contributor, collection_date,

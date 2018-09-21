@@ -439,3 +439,53 @@ class TestOpenMLDataset(TestBase):
             paper_url=paper_url
         )
         dataset.publish()
+
+    def test_create_dataset_pandas_error(self):
+        # arff expects the categorical column to contain only string and we
+        # need to raise an error asking the user to convert all data to string.
+        pd = pytest.importorskip('pandas')
+        # the column 'outloook' will contain both strings and integers.
+        data = [
+            ['a', 1, 85.0, 85.0, 'FALSE', 'no'],
+            ['b', 0, 80.0, 90.0, 'TRUE', 'no'],
+            ['c', 'overcast', 83.0, 86.0, 'FALSE', 'yes'],
+            ['d', 'rainy', 70.0, 96.0, 'FALSE', 'yes'],
+        ]
+        column_names = ['rnd_str', 'outlook', 'temperature', 'humidity',
+                        'windy', 'play']
+        df = pd.DataFrame(data, columns=column_names)
+        # enforce the type of each column
+        df['outlook'] = df['outlook'].astype('category')
+        df['windy'] = df['windy'].astype('category')
+        df['play'] = df['play'].astype('category')
+        # meta-information
+        name = 'Pandas_testing_dataset'
+        description = 'Synthetic dataset created from a Pandas DataFrame'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'play'
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+        with pytest.raises(ValueError, match="The column 'outlook'"):
+            openml.datasets.functions.create_dataset(
+                name=name,
+                description=description,
+                creator=creator,
+                contributor=None,
+                collection_date=collection_date,
+                language=language,
+                licence=licence,
+                default_target_attribute=default_target_attribute,
+                row_id_attribute=None,
+                ignore_attribute=None,
+                citation=citation,
+                attributes='auto',
+                data=df,
+                format='arff',
+                version_label='test',
+                original_data_url=original_data_url,
+                paper_url=paper_url
+            )
