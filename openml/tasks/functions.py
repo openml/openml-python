@@ -8,7 +8,7 @@ import xmltodict
 
 from ..exceptions import OpenMLCacheException
 from ..datasets import get_dataset
-from .task import ClassificationTask, RegressionTask, ClusteringTask
+from .task import ClassificationTask, RegressionTask, ClusteringTask, LearningCurveTask
 import openml.utils
 import openml._api_calls
 
