@@ -609,7 +609,7 @@ def _create_dataset_from_description(description, features, qualities, arff_file
     Parameters
     ----------
     description : dict
-        Description of a dataset in xmlish dict.
+        Description of a dataset in xml dict.
     arff_file : string
         Path of dataset arff file.
 

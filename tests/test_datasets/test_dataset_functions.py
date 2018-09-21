@@ -342,13 +342,16 @@ class TestOpenMLDataset(TestBase):
         dataset.publish()
         self.assertIsInstance(dataset.dataset_id, int)
 
+
     def test_create_dataset_numpy(self):
+
         data = np.array([[1, 2, 3],
                          [1.2, 2.5, 3.8],
                          [2, 5, 8],
                          [0, 1, 0]]).T
         attributes = [('col_{}'.format(i), 'REAL')
                       for i in range(data.shape[1])]
+
         name = 'NumPy_testing_dataset'
         description = 'Synthetic dataset created from a NumPy array'
         creator = 'OpenML tester'
@@ -374,6 +377,65 @@ class TestOpenMLDataset(TestBase):
             attributes=attributes,
             data=data,
             format='arff',
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        dataset.publish()
+
+
+    def test_create_dataset_list(self):
+
+        data = [
+            ['a', 'sunny', 85.0, 85.0, 'FALSE', 'no'],
+            ['b', 'sunny', 80.0, 90.0, 'TRUE', 'no'],
+            ['c', 'overcast', 83.0, 86.0, 'FALSE', 'yes'],
+            ['d', 'rainy', 70.0, 96.0, 'FALSE', 'yes'],
+            ['e', 'rainy', 68.0, 80.0, 'FALSE', 'yes'],
+            ['f', 'rainy', 65.0, 70.0, 'TRUE', 'no'],
+            ['g', 'overcast', 64.0, 65.0, 'TRUE', 'yes'],
+            ['h', 'sunny', 72.0, 95.0, 'FALSE', 'no'],
+            ['i', 'sunny', 69.0, 70.0, 'FALSE', 'yes'],
+            ['j', 'rainy', 75.0, 80.0, 'FALSE', 'yes'],
+            ['k', 'sunny', 75.0, 70.0, 'TRUE', 'yes'],
+            ['l', 'overcast', 72.0, 90.0, 'TRUE', 'yes'],
+            ['m', 'overcast', 81.0, 75.0, 'FALSE', 'yes'],
+            ['n', 'rainy', 71.0, 91.0, 'TRUE', 'no'],
+        ]
+        column_names = [
+            ('rnd_str', 'STRING'),
+            ('outlook', ['sunny', 'overcast', 'rainy']),
+            ('temperature', 'REAL'),
+            ('humidity', 'REAL'),
+            ('windy', ['TRUE', 'FALSE']),
+            ('play', ['yes', 'no']),
+        ]
+
+        name = "Wind dataset"
+        description = 'Testing dataset upload when the data is a list of lists'
+        creator = 'OpenML test'
+        collection_date = '21-09-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'play'
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=citation,
+            attributes=column_names,
+            data=data,
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url

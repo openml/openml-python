@@ -30,8 +30,8 @@ description = breast_cancer.DESCR
 data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
 attributes = [
-    (attribute_name, 'REAL') for attribute_name in attribute_names
-] + [('class', 'REAL')]
+                 (attribute_name, 'REAL') for attribute_name in attribute_names
+             ] + [('class', targets)]
 
 ############################################################################
 # Create the dataset object
