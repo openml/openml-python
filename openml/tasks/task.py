@@ -49,11 +49,11 @@ class OpenMLTask(object):
         openml._api_calls._perform_api_call("/task/untag", data=data)
 
 
-class SupervisedTask(OpenMLTask):
+class OpenMLSupervisedTask(OpenMLTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
                  estimation_procedure_type, estimation_parameters,
                  evaluation_measure, target_name, data_splits_url):
-        super(SupervisedTask, self).__init__(
+        super(OpenMLSupervisedTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
             task_type=task_type,
@@ -128,12 +128,12 @@ class SupervisedTask(OpenMLTask):
         return self.split.repeats, self.split.folds, self.split.samples
 
 
-class ClassificationTask(SupervisedTask):
+class OpenMLClassificationTask(OpenMLSupervisedTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
                  estimation_procedure_type, estimation_parameters,
                  evaluation_measure, target_name, data_splits_url,
                  class_labels=None, cost_matrix=None):
-        super(ClassificationTask, self).__init__(
+        super(OpenMLClassificationTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
             task_type=task_type,
@@ -154,11 +154,11 @@ class ClassificationTask(SupervisedTask):
             raise NotImplementedError("Costmatrix")
 
 
-class RegressionTask(SupervisedTask):
+class OpenMLRegressionTask(OpenMLSupervisedTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
                  estimation_procedure_type, estimation_parameters,
                  evaluation_measure, target_name, data_splits_url):
-        super(RegressionTask, self).__init__(
+        super(OpenMLRegressionTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
             task_type=task_type,
@@ -171,11 +171,11 @@ class RegressionTask(SupervisedTask):
         )
 
 
-class ClusteringTask(OpenMLTask):
+class OpenMLClusteringTask(OpenMLTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
                  estimation_procedure_type, estimation_parameters,
                  evaluation_measure, number_of_clusters=None):
-        super(ClusteringTask, self).__init__(
+        super(OpenMLClusteringTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
             task_type=task_type,
@@ -187,12 +187,12 @@ class ClusteringTask(OpenMLTask):
         self.number_of_clusters = number_of_clusters
 
 
-class LearningCurveTask(SupervisedTask):
+class OpenMLLearningCurveTask(OpenMLSupervisedTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
                  estimation_procedure_type, estimation_parameters,
                  evaluation_measure, target_name, data_splits_url,
                  class_labels=None, cost_matrix=None):
-        super(LearningCurveTask, self).__init__(
+        super(OpenMLLearningCurveTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
             task_type=task_type,
