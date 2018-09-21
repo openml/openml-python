@@ -417,9 +417,10 @@ def create_dataset(name, description, creator, contributor, collection_date,
         A list of tuples. Each tuple consists of the attribute name and type.
         If passing a pandas DataFrame, the attributes can be automatically
         inferred by passing ``'auto'``.
-    data : numpy.ndarray
-        An array that contains both the attributes and the targets, with
-        shape=(n_samples, n_features).
+    data : numpy.ndarray or pandas.DataFrame, shape (n_samples, n_features)
+        An array that contains both the attributes and the targets. When
+        providing a dataframe, the attribute names and type can be inferred by
+        passing ``attributes='auto'``.
         The target feature is indicated as meta-data of the dataset.
     default_target_attribute : str
         The default target attribute, if it exists.
