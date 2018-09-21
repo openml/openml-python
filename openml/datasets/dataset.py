@@ -14,12 +14,6 @@ import pandas as pd
 import scipy.sparse
 import xmltodict
 
-try:
-    import pandas as pd
-    HAVE_PANDAS = True
-except ImportError:
-    HAVE_PANDAS = False
-
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
 import openml._api_calls
@@ -168,8 +162,8 @@ class OpenMLDataset(object):
                 try:
                     data = self._get_arff(self.format)
                 except OSError as e:
-                    logger.critical("Please check that the data file %s is there "
-                                    "and can be read.", self.data_file)
+                    logger.critical("Please check that the data file %s is "
+                                    "there and can be read.", self.data_file)
                     raise e
 
                 categorical = []
@@ -188,10 +182,10 @@ class OpenMLDataset(object):
                             )
                     # string can only be supported with pandas DataFrame
                     elif type_ == 'STRING' and format.lower() == 'sparse_arff':
-                           raise ValueError(
-                               "Dataset containing strings is not supported "
-                               "with sparse ARFF."
-                           )
+                        raise ValueError(
+                            "Dataset containing strings is not supported "
+                            "with sparse ARFF."
+                        )
                     categorical.append(isinstance(type_, list))
                     attribute_names.append(name)
 
@@ -213,7 +207,8 @@ class OpenMLDataset(object):
                 with open(self.data_pickle_file, "wb") as fh:
                     pickle.dump((X, categorical, attribute_names), fh, -1)
                 logger.debug("Saved dataset %d: %s to file %s" %
-                                (int(self.dataset_id or -1), self.name, self.data_pickle_file))
+                                (int(self.dataset_id or -1),
+                                 self.name, self.data_pickle_file))
 
     def push_tag(self, tag):
         """Annotates this data set with a tag on the server.
@@ -410,10 +405,9 @@ class OpenMLDataset(object):
                     "Number of requested targets %d is not implemented." %
                     np.sum(targets)
                 )
-            target_categorical = [
-                cat for cat, column in
-                six.moves.zip(categorical, attribute_names)
-                if column in target
+            target_categorical = [cat
+            for cat, column in six.moves.zip(categorical, attribute_names)
+            if column in target
             ]
             target_dtype = int if target_categorical[0] else float
 
