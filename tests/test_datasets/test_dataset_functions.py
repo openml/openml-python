@@ -383,7 +383,6 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
 
-
     def test_create_dataset_list(self):
 
         data = [
@@ -411,7 +410,7 @@ class TestOpenMLDataset(TestBase):
             ('play', ['yes', 'no']),
         ]
 
-        name = "Wind dataset"
+        name = "Wind_dataset_test"
         description = 'Testing dataset upload when the data is a list of lists'
         creator = 'OpenML test'
         collection_date = '21-09-2018'
