@@ -84,7 +84,7 @@ class OpenMLDataset(object):
     dataset: string, optional
         Serialized arff dataset string.
     """
-    def __init__(self, name, description, dataset_id=None, format='arff',
+    def __init__(self, name, description, format='arff', dataset_id=None,
                  version=None, creator=None, contributor=None,
                  collection_date=None, upload_date=None, language=None,
                  licence=None, url=None, default_target_attribute=None,
