@@ -295,7 +295,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_deletion_of_cache_dir(self):
         # Simple removal
-        did_cache_dir = openml.utils._create_cache_directory_for_id(
+        did_cache_dir = _create_cache_directory_for_id(
             DATASETS_CACHE_DIR_NAME, 1,
         )
         self.assertTrue(os.path.exists(did_cache_dir))
@@ -362,7 +362,7 @@ class TestOpenMLDataset(TestBase):
         citation = 'None'
         original_data_url = 'http://openml.github.io/openml-python'
         paper_url = 'http://openml.github.io/openml-python'
-        dataset = openml.datasets.functions.create_dataset(
+        dataset = create_dataset(
             name=name,
             description=description,
             creator=creator,
@@ -376,7 +376,6 @@ class TestOpenMLDataset(TestBase):
             citation=citation,
             attributes=attributes,
             data=data,
-            format='arff',
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url
@@ -421,7 +420,7 @@ class TestOpenMLDataset(TestBase):
         original_data_url = 'http://openml.github.io/openml-python'
         paper_url = 'http://openml.github.io/openml-python'
 
-        dataset = openml.datasets.functions.create_dataset(
+        dataset = create_dataset(
             name=name,
             description=description,
             creator=creator,
