@@ -1,15 +1,16 @@
 import io
 import os
 
-from .. import config
 from .. import datasets
 from .split import OpenMLSplit
 import openml._api_calls
 from ..utils import _create_cache_directory_for_id
 
+
 class OpenMLTask(object):
-    def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
-                 estimation_parameters, evaluation_measure):
+    def __init__(self, task_id, task_type_id, task_type, data_set_id,
+                 estimation_procedure_type, estimation_parameters,
+                 evaluation_measure):
         self.task_id = int(task_id)
         self.task_type_id = int(task_type_id)
         self.task_type = task_type
@@ -47,11 +48,20 @@ class OpenMLTask(object):
         data = {'task_id': self.task_id, 'tag': tag}
         openml._api_calls._perform_api_call("/task/untag", data=data)
 
+
 class SupervisedTask(OpenMLTask):
-    def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
-                 estimation_parameters, evaluation_measure, target_name, data_splits_url):
-        super(SupervisedTask, self).__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
-                 estimation_parameters, evaluation_measure)
+    def __init__(self, task_id, task_type_id, task_type, data_set_id,
+                 estimation_procedure_type, estimation_parameters,
+                 evaluation_measure, target_name, data_splits_url):
+        super(SupervisedTask, self).__init__(
+            task_id=task_id,
+            task_type_id=task_type_id,
+            task_type=task_type,
+            data_set_id=data_set_id,
+            estimation_procedure_type=estimation_procedure_type,
+            estimation_parameters=estimation_parameters,
+            evaluation_measure=evaluation_measure,
+        )
         self.target_name = target_name
         self.estimation_procedure["data_splits_url"] = data_splits_url
         self.split = None
@@ -75,7 +85,11 @@ class SupervisedTask(OpenMLTask):
         if self.split is None:
             self.split = self.download_split()
 
-        train_indices, test_indices = self.split.get(repeat=repeat, fold=fold, sample=sample)
+        train_indices, test_indices = self.split.get(
+            repeat=repeat,
+            fold=fold,
+            sample=sample,
+        )
         return train_indices, test_indices
 
     def _download_split(self, cache_file):
@@ -98,7 +112,8 @@ class SupervisedTask(OpenMLTask):
             "datasplits.arff",
         )
 
-        # Not all tasks come with a split, e.g. in clustering the full dataset is always used
+        # Not all tasks come with a split, e.g. in clustering the full
+        # dataset is always used
         if self.estimation_procedure["data_splits_url"]:
 
             try:
@@ -111,9 +126,20 @@ class SupervisedTask(OpenMLTask):
             return split
 
         else:  # if no data splits are used
-            no_split = {0: {0: {0: (list(range(self.get_dataset().get_data().shape[0])),
-                                    list(range(self.get_dataset().get_data().shape[0])))}}}
-            split = OpenMLSplit('no_split', 'no actual split, all points in train and test', no_split)
+            no_split = {
+                0: {
+                    0: {
+                        0: (
+                            list(range(self.get_dataset().get_data().shape[0])),
+                            list(range(self.get_dataset().get_data().shape[0])))
+                    }
+                }
+            }
+            split = OpenMLSplit(
+                'no_split',
+                'no actual split, all points in train and test',
+                no_split,
+            )
             return split
 
     def get_split_dimensions(self):
@@ -123,12 +149,22 @@ class SupervisedTask(OpenMLTask):
         return self.split.repeats, self.split.folds, self.split.samples
 
 
-
 class ClassificationTask(SupervisedTask):
-    def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
-                 estimation_parameters, evaluation_measure, target_name, data_splits_url, class_labels=None, cost_matrix=None):
-        super(ClassificationTask, self).__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
-                 estimation_parameters, evaluation_measure, target_name, data_splits_url)
+    def __init__(self, task_id, task_type_id, task_type, data_set_id,
+                 estimation_procedure_type, estimation_parameters,
+                 evaluation_measure, target_name, data_splits_url,
+                 class_labels=None, cost_matrix=None):
+        super(ClassificationTask, self).__init__(
+            task_id=task_id,
+            task_type_id=task_type_id,
+            task_type=task_type,
+            data_set_id=data_set_id,
+            estimation_procedure_type=estimation_procedure_type,
+            estimation_parameters=estimation_parameters,
+            evaluation_measure=evaluation_measure,
+            target_name=target_name,
+            data_splits_url=data_splits_url,
+        )
         self.target_name = target_name
         self.class_labels = class_labels
         self.cost_matrix = cost_matrix
@@ -138,26 +174,56 @@ class ClassificationTask(SupervisedTask):
         if cost_matrix is not None:
             raise NotImplementedError("Costmatrix")
 
+
 class RegressionTask(SupervisedTask):
-    def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
-                 estimation_parameters, evaluation_measure, target_name, data_splits_url):
-        super(RegressionTask, self).__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
-                 estimation_parameters, evaluation_measure, target_name, data_splits_url)
+    def __init__(self, task_id, task_type_id, task_type, data_set_id,
+                 estimation_procedure_type, estimation_parameters,
+                 evaluation_measure, target_name, data_splits_url):
+        super(RegressionTask, self).__init__(
+            task_id=task_id,
+            task_type_id=task_type_id,
+            task_type=task_type,
+            data_set_id=data_set_id,
+            estimation_procedure_type=estimation_procedure_type,
+            estimation_parameters=estimation_parameters,
+            evaluation_measure=evaluation_measure,
+            target_name=target_name,
+            data_splits_url=data_splits_url,
+        )
 
 
 class ClusteringTask(OpenMLTask):
-    def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
-                 estimation_parameters, evaluation_measure, number_of_clusters=None):
-        super(ClusteringTask, self).__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
-                 estimation_parameters, evaluation_measure)
+    def __init__(self, task_id, task_type_id, task_type, data_set_id,
+                 estimation_procedure_type, estimation_parameters,
+                 evaluation_measure, number_of_clusters=None):
+        super(ClusteringTask, self).__init__(
+            task_id=task_id,
+            task_type_id=task_type_id,
+            task_type=task_type,
+            data_set_id=data_set_id,
+            estimation_procedure_type=estimation_procedure_type,
+            estimation_parameters=estimation_parameters,
+            evaluation_measure=evaluation_measure,
+        )
         self.number_of_clusters = number_of_clusters
 
+
 class LearningCurveTask(SupervisedTask):
-    def __init__(self, task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
-                 estimation_parameters, evaluation_measure, target_name, data_splits_url, class_labels=None,
-                 cost_matrix=None):
-        super(LearningCurveTask, self).__init__(task_id, task_type_id, task_type, data_set_id, estimation_procedure_type,
-                         estimation_parameters, evaluation_measure, target_name, data_splits_url)
+    def __init__(self, task_id, task_type_id, task_type, data_set_id,
+                 estimation_procedure_type, estimation_parameters,
+                 evaluation_measure, target_name, data_splits_url,
+                 class_labels=None, cost_matrix=None):
+        super(LearningCurveTask, self).__init__(
+            task_id=task_id,
+            task_type_id=task_type_id,
+            task_type=task_type,
+            data_set_id=data_set_id,
+            estimation_procedure_type=estimation_procedure_type,
+            estimation_parameters=estimation_parameters,
+            evaluation_measure=evaluation_measure,
+            target_name=target_name,
+            data_splits_url=data_splits_url,
+        )
         self.target_name = target_name
         self.class_labels = class_labels
         self.cost_matrix = cost_matrix
@@ -166,10 +232,3 @@ class LearningCurveTask(SupervisedTask):
 
         if cost_matrix is not None:
             raise NotImplementedError("Costmatrix")
-
-
-
-
-
-
-

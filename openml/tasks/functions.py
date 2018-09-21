@@ -8,7 +8,12 @@ import xmltodict
 
 from ..exceptions import OpenMLCacheException
 from ..datasets import get_dataset
-from .task import ClassificationTask, RegressionTask, ClusteringTask, LearningCurveTask
+from .task import (
+    ClassificationTask,
+    RegressionTask,
+    ClusteringTask,
+    LearningCurveTask,
+)
 import openml.utils
 import openml._api_calls
 
@@ -290,7 +295,10 @@ def get_task(task_id):
             task.class_labels = class_labels
             task.download_split()
         except Exception as e:
-            openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
+            openml.utils._remove_cache_dir_for_id(
+                TASKS_CACHE_DIR_NAME,
+                tid_cache_dir,
+            )
             raise e
 
     return task
@@ -302,7 +310,10 @@ def _get_task_description(task_id):
         return _get_cached_task(task_id)
     except OpenMLCacheException:
         xml_file = os.path.join(
-            openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id),
+            openml.utils._create_cache_directory_for_id(
+                TASKS_CACHE_DIR_NAME,
+                task_id,
+            ),
             "task.xml",
         )
         task_xml = openml._api_calls._perform_api_call("task/%d" % task_id)
@@ -336,7 +347,8 @@ def _create_task_from_xml(xml):
 
     evaluation_measures = None
     if 'evaluation_measures' in inputs:
-        evaluation_measures = inputs["evaluation_measures"]["oml:evaluation_measures"]["oml:evaluation_measure"]
+        evaluation_measures = inputs["evaluation_measures"][
+            "oml:evaluation_measures"]["oml:evaluation_measure"]
 
     # Convert some more parameters
     for parameter in \
@@ -353,11 +365,14 @@ def _create_task_from_xml(xml):
             dic["oml:task_type_id"],
             task_type,
             inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
-            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:type"],
+            inputs["estimation_procedure"][
+                "oml:estimation_procedure"]["oml:type"],
             estimation_parameters,
             evaluation_measures,
             inputs["source_data"]["oml:data_set"]["oml:target_feature"],
-            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:data_splits_url"])
+            inputs["estimation_procedure"][
+                "oml:estimation_procedure"]["oml:data_splits_url"],
+        )
 
     elif task_type == "Supervised Regression":
         return RegressionTask(
@@ -365,11 +380,14 @@ def _create_task_from_xml(xml):
             dic["oml:task_type_id"],
             task_type,
             inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
-            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:type"],
+            inputs["estimation_procedure"][
+                "oml:estimation_procedure"]["oml:type"],
             estimation_parameters,
             evaluation_measures,
             inputs["source_data"]["oml:data_set"]["oml:target_feature"],
-            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:data_splits_url"])
+            inputs["estimation_procedure"][
+                "oml:estimation_procedure"]["oml:data_splits_url"],
+        )
 
     elif task_type == "Clustering":
         return ClusteringTask(
@@ -377,9 +395,11 @@ def _create_task_from_xml(xml):
             dic["oml:task_type_id"],
             task_type,
             inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
-            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:type"],
+            inputs["estimation_procedure"][
+                "oml:estimation_procedure"]["oml:type"],
             estimation_parameters,
-            evaluation_measures)
+            evaluation_measures,
+        )
 
     elif task_type == "Learning Curve":
         return LearningCurveTask(
@@ -387,11 +407,14 @@ def _create_task_from_xml(xml):
             dic["oml:task_type_id"],
             task_type,
             inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
-            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:type"],
+            inputs["estimation_procedure"][
+                "oml:estimation_procedure"]["oml:type"],
             estimation_parameters,
             evaluation_measures,
             inputs["source_data"]["oml:data_set"]["oml:target_feature"],
-            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:data_splits_url"])
+            inputs["estimation_procedure"][
+                "oml:estimation_procedure"]["oml:data_splits_url"],
+        )
 
     else:
         raise NotImplementedError(task_type)
