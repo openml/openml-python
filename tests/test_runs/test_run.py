@@ -114,8 +114,14 @@ class TestRun(TestBase):
             int_part_prime = [line[:3] for line in run_prime_trace_content]
             _check_array(int_part_prime, int)
 
-            float_part = np.array(np.array(run_trace_content)[:, 3:4], dtype=float)
-            float_part_prime = np.array(np.array(run_prime_trace_content)[:, 3:4], dtype=float)
+            float_part = np.array(
+                np.array(run_trace_content)[:, 3:4],
+                dtype=float,
+            )
+            float_part_prime = np.array(
+                np.array(run_prime_trace_content)[:, 3:4],
+                dtype=float,
+            )
             bool_part = [line[4] for line in run_trace_content]
             bool_part_prime = [line[4] for line in run_prime_trace_content]
             for bp, bpp in zip(bool_part, bool_part_prime):
@@ -123,7 +129,8 @@ class TestRun(TestBase):
                 self.assertIn(bpp, ['true', 'false'])
             string_part = np.array(run_trace_content)[:, 5:]
             string_part_prime = np.array(run_prime_trace_content)[:, 5:]
-            # JvR: Python 2.7 requires an almost equal check, rather than an equals check
+            # JvR: Python 2.7 requires an almost equal check, rather than an
+            # equals check
             np.testing.assert_array_almost_equal(int_part, int_part_prime)
             np.testing.assert_array_almost_equal(float_part, float_part_prime)
             self.assertEqual(bool_part, bool_part_prime)
@@ -175,13 +182,20 @@ class TestRun(TestBase):
             ('classifier', DummyClassifier()),
         ])
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(task, model, add_local_measures=False)
+        run = openml.runs.run_model_on_task(
+            task,
+            model,
+            add_local_measures=False,
+        )
 
-        cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
+        cache_path = os.path.join(
+            self.workdir,
+            'runs',
+            str(random.getrandbits(128)),
+        )
         run.to_filesystem(cache_path, store_model=False)
         # obtain run from filesystem
         openml.runs.OpenMLRun.from_filesystem(cache_path, expect_model=False)
         # assert default behaviour is throwing an error
         with self.assertRaises(ValueError, msg='Could not find model.pkl'):
             openml.runs.OpenMLRun.from_filesystem(cache_path)
-            

@@ -299,9 +299,15 @@ class OpenMLRun(object):
         self : OpenMLRun
         """
         if self.model is None:
-            raise PyOpenMLError("OpenMLRun obj does not contain a model. (This should never happen.) ")
+            raise PyOpenMLError(
+                "OpenMLRun obj does not contain a model. "
+                "(This should never happen.) "
+            )
         if self.flow_id is None:
-            raise PyOpenMLError("OpenMLRun obj does not contain a flow id. (Should have been added while executing the task.) ")
+            raise PyOpenMLError(
+                "OpenMLRun obj does not contain a flow id. "
+                "(Should have been added while executing the task.) "
+            )
 
         description_xml = self._create_description_xml()
         file_elements = {'description': ("description.xml", description_xml)}

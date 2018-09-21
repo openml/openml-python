@@ -178,11 +178,12 @@ class TestRun(TestBase):
         downloaded = openml.runs.get_run(run_.run_id)
         assert('openml-python' in downloaded.tags)
 
-        # TODO make sure that these attributes are instantiated when downloading a run?
-        # Or make sure that the trace object is created when running a flow on a task (and not
-        # only the arff object is created, so that the two objects can actually be compared).
-        #downloaded_run_trace = downloaded._generate_trace_arff_dict()
-        #self.assertEqual(run_trace, downloaded_run_trace)
+        # TODO make sure that these attributes are instantiated when
+        # downloading a run? Or make sure that the trace object is created when
+        # running a flow on a task (and not only the arff object is created,
+        # so that the two objects can actually be compared):
+        # downloaded_run_trace = downloaded._generate_trace_arff_dict()
+        # self.assertEqual(run_trace, downloaded_run_trace)
 
         return run
 
@@ -730,7 +731,8 @@ class TestRun(TestBase):
         for att_idx in range(len(trace_attribute_list)):
             att_type = trace_attribute_list[att_idx][1]
             att_name = trace_attribute_list[att_idx][0]
-            # They no longer start with parameter_ if they come from extract_arff_trace!
+            # They no longer start with parameter_ if they come from
+            # extract_arff_trace!
             if att_name.startswith("parameter_"):
                 # add this to the found parameters
                 param_name = att_name[len("parameter_"):]
@@ -746,7 +748,12 @@ class TestRun(TestBase):
                     val = trace_list[line_idx][att_idx]
                     if isinstance(att_type, list):
                         self.assertIn(val, att_type)
-                    elif att_name in ['hidden_layer_sizes', 'activation', 'learning_rate_init', 'max_iter']:
+                    elif att_name in [
+                        'hidden_layer_sizes',
+                        'activation',
+                        'learning_rate_init',
+                        'max_iter',
+                    ]:
                         self.assertIsInstance(
                             trace_list[line_idx][att_idx],
                             str,
@@ -1101,7 +1108,11 @@ class TestRun(TestBase):
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content,  _, _, _ = _run_task_get_arffcontent(model, task, add_local_measures=True)
+        data_content,  _, _, _ = _run_task_get_arffcontent(
+            model,
+            task,
+            add_local_measures=True,
+        )
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)

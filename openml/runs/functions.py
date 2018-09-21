@@ -483,7 +483,10 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
     if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
         # arff_tracecontent is already set
         arff_trace_attributes = _extract_arfftrace_attributes(model_fold)
-        trace = OpenMLRunTrace.generate(arff_trace_attributes, arff_tracecontent)
+        trace = OpenMLRunTrace.generate(
+            arff_trace_attributes,
+            arff_tracecontent,
+        )
     else:
         trace = None
 
