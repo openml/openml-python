@@ -44,9 +44,16 @@ class OpenMLRunTrace(object):
             selected as the best iteration by the search procedure
         """
         for (r, f, i) in self.trace_iterations:
-            if r == repeat and f == fold and self.trace_iterations[(r, f, i)].selected is True:
+            if (
+                r == repeat
+                and f == fold
+                and self.trace_iterations[(r, f, i)].selected is True
+            ):
                 return i
-        raise ValueError('Could not find the selected iteration for rep/fold %d/%d' % (repeat, fold))
+        raise ValueError(
+            'Could not find the selected iteration for rep/fold %d/%d' %
+            (repeat, fold)
+        )
 
     @classmethod
     def generate(cls, attributes, content):
@@ -85,13 +92,11 @@ class OpenMLRunTrace(object):
             if required_attribute not in attribute_idx:
                 raise ValueError(
                     'arff misses required attribute: %s' % required_attribute)
-        parameter_attributes = []
-        for attribute in attribute_idx:
-            if (
-                attribute not in required_attributes
-                and attribute != 'setup_string'
-            ):
-                parameter_attributes.append(attribute)
+        parameter_attributes = [
+            attribute for attribute in attribute_idx
+            if attribute not in required_attributes
+            and attribute != 'setup_string'
+        ]
 
         for itt in content:
             repeat = int(itt[attribute_idx['repeat']])
@@ -114,9 +119,10 @@ class OpenMLRunTrace(object):
                     'expected {"true", "false"} value for selected field, '
                     'received: %s' % selected_value
                 )
-            parameters = OrderedDict()
-            for attribute in parameter_attributes:
-                parameters[attribute] = itt[attribute_idx[attribute]]
+            parameters = OrderedDict([
+                (attribute, attribute_idx[attribute])
+                for attribute in parameter_attributes
+            ])
 
             current = OpenMLTraceIteration(
                 repeat,
@@ -198,10 +204,10 @@ class OpenMLRunTrace(object):
             ('evaluation', 'NUMERIC'),
             ('selected', ['true', 'false']),
         ]
-        for parameter in next(
-            iter(self.trace_iterations.values())
-        ).get_parameters():
-            trace_attributes.append(('parameter_' + parameter, 'STRING'))
+        trace_attributes.extend([
+            ('parameter_' + parameter, 'STRING')
+            for parameter in self.trace_iterations.values()
+        ])
 
         arff_dict = OrderedDict()
         data = []
@@ -283,11 +289,11 @@ class OpenMLRunTrace(object):
 
             parameters = OrderedDict()
             for attribute_name, idx in attribute_idx.items():
-                if attribute_name in required_attributes:
-                    continue
-                if attribute_name.startswith(PREFIX):
+                if (
+                    attribute_name not in required_attributes
+                    and attribute_name.startswith(PREFIX)
+                ):
                     parameters[attribute_name] = itt[idx]
-
 
             current = OpenMLTraceIteration(
                 repeat=repeat,
