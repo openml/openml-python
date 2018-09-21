@@ -627,7 +627,7 @@ def _create_dataset_from_description(description, features, qualities, arff_file
         collection_date=description.get("oml:collection_date"),
         upload_date=description.get("oml:upload_date"),
         language=description.get("oml:language"),
-        license=description.get("oml:licence"),
+        licence=description.get("oml:licence"),
         url=description["oml:url"],
         default_target_attribute=description.get("oml:default_target_attribute"),
         row_id_attribute=description.get("oml:row_id_attribute"),
