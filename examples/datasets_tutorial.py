@@ -55,7 +55,11 @@ print(dataset.description[:500])
 ############################################################################
 # Get the actual data.
 #
-# Returned as numpy array, with meta-info (e.g. target feature, feature names,...)
+# The dataset can be returned in 2 possible formats: as a NumPy array or as
+# a Pandas DataFrame. The format is controlled with the parameter
+# ``dataset_format`` which can be either 'array' (default) or 'dataframe'.
+# Let's first build our dataset from a NumPy array and manually create a
+# dataframe.
 X, y, attribute_names = dataset.get_data(
     target=dataset.default_target_attribute,
     return_attribute_names=True,
@@ -63,6 +67,14 @@ X, y, attribute_names = dataset.get_data(
 eeg = pd.DataFrame(X, columns=attribute_names)
 eeg['class'] = y
 print(eeg[:10])
+
+############################################################################
+# Instead of creating manually the dataframe, you can already request a
+# dataframe with the correct dtypes.
+X, y = dataset.get_data(target=dataset.default_target_attribute,
+                        dataset_format='dataframe')
+print(X.head())
+print(X.info())
 
 ############################################################################
 # Exercise 2

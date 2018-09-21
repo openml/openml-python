@@ -334,9 +334,9 @@ class OpenMLDataset(object):
 
         Returns
         -------
-        X : dataframe or sparse matrix, shape (n_samples, n_columns)
+        X : ndarray, dataframe, or sparse matrix, shape (n_samples, n_columns)
             Dataset
-        y : numpy array or pandas series, shape (n_samples,)
+        y : ndarray or series, shape (n_samples,)
             Target column(s). Only returned if target is not None.
         categorical_indicator : boolean ndarray
             Mask that indicate categorical features. Only returned if
