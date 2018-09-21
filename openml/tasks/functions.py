@@ -363,7 +363,8 @@ def _create_task_from_xml(xml):
         'task_id': dic["oml:task_id"],
         'task_type': task_type,
         'task_type_id': dic["oml:task_type_id"],
-        'data_set_id': inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
+        'data_set_id': inputs["source_data"][
+            "oml:data_set"]["oml:data_set_id"],
         'estimation_procedure_type': inputs["estimation_procedure"][
                 "oml:estimation_procedure"]["oml:type"],
         'estimation_parameters': estimation_parameters,
