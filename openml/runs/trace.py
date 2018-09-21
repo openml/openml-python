@@ -30,13 +30,13 @@ class OpenMLRunTrace(object):
         Returns the trace iteration that was marked as selected. In
         case multiple are marked as selected (should not happen) the
         first of these is returned
-        
+
         Parameters
         ----------
         fold: int
-        
+
         repeat: int
-        
+
         Returns
         ----------
         OpenMLTraceIteration
@@ -205,8 +205,8 @@ class OpenMLRunTrace(object):
             ('selected', ['true', 'false']),
         ]
         trace_attributes.extend([
-            ('parameter_' + parameter, 'STRING')
-            for parameter in self.trace_iterations.values()
+            ('parameter_' + parameter, 'STRING') for parameter in
+            next(iter(self.trace_iterations.values())).get_parameters()
         ])
 
         arff_dict = OrderedDict()
@@ -383,7 +383,7 @@ class OpenMLTraceIteration(object):
 
     fold : int
         fold number (in case of no folds: 0)
-    
+
     iteration : int
         iteration number of optimization procedure
 
@@ -391,11 +391,11 @@ class OpenMLTraceIteration(object):
         json string representing the parameters
 
     evaluation : double
-        The evaluation that was awarded to this trace iteration. 
+        The evaluation that was awarded to this trace iteration.
         Measure is defined by the task
 
     selected : bool
-        Whether this was the best of all iterations, and hence 
+        Whether this was the best of all iterations, and hence
         selected for making predictions. Per fold/repeat there
         should be only one iteration selected
 
@@ -455,7 +455,7 @@ class OpenMLTraceIteration(object):
 
     def __str__(self):
         """
-        tmp string representation, will be changed in the near future 
+        tmp string representation, will be changed in the near future
         """
         return '[(%d,%d,%d): %f (%r)]' % (
             self.repeat,
