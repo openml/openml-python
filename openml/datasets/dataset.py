@@ -300,8 +300,8 @@ class OpenMLDataset(object):
         NumPy array instead, respectively.
         """
         if array_format == "array" and not scipy.sparse.issparse(data):
-            return data.values
-        elif array_format == "dataframe" and scipy.sparse.issparse(data):
+            return np.asarray(data)
+        if array_format == "dataframe" and scipy.sparse.issparse(data):
             return pd.SparseDataFrame(data, columns=attribute_names)
         return data
 

@@ -1,10 +1,12 @@
+import pytest
 import numpy as np
+import pandas as pd
 from scipy import sparse
 import six
 from time import time
 
-from openml.testing import TestBase
 import openml
+from openml.testing import TestBase
 
 
 class OpenMLDatasetTest(TestBase):
@@ -17,6 +19,7 @@ class OpenMLDatasetTest(TestBase):
         # Load dataset id 2 - dataset 2 is interesting because it contains
         # missing values, categorical features etc.
         self.dataset = openml.datasets.get_dataset(2)
+        self.titanic = openml.datasets.get_dataset(40945)
 
     def test_get_data(self):
         # Basic usage
@@ -96,6 +99,58 @@ class OpenMLDatasetTest(TestBase):
             include_ignore_attributes=False, return_categorical_indicator=True)
         self.assertEqual(len(categorical), 38)
         # TODO test multiple ignore attributes!
+
+    def test_get_data_numpy(self):
+        data = self.titanic.get_data(dataset_format='array')
+        self.assertTrue(isinstance(data, np.ndarray))
+        self.assertEqual(data.shape[1], len(self.titanic.features))
+        self.assertEqual(data.shape[0], 1309)
+        self.assertTrue(data.dtype == 'object')
+
+        X, y = self.titanic.get_data(
+            dataset_format='array',
+            target=self.titanic.default_target_attribute)
+        self.assertTrue(isinstance(X, np.ndarray))
+        self.assertTrue(isinstance(y, np.ndarray))
+        self.assertEqual(X.shape, (1309, 13))
+        self.assertEqual(y.shape, (1309,))
+        self.assertTrue(X.dtype == 'object')
+        self.assertTrue(y.dtype == int)
+
+    def test_get_data_pandas(self):
+        data = self.titanic.get_data(dataset_format='dataframe')
+        self.assertTrue(isinstance(data, pd.DataFrame))
+        self.assertEqual(data.shape[1], len(self.titanic.features))
+        self.assertEqual(data.shape[0], 1309)
+        col_dtype = {
+            'pclass': 'float64',
+            'survived': 'category',
+            'name': 'object',
+            'sex': 'category',
+            'age': 'float64',
+            'sibsp': 'float64',
+            'parch': 'float64',
+            'ticket': 'object',
+            'fare': 'float64',
+            'cabin': 'object',
+            'embarked': 'category',
+            'boat': 'object',
+            'body': 'float64',
+            'home.dest': 'object'
+        }
+        for col_name in data.columns:
+            self.assertTrue(data[col_name].dtype.name == col_dtype[col_name])
+
+        X, y = self.titanic.get_data(
+            dataset_format='dataframe',
+            target=self.titanic.default_target_attribute)
+        self.assertTrue(isinstance(X, pd.DataFrame))
+        self.assertTrue(isinstance(y, pd.Series))
+        self.assertEqual(X.shape, (1309, 13))
+        self.assertEqual(y.shape, (1309,))
+        for col_name in X.columns:
+            self.assertTrue(X[col_name].dtype.name == col_dtype[col_name])
+        self.assertTrue(y.dtype.name == col_dtype['survived'])
 
 
 class OpenMLDatasetTestOnTestServer(TestBase):
