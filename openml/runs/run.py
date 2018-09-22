@@ -56,7 +56,7 @@ class OpenMLRun(object):
 
     def __str__(self):
         flow_name = self.flow_name
-        if len(flow_name) > 26:
+        if flow_name is not None and len(flow_name) > 26:
             # long enough to show sklearn.pipeline.Pipeline
             flow_name = flow_name[:26] + "..."
         return "[run id: {}, task id: {}, flow id: {}, flow name: {}]".format(
