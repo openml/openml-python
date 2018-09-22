@@ -285,7 +285,7 @@ class TestRun(TestBase):
         self.assertEqual(flow2.flow_id, flow.flow_id)
 
     ############################################################################
-    # These unit tests are ment to test the following functions, using a varity
+    # These unit tests are meant to test the following functions, using a varity
     #  of flows:
     # - openml.runs.run_task()
     # - openml.runs.OpenMLRun.publish()
@@ -344,9 +344,62 @@ class TestRun(TestBase):
         self._check_fold_evaluations(run.fold_evaluations, 1, num_folds)
         pass
 
+
+    def _run_and_upload_regression(self, clf, rsv):
+        def determine_grid_size(param_grid):
+            if isinstance(param_grid, dict):
+                grid_iterations = 1
+                for param in param_grid:
+                    grid_iterations *= len(param_grid[param])
+                return grid_iterations
+            elif isinstance(param_grid, list):
+                grid_iterations = 0
+                for sub_grid in param_grid:
+                    grid_iterations += determine_grid_size(sub_grid)
+                return grid_iterations
+            else:
+                raise TypeError('Param Grid should be of type list (GridSearch only) or dict')
+
+        task_id = 738  # quake dataset
+        num_test_instances = 719  # 33% holdout task
+        num_folds = 1  # because of holdout
+        num_iterations = 5  # for base search classifiers
+
+        run = self._perform_run(task_id, num_test_instances, clf,
+                                random_state_value=rsv)
+
+        # obtain accuracy scores using get_metric_score:
+        mae_scores = run.get_metric_fn(sklearn.metrics.mean_absolute_error)
+        # compare with the scores in user defined measures
+        mae_scores_provided = []
+        for rep in run.fold_evaluations['mean_absolute_error'].keys():
+            for fold in run.fold_evaluations['mean_absolute_error'][rep].keys():
+                mae_scores_provided.append(
+                    run.fold_evaluations['mean_absolute_error'][rep][fold])
+        self.assertEqual(sum(mae_scores_provided), sum(mae_scores))
+
+        if isinstance(clf, BaseSearchCV):
+            if isinstance(clf, GridSearchCV):
+                grid_iterations = determine_grid_size(clf.param_grid)
+                self.assertEqual(len(run.trace_content),
+                                 grid_iterations * num_folds)
+            else:
+                self.assertEqual(len(run.trace_content),
+                                 num_iterations * num_folds)
+            check_res = self._check_serialized_optimized_run(run.run_id)
+            self.assertTrue(check_res)
+
+        # todo: check if runtime is present
+        self._check_fold_evaluations(run.fold_evaluations, 1, num_folds)
+        pass
+
     def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression()
         self._run_and_upload(lr, '62501')
+
+    def test_run_and_upload_linear_regression(self):
+        lr = LinearRegression()
+        self._run_and_upload_regression(lr, '62501')
 
     def test_run_and_upload_pipeline_dummy_pipeline(self):
 

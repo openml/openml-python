@@ -614,6 +614,9 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
             arff_datacontent.append(arff_line)
 
     elif task.task_type == 'Supervised Regression':
+        if add_local_measures:
+            _calculate_local_measure(sklearn.metrics.mean_absolute_error, 'mean_absolute_error')
+
         for i in range(0, len(test_indices)):
             arff_line = [rep_no, fold_no, row_id, PredY[i], testY[i]]
             arff_datacontent.append(arff_line)
