@@ -31,7 +31,7 @@ data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
 attributes = [
                  (attribute_name, 'REAL') for attribute_name in attribute_names
-             ] + [('class', targets)]
+             ] + [('class', list(targets))]
 
 ############################################################################
 # Create the dataset object
