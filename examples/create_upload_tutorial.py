@@ -75,9 +75,11 @@ dataset = openml.datasets.functions.create_dataset(
     data=data,
     # A version label which is provided by the user.
     version_label='test',
-    original_data_url='https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Diagnostic)',
-    paper_url='https://www.spiedigitallibrary.org/conference-proceedings-of-spie/1905/0000/'
-              'Nuclear-feature-extraction-for-breast-tumor-diagnosis/10.1117/12.148698.short?SSO=1'
+    original_data_url='https://archive.ics.uci.edu/ml/datasets/'
+                      'Breast+Cancer+Wisconsin+(Diagnostic)',
+    paper_url='https://www.spiedigitallibrary.org/conference-proceedings-of-spie/'
+              '1905/0000/Nuclear-feature-extraction-for-breast-tumor-diagnosis/'
+              '10.1117/12.148698.short?SSO=1'
 )
 
 ############################################################################
