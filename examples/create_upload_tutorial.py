@@ -9,7 +9,8 @@ import openml
 import sklearn.datasets
 
 ############################################################################
-# For this example we will upload to the test server to not  pollute the live server with countless copies of the same dataset.
+# For this example we will upload to the test server to not  pollute the live
+# server with countless copies of the same dataset.
 openml.config.server = 'https://test.openml.org/api/v1/xml'
 
 ############################################################################
@@ -21,7 +22,6 @@ name = 'BreastCancer(scikit-learn)'
 X = breast_cancer.data
 y = breast_cancer.target
 attribute_names = breast_cancer.feature_names
-targets = breast_cancer.target_names
 description = breast_cancer.DESCR
 
 ############################################################################
@@ -31,7 +31,7 @@ data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
 attributes = [
                  (attribute_name, 'REAL') for attribute_name in attribute_names
-             ] + [('class', list(targets))]
+             ] + [('class', 'INTEGER')]
 
 ############################################################################
 # Create the dataset object
@@ -76,7 +76,8 @@ dataset = openml.datasets.functions.create_dataset(
     # A version label which is provided by the user.
     version_label='test',
     original_data_url='https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Diagnostic)',
-    paper_url='https://www.spiedigitallibrary.org/conference-proceedings-of-spie/1905/0000/Nuclear-feature-extraction-for-breast-tumor-diagnosis/10.1117/12.148698.short?SSO=1'
+    paper_url='https://www.spiedigitallibrary.org/conference-proceedings-of-spie/1905/0000/'
+              'Nuclear-feature-extraction-for-breast-tumor-diagnosis/10.1117/12.148698.short?SSO=1'
 )
 
 ############################################################################
