@@ -206,15 +206,31 @@ class OpenMLDataset(object):
         openml._api_calls._perform_api_call("/data/untag", data=data)
 
     def __eq__(self, other):
+
+        server_fields = {
+            'dataset_id':True,
+            'version':True,
+            'upload_date':True,
+            'url':True,
+            'dataset':True,
+            'data_file': True,
+        }
+
         if type(other) != OpenMLDataset:
             return False
-        elif (
-            self.dataset_id == other.dataset_id
-            or (self.name == other._name and self.version == other._version)
-        ):
-            return True
         else:
-            return False
+            for field in self.__dict__:
+                if field not in server_fields:
+                    if field in other.__dict__:
+                        if self.__dict__[field] != other.__dict__[field]:
+                            return False
+                    else:
+                        return False
+        return True
+
+    def __ne__(self, other):
+        """Only needed for python 2, unnecessary in Python 3"""
+        return not self.__eq__(other)
 
     def _get_arff(self, format):
         """Read ARFF file and return decoded arff.

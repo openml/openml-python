@@ -21,9 +21,10 @@ breast_cancer = sklearn.datasets.load_breast_cancer()
 name = 'BreastCancer(scikit-learn)'
 X = breast_cancer.data
 y = breast_cancer.target
+target_names = breast_cancer.target_names
+y = np.array([target_names[i] for i in y])
 attribute_names = breast_cancer.feature_names
 description = breast_cancer.DESCR
-
 ############################################################################
 # OpenML does not distinguish between the attributes and targets on the data level and stores all data in a
 # single matrix. The target feature is indicated as meta-data of the dataset (and tasks on that data).
@@ -31,7 +32,7 @@ data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
 attributes = [
                  (attribute_name, 'REAL') for attribute_name in attribute_names
-             ] + [('class', 'INTEGER')]
+             ] + [('class', list(breast_cancer.target_names))]
 
 ############################################################################
 # Create the dataset object
@@ -75,11 +76,15 @@ dataset = openml.datasets.functions.create_dataset(
     data=data,
     # A version label which is provided by the user.
     version_label='test',
-    original_data_url='https://archive.ics.uci.edu/ml/datasets/'
-                      'Breast+Cancer+Wisconsin+(Diagnostic)',
-    paper_url='https://www.spiedigitallibrary.org/conference-proceedings-of-spie/'
-              '1905/0000/Nuclear-feature-extraction-for-breast-tumor-diagnosis/'
-              '10.1117/12.148698.short?SSO=1'
+    original_data_url=(
+        'https://archive.ics.uci.edu/ml/datasets/'
+        'Breast+Cancer+Wisconsin+(Diagnostic)'
+    ),
+    paper_url=(
+        'https://www.spiedigitallibrary.org/conference-proceedings-of-spie/'
+        '1905/0000/Nuclear-feature-extraction-for-breast-tumor-diagnosis/'
+        '10.1117/12.148698.short?SSO=1'
+    )
 )
 
 ############################################################################

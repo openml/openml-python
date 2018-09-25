@@ -449,4 +449,6 @@ class TestOpenMLDataset(TestBase):
             original_data_url=original_data_url,
             paper_url=paper_url
         )
-        dataset.publish()
+        uploaded_did = dataset.publish()
+        uploaded_dataset = openml.datasets.get_dataset(uploaded_did)
+        self.assertTrue(dataset == uploaded_dataset)
