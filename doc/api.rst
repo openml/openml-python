@@ -30,6 +30,7 @@ Top-level Classes
    :template: function.rst
 
     check_datasets_active
+    create_dataset
     get_dataset
     get_datasets
     list_datasets
