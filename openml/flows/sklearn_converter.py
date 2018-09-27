@@ -307,9 +307,11 @@ def _extract_information_from_model(model):
 
         if (isinstance(rval, (list, tuple)) and len(rval) > 0 and
                 isinstance(rval[0], (list, tuple)) and
-                all([type(rval[0]) == type(rval[i]) for i in range(len(rval))])):
+                all([isinstance(rval[i], type(rval[0]))
+                     for i in range(len(rval))])):
 
-            # Steps in a pipeline or feature union, or base classifiers in voting classifier
+            # Steps in a pipeline or feature union, or base classifiers in
+            # voting classifier
             parameter_value = list()
             reserved_keywords = set(model.get_params(deep=False).keys())
 
@@ -318,18 +320,23 @@ def _extract_information_from_model(model):
                 sub_component = sub_component_tuple[1]
                 sub_component_type = type(sub_component_tuple)
                 if not 2 <= len(sub_component_tuple) <= 3:
-                    # length 2 is for {VotingClassifier.estimators, Pipeline.steps, FeatureUnion.transformer_list}
+                    # length 2 is for {VotingClassifier.estimators,
+                    # Pipeline.steps, FeatureUnion.transformer_list}
                     # length 3 is for ColumnTransformer
-                    raise ValueError('Length of tuple does not match assumptions')
+                    msg = 'Length of tuple does not match assumptions'
+                    raise ValueError(msg)
                 if not isinstance(sub_component, (OpenMLFlow, type(None))):
-                    raise ValueError('Second item of tuple does not match assumptions. '\
-                                     'Expected OpenMLFlow, got %s' % type(sub_component))
+                    msg = 'Second item of tuple does not match assumptions. '\
+                          'Expected OpenMLFlow, got %s' % type(sub_component)
+                    raise ValueError(msg)
 
                 if identifier in reserved_keywords:
                     parent_model_name = model.__module__ + "." + \
                                         model.__class__.__name__
-                    raise PyOpenMLError('Found element shadowing official ' + \
-                                        'parameter for %s: %s' % (parent_model_name, identifier))
+                    msg = 'Found element shadowing official '\
+                          'parameter for %s: %s' % (parent_model_name,
+                                                    identifier)
+                    raise PyOpenMLError(msg)
 
                 if sub_component is None:
                     # In a FeatureUnion it is legal to have a None step
