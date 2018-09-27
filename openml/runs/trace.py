@@ -100,7 +100,7 @@ class OpenMLRunTrace(object):
             attributes=attributes,
             content=content,
             error_message='setup_string not allowed when constructing a '
-                'trace object from run results.'
+                          'trace object from run results.'
         )
 
     @classmethod
@@ -221,9 +221,7 @@ class OpenMLRunTrace(object):
         return cls._trace_from_arff_struct(
             attributes=attributes,
             content=content,
-            error_message=
-                'setup_string not supported for arff serialization'
-
+            error_message='setup_string not supported for arff serialization'
         )
 
     @classmethod

@@ -20,4 +20,7 @@ __all__ = [
     'get_run',
     'list_runs',
     'get_runs',
+    'get_run_trace',
+    'initialize_model_from_run',
+    'initialize_model_from_trace'
 ]
