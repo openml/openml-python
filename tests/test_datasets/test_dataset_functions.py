@@ -31,7 +31,8 @@ from openml.datasets.functions import (create_dataset,
                                        _get_dataset_arff,
                                        _get_dataset_features,
                                        _get_dataset_qualities,
-                                       DATASETS_CACHE_DIR_NAME)
+                                       DATASETS_CACHE_DIR_NAME,
+                                       _get_online_dataset_arff)
 
 
 class TestOpenMLDataset(TestBase):
@@ -450,5 +451,8 @@ class TestOpenMLDataset(TestBase):
             paper_url=paper_url
         )
         uploaded_did = dataset.publish()
-        uploaded_dataset = openml.datasets.get_dataset(uploaded_did)
-        self.assertTrue(dataset == uploaded_dataset)
+        self.assertEqual(
+            _get_online_dataset_arff(uploaded_did),
+            dataset._dataset,
+            "Uploaded arff does not match original one"
+        )

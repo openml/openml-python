@@ -647,3 +647,24 @@ def _create_dataset_from_description(description, features, qualities, arff_file
         qualities=qualities,
     )
     return dataset
+
+
+def _get_online_dataset_arff(did):
+    """Download the arff file for a given dataset id
+    from the OpenML website.
+
+    Parameters
+    ----------
+    did : int
+        A dataset id.
+
+    Returns
+    -------
+    str
+        A string representation of an arff file.
+    """
+    dataset_xml = openml._api_calls._perform_api_call("data/%d" % did)
+    # use the url from the dataset description and return the arff string
+    return openml._api_calls._read_url(
+        xmltodict.parse(dataset_xml)['oml:data_set_description']['oml:url']
+    )
