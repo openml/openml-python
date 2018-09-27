@@ -174,4 +174,3 @@ class TestRun(TestBase):
         # assert default behaviour is throwing an error
         with self.assertRaises(ValueError, msg='Could not find model.pkl'):
             openml.runs.OpenMLRun.from_filesystem(cache_path)
-            

@@ -24,6 +24,7 @@ class OpenMLRun(object):
     FIXME
 
     """
+
     def __init__(self, task_id, flow_id, dataset_id, setup_string=None,
                  output_files=None, setup_id=None, tags=None, uploader=None, uploader_name=None,
                  evaluations=None, fold_evaluations=None, sample_evaluations=None,
@@ -202,19 +203,21 @@ class OpenMLRun(object):
                                        ('fold', 'NUMERIC'),
                                        ('sample', 'NUMERIC'),
                                        ('row_id', 'NUMERIC')] + \
-                [('confidence.' + class_labels[i], 'NUMERIC') for i in range(len(class_labels))] +\
-               [('prediction', class_labels),
-                 ('correct', class_labels)]
+                                      [('confidence.' + class_labels[i], 'NUMERIC') for i in range(len(class_labels))] + \
+                                      [('prediction', class_labels),
+                                       ('correct', class_labels)]
 
         elif task.task_type == 'Supervised Regression':
             arff_dict['attributes'] = [('repeat', 'NUMERIC'),
                                        ('fold', 'NUMERIC'),
-                                       ('row_id', 'NUMERIC')] + \
-               [('prediction', class_labels),
-                 ('truth', class_labels)]
+                                       ('row_id', 'NUMERIC'),
+                                       ('prediction', 'NUMERIC'),
+                                       ('truth', 'NUMERIC')]
 
         elif task.task_type == 'Clustering':
-            arff_dict['attributes'] = [('row_id', 'NUMERIC'),
+            arff_dict['attributes'] = [('repeat', 'NUMERIC'),
+                                       ('fold', 'NUMERIC'),
+                                       ('row_id', 'NUMERIC'),
                                        ('cluster', 'NUMERIC')]
 
         return arff_dict
@@ -243,11 +246,11 @@ class OpenMLRun(object):
         return arff_dict
 
     def get_metric_fn(self, sklearn_fn, kwargs={}):
-        """Calculates metric scores based on predicted values. Assumes the
+        """Calculates metric scores based on prnedicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
-        it assumes that the 'correct' attribute is specified in the arff
-        (which is an optional field, but always the case for openml-python
-        runs)
+        it assumes that the 'correct' or 'truth' attribute is specified in
+        the arff (which is an optional field, but always the case for
+        openml-python runs)
 
         Parameters
         ----------
@@ -271,11 +274,16 @@ class OpenMLRun(object):
         else:
             raise ValueError('Run should have been locally executed or contain outputfile reference.')
 
+        # Need to know more about the task to compute scores correctly
+        task = get_task(self.task_id)
+
         attribute_names = [att[0] for att in predictions_arff['attributes']]
-        if 'correct' not in attribute_names:
-            raise ValueError('Attribute "correct" should be set')
-        if 'prediction' not in attribute_names:
-            raise ValueError('Attribute "predict" should be set')
+        if task.task_type == 'Supervised Classification' and 'correct' not in attribute_names:
+            raise ValueError('Attribute "correct" should be set for classification task runs')
+        if task.task_type == 'Supervised Regression' and 'truth' not in attribute_names:
+            raise ValueError('Attribute "truth" should be set for regression task runs')
+        if task.task_type != 'Clustering' and 'prediction' not in attribute_names:
+            raise ValueError('Attribute "predict" should be set for supervised task runs')
 
         def _attribute_list_to_dict(attribute_list):
             # convenience function: Creates a mapping to map from the name of attributes
@@ -285,19 +293,26 @@ class OpenMLRun(object):
             for idx in range(len(attribute_list)):
                 res[attribute_list[idx][0]] = idx
             return res
+
         attribute_dict = _attribute_list_to_dict(predictions_arff['attributes'])
 
-        # might throw KeyError!
-        predicted_idx = attribute_dict['prediction']
-        correct_idx = attribute_dict['correct']
         repeat_idx = attribute_dict['repeat']
         fold_idx = attribute_dict['fold']
-        sample_idx = attribute_dict['sample'] # TODO: this one might be zero
+        predicted_idx = attribute_dict['prediction']  # Assume supervised tasks
+
+        if task.task_type == 'Supervised Classification' or self.task_type == 'Learning Curve':
+            correct_idx = attribute_dict['correct']
+        elif task.task_type == 'Supervised Regression':
+            correct_idx = attribute_dict['truth']
+        has_samples = False
+        if 'sample' in attribute_dict:
+            sample_idx = attribute_dict['sample']
+            has_samples = True
 
         if predictions_arff['attributes'][predicted_idx][1] != predictions_arff['attributes'][correct_idx][1]:
             pred = predictions_arff['attributes'][predicted_idx][1]
             corr = predictions_arff['attributes'][correct_idx][1]
-            raise ValueError('Predicted and Correct do not have equal values: %s Vs. %s' %(str(pred), str(corr)))
+            raise ValueError('Predicted and Correct do not have equal values: %s Vs. %s' % (str(pred), str(corr)))
 
         # TODO: these could be cached
         values_predict = {}
@@ -305,11 +320,17 @@ class OpenMLRun(object):
         for line_idx, line in enumerate(predictions_arff['data']):
             rep = line[repeat_idx]
             fold = line[fold_idx]
-            samp = line[sample_idx]
+            if has_samples:
+                samp = line[sample_idx]
+            else:
+                samp = 0  # No learning curve sample, always 0
 
-            # TODO: can be sped up bt preprocessing index, but OK for now.
-            prediction = predictions_arff['attributes'][predicted_idx][1].index(line[predicted_idx])
-            correct = predictions_arff['attributes'][predicted_idx][1].index(line[correct_idx])
+            if task.task_type == 'Supervised Classification' or self.task_type == 'Learning Curve':
+                prediction = predictions_arff['attributes'][predicted_idx][1].index(line[predicted_idx])
+                correct = predictions_arff['attributes'][predicted_idx][1].index(line[correct_idx])
+            elif task.task_type == 'Supervised Regression':
+                prediction = line[predicted_idx]
+                correct = line[correct_idx]
             if rep not in values_predict:
                 values_predict[rep] = OrderedDict()
                 values_correct[rep] = OrderedDict()
@@ -320,8 +341,8 @@ class OpenMLRun(object):
                 values_predict[rep][fold][samp] = []
                 values_correct[rep][fold][samp] = []
 
-            values_predict[line[repeat_idx]][line[fold_idx]][line[sample_idx]].append(prediction)
-            values_correct[line[repeat_idx]][line[fold_idx]][line[sample_idx]].append(correct)
+            values_predict[rep][fold][samp].append(prediction)
+            values_correct[rep][fold][samp].append(correct)
 
         scores = []
         for rep in values_predict.keys():
@@ -345,7 +366,8 @@ class OpenMLRun(object):
         if self.model is None:
             raise PyOpenMLError("OpenMLRun obj does not contain a model. (This should never happen.) ")
         if self.flow_id is None:
-            raise PyOpenMLError("OpenMLRun obj does not contain a flow id. (Should have been added while executing the task.) ")
+            raise PyOpenMLError("OpenMLRun obj does not contain a flow id. "
+                                "(Should have been added while executing the task.) ")
 
         description_xml = self._create_description_xml()
         file_elements = {'description': ("description.xml", description_xml)}
@@ -428,7 +450,8 @@ class OpenMLRun(object):
                                  'parameters expected by the '
                                  'flow:\nexpected flow parameters: '
                                  '%s\nmodel parameters: %s' % (
-                    sorted(expected_parameters| expected_components), sorted(model_parameters)))
+                                     sorted(expected_parameters | expected_components),
+                                     sorted(model_parameters)))
 
             _params = []
             for _param_name in _flow.parameters:
@@ -570,7 +593,7 @@ def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
     if tags is not None:
         description['oml:run']['oml:tag'] = tags  # Tags describing the run
     if (fold_evaluations is not None and len(fold_evaluations) > 0) or \
-       (sample_evaluations is not None and len(sample_evaluations) > 0):
+            (sample_evaluations is not None and len(sample_evaluations) > 0):
         description['oml:run']['oml:output_data'] = OrderedDict()
         description['oml:run']['oml:output_data']['oml:evaluation'] = list()
     if fold_evaluations is not None:

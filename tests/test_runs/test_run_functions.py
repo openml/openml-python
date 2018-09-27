@@ -82,7 +82,7 @@ class TestRun(TestBase):
         except openml.exceptions.OpenMLServerException as e:
             e.additional = str(e.additional) + '; run_id: ' + str(run_id)
             raise e
-        
+
         run_prime = openml.runs.run_model_on_task(task, model_prime,
                                                   avoid_duplicate_runs=False,
                                                   seed=1)
@@ -106,7 +106,9 @@ class TestRun(TestBase):
                      random_state_value=None, check_setup=True):
         classes_without_random_state = \
             ['sklearn.model_selection._search.GridSearchCV',
-             'sklearn.pipeline.Pipeline']
+             'sklearn.pipeline.Pipeline',
+             'sklearn.linear_model.base.LinearRegression',
+             ]
 
         def _remove_random_state(flow):
             if 'random_state' in flow.parameters:
@@ -171,7 +173,8 @@ class TestRun(TestBase):
 
         return run
 
-    def _check_fold_evaluations(self, fold_evaluations, num_repeats, num_folds, max_time_allowed=60000):
+    def _check_fold_evaluations(self, fold_evaluations, num_repeats, num_folds, max_time_allowed=60000,
+                                task_type="Supervised Classification"):
         """
         Checks whether the right timing measures are attached to the run (before upload).
         Test is only performed for versions >= Python3.3
@@ -184,8 +187,17 @@ class TestRun(TestBase):
         # a dict mapping from openml measure to a tuple with the minimum and maximum allowed value
         check_measures = {'usercpu_time_millis_testing': (0, max_time_allowed),
                           'usercpu_time_millis_training': (0, max_time_allowed),  # should take at least one millisecond (?)
-                          'usercpu_time_millis': (0, max_time_allowed),
-                          'predictive_accuracy': (0, 1)}
+                          'usercpu_time_millis': (0, max_time_allowed)}
+
+        print(task_type)
+
+        if task_type == "Supervised Classification" or task_type == "Learning Curve":
+            check_measures['predictive_accuracy'] = (0, 1)
+        elif task_type == "Supervised Regression":
+            check_measures['mean_absolute_error'] = (0, float("inf"))
+
+        print(check_measures.keys())
+        print(fold_evaluations.keys())
 
         self.assertIsInstance(fold_evaluations, dict)
         if sys.version_info[:2] >= (3, 3):
@@ -341,7 +353,7 @@ class TestRun(TestBase):
             self.assertTrue(check_res)
 
         # todo: check if runtime is present
-        self._check_fold_evaluations(run.fold_evaluations, 1, num_folds)
+        self._check_fold_evaluations(run.fold_evaluations, 1, num_folds, task_type="Supervised Classification")
         pass
 
 
@@ -361,7 +373,7 @@ class TestRun(TestBase):
                 raise TypeError('Param Grid should be of type list (GridSearch only) or dict')
 
         task_id = 738  # quake dataset
-        num_test_instances = 719  # 33% holdout task
+        num_test_instances = 718  # 33% holdout task
         num_folds = 1  # because of holdout
         num_iterations = 5  # for base search classifiers
 
@@ -390,7 +402,7 @@ class TestRun(TestBase):
             self.assertTrue(check_res)
 
         # todo: check if runtime is present
-        self._check_fold_evaluations(run.fold_evaluations, 1, num_folds)
+        self._check_fold_evaluations(run.fold_evaluations, 1, num_folds, task_type="Supervised Regression")
         pass
 
     def test_run_and_upload_logistic_regression(self):
@@ -883,7 +895,7 @@ class TestRun(TestBase):
         # trace. SGD does not produce any
         self.assertIsInstance(arff_tracecontent, type(None))
 
-        self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds)
+        self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds, task_type=task.task_type)
 
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
@@ -927,7 +939,7 @@ class TestRun(TestBase):
         for measure in user_defined_measures:
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
-        self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds)
+        self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds, task_type=task.task_type)
 
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
@@ -1071,7 +1083,7 @@ class TestRun(TestBase):
         flows = [74, 1718]
 
         '''
-        Since the results are taken by batch size, the function does not throw an OpenMLServerError anymore. 
+        Since the results are taken by batch size, the function does not throw an OpenMLServerError anymore.
         Instead it throws a TimeOutException. For the moment commented out.
         '''
         #self.assertRaises(openml.exceptions.OpenMLServerError, openml.runs.list_runs)
