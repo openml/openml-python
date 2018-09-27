@@ -144,9 +144,17 @@ class TestRun(TestBase):
             ('classifier', DecisionTreeClassifier(max_depth=1)),
         ])
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(task, model, add_local_measures=False)
+        run = openml.runs.run_model_on_task(
+            model=model,
+            task=task,
+            add_local_measures=False,
+        )
 
-        cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
+        cache_path = os.path.join(
+            self.workdir,
+            'runs',
+            str(random.getrandbits(128)),
+        )
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
@@ -173,7 +181,11 @@ class TestRun(TestBase):
             add_local_measures=False,
         )
 
-        cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
+        cache_path = os.path.join(
+            self.workdir,
+            'runs',
+            str(random.getrandbits(128)),
+        )
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)

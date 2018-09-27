@@ -118,7 +118,7 @@ class OpenMLRun(object):
                 run.model = pickle.load(fp)
 
         if os.path.isfile(trace_path):
-            run.trace = openml.runs.OpenMLRunTrace.from_filesystem(trace_path)
+            run.trace = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
 
         return run
 
@@ -164,7 +164,7 @@ class OpenMLRun(object):
                 pickle.dump(self.model, f)
 
         if self.trace is not None:
-            self.trace.to_filesystem(output_directory)
+            self.trace._to_filesystem(output_directory)
 
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the server.

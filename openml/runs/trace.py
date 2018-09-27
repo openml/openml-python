@@ -5,6 +5,13 @@ import xmltodict
 from collections import OrderedDict
 
 PREFIX = 'parameter_'
+REQUIRED_ATTRIBUTES = [
+    'repeat',
+    'fold',
+    'iteration',
+    'evaluation',
+    'selected',
+]
 
 
 class OpenMLRunTrace(object):
@@ -62,83 +69,42 @@ class OpenMLRunTrace(object):
         Generates the trace object from the attributes and content extracted
         while running the underlying flow.
 
+        Parameters
+        ----------
+
+        attributes : list
+            List of tuples describing the arff attributes.
+
+        content : list
+            List of lists containing information about the individual tuning
+            runs.
+
         Returns
         -------
         OpenMLRunTrace
         """
 
         if content is None:
-            if attributes is None:
-                return None
-            else:
-                raise ValueError('Trace content not available.')
-        if len(content) == 0:
+            raise ValueError('Trace content not available.')
+        elif attributes is None:
+            raise ValueError('Trace attributes not available.')
+        elif len(content) == 0:
             raise ValueError('Trace content is empty.')
-        if attributes is not None:
-            if len(attributes) != len(content[0]):
-                raise ValueError(
-                    'Trace_attributes and trace_content not compatible:'
-                    ' %s vs %s' % (attributes, content[0])
-                )
-        else:
-            raise ValueError('No trace attributes available')
-
-        trace = OrderedDict()
-        attribute_idx = {att[0]: idx for idx, att in enumerate(attributes)}
-
-        required_attributes = ['repeat', 'fold', 'iteration', 'evaluation',
-                               'selected']
-        for required_attribute in required_attributes:
-            if required_attribute not in attribute_idx:
-                raise ValueError(
-                    'arff misses required attribute: %s' % required_attribute)
-        parameter_attributes = [
-            attribute for attribute in attribute_idx
-            if attribute not in required_attributes
-            and attribute != 'setup_string'
-        ]
-
-        for itt in content:
-            repeat = int(itt[attribute_idx['repeat']])
-            fold = int(itt[attribute_idx['fold']])
-            iteration = int(itt[attribute_idx['iteration']])
-            evaluation = float(itt[attribute_idx['evaluation']])
-            selected_value = itt[attribute_idx['selected']]
-            if 'setup_string' in attribute_idx:
-                raise ValueError(
-                    'setup_string not allowed when constructing a trace object'
-                    ' run results.'
-                )
-            setup_string = None
-            if selected_value == 'true':
-                selected = True
-            elif selected_value == 'false':
-                selected = False
-            else:
-                raise ValueError(
-                    'expected {"true", "false"} value for selected field, '
-                    'received: %s' % selected_value
-                )
-            parameters = OrderedDict([
-                (attribute, itt[attribute_idx[attribute]])
-                for attribute in parameter_attributes
-            ])
-
-            current = OpenMLTraceIteration(
-                repeat,
-                fold,
-                iteration,
-                setup_string,
-                evaluation,
-                selected,
-                paramaters=parameters
+        elif len(attributes) != len(content[0]):
+            raise ValueError(
+                'Trace_attributes and trace_content not compatible:'
+                ' %s vs %s' % (attributes, content[0])
             )
-            trace[(repeat, fold, iteration)] = current
 
-        return cls(None, trace)
+        return cls._trace_from_arff_struct(
+            attributes=attributes,
+            content=content,
+            error_message='setup_string not allowed when constructing a '
+                'trace object from run results.'
+        )
 
     @classmethod
-    def from_filesystem(cls, file_path):
+    def _from_filesystem(cls, file_path):
         """
         Logic to deserialize the trace from the filesystem.
 
@@ -167,7 +133,7 @@ class OpenMLRunTrace(object):
 
         return cls.trace_from_arff(trace_arff)
 
-    def to_filesystem(self, file_path):
+    def _to_filesystem(self, file_path):
         """Serialize the trace object to the filesystem.
 
         Serialize the trace object as an arff.
@@ -205,31 +171,32 @@ class OpenMLRunTrace(object):
             ('selected', ['true', 'false']),
         ]
         trace_attributes.extend([
-            ('parameter_' + parameter, 'STRING') for parameter in
+            (PREFIX + parameter, 'STRING') for parameter in
             next(iter(self.trace_iterations.values())).get_parameters()
         ])
 
         arff_dict = OrderedDict()
         data = []
         for trace_iteration in self.trace_iterations.values():
-            tit_list = []
+            tmp_list = []
             for attr, _ in trace_attributes:
-                if attr.startswith('parameter_'):
-                    attr = attr[len('parameter_'):]
+                if attr.startswith(PREFIX):
+                    attr = attr[len(PREFIX):]
                     value = trace_iteration.get_parameters()[attr]
                 else:
                     value = getattr(trace_iteration, attr)
                 if attr == 'selected':
                     if value:
-                        tit_list.append('true')
+                        tmp_list.append('true')
                     else:
-                        tit_list.append('false')
+                        tmp_list.append('false')
                 else:
-                    tit_list.append(value)
-            data.append(tit_list)
+                    tmp_list.append(value)
+            data.append(tmp_list)
 
         arff_dict['attributes'] = trace_attributes
         arff_dict['data'] = data
+        # TODO allow to pass a trace description when running a flow
         arff_dict['relation'] = "Trace"
         return arff_dict
 
@@ -249,29 +216,46 @@ class OpenMLRunTrace(object):
         -------
         OpenMLRunTrace
         """
+        attributes = arff_obj['attributes']
+        content = arff_obj['data']
+        return cls._trace_from_arff_struct(
+            attributes=attributes,
+            content=content,
+            error_message=
+                'setup_string not supported for arff serialization'
+
+        )
+
+    @classmethod
+    def _trace_from_arff_struct(cls, attributes, content, error_message):
         trace = OrderedDict()
-        # flag if setup string is in attributes
-        attribute_idx = {
-            att[0]: idx for idx, att in enumerate(arff_obj['attributes'])
-        }
-        required_attributes = [
-            'repeat',
-            'fold',
-            'iteration',
-            'evaluation',
-            'selected',
-        ]
-        for required_attribute in required_attributes:
+        attribute_idx = {att[0]: idx for idx, att in enumerate(attributes)}
+
+        for required_attribute in REQUIRED_ATTRIBUTES:
             if required_attribute not in attribute_idx:
                 raise ValueError(
                     'arff misses required attribute: %s' % required_attribute
                 )
         if 'setup_string' in attribute_idx:
-            raise ValueError(
-                'setup_string not supported for arff serialization'
-            )
+            raise ValueError(error_message)
 
-        for itt in arff_obj['data']:
+        # note that the required attributes can not be duplicated because
+        # they are not parameters
+        parameter_attributes = []
+        for attribute in attribute_idx:
+            if attribute in REQUIRED_ATTRIBUTES:
+                continue
+            elif attribute == 'setup_string':
+                continue
+            elif not attribute.startswith(PREFIX):
+                raise ValueError(
+                    'Encountered unknown attribute %s that does not start '
+                    'with prefix %s' % (attribute, PREFIX)
+                )
+            else:
+                parameter_attributes.append(attribute)
+
+        for itt in content:
             repeat = int(itt[attribute_idx['repeat']])
             fold = int(itt[attribute_idx['fold']])
             iteration = int(itt[attribute_idx['iteration']])
@@ -287,13 +271,10 @@ class OpenMLRunTrace(object):
                     'received: %s' % selected_value
                 )
 
-            parameters = OrderedDict()
-            for attribute_name, idx in attribute_idx.items():
-                if (
-                    attribute_name not in required_attributes
-                    and attribute_name.startswith(PREFIX)
-                ):
-                    parameters[attribute_name] = itt[idx]
+            parameters = OrderedDict([
+                (attribute, itt[attribute_idx[attribute]])
+                for attribute in parameter_attributes
+            ])
 
             current = OpenMLTraceIteration(
                 repeat=repeat,
@@ -423,7 +404,7 @@ class OpenMLTraceIteration(object):
             )
         elif not setup_string and not paramaters:
             raise ValueError(
-                'Either setup_string or parameters needs to be paased as '
+                'Either setup_string or parameters needs to be passed as '
                 'argument.'
             )
         if paramaters is not None and not isinstance(paramaters, OrderedDict):
@@ -441,17 +422,17 @@ class OpenMLTraceIteration(object):
         self.parameters = paramaters
 
     def get_parameters(self):
-        if self.parameters:
-            return self.parameters
-
         result = {}
         # parameters have prefix 'parameter_'
 
-        prefix = 'parameter_'
-        for param in self.setup_string:
-            key = param[len(prefix):]
-            value = self.setup_string[param]
-            result[key] = json.loads(value)
+        if self.setup_string:
+            for param in self.setup_string:
+                key = param[len(PREFIX):]
+                value = self.setup_string[param]
+                result[key] = json.loads(value)
+        else:
+            for param, value in self.parameters.items():
+                result[param[len(PREFIX):]] = value
         return result
 
     def __str__(self):

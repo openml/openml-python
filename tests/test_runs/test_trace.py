@@ -32,13 +32,16 @@ class TestTrace(unittest.TestCase):
 
     def test_initialization(self):
         """Check all different ways to fail the initialization """
-        rval = OpenMLRunTrace.generate(None, None)
-        self.assertIsNone(rval)
         with self.assertRaisesRegexp(
             ValueError,
             'Trace content not available.',
         ):
             OpenMLRunTrace.generate(attributes='foo', content=None)
+        with self.assertRaisesRegexp(
+            ValueError,
+            'Trace attributes not available.',
+        ):
+            OpenMLRunTrace.generate(attributes=None, content='foo')
         with self.assertRaisesRegexp(
             ValueError,
             'Trace content is empty.'
@@ -49,3 +52,37 @@ class TestTrace(unittest.TestCase):
             'Trace_attributes and trace_content not compatible:'
         ):
             OpenMLRunTrace.generate(attributes=['abc'], content=[[1, 2]])
+
+    def test_duplicate_name(self):
+        # Test that the user does not pass a parameter which has the same name
+        # as one of the required trace attributes
+        trace_attributes = [
+            ('repeat', 'NUMERICAL'),
+            ('fold', 'NUMERICAL'),
+            ('iteration', 'NUMERICAL'),
+            ('evaluation', 'NUMERICAL'),
+            ('selected', ['true', 'false']),
+            ('repeat', 'NUMERICAL'),
+        ]
+        trace_content = [[0, 0, 0, 0.5, 'true', 1], [0, 0, 0, 0.9, 'false', 2]]
+        with self.assertRaisesRegexp(
+            ValueError,
+            'Either setup_string or parameters needs to be passed as argument.'
+        ):
+            OpenMLRunTrace.generate(trace_attributes, trace_content)
+
+        trace_attributes = [
+            ('repeat', 'NUMERICAL'),
+            ('fold', 'NUMERICAL'),
+            ('iteration', 'NUMERICAL'),
+            ('evaluation', 'NUMERICAL'),
+            ('selected', ['true', 'false']),
+            ('sunshine', 'NUMERICAL'),
+        ]
+        trace_content = [[0, 0, 0, 0.5, 'true', 1], [0, 0, 0, 0.9, 'false', 2]]
+        with self.assertRaisesRegexp(
+            ValueError,
+            'Encountered unknown attribute sunshine that does not start with '
+            'prefix parameter_'
+        ):
+            OpenMLRunTrace.generate(trace_attributes, trace_content)
