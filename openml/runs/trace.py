@@ -120,7 +120,7 @@ class OpenMLRunTrace(object):
                     'received: %s' % selected_value
                 )
             parameters = OrderedDict([
-                (attribute, attribute_idx[attribute])
+                (attribute, itt[attribute_idx[attribute]])
                 for attribute in parameter_attributes
             ])
 

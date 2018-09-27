@@ -83,7 +83,7 @@ class TestRun(TestBase):
         except openml.exceptions.OpenMLServerException as e:
             e.additional = str(e.additional) + '; run_id: ' + str(run_id)
             raise e
-        
+
         run_prime = openml.runs.run_model_on_task(model_prime, task,
                                                   avoid_duplicate_runs=False,
                                                   seed=1)
@@ -120,7 +120,7 @@ class TestRun(TestBase):
         flow.publish()
 
         task = openml.tasks.get_task(task_id)
-        run = openml.runs.run_flow_on_task(task, flow, seed=1,
+        run = openml.runs.run_flow_on_task(flow, task, seed=1,
                                            avoid_duplicate_runs=openml.config.avoid_duplicate_runs)
         run_ = run.publish()
         self.assertEqual(run_, run)

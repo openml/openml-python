@@ -23,7 +23,7 @@ class TestTrace(unittest.TestCase):
         trace = OpenMLRunTrace(-1, trace_iterations=trace_iterations)
         # This next one should simply not fail
         self.assertEqual(trace.get_selected_iteration(2, 2), 2)
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegexp(
             ValueError,
                 'Could not find the selected iteration for rep/fold 3/3',
         ):
@@ -34,17 +34,17 @@ class TestTrace(unittest.TestCase):
         """Check all different ways to fail the initialization """
         rval = OpenMLRunTrace.generate(None, None)
         self.assertIsNone(rval)
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegexp(
             ValueError,
             'Trace content not available.',
         ):
             OpenMLRunTrace.generate(attributes='foo', content=None)
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegexp(
             ValueError,
             'Trace content is empty.'
         ):
             OpenMLRunTrace.generate(attributes='foo', content=[])
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegexp(
             ValueError,
             'Trace_attributes and trace_content not compatible:'
         ):
