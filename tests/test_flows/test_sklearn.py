@@ -386,8 +386,7 @@ class TestSklearn(unittest.TestCase):
             remainder='passthrough')
         model = sklearn.pipeline.Pipeline(
             steps=[('transformer', inner),
-                   ('classifier', sklearn.tree.DecisionTreeClassifier())
-        ])
+                   ('classifier', sklearn.tree.DecisionTreeClassifier())])
         fixture_name = \
             'sklearn.pipeline.Pipeline('\
             'transformer=sklearn.compose._column_transformer.'\
