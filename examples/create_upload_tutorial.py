@@ -7,19 +7,29 @@ A tutorial on how to create and upload a dataset to OpenML.
 import numpy as np
 import openml
 import sklearn.datasets
+from openml.datasets.functions import create_dataset
 
 ############################################################################
-# For this example we will upload to the test server to not  pollute the live
+# For this tutorial we will upload to the test server to not  pollute the live
 # server with countless copies of the same dataset.
 openml.config.server = 'https://test.openml.org/api/v1/xml'
 
 ############################################################################
-# Prepare the data
-# ^^^^^^^^^^^^^^^^
+# The dataset that you upload to OpenML can be:
+#
+# * A numpy array.
+# * A list of lists.
+
+############################################################################
+# Dataset is a numpy array
+# ^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# Prepare dataset
+# ===============
 # Load an example dataset from scikit-learn which we will upload to OpenML.org via the API.
 breast_cancer = sklearn.datasets.load_breast_cancer()
 name = 'BreastCancer(scikit-learn)'
-X = breast_cancer.data
+x = breast_cancer.data
 y = breast_cancer.target
 target_names = breast_cancer.target_names
 y = np.array([target_names[i] for i in y])
@@ -28,7 +38,8 @@ description = breast_cancer.DESCR
 ############################################################################
 # OpenML does not distinguish between the attributes and targets on the data level and stores all data in a
 # single matrix. The target feature is indicated as meta-data of the dataset (and tasks on that data).
-data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
+
+data = np.concatenate((x, y.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
 attributes = [
                  (attribute_name, 'REAL') for attribute_name in attribute_names
@@ -36,11 +47,11 @@ attributes = [
 
 ############################################################################
 # Create the dataset object
-# ^^^^^^^^^^^^^^^^^^^^^^^^^
+# =========================
 # The definition of all fields can be found in the XSD files describing the expected format:
 #
 # https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd
-dataset = openml.datasets.functions.create_dataset(
+dataset = create_dataset(
     # The name of the dataset (needs to be unique). 
     # Must not be longer than 128 characters and only contain
     # a-z, A-Z, 0-9 and the following special characters: _\-\.(),
@@ -87,6 +98,80 @@ dataset = openml.datasets.functions.create_dataset(
     )
 )
 
+############################################################################
+try:
+    upload_id = dataset.publish()
+    print('URL for dataset: %s/data/%d' % (openml.config.server, upload_id))
+except openml.exceptions.PyOpenMLError as err:
+    print("OpenML: {0}".format(err))
+
+############################################################################
+# Dataset is a list of lists
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# Weather dataset:
+# http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
+data = [
+    ['sunny', 85, 85, 'FALSE', 'no'],
+    ['sunny', 80, 90, 'TRUE', 'no'],
+    ['overcast', 83, 86, 'FALSE', 'yes'],
+    ['rainy', 70, 96, 'FALSE', 'yes'],
+    ['rainy', 68, 80, 'FALSE', 'yes'],
+    ['rainy', 65, 70, 'TRUE', 'no'],
+    ['overcast', 64, 65, 'TRUE', 'yes'],
+    ['sunny', 72, 95, 'FALSE', 'no'],
+    ['sunny', 69, 70, 'FALSE', 'yes'],
+    ['rainy', 75, 80, 'FALSE', 'yes'],
+    ['sunny', 75, 70, 'TRUE', 'yes'],
+    ['overcast', 72, 90, 'TRUE', 'yes'],
+    ['overcast', 81, 75, 'FALSE', 'yes'],
+    ['rainy', 71, 91, 'TRUE', 'no'],
+]
+
+column_names = [
+    ('outlook', ['sunny', 'overcast', 'rainy']),
+    ('temperature', 'REAL'),
+    ('humidity', 'REAL'),
+    ('windy', ['TRUE', 'FALSE']),
+    ('play', ['yes', 'no']),
+]
+
+name = "Wind"
+description = (
+    'The weather problem is a tiny dataset that we will use repeatedly'
+    ' to illustrate machine learning methods. Entirely fictitious, it '
+    'supposedly concerns the conditions that are suitable for playing '
+    'some unspecified game. In general, instances in a dataset are '
+    'characterized by the values of features, or attributes, that measure '
+    'different aspects of the instance. In this case there are four '
+    'attributes: outlook, temperature, humidity, and windy. '
+    'The outcome is whether to play or not.'
+)
+collection_date = '01-01-2011'
+language = 'English'
+default_target_attribute = 'play'
+citation = 'I. H. Witten, E. Frank, M. A. Hall, and ITPro,' \
+           ' Data mining practical machine learning tools and techniques, ' \
+           'third edition. Burlington, Mass.: Morgan Kaufmann Publishers, 2011'
+
+dataset = create_dataset(
+    name=name,
+    description=description,
+    creator=None,
+    contributor=None,
+    collection_date=collection_date,
+    language=language,
+    licence=None,
+    default_target_attribute=default_target_attribute,
+    row_id_attribute=None,
+    ignore_attribute=None,
+    citation=citation,
+    attributes=column_names,
+    data=data,
+    version_label='example',
+)
+
+uploaded_did = dataset.publish()
 ############################################################################
 try:
     upload_id = dataset.publish()

@@ -383,7 +383,7 @@ def create_dataset(name, description, creator, contributor, collection_date,
         License of the data.
     attributes : list
         A list of tuples. Each tuple consists of the attribute name and type.
-    data : numpy.ndarray
+    data : numpy.ndarray | list
         An array that contains both the attributes and the targets, with
         shape=(n_samples, n_features).
         The target feature is indicated as meta-data of the dataset.
