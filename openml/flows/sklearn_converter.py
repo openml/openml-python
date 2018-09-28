@@ -150,10 +150,10 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False):
                 del components[key]
                 if step_name is None:
                     rval = component
-                elif 'param_1' not in value:
+                elif 'argument_1' not in value:
                     rval = (step_name, component)
                 else:
-                    rval = (step_name, component, value['param_1'])
+                    rval = (step_name, component, value['argument_1'])
             elif serialized_type == 'cv_object':
                 rval = _deserialize_cross_validator(value)
             else:
@@ -328,7 +328,7 @@ def _extract_information_from_model(model):
                 if not isinstance(sub_component, (OpenMLFlow, type(None))):
                     msg = 'Second item of tuple does not match assumptions. '\
                           'Expected OpenMLFlow, got %s' % type(sub_component)
-                    raise ValueError(msg)
+                    raise TypeError(msg)
 
                 if identifier in reserved_keywords:
                     parent_model_name = model.__module__ + "." + \
@@ -360,7 +360,7 @@ def _extract_information_from_model(model):
                     cr_value['key'] = identifier
                     cr_value['step_name'] = identifier
                     if len(sub_component_tuple) == 3:
-                        cr_value['param_1'] = sub_component_tuple[2]
+                        cr_value['argument_1'] = sub_component_tuple[2]
                     component_reference['value'] = cr_value
                     parameter_value.append(component_reference)
 
