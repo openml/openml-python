@@ -1,6 +1,5 @@
 import json
 import os
-import pytest
 import sys
 import unittest
 from distutils.version import LooseVersion
@@ -348,8 +347,8 @@ class TestSklearn(unittest.TestCase):
         self.assertEqual(new_model_params, fu_params)
         new_model.fit(self.X, self.y)
 
-    @pytest.mark.skipif(LooseVersion(sklearn.__version__) < "0.20",
-                        reason="columntransformer introduction in 0.20.0")
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
+                     reason="columntransformer introduction in 0.20.0")
     def test_serialize_column_transformer(self):
         # temporary local import, dependend on version 0.20
         import sklearn.compose
@@ -373,8 +372,8 @@ class TestSklearn(unittest.TestCase):
         serialization2 = sklearn_to_flow(new_model)
         assert_flows_equal(serialization, serialization2)
 
-    @pytest.mark.skipif(LooseVersion(sklearn.__version__) < "0.20",
-                        reason="columntransformer introduction in 0.20.0")
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
+                     reason="columntransformer introduction in 0.20.0")
     def test_serialize_column_transformer_pipeline(self):
         # temporary local import, dependend on version 0.20
         import sklearn.compose

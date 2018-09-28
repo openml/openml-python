@@ -13,7 +13,7 @@ import openml
 import openml.exceptions
 import openml._api_calls
 import sklearn
-import pytest
+import unittest
 
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent, \
@@ -356,8 +356,8 @@ class TestRun(TestBase):
                                     ('dummy', DummyClassifier(strategy='prior'))])
         self._run_and_upload(pipeline1, '62501')
 
-    @pytest.mark.skipif(LooseVersion(sklearn.__version__) < "0.20",
-                        reason="columntransformer introduction in 0.20.0")
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
+                     reason="columntransformer introduction in 0.20.0")
     def test_run_and_upload_column_transformer_pipeline(self):
         import sklearn.compose
         inner = sklearn.compose.ColumnTransformer(
