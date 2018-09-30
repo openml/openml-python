@@ -72,7 +72,7 @@ class OpenMLTask(object):
             self.split = self.download_split()
 
         return self.split.repeats, self.split.folds, self.split.samples
-
+      
     def push_tag(self, tag):
         """Annotates this task with a tag on the server.
 
@@ -94,7 +94,6 @@ class OpenMLTask(object):
         """
         data = {'task_id': self.task_id, 'tag': tag}
         openml._api_calls._perform_api_call("/task/untag", data=data)
-
 
 class OpenMLSupervisedTask(OpenMLTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
@@ -126,7 +125,6 @@ class OpenMLSupervisedTask(OpenMLTask):
             raise NotImplementedError(self.task_type)
         X_and_y = dataset.get_data(target=self.target_name)
         return X_and_y
-
 
 class OpenMLClassificationTask(OpenMLSupervisedTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,

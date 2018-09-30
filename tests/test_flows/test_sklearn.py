@@ -125,7 +125,6 @@ class TestSklearn(unittest.TestCase):
 
         self.assertEqual(check_dependencies_mock.call_count, 1)
 
-
     @mock.patch('openml.flows.sklearn_converter._check_dependencies')
     def test_serialize_model_clustering(self, check_dependencies_mock):
         model = sklearn.cluster.KMeans()
@@ -180,7 +179,6 @@ class TestSklearn(unittest.TestCase):
 
         self.assertEqual(check_dependencies_mock.call_count, 1)
 
-
     def test_serialize_model_with_subcomponent(self):
         model = sklearn.ensemble.AdaBoostClassifier(
             n_estimators=100, base_estimator=sklearn.tree.DecisionTreeClassifier())
@@ -228,8 +226,8 @@ class TestSklearn(unittest.TestCase):
     def test_serialize_pipeline(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         dummy = sklearn.dummy.DummyClassifier(strategy='prior')
-        model = sklearn.pipeline.Pipeline(steps=(
-            ('scaler', scaler), ('dummy', dummy)))
+        model = sklearn.pipeline.Pipeline(steps=[
+            ('scaler', scaler), ('dummy', dummy)])
 
         fixture_name = 'sklearn.pipeline.Pipeline(' \
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
@@ -290,8 +288,8 @@ class TestSklearn(unittest.TestCase):
     def test_serialize_pipeline_clustering(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         km = sklearn.cluster.KMeans()
-        model = sklearn.pipeline.Pipeline(steps=(
-            ('scaler', scaler), ('clusterer', km)))
+        model = sklearn.pipeline.Pipeline(steps=[
+            ('scaler', scaler), ('clusterer', km)])
 
         fixture_name = 'sklearn.pipeline.Pipeline(' \
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
@@ -349,12 +347,71 @@ class TestSklearn(unittest.TestCase):
         self.assertEqual(new_model_params, fu_params)
         new_model.fit(self.X, self.y)
 
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
+                     reason="columntransformer introduction in 0.20.0")
+    def test_serialize_column_transformer(self):
+        # temporary local import, dependend on version 0.20
+        import sklearn.compose
+        model = sklearn.compose.ColumnTransformer(
+            transformers=[
+                ('numeric', sklearn.preprocessing.StandardScaler(), [0, 1, 2]),
+                ('nominal', sklearn.preprocessing.OneHotEncoder(
+                    handle_unknown='ignore'), [3, 4, 5])],
+            remainder='passthrough')
+        fixture = 'sklearn.compose._column_transformer.ColumnTransformer(' \
+                  'numeric=sklearn.preprocessing.data.StandardScaler,' \
+                  'nominal=sklearn.preprocessing._encoders.OneHotEncoder)'
+        fixture_description = 'Automatically created scikit-learn flow.'
+        serialization = sklearn_to_flow(model)
+        self.assertEqual(serialization.name, fixture)
+        self.assertEqual(serialization.description, fixture_description)
+        # del serialization.model
+        new_model = flow_to_sklearn(serialization)
+        self.assertEqual(type(new_model), type(model))
+        self.assertIsNot(new_model, model)
+        serialization2 = sklearn_to_flow(new_model)
+        assert_flows_equal(serialization, serialization2)
+
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
+                     reason="columntransformer introduction in 0.20.0")
+    def test_serialize_column_transformer_pipeline(self):
+        # temporary local import, dependend on version 0.20
+        import sklearn.compose
+        inner = sklearn.compose.ColumnTransformer(
+            transformers=[
+                ('numeric', sklearn.preprocessing.StandardScaler(), [0, 1, 2]),
+                ('nominal', sklearn.preprocessing.OneHotEncoder(
+                    handle_unknown='ignore'), [3, 4, 5])],
+            remainder='passthrough')
+        model = sklearn.pipeline.Pipeline(
+            steps=[('transformer', inner),
+                   ('classifier', sklearn.tree.DecisionTreeClassifier())])
+        fixture_name = \
+            'sklearn.pipeline.Pipeline('\
+            'transformer=sklearn.compose._column_transformer.'\
+            'ColumnTransformer('\
+            'numeric=sklearn.preprocessing.data.StandardScaler,'\
+            'nominal=sklearn.preprocessing._encoders.OneHotEncoder),'\
+            'classifier=sklearn.tree.tree.DecisionTreeClassifier)'
+
+        fixture_description = 'Automatically created scikit-learn flow.'
+        serialization = sklearn_to_flow(model)
+        self.assertEqual(serialization.name, fixture_name)
+        self.assertEqual(serialization.description, fixture_description)
+        # del serialization.model
+        new_model = flow_to_sklearn(serialization)
+        self.assertEqual(type(new_model), type(model))
+        self.assertIsNot(new_model, model)
+        serialization2 = sklearn_to_flow(new_model)
+        assert_flows_equal(serialization, serialization2)
+
     def test_serialize_feature_union(self):
         ohe_params = {'sparse': False}
         if LooseVersion(sklearn.__version__) >= "0.20":
             ohe_params['categories'] = 'auto'
         ohe = sklearn.preprocessing.OneHotEncoder(**ohe_params)
         scaler = sklearn.preprocessing.StandardScaler()
+
         fu = sklearn.pipeline.FeatureUnion(
             transformer_list=[('ohe', ohe), ('scaler', scaler)])
         serialization = sklearn_to_flow(fu)
@@ -443,8 +500,8 @@ class TestSklearn(unittest.TestCase):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         boosting = sklearn.ensemble.AdaBoostClassifier(
             base_estimator=sklearn.tree.DecisionTreeClassifier())
-        model = sklearn.pipeline.Pipeline(steps=(
-            ('ohe', ohe), ('scaler', scaler), ('boosting', boosting)))
+        model = sklearn.pipeline.Pipeline(steps=[
+            ('ohe', ohe), ('scaler', scaler), ('boosting', boosting)])
         parameter_grid = {
             'n_estimators': [1, 5, 10, 100],
             'learning_rate': scipy.stats.uniform(0.01, 0.99),
@@ -457,13 +514,14 @@ class TestSklearn(unittest.TestCase):
         module_name_encoder = ('_encoders'
                                if LooseVersion(sklearn.__version__) >= "0.20"
                                else 'data')
-        fixture_name = ('sklearn.model_selection._search.RandomizedSearchCV(' \
-                        'estimator=sklearn.pipeline.Pipeline(' \
-                        'ohe=sklearn.preprocessing.{}.OneHotEncoder,' \
-                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
-                        'boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
-                        'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))'
-                       .format(module_name_encoder))
+        fixture_name = \
+            ('sklearn.model_selection._search.RandomizedSearchCV('
+             'estimator=sklearn.pipeline.Pipeline('
+             'ohe=sklearn.preprocessing.{}.OneHotEncoder,'
+             'scaler=sklearn.preprocessing.data.StandardScaler,'
+             'boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier('
+             'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))'.
+             format(module_name_encoder))
         self.assertEqual(serialized.name, fixture_name)
 
         # now do deserialization
@@ -710,7 +768,6 @@ class TestSklearn(unittest.TestCase):
                 base_estimator=sklearn.tree.DecisionTreeClassifier))
         ]
         self.assertRaises(ValueError, sklearn.pipeline.Pipeline, steps=steps)
-
 
     def test_illegal_parameter_names_featureunion(self):
         # illegal name: transformer_list

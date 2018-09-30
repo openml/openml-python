@@ -150,8 +150,10 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False):
                 del components[key]
                 if step_name is None:
                     rval = component
-                else:
+                elif 'argument_1' not in value:
                     rval = (step_name, component)
+                else:
+                    rval = (step_name, component, value['argument_1'])
             elif serialized_type == 'cv_object':
                 rval = _deserialize_cross_validator(value)
             else:
@@ -305,21 +307,36 @@ def _extract_information_from_model(model):
 
         if (isinstance(rval, (list, tuple)) and len(rval) > 0 and
                 isinstance(rval[0], (list, tuple)) and
-                [type(rval[0]) == type(rval[i]) for i in range(len(rval))]):
+                all([isinstance(rval[i], type(rval[0]))
+                     for i in range(len(rval))])):
 
-            # Steps in a pipeline or feature union, or base classifiers in voting classifier
+            # Steps in a pipeline or feature union, or base classifiers in
+            # voting classifier
             parameter_value = list()
             reserved_keywords = set(model.get_params(deep=False).keys())
 
             for sub_component_tuple in rval:
-                identifier, sub_component = sub_component_tuple
+                identifier = sub_component_tuple[0]
+                sub_component = sub_component_tuple[1]
                 sub_component_type = type(sub_component_tuple)
+                if not 2 <= len(sub_component_tuple) <= 3:
+                    # length 2 is for {VotingClassifier.estimators,
+                    # Pipeline.steps, FeatureUnion.transformer_list}
+                    # length 3 is for ColumnTransformer
+                    msg = 'Length of tuple does not match assumptions'
+                    raise ValueError(msg)
+                if not isinstance(sub_component, (OpenMLFlow, type(None))):
+                    msg = 'Second item of tuple does not match assumptions. '\
+                          'Expected OpenMLFlow, got %s' % type(sub_component)
+                    raise TypeError(msg)
 
                 if identifier in reserved_keywords:
                     parent_model_name = model.__module__ + "." + \
                                         model.__class__.__name__
-                    raise PyOpenMLError('Found element shadowing official ' + \
-                                        'parameter for %s: %s' % (parent_model_name, identifier))
+                    msg = 'Found element shadowing official '\
+                          'parameter for %s: %s' % (parent_model_name,
+                                                    identifier)
+                    raise PyOpenMLError(msg)
 
                 if sub_component is None:
                     # In a FeatureUnion it is legal to have a None step
@@ -342,6 +359,8 @@ def _extract_information_from_model(model):
                     cr_value = OrderedDict()
                     cr_value['key'] = identifier
                     cr_value['step_name'] = identifier
+                    if len(sub_component_tuple) == 3:
+                        cr_value['argument_1'] = sub_component_tuple[2]
                     component_reference['value'] = cr_value
                     parameter_value.append(component_reference)
 
