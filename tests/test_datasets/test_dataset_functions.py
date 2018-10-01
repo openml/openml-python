@@ -475,83 +475,141 @@ class TestOpenMLDataset(TestBase):
         )
 
 
-def test_create_dataset_sparse(self):
+    def test_create_dataset_sparse(self):
 
-    # test the scipy.sparse.coo_matrix
-    sparse_data = scipy.sparse.coo_matrix((
+        # test the scipy.sparse.coo_matrix
+        sparse_data = scipy.sparse.coo_matrix((
         [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
         [0, 1, 1, 2, 2, 3, 3],
         [0, 1, 2, 0, 2, 0, 1],
-    ))
+        ))
 
-    column_names = [
+        column_names = [
         ('input1', 'REAL'),
         ('input2', 'REAL'),
         ('y', 'REAL'),
-    ]
+        ]
 
-    xor_dataset = create_dataset(
-        name="XOR",
-        description='Dataset representing the XOR operation',
-        creator=None,
-        contributor=None,
-        collection_date=None,
-        language='English',
-        licence=None,
-        default_target_attribute='y',
-        row_id_attribute=None,
-        ignore_attribute=None,
-        citation=None,
-        attributes=column_names,
-        data=sparse_data,
-        version_label='test',
-    )
+        xor_dataset = create_dataset(
+            name="XOR",
+            description='Dataset representing the XOR operation',
+            creator=None,
+            contributor=None,
+            collection_date=None,
+            language='English',
+            licence=None,
+            default_target_attribute='y',
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=None,
+            attributes=column_names,
+            data=sparse_data,
+            version_label='test',
+        )
 
-    upload_did = xor_dataset.publish()
-    self.assertEqual(
-        _get_online_dataset_arff(upload_did),
-        xor_dataset._dataset,
-        "Uploaded arff does not match original one"
-    )
-    self.assertEqual(
-        _get_online_dataset_format(upload_did),
-        'sparse_arff',
-        "Wrong format for dataset"
-    )
+        upload_did = xor_dataset.publish()
+        self.assertEqual(
+            _get_online_dataset_arff(upload_did),
+            xor_dataset._dataset,
+            "Uploaded arff does not match original one"
+        )
+        self.assertEqual(
+            _get_online_dataset_format(upload_did),
+            'sparse_arff',
+            "Wrong format for dataset"
+        )
 
-    # test the list of dicts sparse representation
-    sparse_data = [
-        {},
-        {1: 1.0, 2: 1.0},
-        {0: 1.0, 2: 1.0},
-        {0: 1.0, 1: 1.0}
-    ]
+        # test the list of dicts sparse representation
+        sparse_data = [
+            {},
+            {1: 1.0, 2: 1.0},
+            {0: 1.0, 2: 1.0},
+            {0: 1.0, 1: 1.0}
+        ]
 
-    xor_dataset = create_dataset(
-        name="XOR",
-        description='Dataset representing the XOR operation',
-        creator=None,
-        contributor=None,
-        collection_date=None,
-        language='English',
-        licence=None,
-        default_target_attribute='y',
-        row_id_attribute=None,
-        ignore_attribute=None,
-        citation=None,
-        attributes=column_names,
-        data=sparse_data,
-        version_label='test',
-    )
+        xor_dataset = create_dataset(
+            name="XOR",
+            description='Dataset representing the XOR operation',
+            creator=None,
+            contributor=None,
+            collection_date=None,
+            language='English',
+            licence=None,
+            default_target_attribute='y',
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=None,
+            attributes=column_names,
+            data=sparse_data,
+            version_label='test',
+        )
 
-    upload_did = xor_dataset.publish()
-    self.assertEqual(
-        _get_online_dataset_arff(upload_did),
-        xor_dataset._dataset,
-        "Uploaded arff does not match original one"
-    )
-    self.assertEqual(
-        _get_online_dataset_format(upload_did),
-        'sparse_arff',
-        "Wrong format for dataset"
-    )
+        upload_did = xor_dataset.publish()
+        self.assertEqual(
+            _get_online_dataset_arff(upload_did),
+            xor_dataset._dataset,
+            "Uploaded arff does not match original one"
+        )
+        self.assertEqual(
+            _get_online_dataset_format(upload_did),
+            'sparse_arff',
+            "Wrong format for dataset"
+        )
+
+
+    def test_create_invalid_dataset(self):
+
+        data = [
+            'sunny',
+            'overcast',
+            'overcast',
+            'rainy',
+            'rainy',
+            'rainy',
+            'overcast',
+            'sunny',
+            'sunny',
+            'rainy',
+            'sunny',
+            'overcast',
+            'overcast',
+            'rainy',
+        ]
+
+        self.assertRaises(
+            ValueError,
+            create_dataset,
+            name=None,
+            description=None,
+            creator=None,
+            contributor=None,
+            collection_date=None,
+            language=None,
+            licence=None,
+            default_target_attribute=None,
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=None,
+            attributes=None,
+            data=data,
+        )
+
+        data = ["sunny"]
+
+        self.assertRaises(
+            ValueError,
+            create_dataset,
+            name=None,
+            description=None,
+            creator=None,
+            contributor=None,
+            collection_date=None,
+            language=None,
+            licence=None,
+            default_target_attribute=None,
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=None,
+            attributes=None,
+            data=data,
+        )
