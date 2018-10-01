@@ -1,5 +1,6 @@
 import arff
 import collections
+from distutils.version import LooseVersion
 import json
 import os
 import random
@@ -12,6 +13,7 @@ import openml
 import openml.exceptions
 import openml._api_calls
 import sklearn
+import unittest
 
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent, \
@@ -428,6 +430,21 @@ class TestRun(TestBase):
                                     ('dummy', DummyClassifier(strategy='prior'))])
         self._run_and_upload(pipeline1, '62501')
 
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
+                     reason="columntransformer introduction in 0.20.0")
+    def test_run_and_upload_column_transformer_pipeline(self):
+        import sklearn.compose
+        inner = sklearn.compose.ColumnTransformer(
+            transformers=[
+                ('numeric', sklearn.preprocessing.StandardScaler(), [0, 1, 2]),
+                ('nominal', sklearn.preprocessing.OneHotEncoder(
+                    handle_unknown='ignore'), [3, 4, 5])],
+            remainder='passthrough')
+        pipeline = sklearn.pipeline.Pipeline(
+            steps=[('transformer', inner),
+                   ('classifier', sklearn.tree.DecisionTreeClassifier())])
+        self._run_and_upload(pipeline, '62501')
+
     def test_run_and_upload_decision_tree_pipeline(self):
         pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                     ('VarianceThreshold', VarianceThreshold()),
@@ -464,7 +481,6 @@ class TestRun(TestBase):
         # This testcase is important for 2 reasons:
         # 1) it verifies the correct handling of masked arrays (not all parameters are active)
         # 2) it verifies the correct handling of a 2-layered grid search
-        # Note that this is a list of dictionaries, all containing 1 hyperparameter.
         gridsearch = GridSearchCV(
             RandomForestClassifier(n_estimators=5),
             [

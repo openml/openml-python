@@ -39,6 +39,9 @@ fi
 if [[ "$COVERAGE" == "true" ]]; then
     pip install codecov pytest-cov
 fi
+if [[ "$RUN_FLAKE8" == "true" ]]; then
+    pip install flake8
+fi
 
 python --version
 python -c "import numpy; print('numpy %s' % numpy.__version__)"
