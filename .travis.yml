@@ -25,6 +25,11 @@ env:
   - DISTRIB="conda" PYTHON_VERSION="3.6" SKLEARN_VERSION="0.19.2"
   - DISTRIB="conda" PYTHON_VERSION="3.6" SKLEARN_VERSION="0.18.2"
 
+before_install:
+  # Fix intermittent "resource temporarily unavailable" and "write" errors failing the Travis builds.
+  # See: https://github.com/travis-ci/travis-ci/issues/8920
+  - python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
+
 install: source ci_scripts/install.sh
 script: bash ci_scripts/test.sh
 after_success: source ci_scripts/success.sh && source ci_scripts/create_doc.sh $TRAVIS_BRANCH "doc_result"
