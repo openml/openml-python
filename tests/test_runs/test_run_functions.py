@@ -963,10 +963,8 @@ class TestRun(TestBase):
         flow_new = sklearn_to_flow(clf)
 
         flow_new.flow_id = -1
-        expected_message_regex = (
-            "Result from API call flow_exists and flow.flow_id are not same: "
-            "'-1' vs '[0-9]+'"
-        )
+        expected_message_regex = \
+            'Result flow_exists and flow_ids are not same.'
         self.assertRaisesRegexp(
             ValueError,
             expected_message_regex,

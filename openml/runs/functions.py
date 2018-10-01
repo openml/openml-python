@@ -131,7 +131,7 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
     # (compared to result of openml.flows.flow_exists)
     if flow_id is False:
         if flow.flow_id is not None:
-            raise ValueError('flow.flow_id is not None, but the flow does not'
+            raise ValueError('flow.flow_id is not None, but the flow does not '
                              'exist on the server according to flow_exists')
         _publish_flow_if_necessary(flow)
 
@@ -148,7 +148,7 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
         # through "run_model_on_task"
         if flow.flow_id != flow_id:
             # This should never happen, unless user made a flow-creation fault
-            raise ValueError('Result flow_exists and flow_ids are not same. ')
+            raise ValueError('Result flow_exists and flow_ids are not same.')
 
     run = OpenMLRun(
         task_id=task.task_id,
