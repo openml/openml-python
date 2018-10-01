@@ -20,6 +20,7 @@ from openml.runs.functions import _run_task_get_arffcontent, \
     _get_seeded_model, _run_exists, _extract_arfftrace, \
     _extract_arfftrace_attributes, _prediction_to_row, _check_n_jobs
 from openml.flows.sklearn_converter import sklearn_to_flow
+from openml.runs.trace import OpenMLRunTrace
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
@@ -84,8 +85,8 @@ class TestRun(TestBase):
         except openml.exceptions.OpenMLServerException as e:
             e.additional = str(e.additional) + '; run_id: ' + str(run_id)
             raise e
-        
-        run_prime = openml.runs.run_model_on_task(task, model_prime,
+
+        run_prime = openml.runs.run_model_on_task(model_prime, task,
                                                   avoid_duplicate_runs=False,
                                                   seed=1)
         predictions_prime = run_prime._generate_arff_dict()
@@ -121,11 +122,19 @@ class TestRun(TestBase):
         flow.publish()
 
         task = openml.tasks.get_task(task_id)
-        run = openml.runs.run_flow_on_task(task, flow, seed=1,
+        run = openml.runs.run_flow_on_task(flow, task, seed=1,
                                            avoid_duplicate_runs=openml.config.avoid_duplicate_runs)
         run_ = run.publish()
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
+
+        # This is only a smoke check right now
+        # TODO add a few asserts here
+        run._create_description_xml()
+        if run.trace is not None:
+            # This is only a smoke check right now
+            # TODO add a few asserts here
+            run.trace.trace_to_arff()
 
         # check arff output
         self.assertEqual(len(run.data_content), num_instances)
@@ -170,6 +179,13 @@ class TestRun(TestBase):
 
         downloaded = openml.runs.get_run(run_.run_id)
         assert('openml-python' in downloaded.tags)
+
+        # TODO make sure that these attributes are instantiated when
+        # downloading a run? Or make sure that the trace object is created when
+        # running a flow on a task (and not only the arff object is created,
+        # so that the two objects can actually be compared):
+        # downloaded_run_trace = downloaded._generate_trace_arff_dict()
+        # self.assertEqual(run_trace, downloaded_run_trace)
 
         return run
 
@@ -256,7 +272,7 @@ class TestRun(TestBase):
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
         self.assertRaises(AttributeError, openml.runs.run_model_on_task,
-                          task=task, model=clf, avoid_duplicate_runs=False)
+                          model=clf, task=task, avoid_duplicate_runs=False)
 
     def test_check_erronous_sklearn_flow_fails(self):
         task_id = 115
@@ -329,15 +345,17 @@ class TestRun(TestBase):
             for fold in run.fold_evaluations['predictive_accuracy'][rep].keys():
                 accuracy_scores_provided.append(
                     run.fold_evaluations['predictive_accuracy'][rep][fold])
+
         self.assertEqual(sum(accuracy_scores_provided), sum(accuracy_scores))
 
         if isinstance(clf, BaseSearchCV):
+            trace_content = run.trace.trace_to_arff()['data']
             if isinstance(clf, GridSearchCV):
                 grid_iterations = determine_grid_size(clf.param_grid)
-                self.assertEqual(len(run.trace_content),
+                self.assertEqual(len(trace_content),
                                  grid_iterations * num_folds)
             else:
-                self.assertEqual(len(run.trace_content),
+                self.assertEqual(len(trace_content),
                                  num_iterations * num_folds)
             check_res = self._check_serialized_optimized_run(run.run_id)
             self.assertTrue(check_res)
@@ -589,7 +607,9 @@ class TestRun(TestBase):
         try:
             # in case the run did not exists yet
             run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=True)
-            trace = openml.runs.functions._create_trace_from_arff(run._generate_trace_arff_dict())
+            trace = openml.runs.functions._create_trace_from_arff(
+                run._generate_trace_arff_dict()
+            )
             self.assertEqual(
                 len(trace.trace_iterations),
                 num_iterations * num_folds,
@@ -727,6 +747,8 @@ class TestRun(TestBase):
         for att_idx in range(len(trace_attribute_list)):
             att_type = trace_attribute_list[att_idx][1]
             att_name = trace_attribute_list[att_idx][0]
+            # They no longer start with parameter_ if they come from
+            # extract_arff_trace!
             if att_name.startswith("parameter_"):
                 # add this to the found parameters
                 param_name = att_name[len("parameter_"):]
@@ -742,10 +764,30 @@ class TestRun(TestBase):
                     val = trace_list[line_idx][att_idx]
                     if isinstance(att_type, list):
                         self.assertIn(val, att_type)
+                    elif att_name in [
+                        'hidden_layer_sizes',
+                        'activation',
+                        'learning_rate_init',
+                        'max_iter',
+                    ]:
+                        self.assertIsInstance(
+                            trace_list[line_idx][att_idx],
+                            str,
+                            msg=att_name
+                        )
+                        optimized_params.add(att_name)
                     elif att_name in ['repeat', 'fold', 'iteration']:
-                        self.assertIsInstance(trace_list[line_idx][att_idx], int)
+                        self.assertIsInstance(
+                            trace_list[line_idx][att_idx],
+                            int,
+                            msg=att_name
+                        )
                     else: # att_type = real
-                        self.assertIsInstance(trace_list[line_idx][att_idx], float)
+                        self.assertIsInstance(
+                            trace_list[line_idx][att_idx],
+                            float,
+                            msg=att_name
+                        )
 
         self.assertEqual(set(param_grid.keys()), optimized_params)
 
@@ -827,10 +869,18 @@ class TestRun(TestBase):
         flow_new = sklearn_to_flow(clf)
 
         flow_new.flow_id = -1
-        expected_message_regex = "Result flow_exists and flow.flow_id are not same."
-        self.assertRaisesRegexp(ValueError, expected_message_regex,
-                                openml.runs.run_flow_on_task, task=task, flow=flow_new,
-                                avoid_duplicate_runs=False)
+        expected_message_regex = (
+            "Result from API call flow_exists and flow.flow_id are not same: "
+            "'-1' vs '[0-9]+'"
+        )
+        self.assertRaisesRegexp(
+            ValueError,
+            expected_message_regex,
+            openml.runs.run_flow_on_task,
+            task=task,
+            flow=flow_new,
+            avoid_duplicate_runs=False,
+        )
 
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(7)
@@ -839,12 +889,16 @@ class TestRun(TestBase):
         num_repeats = 1
 
         clf = SGDClassifier(loss='log', random_state=1)
-        res = openml.runs.functions._run_task_get_arffcontent(clf, task, add_local_measures=True)
-        arff_datacontent, arff_tracecontent, _, fold_evaluations, sample_evaluations = res
+        res = openml.runs.functions._run_task_get_arffcontent(
+            clf,
+            task,
+            add_local_measures=True,
+        )
+        arff_datacontent, trace, fold_evaluations, _ = res
         # predictions
         self.assertIsInstance(arff_datacontent, list)
         # trace. SGD does not produce any
-        self.assertIsInstance(arff_tracecontent, type(None))
+        self.assertIsInstance(trace, type(None))
 
         self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds)
 
@@ -914,7 +968,7 @@ class TestRun(TestBase):
     def test__create_trace_from_arff(self):
         with open(self.static_cache_dir + '/misc/trace.arff', 'r') as arff_file:
             trace_arff = arff.load(arff_file)
-        trace = openml.runs.functions._create_trace_from_arff(trace_arff)
+        OpenMLRunTrace.trace_from_arff(trace_arff)
 
     def test_get_run(self):
         # this run is not available on test
@@ -1070,7 +1124,11 @@ class TestRun(TestBase):
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content, _, _, _, _ = _run_task_get_arffcontent(model, task, add_local_measures=True)
+        data_content,  _, _, _ = _run_task_get_arffcontent(
+            model,
+            task,
+            add_local_measures=True,
+        )
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
         self.assertEqual(len(data_content), 4490)
@@ -1091,8 +1149,16 @@ class TestRun(TestBase):
                 ('imputer', sklearn.preprocessing.Imputer()), ('estimator', HardNaiveBayes())
             ])
 
-            arff_content1, arff_header1, _, _, _ = _run_task_get_arffcontent(clf1, task, add_local_measures=True)
-            arff_content2, arff_header2, _, _, _ = _run_task_get_arffcontent(clf2, task, add_local_measures=True)
+            arff_content1, _, _, _ = _run_task_get_arffcontent(
+                clf1,
+                task,
+                add_local_measures=True,
+            )
+            arff_content2, _, _, _ = _run_task_get_arffcontent(
+                clf2,
+                task,
+                add_local_measures=True,
+            )
 
             # verifies last two arff indices (predict and correct)
             # TODO: programmatically check wether these are indeed features (predict, correct)
