@@ -40,7 +40,9 @@ attribute_names = breast_cancer.feature_names
 description = breast_cancer.DESCR
 ############################################################################
 # OpenML does not distinguish between the attributes and targets on the data level and stores all data in a
-# single matrix. The target feature is indicated as meta-data of the dataset (and tasks on that data).
+# single matrix.
+#
+# The target feature is indicated as meta-data of the dataset (and tasks on that data).
 
 data = np.concatenate((x, y.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
@@ -182,15 +184,15 @@ print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 
 ############################################################################
 # Dataset is a sparse matrix
+# ==========================
 #
-# Sparse data can be represented as a
-# `scipy.sparse.coo https://docs.scipy.org/doc/scipy/reference/sparse.html>`_.
-# or a list of dictionaries in the arff object.
+# Sparse data can be represented in the arff object as a
+# `scipy.sparse.coo <https://docs.scipy.org/doc/scipy/reference/sparse.html>`_,
+# or a list of dictionaries.
 
 sparse_data = coo_matrix((
     [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-    [0, 1, 1, 2, 2, 3, 3],
-    [0, 1, 2, 0, 2, 0, 1],
+    ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1]),
 ))
 
 column_names = [

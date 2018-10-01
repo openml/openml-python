@@ -477,14 +477,14 @@ class TestOpenMLDataset(TestBase):
 
         # test the scipy.sparse.coo_matrix
         sparse_data = scipy.sparse.coo_matrix((
-        [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-        ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
+            [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
         ))
 
         column_names = [
-        ('input1', 'REAL'),
-        ('input2', 'REAL'),
-        ('y', 'REAL'),
+            ('input1', 'REAL'),
+            ('input2', 'REAL'),
+            ('y', 'REAL'),
         ]
 
         xor_dataset = create_dataset(
