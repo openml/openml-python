@@ -208,11 +208,11 @@ class OpenMLDataset(object):
     def __eq__(self, other):
 
         server_fields = {
-            'dataset_id':True,
-            'version':True,
-            'upload_date':True,
-            'url':True,
-            'dataset':True,
+            'dataset_id': True,
+            'version': True,
+            'upload_date': True,
+            'url': True,
+            'dataset': True,
             'data_file': True,
         }
 

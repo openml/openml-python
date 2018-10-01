@@ -7,6 +7,7 @@ A tutorial on how to create and upload a dataset to OpenML.
 import numpy as np
 import openml
 import sklearn.datasets
+from scipy.sparse import coo_matrix
 from openml.datasets.functions import create_dataset
 
 ############################################################################
@@ -19,14 +20,16 @@ openml.config.server = 'https://test.openml.org/api/v1/xml'
 #
 # * A numpy array.
 # * A list of lists.
+# * A sparse matrix
 
 ############################################################################
 # Dataset is a numpy array
-# ^^^^^^^^^^^^^^^^^^^^^^^^
+# ========================
 #
 # Prepare dataset
-# ===============
+# ^^^^^^^^^^^^^^^
 # Load an example dataset from scikit-learn which we will upload to OpenML.org via the API.
+
 breast_cancer = sklearn.datasets.load_breast_cancer()
 name = 'BreastCancer(scikit-learn)'
 x = breast_cancer.data
@@ -44,14 +47,26 @@ attribute_names = list(attribute_names)
 attributes = [
                  (attribute_name, 'REAL') for attribute_name in attribute_names
              ] + [('class', list(breast_cancer.target_names))]
+citation = (
+    "W.N. Street, W.H. Wolberg and O.L. Mangasarian. "
+    "Nuclear feature extraction for breast tumor diagnosis. "
+    "IS&T/SPIE 1993 International Symposium on Electronic Imaging: Science and Technology, "
+    "volume 1905, pages 861-870, San Jose, CA, 1993."
+)
+paper_url = (
+    'https://www.spiedigitallibrary.org/conference-proceedings-of-spie/'
+    '1905/0000/Nuclear-feature-extraction-for-breast-tumor-diagnosis/'
+    '10.1117/12.148698.short?SSO=1'
+)
 
 ############################################################################
 # Create the dataset object
-# =========================
+# ^^^^^^^^^^^^^^^^^^^^^^^^^
 # The definition of all fields can be found in the XSD files describing the expected format:
 #
 # https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd
-dataset = create_dataset(
+
+bc_dataset = create_dataset(
     # The name of the dataset (needs to be unique). 
     # Must not be longer than 128 characters and only contain
     # a-z, A-Z, 0-9 and the following special characters: _\-\.(),
@@ -76,12 +91,7 @@ dataset = create_dataset(
     # Attributes that should be excluded in modelling, such as identifiers and indexes.
     ignore_attribute=None,
     # How to cite the paper.
-    citation=(
-        "W.N. Street, W.H. Wolberg and O.L. Mangasarian. "
-        "Nuclear feature extraction for breast tumor diagnosis. "
-        "IS&T/SPIE 1993 International Symposium on Electronic Imaging: Science and Technology, "
-        "volume 1905, pages 861-870, San Jose, CA, 1993."
-    ),
+    citation=citation,
     # Attributes of the data
     attributes=attributes,
     data=data,
@@ -91,26 +101,21 @@ dataset = create_dataset(
         'https://archive.ics.uci.edu/ml/datasets/'
         'Breast+Cancer+Wisconsin+(Diagnostic)'
     ),
-    paper_url=(
-        'https://www.spiedigitallibrary.org/conference-proceedings-of-spie/'
-        '1905/0000/Nuclear-feature-extraction-for-breast-tumor-diagnosis/'
-        '10.1117/12.148698.short?SSO=1'
-    )
+    paper_url=paper_url,
 )
 
 ############################################################################
-try:
-    upload_id = dataset.publish()
-    print('URL for dataset: %s/data/%d' % (openml.config.server, upload_id))
-except openml.exceptions.PyOpenMLError as err:
-    print("OpenML: {0}".format(err))
+
+upload_did = bc_dataset.publish()
+print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 
 ############################################################################
 # Dataset is a list of lists
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^
+# ==========================
 #
 # Weather dataset:
 # http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
+
 data = [
     ['sunny', 85, 85, 'FALSE', 'no'],
     ['sunny', 80, 90, 'TRUE', 'no'],
@@ -128,7 +133,7 @@ data = [
     ['rainy', 71, 91, 'TRUE', 'no'],
 ]
 
-column_names = [
+attribute_names = [
     ('outlook', ['sunny', 'overcast', 'rainy']),
     ('temperature', 'REAL'),
     ('humidity', 'REAL'),
@@ -136,7 +141,6 @@ column_names = [
     ('play', ['yes', 'no']),
 ]
 
-name = "Wind"
 description = (
     'The weather problem is a tiny dataset that we will use repeatedly'
     ' to illustrate machine learning methods. Entirely fictitious, it '
@@ -147,34 +151,72 @@ description = (
     'attributes: outlook, temperature, humidity, and windy. '
     'The outcome is whether to play or not.'
 )
-collection_date = '01-01-2011'
-language = 'English'
-default_target_attribute = 'play'
-citation = 'I. H. Witten, E. Frank, M. A. Hall, and ITPro,' \
-           ' Data mining practical machine learning tools and techniques, ' \
-           'third edition. Burlington, Mass.: Morgan Kaufmann Publishers, 2011'
 
-dataset = create_dataset(
-    name=name,
+citation = (
+    'I. H. Witten, E. Frank, M. A. Hall, and ITPro,'
+    'Data mining practical machine learning tools and techniques, '
+    'third edition. Burlington, Mass.: Morgan Kaufmann Publishers, 2011'
+)
+
+wind_dataset = create_dataset(
+    name="Wind",
     description=description,
     creator=None,
     contributor=None,
-    collection_date=collection_date,
-    language=language,
+    collection_date='01-01-2011',
+    language='English',
     licence=None,
-    default_target_attribute=default_target_attribute,
+    default_target_attribute='play',
     row_id_attribute=None,
     ignore_attribute=None,
     citation=citation,
-    attributes=column_names,
+    attributes=attribute_names,
     data=data,
     version_label='example',
 )
 
-uploaded_did = dataset.publish()
 ############################################################################
-try:
-    upload_id = dataset.publish()
-    print('URL for dataset: %s/data/%d' % (openml.config.server, upload_id))
-except openml.exceptions.PyOpenMLError as err:
-    print("OpenML: {0}".format(err))
+
+upload_did = wind_dataset.publish()
+print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+
+############################################################################
+# Dataset is a sparse matrix
+#
+# Sparse data can be represented as a
+# `scipy.sparse.coo https://docs.scipy.org/doc/scipy/reference/sparse.html>`_.
+# or a list of dictionaries in the arff object.
+
+sparse_data = coo_matrix((
+    [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+    [0, 1, 1, 2, 2, 3, 3],
+    [0, 1, 2, 0, 2, 0, 1],
+))
+
+column_names = [
+    ('input1', 'REAL'),
+    ('input2', 'REAL'),
+    ('y', 'REAL'),
+]
+
+xor_dataset = create_dataset(
+    name="XOR",
+    description='Dataset representing the XOR operation',
+    creator=None,
+    contributor=None,
+    collection_date=None,
+    language='English',
+    licence=None,
+    default_target_attribute='y',
+    row_id_attribute=None,
+    ignore_attribute=None,
+    citation=None,
+    attributes=column_names,
+    data=sparse_data,
+    version_label='example',
+)
+
+############################################################################
+
+upload_did = xor_dataset.publish()
+print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))

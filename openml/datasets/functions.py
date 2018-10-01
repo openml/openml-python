@@ -3,10 +3,10 @@ import hashlib
 import io
 import os
 import re
-import shutil
+import numpy as np
 import six
 import arff
-
+from scipy.sparse import coo_matrix
 from oslo_concurrency import lockutils
 import xmltodict
 
@@ -383,7 +383,7 @@ def create_dataset(name, description, creator, contributor, collection_date,
         License of the data.
     attributes : list
         A list of tuples. Each tuple consists of the attribute name and type.
-    data : numpy.ndarray | list
+    data : numpy.ndarray | list | scipy.sparse.coo_matrix
         An array that contains both the attributes and the targets, with
         shape=(n_samples, n_features).
         The target feature is indicated as meta-data of the dataset.
@@ -416,6 +416,21 @@ def create_dataset(name, description, creator, contributor, collection_date,
         'data': data
     }
 
+    # Determine arff format from the dataset
+    if isinstance(data, list):
+        if isinstance(data[0], list):
+            d_format = 'arff'
+        elif isinstance(data[0], dict):
+            d_format = 'sparse_arff'
+        else:
+            raise ValueError('Illegal value, only list of lists/dicts is supported')
+    elif isinstance(data, np.ndarray):
+        d_format = 'arff'
+    elif isinstance(data, coo_matrix):
+        d_format = 'sparse_arff'
+    else:
+        raise ValueError('Illegal value, please check the function documentation')
+
     # serializes the arff dataset object and returns a string
     arff_dataset = arff.dumps(arff_object)
     try:
@@ -426,11 +441,13 @@ def create_dataset(name, description, creator, contributor, collection_date,
         raise ValueError("The arguments you have provided \
                              do not construct a valid arff file")
 
-    return OpenMLDataset(name, description, creator=creator,
+    return OpenMLDataset(name, description, creator=creator, format=d_format,
                          contributor=contributor, collection_date=collection_date,
-                         language=language, licence=licence, default_target_attribute=default_target_attribute,
-                         row_id_attribute=row_id_attribute, ignore_attribute=ignore_attribute, citation=citation,
-                         version_label=version_label, original_data_url=original_data_url, paper_url=paper_url,
+                         language=language, licence=licence,
+                         default_target_attribute=default_target_attribute,
+                         row_id_attribute=row_id_attribute, ignore_attribute=ignore_attribute,
+                         citation=citation, version_label=version_label,
+                         original_data_url=original_data_url, paper_url=paper_url,
                          update_comment=update_comment, dataset=arff_dataset)
 
 
@@ -664,7 +681,30 @@ def _get_online_dataset_arff(did):
         A string representation of an arff file.
     """
     dataset_xml = openml._api_calls._perform_api_call("data/%d" % did)
+    # build a dict from the xml.
     # use the url from the dataset description and return the arff string
     return openml._api_calls._read_url(
         xmltodict.parse(dataset_xml)['oml:data_set_description']['oml:url']
     )
+
+
+def _get_online_dataset_format(did):
+    """Get the dataset format for a given dataset id
+    from the OpenML website.
+
+    Parameters
+    ----------
+    did : int
+        A dataset id.
+
+    Returns
+    -------
+    str
+        Dataset format.
+    """
+    dataset_xml = openml._api_calls._perform_api_call("data/%d" % did)
+    # build a dict from the xml and get the format from the dataset description
+    return xmltodict.parse(dataset_xml)
+    ['oml:data_set_description']
+    ['oml:format']\
+        .lower()
