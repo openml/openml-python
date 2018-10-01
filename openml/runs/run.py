@@ -28,11 +28,10 @@ class OpenMLRun(object):
     def __init__(self, task_id, flow_id, dataset_id, setup_string=None,
                  output_files=None, setup_id=None, tags=None, uploader=None,
                  uploader_name=None, evaluations=None, fold_evaluations=None,
-                 sample_evaluations=None, data_content=None,
-                 trace_attributes=None, trace_content=None, model=None,
-                 task_type=None, task_evaluation_measure=None, flow_name=None,
-                 parameter_settings=None, predictions_url=None, task=None,
-                 flow=None, run_id=None):
+                 sample_evaluations=None, data_content=None, trace=None,
+                 model=None, task_type=None, task_evaluation_measure=None,
+                 flow_name=None, parameter_settings=None, predictions_url=None,
+                 task=None, flow=None, run_id=None):
         self.uploader = uploader
         self.uploader_name = uploader_name
         self.task_id = task_id
