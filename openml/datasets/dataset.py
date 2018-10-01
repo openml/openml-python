@@ -167,13 +167,13 @@ class OpenMLDataset(object):
                                    for name, type_ in data['attributes']]
                     attribute_names = [name for name, type_ in data['attributes']]
 
-                    if format.lower() == 'sparse_arff':
+                    if data_format.lower() == 'sparse_arff':
                         X = data['data']
                         X_shape = (max(X[1]) + 1, max(X[2]) + 1)
                         X = scipy.sparse.coo_matrix(
                             (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
                         X = X.tocsr()
-                    elif format.lower() == 'arff':
+                    elif data_format.lower() == 'arff':
                         X = np.array(data['data'], dtype=np.float32)
                     else:
                         raise Exception()
@@ -259,9 +259,9 @@ class OpenMLDataset(object):
         if bits != 64 and os.path.getsize(filename) > 120000000:
             return NotImplementedError("File too big")
 
-        if format.lower() == 'arff':
+        if data_format.lower() == 'arff':
             return_type = arff.DENSE
-        elif format.lower() == 'sparse_arff':
+        elif data_format.lower() == 'sparse_arff':
             return_type = arff.COO
         else:
             raise ValueError('Unknown data format %s' % format)
