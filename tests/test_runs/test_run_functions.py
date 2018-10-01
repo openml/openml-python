@@ -963,11 +963,18 @@ class TestRun(TestBase):
         flow_new = sklearn_to_flow(clf)
 
         flow_new.flow_id = -1
-        expected_message_regex = "Result flow_exists and flow.flow_id are " \
-                                 "not same."
-        self.assertRaisesRegexp(ValueError, expected_message_regex,
-                                openml.runs.run_flow_on_task, task=task,
-                                flow=flow_new, avoid_duplicate_runs=False)
+        expected_message_regex = (
+            "Result from API call flow_exists and flow.flow_id are not same: "
+            "'-1' vs '[0-9]+'"
+        )
+        self.assertRaisesRegexp(
+            ValueError,
+            expected_message_regex,
+            openml.runs.run_flow_on_task,
+            task=task,
+            flow=flow_new,
+            avoid_duplicate_runs=False,
+        )
 
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(7)
