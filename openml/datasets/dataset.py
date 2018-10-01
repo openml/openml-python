@@ -100,7 +100,7 @@ class OpenMLDataset(object):
         self.name = name
         self.version = int(version) if version is not None else None
         self.description = description
-        self.data_format = data_format
+        self.format = data_format
         self.creator = creator
         self.contributor = contributor
         self.collection_date = collection_date
@@ -157,7 +157,7 @@ class OpenMLDataset(object):
                     logger.debug("Data pickle file already exists.")
                 else:
                     try:
-                        data = self._get_arff(self.data_format)
+                        data = self._get_arff(self.format)
                     except OSError as e:
                         logger.critical("Please check that the data file %s is there "
                                         "and can be read.", self.data_file)
@@ -415,12 +415,12 @@ class OpenMLDataset(object):
         # Should make a method that only reads the attributes
         arffFileName = self.data_file
 
-        if self.data_format.lower() == 'arff':
+        if self.format.lower() == 'arff':
             return_type = arff.DENSE
-        elif self.data_format.lower() == 'sparse_arff':
+        elif self.format.lower() == 'sparse_arff':
             return_type = arff.COO
         else:
-            raise ValueError('Unknown data format %s' % self.data_format)
+            raise ValueError('Unknown data format %s' % self.format)
 
         with io.open(arffFileName, encoding='utf8') as fh:
             arffData = arff.ArffDecoder().decode(fh, return_type=return_type)
