@@ -436,7 +436,10 @@ def create_dataset(name, description, creator, contributor, collection_date,
     try:
         # check if arff is valid
         decoder = arff.ArffDecoder()
-        decoder.decode(arff_dataset, encode_nominal=True)
+        if d_format == 'arff':
+            decoder.decode(arff_dataset, encode_nominal=True)
+        if d_format == 'sparse_arff':
+            decoder.decode(arff_dataset, encode_nominal=True, return_type=arff.COO)
     except arff.ArffException:
         raise ValueError("The arguments you have provided \
                              do not construct a valid arff file")

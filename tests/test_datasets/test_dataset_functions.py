@@ -355,7 +355,6 @@ class TestOpenMLDataset(TestBase):
         dataset.publish()
         self.assertIsInstance(dataset.dataset_id, int)
 
-
     def test_create_dataset_numpy(self):
 
         data = np.array([[1, 2, 3],
@@ -474,14 +473,12 @@ class TestOpenMLDataset(TestBase):
             "Wrong format for dataset"
         )
 
-
     def test_create_dataset_sparse(self):
 
         # test the scipy.sparse.coo_matrix
         sparse_data = scipy.sparse.coo_matrix((
         [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-        [0, 1, 1, 2, 2, 3, 3],
-        [0, 1, 2, 0, 2, 0, 1],
+        ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
         ))
 
         column_names = [
@@ -521,7 +518,7 @@ class TestOpenMLDataset(TestBase):
 
         # test the list of dicts sparse representation
         sparse_data = [
-            {},
+            {0: 0.0},
             {1: 1.0, 2: 1.0},
             {0: 1.0, 2: 1.0},
             {0: 1.0, 1: 1.0}
@@ -555,7 +552,6 @@ class TestOpenMLDataset(TestBase):
             'sparse_arff',
             "Wrong format for dataset"
         )
-
 
     def test_create_invalid_dataset(self):
 
