@@ -199,14 +199,15 @@ class OpenMLRun(object):
 
         # Separate these out? Normal classification doesn't need 'sample'
         if task.task_type in ['Supervised Classification', 'Learning Curve']:
-            arff_dict['attributes'] = [('repeat', 'NUMERIC'),
-                                       ('fold', 'NUMERIC'),
-                                       ('sample', 'NUMERIC'),
-                                       ('row_id', 'NUMERIC')] + \
-                                      [('confidence.' + class_labels[i], 'NUMERIC') for i in
-                                       range(len(class_labels))] + \
-                                      [('prediction', class_labels),
-                                       ('correct', class_labels)]
+            arff_dict['attributes'] = [
+                ('repeat', 'NUMERIC'),
+                ('fold', 'NUMERIC'),
+                ('sample', 'NUMERIC'),
+                ('row_id', 'NUMERIC')] + \
+                [('confidence.' + class_labels[i], 'NUMERIC') for i in
+                 range(len(class_labels))] + \
+                [('prediction', class_labels),
+                 ('correct', class_labels)]
 
         elif task.task_type == 'Supervised Regression':
             arff_dict['attributes'] = [('repeat', 'NUMERIC'),

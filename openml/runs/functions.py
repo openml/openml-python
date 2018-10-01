@@ -459,8 +459,8 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
                         user_defined_measures_per_sample[measure][rep_no][fold_no] = collections.OrderedDict()
 
                     user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[measure]
-                    user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = \
-                        user_defined_measures_fold[measure]
+                    user_defined_measures_per_sample[measure][rep_no][fold_no][
+                        sample_no] = user_defined_measures_fold[measure]
 
     # Note that we need to use a fitted model (i.e., model_fold, and not model) here,
     # to ensure it contains the hyperparameter data (in cv_results_)
@@ -472,10 +472,10 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
         arff_trace_attributes = None
 
     return arff_datacontent, \
-           arff_tracecontent, \
-           arff_trace_attributes, \
-           user_defined_measures_per_fold, \
-           user_defined_measures_per_sample
+        arff_tracecontent, \
+        arff_trace_attributes, \
+        user_defined_measures_per_fold, \
+        user_defined_measures_per_sample
 
 
 def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runtime, add_local_measures):
@@ -621,8 +621,8 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
         user_defined_measures['usercpu_time_millis_testing'] = modelpredict_duration
         user_defined_measures['usercpu_time_millis'] = modelfit_duration + modelpredict_duration
 
-    # add client-side calculated metrics. These is used on the server as consistency
-    # check, only useful for supervised tasks
+    # add client-side calculated metrics. These is used on the server as
+    # consistency check, only useful for supervised tasks
     def _calculate_local_measure(sklearn_fn, openml_name):
         user_defined_measures[openml_name] = sklearn_fn(testY, PredY)
 
@@ -638,7 +638,8 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
         if ProbaY.shape[1] != len(task.class_labels):
             warnings.warn("Repeat %d Fold %d: estimator only predicted for "
                           "%d/%d classes!" % (
-                              rep_no, fold_no, ProbaY.shape[1], len(task.class_labels)))
+                              rep_no, fold_no, ProbaY.shape[1],
+                              len(task.class_labels)))
 
         if add_local_measures:
             _calculate_local_measure(sklearn.metrics.accuracy_score,

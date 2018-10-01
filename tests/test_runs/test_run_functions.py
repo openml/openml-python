@@ -142,8 +142,8 @@ class TestRun(TestBase):
             flow_server = openml.flows.sklearn_to_flow(clf_server)
 
             if flow.class_name not in classes_without_random_state:
-                error_msg = 'Flow class %s (id=%d) does not have a random state parameter' % (
-                flow.class_name, flow.flow_id)
+                error_msg = 'Flow class %s (id=%d) does not have a random ' \
+                            'state parameter' % (flow.class_name, flow.flow_id)
                 self.assertIn('random_state', flow.parameters, error_msg)
                 # If the flow is initialized from a model without a random state,
                 # the flow is on the server without any random state
@@ -189,10 +189,11 @@ class TestRun(TestBase):
         """
 
         # a dict mapping from openml measure to a tuple with the minimum and maximum allowed value
-        check_measures = {'usercpu_time_millis_testing': (0, max_time_allowed),
-                          'usercpu_time_millis_training': (0, max_time_allowed),
-                          # should take at least one millisecond (?)
-                          'usercpu_time_millis': (0, max_time_allowed)}
+        check_measures = {
+            'usercpu_time_millis_testing': (0, max_time_allowed),
+            'usercpu_time_millis_training': (0, max_time_allowed),
+            # should take at least one millisecond (?)
+            'usercpu_time_millis': (0, max_time_allowed)}
 
         print(task_type)
 
@@ -225,7 +226,8 @@ class TestRun(TestBase):
                         self.assertGreaterEqual(evaluation, min_val)
                         self.assertLessEqual(evaluation, max_val)
 
-    def _check_sample_evaluations(self, sample_evaluations, num_repeats, num_folds, num_samples,
+    def _check_sample_evaluations(self, sample_evaluations, num_repeats,
+                                  num_folds, num_samples,
                                   max_time_allowed=60000):
         """
         Checks whether the right timing measures are attached to the run (before upload).
@@ -237,11 +239,12 @@ class TestRun(TestBase):
         """
 
         # a dict mapping from openml measure to a tuple with the minimum and maximum allowed value
-        check_measures = {'usercpu_time_millis_testing': (0, max_time_allowed),
-                          'usercpu_time_millis_training': (0, max_time_allowed),
-                          # should take at least one millisecond (?)
-                          'usercpu_time_millis': (0, max_time_allowed),
-                          'predictive_accuracy': (0, 1)}
+        check_measures = {
+            'usercpu_time_millis_testing': (0, max_time_allowed),
+            'usercpu_time_millis_training': (0, max_time_allowed),
+            # should take at least one millisecond (?)
+            'usercpu_time_millis': (0, max_time_allowed),
+            'predictive_accuracy': (0, 1)}
 
         self.assertIsInstance(sample_evaluations, dict)
         if sys.version_info[:2] >= (3, 3):
@@ -619,7 +622,8 @@ class TestRun(TestBase):
 
     def test_online_run_metric_score(self):
         openml.config.server = self.production_server
-        run = openml.runs.get_run(5965513)  # important to use binary classification task, due to assertions
+        # important to use binary classification task, due to assertions
+        run = openml.runs.get_run(5965513)
         self._test_local_evaluations(run)
 
     def test_initialize_model_from_run(self):
@@ -696,12 +700,14 @@ class TestRun(TestBase):
         # would be better to not sentinel these clfs,
         # so we do not have to perform the actual runs
         # and can just check their status on line
-        clfs = [sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='mean')),
-                                                 ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
-                                                 ('Estimator', DecisionTreeClassifier(max_depth=4))]),
-                sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='most_frequent')),
-                                                 ('VarianceThreshold', VarianceThreshold(threshold=0.1)),
-                                                 ('Estimator', DecisionTreeClassifier(max_depth=4))])]
+        clfs = [sklearn.pipeline.Pipeline(steps=[
+                    ('Imputer', Imputer(strategy='mean')),
+                    ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
+                    ('Estimator', DecisionTreeClassifier(max_depth=4))]),
+                sklearn.pipeline.Pipeline(steps=[
+                    ('Imputer', Imputer(strategy='most_frequent')),
+                    ('VarianceThreshold', VarianceThreshold(threshold=0.1)),
+                    ('Estimator', DecisionTreeClassifier(max_depth=4))])]
 
         task = openml.tasks.get_task(115)
 
@@ -1110,11 +1116,12 @@ class TestRun(TestBase):
         flows = [74, 1718]
 
         '''
-        Since the results are taken by batch size, the function does not throw 
-        an OpenMLServerError anymore. Instead it throws a TimeOutException. For 
-        the moment commented out.
+        Since the results are taken by batch size, the function does not 
+        throw an OpenMLServerError anymore. Instead it throws a 
+        TimeOutException. For the moment commented out.
         '''
-        # self.assertRaises(openml.exceptions.OpenMLServerError, openml.runs.list_runs)
+        # self.assertRaises(openml.exceptions.OpenMLServerError,
+        # openml.runs.list_runs)
 
         runs = openml.runs.list_runs(id=ids)
         self.assertEqual(len(runs), 2)
