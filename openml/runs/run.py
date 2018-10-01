@@ -49,8 +49,7 @@ class OpenMLRun(object):
         self.sample_evaluations = sample_evaluations
         self.data_content = data_content
         self.output_files = output_files
-        self.trace_attributes = trace_attributes
-        self.trace_content = trace_content
+        self.trace = trace
         self.error_message = None
         self.task = task
         self.flow = flow
@@ -123,11 +122,7 @@ class OpenMLRun(object):
                 run.model = pickle.load(fp)
 
         if os.path.isfile(trace_path):
-            trace_arff = \
-                openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
-
-            run.trace_attributes = trace_arff['attributes']
-            run.trace_content = trace_arff['data']
+            run.trace = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
 
         return run
 
@@ -173,10 +168,8 @@ class OpenMLRun(object):
             with open(os.path.join(output_directory, 'model.pkl'), 'wb') as f:
                 pickle.dump(self.model, f)
 
-        if self.trace_content is not None:
-            trace_arff = arff.dumps(self._generate_trace_arff_dict())
-            with open(os.path.join(output_directory, 'trace.arff'), 'w') as f:
-                f.write(trace_arff)
+        if self.trace is not None:
+            self.trace._to_filesystem(output_directory)
 
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the
@@ -230,33 +223,7 @@ class OpenMLRun(object):
                                        ('cluster', 'NUMERIC')]
 
         return arff_dict
-
-    def _generate_trace_arff_dict(self):
-        """Generates the arff dictionary for uploading predictions to the
-        server.
-
-        Assumes that the run has been executed.
-
-        Returns
-        -------
-        arf_dict : dict
-            Dictionary representation of the ARFF file that will be uploaded.
-            Contains information about the optimization trace.
-        """
-        if self.trace_content is None or len(self.trace_content) == 0:
-            raise ValueError('No trace content available.')
-        if len(self.trace_attributes) != len(self.trace_content[0]):
-            raise ValueError('Trace_attributes and trace_content not '
-                             'compatible')
-
-        arff_dict = OrderedDict()
-        arff_dict['attributes'] = self.trace_attributes
-        arff_dict['data'] = self.trace_content
-        arff_dict['relation'] = 'openml_task_' + str(self.task_id) + \
-                                '_predictions'
-
-        return arff_dict
-
+      
     def get_metric_fn(self, sklearn_fn, kwargs={}):
         """Calculates metric scores based on prnedicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
@@ -392,11 +359,15 @@ class OpenMLRun(object):
         self : OpenMLRun
         """
         if self.model is None:
-            raise PyOpenMLError("OpenMLRun obj does not contain a model. "
-                                "(This should never happen.) ")
+            raise PyOpenMLError(
+                "OpenMLRun obj does not contain a model. "
+                "(This should never happen.) "
+            )
         if self.flow_id is None:
-            raise PyOpenMLError("OpenMLRun obj does not contain a flow id. "
-                                "(Should have been uploaded before.) ")
+            raise PyOpenMLError(
+                "OpenMLRun obj does not contain a flow id. "
+                "(Should have been added while executing the task.) "
+            )
 
         description_xml = self._create_description_xml()
         file_elements = {'description': ("description.xml", description_xml)}
@@ -405,8 +376,8 @@ class OpenMLRun(object):
             predictions = arff.dumps(self._generate_arff_dict())
             file_elements['predictions'] = ("predictions.arff", predictions)
 
-        if self.trace_content is not None:
-            trace_arff = arff.dumps(self._generate_trace_arff_dict())
+        if self.trace is not None:
+            trace_arff = arff.dumps(self.trace.trace_to_arff())
             file_elements['trace'] = ("trace.arff", trace_arff)
 
         return_value = openml._api_calls._perform_api_call("/run/",

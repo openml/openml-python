@@ -100,28 +100,43 @@ class TestRun(TestBase):
         np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
         np.testing.assert_array_equal(string_part, string_part_prime)
 
-        if run.trace_content is not None:
+        if run.trace is not None:
+            run_trace_content = run.trace.trace_to_arff()['data']
+        else:
+            run_trace_content = None
+
+        if run_prime.trace is not None:
+            run_prime_trace_content = run_prime.trace.trace_to_arff()['data']
+        else:
+            run_prime_trace_content = None
+
+        if run_trace_content is not None:
             def _check_array(array, type_):
                 for line in array:
                     for entry in line:
                         self.assertIsInstance(entry, type_)
 
-            int_part = [line[:3] for line in run.trace_content]
+            int_part = [line[:3] for line in run_trace_content]
             _check_array(int_part, int)
-            int_part_prime = [line[:3] for line in run_prime.trace_content]
+            int_part_prime = [line[:3] for line in run_prime_trace_content]
             _check_array(int_part_prime, int)
 
-            float_part = np.array(np.array(run.trace_content)[:, 3:4],
-                                  dtype=float)
-            float_part_prime = np.array(np.array(
-                run_prime.trace_content)[:, 3:4], dtype=float)
-            bool_part = [line[4] for line in run.trace_content]
-            bool_part_prime = [line[4] for line in run_prime.trace_content]
+            float_part = np.array(
+                np.array(run_trace_content)[:, 3:4],
+                dtype=float,
+            )
+            float_part_prime = np.array(
+                np.array(run_prime_trace_content)[:, 3:4],
+                dtype=float,
+            )
+            bool_part = [line[4] for line in run_trace_content]
+            bool_part_prime = [line[4] for line in run_prime_trace_content]
             for bp, bpp in zip(bool_part, bool_part_prime):
                 self.assertIn(bp, ['true', 'false'])
                 self.assertIn(bpp, ['true', 'false'])
-            string_part = np.array(run.trace_content)[:, 5:]
-            string_part_prime = np.array(run_prime.trace_content)[:, 5:]
+            string_part = np.array(run_trace_content)[:, 5:]
+            string_part_prime = np.array(run_prime_trace_content)[:, 5:]
+
             # JvR: Python 2.7 requires an almost equal check, rather than an
             # equals check
             np.testing.assert_array_almost_equal(int_part, int_part_prime)
@@ -129,7 +144,7 @@ class TestRun(TestBase):
             self.assertEqual(bool_part, bool_part_prime)
             np.testing.assert_array_equal(string_part, string_part_prime)
         else:
-            self.assertIsNone(run_prime.trace_content)
+            self.assertIsNone(run_prime_trace_content)
 
     def test_to_from_filesystem_vanilla(self):
         model = Pipeline([
@@ -137,11 +152,17 @@ class TestRun(TestBase):
             ('classifier', DecisionTreeClassifier(max_depth=1)),
         ])
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(task, model,
-                                            add_local_measures=False)
+        run = openml.runs.run_model_on_task(
+            model=model,
+            task=task,
+            add_local_measures=False,
+        )
 
-        cache_path = os.path.join(self.workdir, 'runs',
-                                  str(random.getrandbits(128)))
+        cache_path = os.path.join(
+            self.workdir,
+            'runs',
+            str(random.getrandbits(128)),
+        )
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
@@ -162,11 +183,17 @@ class TestRun(TestBase):
         )
 
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(task, model,
-                                            add_local_measures=False)
+        run = openml.runs.run_model_on_task(
+            model,
+            task,
+            add_local_measures=False,
+        )
 
-        cache_path = os.path.join(self.workdir, 'runs',
-                                  str(random.getrandbits(128)))
+        cache_path = os.path.join(
+            self.workdir,
+            'runs',
+            str(random.getrandbits(128)),
+        )
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
@@ -179,11 +206,17 @@ class TestRun(TestBase):
             ('classifier', DummyClassifier()),
         ])
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(task, model,
-                                            add_local_measures=False)
+        run = openml.runs.run_model_on_task(
+            task,
+            model,
+            add_local_measures=False,
+        )
 
-        cache_path = os.path.join(self.workdir, 'runs',
-                                  str(random.getrandbits(128)))
+        cache_path = os.path.join(
+            self.workdir,
+            'runs',
+            str(random.getrandbits(128)),
+        )
         run.to_filesystem(cache_path, store_model=False)
         # obtain run from filesystem
         openml.runs.OpenMLRun.from_filesystem(cache_path, expect_model=False)

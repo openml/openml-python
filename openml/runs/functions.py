@@ -23,7 +23,7 @@ from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..tasks import OpenMLTask
 from .run import OpenMLRun, _get_version_information
-from .trace import OpenMLRunTrace, OpenMLTraceIteration
+from .trace import OpenMLRunTrace
 
 # _get_version_info, _get_dict and _create_setup_string are in run.py to avoid
 # circular imports
@@ -135,6 +135,7 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
                              'exist on the server according to flow_exists')
         _publish_flow_if_necessary(flow)
 
+    data_content, trace, fold_evaluations, sample_evaluations = res
     if not isinstance(flow.flow_id, int):
         # This is the usual behaviour, where the flow object was initiated off
         # line and requires some additional information (flow_id, input_id for
@@ -148,20 +149,23 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
         # through "run_model_on_task"
         if flow.flow_id != flow_id:
             # This should never happen, unless user made a flow-creation fault
-            raise ValueError('Result flow_exists and flow_ids are not same.')
+            raise ValueError(
+                "Result from API call flow_exists and flow.flow_id are not "
+                "same: '%s' vs '%s'" % (str(flow.flow_id), str(flow_id))
+            )
 
     run = OpenMLRun(
         task_id=task.task_id,
         flow_id=flow.flow_id,
         dataset_id=dataset.dataset_id,
         model=flow.model,
-        tags=tags,
         flow_name=flow.name,
+        tags=tags,
+        trace=trace,
+        data_content=data_content,
     )
     run.parameter_settings = OpenMLRun._parse_parameters(flow)
 
-    run.data_content, run.trace_content, run.trace_attributes, \
-        fold_evaluations, sample_evaluations = res
     # now we need to attach the detailed evaluations
     if task.task_type_id == 3:
         run.sample_evaluations = sample_evaluations
@@ -208,7 +212,7 @@ def get_run_trace(run_id):
     openml.runs.OpenMLTrace
     """
     trace_xml = openml._api_calls._perform_api_call('run/trace/%d' % run_id)
-    run_trace = _create_trace_from_description(trace_xml)
+    run_trace = OpenMLRunTrace.trace_from_xml(trace_xml)
     return run_trace
 
 
@@ -501,15 +505,19 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
     if isinstance(model_fold, sklearn.model_selection._search.BaseSearchCV):
         # arff_tracecontent is already set
         arff_trace_attributes = _extract_arfftrace_attributes(model_fold)
+        trace = OpenMLRunTrace.generate(
+            arff_trace_attributes,
+            arff_tracecontent,
+        )
     else:
-        arff_tracecontent = None
-        arff_trace_attributes = None
+        trace = None
 
-    return arff_datacontent, \
-        arff_tracecontent, \
-        arff_trace_attributes, \
-        user_defined_measures_per_fold, \
-        user_defined_measures_per_sample
+    return (
+        arff_datacontent,
+        trace,
+        user_defined_measures_per_fold,
+        user_defined_measures_per_sample,
+    )
 
 
 def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
@@ -773,9 +781,10 @@ def _extract_arfftrace_attributes(model):
                     raise TypeError('Unsupported param type in param grid: '
                                     '%s' % key)
 
-            # we renamed the attribute param to parameter, as this is a
-            # required OpenML convention
-            attribute = ("parameter_" + key[6:], type)
+            # we renamed the attribute param to parameter, as this is a required
+            # OpenML convention - this also guards against name collisions
+            # with the required trace attributes
+            attribute = (openml.runs.trace.PREFIX + key[6:], type)
             trace_attributes.append(attribute)
     return trace_attributes
 
@@ -981,96 +990,7 @@ def _create_run_from_xml(xml, from_server=True):
                      fold_evaluations=fold_evaluations,
                      sample_evaluations=sample_evaluations,
                      tags=tags)
-
-
-def _create_trace_from_description(xml):
-    result_dict = xmltodict.parse(xml, force_list=('oml:trace_iteration',))[
-        'oml:trace']
-
-    run_id = result_dict['oml:run_id']
-    trace = collections.OrderedDict()
-
-    if 'oml:trace_iteration' not in result_dict:
-        raise ValueError('Run does not contain valid trace. ')
-
-    assert type(result_dict['oml:trace_iteration']) == list, \
-        type(result_dict['oml:trace_iteration'])
-
-    for itt in result_dict['oml:trace_iteration']:
-        repeat = int(itt['oml:repeat'])
-        fold = int(itt['oml:fold'])
-        iteration = int(itt['oml:iteration'])
-        setup_string = json.loads(itt['oml:setup_string'])
-        evaluation = float(itt['oml:evaluation'])
-
-        selectedValue = itt['oml:selected']
-        if selectedValue == 'true':
-            selected = True
-        elif selectedValue == 'false':
-            selected = False
-        else:
-            raise ValueError('expected {"true", "false"} value for '
-                             'selected field, received: %s' % selectedValue)
-
-        current = OpenMLTraceIteration(repeat, fold, iteration,
-                                       setup_string, evaluation,
-                                       selected)
-        trace[(repeat, fold, iteration)] = current
-
-    return OpenMLRunTrace(run_id, trace)
-
-
-def _create_trace_from_arff(arff_obj):
-    """
-    Creates a trace file from arff obj (for example, generated by a local run)
-
-    Parameters
-    ----------
-    arff_obj : dict
-        LIAC arff obj, dict containing attributes, relation, data and
-        description
-
-    Returns
-    -------
-    run : OpenMLRunTrace
-        Object containing None for run id and a dict containing the trace
-        iterations
-    """
-    trace = collections.OrderedDict()
-    attribute_idx = {att[0]: idx for idx, att in
-                     enumerate(arff_obj['attributes'])}
-    for required_attribute in ['repeat', 'fold', 'iteration', 'evaluation',
-                               'selected']:
-        if required_attribute not in attribute_idx:
-            raise ValueError('arff misses required attribute:'
-                             ' %s' % required_attribute)
-
-    for itt in arff_obj['data']:
-        repeat = int(itt[attribute_idx['repeat']])
-        fold = int(itt[attribute_idx['fold']])
-        iteration = int(itt[attribute_idx['iteration']])
-        evaluation = float(itt[attribute_idx['evaluation']])
-        selectedValue = itt[attribute_idx['selected']]
-        if selectedValue == 'true':
-            selected = True
-        elif selectedValue == 'false':
-            selected = False
-        else:
-            raise ValueError('expected {"true", "false"} value for selected '
-                             'field, received: %s' % selectedValue)
-
-        # TODO: if someone needs it, he can use the parameter
-        # fields to revive the setup_string as well
-        # However, this is usually done by the OpenML server
-        # and if we are going to duplicate this functionality
-        # it needs proper testing
-
-        current = OpenMLTraceIteration(repeat, fold, iteration, None,
-                                       evaluation, selected)
-        trace[(repeat, fold, iteration)] = current
-
-    return OpenMLRunTrace(None, trace)
-
+  
 
 def _get_cached_run(run_id):
     """Load a run from the cache."""
