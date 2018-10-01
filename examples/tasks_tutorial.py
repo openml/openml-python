@@ -59,7 +59,8 @@ print(len(filtered_tasks))
 
 ############################################################################
 # Resampling strategies can be found on
-# the `OpenML Website <http://www.openml.org/search?type=measure&q=estimation%20procedure>`_.
+# the `OpenML Website <http://www.openml.org
+# /search?type=measure&q=estimation%20procedure>`_.
 #
 # Similar to listing tasks by task type, we can list tasks by tags:
 

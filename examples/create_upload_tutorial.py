@@ -39,10 +39,11 @@ y = np.array([target_names[i] for i in y])
 attribute_names = breast_cancer.feature_names
 description = breast_cancer.DESCR
 ############################################################################
-# OpenML does not distinguish between the attributes and targets on the data level and stores all data in a
-# single matrix.
+# OpenML does not distinguish between the attributes and
+# targets on the data level and stores all data in a single matrix.
 #
-# The target feature is indicated as meta-data of the dataset (and tasks on that data).
+# The target feature is indicated as meta-data of the
+# dataset (and tasks on that data).
 
 data = np.concatenate((x, y.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
@@ -52,7 +53,8 @@ attributes = [
 citation = (
     "W.N. Street, W.H. Wolberg and O.L. Mangasarian. "
     "Nuclear feature extraction for breast tumor diagnosis. "
-    "IS&T/SPIE 1993 International Symposium on Electronic Imaging: Science and Technology, "
+    "IS&T/SPIE 1993 International Symposium on Electronic "
+    "Imaging: Science and Technology, "
     "volume 1905, pages 861-870, San Jose, CA, 1993."
 )
 paper_url = (

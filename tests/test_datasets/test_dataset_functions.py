@@ -326,7 +326,7 @@ class TestOpenMLDataset(TestBase):
         dataset = OpenMLDataset(
             "anneal",
             "test",
-            format="ARFF",
+            data_format="ARFF",
             version=1,
             licence="public",
             default_target_attribute="class",
@@ -348,7 +348,7 @@ class TestOpenMLDataset(TestBase):
         dataset = OpenMLDataset(
             "UploadTestWithURL",
             "test",
-            format="ARFF",
+            data_format="ARFF",
             version=1,
             url="https://www.openml.org/data/download/61/dataset_61_iris.arff",
         )
