@@ -459,8 +459,8 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
                         user_defined_measures_per_sample[measure][rep_no][fold_no] = collections.OrderedDict()
 
                     user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[measure]
-                    user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = user_defined_measures_fold[
-                        measure]
+                    user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = \
+                        user_defined_measures_fold[measure]
 
     # Note that we need to use a fitted model (i.e., model_fold, and not model) here,
     # to ensure it contains the hyperparameter data (in cv_results_)
@@ -472,10 +472,10 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
         arff_trace_attributes = None
 
     return arff_datacontent, \
-        arff_tracecontent, \
-        arff_trace_attributes, \
-        user_defined_measures_per_fold, \
-        user_defined_measures_per_sample
+           arff_tracecontent, \
+           arff_trace_attributes, \
+           user_defined_measures_per_fold, \
+           user_defined_measures_per_sample
 
 
 def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runtime, add_local_measures):
@@ -599,7 +599,8 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
             'Supervised Classification',
             'Learning Curve',
     ):
-        if isinstance(used_estimator, sklearn.model_selection._search.BaseSearchCV):
+        if isinstance(used_estimator,
+                      sklearn.model_selection._search.BaseSearchCV):
             model_classes = used_estimator.best_estimator_.classes_
         else:
             model_classes = used_estimator.classes_
@@ -607,20 +608,21 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
     if can_measure_runtime:
         modelpredict_starttime = time.process_time()
 
-    # In supervised learning this returns the predictions for Y, in clustering it returns the clusters
+    # In supervised learning this returns the predictions for Y, in clustering
+    # it returns the clusters
     PredY = model.predict(testX)
 
-    # TODO: Check if it OK to move predict_proba outside of the runtime measurement
-    # Before we were doing both predict and predict_proba within the measurement,
-    # so we were counting prediction time twice?
+    # TODO: Is it OK to move predict_proba outside of the runtime measurement?
+    # Before we were doing both predict and predict_proba within the
+    # measurement, so we were counting prediction time twice?
 
     if can_measure_runtime:
         modelpredict_duration = (time.process_time() - modelpredict_starttime) * 1000
         user_defined_measures['usercpu_time_millis_testing'] = modelpredict_duration
         user_defined_measures['usercpu_time_millis'] = modelfit_duration + modelpredict_duration
 
-    # add client-side calculated metrics. These is used on the server as consistency check
-    # only useful for supervised tasks
+    # add client-side calculated metrics. These is used on the server as consistency
+    # check, only useful for supervised tasks
     def _calculate_local_measure(sklearn_fn, openml_name):
         user_defined_measures[openml_name] = sklearn_fn(testY, PredY)
 
@@ -634,16 +636,20 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no, can_measure_runt
             ProbaY = _prediction_to_probabilities(PredY, list(model_classes))
 
         if ProbaY.shape[1] != len(task.class_labels):
-            warnings.warn("Repeat %d Fold %d: estimator only predicted for %d/%d classes!" % (
-                rep_no, fold_no, ProbaY.shape[1], len(task.class_labels)))
+            warnings.warn("Repeat %d Fold %d: estimator only predicted for "
+                          "%d/%d classes!" % (
+                              rep_no, fold_no, ProbaY.shape[1], len(task.class_labels)))
 
         if add_local_measures:
-            _calculate_local_measure(sklearn.metrics.accuracy_score, 'predictive_accuracy')
+            _calculate_local_measure(sklearn.metrics.accuracy_score,
+                                     'predictive_accuracy')
 
         for i in range(0, len(test_indices)):
             arff_line = _prediction_to_row(rep_no, fold_no, sample_no,
-                                           test_indices[i], task.class_labels[testY[i]],
-                                           PredY[i], ProbaY[i], task.class_labels, model_classes)
+                                           test_indices[i],
+                                           task.class_labels[testY[i]],
+                                           PredY[i], ProbaY[i],
+                                           task.class_labels, model_classes)
             arff_datacontent.append(arff_line)
 
     elif task.task_type == 'Supervised Regression':
@@ -716,7 +722,8 @@ def _extract_arfftrace_attributes(model):
                     # list of integers
                     type = 'STRING'
                 else:
-                    raise TypeError('Unsupported param type in param grid: %s' % key)
+                    raise TypeError('Unsupported param type in param grid: '
+                                    '%s' % key)
 
             # we renamed the attribute param to parameter, as this is a required
             # OpenML convention
@@ -971,7 +978,8 @@ def _create_trace_from_arff(arff_obj):
     attribute_idx = {att[0]: idx for idx, att in enumerate(arff_obj['attributes'])}
     for required_attribute in ['repeat', 'fold', 'iteration', 'evaluation', 'selected']:
         if required_attribute not in attribute_idx:
-            raise ValueError('arff misses required attribute: %s' % required_attribute)
+            raise ValueError('arff misses required attribute:'
+                             ' %s' % required_attribute)
 
     for itt in arff_obj['data']:
         repeat = int(itt[attribute_idx['repeat']])

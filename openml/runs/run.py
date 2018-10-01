@@ -199,11 +199,12 @@ class OpenMLRun(object):
 
         # Separate these out? Normal classification doesn't need 'sample'
         if task.task_type in ['Supervised Classification', 'Learning Curve']:
-            arff_dict['attributes'] = [('repeat', 'NUMERIC'),  # lowercase 'numeric' gives an error
+            arff_dict['attributes'] = [('repeat', 'NUMERIC'),
                                        ('fold', 'NUMERIC'),
                                        ('sample', 'NUMERIC'),
                                        ('row_id', 'NUMERIC')] + \
-                                      [('confidence.' + class_labels[i], 'NUMERIC') for i in range(len(class_labels))] + \
+                                      [('confidence.' + class_labels[i], 'NUMERIC') for i in
+                                       range(len(class_labels))] + \
                                       [('prediction', class_labels),
                                        ('correct', class_labels)]
 
@@ -278,12 +279,18 @@ class OpenMLRun(object):
         task = get_task(self.task_id)
 
         attribute_names = [att[0] for att in predictions_arff['attributes']]
-        if task.task_type == 'Supervised Classification' and 'correct' not in attribute_names:
-            raise ValueError('Attribute "correct" should be set for classification task runs')
-        if task.task_type == 'Supervised Regression' and 'truth' not in attribute_names:
-            raise ValueError('Attribute "truth" should be set for regression task runs')
-        if task.task_type != 'Clustering' and 'prediction' not in attribute_names:
-            raise ValueError('Attribute "predict" should be set for supervised task runs')
+        if task.task_type == 'Supervised Classification' and 'correct' not in \
+                attribute_names:
+            raise ValueError('Attribute "correct" should be set for '
+                             'classification task runs')
+        if task.task_type == 'Supervised Regression' and 'truth' not in \
+                attribute_names:
+            raise ValueError('Attribute "truth" should be set for '
+                             'regression task runs')
+        if task.task_type != 'Clustering' and 'prediction' not in \
+                attribute_names:
+            raise ValueError('Attribute "predict" should be set for '
+                             'supervised task runs')
 
         def _attribute_list_to_dict(attribute_list):
             # convenience function: Creates a mapping to map from the name of attributes
@@ -300,7 +307,8 @@ class OpenMLRun(object):
         fold_idx = attribute_dict['fold']
         predicted_idx = attribute_dict['prediction']  # Assume supervised tasks
 
-        if task.task_type == 'Supervised Classification' or self.task_type == 'Learning Curve':
+        if task.task_type == 'Supervised Classification' or \
+                self.task_type == 'Learning Curve':
             correct_idx = attribute_dict['correct']
         elif task.task_type == 'Supervised Regression':
             correct_idx = attribute_dict['truth']
@@ -312,7 +320,8 @@ class OpenMLRun(object):
         if predictions_arff['attributes'][predicted_idx][1] != predictions_arff['attributes'][correct_idx][1]:
             pred = predictions_arff['attributes'][predicted_idx][1]
             corr = predictions_arff['attributes'][correct_idx][1]
-            raise ValueError('Predicted and Correct do not have equal values: %s Vs. %s' % (str(pred), str(corr)))
+            raise ValueError('Predicted and Correct do not have equal values: '
+                             '%s Vs. %s' % (str(pred), str(corr)))
 
         # TODO: these could be cached
         values_predict = {}
@@ -325,7 +334,8 @@ class OpenMLRun(object):
             else:
                 samp = 0  # No learning curve sample, always 0
 
-            if task.task_type == 'Supervised Classification' or self.task_type == 'Learning Curve':
+            if task.task_type == 'Supervised Classification' or \
+                    self.task_type == 'Learning Curve':
                 prediction = predictions_arff['attributes'][predicted_idx][1].index(line[predicted_idx])
                 correct = predictions_arff['attributes'][predicted_idx][1].index(line[correct_idx])
             elif task.task_type == 'Supervised Regression':
@@ -364,10 +374,11 @@ class OpenMLRun(object):
         self : OpenMLRun
         """
         if self.model is None:
-            raise PyOpenMLError("OpenMLRun obj does not contain a model. (This should never happen.) ")
+            raise PyOpenMLError("OpenMLRun obj does not contain a model. "
+                                "(This should never happen.) ")
         if self.flow_id is None:
             raise PyOpenMLError("OpenMLRun obj does not contain a flow id. "
-                                "(Should have been added while executing the task.) ")
+                                "(Should have been uploaded before.) ")
 
         description_xml = self._create_description_xml()
         file_elements = {'description': ("description.xml", description_xml)}
@@ -450,7 +461,8 @@ class OpenMLRun(object):
                                  'parameters expected by the '
                                  'flow:\nexpected flow parameters: '
                                  '%s\nmodel parameters: %s' % (
-                                     sorted(expected_parameters | expected_components),
+                                     sorted(expected_parameters |
+                                            expected_components),
                                      sorted(model_parameters)))
 
             _params = []
