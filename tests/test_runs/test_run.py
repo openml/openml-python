@@ -7,7 +7,8 @@ from sklearn.dummy import DummyClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, StratifiedKFold
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, \
+    StratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Imputer
 
@@ -75,21 +76,27 @@ class TestRun(TestBase):
         self.assertEqual(len(run_list), 0)
 
     def _test_run_obj_equals(self, run, run_prime):
-        for dictionary in ['evaluations', 'fold_evaluations', 'sample_evaluations']:
+        for dictionary in ['evaluations', 'fold_evaluations',
+                           'sample_evaluations']:
             if getattr(run, dictionary) is not None:
-                self.assertDictEqual(getattr(run, dictionary), getattr(run_prime, dictionary))
+                self.assertDictEqual(getattr(run, dictionary),
+                                     getattr(run_prime, dictionary))
             else:
                 # should be none or empty
                 other = getattr(run_prime, dictionary)
                 if other is not None:
                     self.assertDictEqual(other, dict())
-        self.assertEqual(run._create_description_xml(), run_prime._create_description_xml())
+        self.assertEqual(run._create_description_xml(),
+                         run_prime._create_description_xml())
 
-        numeric_part = np.array(np.array(run.data_content)[:, 0:-2], dtype=float)
-        numeric_part_prime = np.array(np.array(run_prime.data_content)[:, 0:-2], dtype=float)
+        numeric_part = \
+            np.array(np.array(run.data_content)[:, 0:-2], dtype=float)
+        numeric_part_prime = \
+            np.array(np.array(run_prime.data_content)[:, 0:-2], dtype=float)
         string_part = np.array(run.data_content)[:, -2:]
         string_part_prime = np.array(run_prime.data_content)[:, -2:]
-        # JvR: Python 2.7 requires an almost equal check, rather than an equals check
+        # JvR: Python 2.7 requires an almost equal check,
+        # rather than an equals check
         np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
         np.testing.assert_array_equal(string_part, string_part_prime)
 
@@ -104,8 +111,10 @@ class TestRun(TestBase):
             int_part_prime = [line[:3] for line in run_prime.trace_content]
             _check_array(int_part_prime, int)
 
-            float_part = np.array(np.array(run.trace_content)[:, 3:4], dtype=float)
-            float_part_prime = np.array(np.array(run_prime.trace_content)[:, 3:4], dtype=float)
+            float_part = np.array(np.array(run.trace_content)[:, 3:4],
+                                  dtype=float)
+            float_part_prime = np.array(np.array(
+                run_prime.trace_content)[:, 3:4], dtype=float)
             bool_part = [line[4] for line in run.trace_content]
             bool_part_prime = [line[4] for line in run_prime.trace_content]
             for bp, bpp in zip(bool_part, bool_part_prime):
@@ -113,7 +122,8 @@ class TestRun(TestBase):
                 self.assertIn(bpp, ['true', 'false'])
             string_part = np.array(run.trace_content)[:, 5:]
             string_part_prime = np.array(run_prime.trace_content)[:, 5:]
-            # JvR: Python 2.7 requires an almost equal check, rather than an equals check
+            # JvR: Python 2.7 requires an almost equal check, rather than an
+            # equals check
             np.testing.assert_array_almost_equal(int_part, int_part_prime)
             np.testing.assert_array_almost_equal(float_part, float_part_prime)
             self.assertEqual(bool_part, bool_part_prime)
@@ -127,9 +137,11 @@ class TestRun(TestBase):
             ('classifier', DecisionTreeClassifier(max_depth=1)),
         ])
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(task, model, add_local_measures=False)
+        run = openml.runs.run_model_on_task(task, model,
+                                            add_local_measures=False)
 
-        cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
+        cache_path = os.path.join(self.workdir, 'runs',
+                                  str(random.getrandbits(128)))
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
@@ -150,9 +162,11 @@ class TestRun(TestBase):
         )
 
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(task, model, add_local_measures=False)
+        run = openml.runs.run_model_on_task(task, model,
+                                            add_local_measures=False)
 
-        cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
+        cache_path = os.path.join(self.workdir, 'runs',
+                                  str(random.getrandbits(128)))
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
@@ -165,9 +179,11 @@ class TestRun(TestBase):
             ('classifier', DummyClassifier()),
         ])
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(task, model, add_local_measures=False)
+        run = openml.runs.run_model_on_task(task, model,
+                                            add_local_measures=False)
 
-        cache_path = os.path.join(self.workdir, 'runs', str(random.getrandbits(128)))
+        cache_path = os.path.join(self.workdir, 'runs',
+                                  str(random.getrandbits(128)))
         run.to_filesystem(cache_path, store_model=False)
         # obtain run from filesystem
         openml.runs.OpenMLRun.from_filesystem(cache_path, expect_model=False)

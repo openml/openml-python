@@ -26,10 +26,11 @@ class OpenMLRun(object):
     """
 
     def __init__(self, task_id, flow_id, dataset_id, setup_string=None,
-                 output_files=None, setup_id=None, tags=None, uploader=None, uploader_name=None,
-                 evaluations=None, fold_evaluations=None, sample_evaluations=None,
-                 data_content=None, trace_attributes=None, trace_content=None,
-                 model=None, task_type=None, task_evaluation_measure=None, flow_name=None,
+                 output_files=None, setup_id=None, tags=None, uploader=None,
+                 uploader_name=None, evaluations=None, fold_evaluations=None,
+                 sample_evaluations=None, data_content=None,
+                 trace_attributes=None, trace_content=None, model=None,
+                 task_type=None, task_evaluation_measure=None, flow_name=None,
                  parameter_settings=None, predictions_url=None, task=None,
                  flow=None, run_id=None):
         self.uploader = uploader
@@ -108,19 +109,22 @@ class OpenMLRun(object):
 
         with open(description_path, 'r') as fp:
             xml_string = fp.read()
-            run = openml.runs.functions._create_run_from_xml(xml_string, from_server=False)
+            run = openml.runs.functions._create_run_from_xml(xml_string,
+                                                             from_server=False)
 
         with open(predictions_path, 'r') as fp:
             predictions = arff.load(fp)
             run.data_content = predictions['data']
 
         if os.path.isfile(model_path):
-            # note that it will load the model if the file exists, even if expect_model is False
+            # note that it will load the model if the file exists, even if
+            # expect_model is False
             with open(model_path, 'rb') as fp:
                 run.model = pickle.load(fp)
 
         if os.path.isfile(trace_path):
-            trace_arff = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
+            trace_arff = \
+                openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
 
             run.trace_attributes = trace_arff['attributes']
             run.trace_content = trace_arff['data']
@@ -144,7 +148,8 @@ class OpenMLRun(object):
             model.
         """
         if self.data_content is None or self.model is None:
-            raise ValueError('Run should have been executed (and contain model / predictions)')
+            raise ValueError('Run should have been executed (and contain '
+                             'model / predictions)')
 
         try:
             os.makedirs(output_directory)
@@ -162,7 +167,7 @@ class OpenMLRun(object):
 
         with open(os.path.join(output_directory, 'description.xml'), 'w') as f:
             f.write(run_xml)
-        with open(os.path.join(output_directory, 'predictions.arff'), 'w') as f:
+        with open(os.path.join(output_directory,'predictions.arff'), 'w') as f:
             f.write(predictions_arff)
         if store_model:
             with open(os.path.join(output_directory, 'model.pkl'), 'wb') as f:
@@ -174,7 +179,8 @@ class OpenMLRun(object):
                 f.write(trace_arff)
 
     def _generate_arff_dict(self):
-        """Generates the arff dictionary for uploading predictions to the server.
+        """Generates the arff dictionary for uploading predictions to the
+        server.
 
         Assumes that the run has been executed.
 
@@ -195,7 +201,8 @@ class OpenMLRun(object):
         arff_dict = OrderedDict()
         arff_dict['data'] = self.data_content
         arff_dict['description'] = "\n".join(run_environment)
-        arff_dict['relation'] = 'openml_task_' + str(task.task_id) + '_predictions'
+        arff_dict['relation'] = 'openml_task_' + str(task.task_id) + \
+                                '_predictions'
 
         # Separate these out? Normal classification doesn't need 'sample'
         if task.task_type in ['Supervised Classification', 'Learning Curve']:
@@ -225,7 +232,8 @@ class OpenMLRun(object):
         return arff_dict
 
     def _generate_trace_arff_dict(self):
-        """Generates the arff dictionary for uploading predictions to the server.
+        """Generates the arff dictionary for uploading predictions to the
+        server.
 
         Assumes that the run has been executed.
 
@@ -238,12 +246,14 @@ class OpenMLRun(object):
         if self.trace_content is None or len(self.trace_content) == 0:
             raise ValueError('No trace content available.')
         if len(self.trace_attributes) != len(self.trace_content[0]):
-            raise ValueError('Trace_attributes and trace_content not compatible')
+            raise ValueError('Trace_attributes and trace_content not '
+                             'compatible')
 
         arff_dict = OrderedDict()
         arff_dict['attributes'] = self.trace_attributes
         arff_dict['data'] = self.trace_content
-        arff_dict['relation'] = 'openml_task_' + str(self.task_id) + '_predictions'
+        arff_dict['relation'] = 'openml_task_' + str(self.task_id) + \
+                                '_predictions'
 
         return arff_dict
 
@@ -271,10 +281,12 @@ class OpenMLRun(object):
             predictions_file_url = openml._api_calls._file_id_to_url(
                 self.output_files['predictions'], 'predictions.arff',
             )
-            predictions_arff = arff.loads(openml._api_calls._read_url(predictions_file_url))
+            predictions_arff = \
+                arff.loads(openml._api_calls._read_url(predictions_file_url))
             # TODO: make this a stream reader
         else:
-            raise ValueError('Run should have been locally executed or contain outputfile reference.')
+            raise ValueError('Run should have been locally executed or '
+                             'contain outputfile reference.')
 
         # Need to know more about the task to compute scores correctly
         task = get_task(self.task_id)
@@ -294,15 +306,17 @@ class OpenMLRun(object):
                              'supervised task runs')
 
         def _attribute_list_to_dict(attribute_list):
-            # convenience function: Creates a mapping to map from the name of attributes
-            # present in the arff prediction file to their index. This is necessary
-            # because the number of classes can be different for different tasks.
+            # convenience function: Creates a mapping to map from the name of
+            # attributes present in the arff prediction file to their index.
+            # This is necessary because the number of classes can be different
+            # for different tasks.
             res = OrderedDict()
             for idx in range(len(attribute_list)):
                 res[attribute_list[idx][0]] = idx
             return res
 
-        attribute_dict = _attribute_list_to_dict(predictions_arff['attributes'])
+        attribute_dict = \
+            _attribute_list_to_dict(predictions_arff['attributes'])
 
         repeat_idx = attribute_dict['repeat']
         fold_idx = attribute_dict['fold']
@@ -318,7 +332,8 @@ class OpenMLRun(object):
             sample_idx = attribute_dict['sample']
             has_samples = True
 
-        if predictions_arff['attributes'][predicted_idx][1] != predictions_arff['attributes'][correct_idx][1]:
+        if predictions_arff['attributes'][predicted_idx][1] != \
+                predictions_arff['attributes'][correct_idx][1]:
             pred = predictions_arff['attributes'][predicted_idx][1]
             corr = predictions_arff['attributes'][correct_idx][1]
             raise ValueError('Predicted and Correct do not have equal values: '
@@ -337,8 +352,10 @@ class OpenMLRun(object):
 
             if task.task_type == 'Supervised Classification' or \
                     self.task_type == 'Learning Curve':
-                prediction = predictions_arff['attributes'][predicted_idx][1].index(line[predicted_idx])
-                correct = predictions_arff['attributes'][predicted_idx][1].index(line[correct_idx])
+                prediction = predictions_arff['attributes'][predicted_idx][1].\
+                    index(line[predicted_idx])
+                correct = predictions_arff['attributes'][predicted_idx][1].\
+                    index(line[correct_idx])
             elif task.task_type == 'Supervised Regression':
                 prediction = line[predicted_idx]
                 correct = line[correct_idx]
@@ -392,8 +409,10 @@ class OpenMLRun(object):
             trace_arff = arff.dumps(self._generate_trace_arff_dict())
             file_elements['trace'] = ("trace.arff", trace_arff)
 
-        return_value = openml._api_calls._perform_api_call("/run/", file_elements=file_elements)
-        run_id = int(xmltodict.parse(return_value)['oml:upload_run']['oml:run_id'])
+        return_value = openml._api_calls._perform_api_call("/run/",
+            file_elements=file_elements)
+        run_id = \
+            int(xmltodict.parse(return_value)['oml:upload_run']['oml:run_id'])
         self.run_id = run_id
         return self
 
@@ -430,7 +449,8 @@ class OpenMLRun(object):
         Parameters
         ----------
         flow : OpenMLFlow
-            openml flow object (containing flow ids, i.e., it has to be downloaded from the server)
+            openml flow object (containing flow ids, i.e., it has to be
+            downloaded from the server)
 
         model : BaseEstimator, optional
             If not given, the parameters are extracted from ``flow.model``.
@@ -450,14 +470,16 @@ class OpenMLRun(object):
 
         def extract_parameters(_flow, _flow_dict, component_model,
                                _main_call=False, main_id=None):
-            # _flow is openml flow object, _param dict maps from flow name to flow id
-            # for the main call, the param dict can be overridden (useful for unit tests / sentinels)
-            # this way, for flows without subflows we do not have to rely on _flow_dict
+            # _flow is openml flow object, _param dict maps from flow name to
+            # flow id for the main call, the param dict can be overridden
+            # (useful for unit tests / sentinels) this way, for flows without
+            # subflows we do not have to rely on _flow_dict
             expected_parameters = set(_flow.parameters)
             expected_components = set(_flow.components)
             model_parameters = set([mp for mp in component_model.get_params()
                                     if '__' not in mp])
-            if len((expected_parameters | expected_components) ^ model_parameters) != 0:
+            if len((expected_parameters | expected_components) ^
+                   model_parameters) != 0:
                 raise ValueError('Parameters of the model do not match the '
                                  'parameters expected by the '
                                  'flow:\nexpected flow parameters: '
@@ -483,7 +505,8 @@ class OpenMLRun(object):
                     _tmp = json.dumps(_tmp)
                 except TypeError as e:
                     # Python3.5 exception message:
-                    # <openml.flows.flow.OpenMLFlow object at 0x7fed87978160> is not JSON serializable
+                    # <openml.flows.flow.OpenMLFlow object at 0x7fed87978160>
+                    # is not JSON serializable
                     # Python3.6 exception message:
                     # Object of type 'OpenMLFlow' is not JSON serializable
                     if 'OpenMLFlow' in e.args[0] and \
@@ -516,8 +539,9 @@ class OpenMLRun(object):
 
             for _identifier in _flow.components:
                 subcomponent_model = component_model.get_params()[_identifier]
-                _params.extend(extract_parameters(_flow.components[_identifier],
-                                                  _flow_dict, subcomponent_model))
+                _params.extend(extract_parameters(
+                    _flow.components[_identifier],
+                    _flow_dict, subcomponent_model))
             return _params
 
         flow_dict = get_flow_dict(flow)
@@ -549,14 +573,15 @@ class OpenMLRun(object):
         openml._api_calls._perform_api_call("/run/untag", data=data)
 
 
-################################################################################
+###############################################################################
 # Functions which cannot be in runs/functions due to circular imports
 
 
 # This can possibly be done by a package such as pyxb, but I could not get
 # it to work properly.
 def _get_version_information():
-    """Gets versions of python, sklearn, numpy and scipy, returns them in an array,
+    """Gets versions of python, sklearn, numpy and scipy, returns them in an
+    array,
 
     Returns
     -------
@@ -585,16 +610,19 @@ def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
     taskid : int
         the identifier of the task
     setup_string : string
-        a CLI string which can invoke the learning with the correct parameter settings
+        a CLI string which can invoke the learning with the correct parameter
+        settings
     parameter_settings : array of dicts
-        each dict containing keys name, value and component, one per parameter setting
+        each dict containing keys name, value and component, one per parameter
+        setting
     tags : array of strings
         information that give a description of the run, must conform to
         regex ``([a-zA-Z0-9_\-\.])+``
-    fold_evaluations : dict mapping from evaluation measure to a dict mapping repeat_nr
-        to a dict mapping from fold nr to a value (double)
-    sample_evaluations : dict mapping from evaluation measure to a dict mapping repeat_nr
-        to a dict mapping from fold nr to a dict mapping to a sample nr to a value (double)
+    fold_evaluations : dict mapping from evaluation measure to a dict mapping
+        repeat_nr to a dict mapping from fold nr to a value (double)
+    sample_evaluations : dict mapping from evaluation measure to a dict
+        mapping repeat_nr to a dict mapping from fold nr to a dict mapping to
+        a sample nr to a value (double)
     sample_evaluations :
     Returns
     -------
@@ -618,18 +646,23 @@ def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
         for measure in fold_evaluations:
             for repeat in fold_evaluations[measure]:
                 for fold, value in fold_evaluations[measure][repeat].items():
-                    current = OrderedDict([('@repeat', str(repeat)), ('@fold', str(fold)),
-                                           ('oml:name', measure), ('oml:value', str(value))])
-                    description['oml:run']['oml:output_data']['oml:evaluation'].append(current)
+                    current = OrderedDict([
+                        ('@repeat', str(repeat)), ('@fold', str(fold)),
+                        ('oml:name', measure), ('oml:value', str(value))])
+                    description['oml:run']['oml:output_data'][
+                        'oml:evaluation'].append(current)
     if sample_evaluations is not None:
         for measure in sample_evaluations:
             for repeat in sample_evaluations[measure]:
                 for fold in sample_evaluations[measure][repeat]:
-                    for sample, value in sample_evaluations[measure][repeat][fold].items():
-                        current = OrderedDict([('@repeat', str(repeat)), ('@fold', str(fold)),
-                                               ('@sample', str(sample)), ('oml:name', measure),
-                                               ('oml:value', str(value))])
-                        description['oml:run']['oml:output_data']['oml:evaluation'].append(current)
+                    for sample, value in sample_evaluations[measure][repeat][
+                            fold].items():
+                        current = OrderedDict([
+                            ('@repeat', str(repeat)), ('@fold', str(fold)),
+                            ('@sample', str(sample)), ('oml:name', measure),
+                            ('oml:value', str(value))])
+                        description['oml:run']['oml:output_data'][
+                            'oml:evaluation'].append(current)
     return description
 
 
