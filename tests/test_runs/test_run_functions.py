@@ -131,9 +131,9 @@ class TestRun(TestBase):
 
         task = openml.tasks.get_task(task_id)
 
-        run = openml.runs.run_flow_on_task(flow, task, seed=1,
-                                           avoid_duplicate_runs=
-                                           openml.config.avoid_duplicate_runs)
+        run = openml.runs.run_flow_on_task(
+            flow, task, seed=1,
+            avoid_duplicate_runs=openml.config.avoid_duplicate_runs)
         run_ = run.publish()
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
@@ -444,12 +444,13 @@ class TestRun(TestBase):
         self.assertEqual(sum(mae_scores_provided), sum(mae_scores))
 
         if isinstance(clf, BaseSearchCV):
+            trace_content = run.trace.trace_to_arff()['data']
             if isinstance(clf, GridSearchCV):
                 grid_iterations = determine_grid_size(clf.param_grid)
-                self.assertEqual(len(run.trace_content),
+                self.assertEqual(len(trace_content),
                                  grid_iterations * num_folds)
             else:
-                self.assertEqual(len(run.trace_content),
+                self.assertEqual(len(trace_content),
                                  num_iterations * num_folds)
             check_res = self._check_serialized_optimized_run(run.run_id)
             self.assertTrue(check_res)
