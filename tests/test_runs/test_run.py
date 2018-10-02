@@ -156,6 +156,7 @@ class TestRun(TestBase):
             model=model,
             task=task,
             add_local_measures=False,
+            avoid_duplicate_runs=False,
         )
 
         cache_path = os.path.join(
@@ -187,6 +188,7 @@ class TestRun(TestBase):
             model,
             task,
             add_local_measures=False,
+            avoid_duplicate_runs=False,
         )
 
         cache_path = os.path.join(
