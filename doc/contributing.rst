@@ -108,6 +108,15 @@ From within the directory of the cloned package, execute:
 
 .. _extending:
 
+Executing a specific test can be done by specifying the test script, class, and function.  
+For instance, this runs the linear regression unit test:
+
+.. code:: bash
+
+    pytest test_run_functions.py::TestRun::test_run_and_upload_linear_regression
+
+.. _extending:
+
 Connecting new machine learning libraries
 =========================================
 
