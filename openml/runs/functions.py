@@ -456,7 +456,7 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
     # of tuples
     # https://docs.python.org/3.6/reference/expressions.html#value-comparisons
     can_measure_runtime = sys.version_info[:2] >= (3, 3) and \
-                          _check_n_jobs(model)
+        _check_n_jobs(model)
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
     num_reps, num_folds, num_samples = task.get_split_dimensions()
@@ -495,8 +495,8 @@ def _run_task_get_arffcontent(model, task, add_local_measures):
                         user_defined_measures_per_sample[measure][rep_no][
                             fold_no] = collections.OrderedDict()
 
-                    user_defined_measures_per_fold[measure][rep_no][fold_no] = \
-                        user_defined_measures_fold[measure]
+                    user_defined_measures_per_fold[measure][rep_no][
+                        fold_no] = user_defined_measures_fold[measure]
                     user_defined_measures_per_sample[measure][rep_no][fold_no][
                         sample_no] = user_defined_measures_fold[measure]
 

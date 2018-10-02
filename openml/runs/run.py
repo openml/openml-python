@@ -161,7 +161,8 @@ class OpenMLRun(object):
 
         with open(os.path.join(output_directory, 'description.xml'), 'w') as f:
             f.write(run_xml)
-        with open(os.path.join(output_directory,'predictions.arff'), 'w') as f:
+        with open(os.path.join(output_directory, 'predictions.arff'), 'w') as \
+                f:
             f.write(predictions_arff)
         if store_model:
             with open(os.path.join(output_directory, 'model.pkl'), 'wb') as f:
@@ -199,14 +200,15 @@ class OpenMLRun(object):
         # Separate these out? Normal classification doesn't need 'sample'
         if task.task_type in ['Supervised Classification', 'Learning Curve']:
             arff_dict['attributes'] = [
-                ('repeat', 'NUMERIC'),
-                ('fold', 'NUMERIC'),
-                ('sample', 'NUMERIC'),
-                ('row_id', 'NUMERIC')] + \
-                [('confidence.' + class_labels[i], 'NUMERIC') for i in
-                 range(len(class_labels))] + \
-                [('prediction', class_labels),
-                 ('correct', class_labels)]
+                                          ('repeat', 'NUMERIC'),
+                                          ('fold', 'NUMERIC'),
+                                          ('sample', 'NUMERIC'),
+                                          ('row_id', 'NUMERIC')] + \
+                                      [('confidence.' + class_labels[i],
+                                        'NUMERIC') for i in
+                                       range(len(class_labels))] + \
+                                      [('prediction', class_labels),
+                                       ('correct', class_labels)]
 
         elif task.task_type == 'Supervised Regression':
             arff_dict['attributes'] = [('repeat', 'NUMERIC'),
@@ -222,7 +224,7 @@ class OpenMLRun(object):
                                        ('cluster', 'NUMERIC')]
 
         return arff_dict
-      
+
     def get_metric_fn(self, sklearn_fn, kwargs={}):
         """Calculates metric scores based on prnedicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
@@ -318,9 +320,9 @@ class OpenMLRun(object):
 
             if task.task_type == 'Supervised Classification' or \
                     self.task_type == 'Learning Curve':
-                prediction = predictions_arff['attributes'][predicted_idx][1].\
-                    index(line[predicted_idx])
-                correct = predictions_arff['attributes'][predicted_idx][1].\
+                prediction = predictions_arff['attributes'][predicted_idx][
+                    1].index(line[predicted_idx])
+                correct = predictions_arff['attributes'][predicted_idx][1]. \
                     index(line[correct_idx])
             elif task.task_type == 'Supervised Regression':
                 prediction = line[predicted_idx]
@@ -379,8 +381,9 @@ class OpenMLRun(object):
             trace_arff = arff.dumps(self.trace.trace_to_arff())
             file_elements['trace'] = ("trace.arff", trace_arff)
 
-        return_value = openml._api_calls._perform_api_call("/run/",
-            file_elements=file_elements)
+        return_value = \
+            openml._api_calls._perform_api_call("/run/",
+                                                file_elements=file_elements)
         run_id = \
             int(xmltodict.parse(return_value)['oml:upload_run']['oml:run_id'])
         self.run_id = run_id

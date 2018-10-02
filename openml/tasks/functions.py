@@ -19,6 +19,7 @@ import openml._api_calls
 
 TASKS_CACHE_DIR_NAME = 'tasks'
 
+
 def _get_cached_tasks():
     """Return a dict of all the tasks which are cached locally.
     Returns
@@ -45,7 +46,6 @@ def _get_cached_tasks():
     return tasks
 
 
-
 def _get_cached_task(tid):
     """Return a cached task based on the given id.
 
@@ -64,10 +64,12 @@ def _get_cached_task(tid):
     )
 
     try:
-        with io.open(os.path.join(tid_cache_dir, "task.xml"), encoding='utf8') as fh:
+        with io.open(os.path.join(tid_cache_dir, "task.xml"), encoding='utf8')\
+                as fh:
             return _create_task_from_xml(fh.read())
     except (OSError, IOError):
-        openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
+        openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME,
+                                              tid_cache_dir)
         raise OpenMLCacheException("Task file for tid %d not "
                                    "cached" % tid)
 
@@ -82,7 +84,8 @@ def _get_estimation_procedure_list():
         name, type, repeats, folds, stratified.
     """
 
-    xml_string = openml._api_calls._perform_api_call("estimationprocedure/list")
+    xml_string = \
+        openml._api_calls._perform_api_call("estimationprocedure/list")
     procs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
     if 'oml:estimationprocedures' not in procs_dict:
@@ -96,10 +99,12 @@ def _get_estimation_procedure_list():
         raise ValueError('Error in return XML, value of '
                          'oml:estimationprocedures/@xmlns:oml is not '
                          'http://openml.org/openml, but %s' %
-                         str(procs_dict['oml:estimationprocedures']['@xmlns:oml']))
+                         str(procs_dict['oml:estimationprocedures'][
+                            '@xmlns:oml']))
 
     procs = []
-    for proc_ in procs_dict['oml:estimationprocedures']['oml:estimationprocedure']:
+    for proc_ in procs_dict['oml:estimationprocedures'][
+            'oml:estimationprocedure']:
         procs.append(
             {
                 'id': int(proc_['oml:id']),
@@ -138,7 +143,8 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
     tag : str, optional
         the tag to include
     kwargs: dict, optional
-        Legal filter operators: data_tag, status, data_id, data_name, number_instances, number_features,
+        Legal filter operators: data_tag, status, data_id, data_name,
+        number_instances, number_features,
         number_classes, number_missing_values.
     Returns
     -------
@@ -148,7 +154,8 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
         task id, dataset id, task_type and status. If qualities are calculated
         for the associated dataset, some of these are also returned.
     """
-    return openml.utils._list_all(_list_tasks, task_type_id=task_type_id, offset=offset, size=size, tag=tag, **kwargs)
+    return openml.utils._list_all(_list_tasks, task_type_id=task_type_id,
+                                  offset=offset, size=size, tag=tag, **kwargs)
 
 
 def _list_tasks(task_type_id=None, **kwargs):
@@ -190,7 +197,8 @@ def _list_tasks(task_type_id=None, **kwargs):
 def __list_tasks(api_call):
 
     xml_string = openml._api_calls._perform_api_call(api_call)
-    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task', 'oml:input'))
+    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task',
+                                                         'oml:input'))
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s'
@@ -226,7 +234,8 @@ def __list_tasks(api_call):
             # Other task inputs
             for input in task_.get('oml:input', list()):
                 if input['@name'] == 'estimation_procedure':
-                    task[input['@name']] = proc_dict[int(input['#text'])]['name']
+                    task[input['@name']] = \
+                        proc_dict[int(input['#text'])]['name']
                 else:
                     value = input.get('#text')
                     task[input['@name']] = value
@@ -237,7 +246,8 @@ def __list_tasks(api_call):
                     quality_value = 0.0
                 else:
                     quality['#text'] = float(quality['#text'])
-                    if abs(int(quality['#text']) - quality['#text']) < 0.0000001:
+                    if abs(int(quality['#text']) - quality['#text']) \
+                            < 0.0000001:
                         quality['#text'] = int(quality['#text'])
                     quality_value = quality['#text']
                 task[quality['@name']] = quality_value
@@ -321,6 +331,7 @@ def _get_task_description(task_id):
         with io.open(xml_file, "w", encoding='utf8') as fh:
             fh.write(task_xml)
         return _create_task_from_xml(task_xml)
+
 
 def _create_task_from_xml(xml):
     """Create a task given a xml string.

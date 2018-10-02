@@ -132,7 +132,8 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(task_id)
 
         run = openml.runs.run_flow_on_task(flow, task, seed=1,
-          avoid_duplicate_runs=openml.config.avoid_duplicate_runs)
+                                           avoid_duplicate_runs=
+                                           openml.config.avoid_duplicate_runs)
         run_ = run.publish()
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
@@ -722,7 +723,7 @@ class TestRun(TestBase):
         # from the past
         try:
             # in case the run did not exists yet
-            run = openml.runs.run_model_on_task(task, clf, 
+            run = openml.runs.run_model_on_task(task, clf,
                                                 avoid_duplicate_runs=True)
             trace = openml.runs.functions._create_trace_from_arff(
                 run._generate_trace_arff_dict()
@@ -910,7 +911,7 @@ class TestRun(TestBase):
                             int,
                             msg=att_name
                         )
-                    else: # att_type = real
+                    else:  # att_type = real
                         self.assertIsInstance(
                             trace_list[line_idx][att_idx],
                             float,
@@ -1225,8 +1226,8 @@ class TestRun(TestBase):
         flows = [74, 1718]
 
         '''
-        Since the results are taken by batch size, the function does not 
-        throw an OpenMLServerError anymore. Instead it throws a 
+        Since the results are taken by batch size, the function does not
+        throw an OpenMLServerError anymore. Instead it throws a
         TimeOutException. For the moment commented out.
         '''
         # self.assertRaises(openml.exceptions.OpenMLServerError,
