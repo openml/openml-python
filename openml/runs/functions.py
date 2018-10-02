@@ -781,7 +781,7 @@ def _extract_arfftrace_attributes(model):
                     raise TypeError('Unsupported param type in param grid: '
                                     '%s' % key)
 
-            # we renamed the attribute param to parameter, as this is a required
+            # renamed the attribute param to parameter, as this is a required
             # OpenML convention - this also guards against name collisions
             # with the required trace attributes
             attribute = (openml.runs.trace.PREFIX + key[6:], type)
@@ -990,7 +990,7 @@ def _create_run_from_xml(xml, from_server=True):
                      fold_evaluations=fold_evaluations,
                      sample_evaluations=sample_evaluations,
                      tags=tags)
-  
+
 
 def _get_cached_run(run_id):
     """Load a run from the cache."""
