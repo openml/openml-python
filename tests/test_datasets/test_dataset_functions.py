@@ -431,7 +431,9 @@ class TestOpenMLDataset(TestBase):
 
         dataset = create_dataset(
             name="Wind_dataset",
-            description='Testing dataset upload when the data is a list of lists',
+            description=(
+                'Testing dataset upload when the data is a list of lists'
+            ),
             creator='OpenML test',
             contributor=None,
             collection_date='21-09-2018',
