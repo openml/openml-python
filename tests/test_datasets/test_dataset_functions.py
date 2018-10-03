@@ -357,43 +357,39 @@ class TestOpenMLDataset(TestBase):
 
     def test_create_dataset_numpy(self):
 
-        data = np.array([[1, 2, 3],
-                         [1.2, 2.5, 3.8],
-                         [2, 5, 8],
-                         [0, 1, 0]]).T
+        data = np.array(
+            [
+                [1, 2, 3],
+                [1.2, 2.5, 3.8],
+                [2, 5, 8],
+                [0, 1, 0]
+            ]
+        ).T
+
         attributes = [('col_{}'.format(i), 'REAL')
                       for i in range(data.shape[1])]
 
-        name = 'NumPy_testing_dataset'
-        description = 'Synthetic dataset created from a NumPy array'
-        creator = 'OpenML tester'
-        collection_date = '01-01-2018'
-        language = 'English'
-        licence = 'MIT'
-        default_target_attribute = 'col_{}'.format(data.shape[1] - 1)
-        citation = 'None'
-        original_data_url = 'http://openml.github.io/openml-python'
-        paper_url = 'http://openml.github.io/openml-python'
         dataset = create_dataset(
-            name=name,
-            description=description,
-            creator=creator,
+            name='NumPy_testing_dataset',
+            description='Synthetic dataset created from a NumPy array',
+            creator='OpenML tester',
             contributor=None,
-            collection_date=collection_date,
-            language=language,
-            licence=licence,
-            default_target_attribute=default_target_attribute,
+            collection_date='01-01-2018',
+            language='English',
+            licence='MIT',
+            default_target_attribute='col_{}'.format(data.shape[1] - 1),
             row_id_attribute=None,
             ignore_attribute=None,
-            citation=citation,
+            citation='None',
             attributes=attributes,
             data=data,
             version_label='test',
-            original_data_url=original_data_url,
-            paper_url=paper_url
+            original_data_url='http://openml.github.io/openml-python',
+            paper_url='http://openml.github.io/openml-python'
         )
 
         upload_did = dataset.publish()
+
         self.assertEqual(
             _get_online_dataset_arff(upload_did),
             dataset._dataset,
@@ -423,7 +419,8 @@ class TestOpenMLDataset(TestBase):
             ['m', 'overcast', 81.0, 75.0, 'FALSE', 'yes'],
             ['n', 'rainy', 71.0, 91.0, 'TRUE', 'no'],
         ]
-        column_names = [
+
+        attributes = [
             ('rnd_str', 'STRING'),
             ('outlook', ['sunny', 'overcast', 'rainy']),
             ('temperature', 'REAL'),
@@ -432,35 +429,25 @@ class TestOpenMLDataset(TestBase):
             ('play', ['yes', 'no']),
         ]
 
-        name = "Wind_dataset_test"
-        description = 'Testing dataset upload when the data is a list of lists'
-        creator = 'OpenML test'
-        collection_date = '21-09-2018'
-        language = 'English'
-        licence = 'MIT'
-        default_target_attribute = 'play'
-        citation = 'None'
-        original_data_url = 'http://openml.github.io/openml-python'
-        paper_url = 'http://openml.github.io/openml-python'
-
         dataset = create_dataset(
-            name=name,
-            description=description,
-            creator=creator,
+            name="Wind_dataset",
+            description='Testing dataset upload when the data is a list of lists',
+            creator='OpenML test',
             contributor=None,
-            collection_date=collection_date,
-            language=language,
-            licence=licence,
-            default_target_attribute=default_target_attribute,
+            collection_date='21-09-2018',
+            language='English',
+            licence='MIT',
+            default_target_attribute='play',
             row_id_attribute=None,
             ignore_attribute=None,
-            citation=citation,
-            attributes=column_names,
+            citation='None',
+            attributes=attributes,
             data=data,
             version_label='test',
-            original_data_url=original_data_url,
-            paper_url=paper_url
+            original_data_url='http://openml.github.io/openml-python',
+            paper_url='http://openml.github.io/openml-python'
         )
+
         upload_did = dataset.publish()
         self.assertEqual(
             _get_online_dataset_arff(upload_did),
@@ -572,40 +559,31 @@ class TestOpenMLDataset(TestBase):
             'rainy',
         ]
 
+        param = {
+            'name': None,
+            'description': None,
+            'creator': None,
+            'contributor': None,
+            'collection_date': None,
+            'language': None,
+            'licence': None,
+            'default_target_attribute': None,
+            'row_id_attribute': None,
+            'ignore_attribute': None,
+            'citation': None,
+            'attributes': None,
+            'data': data
+        }
+
         self.assertRaises(
             ValueError,
             create_dataset,
-            name=None,
-            description=None,
-            creator=None,
-            contributor=None,
-            collection_date=None,
-            language=None,
-            licence=None,
-            default_target_attribute=None,
-            row_id_attribute=None,
-            ignore_attribute=None,
-            citation=None,
-            attributes=None,
-            data=data,
+            **param,
         )
 
-        data = ["sunny"]
-
+        param['data'] = data[0]
         self.assertRaises(
             ValueError,
             create_dataset,
-            name=None,
-            description=None,
-            creator=None,
-            contributor=None,
-            collection_date=None,
-            language=None,
-            licence=None,
-            default_target_attribute=None,
-            row_id_attribute=None,
-            ignore_attribute=None,
-            citation=None,
-            attributes=None,
-            data=data,
+            **param,
         )
