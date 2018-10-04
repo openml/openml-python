@@ -580,12 +580,12 @@ class TestOpenMLDataset(TestBase):
         self.assertRaises(
             ValueError,
             create_dataset,
-            **param,
+            **param
         )
 
         param['data'] = data[0]
         self.assertRaises(
             ValueError,
             create_dataset,
-            **param,
+            **param
         )
