@@ -23,7 +23,7 @@ _defaults = {
     'avoid_duplicate_runs': 'True',
 }
 
-config_file = os.path.expanduser('~/.openml/config')
+config_file = os.path.expanduser(os.path.join('~', '.openml' 'config'))
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
@@ -48,7 +48,7 @@ def _setup():
     global avoid_duplicate_runs
     # read config file, create cache directory
     try:
-        os.mkdir(os.path.expanduser('~/.openml'))
+        os.mkdir(os.path.expanduser(os.path.join('~', '.openml')))
     except (IOError, OSError):
         # TODO add debug information
         pass
