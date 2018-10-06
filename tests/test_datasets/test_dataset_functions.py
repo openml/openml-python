@@ -14,6 +14,7 @@ from oslo_concurrency import lockutils
 
 import pytest
 import numpy as np
+import pandas as pd
 import scipy.sparse
 
 import openml
@@ -24,6 +25,7 @@ from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 
 from openml.datasets.functions import (create_dataset,
+                                       attributes_arff_from_df,
                                        _get_cached_dataset,
                                        _get_cached_dataset_features,
                                        _get_cached_dataset_qualities,
@@ -343,6 +345,18 @@ class TestOpenMLDataset(TestBase):
         dataset.publish()
         self.assertIsInstance(dataset.dataset_id, int)
 
+    def test_attributes_arff_from_df(self):
+        df = pd.DataFrame(
+            [[1, 1.0, 'xxx', 'A'], [2, 2.0, 'yyy', 'B']],
+            columns=['integer', 'floating', 'string', 'category']
+        )
+        df['category'] = df['category'].astype('category')
+        attributes = attributes_arff_from_df(df)
+        self.assertEqual(attributes, [('integer', 'INTEGER'),
+                                      ('floating', 'REAL'),
+                                      ('string', 'STRING'),
+                                      ('category', ['A', 'B'])])
+
     def test_create_dataset_numpy(self):
         data = np.array([[1, 2, 3],
                          [1.2, 2.5, 3.8],
@@ -384,7 +398,6 @@ class TestOpenMLDataset(TestBase):
     def test_create_dataset_pandas(self):
         # pandas is only a optional dependency and we need to skip the test if
         # it is not installed.
-        pd = pytest.importorskip('pandas')
         data = [
             ['a', 'sunny', 85.0, 85.0, 'FALSE', 'no'],
             ['b', 'sunny', 80.0, 90.0, 'TRUE', 'no'],
@@ -443,7 +456,6 @@ class TestOpenMLDataset(TestBase):
     def test_create_dataset_pandas_error(self):
         # arff expects the categorical column to contain only string and we
         # need to raise an error asking the user to convert all data to string.
-        pd = pytest.importorskip('pandas')
         # the column 'outloook' will contain both strings and integers.
         data = [
             ['a', 1, 85.0, 85.0, 'FALSE', 'no'],

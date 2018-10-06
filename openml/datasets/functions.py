@@ -6,6 +6,7 @@ import re
 import shutil
 import six
 import arff
+import pandas as pd
 
 from oslo_concurrency import lockutils
 import xmltodict
@@ -353,37 +354,50 @@ def get_dataset(dataset_id):
     return dataset
 
 
-def _pandas_dtype_to_arff_dtype(df, column_name, column_dtype):
-    """Map Pandas dtype to ARFF dtype
+def attributes_arff_from_df(df):
+    """Create the attributes as specified by the ARFF format using a dataframe.
 
     Arguments:
         df : DataFrame, shape (n_samples, n_features)
-            The dataframe containing the data.
-        column_name : str
-            The name of the column for which we want to infer the dtype.
-        column_dtype : dtype
-            The Pandas data type of the column of interest.
+            The dataframe containing the data set.
 
     Returns:
-        arff_dtype : str
-            The ARFF dtype for the given column.
+        attributes_arff : str
+            The data set attributes as required by the ARFF format.
     """
-    if column_dtype.name == 'category':
-        arff_dtype = df[column_name].unique().tolist()
-        # for categorical feature, arff expects a list string. However, a
-        # categorical column can contain mixed type and we should therefore
-        # raise an error asking to convert all enties to string.
-        if not all([isinstance(cat, six.string_types) for cat in arff_dtype]):
-            raise ValueError("The column '{}' of the dataframe is of "
-                             "'category' dtype. Therefore, all values in this "
-                             "columns should be string. Please convert the "
-                             "entries which are not string."
-                             .format(column_name))
-    elif column_dtype.name == 'object':
-        arff_dtype = 'STRING'
-    else:
-        arff_dtype = 'NUMERIC'
-    return arff_dtype
+    PD_DTYPES_TO_ARFF_DTYPE = {
+        'integer': 'INTEGER',
+        'floating': 'REAL',
+        'string': 'STRING'
+    }
+    attributes_arff = []
+    for column_name in df:
+        # skipna=True does not infer properly the dtype. The NA values are
+        # dropped before the inference instead.
+        column_dtype = pd.api.types.infer_dtype(df[column_name].dropna())
+
+        if column_dtype == 'categorical':
+            # for categorical feature, arff expects a list string. However, a
+            # categorical column can contain mixed type and we should therefore
+            # raise an error asking to convert all entries to string.
+            categories = df[column_name].cat.categories
+            categories_dtype = pd.api.types.infer_dtype(categories)
+            if categories_dtype != 'string':
+                raise ValueError("The column '{}' of the dataframe is of "
+                                 "'category' dtype. Therefore, all values in "
+                                 "this columns should be string. Please "
+                                 "convert the entries which are not string."
+                                 .format(column_name))
+            attributes_arff.append((column_name, categories.tolist()))
+        elif column_dtype in PD_DTYPES_TO_ARFF_DTYPE.keys():
+            attributes_arff.append((column_name,
+                                    PD_DTYPES_TO_ARFF_DTYPE[column_dtype]))
+        else:
+            raise ValueError("The dtype {} of the column {} is not currently "
+                             "supported by liac-arff. Supported dtypes are "
+                             "categorical, string, interger, and floating."
+                             .format(column_dtype, column_name))
+    return attributes_arff
 
 
 def create_dataset(name, description, creator, contributor, collection_date,
@@ -414,10 +428,12 @@ def create_dataset(name, description, creator, contributor, collection_date,
         Starts with 1 upper case letter, rest lower case, e.g. 'English'.
     licence : str
         License of the data.
-    attributes : list or 'auto'
+    attributes : list, dict, or 'auto'
         A list of tuples. Each tuple consists of the attribute name and type.
         If passing a pandas DataFrame, the attributes can be automatically
-        inferred by passing ``'auto'``.
+        inferred by passing ``'auto'``. Specific attributes can be manually
+        specified by a passing a dictionary where the key is the name of the
+        attribute and the value is the data type of the attribute.
     data : numpy.ndarray or pandas.DataFrame, shape (n_samples, n_features)
         An array that contains both the attributes and the targets. When
         providing a dataframe, the attribute names and type can be inferred by
@@ -448,15 +464,19 @@ def create_dataset(name, description, creator, contributor, collection_date,
     class:`openml.OpenMLDataset`
         Dataset description."""
 
-    if attributes == 'auto':
+    if attributes == 'auto' or isinstance(attributes, dict):
         if not hasattr(data, "columns"):
             raise ValueError("Automatically inferring the attributes required "
                              "a pandas DataFrame. A {!r} was given instead."
                              .format(data))
         # infer the type of data for each column of the DataFrame
-        attributes_ = [(col_name,
-                        _pandas_dtype_to_arff_dtype(data, col_name, col_dtype))
-                       for col_name, col_dtype in data.dtypes.iteritems()]
+        attributes_ = attributes_arff_from_df(data)
+        if isinstance(attributes, dict):
+            # override the attributes which was specified by the user
+            for attr_idx in range(len(attributes_)):
+                attr_name = attributes_[attr_idx][0]
+                if attr_name in attributes.keys():
+                    attributes_[attr_idx] = (attr_name, attributes[attr_name])
     else:
         attributes_ = attributes
 
