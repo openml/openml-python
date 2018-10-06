@@ -106,14 +106,17 @@ class TestSklearn(unittest.TestCase):
                             ('presort', 'false'),
                             ('random_state', 'null'),
                             ('splitter', '"best"')))
+        structure_fixture = {'sklearn.tree.tree.DecisionTreeClassifier': []}
 
         serialization = sklearn_to_flow(model)
+        structure = openml.flows.flow_structure(serialization, 'name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.class_name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertEqual(serialization.parameters, fixture_parameters)
         self.assertEqual(serialization.dependencies, version_fixture)
+        self.assertDictEqual(structure, structure_fixture)
 
         new_model = flow_to_sklearn(serialization)
 
@@ -160,14 +163,17 @@ class TestSklearn(unittest.TestCase):
                              ('random_state', 'null'),
                              ('tol', '0.0001'),
                              ('verbose', '0')))
+        fixture_structure = {'sklearn.cluster.k_means_.KMeans': []}
 
         serialization = sklearn_to_flow(model)
+        structure = openml.flows.flow_structure(serialization, 'name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.class_name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertEqual(serialization.parameters, fixture_parameters)
         self.assertEqual(serialization.dependencies, version_fixture)
+        self.assertDictEqual(structure, fixture_structure)
 
         new_model = flow_to_sklearn(serialization)
 
@@ -190,8 +196,13 @@ class TestSklearn(unittest.TestCase):
         fixture_subcomponent_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_subcomponent_class_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_subcomponent_description = 'Automatically created scikit-learn flow.'
+        fixture_structure = {
+            fixture_name: [],
+            'sklearn.tree.tree.DecisionTreeClassifier': ['base_estimator']
+        }
 
-        serialization =  sklearn_to_flow(model)
+        serialization = sklearn_to_flow(model)
+        structure = openml.flows.flow_structure(serialization, 'name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.class_name, fixture_class_name)
@@ -206,6 +217,7 @@ class TestSklearn(unittest.TestCase):
                          fixture_subcomponent_class_name)
         self.assertEqual(serialization.components['base_estimator'].description,
                          fixture_subcomponent_description)
+        self.assertDictEqual(structure, fixture_structure)
 
         new_model = flow_to_sklearn(serialization)
 
@@ -233,11 +245,18 @@ class TestSklearn(unittest.TestCase):
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
                        'dummy=sklearn.dummy.DummyClassifier)'
         fixture_description = 'Automatically created scikit-learn flow.'
+        fixture_structure = {
+            fixture_name: [],
+            'sklearn.preprocessing.data.StandardScaler': ['scaler'],
+            'sklearn.dummy.DummyClassifier': ['dummy']
+        }
 
         serialization = sklearn_to_flow(model)
+        structure = openml.flows.flow_structure(serialization, 'name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
+        self.assertDictEqual(structure, fixture_structure)
 
         # Comparing the pipeline
         # The parameters only have the name of base objects(not the whole flow)
@@ -295,11 +314,18 @@ class TestSklearn(unittest.TestCase):
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
                        'clusterer=sklearn.cluster.k_means_.KMeans)'
         fixture_description = 'Automatically created scikit-learn flow.'
+        fixture_structure = {
+            fixture_name: [],
+            'sklearn.preprocessing.data.StandardScaler': ['scaler'],
+            'sklearn.cluster.k_means_.KMeans': ['clusterer']
+        }
 
         serialization = sklearn_to_flow(model)
+        structure = openml.flows.flow_structure(serialization, 'name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
+        self.assertDictEqual(structure, fixture_structure)
 
         # Comparing the pipeline
         # The parameters only have the name of base objects(not the whole flow)
@@ -362,9 +388,17 @@ class TestSklearn(unittest.TestCase):
                   'numeric=sklearn.preprocessing.data.StandardScaler,' \
                   'nominal=sklearn.preprocessing._encoders.OneHotEncoder)'
         fixture_description = 'Automatically created scikit-learn flow.'
+        fixture_structure = {
+            fixture: [],
+            'sklearn.preprocessing.data.StandardScaler': ['numeric'],
+            'sklearn.preprocessing._encoders.OneHotEncoder': ['nominal']
+        }
+
         serialization = sklearn_to_flow(model)
+        structure = openml.flows.flow_structure(serialization, 'name')
         self.assertEqual(serialization.name, fixture)
         self.assertEqual(serialization.description, fixture_description)
+        self.assertDictEqual(structure, fixture_structure)
         # del serialization.model
         new_model = flow_to_sklearn(serialization)
         self.assertEqual(type(new_model), type(model))
@@ -393,11 +427,24 @@ class TestSklearn(unittest.TestCase):
             'numeric=sklearn.preprocessing.data.StandardScaler,'\
             'nominal=sklearn.preprocessing._encoders.OneHotEncoder),'\
             'classifier=sklearn.tree.tree.DecisionTreeClassifier)'
+        fixture_structure = {
+            'sklearn.preprocessing.data.StandardScaler':
+                ['transformer', 'numeric'],
+            'sklearn.preprocessing._encoders.OneHotEncoder':
+                ['transformer', 'nominal'],
+            'sklearn.compose._column_transformer.ColumnTransformer(numeric='
+            'sklearn.preprocessing.data.StandardScaler,nominal=sklearn.'
+            'preprocessing._encoders.OneHotEncoder)': ['transformer'],
+            'sklearn.tree.tree.DecisionTreeClassifier': ['classifier'],
+            fixture_name: [],
+        }
 
         fixture_description = 'Automatically created scikit-learn flow.'
         serialization = sklearn_to_flow(model)
+        structure = openml.flows.flow_structure(serialization, 'name')
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
+        self.assertDictEqual(structure, fixture_structure)
         # del serialization.model
         new_model = flow_to_sklearn(serialization)
         self.assertEqual(type(new_model), type(model))
@@ -415,15 +462,23 @@ class TestSklearn(unittest.TestCase):
         fu = sklearn.pipeline.FeatureUnion(
             transformer_list=[('ohe', ohe), ('scaler', scaler)])
         serialization = sklearn_to_flow(fu)
+        structure = openml.flows.flow_structure(serialization, 'name')
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = ('_encoders'
                                if LooseVersion(sklearn.__version__) >= "0.20"
                                else 'data')
-        self.assertEqual(serialization.name,
-                         'sklearn.pipeline.FeatureUnion('
-                         'ohe=sklearn.preprocessing.{}.OneHotEncoder,'
-                         'scaler=sklearn.preprocessing.data.StandardScaler)'
-                         .format(module_name_encoder))
+        fixture_name = ('sklearn.pipeline.FeatureUnion('
+                        'ohe=sklearn.preprocessing.{}.OneHotEncoder,'
+                        'scaler=sklearn.preprocessing.data.StandardScaler)'
+                        .format(module_name_encoder))
+        fixture_structure = {
+            fixture_name: [],
+            'sklearn.preprocessing.{}.'
+            'OneHotEncoder'.format(module_name_encoder): ['ohe'],
+            'sklearn.preprocessing.data.StandardScaler': ['scaler']
+        }
+        self.assertEqual(serialization.name, fixture_name)
+        self.assertDictEqual(structure, fixture_structure)
         new_model = flow_to_sklearn(serialization)
 
         self.assertEqual(type(new_model), type(fu))
@@ -510,19 +565,31 @@ class TestSklearn(unittest.TestCase):
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
         serialized = sklearn_to_flow(rs)
+        structure = openml.flows.flow_structure(serialized, 'name')
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = ('_encoders'
                                if LooseVersion(sklearn.__version__) >= "0.20"
                                else 'data')
-        fixture_name = \
-            ('sklearn.model_selection._search.RandomizedSearchCV('
-             'estimator=sklearn.pipeline.Pipeline('
-             'ohe=sklearn.preprocessing.{}.OneHotEncoder,'
-             'scaler=sklearn.preprocessing.data.StandardScaler,'
-             'boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier('
-             'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))'.
-             format(module_name_encoder))
+        ohe_name = 'sklearn.preprocessing.%s.OneHotEncoder' % \
+                   module_name_encoder
+        scaler_name = 'sklearn.preprocessing.data.StandardScaler'
+        tree_name = 'sklearn.tree.tree.DecisionTreeClassifier'
+        boosting_name = 'sklearn.ensemble.weight_boosting.AdaBoostClassifier' \
+                        '(base_estimator=%s)' % tree_name
+        pipeline_name = 'sklearn.pipeline.Pipeline(ohe=%s,scaler=%s,' \
+                        'boosting=%s)' % (ohe_name, scaler_name, boosting_name)
+        fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV' \
+                       '(estimator=%s)' % pipeline_name
+        fixture_structure = {
+            ohe_name: ['estimator', 'ohe'],
+            scaler_name: ['estimator', 'scaler'],
+            tree_name: ['estimator', 'boosting', 'base_estimator'],
+            boosting_name: ['estimator', 'boosting'],
+            pipeline_name: ['estimator'],
+            fixture_name: []
+        }
         self.assertEqual(serialized.name, fixture_name)
+        self.assertEqual(structure, fixture_structure)
 
         # now do deserialization
         deserialized = flow_to_sklearn(serialized)
