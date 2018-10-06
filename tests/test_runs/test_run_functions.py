@@ -602,7 +602,7 @@ class TestRun(TestBase):
                                   "max_features": [1, 2, 3, 4],
                                   "bootstrap": [True, False],
                                   "criterion": ["gini", "entropy"]},
-                                 num_iterations, random_state=42)
+                                 num_iterations, random_state=42, cv=3)
 
         # [SPEED] make unit test faster by exploiting run information from the past
         try:
