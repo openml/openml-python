@@ -136,7 +136,7 @@ So far the run is only available locally. By calling the publish function, the r
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/34012
+    Uploaded to http://test.openml.org/r/3496
 
 
 We can now also inspect the flow object which was automatically created:
@@ -168,7 +168,7 @@ We can now also inspect the flow object which was automatically created:
      'dependencies': 'sklearn==0.20.0\nnumpy>=1.6.1\nscipy>=0.9',
      'description': 'Automatically created scikit-learn flow.',
      'external_version': 'openml==0.8.0dev,sklearn==0.20.0',
-     'flow_id': 70526,
+     'flow_id': 1540,
      'language': 'English',
      'model': ExtraTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
               max_features='auto', max_leaf_nodes=None,
@@ -180,9 +180,9 @@ We can now also inspect the flow object which was automatically created:
      'parameters': OrderedDict([...]),
      'parameters_meta_info': OrderedDict([...]),
      'tags': [...],
-     'upload_date': '2018-09-27T10:20:17',
+     'upload_date': '2018-10-06T22:26:12',
      'uploader': '1159',
-     'version': '2'}
+     'version': '1'}
 
 
 It also works with pipelines
@@ -216,7 +216,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/34014
+    Uploaded to http://test.openml.org/r/3497
 
 
 Challenge
@@ -257,10 +257,10 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/34017
+    kNN on diabetes: http://test.openml.org/r/3498
 
 
-**Total running time of the script:** ( 0 minutes  18.067 seconds)
+**Total running time of the script:** ( 0 minutes  14.231 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:
