@@ -45,6 +45,7 @@ setuptools.setup(name="openml",
                      'nbformat',
                      'python-dateutil',
                      'oslo.concurrency',
+                     'pandas',
                  ],
                  extras_require={
                      'test': [

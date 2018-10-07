@@ -386,16 +386,21 @@ def attributes_arff_from_df(df):
                 raise ValueError("The column '{}' of the dataframe is of "
                                  "'category' dtype. Therefore, all values in "
                                  "this columns should be string. Please "
-                                 "convert the entries which are not string."
-                                 .format(column_name))
+                                 "convert the entries which are not string. "
+                                 "Got {} dtype in this column."
+                                 .format(column_name, categories_dtype))
             attributes_arff.append((column_name, categories.tolist()))
+        elif column_dtype == 'boolean':
+            # boolean are encoded as categorical.
+            attributes_arff.append((column_name, ['True', 'False']))
         elif column_dtype in PD_DTYPES_TO_ARFF_DTYPE.keys():
             attributes_arff.append((column_name,
                                     PD_DTYPES_TO_ARFF_DTYPE[column_dtype]))
         else:
-            raise ValueError("The dtype {} of the column {} is not currently "
-                             "supported by liac-arff. Supported dtypes are "
-                             "categorical, string, interger, and floating."
+            raise ValueError("The dtype '{}' of the column '{}' is not "
+                             "currently supported by liac-arff. Supported "
+                             "dtypes are categorical, string, interger, "
+                             "floating, and boolean."
                              .format(column_dtype, column_name))
     return attributes_arff
 

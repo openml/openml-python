@@ -347,15 +347,43 @@ class TestOpenMLDataset(TestBase):
 
     def test_attributes_arff_from_df(self):
         df = pd.DataFrame(
-            [[1, 1.0, 'xxx', 'A'], [2, 2.0, 'yyy', 'B']],
-            columns=['integer', 'floating', 'string', 'category']
+            [[1, 1.0, 'xxx', 'A', True], [2, 2.0, 'yyy', 'B', False]],
+            columns=['integer', 'floating', 'string', 'category', 'boolean']
         )
         df['category'] = df['category'].astype('category')
         attributes = attributes_arff_from_df(df)
         self.assertEqual(attributes, [('integer', 'INTEGER'),
                                       ('floating', 'REAL'),
                                       ('string', 'STRING'),
-                                      ('category', ['A', 'B'])])
+                                      ('category', ['A', 'B']),
+                                      ('boolean', ['True', 'False'])])
+
+    def test_attributes_arff_from_df_mixed_dtype_categories(self):
+        # liac-arff imposed categorical attributes to be of sting dtype. We
+        # raise an error if this is not the case.
+        df = pd.DataFrame([[1], ['2'], [3.]])
+        df[0] = df[0].astype('category')
+        err_msg = "The column '0' of the dataframe is of 'category' dtype."
+        with pytest.raises(ValueError, match=err_msg):
+            attributes_arff_from_df(df)
+
+    def test_attributes_arff_from_df_unknown_dtype(self):
+        # check that an error is raised when the dtype is not supported by
+        # liac-arff
+        data = [
+            [[1], ['2'], [3.]],
+            [pd.Timestamp('2012-05-01'), pd.Timestamp('2012-05-02')],
+        ]
+        dtype = [
+            'mixed-integer',
+            'datetime64'
+        ]
+        for arr, dt in zip(data, dtype):
+            df = pd.DataFrame(arr)
+            err_msg = ("The dtype '{}' of the column '0' is not currently "
+                       "supported by liac-arff".format(dt))
+            with pytest.raises(ValueError, match=err_msg):
+                attributes_arff_from_df(df)
 
     def test_create_dataset_numpy(self):
         data = np.array([[1, 2, 3],
@@ -452,52 +480,3 @@ class TestOpenMLDataset(TestBase):
             paper_url=paper_url
         )
         dataset.publish()
-
-    def test_create_dataset_pandas_error(self):
-        # arff expects the categorical column to contain only string and we
-        # need to raise an error asking the user to convert all data to string.
-        # the column 'outloook' will contain both strings and integers.
-        data = [
-            ['a', 1, 85.0, 85.0, 'FALSE', 'no'],
-            ['b', 0, 80.0, 90.0, 'TRUE', 'no'],
-            ['c', 'overcast', 83.0, 86.0, 'FALSE', 'yes'],
-            ['d', 'rainy', 70.0, 96.0, 'FALSE', 'yes'],
-        ]
-        column_names = ['rnd_str', 'outlook', 'temperature', 'humidity',
-                        'windy', 'play']
-        df = pd.DataFrame(data, columns=column_names)
-        # enforce the type of each column
-        df['outlook'] = df['outlook'].astype('category')
-        df['windy'] = df['windy'].astype('category')
-        df['play'] = df['play'].astype('category')
-        # meta-information
-        name = 'Pandas_testing_dataset'
-        description = 'Synthetic dataset created from a Pandas DataFrame'
-        creator = 'OpenML tester'
-        collection_date = '01-01-2018'
-        language = 'English'
-        licence = 'MIT'
-        default_target_attribute = 'play'
-        citation = 'None'
-        original_data_url = 'http://openml.github.io/openml-python'
-        paper_url = 'http://openml.github.io/openml-python'
-        with pytest.raises(ValueError, match="The column 'outlook'"):
-            openml.datasets.functions.create_dataset(
-                name=name,
-                description=description,
-                creator=creator,
-                contributor=None,
-                collection_date=collection_date,
-                language=language,
-                licence=licence,
-                default_target_attribute=default_target_attribute,
-                row_id_attribute=None,
-                ignore_attribute=None,
-                citation=citation,
-                attributes='auto',
-                data=df,
-                format='arff',
-                version_label='test',
-                original_data_url=original_data_url,
-                paper_url=paper_url
-            )
