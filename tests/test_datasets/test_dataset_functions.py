@@ -431,23 +431,14 @@ class TestOpenMLDataset(TestBase):
             ['b', 'sunny', 80.0, 90.0, 'TRUE', 'no'],
             ['c', 'overcast', 83.0, 86.0, 'FALSE', 'yes'],
             ['d', 'rainy', 70.0, 96.0, 'FALSE', 'yes'],
-            ['e', 'rainy', 68.0, 80.0, 'FALSE', 'yes'],
-            ['f', 'rainy', 65.0, 70.0, 'TRUE', 'no'],
-            ['g', 'overcast', 64.0, 65.0, 'TRUE', 'yes'],
-            ['h', 'sunny', 72.0, 95.0, 'FALSE', 'no'],
-            ['i', 'sunny', 69.0, 70.0, 'FALSE', 'yes'],
-            ['j', 'rainy', 75.0, 80.0, 'FALSE', 'yes'],
-            ['k', 'sunny', 75.0, 70.0, 'TRUE', 'yes'],
-            ['l', 'overcast', 72.0, 90.0, 'TRUE', 'yes'],
-            ['m', 'overcast', 81.0, 75.0, 'FALSE', 'yes'],
-            ['n', 'rainy', 71.0, 91.0, 'TRUE', 'no']
+            ['e', 'rainy', 68.0, 80.0, 'FALSE', 'yes']
         ]
         column_names = ['rnd_str', 'outlook', 'temperature', 'humidity',
                         'windy', 'play']
         df = pd.DataFrame(data, columns=column_names)
         # enforce the type of each column
         df['outlook'] = df['outlook'].astype('category')
-        df['windy'] = df['windy'].astype('category')
+        df['windy'] = df['windy'].astype('bool')
         df['play'] = df['play'].astype('category')
         # meta-information
         name = 'Pandas_testing_dataset'
@@ -480,3 +471,68 @@ class TestOpenMLDataset(TestBase):
             paper_url=paper_url
         )
         dataset.publish()
+        # Check that we can overwrite the attributes
+        data = [['a'], ['b'], ['c'], ['d'], ['e']]
+        column_names = ['rnd_str']
+        df = pd.DataFrame(data, columns=column_names)
+        df['rnd_str'] = df['rnd_str'].astype('category')
+        attributes = {'rnd_str': ['a', 'b', 'c', 'd', 'e', 'f', 'g']}
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=citation,
+            attributes=attributes,
+            data=df,
+            format='arff',
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        dataset.publish()
+
+    def test_create_dataset_attributes_auto_without_df(self):
+        # attributes cannot be inferred without passing a dataframe
+        data = np.array([[1, 2, 3],
+                         [1.2, 2.5, 3.8],
+                         [2, 5, 8],
+                         [0, 1, 0]]).T
+        attributes = 'auto'
+        name = 'NumPy_testing_dataset'
+        description = 'Synthetic dataset created from a NumPy array'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'col_{}'.format(data.shape[1] - 1)
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+        err_msg = "Automatically inferring the attributes required a pandas"
+        with pytest.raises(ValueError, match=err_msg):
+            dataset = openml.datasets.functions.create_dataset(
+                name=name,
+                description=description,
+                creator=creator,
+                contributor=None,
+                collection_date=collection_date,
+                language=language,
+                licence=licence,
+                default_target_attribute=default_target_attribute,
+                row_id_attribute=None,
+                ignore_attribute=None,
+                citation=citation,
+                attributes=attributes,
+                data=data,
+                format='arff',
+                version_label='test',
+                original_data_url=original_data_url,
+                paper_url=paper_url
+            )

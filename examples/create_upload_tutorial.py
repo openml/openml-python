@@ -140,7 +140,7 @@ column_names = ['rnd_str', 'outlook', 'temperature', 'humidity',
 df = pd.DataFrame(data, columns=column_names)
 # enforce the categorical column to have a categorical dtype
 df['outlook'] = df['outlook'].astype('category')
-df['windy'] = df['windy'].astype('category')
+df['windy'] = df['windy'].astype('bool')
 df['play'] = df['play'].astype('category')
 print(df.info())
 
