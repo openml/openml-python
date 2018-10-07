@@ -5,6 +5,7 @@ import time
 import openml
 import openml.exceptions
 from openml.testing import TestBase
+import sklearn
 
 from sklearn.ensemble import BaggingClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -157,6 +158,29 @@ class TestSetupFunctions(TestBase):
         all = set(setups.keys()).union(setups2.keys())
 
         self.assertEqual(len(all), size * 2)
+
+    def test_openml_param_name_to_sklearn(self):
+        scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
+        boosting = sklearn.ensemble.AdaBoostClassifier(
+            base_estimator=sklearn.tree.DecisionTreeClassifier())
+        model = sklearn.pipeline.Pipeline(steps=[
+            ('scaler', scaler), ('boosting', boosting)])
+        flow = openml.flows.sklearn_to_flow(model)
+        task = openml.tasks.get_task(115)
+        run = openml.runs.run_flow_on_task(flow, task)
+        run = run.publish()
+        run = openml.runs.get_run(run.run_id)
+        setup = openml.setups.get_setup(run.setup_id)
+        
+        parametername_sid = dict()
+        for sid, parameter in setup.parameters.items():
+            parametername_sid[parameter.parameter_name] = sid
+
+        fixture = 'boosting__base_estimator__min_samples_leaf'
+        sklearn_name = openml.setups.openml_param_name_to_sklearn(
+            setup.parameters[parametername_sid['min_samples_leaf']], flow
+        )
+        self.assertEqual(fixture, sklearn_name)
 
     def test_get_cached_setup(self):
         openml.config.cache_directory = self.static_cache_dir
