@@ -376,7 +376,10 @@ def create_dataset(name, description, creator, contributor, collection_date,
     description : str
         Description of the dataset.
     format : str, optional
-        Format of the dataset. Only 'arff' for now.
+        Format of the dataset which can be either 'arff' or 'sparse-arff'.
+        By default, the format is automatically inferred.
+        .. deprecated: 0.8
+            ``format`` is deprecated in 0.8 and will be removed in 0.10.
     creator : str
         The person who created the dataset.
     contributor : str
@@ -421,30 +424,33 @@ def create_dataset(name, description, creator, contributor, collection_date,
         warn("The format parameter will be deprecated in the future,"
              " the method will determine the format of the ARFF "
              "based on the given data.", DeprecationWarning)
+        d_format = format
 
     # Determine ARFF format from the dataset
-    if isinstance(data, list):
-        if isinstance(data[0], list):
+    else:
+        if isinstance(data, list):
+            if isinstance(data[0], list):
+                d_format = 'arff'
+            elif isinstance(data[0], dict):
+                d_format = 'sparse_arff'
+            else:
+                raise ValueError(
+                    'When giving a list, the list should contain a list for dense '
+                    'data or a dictionary for sparse data. Got {!r} instead.'
+                    .format(data[0])
+                )
+        elif isinstance(data, np.ndarray):
             d_format = 'arff'
-        elif isinstance(data[0], dict):
+        elif isinstance(data, coo_matrix):
             d_format = 'sparse_arff'
         else:
             raise ValueError(
-                'When giving a list, the list should contain a list for dense '
-                'data or a dictionary for sparse data. Got {!r} instead.'
-                .format(data[0])
+                'Invalid data type. The data type can be a list of '
+                'lists or a numpy ndarray for dense data. Otherwise, '
+                'it can be a list of dicts or scipy.sparse.coo_matrix'
+                'for sparse data.'
             )
-    elif isinstance(data, np.ndarray):
-        d_format = 'arff'
-    elif isinstance(data, coo_matrix):
-        d_format = 'sparse_arff'
-    else:
-        raise ValueError(
-            'Invalid data type. The data type can be a list of '
-            'lists or a numpy ndarray for dense data. Otherwise, '
-            'it can be a list of dicts or scipy.sparse.coo_matrix'
-            'for sparse data.'
-        )
+
     arff_object = {
         'relation': name,
         'description': description,

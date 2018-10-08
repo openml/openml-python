@@ -1,19 +1,16 @@
 import unittest
 import os
 import sys
-
+import numpy as np
+import scipy.sparse
+import random
+import six
 if sys.version_info[0] >= 3:
     from unittest import mock
 else:
     import mock
-
-import random
-import six
-
 from oslo_concurrency import lockutils
-
-import numpy as np
-import scipy.sparse
+from warnings import filterwarnings, catch_warnings
 
 import openml
 from openml import OpenMLDataset
@@ -59,6 +56,24 @@ class TestOpenMLDataset(TestBase):
                     os.remove(pickle_path)
                 except:
                     pass
+
+    def _get_empty_param_for_dataset(self):
+
+        return {
+            'name': None,
+            'description': None,
+            'creator': None,
+            'contributor': None,
+            'collection_date': None,
+            'language': None,
+            'licence': None,
+            'default_target_attribute': None,
+            'row_id_attribute': None,
+            'ignore_attribute': None,
+            'citation': None,
+            'attributes': None,
+            'data': None
+        }
 
     def test__list_cached_datasets(self):
         openml.config.cache_directory = self.static_cache_dir
@@ -561,21 +576,8 @@ class TestOpenMLDataset(TestBase):
             'rainy',
         ]
 
-        param = {
-            'name': None,
-            'description': None,
-            'creator': None,
-            'contributor': None,
-            'collection_date': None,
-            'language': None,
-            'licence': None,
-            'default_target_attribute': None,
-            'row_id_attribute': None,
-            'ignore_attribute': None,
-            'citation': None,
-            'attributes': None,
-            'data': data
-        }
+        param = self._get_empty_param_for_dataset()
+        param['data'] = data
 
         self.assertRaises(
             ValueError,
@@ -589,3 +591,15 @@ class TestOpenMLDataset(TestBase):
             create_dataset,
             **param
         )
+
+    def test_create_dataset_warning(self):
+
+        parameters = self._get_empty_param_for_dataset()
+        parameters['format'] = 'arff'
+        with catch_warnings():
+            filterwarnings('error')
+            self.assertRaises(
+                DeprecationWarning,
+                create_dataset,
+                **parameters
+            )

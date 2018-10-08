@@ -1,10 +1,11 @@
 import numpy as np
-from scipy import sparse
 import six
+import openml
 from time import time
+from scipy import sparse
+from warnings import filterwarnings, catch_warnings
 
 from openml.testing import TestBase
-import openml
 
 
 class OpenMLDatasetTest(TestBase):
@@ -96,6 +97,18 @@ class OpenMLDatasetTest(TestBase):
             include_ignore_attributes=False, return_categorical_indicator=True)
         self.assertEqual(len(categorical), 38)
         # TODO test multiple ignore attributes!
+
+    def test_dataset_format_constructor(self):
+
+        with catch_warnings():
+            filterwarnings('error')
+            self.assertRaises(
+                DeprecationWarning,
+                openml.OpenMLDataset,
+                'Test',
+                'Test',
+                format='arff'
+            )
 
 
 class OpenMLDatasetTestOnTestServer(TestBase):
