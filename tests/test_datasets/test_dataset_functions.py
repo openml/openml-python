@@ -27,13 +27,13 @@ from openml.datasets.functions import (create_dataset,
                                        _get_cached_dataset_features,
                                        _get_cached_dataset_qualities,
                                        _get_cached_datasets,
-                                       _get_dataset_description,
                                        _get_dataset_arff,
+                                       _get_dataset_description,
                                        _get_dataset_features,
                                        _get_dataset_qualities,
-                                       DATASETS_CACHE_DIR_NAME,
                                        _get_online_dataset_arff,
-                                       _get_online_dataset_format)
+                                       _get_online_dataset_format,
+                                       DATASETS_CACHE_DIR_NAME)
 
 
 class TestOpenMLDataset(TestBase):
@@ -326,7 +326,7 @@ class TestOpenMLDataset(TestBase):
         dataset = OpenMLDataset(
             "anneal",
             "test",
-            data_format="ARFF",
+            data_format="arff",
             version=1,
             licence="public",
             default_target_attribute="class",
@@ -348,7 +348,7 @@ class TestOpenMLDataset(TestBase):
         dataset = OpenMLDataset(
             "UploadTestWithURL",
             "test",
-            data_format="ARFF",
+            data_format="arff",
             version=1,
             url="https://www.openml.org/data/download/61/dataset_61_iris.arff",
         )
@@ -454,7 +454,7 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(
             _get_online_dataset_arff(upload_did),
             dataset._dataset,
-            "Uploaded arff does not match original one"
+            "Uploaded ARFF does not match original one"
         )
         self.assertEqual(
             _get_online_dataset_format(upload_did),
@@ -497,7 +497,7 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(
             _get_online_dataset_arff(upload_did),
             xor_dataset._dataset,
-            "Uploaded arff does not match original one"
+            "Uploaded ARFF does not match original one"
         )
         self.assertEqual(
             _get_online_dataset_format(upload_did),
@@ -534,7 +534,7 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(
             _get_online_dataset_arff(upload_did),
             xor_dataset._dataset,
-            "Uploaded arff does not match original one"
+            "Uploaded ARFF does not match original one"
         )
         self.assertEqual(
             _get_online_dataset_format(upload_did),
