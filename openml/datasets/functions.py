@@ -435,8 +435,9 @@ def create_dataset(name, description, creator, contributor, collection_date,
                 d_format = 'sparse_arff'
             else:
                 raise ValueError(
-                    'When giving a list, the list should contain a list for dense '
-                    'data or a dictionary for sparse data. Got {!r} instead.'
+                    'When giving a list, the list should contain a '
+                    'list for dense data or a dictionary for sparse '
+                    'data. Got {!r} instead.'
                     .format(data[0])
                 )
         elif isinstance(data, np.ndarray):

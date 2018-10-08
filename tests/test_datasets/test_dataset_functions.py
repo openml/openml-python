@@ -1,24 +1,11 @@
-import unittest
-import os
-import sys
-import numpy as np
-import scipy.sparse
-import random
-import six
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
+import openml
 from oslo_concurrency import lockutils
 from warnings import filterwarnings, catch_warnings
-
-import openml
 from openml import OpenMLDataset
 from openml.exceptions import OpenMLCacheException, PyOpenMLError, \
     OpenMLHashException, PrivateDatasetError
 from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
-
 from openml.datasets.functions import (create_dataset,
                                        _get_cached_dataset,
                                        _get_cached_dataset_features,
@@ -31,6 +18,18 @@ from openml.datasets.functions import (create_dataset,
                                        _get_online_dataset_arff,
                                        _get_online_dataset_format,
                                        DATASETS_CACHE_DIR_NAME)
+
+import unittest
+import os
+import sys
+import numpy as np
+import scipy.sparse
+import random
+import six
+if sys.version_info[0] >= 3:
+    from unittest import mock
+else:
+    import mock
 
 
 class TestOpenMLDataset(TestBase):
