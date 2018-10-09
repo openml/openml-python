@@ -37,6 +37,9 @@ def setup_exists(flow, model=None):
 
     if model is None:
         model = flow.model
+        if flow.model is None:
+            raise ValueError('Could not locate model (neither given as'
+                             'argument nor available as flow.model)')
     else:
         exists = flow_exists(flow.name, flow.external_version)
         if exists != flow.flow_id:
