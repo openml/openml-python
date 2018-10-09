@@ -171,7 +171,7 @@ class TestSetupFunctions(TestBase):
         run = run.publish()
         run = openml.runs.get_run(run.run_id)
         setup = openml.setups.get_setup(run.setup_id)
-        
+
         parametername_sid = dict()
         for sid, parameter in setup.parameters.items():
             parametername_sid[parameter.parameter_name] = sid
@@ -185,7 +185,6 @@ class TestSetupFunctions(TestBase):
     def test_get_cached_setup(self):
         openml.config.cache_directory = self.static_cache_dir
         openml.setups.functions._get_cached_setup(1)
-
 
     def test_get_uncached_setup(self):
         openml.config.cache_directory = self.static_cache_dir
