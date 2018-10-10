@@ -1,4 +1,3 @@
-import openml
 from openml.flows import OpenMLFlow
 from openml.setups import OpenMLParameter
 
