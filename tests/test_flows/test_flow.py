@@ -4,6 +4,7 @@ import hashlib
 import re
 import sys
 import time
+from distutils.version import LooseVersion
 
 if sys.version_info[0] >= 3:
     from unittest import mock
@@ -22,6 +23,12 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.naive_bayes
 import sklearn.tree
+
+if LooseVersion(sklearn.__version__) < "0.20":
+    from sklearn.preprocessing import Imputer
+else:
+    from sklearn.impute import SimpleImputer as Imputer
+
 import xmltodict
 
 from openml.testing import TestBase
@@ -230,8 +237,8 @@ class TestFlow(TestBase):
 
     def test_illegal_flow(self):
         # should throw error as it contains two imputers
-        illegal = sklearn.pipeline.Pipeline(steps=[('imputer1', sklearn.preprocessing.Imputer()),
-                                                   ('imputer2', sklearn.preprocessing.Imputer()),
+        illegal = sklearn.pipeline.Pipeline(steps=[('imputer1', Imputer()),
+                                                   ('imputer2', Imputer()),
                                                    ('classif', sklearn.tree.DecisionTreeClassifier())])
         self.assertRaises(ValueError, openml.flows.sklearn_to_flow, illegal)
 
@@ -256,9 +263,11 @@ class TestFlow(TestBase):
         # create a flow
         nb = sklearn.naive_bayes.GaussianNB()
 
-        steps = [('imputation', sklearn.preprocessing.Imputer(strategy='median')),
-                 ('hotencoding', sklearn.preprocessing.OneHotEncoder(sparse=False,
-                                                                     handle_unknown='ignore')),
+        ohe_params = {'sparse': False, 'handle_unknown': 'ignore'}
+        if LooseVersion(sklearn.__version__) >= '0.20':
+            ohe_params['categories'] = 'auto'
+        steps = [('imputation', Imputer(strategy='median')),
+                 ('hotencoding', sklearn.preprocessing.OneHotEncoder(**ohe_params)),
                  ('variencethreshold', sklearn.feature_selection.VarianceThreshold()),
                  ('classifier', sklearn.tree.DecisionTreeClassifier())]
         complicated = sklearn.pipeline.Pipeline(steps=steps)
@@ -274,7 +283,7 @@ class TestFlow(TestBase):
             # check if flow exists can find it
             flow = openml.flows.get_flow(flow.flow_id)
             downloaded_flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
-            self.assertEquals(downloaded_flow_id, flow.flow_id)
+            self.assertEqual(downloaded_flow_id, flow.flow_id)
 
     def test_sklearn_to_upload_to_flow(self):
         iris = sklearn.datasets.load_iris()
@@ -282,8 +291,10 @@ class TestFlow(TestBase):
         y = iris.target
 
         # Test a more complicated flow
-        ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[1],
-                                                  handle_unknown='ignore')
+        ohe_params = {'handle_unknown': 'ignore'}
+        if LooseVersion(sklearn.__version__) >= "0.20":
+            ohe_params['categories'] = 'auto'
+        ohe = sklearn.preprocessing.OneHotEncoder(**ohe_params)
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         pca = sklearn.decomposition.TruncatedSVD()
         fs = sklearn.feature_selection.SelectPercentile(
@@ -338,17 +349,20 @@ class TestFlow(TestBase):
         openml.flows.functions.assert_flows_equal(new_flow, flow)
         self.assertIsNot(new_flow, flow)
 
+        # OneHotEncoder was moved to _encoders module in 0.20
+        module_name_encoder = ('_encoders'
+                               if LooseVersion(sklearn.__version__) >= "0.20"
+                               else 'data')
         fixture_name = '%ssklearn.model_selection._search.RandomizedSearchCV(' \
                        'estimator=sklearn.pipeline.Pipeline(' \
-                       'ohe=sklearn.preprocessing.data.OneHotEncoder,' \
+                       'ohe=sklearn.preprocessing.%s.OneHotEncoder,' \
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
                        'fu=sklearn.pipeline.FeatureUnion(' \
                        'pca=sklearn.decomposition.truncated_svd.TruncatedSVD,' \
                        'fs=sklearn.feature_selection.univariate_selection.SelectPercentile),' \
                        'boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
                        'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))' \
-                        % sentinel
-
+                        % (sentinel, module_name_encoder)
         self.assertEqual(new_flow.name, fixture_name)
         new_flow.model.fit(X, y)
 

@@ -186,7 +186,7 @@ def __list_setups(api_call):
 
 
 def initialize_model(setup_id):
-    '''
+    """
     Initialized a model based on a setup_id (i.e., using the exact
     same parameter settings)
 
@@ -199,7 +199,7 @@ def initialize_model(setup_id):
         -------
         model : sklearn model
             the scikitlearn model with all parameters initailized
-    '''
+    """
 
     # transform an openml setup object into
     # a dict of dicts, structured: flow_id maps to dict of
@@ -256,9 +256,9 @@ def _to_dict(flow_id, openml_parameter_settings):
 
 
 def _create_setup_from_xml(result_dict):
-    '''
-     Turns an API xml result into a OpenMLSetup object
-    '''
+    """
+    Turns an API xml result into a OpenMLSetup object
+    """
     setup_id = int(result_dict['oml:setup_parameters']['oml:setup_id'])
     flow_id = int(result_dict['oml:setup_parameters']['oml:flow_id'])
     parameters = {}
@@ -278,6 +278,7 @@ def _create_setup_from_xml(result_dict):
             raise ValueError('Expected None, list or dict, received someting else: %s' %str(type(xml_parameters)))
 
     return OpenMLSetup(setup_id, flow_id, parameters)
+
 
 def _create_setup_parameter_from_xml(result_dict):
     return OpenMLParameter(int(result_dict['oml:id']),
