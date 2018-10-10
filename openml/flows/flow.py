@@ -359,6 +359,35 @@ class OpenMLFlow(object):
                              (flow_id, message))
         return self
 
+    def get_structure(self, key_item):
+        """
+        Returns for each sub-component of the flow the path of identifiers that
+        should be traversed to reach this component. The resulting dict maps a
+        key (identifying a flow be either its id, name or fullname) to the
+        parameter prefix.
+
+        Parameters
+        ----------
+
+        key_item: str
+            The flow attribute that will be used to identify flows in the
+            structure. Allowed values {flow_id, name}
+
+        Returns
+        -------
+        structure: dict[str, List[str]]
+            The flow structure
+        """
+        if key_item not in ['flow_id', 'name']:
+            raise ValueError('key_item should be in {flow_id, name}')
+        structure = dict()
+        for key, sub_flow in self.components.items():
+            sub_structure = sub_flow.get_structure(key_item)
+            for flow_name, flow_sub_structure in sub_structure.items():
+                structure[flow_name] = [key] + flow_sub_structure
+        structure[getattr(self, key_item)] = []
+        return structure
+
     def get_subflow(self, structure):
         """
         Returns a subflow from the tree of dependencies.

@@ -160,7 +160,6 @@ class TestSetupFunctions(TestBase):
         self.assertEqual(len(all), size * 2)
 
     def test_openml_param_name_to_sklearn(self):
-        # test is also responsible for: sklearn_param_name_to_openml
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         boosting = sklearn.ensemble.AdaBoostClassifier(
             base_estimator=sklearn.tree.DecisionTreeClassifier())
@@ -177,8 +176,19 @@ class TestSetupFunctions(TestBase):
         self.assertGreater(len(setup.parameters), 15)
 
         for parameter in setup.parameters.values():
-            sklearn_name = openml.setups.openml_param_name_to_sklearn(parameter, flow)
-            openml_name = openml.setups.sklearn_param_name_to_openml(sklearn_name, flow)
+            sklearn_name = openml.setups.openml_param_name_to_sklearn(
+                parameter, flow)
+
+            # test the inverse. Currently, OpenML stores the hyperparameter
+            # fullName as flow.name + flow.version + parameter.name on the
+            # server (but this behaviour is not documented and might or might
+            # not change in the future. Hence, we won't offer this
+            # transformation functionality in the main package yet.)
+            splitted = sklearn_name.split("__")
+            subflow = flow.get_subflow(splitted[0:-1])
+            openml_name = "%s(%s)_%s" % (subflow.name,
+                                         subflow.version,
+                                         splitted[-1])
             self.assertEqual(parameter.full_name, openml_name)
 
     def test_get_cached_setup(self):

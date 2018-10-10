@@ -486,40 +486,6 @@ def _deserialize_model(flow, keep_defaults):
     return model_class(**parameter_dict)
 
 
-def flow_structure(flow, key_item):
-    """
-    Returns for each sub-component of the flow the path of identifiers that
-    should be traversed to reach this component. The resulting dict maps a key
-    (identifying a flow be either its id, name or fullname) to the parameter
-    prefix.
-
-    Parameters
-    ----------
-    flow: OpenMLFlow
-        The flow to generate the parameter prefixes for
-
-    key_item: str
-        The flow attribute that will be used to identify flows in the
-        structure. Allowed values {id, name}
-
-    Returns
-    -------
-    structure: dict[str, List[str]]
-        The flow structure
-    """
-    if not isinstance(flow, OpenMLFlow):
-        raise TypeError('flow should be of type OpenMLFlow')
-    if key_item not in ['id', 'name']:
-        raise ValueError('key_item should be in {id, name}')
-    structure = dict()
-    for key, sub_flow in flow.components.items():
-        sub_structure = flow_structure(sub_flow, key_item)
-        for flow_name, flow_sub_structure in sub_structure.items():
-            structure[flow_name] = [key] + flow_sub_structure
-    structure[getattr(flow, key_item)] = []
-    return structure
-
-
 def _check_dependencies(dependencies):
     if not dependencies:
         return

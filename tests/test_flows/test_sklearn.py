@@ -109,7 +109,7 @@ class TestSklearn(unittest.TestCase):
         structure_fixture = {'sklearn.tree.tree.DecisionTreeClassifier': []}
 
         serialization = sklearn_to_flow(model)
-        structure = openml.flows.flow_structure(serialization, 'name')
+        structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.class_name, fixture_name)
@@ -166,7 +166,7 @@ class TestSklearn(unittest.TestCase):
         fixture_structure = {'sklearn.cluster.k_means_.KMeans': []}
 
         serialization = sklearn_to_flow(model)
-        structure = openml.flows.flow_structure(serialization, 'name')
+        structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.class_name, fixture_name)
@@ -202,7 +202,7 @@ class TestSklearn(unittest.TestCase):
         }
 
         serialization = sklearn_to_flow(model)
-        structure = openml.flows.flow_structure(serialization, 'name')
+        structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.class_name, fixture_class_name)
@@ -252,7 +252,7 @@ class TestSklearn(unittest.TestCase):
         }
 
         serialization = sklearn_to_flow(model)
-        structure = openml.flows.flow_structure(serialization, 'name')
+        structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
@@ -321,7 +321,7 @@ class TestSklearn(unittest.TestCase):
         }
 
         serialization = sklearn_to_flow(model)
-        structure = openml.flows.flow_structure(serialization, 'name')
+        structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
@@ -395,7 +395,7 @@ class TestSklearn(unittest.TestCase):
         }
 
         serialization = sklearn_to_flow(model)
-        structure = openml.flows.flow_structure(serialization, 'name')
+        structure = serialization.get_structure('name')
         self.assertEqual(serialization.name, fixture)
         self.assertEqual(serialization.description, fixture_description)
         self.assertDictEqual(structure, fixture_structure)
@@ -441,7 +441,7 @@ class TestSklearn(unittest.TestCase):
 
         fixture_description = 'Automatically created scikit-learn flow.'
         serialization = sklearn_to_flow(model)
-        structure = openml.flows.flow_structure(serialization, 'name')
+        structure = serialization.get_structure('name')
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertDictEqual(structure, fixture_structure)
@@ -462,7 +462,7 @@ class TestSklearn(unittest.TestCase):
         fu = sklearn.pipeline.FeatureUnion(
             transformer_list=[('ohe', ohe), ('scaler', scaler)])
         serialization = sklearn_to_flow(fu)
-        structure = openml.flows.flow_structure(serialization, 'name')
+        structure = serialization.get_structure('name')
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = ('_encoders'
                                if LooseVersion(sklearn.__version__) >= "0.20"
@@ -565,7 +565,7 @@ class TestSklearn(unittest.TestCase):
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
         serialized = sklearn_to_flow(rs)
-        structure = openml.flows.flow_structure(serialized, 'name')
+        structure = serialized.get_structure('name')
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = ('_encoders'
                                if LooseVersion(sklearn.__version__) >= "0.20"
