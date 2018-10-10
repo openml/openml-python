@@ -176,7 +176,7 @@ class TestSetupFunctions(TestBase):
         # make sure to test enough parameters
         self.assertGreater(len(setup.parameters), 15)
 
-        for sid, parameter in setup.parameters.items():
+        for parameter in setup.parameters.values():
             sklearn_name = openml.setups.openml_param_name_to_sklearn(parameter, flow)
             openml_name = openml.setups.sklearn_param_name_to_openml(sklearn_name, flow)
             self.assertEqual(parameter.full_name, openml_name)
