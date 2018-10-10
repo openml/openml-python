@@ -440,7 +440,8 @@ def status_update(data_id, status):
     """
     Updates the status of a dataset to either 'active' or 'deactivated'. Please
     see the OpenML API documentation for a description of the status and all
-    legal status transitions.
+    legal status transitions:
+    https://docs.openml.org/#dataset-status
 
     Parameters
     ----------
