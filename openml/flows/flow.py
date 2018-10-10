@@ -368,7 +368,6 @@ class OpenMLFlow(object):
 
         Parameters
         ----------
-
         key_item: str
             The flow attribute that will be used to identify flows in the
             structure. Allowed values {flow_id, name}
@@ -402,6 +401,8 @@ class OpenMLFlow(object):
         sub_component: OpenMLFlow
             The OpenMLFlow that corresponds to the structure
         """
+        if len(structure) < 1:
+            raise ValueError('Please provide a structure list of size >= 1')
         sub_identifier = structure[0]
         if sub_identifier not in self.components:
             raise ValueError('Flow %s does not contain component with '

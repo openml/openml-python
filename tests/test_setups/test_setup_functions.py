@@ -185,7 +185,10 @@ class TestSetupFunctions(TestBase):
             # not change in the future. Hence, we won't offer this
             # transformation functionality in the main package yet.)
             splitted = sklearn_name.split("__")
-            subflow = flow.get_subflow(splitted[0:-1])
+            if len(splitted) > 1:  # if len is 1, it is part of root flow
+                subflow = flow.get_subflow(splitted[0:-1])
+            else:
+                subflow = flow
             openml_name = "%s(%s)_%s" % (subflow.name,
                                          subflow.version,
                                          splitted[-1])
