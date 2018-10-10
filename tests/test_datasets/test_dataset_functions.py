@@ -349,8 +349,28 @@ class TestOpenMLDataset(TestBase):
         dataset.publish()
         did = dataset.dataset_id
 
+        # admin key for test server (only adminds can activate datasets.
+        # all users can deactivate their own datasets)
+        openml.config.apikey = 'd488d8afd93b32331cf6ea9d7003d4c3'
+
         openml.datasets.status_update(did, 'active')
+        # need to use listing fn, as this is immune to cache
+        result = openml.datasets.list_datasets(data_id=did, status='all')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[did]['status'], 'active')
         openml.datasets.status_update(did, 'deactivated')
+        # need to use listing fn, as this is immune to cache
+        result = openml.datasets.list_datasets(data_id=did, status='all')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[did]['status'], 'deactivated')
         openml.datasets.status_update(did, 'active')
+        # need to use listing fn, as this is immune to cache
+        result = openml.datasets.list_datasets(data_id=did, status='all')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[did]['status'], 'active')
         with self.assertRaises(ValueError):
             openml.datasets.status_update(did, 'in_preparation')
+        # need to use listing fn, as this is immune to cache
+        result = openml.datasets.list_datasets(data_id=did, status='all')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[did]['status'], 'active')
