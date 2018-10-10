@@ -35,6 +35,9 @@ class OpenMLParameter(object):
             The input id from the openml database
         flow id : int
             The flow to which this parameter is associated
+        flow name : str
+            The name of the flow (no version number) to which this parameter
+            is associated
         full_name : str
             The name of the flow and parameter combined
         parameter_name : str
