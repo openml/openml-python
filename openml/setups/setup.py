@@ -47,7 +47,8 @@ class OpenMLParameter(object):
         value : str
             If the parameter was set, the value that it was set to. 
     """
-    def __init__(self, id, flow_id, flow_name, full_name, parameter_name, data_type, default_value, value):
+    def __init__(self, id, flow_id, flow_name, full_name, parameter_name,
+                 data_type, default_value, value):
         self.id = id
         self.flow_id = flow_id
         self.flow_name = flow_name

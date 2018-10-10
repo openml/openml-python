@@ -359,6 +359,30 @@ class OpenMLFlow(object):
                              (flow_id, message))
         return self
 
+    def get_subflow(self, structure):
+        """
+        Returns a subflow from the tree of dependencies.
+
+        Parameters
+        ----------
+        structure: list[str]
+            A list of strings, indicating the location of the subflow
+
+        Returns
+        -------
+        sub_component: OpenMLFlow
+            The OpenMLFlow that corresponds to the structure
+        """
+        sub_identifier = structure[0]
+        if sub_identifier not in self.components:
+            raise ValueError('Flow %s does not contain component with '
+                             'identifier %s' % (self.name, sub_identifier))
+        if len(structure) == 1:
+            return self.components[sub_identifier]
+        else:
+            structure.pop(0)
+            return self.components[sub_identifier].get_subflow(structure)
+
     def push_tag(self, tag):
         """Annotates this flow with a tag on the server.
 

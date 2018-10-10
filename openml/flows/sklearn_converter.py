@@ -500,7 +500,7 @@ def flow_structure(flow, key_item):
 
     key_item: str
         The flow attribute that will be used to identify flows in the
-        structure. Allowed values {id, name, fullName}
+        structure. Allowed values {id, name}
 
     Returns
     -------
@@ -509,8 +509,8 @@ def flow_structure(flow, key_item):
     """
     if not isinstance(flow, OpenMLFlow):
         raise TypeError('flow should be of type OpenMLFlow')
-    if key_item not in ['id', 'name', 'fullName']:
-        raise ValueError('key_item should be in {id, name, fullName}')
+    if key_item not in ['id', 'name']:
+        raise ValueError('key_item should be in {id, name}')
     structure = dict()
     for key, sub_flow in flow.components.items():
         sub_structure = flow_structure(sub_flow, key_item)

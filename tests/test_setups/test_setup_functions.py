@@ -160,6 +160,7 @@ class TestSetupFunctions(TestBase):
         self.assertEqual(len(all), size * 2)
 
     def test_openml_param_name_to_sklearn(self):
+        # test is also responsible for: sklearn_param_name_to_openml
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         boosting = sklearn.ensemble.AdaBoostClassifier(
             base_estimator=sklearn.tree.DecisionTreeClassifier())
@@ -172,15 +173,13 @@ class TestSetupFunctions(TestBase):
         run = openml.runs.get_run(run.run_id)
         setup = openml.setups.get_setup(run.setup_id)
 
-        parametername_sid = dict()
-        for sid, parameter in setup.parameters.items():
-            parametername_sid[parameter.parameter_name] = sid
+        # make sure to test enough parameters
+        self.assertGreater(len(setup.parameters), 15)
 
-        fixture = 'boosting__base_estimator__min_samples_leaf'
-        sklearn_name = openml.setups.openml_param_name_to_sklearn(
-            setup.parameters[parametername_sid['min_samples_leaf']], flow
-        )
-        self.assertEqual(fixture, sklearn_name)
+        for sid, parameter in setup.parameters.items():
+            sklearn_name = openml.setups.openml_param_name_to_sklearn(parameter, flow)
+            openml_name = openml.setups.sklearn_param_name_to_openml(sklearn_name, flow)
+            self.assertEqual(parameter.full_name, openml_name)
 
     def test_get_cached_setup(self):
         openml.config.cache_directory = self.static_cache_dir
