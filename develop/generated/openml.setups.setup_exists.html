@@ -121,7 +121,9 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>flow</strong> <span class="classifier-delimiter">:</span> <span class="classifier">flow</span></dt>
-<dd><p class="first last">The openml flow object.</p>
+<dd><p class="first last">The openml flow object. Should have flow id present for the main flow
+and all subflows (i.e., it should be downloaded from the server by
+means of flow.get, and not instantiated locally)</p>
 </dd>
 <dt><strong>sklearn_model</strong> <span class="classifier-delimiter">:</span> <span class="classifier">BaseEstimator, optional</span></dt>
 <dd><p class="first last">If given, the parameters are parsed from this model instead of the
