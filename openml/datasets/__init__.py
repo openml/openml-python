@@ -4,6 +4,7 @@ from .functions import (
     get_dataset,
     get_datasets,
     list_datasets,
+    status_update,
 )
 from .dataset import OpenMLDataset
 from .data_feature import OpenMLDataFeature
@@ -16,4 +17,5 @@ __all__ = [
     'list_datasets',
     'OpenMLDataset',
     'OpenMLDataFeature',
+    'status_update',
 ]
