@@ -5,9 +5,10 @@ Dataset upload tutorial
 A tutorial on how to create and upload a dataset to OpenML.
 """
 import numpy as np
-import openml
 import sklearn.datasets
 from scipy.sparse import coo_matrix
+
+import openml
 from openml.datasets.functions import create_dataset
 
 ############################################################################
@@ -30,14 +31,13 @@ openml.config.server = 'https://test.openml.org/api/v1/xml'
 # ^^^^^^^^^^^^^^^
 # Load an example dataset from scikit-learn which we will upload to OpenML.org via the API.
 
-breast_cancer = sklearn.datasets.load_breast_cancer()
-name = 'BreastCancer(scikit-learn)'
-X = breast_cancer.data
-y = breast_cancer.target
-target_names = breast_cancer.target_names
-y = np.array([target_names[i] for i in y])
-attribute_names = breast_cancer.feature_names
-description = breast_cancer.DESCR
+diabetes = sklearn.datasets.load_diabetes()
+name = 'Diabetes(scikit-learn)'
+X = diabetes.data
+y = diabetes.target
+attribute_names = diabetes.feature_names
+description = diabetes.DESCR
+
 ############################################################################
 # OpenML does not distinguish between the attributes and
 # targets on the data level and stores all data in a single matrix.
@@ -49,18 +49,15 @@ data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
 attributes = [
                  (attribute_name, 'REAL') for attribute_name in attribute_names
-             ] + [('class', list(breast_cancer.target_names))]
+             ] + [('class', 'INTEGER')]
 citation = (
-    "W.N. Street, W.H. Wolberg and O.L. Mangasarian. "
-    "Nuclear feature extraction for breast tumor diagnosis. "
-    "IS&T/SPIE 1993 International Symposium on Electronic "
-    "Imaging: Science and Technology, "
-    "volume 1905, pages 861-870, San Jose, CA, 1993."
+    "Bradley Efron, Trevor Hastie, Iain Johnstone and "
+    "Robert Tibshirani (2004) “Least Angle Regression,” "
+    "Annals of Statistics (with discussion), 407-499"
 )
 paper_url = (
-    'https://www.spiedigitallibrary.org/conference-proceedings-of-spie/'
-    '1905/0000/Nuclear-feature-extraction-for-breast-tumor-diagnosis/'
-    '10.1117/12.148698.short?SSO=1'
+    'http://web.stanford.edu/~hastie/Papers/'
+    'LARS/LeastAngle_2002.pdf'
 )
 
 ############################################################################
@@ -70,7 +67,7 @@ paper_url = (
 #
 # https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd
 
-bc_dataset = create_dataset(
+diabetes_dataset = create_dataset(
     # The name of the dataset (needs to be unique). 
     # Must not be longer than 128 characters and only contain
     # a-z, A-Z, 0-9 and the following special characters: _\-\.(),
@@ -78,11 +75,12 @@ bc_dataset = create_dataset(
     # Textual description of the dataset.
     description=description,
     # The person who created the dataset.
-    creator='Dr. William H. Wolberg, W. Nick Street, Olvi L. Mangasarian',
+    creator="Bradley Efron, Trevor Hastie, "
+            "Iain Johnstone and Robert Tibshirani",
     # People who contributed to the current version of the dataset.
     contributor=None,
     # The date the data was originally collected, given by the uploader.
-    collection_date='01-11-1995',
+    collection_date='09-01-2012',
     # Language in which the data is represented.
     # Starts with 1 upper case letter, rest lower case, e.g. 'English'.
     language='English',
@@ -102,15 +100,14 @@ bc_dataset = create_dataset(
     # A version label which is provided by the user.
     version_label='test',
     original_data_url=(
-        'https://archive.ics.uci.edu/ml/datasets/'
-        'Breast+Cancer+Wisconsin+(Diagnostic)'
+        'http://www4.stat.ncsu.edu/~boos/var.select/diabetes.html'
     ),
     paper_url=paper_url,
 )
 
 ############################################################################
 
-upload_did = bc_dataset.publish()
+upload_did = diabetes_dataset.publish()
 print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 
 ############################################################################
@@ -162,10 +159,10 @@ citation = (
     'third edition. Burlington, Mass.: Morgan Kaufmann Publishers, 2011'
 )
 
-wind_dataset = create_dataset(
+weather_dataset = create_dataset(
     name="Wind",
     description=description,
-    creator=None,
+    creator='I. H. Witten, E. Frank, M. A. Hall, and ITPro',
     contributor=None,
     collection_date='01-01-2011',
     language='English',
@@ -181,7 +178,7 @@ wind_dataset = create_dataset(
 
 ############################################################################
 
-upload_did = wind_dataset.publish()
+upload_did = weather_dataset.publish()
 print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 
 ############################################################################
