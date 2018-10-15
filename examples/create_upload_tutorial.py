@@ -32,7 +32,7 @@ openml.config.server = 'https://test.openml.org/api/v1/xml'
 
 breast_cancer = sklearn.datasets.load_breast_cancer()
 name = 'BreastCancer(scikit-learn)'
-x = breast_cancer.data
+X = breast_cancer.data
 y = breast_cancer.target
 target_names = breast_cancer.target_names
 y = np.array([target_names[i] for i in y])
