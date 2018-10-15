@@ -45,7 +45,7 @@ description = breast_cancer.DESCR
 # The target feature is indicated as meta-data of the
 # dataset (and tasks on that data).
 
-data = np.concatenate((x, y.reshape((-1, 1))), axis=1)
+data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
 attributes = [
                  (attribute_name, 'REAL') for attribute_name in attribute_names
