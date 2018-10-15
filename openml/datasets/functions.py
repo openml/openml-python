@@ -2,6 +2,7 @@ import hashlib
 import io
 import os
 import re
+
 import numpy as np
 import six
 import arff
@@ -358,11 +359,13 @@ def get_dataset(dataset_id):
     return dataset
 
 
-def create_dataset(name, description, creator, contributor, collection_date,
-                   language, licence, attributes, data, default_target_attribute,
-                   row_id_attribute, ignore_attribute, citation, format=None,
-                   original_data_url=None, paper_url=None, update_comment=None,
-                   version_label=None):
+def create_dataset(name, description, creator, contributor,
+                   collection_date, language,
+                   licence, attributes, data,
+                   default_target_attribute, row_id_attribute,
+                   ignore_attribute, citation, format=None,
+                   original_data_url=None, paper_url=None,
+                   update_comment=None, version_label=None):
     """Create a dataset.
 
     This function creates an OpenMLDataset object.
@@ -376,7 +379,7 @@ def create_dataset(name, description, creator, contributor, collection_date,
     description : str
         Description of the dataset.
     format : str, optional
-        Format of the dataset which can be either 'arff' or 'sparse-arff'.
+        Format of the dataset which can be either 'arff' or 'sparse_arff'.
         By default, the format is automatically inferred.
         .. deprecated: 0.8
             ``format`` is deprecated in 0.8 and will be removed in 0.10.

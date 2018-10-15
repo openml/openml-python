@@ -17,7 +17,11 @@ from openml.datasets.functions import create_dataset
 openml.config.server = 'https://test.openml.org/api/v1/xml'
 
 ############################################################################
-# The dataset that you upload to OpenML can be:
+# The dataset that you upload to OpenML can be an
+# iterable object that returns iterables:
+#
+# Below we will cover the following cases of the
+# dataset object:
 #
 # * A numpy array.
 # * A list of lists.
@@ -29,7 +33,8 @@ openml.config.server = 'https://test.openml.org/api/v1/xml'
 #
 # Prepare dataset
 # ^^^^^^^^^^^^^^^
-# Load an example dataset from scikit-learn which we will upload to OpenML.org via the API.
+# Load an example dataset from scikit-learn which we
+# will upload to OpenML.org via the API.
 
 diabetes = sklearn.datasets.load_diabetes()
 name = 'Diabetes(scikit-learn)'
@@ -63,7 +68,8 @@ paper_url = (
 ############################################################################
 # Create the dataset object
 # ^^^^^^^^^^^^^^^^^^^^^^^^^
-# The definition of all fields can be found in the XSD files describing the expected format:
+# The definition of all fields can be found in the
+# XSD files describing the expected format:
 #
 # https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd
 
@@ -185,7 +191,7 @@ print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 # Dataset is a sparse matrix
 # ==========================
 #
-# Sparse data can be represented in the arff object as a
+# Sparse data can be passed as a
 # `scipy.sparse.coo <https://docs.scipy.org/doc/scipy/reference/sparse.html>`_,
 # or a list of dictionaries.
 
