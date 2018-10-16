@@ -434,7 +434,7 @@ def create_dataset(name, description, creator, contributor,
         if isinstance(data, list) or isinstance(data, np.ndarray):
             if isinstance(data[0], list) or isinstance(data[0], np.ndarray):
                 d_format = 'arff'
-            elif isinstance(data[0], OrderedDict):
+            elif isinstance(data[0], dict):
                 d_format = 'sparse_arff'
             else:
                 raise ValueError(
