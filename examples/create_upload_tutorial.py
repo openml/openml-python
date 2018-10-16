@@ -52,8 +52,8 @@ description = diabetes.DESCR
 data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
 attributes = [
-                 (attribute_name, 'REAL') for attribute_name in attribute_names
-             ] + [('class', 'INTEGER')]
+    (attribute_name, 'REAL') for attribute_name in attribute_names
+] + [('class', 'INTEGER')]
 citation = (
     "Bradley Efron, Trevor Hastie, Iain Johnstone and "
     "Robert Tibshirani (2004) (Least Angle Regression) "
