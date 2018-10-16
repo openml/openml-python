@@ -1,6 +1,20 @@
-import openml
+import unittest
+import os
+import sys
+import random
+if sys.version_info[0] >= 3:
+    from unittest import mock
+else:
+    import mock
+
+import arff
+import six
+import numpy as np
+import scipy.sparse
 from oslo_concurrency import lockutils
 from warnings import filterwarnings, catch_warnings
+
+import openml
 from openml import OpenMLDataset
 from openml.exceptions import OpenMLCacheException, PyOpenMLError, \
     OpenMLHashException, PrivateDatasetError
@@ -18,18 +32,6 @@ from openml.datasets.functions import (create_dataset,
                                        _get_online_dataset_arff,
                                        _get_online_dataset_format,
                                        DATASETS_CACHE_DIR_NAME)
-
-import unittest
-import os
-import sys
-import numpy as np
-import scipy.sparse
-import random
-import six
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
 
 
 class TestOpenMLDataset(TestBase):
@@ -602,3 +604,36 @@ class TestOpenMLDataset(TestBase):
                 create_dataset,
                 **parameters
             )
+
+    def test_get_online_dataset_arff(self):
+
+        # Australian dataset
+        dataset_id = 100
+        dataset = openml.datasets.get_dataset(dataset_id)
+        decoder = arff.ArffDecoder()
+        # check if the arff from the dataset is
+        # the same as the arff from _get_arff function
+        d_format = (dataset.format).lower()
+
+        self.assertEqual(
+            dataset._get_arff(d_format),
+            decoder.decode(
+                _get_online_dataset_arff(dataset_id),
+                encode_nominal=True,
+                return_type=arff.DENSE
+                if d_format == 'arff' else arff.COO
+            ),
+            "ARFF files are not equal"
+        )
+
+    def test_get_online_dataset_format(self):
+
+        # Phoneme dataset
+        dataset_id = 77
+        dataset = openml.datasets.get_dataset(dataset_id)
+
+        self.assertEqual(
+            (dataset.format).lower(),
+            _get_online_dataset_format(dataset_id),
+            "The format of the ARFF files is different"
+        )

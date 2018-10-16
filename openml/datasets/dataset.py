@@ -271,9 +271,9 @@ class OpenMLDataset(object):
         if bits != 64 and os.path.getsize(filename) > 120000000:
             return NotImplementedError("File too big")
 
-        if self.format.lower() == 'arff':
+        if format.lower() == 'arff':
             return_type = arff.DENSE
-        elif self.format.lower() == 'sparse_arff':
+        elif format.lower() == 'sparse_arff':
             return_type = arff.COO
         else:
             raise ValueError('Unknown data format %s' % format)

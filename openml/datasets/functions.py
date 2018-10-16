@@ -431,28 +431,25 @@ def create_dataset(name, description, creator, contributor,
 
     # Determine ARFF format from the dataset
     else:
-        if isinstance(data, list):
-            if isinstance(data[0], list):
+        if isinstance(data, list) or isinstance(data, np.ndarray):
+            if isinstance(data[0], list) or isinstance(data[0], np.ndarray):
                 d_format = 'arff'
-            elif isinstance(data[0], dict):
+            elif isinstance(data[0], OrderedDict):
                 d_format = 'sparse_arff'
             else:
                 raise ValueError(
-                    'When giving a list, the list should contain a '
-                    'list for dense data or a dictionary for sparse '
+                    'When giving a list or a numpy.ndarray, '
+                    'they should contain a list/ numpy.ndarray '
+                    'for dense data or a dictionary for sparse '
                     'data. Got {!r} instead.'
                     .format(data[0])
                 )
-        elif isinstance(data, np.ndarray):
-            d_format = 'arff'
         elif isinstance(data, coo_matrix):
             d_format = 'sparse_arff'
         else:
             raise ValueError(
-                'Invalid data type. The data type can be a list of '
-                'lists or a numpy ndarray for dense data. Otherwise, '
-                'it can be a list of dicts or scipy.sparse.coo_matrix'
-                'for sparse data.'
+                'Invalid data type. The data type can be a list, '
+                'a numpy ndarray or a scipy.sparse.coo_matrix'
             )
 
     arff_object = {

@@ -17,19 +17,18 @@ from openml.datasets.functions import create_dataset
 openml.config.server = 'https://test.openml.org/api/v1/xml'
 
 ############################################################################
-# The dataset that you upload to OpenML can be an
-# iterable object that returns iterables:
-#
 # Below we will cover the following cases of the
 # dataset object:
 #
-# * A numpy array.
-# * A list of lists.
+# * A numpy array
+# * A list
 # * A sparse matrix
 
 ############################################################################
 # Dataset is a numpy array
 # ========================
+# A numpy array can contain lists in the case of dense data
+# or it can contain OrderedDicts in the case of sparse data.
 #
 # Prepare dataset
 # ^^^^^^^^^^^^^^^
@@ -57,7 +56,7 @@ attributes = [
              ] + [('class', 'INTEGER')]
 citation = (
     "Bradley Efron, Trevor Hastie, Iain Johnstone and "
-    "Robert Tibshirani (2004) “Least Angle Regression,” "
+    "Robert Tibshirani (2004) (Least Angle Regression) "
     "Annals of Statistics (with discussion), 407-499"
 )
 paper_url = (
@@ -117,8 +116,10 @@ upload_did = diabetes_dataset.publish()
 print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 
 ############################################################################
-# Dataset is a list of lists
-# ==========================
+# Dataset is a list
+# =================
+# A list can contain lists in the case of dense data
+# or it can contain OrderedDicts in the case of sparse data.
 #
 # Weather dataset:
 # http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
@@ -190,10 +191,6 @@ print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 ############################################################################
 # Dataset is a sparse matrix
 # ==========================
-#
-# Sparse data can be passed as a
-# `scipy.sparse.coo <https://docs.scipy.org/doc/scipy/reference/sparse.html>`_,
-# or a list of dictionaries.
 
 sparse_data = coo_matrix((
     [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],

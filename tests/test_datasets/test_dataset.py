@@ -1,10 +1,11 @@
+from time import time
+
 import numpy as np
 import six
-import openml
-from time import time
 from scipy import sparse
 from warnings import filterwarnings, catch_warnings
 
+import openml
 from openml.testing import TestBase
 
 
