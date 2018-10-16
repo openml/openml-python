@@ -20,7 +20,9 @@ def setup_exists(flow, model=None):
     ----------
 
     flow : flow
-        The openml flow object.
+        The openml flow object. Should have flow id present for the main flow
+        and all subflows (i.e., it should be downloaded from the server by
+        means of flow.get, and not instantiated locally)
 
     sklearn_model : BaseEstimator, optional
         If given, the parameters are parsed from this model instead of the
@@ -36,11 +38,16 @@ def setup_exists(flow, model=None):
     openml.flows.functions._check_flow_for_server_id(flow)
 
     if model is None:
+        # model is left empty. We take the model from the flow.
         model = flow.model
-    else:
-        exists = flow_exists(flow.name, flow.external_version)
-        if exists != flow.flow_id:
-            raise ValueError('This should not happen!')
+        if flow.model is None:
+            raise ValueError('Could not locate model (neither given as'
+                             'argument nor available as flow.model)')
+
+    # checks whether the flow exists on the server and flow ids align
+    exists = flow_exists(flow.name, flow.external_version)
+    if exists != flow.flow_id:
+        raise ValueError('This should not happen!')
 
     openml_param_settings = openml.runs.OpenMLRun._parse_parameters(flow, model)
     description = xmltodict.unparse(_to_dict(flow.flow_id,
@@ -186,7 +193,7 @@ def __list_setups(api_call):
 
 
 def initialize_model(setup_id):
-    '''
+    """
     Initialized a model based on a setup_id (i.e., using the exact
     same parameter settings)
 
@@ -199,7 +206,7 @@ def initialize_model(setup_id):
         -------
         model : sklearn model
             the scikitlearn model with all parameters initailized
-    '''
+    """
 
     # transform an openml setup object into
     # a dict of dicts, structured: flow_id maps to dict of
@@ -256,9 +263,9 @@ def _to_dict(flow_id, openml_parameter_settings):
 
 
 def _create_setup_from_xml(result_dict):
-    '''
-     Turns an API xml result into a OpenMLSetup object
-    '''
+    """
+    Turns an API xml result into a OpenMLSetup object
+    """
     setup_id = int(result_dict['oml:setup_parameters']['oml:setup_id'])
     flow_id = int(result_dict['oml:setup_parameters']['oml:flow_id'])
     parameters = {}
@@ -278,6 +285,7 @@ def _create_setup_from_xml(result_dict):
             raise ValueError('Expected None, list or dict, received someting else: %s' %str(type(xml_parameters)))
 
     return OpenMLSetup(setup_id, flow_id, parameters)
+
 
 def _create_setup_parameter_from_xml(result_dict):
     return OpenMLParameter(int(result_dict['oml:id']),
