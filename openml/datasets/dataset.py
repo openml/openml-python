@@ -251,7 +251,7 @@ class OpenMLDataset(object):
 
         Returns
         -------
-        arff_string :
+        dict
             Decoded arff.
 
         """
