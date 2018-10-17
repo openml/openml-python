@@ -480,7 +480,7 @@ class TestOpenMLDataset(TestBase):
         ]
 
         dataset = create_dataset(
-            name="Wind_dataset",
+            name="ModifiedWeather",
             description=(
                 'Testing dataset upload when the data is a list of lists'
             ),

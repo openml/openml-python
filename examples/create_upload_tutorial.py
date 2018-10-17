@@ -167,7 +167,7 @@ citation = (
 )
 
 weather_dataset = create_dataset(
-    name="Wind",
+    name="Weather",
     description=description,
     creator='I. H. Witten, E. Frank, M. A. Hall, and ITPro',
     contributor=None,
