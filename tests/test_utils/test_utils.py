@@ -1,8 +1,12 @@
 from openml.testing import TestBase
 import numpy as np
 import openml
+import sys
 
-from unittest import mock
+if sys.version_info[0] >= 3:
+    from unittest import mock
+else:
+    import mock
 
 
 class OpenMLTaskTest(TestBase):
