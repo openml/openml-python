@@ -2,19 +2,38 @@ from openml.testing import TestBase
 import numpy as np
 import openml
 
+from unittest import mock
+
 
 class OpenMLTaskTest(TestBase):
     _multiprocess_can_split_ = True
     _batch_size = 25
 
+    def mocked_perform_api_call(call):
+        # TODO: JvR: Why is this not a staticmethod?
+        url = openml.config.server + '/' + call
+        return openml._api_calls._read_url(url)
+
     def test_list_all(self):
         openml.utils._list_all(openml.tasks.functions._list_tasks)
+
+    @mock.patch('openml._api_calls._perform_api_call', side_effect=mocked_perform_api_call)
+    def test_list_all_few_results_available(self, _perform_api_call):
+        # we want to make sure that the number of api calls is only 1.
+        # Although we have multiple versions of the iris dataset, there is only
+        # one with this name/version combination
+
+        datasets = openml.datasets.list_datasets(size=1000,
+                                                 data_name='iris',
+                                                 data_version=1)
+        self.assertEqual(len(datasets), 1)
+        self.assertEqual(_perform_api_call.call_count, 1)
 
     def test_list_all_for_datasets(self):
         required_size = 127  # default test server reset value
         datasets = openml.datasets.list_datasets(batch_size=self._batch_size, size=required_size)
 
-        self.assertEquals(len(datasets), required_size)
+        self.assertEqual(len(datasets), required_size)
         for did in datasets:
             self._check_dataset(datasets[did])
 
@@ -22,19 +41,19 @@ class OpenMLTaskTest(TestBase):
         datasets_a = openml.datasets.list_datasets()
         datasets_b = openml.datasets.list_datasets(size=np.inf)
 
-        self.assertEquals(len(datasets_a), len(datasets_b))
+        self.assertEqual(len(datasets_a), len(datasets_b))
 
     def test_list_all_for_tasks(self):
         required_size = 1068  # default test server reset value
         tasks = openml.tasks.list_tasks(batch_size=self._batch_size, size=required_size)
 
-        self.assertEquals(len(tasks), required_size)
+        self.assertEqual(len(tasks), required_size)
 
     def test_list_all_for_flows(self):
         required_size = 15  # default test server reset value
         flows = openml.flows.list_flows(batch_size=self._batch_size, size=required_size)
 
-        self.assertEquals(len(flows), required_size)
+        self.assertEqual(len(flows), required_size)
 
     def test_list_all_for_setups(self):
         required_size = 50
@@ -42,14 +61,14 @@ class OpenMLTaskTest(TestBase):
         setups = openml.setups.list_setups(size=required_size)
 
         # might not be on test server after reset, please rerun test at least once if fails
-        self.assertEquals(len(setups), required_size)
+        self.assertEqual(len(setups), required_size)
 
     def test_list_all_for_runs(self):
         required_size = 48
         runs = openml.runs.list_runs(batch_size=self._batch_size, size=required_size)
 
         # might not be on test server after reset, please rerun test at least once if fails
-        self.assertEquals(len(runs), required_size)
+        self.assertEqual(len(runs), required_size)
 
     def test_list_all_for_evaluations(self):
         required_size = 57
@@ -58,4 +77,4 @@ class OpenMLTaskTest(TestBase):
                                                           size=required_size)
 
         # might not be on test server after reset, please rerun test at least once if fails
-        self.assertEquals(len(evaluations), required_size)
+        self.assertEqual(len(evaluations), required_size)
