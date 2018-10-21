@@ -389,7 +389,7 @@ def attributes_arff_from_df(df):
             # raise an error asking to convert all entries to string.
             categories = df[column_name].cat.categories
             categories_dtype = pd.api.types.infer_dtype(categories)
-            if categories_dtype != 'string':
+            if categories_dtype not in ('string', 'unicode'):
                 raise ValueError("The column '{}' of the dataframe is of "
                                  "'category' dtype. Therefore, all values in "
                                  "this columns should be string. Please "
@@ -406,7 +406,7 @@ def attributes_arff_from_df(df):
         else:
             raise ValueError("The dtype '{}' of the column '{}' is not "
                              "currently supported by liac-arff. Supported "
-                             "dtypes are categorical, string, interger, "
+                             "dtypes are categorical, string, integer, "
                              "floating, and boolean."
                              .format(column_dtype, column_name))
     return attributes_arff

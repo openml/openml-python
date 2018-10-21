@@ -718,8 +718,6 @@ class TestOpenMLDataset(TestBase):
         dataset.publish()
 
     def test_create_dataset_pandas(self):
-        # pandas is only a optional dependency and we need to skip the test if
-        # it is not installed.
         data = [
             ['a', 'sunny', 85.0, 85.0, 'FALSE', 'no'],
             ['b', 'sunny', 80.0, 90.0, 'TRUE', 'no'],
