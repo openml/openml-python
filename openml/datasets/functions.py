@@ -364,13 +364,15 @@ def get_dataset(dataset_id):
 def attributes_arff_from_df(df):
     """Create the attributes as specified by the ARFF format using a dataframe.
 
-    Arguments:
-        df : DataFrame, shape (n_samples, n_features)
-            The dataframe containing the data set.
+    Parameters
+    ----------
+    df : DataFrame, shape (n_samples, n_features)
+        The dataframe containing the data set.
 
-    Returns:
-        attributes_arff : str
-            The data set attributes as required by the ARFF format.
+    Returns
+    -------
+    attributes_arff : str
+        The data set attributes as required by the ARFF format.
     """
     PD_DTYPES_TO_ARFF_DTYPE = {
         'integer': 'INTEGER',
