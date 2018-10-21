@@ -820,7 +820,7 @@ class TestOpenMLDataset(TestBase):
         paper_url = 'http://openml.github.io/openml-python'
         err_msg = "Automatically inferring the attributes required a pandas"
         with pytest.raises(ValueError, match=err_msg):
-            dataset = openml.datasets.functions.create_dataset(
+            openml.datasets.functions.create_dataset(
                 name=name,
                 description=description,
                 creator=creator,
