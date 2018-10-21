@@ -715,7 +715,6 @@ class TestOpenMLDataset(TestBase):
             _get_online_dataset_format(dataset_id),
             "The format of the ARFF files is different"
         )
-        dataset.publish()
 
     def test_create_dataset_pandas(self):
         data = [
