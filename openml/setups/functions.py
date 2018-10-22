@@ -281,7 +281,7 @@ def _create_setup_from_xml(result_dict):
 
 
 def _create_setup_parameter_from_xml(result_dict):
-    return OpenMLParameter(id=int(result_dict['oml:id']),
+    return OpenMLParameter(input_id=int(result_dict['oml:id']),
                            flow_id=int(result_dict['oml:flow_id']),
                            flow_name=result_dict['oml:flow_name'],
                            full_name=result_dict['oml:full_name'],
