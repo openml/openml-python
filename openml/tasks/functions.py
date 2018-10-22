@@ -282,14 +282,15 @@ def get_task(task_id):
         The OpenML task id.
     """
     task_id = int(task_id)
-    tid_cache_dir = openml.utils._create_cache_directory_for_id(
-        TASKS_CACHE_DIR_NAME, task_id,
-    )
 
     with lockutils.external_lock(
             name='task.functions.get_task:%d' % task_id,
             lock_path=openml.utils._create_lockfiles_dir(),
     ):
+        tid_cache_dir = openml.utils._create_cache_directory_for_id(
+            TASKS_CACHE_DIR_NAME, task_id,
+        )
+
         try:
             task = _get_task_description(task_id)
             dataset = get_dataset(task.dataset_id)
