@@ -794,11 +794,14 @@ class TestOpenMLDataset(TestBase):
             paper_url=paper_url
         )
         upload_did = dataset.publish()
+        downloaded_data = _get_online_dataset_arff(upload_did)
         self.assertEqual(
-            _get_online_dataset_arff(upload_did),
+            downloaded_data,
             dataset._dataset,
             "Uploaded ARFF does not match original one"
         )
+        self.assertTrue(
+            '@ATTRIBUTE rnd_str {a, b, c, d, e, f, g}' in downloaded_data)
 
     def test_create_dataset_attributes_auto_without_df(self):
         # attributes cannot be inferred without passing a dataframe
