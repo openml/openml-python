@@ -21,7 +21,8 @@ class OpenMLTaskTest(TestBase):
     def test_list_all(self):
         openml.utils._list_all(openml.tasks.functions._list_tasks)
 
-    @mock.patch('openml._api_calls._perform_api_call', side_effect=mocked_perform_api_call)
+    @mock.patch('openml._api_calls._perform_api_call', 
+                side_effect=mocked_perform_api_call)
     def test_list_all_few_results_available(self, _perform_api_call):
         # we want to make sure that the number of api calls is only 1.
         # Although we have multiple versions of the iris dataset, there is only
