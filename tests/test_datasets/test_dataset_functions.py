@@ -9,7 +9,10 @@ else:
 
 import arff
 import six
+
+import pytest
 import numpy as np
+import pandas as pd
 import scipy.sparse
 from oslo_concurrency import lockutils
 from warnings import filterwarnings, catch_warnings
@@ -21,6 +24,7 @@ from openml.exceptions import OpenMLCacheException, PyOpenMLError, \
 from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (create_dataset,
+                                       attributes_arff_from_df,
                                        _get_cached_dataset,
                                        _get_cached_dataset_features,
                                        _get_cached_dataset_qualities,
@@ -405,6 +409,46 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[did]['status'], 'active')
 
+    def test_attributes_arff_from_df(self):
+        df = pd.DataFrame(
+            [[1, 1.0, 'xxx', 'A', True], [2, 2.0, 'yyy', 'B', False]],
+            columns=['integer', 'floating', 'string', 'category', 'boolean']
+        )
+        df['category'] = df['category'].astype('category')
+        attributes = attributes_arff_from_df(df)
+        self.assertEqual(attributes, [('integer', 'INTEGER'),
+                                      ('floating', 'REAL'),
+                                      ('string', 'STRING'),
+                                      ('category', ['A', 'B']),
+                                      ('boolean', ['True', 'False'])])
+
+    def test_attributes_arff_from_df_mixed_dtype_categories(self):
+        # liac-arff imposed categorical attributes to be of sting dtype. We
+        # raise an error if this is not the case.
+        df = pd.DataFrame([[1], ['2'], [3.]])
+        df[0] = df[0].astype('category')
+        err_msg = "The column '0' of the dataframe is of 'category' dtype."
+        with pytest.raises(ValueError, match=err_msg):
+            attributes_arff_from_df(df)
+
+    def test_attributes_arff_from_df_unknown_dtype(self):
+        # check that an error is raised when the dtype is not supported by
+        # liac-arff
+        data = [
+            [[1], ['2'], [3.]],
+            [pd.Timestamp('2012-05-01'), pd.Timestamp('2012-05-02')],
+        ]
+        dtype = [
+            'mixed-integer',
+            'datetime64'
+        ]
+        for arr, dt in zip(data, dtype):
+            df = pd.DataFrame(arr)
+            err_msg = ("The dtype '{}' of the column '0' is not currently "
+                       "supported by liac-arff".format(dt))
+            with pytest.raises(ValueError, match=err_msg):
+                attributes_arff_from_df(df)
+
     def test_create_dataset_numpy(self):
 
         data = np.array(
@@ -671,3 +715,129 @@ class TestOpenMLDataset(TestBase):
             _get_online_dataset_format(dataset_id),
             "The format of the ARFF files is different"
         )
+
+    def test_create_dataset_pandas(self):
+        data = [
+            ['a', 'sunny', 85.0, 85.0, 'FALSE', 'no'],
+            ['b', 'sunny', 80.0, 90.0, 'TRUE', 'no'],
+            ['c', 'overcast', 83.0, 86.0, 'FALSE', 'yes'],
+            ['d', 'rainy', 70.0, 96.0, 'FALSE', 'yes'],
+            ['e', 'rainy', 68.0, 80.0, 'FALSE', 'yes']
+        ]
+        column_names = ['rnd_str', 'outlook', 'temperature', 'humidity',
+                        'windy', 'play']
+        df = pd.DataFrame(data, columns=column_names)
+        # enforce the type of each column
+        df['outlook'] = df['outlook'].astype('category')
+        df['windy'] = df['windy'].astype('bool')
+        df['play'] = df['play'].astype('category')
+        # meta-information
+        name = 'Pandas_testing_dataset'
+        description = 'Synthetic dataset created from a Pandas DataFrame'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'play'
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=citation,
+            attributes='auto',
+            data=df,
+            format=None,
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        upload_did = dataset.publish()
+        self.assertEqual(
+            _get_online_dataset_arff(upload_did),
+            dataset._dataset,
+            "Uploaded ARFF does not match original one"
+        )
+
+        # Check that we can overwrite the attributes
+        data = [['a'], ['b'], ['c'], ['d'], ['e']]
+        column_names = ['rnd_str']
+        df = pd.DataFrame(data, columns=column_names)
+        df['rnd_str'] = df['rnd_str'].astype('category')
+        attributes = {'rnd_str': ['a', 'b', 'c', 'd', 'e', 'f', 'g']}
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=citation,
+            attributes=attributes,
+            data=df,
+            format=None,
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        upload_did = dataset.publish()
+        downloaded_data = _get_online_dataset_arff(upload_did)
+        self.assertEqual(
+            downloaded_data,
+            dataset._dataset,
+            "Uploaded ARFF does not match original one"
+        )
+        self.assertTrue(
+            '@ATTRIBUTE rnd_str {a, b, c, d, e, f, g}' in downloaded_data)
+
+    def test_create_dataset_attributes_auto_without_df(self):
+        # attributes cannot be inferred without passing a dataframe
+        data = np.array([[1, 2, 3],
+                         [1.2, 2.5, 3.8],
+                         [2, 5, 8],
+                         [0, 1, 0]]).T
+        attributes = 'auto'
+        name = 'NumPy_testing_dataset'
+        description = 'Synthetic dataset created from a NumPy array'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'col_{}'.format(data.shape[1] - 1)
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+        err_msg = "Automatically inferring the attributes required a pandas"
+        with pytest.raises(ValueError, match=err_msg):
+            openml.datasets.functions.create_dataset(
+                name=name,
+                description=description,
+                creator=creator,
+                contributor=None,
+                collection_date=collection_date,
+                language=language,
+                licence=licence,
+                default_target_attribute=default_target_attribute,
+                row_id_attribute=None,
+                ignore_attribute=None,
+                citation=citation,
+                attributes=attributes,
+                data=data,
+                format=None,
+                version_label='test',
+                original_data_url=original_data_url,
+                paper_url=paper_url
+            )

@@ -6,6 +6,8 @@ import re
 import numpy as np
 import six
 import arff
+import pandas as pd
+
 import xmltodict
 from scipy.sparse import coo_matrix
 from oslo_concurrency import lockutils
@@ -359,6 +361,59 @@ def get_dataset(dataset_id):
     return dataset
 
 
+def attributes_arff_from_df(df):
+    """Create the attributes as specified by the ARFF format using a dataframe.
+
+    Parameters
+    ----------
+    df : DataFrame, shape (n_samples, n_features)
+        The dataframe containing the data set.
+
+    Returns
+    -------
+    attributes_arff : str
+        The data set attributes as required by the ARFF format.
+    """
+    PD_DTYPES_TO_ARFF_DTYPE = {
+        'integer': 'INTEGER',
+        'floating': 'REAL',
+        'string': 'STRING'
+    }
+    attributes_arff = []
+    for column_name in df:
+        # skipna=True does not infer properly the dtype. The NA values are
+        # dropped before the inference instead.
+        column_dtype = pd.api.types.infer_dtype(df[column_name].dropna())
+
+        if column_dtype == 'categorical':
+            # for categorical feature, arff expects a list string. However, a
+            # categorical column can contain mixed type and we should therefore
+            # raise an error asking to convert all entries to string.
+            categories = df[column_name].cat.categories
+            categories_dtype = pd.api.types.infer_dtype(categories)
+            if categories_dtype not in ('string', 'unicode'):
+                raise ValueError("The column '{}' of the dataframe is of "
+                                 "'category' dtype. Therefore, all values in "
+                                 "this columns should be string. Please "
+                                 "convert the entries which are not string. "
+                                 "Got {} dtype in this column."
+                                 .format(column_name, categories_dtype))
+            attributes_arff.append((column_name, categories.tolist()))
+        elif column_dtype == 'boolean':
+            # boolean are encoded as categorical.
+            attributes_arff.append((column_name, ['True', 'False']))
+        elif column_dtype in PD_DTYPES_TO_ARFF_DTYPE.keys():
+            attributes_arff.append((column_name,
+                                    PD_DTYPES_TO_ARFF_DTYPE[column_dtype]))
+        else:
+            raise ValueError("The dtype '{}' of the column '{}' is not "
+                             "currently supported by liac-arff. Supported "
+                             "dtypes are categorical, string, integer, "
+                             "floating, and boolean."
+                             .format(column_dtype, column_name))
+    return attributes_arff
+
+
 def create_dataset(name, description, creator, contributor,
                    collection_date, language,
                    licence, attributes, data,
@@ -394,11 +449,16 @@ def create_dataset(name, description, creator, contributor,
         Starts with 1 upper case letter, rest lower case, e.g. 'English'.
     licence : str
         License of the data.
-    attributes : list
+    attributes : list, dict, or 'auto'
         A list of tuples. Each tuple consists of the attribute name and type.
-    data : numpy.ndarray | list | scipy.sparse.coo_matrix
-        An array that contains both the attributes and the targets, with
-        shape=(n_samples, n_features).
+        If passing a pandas DataFrame, the attributes can be automatically
+        inferred by passing ``'auto'``. Specific attributes can be manually
+        specified by a passing a dictionary where the key is the name of the
+        attribute and the value is the data type of the attribute.
+    data : ndarray, list, dataframe, coo_matrix, shape (n_samples, n_features)
+        An array that contains both the attributes and the targets. When
+        providing a dataframe, the attribute names and type can be inferred by
+        passing ``attributes='auto'``.
         The target feature is indicated as meta-data of the dataset.
     default_target_attribute : str
         The default target attribute, if it exists.
@@ -423,6 +483,24 @@ def create_dataset(name, description, creator, contributor,
     class:`openml.OpenMLDataset`
         Dataset description."""
 
+    if attributes == 'auto' or isinstance(attributes, dict):
+        if not hasattr(data, "columns"):
+            raise ValueError("Automatically inferring the attributes required "
+                             "a pandas DataFrame. A {!r} was given instead."
+                             .format(data))
+        # infer the type of data for each column of the DataFrame
+        attributes_ = attributes_arff_from_df(data)
+        if isinstance(attributes, dict):
+            # override the attributes which was specified by the user
+            for attr_idx in range(len(attributes_)):
+                attr_name = attributes_[attr_idx][0]
+                if attr_name in attributes.keys():
+                    attributes_[attr_idx] = (attr_name, attributes[attr_name])
+    else:
+        attributes_ = attributes
+
+    data = data.values if hasattr(data, "columns") else data
+
     if format is not None:
         warn("The format parameter will be deprecated in the future,"
              " the method will determine the format of the ARFF "
@@ -431,8 +509,8 @@ def create_dataset(name, description, creator, contributor,
 
     # Determine ARFF format from the dataset
     else:
-        if isinstance(data, list) or isinstance(data, np.ndarray):
-            if isinstance(data[0], list) or isinstance(data[0], np.ndarray):
+        if isinstance(data, (list, np.ndarray)):
+            if isinstance(data[0], (list, np.ndarray)):
                 d_format = 'arff'
             elif isinstance(data[0], dict):
                 d_format = 'sparse_arff'
@@ -455,7 +533,7 @@ def create_dataset(name, description, creator, contributor,
     arff_object = {
         'relation': name,
         'description': description,
-        'attributes': attributes,
+        'attributes': attributes_,
         'data': data
     }
 
