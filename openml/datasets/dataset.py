@@ -174,13 +174,20 @@ class OpenMLDataset(object):
                                     "there and can be read.", self.data_file)
                     raise e
 
-                categorical = []
+                ARFF_DTYPES_TO_PD_DTYPE = {
+                    'INTEGER': int,
+                    'REAL': float,
+                    'NUMERIC': float,
+                    'STRING': object
+                }
+                attribute_dtype = {}
                 attribute_names = []
+                categorical = {}
                 for name, type_ in data['attributes']:
-                    # if the feature is nominal, the categories need to be
-                    # numeric
+                    # if the feature is nominal and the a sparse matrix is
+                    # requested, the categories need to be numeric
                     if (isinstance(type_, list) and
-                            format.lower() == 'sparse_arff'):
+                            self.format.lower() == 'sparse_arff'):
                         try:
                             np.array(type_, dtype=np.float32)
                         except ValueError:
@@ -189,25 +196,70 @@ class OpenMLDataset(object):
                                 "using sparse ARFF."
                             )
                     # string can only be supported with pandas DataFrame
-                    elif type_ == 'STRING' and format.lower() == 'sparse_arff':
+                    elif type_ == 'STRING' and self.format.lower() == 'sparse_arff':
                         raise ValueError(
                             "Dataset containing strings is not supported "
                             "with sparse ARFF."
                         )
-                    categorical.append(isinstance(type_, list))
+
+                    if isinstance(type_, list):
+                        categorical[name] = True
+                        if set(['True', 'False']) == set(type_):
+                            attribute_dtype[name] = bool
+                        else:
+                            # infer the underlying dtype of the categories to
+                            # downcast it if possible
+                            try:
+                                # try to downcast to integer
+                                [int(x) for x in type_]
+                                attribute_dtype[name] = int
+                            except ValueError:
+                                try:
+                                    # otherwise try to downcast to float
+                                    [float(x) for x in type_]
+                                    attribute_dtype[name] = float
+                                except ValueError:
+                                    # otherwise keep the column as object
+                                    attribute_dtype[name] = object
+                    else:
+                        categorical[name] = False
+                        attribute_dtype[name] = ARFF_DTYPES_TO_PD_DTYPE[type_]
                     attribute_names.append(name)
 
-                if format.lower() == 'sparse_arff':
+                if self.format.lower() == 'sparse_arff':
                     X = data['data']
                     X_shape = (max(X[1]) + 1, max(X[2]) + 1)
                     X = scipy.sparse.coo_matrix(
                         (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
                     X = X.tocsr()
-                elif format.lower() == 'arff':
+
+                elif self.format.lower() == 'arff':
                     X = pd.DataFrame(data['data'], columns=attribute_names)
-                    # convert the categorical column to the right dtype.
-                    for column_idx, column_name in enumerate(X.columns):
-                        if categorical[column_idx]:
+                    X_null_count = X.isnull().sum()
+
+                    for column_name in X.columns:
+                        if (attribute_dtype[column_name] == int and
+                                pd.api.types.infer_dtype(
+                                    X[column_name]) != 'integer'):
+                            if X_null_count[column_name] > 0:
+                                X[column_name] = self._create_column_int_with_NA(
+                                    X[column_name]
+                                )
+                            else:
+                                X[column_name] = X[column_name].astype(int)
+
+                        elif (attribute_dtype[column_name] == float and
+                                pd.api.types.infer_dtype(
+                                    X[column_name]) != 'floating'):
+                            X[column_name] = X[column_name].astype(float)
+
+                        elif attribute_dtype[column_name] == bool:
+                            X[column_name] = self._create_column_bool(
+                                X[column_name],
+                                missing_values=bool(X_null_count[column_name])
+                            )
+
+                        if categorical[column_name]:
                             X[column_name] = X[column_name].astype('category')
                 else:
                     raise Exception()
@@ -329,6 +381,28 @@ class OpenMLDataset(object):
         if array_format == "dataframe" and scipy.sparse.issparse(data):
             return pd.SparseDataFrame(data, columns=attribute_names)
         return data
+
+    @staticmethod
+    def _create_column_int_with_NA(series):
+        col = [np.nan
+               if x is None or np.isnan(x)
+               else int(x) for x in series]
+        return pd.Series(col, index=series.index, dtype=object)
+
+    @staticmethod
+    def _create_column_bool(series, missing_values=False):
+        if missing_values:
+            col = []
+            for x in series:
+                if x is None:
+                    col.append(np.nan)
+                else:
+                    col.append(True if x.lower() == 'true' else False)
+            col = pd.Series(col, index=series.index, dtype=object)
+        else:
+            col = [True if x.lower() == 'true' else False for x in series]
+            col = pd.Series(col, index=series.index, dtype=np.bool_)
+        return col
 
     def get_data(self, target=None,
                  include_row_id=False,

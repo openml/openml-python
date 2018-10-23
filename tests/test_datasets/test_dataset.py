@@ -30,6 +30,8 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual((898, 39), rval.shape)
         rval, categorical = self.dataset.get_data(
             return_categorical_indicator=True)
+        print(rval)
+        print(categorical)
         self.assertEqual(len(categorical), 39)
         self.assertTrue(all([isinstance(cat, bool) for cat in categorical]))
         rval, attribute_names = self.dataset.get_data(
