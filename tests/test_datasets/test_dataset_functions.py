@@ -427,8 +427,7 @@ class TestOpenMLDataset(TestBase):
                                  [2, 2.0],
                                  [0, 0]],
                                 columns=['integer', 'floating'],
-                                default_fill_value=0
-        )
+                                default_fill_value=0)
         df['integer'] = df['integer'].astype(np.int64)
         attributes = attributes_arff_from_df(df)
         self.assertEqual(attributes, [('integer', 'INTEGER'),
