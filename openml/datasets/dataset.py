@@ -175,14 +175,14 @@ class OpenMLDataset(object):
                     raise e
 
                 ARFF_DTYPES_TO_PD_DTYPE = {
-                    'INTEGER': int,
-                    'REAL': float,
-                    'NUMERIC': float,
-                    'STRING': object
+                    'INTEGER': 'integer',
+                    'REAL': 'floating',
+                    'NUMERIC': 'floating',
+                    'STRING': 'string'
                 }
                 attribute_dtype = {}
                 attribute_names = []
-                categorical = {}
+                categorical = []
                 for name, type_ in data['attributes']:
                     # if the feature is nominal and the a sparse matrix is
                     # requested, the categories need to be numeric
@@ -196,33 +196,22 @@ class OpenMLDataset(object):
                                 "using sparse ARFF."
                             )
                     # string can only be supported with pandas DataFrame
-                    elif type_ == 'STRING' and self.format.lower() == 'sparse_arff':
+                    elif (type_ == 'STRING' and
+                          self.format.lower() == 'sparse_arff'):
                         raise ValueError(
                             "Dataset containing strings is not supported "
                             "with sparse ARFF."
                         )
 
+                    # infer the dtype from the ARFF header
                     if isinstance(type_, list):
-                        categorical[name] = True
+                        categorical.append(True)
                         if set(['True', 'False']) == set(type_):
-                            attribute_dtype[name] = bool
+                            attribute_dtype[name] = 'boolean'
                         else:
-                            # infer the underlying dtype of the categories to
-                            # downcast it if possible
-                            try:
-                                # try to downcast to integer
-                                [int(x) for x in type_]
-                                attribute_dtype[name] = int
-                            except ValueError:
-                                try:
-                                    # otherwise try to downcast to float
-                                    [float(x) for x in type_]
-                                    attribute_dtype[name] = float
-                                except ValueError:
-                                    # otherwise keep the column as object
-                                    attribute_dtype[name] = object
+                            attribute_dtype[name] = 'categorical'
                     else:
-                        categorical[name] = False
+                        categorical.append(False)
                         attribute_dtype[name] = ARFF_DTYPES_TO_PD_DTYPE[type_]
                     attribute_names.append(name)
 
@@ -238,7 +227,14 @@ class OpenMLDataset(object):
                     X_null_count = X.isnull().sum()
 
                     for column_name in X.columns:
-                        if (attribute_dtype[column_name] == int and
+                        if attribute_dtype[column_name] == 'bool':
+                            X[column_name] = self._create_column_bool(
+                                X[column_name],
+                                missing_values=bool(X_null_count[column_name])
+                            )
+                        elif attribute_dtype[column_name] == 'categorical':
+                            X[column_name] = X[column_name].astype('category')
+                        elif (attribute_dtype[column_name] == 'integer' and
                                 pd.api.types.infer_dtype(
                                     X[column_name]) != 'integer'):
                             if X_null_count[column_name] > 0:
@@ -247,20 +243,10 @@ class OpenMLDataset(object):
                                 )
                             else:
                                 X[column_name] = X[column_name].astype(int)
-
-                        elif (attribute_dtype[column_name] == float and
+                        elif (attribute_dtype[column_name] == 'floating' and
                                 pd.api.types.infer_dtype(
                                     X[column_name]) != 'floating'):
                             X[column_name] = X[column_name].astype(float)
-
-                        elif attribute_dtype[column_name] == bool:
-                            X[column_name] = self._create_column_bool(
-                                X[column_name],
-                                missing_values=bool(X_null_count[column_name])
-                            )
-
-                        if categorical[column_name]:
-                            X[column_name] = X[column_name].astype('category')
                 else:
                     raise Exception()
 
@@ -384,6 +370,7 @@ class OpenMLDataset(object):
 
     @staticmethod
     def _create_column_int_with_NA(series):
+        """Convert to object an int series containing missing values."""
         col = [np.nan
                if x is None or np.isnan(x)
                else int(x) for x in series]
@@ -391,9 +378,12 @@ class OpenMLDataset(object):
 
     @staticmethod
     def _create_column_bool(series, missing_values=False):
+        """Convert from string True/False to boolean."""
         if missing_values:
             col = []
             for x in series:
+                # None is the marker used in liac-arff to mark missing values.
+                # It will not be changed by pandas when creating the dataframe.
                 if x is None:
                     col.append(np.nan)
                 else:
