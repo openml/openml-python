@@ -1,4 +1,4 @@
-from time import time
+from time import time, sleep
 from warnings import filterwarnings, catch_warnings
 
 import six
@@ -8,6 +8,10 @@ from scipy import sparse
 
 import openml
 from openml.testing import TestBase
+from openml.datasets.functions import _get_online_dataset_arff
+from openml.datasets.functions import attributes_arff_from_df
+from openml.datasets import get_dataset
+from openml.exceptions import OpenMLServerException
 
 
 class OpenMLDatasetTest(TestBase):
@@ -166,6 +170,24 @@ class OpenMLDatasetTest(TestBase):
                 'Test',
                 format='arff'
             )
+
+
+class OpenMLGetData(TestBase):
+    def setUp(self):
+        super(OpenMLGetData, self).setUp()
+
+    def test_get_data_xxx(self):
+        download_dataset = get_dataset(4659)
+        df = download_dataset.get_data(dataset_format='dataframe')
+        attributes_inferred = attributes_arff_from_df(df)
+        attributes_expected = [('rnd_str', 'STRING'),
+                               ('outlook', ['overcast', 'rainy', 'sunny']),
+                               ('temperature', 'REAL'),
+                               ('humidity', 'REAL'),
+                               ('windy', ['True', 'False']),
+                               ('play', ['no', 'yes']),
+                               ('integer', 'INTEGER')]
+        self.assertEqual(attributes_inferred, attributes_expected)
 
 
 class OpenMLDatasetTestOnTestServer(TestBase):

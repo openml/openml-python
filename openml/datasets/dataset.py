@@ -182,6 +182,7 @@ class OpenMLDataset(object):
                 }
                 attribute_dtype = {}
                 attribute_names = []
+                categories_names = {}
                 categorical = []
                 for name, type_ in data['attributes']:
                     # if the feature is nominal and the a sparse matrix is
@@ -206,6 +207,7 @@ class OpenMLDataset(object):
                     # infer the dtype from the ARFF header
                     if isinstance(type_, list):
                         categorical.append(True)
+                        categories_names[name] = type_
                         if set(['True', 'False']) == set(type_):
                             attribute_dtype[name] = 'boolean'
                         else:
@@ -227,20 +229,22 @@ class OpenMLDataset(object):
                     X_null_count = X.isnull().sum()
 
                     for column_name in X.columns:
-                        if attribute_dtype[column_name] == 'bool':
+                        if attribute_dtype[column_name] == 'boolean':
                             X[column_name] = self._create_column_bool(
                                 X[column_name],
-                                missing_values=bool(X_null_count[column_name])
+                                categories_names[column_name]
                             )
                         elif attribute_dtype[column_name] == 'categorical':
-                            X[column_name] = X[column_name].astype('category')
+                            X[column_name] = self._unpack_categories(
+                                X[column_name],
+                                categories_names[column_name]
+                            )
                         elif (attribute_dtype[column_name] == 'integer' and
                                 pd.api.types.infer_dtype(
                                     X[column_name]) != 'integer'):
                             if X_null_count[column_name] > 0:
-                                X[column_name] = self._create_column_int_with_NA(
-                                    X[column_name]
-                                )
+                                X[column_name] = \
+                                self._create_column_int_with_NA(X[column_name])
                             else:
                                 X[column_name] = X[column_name].astype(int)
                         elif (attribute_dtype[column_name] == 'floating' and
@@ -377,22 +381,26 @@ class OpenMLDataset(object):
         return pd.Series(col, index=series.index, dtype=object)
 
     @staticmethod
-    def _create_column_bool(series, missing_values=False):
-        """Convert from string True/False to boolean."""
-        if missing_values:
-            col = []
-            for x in series:
-                # None is the marker used in liac-arff to mark missing values.
-                # It will not be changed by pandas when creating the dataframe.
-                if x is None:
-                    col.append(np.nan)
-                else:
-                    col.append(True if x.lower() == 'true' else False)
-            col = pd.Series(col, index=series.index, dtype=object)
-        else:
-            col = [True if x.lower() == 'true' else False for x in series]
-            col = pd.Series(col, index=series.index, dtype=np.bool_)
-        return col
+    def _create_column_bool(series, categories):
+        col = []
+        for x in series:
+            try:
+                val = categories[int(x)]
+                val = True if val.lower() == 'true' else False
+                col.append(val)
+            except (TypeError, ValueError):
+                col.append(np.nan)
+        return pd.Series(col, index=series.index, dtype=object)
+
+    @staticmethod
+    def _unpack_categories(series, categories):
+        col = []
+        for x in series:
+            try:
+                col.append(categories[int(x)])
+            except (TypeError, ValueError):
+                col.append(np.nan)
+        return pd.Series(col, index=series.index, dtype='category')
 
     def get_data(self, target=None,
                  include_row_id=False,
