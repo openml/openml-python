@@ -423,19 +423,16 @@ class TestOpenMLDataset(TestBase):
                                       ('category', ['A', 'B']),
                                       ('boolean', ['True', 'False'])])
         # SparseDataFrame case
-        df = pd.DataFrame(
-            [[1, 1.0, 'xxx', 'A', True],
-             [2, 2.0, 'yyy', 'B', False],
-             [None, None, None, None]],
-            columns=['integer', 'floating', 'string', 'category', 'boolean']
-        ).to_sparse()
-        df['category'] = df['category'].astype('category')
+        df = pd.SparseDataFrame([[1, 1.0],
+                                 [2, 2.0],
+                                 [0, 0]],
+                                columns=['integer', 'floating'],
+                                default_fill_value=0
+        )
+        df['integer'] = df['integer'].astype(np.int64)
         attributes = attributes_arff_from_df(df)
         self.assertEqual(attributes, [('integer', 'INTEGER'),
-                                      ('floating', 'REAL'),
-                                      ('string', 'STRING'),
-                                      ('category', ['A', 'B']),
-                                      ('boolean', ['True', 'False'])])
+                                      ('floating', 'REAL')])
 
     def test_attributes_arff_from_df_mixed_dtype_categories(self):
         # liac-arff imposed categorical attributes to be of sting dtype. We
