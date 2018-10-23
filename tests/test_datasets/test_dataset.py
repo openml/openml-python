@@ -1,8 +1,10 @@
+from time import time
+from warnings import filterwarnings, catch_warnings
+
+import six
 import numpy as np
 import pandas as pd
 from scipy import sparse
-import six
-from time import time
 
 import openml
 from openml.testing import TestBase
@@ -150,6 +152,18 @@ class OpenMLDatasetTest(TestBase):
         for col_name in X.columns:
             self.assertTrue(X[col_name].dtype.name == col_dtype[col_name])
         self.assertTrue(y.dtype.name == col_dtype['survived'])
+
+    def test_dataset_format_constructor(self):
+
+        with catch_warnings():
+            filterwarnings('error')
+            self.assertRaises(
+                DeprecationWarning,
+                openml.OpenMLDataset,
+                'Test',
+                'Test',
+                format='arff'
+            )
 
 
 class OpenMLDatasetTestOnTestServer(TestBase):

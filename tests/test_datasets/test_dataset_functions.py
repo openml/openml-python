@@ -1,19 +1,21 @@
 import unittest
 import os
 import sys
-
+import random
 if sys.version_info[0] >= 3:
     from unittest import mock
 else:
     import mock
 
-import random
+import arff
 import six
 
-from oslo_concurrency import lockutils
-
+import pytest
 import numpy as np
+import pandas as pd
 import scipy.sparse
+from oslo_concurrency import lockutils
+from warnings import filterwarnings, catch_warnings
 
 import openml
 from openml import OpenMLDataset
@@ -21,16 +23,18 @@ from openml.exceptions import OpenMLCacheException, PyOpenMLError, \
     OpenMLHashException, PrivateDatasetError
 from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
-
 from openml.datasets.functions import (create_dataset,
+                                       attributes_arff_from_df,
                                        _get_cached_dataset,
                                        _get_cached_dataset_features,
                                        _get_cached_dataset_qualities,
                                        _get_cached_datasets,
-                                       _get_dataset_description,
                                        _get_dataset_arff,
+                                       _get_dataset_description,
                                        _get_dataset_features,
                                        _get_dataset_qualities,
+                                       _get_online_dataset_arff,
+                                       _get_online_dataset_format,
                                        DATASETS_CACHE_DIR_NAME)
 
 
@@ -57,6 +61,24 @@ class TestOpenMLDataset(TestBase):
                     os.remove(pickle_path)
                 except:
                     pass
+
+    def _get_empty_param_for_dataset(self):
+
+        return {
+            'name': None,
+            'description': None,
+            'creator': None,
+            'contributor': None,
+            'collection_date': None,
+            'language': None,
+            'licence': None,
+            'default_target_attribute': None,
+            'row_id_attribute': None,
+            'ignore_attribute': None,
+            'citation': None,
+            'attributes': None,
+            'data': None
+        }
 
     def test__list_cached_datasets(self):
         openml.config.cache_directory = self.static_cache_dir
@@ -289,7 +311,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_deletion_of_cache_dir(self):
         # Simple removal
-        did_cache_dir = openml.utils._create_cache_directory_for_id(
+        did_cache_dir = _create_cache_directory_for_id(
             DATASETS_CACHE_DIR_NAME, 1,
         )
         self.assertTrue(os.path.exists(did_cache_dir))
@@ -311,12 +333,19 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(len(os.listdir(datasets_cache_dir)), 0)
 
     def test_publish_dataset(self):
+
         openml.datasets.get_dataset(3)
         file_path = os.path.join(openml.config.get_cache_directory(),
                                  "datasets", "3", "dataset.arff")
         dataset = OpenMLDataset(
-            "anneal", "test", "ARFF",
-            version=1, licence="public", default_target_attribute="class", data_file=file_path)
+            "anneal",
+            "test",
+            data_format="arff",
+            version=1,
+            licence="public",
+            default_target_attribute="class",
+            data_file=file_path,
+        )
         dataset.publish()
         self.assertIsInstance(dataset.dataset_id, int)
 
@@ -329,27 +358,381 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(labels, ['C', 'H', 'G'])
 
     def test_upload_dataset_with_url(self):
+
+        dataset = OpenMLDataset(
+            "UploadTestWithURL",
+            "test",
+            data_format="arff",
+            version=1,
+            url="https://www.openml.org/data/download/61/dataset_61_iris.arff",
+        )
+        dataset.publish()
+        self.assertIsInstance(dataset.dataset_id, int)
+
+    def test_data_status(self):
         dataset = OpenMLDataset(
             "UploadTestWithURL", "test", "ARFF",
             version=1,
             url="https://www.openml.org/data/download/61/dataset_61_iris.arff")
         dataset.publish()
-        self.assertIsInstance(dataset.dataset_id, int)
+        did = dataset.dataset_id
+
+        # admin key for test server (only adminds can activate datasets.
+        # all users can deactivate their own datasets)
+        openml.config.apikey = 'd488d8afd93b32331cf6ea9d7003d4c3'
+
+        openml.datasets.status_update(did, 'active')
+        # need to use listing fn, as this is immune to cache
+        result = openml.datasets.list_datasets(data_id=did, status='all')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[did]['status'], 'active')
+        openml.datasets.status_update(did, 'deactivated')
+        # need to use listing fn, as this is immune to cache
+        result = openml.datasets.list_datasets(data_id=did, status='all')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[did]['status'], 'deactivated')
+        openml.datasets.status_update(did, 'active')
+        # need to use listing fn, as this is immune to cache
+        result = openml.datasets.list_datasets(data_id=did, status='all')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[did]['status'], 'active')
+        with self.assertRaises(ValueError):
+            openml.datasets.status_update(did, 'in_preparation')
+        # need to use listing fn, as this is immune to cache
+        result = openml.datasets.list_datasets(data_id=did, status='all')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[did]['status'], 'active')
+
+    def test_attributes_arff_from_df(self):
+        df = pd.DataFrame(
+            [[1, 1.0, 'xxx', 'A', True], [2, 2.0, 'yyy', 'B', False]],
+            columns=['integer', 'floating', 'string', 'category', 'boolean']
+        )
+        df['category'] = df['category'].astype('category')
+        attributes = attributes_arff_from_df(df)
+        self.assertEqual(attributes, [('integer', 'INTEGER'),
+                                      ('floating', 'REAL'),
+                                      ('string', 'STRING'),
+                                      ('category', ['A', 'B']),
+                                      ('boolean', ['True', 'False'])])
+
+    def test_attributes_arff_from_df_mixed_dtype_categories(self):
+        # liac-arff imposed categorical attributes to be of sting dtype. We
+        # raise an error if this is not the case.
+        df = pd.DataFrame([[1], ['2'], [3.]])
+        df[0] = df[0].astype('category')
+        err_msg = "The column '0' of the dataframe is of 'category' dtype."
+        with pytest.raises(ValueError, match=err_msg):
+            attributes_arff_from_df(df)
+
+    def test_attributes_arff_from_df_unknown_dtype(self):
+        # check that an error is raised when the dtype is not supported by
+        # liac-arff
+        data = [
+            [[1], ['2'], [3.]],
+            [pd.Timestamp('2012-05-01'), pd.Timestamp('2012-05-02')],
+        ]
+        dtype = [
+            'mixed-integer',
+            'datetime64'
+        ]
+        for arr, dt in zip(data, dtype):
+            df = pd.DataFrame(arr)
+            err_msg = ("The dtype '{}' of the column '0' is not currently "
+                       "supported by liac-arff".format(dt))
+            with pytest.raises(ValueError, match=err_msg):
+                attributes_arff_from_df(df)
 
     def test_create_dataset_numpy(self):
-        data = np.array([[1, 2, 3],
-                         [1.2, 2.5, 3.8],
-                         [2, 5, 8],
-                         [0, 1, 0]]).T
+
+        data = np.array(
+            [
+                [1, 2, 3],
+                [1.2, 2.5, 3.8],
+                [2, 5, 8],
+                [0, 1, 0]
+            ]
+        ).T
+
         attributes = [('col_{}'.format(i), 'REAL')
                       for i in range(data.shape[1])]
-        name = 'NumPy_testing_dataset'
-        description = 'Synthetic dataset created from a NumPy array'
+
+        dataset = create_dataset(
+            name='NumPy_testing_dataset',
+            description='Synthetic dataset created from a NumPy array',
+            creator='OpenML tester',
+            contributor=None,
+            collection_date='01-01-2018',
+            language='English',
+            licence='MIT',
+            default_target_attribute='col_{}'.format(data.shape[1] - 1),
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation='None',
+            attributes=attributes,
+            data=data,
+            version_label='test',
+            original_data_url='http://openml.github.io/openml-python',
+            paper_url='http://openml.github.io/openml-python'
+        )
+
+        upload_did = dataset.publish()
+
+        self.assertEqual(
+            _get_online_dataset_arff(upload_did),
+            dataset._dataset,
+            "Uploaded arff does not match original one"
+        )
+        self.assertEqual(
+            _get_online_dataset_format(upload_did),
+            'arff',
+            "Wrong format for dataset"
+        )
+
+    def test_create_dataset_list(self):
+
+        data = [
+            ['a', 'sunny', 85.0, 85.0, 'FALSE', 'no'],
+            ['b', 'sunny', 80.0, 90.0, 'TRUE', 'no'],
+            ['c', 'overcast', 83.0, 86.0, 'FALSE', 'yes'],
+            ['d', 'rainy', 70.0, 96.0, 'FALSE', 'yes'],
+            ['e', 'rainy', 68.0, 80.0, 'FALSE', 'yes'],
+            ['f', 'rainy', 65.0, 70.0, 'TRUE', 'no'],
+            ['g', 'overcast', 64.0, 65.0, 'TRUE', 'yes'],
+            ['h', 'sunny', 72.0, 95.0, 'FALSE', 'no'],
+            ['i', 'sunny', 69.0, 70.0, 'FALSE', 'yes'],
+            ['j', 'rainy', 75.0, 80.0, 'FALSE', 'yes'],
+            ['k', 'sunny', 75.0, 70.0, 'TRUE', 'yes'],
+            ['l', 'overcast', 72.0, 90.0, 'TRUE', 'yes'],
+            ['m', 'overcast', 81.0, 75.0, 'FALSE', 'yes'],
+            ['n', 'rainy', 71.0, 91.0, 'TRUE', 'no'],
+        ]
+
+        attributes = [
+            ('rnd_str', 'STRING'),
+            ('outlook', ['sunny', 'overcast', 'rainy']),
+            ('temperature', 'REAL'),
+            ('humidity', 'REAL'),
+            ('windy', ['TRUE', 'FALSE']),
+            ('play', ['yes', 'no']),
+        ]
+
+        dataset = create_dataset(
+            name="ModifiedWeather",
+            description=(
+                'Testing dataset upload when the data is a list of lists'
+            ),
+            creator='OpenML test',
+            contributor=None,
+            collection_date='21-09-2018',
+            language='English',
+            licence='MIT',
+            default_target_attribute='play',
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation='None',
+            attributes=attributes,
+            data=data,
+            version_label='test',
+            original_data_url='http://openml.github.io/openml-python',
+            paper_url='http://openml.github.io/openml-python'
+        )
+
+        upload_did = dataset.publish()
+        self.assertEqual(
+            _get_online_dataset_arff(upload_did),
+            dataset._dataset,
+            "Uploaded ARFF does not match original one"
+        )
+        self.assertEqual(
+            _get_online_dataset_format(upload_did),
+            'arff',
+            "Wrong format for dataset"
+        )
+
+    def test_create_dataset_sparse(self):
+
+        # test the scipy.sparse.coo_matrix
+        sparse_data = scipy.sparse.coo_matrix((
+            [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
+        ))
+
+        column_names = [
+            ('input1', 'REAL'),
+            ('input2', 'REAL'),
+            ('y', 'REAL'),
+        ]
+
+        xor_dataset = create_dataset(
+            name="XOR",
+            description='Dataset representing the XOR operation',
+            creator=None,
+            contributor=None,
+            collection_date=None,
+            language='English',
+            licence=None,
+            default_target_attribute='y',
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=None,
+            attributes=column_names,
+            data=sparse_data,
+            version_label='test',
+        )
+
+        upload_did = xor_dataset.publish()
+        self.assertEqual(
+            _get_online_dataset_arff(upload_did),
+            xor_dataset._dataset,
+            "Uploaded ARFF does not match original one"
+        )
+        self.assertEqual(
+            _get_online_dataset_format(upload_did),
+            'sparse_arff',
+            "Wrong format for dataset"
+        )
+
+        # test the list of dicts sparse representation
+        sparse_data = [
+            {0: 0.0},
+            {1: 1.0, 2: 1.0},
+            {0: 1.0, 2: 1.0},
+            {0: 1.0, 1: 1.0}
+        ]
+
+        xor_dataset = create_dataset(
+            name="XOR",
+            description='Dataset representing the XOR operation',
+            creator=None,
+            contributor=None,
+            collection_date=None,
+            language='English',
+            licence=None,
+            default_target_attribute='y',
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=None,
+            attributes=column_names,
+            data=sparse_data,
+            version_label='test',
+        )
+
+        upload_did = xor_dataset.publish()
+        self.assertEqual(
+            _get_online_dataset_arff(upload_did),
+            xor_dataset._dataset,
+            "Uploaded ARFF does not match original one"
+        )
+        self.assertEqual(
+            _get_online_dataset_format(upload_did),
+            'sparse_arff',
+            "Wrong format for dataset"
+        )
+
+    def test_create_invalid_dataset(self):
+
+        data = [
+            'sunny',
+            'overcast',
+            'overcast',
+            'rainy',
+            'rainy',
+            'rainy',
+            'overcast',
+            'sunny',
+            'sunny',
+            'rainy',
+            'sunny',
+            'overcast',
+            'overcast',
+            'rainy',
+        ]
+
+        param = self._get_empty_param_for_dataset()
+        param['data'] = data
+
+        self.assertRaises(
+            ValueError,
+            create_dataset,
+            **param
+        )
+
+        param['data'] = data[0]
+        self.assertRaises(
+            ValueError,
+            create_dataset,
+            **param
+        )
+
+    def test_create_dataset_warning(self):
+
+        parameters = self._get_empty_param_for_dataset()
+        parameters['format'] = 'arff'
+        with catch_warnings():
+            filterwarnings('error')
+            self.assertRaises(
+                DeprecationWarning,
+                create_dataset,
+                **parameters
+            )
+
+    def test_get_online_dataset_arff(self):
+
+        # Australian dataset
+        dataset_id = 100
+        dataset = openml.datasets.get_dataset(dataset_id)
+        decoder = arff.ArffDecoder()
+        # check if the arff from the dataset is
+        # the same as the arff from _get_arff function
+        d_format = (dataset.format).lower()
+
+        self.assertEqual(
+            dataset._get_arff(d_format),
+            decoder.decode(
+                _get_online_dataset_arff(dataset_id),
+                encode_nominal=True,
+                return_type=arff.DENSE
+                if d_format == 'arff' else arff.COO
+            ),
+            "ARFF files are not equal"
+        )
+
+    def test_get_online_dataset_format(self):
+
+        # Phoneme dataset
+        dataset_id = 77
+        dataset = openml.datasets.get_dataset(dataset_id)
+
+        self.assertEqual(
+            (dataset.format).lower(),
+            _get_online_dataset_format(dataset_id),
+            "The format of the ARFF files is different"
+        )
+
+    def test_create_dataset_pandas(self):
+        data = [
+            ['a', 'sunny', 85.0, 85.0, 'FALSE', 'no'],
+            ['b', 'sunny', 80.0, 90.0, 'TRUE', 'no'],
+            ['c', 'overcast', 83.0, 86.0, 'FALSE', 'yes'],
+            ['d', 'rainy', 70.0, 96.0, 'FALSE', 'yes'],
+            ['e', 'rainy', 68.0, 80.0, 'FALSE', 'yes']
+        ]
+        column_names = ['rnd_str', 'outlook', 'temperature', 'humidity',
+                        'windy', 'play']
+        df = pd.DataFrame(data, columns=column_names)
+        # enforce the type of each column
+        df['outlook'] = df['outlook'].astype('category')
+        df['windy'] = df['windy'].astype('bool')
+        df['play'] = df['play'].astype('category')
+        # meta-information
+        name = 'Pandas_testing_dataset'
+        description = 'Synthetic dataset created from a Pandas DataFrame'
         creator = 'OpenML tester'
         collection_date = '01-01-2018'
         language = 'English'
         licence = 'MIT'
-        default_target_attribute = 'col_{}'.format(data.shape[1] - 1)
+        default_target_attribute = 'play'
         citation = 'None'
         original_data_url = 'http://openml.github.io/openml-python'
         paper_url = 'http://openml.github.io/openml-python'
@@ -365,11 +748,90 @@ class TestOpenMLDataset(TestBase):
             row_id_attribute=None,
             ignore_attribute=None,
             citation=citation,
-            attributes=attributes,
-            data=data,
-            format='arff',
+            attributes='auto',
+            data=df,
+            format=None,
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url
         )
-        dataset.publish()
+        upload_did = dataset.publish()
+        self.assertEqual(
+            _get_online_dataset_arff(upload_did),
+            dataset._dataset,
+            "Uploaded ARFF does not match original one"
+        )
+
+        # Check that we can overwrite the attributes
+        data = [['a'], ['b'], ['c'], ['d'], ['e']]
+        column_names = ['rnd_str']
+        df = pd.DataFrame(data, columns=column_names)
+        df['rnd_str'] = df['rnd_str'].astype('category')
+        attributes = {'rnd_str': ['a', 'b', 'c', 'd', 'e', 'f', 'g']}
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=citation,
+            attributes=attributes,
+            data=df,
+            format=None,
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        upload_did = dataset.publish()
+        downloaded_data = _get_online_dataset_arff(upload_did)
+        self.assertEqual(
+            downloaded_data,
+            dataset._dataset,
+            "Uploaded ARFF does not match original one"
+        )
+        self.assertTrue(
+            '@ATTRIBUTE rnd_str {a, b, c, d, e, f, g}' in downloaded_data)
+
+    def test_create_dataset_attributes_auto_without_df(self):
+        # attributes cannot be inferred without passing a dataframe
+        data = np.array([[1, 2, 3],
+                         [1.2, 2.5, 3.8],
+                         [2, 5, 8],
+                         [0, 1, 0]]).T
+        attributes = 'auto'
+        name = 'NumPy_testing_dataset'
+        description = 'Synthetic dataset created from a NumPy array'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'col_{}'.format(data.shape[1] - 1)
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+        err_msg = "Automatically inferring the attributes required a pandas"
+        with pytest.raises(ValueError, match=err_msg):
+            openml.datasets.functions.create_dataset(
+                name=name,
+                description=description,
+                creator=creator,
+                contributor=None,
+                collection_date=collection_date,
+                language=language,
+                licence=licence,
+                default_target_attribute=default_target_attribute,
+                row_id_attribute=None,
+                ignore_attribute=None,
+                citation=citation,
+                attributes=attributes,
+                data=data,
+                format=None,
+                version_label='test',
+                original_data_url=original_data_url,
+                paper_url=paper_url
+            )
