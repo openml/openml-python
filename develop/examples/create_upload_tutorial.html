@@ -109,6 +109,7 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#dataset-is-a-list">Dataset is a list</a></li>
+<li><a class="reference internal" href="#dataset-is-a-pandas-dataframe">Dataset is a pandas DataFrame</a></li>
 <li><a class="reference internal" href="#dataset-is-a-sparse-matrix">Dataset is a sparse matrix</a></li>
 </ul>
 
@@ -124,6 +125,7 @@
 <span id="sphx-glr-examples-create-upload-tutorial-py"></span><h1>Dataset upload tutorial<a class="headerlink" href="#dataset-upload-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>A tutorial on how to create and upload a dataset to OpenML.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">sklearn.datasets</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">coo_matrix</span>
 
@@ -131,27 +133,27 @@
 <span class="kn">from</span> <span class="nn">openml.datasets.functions</span> <span class="kn">import</span> <span class="n">create_dataset</span>
 </pre></div>
 </div>
-<p>For this tutorial we will upload to the test server to not  pollute the live
+<p>For this tutorial we will upload to the test server to not pollute the live
 server with countless copies of the same dataset.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="s1">&#39;https://test.openml.org/api/v1/xml&#39;</span>
 </pre></div>
 </div>
-<p>Below we will cover the following cases of the
-dataset object:</p>
+<p>Below we will cover the following cases of the dataset object:</p>
 <ul class="simple">
 <li>A numpy array</li>
 <li>A list</li>
+<li>A pandas dataframe</li>
 <li>A sparse matrix</li>
 </ul>
 </div>
 <div class="section" id="dataset-is-a-numpy-array">
 <h1>Dataset is a numpy array<a class="headerlink" href="#dataset-is-a-numpy-array" title="Permalink to this headline">¶</a></h1>
-<p>A numpy array can contain lists in the case of dense data
-or it can contain OrderedDicts in the case of sparse data.</p>
+<p>A numpy array can contain lists in the case of dense data or it can contain
+OrderedDicts in the case of sparse data.</p>
 <div class="section" id="prepare-dataset">
 <h2>Prepare dataset<a class="headerlink" href="#prepare-dataset" title="Permalink to this headline">¶</a></h2>
-<p>Load an example dataset from scikit-learn which we
-will upload to OpenML.org via the API.</p>
+<p>Load an example dataset from scikit-learn which we will upload to OpenML.org
+via the API.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">diabetes</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">load_diabetes</span><span class="p">()</span>
 <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Diabetes(scikit-learn)&#39;</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">diabetes</span><span class="o">.</span><span class="n">data</span>
@@ -160,10 +162,10 @@ will upload to OpenML.org via the API.</p>
 <span class="n">description</span> <span class="o">=</span> <span class="n">diabetes</span><span class="o">.</span><span class="n">DESCR</span>
 </pre></div>
 </div>
-<p>OpenML does not distinguish between the attributes and
-targets on the data level and stores all data in a single matrix.</p>
-<p>The target feature is indicated as meta-data of the
-dataset (and tasks on that data).</p>
+<p>OpenML does not distinguish between the attributes and targets on the data
+level and stores all data in a single matrix.</p>
+<p>The target feature is indicated as meta-data of the dataset (and tasks on
+that data).</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">attribute_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">attribute_names</span><span class="p">)</span>
 <span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span>
@@ -183,8 +185,8 @@ dataset (and tasks on that data).</p>
 </div>
 <div class="section" id="create-the-dataset-object">
 <h2>Create the dataset object<a class="headerlink" href="#create-the-dataset-object" title="Permalink to this headline">¶</a></h2>
-<p>The definition of all fields can be found in the
-XSD files describing the expected format:</p>
+<p>The definition of all fields can be found in the XSD files describing the
+expected format:</p>
 <p><a class="reference external" href="https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd">https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd</a></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">diabetes_dataset</span> <span class="o">=</span> <span class="n">create_dataset</span><span class="p">(</span>
     <span class="c1"># The name of the dataset (needs to be unique).</span>
@@ -207,9 +209,11 @@ XSD files describing the expected format:</p>
     <span class="n">licence</span><span class="o">=</span><span class="s1">&#39;BSD (from scikit-learn)&#39;</span><span class="p">,</span>
     <span class="c1"># Name of the target. Can also have multiple values (comma-separated).</span>
     <span class="n">default_target_attribute</span><span class="o">=</span><span class="s1">&#39;class&#39;</span><span class="p">,</span>
-    <span class="c1"># The attribute that represents the row-id column, if present in the dataset.</span>
+    <span class="c1"># The attribute that represents the row-id column, if present in the</span>
+    <span class="c1"># dataset.</span>
     <span class="n">row_id_attribute</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-    <span class="c1"># Attributes that should be excluded in modelling, such as identifiers and indexes.</span>
+    <span class="c1"># Attributes that should be excluded in modelling, such as identifiers and</span>
+    <span class="c1"># indexes.</span>
     <span class="n">ignore_attribute</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
     <span class="c1"># How to cite the paper.</span>
     <span class="n">citation</span><span class="o">=</span><span class="n">citation</span><span class="p">,</span>
@@ -230,15 +234,15 @@ XSD files describing the expected format:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/3836
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/4241
 </pre></div>
 </div>
 </div>
 </div>
 <div class="section" id="dataset-is-a-list">
 <h1>Dataset is a list<a class="headerlink" href="#dataset-is-a-list" title="Permalink to this headline">¶</a></h1>
-<p>A list can contain lists in the case of dense data
-or it can contain OrderedDicts in the case of sparse data.</p>
+<p>A list can contain lists in the case of dense data or it can contain
+OrderedDicts in the case of sparse data.</p>
 <p>Weather dataset:
 <a class="reference external" href="http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html">http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html</a></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
@@ -306,7 +310,69 @@ or it can contain OrderedDicts in the case of sparse data.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/3837
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/4242
+</pre></div>
+</div>
+</div>
+<div class="section" id="dataset-is-a-pandas-dataframe">
+<h1>Dataset is a pandas DataFrame<a class="headerlink" href="#dataset-is-a-pandas-dataframe" title="Permalink to this headline">¶</a></h1>
+<p>It might happen that your dataset is made of heterogeneous data which can be
+usually stored as a Pandas DataFrame. DataFrame offers the adavantages to
+store the type of data for each column as well as the attribute names.
+Therefore, when providing a Pandas DataFrame, OpenML can infer those
+information without the need to specifically provide them when calling the
+function <code class="xref py py-func docutils literal notranslate"><span class="pre">create_dataset()</span></code>. In this regard, you only need to pass
+<code class="docutils literal notranslate"><span class="pre">'auto'</span></code> to the <code class="docutils literal notranslate"><span class="pre">attributes</span></code> parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">col_name</span> <span class="k">for</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">attribute_names</span><span class="p">])</span>
+<span class="c1"># enforce the categorical column to have a categorical dtype</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;outlook&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;outlook&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;windy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;windy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;bool&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;play&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;play&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 14 entries, 0 to 13
+Data columns (total 5 columns):
+outlook        14 non-null category
+temperature    14 non-null int64
+humidity       14 non-null int64
+windy          14 non-null bool
+play           14 non-null category
+dtypes: bool(1), category(2), int64(2)
+memory usage: 546.0 bytes
+None
+</pre></div>
+</div>
+<p>We enforce the column ‘outlook’, ‘winday’, and ‘play’ to be a categorical
+dtype while the column ‘rnd_str’ is kept as a string column. Then, we can
+call <code class="xref py py-func docutils literal notranslate"><span class="pre">create_dataset()</span></code> by passing the dataframe and fixing the parameter
+<code class="docutils literal notranslate"><span class="pre">attributes</span></code> to <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">weather_dataset</span> <span class="o">=</span> <span class="n">create_dataset</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Weather&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+    <span class="n">creator</span><span class="o">=</span><span class="s1">&#39;I. H. Witten, E. Frank, M. A. Hall, and ITPro&#39;</span><span class="p">,</span>
+    <span class="n">contributor</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">collection_date</span><span class="o">=</span><span class="s1">&#39;01-01-2011&#39;</span><span class="p">,</span>
+    <span class="n">language</span><span class="o">=</span><span class="s1">&#39;English&#39;</span><span class="p">,</span>
+    <span class="n">licence</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">default_target_attribute</span><span class="o">=</span><span class="s1">&#39;play&#39;</span><span class="p">,</span>
+    <span class="n">row_id_attribute</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">ignore_attribute</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">citation</span><span class="o">=</span><span class="n">citation</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+    <span class="n">version_label</span><span class="o">=</span><span class="s1">&#39;example&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">upload_did</span> <span class="o">=</span> <span class="n">weather_dataset</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;URL for dataset: </span><span class="si">%s</span><span class="s1">/data/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">upload_did</span><span class="p">))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/4243
 </pre></div>
 </div>
 </div>
@@ -346,10 +412,10 @@ or it can contain OrderedDicts in the case of sparse data.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/3838
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/4244
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  4.208 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  6.124 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-create-upload-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/cfed637ede9071636ff8da65fe73607a/create_upload_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">create_upload_tutorial.py</span></code></a></div>
