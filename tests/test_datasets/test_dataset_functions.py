@@ -803,6 +803,65 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(
             '@ATTRIBUTE rnd_str {a, b, c, d, e, f, g}' in downloaded_data)
 
+    def test_create_dataset_row_id_attribute_inference(self):
+        # meta-information
+        name = 'Pandas_testing_dataset'
+        description = 'Synthetic dataset created from a Pandas DataFrame'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'play'
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+        # Check that the index name is well inferred.
+        data = [['a'], ['b'], ['c'], ['d'], ['e']]
+        column_names = ['rnd_str']
+        df = pd.DataFrame(data, columns=column_names)
+        df.index.name = "index"
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            ignore_attribute=None,
+            citation=citation,
+            attributes='auto',
+            data=df,
+            row_id_attribute=None,
+            format=None,
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        self.assertEqual(dataset.row_id_attribute, df.index.name)
+        # Check that we don't overwrite the index name if provided
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            ignore_attribute=None,
+            citation=citation,
+            attributes='auto',
+            data=df,
+            row_id_attribute='index_column',
+            format=None,
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        self.assertEqual(dataset.row_id_attribute, 'index_column')
+
     def test_create_dataset_attributes_auto_without_df(self):
         # attributes cannot be inferred without passing a dataframe
         data = np.array([[1, 2, 3],
