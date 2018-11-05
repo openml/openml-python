@@ -2,7 +2,6 @@ from collections import OrderedDict
 import io
 import re
 import os
-import six
 
 from oslo_concurrency import lockutils
 import xmltodict
@@ -293,9 +292,12 @@ def get_task(task_id):
         try:
             task = _get_task_description(task_id)
             dataset = get_dataset(task.dataset_id)
-            class_labels = dataset.retrieve_class_labels(task.target_name)
-            task.class_labels = class_labels
-            task.download_split()
+            # Clustering tasks do not have class labels
+            # and do not offer download_split
+            if not isinstance(task, OpenMLClusteringTask):
+                task.class_labels = \
+                    dataset.retrieve_class_labels(task.target_name)
+                task.download_split()
         except Exception as e:
             openml.utils._remove_cache_dir_for_id(
                 TASKS_CACHE_DIR_NAME,
@@ -324,6 +326,7 @@ def _get_task_description(task_id):
             fh.write(task_xml)
         return _create_task_from_xml(task_xml)
 
+
 def _create_task_from_xml(xml):
     """Create a task given a xml string.
 
@@ -342,14 +345,14 @@ def _create_task_from_xml(xml):
     # Due to the unordered structure we obtain, we first have to extract
     # the possible keys of oml:input; dic["oml:input"] is a list of
     # OrderedDicts
+
     # Check if there is a list of inputs
     if isinstance(dic["oml:input"], list):
         for input_ in dic["oml:input"]:
             name = input_["@name"]
             inputs[name] = input_
-    # https://github.com/openml/openml-python/issues/538
-    # TODO Handle single input and no estimation procedure.
-    elif isinstance(dic["oml:input"], six.string_types):
+    # Single input case
+    elif isinstance(dic["oml:input"], dict):
         name = dic["oml:input"]["@name"]
         inputs[name] = dic["oml:input"]
 
@@ -358,14 +361,6 @@ def _create_task_from_xml(xml):
         evaluation_measures = inputs["evaluation_measures"][
             "oml:evaluation_measures"]["oml:evaluation_measure"]
 
-    # Convert some more parameters
-    for parameter in \
-            inputs["estimation_procedure"]["oml:estimation_procedure"][
-                "oml:parameter"]:
-        name = parameter["@name"]
-        text = parameter.get("#text", "")
-        estimation_parameters[name] = text
-
     task_type = dic["oml:task_type"]
     common_kwargs = {
         'task_id': dic["oml:task_id"],
@@ -373,9 +368,6 @@ def _create_task_from_xml(xml):
         'task_type_id': dic["oml:task_type_id"],
         'data_set_id': inputs["source_data"][
             "oml:data_set"]["oml:data_set_id"],
-        'estimation_procedure_type': inputs["estimation_procedure"][
-                "oml:estimation_procedure"]["oml:type"],
-        'estimation_parameters': estimation_parameters,
         'evaluation_measure': evaluation_measures,
     }
     if task_type in (
@@ -383,6 +375,18 @@ def _create_task_from_xml(xml):
         "Supervised Regression",
         "Learning Curve"
     ):
+        # Convert some more parameters
+        for parameter in \
+                inputs["estimation_procedure"]["oml:estimation_procedure"][
+                    "oml:parameter"]:
+            name = parameter["@name"]
+            text = parameter.get("#text", "")
+            estimation_parameters[name] = text
+
+        common_kwargs['estimation_procedure_type'] =  inputs[
+            "estimation_procedure"][
+            "oml:estimation_procedure"]["oml:type"],
+        common_kwargs['estimation_parameters'] =  estimation_parameters,
         common_kwargs['target_name'] = inputs[
                 "source_data"]["oml:data_set"]["oml:target_feature"]
         common_kwargs['data_splits_url'] = inputs["estimation_procedure"][
