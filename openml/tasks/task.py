@@ -5,6 +5,7 @@ from typing import Union
 import numpy as np
 import pandas as pd
 import scipy.sparse
+from collections import OrderedDict
 
 from .. import datasets
 from .split import OpenMLSplit
@@ -93,6 +94,42 @@ class OpenMLTask(object):
         """
         _tag_entity('task', self.task_id, tag, untag=True)
 
+    def _task_to_dict(self):
+
+        task_container = OrderedDict()
+        task_dict = OrderedDict([
+            ('@xmlns:oml', 'http://openml.org/openml')
+        ])
+        task_container['oml:task'] = task_dict
+        if self.task_id is not None:
+            task_dict['oml:task_id'] = self.task_id
+        task_dict['oml:task_type_id'] = self.task_type_id
+        task_dict['oml:task_type'] = self.task_type
+        # not a clustering task, so more than 1 input
+        first_input = OrderedDict([
+            ('@name', 'source_data'),
+            ('oml:data_set',
+             OrderedDict([
+                ('oml:data_set_id', self.dataset_id)
+             ]))
+        ])
+        if self.task_type_id == 5 and self.evaluation_measure is None:
+            task_dict['oml:input'] = first_input
+        else:
+            task_dict['oml:input'] = [first_input]
+
+        if self.evaluation_measure is not None:
+            task_dict['oml:target_feature'] = OrderedDict([
+                ('@name', 'evaluation_measures'),
+                ('oml:evaluation_measures',
+                 OrderedDict([
+                     ('oml:evaluation_measure', self.evaluation_measure)
+                 ])
+                 )
+            ])
+
+        return task_container
+
 
 class OpenMLSupervisedTask(OpenMLTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
@@ -137,6 +174,12 @@ class OpenMLSupervisedTask(OpenMLTask):
             dataset_format=dataset_format, target=self.target_name,
         )
         return X_and_y
+
+    def _task_to_dict(self):
+
+        task_container = super(OpenMLSupervisedTask, self)._task_to_dict()
+        source_data = task_container['oml:input'][0]
+        source_data['oml:data_set']['oml:target_feature'] = self.target_name
 
 
 class OpenMLClassificationTask(OpenMLSupervisedTask):
