@@ -180,6 +180,12 @@ class OpenMLSupervisedTask(OpenMLTask):
         task_container = super(OpenMLSupervisedTask, self)._task_to_dict()
         source_data = task_container['oml:input'][0]
         source_data['oml:data_set']['oml:target_feature'] = self.target_name
+        task_container['oml:input'].append(
+            OrderedDict([
+                ('@name', 'estimation_procedure'),
+                ('oml:estimation_procedure', self.estimation_procedure)
+            ])
+        )
 
 
 class OpenMLClassificationTask(OpenMLSupervisedTask):
@@ -203,6 +209,16 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
 
         if cost_matrix is not None:
             raise NotImplementedError("Costmatrix")
+
+    def _task_to_dict(self):
+
+        task_container = super(OpenMLClassificationTask, self)._task_to_dict()
+        task_container['oml:input'].append(
+            OrderedDict([
+                ('@name', 'cost_matrix'),
+                ('oml:cost_matrix', self.cost_matrix)
+            ])
+        )
 
 
 class OpenMLRegressionTask(OpenMLSupervisedTask):
@@ -232,6 +248,7 @@ class OpenMLClusteringTask(OpenMLTask):
             data_set_id=data_set_id,
             evaluation_measure=evaluation_measure,
         )
+        # TODO place number of cluster in the task dict
         self.number_of_clusters = number_of_clusters
 
     def get_X(
