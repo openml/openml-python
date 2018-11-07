@@ -596,22 +596,21 @@ class TestRun(TestBase):
 
         task = openml.tasks.get_task(task_id)
         # IMPORTANT! Do not sentinel this flow. is faster if we don't wait on openml server
-        clf = RandomizedSearchCV(RandomForestClassifier(random_state=42),
+        clf = RandomizedSearchCV(RandomForestClassifier(random_state=42,
+                                                        n_estimators=5),
                                  {"max_depth": [3, None],
                                   "max_features": [1, 2, 3, 4],
                                   "bootstrap": [True, False],
                                   "criterion": ["gini", "entropy"]},
-                                 num_iterations, random_state=42)
+                                 num_iterations, random_state=42, cv=3)
 
         # [SPEED] make unit test faster by exploiting run information from the past
         try:
             # in case the run did not exists yet
-            run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=True)
-            trace = openml.runs.functions._create_trace_from_arff(
-                run._generate_trace_arff_dict()
-            )
+            run = openml.runs.run_model_on_task(clf, task,
+                                                avoid_duplicate_runs=True)
             self.assertEqual(
-                len(trace.trace_iterations),
+                len(run.trace.trace_iterations),
                 num_iterations * num_folds,
             )
             run = run.publish()

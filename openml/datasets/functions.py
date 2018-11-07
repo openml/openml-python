@@ -1,20 +1,28 @@
-from collections import OrderedDict
 import hashlib
 import io
 import os
 import re
-import shutil
+
+import numpy as np
 import six
 import arff
+import pandas as pd
 
-from oslo_concurrency import lockutils
 import xmltodict
+from scipy.sparse import coo_matrix
+from oslo_concurrency import lockutils
+from collections import OrderedDict
+from warnings import warn
 
 import openml.utils
 import openml._api_calls
 from .dataset import OpenMLDataset
-from ..exceptions import OpenMLCacheException, OpenMLServerException, \
-    OpenMLHashException, PrivateDatasetError
+from ..exceptions import (
+    OpenMLCacheException,
+    OpenMLHashException,
+    OpenMLServerException,
+    PrivateDatasetError,
+)
 from ..utils import (
     _create_cache_directory,
     _remove_cache_dir_for_id,
@@ -353,11 +361,66 @@ def get_dataset(dataset_id):
     return dataset
 
 
-def create_dataset(name, description, creator, contributor, collection_date,
-                   language, licence, attributes, data, default_target_attribute,
-                   row_id_attribute, ignore_attribute, citation, format="arff",
-                   original_data_url=None, paper_url=None, update_comment=None,
-                   version_label=None):
+def attributes_arff_from_df(df):
+    """Create the attributes as specified by the ARFF format using a dataframe.
+
+    Parameters
+    ----------
+    df : DataFrame, shape (n_samples, n_features)
+        The dataframe containing the data set.
+
+    Returns
+    -------
+    attributes_arff : str
+        The data set attributes as required by the ARFF format.
+    """
+    PD_DTYPES_TO_ARFF_DTYPE = {
+        'integer': 'INTEGER',
+        'floating': 'REAL',
+        'string': 'STRING'
+    }
+    attributes_arff = []
+    for column_name in df:
+        # skipna=True does not infer properly the dtype. The NA values are
+        # dropped before the inference instead.
+        column_dtype = pd.api.types.infer_dtype(df[column_name].dropna())
+
+        if column_dtype == 'categorical':
+            # for categorical feature, arff expects a list string. However, a
+            # categorical column can contain mixed type and we should therefore
+            # raise an error asking to convert all entries to string.
+            categories = df[column_name].cat.categories
+            categories_dtype = pd.api.types.infer_dtype(categories)
+            if categories_dtype not in ('string', 'unicode'):
+                raise ValueError("The column '{}' of the dataframe is of "
+                                 "'category' dtype. Therefore, all values in "
+                                 "this columns should be string. Please "
+                                 "convert the entries which are not string. "
+                                 "Got {} dtype in this column."
+                                 .format(column_name, categories_dtype))
+            attributes_arff.append((column_name, categories.tolist()))
+        elif column_dtype == 'boolean':
+            # boolean are encoded as categorical.
+            attributes_arff.append((column_name, ['True', 'False']))
+        elif column_dtype in PD_DTYPES_TO_ARFF_DTYPE.keys():
+            attributes_arff.append((column_name,
+                                    PD_DTYPES_TO_ARFF_DTYPE[column_dtype]))
+        else:
+            raise ValueError("The dtype '{}' of the column '{}' is not "
+                             "currently supported by liac-arff. Supported "
+                             "dtypes are categorical, string, integer, "
+                             "floating, and boolean."
+                             .format(column_dtype, column_name))
+    return attributes_arff
+
+
+def create_dataset(name, description, creator, contributor,
+                   collection_date, language,
+                   licence, attributes, data,
+                   default_target_attribute, row_id_attribute,
+                   ignore_attribute, citation, format=None,
+                   original_data_url=None, paper_url=None,
+                   update_comment=None, version_label=None):
     """Create a dataset.
 
     This function creates an OpenMLDataset object.
@@ -370,6 +433,11 @@ def create_dataset(name, description, creator, contributor, collection_date,
         Name of the dataset.
     description : str
         Description of the dataset.
+    format : str, optional
+        Format of the dataset which can be either 'arff' or 'sparse_arff'.
+        By default, the format is automatically inferred.
+        .. deprecated: 0.8
+            ``format`` is deprecated in 0.8 and will be removed in 0.10.
     creator : str
         The person who created the dataset.
     contributor : str
@@ -381,11 +449,16 @@ def create_dataset(name, description, creator, contributor, collection_date,
         Starts with 1 upper case letter, rest lower case, e.g. 'English'.
     licence : str
         License of the data.
-    attributes : list
+    attributes : list, dict, or 'auto'
         A list of tuples. Each tuple consists of the attribute name and type.
-    data : numpy.ndarray
-        An array that contains both the attributes and the targets, with
-        shape=(n_samples, n_features).
+        If passing a pandas DataFrame, the attributes can be automatically
+        inferred by passing ``'auto'``. Specific attributes can be manually
+        specified by a passing a dictionary where the key is the name of the
+        attribute and the value is the data type of the attribute.
+    data : ndarray, list, dataframe, coo_matrix, shape (n_samples, n_features)
+        An array that contains both the attributes and the targets. When
+        providing a dataframe, the attribute names and type can be inferred by
+        passing ``attributes='auto'``.
         The target feature is indicated as meta-data of the dataset.
     default_target_attribute : str
         The default target attribute, if it exists.
@@ -396,8 +469,6 @@ def create_dataset(name, description, creator, contributor, collection_date,
         Attributes that should be excluded in modelling, such as identifiers and indexes.
     citation : str
         Reference(s) that should be cited when building on this data.
-    format : str, optional
-        Format of the dataset. Only 'arff' for now.
     version_label : str, optional
         Version label provided by user, can be a date, hash, or some other type of id.
     original_data_url : str, optional
@@ -411,29 +482,123 @@ def create_dataset(name, description, creator, contributor, collection_date,
     -------
     class:`openml.OpenMLDataset`
         Dataset description."""
+
+    if attributes == 'auto' or isinstance(attributes, dict):
+        if not hasattr(data, "columns"):
+            raise ValueError("Automatically inferring the attributes required "
+                             "a pandas DataFrame. A {!r} was given instead."
+                             .format(data))
+        # infer the type of data for each column of the DataFrame
+        attributes_ = attributes_arff_from_df(data)
+        if isinstance(attributes, dict):
+            # override the attributes which was specified by the user
+            for attr_idx in range(len(attributes_)):
+                attr_name = attributes_[attr_idx][0]
+                if attr_name in attributes.keys():
+                    attributes_[attr_idx] = (attr_name, attributes[attr_name])
+    else:
+        attributes_ = attributes
+
+    data = data.values if hasattr(data, "columns") else data
+
+    if format is not None:
+        warn("The format parameter will be deprecated in the future,"
+             " the method will determine the format of the ARFF "
+             "based on the given data.", DeprecationWarning)
+        d_format = format
+
+    # Determine ARFF format from the dataset
+    else:
+        if isinstance(data, (list, np.ndarray)):
+            if isinstance(data[0], (list, np.ndarray)):
+                d_format = 'arff'
+            elif isinstance(data[0], dict):
+                d_format = 'sparse_arff'
+            else:
+                raise ValueError(
+                    'When giving a list or a numpy.ndarray, '
+                    'they should contain a list/ numpy.ndarray '
+                    'for dense data or a dictionary for sparse '
+                    'data. Got {!r} instead.'
+                    .format(data[0])
+                )
+        elif isinstance(data, coo_matrix):
+            d_format = 'sparse_arff'
+        else:
+            raise ValueError(
+                'Invalid data type. The data type can be a list, '
+                'a numpy ndarray or a scipy.sparse.coo_matrix'
+            )
+
     arff_object = {
         'relation': name,
         'description': description,
-        'attributes': attributes,
+        'attributes': attributes_,
         'data': data
     }
 
-    # serializes the arff dataset object and returns a string
+    # serializes the ARFF dataset object and returns a string
     arff_dataset = arff.dumps(arff_object)
     try:
-        # check if arff is valid
+        # check if ARFF is valid
         decoder = arff.ArffDecoder()
-        decoder.decode(arff_dataset, encode_nominal=True)
+        decoder.decode(
+            arff_dataset,
+            encode_nominal=True,
+            return_type=arff.COO if d_format == 'sparse_arff' else arff.DENSE
+        )
     except arff.ArffException:
         raise ValueError("The arguments you have provided \
-                             do not construct a valid arff file")
+                             do not construct a valid ARFF file")
 
-    return OpenMLDataset(name, description, format, creator=creator,
-                         contributor=contributor, collection_date=collection_date,
-                         language=language, licence=licence, default_target_attribute=default_target_attribute,
-                         row_id_attribute=row_id_attribute, ignore_attribute=ignore_attribute, citation=citation,
-                         version_label=version_label, original_data_url=original_data_url, paper_url=paper_url,
-                         update_comment=update_comment, dataset=arff_dataset)
+    return OpenMLDataset(
+        name,
+        description,
+        data_format=d_format,
+        creator=creator,
+        contributor=contributor,
+        collection_date=collection_date,
+        language=language,
+        licence=licence,
+        default_target_attribute=default_target_attribute,
+        row_id_attribute=row_id_attribute,
+        ignore_attribute=ignore_attribute,
+        citation=citation,
+        version_label=version_label,
+        original_data_url=original_data_url,
+        paper_url=paper_url,
+        update_comment=update_comment,
+        dataset=arff_dataset,
+    )
+
+
+def status_update(data_id, status):
+    """
+    Updates the status of a dataset to either 'active' or 'deactivated'. Please
+    see the OpenML API documentation for a description of the status and all
+    legal status transitions:
+    https://docs.openml.org/#dataset-status
+
+    Parameters
+    ----------
+    data_id : int
+        The data id of the dataset
+    status : str,
+        'active' or 'deactivated'
+    """
+    legal_status = {'active', 'deactivated'}
+    if status not in legal_status:
+        raise ValueError('Illegal status value. '
+                         'Legal values: %s' % legal_status)
+    data = {'data_id': data_id, 'status': status}
+    result_xml = openml._api_calls._perform_api_call("data/status/update",
+                                                     data=data)
+    result = xmltodict.parse(result_xml)
+    server_data_id = result['oml:data_status_update']['oml:id']
+    server_status = result['oml:data_status_update']['oml:status']
+    if status != server_status or int(data_id) != int(server_data_id):
+        # This should never happen
+        raise ValueError('Data id/status does not collide')
 
 
 def _get_dataset_description(did_cache_dir, dataset_id):
@@ -476,7 +641,7 @@ def _get_dataset_description(did_cache_dir, dataset_id):
 
 
 def _get_dataset_arff(did_cache_dir, description):
-    """Get the filepath to the dataset arff
+    """Get the filepath to the dataset ARFF
 
     Checks if the file is in the cache, if yes, return the path to the file. If
     not, downloads the file and caches it, then returns the file path.
@@ -494,7 +659,7 @@ def _get_dataset_arff(did_cache_dir, description):
     Returns
     -------
     output_filename : string
-        Location of arff file.
+        Location of ARFF file.
     """
     output_file_path = os.path.join(did_cache_dir, "dataset.arff")
     md5_checksum_fixture = description.get("oml:md5_checksum")
@@ -609,40 +774,86 @@ def _create_dataset_from_description(description, features, qualities, arff_file
     Parameters
     ----------
     description : dict
-        Description of a dataset in xmlish dict.
+        Description of a dataset in xml dict.
     arff_file : string
-        Path of dataset arff file.
+        Path of dataset ARFF file.
 
     Returns
     -------
     dataset : dataset object
-        Dataset object from dict and arff.
+        Dataset object from dict and ARFF.
     """
     dataset = OpenMLDataset(
         description["oml:name"],
         description.get("oml:description"),
-        description["oml:format"],
-        description["oml:id"],
-        description["oml:version"],
-        description.get("oml:creator"),
-        description.get("oml:contributor"),
-        description.get("oml:collection_date"),
-        description.get("oml:upload_date"),
-        description.get("oml:language"),
-        description.get("oml:licence"),
-        description["oml:url"],
-        description.get("oml:default_target_attribute"),
-        description.get("oml:row_id_attribute"),
-        description.get("oml:ignore_attribute"),
-        description.get("oml:version_label"),
-        description.get("oml:citation"),
-        description.get("oml:tag"),
-        description.get("oml:visibility"),
-        description.get("oml:original_data_url"),
-        description.get("oml:paper_url"),
-        description.get("oml:update_comment"),
-        description.get("oml:md5_checksum"),
+        data_format=description["oml:format"],
+        dataset_id=description["oml:id"],
+        version=description["oml:version"],
+        creator=description.get("oml:creator"),
+        contributor=description.get("oml:contributor"),
+        collection_date=description.get("oml:collection_date"),
+        upload_date=description.get("oml:upload_date"),
+        language=description.get("oml:language"),
+        licence=description.get("oml:licence"),
+        url=description["oml:url"],
+        default_target_attribute=description.get(
+            "oml:default_target_attribute"
+        ),
+        row_id_attribute=description.get("oml:row_id_attribute"),
+        ignore_attribute=description.get("oml:ignore_attribute"),
+        version_label=description.get("oml:version_label"),
+        citation=description.get("oml:citation"),
+        tag=description.get("oml:tag"),
+        visibility=description.get("oml:visibility"),
+        original_data_url=description.get("oml:original_data_url"),
+        paper_url=description.get("oml:paper_url"),
+        update_comment=description.get("oml:update_comment"),
+        md5_checksum=description.get("oml:md5_checksum"),
         data_file=arff_file,
         features=features,
-        qualities=qualities)
+        qualities=qualities,
+    )
     return dataset
+
+
+def _get_online_dataset_arff(dataset_id):
+    """Download the ARFF file for a given dataset id
+    from the OpenML website.
+
+    Parameters
+    ----------
+    dataset_id : int
+        A dataset id.
+
+    Returns
+    -------
+    str
+        A string representation of an ARFF file.
+    """
+    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id)
+    # build a dict from the xml.
+    # use the url from the dataset description and return the ARFF string
+    return openml._api_calls._read_url(
+        xmltodict.parse(dataset_xml)['oml:data_set_description']['oml:url']
+    )
+
+
+def _get_online_dataset_format(dataset_id):
+    """Get the dataset format for a given dataset id
+    from the OpenML website.
+
+    Parameters
+    ----------
+    dataset_id : int
+        A dataset id.
+
+    Returns
+    -------
+    str
+        Dataset format.
+    """
+    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id)
+    # build a dict from the xml and get the format from the dataset description
+    return xmltodict\
+        .parse(dataset_xml)['oml:data_set_description']['oml:format']\
+        .lower()

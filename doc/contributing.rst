@@ -30,7 +30,7 @@ in python, `scikit-learn <http://scikit-learn.org/stable/index.html>`_.
 Thereby it will automatically be compatible with many machine learning
 libraries written in Python.
 
-We aim to keep the package as leight-weight as possible and we will try to
+We aim to keep the package as light-weight as possible and we will try to
 keep the number of potential installation dependencies as low as possible.
 Therefore, the connection to other machine learning libraries such as
 *pytorch*, *keras* or *tensorflow* should not be done directly inside this
@@ -43,7 +43,7 @@ Open issues and potential todos
 
 We collect open issues and feature requests in an `issue tracker on github <https://github.com/openml/openml-python/issues>`_.
 The issue tracker contains issues marked as *Good first issue*, which shows
-issues which are good for beginers. We also maintain a somewhat up-to-date
+issues which are good for beginners. We also maintain a somewhat up-to-date
 `roadmap <https://github.com/openml/openml-python/issues/410>`_ which
 contains longer-term goals.
 
