@@ -488,6 +488,15 @@ def create_dataset(name, description, creator, contributor,
     class:`openml.OpenMLDataset`
         Dataset description."""
 
+    if hasattr(data, "index"):
+        # infer the row id from the index of the dataset
+        if row_id_attribute is None:
+            row_id_attribute = data.index.name
+        # When calling data.values, the index will be skipped. We need to reset
+        # the index such that it is part of the data.
+        if data.index.name is not None:
+            data = data.reset_index()
+
     if attributes == 'auto' or isinstance(attributes, dict):
         if not hasattr(data, "columns"):
             raise ValueError("Automatically inferring the attributes required "
@@ -504,8 +513,13 @@ def create_dataset(name, description, creator, contributor,
     else:
         attributes_ = attributes
 
-    if row_id_attribute is None and hasattr(data, "index"):
-        row_id_attribute = data.index.name
+    is_row_id_an_attribute = any([attr[0] == row_id_attribute
+                                  for attr in attributes_])
+    if row_id_attribute is not None and not is_row_id_an_attribute:
+        raise ValueError("'row_id_attribute' should be one of the data "
+                         "attribute. Got '{}' while candidates are {}."
+                         .format(row_id_attribute,
+                                 [attr[0] for attr in attributes_]))
 
     data = data.values if hasattr(data, "columns") else data
 
