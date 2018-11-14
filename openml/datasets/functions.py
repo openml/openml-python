@@ -468,7 +468,9 @@ def create_dataset(name, description, creator, contributor,
     row_id_attribute : str, optional
         The attribute that represents the row-id column, if present in the
         dataset. If ``data`` is a dataframe and ``row_id_attribute`` is not
-        specified, it will be inferred.
+        specified, the index of the dataframe will be used as the
+        ``row_id_attribute``. If the name of the index is ``None``, it will
+        be discarded.
         .. versionadded: 0.8
            Inference of ``row_id_attribute`` from a dataframe.
     format : str, optional
