@@ -828,24 +828,24 @@ class TestOpenMLDataset(TestBase):
         err_msg = ("should be one of the data attribute.")
         with pytest.raises(ValueError, match=err_msg):
             openml.datasets.functions.create_dataset(
-                    name=name,
-                    description=description,
-                    creator=creator,
-                    contributor=None,
-                    collection_date=collection_date,
-                    language=language,
-                    licence=licence,
-                    default_target_attribute=default_target_attribute,
-                    ignore_attribute=None,
-                    citation=citation,
-                    attributes='auto',
-                    data=df,
-                    row_id_attribute='unknown_row_id',
-                    format=None,
-                    version_label='test',
-                    original_data_url=original_data_url,
-                    paper_url=paper_url
-                )
+                name=name,
+                description=description,
+                creator=creator,
+                contributor=None,
+                collection_date=collection_date,
+                language=language,
+                licence=licence,
+                default_target_attribute=default_target_attribute,
+                ignore_attribute=None,
+                citation=citation,
+                attributes='auto',
+                data=df,
+                row_id_attribute='unknown_row_id',
+                format=None,
+                version_label='test',
+                original_data_url=original_data_url,
+                paper_url=paper_url
+            )
 
     def test_create_dataset_row_id_attribute_inference(self):
         # meta-information
