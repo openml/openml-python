@@ -18,7 +18,6 @@ class OpenMLTask(object):
         self.estimation_procedure = dict()
         self.estimation_procedure["type"] = estimation_procedure_type
         self.estimation_procedure["parameters"] = estimation_parameters
-        #
         self.estimation_parameters = estimation_parameters
         self.evaluation_measure = evaluation_measure
 
@@ -144,11 +143,8 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
             target_name=target_name,
             data_splits_url=data_splits_url,
         )
-        self.target_name = target_name
         self.class_labels = class_labels
         self.cost_matrix = cost_matrix
-        self.estimation_procedure["data_splits_url"] = data_splits_url
-        self.split = None
 
         if cost_matrix is not None:
             raise NotImplementedError("Costmatrix")
@@ -187,7 +183,7 @@ class OpenMLClusteringTask(OpenMLTask):
         self.number_of_clusters = number_of_clusters
 
 
-class OpenMLLearningCurveTask(OpenMLSupervisedTask):
+class OpenMLLearningCurveTask(OpenMLClassificationTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
                  estimation_procedure_type, estimation_parameters,
                  evaluation_measure, target_name, data_splits_url,
@@ -202,12 +198,6 @@ class OpenMLLearningCurveTask(OpenMLSupervisedTask):
             evaluation_measure=evaluation_measure,
             target_name=target_name,
             data_splits_url=data_splits_url,
+            class_labels=class_labels,
+            cost_matrix=cost_matrix
         )
-        self.target_name = target_name
-        self.class_labels = class_labels
-        self.cost_matrix = cost_matrix
-        self.estimation_procedure["data_splits_url"] = data_splits_url
-        self.split = None
-
-        if cost_matrix is not None:
-            raise NotImplementedError("Costmatrix")
