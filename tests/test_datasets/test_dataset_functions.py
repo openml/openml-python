@@ -852,8 +852,12 @@ class TestOpenMLDataset(TestBase):
             )
             self.assertEqual(dataset.row_id_attribute, output_row_id)
             upload_did = dataset.publish()
-            xx = _get_online_dataset_arff(upload_did)
-            print(xx)
+            arff_dataset = arff.loads(_get_online_dataset_arff(upload_did))
+            arff_data = np.array(arff_dataset['data'], dtype=object)
+            # if we set the name of the index then the index will be added to
+            # the data
+            expected_shape = (5, 3) if index_name is None else (5, 4)
+            self.assertEqual(arff_data.shape, expected_shape)
 
     def test_create_dataset_attributes_auto_without_df(self):
         # attributes cannot be inferred without passing a dataframe
