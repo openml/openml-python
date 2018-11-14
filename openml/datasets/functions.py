@@ -515,12 +515,13 @@ def create_dataset(name, description, creator, contributor,
 
     if row_id_attribute is not None:
         is_row_id_an_attribute = any([attr[0] == row_id_attribute
-                                  for attr in attributes_])
+                                      for attr in attributes_])
         if not is_row_id_an_attribute:
-            raise ValueError("'row_id_attribute' should be one of the data "
-                            "attribute. Got '{}' while candidates are {}."
-                            .format(row_id_attribute,
-                                    [attr[0] for attr in attributes_]))
+            raise ValueError(
+                "'row_id_attribute' should be one of the data attribute. "
+                " Got '{}' while candidates are {}."
+                .format(row_id_attribute, [attr[0] for attr in attributes_])
+            )
 
     data = data.values if hasattr(data, "columns") else data
 
