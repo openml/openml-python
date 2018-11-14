@@ -671,18 +671,6 @@ class TestOpenMLDataset(TestBase):
             **param
         )
 
-    def test_create_dataset_warning(self):
-
-        parameters = self._get_empty_param_for_dataset()
-        parameters['format'] = 'arff'
-        with catch_warnings():
-            filterwarnings('error')
-            self.assertRaises(
-                DeprecationWarning,
-                create_dataset,
-                **parameters
-            )
-
     def test_get_online_dataset_arff(self):
 
         # Australian dataset
@@ -756,7 +744,6 @@ class TestOpenMLDataset(TestBase):
             citation=citation,
             attributes='auto',
             data=df,
-            format=None,
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url
@@ -788,7 +775,6 @@ class TestOpenMLDataset(TestBase):
             citation=citation,
             attributes=attributes,
             data=df,
-            format=None,
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url
@@ -836,7 +822,6 @@ class TestOpenMLDataset(TestBase):
                 citation=citation,
                 attributes=attributes,
                 data=data,
-                format=None,
                 version_label='test',
                 original_data_url=original_data_url,
                 paper_url=paper_url
