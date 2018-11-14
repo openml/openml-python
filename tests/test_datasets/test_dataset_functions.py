@@ -804,6 +804,49 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(
             '@ATTRIBUTE rnd_str {a, b, c, d, e, f, g}' in downloaded_data)
 
+    def test_create_dataset_row_id_attribute_error(self):
+        # meta-information
+        name = 'Pandas_testing_dataset'
+        description = 'Synthetic dataset created from a Pandas DataFrame'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'target'
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+        # Check that the index name is well inferred.
+        data = [['a', 1, 0],
+                ['b', 2, 1],
+                ['c', 3, 0],
+                ['d', 4, 1],
+                ['e', 5, 0]]
+        column_names = ['rnd_str', 'integer', 'target']
+        df = pd.DataFrame(data, columns=column_names)
+        # affecting row_id_attribute to an unknown column should raise an error
+        err_msg = ("should be one of the data attribute.")
+        with pytest.raises(ValueError, match=err_msg):
+            openml.datasets.functions.create_dataset(
+                    name=name,
+                    description=description,
+                    creator=creator,
+                    contributor=None,
+                    collection_date=collection_date,
+                    language=language,
+                    licence=licence,
+                    default_target_attribute=default_target_attribute,
+                    ignore_attribute=None,
+                    citation=citation,
+                    attributes='auto',
+                    data=df,
+                    row_id_attribute='unknown_row_id',
+                    format=None,
+                    version_label='test',
+                    original_data_url=original_data_url,
+                    paper_url=paper_url
+                )
+
     def test_create_dataset_row_id_attribute_inference(self):
         # meta-information
         name = 'Pandas_testing_dataset'
