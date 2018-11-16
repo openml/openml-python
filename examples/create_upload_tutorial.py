@@ -245,7 +245,7 @@ print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 sparse_data = coo_matrix((
     [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
     ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
-    ))
+))
 
 column_names = [
     ('input1', 'REAL'),
@@ -281,8 +281,8 @@ print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 # ====================================
 
 sparse_data = coo_matrix((
-            [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-            ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
+    [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+    ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
 ))
 column_names = ['input1', 'input2', 'y']
 df = pd.SparseDataFrame(sparse_data, columns=column_names)
