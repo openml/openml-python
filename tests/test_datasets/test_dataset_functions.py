@@ -411,6 +411,7 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(result[did]['status'], 'active')
 
     def test_attributes_arff_from_df(self):
+        # DataFrame case
         df = pd.DataFrame(
             [[1, 1.0, 'xxx', 'A', True], [2, 2.0, 'yyy', 'B', False]],
             columns=['integer', 'floating', 'string', 'category', 'boolean']
@@ -422,6 +423,16 @@ class TestOpenMLDataset(TestBase):
                                       ('string', 'STRING'),
                                       ('category', ['A', 'B']),
                                       ('boolean', ['True', 'False'])])
+        # SparseDataFrame case
+        df = pd.SparseDataFrame([[1, 1.0],
+                                 [2, 2.0],
+                                 [0, 0]],
+                                columns=['integer', 'floating'],
+                                default_fill_value=0)
+        df['integer'] = df['integer'].astype(np.int64)
+        attributes = attributes_arff_from_df(df)
+        self.assertEqual(attributes, [('integer', 'INTEGER'),
+                                      ('floating', 'REAL')])
 
     def test_attributes_arff_from_df_mixed_dtype_categories(self):
         # liac-arff imposed categorical attributes to be of sting dtype. We
@@ -767,6 +778,46 @@ class TestOpenMLDataset(TestBase):
             _get_online_dataset_arff(upload_did),
             dataset._dataset,
             "Uploaded ARFF does not match original one"
+        )
+
+        # Check that SparseDataFrame are supported properly
+        sparse_data = scipy.sparse.coo_matrix((
+            [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
+        ))
+        column_names = ['input1', 'input2', 'y']
+        df = pd.SparseDataFrame(sparse_data, columns=column_names)
+        # meta-information
+        description = 'Synthetic dataset created from a Pandas SparseDataFrame'
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=citation,
+            attributes='auto',
+            data=df,
+            format=None,
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        upload_did = dataset.publish()
+        self.assertEqual(
+            _get_online_dataset_arff(upload_did),
+            dataset._dataset,
+            "Uploaded ARFF does not match original one"
+        )
+        self.assertEqual(
+            _get_online_dataset_format(upload_did),
+            'sparse_arff',
+            "Wrong format for dataset"
         )
 
         # Check that we can overwrite the attributes

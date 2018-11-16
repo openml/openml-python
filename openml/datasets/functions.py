@@ -502,8 +502,8 @@ def create_dataset(name, description, creator, contributor,
     if attributes == 'auto' or isinstance(attributes, dict):
         if not hasattr(data, "columns"):
             raise ValueError("Automatically inferring the attributes required "
-                             "a pandas DataFrame. A {!r} was given instead."
-                             .format(data))
+                             "a pandas DataFrame or SparseDataFrame. "
+                             "A {!r} was given instead.".format(data))
         # infer the type of data for each column of the DataFrame
         attributes_ = attributes_arff_from_df(data)
         if isinstance(attributes, dict):
@@ -525,7 +525,16 @@ def create_dataset(name, description, creator, contributor,
                 .format(row_id_attribute, [attr[0] for attr in attributes_])
             )
 
-    data = data.values if hasattr(data, "columns") else data
+    if hasattr(data, "columns"):
+        if isinstance(data, pd.SparseDataFrame):
+            data = data.to_coo()
+            # liac-arff only support COO matrices with sorted rows
+            row_idx_sorted = np.argsort(data.row)
+            data.row = data.row[row_idx_sorted]
+            data.col = data.col[row_idx_sorted]
+            data.data = data.data[row_idx_sorted]
+        else:
+            data = data.values
 
     if format is not None:
         warn("The format parameter will be deprecated in the future,"

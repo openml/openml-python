@@ -24,6 +24,7 @@ openml.config.server = 'https://test.openml.org/api/v1/xml'
 # * A list
 # * A pandas dataframe
 # * A sparse matrix
+# * A pandas sparse dataframe
 
 ############################################################################
 # Dataset is a numpy array
@@ -243,7 +244,7 @@ print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 
 sparse_data = coo_matrix((
     [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-    ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1]),
+    ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
 ))
 
 column_names = [
@@ -266,6 +267,41 @@ xor_dataset = create_dataset(
     citation=None,
     attributes=column_names,
     data=sparse_data,
+    version_label='example',
+)
+
+############################################################################
+
+upload_did = xor_dataset.publish()
+print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+
+
+############################################################################
+# Dataset is a pandas sparse dataframe
+# ====================================
+
+sparse_data = coo_matrix((
+    [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+    ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
+))
+column_names = ['input1', 'input2', 'y']
+df = pd.SparseDataFrame(sparse_data, columns=column_names)
+print(df.info())
+
+xor_dataset = create_dataset(
+    name="XOR",
+    description='Dataset representing the XOR operation',
+    creator=None,
+    contributor=None,
+    collection_date=None,
+    language='English',
+    licence=None,
+    default_target_attribute='y',
+    row_id_attribute=None,
+    ignore_attribute=None,
+    citation=None,
+    attributes='auto',
+    data=df,
     version_label='example',
 )
 
