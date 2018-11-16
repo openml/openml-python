@@ -2,6 +2,7 @@ import unittest
 import os
 import sys
 import random
+from itertools import product
 if sys.version_info[0] >= 3:
     from unittest import mock
 else:
@@ -853,6 +854,104 @@ class TestOpenMLDataset(TestBase):
         )
         self.assertTrue(
             '@ATTRIBUTE rnd_str {a, b, c, d, e, f, g}' in downloaded_data)
+
+    def test_create_dataset_row_id_attribute_error(self):
+        # meta-information
+        name = 'Pandas_testing_dataset'
+        description = 'Synthetic dataset created from a Pandas DataFrame'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'target'
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+        # Check that the index name is well inferred.
+        data = [['a', 1, 0],
+                ['b', 2, 1],
+                ['c', 3, 0],
+                ['d', 4, 1],
+                ['e', 5, 0]]
+        column_names = ['rnd_str', 'integer', 'target']
+        df = pd.DataFrame(data, columns=column_names)
+        # affecting row_id_attribute to an unknown column should raise an error
+        err_msg = ("should be one of the data attribute.")
+        with pytest.raises(ValueError, match=err_msg):
+            openml.datasets.functions.create_dataset(
+                name=name,
+                description=description,
+                creator=creator,
+                contributor=None,
+                collection_date=collection_date,
+                language=language,
+                licence=licence,
+                default_target_attribute=default_target_attribute,
+                ignore_attribute=None,
+                citation=citation,
+                attributes='auto',
+                data=df,
+                row_id_attribute='unknown_row_id',
+                format=None,
+                version_label='test',
+                original_data_url=original_data_url,
+                paper_url=paper_url
+            )
+
+    def test_create_dataset_row_id_attribute_inference(self):
+        # meta-information
+        name = 'Pandas_testing_dataset'
+        description = 'Synthetic dataset created from a Pandas DataFrame'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'target'
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+        # Check that the index name is well inferred.
+        data = [['a', 1, 0],
+                ['b', 2, 1],
+                ['c', 3, 0],
+                ['d', 4, 1],
+                ['e', 5, 0]]
+        column_names = ['rnd_str', 'integer', 'target']
+        df = pd.DataFrame(data, columns=column_names)
+        row_id_attr = [None, 'integer']
+        df_index_name = [None, 'index_name']
+        expected_row_id = [None, 'index_name', 'integer', 'integer']
+        for output_row_id, (row_id, index_name) in zip(expected_row_id,
+                                                       product(row_id_attr,
+                                                               df_index_name)):
+            df.index.name = index_name
+            dataset = openml.datasets.functions.create_dataset(
+                name=name,
+                description=description,
+                creator=creator,
+                contributor=None,
+                collection_date=collection_date,
+                language=language,
+                licence=licence,
+                default_target_attribute=default_target_attribute,
+                ignore_attribute=None,
+                citation=citation,
+                attributes='auto',
+                data=df,
+                row_id_attribute=row_id,
+                format=None,
+                version_label='test',
+                original_data_url=original_data_url,
+                paper_url=paper_url
+            )
+            self.assertEqual(dataset.row_id_attribute, output_row_id)
+            upload_did = dataset.publish()
+            arff_dataset = arff.loads(_get_online_dataset_arff(upload_did))
+            arff_data = np.array(arff_dataset['data'], dtype=object)
+            # if we set the name of the index then the index will be added to
+            # the data
+            expected_shape = (5, 3) if index_name is None else (5, 4)
+            self.assertEqual(arff_data.shape, expected_shape)
 
     def test_create_dataset_attributes_auto_without_df(self):
         # attributes cannot be inferred without passing a dataframe
