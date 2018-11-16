@@ -417,8 +417,9 @@ def attributes_arff_from_df(df):
 def create_dataset(name, description, creator, contributor,
                    collection_date, language,
                    licence, attributes, data,
-                   default_target_attribute, row_id_attribute,
-                   ignore_attribute, citation, format=None,
+                   default_target_attribute,
+                   ignore_attribute, citation,
+                   row_id_attribute=None, format=None,
                    original_data_url=None, paper_url=None,
                    update_comment=None, version_label=None):
     """Create a dataset.
@@ -433,11 +434,6 @@ def create_dataset(name, description, creator, contributor,
         Name of the dataset.
     description : str
         Description of the dataset.
-    format : str, optional
-        Format of the dataset which can be either 'arff' or 'sparse_arff'.
-        By default, the format is automatically inferred.
-        .. deprecated: 0.8
-            ``format`` is deprecated in 0.8 and will be removed in 0.10.
     creator : str
         The person who created the dataset.
     contributor : str
@@ -463,14 +459,25 @@ def create_dataset(name, description, creator, contributor,
     default_target_attribute : str
         The default target attribute, if it exists.
         Can have multiple values, comma separated.
-    row_id_attribute : str
-        The attribute that represents the row-id column, if present in the dataset.
     ignore_attribute : str | list
         Attributes that should be excluded in modelling, such as identifiers and indexes.
     citation : str
         Reference(s) that should be cited when building on this data.
     version_label : str, optional
         Version label provided by user, can be a date, hash, or some other type of id.
+    row_id_attribute : str, optional
+        The attribute that represents the row-id column, if present in the
+        dataset. If ``data`` is a dataframe and ``row_id_attribute`` is not
+        specified, the index of the dataframe will be used as the
+        ``row_id_attribute``. If the name of the index is ``None``, it will
+        be discarded.
+        .. versionadded: 0.8
+           Inference of ``row_id_attribute`` from a dataframe.
+    format : str, optional
+        Format of the dataset which can be either 'arff' or 'sparse_arff'.
+        By default, the format is automatically inferred.
+        .. deprecated: 0.8
+            ``format`` is deprecated in 0.8 and will be removed in 0.10.
     original_data_url : str, optional
         For derived data, the url to the original dataset.
     paper_url : str, optional
@@ -482,6 +489,15 @@ def create_dataset(name, description, creator, contributor,
     -------
     class:`openml.OpenMLDataset`
         Dataset description."""
+
+    if isinstance(data, (pd.DataFrame, pd.SparseDataFrame)):
+        # infer the row id from the index of the dataset
+        if row_id_attribute is None:
+            row_id_attribute = data.index.name
+        # When calling data.values, the index will be skipped. We need to reset
+        # the index such that it is part of the data.
+        if data.index.name is not None:
+            data = data.reset_index()
 
     if attributes == 'auto' or isinstance(attributes, dict):
         if not hasattr(data, "columns"):
@@ -498,6 +514,16 @@ def create_dataset(name, description, creator, contributor,
                     attributes_[attr_idx] = (attr_name, attributes[attr_name])
     else:
         attributes_ = attributes
+
+    if row_id_attribute is not None:
+        is_row_id_an_attribute = any([attr[0] == row_id_attribute
+                                      for attr in attributes_])
+        if not is_row_id_an_attribute:
+            raise ValueError(
+                "'row_id_attribute' should be one of the data attribute. "
+                " Got '{}' while candidates are {}."
+                .format(row_id_attribute, [attr[0] for attr in attributes_])
+            )
 
     data = data.values if hasattr(data, "columns") else data
 
