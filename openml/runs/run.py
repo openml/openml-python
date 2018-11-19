@@ -14,6 +14,7 @@ import openml
 import openml._api_calls
 from ..tasks import get_task
 from ..exceptions import PyOpenMLError
+from ..tasks import TaskTypeEnum
 
 
 class OpenMLRun(object):
@@ -197,8 +198,19 @@ class OpenMLRun(object):
         arff_dict['relation'] = 'openml_task_' + str(task.task_id) + \
                                 '_predictions'
 
-        # Separate these out? Normal classification doesn't need 'sample'
-        if task.task_type in ['Supervised Classification', 'Learning Curve']:
+
+        if task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION:
+            arff_dict['attributes'] = [
+                                          ('repeat', 'NUMERIC'),
+                                          ('fold', 'NUMERIC'),
+                                          ('row_id', 'NUMERIC')] + \
+                                      [('confidence.' + class_labels[i],
+                                        'NUMERIC') for i in
+                                       range(len(class_labels))] + \
+                                      [('prediction', class_labels),
+                                       ('correct', class_labels)]
+
+        if task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
             arff_dict['attributes'] = [
                                           ('repeat', 'NUMERIC'),
                                           ('fold', 'NUMERIC'),
@@ -210,14 +222,14 @@ class OpenMLRun(object):
                                       [('prediction', class_labels),
                                        ('correct', class_labels)]
 
-        elif task.task_type == 'Supervised Regression':
+        elif task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION:
             arff_dict['attributes'] = [('repeat', 'NUMERIC'),
                                        ('fold', 'NUMERIC'),
                                        ('row_id', 'NUMERIC'),
                                        ('prediction', 'NUMERIC'),
                                        ('truth', 'NUMERIC')]
 
-        elif task.task_type == 'Clustering':
+        elif task.task_type == TaskTypeEnum.CLUSTERING:
             arff_dict['attributes'] = [('repeat', 'NUMERIC'),
                                        ('fold', 'NUMERIC'),
                                        ('row_id', 'NUMERIC'),
@@ -260,15 +272,15 @@ class OpenMLRun(object):
         task = get_task(self.task_id)
 
         attribute_names = [att[0] for att in predictions_arff['attributes']]
-        if task.task_type == 'Supervised Classification' and 'correct' not in \
+        if task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION and 'correct' not in \
                 attribute_names:
             raise ValueError('Attribute "correct" should be set for '
                              'classification task runs')
-        if task.task_type == 'Supervised Regression' and 'truth' not in \
+        if task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION and 'truth' not in \
                 attribute_names:
             raise ValueError('Attribute "truth" should be set for '
                              'regression task runs')
-        if task.task_type != 'Clustering' and 'prediction' not in \
+        if task.task_type_id != TaskTypeEnum.CLUSTERING and 'prediction' not in \
                 attribute_names:
             raise ValueError('Attribute "predict" should be set for '
                              'supervised task runs')
@@ -290,10 +302,10 @@ class OpenMLRun(object):
         fold_idx = attribute_dict['fold']
         predicted_idx = attribute_dict['prediction']  # Assume supervised tasks
 
-        if task.task_type == 'Supervised Classification' or \
-                self.task_type == 'Learning Curve':
+        if task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION or \
+                self.task_type_id == TaskTypeEnum.LEARNING_CURVE:
             correct_idx = attribute_dict['correct']
-        elif task.task_type == 'Supervised Regression':
+        elif task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION:
             correct_idx = attribute_dict['truth']
         has_samples = False
         if 'sample' in attribute_dict:
@@ -318,13 +330,13 @@ class OpenMLRun(object):
             else:
                 samp = 0  # No learning curve sample, always 0
 
-            if task.task_type == 'Supervised Classification' or \
-                    self.task_type == 'Learning Curve':
+            if task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION or \
+                    self.task_type_id == TaskTypeEnum.LEARNING_CURVE:
                 prediction = predictions_arff['attributes'][predicted_idx][
                     1].index(line[predicted_idx])
                 correct = predictions_arff['attributes'][predicted_idx][1]. \
                     index(line[correct_idx])
-            elif task.task_type == 'Supervised Regression':
+            elif task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION:
                 prediction = line[predicted_idx]
                 correct = line[correct_idx]
             if rep not in values_predict:

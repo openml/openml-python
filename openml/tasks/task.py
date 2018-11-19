@@ -211,3 +211,14 @@ class OpenMLLearningCurveTask(OpenMLSupervisedTask):
 
         if cost_matrix is not None:
             raise NotImplementedError("Costmatrix")
+
+
+class TaskTypeEnum(object):
+    SUPERVISED_CLASSIFICATION = 1
+    SUPERVISED_REGRESSION = 2
+    LEARNING_CURVE = 3
+    SUPERVISED_DATASTREAM_CLASSIFICATION = 4
+    CLUSTERING = 5
+    MACHINE_LEARNING_CHALLENGE = 6
+    SURVIVAL_ANALYSIS = 7
+    SUBGROUP_DISCOVERY = 8

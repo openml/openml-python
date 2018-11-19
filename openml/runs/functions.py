@@ -24,6 +24,7 @@ from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..tasks import OpenMLTask
 from .run import OpenMLRun, _get_version_information
 from .trace import OpenMLRunTrace
+from ..tasks import TaskTypeEnum
 
 # _get_version_info, _get_dict and _create_setup_string are in run.py to avoid
 # circular imports
@@ -167,7 +168,7 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
     run.parameter_settings = OpenMLRun._parse_parameters(flow)
 
     # now we need to attach the detailed evaluations
-    if task.task_type_id == 3:
+    if task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
         run.sample_evaluations = sample_evaluations
     else:
         run.fold_evaluations = fold_evaluations
@@ -583,18 +584,18 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
 
     train_indices, test_indices = task.get_train_test_split_indices(
         repeat=rep_no, fold=fold_no, sample=sample_no)
-    if task.task_type in (
-            "Supervised Classification",
-            "Supervised Regression",
-            "Learning Curve",
+    if task.task_type_id in (
+            TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+            TaskTypeEnum.SUPERVISED_REGRESSION,
+            TaskTypeEnum.LEARNING_CURVE,
     ):
         X, Y = task.get_X_and_y()
         trainX = X[train_indices]
         trainY = Y[train_indices]
         testX = X[test_indices]
         testY = Y[test_indices]
-    elif task.task_type in (
-            "Clustering",
+    elif task.task_type_id in (
+            TaskTypeEnum.CLUSTERING,
     ):
         trainX = train_indices
         testX = test_indices
@@ -608,14 +609,14 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
         if can_measure_runtime:
             modelfit_starttime = time.process_time()
 
-        if task.task_type in (
-                "Supervised Classification",
-                "Supervised Regression",
-                "Learning Curve",
+        if task.task_type_id in (
+                TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+                TaskTypeEnum.SUPERVISED_REGRESSION,
+                TaskTypeEnum.LEARNING_CURVE,
         ):
             model.fit(trainX, trainY)
         elif task.task_type in (
-                "Clustering",
+                TaskTypeEnum.CLUSTERING,
         ):
             model.fit(trainX)
 
@@ -642,9 +643,9 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
     else:
         used_estimator = model
 
-    if task.task_type in (
-            'Supervised Classification',
-            'Learning Curve',
+    if task.task_type_id in (
+            TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+            TaskTypeEnum.LEARNING_CURVE,
     ):
         if isinstance(used_estimator,
                       sklearn.model_selection._search.BaseSearchCV):
@@ -679,7 +680,10 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
     # Task type specific outputs
     arff_datacontent = []
 
-    if task.task_type in ['Supervised Classification', 'Learning Curve']:
+    if task.task_type_id in (
+            TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+            TaskTypeEnum.LEARNING_CURVE,
+    ):
         try:
             ProbaY = model.predict_proba(testX)
         except AttributeError:
@@ -703,7 +707,7 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
                                            task.class_labels, model_classes)
             arff_datacontent.append(arff_line)
 
-    elif task.task_type == 'Supervised Regression':
+    elif task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION:
         if add_local_measures:
             _calculate_local_measure(sklearn.metrics.mean_absolute_error,
                                      'mean_absolute_error')
@@ -712,7 +716,7 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
             arff_line = [rep_no, fold_no, test_indices[i], PredY[i], testY[i]]
             arff_datacontent.append(arff_line)
 
-    elif task.task_type == 'Clustering':
+    elif task.task_type_id == TaskTypeEnum.CLUSTERING:
         for i in range(0, len(test_indices)):
             arff_line = [test_indices[i], PredY[i]]  # row_id, cluster ID
             arff_datacontent.append(arff_line)
@@ -964,7 +968,7 @@ def _create_run_from_xml(xml, from_server=True):
 
     if 'predictions' not in files and from_server is True:
         task = openml.tasks.get_task(task_id)
-        if task.task_type_id == 8:
+        if task.task_type_id == TaskTypeEnum.SUBGROUP_DISCOVERY:
             raise NotImplementedError(
                 'Subgroup discovery tasks are not yet supported.'
             )

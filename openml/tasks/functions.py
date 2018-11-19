@@ -13,9 +13,11 @@ from .task import (
     OpenMLRegressionTask,
     OpenMLClusteringTask,
     OpenMLLearningCurveTask,
+    TaskTypeEnum,
 )
 import openml.utils
 import openml._api_calls
+
 
 TASKS_CACHE_DIR_NAME = 'tasks'
 
@@ -381,10 +383,10 @@ def _create_task_from_xml(xml):
         'estimation_parameters': estimation_parameters,
         'evaluation_measure': evaluation_measures,
     }
-    if task_type in (
-        "Supervised Classification",
-        "Supervised Regression",
-        "Learning Curve"
+    if task_type_id in (
+        TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+        TaskTypeEnum.SUPERVISED_REGRESSION,
+        TaskTypeEnum.LEARNING_CURVE
     ):
         common_kwargs['target_name'] = inputs[
                 "source_data"]["oml:data_set"]["oml:target_feature"]
