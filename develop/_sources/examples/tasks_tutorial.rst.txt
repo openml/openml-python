@@ -78,8 +78,8 @@ to have better visualization and easier access:
 
     Index(['tid', 'ttid', 'did', 'name', 'task_type', 'status',
            'estimation_procedure', 'source_data', 'target_feature',
-           'MajorityClassSize', 'MinorityClassSize', 'NumberOfClasses',
-           'NumberOfFeatures', 'NumberOfInstances',
+           'MajorityClassSize', 'MaxNominalAttDistinctValues', 'MinorityClassSize',
+           'NumberOfClasses', 'NumberOfFeatures', 'NumberOfInstances',
            'NumberOfInstancesWithMissingValues', 'NumberOfMissingValues',
            'NumberOfNumericFeatures', 'NumberOfSymbolicFeatures'],
           dtype='object')
@@ -91,7 +91,7 @@ to have better visualization and easier access:
     4    4            ...                                 33.0
     5    5            ...                                 33.0
 
-    [5 rows x 18 columns]
+    [5 rows x 19 columns]
 
 
 We can filter the list of tasks to only contain datasets with more than 500 samples, but less than 1000 samples:
@@ -240,7 +240,7 @@ Furthermore, we can list tasks based on the dataset id:
     364  364            ...                                    1
     365  365            ...                                    1
 
-    [5 rows x 18 columns]
+    [5 rows x 19 columns]
 
 
 In addition, a size limit and an offset can be applied both separately and simultaneously:
@@ -276,7 +276,7 @@ In addition, a size limit and an offset can be applied both separately and simul
     59   59            ...                                  241
     60   60            ...                                  241
 
-    [10 rows x 18 columns]
+    [10 rows x 19 columns]
 
 
 **OpenML 100**
@@ -307,7 +307,7 @@ Finally, it is also possible to list all tasks on OpenML with:
 
  .. code-block:: none
 
-    1071
+    1068
 
 
 Exercise
@@ -409,10 +409,10 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLClassificationTask object at 0x14ad0b152898>
+    <openml.tasks.task.OpenMLClassificationTask object at 0x1547e7dd9dd8>
 
 
-**Total running time of the script:** ( 0 minutes  19.603 seconds)
+**Total running time of the script:** ( 0 minutes  18.947 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:

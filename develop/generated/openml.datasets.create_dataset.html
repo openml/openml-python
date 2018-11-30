@@ -12,7 +12,6 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -61,9 +60,9 @@
                 <li><a href="../index.html">Start</a></li>
                 <li><a href="../usage.html">User Guide</a></li>
                 <li><a href="../api.html">API</a></li>
-                <li><a href="../progress.html">Changelog</a></li>
+                <li><a href="../examples/index.html">Examples</a></li>
                 <li><a href="../contributing.html">Contributing</a></li>
-                <li><a href="../progress.html">Progress</a></li>
+                <li><a href="../progress.html">Changelog</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -113,7 +112,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.create_dataset<a class="headerlink" href="#openml-datasets-create-dataset" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.datasets.create_dataset">
-<code class="descclassname">openml.datasets.</code><code class="descname">create_dataset</code><span class="sig-paren">(</span><em>name</em>, <em>description</em>, <em>creator</em>, <em>contributor</em>, <em>collection_date</em>, <em>language</em>, <em>licence</em>, <em>attributes</em>, <em>data</em>, <em>default_target_attribute</em>, <em>row_id_attribute</em>, <em>ignore_attribute</em>, <em>citation</em>, <em>format=None</em>, <em>original_data_url=None</em>, <em>paper_url=None</em>, <em>update_comment=None</em>, <em>version_label=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.create_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.datasets.</code><code class="descname">create_dataset</code><span class="sig-paren">(</span><em>name</em>, <em>description</em>, <em>creator</em>, <em>contributor</em>, <em>collection_date</em>, <em>language</em>, <em>licence</em>, <em>attributes</em>, <em>data</em>, <em>default_target_attribute</em>, <em>ignore_attribute</em>, <em>citation</em>, <em>row_id_attribute=None</em>, <em>format=None</em>, <em>original_data_url=None</em>, <em>paper_url=None</em>, <em>update_comment=None</em>, <em>version_label=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.create_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a dataset.</p>
 <p>This function creates an OpenMLDataset object.
 The OpenMLDataset object contains information related to the dataset
@@ -128,14 +127,6 @@ and the actual data file.</p>
 </dd>
 <dt><strong>description</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
 <dd><p class="first last">Description of the dataset.</p>
-</dd>
-<dt><strong>format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
-<dd><p class="first">Format of the dataset which can be either ‘arff’ or ‘sparse_arff’.
-By default, the format is automatically inferred.
-.. deprecated: 0.8</p>
-<blockquote class="last">
-<div><p><code class="docutils literal notranslate"><span class="pre">format</span></code> is deprecated in 0.8 and will be removed in 0.10.</p>
-</div></blockquote>
 </dd>
 <dt><strong>creator</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
 <dd><p class="first last">The person who created the dataset.</p>
@@ -170,9 +161,6 @@ The target feature is indicated as meta-data of the dataset.</p>
 <dd><p class="first last">The default target attribute, if it exists.
 Can have multiple values, comma separated.</p>
 </dd>
-<dt><strong>row_id_attribute</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">The attribute that represents the row-id column, if present in the dataset.</p>
-</dd>
 <dt><strong>ignore_attribute</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str | list</span></dt>
 <dd><p class="first last">Attributes that should be excluded in modelling, such as identifiers and indexes.</p>
 </dd>
@@ -181,6 +169,25 @@ Can have multiple values, comma separated.</p>
 </dd>
 <dt><strong>version_label</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
 <dd><p class="first last">Version label provided by user, can be a date, hash, or some other type of id.</p>
+</dd>
+<dt><strong>row_id_attribute</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first">The attribute that represents the row-id column, if present in the
+dataset. If <code class="docutils literal notranslate"><span class="pre">data</span></code> is a dataframe and <code class="docutils literal notranslate"><span class="pre">row_id_attribute</span></code> is not
+specified, the index of the dataframe will be used as the
+<code class="docutils literal notranslate"><span class="pre">row_id_attribute</span></code>. If the name of the index is <code class="docutils literal notranslate"><span class="pre">None</span></code>, it will
+be discarded.
+.. versionadded: 0.8</p>
+<blockquote class="last">
+<div><p>Inference of <code class="docutils literal notranslate"><span class="pre">row_id_attribute</span></code> from a dataframe.</p>
+</div></blockquote>
+</dd>
+<dt><strong>format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first">Format of the dataset which can be either ‘arff’ or ‘sparse_arff’.
+By default, the format is automatically inferred.
+.. deprecated: 0.8</p>
+<blockquote class="last">
+<div><p><code class="docutils literal notranslate"><span class="pre">format</span></code> is deprecated in 0.8 and will be removed in 0.10.</p>
+</div></blockquote>
 </dd>
 <dt><strong>original_data_url</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
 <dd><p class="first last">For derived data, the url to the original dataset.</p>
@@ -220,7 +227,7 @@ Can have multiple values, comma separated.</p>
     </p>
     <p>
         &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.<br/>
     </p>
   </div>
 </footer>

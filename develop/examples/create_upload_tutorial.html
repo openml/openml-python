@@ -12,7 +12,6 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -61,9 +60,9 @@
                 <li><a href="../index.html">Start</a></li>
                 <li><a href="../usage.html">User Guide</a></li>
                 <li><a href="../api.html">API</a></li>
-                <li><a href="../progress.html">Changelog</a></li>
+                <li><a href="index.html">Examples</a></li>
                 <li><a href="../contributing.html">Contributing</a></li>
-                <li><a href="../progress.html">Progress</a></li>
+                <li><a href="../progress.html">Changelog</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -111,6 +110,7 @@
 <li><a class="reference internal" href="#dataset-is-a-list">Dataset is a list</a></li>
 <li><a class="reference internal" href="#dataset-is-a-pandas-dataframe">Dataset is a pandas DataFrame</a></li>
 <li><a class="reference internal" href="#dataset-is-a-sparse-matrix">Dataset is a sparse matrix</a></li>
+<li><a class="reference internal" href="#dataset-is-a-pandas-sparse-dataframe">Dataset is a pandas sparse dataframe</a></li>
 </ul>
 
         </div>
@@ -144,6 +144,7 @@ server with countless copies of the same dataset.</p>
 <li>A list</li>
 <li>A pandas dataframe</li>
 <li>A sparse matrix</li>
+<li>A pandas sparse dataframe</li>
 </ul>
 </div>
 <div class="section" id="dataset-is-a-numpy-array">
@@ -234,7 +235,7 @@ expected format:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/4775
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/5540
 </pre></div>
 </div>
 </div>
@@ -310,7 +311,7 @@ OrderedDicts in the case of sparse data.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/4776
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/5541
 </pre></div>
 </div>
 </div>
@@ -345,7 +346,7 @@ memory usage: 546.0 bytes
 None
 </pre></div>
 </div>
-<p>We enforce the column ‘outlook’, ‘winday’, and ‘play’ to be a categorical
+<p>We enforce the column ‘outlook’, ‘windy’, and ‘play’ to be a categorical
 dtype while the column ‘rnd_str’ is kept as a string column. Then, we can
 call <code class="xref py py-func docutils literal notranslate"><span class="pre">create_dataset()</span></code> by passing the dataframe and fixing the parameter
 <code class="docutils literal notranslate"><span class="pre">attributes</span></code> to <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>.</p>
@@ -372,7 +373,7 @@ call <code class="xref py py-func docutils literal notranslate"><span class="pre
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/4778
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/5542
 </pre></div>
 </div>
 </div>
@@ -380,7 +381,7 @@ call <code class="xref py py-func docutils literal notranslate"><span class="pre
 <h1>Dataset is a sparse matrix<a class="headerlink" href="#dataset-is-a-sparse-matrix" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sparse_data</span> <span class="o">=</span> <span class="n">coo_matrix</span><span class="p">((</span>
     <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-    <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+    <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 <span class="p">))</span>
 
 <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span>
@@ -412,10 +413,59 @@ call <code class="xref py py-func docutils literal notranslate"><span class="pre
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/4779
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/5543
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  6.249 seconds)</p>
+</div>
+<div class="section" id="dataset-is-a-pandas-sparse-dataframe">
+<h1>Dataset is a pandas sparse dataframe<a class="headerlink" href="#dataset-is-a-pandas-sparse-dataframe" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sparse_data</span> <span class="o">=</span> <span class="n">coo_matrix</span><span class="p">((</span>
+    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+    <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="p">))</span>
+<span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;input1&#39;</span><span class="p">,</span> <span class="s1">&#39;input2&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">SparseDataFrame</span><span class="p">(</span><span class="n">sparse_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
+
+<span class="n">xor_dataset</span> <span class="o">=</span> <span class="n">create_dataset</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;XOR&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Dataset representing the XOR operation&#39;</span><span class="p">,</span>
+    <span class="n">creator</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">contributor</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">collection_date</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">language</span><span class="o">=</span><span class="s1">&#39;English&#39;</span><span class="p">,</span>
+    <span class="n">licence</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">default_target_attribute</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span>
+    <span class="n">row_id_attribute</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">ignore_attribute</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">citation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+    <span class="n">version_label</span><span class="o">=</span><span class="s1">&#39;example&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.sparse.frame.SparseDataFrame&#39;&gt;
+RangeIndex: 4 entries, 0 to 3
+Data columns (total 3 columns):
+input1    3 non-null float64
+input2    2 non-null float64
+y         2 non-null float64
+dtypes: float64(3)
+memory usage: 136.0 bytes
+None
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">upload_did</span> <span class="o">=</span> <span class="n">xor_dataset</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;URL for dataset: </span><span class="si">%s</span><span class="s1">/data/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">upload_did</span><span class="p">))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/5544
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  4.993 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-create-upload-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/cfed637ede9071636ff8da65fe73607a/create_upload_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">create_upload_tutorial.py</span></code></a></div>
@@ -438,7 +488,7 @@ call <code class="xref py py-func docutils literal notranslate"><span class="pre
     </p>
     <p>
         &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.<br/>
     </p>
   </div>
 </footer>

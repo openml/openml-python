@@ -12,7 +12,6 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -61,9 +60,9 @@
                 <li><a href="../index.html">Start</a></li>
                 <li><a href="../usage.html">User Guide</a></li>
                 <li><a href="../api.html">API</a></li>
-                <li><a href="../progress.html">Changelog</a></li>
+                <li><a href="index.html">Examples</a></li>
                 <li><a href="../contributing.html">Contributing</a></li>
-                <li><a href="../progress.html">Progress</a></li>
+                <li><a href="../progress.html">Changelog</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -151,8 +150,8 @@ to have better visualization and easier access:</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;tid&#39;, &#39;ttid&#39;, &#39;did&#39;, &#39;name&#39;, &#39;task_type&#39;, &#39;status&#39;,
        &#39;estimation_procedure&#39;, &#39;source_data&#39;, &#39;target_feature&#39;,
-       &#39;MajorityClassSize&#39;, &#39;MinorityClassSize&#39;, &#39;NumberOfClasses&#39;,
-       &#39;NumberOfFeatures&#39;, &#39;NumberOfInstances&#39;,
+       &#39;MajorityClassSize&#39;, &#39;MaxNominalAttDistinctValues&#39;, &#39;MinorityClassSize&#39;,
+       &#39;NumberOfClasses&#39;, &#39;NumberOfFeatures&#39;, &#39;NumberOfInstances&#39;,
        &#39;NumberOfInstancesWithMissingValues&#39;, &#39;NumberOfMissingValues&#39;,
        &#39;NumberOfNumericFeatures&#39;, &#39;NumberOfSymbolicFeatures&#39;],
       dtype=&#39;object&#39;)
@@ -164,7 +163,7 @@ First 5 of 612 tasks:
 4    4            ...                                 33.0
 5    5            ...                                 33.0
 
-[5 rows x 18 columns]
+[5 rows x 19 columns]
 </pre></div>
 </div>
 <p>We can filter the list of tasks to only contain datasets with more than 500 samples, but less than 1000 samples:</p>
@@ -232,7 +231,7 @@ Index: []
 364  364            ...                                    1
 365  365            ...                                    1
 
-[5 rows x 18 columns]
+[5 rows x 19 columns]
 </pre></div>
 </div>
 <p>In addition, a size limit and an offset can be applied both separately and simultaneously:</p>
@@ -254,7 +253,7 @@ Index: []
 59   59            ...                                  241
 60   60            ...                                  241
 
-[10 rows x 18 columns]
+[10 rows x 19 columns]
 </pre></div>
 </div>
 <p><strong>OpenML 100</strong>
@@ -271,7 +270,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1071
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1068
 </pre></div>
 </div>
 <div class="section" id="exercise">
@@ -322,10 +321,10 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLClassificationTask object at 0x14ad0b152898&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLClassificationTask object at 0x1547e7dd9dd8&gt;
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  19.603 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  18.947 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-tasks-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/204148be48b3a7d6b2cc72a9fc63c69e/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></div>
@@ -349,7 +348,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     </p>
     <p>
         &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.<br/>
     </p>
   </div>
 </footer>
