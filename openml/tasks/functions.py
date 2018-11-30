@@ -10,9 +10,10 @@ from ..exceptions import OpenMLCacheException
 from ..datasets import get_dataset
 from .task import (
     OpenMLClassificationTask,
-    OpenMLRegressionTask,
     OpenMLClusteringTask,
     OpenMLLearningCurveTask,
+    OpenMLRegressionTask,
+    OpenMLSupervisedTask
 )
 import openml.utils
 import openml._api_calls
@@ -294,10 +295,11 @@ def get_task(task_id):
             dataset = get_dataset(task.dataset_id)
             # Clustering tasks do not have class labels
             # and do not offer download_split
-            if not isinstance(task, OpenMLClusteringTask):
-                task.class_labels = \
-                    dataset.retrieve_class_labels(task.target_name)
+            if isinstance(task, OpenMLSupervisedTask):
                 task.download_split()
+                if isinstance(task, OpenMLClassificationTask):
+                    task.class_labels = \
+                        dataset.retrieve_class_labels(task.target_name)
         except Exception as e:
             openml.utils._remove_cache_dir_for_id(
                 TASKS_CACHE_DIR_NAME,
