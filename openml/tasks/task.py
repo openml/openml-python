@@ -9,16 +9,11 @@ from ..utils import _create_cache_directory_for_id
 
 class OpenMLTask(object):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
-                 estimation_procedure_type, estimation_parameters,
                  evaluation_measure):
         self.task_id = int(task_id)
         self.task_type_id = int(task_type_id)
         self.task_type = task_type
         self.dataset_id = int(data_set_id)
-        self.estimation_procedure = dict()
-        self.estimation_procedure["type"] = estimation_procedure_type
-        self.estimation_procedure["parameters"] = estimation_parameters
-        self.estimation_parameters = estimation_parameters
         self.evaluation_measure = evaluation_measure
 
     def get_dataset(self):
@@ -57,12 +52,14 @@ class OpenMLSupervisedTask(OpenMLTask):
             task_type_id=task_type_id,
             task_type=task_type,
             data_set_id=data_set_id,
-            estimation_procedure_type=estimation_procedure_type,
-            estimation_parameters=estimation_parameters,
             evaluation_measure=evaluation_measure,
         )
-        self.target_name = target_name
+        self.estimation_procedure = dict()
+        self.estimation_procedure["type"] = estimation_procedure_type
+        self.estimation_procedure["parameters"] = estimation_parameters
+        self.estimation_parameters = estimation_parameters
         self.estimation_procedure["data_splits_url"] = data_splits_url
+        self.target_name = target_name
         self.split = None
 
     def get_X_and_y(self):
@@ -169,15 +166,12 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
 
 class OpenMLClusteringTask(OpenMLTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
-                 estimation_procedure_type, estimation_parameters,
                  evaluation_measure, number_of_clusters=None):
         super(OpenMLClusteringTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
             task_type=task_type,
             data_set_id=data_set_id,
-            estimation_procedure_type=estimation_procedure_type,
-            estimation_parameters=estimation_parameters,
             evaluation_measure=evaluation_measure,
         )
         self.number_of_clusters = number_of_clusters
