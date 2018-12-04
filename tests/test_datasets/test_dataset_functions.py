@@ -790,7 +790,6 @@ class TestOpenMLDataset(TestBase):
             citation=citation,
             attributes='auto',
             data=df,
-            format=None,
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url
@@ -878,7 +877,6 @@ class TestOpenMLDataset(TestBase):
                 attributes='auto',
                 data=df,
                 row_id_attribute='unknown_row_id',
-                format=None,
                 version_label='test',
                 original_data_url=original_data_url,
                 paper_url=paper_url
@@ -925,7 +923,6 @@ class TestOpenMLDataset(TestBase):
                 attributes='auto',
                 data=df,
                 row_id_attribute=row_id,
-                format=None,
                 version_label='test',
                 original_data_url=original_data_url,
                 paper_url=paper_url
