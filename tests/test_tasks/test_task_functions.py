@@ -156,6 +156,15 @@ class TestTask(TestBase):
         task = openml.tasks.get_task(1)
         self.assertIsInstance(task, OpenMLTask)
 
+    def test_get_task_different_types(self):
+        openml.config.server = self.production_server
+        # Regression task
+        openml.tasks.functions.get_task(5001)
+        # Learning curve
+        openml.tasks.functions.get_task(64)
+        # Issue 538, get_task failing with clustering task.
+        openml.tasks.functions.get_task(126033)
+
     def test_download_split(self):
         task = openml.tasks.get_task(1)
         split = task.download_split()

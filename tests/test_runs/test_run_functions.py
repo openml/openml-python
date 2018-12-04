@@ -563,7 +563,9 @@ class TestRun(TestBase):
 
     def test_online_run_metric_score(self):
         openml.config.server = self.production_server
-        run = openml.runs.get_run(5965513) # important to use binary classification task, due to assertions
+        # important to use binary classification task,
+        # due to assertions
+        run = openml.runs.get_run(9864498)
         self._test_local_evaluations(run)
 
     def test_initialize_model_from_run(self):

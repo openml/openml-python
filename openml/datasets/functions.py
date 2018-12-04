@@ -417,8 +417,9 @@ def attributes_arff_from_df(df):
 def create_dataset(name, description, creator, contributor,
                    collection_date, language,
                    licence, attributes, data,
-                   default_target_attribute, row_id_attribute,
+                   default_target_attribute,
                    ignore_attribute, citation,
+                   row_id_attribute=None,
                    original_data_url=None, paper_url=None,
                    update_comment=None, version_label=None):
     """Create a dataset.
@@ -458,14 +459,20 @@ def create_dataset(name, description, creator, contributor,
     default_target_attribute : str
         The default target attribute, if it exists.
         Can have multiple values, comma separated.
-    row_id_attribute : str
-        The attribute that represents the row-id column, if present in the dataset.
     ignore_attribute : str | list
         Attributes that should be excluded in modelling, such as identifiers and indexes.
     citation : str
         Reference(s) that should be cited when building on this data.
     version_label : str, optional
         Version label provided by user, can be a date, hash, or some other type of id.
+    row_id_attribute : str, optional
+        The attribute that represents the row-id column, if present in the
+        dataset. If ``data`` is a dataframe and ``row_id_attribute`` is not
+        specified, the index of the dataframe will be used as the
+        ``row_id_attribute``. If the name of the index is ``None``, it will
+        be discarded.
+        .. versionadded: 0.8
+           Inference of ``row_id_attribute`` from a dataframe.
     original_data_url : str, optional
         For derived data, the url to the original dataset.
     paper_url : str, optional
@@ -478,11 +485,20 @@ def create_dataset(name, description, creator, contributor,
     class:`openml.OpenMLDataset`
         Dataset description."""
 
+    if isinstance(data, (pd.DataFrame, pd.SparseDataFrame)):
+        # infer the row id from the index of the dataset
+        if row_id_attribute is None:
+            row_id_attribute = data.index.name
+        # When calling data.values, the index will be skipped. We need to reset
+        # the index such that it is part of the data.
+        if data.index.name is not None:
+            data = data.reset_index()
+
     if attributes == 'auto' or isinstance(attributes, dict):
         if not hasattr(data, "columns"):
             raise ValueError("Automatically inferring the attributes required "
-                             "a pandas DataFrame. A {!r} was given instead."
-                             .format(data))
+                             "a pandas DataFrame or SparseDataFrame. "
+                             "A {!r} was given instead.".format(data))
         # infer the type of data for each column of the DataFrame
         attributes_ = attributes_arff_from_df(data)
         if isinstance(attributes, dict):
@@ -494,11 +510,26 @@ def create_dataset(name, description, creator, contributor,
     else:
         attributes_ = attributes
 
-    # convert the data into a numpy array or a scipy sparse matrix
-    if isinstance(data, pd.SparseDataFrame):
-        data = data.coo()
-    elif isinstance(data, pd.DataFrame):
-        data = data.values
+    if row_id_attribute is not None:
+        is_row_id_an_attribute = any([attr[0] == row_id_attribute
+                                      for attr in attributes_])
+        if not is_row_id_an_attribute:
+            raise ValueError(
+                "'row_id_attribute' should be one of the data attribute. "
+                " Got '{}' while candidates are {}."
+                .format(row_id_attribute, [attr[0] for attr in attributes_])
+            )
+
+    if hasattr(data, "columns"):
+        if isinstance(data, pd.SparseDataFrame):
+            data = data.to_coo()
+            # liac-arff only support COO matrices with sorted rows
+            row_idx_sorted = np.argsort(data.row)
+            data.row = data.row[row_idx_sorted]
+            data.col = data.col[row_idx_sorted]
+            data.data = data.data[row_idx_sorted]
+        else:
+            data = data.values
 
     if isinstance(data, (list, np.ndarray)):
         if isinstance(data[0], (list, np.ndarray)):
@@ -517,8 +548,11 @@ def create_dataset(name, description, creator, contributor,
         data_format = 'sparse_arff'
     else:
         raise ValueError(
-            'Invalid data type. The data type can be a list, '
-            'a numpy ndarray or a scipy.sparse.coo_matrix'
+            'When giving a list or a numpy.ndarray, '
+            'they should contain a list/ numpy.ndarray '
+            'for dense data or a dictionary for sparse '
+            'data. Got {!r} instead.'
+            .format(data[0])
         )
 
     arff_object = {
