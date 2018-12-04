@@ -108,7 +108,7 @@ def __list_evaluations(api_call):
         run_id = int(eval_['oml:run_id'])
         array_data = None
         if 'oml:array_data' in eval_:
-            eval_['oml:array_data']
+            array_data = eval_['oml:array_data']
 
         evals[run_id] = OpenMLEvaluation(int(eval_['oml:run_id']), int(eval_['oml:task_id']),
                                       int(eval_['oml:setup_id']), int(eval_['oml:flow_id']),

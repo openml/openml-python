@@ -19,11 +19,11 @@ _defaults = {
     'apikey': None,
     'server': "https://www.openml.org/api/v1/xml",
     'verbosity': 0,
-    'cachedir': os.path.expanduser('~/.openml/cache'),
+    'cachedir': os.path.expanduser(os.path.join('~', '.openml', 'cache')),
     'avoid_duplicate_runs': 'True',
 }
 
-config_file = os.path.expanduser('~/.openml/config')
+config_file = os.path.expanduser(os.path.join('~', '.openml' 'config'))
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
@@ -48,7 +48,7 @@ def _setup():
     global avoid_duplicate_runs
     # read config file, create cache directory
     try:
-        os.mkdir(os.path.expanduser('~/.openml'))
+        os.mkdir(os.path.expanduser(os.path.join('~', '.openml')))
     except (IOError, OSError):
         # TODO add debug information
         pass
@@ -96,7 +96,7 @@ def get_cache_directory():
 
     """
     url_suffix = urlparse(server).netloc
-    reversed_url_suffix = '/'.join(url_suffix.split('.')[::-1])
+    reversed_url_suffix = os.sep.join(url_suffix.split('.')[::-1])
     if not cache_directory:
         _cachedir = _defaults(cache_directory)
     else:

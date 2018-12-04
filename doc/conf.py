@@ -143,9 +143,9 @@ html_theme_options = {
         ('Start', 'index'),
         ('User Guide', 'usage'),
         ('API', 'api'),
-        ('Changelog', 'progress'),
+        ('Examples', 'examples/index'),
         ('Contributing', 'contributing'),
-        ('Progress', 'progress'),
+        ('Changelog', 'progress'),
     ],
 
     # Render the next and previous page links in navbar. (Default: true)

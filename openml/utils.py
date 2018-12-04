@@ -126,7 +126,6 @@ def _list_all(listing_call, *args, **filters):
     if 'batch_size' in active_filters:
         BATCH_SIZE_ORIG = active_filters['batch_size']
         del active_filters['batch_size']
-    batch_size = BATCH_SIZE_ORIG
 
     # max number of results to be shown
     LIMIT = None
@@ -137,22 +136,26 @@ def _list_all(listing_call, *args, **filters):
     # check if the batch size is greater than the number of results that need to be returned.
     if LIMIT is not None:
         if BATCH_SIZE_ORIG > LIMIT:
-            batch_size = LIMIT
+            BATCH_SIZE_ORIG = min(LIMIT, BATCH_SIZE_ORIG)
     if 'offset' in active_filters:
         offset = active_filters['offset']
         del active_filters['offset']
+    batch_size = BATCH_SIZE_ORIG
     while True:
         try:
+            current_offset = offset + BATCH_SIZE_ORIG * page
             new_batch = listing_call(
                 *args,
                 limit=batch_size,
-                offset=offset + BATCH_SIZE_ORIG * page,
+                offset=current_offset,
                 **active_filters
             )
         except openml.exceptions.OpenMLServerNoResult:
             # we want to return an empty dict in this case
             break
         result.update(new_batch)
+        if len(new_batch) < batch_size:
+            break
         page += 1
         if LIMIT is not None:
             # check if the number of required results has been achieved
