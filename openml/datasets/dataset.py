@@ -228,7 +228,11 @@ class OpenMLDataset(object):
                     X = pd.DataFrame(data['data'], columns=attribute_names)
                     X_null_count = X.isnull().sum()
 
+                    # We convert each column to the dtype of origin
+                    # (i.e., during the uploading to OpenML)
                     for column_name in X.columns:
+                        # True and False are stored as category and we are
+                        # converting them back to boolean
                         if attribute_dtype[column_name] == 'boolean':
                             X[column_name] = self._create_column_bool(
                                 X[column_name],
@@ -240,20 +244,25 @@ class OpenMLDataset(object):
                                 categories_names[column_name]
                             )
                         elif (attribute_dtype[column_name] == 'integer' and
-                                pd.api.types.infer_dtype(
-                                    X[column_name]) != 'integer'):
+                              pd.api.types.infer_dtype(
+                                  X[column_name]) != 'integer'):
                             if X_null_count[column_name] > 0:
+                                # If there is so missing values and the column
+                                # is supposed of integer dtype, we store it as
+                                # an object column of mixed dtype (int and
+                                # float for the np.nan marker).
                                 X[column_name] = \
                                 self._create_column_int_with_NA(X[column_name])
                             else:
                                 X[column_name] = X[column_name].astype(int)
                         elif (attribute_dtype[column_name] == 'floating' and
-                                pd.api.types.infer_dtype(
-                                    X[column_name]) != 'floating'):
+                              pd.api.types.infer_dtype(
+                                  X[column_name]) != 'floating'):
                             X[column_name] = X[column_name].astype(float)
                 else:
                     raise Exception()
 
+                # Pickle the dataframe or the sparse matrix.
                 with open(self.data_pickle_file, "wb") as fh:
                     pickle.dump((X, categorical, attribute_names), fh, -1)
                 logger.debug("Saved dataset %d: %s to file %s" %
@@ -390,7 +399,7 @@ class OpenMLDataset(object):
                 col.append(val)
             except (TypeError, ValueError):
                 col.append(np.nan)
-        return pd.Series(col, index=series.index, dtype=object)
+        return pd.Series(col, index=series.index)
 
     @staticmethod
     def _unpack_categories(series, categories):
