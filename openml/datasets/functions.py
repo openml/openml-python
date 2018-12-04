@@ -494,7 +494,11 @@ def create_dataset(name, description, creator, contributor,
     else:
         attributes_ = attributes
 
-    data = data.values if hasattr(data, "columns") else data
+    # convert the data into a numpy array or a scipy sparse matrix
+    if isinstance(data, pd.SparseDataFrame):
+        data = data.coo()
+    elif isinstance(data, pd.DataFrame):
+        data = data.values
 
     if isinstance(data, (list, np.ndarray)):
         if isinstance(data[0], (list, np.ndarray)):
