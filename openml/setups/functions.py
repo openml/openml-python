@@ -216,7 +216,8 @@ def initialize_model(setup_id):
     model = openml.flows.flow_to_sklearn(flow)
     hyperparameters = {
         openml.setups.openml_param_name_to_sklearn(hp, flow):
-            openml.flows.flow_to_sklearn(hp.value) for hp in setup.parameters.values()
+            openml.flows.flow_to_sklearn(hp.value)
+        for hp in setup.parameters.values()
     }
     model.set_params(**hyperparameters)
     return model

@@ -30,5 +30,5 @@ def openml_param_name_to_sklearn(openml_parameter, flow):
         raise ValueError('Obtained OpenMLParameter and OpenMLFlow do not '
                          'correspond. ')
 
-    return '__'.join(flow_structure[openml_parameter.flow_name] +
+    return '__'.join(flow_structure[openml_parameter.flow_name] + \
                      [openml_parameter.parameter_name])
