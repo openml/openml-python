@@ -33,8 +33,8 @@ def get_flow(flow_id, reinstantiate=False):
     flow = OpenMLFlow._from_dict(flow_dict)
 
     if reinstantiate:
-        if not (flow_dict['external_version'].startswith('sklearn==')
-                or ',sklearn==' in flow_dict['external_version']):
+        if not (flow.external_version.startswith('sklearn==')
+                or ',sklearn==' in flow.external_version):
             raise ValueError('Only sklearn flows can be reinstantiated')
         flow.model = openml.flows.flow_to_sklearn(flow)
 

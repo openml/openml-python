@@ -275,9 +275,9 @@ class TestFlow(TestBase):
         for classifier in [nb, complicated]:
             flow = openml.flows.sklearn_to_flow(classifier)
             flow, _ = self._add_sentinel_to_flow_name(flow, None)
-            #publish the flow
+            # publish the flow
             flow = flow.publish()
-            #redownload the flow
+            # redownload the flow
             flow = openml.flows.get_flow(flow.flow_id)
 
             # check if flow exists can find it
@@ -329,7 +329,8 @@ class TestFlow(TestBase):
         # Check whether we can load the flow again
         # Remove the sentinel from the name again so that we can reinstantiate
         # the object again
-        new_flow = openml.flows.get_flow(flow_id=flow.flow_id)
+        new_flow = openml.flows.get_flow(flow_id=flow.flow_id,
+                                         reinstantiate=True)
 
         local_xml = flow._to_xml()
         server_xml = new_flow._to_xml()
