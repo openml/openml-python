@@ -28,6 +28,7 @@ import logging
 import numpy as np
 import openml
 import sklearn.ensemble
+import sklearn.impute
 import sklearn.preprocessing
 
 
@@ -46,7 +47,7 @@ task = openml.tasks.get_task(6)  # letter dataset
 # many potential hyperparameters. Of course, the model can be as complex and as
 # easy as you want it to be
 model_original = sklearn.pipeline.make_pipeline(
-    sklearn.preprocessing.Imputer(),
+    sklearn.impute.SimpleImputer(),
     sklearn.preprocessing.StandardScaler(),
     sklearn.ensemble.RandomForestClassifier()
 )
@@ -57,7 +58,7 @@ model_original = sklearn.pipeline.make_pipeline(
 # this tutorial we set them to some specific values that might or might not be
 # optimal
 hyperparameters_original = {
-    'imputer__strategy': 'median',
+    'simpleimputer__strategy': 'median',
     'randomforestclassifier__random_state': 42,
     'randomforestclassifier__min_samples_leaf': 1,
     'randomforestclassifier__max_features': 0.2
