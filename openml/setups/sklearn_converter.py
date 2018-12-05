@@ -29,6 +29,6 @@ def openml_param_name_to_sklearn(openml_parameter, flow):
     if openml_parameter.flow_name not in flow_structure:
         raise ValueError('Obtained OpenMLParameter and OpenMLFlow do not '
                          'correspond. ')
-
-    return '__'.join(flow_structure[openml_parameter.flow_name] + \
-                     [openml_parameter.parameter_name])
+    
+    name = openml_parameter.flow_name  # for PEP8
+    return '__'.join(flow_structure[name] + [openml_parameter.parameter_name])
