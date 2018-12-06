@@ -2,6 +2,7 @@ import unittest
 import os
 import sys
 import random
+from itertools import product
 if sys.version_info[0] >= 3:
     from unittest import mock
 else:
@@ -410,6 +411,7 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(result[did]['status'], 'active')
 
     def test_attributes_arff_from_df(self):
+        # DataFrame case
         df = pd.DataFrame(
             [[1, 1.0, 'xxx', 'A', True], [2, 2.0, 'yyy', 'B', False]],
             columns=['integer', 'floating', 'string', 'category', 'boolean']
@@ -421,6 +423,16 @@ class TestOpenMLDataset(TestBase):
                                       ('string', 'STRING'),
                                       ('category', ['A', 'B']),
                                       ('boolean', ['True', 'False'])])
+        # SparseDataFrame case
+        df = pd.SparseDataFrame([[1, 1.0],
+                                 [2, 2.0],
+                                 [0, 0]],
+                                columns=['integer', 'floating'],
+                                default_fill_value=0)
+        df['integer'] = df['integer'].astype(np.int64)
+        attributes = attributes_arff_from_df(df)
+        self.assertEqual(attributes, [('integer', 'INTEGER'),
+                                      ('floating', 'REAL')])
 
     def test_attributes_arff_from_df_mixed_dtype_categories(self):
         # liac-arff imposed categorical attributes to be of sting dtype. We
@@ -671,18 +683,6 @@ class TestOpenMLDataset(TestBase):
             **param
         )
 
-    def test_create_dataset_warning(self):
-
-        parameters = self._get_empty_param_for_dataset()
-        parameters['format'] = 'arff'
-        with catch_warnings():
-            filterwarnings('error')
-            self.assertRaises(
-                DeprecationWarning,
-                create_dataset,
-                **parameters
-            )
-
     def test_get_online_dataset_arff(self):
 
         # Australian dataset
@@ -756,7 +756,6 @@ class TestOpenMLDataset(TestBase):
             citation=citation,
             attributes='auto',
             data=df,
-            format=None,
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url
@@ -766,6 +765,45 @@ class TestOpenMLDataset(TestBase):
             _get_online_dataset_arff(upload_did),
             dataset._dataset,
             "Uploaded ARFF does not match original one"
+        )
+
+        # Check that SparseDataFrame are supported properly
+        sparse_data = scipy.sparse.coo_matrix((
+            [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
+        ))
+        column_names = ['input1', 'input2', 'y']
+        df = pd.SparseDataFrame(sparse_data, columns=column_names)
+        # meta-information
+        description = 'Synthetic dataset created from a Pandas SparseDataFrame'
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=citation,
+            attributes='auto',
+            data=df,
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        upload_did = dataset.publish()
+        self.assertEqual(
+            _get_online_dataset_arff(upload_did),
+            dataset._dataset,
+            "Uploaded ARFF does not match original one"
+        )
+        self.assertEqual(
+            _get_online_dataset_format(upload_did),
+            'sparse_arff',
+            "Wrong format for dataset"
         )
 
         # Check that we can overwrite the attributes
@@ -788,7 +826,6 @@ class TestOpenMLDataset(TestBase):
             citation=citation,
             attributes=attributes,
             data=df,
-            format=None,
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url
@@ -802,6 +839,102 @@ class TestOpenMLDataset(TestBase):
         )
         self.assertTrue(
             '@ATTRIBUTE rnd_str {a, b, c, d, e, f, g}' in downloaded_data)
+
+    def test_create_dataset_row_id_attribute_error(self):
+        # meta-information
+        name = 'Pandas_testing_dataset'
+        description = 'Synthetic dataset created from a Pandas DataFrame'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'target'
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+        # Check that the index name is well inferred.
+        data = [['a', 1, 0],
+                ['b', 2, 1],
+                ['c', 3, 0],
+                ['d', 4, 1],
+                ['e', 5, 0]]
+        column_names = ['rnd_str', 'integer', 'target']
+        df = pd.DataFrame(data, columns=column_names)
+        # affecting row_id_attribute to an unknown column should raise an error
+        err_msg = ("should be one of the data attribute.")
+        with pytest.raises(ValueError, match=err_msg):
+            openml.datasets.functions.create_dataset(
+                name=name,
+                description=description,
+                creator=creator,
+                contributor=None,
+                collection_date=collection_date,
+                language=language,
+                licence=licence,
+                default_target_attribute=default_target_attribute,
+                ignore_attribute=None,
+                citation=citation,
+                attributes='auto',
+                data=df,
+                row_id_attribute='unknown_row_id',
+                version_label='test',
+                original_data_url=original_data_url,
+                paper_url=paper_url
+            )
+
+    def test_create_dataset_row_id_attribute_inference(self):
+        # meta-information
+        name = 'Pandas_testing_dataset'
+        description = 'Synthetic dataset created from a Pandas DataFrame'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'target'
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+        # Check that the index name is well inferred.
+        data = [['a', 1, 0],
+                ['b', 2, 1],
+                ['c', 3, 0],
+                ['d', 4, 1],
+                ['e', 5, 0]]
+        column_names = ['rnd_str', 'integer', 'target']
+        df = pd.DataFrame(data, columns=column_names)
+        row_id_attr = [None, 'integer']
+        df_index_name = [None, 'index_name']
+        expected_row_id = [None, 'index_name', 'integer', 'integer']
+        for output_row_id, (row_id, index_name) in zip(expected_row_id,
+                                                       product(row_id_attr,
+                                                               df_index_name)):
+            df.index.name = index_name
+            dataset = openml.datasets.functions.create_dataset(
+                name=name,
+                description=description,
+                creator=creator,
+                contributor=None,
+                collection_date=collection_date,
+                language=language,
+                licence=licence,
+                default_target_attribute=default_target_attribute,
+                ignore_attribute=None,
+                citation=citation,
+                attributes='auto',
+                data=df,
+                row_id_attribute=row_id,
+                version_label='test',
+                original_data_url=original_data_url,
+                paper_url=paper_url
+            )
+            self.assertEqual(dataset.row_id_attribute, output_row_id)
+            upload_did = dataset.publish()
+            arff_dataset = arff.loads(_get_online_dataset_arff(upload_did))
+            arff_data = np.array(arff_dataset['data'], dtype=object)
+            # if we set the name of the index then the index will be added to
+            # the data
+            expected_shape = (5, 3) if index_name is None else (5, 4)
+            self.assertEqual(arff_data.shape, expected_shape)
 
     def test_create_dataset_attributes_auto_without_df(self):
         # attributes cannot be inferred without passing a dataframe
@@ -836,7 +969,6 @@ class TestOpenMLDataset(TestBase):
                 citation=citation,
                 attributes=attributes,
                 data=data,
-                format=None,
                 version_label='test',
                 original_data_url=original_data_url,
                 paper_url=paper_url
