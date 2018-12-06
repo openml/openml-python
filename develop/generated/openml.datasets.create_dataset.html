@@ -112,7 +112,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.create_dataset<a class="headerlink" href="#openml-datasets-create-dataset" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.datasets.create_dataset">
-<code class="descclassname">openml.datasets.</code><code class="descname">create_dataset</code><span class="sig-paren">(</span><em>name</em>, <em>description</em>, <em>creator</em>, <em>contributor</em>, <em>collection_date</em>, <em>language</em>, <em>licence</em>, <em>attributes</em>, <em>data</em>, <em>default_target_attribute</em>, <em>ignore_attribute</em>, <em>citation</em>, <em>row_id_attribute=None</em>, <em>format=None</em>, <em>original_data_url=None</em>, <em>paper_url=None</em>, <em>update_comment=None</em>, <em>version_label=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.create_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.datasets.</code><code class="descname">create_dataset</code><span class="sig-paren">(</span><em>name</em>, <em>description</em>, <em>creator</em>, <em>contributor</em>, <em>collection_date</em>, <em>language</em>, <em>licence</em>, <em>attributes</em>, <em>data</em>, <em>default_target_attribute</em>, <em>ignore_attribute</em>, <em>citation</em>, <em>row_id_attribute=None</em>, <em>original_data_url=None</em>, <em>paper_url=None</em>, <em>update_comment=None</em>, <em>version_label=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.create_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a dataset.</p>
 <p>This function creates an OpenMLDataset object.
 The OpenMLDataset object contains information related to the dataset
@@ -179,14 +179,6 @@ be discarded.
 .. versionadded: 0.8</p>
 <blockquote class="last">
 <div><p>Inference of <code class="docutils literal notranslate"><span class="pre">row_id_attribute</span></code> from a dataframe.</p>
-</div></blockquote>
-</dd>
-<dt><strong>format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
-<dd><p class="first">Format of the dataset which can be either ‘arff’ or ‘sparse_arff’.
-By default, the format is automatically inferred.
-.. deprecated: 0.8</p>
-<blockquote class="last">
-<div><p><code class="docutils literal notranslate"><span class="pre">format</span></code> is deprecated in 0.8 and will be removed in 0.10.</p>
 </div></blockquote>
 </dd>
 <dt><strong>original_data_url</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>

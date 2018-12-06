@@ -136,7 +136,7 @@ So far the run is only available locally. By calling the publish function, the r
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/11029
+    Uploaded to http://test.openml.org/r/12859
 
 
 We can now also inspect the flow object which was automatically created:
@@ -216,7 +216,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/11031
+    Uploaded to http://test.openml.org/r/12860
 
 
 Challenge
@@ -257,10 +257,10 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/11032
+    kNN on diabetes: http://test.openml.org/r/12861
 
 
-**Total running time of the script:** ( 0 minutes  13.710 seconds)
+**Total running time of the script:** ( 0 minutes  13.475 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:
