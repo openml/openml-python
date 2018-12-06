@@ -990,3 +990,38 @@ class TestSklearn(unittest.TestCase):
         # equals function for this
         assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig),
                            openml.flows.sklearn_to_flow(pipe_deserialized))
+
+    def test_openml_param_name_to_sklearn(self):
+        scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
+        boosting = sklearn.ensemble.AdaBoostClassifier(
+            base_estimator=sklearn.tree.DecisionTreeClassifier())
+        model = sklearn.pipeline.Pipeline(steps=[
+            ('scaler', scaler), ('boosting', boosting)])
+        flow = openml.flows.sklearn_to_flow(model)
+        task = openml.tasks.get_task(115)
+        run = openml.runs.run_flow_on_task(flow, task)
+        run = run.publish()
+        run = openml.runs.get_run(run.run_id)
+        setup = openml.setups.get_setup(run.setup_id)
+
+        # make sure to test enough parameters
+        self.assertGreater(len(setup.parameters), 15)
+
+        for parameter in setup.parameters.values():
+            sklearn_name = openml.flows.openml_param_name_to_sklearn(
+                parameter, flow)
+
+            # test the inverse. Currently, OpenML stores the hyperparameter
+            # fullName as flow.name + flow.version + parameter.name on the
+            # server (but this behaviour is not documented and might or might
+            # not change in the future. Hence, we won't offer this
+            # transformation functionality in the main package yet.)
+            splitted = sklearn_name.split("__")
+            if len(splitted) > 1:  # if len is 1, it is part of root flow
+                subflow = flow.get_subflow(splitted[0:-1])
+            else:
+                subflow = flow
+            openml_name = "%s(%s)_%s" % (subflow.name,
+                                         subflow.version,
+                                         splitted[-1])
+            self.assertEqual(parameter.full_name, openml_name)

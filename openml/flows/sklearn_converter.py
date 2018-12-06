@@ -177,6 +177,37 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False):
     return rval
 
 
+def openml_param_name_to_sklearn(openml_parameter, flow):
+    """
+    Converts the name of an OpenMLParameter into the sklean name, given a flow.
+
+    Parameters
+    ----------
+    openml_parameter: OpenMLParameter
+        The parameter under consideration
+
+    flow: OpenMLFlow
+        The flow that provides context.
+
+    Returns
+    -------
+    sklearn_parameter_name: str
+        The name the parameter will have once used in scikit-learn
+    """
+    if not isinstance(openml_parameter, openml.setups.OpenMLParameter):
+        raise ValueError('openml_parameter should be an instance of '
+                         'OpenMLParameter')
+    if not isinstance(flow, OpenMLFlow):
+        raise ValueError('flow should be an instance of OpenMLFlow')
+
+    flow_structure = flow.get_structure('name')
+    if openml_parameter.flow_name not in flow_structure:
+        raise ValueError('Obtained OpenMLParameter and OpenMLFlow do not '
+                         'correspond. ')
+    name = openml_parameter.flow_name  # for PEP8
+    return '__'.join(flow_structure[name] + [openml_parameter.parameter_name])
+
+
 def _serialize_model(model):
     """Create an OpenMLFlow.
 

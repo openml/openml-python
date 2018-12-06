@@ -9,17 +9,19 @@ One of the key features of the openml-python library is that is allows to
 reinstantiate flows with hyperparameter settings that were uploaded before.
 This tutorial uses the concept of setups. Although setups are not extensively
 described in the OpenML documentation (because most users will not directly
-use them)
+use them), they form a important concept within OpenML distinguishing between
+hyperparameter configurations.
+A setup is the combination of a flow with all its hyperparameters set.
 
 A key requirement for reinstantiating a flow is to have the same scikit-learn
-version as the flow that was uploaded. This tutorial will upload the flow
-itself, so it can be ran with any scikit-learn version that is supported by
-this library.
+version as the flow that was uploaded. However, this tutorial will upload the
+flow itself, so it can be ran with any scikit-learn version that is supported
+by this library.
 
-In this tutotial we will
-    1) Create a flow and use it to solve a task
+In this tutorial we will
+    1) Create a flow and use it to solve a task;
     2) Download the flow, reinstantiate the model with same hyperparameters,
-       and solve the same task again.
+       and solve the same task again;
     3) We will verify that the obtained results are exactly the same.
 Readers interested in reinstantiating a setup can skip part 1 and 2 and start
 with part 3 immediately.
@@ -40,7 +42,7 @@ root.setLevel(logging.INFO)
 ###############################################################################
 
 # first, let's download the task that we are interested in
-task = openml.tasks.get_task(6)  # letter dataset
+task = openml.tasks.get_task(6)
 
 
 # we will create a fairly complex model, with many preprocessing components and
@@ -48,20 +50,21 @@ task = openml.tasks.get_task(6)  # letter dataset
 # easy as you want it to be
 model_original = sklearn.pipeline.make_pipeline(
     sklearn.impute.SimpleImputer(),
-    sklearn.preprocessing.StandardScaler(),
     sklearn.ensemble.RandomForestClassifier()
 )
 
 
 # Let's change some hyperparameters. Of course, in any good application we
-# would tune them using, e.g., Random Search or SMAC, but for the purpose of
-# this tutorial we set them to some specific values that might or might not be
-# optimal
+# would tune them using, e.g., Random Search or Bayesian Optimization, but for
+# the purpose of this tutorial we set them to some specific values that might
+# or might not be optimal
 hyperparameters_original = {
     'simpleimputer__strategy': 'median',
-    'randomforestclassifier__random_state': 42,
+    'randomforestclassifier__criterion': 'entropy',
+    'randomforestclassifier__max_features': 0.2,
     'randomforestclassifier__min_samples_leaf': 1,
-    'randomforestclassifier__max_features': 0.2
+    'randomforestclassifier__n_estimators': 16,
+    'randomforestclassifier__random_state': 42,
 }
 model_original.set_params(**hyperparameters_original)
 
@@ -96,5 +99,5 @@ run_duplicate = openml.runs.run_model_on_task(
 ###############################################################################
 
 # the run has stored all predictions in the field data content
-np.testing.assert_array_equal(run_original.data_content, 
+np.testing.assert_array_equal(run_original.data_content,
                               run_duplicate.data_content)

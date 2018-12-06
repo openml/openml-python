@@ -363,7 +363,7 @@ class OpenMLFlow(object):
         """
         Returns for each sub-component of the flow the path of identifiers that
         should be traversed to reach this component. The resulting dict maps a
-        key (identifying a flow be either its id, name or fullname) to the
+        key (identifying a flow by either its id, name or fullname) to the
         parameter prefix.
 
         Parameters
@@ -374,7 +374,7 @@ class OpenMLFlow(object):
 
         Returns
         -------
-        structure: dict[str, List[str]]
+        dict[str, List[str]]
             The flow structure
         """
         if key_item not in ['flow_id', 'name']:
@@ -398,7 +398,7 @@ class OpenMLFlow(object):
 
         Returns
         -------
-        sub_component: OpenMLFlow
+        OpenMLFlow
             The OpenMLFlow that corresponds to the structure
         """
         if len(structure) < 1:
