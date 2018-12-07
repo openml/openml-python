@@ -112,15 +112,27 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>.get_flow<a class="headerlink" href="#openml-flows-get-flow" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.flows.get_flow">
-<code class="descclassname">openml.flows.</code><code class="descname">get_flow</code><span class="sig-paren">(</span><em>flow_id</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.flows.get_flow" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.flows.</code><code class="descname">get_flow</code><span class="sig-paren">(</span><em>flow_id</em>, <em>reinstantiate=False</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.flows.get_flow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download the OpenML flow for a given flow ID.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>flow_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
 <dd><p class="first last">The OpenML flow id.</p>
+</dd>
+<dt><strong>reinstantiate: bool</strong></dt>
+<dd><p class="first last">Whether to reinstantiate the flow to a sklearn model.
+Note that this can only be done with sklearn flows, and
+when</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>flow</strong> <span class="classifier-delimiter">:</span> <span class="classifier">OpenMLFlow</span></dt>
+<dd><p class="first last">the flow</p>
 </dd>
 </dl>
 </td>
