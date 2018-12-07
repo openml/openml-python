@@ -5,6 +5,7 @@ Dataset upload tutorial
 A tutorial on how to create and upload a dataset to OpenML.
 """
 import numpy as np
+import pandas as pd
 import sklearn.datasets
 from scipy.sparse import coo_matrix
 
@@ -12,28 +13,29 @@ import openml
 from openml.datasets.functions import create_dataset
 
 ############################################################################
-# For this tutorial we will upload to the test server to not  pollute the live
+# For this tutorial we will upload to the test server to not pollute the live
 # server with countless copies of the same dataset.
 openml.config.server = 'https://test.openml.org/api/v1/xml'
 
 ############################################################################
-# Below we will cover the following cases of the
-# dataset object:
+# Below we will cover the following cases of the dataset object:
 #
 # * A numpy array
 # * A list
+# * A pandas dataframe
 # * A sparse matrix
+# * A pandas sparse dataframe
 
 ############################################################################
 # Dataset is a numpy array
 # ========================
-# A numpy array can contain lists in the case of dense data
-# or it can contain OrderedDicts in the case of sparse data.
+# A numpy array can contain lists in the case of dense data or it can contain
+# OrderedDicts in the case of sparse data.
 #
 # Prepare dataset
 # ^^^^^^^^^^^^^^^
-# Load an example dataset from scikit-learn which we
-# will upload to OpenML.org via the API.
+# Load an example dataset from scikit-learn which we will upload to OpenML.org
+# via the API.
 
 diabetes = sklearn.datasets.load_diabetes()
 name = 'Diabetes(scikit-learn)'
@@ -43,11 +45,11 @@ attribute_names = diabetes.feature_names
 description = diabetes.DESCR
 
 ############################################################################
-# OpenML does not distinguish between the attributes and
-# targets on the data level and stores all data in a single matrix.
+# OpenML does not distinguish between the attributes and targets on the data
+# level and stores all data in a single matrix.
 #
-# The target feature is indicated as meta-data of the
-# dataset (and tasks on that data).
+# The target feature is indicated as meta-data of the dataset (and tasks on
+# that data).
 
 data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
@@ -67,13 +69,13 @@ paper_url = (
 ############################################################################
 # Create the dataset object
 # ^^^^^^^^^^^^^^^^^^^^^^^^^
-# The definition of all fields can be found in the
-# XSD files describing the expected format:
+# The definition of all fields can be found in the XSD files describing the
+# expected format:
 #
 # https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd
 
 diabetes_dataset = create_dataset(
-    # The name of the dataset (needs to be unique). 
+    # The name of the dataset (needs to be unique).
     # Must not be longer than 128 characters and only contain
     # a-z, A-Z, 0-9 and the following special characters: _\-\.(),
     name=name,
@@ -93,9 +95,11 @@ diabetes_dataset = create_dataset(
     licence='BSD (from scikit-learn)',
     # Name of the target. Can also have multiple values (comma-separated).
     default_target_attribute='class',
-    # The attribute that represents the row-id column, if present in the dataset.
+    # The attribute that represents the row-id column, if present in the
+    # dataset.
     row_id_attribute=None,
-    # Attributes that should be excluded in modelling, such as identifiers and indexes.
+    # Attributes that should be excluded in modelling, such as identifiers and
+    # indexes.
     ignore_attribute=None,
     # How to cite the paper.
     citation=citation,
@@ -118,8 +122,8 @@ print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 ############################################################################
 # Dataset is a list
 # =================
-# A list can contain lists in the case of dense data
-# or it can contain OrderedDicts in the case of sparse data.
+# A list can contain lists in the case of dense data or it can contain
+# OrderedDicts in the case of sparse data.
 #
 # Weather dataset:
 # http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
@@ -189,12 +193,58 @@ upload_did = weather_dataset.publish()
 print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 
 ############################################################################
+# Dataset is a pandas DataFrame
+# =============================
+# It might happen that your dataset is made of heterogeneous data which can be
+# usually stored as a Pandas DataFrame. DataFrame offers the adavantages to
+# store the type of data for each column as well as the attribute names.
+# Therefore, when providing a Pandas DataFrame, OpenML can infer those
+# information without the need to specifically provide them when calling the
+# function :func:`create_dataset`. In this regard, you only need to pass
+# ``'auto'`` to the ``attributes`` parameter.
+
+df = pd.DataFrame(data, columns=[col_name for col_name, _ in attribute_names])
+# enforce the categorical column to have a categorical dtype
+df['outlook'] = df['outlook'].astype('category')
+df['windy'] = df['windy'].astype('bool')
+df['play'] = df['play'].astype('category')
+print(df.info())
+
+############################################################################
+# We enforce the column 'outlook', 'windy', and 'play' to be a categorical
+# dtype while the column 'rnd_str' is kept as a string column. Then, we can
+# call :func:`create_dataset` by passing the dataframe and fixing the parameter
+# ``attributes`` to ``'auto'``.
+
+weather_dataset = create_dataset(
+    name="Weather",
+    description=description,
+    creator='I. H. Witten, E. Frank, M. A. Hall, and ITPro',
+    contributor=None,
+    collection_date='01-01-2011',
+    language='English',
+    licence=None,
+    default_target_attribute='play',
+    row_id_attribute=None,
+    ignore_attribute=None,
+    citation=citation,
+    attributes='auto',
+    data=df,
+    version_label='example',
+)
+
+############################################################################
+
+upload_did = weather_dataset.publish()
+print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+
+############################################################################
 # Dataset is a sparse matrix
 # ==========================
 
 sparse_data = coo_matrix((
     [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-    ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1]),
+    ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
 ))
 
 column_names = [
@@ -217,6 +267,41 @@ xor_dataset = create_dataset(
     citation=None,
     attributes=column_names,
     data=sparse_data,
+    version_label='example',
+)
+
+############################################################################
+
+upload_did = xor_dataset.publish()
+print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+
+
+############################################################################
+# Dataset is a pandas sparse dataframe
+# ====================================
+
+sparse_data = coo_matrix((
+    [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+    ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
+))
+column_names = ['input1', 'input2', 'y']
+df = pd.SparseDataFrame(sparse_data, columns=column_names)
+print(df.info())
+
+xor_dataset = create_dataset(
+    name="XOR",
+    description='Dataset representing the XOR operation',
+    creator=None,
+    contributor=None,
+    collection_date=None,
+    language='English',
+    licence=None,
+    default_target_attribute='y',
+    row_id_attribute=None,
+    ignore_attribute=None,
+    citation=None,
+    attributes='auto',
+    data=df,
     version_label='example',
 )
 

@@ -10,9 +10,10 @@ from ..exceptions import OpenMLCacheException
 from ..datasets import get_dataset
 from .task import (
     OpenMLClassificationTask,
-    OpenMLRegressionTask,
     OpenMLClusteringTask,
     OpenMLLearningCurveTask,
+    OpenMLRegressionTask,
+    OpenMLSupervisedTask
 )
 import openml.utils
 import openml._api_calls
@@ -294,9 +295,13 @@ def get_task(task_id):
         try:
             task = _get_task_description(task_id)
             dataset = get_dataset(task.dataset_id)
-            class_labels = dataset.retrieve_class_labels(task.target_name)
-            task.class_labels = class_labels
-            task.download_split()
+            # Clustering tasks do not have class labels
+            # and do not offer download_split
+            if isinstance(task, OpenMLSupervisedTask):
+                task.download_split()
+                if isinstance(task, OpenMLClassificationTask):
+                    task.class_labels = \
+                        dataset.retrieve_class_labels(task.target_name)
         except Exception as e:
             openml.utils._remove_cache_dir_for_id(
                 TASKS_CACHE_DIR_NAME,
@@ -325,6 +330,7 @@ def _get_task_description(task_id):
             fh.write(task_xml)
         return _create_task_from_xml(task_xml)
 
+
 def _create_task_from_xml(xml):
     """Create a task given a xml string.
 
@@ -338,28 +344,26 @@ def _create_task_from_xml(xml):
     OpenMLTask
     """
     dic = xmltodict.parse(xml)["oml:task"]
-
     estimation_parameters = dict()
     inputs = dict()
     # Due to the unordered structure we obtain, we first have to extract
     # the possible keys of oml:input; dic["oml:input"] is a list of
     # OrderedDicts
-    for input_ in dic["oml:input"]:
-        name = input_["@name"]
-        inputs[name] = input_
+
+    # Check if there is a list of inputs
+    if isinstance(dic["oml:input"], list):
+        for input_ in dic["oml:input"]:
+            name = input_["@name"]
+            inputs[name] = input_
+    # Single input case
+    elif isinstance(dic["oml:input"], dict):
+        name = dic["oml:input"]["@name"]
+        inputs[name] = dic["oml:input"]
 
     evaluation_measures = None
     if 'evaluation_measures' in inputs:
         evaluation_measures = inputs["evaluation_measures"][
             "oml:evaluation_measures"]["oml:evaluation_measure"]
-
-    # Convert some more parameters
-    for parameter in \
-            inputs["estimation_procedure"]["oml:estimation_procedure"][
-                "oml:parameter"]:
-        name = parameter["@name"]
-        text = parameter.get("#text", "")
-        estimation_parameters[name] = text
 
     task_type = dic["oml:task_type"]
     common_kwargs = {
@@ -368,9 +372,6 @@ def _create_task_from_xml(xml):
         'task_type_id': dic["oml:task_type_id"],
         'data_set_id': inputs["source_data"][
             "oml:data_set"]["oml:data_set_id"],
-        'estimation_procedure_type': inputs["estimation_procedure"][
-                "oml:estimation_procedure"]["oml:type"],
-        'estimation_parameters': estimation_parameters,
         'evaluation_measure': evaluation_measures,
     }
     if task_type in (
@@ -378,6 +379,18 @@ def _create_task_from_xml(xml):
         "Supervised Regression",
         "Learning Curve"
     ):
+        # Convert some more parameters
+        for parameter in \
+                inputs["estimation_procedure"]["oml:estimation_procedure"][
+                    "oml:parameter"]:
+            name = parameter["@name"]
+            text = parameter.get("#text", "")
+            estimation_parameters[name] = text
+
+        common_kwargs['estimation_procedure_type'] = inputs[
+            "estimation_procedure"][
+            "oml:estimation_procedure"]["oml:type"]
+        common_kwargs['estimation_parameters'] = estimation_parameters
         common_kwargs['target_name'] = inputs[
                 "source_data"]["oml:data_set"]["oml:target_feature"]
         common_kwargs['data_splits_url'] = inputs["estimation_procedure"][
