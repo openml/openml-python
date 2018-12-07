@@ -627,7 +627,8 @@ class TestRun(TestBase):
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
             self.assertIsInstance(flow_exists, int)
             self.assertGreater(flow_exists, 0)
-            downloaded_flow = openml.flows.get_flow(flow_exists)
+            downloaded_flow = openml.flows.get_flow(flow_exists,
+                                                    reinstantiate=True)
             setup_exists = openml.setups.setup_exists(downloaded_flow)
             self.assertIsInstance(setup_exists, int)
             self.assertGreater(setup_exists, 0)
