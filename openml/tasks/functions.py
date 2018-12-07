@@ -387,8 +387,8 @@ def _create_task_from_xml(xml):
 
         common_kwargs['estimation_procedure_type'] = inputs[
             "estimation_procedure"][
-            "oml:estimation_procedure"]["oml:type"],
-        common_kwargs['estimation_parameters'] = estimation_parameters,
+            "oml:estimation_procedure"]["oml:type"]
+        common_kwargs['estimation_parameters'] = estimation_parameters
         common_kwargs['target_name'] = inputs[
                 "source_data"]["oml:data_set"]["oml:target_feature"]
         common_kwargs['data_splits_url'] = inputs["estimation_procedure"][
