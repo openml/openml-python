@@ -15,8 +15,9 @@ A setup is the combination of a flow with all its hyperparameters set.
 
 A key requirement for reinstantiating a flow is to have the same scikit-learn
 version as the flow that was uploaded. However, this tutorial will upload the
-flow itself, so it can be ran with any scikit-learn version that is supported
-by this library.
+flow (that will later be reinstantiated) itself, so it can be ran with any
+scikit-learn version that is supported by this library. In this case, the
+requirement of the corresponding scikit-learn versions is automatically met.
 
 In this tutorial we will
     1) Create a flow and use it to solve a task;
