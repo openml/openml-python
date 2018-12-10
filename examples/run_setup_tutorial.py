@@ -23,8 +23,6 @@ In this tutorial we will
     2) Download the flow, reinstantiate the model with same hyperparameters,
        and solve the same task again;
     3) We will verify that the obtained results are exactly the same.
-Readers interested in reinstantiating a setup can skip part 1 and 2 and start
-with part 3 immediately.
 """
 import logging
 import numpy as np
