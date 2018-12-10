@@ -230,19 +230,20 @@ class OpenMLDataset(object):
 
                     # We convert each column to the dtype of origin
                     # (i.e., during the uploading to OpenML)
+                    col = []
                     for column_name in X.columns:
                         # True and False are stored as category and we are
                         # converting them back to boolean
                         if attribute_dtype[column_name] == 'boolean':
-                            X[column_name] = self._create_column_bool(
+                            col.append(self._create_column_bool(
                                 X[column_name],
                                 categories_names[column_name]
-                            )
+                            ))
                         elif attribute_dtype[column_name] == 'categorical':
-                            X[column_name] = self._unpack_categories(
+                            col.append(self._unpack_categories(
                                 X[column_name],
                                 categories_names[column_name]
-                            )
+                            ))
                         elif (attribute_dtype[column_name] == 'integer' and
                               pd.api.types.infer_dtype(
                                   X[column_name]) != 'integer'):
@@ -251,14 +252,17 @@ class OpenMLDataset(object):
                                 # is supposed of integer dtype, we store it as
                                 # an object column of mixed dtype (int and
                                 # float for the np.nan marker).
-                                X[column_name] = \
-                                self._create_column_int_with_NA(X[column_name])
+                                col.append(
+                                    self._create_column_int_with_NA(
+                                        X[column_name])
+                                )
                             else:
-                                X[column_name] = X[column_name].astype(int)
+                                col.append(X[column_name].astype(int))
                         elif (attribute_dtype[column_name] == 'floating' and
                               pd.api.types.infer_dtype(
                                   X[column_name]) != 'floating'):
-                            X[column_name] = X[column_name].astype(float)
+                            col.append(X[column_name].astype(float))
+                    X = pd.concat(X, axis=1)
                 else:
                     raise Exception()
 
