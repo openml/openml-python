@@ -5,7 +5,6 @@ import time
 import openml
 import openml.exceptions
 from openml.testing import TestBase
-import sklearn
 
 from sklearn.ensemble import BaggingClassifier
 from sklearn.tree import DecisionTreeClassifier
