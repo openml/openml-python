@@ -11,7 +11,6 @@ import re
 import six
 import warnings
 import sys
-import inspect
 
 import numpy as np
 import scipy.stats.distributions

@@ -1,4 +1,4 @@
-from .flow import OpenMLFlow, _copy_server_fields
+from .flow import OpenMLFlow
 
 from .sklearn_converter import sklearn_to_flow, flow_to_sklearn, \
     openml_param_name_to_sklearn

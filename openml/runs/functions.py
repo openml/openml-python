@@ -17,8 +17,9 @@ import openml.utils
 import openml._api_calls
 from ..exceptions import PyOpenMLError
 from .. import config
-from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
-    _copy_server_fields, OpenMLFlow
+from openml.flows.sklearn_converter import _check_n_jobs
+from openml.flows.flow import _copy_server_fields
+from ..flows import sklearn_to_flow, get_flow, flow_exists, OpenMLFlow
 from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..tasks import OpenMLTask
