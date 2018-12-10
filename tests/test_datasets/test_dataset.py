@@ -34,8 +34,6 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual((898, 39), rval.shape)
         rval, categorical = self.dataset.get_data(
             return_categorical_indicator=True)
-        print(rval)
-        print(categorical)
         self.assertEqual(len(categorical), 39)
         self.assertTrue(all([isinstance(cat, bool) for cat in categorical]))
         rval, attribute_names = self.dataset.get_data(
@@ -146,6 +144,8 @@ class OpenMLDatasetTest(TestBase):
             'home.dest': 'object'
         }
         for col_name in data.columns:
+            print(data[col_name].dtype.name)
+            print(col_dtype[col_name])
             self.assertTrue(data[col_name].dtype.name == col_dtype[col_name])
 
         X, y = self.titanic.get_data(
@@ -170,24 +170,6 @@ class OpenMLDatasetTest(TestBase):
                 'Test',
                 format='arff'
             )
-
-
-class OpenMLGetData(TestBase):
-    def setUp(self):
-        super(OpenMLGetData, self).setUp()
-
-    def test_get_data_xxx(self):
-        download_dataset = get_dataset(4659)
-        df = download_dataset.get_data(dataset_format='dataframe')
-        attributes_inferred = attributes_arff_from_df(df)
-        attributes_expected = [('rnd_str', 'STRING'),
-                               ('outlook', ['overcast', 'rainy', 'sunny']),
-                               ('temperature', 'REAL'),
-                               ('humidity', 'REAL'),
-                               ('windy', ['True', 'False']),
-                               ('play', ['no', 'yes']),
-                               ('integer', 'INTEGER')]
-        self.assertEqual(attributes_inferred, attributes_expected)
 
 
 class OpenMLDatasetTestOnTestServer(TestBase):

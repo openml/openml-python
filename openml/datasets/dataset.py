@@ -226,43 +226,16 @@ class OpenMLDataset(object):
 
                 elif self.format.lower() == 'arff':
                     X = pd.DataFrame(data['data'], columns=attribute_names)
-                    X_null_count = X.isnull().sum()
 
-                    # We convert each column to the dtype of origin
-                    # (i.e., during the uploading to OpenML)
                     col = []
                     for column_name in X.columns:
-                        # True and False are stored as category and we are
-                        # converting them back to boolean
-                        if attribute_dtype[column_name] == 'boolean':
-                            col.append(self._create_column_bool(
-                                X[column_name],
-                                categories_names[column_name]
-                            ))
-                        elif attribute_dtype[column_name] == 'categorical':
+                        if attribute_dtype[column_name] in ('categorical',
+                                                            'boolean'):
                             col.append(self._unpack_categories(
-                                X[column_name],
-                                categories_names[column_name]
-                            ))
-                        elif (attribute_dtype[column_name] == 'integer' and
-                              pd.api.types.infer_dtype(
-                                  X[column_name]) != 'integer'):
-                            if X_null_count[column_name] > 0:
-                                # If there is so missing values and the column
-                                # is supposed of integer dtype, we store it as
-                                # an object column of mixed dtype (int and
-                                # float for the np.nan marker).
-                                col.append(
-                                    self._create_column_int_with_NA(
-                                        X[column_name])
-                                )
-                            else:
-                                col.append(X[column_name].astype(int))
-                        elif (attribute_dtype[column_name] == 'floating' and
-                              pd.api.types.infer_dtype(
-                                  X[column_name]) != 'floating'):
-                            col.append(X[column_name].astype(float))
-                    X = pd.concat(X, axis=1)
+                                X[column_name], categories_names[column_name]))
+                        else:
+                            col.append(X[column_name])
+                    X = pd.concat(col, axis=1)
                 else:
                     raise Exception()
 
@@ -386,26 +359,6 @@ class OpenMLDataset(object):
         return data
 
     @staticmethod
-    def _create_column_int_with_NA(series):
-        """Convert to object an int series containing missing values."""
-        col = [np.nan
-               if x is None or np.isnan(x)
-               else int(x) for x in series]
-        return pd.Series(col, index=series.index, dtype=object)
-
-    @staticmethod
-    def _create_column_bool(series, categories):
-        col = []
-        for x in series:
-            try:
-                val = categories[int(x)]
-                val = True if val.lower() == 'true' else False
-                col.append(val)
-            except (TypeError, ValueError):
-                col.append(np.nan)
-        return pd.Series(col, index=series.index)
-
-    @staticmethod
     def _unpack_categories(series, categories):
         col = []
         for x in series:
@@ -413,7 +366,8 @@ class OpenMLDataset(object):
                 col.append(categories[int(x)])
             except (TypeError, ValueError):
                 col.append(np.nan)
-        return pd.Series(col, index=series.index, dtype='category')
+        return pd.Series(col, index=series.index, dtype='category',
+                         name=series.name)
 
     def get_data(self, target=None,
                  include_row_id=False,
