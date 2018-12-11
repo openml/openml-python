@@ -89,6 +89,26 @@ General examples for OpenML usage.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="By: Jan N. van Rijn">
+
+.. only:: html
+
+    .. figure:: /examples/images/thumb/sphx_glr_run_setup_tutorial_thumb.png
+
+        :ref:`sphx_glr_examples_run_setup_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/run_setup_tutorial
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to create and upload a dataset to OpenML. ">
 
 .. only:: html

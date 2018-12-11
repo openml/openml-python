@@ -206,6 +206,62 @@ machines.</p>
 </tbody>
 </table>
 <dl class="method">
+<dt id="openml.OpenMLFlow.get_structure">
+<code class="descname">get_structure</code><span class="sig-paren">(</span><em>key_item</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.get_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns for each sub-component of the flow the path of identifiers that
+should be traversed to reach this component. The resulting dict maps a
+key (identifying a flow by either its id, name or fullname) to the
+parameter prefix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>key_item: str</strong></dt>
+<dd><p class="first last">The flow attribute that will be used to identify flows in the
+structure. Allowed values {flow_id, name}</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict[str, List[str]]</strong></dt>
+<dd><p class="first last">The flow structure</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLFlow.get_subflow">
+<code class="descname">get_subflow</code><span class="sig-paren">(</span><em>structure</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.get_subflow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a subflow from the tree of dependencies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>structure: list[str]</strong></dt>
+<dd><p class="first last">A list of strings, indicating the location of the subflow</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>OpenMLFlow</strong></dt>
+<dd><p class="first last">The OpenMLFlow that corresponds to the structure</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="openml.OpenMLFlow.publish">
 <code class="descname">publish</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.publish" title="Permalink to this definition">¶</a></dt>
 <dd><p>Publish flow to OpenML server.</p>
