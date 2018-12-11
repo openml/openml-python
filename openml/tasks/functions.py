@@ -172,7 +172,7 @@ def _list_tasks(task_type_id=None, **kwargs):
         - Survival Analysis: 7
         - Subgroup Discovery: 8
     kwargs: dict, optional
-        Legal filter operators: tag, data_tag, status, limit,
+        Legal filter operators: tag, task_id (list), data_tag, status, limit,
         offset, data_id, data_name, number_instances, number_features,
         number_classes, number_missing_values.
     Returns
@@ -184,6 +184,8 @@ def _list_tasks(task_type_id=None, **kwargs):
         api_call += "/type/%d" % int(task_type_id)
     if kwargs is not None:
         for operator, value in kwargs.items():
+            if operator == 'task_id':
+                value = ','.join([str(int(i)) for i in value])
             api_call += "/%s/%s" % (operator, value)
     return __list_tasks(api_call)
 

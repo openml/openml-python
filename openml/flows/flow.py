@@ -346,6 +346,60 @@ class OpenMLFlow(object):
                              (flow_id, message))
         return self
 
+    def get_structure(self, key_item):
+        """
+        Returns for each sub-component of the flow the path of identifiers that
+        should be traversed to reach this component. The resulting dict maps a
+        key (identifying a flow by either its id, name or fullname) to the
+        parameter prefix.
+
+        Parameters
+        ----------
+        key_item: str
+            The flow attribute that will be used to identify flows in the
+            structure. Allowed values {flow_id, name}
+
+        Returns
+        -------
+        dict[str, List[str]]
+            The flow structure
+        """
+        if key_item not in ['flow_id', 'name']:
+            raise ValueError('key_item should be in {flow_id, name}')
+        structure = dict()
+        for key, sub_flow in self.components.items():
+            sub_structure = sub_flow.get_structure(key_item)
+            for flow_name, flow_sub_structure in sub_structure.items():
+                structure[flow_name] = [key] + flow_sub_structure
+        structure[getattr(self, key_item)] = []
+        return structure
+
+    def get_subflow(self, structure):
+        """
+        Returns a subflow from the tree of dependencies.
+
+        Parameters
+        ----------
+        structure: list[str]
+            A list of strings, indicating the location of the subflow
+
+        Returns
+        -------
+        OpenMLFlow
+            The OpenMLFlow that corresponds to the structure
+        """
+        if len(structure) < 1:
+            raise ValueError('Please provide a structure list of size >= 1')
+        sub_identifier = structure[0]
+        if sub_identifier not in self.components:
+            raise ValueError('Flow %s does not contain component with '
+                             'identifier %s' % (self.name, sub_identifier))
+        if len(structure) == 1:
+            return self.components[sub_identifier]
+        else:
+            structure.pop(0)
+            return self.components[sub_identifier].get_subflow(structure)
+
     def push_tag(self, tag):
         """Annotates this flow with a tag on the server.
 

@@ -74,6 +74,30 @@ class TestFlow(TestBase):
         self.assertEqual(subflow_3.parameters['L'], '-1')
         self.assertEqual(len(subflow_3.components), 0)
 
+    def test_get_structure(self):
+        # also responsible for testing: flow.get_subflow
+        # We need to use the production server here because 4024 is not the
+        # test server
+        openml.config.server = self.production_server
+
+        flow = openml.flows.get_flow(4024)
+        flow_structure_name = flow.get_structure('name')
+        flow_structure_id = flow.get_structure('flow_id')
+        # components: root (filteredclassifier), multisearch, loginboost,
+        # reptree
+        self.assertEqual(len(flow_structure_name), 4)
+        self.assertEqual(len(flow_structure_id), 4)
+
+        for sub_flow_name, structure in flow_structure_name.items():
+            if len(structure) > 0:  # skip root element
+                subflow = flow.get_subflow(structure)
+                self.assertEqual(subflow.name, sub_flow_name)
+
+        for sub_flow_id, structure in flow_structure_id.items():
+            if len(structure) > 0:  # skip root element
+                subflow = flow.get_subflow(structure)
+                self.assertEqual(subflow.flow_id, sub_flow_id)
+
     def test_tagging(self):
         flow_list = openml.flows.list_flows(size=1)
         flow_id = list(flow_list.keys())[0]

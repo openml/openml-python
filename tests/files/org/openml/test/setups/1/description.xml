@@ -4,6 +4,7 @@
 	<oml:parameter>
 		<oml:id>3432</oml:id>
 		<oml:flow_id>60</oml:flow_id>
+		<oml:flow_name>weka.J48</oml:flow_name>
 		<oml:full_name>weka.J48(1)_C</oml:full_name>
 		<oml:parameter_name>C</oml:parameter_name>
 		<oml:data_type>option</oml:data_type>
@@ -13,6 +14,7 @@
 	<oml:parameter>
 		<oml:id>3435</oml:id>
 		<oml:flow_id>60</oml:flow_id>
+		<oml:flow_name>weka.J48</oml:flow_name>
 		<oml:full_name>weka.J48(1)_M</oml:full_name>
 		<oml:parameter_name>M</oml:parameter_name>
 		<oml:data_type>option</oml:data_type>
