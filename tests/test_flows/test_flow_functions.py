@@ -5,9 +5,10 @@ import unittest
 import six
 
 import openml
+from openml.testing import TestBase
 
 
-class TestFlowFunctions(unittest.TestCase):
+class TestFlowFunctions(TestBase):
     _multiprocess_can_split_ = True
 
     def _check_flow(self, flow):
