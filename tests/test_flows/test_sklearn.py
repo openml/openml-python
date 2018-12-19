@@ -62,6 +62,7 @@ class TestSklearn(TestBase):
     # than 1 seconds
 
     def setUp(self):
+        super(TestSklearn, self).setUp()
         iris = sklearn.datasets.load_iris()
         self.X = iris.data
         self.y = iris.target
