@@ -24,6 +24,7 @@ class TestFlowFunctions(TestBase):
                         flow['external_version'] is None)
 
     def test_list_flows(self):
+        openml.config.server = self.production_server
         # We can only perform a smoke test here because we test on dynamic
         # data from the internet...
         flows = openml.flows.list_flows()
@@ -33,6 +34,7 @@ class TestFlowFunctions(TestBase):
             self._check_flow(flows[fid])
 
     def test_list_flows_empty(self):
+        openml.config.server = self.production_server
         flows = openml.flows.list_flows(tag='NoOneEverUsesThisTag123')
         if len(flows) > 0:
             raise ValueError('UnitTest Outdated, got somehow results (please adapt)')
@@ -40,12 +42,14 @@ class TestFlowFunctions(TestBase):
         self.assertIsInstance(flows, dict)
 
     def test_list_flows_by_tag(self):
+        openml.config.server = self.production_server
         flows = openml.flows.list_flows(tag='weka')
         self.assertGreaterEqual(len(flows), 5)
         for did in flows:
             self._check_flow(flows[did])
 
     def test_list_flows_paginate(self):
+        openml.config.server = self.production_server
         size = 10
         max = 100
         for i in range(0, max, size):
