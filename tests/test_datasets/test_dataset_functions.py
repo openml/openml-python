@@ -367,7 +367,7 @@ class TestOpenMLDataset(TestBase):
     def test_upload_dataset_with_url(self):
 
         dataset = OpenMLDataset(
-            "%s-UploadTestWithURL" %  self._get_sentinel(),
+            "%s-UploadTestWithURL" % self._get_sentinel(),
             "test",
             data_format="arff",
             version=1,
