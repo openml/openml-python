@@ -69,7 +69,7 @@ Run the scikit-learn model on the task (requires an API key).
 
  .. code-block:: none
 
-    URL for run: https://test.openml.org/api/v1/xml/run/21188
+    URL for run: https://test.openml.org/api/v1/xml/run/21324
 
 
 **Total running time of the script:** ( 0 minutes  3.284 seconds)
