@@ -136,7 +136,7 @@ So far the run is only available locally. By calling the publish function, the r
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/21427
+    Uploaded to http://test.openml.org/r/21569
 
 
 We can now also inspect the flow object which was automatically created:
@@ -211,7 +211,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/21428
+    Uploaded to http://test.openml.org/r/21570
 
 
 Challenge
@@ -252,7 +252,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/21429
+    kNN on diabetes: http://test.openml.org/r/21571
 
 
 **Total running time of the script:** ( 0 minutes  13.471 seconds)
