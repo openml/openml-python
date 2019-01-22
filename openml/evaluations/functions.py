@@ -1,13 +1,14 @@
+import csv
 import xmltodict
 
-from openml.exceptions import OpenMLServerNoResult
 import openml.utils
 import openml._api_calls
 from ..evaluations import OpenMLEvaluation
 
 
 def list_evaluations(function, offset=None, size=None, id=None, task=None,
-                     setup=None, flow=None, uploader=None, tag=None):
+                     setup=None, flow=None, uploader=None, tag=None,
+                     per_fold=None):
     """
     List all run-evaluation pairs matching all of the given filters.
     (Supports large amount of results)
@@ -33,13 +34,19 @@ def list_evaluations(function, offset=None, size=None, id=None, task=None,
 
     tag : str, optional
 
+    per_fold : bool, optional
+
     Returns
     -------
     dict
     """
+    if per_fold is not None:
+        per_fold = str(per_fold).lower()
 
-    return openml.utils._list_all(_list_evaluations, function, offset=offset, size=size,
-                                  id=id, task=task, setup=setup, flow=flow, uploader=uploader, tag=tag)
+    return openml.utils._list_all(_list_evaluations, function, offset=offset,
+                                  size=size, id=id, task=task, setup=setup,
+                                  flow=flow, uploader=uploader, tag=tag,
+                                  per_fold=per_fold)
 
 
 def _list_evaluations(function, id=None, task=None,
@@ -94,11 +101,12 @@ def _list_evaluations(function, id=None, task=None,
 def __list_evaluations(api_call):
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call)
+    print(xml_string)
     evals_dict = xmltodict.parse(xml_string, force_list=('oml:evaluation',))
     # Minimalistic check if the XML is useful
     if 'oml:evaluations' not in evals_dict:
-        raise ValueError('Error in return XML, does not contain "oml:evaluations": %s'
-                         % str(evals_dict))
+        raise ValueError('Error in return XML, does not contain '
+                         '"oml:evaluations": %s' % str(evals_dict))
 
     assert type(evals_dict['oml:evaluations']['oml:evaluation']) == list, \
         type(evals_dict['oml:evaluations'])
@@ -106,15 +114,25 @@ def __list_evaluations(api_call):
     evals = dict()
     for eval_ in evals_dict['oml:evaluations']['oml:evaluation']:
         run_id = int(eval_['oml:run_id'])
+        value = None
+        values = None
         array_data = None
+        if 'oml:value' in eval_:
+            value = float(eval_['oml:value'])
+        if 'oml:values' in eval_:
+            values = csv.reader(eval_['oml:values'])
         if 'oml:array_data' in eval_:
             array_data = eval_['oml:array_data']
 
-        evals[run_id] = OpenMLEvaluation(int(eval_['oml:run_id']), int(eval_['oml:task_id']),
-                                      int(eval_['oml:setup_id']), int(eval_['oml:flow_id']),
-                                      eval_['oml:flow_name'], eval_['oml:data_id'],
-                                      eval_['oml:data_name'], eval_['oml:function'],
-                                      eval_['oml:upload_time'], float(eval_['oml:value']),
-                                      array_data)
+        evals[run_id] = OpenMLEvaluation(int(eval_['oml:run_id']),
+                                         int(eval_['oml:task_id']),
+                                         int(eval_['oml:setup_id']),
+                                         int(eval_['oml:flow_id']),
+                                         eval_['oml:flow_name'],
+                                         eval_['oml:data_id'],
+                                         eval_['oml:data_name'],
+                                         eval_['oml:function'],
+                                         eval_['oml:upload_time'],
+                                         value, values, array_data)
 
     return evals
