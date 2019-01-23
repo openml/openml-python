@@ -1,4 +1,4 @@
-import csv
+import json
 import xmltodict
 
 import openml.utils
@@ -101,7 +101,6 @@ def _list_evaluations(function, id=None, task=None,
 def __list_evaluations(api_call):
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call)
-    print(xml_string)
     evals_dict = xmltodict.parse(xml_string, force_list=('oml:evaluation',))
     # Minimalistic check if the XML is useful
     if 'oml:evaluations' not in evals_dict:
@@ -120,7 +119,7 @@ def __list_evaluations(api_call):
         if 'oml:value' in eval_:
             value = float(eval_['oml:value'])
         if 'oml:values' in eval_:
-            values = csv.reader(eval_['oml:values'])
+            values = json.loads(eval_['oml:values'])
         if 'oml:array_data' in eval_:
             array_data = eval_['oml:array_data']
 
