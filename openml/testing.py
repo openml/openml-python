@@ -77,16 +77,20 @@ class TestBase(unittest.TestCase):
                 raise
         openml.config.server = self.production_server
 
-    def _add_sentinel_to_flow_name(self, flow, sentinel=None):
+    def _get_sentinel(self, sentinel=None):
         if sentinel is None:
             # Create a unique prefix for the flow. Necessary because the flow is
             # identified by its name and external version online. Having a unique
             #  name allows us to publish the same flow in each test run
             md5 = hashlib.md5()
             md5.update(str(time.time()).encode('utf-8'))
+            md5.update(str(os.getpid()).encode('utf-8'))
             sentinel = md5.hexdigest()[:10]
             sentinel = 'TEST%s' % sentinel
+        return sentinel
 
+    def _add_sentinel_to_flow_name(self, flow, sentinel=None):
+        sentinel = self._get_sentinel(sentinel=sentinel)
         flows_to_visit = list()
         flows_to_visit.append(flow)
         while len(flows_to_visit) > 0:
