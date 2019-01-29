@@ -7,6 +7,8 @@ import pandas as pd
 import scipy.sparse
 from collections import OrderedDict
 
+import xmltodict
+
 from .. import datasets
 from .split import OpenMLSplit
 import openml._api_calls
@@ -94,7 +96,7 @@ class OpenMLTask(object):
         """
         _tag_entity('task', self.task_id, tag, untag=True)
 
-    def _task_to_dict(self):
+    def _to_dict(self):
 
         task_container = OrderedDict()
         task_dict = OrderedDict([
@@ -105,7 +107,7 @@ class OpenMLTask(object):
             task_dict['oml:task_id'] = self.task_id
         task_dict['oml:task_type_id'] = self.task_type_id
         task_dict['oml:task_type'] = self.task_type
-        # not a clustering task, so more than 1 input
+
         first_input = OrderedDict([
             ('@name', 'source_data'),
             ('oml:data_set',
@@ -113,22 +115,40 @@ class OpenMLTask(object):
                 ('oml:data_set_id', self.dataset_id)
              ]))
         ])
+        # not a clustering task, so more than 1 input
         if self.task_type_id == 5 and self.evaluation_measure is None:
             task_dict['oml:input'] = first_input
         else:
             task_dict['oml:input'] = [first_input]
 
+        # has 2 inputs, not a clustering task
         if self.evaluation_measure is not None:
-            task_dict['oml:target_feature'] = OrderedDict([
-                ('@name', 'evaluation_measures'),
-                ('oml:evaluation_measures',
-                 OrderedDict([
-                     ('oml:evaluation_measure', self.evaluation_measure)
-                 ])
-                 )
-            ])
+            task_dict['oml:input'].append(
+                OrderedDict([
+                    ('@name', 'evaluation_measures'),
+                    ('oml:evaluation_measures', OrderedDict([
+                        ('oml:evaluation_measure', self.evaluation_measure)
+                    ]))
+                ])
+            )
 
         return task_container
+
+    def _to_xml(self):
+        """Generate xml representation of self for upload to server.
+
+        Returns
+        -------
+        str
+            Task represented as XML string.
+        """
+        task_dict = self._to_dict()
+        task_xml = xmltodict.unparse(task_dict, pretty=True)
+
+        # A task may not be uploaded with the xml encoding specification:
+        # <?xml version="1.0" encoding="utf-8"?>
+        task_xml = task_xml.split('\n', 1)[-1]
+        return task_xml
 
 
 class OpenMLSupervisedTask(OpenMLTask):
@@ -175,17 +195,35 @@ class OpenMLSupervisedTask(OpenMLTask):
         )
         return X_and_y
 
-    def _task_to_dict(self):
+    def _to_dict(self):
 
-        task_container = super(OpenMLSupervisedTask, self)._task_to_dict()
+        task_container = super(OpenMLSupervisedTask, self)._to_dict()
         source_data = task_container['oml:input'][0]
         source_data['oml:data_set']['oml:target_feature'] = self.target_name
+
+        estimation_parameters = list()
+
+        for parameter in self.estimation_parameters:
+            estimation_parameter = OrderedDict(
+                ('@name', parameter),
+                ('oml:%s' % parameter, self.estimation_parameters[parameter])
+            )
+            estimation_parameters.append(estimation_parameter)
+
+        estimation_procedure = OrderedDict([
+            ('oml:parameter', estimation_parameters),
+            ('oml:type', self.estimation_procedure["type"]),
+            ('oml:data_splits_url', self.estimation_procedure['data_splits_url'])
+        ])
+
         task_container['oml:input'].append(
             OrderedDict([
                 ('@name', 'estimation_procedure'),
-                ('oml:estimation_procedure', self.estimation_procedure)
+                ('oml:estimation_procedure', estimation_procedure)
             ])
         )
+
+        return task_container
 
 
 class OpenMLClassificationTask(OpenMLSupervisedTask):
@@ -210,15 +248,17 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
         if cost_matrix is not None:
             raise NotImplementedError("Costmatrix")
 
-    def _task_to_dict(self):
+    def _to_dict(self):
 
-        task_container = super(OpenMLClassificationTask, self)._task_to_dict()
+        task_container = super(OpenMLClassificationTask, self)._to_dict()
         task_container['oml:input'].append(
             OrderedDict([
                 ('@name', 'cost_matrix'),
                 ('oml:cost_matrix', self.cost_matrix)
             ])
         )
+
+        return task_container
 
 
 class OpenMLRegressionTask(OpenMLSupervisedTask):
