@@ -12,8 +12,8 @@ class OpenMLLearningCurveTest(OpenMLSupervisedTaskTest):
     def test_get_X_and_Y(self):
 
         X, Y = super(OpenMLLearningCurveTest, self).test_get_X_and_Y()
-        self.assertEqual((345 , 7), X.shape)
+        self.assertEqual((345, 7), X.shape)
         self.assertIsInstance(X, np.ndarray)
-        self.assertEqual((345 , ), Y.shape)
+        self.assertEqual((345, ), Y.shape)
         self.assertIsInstance(Y, np.ndarray)
         self.assertEqual(Y.dtype, int)
