@@ -102,33 +102,30 @@ class OpenMLTask(object):
         task_dict = OrderedDict([
             ('@xmlns:oml', 'http://openml.org/openml')
         ])
-        task_container['oml:task'] = task_dict
+        task_container['oml:task_inputs'] = task_dict
+
         if self.task_id is not None:
             task_dict['oml:task_id'] = self.task_id
+
         task_dict['oml:task_type_id'] = self.task_type_id
-        task_dict['oml:task_type'] = self.task_type
 
-        first_input = OrderedDict([
+        source_data = OrderedDict([
             ('@name', 'source_data'),
-            ('oml:data_set',
-             OrderedDict([
-                ('oml:data_set_id', self.dataset_id)
-             ]))
+            ('#text', str(self.dataset_id))
         ])
-        # not a clustering task, so more than 1 input
-        if self.task_type_id == 5 and self.evaluation_measure is None:
-            task_dict['oml:input'] = first_input
-        else:
-            task_dict['oml:input'] = [first_input]
 
-        # has 2 inputs, not a clustering task
+        # not a clustering task
+        if self.task_type_id == 5:
+            task_dict['oml:input'] = source_data
+        else:
+            task_dict['oml:input'] = [source_data]
+
+        # has an evaluation measure
         if self.evaluation_measure is not None:
             task_dict['oml:input'].append(
                 OrderedDict([
                     ('@name', 'evaluation_measures'),
-                    ('oml:evaluation_measures', OrderedDict([
-                        ('oml:evaluation_measure', self.evaluation_measure)
-                    ]))
+                    ('#text', self.evaluation_measure)
                 ])
             )
 
@@ -150,11 +147,36 @@ class OpenMLTask(object):
         task_xml = task_xml.split('\n', 1)[-1]
         return task_xml
 
+    def publish(self):
+        """Publish task to OpenML server.
+
+        Returns
+        -------
+        task_id: int
+            Returns the id of the uploaded task
+            if successful.
+
+        """
+
+        xml_description = self._to_xml()
+
+        file_elements = {'description': xml_description}
+
+        return_value = openml._api_calls._perform_api_call(
+            "task/",
+            file_elements=file_elements,
+        )
+
+        task_id = int(xmltodict.parse(return_value)['oml:upload_task']['oml:id'])
+
+        return task_id
+
 
 class OpenMLSupervisedTask(OpenMLTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
                  estimation_procedure_type, estimation_parameters,
-                 evaluation_measure, target_name, data_splits_url):
+                 evaluation_measure, target_name, data_splits_url,
+                 estimation_procedure_id=1):
         super(OpenMLSupervisedTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
@@ -167,6 +189,7 @@ class OpenMLSupervisedTask(OpenMLTask):
         self.estimation_procedure["parameters"] = estimation_parameters
         self.estimation_parameters = estimation_parameters
         self.estimation_procedure["data_splits_url"] = data_splits_url
+        self.estimation_procedure_id = estimation_procedure_id
         self.target_name = target_name
         self.split = None
 
@@ -198,29 +221,19 @@ class OpenMLSupervisedTask(OpenMLTask):
     def _to_dict(self):
 
         task_container = super(OpenMLSupervisedTask, self)._to_dict()
-        source_data = task_container['oml:input'][0]
-        source_data['oml:data_set']['oml:target_feature'] = self.target_name
 
-        estimation_parameters = list()
+        task_container['oml:task_inputs'].get('oml:input').extend(
+            [
+                OrderedDict([
+                    ('@name', 'target_feature'),
+                    ('#text', self.target_name)
+                ]),
 
-        for parameter in self.estimation_parameters:
-            estimation_parameter = OrderedDict(
-                ('@name', parameter),
-                ('oml:%s' % parameter, self.estimation_parameters[parameter])
-            )
-            estimation_parameters.append(estimation_parameter)
-
-        estimation_procedure = OrderedDict([
-            ('oml:parameter', estimation_parameters),
-            ('oml:type', self.estimation_procedure["type"]),
-            ('oml:data_splits_url', self.estimation_procedure['data_splits_url'])
-        ])
-
-        task_container['oml:input'].append(
-            OrderedDict([
-                ('@name', 'estimation_procedure'),
-                ('oml:estimation_procedure', estimation_procedure)
-            ])
+                OrderedDict([
+                    ('@name', 'estimation_procedure'),
+                    ('#text', str(self.estimation_procedure_id))
+                ])
+            ]
         )
 
         return task_container
@@ -230,7 +243,8 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
                  estimation_procedure_type, estimation_parameters,
                  evaluation_measure, target_name, data_splits_url,
-                 class_labels=None, cost_matrix=None):
+                 class_labels=None, cost_matrix=None,
+                 estimation_procedure_id=1):
         super(OpenMLClassificationTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
@@ -241,6 +255,7 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
             evaluation_measure=evaluation_measure,
             target_name=target_name,
             data_splits_url=data_splits_url,
+            estimation_procedure_id=estimation_procedure_id
         )
         self.class_labels = class_labels
         self.cost_matrix = cost_matrix
@@ -248,23 +263,12 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
         if cost_matrix is not None:
             raise NotImplementedError("Costmatrix")
 
-    def _to_dict(self):
-
-        task_container = super(OpenMLClassificationTask, self)._to_dict()
-        task_container['oml:input'].append(
-            OrderedDict([
-                ('@name', 'cost_matrix'),
-                ('oml:cost_matrix', self.cost_matrix)
-            ])
-        )
-
-        return task_container
-
 
 class OpenMLRegressionTask(OpenMLSupervisedTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
                  estimation_procedure_type, estimation_parameters,
-                 evaluation_measure, target_name, data_splits_url):
+                 evaluation_measure, target_name, data_splits_url,
+                 estimation_procedure_id=1):
         super(OpenMLRegressionTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
@@ -275,12 +279,13 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
             evaluation_measure=evaluation_measure,
             target_name=target_name,
             data_splits_url=data_splits_url,
+            estimation_procedure_id=estimation_procedure_id
         )
 
 
 class OpenMLClusteringTask(OpenMLTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
-                 evaluation_measure, number_of_clusters=None):
+                 evaluation_measure):
         super(OpenMLClusteringTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
@@ -288,8 +293,6 @@ class OpenMLClusteringTask(OpenMLTask):
             data_set_id=data_set_id,
             evaluation_measure=evaluation_measure,
         )
-        # TODO place number of cluster in the task dict
-        self.number_of_clusters = number_of_clusters
 
     def get_X(
         self,
@@ -319,7 +322,8 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
                  estimation_procedure_type, estimation_parameters,
                  evaluation_measure, target_name, data_splits_url,
-                 class_labels=None, cost_matrix=None):
+                 class_labels=None, cost_matrix=None,
+                 estimation_procedure_id=1):
         super(OpenMLLearningCurveTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
@@ -331,7 +335,8 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
             target_name=target_name,
             data_splits_url=data_splits_url,
             class_labels=class_labels,
-            cost_matrix=cost_matrix
+            cost_matrix=cost_matrix,
+            estimation_procedure_id=estimation_procedure_id
         )
         self.target_name = target_name
         self.class_labels = class_labels
