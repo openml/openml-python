@@ -6,9 +6,8 @@ from tests.test_tasks import OpenMLSupervisedTaskTest
 class OpenMLLearningCurveTest(OpenMLSupervisedTaskTest):
 
     def setUp(self):
-
-        self.task_id = 801
         super(OpenMLLearningCurveTest, self).setUp()
+        self.task_id = 801
 
     def test_get_X_and_Y(self):
 

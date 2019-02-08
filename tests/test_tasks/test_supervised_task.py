@@ -7,6 +7,12 @@ from tests.test_tasks import OpenMLTaskTest
 class OpenMLSupervisedTaskTest(OpenMLTaskTest):
     # task id will be set from the
     # extending classes
+
+    def setUp(self):
+
+        self(OpenMLSupervisedTaskTest, self).setUp()
+        self.task_id = 11
+
     @classmethod
     def setUpClass(cls):
         if cls is OpenMLSupervisedTaskTest:

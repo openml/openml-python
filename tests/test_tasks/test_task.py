@@ -9,6 +9,10 @@ class OpenMLTaskTest(TestBase):
     # task id will be set from the
     # extending classes
 
+    def setUp(self):
+
+        self.task_id = 11
+
     @classmethod
     def setUpClass(cls):
         if cls is OpenMLTaskTest:

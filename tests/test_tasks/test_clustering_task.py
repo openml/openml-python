@@ -7,8 +7,8 @@ class OpenMLClusteringTest(OpenMLTaskTest):
 
     def setUp(self):
 
-        self.task_id = 126101
         super(OpenMLClusteringTest, self).setUp()
+        self.task_id = 126101
 
     def test_get_dataset(self):
 

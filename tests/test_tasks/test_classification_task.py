@@ -7,8 +7,8 @@ class OpenMLClassificationTest(OpenMLSupervisedTaskTest):
 
     def setUp(self):
 
-        self.task_id = 11
         super(OpenMLClassificationTest, self).setUp()
+        self.task_id = 11
 
     def test_get_X_and_Y(self):
 
