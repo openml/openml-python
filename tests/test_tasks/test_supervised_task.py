@@ -1,13 +1,21 @@
 import unittest
 
 import openml
-from tests.test_tasks.test_task import OpenMLTaskTest
+from tests.test_tasks import OpenMLTaskTest
 
 
-@unittest.skip("Supervised class does not need to be tested")
 class OpenMLSupervisedTaskTest(OpenMLTaskTest):
     # task id will be set from the
     # extending classes
+    @classmethod
+    def setUpClass(cls):
+        if cls is OpenMLSupervisedTaskTest:
+            raise unittest.SkipTest(
+                "Skip OpenMLSupervisedTaskTest tests,"
+                " it's a base class"
+            )
+        super(OpenMLSupervisedTaskTest, cls).setUpClass()
+
     def test_get_X_and_Y(self):
 
         task = openml.tasks.get_task(self.task_id)

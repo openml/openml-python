@@ -5,10 +5,19 @@ from openml.testing import TestBase
 from openml.exceptions import OpenMLServerException
 
 
-@unittest.skip("Base class does not need to be tested")
 class OpenMLTaskTest(TestBase):
     # task id will be set from the
     # extending classes
+
+    @classmethod
+    def setUpClass(cls):
+        if cls is OpenMLTaskTest:
+            raise unittest.SkipTest(
+                "Skip OpenMLTaskTest tests,"
+                " it's a base class"
+            )
+        super(OpenMLTaskTest, cls).setUpClass()
+
     def test_download_task(self):
 
         openml.tasks.get_task(self.task_id)

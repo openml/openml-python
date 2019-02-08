@@ -1,13 +1,14 @@
 import openml
 
-from tests.test_tasks.test_task import OpenMLTaskTest
+from tests.test_tasks import OpenMLTaskTest
 
 
 class OpenMLClusteringTest(OpenMLTaskTest):
 
-    def setup(self):
+    def setUp(self):
 
         self.task_id = 126101
+        super(OpenMLClusteringTest, self).setUp()
 
     def test_get_dataset(self):
 
