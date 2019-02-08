@@ -9,6 +9,7 @@ class OpenMLRegressionTest(OpenMLSupervisedTaskTest):
 
         super(OpenMLRegressionTest, self).setUp()
         self.task_id = 625
+        self.estimation_procedure = 12
 
     def test_get_X_and_Y(self):
 

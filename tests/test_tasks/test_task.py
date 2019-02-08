@@ -13,6 +13,7 @@ class OpenMLTaskTest(TestBase):
 
         super(OpenMLTaskTest, self).setUp()
         self.task_id = 11
+        self.estimation_procedure = 23
 
     @classmethod
     def setUpClass(cls):
@@ -30,7 +31,7 @@ class OpenMLTaskTest(TestBase):
     def test_upload_task(self):
 
         task = openml.tasks.get_task(self.task_id)
-        task.estimation_procedure_id = 23
+        task.estimation_procedure_id = self.estimation_procedure
         try:
             task.publish()
         except OpenMLServerException as e:
