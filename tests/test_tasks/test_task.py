@@ -11,6 +11,7 @@ class OpenMLTaskTest(TestBase):
 
     def setUp(self):
 
+        super(OpenMLTaskTest, self).setUp()
         self.task_id = 11
 
     @classmethod

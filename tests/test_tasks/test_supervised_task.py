@@ -10,7 +10,7 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
 
     def setUp(self):
 
-        self(OpenMLSupervisedTaskTest, self).setUp()
+        super(OpenMLSupervisedTaskTest, self).setUp()
         self.task_id = 11
 
     @classmethod
