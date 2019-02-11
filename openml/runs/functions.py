@@ -184,7 +184,7 @@ def _publish_flow_if_necessary(flow):
     except OpenMLServerException as e:
         if e.message == "flow already exists":
             # TODO: JvR: the following lines of code can be replaced by
-            # a pass (after changing the unit test) as run_flow_on_task does
+            # a pass (after changing the unit tests) as run_flow_on_task does
             # not longer rely on it
             flow_id = openml.flows.flow_exists(flow.name,
                                                flow.external_version)
