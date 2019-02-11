@@ -18,6 +18,8 @@ Changelog
 * ADD #523: Support for scikit-learn 0.20's new ColumnTransformer.
 * ADD #459: Enhanced support to store runs on disk prior to uploading them to
   OpenML.
+* ADD #564: New helpers to access the structure of a flow (and find its
+  subflows).
 * FIX #538: Support loading clustering tasks.
 * FIX #464: Fixes a bug related to listing functions (returns correct listing
   size).
@@ -27,9 +29,11 @@ Changelog
 * FIX #536: Flows can now be printed when the flow name is None.
 * FIX #504: Better support for hierarchical hyperparameters when uploading
   scikit-learn's grid and random search.
+* FIX #569: Less strict checking of flow dependencies when loading flows.
 * FIX #431: Pickle of task splits are no longer cached.
 * DOC #540: More examples for dataset uploading.
 * DOC #554: Remove the doubled progress entry from the docs.
+* MAINT #613: Utilize the latest updates in OpenML evaluation listings.
 * MAINT #482: Cleaner interface for handling search traces.
 * MAINT #557: Continuous integration works for scikit-learn 0.18-0.20.
 * MAINT #542: Continuous integration now runs python3.7 as well.
