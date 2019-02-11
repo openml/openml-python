@@ -33,6 +33,7 @@ else:
     from sklearn.impute import SimpleImputer as Imputer
 
 import openml
+from openml.testing import TestBase
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
 from openml.flows.functions import assert_flows_equal
 from openml.flows.sklearn_converter import _format_external_version, \
@@ -56,11 +57,12 @@ class Model(sklearn.base.BaseEstimator):
         pass
 
 
-class TestSklearn(unittest.TestCase):
+class TestSklearn(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take less
     # than 1 seconds
 
     def setUp(self):
+        super(TestSklearn, self).setUp()
         iris = sklearn.datasets.load_iris()
         self.X = iris.data
         self.y = iris.target

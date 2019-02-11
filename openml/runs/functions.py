@@ -127,6 +127,11 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
             raise ValueError('flow.flow_id is not None, but the flow does not'
                              'exist on the server according to flow_exists')
         _publish_flow_if_necessary(flow)
+        # if the flow was published successfully
+        # and has an id
+        if flow.flow_id is not None:
+            flow_id = flow.flow_id
+
 
     data_content, trace, fold_evaluations, sample_evaluations = res
     if not isinstance(flow.flow_id, int):
