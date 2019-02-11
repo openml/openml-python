@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLEvaluation<a class="headerlink" href="#openml-openmlevaluation" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="openml.OpenMLEvaluation">
-<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLEvaluation</code><span class="sig-paren">(</span><em>run_id</em>, <em>task_id</em>, <em>setup_id</em>, <em>flow_id</em>, <em>flow_name</em>, <em>data_id</em>, <em>data_name</em>, <em>function</em>, <em>upload_time</em>, <em>value</em>, <em>array_data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLEvaluation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLEvaluation</code><span class="sig-paren">(</span><em>run_id</em>, <em>task_id</em>, <em>setup_id</em>, <em>flow_id</em>, <em>flow_name</em>, <em>data_id</em>, <em>data_name</em>, <em>function</em>, <em>upload_time</em>, <em>value</em>, <em>values</em>, <em>array_data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLEvaluation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contains all meta-information about a run / evaluation combination,
 according to the evaluation/list function</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -145,6 +145,9 @@ according to the evaluation/list function</p>
 <dt><strong>value</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
 <dd><p class="first last">the value of this evaluation</p>
 </dd>
+<dt><strong>values</strong> <span class="classifier-delimiter">:</span> <span class="classifier">List[float]</span></dt>
+<dd><p class="first last">the values per repeat and fold (if requested)</p>
+</dd>
 <dt><strong>array_data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
 <dd><p class="first last">list of information per class (e.g., in case of precision, auroc, recall)</p>
 </dd>
@@ -170,7 +173,7 @@ according to the evaluation/list function</p>
     </p>
     <p>
         &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.<br/>
     </p>
   </div>
 </footer>

@@ -156,13 +156,13 @@ to have better visualization and easier access:</p>
        &#39;NumberOfInstancesWithMissingValues&#39;, &#39;NumberOfMissingValues&#39;,
        &#39;NumberOfNumericFeatures&#39;, &#39;NumberOfSymbolicFeatures&#39;],
       dtype=&#39;object&#39;)
-First 5 of 612 tasks:
-   tid            ...             NumberOfSymbolicFeatures
-1    1            ...                                 33.0
-2    2            ...                                 33.0
-3    3            ...                                 33.0
-4    4            ...                                 33.0
-5    5            ...                                 33.0
+First 5 of 614 tasks:
+   tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
+1    1     1  ...                      6.0                     33.0
+2    2     1  ...                      6.0                     33.0
+3    3     1  ...                      6.0                     33.0
+4    4     1  ...                      6.0                     33.0
+5    5     1  ...                      6.0                     33.0
 
 [5 rows x 19 columns]
 </pre></div>
@@ -173,7 +173,7 @@ First 5 of 612 tasks:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1, 2, 3, 4, 5, 6, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 41, 42, 91, 92, 93, 94, 95, 96, 115, 116, 117, 118, 119, 120, 127, 128, 129, 130, 131, 132, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 181, 182, 183, 184, 185, 186, 193, 194, 195, 196, 197, 198, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 229, 230, 231, 232, 233, 234, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 307, 308, 309, 310, 311, 312, 379, 380, 381, 382, 383, 384, 391, 392, 393, 394, 395, 396, 433, 434, 435, 436, 437, 438, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 565, 566, 567, 568, 569, 570, 595, 596, 597, 598, 599, 600, 607, 608, 609, 610, 611, 612]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1, 2, 3, 4, 5, 6, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 41, 42, 91, 92, 93, 94, 95, 96, 115, 116, 117, 118, 119, 120, 127, 128, 129, 130, 131, 132, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 181, 182, 183, 184, 185, 186, 193, 194, 195, 196, 197, 198, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 229, 230, 231, 232, 233, 234, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 307, 308, 309, 310, 311, 312, 379, 380, 381, 382, 383, 384, 391, 392, 393, 394, 395, 396, 433, 434, 435, 436, 437, 438, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 565, 566, 567, 568, 569, 570, 595, 596, 597, 598, 599, 600, 607, 608, 609, 610, 611, 612, 1115]
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
@@ -181,7 +181,7 @@ First 5 of 612 tasks:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>156
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>157
 </pre></div>
 </div>
 <p>Then, we can further restrict the tasks to all have the same resampling strategy:</p>
@@ -225,12 +225,12 @@ Index: []
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 5 of 9 tasks:
-     tid            ...             NumberOfSymbolicFeatures
-361  361            ...                                    1
-362  362            ...                                    1
-363  363            ...                                    1
-364  364            ...                                    1
-365  365            ...                                    1
+     tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
+361  361     1  ...                        7                        1
+362  362     1  ...                        7                        1
+363  363     1  ...                        7                        1
+364  364     1  ...                        7                        1
+365  365     1  ...                        7                        1
 
 [5 rows x 19 columns]
 </pre></div>
@@ -242,17 +242,17 @@ Index: []
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tid            ...             NumberOfSymbolicFeatures
-51   51            ...                                    1
-52   52            ...                                    1
-53   53            ...                                    1
-54   54            ...                                    1
-55   55            ...                                  241
-56   56            ...                                  241
-57   57            ...                                  241
-58   58            ...                                  241
-59   59            ...                                  241
-60   60            ...                                  241
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
+51   51     1  ...                        6                        1
+52   52     1  ...                        6                        1
+53   53     1  ...                        6                        1
+54   54     1  ...                        6                        1
+55   55     1  ...                        0                      241
+56   56     1  ...                        0                      241
+57   57     1  ...                        0                      241
+58   58     1  ...                        0                      241
+59   59     1  ...                        0                      241
+60   60     1  ...                        0                      241
 
 [10 rows x 19 columns]
 </pre></div>
@@ -271,7 +271,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1068
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1070
 </pre></div>
 </div>
 <div class="section" id="exercise">
@@ -322,10 +322,10 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLClassificationTask object at 0x2b69c3cc9be0&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLClassificationTask object at 0x2b15230be9b0&gt;
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  19.430 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  22.633 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-tasks-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/204148be48b3a7d6b2cc72a9fc63c69e/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></div>
@@ -349,7 +349,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     </p>
     <p>
         &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.<br/>
     </p>
   </div>
 </footer>
