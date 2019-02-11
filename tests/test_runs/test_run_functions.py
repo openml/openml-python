@@ -999,7 +999,7 @@ class TestRun(TestBase):
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
-        runs = openml.runs.list_runs(id=[2])
+        runs = openml.runs.list_runs(id=[2], show_errors=True)
         self.assertEqual(len(runs), 1)
         for rid in runs:
             self._check_run(runs[rid])
