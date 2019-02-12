@@ -1067,3 +1067,37 @@ class TestSklearn(TestBase):
                                          subflow.version,
                                          splitted[-1])
             self.assertEqual(parameter.full_name, openml_name)
+
+    def test_obtain_parameter_values_flow_not_from_server(self):
+        model = sklearn.linear_model.LogisticRegression()
+        flow = sklearn_to_flow(model)
+        msg = 'Flow sklearn.linear_model.logistic.LogisticRegression has no flow_id!'
+
+        self.assertRaisesRegex(ValueError, msg, openml.flows.obtain_parameter_values, flow)
+
+        model = sklearn.ensemble.AdaBoostClassifier(base_estimator=sklearn.linear_model.LogisticRegression())
+        flow = sklearn_to_flow(model)
+        flow.flow_id = 1
+        self.assertRaisesRegex(ValueError, msg, openml.flows.obtain_parameter_values, flow)
+
+    def test_obtain_parameter_values(self):
+
+        model = sklearn.model_selection.RandomizedSearchCV(
+            estimator=sklearn.ensemble.RandomForestClassifier(n_estimators=5),
+            param_distributions={
+                "max_depth": [3, None],
+                "max_features": [1, 2, 3, 4],
+                "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
+                "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                "bootstrap": [True, False], "criterion": ["gini", "entropy"]},
+            cv=sklearn.model_selection.StratifiedKFold(n_splits=2, random_state=1),
+            n_iter=5)
+        flow = sklearn_to_flow(model)
+        flow.flow_id = 1
+        flow.components['estimator'].flow_id = 2
+        parameters = openml.flows.obtain_parameter_values(flow)
+        for parameter in parameters:
+            self.assertIsNotNone(parameter['oml:component'], msg=parameter)
+            if parameter['oml:name'] == 'n_estimators':
+                self.assertEqual(parameter['oml:value'], '5')
+                self.assertEqual(parameter['oml:component'], 2)

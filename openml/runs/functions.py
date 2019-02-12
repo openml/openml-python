@@ -163,7 +163,8 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
         trace=trace,
         data_content=data_content,
     )
-    run.parameter_settings = OpenMLRun._parse_parameters(flow)
+    # TODO: currently hard-coded sklearn assumption.
+    run.parameter_settings = openml.flows.obtain_parameter_values(flow)
 
     # now we need to attach the detailed evaluations
     if task.task_type_id == 3:

@@ -12,22 +12,16 @@ from openml.exceptions import OpenMLServerNoResult
 import openml.utils
 
 
-def setup_exists(flow, model=None):
+def setup_exists(flow):
     """
     Checks whether a hyperparameter configuration already exists on the server.
 
     Parameters
     ----------
-
     flow : flow
         The openml flow object. Should have flow id present for the main flow
         and all subflows (i.e., it should be downloaded from the server by
         means of flow.get, and not instantiated locally)
-
-    sklearn_model : BaseEstimator, optional
-        If given, the parameters are parsed from this model instead of the
-        model in the flow. If not given, parameters are parsed from
-        ``flow.model``.
 
     Returns
     -------
@@ -36,20 +30,16 @@ def setup_exists(flow, model=None):
     """
     # sadly, this api call relies on a run object
     openml.flows.functions._check_flow_for_server_id(flow)
-
-    if model is None:
-        # model is left empty. We take the model from the flow.
-        model = flow.model
-        if flow.model is None:
-            raise ValueError('Could not locate model (neither given as'
-                             'argument nor available as flow.model)')
+    if flow.model is None:
+        raise ValueError('Flow should have model field set with the actual model. ')
 
     # checks whether the flow exists on the server and flow ids align
     exists = flow_exists(flow.name, flow.external_version)
     if exists != flow.flow_id:
         raise ValueError('This should not happen!')
 
-    openml_param_settings = openml.runs.OpenMLRun._parse_parameters(flow, model)
+    # TODO: currently hard-coded sklearn assumption
+    openml_param_settings = openml.flows.obtain_parameter_values(flow)
     description = xmltodict.unparse(_to_dict(flow.flow_id,
                                              openml_param_settings),
                                     pretty=True)
