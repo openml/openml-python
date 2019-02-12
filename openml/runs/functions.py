@@ -141,7 +141,6 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
         if flow.flow_id is not None:
             flow_id = flow.flow_id
 
-
     data_content, trace, fold_evaluations, sample_evaluations = res
     if not isinstance(flow.flow_id, int):
         # This is the usual behaviour, where the flow object was initiated off
@@ -595,16 +594,16 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
             TaskTypeEnum.SUPERVISED_REGRESSION,
             TaskTypeEnum.LEARNING_CURVE,
     ):
-        X, Y = task.get_X_and_y()
-        trainX = X[train_indices]
-        trainY = Y[train_indices]
-        testX = X[test_indices]
-        testY = Y[test_indices]
+        x, y = task.get_X_and_y()
+        train_x = x[train_indices]
+        train_y = y[train_indices]
+        test_x = x[test_indices]
+        test_y = y[test_indices]
     elif task.task_type_id in (
             TaskTypeEnum.CLUSTERING,
     ):
-        trainX = train_indices
-        testX = test_indices
+        train_x = train_indices
+        test_x = test_indices
     else:
         raise NotImplementedError(task.task_type)
 
@@ -620,11 +619,11 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
                 TaskTypeEnum.SUPERVISED_REGRESSION,
                 TaskTypeEnum.LEARNING_CURVE,
         ):
-            model.fit(trainX, trainY)
+            model.fit(train_x, train_y)
         elif task.task_type in (
                 TaskTypeEnum.CLUSTERING,
         ):
-            model.fit(trainX)
+            model.fit(train_x)
 
         if can_measure_runtime:
             modelfit_duration = \
@@ -664,7 +663,7 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
 
     # In supervised learning this returns the predictions for Y, in clustering
     # it returns the clusters
-    PredY = model.predict(testX)
+    pred_y = model.predict(test_x)
 
     # TODO: Is it OK to move predict_proba outside of the runtime measurement?
     # Before we were doing both predict and predict_proba within the
@@ -681,7 +680,7 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
     # add client-side calculated metrics. These is used on the server as
     # consistency check, only useful for supervised tasks
     def _calculate_local_measure(sklearn_fn, openml_name):
-        user_defined_measures[openml_name] = sklearn_fn(testY, PredY)
+        user_defined_measures[openml_name] = sklearn_fn(test_y, pred_y)
 
     # Task type specific outputs
     arff_datacontent = []
@@ -691,14 +690,14 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
             TaskTypeEnum.LEARNING_CURVE,
     ):
         try:
-            ProbaY = model.predict_proba(testX)
+            proba_y = model.predict_proba(test_x)
         except AttributeError:
-            ProbaY = _prediction_to_probabilities(PredY, list(model_classes))
+            proba_y = _prediction_to_probabilities(pred_y, list(model_classes))
 
-        if ProbaY.shape[1] != len(task.class_labels):
+        if proba_y.shape[1] != len(task.class_labels):
             warnings.warn("Repeat %d Fold %d: estimator only predicted for "
                           "%d/%d classes!" % (
-                              rep_no, fold_no, ProbaY.shape[1],
+                              rep_no, fold_no, proba_y.shape[1],
                               len(task.class_labels)))
 
         if add_local_measures:
@@ -708,8 +707,8 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
         for i in range(0, len(test_indices)):
             arff_line = _prediction_to_row(rep_no, fold_no, sample_no,
                                            test_indices[i],
-                                           task.class_labels[testY[i]],
-                                           PredY[i], ProbaY[i],
+                                           task.class_labels[test_y[i]],
+                                           pred_y[i], proba_y[i],
                                            task.class_labels, model_classes)
             arff_datacontent.append(arff_line)
 
@@ -719,12 +718,13 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
                                      'mean_absolute_error')
 
         for i in range(0, len(test_indices)):
-            arff_line = [rep_no, fold_no, test_indices[i], PredY[i], testY[i]]
+            arff_line = [rep_no, fold_no, test_indices[i], pred_y[i],
+                         test_y[i]]
             arff_datacontent.append(arff_line)
 
     elif task.task_type_id == TaskTypeEnum.CLUSTERING:
         for i in range(0, len(test_indices)):
-            arff_line = [test_indices[i], PredY[i]]  # row_id, cluster ID
+            arff_line = [test_indices[i], pred_y[i]]  # row_id, cluster ID
             arff_datacontent.append(arff_line)
 
     return arff_datacontent, arff_tracecontent, user_defined_measures, model

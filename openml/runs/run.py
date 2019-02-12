@@ -202,8 +202,7 @@ class OpenMLRun(object):
             arff_dict['attributes'] = [
                                           ('repeat', 'NUMERIC'),
                                           ('fold', 'NUMERIC'),
-                                          ('sample', 'NUMERIC'), # Legacy,
-                                                                 # remove later
+                                          ('sample', 'NUMERIC'),  # Legacy
                                           ('row_id', 'NUMERIC')] + \
                                       [('confidence.' + class_labels[i],
                                         'NUMERIC') for i in
@@ -274,16 +273,16 @@ class OpenMLRun(object):
         task = get_task(self.task_id)
 
         attribute_names = [att[0] for att in predictions_arff['attributes']]
-        if task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION and 'correct' not in \
-                attribute_names:
+        if task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION and \
+                'correct' not in attribute_names:
             raise ValueError('Attribute "correct" should be set for '
                              'classification task runs')
-        if task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION and 'truth' not in \
-                attribute_names:
+        if task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION and \
+                'truth' not in attribute_names:
             raise ValueError('Attribute "truth" should be set for '
                              'regression task runs')
-        if task.task_type_id != TaskTypeEnum.CLUSTERING and 'prediction' not in \
-                attribute_names:
+        if task.task_type_id != TaskTypeEnum.CLUSTERING and \
+                'prediction' not in attribute_names:
             raise ValueError('Attribute "predict" should be set for '
                              'supervised task runs')
 

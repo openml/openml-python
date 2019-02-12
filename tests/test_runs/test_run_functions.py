@@ -39,6 +39,7 @@ from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
     StratifiedKFold
 from sklearn.pipeline import Pipeline
 
+
 class HardNaiveBayes(GaussianNB):
     # class for testing a naive bayes classifier that does not allow soft
     # predictions
@@ -722,7 +723,8 @@ class TestRun(TestBase):
 
         task = openml.tasks.get_task(task_id)
 
-        # IMPORTANT! Do not sentinel this flow. is faster if we don't wait on openml server
+        # IMPORTANT! Do not sentinel this flow. is faster if we don't wait
+        # on openml server
         clf = RandomizedSearchCV(RandomForestClassifier(random_state=42,
                                                         n_estimators=5),
 
@@ -738,9 +740,6 @@ class TestRun(TestBase):
             # in case the run did not exists yet
             run = openml.runs.run_model_on_task(task, clf,
                                                 avoid_duplicate_runs=True)
-            trace = openml.runs.functions._create_trace_from_arff(
-                run._generate_trace_arff_dict()
-            )
 
             self.assertEqual(
                 len(run.trace.trace_iterations),
