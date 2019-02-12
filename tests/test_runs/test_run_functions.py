@@ -50,6 +50,12 @@ class HardNaiveBayes(GaussianNB):
 
 class TestRun(TestBase):
     _multiprocess_can_split_ = True
+    # diabetis dataset, 768 observations, 0 missing vals, 33% holdout set
+    # (253 test obs)
+    TEST_SERVER_TASK_SIMPLE = (119, 0, 253)
+    # creadit-a dataset, 690 observations, 67 missing vals, 33% holdout set
+    # (227 test obs)
+    TEST_SERVER_TASK_MISSING_VALS = (96, 67, 227)
 
     def _wait_for_processed_run(self, run_id, max_waiting_time_seconds):
         # it can take a while for a run to be processed on the OpenML (test) server
@@ -105,7 +111,7 @@ class TestRun(TestBase):
 
         return True
 
-    def _perform_run(self, task_id, num_instances, clf,
+    def _perform_run(self, task_id, num_instances, n_missing_vals, clf,
                      random_state_value=None, check_setup=True):
         classes_without_random_state = \
             ['sklearn.model_selection._search.GridSearchCV',
@@ -122,6 +128,8 @@ class TestRun(TestBase):
         flow.publish()
 
         task = openml.tasks.get_task(task_id)
+        X, y = task.get_X_and_y()
+        self.assertEqual(np.count_nonzero(np.isnan(X)), n_missing_vals)
         run = openml.runs.run_flow_on_task(flow, task, seed=1,
                                            avoid_duplicate_runs=openml.config.avoid_duplicate_runs)
         run_ = run.publish()
@@ -314,7 +322,7 @@ class TestRun(TestBase):
     # execution of the unit tests without the need to add an additional module
     # like unittest2
 
-    def _run_and_upload(self, clf, rsv):
+    def _run_and_upload(self, clf, task_id, n_missing_vals, n_test_obs, rsv):
         def determine_grid_size(param_grid):
             if isinstance(param_grid, dict):
                 grid_iterations = 1
@@ -329,12 +337,10 @@ class TestRun(TestBase):
             else:
                 raise TypeError('Param Grid should be of type list (GridSearch only) or dict')
 
-        task_id = 119  # diabates dataset
-        num_test_instances = 253  # 33% holdout task
         num_folds = 1  # because of holdout
         num_iterations = 5  # for base search classifiers
 
-        run = self._perform_run(task_id, num_test_instances, clf,
+        run = self._perform_run(task_id, n_test_obs, n_missing_vals, clf,
                                 random_state_value=rsv)
 
         # obtain accuracy scores using get_metric_score:
@@ -366,13 +372,19 @@ class TestRun(TestBase):
 
     def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression()
-        self._run_and_upload(lr, '62501')
+        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
+        self._run_and_upload(lr, task_id, n_missing_vals, n_test_obs, '62501')
 
     def test_run_and_upload_pipeline_dummy_pipeline(self):
 
         pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
                                     ('dummy', DummyClassifier(strategy='prior'))])
-        self._run_and_upload(pipeline1, '62501')
+        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
+        self._run_and_upload(pipeline1, task_id, n_missing_vals, n_test_obs, '62501')
 
     @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
                      reason="columntransformer introduction in 0.20.0")
@@ -387,7 +399,11 @@ class TestRun(TestBase):
         pipeline = sklearn.pipeline.Pipeline(
             steps=[('transformer', inner),
                    ('classifier', sklearn.tree.DecisionTreeClassifier())])
-        self._run_and_upload(pipeline, '62501')
+        # important to test on datasets with missing values. See issue #602
+        task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
+        n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
+        n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
+        self._run_and_upload(pipeline, task_id, n_missing_vals, n_test_obs, '62501')
 
     def test_run_and_upload_decision_tree_pipeline(self):
         pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
@@ -397,13 +413,19 @@ class TestRun(TestBase):
                                         {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
                                          'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
                                         cv=3, n_iter=10))])
-        self._run_and_upload(pipeline2, '62501')
+        task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
+        n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
+        n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
+        self._run_and_upload(pipeline2, task_id, n_missing_vals, n_test_obs, '62501')
 
     def test_run_and_upload_gridsearch(self):
         gridsearch = GridSearchCV(BaggingClassifier(base_estimator=SVC()),
                                   {"base_estimator__C": [0.01, 0.1, 10],
                                    "base_estimator__gamma": [0.01, 0.1, 10]})
-        self._run_and_upload(gridsearch, '62501')
+        task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
+        n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
+        n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
+        self._run_and_upload(gridsearch, task_id, n_missing_vals, n_test_obs, '62501')
 
     def test_run_and_upload_randomsearch(self):
         randomsearch = RandomizedSearchCV(
@@ -419,7 +441,10 @@ class TestRun(TestBase):
         # The random states for the RandomizedSearchCV is set after the
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
-        self._run_and_upload(randomsearch, '12172')
+        task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
+        n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
+        n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
+        self._run_and_upload(randomsearch, task_id, n_missing_vals, n_test_obs, '12172')
 
     def test_run_and_upload_maskedarrays(self):
         # This testcase is important for 2 reasons:
@@ -436,27 +461,32 @@ class TestRun(TestBase):
         # The random states for the GridSearchCV is set after the
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
-        self._run_and_upload(gridsearch, '12172')
+        task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
+        n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
+        n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
+        self._run_and_upload(gridsearch, task_id, n_missing_vals, n_test_obs, '12172')
 
     ############################################################################
 
     def test_learning_curve_task_1(self):
         task_id = 801  # diabates dataset
-        num_test_instances = 6144 # for learning curve
+        num_test_instances = 6144  # for learning curve
+        num_missing_vals = 0
         num_repeats = 1
         num_folds = 10
         num_samples = 8
 
         pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
                                     ('dummy', DummyClassifier(strategy='prior'))])
-        run = self._perform_run(task_id, num_test_instances, pipeline1,
-                                random_state_value='62501')
+        run = self._perform_run(task_id, num_test_instances, num_missing_vals,
+                                pipeline1, random_state_value='62501')
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
                                        num_folds, num_samples)
 
     def test_learning_curve_task_2(self):
         task_id = 801  # diabates dataset
         num_test_instances = 6144  # for learning curve
+        num_missing_vals = 0
         num_repeats = 1
         num_folds = 10
         num_samples = 8
@@ -468,7 +498,7 @@ class TestRun(TestBase):
                                         {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
                                          'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
                                         cv=3, n_iter=10))])
-        run = self._perform_run(task_id, num_test_instances, pipeline2,
+        run = self._perform_run(task_id, num_test_instances, num_missing_vals, pipeline2,
                                 random_state_value='62501')
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
                                        num_folds, num_samples)
