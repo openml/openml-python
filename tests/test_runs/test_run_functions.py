@@ -110,7 +110,8 @@ class TestRun(TestBase):
         self._compare_predictions(predictions, predictions_prime)
 
     def _perform_run(self, task_id, num_instances, n_missing_vals, clf,
-                     flow_expected_rsv=None, seed=1, check_setup=True):
+                     flow_expected_rsv=None, seed=1, check_setup=True,
+                     sentinel=None):
         """
         Runs a classifier on a task, and performs some basic checks.
         Also uploads the run.
@@ -139,6 +140,9 @@ class TestRun(TestBase):
             If set to True, the flow will be downloaded again and
             reinstantiated, for consistency with original flow.
 
+        sentinel: optional, str
+            in case the sentinel should be user specified
+
         Returns:
         --------
         run: OpenMLRun
@@ -155,8 +159,9 @@ class TestRun(TestBase):
                 _remove_random_state(component)
 
         flow = sklearn_to_flow(clf)
-        flow, _ = self._add_sentinel_to_flow_name(flow, None)
-        flow.publish()
+        flow, _ = self._add_sentinel_to_flow_name(flow, sentinel)
+        if not openml.flows.flow_exists(flow.name, flow.external_version):
+            flow.publish()
 
         task = openml.tasks.get_task(task_id)
         X, y = task.get_X_and_y()
@@ -352,7 +357,7 @@ class TestRun(TestBase):
     # like unittest2
 
     def _run_and_upload(self, clf, task_id, n_missing_vals, n_test_obs,
-                        flow_expected_rsv):
+                        flow_expected_rsv, sentinel=None):
         def determine_grid_size(param_grid):
             if isinstance(param_grid, dict):
                 grid_iterations = 1
@@ -372,7 +377,8 @@ class TestRun(TestBase):
         num_iterations = 5  # for base search classifiers
 
         run = self._perform_run(task_id, n_test_obs, n_missing_vals, clf,
-                                flow_expected_rsv=flow_expected_rsv, seed=seed)
+                                flow_expected_rsv=flow_expected_rsv, seed=seed,
+                                sentinel=sentinel)
 
         # obtain accuracy scores using get_metric_score:
         accuracy_scores = run.get_metric_fn(sklearn.metrics.accuracy_score)
@@ -443,28 +449,37 @@ class TestRun(TestBase):
         import sklearn.compose
         import sklearn.impute
 
-        # important to test on datasets with missing values. See issue #602
-        task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
-        n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
-        self.assertGreater(n_missing_vals, 50)
-        n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
-        nominal_atts = self.TEST_SERVER_TASK_MISSING_VALS[3]
-        numeric_atts = self.TEST_SERVER_TASK_MISSING_VALS[4]
+        def get_ct_cf(nominal_indices, numeric_indices):
+            inner = sklearn.compose.ColumnTransformer(
+                transformers=[
+                    ('numeric', sklearn.preprocessing.StandardScaler(),
+                     nominal_indices),
+                    ('nominal', sklearn.preprocessing.OneHotEncoder(
+                        handle_unknown='ignore'), numeric_indices)],
+                remainder='passthrough')
+            return sklearn.pipeline.Pipeline(
+                steps=[('imputer', sklearn.impute.SimpleImputer(
+                    strategy='constant', fill_value=-1)),
+                       ('transformer', inner),
+                       ('classifier', sklearn.tree.DecisionTreeClassifier())])
 
-        inner = sklearn.compose.ColumnTransformer(
-            transformers=[
-                ('numeric', sklearn.preprocessing.StandardScaler(),
-                 nominal_atts),
-                ('nominal', sklearn.preprocessing.OneHotEncoder(
-                    handle_unknown='ignore'), numeric_atts)],
-            remainder='passthrough')
-        pipeline = sklearn.pipeline.Pipeline(
-            steps=[('imputer', sklearn.impute.SimpleImputer(
-                strategy='constant', fill_value=-1)),
-                   ('transformer', inner),
-                   ('classifier', sklearn.tree.DecisionTreeClassifier())])
-        self._run_and_upload(pipeline, task_id,
-                             n_missing_vals, n_test_obs, '62501')
+        sentinel = self._get_sentinel()
+        self._run_and_upload(get_ct_cf(self.TEST_SERVER_TASK_SIMPLE[3],
+                                       self.TEST_SERVER_TASK_SIMPLE[4]),
+                             self.TEST_SERVER_TASK_SIMPLE[0],
+                             self.TEST_SERVER_TASK_SIMPLE[1],
+                             self.TEST_SERVER_TASK_SIMPLE[2],
+                             '62501',
+                             sentinel)
+        # Due to #602, it is important to test this model on two tasks
+        # with different column specifications
+        self._run_and_upload(get_ct_cf(self.TEST_SERVER_TASK_MISSING_VALS[3],
+                                       self.TEST_SERVER_TASK_MISSING_VALS[4]),
+                             self.TEST_SERVER_TASK_MISSING_VALS[0],
+                             self.TEST_SERVER_TASK_MISSING_VALS[1],
+                             self.TEST_SERVER_TASK_MISSING_VALS[2],
+                             '62501',
+                             sentinel)
 
     def test_run_and_upload_decision_tree_pipeline(self):
         pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
