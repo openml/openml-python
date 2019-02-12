@@ -162,7 +162,6 @@ class TestSetupFunctions(TestBase):
         openml.config.cache_directory = self.static_cache_dir
         openml.setups.functions._get_cached_setup(1)
 
-
     def test_get_uncached_setup(self):
         openml.config.cache_directory = self.static_cache_dir
         with self.assertRaises(openml.exceptions.OpenMLCacheException):

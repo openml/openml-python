@@ -17,8 +17,9 @@ import openml.utils
 import openml._api_calls
 from ..exceptions import PyOpenMLError
 from .. import config
-from ..flows import sklearn_to_flow, get_flow, flow_exists, _check_n_jobs, \
-    _copy_server_fields, OpenMLFlow
+from openml.flows.sklearn_converter import _check_n_jobs
+from openml.flows.flow import _copy_server_fields
+from ..flows import sklearn_to_flow, get_flow, flow_exists, OpenMLFlow
 from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException
 from ..tasks import OpenMLTask
@@ -126,6 +127,11 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
             raise ValueError('flow.flow_id is not None, but the flow does not'
                              'exist on the server according to flow_exists')
         _publish_flow_if_necessary(flow)
+        # if the flow was published successfully
+        # and has an id
+        if flow.flow_id is not None:
+            flow_id = flow.flow_id
+
 
     data_content, trace, fold_evaluations, sample_evaluations = res
     if not isinstance(flow.flow_id, int):
@@ -178,7 +184,7 @@ def _publish_flow_if_necessary(flow):
     except OpenMLServerException as e:
         if e.message == "flow already exists":
             # TODO: JvR: the following lines of code can be replaced by
-            # a pass (after changing the unit test) as run_flow_on_task does
+            # a pass (after changing the unit tests) as run_flow_on_task does
             # not longer rely on it
             flow_id = openml.flows.flow_exists(flow.name,
                                                flow.external_version)

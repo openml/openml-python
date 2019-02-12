@@ -5,9 +5,10 @@ import unittest
 import numpy as np
 
 from openml import OpenMLSplit
+from openml.testing import TestBase
 
 
-class OpenMLSplitTest(unittest.TestCase):
+class OpenMLSplitTest(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take less
     # than 5 seconds + rebuilding the test would potentially be costly
 

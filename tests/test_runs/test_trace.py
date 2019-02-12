@@ -1,9 +1,8 @@
-import unittest
-
 from openml.runs import OpenMLRunTrace, OpenMLTraceIteration
+from openml.testing import TestBase
 
 
-class TestTrace(unittest.TestCase):
+class TestTrace(TestBase):
     def test_get_selected_iteration(self):
         trace_iterations = {}
         for i in range(5):
