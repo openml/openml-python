@@ -51,11 +51,13 @@ class HardNaiveBayes(GaussianNB):
 class TestRun(TestBase):
     _multiprocess_can_split_ = True
     # diabetis dataset, 768 observations, 0 missing vals, 33% holdout set
-    # (253 test obs)
-    TEST_SERVER_TASK_SIMPLE = (119, 0, 253)
+    # (253 test obs), no nominal attributes, all numeric attributes
+    TEST_SERVER_TASK_SIMPLE = (119, 0, 253, list(), list(range(8)))
     # creadit-a dataset, 690 observations, 67 missing vals, 33% holdout set
     # (227 test obs)
-    TEST_SERVER_TASK_MISSING_VALS = (96, 67, 227)
+    TEST_SERVER_TASK_MISSING_VALS = (96, 67, 227,
+                                     [0, 3, 4, 5, 6, 8, 9, 11, 12],
+                                     [1, 2, 7, 10, 13, 14])
 
     def _wait_for_processed_run(self, run_id, max_waiting_time_seconds):
         # it can take a while for a run to be processed on the OpenML (test) server
@@ -194,7 +196,6 @@ class TestRun(TestBase):
         # so that the two objects can actually be compared):
         # downloaded_run_trace = downloaded._generate_trace_arff_dict()
         # self.assertEqual(run_trace, downloaded_run_trace)
-
         return run
 
     def _check_fold_evaluations(self, fold_evaluations, num_repeats, num_folds, max_time_allowed=60000):
@@ -390,20 +391,30 @@ class TestRun(TestBase):
                      reason="columntransformer introduction in 0.20.0")
     def test_run_and_upload_column_transformer_pipeline(self):
         import sklearn.compose
-        inner = sklearn.compose.ColumnTransformer(
-            transformers=[
-                ('numeric', sklearn.preprocessing.StandardScaler(), [0, 1, 2]),
-                ('nominal', sklearn.preprocessing.OneHotEncoder(
-                    handle_unknown='ignore'), [3, 4, 5])],
-            remainder='passthrough')
-        pipeline = sklearn.pipeline.Pipeline(
-            steps=[('transformer', inner),
-                   ('classifier', sklearn.tree.DecisionTreeClassifier())])
+        import sklearn.impute
+
         # important to test on datasets with missing values. See issue #602
         task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
         n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
+        self.assertGreater(n_missing_vals, 50)
         n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
-        self._run_and_upload(pipeline, task_id, n_missing_vals, n_test_obs, '62501')
+        nominal_atts = self.TEST_SERVER_TASK_MISSING_VALS[3]
+        numeric_atts = self.TEST_SERVER_TASK_MISSING_VALS[4]
+
+        inner = sklearn.compose.ColumnTransformer(
+            transformers=[
+                ('numeric', sklearn.preprocessing.StandardScaler(),
+                 nominal_atts),
+                ('nominal', sklearn.preprocessing.OneHotEncoder(
+                    handle_unknown='ignore'), numeric_atts)],
+            remainder='passthrough')
+        pipeline = sklearn.pipeline.Pipeline(
+            steps=[('imputer', sklearn.impute.SimpleImputer(
+                strategy='constant', fill_value=-1)),
+                   ('transformer', inner),
+                   ('classifier', sklearn.tree.DecisionTreeClassifier())])
+        self._run_and_upload(pipeline, task_id,
+                             n_missing_vals, n_test_obs, '62501')
 
     def test_run_and_upload_decision_tree_pipeline(self):
         pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
@@ -422,9 +433,9 @@ class TestRun(TestBase):
         gridsearch = GridSearchCV(BaggingClassifier(base_estimator=SVC()),
                                   {"base_estimator__C": [0.01, 0.1, 10],
                                    "base_estimator__gamma": [0.01, 0.1, 10]})
-        task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
-        n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
-        n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
+        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
         self._run_and_upload(gridsearch, task_id, n_missing_vals, n_test_obs, '62501')
 
     def test_run_and_upload_randomsearch(self):
@@ -441,9 +452,9 @@ class TestRun(TestBase):
         # The random states for the RandomizedSearchCV is set after the
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
-        task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
-        n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
-        n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
+        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
         self._run_and_upload(randomsearch, task_id, n_missing_vals, n_test_obs, '12172')
 
     def test_run_and_upload_maskedarrays(self):
@@ -461,9 +472,9 @@ class TestRun(TestBase):
         # The random states for the GridSearchCV is set after the
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
-        task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
-        n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
-        n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
+        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
         self._run_and_upload(gridsearch, task_id, n_missing_vals, n_test_obs, '12172')
 
     ############################################################################

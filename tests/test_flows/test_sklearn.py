@@ -121,6 +121,10 @@ class TestSklearn(TestBase):
         self.assertDictEqual(structure, structure_fixture)
 
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        self.assertEqual(str(model.get_params()),
+                         str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -178,6 +182,10 @@ class TestSklearn(TestBase):
         self.assertDictEqual(structure, fixture_structure)
 
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        self.assertEqual(str(model.get_params()),
+                         str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -222,6 +230,10 @@ class TestSklearn(TestBase):
         self.assertDictEqual(structure, fixture_structure)
 
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        self.assertEqual(str(model.get_params()),
+                         str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -285,6 +297,10 @@ class TestSklearn(TestBase):
 
         #del serialization.model
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        self.assertEqual(str(model.get_params()),
+                         str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -354,6 +370,10 @@ class TestSklearn(TestBase):
 
         # del serialization.model
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        self.assertEqual(str(model.get_params()),
+                         str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -403,6 +423,10 @@ class TestSklearn(TestBase):
         self.assertDictEqual(structure, fixture_structure)
         # del serialization.model
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        self.assertEqual(str(model.get_params()),
+                         str(new_model.get_params()))
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
         serialization2 = sklearn_to_flow(new_model)
@@ -449,6 +473,10 @@ class TestSklearn(TestBase):
         self.assertDictEqual(structure, fixture_structure)
         # del serialization.model
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        self.assertEqual(str(model.get_params()),
+                         str(new_model.get_params()))
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
         serialization2 = sklearn_to_flow(new_model)
@@ -482,6 +510,10 @@ class TestSklearn(TestBase):
         self.assertEqual(serialization.name, fixture_name)
         self.assertDictEqual(structure, fixture_structure)
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        self.assertEqual(str(fu.get_params()),
+                         str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(fu))
         self.assertIsNot(new_model, fu)
@@ -560,9 +592,12 @@ class TestSklearn(TestBase):
         model = sklearn.pipeline.Pipeline(steps=[
             ('ohe', ohe), ('scaler', scaler), ('boosting', boosting)])
         parameter_grid = {
-            'n_estimators': [1, 5, 10, 100],
+            'base_estimator__max_depth': scipy.stats.randint(1, 10),
             'learning_rate': scipy.stats.uniform(0.01, 0.99),
-            'base_estimator__max_depth': scipy.stats.randint(1, 10)}
+            'n_estimators': [1, 5, 10, 100]
+        }
+        # convert to ordered dict, due to param grid check
+        parameter_grid = OrderedDict(parameter_grid)
         cv = sklearn.model_selection.StratifiedKFold(n_splits=5, shuffle=True)
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
@@ -595,6 +630,11 @@ class TestSklearn(TestBase):
 
         # now do deserialization
         deserialized = flow_to_sklearn(serialized)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # JvR: compare str length, due to memory address of distribution
+        self.assertEqual(len(str(rs.get_params())),
+                         len(str(deserialized.get_params())))
 
         # Checks that sklearn_to_flow is idempotent.
         serialized2 = sklearn_to_flow(deserialized)

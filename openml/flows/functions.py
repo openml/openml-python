@@ -1,5 +1,6 @@
 import dateutil.parser
 
+import logging
 import xmltodict
 import six
 
@@ -229,6 +230,20 @@ def assert_flows_equal(flow1, flow2,
                 if name not in attr2:
                     raise ValueError('Component %s only available in '
                                      'argument2, but not in argument1.' % name)
+                if not ignore_parameter_values:
+                    model1 = openml.flows.flow_to_sklearn(attr1[name])
+                    model2 = openml.flows.flow_to_sklearn(attr2[name])
+                    # JvR: we can only compare strings here
+                    if len(str(model1)) != len(str(model2)):
+                        logging.error('Flow 1: %s, Flow 2: %s' % (str(model1), str(model2)))
+                        raise ValueError('Scikit-learn serializations do not '
+                                         'have same string representation. '
+                                         'Lengths %d vs %d')
+                    if str(model1) != str(model2):
+                        logging.error('Flow 1: %s, Flow 2: %s' % (str(model1), str(model2)))
+                        raise ValueError('Scikit-learn serializations do not '
+                                         'have same string representation. ' 
+                                         '(Check content)')
                 assert_flows_equal(attr1[name], attr2[name],
                                    ignore_parameter_values_on_older_children,
                                    ignore_parameter_values)
