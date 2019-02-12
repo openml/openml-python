@@ -377,10 +377,10 @@ def _create_task_from_xml(xml):
         evaluation_measures = inputs["evaluation_measures"][
             "oml:evaluation_measures"]["oml:evaluation_measure"]
 
-    task_type = dic["oml:task_type"]
+    task_type_id = int(dic["oml:task_type_id"])
     common_kwargs = {
         'task_id': dic["oml:task_id"],
-        'task_type': task_type,
+        'task_type': dic["oml:task_type"],
         'task_type_id': dic["oml:task_type_id"],
         'data_set_id': inputs["source_data"][
             "oml:data_set"]["oml:data_set_id"],
@@ -409,11 +409,11 @@ def _create_task_from_xml(xml):
                 "oml:estimation_procedure"]["oml:data_splits_url"]
 
     cls = {
-        "Supervised Classification": OpenMLClassificationTask,
-        "Supervised Regression": OpenMLRegressionTask,
-        "Clustering": OpenMLClusteringTask,
-        "Learning Curve": OpenMLLearningCurveTask,
-    }.get(task_type)
+        TaskTypeEnum.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
+        TaskTypeEnum.SUPERVISED_REGRESSION: OpenMLRegressionTask,
+        TaskTypeEnum.CLUSTERING: OpenMLClusteringTask,
+        TaskTypeEnum.LEARNING_CURVE: OpenMLLearningCurveTask,
+    }.get(task_type_id)
     if cls is None:
-        raise NotImplementedError('Task type %s not supported.')
+        raise NotImplementedError('Task type %s not supported.' % common_kwargs['task_type'])
     return cls(**common_kwargs)

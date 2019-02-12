@@ -14,6 +14,7 @@ import openml.exceptions
 import openml._api_calls
 import sklearn
 import unittest
+import warnings
 
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent, \
@@ -38,7 +39,6 @@ from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
     StratifiedKFold
 from sklearn.pipeline import Pipeline
 
-
 class HardNaiveBayes(GaussianNB):
     # class for testing a naive bayes classifier that does not allow soft
     # predictions
@@ -52,6 +52,13 @@ class HardNaiveBayes(GaussianNB):
 
 class TestRun(TestBase):
     _multiprocess_can_split_ = True
+
+    # Suppress warnings to facilitate testing
+    hide_warnings = True
+    if hide_warnings:
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+        warnings.filterwarnings("ignore", category=FutureWarning)
+        warnings.filterwarnings("ignore", category=UserWarning)
 
     def _wait_for_processed_run(self, run_id, max_waiting_time_seconds):
         # it can take a while for a run to be processed on the OpenML (test)
