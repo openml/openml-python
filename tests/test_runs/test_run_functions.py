@@ -74,32 +74,8 @@ class TestRun(TestBase):
             else:
                 time.sleep(10)
 
-    def _check_serialized_optimized_run(self, run_id):
-        run = openml.runs.get_run(run_id)
-        task = openml.tasks.get_task(run.task_id)
-
-        # TODO: assert holdout task
-
-        # downloads the predictions of the old task
-        predictions_url = openml._api_calls._file_id_to_url(run.output_files['predictions'])
-        predictions = arff.loads(openml._api_calls._read_url(predictions_url))
-
-        # downloads the best model based on the optimization trace
-        # suboptimal (slow), and not guaranteed to work if evaluation
-        # engine is behind. TODO: mock this? We have the arff already on the server
-        self._wait_for_processed_run(run_id, 200)
-        try:
-            model_prime = openml.runs.initialize_model_from_trace(run_id, 0, 0)
-        except openml.exceptions.OpenMLServerException as e:
-            e.additional = str(e.additional) + '; run_id: ' + str(run_id)
-            raise e
-
-        run_prime = openml.runs.run_model_on_task(model_prime, task,
-                                                  avoid_duplicate_runs=False,
-                                                  seed=1)
-        predictions_prime = run_prime._generate_arff_dict()
-
-        self.assertEqual(len(predictions_prime['data']), len(predictions['data']))
+    def _compare_predictions(self, predictions, predictions_prime):
+        self.assertEqual(predictions_prime['data'].shape, predictions['data'].shape)
 
         # The original search model does not submit confidence bounds,
         # so we can not compare the arff line
@@ -113,8 +89,56 @@ class TestRun(TestBase):
 
         return True
 
+    def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed):
+        run = openml.runs.get_run(run_id)
+        task = openml.tasks.get_task(run.task_id)
+
+        # TODO: assert holdout task
+
+        # downloads the predictions of the old task
+        predictions_url = openml._api_calls._file_id_to_url(run.output_files['predictions'])
+        predictions = arff.loads(openml._api_calls._read_url(predictions_url))
+
+        run_prime = openml.runs.run_model_on_task(model_prime, task,
+                                                  avoid_duplicate_runs=False,
+                                                  seed=seed)
+        predictions_prime = run_prime._generate_arff_dict()
+
+        self._compare_predictions(predictions, predictions_prime)
+
     def _perform_run(self, task_id, num_instances, n_missing_vals, clf,
-                     random_state_value=None, check_setup=True):
+                     flow_expected_rsv=None, seed=1, check_setup=True):
+        """
+        Runs a classifier on a task, and performs some basic checks.
+        Also uploads the run.
+
+        Parameters:
+        ----------
+        task_id : int
+
+        num_instances: int
+
+        n_missing_values: int
+
+        clf: sklearn.base.BaseEstimator
+            The classifier to run
+
+        flow_expected_rsv: str
+            The expected random state value for the flow (check by hand,
+            depends on seed parameter)
+
+        seed: int
+            The seed with which the RSV for runs will be initialized
+
+        check_setup: bool
+            If set to True, the flow will be downloaded again and
+            reinstantiated, for consistency with original flow.
+
+        Returns:
+        --------
+        run: OpenMLRun
+            The performed run (with run id)
+        """
         classes_without_random_state = \
             ['sklearn.model_selection._search.GridSearchCV',
              'sklearn.pipeline.Pipeline']
@@ -132,7 +156,7 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(task_id)
         X, y = task.get_X_and_y()
         self.assertEqual(np.count_nonzero(np.isnan(X)), n_missing_vals)
-        run = openml.runs.run_flow_on_task(flow, task, seed=1,
+        run = openml.runs.run_flow_on_task(flow, task, seed=seed,
                                            avoid_duplicate_runs=openml.config.avoid_duplicate_runs)
         run_ = run.publish()
         self.assertEqual(run_, run)
@@ -154,7 +178,6 @@ class TestRun(TestBase):
             run_id = run_.run_id
             run_server = openml.runs.get_run(run_id)
             clf_server = openml.setups.initialize_model(run_server.setup_id)
-
             flow_local = openml.flows.sklearn_to_flow(clf)
             flow_server = openml.flows.sklearn_to_flow(clf_server)
 
@@ -167,9 +190,9 @@ class TestRun(TestBase):
                 # As soon as a flow is run, a random state is set in the model.
                 # If a flow is re-instantiated
                 self.assertEqual(flow_local.parameters['random_state'],
-                                 random_state_value)
+                                 flow_expected_rsv)
                 self.assertEqual(flow_server.parameters['random_state'],
-                                 random_state_value)
+                                 flow_expected_rsv)
             _remove_random_state(flow_local)
             _remove_random_state(flow_server)
             openml.flows.assert_flows_equal(flow_local, flow_server)
@@ -179,7 +202,7 @@ class TestRun(TestBase):
             flow_server2 = openml.flows.sklearn_to_flow(clf_server2)
             if flow.class_name not in classes_without_random_state:
                 self.assertEqual(flow_server2.parameters['random_state'],
-                                 random_state_value)
+                                 flow_expected_rsv)
 
             _remove_random_state(flow_server2)
             openml.flows.assert_flows_equal(flow_local, flow_server2)
@@ -323,7 +346,8 @@ class TestRun(TestBase):
     # execution of the unit tests without the need to add an additional module
     # like unittest2
 
-    def _run_and_upload(self, clf, task_id, n_missing_vals, n_test_obs, rsv):
+    def _run_and_upload(self, clf, task_id, n_missing_vals, n_test_obs,
+                        flow_expected_rsv):
         def determine_grid_size(param_grid):
             if isinstance(param_grid, dict):
                 grid_iterations = 1
@@ -336,13 +360,14 @@ class TestRun(TestBase):
                     grid_iterations += determine_grid_size(sub_grid)
                 return grid_iterations
             else:
-                raise TypeError('Param Grid should be of type list (GridSearch only) or dict')
-
+                raise TypeError('Param Grid should be of type list '
+                                '(GridSearch only) or dict')
+        seed = 1
         num_folds = 1  # because of holdout
         num_iterations = 5  # for base search classifiers
 
         run = self._perform_run(task_id, n_test_obs, n_missing_vals, clf,
-                                random_state_value=rsv)
+                                flow_expected_rsv=flow_expected_rsv, seed=seed)
 
         # obtain accuracy scores using get_metric_score:
         accuracy_scores = run.get_metric_fn(sklearn.metrics.accuracy_score)
@@ -364,8 +389,21 @@ class TestRun(TestBase):
             else:
                 self.assertEqual(len(trace_content),
                                  num_iterations * num_folds)
-            check_res = self._check_serialized_optimized_run(run.run_id)
-            self.assertTrue(check_res)
+
+            # downloads the best model based on the optimization trace
+            # suboptimal (slow), and not guaranteed to work if evaluation
+            # engine is behind.
+            # TODO: mock this? We have the arff already on the server
+            self._wait_for_processed_run(run.run_id, 200)
+            try:
+                model_prime = openml.runs.initialize_model_from_trace(
+                    run.run_id, 0, 0)
+            except openml.exceptions.OpenMLServerException as e:
+                e.additional = str(e.additional) + '; run_id: ' + \
+                               str(run.run_id)
+                raise e
+
+            self._rerun_model_and_compare_predictions(run.run_id, model_prime, seed)
 
         # todo: check if runtime is present
         self._check_fold_evaluations(run.fold_evaluations, 1, num_folds)

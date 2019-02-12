@@ -74,7 +74,8 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
     flow_tags : list(str)
         A list of tags that the flow should have at creation.
     seed: int
-        Models that are not seeded will get this seed.
+        Models that are not seeded will be automatically seeded by a RNG. The
+        RBG will be seeded with this seed.
     add_local_measures : bool
         Determines whether to calculate a set of evaluation measures locally,
         to later verify server behaviour. Defaults to True
