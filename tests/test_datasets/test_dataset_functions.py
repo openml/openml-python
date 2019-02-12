@@ -367,7 +367,7 @@ class TestOpenMLDataset(TestBase):
     def test_upload_dataset_with_url(self):
 
         dataset = OpenMLDataset(
-            "UploadTestWithURL",
+            "%s-UploadTestWithURL" % self._get_sentinel(),
             "test",
             data_format="arff",
             version=1,
@@ -378,7 +378,8 @@ class TestOpenMLDataset(TestBase):
 
     def test_data_status(self):
         dataset = OpenMLDataset(
-            "UploadTestWithURL", "test", "ARFF",
+            "%s-UploadTestWithURL" % self._get_sentinel(),
+            "test", "ARFF",
             version=1,
             url="https://www.openml.org/data/download/61/dataset_61_iris.arff")
         dataset.publish()
@@ -476,7 +477,7 @@ class TestOpenMLDataset(TestBase):
                       for i in range(data.shape[1])]
 
         dataset = create_dataset(
-            name='NumPy_testing_dataset',
+            name='%s-NumPy_testing_dataset' % self._get_sentinel(),
             description='Synthetic dataset created from a NumPy array',
             creator='OpenML tester',
             contributor=None,
@@ -536,7 +537,7 @@ class TestOpenMLDataset(TestBase):
         ]
 
         dataset = create_dataset(
-            name="ModifiedWeather",
+            name="%s-ModifiedWeather" % self._get_sentinel(),
             description=(
                 'Testing dataset upload when the data is a list of lists'
             ),
@@ -583,7 +584,7 @@ class TestOpenMLDataset(TestBase):
         ]
 
         xor_dataset = create_dataset(
-            name="XOR",
+            name="%s-XOR" % self._get_sentinel(),
             description='Dataset representing the XOR operation',
             creator=None,
             contributor=None,
@@ -620,7 +621,7 @@ class TestOpenMLDataset(TestBase):
         ]
 
         xor_dataset = create_dataset(
-            name="XOR",
+            name="%s-XOR" % self._get_sentinel(),
             description='Dataset representing the XOR operation',
             creator=None,
             contributor=None,
@@ -683,18 +684,6 @@ class TestOpenMLDataset(TestBase):
             **param
         )
 
-    def test_create_dataset_warning(self):
-
-        parameters = self._get_empty_param_for_dataset()
-        parameters['format'] = 'arff'
-        with catch_warnings():
-            filterwarnings('error')
-            self.assertRaises(
-                DeprecationWarning,
-                create_dataset,
-                **parameters
-            )
-
     def test_get_online_dataset_arff(self):
 
         # Australian dataset
@@ -744,7 +733,7 @@ class TestOpenMLDataset(TestBase):
         df['windy'] = df['windy'].astype('bool')
         df['play'] = df['play'].astype('category')
         # meta-information
-        name = 'Pandas_testing_dataset'
+        name = '%s-pandas_testing_dataset' % self._get_sentinel()
         description = 'Synthetic dataset created from a Pandas DataFrame'
         creator = 'OpenML tester'
         collection_date = '01-01-2018'
@@ -768,7 +757,6 @@ class TestOpenMLDataset(TestBase):
             citation=citation,
             attributes='auto',
             data=df,
-            format=None,
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url
@@ -803,7 +791,6 @@ class TestOpenMLDataset(TestBase):
             citation=citation,
             attributes='auto',
             data=df,
-            format=None,
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url
@@ -840,7 +827,6 @@ class TestOpenMLDataset(TestBase):
             citation=citation,
             attributes=attributes,
             data=df,
-            format=None,
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url
@@ -857,7 +843,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_create_dataset_row_id_attribute_error(self):
         # meta-information
-        name = 'Pandas_testing_dataset'
+        name = '%s-pandas_testing_dataset' % self._get_sentinel()
         description = 'Synthetic dataset created from a Pandas DataFrame'
         creator = 'OpenML tester'
         collection_date = '01-01-2018'
@@ -892,7 +878,6 @@ class TestOpenMLDataset(TestBase):
                 attributes='auto',
                 data=df,
                 row_id_attribute='unknown_row_id',
-                format=None,
                 version_label='test',
                 original_data_url=original_data_url,
                 paper_url=paper_url
@@ -900,7 +885,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_create_dataset_row_id_attribute_inference(self):
         # meta-information
-        name = 'Pandas_testing_dataset'
+        name = '%s-pandas_testing_dataset' % self._get_sentinel()
         description = 'Synthetic dataset created from a Pandas DataFrame'
         creator = 'OpenML tester'
         collection_date = '01-01-2018'
@@ -939,7 +924,6 @@ class TestOpenMLDataset(TestBase):
                 attributes='auto',
                 data=df,
                 row_id_attribute=row_id,
-                format=None,
                 version_label='test',
                 original_data_url=original_data_url,
                 paper_url=paper_url
@@ -986,7 +970,6 @@ class TestOpenMLDataset(TestBase):
                 citation=citation,
                 attributes=attributes,
                 data=data,
-                format=None,
                 version_label='test',
                 original_data_url=original_data_url,
                 paper_url=paper_url

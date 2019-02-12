@@ -419,7 +419,7 @@ def create_dataset(name, description, creator, contributor,
                    licence, attributes, data,
                    default_target_attribute,
                    ignore_attribute, citation,
-                   row_id_attribute=None, format=None,
+                   row_id_attribute=None,
                    original_data_url=None, paper_url=None,
                    update_comment=None, version_label=None):
     """Create a dataset.
@@ -473,11 +473,6 @@ def create_dataset(name, description, creator, contributor,
         be discarded.
         .. versionadded: 0.8
            Inference of ``row_id_attribute`` from a dataframe.
-    format : str, optional
-        Format of the dataset which can be either 'arff' or 'sparse_arff'.
-        By default, the format is automatically inferred.
-        .. deprecated: 0.8
-            ``format`` is deprecated in 0.8 and will be removed in 0.10.
     original_data_url : str, optional
         For derived data, the url to the original dataset.
     paper_url : str, optional
@@ -536,34 +531,29 @@ def create_dataset(name, description, creator, contributor,
         else:
             data = data.values
 
-    if format is not None:
-        warn("The format parameter will be deprecated in the future,"
-             " the method will determine the format of the ARFF "
-             "based on the given data.", DeprecationWarning)
-        d_format = format
-
-    # Determine ARFF format from the dataset
-    else:
-        if isinstance(data, (list, np.ndarray)):
-            if isinstance(data[0], (list, np.ndarray)):
-                d_format = 'arff'
-            elif isinstance(data[0], dict):
-                d_format = 'sparse_arff'
-            else:
-                raise ValueError(
-                    'When giving a list or a numpy.ndarray, '
-                    'they should contain a list/ numpy.ndarray '
-                    'for dense data or a dictionary for sparse '
-                    'data. Got {!r} instead.'
-                    .format(data[0])
-                )
-        elif isinstance(data, coo_matrix):
-            d_format = 'sparse_arff'
+    if isinstance(data, (list, np.ndarray)):
+        if isinstance(data[0], (list, np.ndarray)):
+            data_format = 'arff'
+        elif isinstance(data[0], dict):
+            data_format = 'sparse_arff'
         else:
             raise ValueError(
-                'Invalid data type. The data type can be a list, '
-                'a numpy ndarray or a scipy.sparse.coo_matrix'
+                'When giving a list or a numpy.ndarray, '
+                'they should contain a list/ numpy.ndarray '
+                'for dense data or a dictionary for sparse '
+                'data. Got {!r} instead.'
+                .format(data[0])
             )
+    elif isinstance(data, coo_matrix):
+        data_format = 'sparse_arff'
+    else:
+        raise ValueError(
+            'When giving a list or a numpy.ndarray, '
+            'they should contain a list/ numpy.ndarray '
+            'for dense data or a dictionary for sparse '
+            'data. Got {!r} instead.'
+            .format(data[0])
+        )
 
     arff_object = {
         'relation': name,
@@ -577,10 +567,11 @@ def create_dataset(name, description, creator, contributor,
     try:
         # check if ARFF is valid
         decoder = arff.ArffDecoder()
+        return_type = arff.COO if data_format == 'sparse_arff' else arff.DENSE
         decoder.decode(
             arff_dataset,
             encode_nominal=True,
-            return_type=arff.COO if d_format == 'sparse_arff' else arff.DENSE
+            return_type=return_type
         )
     except arff.ArffException:
         raise ValueError("The arguments you have provided \
@@ -589,7 +580,7 @@ def create_dataset(name, description, creator, contributor,
     return OpenMLDataset(
         name,
         description,
-        data_format=d_format,
+        data_format=data_format,
         creator=creator,
         contributor=contributor,
         collection_date=collection_date,
