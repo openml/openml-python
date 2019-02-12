@@ -337,7 +337,9 @@ class OpenMLFlow(object):
         flow = openml.flows.functions.get_flow(flow_id)
         _copy_server_fields(flow, self)
         try:
-            openml.flows.functions.assert_flows_equal(self, flow, flow.upload_date)
+            openml.flows.functions.assert_flows_equal(
+                self, flow, flow.upload_date, ignore_parameter_values=True
+            )
         except ValueError as e:
             message = e.args[0]
             raise ValueError("Flow was not stored correctly on the server. "

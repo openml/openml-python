@@ -120,6 +120,8 @@ class TestRun(TestBase):
         task_id : int
 
         num_instances: int
+            The expected length of the prediction file (number of test
+            instances in original dataset)
 
         n_missing_values: int
 
@@ -406,12 +408,14 @@ class TestRun(TestBase):
                                str(run.run_id)
                 raise e
 
-            self._rerun_model_and_compare_predictions(run.run_id, model_prime, seed)
+            self._rerun_model_and_compare_predictions(run.run_id, model_prime,
+                                                      seed)
         else:
             run_downloaded = openml.runs.get_run(run.run_id)
-            model_prime = openml.setups.initialize_model(run_downloaded.setup_id)
-            self._rerun_model_and_compare_predictions(run.run_id, model_prime, seed)
-
+            sid = run_downloaded.setup_id
+            model_prime = openml.setups.initialize_model(sid)
+            self._rerun_model_and_compare_predictions(run.run_id,
+                                                      model_prime, seed)
 
         # todo: check if runtime is present
         self._check_fold_evaluations(run.fold_evaluations, 1, num_folds)
@@ -536,7 +540,7 @@ class TestRun(TestBase):
         pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
                                     ('dummy', DummyClassifier(strategy='prior'))])
         run = self._perform_run(task_id, num_test_instances, num_missing_vals,
-                                pipeline1, random_state_value='62501')
+                                pipeline1, flow_expected_rsv='62501')
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
                                        num_folds, num_samples)
 
@@ -556,7 +560,7 @@ class TestRun(TestBase):
                                          'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
                                         cv=3, n_iter=10))])
         run = self._perform_run(task_id, num_test_instances, num_missing_vals, pipeline2,
-                                random_state_value='62501')
+                                flow_expected_rsv='62501')
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
                                        num_folds, num_samples)
 
