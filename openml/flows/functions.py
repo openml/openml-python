@@ -238,7 +238,7 @@ def assert_flows_equal(flow1, flow2,
                         logging.error('Flow 1: %s, Flow 2: %s' % (str(model1), str(model2)))
                         raise ValueError('Scikit-learn serializations do not '
                                          'have same string representation. '
-                                         'Lengths %d vs %d')
+                                         'Lengths %d vs %d' % (len(str(model1)), len(str(model2))))
                     if str(model1) != str(model2):
                         logging.error('Flow 1: %s, Flow 2: %s' % (str(model1), str(model2)))
                         raise ValueError('Scikit-learn serializations do not '

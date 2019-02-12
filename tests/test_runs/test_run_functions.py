@@ -75,17 +75,19 @@ class TestRun(TestBase):
                 time.sleep(10)
 
     def _compare_predictions(self, predictions, predictions_prime):
-        self.assertEqual(predictions_prime['data'].shape, predictions['data'].shape)
+        self.assertEqual(np.array(predictions_prime['data']).shape,
+                         np.array(predictions['data']).shape)
 
-        # The original search model does not submit confidence bounds,
-        # so we can not compare the arff line
+        # The original search model does not submit confidence
+        # bounds, so we can not compare the arff line
         compare_slice = [0, 1, 2, -1, -2]
         for idx in range(len(predictions['data'])):
             # depends on the assumption "predictions are in same order"
             # that does not necessarily hold.
             # But with the current code base, it holds.
             for col_idx in compare_slice:
-                self.assertEqual(predictions['data'][idx][col_idx], predictions_prime['data'][idx][col_idx])
+                self.assertEqual(predictions['data'][idx][col_idx],
+                                 predictions_prime['data'][idx][col_idx])
 
         return True
 
@@ -96,7 +98,8 @@ class TestRun(TestBase):
         # TODO: assert holdout task
 
         # downloads the predictions of the old task
-        predictions_url = openml._api_calls._file_id_to_url(run.output_files['predictions'])
+        file_id = run.output_files['predictions']
+        predictions_url = openml._api_calls._file_id_to_url(file_id)
         predictions = arff.loads(openml._api_calls._read_url(predictions_url))
 
         run_prime = openml.runs.run_model_on_task(model_prime, task,
@@ -404,6 +407,11 @@ class TestRun(TestBase):
                 raise e
 
             self._rerun_model_and_compare_predictions(run.run_id, model_prime, seed)
+        else:
+            run_downloaded = openml.runs.get_run(run.run_id)
+            model_prime = openml.setups.initialize_model(run_downloaded.setup_id)
+            self._rerun_model_and_compare_predictions(run.run_id, model_prime, seed)
+
 
         # todo: check if runtime is present
         self._check_fold_evaluations(run.fold_evaluations, 1, num_folds)
