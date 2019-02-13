@@ -410,8 +410,7 @@ class TestRun(TestBase):
                 model_prime = openml.runs.initialize_model_from_trace(
                     run.run_id, 0, 0)
             except openml.exceptions.OpenMLServerException as e:
-                e.additional = str(e.additional) + '; run_id: ' + \
-                               str(run.run_id)
+                e.additional = "%s; run_id %d" % (e.additional, run.run_id)
                 raise e
 
             self._rerun_model_and_compare_predictions(run.run_id, model_prime,
@@ -441,7 +440,8 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        self._run_and_upload(pipeline1, task_id, n_missing_vals, n_test_obs, '62501')
+        self._run_and_upload(pipeline1, task_id, n_missing_vals, n_test_obs,
+                             '62501')
 
     @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
                      reason="columntransformer introduction in 0.20.0")
@@ -501,7 +501,8 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        self._run_and_upload(gridsearch, task_id, n_missing_vals, n_test_obs, '62501')
+        self._run_and_upload(gridsearch, task_id, n_missing_vals, n_test_obs,
+                             '62501')
 
     def test_run_and_upload_randomsearch(self):
         randomsearch = RandomizedSearchCV(
@@ -520,7 +521,8 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        self._run_and_upload(randomsearch, task_id, n_missing_vals, n_test_obs, '12172')
+        self._run_and_upload(randomsearch, task_id, n_missing_vals,
+                             n_test_obs, '12172')
 
     def test_run_and_upload_maskedarrays(self):
         # This testcase is important for 2 reasons:
@@ -540,7 +542,8 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        self._run_and_upload(gridsearch, task_id, n_missing_vals, n_test_obs, '12172')
+        self._run_and_upload(gridsearch, task_id, n_missing_vals, n_test_obs,
+                             '12172')
 
     ############################################################################
 
@@ -574,8 +577,8 @@ class TestRun(TestBase):
                                         {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
                                          'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
                                         cv=3, n_iter=10))])
-        run = self._perform_run(task_id, num_test_instances, num_missing_vals, pipeline2,
-                                flow_expected_rsv='62501')
+        run = self._perform_run(task_id, num_test_instances, num_missing_vals,
+                                pipeline2, flow_expected_rsv='62501')
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
                                        num_folds, num_samples)
 
@@ -772,8 +775,8 @@ class TestRun(TestBase):
             flow = openml.flows.sklearn_to_flow(clf)
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
             self.assertGreater(flow_exists, 0)
-            downloaded_flow = openml.flows.get_flow(flow_exists)
-            setup_exists = openml.setups.setup_exists(downloaded_flow, clf)
+            downloaded_flow = openml.flows.get_flow(flow_exists, reinstantiate=True)
+            setup_exists = openml.setups.setup_exists(downloaded_flow)
             self.assertGreater(setup_exists, 0)
             run_ids = _run_exists(task.task_id, setup_exists)
             self.assertTrue(run_ids, msg=(run_ids, clf))

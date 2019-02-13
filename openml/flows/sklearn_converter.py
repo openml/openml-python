@@ -122,7 +122,7 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False,
     logging.info('-%s flow_to_sklearn START o=%s, components=%s, '
                  'init_defaults=%s' % ('-' * recursion_depth, o, components,
                                        initialize_with_defaults))
-    depth_pp = recursion_depth+1  # shortcut var, depth plus plus
+    depth_pp = recursion_depth + 1  # shortcut var, depth plus plus
 
     # First, we need to check whether the presented object is a json string.
     # JSON strings are used to encoder parameter values. By passing around
@@ -282,9 +282,10 @@ def obtain_parameter_values(flow):
                     return False
             return True
 
-        # _flow is openml flow object, _param dict maps from flow name to flow id
-        # for the main call, the param dict can be overridden (useful for unit tests / sentinels)
-        # this way, for flows without subflows we do not have to rely on _flow_dict
+        # _flow is openml flow object, _param dict maps from flow name to flow
+        # id for the main call, the param dict can be overridden (useful for
+        # unit tests / sentinels) this way, for flows without subflows we do
+        # not have to rely on _flow_dict
         exp_parameters = set(_flow.parameters)
         exp_components = set(_flow.components)
         model_parameters = set([mp for mp in component_model.get_params()
@@ -327,8 +328,10 @@ def obtain_parameter_values(flow):
                     subcomponent_identifier = subcomponent[0]
                     subcomponent_flow = subcomponent[1]
                     if not isinstance(subcomponent_identifier, str):
-                        raise TypeError('Subcomponent identifier should be string')
-                    if not isinstance(subcomponent_flow, openml.flows.OpenMLFlow):
+                        raise TypeError('Subcomponent identifier should be'
+                                        'string')
+                    if not isinstance(subcomponent_flow,
+                                      openml.flows.OpenMLFlow):
                         raise TypeError('Subcomponent flow should be string')
 
                     current = {
@@ -340,7 +343,8 @@ def obtain_parameter_values(flow):
                     }
                     if len(subcomponent) == 3:
                         if not isinstance(subcomponent[2], list):
-                            raise TypeError('Subcomponent argument should be list')
+                            raise TypeError('Subcomponent argument should be'
+                                            'list')
                         current['value']['argument_1'] = subcomponent[2]
                     parsed_values.append(current)
                 parsed_values = json.dumps(parsed_values)
@@ -645,11 +649,12 @@ def _deserialize_model(flow, keep_defaults, recursion_depth):
 
     for name in parameters:
         value = parameters.get(name)
-        logging.info('--%s flow_parameter=%s, value=%s' % ('-' * recursion_depth, name, value))
+        logging.info('--%s flow_parameter=%s, value=%s' %
+                     ('-' * recursion_depth, name, value))
         rval = flow_to_sklearn(value,
                                components=components_,
                                initialize_with_defaults=keep_defaults,
-                               recursion_depth=recursion_depth+1)
+                               recursion_depth=recursion_depth + 1)
         parameter_dict[name] = rval
 
     for name in components:
@@ -658,10 +663,10 @@ def _deserialize_model(flow, keep_defaults, recursion_depth):
         if name not in components_:
             continue
         value = components[name]
-        logging.info('--%s flow_component=%s, value=%s' % ('-' * recursion_depth, name, value))
+        logging.info('--%s flow_component=%s, value=%s'
+                     % ('-' * recursion_depth, name, value))
         rval = flow_to_sklearn(value,
-                               recursion_depth=recursion_depth+1
-                               **kwargs)
+                               recursion_depth=recursion_depth + 1)
         parameter_dict[name] = rval
 
     module_name = model_name.rsplit('.', 1)
@@ -900,7 +905,7 @@ def _deserialize_cross_validator(value, recursion_depth):
                           module_name[1])
     for parameter in parameters:
         parameters[parameter] = flow_to_sklearn(
-            parameters[parameter], recursion_depth=recursion_depth+1
+            parameters[parameter], recursion_depth=recursion_depth + 1
         )
     return model_class(**parameters)
 

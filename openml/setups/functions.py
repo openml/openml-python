@@ -31,7 +31,8 @@ def setup_exists(flow):
     # sadly, this api call relies on a run object
     openml.flows.functions._check_flow_for_server_id(flow)
     if flow.model is None:
-        raise ValueError('Flow should have model field set with the actual model. ')
+        raise ValueError('Flow should have model field set with the actual '
+                         'model. ')
 
     # checks whether the flow exists on the server and flow ids align
     exists = flow_exists(flow.name, flow.external_version)
