@@ -46,6 +46,7 @@ Changelog
   `#479 <https://github.com/openml/openml-python/pull/479>`_:
   the OpenML connector fails earlier and with a better error message when
   failing to create a flow from the OpenML description.
+* MAINT #561: Improve documentation on running specific unit tests.
 
 0.4.-0.7
 ~~~~~~~~
