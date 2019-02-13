@@ -197,19 +197,22 @@ def initialize_model(setup_id):
         model : sklearn model
             the scikitlearn model with all parameters initailized
     """
-
-    # transform an openml setup object into
-    # a dict of dicts, structured: flow_id maps to dict of
-    # parameter_names mapping to parameter_value
     setup = get_setup(setup_id)
     flow = openml.flows.get_flow(setup.flow_id)
+
+    # instead of using scikit-learns "set_params" function, we override the
+    # OpenMLFlow objects default parameter value so we can utilize the
+    # flow_to_sklearn function to reinitialize the flow with the set defaults.
+    for hyperparameter in setup.parameters.values():
+        structure = flow.get_structure('flow_id')
+        if len(structure[hyperparameter.flow_id]) > 0:
+            subflow = flow.get_subflow(structure[hyperparameter.flow_id])
+        else:
+            subflow = flow
+        subflow.parameters[hyperparameter.parameter_name] = \
+            hyperparameter.value
+
     model = openml.flows.flow_to_sklearn(flow)
-    hyperparameters = {
-        openml.flows.openml_param_name_to_sklearn(hp, flow):
-            openml.flows.flow_to_sklearn(hp.value)
-        for hp in setup.parameters.values()
-    }
-    model.set_params(**hyperparameters)
     return model
 
 

@@ -390,6 +390,9 @@ class OpenMLFlow(object):
         OpenMLFlow
             The OpenMLFlow that corresponds to the structure
         """
+        # make a copy of structure, as we don't want to change it in the
+        # outer scope
+        structure = list(structure)
         if len(structure) < 1:
             raise ValueError('Please provide a structure list of size >= 1')
         sub_identifier = structure[0]
