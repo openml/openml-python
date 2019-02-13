@@ -327,8 +327,8 @@ def obtain_parameter_values(flow):
 
                     subcomponent_identifier = subcomponent[0]
                     subcomponent_flow = subcomponent[1]
-                    if not isinstance(subcomponent_identifier, str):
-                        raise TypeError('Subcomponent identifier should be'
+                    if not isinstance(subcomponent_identifier, six.string_types):
+                        raise TypeError('Subcomponent identifier should be '
                                         'string')
                     if not isinstance(subcomponent_flow,
                                       openml.flows.OpenMLFlow):
