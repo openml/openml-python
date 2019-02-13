@@ -111,9 +111,9 @@
 </li>
 <li><a class="reference internal" href="#installation">Installation</a><ul>
 <li><a class="reference internal" href="#installation-from-github">Installation from github</a></li>
-<li><a class="reference internal" href="#testing">Testing</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
 <li><a class="reference internal" href="#connecting-new-machine-learning-libraries">Connecting new machine learning libraries</a></li>
 </ul>
 </li>
@@ -195,16 +195,46 @@ execute</p>
 </pre></div>
 </div>
 </div>
+</div>
 <div class="section" id="testing">
-<h3>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
 <p>From within the directory of the cloned package, execute:</p>
 <div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="n">tests</span><span class="o">/</span>
 </pre></div>
 </div>
+<p id="extending">Executing a specific test can be done by specifying the module, test case, and test.
+To obtain a hierarchical list of all tests, run</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="o">--</span><span class="n">collect</span><span class="o">-</span><span class="n">only</span>
+</pre></div>
 </div>
+<div class="code bash highlight-default notranslate" id="id4"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Module</span> <span class="s1">&#39;tests/test_datasets/test_dataset.py&#39;</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">UnitTestCase</span> <span class="s1">&#39;OpenMLDatasetTest&#39;</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_dataset_format_constructor&#39;</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_get_data&#39;</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_get_data_rowid_and_ignore_and_target&#39;</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_get_data_with_ignore_attributes&#39;</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_get_data_with_rowid&#39;</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_get_data_with_target&#39;</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">UnitTestCase</span> <span class="s1">&#39;OpenMLDatasetTestOnTestServer&#39;</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_tagging&#39;</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p id="id5">To run a specific module, add the module name, for instance:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="n">tests</span><span class="o">/</span><span class="n">test_datasets</span><span class="o">/</span><span class="n">test_dataset</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p id="id6">To run a specific unit test case, add the test case name, for instance:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="n">tests</span><span class="o">/</span><span class="n">test_datasets</span><span class="o">/</span><span class="n">test_dataset</span><span class="o">.</span><span class="n">py</span><span class="p">::</span><span class="n">OpenMLDatasetTest</span>
+</pre></div>
+</div>
+<p id="id7">To run a specific unit test, add the test name, for instance:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="n">tests</span><span class="o">/</span><span class="n">test_datasets</span><span class="o">/</span><span class="n">test_dataset</span><span class="o">.</span><span class="n">py</span><span class="p">::</span><span class="n">OpenMLDatasetTest</span><span class="p">::</span><span class="n">test_get_data</span>
+</pre></div>
+</div>
+<p id="id8">Happy testing!</p>
 </div>
 <div class="section" id="connecting-new-machine-learning-libraries">
-<span id="extending"></span><h2>Connecting new machine learning libraries<a class="headerlink" href="#connecting-new-machine-learning-libraries" title="Permalink to this headline">¶</a></h2>
+<h2>Connecting new machine learning libraries<a class="headerlink" href="#connecting-new-machine-learning-libraries" title="Permalink to this headline">¶</a></h2>
 <p>Coming soon - please stay tuned!</p>
 </div>
 </div>
