@@ -188,14 +188,14 @@ def initialize_model(setup_id):
     same parameter settings)
 
     Parameters
-        ----------
-        setup_id : int
-            The Openml setup_id
+    ----------
+    setup_id : int
+        The Openml setup_id
 
-        Returns
-        -------
-        model : sklearn model
-            the scikitlearn model with all parameters initailized
+    Returns
+    -------
+    model : sklearn model
+        the scikitlearn model with all parameters initialized
     """
     setup = get_setup(setup_id)
     flow = openml.flows.get_flow(setup.flow_id)
