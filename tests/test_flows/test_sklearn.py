@@ -612,8 +612,8 @@ class TestSklearn(TestBase):
             'learning_rate': scipy.stats.uniform(0.01, 0.99),
             'n_estimators': [1, 5, 10, 100]
         }
-        # convert to ordered dict, due to param grid check
-        parameter_grid = OrderedDict(parameter_grid)
+        # convert to ordered dict, sorted by keys) due to param grid check
+        parameter_grid = OrderedDict(sorted(parameter_grid.items()))
         cv = sklearn.model_selection.StratifiedKFold(n_splits=5, shuffle=True)
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
