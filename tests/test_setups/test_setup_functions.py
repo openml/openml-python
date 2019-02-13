@@ -74,7 +74,7 @@ class TestSetupFunctions(TestBase):
         # setups (yet) as it hasn't been ran
         setup_id = openml.setups.setup_exists(flow)
         self.assertFalse(setup_id)
-        setup_id = openml.setups.setup_exists(flow, classif)
+        setup_id = openml.setups.setup_exists(flow)
         self.assertFalse(setup_id)
 
         # now run the flow on an easy task:

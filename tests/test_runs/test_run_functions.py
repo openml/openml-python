@@ -458,10 +458,13 @@ class TestRun(TestBase):
                         handle_unknown='ignore'), numeric_indices)],
                 remainder='passthrough')
             return sklearn.pipeline.Pipeline(
-                steps=[('imputer', sklearn.impute.SimpleImputer(
-                    strategy='constant', fill_value=-1)),
-                       ('transformer', inner),
-                       ('classifier', sklearn.tree.DecisionTreeClassifier())])
+                steps=[
+                    ('imputer', sklearn.impute.SimpleImputer(
+                        strategy='constant', fill_value=-1)),
+                    ('transformer', inner),
+                    ('classifier', sklearn.tree.DecisionTreeClassifier())
+                ]
+            )
 
         sentinel = self._get_sentinel()
         self._run_and_upload(get_ct_cf(self.TEST_SERVER_TASK_SIMPLE[3],
@@ -492,7 +495,8 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
         n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
         n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
-        self._run_and_upload(pipeline2, task_id, n_missing_vals, n_test_obs, '62501')
+        self._run_and_upload(pipeline2, task_id, n_missing_vals, n_test_obs,
+                             '62501')
 
     def test_run_and_upload_gridsearch(self):
         gridsearch = GridSearchCV(BaggingClassifier(base_estimator=SVC()),
@@ -753,12 +757,19 @@ class TestRun(TestBase):
         # would be better to not sentinel these clfs,
         # so we do not have to perform the actual runs
         # and can just check their status on line
-        clfs = [sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='mean')),
-                                                ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
-                                                ('Estimator', DecisionTreeClassifier(max_depth=4))]),
-                sklearn.pipeline.Pipeline(steps=[('Imputer', Imputer(strategy='most_frequent')),
-                                                 ('VarianceThreshold', VarianceThreshold(threshold=0.1)),
-                                                 ('Estimator', DecisionTreeClassifier(max_depth=4))])]
+        rs = 1
+        clfs = [
+            sklearn.pipeline.Pipeline(steps=[
+                ('Imputer', Imputer(strategy='mean')),
+                ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
+                ('Estimator', DecisionTreeClassifier(max_depth=4))
+            ]),
+            sklearn.pipeline.Pipeline(steps=[
+                ('Imputer', Imputer(strategy='most_frequent')),
+                ('VarianceThreshold', VarianceThreshold(threshold=0.1)),
+                ('Estimator', DecisionTreeClassifier(max_depth=4))]
+            )
+        ]
 
         task = openml.tasks.get_task(115)
 
@@ -766,7 +777,8 @@ class TestRun(TestBase):
             try:
                 # first populate the server with this run.
                 # skip run if it was already performed.
-                run = openml.runs.run_model_on_task(task, clf, avoid_duplicate_runs=True)
+                run = openml.runs.run_model_on_task(task, clf, seed=rs,
+                                                    avoid_duplicate_runs=True)
                 run.publish()
             except openml.exceptions.PyOpenMLError as e:
                 # run already existed. Great.
@@ -775,7 +787,10 @@ class TestRun(TestBase):
             flow = openml.flows.sklearn_to_flow(clf)
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
             self.assertGreater(flow_exists, 0)
-            downloaded_flow = openml.flows.get_flow(flow_exists, reinstantiate=True)
+            # Do NOT use get_flow reinitialization, this potentially sets
+            # hyperparameter values wrong. Rather use the local model.
+            downloaded_flow = openml.flows.get_flow(flow_exists)
+            downloaded_flow.model = clf
             setup_exists = openml.setups.setup_exists(downloaded_flow)
             self.assertGreater(setup_exists, 0)
             run_ids = _run_exists(task.task_id, setup_exists)

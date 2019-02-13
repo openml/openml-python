@@ -1071,7 +1071,7 @@ class TestSklearn(TestBase):
     def test_obtain_parameter_values_flow_not_from_server(self):
         model = sklearn.linear_model.LogisticRegression()
         flow = sklearn_to_flow(model)
-        msg = 'Flow sklearn.linear_model.logistic.LogisticRegression has no' \
+        msg = 'Flow sklearn.linear_model.logistic.LogisticRegression has no ' \
               'flow_id!'
 
         self.assertRaisesRegex(ValueError, msg,
