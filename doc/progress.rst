@@ -13,7 +13,7 @@ Changelog
 ~~~~~
 
 * ADD #440: Improved dataset upload.
-* ADD #545, #583: Allow uploading a dataset from a pandas dataframe.
+* ADD #545, #583: Allow uploading a dataset from a pandas DataFrame.
 * ADD #528: New functions to update the status of a dataset.
 * ADD #523: Support for scikit-learn 0.20's new ColumnTransformer.
 * ADD #459: Enhanced support to store runs on disk prior to uploading them to
