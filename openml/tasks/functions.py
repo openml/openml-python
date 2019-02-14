@@ -103,7 +103,7 @@ def _get_estimation_procedure_list():
                          'oml:estimationprocedures/@xmlns:oml is not '
                          'http://openml.org/openml, but %s' %
                          str(procs_dict['oml:estimationprocedures'][
-                            '@xmlns:oml']))
+                                '@xmlns:oml']))
 
     procs = []
     for proc_ in procs_dict['oml:estimationprocedures'][
