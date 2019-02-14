@@ -121,6 +121,12 @@ class TestSklearn(TestBase):
         self.assertDictEqual(structure, structure_fixture)
 
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -178,6 +184,12 @@ class TestSklearn(TestBase):
         self.assertDictEqual(structure, fixture_structure)
 
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -222,6 +234,12 @@ class TestSklearn(TestBase):
         self.assertDictEqual(structure, fixture_structure)
 
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -285,6 +303,12 @@ class TestSklearn(TestBase):
 
         #del serialization.model
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -354,6 +378,12 @@ class TestSklearn(TestBase):
 
         # del serialization.model
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -403,6 +433,12 @@ class TestSklearn(TestBase):
         self.assertDictEqual(structure, fixture_structure)
         # del serialization.model
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
         serialization2 = sklearn_to_flow(new_model)
@@ -449,6 +485,12 @@ class TestSklearn(TestBase):
         self.assertDictEqual(structure, fixture_structure)
         # del serialization.model
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
         serialization2 = sklearn_to_flow(new_model)
@@ -482,6 +524,12 @@ class TestSklearn(TestBase):
         self.assertEqual(serialization.name, fixture_name)
         self.assertDictEqual(structure, fixture_structure)
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(fu.get_params()),
+                             str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(fu))
         self.assertIsNot(new_model, fu)
@@ -560,9 +608,12 @@ class TestSklearn(TestBase):
         model = sklearn.pipeline.Pipeline(steps=[
             ('ohe', ohe), ('scaler', scaler), ('boosting', boosting)])
         parameter_grid = {
-            'n_estimators': [1, 5, 10, 100],
+            'base_estimator__max_depth': scipy.stats.randint(1, 10),
             'learning_rate': scipy.stats.uniform(0.01, 0.99),
-            'base_estimator__max_depth': scipy.stats.randint(1, 10)}
+            'n_estimators': [1, 5, 10, 100]
+        }
+        # convert to ordered dict, sorted by keys) due to param grid check
+        parameter_grid = OrderedDict(sorted(parameter_grid.items()))
         cv = sklearn.model_selection.StratifiedKFold(n_splits=5, shuffle=True)
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
@@ -595,6 +646,13 @@ class TestSklearn(TestBase):
 
         # now do deserialization
         deserialized = flow_to_sklearn(serialized)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # JvR: compare str length, due to memory address of distribution
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(len(str(rs.get_params())),
+                             len(str(deserialized.get_params())))
 
         # Checks that sklearn_to_flow is idempotent.
         serialized2 = sklearn_to_flow(deserialized)
@@ -1027,3 +1085,43 @@ class TestSklearn(TestBase):
                                          subflow.version,
                                          splitted[-1])
             self.assertEqual(parameter.full_name, openml_name)
+
+    def test_obtain_parameter_values_flow_not_from_server(self):
+        model = sklearn.linear_model.LogisticRegression()
+        flow = sklearn_to_flow(model)
+        msg = 'Flow sklearn.linear_model.logistic.LogisticRegression has no ' \
+              'flow_id!'
+
+        self.assertRaisesRegexp(ValueError, msg,
+                                openml.flows.obtain_parameter_values, flow)
+
+        model = sklearn.ensemble.AdaBoostClassifier(
+            base_estimator=sklearn.linear_model.LogisticRegression()
+        )
+        flow = sklearn_to_flow(model)
+        flow.flow_id = 1
+        self.assertRaisesRegexp(ValueError, msg,
+                                openml.flows.obtain_parameter_values, flow)
+
+    def test_obtain_parameter_values(self):
+
+        model = sklearn.model_selection.RandomizedSearchCV(
+            estimator=sklearn.ensemble.RandomForestClassifier(n_estimators=5),
+            param_distributions={
+                "max_depth": [3, None],
+                "max_features": [1, 2, 3, 4],
+                "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
+                "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                "bootstrap": [True, False], "criterion": ["gini", "entropy"]},
+            cv=sklearn.model_selection.StratifiedKFold(n_splits=2,
+                                                       random_state=1),
+            n_iter=5)
+        flow = sklearn_to_flow(model)
+        flow.flow_id = 1
+        flow.components['estimator'].flow_id = 2
+        parameters = openml.flows.obtain_parameter_values(flow)
+        for parameter in parameters:
+            self.assertIsNotNone(parameter['oml:component'], msg=parameter)
+            if parameter['oml:name'] == 'n_estimators':
+                self.assertEqual(parameter['oml:value'], '5')
+                self.assertEqual(parameter['oml:component'], 2)

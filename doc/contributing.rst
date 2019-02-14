@@ -98,7 +98,7 @@ execute
     python setup.py install
 
 Testing
-~~~~~~~
+=======
 
 From within the directory of the cloned package, execute:
 
@@ -108,7 +108,7 @@ From within the directory of the cloned package, execute:
 
 .. _extending:
 
-Executing a specific test can be done by specifying the test script, class, and function.  
+Executing a specific test can be done by specifying the module, test case, and test.  
 To obtain a hierarchical list of all tests, run
 
 .. code:: bash
@@ -117,7 +117,8 @@ To obtain a hierarchical list of all tests, run
 
 .. _extending:
 
-.. code:: python
+.. code:: bash
+
     <Module 'tests/test_datasets/test_dataset.py'>
       <UnitTestCase 'OpenMLDatasetTest'>
         <TestCaseFunction 'test_dataset_format_constructor'>
@@ -128,7 +129,8 @@ To obtain a hierarchical list of all tests, run
         <TestCaseFunction 'test_get_data_with_target'>
       <UnitTestCase 'OpenMLDatasetTestOnTestServer'>
         <TestCaseFunction 'test_tagging'>
-    ...
+        
+.. _extending:
 
 To run a specific module, add the module name, for instance:
 

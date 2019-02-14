@@ -54,6 +54,14 @@ class HardNaiveBayes(GaussianNB):
 
 class TestRun(TestBase):
     _multiprocess_can_split_ = True
+    # diabetis dataset, 768 observations, 0 missing vals, 33% holdout set
+    # (253 test obs), no nominal attributes, all numeric attributes
+    TEST_SERVER_TASK_SIMPLE = (119, 0, 253, list(), list(range(8)))
+    # creadit-a dataset, 690 observations, 67 missing vals, 33% holdout set
+    # (227 test obs)
+    TEST_SERVER_TASK_MISSING_VALS = (96, 67, 227,
+                                     [0, 3, 4, 5, 6, 8, 9, 11, 12],
+                                     [1, 2, 7, 10, 13, 14])
 
     # Suppress warnings to facilitate testing
     hide_warnings = True
@@ -78,37 +86,12 @@ class TestRun(TestBase):
             else:
                 time.sleep(10)
 
-    def _check_serialized_optimized_run(self, run_id):
-        run = openml.runs.get_run(run_id)
-        task = openml.tasks.get_task(run.task_id)
+    def _compare_predictions(self, predictions, predictions_prime):
+        self.assertEqual(np.array(predictions_prime['data']).shape,
+                         np.array(predictions['data']).shape)
 
-        # TODO: assert holdout task
-
-        # downloads the predictions of the old task
-        predictions_url = openml._api_calls._file_id_to_url(
-            run.output_files['predictions'])
-        predictions = arff.loads(openml._api_calls._read_url(predictions_url))
-
-        # downloads the best model based on the optimization trace suboptimal
-        # (slow), and not guaranteed to work if evaluation engine is behind.
-        # TODO: mock this? We have the arff already on the server
-        self._wait_for_processed_run(run_id, 200)
-        try:
-            model_prime = openml.runs.initialize_model_from_trace(run_id, 0, 0)
-        except openml.exceptions.OpenMLServerException as e:
-            e.additional = str(e.additional) + '; run_id: ' + str(run_id)
-            raise e
-
-        run_prime = openml.runs.run_model_on_task(model_prime, task,
-                                                  avoid_duplicate_runs=False,
-                                                  seed=1)
-        predictions_prime = run_prime._generate_arff_dict()
-
-        self.assertEqual(len(predictions_prime['data']),
-                         len(predictions['data']))
-
-        # The original search model does not submit confidence bounds,
-        # so we can not compare the arff line
+        # The original search model does not submit confidence
+        # bounds, so we can not compare the arff line
         compare_slice = [0, 1, 2, -1, -2]
         for idx in range(len(predictions['data'])):
             # depends on the assumption "predictions are in same order"
@@ -120,8 +103,62 @@ class TestRun(TestBase):
 
         return True
 
-    def _perform_run(self, task_id, num_instances, clf,
-                     random_state_value=None, check_setup=True):
+    def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed):
+        run = openml.runs.get_run(run_id)
+        task = openml.tasks.get_task(run.task_id)
+
+        # TODO: assert holdout task
+
+        # downloads the predictions of the old task
+        file_id = run.output_files['predictions']
+        predictions_url = openml._api_calls._file_id_to_url(file_id)
+        predictions = arff.loads(openml._api_calls._read_url(predictions_url))
+        run_prime = openml.runs.run_model_on_task(model_prime, task,
+                                                  avoid_duplicate_runs=False,
+                                                  seed=seed)
+        predictions_prime = run_prime._generate_arff_dict()
+
+        self._compare_predictions(predictions, predictions_prime)
+
+    def _perform_run(self, task_id, num_instances, n_missing_vals, clf,
+                     flow_expected_rsv=None, seed=1, check_setup=True,
+                     sentinel=None):
+        """
+        Runs a classifier on a task, and performs some basic checks.
+        Also uploads the run.
+        
+        Parameters:
+        ----------
+        task_id : int
+
+        num_instances: int
+            The expected length of the prediction file (number of test
+            instances in original dataset)
+
+        n_missing_values: int
+
+        clf: sklearn.base.BaseEstimator
+            The classifier to run
+
+        flow_expected_rsv: str
+            The expected random state value for the flow (check by hand,
+            depends on seed parameter)
+
+        seed: int
+            The seed with which the RSV for runs will be initialized
+
+        check_setup: bool
+            If set to True, the flow will be downloaded again and
+            reinstantiated, for consistency with original flow.
+
+        sentinel: optional, str
+            in case the sentinel should be user specified
+
+        Returns:
+        --------
+        run: OpenMLRun
+            The performed run (with run id)
+        """
         classes_without_random_state = \
             ['sklearn.model_selection._search.GridSearchCV',
              'sklearn.pipeline.Pipeline',
@@ -135,14 +172,16 @@ class TestRun(TestBase):
                 _remove_random_state(component)
 
         flow = sklearn_to_flow(clf)
-        flow, _ = self._add_sentinel_to_flow_name(flow, None)
-        flow.publish()
+        flow, _ = self._add_sentinel_to_flow_name(flow, sentinel)
+        if not openml.flows.flow_exists(flow.name, flow.external_version):
+            flow.publish()
 
         task = openml.tasks.get_task(task_id)
 
-        run = openml.runs.run_flow_on_task(
-            flow, task, seed=1,
-            avoid_duplicate_runs=openml.config.avoid_duplicate_runs)
+        X, y = task.get_X_and_y()
+        self.assertEqual(np.count_nonzero(np.isnan(X)), n_missing_vals)
+        run = openml.runs.run_flow_on_task(flow, task, seed=seed,
+                                           avoid_duplicate_runs=openml.config.avoid_duplicate_runs)
         run_ = run.publish()
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
@@ -163,7 +202,6 @@ class TestRun(TestBase):
             run_id = run_.run_id
             run_server = openml.runs.get_run(run_id)
             clf_server = openml.setups.initialize_model(run_server.setup_id)
-
             flow_local = openml.flows.sklearn_to_flow(clf)
             flow_server = openml.flows.sklearn_to_flow(clf_server)
 
@@ -177,9 +215,9 @@ class TestRun(TestBase):
                 # As soon as a flow is run, a random state is set in the model.
                 # If a flow is re-instantiated
                 self.assertEqual(flow_local.parameters['random_state'],
-                                 random_state_value)
+                                 flow_expected_rsv)
                 self.assertEqual(flow_server.parameters['random_state'],
-                                 random_state_value)
+                                 flow_expected_rsv)
             _remove_random_state(flow_local)
             _remove_random_state(flow_server)
             openml.flows.assert_flows_equal(flow_local, flow_server)
@@ -190,7 +228,7 @@ class TestRun(TestBase):
             flow_server2 = openml.flows.sklearn_to_flow(clf_server2)
             if flow.class_name not in classes_without_random_state:
                 self.assertEqual(flow_server2.parameters['random_state'],
-                                 random_state_value)
+                                 flow_expected_rsv)
 
             _remove_random_state(flow_server2)
             openml.flows.assert_flows_equal(flow_local, flow_server2)
@@ -207,7 +245,6 @@ class TestRun(TestBase):
         # so that the two objects can actually be compared):
         # downloaded_run_trace = downloaded._generate_trace_arff_dict()
         # self.assertEqual(run_trace, downloaded_run_trace)
-
         return run
 
     def _check_fold_evaluations(self, fold_evaluations, num_repeats, num_folds,
@@ -360,8 +397,8 @@ class TestRun(TestBase):
     # execution of the unit tests without the need to add an additional module
     # like unittest2
 
-    def _run_and_upload(self, clf, rsv, task_id, num_test_instances, num_folds,
-                        num_iterations, metric, metric_name, task_type):
+    def _run_and_upload(self, clf, task_id, n_missing_vals, n_test_obs,
+                        flow_expected_rsv, sentinel=None):
         def determine_grid_size(param_grid):
             if isinstance(param_grid, dict):
                 grid_iterations = 1
@@ -376,9 +413,13 @@ class TestRun(TestBase):
             else:
                 raise TypeError('Param Grid should be of type list '
                                 '(GridSearch only) or dict')
+        seed = 1
+        num_folds = 1  # because of holdout
+        num_iterations = 5  # for base search classifiers
 
-        run = self._perform_run(task_id, num_test_instances, clf,
-                                random_state_value=rsv)
+        run = self._perform_run(task_id, n_test_obs, n_missing_vals, clf,
+                                flow_expected_rsv=flow_expected_rsv, seed=seed,
+                                sentinel=sentinel)
 
         # obtain scores using get_metric_score:
         scores = run.get_metric_fn(metric)
@@ -400,8 +441,27 @@ class TestRun(TestBase):
             else:
                 self.assertEqual(len(trace_content),
                                  num_iterations * num_folds)
-            check_res = self._check_serialized_optimized_run(run.run_id)
-            self.assertTrue(check_res)
+
+            # downloads the best model based on the optimization trace
+            # suboptimal (slow), and not guaranteed to work if evaluation
+            # engine is behind.
+            # TODO: mock this? We have the arff already on the server
+            self._wait_for_processed_run(run.run_id, 200)
+            try:
+                model_prime = openml.runs.initialize_model_from_trace(
+                    run.run_id, 0, 0)
+            except openml.exceptions.OpenMLServerException as e:
+                e.additional = "%s; run_id %d" % (e.additional, run.run_id)
+                raise e
+
+            self._rerun_model_and_compare_predictions(run.run_id, model_prime,
+                                                      seed)
+        else:
+            run_downloaded = openml.runs.get_run(run.run_id)
+            sid = run_downloaded.setup_id
+            model_prime = openml.setups.initialize_model(sid)
+            self._rerun_model_and_compare_predictions(run.run_id,
+                                                      model_prime, seed)
 
         # todo: check if runtime is present
         self._check_fold_evaluations(run.fold_evaluations, 1, num_folds,
@@ -434,7 +494,10 @@ class TestRun(TestBase):
 
     def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression()
-        self._run_and_upload(lr, '62501')
+        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
+        self._run_and_upload(lr, task_id, n_missing_vals, n_test_obs, '62501')
 
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
@@ -442,42 +505,78 @@ class TestRun(TestBase):
 
     def test_run_and_upload_pipeline_dummy_pipeline(self):
 
-        pipeline1 = Pipeline(steps=[
-            ('scaler', StandardScaler(with_mean=False)),
-            ('dummy', DummyClassifier(strategy='prior'))])
-        self._run_and_upload(pipeline1, '62501')
+        pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
+                                    ('dummy', DummyClassifier(strategy='prior'))])
+        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
+        self._run_and_upload(pipeline1, task_id, n_missing_vals, n_test_obs,
+                             '62501')
 
     @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
                      reason="columntransformer introduction in 0.20.0")
     def test_run_and_upload_column_transformer_pipeline(self):
         import sklearn.compose
-        inner = sklearn.compose.ColumnTransformer(
-            transformers=[
-                ('numeric', sklearn.preprocessing.StandardScaler(), [0, 1, 2]),
-                ('nominal', sklearn.preprocessing.OneHotEncoder(
-                    handle_unknown='ignore'), [3, 4, 5])],
-            remainder='passthrough')
-        pipeline = sklearn.pipeline.Pipeline(
-            steps=[('transformer', inner),
-                   ('classifier', sklearn.tree.DecisionTreeClassifier())])
-        self._run_and_upload(pipeline, '62501')
+        import sklearn.impute
+
+        def get_ct_cf(nominal_indices, numeric_indices):
+            inner = sklearn.compose.ColumnTransformer(
+                transformers=[
+                    ('numeric', sklearn.preprocessing.StandardScaler(),
+                     nominal_indices),
+                    ('nominal', sklearn.preprocessing.OneHotEncoder(
+                        handle_unknown='ignore'), numeric_indices)],
+                remainder='passthrough')
+            return sklearn.pipeline.Pipeline(
+                steps=[
+                    ('imputer', sklearn.impute.SimpleImputer(
+                        strategy='constant', fill_value=-1)),
+                    ('transformer', inner),
+                    ('classifier', sklearn.tree.DecisionTreeClassifier())
+                ]
+            )
+
+        sentinel = self._get_sentinel()
+        self._run_and_upload(get_ct_cf(self.TEST_SERVER_TASK_SIMPLE[3],
+                                       self.TEST_SERVER_TASK_SIMPLE[4]),
+                             self.TEST_SERVER_TASK_SIMPLE[0],
+                             self.TEST_SERVER_TASK_SIMPLE[1],
+                             self.TEST_SERVER_TASK_SIMPLE[2],
+                             '62501',
+                             sentinel)
+        # Due to #602, it is important to test this model on two tasks
+        # with different column specifications
+        self._run_and_upload(get_ct_cf(self.TEST_SERVER_TASK_MISSING_VALS[3],
+                                       self.TEST_SERVER_TASK_MISSING_VALS[4]),
+                             self.TEST_SERVER_TASK_MISSING_VALS[0],
+                             self.TEST_SERVER_TASK_MISSING_VALS[1],
+                             self.TEST_SERVER_TASK_MISSING_VALS[2],
+                             '62501',
+                             sentinel)
 
     def test_run_and_upload_decision_tree_pipeline(self):
-        pipeline2 = Pipeline(steps=[
-            ('Imputer', Imputer(strategy='median')),
-            ('VarianceThreshold', VarianceThreshold()),
-            ('Estimator', RandomizedSearchCV(
-                DecisionTreeClassifier(),
-                {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
-                 'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
-                cv=3, n_iter=10))])
-        self._run_and_upload(pipeline2, '62501')
+        pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+                                    ('VarianceThreshold', VarianceThreshold()),
+                                    ('Estimator', RandomizedSearchCV(
+                                        DecisionTreeClassifier(),
+                                        {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
+                                         'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
+                                        cv=3, n_iter=10))])
+        task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
+        n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
+        n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
+        self._run_and_upload(pipeline2, task_id, n_missing_vals, n_test_obs,
+                             '62501')
 
     def test_run_and_upload_gridsearch(self):
         gridsearch = GridSearchCV(BaggingClassifier(base_estimator=SVC()),
                                   {"base_estimator__C": [0.01, 0.1, 10],
                                    "base_estimator__gamma": [0.01, 0.1, 10]})
-        self._run_and_upload(gridsearch, '62501')
+        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
+        self._run_and_upload(gridsearch, task_id, n_missing_vals, n_test_obs,
+                             '62501')
 
     def test_run_and_upload_randomsearch(self):
         randomsearch = RandomizedSearchCV(
@@ -493,7 +592,11 @@ class TestRun(TestBase):
         # The random states for the RandomizedSearchCV is set after the
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
-        self._run_and_upload(randomsearch, '12172')
+        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
+        self._run_and_upload(randomsearch, task_id, n_missing_vals,
+                             n_test_obs, '12172')
 
     def test_run_and_upload_maskedarrays(self):
         # This testcase is important for 2 reasons:
@@ -511,42 +614,46 @@ class TestRun(TestBase):
         # The random states for the GridSearchCV is set after the
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
-        self._run_and_upload(gridsearch, '12172')
+        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
+        self._run_and_upload(gridsearch, task_id, n_missing_vals, n_test_obs,
+                             '12172')
 
     ##########################################################################
 
     def test_learning_curve_task_1(self):
         task_id = 801  # diabates dataset
         num_test_instances = 6144  # for learning curve
+        num_missing_vals = 0
         num_repeats = 1
         num_folds = 10
         num_samples = 8
 
-        pipeline1 = Pipeline(steps=[
-            ('scaler', StandardScaler(with_mean=False)),
-            ('dummy', DummyClassifier(strategy='prior'))])
-        run = self._perform_run(task_id, num_test_instances, pipeline1,
-                                random_state_value='62501')
+        pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
+                                    ('dummy', DummyClassifier(strategy='prior'))])
+        run = self._perform_run(task_id, num_test_instances, num_missing_vals,
+                                pipeline1, flow_expected_rsv='62501')
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
                                        num_folds, num_samples)
 
     def test_learning_curve_task_2(self):
         task_id = 801  # diabates dataset
         num_test_instances = 6144  # for learning curve
+        num_missing_vals = 0
         num_repeats = 1
         num_folds = 10
         num_samples = 8
 
-        pipeline2 = Pipeline(steps=[
-            ('Imputer', Imputer(strategy='median')),
-            ('VarianceThreshold', VarianceThreshold()),
-            ('Estimator', RandomizedSearchCV(
-                DecisionTreeClassifier(),
-                {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
-                 'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
-                cv=3, n_iter=10))])
-        run = self._perform_run(task_id, num_test_instances, pipeline2,
-                                random_state_value='62501')
+        pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+                                    ('VarianceThreshold', VarianceThreshold()),
+                                    ('Estimator', RandomizedSearchCV(
+                                        DecisionTreeClassifier(),
+                                        {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
+                                         'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
+                                        cv=3, n_iter=10))])
+        run = self._perform_run(task_id, num_test_instances, num_missing_vals,
+                                pipeline2, flow_expected_rsv='62501')
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
                                        num_folds, num_samples)
 
@@ -716,18 +823,20 @@ class TestRun(TestBase):
             if 'Run already exists in server' not in e.message:
                 # in this case the error was not the one we expected
                 raise e
-            # run was already
-            flow = openml.flows.sklearn_to_flow(clf)
-            flow_exists = openml.flows.flow_exists(flow.name,
-                                                   flow.external_version)
-            self.assertIsInstance(flow_exists, int)
-            self.assertGreater(flow_exists, 0)
-            downloaded_flow = openml.flows.get_flow(flow_exists,
-                                                    reinstantiate=True)
-            setup_exists = openml.setups.setup_exists(downloaded_flow)
-            self.assertIsInstance(setup_exists, int)
-            self.assertGreater(setup_exists, 0)
-            run_ids = _run_exists(task.task_id, setup_exists)
+            # run was already performed
+            message = e.message
+            if sys.version_info[0] == 2:
+                # Parse a string like:
+                # 'Run already exists in server. Run id(s): set([37501])'
+                run_ids = (
+                    message.split('[')[1].replace(']', '').
+                    replace(')', '').split(',')
+                )
+            else:
+                # Parse a string like:
+                # "Run already exists in server. Run id(s): {36980}"
+                run_ids = message.split('{')[1].replace('}', '').split(',')
+            run_ids = [int(run_id) for run_id in run_ids]
             self.assertGreater(len(run_ids), 0)
             run_id = random.choice(list(run_ids))
 
@@ -740,14 +849,19 @@ class TestRun(TestBase):
         # would be better to not sentinel these clfs,
         # so we do not have to perform the actual runs
         # and can just check their status on line
-        clfs = [sklearn.pipeline.Pipeline(steps=[
-            ('Imputer', Imputer(strategy='mean')),
-            ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
-            ('Estimator', DecisionTreeClassifier(max_depth=4))]),
+        rs = 1
+        clfs = [
+            sklearn.pipeline.Pipeline(steps=[
+                ('Imputer', Imputer(strategy='mean')),
+                ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
+                ('Estimator', DecisionTreeClassifier(max_depth=4))
+            ]),
             sklearn.pipeline.Pipeline(steps=[
                 ('Imputer', Imputer(strategy='most_frequent')),
                 ('VarianceThreshold', VarianceThreshold(threshold=0.1)),
-                ('Estimator', DecisionTreeClassifier(max_depth=4))])]
+                ('Estimator', DecisionTreeClassifier(max_depth=4))]
+            )
+        ]
 
         task = openml.tasks.get_task(115)
 
@@ -755,7 +869,7 @@ class TestRun(TestBase):
             try:
                 # first populate the server with this run.
                 # skip run if it was already performed.
-                run = openml.runs.run_model_on_task(task, clf,
+                run = openml.runs.run_model_on_task(task, clf, seed=rs,
                                                     avoid_duplicate_runs=True)
                 run.publish()
             except openml.exceptions.PyOpenMLError as e:
@@ -766,8 +880,11 @@ class TestRun(TestBase):
             flow_exists = openml.flows.flow_exists(flow.name,
                                                    flow.external_version)
             self.assertGreater(flow_exists, 0)
+            # Do NOT use get_flow reinitialization, this potentially sets
+            # hyperparameter values wrong. Rather use the local model.
             downloaded_flow = openml.flows.get_flow(flow_exists)
-            setup_exists = openml.setups.setup_exists(downloaded_flow, clf)
+            downloaded_flow.model = clf
+            setup_exists = openml.setups.setup_exists(downloaded_flow)
             self.assertGreater(setup_exists, 0)
             run_ids = _run_exists(task.task_id, setup_exists)
             self.assertTrue(run_ids, msg=(run_ids, clf))

@@ -337,7 +337,9 @@ class OpenMLFlow(object):
         flow = openml.flows.functions.get_flow(flow_id)
         _copy_server_fields(flow, self)
         try:
-            openml.flows.functions.assert_flows_equal(self, flow, flow.upload_date)
+            openml.flows.functions.assert_flows_equal(
+                self, flow, flow.upload_date, ignore_parameter_values=True
+            )
         except ValueError as e:
             message = e.args[0]
             raise ValueError("Flow was not stored correctly on the server. "
@@ -388,6 +390,9 @@ class OpenMLFlow(object):
         OpenMLFlow
             The OpenMLFlow that corresponds to the structure
         """
+        # make a copy of structure, as we don't want to change it in the
+        # outer scope
+        structure = list(structure)
         if len(structure) < 1:
             raise ValueError('Please provide a structure list of size >= 1')
         sub_identifier = structure[0]
