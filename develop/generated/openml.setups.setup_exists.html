@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>openml.setups.setup_exists &#8212; OpenML 0.8.0dev documentation</title>
+    <title>openml.setups.setup_exists &#8212; OpenML 0.8.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.8.0dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.8.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.setups</span></code>.setup_exists<a class="headerlink" href="#openml-setups-setup-exists" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.setups.setup_exists">
-<code class="descclassname">openml.setups.</code><code class="descname">setup_exists</code><span class="sig-paren">(</span><em>flow</em>, <em>model=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.setups.setup_exists" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.setups.</code><code class="descname">setup_exists</code><span class="sig-paren">(</span><em>flow</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.setups.setup_exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks whether a hyperparameter configuration already exists on the server.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -124,11 +124,6 @@
 <dd><p class="first last">The openml flow object. Should have flow id present for the main flow
 and all subflows (i.e., it should be downloaded from the server by
 means of flow.get, and not instantiated locally)</p>
-</dd>
-<dt><strong>sklearn_model</strong> <span class="classifier-delimiter">:</span> <span class="classifier">BaseEstimator, optional</span></dt>
-<dd><p class="first last">If given, the parameters are parsed from this model instead of the
-model in the flow. If not given, parameters are parsed from
-<code class="docutils literal notranslate"><span class="pre">flow.model</span></code>.</p>
 </dd>
 </dl>
 </td>

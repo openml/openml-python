@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>openml.flows.flow_to_sklearn &#8212; OpenML 0.8.0dev documentation</title>
+    <title>openml.flows.flow_to_sklearn &#8212; OpenML 0.8.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.8.0dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.8.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>.flow_to_sklearn<a class="headerlink" href="#openml-flows-flow-to-sklearn" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.flows.flow_to_sklearn">
-<code class="descclassname">openml.flows.</code><code class="descname">flow_to_sklearn</code><span class="sig-paren">(</span><em>o</em>, <em>components=None</em>, <em>initialize_with_defaults=False</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.flows.flow_to_sklearn" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.flows.</code><code class="descname">flow_to_sklearn</code><span class="sig-paren">(</span><em>o</em>, <em>components=None</em>, <em>initialize_with_defaults=False</em>, <em>recursion_depth=0</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.flows.flow_to_sklearn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes a sklearn model based on a flow.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -129,6 +129,10 @@ parameter value that is accepted by)</p>
 <dt><strong>initialize_with_defaults</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=False)</span></dt>
 <dd><p class="first last">If this flag is set, the hyperparameter values of flows will be
 ignored and a flow with its defaults is returned.</p>
+</dd>
+<dt><strong>recursion_depth</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">The depth at which this flow is called, mostly for debugging
+purposes</p>
 </dd>
 </dl>
 </td>
