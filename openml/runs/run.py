@@ -236,10 +236,15 @@ class OpenMLRun(object):
                                        ('row_id', 'NUMERIC'),
                                        ('cluster', 'NUMERIC')]
 
+        else:
+            raise NotImplementedError(
+                'Task type %s is not yet supported.' % str(task.task_type)
+            )
+
         return arff_dict
 
     def get_metric_fn(self, sklearn_fn, kwargs={}):
-        """Calculates metric scores based on prnedicted values. Assumes the
+        """Calculates metric scores based on predicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
         it assumes that the 'correct' or 'truth' attribute is specified in
         the arff (which is an optional field, but always the case for
@@ -273,7 +278,8 @@ class OpenMLRun(object):
         task = get_task(self.task_id)
 
         attribute_names = [att[0] for att in predictions_arff['attributes']]
-        if task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION and \
+        if (task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION or
+                task.task_type_id == TaskTypeEnum.LEARNING_CURVE) and \
                 'correct' not in attribute_names:
             raise ValueError('Attribute "correct" should be set for '
                              'classification task runs')

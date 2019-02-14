@@ -22,6 +22,7 @@ from openml.runs.functions import _run_task_get_arffcontent, \
     _extract_arfftrace_attributes, _prediction_to_row, _check_n_jobs
 from openml.flows.sklearn_converter import sklearn_to_flow
 from openml.runs.trace import OpenMLRunTrace
+from openml.tasks import TaskTypeEnum
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
@@ -211,7 +212,8 @@ class TestRun(TestBase):
 
     def _check_fold_evaluations(self, fold_evaluations, num_repeats, num_folds,
                                 max_time_allowed=60000,
-                                task_type="Supervised Classification"):
+                                task_type=
+                                TaskTypeEnum.SUPERVISED_CLASSIFICATION):
         """
         Checks whether the right timing measures are attached to the run
         (before upload). Test is only performed for versions >= Python3.3
@@ -230,16 +232,11 @@ class TestRun(TestBase):
             # should take at least one millisecond (?)
             'usercpu_time_millis': (0, max_time_allowed)}
 
-        print(task_type)
-
-        if task_type == "Supervised Classification" or \
-                task_type == "Learning Curve":
+        if task_type == TaskTypeEnum.SUPERVISED_CLASSIFICATION or \
+                task_type == TaskTypeEnum.LEARNING_CURVE:
             check_measures['predictive_accuracy'] = (0, 1)
-        elif task_type == "Supervised Regression":
+        elif task_type == TaskTypeEnum.SUPERVISED_REGRESSION:
             check_measures['mean_absolute_error'] = (0, float("inf"))
-
-        print(check_measures.keys())
-        print(fold_evaluations.keys())
 
         self.assertIsInstance(fold_evaluations, dict)
         if sys.version_info[:2] >= (3, 3):
@@ -363,7 +360,8 @@ class TestRun(TestBase):
     # execution of the unit tests without the need to add an additional module
     # like unittest2
 
-    def _run_and_upload(self, clf, rsv):
+    def _run_and_upload(self, clf, rsv, task_id, num_test_instances, num_folds,
+                        num_iterations, metric, metric_name, task_type):
         def determine_grid_size(param_grid):
             if isinstance(param_grid, dict):
                 grid_iterations = 1
@@ -373,31 +371,25 @@ class TestRun(TestBase):
             elif isinstance(param_grid, list):
                 grid_iterations = 0
                 for sub_grid in param_grid:
-                    grid_iterations += determine_grid_size(sub_grid)
+                    grid_iterations += self._determine_grid_size(sub_grid)
                 return grid_iterations
             else:
                 raise TypeError('Param Grid should be of type list '
                                 '(GridSearch only) or dict')
 
-        task_id = 119  # diabates dataset
-        num_test_instances = 253  # 33% holdout task
-        num_folds = 1  # because of holdout
-        num_iterations = 5  # for base search classifiers
-
         run = self._perform_run(task_id, num_test_instances, clf,
                                 random_state_value=rsv)
 
-        # obtain accuracy scores using get_metric_score:
-        accuracy_scores = run.get_metric_fn(sklearn.metrics.accuracy_score)
+        # obtain scores using get_metric_score:
+        scores = run.get_metric_fn(metric)
         # compare with the scores in user defined measures
-        accuracy_scores_provided = []
-        for rep in run.fold_evaluations['predictive_accuracy'].keys():
-            for fold in run.fold_evaluations['predictive_accuracy'][rep]. \
+        scores_provided = []
+        for rep in run.fold_evaluations[metric_name].keys():
+            for fold in run.fold_evaluations[metric_name][rep]. \
                     keys():
-                accuracy_scores_provided.append(
-                    run.fold_evaluations['predictive_accuracy'][rep][fold])
-
-        self.assertEqual(sum(accuracy_scores_provided), sum(accuracy_scores))
+                scores_provided.append(
+                    run.fold_evaluations[metric_name][rep][fold])
+        self.assertEqual(sum(scores_provided), sum(scores))
 
         if isinstance(clf, BaseSearchCV):
             trace_content = run.trace.trace_to_arff()['data']
@@ -413,60 +405,32 @@ class TestRun(TestBase):
 
         # todo: check if runtime is present
         self._check_fold_evaluations(run.fold_evaluations, 1, num_folds,
-                                     task_type="Supervised Classification")
+                                     task_type=task_type)
         pass
 
-    def _run_and_upload_regression(self, clf, rsv):
-        def determine_grid_size(param_grid):
-            if isinstance(param_grid, dict):
-                grid_iterations = 1
-                for param in param_grid:
-                    grid_iterations *= len(param_grid[param])
-                return grid_iterations
-            elif isinstance(param_grid, list):
-                grid_iterations = 0
-                for sub_grid in param_grid:
-                    grid_iterations += determine_grid_size(sub_grid)
-                return grid_iterations
-            else:
-                raise TypeError('Param Grid should be of type list'
-                                '(GridSearch only) or dict')
+    def _run_and_upload_classification(self, clf, rsv):
+        task_id = 119  # diabetes dataset
+        num_test_instances = 253  # 33% holdout task
+        num_folds = 1  # because of holdout
+        num_iterations = 5  # for base search algorithms
+        metric = sklearn.metrics.accuracy_score  # metric class
+        metric_name = 'predictive_accuracy'  # openml metric name
+        task_type = TaskTypeEnum.SUPERVISED_CLASSIFICATION  # task type
 
+        self._run_and_upload(clf, rsv, task_id, num_test_instances, num_folds,
+                             num_iterations, metric, metric_name, task_type)
+
+    def _run_and_upload_regression(self, clf, rsv):
         task_id = 738  # quake dataset
         num_test_instances = 718  # 33% holdout task
         num_folds = 1  # because of holdout
-        num_iterations = 5  # for base search classifiers
+        num_iterations = 5  # for base search algorithms
+        metric = sklearn.metrics.mean_absolute_error  # metric class
+        metric_name = 'mean_absolute_error'  # openml metric name
+        task_type = TaskTypeEnum.SUPERVISED_REGRESSION  # task type
 
-        run = self._perform_run(task_id, num_test_instances, clf,
-                                random_state_value=rsv)
-
-        # obtain accuracy scores using get_metric_score:
-        mae_scores = run.get_metric_fn(sklearn.metrics.mean_absolute_error)
-        # compare with the scores in user defined measures
-        mae_scores_provided = []
-        for rep in run.fold_evaluations['mean_absolute_error'].keys():
-            for fold in run.fold_evaluations['mean_absolute_error'][rep]. \
-                    keys():
-                mae_scores_provided.append(
-                    run.fold_evaluations['mean_absolute_error'][rep][fold])
-        self.assertEqual(sum(mae_scores_provided), sum(mae_scores))
-
-        if isinstance(clf, BaseSearchCV):
-            trace_content = run.trace.trace_to_arff()['data']
-            if isinstance(clf, GridSearchCV):
-                grid_iterations = determine_grid_size(clf.param_grid)
-                self.assertEqual(len(trace_content),
-                                 grid_iterations * num_folds)
-            else:
-                self.assertEqual(len(trace_content),
-                                 num_iterations * num_folds)
-            check_res = self._check_serialized_optimized_run(run.run_id)
-            self.assertTrue(check_res)
-
-        # todo: check if runtime is present
-        self._check_fold_evaluations(run.fold_evaluations, 1, num_folds,
-                                     task_type="Supervised Regression")
-        pass
+        self._run_and_upload(clf, rsv, task_id, num_test_instances, num_folds,
+                             num_iterations, metric, metric_name, task_type)
 
     def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression()
@@ -1048,7 +1012,8 @@ class TestRun(TestBase):
         self.assertIsInstance(trace, type(None))
 
         self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds,
-                                     task_type=task.task_type)
+                                     task_type=
+                                     TaskTypeEnum.SUPERVISED_CLASSIFICATION)
 
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
@@ -1094,7 +1059,7 @@ class TestRun(TestBase):
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
         self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds,
-                                     task_type=task.task_type)
+                                     task_type=task.task_type_id)
 
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), num_instances * num_repeats)

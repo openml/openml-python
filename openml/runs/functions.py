@@ -665,10 +665,6 @@ def _run_model_on_fold(model, task, rep_no, fold_no, sample_no,
     # it returns the clusters
     pred_y = model.predict(test_x)
 
-    # TODO: Is it OK to move predict_proba outside of the runtime measurement?
-    # Before we were doing both predict and predict_proba within the
-    # measurement, so we were counting prediction time twice?
-
     if can_measure_runtime:
         modelpredict_duration = \
             (time.process_time() - modelpredict_starttime) * 1000
