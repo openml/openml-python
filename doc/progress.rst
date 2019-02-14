@@ -20,6 +20,8 @@ Changelog
   OpenML.
 * ADD #564: New helpers to access the structure of a flow (and find its
   subflows).
+* ADD #618: The software will from now on retry to connect to the server if a
+  connection failed. The number of retries can be configured.
 * FIX #538: Support loading clustering tasks.
 * FIX #464: Fixes a bug related to listing functions (returns correct listing
   size).
