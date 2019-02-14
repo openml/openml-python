@@ -742,7 +742,7 @@ class TestRun(TestBase):
                 # 'Run already exists in server. Run id(s): set([37501])'
                 run_ids = (
                     message.split('[')[1].replace(']', '').
-                        replace(')', '').split(',')
+                    replace(')', '').split(',')
                 )
             else:
                 # Parse a string like:
