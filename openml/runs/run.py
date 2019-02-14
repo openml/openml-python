@@ -210,7 +210,7 @@ class OpenMLRun(object):
                                       [('prediction', class_labels),
                                        ('correct', class_labels)]
 
-        if task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
+        elif task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
             class_labels = task.class_labels
             arff_dict['attributes'] = [
                                           ('repeat', 'NUMERIC'),
