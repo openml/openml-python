@@ -67,7 +67,8 @@ def _read_url_files(url, data=None, file_elements=None):
     response = send_request(
         request_method='post',
         url=url,
-        kwargs={'data': data, 'files': file_elements},
+        data=data,
+        files=file_elements,
     )
     if response.status_code != 200:
         raise _parse_server_exception(response, url=url)
@@ -85,14 +86,14 @@ def _read_url(url, data=None):
 
     if len(data) == 0 or (len(data) == 1 and 'api_key' in data):
         response = send_request(
-            request_method='get', url=url, kwargs={'params': data},
+            request_method='get', url=url, data=data,
         )
 
     else:
         # Using requests.post sets header 'Accept-encoding' automatically to
         #  'gzip,deflate'
         response = send_request(
-            request_method='post', url=url, kwargs={'data': data},
+            request_method='post', url=url, data=data,
         )
 
     if response.status_code != 200:
@@ -103,7 +104,12 @@ def _read_url(url, data=None):
     return response.text
 
 
-def send_request(request_method, url, kwargs):
+def send_request(
+    request_method,
+    url,
+    data,
+    files=None,
+):
     n_retries = config.connection_n_retries
     response = None
     with requests.Session() as session:
@@ -111,9 +117,9 @@ def send_request(request_method, url, kwargs):
         for i in range(1, n_retries + 1):
             try:
                 if request_method == 'get':
-                    response = session.get(url, **kwargs)
+                    response = session.get(url, params=data)
                 elif request_method == 'post':
-                    response = session.post(url, **kwargs)
+                    response = session.post(url, data=data, files=files)
                 else:
                     raise NotImplementedError()
                 break
