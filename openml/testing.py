@@ -65,6 +65,10 @@ class TestBase(unittest.TestCase):
                 with open(openml.config.config_file, 'w') as fh:
                     fh.write('apikey = %s' % openml.config.apikey)
 
+        # Increase the number of retries to avoid spurios server failures
+        self.connection_n_retries = openml.config.connection_n_retries
+        openml.config.connection_n_retries = 10
+
     def tearDown(self):
         os.chdir(self.cwd)
         try:
@@ -76,6 +80,7 @@ class TestBase(unittest.TestCase):
             else:
                 raise
         openml.config.server = self.production_server
+        openml.config.connection_n_retries = self.connection_n_retries
 
     def _get_sentinel(self, sentinel=None):
         if sentinel is None:

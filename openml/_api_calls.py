@@ -1,9 +1,7 @@
-import io
-import os
+import time
 import requests
 import warnings
 
-import arff
 import xmltodict
 
 from . import config
@@ -71,7 +69,12 @@ def _read_url_files(url, data=None, file_elements=None):
         file_elements = {}
     # Using requests.post sets header 'Accept-encoding' automatically to
     # 'gzip,deflate'
-    response = requests.post(url, data=data, files=file_elements)
+    #response = requests.post(url, data=data, files=file_elements)
+    response = send_request(
+        request_method='post',
+        url=url,
+        kwargs={'data': data, 'files': file_elements},
+    )
     if response.status_code != 200:
         raise _parse_server_exception(response, url=url)
     if 'Content-Encoding' not in response.headers or \
@@ -86,13 +89,43 @@ def _read_url(url, data=None):
     if config.apikey is not None:
         data['api_key'] = config.apikey
 
-    if len(data) == 0 or (len(data) == 1 and 'api_key' in data):
-        # do a GET
-        response = requests.get(url, params=data)
-    else: # an actual post request
-        # Using requests.post sets header 'Accept-encoding' automatically to
-        #  'gzip,deflate'
-        response = requests.post(url, data=data)
+    with requests.Session() as session:
+        if len(data) == 0 or (len(data) == 1 and 'api_key' in data):
+            response = send_request(
+                request_method='get', url=url, kwargs={'params': data},
+            )
+            # do a GET
+            # for i in range(n_retries):
+            #     try:
+            #         response = session.get(url, params=data)
+            #         break
+            #     except (
+            #         requests.exceptions.ConnectionError,
+            #         requests.exceptions.SSLError,
+            #     ) as e:
+            #         if i == n_retries - 1:
+            #             raise e
+            #         else:
+            #             time.sleep(0.1 * i)
+
+        else: # an actual post request
+            # Using requests.post sets header 'Accept-encoding' automatically to
+            #  'gzip,deflate'
+            response = send_request(
+                request_method='post', url=url, kwargs={'data': data},
+            )
+            # for i in range(n_retries):
+            #     try:
+            #         response = session.post(url, data=data)
+            #         break
+            #     except (
+            #         requests.exceptions.ConnectionError,
+            #         requests.exceptions.SSLError,
+            #     ) as e:
+            #         if i == n_retries - 1:
+            #             raise e
+            #         else:
+            #             time.sleep(0.1 * i)
 
     if response.status_code != 200:
         raise _parse_server_exception(response, url=url)
@@ -100,6 +133,34 @@ def _read_url(url, data=None):
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for %s.' % url)
     return response.text
+
+
+def send_request(request_method, url, kwargs):
+    n_retries = config.connection_n_retries
+    response = None
+    with requests.Session() as session:
+        # Start at one to have a non-zero multiplier for the sleep
+        for i in range(1, n_retries + 1):
+            try:
+                if request_method == 'get':
+                    response = session.get(url, **kwargs)
+                elif request_method == 'post':
+                    response = session.post(url, **kwargs)
+                else:
+                    raise NotImplementedError()
+                break
+            except (
+                    requests.exceptions.ConnectionError,
+                    requests.exceptions.SSLError,
+            ) as e:
+                if i == n_retries:
+                    raise e
+                else:
+                    time.sleep(0.1 * i)
+    if response is None:
+        raise ValueError('This should never happen!')
+    return response
+
 
 
 def _parse_server_exception(response, url=None):

@@ -21,6 +21,7 @@ _defaults = {
     'verbosity': 0,
     'cachedir': os.path.expanduser(os.path.join('~', '.openml', 'cache')),
     'avoid_duplicate_runs': 'True',
+    'connection_n_retries': 2,
 }
 
 config_file = os.path.expanduser(os.path.join('~', '.openml' 'config'))
@@ -31,6 +32,9 @@ server = ""
 apikey = ""
 # The current cache directory (without the server name)
 cache_directory = ""
+
+# Number of retries if the connection breaks
+connection_n_retries = 2
 
 
 def _setup():
@@ -46,6 +50,7 @@ def _setup():
     global server
     global cache_directory
     global avoid_duplicate_runs
+    global connection_n_retries
     # read config file, create cache directory
     try:
         os.mkdir(os.path.expanduser(os.path.join('~', '.openml')))
@@ -57,6 +62,12 @@ def _setup():
     server = config.get('FAKE_SECTION', 'server')
     cache_directory = os.path.expanduser(config.get('FAKE_SECTION', 'cachedir'))
     avoid_duplicate_runs = config.getboolean('FAKE_SECTION', 'avoid_duplicate_runs')
+    connection_n_retries = config.get('FAKE_SECTION', 'connection_n_retries')
+    if connection_n_retries > 20:
+        raise ValueError(
+            'A higher number of retries than 20 is not allowed to keep the '
+            'server load reasonable'
+        )
 
 
 def _parse_config():
