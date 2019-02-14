@@ -737,9 +737,17 @@ class TestRun(TestBase):
                 raise e
             # run was already performed
             message = e.message
-            # Parse a string like:
-            # "Run already exists in server. Run id(s): {36980}"
-            run_ids = message.split('{')[1].replace('}', '').split(',')
+            if sys.version_info[0] == 2:
+                # Parse a string like:
+                # 'Run already exists in server. Run id(s): set([37501])'
+                run_ids = (
+                    message.split('[')[1].replace(']', '').
+                        replace(')', '').split(',')
+                )
+            else:
+                # Parse a string like:
+                # "Run already exists in server. Run id(s): {36980}"
+                run_ids = message.split('{')[1].replace('}', '').split(',')
             run_ids = [int(run_id) for run_id in run_ids]
             self.assertGreater(len(run_ids), 0)
             run_id = random.choice(list(run_ids))
