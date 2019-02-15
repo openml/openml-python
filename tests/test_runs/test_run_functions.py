@@ -35,7 +35,7 @@ from sklearn.linear_model import LogisticRegression, SGDClassifier, \
     LinearRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
-from sklearn.svm import SVC, LinearSVC
+from sklearn.svm import SVC
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
     StratifiedKFold
 from sklearn.pipeline import Pipeline
