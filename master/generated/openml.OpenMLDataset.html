@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>openml.OpenMLDataset &#8212; OpenML 0.8.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.8.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../index.html">Start</a></li>
+                <li><a href="../usage.html">User Guide</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../examples/index.html">Examples</a></li>
+                <li><a href="../contributing.html">Contributing</a></li>
+                <li><a href="../progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLDataset</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <div class="section" id="openml-openmldataset">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLDataset<a class="headerlink" href="#openml-openmldataset" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="openml.OpenMLDataset">
+<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLDataset</code><span class="sig-paren">(</span><em>name</em>, <em>description</em>, <em>format=None</em>, <em>data_format='arff'</em>, <em>dataset_id=None</em>, <em>version=None</em>, <em>creator=None</em>, <em>contributor=None</em>, <em>collection_date=None</em>, <em>upload_date=None</em>, <em>language=None</em>, <em>licence=None</em>, <em>url=None</em>, <em>default_target_attribute=None</em>, <em>row_id_attribute=None</em>, <em>ignore_attribute=None</em>, <em>version_label=None</em>, <em>citation=None</em>, <em>tag=None</em>, <em>visibility=None</em>, <em>original_data_url=None</em>, <em>paper_url=None</em>, <em>update_comment=None</em>, <em>md5_checksum=None</em>, <em>data_file=None</em>, <em>features=None</em>, <em>qualities=None</em>, <em>dataset=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataset object.</p>
+<p>Allows fetching and uploading datasets to OpenML.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Name of the dataset.</p>
+</dd>
+<dt><strong>description</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Description of the dataset.</p>
+</dd>
+<dt><strong>format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Format of the dataset which can be either ‘arff’ or ‘sparse_arff’.</p>
+</dd>
+<dt><strong>dataset_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">Id autogenerated by the server.</p>
+</dd>
+<dt><strong>version</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">Version of this dataset. ‘1’ for original version. Auto-incremented by server.</p>
+</dd>
+<dt><strong>creator</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">The person who created the dataset.</p>
+</dd>
+<dt><strong>contributor</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">People who contributed to the current version of the dataset.</p>
+</dd>
+<dt><strong>collection_date</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">The date the data was originally collected, given by the uploader.</p>
+</dd>
+<dt><strong>upload_date</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">The date-time when the dataset was uploaded, generated by server.</p>
+</dd>
+<dt><strong>language</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Language in which the data is represented.
+Starts with 1 upper case letter, rest lower case, e.g. ‘English’.</p>
+</dd>
+<dt><strong>licence</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">License of the data.</p>
+</dd>
+<dt><strong>url</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Valid URL, points to actual data file, on the OpenML server or another dataset repository.</p>
+</dd>
+<dt><strong>default_target_attribute</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">The default target attribute, if it exists. Can have multiple values, comma separated.</p>
+</dd>
+<dt><strong>row_id_attribute</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">The attribute that represents the row-id column, if present in the dataset.</p>
+</dd>
+<dt><strong>ignore_attribute</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str | list, optional</span></dt>
+<dd><p class="first last">Attributes that should be excluded in modelling, such as identifiers and indexes.</p>
+</dd>
+<dt><strong>version_label</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Version label provided by user, can be a date, hash, or some other type of id.</p>
+</dd>
+<dt><strong>citation</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Reference(s) that should be cited when building on this data.</p>
+</dd>
+<dt><strong>tag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Tags, describing the algorithms.</p>
+</dd>
+<dt><strong>visibility</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Who can see the dataset.
+Typical values: ‘Everyone’,’All my friends’,’Only me’.
+Can also be any of the user’s circles.</p>
+</dd>
+<dt><strong>original_data_url</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">For derived data, the url to the original dataset.</p>
+</dd>
+<dt><strong>paper_url</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Link to a paper describing the dataset.</p>
+</dd>
+<dt><strong>update_comment</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">An explanation for when the dataset is uploaded.</p>
+</dd>
+<dt><strong>status</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Whether the dataset is active.</p>
+</dd>
+<dt><strong>md5_checksum</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">MD5 checksum to check if the dataset is downloaded without corruption.</p>
+</dd>
+<dt><strong>data_file</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Path to where the dataset is located.</p>
+</dd>
+<dt><strong>features</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict, optional</span></dt>
+<dd><p class="first last">A dictionary of dataset features which maps a feature index to a OpenMLDataFeature.</p>
+</dd>
+<dt><strong>qualities</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict, optional</span></dt>
+<dd><p class="first last">A dictionary of dataset qualities which maps a quality name to a quality value.</p>
+</dd>
+<dt><strong>dataset: string, optional</strong></dt>
+<dd><p class="first last">Serialized arff dataset string.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="openml.OpenMLDataset.get_data">
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>target=None</em>, <em>include_row_id=False</em>, <em>include_ignore_attributes=False</em>, <em>return_categorical_indicator=False</em>, <em>return_attribute_names=False</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns dataset content as numpy arrays / sparse matrices.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLDataset.get_features_by_type">
+<code class="descname">get_features_by_type</code><span class="sig-paren">(</span><em>data_type</em>, <em>exclude=None</em>, <em>exclude_ignore_attributes=True</em>, <em>exclude_row_id_attribute=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_features_by_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns indices of features of a given type, e.g., all nominal features.
+Can use additional parameters to exclude various features by index or ontology.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>data_type</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">The data type to return (e.g., nominal, numeric, date, string)</p>
+</dd>
+<dt><strong>exclude</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list(int)</span></dt>
+<dd><dl class="first last docutils">
+<dt>Indices to exclude (and adapt the return values as if these indices</dt>
+<dd><p class="first last">are not present)</p>
+</dd>
+</dl>
+</dd>
+<dt><strong>exclude_ignore_attributes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">Whether to exclude the defined ignore attributes (and adapt the
+return values as if these indices are not present)</p>
+</dd>
+<dt><strong>exclude_row_id_attribute</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">Whether to exclude the defined row id attributes (and adapt the
+return values as if these indices are not present)</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>result</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><p class="first last">a list of indices that have the specified data type</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLDataset.publish">
+<code class="descname">publish</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.publish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Publish the dataset on the OpenML server.</p>
+<p>Upload the dataset description and dataset content to openml.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dataset_id: int</strong></dt>
+<dd><p class="first last">Id of the dataset uploaded to the server.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLDataset.push_tag">
+<code class="descname">push_tag</code><span class="sig-paren">(</span><em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.push_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotates this data set with a tag on the server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Tag to attach to the dataset.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLDataset.remove_tag">
+<code class="descname">remove_tag</code><span class="sig-paren">(</span><em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.remove_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a tag from this dataset on the server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Tag to attach to the dataset.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLDataset.retrieve_class_labels">
+<code class="descname">retrieve_class_labels</code><span class="sig-paren">(</span><em>target_name='class'</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.retrieve_class_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the datasets arff to determine the class-labels.</p>
+<p>If the task has no class labels (for example a regression problem)
+it returns None. Necessary because the data returned by get_data
+only contains the indices of the classes, while OpenML needs the real
+classname when uploading the results of a run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>target_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Name of the target attribute</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
