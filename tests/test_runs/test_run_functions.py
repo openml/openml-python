@@ -103,7 +103,9 @@ class TestRun(TestBase):
                 val_2 = predictions_prime['data'][idx][col_idx]
                 if type(val_1) == type(val_2):
                     self.assertEqual(val_1, val_2)
-                else:  # when one is float, the other a string loaded from arff
+                elif type(val_1) == float or type(val_2) == float:
+                    self.assertTrue(abs(float(val_1)-float(val_2)) < 0.00001)
+                else:
                     self.assertEqual(str(val_1), str(val_2))
 
         return True
