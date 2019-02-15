@@ -579,9 +579,9 @@ class TestRun(TestBase):
                                     ('Estimator', RandomizedSearchCV(
                                         DecisionTreeClassifier(),
                                         {'min_samples_split':
-                                         [2 ** x for x in range(1, 7+1)],
+                                         [2 ** x for x in range(1, 8)],
                                          'min_samples_leaf':
-                                         [2 ** x for x in range(0, 6+1)]},
+                                         [2 ** x for x in range(0, 7)]},
                                         cv=3, n_iter=10))])
         task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
         n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
@@ -676,9 +676,9 @@ class TestRun(TestBase):
                                     ('Estimator', RandomizedSearchCV(
                                         DecisionTreeClassifier(),
                                         {'min_samples_split':
-                                         [2 ** x for x in range(1, 7+1)],
+                                         [2 ** x for x in range(1, 8)],
                                          'min_samples_leaf':
-                                         [2 ** x for x in range(0, 6+1)]},
+                                         [2 ** x for x in range(0, 7)]},
                                         cv=3, n_iter=10))])
         run = self._perform_run(task_id, num_test_instances, num_missing_vals,
                                 pipeline2, flow_expected_rsv='62501')
