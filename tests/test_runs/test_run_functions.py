@@ -57,6 +57,7 @@ class TestRun(TestBase):
     # diabetis dataset, 768 observations, 0 missing vals, 33% holdout set
     # (253 test obs), no nominal attributes, all numeric attributes
     TEST_SERVER_TASK_SIMPLE = (119, 0, 253, list(), list(range(8)))
+    TEST_SERVER_TASK_REGRESSION = (738, 0, 718, list(), list(range(8)))
     # creadit-a dataset, 690 observations, 67 missing vals, 33% holdout set
     # (227 test obs)
     TEST_SERVER_TASK_MISSING_VALS = (96, 67, 227,
@@ -98,8 +99,12 @@ class TestRun(TestBase):
             # that does not necessarily hold.
             # But with the current code base, it holds.
             for col_idx in compare_slice:
-                self.assertEqual(predictions['data'][idx][col_idx],
-                                 predictions_prime['data'][idx][col_idx])
+                val_1 = predictions['data'][idx][col_idx]
+                val_2 = predictions_prime['data'][idx][col_idx]
+                if type(val_1) == type(val_2):
+                    self.assertEqual(val_1, val_2)
+                else:  # when one is float, the other a string loaded from arff
+                    self.assertEqual(str(val_1), str(val_2))
 
         return True
 
@@ -398,7 +403,11 @@ class TestRun(TestBase):
     # like unittest2
 
     def _run_and_upload(self, clf, task_id, n_missing_vals, n_test_obs,
-                        flow_expected_rsv, sentinel=None):
+                        flow_expected_rsv, num_folds=1, num_iterations=5,
+                        seed=1, metric=sklearn.metrics.accuracy_score,
+                        metric_name='predictive_accuracy',
+                        task_type=TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+                        sentinel=None):
         def determine_grid_size(param_grid):
             if isinstance(param_grid, dict):
                 grid_iterations = 1
@@ -408,14 +417,11 @@ class TestRun(TestBase):
             elif isinstance(param_grid, list):
                 grid_iterations = 0
                 for sub_grid in param_grid:
-                    grid_iterations += self._determine_grid_size(sub_grid)
+                    grid_iterations += determine_grid_size(sub_grid)
                 return grid_iterations
             else:
                 raise TypeError('Param Grid should be of type list '
                                 '(GridSearch only) or dict')
-        seed = 1
-        num_folds = 1  # because of holdout
-        num_iterations = 5  # for base search classifiers
 
         run = self._perform_run(task_id, n_test_obs, n_missing_vals, clf,
                                 flow_expected_rsv=flow_expected_rsv, seed=seed,
@@ -426,8 +432,7 @@ class TestRun(TestBase):
         # compare with the scores in user defined measures
         scores_provided = []
         for rep in run.fold_evaluations[metric_name].keys():
-            for fold in run.fold_evaluations[metric_name][rep]. \
-                    keys():
+            for fold in run.fold_evaluations[metric_name][rep].keys():
                 scores_provided.append(
                     run.fold_evaluations[metric_name][rep][fold])
         self.assertEqual(sum(scores_provided), sum(scores))
@@ -468,50 +473,63 @@ class TestRun(TestBase):
                                      task_type=task_type)
         pass
 
-    def _run_and_upload_classification(self, clf, rsv):
-        task_id = 119  # diabetes dataset
-        num_test_instances = 253  # 33% holdout task
+    def _run_and_upload_classification(self, clf, task_id, n_missing_vals,
+                                       n_test_obs, flow_expected_rsv,
+                                       sentinel=None):
         num_folds = 1  # because of holdout
         num_iterations = 5  # for base search algorithms
         metric = sklearn.metrics.accuracy_score  # metric class
         metric_name = 'predictive_accuracy'  # openml metric name
         task_type = TaskTypeEnum.SUPERVISED_CLASSIFICATION  # task type
 
-        self._run_and_upload(clf, rsv, task_id, num_test_instances, num_folds,
-                             num_iterations, metric, metric_name, task_type)
+        self._run_and_upload(clf, task_id, n_missing_vals, n_test_obs,
+                             flow_expected_rsv, num_folds=num_folds,
+                             num_iterations=num_iterations,
+                             metric=metric, metric_name=metric_name,
+                             task_type=task_type, sentinel=sentinel)
 
-    def _run_and_upload_regression(self, clf, rsv):
-        task_id = 738  # quake dataset
-        num_test_instances = 718  # 33% holdout task
+    def _run_and_upload_regression(self, clf, task_id, n_missing_vals,
+                                   n_test_obs, flow_expected_rsv,
+                                   sentinel=None):
         num_folds = 1  # because of holdout
         num_iterations = 5  # for base search algorithms
         metric = sklearn.metrics.mean_absolute_error  # metric class
         metric_name = 'mean_absolute_error'  # openml metric name
         task_type = TaskTypeEnum.SUPERVISED_REGRESSION  # task type
 
-        self._run_and_upload(clf, rsv, task_id, num_test_instances, num_folds,
-                             num_iterations, metric, metric_name, task_type)
+        self._run_and_upload(clf, task_id, n_missing_vals, n_test_obs,
+                             flow_expected_rsv, num_folds=num_folds,
+                             num_iterations=num_iterations,
+                             metric=metric, metric_name=metric_name,
+                             task_type=task_type, sentinel=sentinel)
 
     def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression()
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        self._run_and_upload(lr, task_id, n_missing_vals, n_test_obs, '62501')
+        self._run_and_upload_classification(lr, task_id, n_missing_vals,
+                                            n_test_obs, '62501')
 
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
-        self._run_and_upload_regression(lr, '62501')
+        task_id = self.TEST_SERVER_TASK_REGRESSION[0]
+        n_missing_vals = self.TEST_SERVER_TASK_REGRESSION[1]
+        n_test_obs = self.TEST_SERVER_TASK_REGRESSION[2]
+        self._run_and_upload_regression(lr, task_id, n_missing_vals,
+                                        n_test_obs, '62501')
 
     def test_run_and_upload_pipeline_dummy_pipeline(self):
 
-        pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
-                                    ('dummy', DummyClassifier(strategy='prior'))])
+        pipeline1 = Pipeline(steps=[('scaler',
+                                     StandardScaler(with_mean=False)),
+                                    ('dummy',
+                                     DummyClassifier(strategy='prior'))])
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        self._run_and_upload(pipeline1, task_id, n_missing_vals, n_test_obs,
-                             '62501')
+        self._run_and_upload_classification(pipeline1, task_id, n_missing_vals,
+                                            n_test_obs, '62501')
 
     @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
                      reason="columntransformer introduction in 0.20.0")
@@ -537,22 +555,20 @@ class TestRun(TestBase):
             )
 
         sentinel = self._get_sentinel()
-        self._run_and_upload(get_ct_cf(self.TEST_SERVER_TASK_SIMPLE[3],
-                                       self.TEST_SERVER_TASK_SIMPLE[4]),
-                             self.TEST_SERVER_TASK_SIMPLE[0],
-                             self.TEST_SERVER_TASK_SIMPLE[1],
-                             self.TEST_SERVER_TASK_SIMPLE[2],
-                             '62501',
-                             sentinel)
+        self._run_and_upload_classification(
+            get_ct_cf(self.TEST_SERVER_TASK_SIMPLE[3],
+                      self.TEST_SERVER_TASK_SIMPLE[4]),
+            self.TEST_SERVER_TASK_SIMPLE[0], self.TEST_SERVER_TASK_SIMPLE[1],
+            self.TEST_SERVER_TASK_SIMPLE[2], '62501', sentinel=sentinel)
         # Due to #602, it is important to test this model on two tasks
         # with different column specifications
-        self._run_and_upload(get_ct_cf(self.TEST_SERVER_TASK_MISSING_VALS[3],
-                                       self.TEST_SERVER_TASK_MISSING_VALS[4]),
-                             self.TEST_SERVER_TASK_MISSING_VALS[0],
-                             self.TEST_SERVER_TASK_MISSING_VALS[1],
-                             self.TEST_SERVER_TASK_MISSING_VALS[2],
-                             '62501',
-                             sentinel)
+        self._run_and_upload_classification(
+            get_ct_cf(self.TEST_SERVER_TASK_MISSING_VALS[3],
+                      self.TEST_SERVER_TASK_MISSING_VALS[4]),
+            self.TEST_SERVER_TASK_MISSING_VALS[0],
+            self.TEST_SERVER_TASK_MISSING_VALS[1],
+            self.TEST_SERVER_TASK_MISSING_VALS[2],
+            '62501', sentinel=sentinel)
 
     def test_run_and_upload_decision_tree_pipeline(self):
         pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
@@ -565,8 +581,8 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
         n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
         n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
-        self._run_and_upload(pipeline2, task_id, n_missing_vals, n_test_obs,
-                             '62501')
+        self._run_and_upload_classification(pipeline2, task_id, n_missing_vals,
+                                            n_test_obs, '62501')
 
     def test_run_and_upload_gridsearch(self):
         gridsearch = GridSearchCV(BaggingClassifier(base_estimator=SVC()),
@@ -575,8 +591,9 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        self._run_and_upload(gridsearch, task_id, n_missing_vals, n_test_obs,
-                             '62501')
+        self._run_and_upload_classification(gridsearch, task_id,
+                                            n_missing_vals, n_test_obs,
+                                            '62501')
 
     def test_run_and_upload_randomsearch(self):
         randomsearch = RandomizedSearchCV(
@@ -595,8 +612,9 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        self._run_and_upload(randomsearch, task_id, n_missing_vals,
-                             n_test_obs, '12172')
+        self._run_and_upload_classification(randomsearch, task_id,
+                                            n_missing_vals, n_test_obs,
+                                            '12172')
 
     def test_run_and_upload_maskedarrays(self):
         # This testcase is important for 2 reasons:
@@ -617,8 +635,9 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        self._run_and_upload(gridsearch, task_id, n_missing_vals, n_test_obs,
-                             '12172')
+        self._run_and_upload_classification(gridsearch, task_id,
+                                            n_missing_vals, n_test_obs,
+                                            '12172')
 
     ##########################################################################
 
