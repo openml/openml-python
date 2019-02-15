@@ -200,10 +200,10 @@ class OpenMLRun(object):
         if task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION:
             class_labels = task.class_labels
             arff_dict['attributes'] = [
-                                          ('repeat', 'NUMERIC'),
-                                          ('fold', 'NUMERIC'),
-                                          ('sample', 'NUMERIC'),  # Legacy
-                                          ('row_id', 'NUMERIC')] + \
+                                        ('repeat', 'NUMERIC'),
+                                        ('fold', 'NUMERIC'),
+                                        ('sample', 'NUMERIC'),  # Legacy
+                                        ('row_id', 'NUMERIC')] + \
                                       [('confidence.' + class_labels[i],
                                         'NUMERIC') for i in
                                        range(len(class_labels))] + \
@@ -213,10 +213,10 @@ class OpenMLRun(object):
         elif task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
             class_labels = task.class_labels
             arff_dict['attributes'] = [
-                                          ('repeat', 'NUMERIC'),
-                                          ('fold', 'NUMERIC'),
-                                          ('sample', 'NUMERIC'),
-                                          ('row_id', 'NUMERIC')] + \
+                                        ('repeat', 'NUMERIC'),
+                                        ('fold', 'NUMERIC'),
+                                        ('sample', 'NUMERIC'),
+                                        ('row_id', 'NUMERIC')] + \
                                       [('confidence.' + class_labels[i],
                                         'NUMERIC') for i in
                                        range(len(class_labels))] + \
@@ -278,7 +278,7 @@ class OpenMLRun(object):
         task = get_task(self.task_id)
 
         attribute_names = [att[0] for att in predictions_arff['attributes']]
-        if (task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION or
+        if (task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION or \
                 task.task_type_id == TaskTypeEnum.LEARNING_CURVE) and \
                 'correct' not in attribute_names:
             raise ValueError('Attribute "correct" should be set for '

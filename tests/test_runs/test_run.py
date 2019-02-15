@@ -5,16 +5,11 @@ from time import time
 
 from sklearn.dummy import DummyClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, \
-    StratifiedKFold
+from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Imputer
 
 from openml.testing import TestBase
-from openml.flows.sklearn_converter import sklearn_to_flow
-from openml import OpenMLRun
 import openml
 
 
