@@ -34,25 +34,27 @@ setuptools.setup(name="openml",
                  packages=setuptools.find_packages(),
                  package_data={'': ['*.txt', '*.md']},
                  install_requires=[
-                     'mock',
                      'numpy>=1.6.2',
                      'scipy>=0.13.3',
-                     'liac-arff>=2.2.1',
+                     'mock',
+                     'liac-arff>=2.2.2',
                      'xmltodict',
-                     'nose',
+                     'pytest',
                      'requests',
                      'scikit-learn>=0.18',
                      'nbformat',
                      'python-dateutil',
                      'oslo.concurrency',
+                     'pandas>=0.19.2',
                  ],
                  extras_require={
                      'test': [
                          'nbconvert',
-                         'jupyter_client'
+                         'jupyter_client',
+                         'matplotlib'
                      ]
                  },
-                 test_suite="nose.collector",
+                 test_suite="pytest",
                  classifiers=['Intended Audience :: Science/Research',
                               'Intended Audience :: Developers',
                               'License :: OSI Approved :: BSD License',

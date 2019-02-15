@@ -8,24 +8,35 @@ from . import OpenMLFlow
 import openml.utils
 
 
-def get_flow(flow_id):
+def get_flow(flow_id, reinstantiate=False):
     """Download the OpenML flow for a given flow ID.
 
     Parameters
     ----------
     flow_id : int
         The OpenML flow id.
-    """
-    # TODO add caching here!
-    try:
-        flow_id = int(flow_id)
-    except:
-        raise ValueError("Flow ID must be an int, got %s." % str(flow_id))
 
+    reinstantiate: bool
+        Whether to reinstantiate the flow to a sklearn model.
+        Note that this can only be done with sklearn flows, and
+        when
+
+    Returns
+    -------
+    flow : OpenMLFlow
+        the flow
+    """
+    flow_id = int(flow_id)
     flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id)
 
     flow_dict = xmltodict.parse(flow_xml)
     flow = OpenMLFlow._from_dict(flow_dict)
+
+    if reinstantiate:
+        if not (flow.external_version.startswith('sklearn==') or
+                ',sklearn==' in flow.external_version):
+            raise ValueError('Only sklearn flows can be reinstantiated')
+        flow.model = openml.flows.flow_to_sklearn(flow)
 
     return flow
 
@@ -62,7 +73,7 @@ def list_flows(offset=None, size=None, tag=None, **kwargs):
         - external version
         - uploader
     """
-    return openml.utils.list_all(_list_flows, offset=offset, size=size, tag=tag, **kwargs)
+    return openml.utils._list_all(_list_flows, offset=offset, size=size, tag=tag, **kwargs)
 
 
 def _list_flows(**kwargs):

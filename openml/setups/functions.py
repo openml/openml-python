@@ -12,43 +12,39 @@ from openml.exceptions import OpenMLServerNoResult
 import openml.utils
 
 
-def setup_exists(flow, model=None):
-    '''
+def setup_exists(flow):
+    """
     Checks whether a hyperparameter configuration already exists on the server.
 
     Parameters
     ----------
-
     flow : flow
-        The openml flow object.
-
-    sklearn_model : BaseEstimator, optional
-        If given, the parameters are parsed from this model instead of the
-        model in the flow. If not given, parameters are parsed from
-        ``flow.model``.
+        The openml flow object. Should have flow id present for the main flow
+        and all subflows (i.e., it should be downloaded from the server by
+        means of flow.get, and not instantiated locally)
 
     Returns
     -------
     setup_id : int
         setup id iff exists, False otherwise
-    '''
-
+    """
     # sadly, this api call relies on a run object
     openml.flows.functions._check_flow_for_server_id(flow)
+    if flow.model is None:
+        raise ValueError('Flow should have model field set with the actual '
+                         'model. ')
 
-    if model is None:
-        model = flow.model
-    else:
-        exists = flow_exists(flow.name, flow.external_version)
-        if exists != flow.flow_id:
-            raise ValueError('This should not happen!')
+    # checks whether the flow exists on the server and flow ids align
+    exists = flow_exists(flow.name, flow.external_version)
+    if exists != flow.flow_id:
+        raise ValueError('This should not happen!')
 
-    openml_param_settings = openml.runs.OpenMLRun._parse_parameters(flow, model)
+    # TODO: currently hard-coded sklearn assumption
+    openml_param_settings = openml.flows.obtain_parameter_values(flow)
     description = xmltodict.unparse(_to_dict(flow.flow_id,
                                              openml_param_settings),
                                     pretty=True)
     file_elements = {'description': ('description.arff', description)}
-
     result = openml._api_calls._perform_api_call('/setup/exists/',
                                                  file_elements=file_elements)
     result_dict = xmltodict.parse(result)
@@ -80,14 +76,14 @@ def get_setup(setup_id):
      and returns a structured object
 
     Parameters
-        ----------
-        setup_id : int
-            The Openml setup_id
+    ----------
+    setup_id : int
+        The Openml setup_id
 
-        Returns
-        -------
-        OpenMLSetup
-            an initialized openml setup object
+    Returns
+    -------
+    OpenMLSetup
+        an initialized openml setup object
     """
     setup_dir = os.path.join(config.get_cache_directory(), "setups", str(setup_id))
     setup_file = os.path.join(setup_dir, "description.xml")
@@ -124,8 +120,8 @@ def list_setups(offset=None, size=None, flow=None, tag=None, setup=None):
     dict
         """
 
-    return openml.utils.list_all(_list_setups, offset=offset, size=size,
-                                 flow=flow, tag=tag, setup=setup)
+    return openml.utils._list_all(_list_setups, offset=offset, size=size,
+                                  flow=flow, tag=tag, setup=setup, batch_size=1000)  #batch size for setups is lower
 
 
 def _list_setups(setup=None, **kwargs):
@@ -188,62 +184,37 @@ def __list_setups(api_call):
 
 
 def initialize_model(setup_id):
-    '''
+    """
     Initialized a model based on a setup_id (i.e., using the exact
     same parameter settings)
 
     Parameters
-        ----------
-        setup_id : int
-            The Openml setup_id
+    ----------
+    setup_id : int
+        The Openml setup_id
 
-        Returns
-        -------
-        model : sklearn model
-            the scikitlearn model with all parameters initailized
-    '''
-
-    # transform an openml setup object into
-    # a dict of dicts, structured: flow_id maps to dict of
-    # parameter_names mapping to parameter_value
-
+    Returns
+    -------
+    model : sklearn model
+        the scikitlearn model with all parameters initialized
+    """
     setup = get_setup(setup_id)
-    parameters = {}
-    for _param in setup.parameters:
-        _flow_id = setup.parameters[_param].flow_id
-        _param_name = setup.parameters[_param].parameter_name
-        _param_value = setup.parameters[_param].value
-        if _flow_id not in parameters:
-            parameters[_flow_id] = {}
-        parameters[_flow_id][_param_name] = _param_value
-
-    def _reconstruct_flow(_flow, _params):
-        # recursively set the values of flow parameters (and subflows) to
-        # the specific values from a setup. _params is a dict of
-        # dicts, mapping from flow id to param name to param value
-        # (obtained by using the subfunction _to_dict_of_dicts)
-        for _param in _flow.parameters:
-            # It can happen that no parameters of a flow are in a setup,
-            # then the flow_id is not in _params; usually happens for a
-            # sklearn.pipeline.Pipeline object, where the steps parameter is
-            # not in the setup
-            if _flow.flow_id not in _params:
-                continue
-            # It is not guaranteed that a setup on OpenML has all parameter
-            # settings of a flow, thus a param must not be in _params!
-            if _param not in _params[_flow.flow_id]:
-                continue
-            _flow.parameters[_param] = _params[_flow.flow_id][_param]
-        for _identifier in _flow.components:
-            _flow.components[_identifier] = _reconstruct_flow(_flow.components[_identifier], _params)
-        return _flow
-
-    # now we 'abuse' the parameter object by passing in the
-    # parameters obtained from the setup
     flow = openml.flows.get_flow(setup.flow_id)
-    flow = _reconstruct_flow(flow, parameters)
 
-    return openml.flows.flow_to_sklearn(flow)
+    # instead of using scikit-learns "set_params" function, we override the
+    # OpenMLFlow objects default parameter value so we can utilize the
+    # flow_to_sklearn function to reinitialize the flow with the set defaults.
+    for hyperparameter in setup.parameters.values():
+        structure = flow.get_structure('flow_id')
+        if len(structure[hyperparameter.flow_id]) > 0:
+            subflow = flow.get_subflow(structure[hyperparameter.flow_id])
+        else:
+            subflow = flow
+        subflow.parameters[hyperparameter.parameter_name] = \
+            hyperparameter.value
+
+    model = openml.flows.flow_to_sklearn(flow)
+    return model
 
 
 def _to_dict(flow_id, openml_parameter_settings):
@@ -258,9 +229,9 @@ def _to_dict(flow_id, openml_parameter_settings):
 
 
 def _create_setup_from_xml(result_dict):
-    '''
-     Turns an API xml result into a OpenMLSetup object
-    '''
+    """
+    Turns an API xml result into a OpenMLSetup object
+    """
     setup_id = int(result_dict['oml:setup_parameters']['oml:setup_id'])
     flow_id = int(result_dict['oml:setup_parameters']['oml:flow_id'])
     parameters = {}
@@ -281,11 +252,13 @@ def _create_setup_from_xml(result_dict):
 
     return OpenMLSetup(setup_id, flow_id, parameters)
 
+
 def _create_setup_parameter_from_xml(result_dict):
-    return OpenMLParameter(int(result_dict['oml:id']),
-                           int(result_dict['oml:flow_id']),
-                           result_dict['oml:full_name'],
-                           result_dict['oml:parameter_name'],
-                           result_dict['oml:data_type'],
-                           result_dict['oml:default_value'],
-                           result_dict['oml:value'])
+    return OpenMLParameter(input_id=int(result_dict['oml:id']),
+                           flow_id=int(result_dict['oml:flow_id']),
+                           flow_name=result_dict['oml:flow_name'],
+                           full_name=result_dict['oml:full_name'],
+                           parameter_name=result_dict['oml:parameter_name'],
+                           data_type=result_dict['oml:data_type'],
+                           default_value=result_dict['oml:default_value'],
+                           value=result_dict['oml:value'])

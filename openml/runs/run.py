@@ -1,10 +1,13 @@
 from collections import OrderedDict
+import errno
 import json
+import pickle
 import sys
 import time
 import numpy as np
 
 import arff
+import os
 import xmltodict
 
 import openml
@@ -24,7 +27,7 @@ class OpenMLRun(object):
     def __init__(self, task_id, flow_id, dataset_id, setup_string=None,
                  output_files=None, setup_id=None, tags=None, uploader=None, uploader_name=None,
                  evaluations=None, fold_evaluations=None, sample_evaluations=None,
-                 data_content=None, trace_attributes=None, trace_content=None,
+                 data_content=None, trace=None,
                  model=None, task_type=None, task_evaluation_measure=None, flow_name=None,
                  parameter_settings=None, predictions_url=None, task=None,
                  flow=None, run_id=None):
@@ -44,8 +47,7 @@ class OpenMLRun(object):
         self.sample_evaluations = sample_evaluations
         self.data_content = data_content
         self.output_files = output_files
-        self.trace_attributes = trace_attributes
-        self.trace_content = trace_content
+        self.trace = trace
         self.error_message = None
         self.task = task
         self.flow = flow
@@ -56,7 +58,7 @@ class OpenMLRun(object):
 
     def __str__(self):
         flow_name = self.flow_name
-        if len(flow_name) > 26:
+        if flow_name is not None and len(flow_name) > 26:
             # long enough to show sklearn.pipeline.Pipeline
             flow_name = flow_name[:26] + "..."
         return "[run id: {}, task id: {}, flow id: {}, flow name: {}]".format(
@@ -64,6 +66,105 @@ class OpenMLRun(object):
 
     def _repr_pretty_(self, pp, cycle):
         pp.text(str(self))
+
+    @classmethod
+    def from_filesystem(cls, folder, expect_model=True):
+        """
+        The inverse of the to_filesystem method. Instantiates an OpenMLRun
+        object based on files stored on the file system.
+
+        Parameters
+        ----------
+        folder : str
+            a path leading to the folder where the results
+            are stored
+
+        expect_model : bool
+            if True, it requires the model pickle to be present, and an error
+            will be thrown if not. Otherwise, the model might or might not
+            be present.
+
+        Returns
+        -------
+        run : OpenMLRun
+            the re-instantiated run object
+        """
+        if not os.path.isdir(folder):
+            raise ValueError('Could not find folder')
+
+        description_path = os.path.join(folder, 'description.xml')
+        predictions_path = os.path.join(folder, 'predictions.arff')
+        trace_path = os.path.join(folder, 'trace.arff')
+        model_path = os.path.join(folder, 'model.pkl')
+
+        if not os.path.isfile(description_path):
+            raise ValueError('Could not find description.xml')
+        if not os.path.isfile(predictions_path):
+            raise ValueError('Could not find predictions.arff')
+        if not os.path.isfile(model_path) and expect_model:
+            raise ValueError('Could not find model.pkl')
+
+        with open(description_path, 'r') as fp:
+            xml_string = fp.read()
+            run = openml.runs.functions._create_run_from_xml(xml_string, from_server=False)
+
+        with open(predictions_path, 'r') as fp:
+            predictions = arff.load(fp)
+            run.data_content = predictions['data']
+
+        if os.path.isfile(model_path):
+            # note that it will load the model if the file exists, even if expect_model is False
+            with open(model_path, 'rb') as fp:
+                run.model = pickle.load(fp)
+
+        if os.path.isfile(trace_path):
+            run.trace = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
+
+        return run
+
+    def to_filesystem(self, output_directory, store_model=True):
+        """
+        The inverse of the from_filesystem method. Serializes a run
+        on the filesystem, to be uploaded later.
+
+        Parameters
+        ----------
+        output_directory : str
+            a path leading to the folder where the results
+            will be stored. Should be empty
+
+        store_model : bool
+            if True, a model will be pickled as well. As this is the most
+            storage expensive part, it is often desirable to not store the
+            model.
+        """
+        if self.data_content is None or self.model is None:
+            raise ValueError('Run should have been executed (and contain model / predictions)')
+
+        try:
+            os.makedirs(output_directory)
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                pass
+            else:
+                raise e
+
+        if not os.listdir(output_directory) == []:
+            raise ValueError('Output directory should be empty')
+
+        run_xml = self._create_description_xml()
+        predictions_arff = arff.dumps(self._generate_arff_dict())
+
+        with open(os.path.join(output_directory, 'description.xml'), 'w') as f:
+            f.write(run_xml)
+        with open(os.path.join(output_directory, 'predictions.arff'), 'w') as f:
+            f.write(predictions_arff)
+        if store_model:
+            with open(os.path.join(output_directory, 'model.pkl'), 'wb') as f:
+                pickle.dump(self.model, f)
+
+        if self.trace is not None:
+            self.trace._to_filesystem(output_directory)
 
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the server.
@@ -84,7 +185,7 @@ class OpenMLRun(object):
         task = get_task(self.task_id)
         class_labels = task.class_labels
 
-        arff_dict = {}
+        arff_dict = OrderedDict()
         arff_dict['attributes'] = [('repeat', 'NUMERIC'),  # lowercase 'numeric' gives an error
                                    ('fold', 'NUMERIC'),
                                    ('sample', 'NUMERIC'),
@@ -95,29 +196,6 @@ class OpenMLRun(object):
         arff_dict['data'] = self.data_content
         arff_dict['description'] = "\n".join(run_environment)
         arff_dict['relation'] = 'openml_task_' + str(task.task_id) + '_predictions'
-        return arff_dict
-
-    def _generate_trace_arff_dict(self):
-        """Generates the arff dictionary for uploading predictions to the server.
-
-        Assumes that the run has been executed.
-
-        Returns
-        -------
-        arf_dict : dict
-            Dictionary representation of the ARFF file that will be uploaded.
-            Contains information about the optimization trace.
-        """
-        if self.trace_content is None or len(self.trace_content) == 0:
-            raise ValueError('No trace content avaiable.')
-        if len(self.trace_attributes) != len(self.trace_content[0]):
-            raise ValueError('Trace_attributes and trace_content not compatible')
-
-        arff_dict = {}
-        arff_dict['attributes'] = self.trace_attributes
-        arff_dict['data'] = self.trace_content
-        arff_dict['relation'] = 'openml_task_' + str(self.task_id) + '_predictions'
-
         return arff_dict
 
     def get_metric_fn(self, sklearn_fn, kwargs={}):
@@ -159,7 +237,7 @@ class OpenMLRun(object):
             # convenience function: Creates a mapping to map from the name of attributes
             # present in the arff prediction file to their index. This is necessary
             # because the number of classes can be different for different tasks.
-            res = dict()
+            res = OrderedDict()
             for idx in range(len(attribute_list)):
                 res[attribute_list[idx][0]] = idx
             return res
@@ -189,11 +267,11 @@ class OpenMLRun(object):
             prediction = predictions_arff['attributes'][predicted_idx][1].index(line[predicted_idx])
             correct = predictions_arff['attributes'][predicted_idx][1].index(line[correct_idx])
             if rep not in values_predict:
-                values_predict[rep] = dict()
-                values_correct[rep] = dict()
+                values_predict[rep] = OrderedDict()
+                values_correct[rep] = OrderedDict()
             if fold not in values_predict[rep]:
-                values_predict[rep][fold] = dict()
-                values_correct[rep][fold] = dict()
+                values_predict[rep][fold] = OrderedDict()
+                values_correct[rep][fold] = OrderedDict()
             if samp not in values_predict[rep][fold]:
                 values_predict[rep][fold][samp] = []
                 values_correct[rep][fold][samp] = []
@@ -221,9 +299,15 @@ class OpenMLRun(object):
         self : OpenMLRun
         """
         if self.model is None:
-            raise PyOpenMLError("OpenMLRun obj does not contain a model. (This should never happen.) ");
+            raise PyOpenMLError(
+                "OpenMLRun obj does not contain a model. "
+                "(This should never happen.) "
+            )
         if self.flow_id is None:
-            raise PyOpenMLError("OpenMLRun obj does not contain a flow id. (Should have been added while executing the task.) ");
+            raise PyOpenMLError(
+                "OpenMLRun obj does not contain a flow id. "
+                "(Should have been added while executing the task.) "
+            )
 
         description_xml = self._create_description_xml()
         file_elements = {'description': ("description.xml", description_xml)}
@@ -232,8 +316,8 @@ class OpenMLRun(object):
             predictions = arff.dumps(self._generate_arff_dict())
             file_elements['predictions'] = ("predictions.arff", predictions)
 
-        if self.trace_content is not None:
-            trace_arff = arff.dumps(self._generate_trace_arff_dict())
+        if self.trace is not None:
+            trace_arff = arff.dumps(self.trace.trace_to_arff())
             file_elements['trace'] = ("trace.arff", trace_arff)
 
         return_value = openml._api_calls._perform_api_call("/run/", file_elements=file_elements)
@@ -265,103 +349,6 @@ class OpenMLRun(object):
                                tags=self.tags)
         description_xml = xmltodict.unparse(description, pretty=True)
         return description_xml
-
-    @staticmethod
-    def _parse_parameters(flow, model=None):
-        """Extracts all parameter settings from the model inside a flow in
-        OpenML format.
-
-        Parameters
-        ----------
-        flow : OpenMLFlow
-            openml flow object (containing flow ids, i.e., it has to be downloaded from the server)
-
-        model : BaseEstimator, optional
-            If not given, the parameters are extracted from ``flow.model``.
-
-        """
-
-        if model is None:
-            model = flow.model
-
-        openml.flows.functions._check_flow_for_server_id(flow)
-
-        def get_flow_dict(_flow):
-            flow_map = {_flow.name: _flow.flow_id}
-            for subflow in _flow.components:
-                flow_map.update(get_flow_dict(_flow.components[subflow]))
-            return flow_map
-
-        def extract_parameters(_flow, _flow_dict, component_model,
-                               _main_call=False, main_id=None):
-            # _flow is openml flow object, _param dict maps from flow name to flow id
-            # for the main call, the param dict can be overridden (useful for unit tests / sentinels)
-            # this way, for flows without subflows we do not have to rely on _flow_dict
-            expected_parameters = set(_flow.parameters)
-            expected_components = set(_flow.components)
-            model_parameters = set([mp for mp in component_model.get_params()
-                                    if '__' not in mp])
-            if len((expected_parameters | expected_components) ^ model_parameters) != 0:
-                raise ValueError('Parameters of the model do not match the '
-                                 'parameters expected by the '
-                                 'flow:\nexpected flow parameters: '
-                                 '%s\nmodel parameters: %s' % (
-                    sorted(expected_parameters| expected_components), sorted(model_parameters)))
-
-            _params = []
-            for _param_name in _flow.parameters:
-                _current = OrderedDict()
-                _current['oml:name'] = _param_name
-
-                _tmp = openml.flows.sklearn_to_flow(
-                    component_model.get_params()[_param_name])
-
-                # Try to filter out components (a.k.a. subflows) which are
-                # handled further down in the code (by recursively calling
-                # this function)!
-                if isinstance(_tmp, openml.flows.OpenMLFlow):
-                    continue
-                try:
-                    _tmp = json.dumps(_tmp)
-                except TypeError as e:
-                    # Python3.5 exception message:
-                    # <openml.flows.flow.OpenMLFlow object at 0x7fed87978160> is not JSON serializable
-                    # Python3.6 exception message:
-                    # Object of type 'OpenMLFlow' is not JSON serializable
-                    if 'OpenMLFlow' in e.args[0] and \
-                            'is not JSON serializable' in e.args[0]:
-                        # Additional check that the parameter that could not
-                        # be parsed is actually a list/tuple which is used
-                        # inside a feature union or pipeline
-                        if not isinstance(_tmp, (list, tuple)):
-                            raise e
-                        for step_name, step in _tmp:
-                            if isinstance(step_name, openml.flows.OpenMLFlow):
-                                raise e
-                            elif not isinstance(step, openml.flows.OpenMLFlow):
-                                raise e
-                        continue
-                    else:
-                        raise e
-
-                _current['oml:value'] = _tmp
-                if _main_call:
-                    _current['oml:component'] = main_id
-                else:
-                    _current['oml:component'] = _flow_dict[_flow.name]
-                _params.append(_current)
-
-            for _identifier in _flow.components:
-                subcomponent_model = component_model.get_params()[_identifier]
-                _params.extend(extract_parameters(_flow.components[_identifier],
-                                                  _flow_dict, subcomponent_model))
-            return _params
-
-        flow_dict = get_flow_dict(flow)
-        parameters = extract_parameters(flow, flow_dict, model,
-                                        True, flow.flow_id)
-
-        return parameters
 
     def push_tag(self, tag):
         """Annotates this run with a tag on the server.
@@ -447,8 +434,9 @@ def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
     description['oml:run']['oml:parameter_setting'] = parameter_settings
     if tags is not None:
         description['oml:run']['oml:tag'] = tags  # Tags describing the run
-    if fold_evaluations is not None or sample_evaluations is not None:
-        description['oml:run']['oml:output_data'] = dict()
+    if (fold_evaluations is not None and len(fold_evaluations) > 0) or \
+       (sample_evaluations is not None and len(sample_evaluations) > 0):
+        description['oml:run']['oml:output_data'] = OrderedDict()
         description['oml:run']['oml:output_data']['oml:evaluation'] = list()
     if fold_evaluations is not None:
         for measure in fold_evaluations:

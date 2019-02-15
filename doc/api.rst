@@ -29,7 +29,9 @@ Top-level Classes
    :toctree: generated/
    :template: function.rst
 
+    attributes_arff_from_df
     check_datasets_active
+    create_dataset
     get_dataset
     get_datasets
     list_datasets

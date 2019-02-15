@@ -19,11 +19,12 @@ _defaults = {
     'apikey': None,
     'server': "https://www.openml.org/api/v1/xml",
     'verbosity': 0,
-    'cachedir': os.path.expanduser('~/.openml/cache'),
+    'cachedir': os.path.expanduser(os.path.join('~', '.openml', 'cache')),
     'avoid_duplicate_runs': 'True',
+    'connection_n_retries': 2,
 }
 
-config_file = os.path.expanduser('~/.openml/config')
+config_file = os.path.expanduser(os.path.join('~', '.openml' 'config'))
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
@@ -31,6 +32,9 @@ server = ""
 apikey = ""
 # The current cache directory (without the server name)
 cache_directory = ""
+
+# Number of retries if the connection breaks
+connection_n_retries = 2
 
 
 def _setup():
@@ -46,9 +50,10 @@ def _setup():
     global server
     global cache_directory
     global avoid_duplicate_runs
+    global connection_n_retries
     # read config file, create cache directory
     try:
-        os.mkdir(os.path.expanduser('~/.openml'))
+        os.mkdir(os.path.expanduser(os.path.join('~', '.openml')))
     except (IOError, OSError):
         # TODO add debug information
         pass
@@ -57,6 +62,12 @@ def _setup():
     server = config.get('FAKE_SECTION', 'server')
     cache_directory = os.path.expanduser(config.get('FAKE_SECTION', 'cachedir'))
     avoid_duplicate_runs = config.getboolean('FAKE_SECTION', 'avoid_duplicate_runs')
+    connection_n_retries = config.get('FAKE_SECTION', 'connection_n_retries')
+    if connection_n_retries > 20:
+        raise ValueError(
+            'A higher number of retries than 20 is not allowed to keep the '
+            'server load reasonable'
+        )
 
 
 def _parse_config():
@@ -96,7 +107,7 @@ def get_cache_directory():
 
     """
     url_suffix = urlparse(server).netloc
-    reversed_url_suffix = '/'.join(url_suffix.split('.')[::-1])
+    reversed_url_suffix = os.sep.join(url_suffix.split('.')[::-1])
     if not cache_directory:
         _cachedir = _defaults(cache_directory)
     else:

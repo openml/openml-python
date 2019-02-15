@@ -5,9 +5,10 @@ import unittest
 import numpy as np
 
 from openml import OpenMLSplit
+from openml.testing import TestBase
 
 
-class OpenMLSplitTest(unittest.TestCase):
+class OpenMLSplitTest(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take less
     # than 5 seconds + rebuilding the test would potentially be costly
 
@@ -19,6 +20,7 @@ class OpenMLSplitTest(unittest.TestCase):
             self.directory, "..", "files", "org", "openml", "test",
             "tasks", "1882", "datasplits.arff"
         )
+        # TODO Needs to be adapted regarding the python version
         self.pd_filename = self.arff_filename.replace(".arff", ".pkl")
 
     def tearDown(self):

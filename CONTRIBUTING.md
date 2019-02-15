@@ -74,14 +74,14 @@ following rules before you submit a pull request:
    [task list](https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments)
    in the PR description.
 
--  All tests pass when running `nosetests`. On
+-  All tests pass when running `pytest`. On
    Unix-like systems, check with (from the toplevel source folder):
 
       ```bash
-      $ nosetests
+      $ pytest
       ```
    
-   For Windows systems, execute the command from an Anaconda Prompt or add `nosetests` to PATH before executing the command.
+   For Windows systems, execute the command from an Anaconda Prompt or add `pytest` to PATH before executing the command.
 
 -  Documentation and high-coverage tests are necessary for enhancements to be
    accepted. Bug-fixes or new features should be provided with
@@ -92,6 +92,8 @@ following rules before you submit a pull request:
    For the Bug-fixes case, at the time of the PR, this tests should fail for
    the code base in develop and pass for the PR code.
 
+ - Add your changes to the changelog in the file doc/progress.rst.
+
 
 You can also check for common programming errors with the following
 tools:
@@ -99,8 +101,8 @@ tools:
 -  Code with good unittest **coverage** (at least 80%), check with:
 
   ```bash
-  $ pip install nose coverage
-  $ nosetests --with-coverage path/to/tests_for_package
+  $ pip install pytest pytest-cov
+  $ pytest --cov=. path/to/tests_for_package
   ```
 
 -  No pyflakes warnings, check with:

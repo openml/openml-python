@@ -49,7 +49,7 @@ class TestBase(unittest.TestCase):
         self.cached = True
         # amueller's read/write key that he will throw away later
         openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
-        self.production_server = openml.config.server
+        self.production_server = "https://openml.org/api/v1/xml"
         self.test_server = "https://test.openml.org/api/v1/xml"
         openml.config.cache_directory = None
 
@@ -60,26 +60,42 @@ class TestBase(unittest.TestCase):
 
         # If we're on travis, we save the api key in the config file to allow
         # the notebook tests to read them.
-        if os.environ.get('TRAVIS'):
+        if os.environ.get('TRAVIS') or os.environ.get('APPVEYOR'):
             with lockutils.external_lock('config', lock_path=self.workdir):
                 with open(openml.config.config_file, 'w') as fh:
                     fh.write('apikey = %s' % openml.config.apikey)
 
+        # Increase the number of retries to avoid spurios server failures
+        self.connection_n_retries = openml.config.connection_n_retries
+        openml.config.connection_n_retries = 10
+
     def tearDown(self):
         os.chdir(self.cwd)
-        shutil.rmtree(self.workdir)
+        try:
+            shutil.rmtree(self.workdir)
+        except PermissionError:
+            if os.name == 'nt':
+                # one of the files may still be used by another process
+                pass
+            else:
+                raise
         openml.config.server = self.production_server
+        openml.config.connection_n_retries = self.connection_n_retries
 
-    def _add_sentinel_to_flow_name(self, flow, sentinel=None):
+    def _get_sentinel(self, sentinel=None):
         if sentinel is None:
             # Create a unique prefix for the flow. Necessary because the flow is
             # identified by its name and external version online. Having a unique
             #  name allows us to publish the same flow in each test run
             md5 = hashlib.md5()
             md5.update(str(time.time()).encode('utf-8'))
+            md5.update(str(os.getpid()).encode('utf-8'))
             sentinel = md5.hexdigest()[:10]
             sentinel = 'TEST%s' % sentinel
+        return sentinel
 
+    def _add_sentinel_to_flow_name(self, flow, sentinel=None):
+        sentinel = self._get_sentinel(sentinel=sentinel)
         flows_to_visit = list()
         flows_to_visit.append(flow)
         while len(flows_to_visit) > 0:
