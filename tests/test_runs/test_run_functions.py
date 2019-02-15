@@ -188,7 +188,8 @@ class TestRun(TestBase):
         X, y = task.get_X_and_y()
         self.assertEqual(np.count_nonzero(np.isnan(X)), n_missing_vals)
         run = openml.runs.run_flow_on_task(flow, task, seed=seed,
-                                           avoid_duplicate_runs=openml.config.avoid_duplicate_runs)
+                                           avoid_duplicate_runs=openml
+                                           .config.avoid_duplicate_runs)
         run_ = run.publish()
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
@@ -256,7 +257,8 @@ class TestRun(TestBase):
 
     def _check_fold_evaluations(self, fold_evaluations, num_repeats, num_folds,
                                 max_time_allowed=60000,
-                                task_type=TaskTypeEnum.SUPERVISED_CLASSIFICATION):
+                                task_type=(TaskTypeEnum.
+                                           SUPERVISED_CLASSIFICATION)):
         """
         Checks whether the right timing measures are attached to the run
         (before upload). Test is only performed for versions >= Python3.3
@@ -576,8 +578,10 @@ class TestRun(TestBase):
                                     ('VarianceThreshold', VarianceThreshold()),
                                     ('Estimator', RandomizedSearchCV(
                                         DecisionTreeClassifier(),
-                                        {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
-                                         'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
+                                        {'min_samples_split':
+                                         [2 ** x for x in range(1, 7+1)],
+                                         'min_samples_leaf':
+                                         [2 ** x for x in range(0, 6+1)]},
                                         cv=3, n_iter=10))])
         task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
         n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
@@ -650,8 +654,10 @@ class TestRun(TestBase):
         num_folds = 10
         num_samples = 8
 
-        pipeline1 = Pipeline(steps=[('scaler', StandardScaler(with_mean=False)),
-                                    ('dummy', DummyClassifier(strategy='prior'))])
+        pipeline1 = Pipeline(steps=[('scaler',
+                                     StandardScaler(with_mean=False)),
+                                    ('dummy',
+                                     DummyClassifier(strategy='prior'))])
         run = self._perform_run(task_id, num_test_instances, num_missing_vals,
                                 pipeline1, flow_expected_rsv='62501')
         self._check_sample_evaluations(run.sample_evaluations, num_repeats,
@@ -669,8 +675,10 @@ class TestRun(TestBase):
                                     ('VarianceThreshold', VarianceThreshold()),
                                     ('Estimator', RandomizedSearchCV(
                                         DecisionTreeClassifier(),
-                                        {'min_samples_split': [2 ** x for x in range(1, 7 + 1)],
-                                         'min_samples_leaf': [2 ** x for x in range(0, 6 + 1)]},
+                                        {'min_samples_split':
+                                         [2 ** x for x in range(1, 7+1)],
+                                         'min_samples_leaf':
+                                         [2 ** x for x in range(0, 6+1)]},
                                         cv=3, n_iter=10))])
         run = self._perform_run(task_id, num_test_instances, num_missing_vals,
                                 pipeline2, flow_expected_rsv='62501')
@@ -1148,8 +1156,9 @@ class TestRun(TestBase):
         # trace. SGD does not produce any
         self.assertIsInstance(trace, type(None))
 
+        task_type = TaskTypeEnum.SUPERVISED_CLASSIFICATION
         self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds,
-                                     task_type=TaskTypeEnum.SUPERVISED_CLASSIFICATION)
+                                     task_type=task_type)
 
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
