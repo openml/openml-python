@@ -58,7 +58,7 @@ class TestRun(TestBase):
     # (253 test obs), no nominal attributes, all numeric attributes
     TEST_SERVER_TASK_SIMPLE = (119, 0, 253, list(), list(range(8)))
     TEST_SERVER_TASK_REGRESSION = (738, 0, 718, list(), list(range(8)))
-    # creadit-a dataset, 690 observations, 67 missing vals, 33% holdout set
+    # credit-a dataset, 690 observations, 67 missing vals, 33% holdout set
     # (227 test obs)
     TEST_SERVER_TASK_MISSING_VALS = (96, 67, 227,
                                      [0, 3, 4, 5, 6, 8, 9, 11, 12],
@@ -133,7 +133,7 @@ class TestRun(TestBase):
         """
         Runs a classifier on a task, and performs some basic checks.
         Also uploads the run.
-        
+
         Parameters:
         ----------
         task_id : int
