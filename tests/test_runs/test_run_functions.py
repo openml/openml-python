@@ -256,8 +256,7 @@ class TestRun(TestBase):
 
     def _check_fold_evaluations(self, fold_evaluations, num_repeats, num_folds,
                                 max_time_allowed=60000,
-                                task_type=
-                                TaskTypeEnum.SUPERVISED_CLASSIFICATION):
+                                task_type=TaskTypeEnum.SUPERVISED_CLASSIFICATION):
         """
         Checks whether the right timing measures are attached to the run
         (before upload). Test is only performed for versions >= Python3.3
@@ -1150,8 +1149,7 @@ class TestRun(TestBase):
         self.assertIsInstance(trace, type(None))
 
         self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds,
-                                     task_type=
-                                     TaskTypeEnum.SUPERVISED_CLASSIFICATION)
+                                     task_type=TaskTypeEnum.SUPERVISED_CLASSIFICATION)
 
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
