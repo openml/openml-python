@@ -65,7 +65,6 @@ class TestStudyFunctions(TestBase):
         fixt_descr = 'bla'
         fixt_run_ids = run_list.keys()
         fixt_flow_ids = set([run['flow_id'] for run in run_list.values()])
-        print(fixt_flow_ids)
         fixt_task_ids = set([run['task_id'] for run in run_list.values()])
         fixt_setup_ids = set([run['setup_id']for run in run_list.values()])
         
@@ -78,7 +77,6 @@ class TestStudyFunctions(TestBase):
         )
         study_id = study.publish()
         self.assertGreater(study_id, 0)
-        print(study_id)
         study_downloaded = openml.study.get_study(study_id)
         self.assertEqual(study_downloaded.alias, fixt_alias)
         self.assertEqual(study_downloaded.name, fixt_name)
