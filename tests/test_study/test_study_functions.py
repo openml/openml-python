@@ -29,7 +29,7 @@ class TestStudyFunctions(TestBase):
     
     def test_publish_benchmark_suite(self):
         fixture_alias = None
-        fixture_name = 'unit tested study'
+        fixture_name = 'unit tested benchmark suite'
         fixture_descr = 'bla'
         fixture_task_ids = [1, 2, 3]
         
@@ -51,4 +51,37 @@ class TestStudyFunctions(TestBase):
         self.assertEqual(study_downloaded.runs, None)
         self.assertGreater(len(study_downloaded.data), 0)
         self.assertLessEqual(len(study_downloaded.data), len(fixture_task_ids))
-        self.assertEqual(study_downloaded.tasks, fixture_task_ids)
+        self.assertSetEqual(set(study_downloaded.tasks), set(fixture_task_ids))
+    
+    def test_publish_study(self):
+        # get some random runs to attach
+        run_list = openml.runs.list_runs(size=10)
+        
+        fixt_alias = None
+        fixt_name = 'unit tested study'
+        fixt_descr = 'bla'
+        fixt_run_ids = run_list.keys()
+        fixt_flow_ids = set([run['flow_id'] for run in run_list.values()])
+        print(fixt_flow_ids)
+        fixt_task_ids = set([run['task_id'] for run in run_list.values()])
+        fixt_setup_ids = set([run['setup_id']for run in run_list.values()])
+        
+        study = openml.study.study_create(
+            alias=fixt_alias,
+            benchmark_suite=None,
+            name=fixt_name,
+            description=fixt_descr,
+            run_ids=fixt_run_ids
+        )
+        study_id = study.publish()
+        self.assertGreater(study_id, 0)
+        print(study_id)
+        study_downloaded = openml.study.get_study(study_id)
+        self.assertEqual(study_downloaded.alias, fixt_alias)
+        self.assertEqual(study_downloaded.name, fixt_name)
+        self.assertEqual(study_downloaded.description, fixt_descr)
+        
+        self.assertSetEqual(set(study_downloaded.runs), set(fixt_run_ids))
+        self.assertSetEqual(set(study_downloaded.setups), set(fixt_setup_ids))
+        self.assertSetEqual(set(study_downloaded.flows), set(fixt_flow_ids))
+        self.assertSetEqual(set(study_downloaded.tasks), set(fixt_task_ids))

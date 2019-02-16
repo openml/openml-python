@@ -23,7 +23,10 @@ def get_study(study_id, knowledge_type=None):
     if knowledge_type is not None:
         call_suffix += "/" + knowledge_type
     xml_string = openml._api_calls._perform_api_call(call_suffix, 'get')
-    result_dict = xmltodict.parse(xml_string)['oml:study']
+    force_list_tags = ('oml:data_id', 'oml:flow_id', 
+                       'oml:task_id', 'oml:setup_id', 'oml:run_id')
+    result_dict = xmltodict.parse(xml_string, 
+                                  force_list=force_list_tags)['oml:study']
     study_id = int(result_dict['oml:id'])
     alias = result_dict['oml:alias'] if 'oml:alias' in result_dict else None
     main_knowledge_type = result_dict['oml:main_knowledge_type']
@@ -119,7 +122,7 @@ def study_create(alias, benchmark_suite, name, description, run_ids):
             tags=None,
             data=None,
             tasks=None,
-            fows=None,
+            flows=None,
             setups=None,
             runs=run_ids
     )
