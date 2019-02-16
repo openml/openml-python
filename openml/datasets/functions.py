@@ -865,7 +865,7 @@ def _get_online_dataset_arff(dataset_id):
     # build a dict from the xml.
     # use the url from the dataset description and return the ARFF string
     return openml._api_calls._read_url(
-        xmltodict.parse(dataset_xml)['oml:data_set_description']['oml:url'], 
+        xmltodict.parse(dataset_xml)['oml:data_set_description']['oml:url'],
         request_method='get'
     )
 
