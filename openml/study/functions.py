@@ -165,3 +165,21 @@ def benchmark_suite_create(alias, name, description, task_ids):
             setups=None,
             runs=None
     )
+
+
+def delete_study(study_id):
+    """
+    Deletes an study from the OpenML server.
+    
+    Parameters
+    ----------
+    study_id : int
+        OpenML id of the study
+
+    Returns
+    -------
+    bool
+        True iff the deletion was successful. False otherwse
+    """
+    return openml.utils._delete_entity('study', study_id)
+

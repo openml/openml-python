@@ -52,6 +52,9 @@ class TestStudyFunctions(TestBase):
         self.assertGreater(len(study_downloaded.data), 0)
         self.assertLessEqual(len(study_downloaded.data), len(fixture_task_ids))
         self.assertSetEqual(set(study_downloaded.tasks), set(fixture_task_ids))
+        
+        result = openml.study.delete_study(study_id)
+        self.assertTrue(result)
     
     def test_publish_study(self):
         # get some random runs to attach
@@ -85,3 +88,6 @@ class TestStudyFunctions(TestBase):
         self.assertSetEqual(set(study_downloaded.setups), set(fixt_setup_ids))
         self.assertSetEqual(set(study_downloaded.flows), set(fixt_flow_ids))
         self.assertSetEqual(set(study_downloaded.tasks), set(fixt_task_ids))
+        
+        result = openml.study.delete_study(study_id)
+        self.assertTrue(result)
