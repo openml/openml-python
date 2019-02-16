@@ -22,7 +22,7 @@ def get_study(study_id, knowledge_type=None):
     call_suffix = "study/%s" % str(study_id)
     if knowledge_type is not None:
         call_suffix += "/" + knowledge_type
-    xml_string = openml._api_calls._perform_api_call(call_suffix)
+    xml_string = openml._api_calls._perform_api_call(call_suffix, 'get')
     result_dict = xmltodict.parse(xml_string)['oml:study']
     study_id = int(result_dict['oml:id'])
     alias = result_dict['oml:alias'] if 'oml:alias' in result_dict else None

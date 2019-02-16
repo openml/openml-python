@@ -100,7 +100,7 @@ def _list_evaluations(function, id=None, task=None,
 
 def __list_evaluations(api_call):
     """Helper function to parse API calls which are lists of runs"""
-    xml_string = openml._api_calls._perform_api_call(api_call)
+    xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     evals_dict = xmltodict.parse(xml_string, force_list=('oml:evaluation',))
     # Minimalistic check if the XML is useful
     if 'oml:evaluations' not in evals_dict:

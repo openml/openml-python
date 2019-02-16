@@ -203,7 +203,7 @@ class OpenMLDataset(object):
             Tag to attach to the dataset.
         """
         data = {'data_id': self.dataset_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/data/tag", data=data)
+        openml._api_calls._perform_api_call("/data/tag", 'post', data=data)
 
     def remove_tag(self, tag):
         """Removes a tag from this dataset on the server.
@@ -214,7 +214,7 @@ class OpenMLDataset(object):
             Tag to attach to the dataset.
         """
         data = {'data_id': self.dataset_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/data/untag", data=data)
+        openml._api_calls._perform_api_call("/data/untag", 'post', data=data)
 
     def __eq__(self, other):
 
@@ -535,7 +535,7 @@ class OpenMLDataset(object):
                     raise ValueError("No path/url to the dataset file was given")
 
         return_value = openml._api_calls._perform_api_call(
-            "data/",
+            "data/", 'post',
             file_elements=file_elements,
         )
         self.dataset_id = int(xmltodict.parse(return_value)['oml:upload_data_set']['oml:id'])

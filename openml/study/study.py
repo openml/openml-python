@@ -83,6 +83,7 @@ class OpenMLStudy(object):
 
         return_value = openml._api_calls._perform_api_call(
             "study/",
+            'post',
             file_elements=file_elements,
         )
         self.study_id = int(xmltodict.parse(return_value)['oml:study_upload']['oml:id'])

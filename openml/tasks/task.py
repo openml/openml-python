@@ -29,7 +29,7 @@ class OpenMLTask(object):
             Tag to attach to the task.
         """
         data = {'task_id': self.task_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/task/tag", data=data)
+        openml._api_calls._perform_api_call("/task/tag", 'post', data=data)
 
     def remove_tag(self, tag):
         """Removes a tag from this task on the server.
@@ -40,7 +40,7 @@ class OpenMLTask(object):
             Tag to attach to the task.
         """
         data = {'task_id': self.task_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/task/untag", data=data)
+        openml._api_calls._perform_api_call("/task/untag", 'post', data=data)
 
 
 class OpenMLSupervisedTask(OpenMLTask):
