@@ -127,7 +127,7 @@ def flow_exists(name, external_version):
 
     xml_response = openml._api_calls._perform_api_call(
         "flow/exists",
-        'get',
+        'post',
         data={'name': name, 'external_version': external_version},
     )
 
