@@ -4,15 +4,6 @@ from openml.study import OpenMLStudy
 import openml._api_calls
 
 
-def _multitag_to_list(result_dict, tag):
-    if isinstance(result_dict[tag], list):
-        return result_dict[tag]
-    elif isinstance(result_dict[tag], dict):
-        return [result_dict[tag]]
-    else:
-        raise TypeError()
-
-
 def get_study(study_id, knowledge_type=None):
     """
     Retrieves all relevant information of an OpenML study from the server
@@ -23,8 +14,11 @@ def get_study(study_id, knowledge_type=None):
     if knowledge_type is not None:
         call_suffix += "/" + knowledge_type
     xml_string = openml._api_calls._perform_api_call(call_suffix, 'get')
-    force_list_tags = ('oml:data_id', 'oml:flow_id', 
-                       'oml:task_id', 'oml:setup_id', 'oml:run_id')
+    force_list_tags = (
+            'oml:data_id', 'oml:flow_id', 'oml:task_id', 
+            'oml:setup_id', 'oml:run_id',
+            'oml:tag'  # legacy. 
+    )
     result_dict = xmltodict.parse(xml_string, 
                                   force_list=force_list_tags)['oml:study']
     study_id = int(result_dict['oml:id'])
@@ -40,7 +34,7 @@ def get_study(study_id, knowledge_type=None):
     # tags is legacy. remove once no longer needed.
     tags = []
     if 'oml:tag' in result_dict:
-        for tag in _multitag_to_list(result_dict, 'oml:tag'):
+        for tag in result_dict['oml:tag']:
             current_tag = {'name': tag['oml:name'],
                            'write_access': tag['oml:write_access']}
             if 'oml:window_start' in tag:
@@ -87,7 +81,7 @@ def get_study(study_id, knowledge_type=None):
     return study
 
 
-def study_create(alias, benchmark_suite, name, description, run_ids):
+def create_study(alias, benchmark_suite, name, description, run_ids):
     """
     Creates an OpenML study (collection of knowledge types, where the runs
     are the linked entity)
@@ -128,7 +122,7 @@ def study_create(alias, benchmark_suite, name, description, run_ids):
     )
 
 
-def benchmark_suite_create(alias, name, description, task_ids):
+def create_benchmark_suite(alias, name, description, task_ids):
     """
     Creates an OpenML benchmark suite (collection of knowledge types, where 
     the tasks are the linked entity)
@@ -183,3 +177,61 @@ def delete_study(study_id):
     """
     return openml.utils._delete_entity('study', study_id)
 
+
+def attach_to_study(study_id, entity_ids):
+    """
+    Attaches a set of entities to a collection
+        - provide run ids of existsing runs if the main knowledge type is
+          runs (study)
+        - provide task ids of existing tasks if the main knowledge type is
+          tasks (benchmark suite)
+    
+    Parameters
+    ----------
+    study_id : int
+        OpenML id of the study
+    
+    entity_ids : list (int)
+        List of entities to link to the collection
+    
+    Returns
+    -------
+    int
+        new size of the study (in terms of explicitly linked entities)
+    """
+    uri = 'study/%d/attach' % study_id
+    post_variables = {'ids': ','.join(str(x) for x in entity_ids)}
+    result_xml = openml._api_calls._perform_api_call(uri, 
+                                                     'post', 
+                                                     post_variables)
+    result = xmltodict.parse(result_xml)['oml:study_attach']
+    return int(result['oml:linked_entities'])
+
+def detach_from_study(study_id, entity_ids):
+    """
+    Detaches a set of entities to a collection
+        - provide run ids of existsing runs if the main knowledge type is
+          runs (study)
+        - provide task ids of existing tasks if the main knowledge type is
+          tasks (benchmark suite)
+    
+    Parameters
+    ----------
+    study_id : int
+        OpenML id of the study
+    
+    entity_ids : list (int)
+        List of entities to link to the collection
+    
+    Returns
+    -------
+    int
+        new size of the study (in terms of explicitly linked entities)
+    """
+    uri = 'study/%d/detach' % study_id
+    post_variables = {'ids': ','.join(str(x) for x in entity_ids)}
+    result_xml = openml._api_calls._perform_api_call(uri, 
+                                                     'post', 
+                                                     post_variables)
+    result = xmltodict.parse(result_xml)['oml:study_detach']
+    return int(result['oml:linked_entities'])

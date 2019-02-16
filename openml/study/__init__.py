@@ -1,3 +1,3 @@
 from .study import OpenMLStudy
-from .functions import get_study, study_create, benchmark_suite_create, \
-    delete_study
+from .functions import get_study, create_study, create_benchmark_suite, \
+    delete_study, attach_to_study, detach_from_study
