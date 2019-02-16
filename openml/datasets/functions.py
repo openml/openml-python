@@ -703,7 +703,7 @@ def _get_dataset_arff(did_cache_dir, description):
         pass
 
     url = description['oml:url']
-    arff_string = openml._api_calls._read_url(url)
+    arff_string = openml._api_calls._read_url(url, request_method='get')
     md5 = hashlib.md5()
     md5.update(arff_string.encode('utf-8'))
     md5_checksum = md5.hexdigest()
@@ -865,7 +865,8 @@ def _get_online_dataset_arff(dataset_id):
     # build a dict from the xml.
     # use the url from the dataset description and return the ARFF string
     return openml._api_calls._read_url(
-        xmltodict.parse(dataset_xml)['oml:data_set_description']['oml:url']
+        xmltodict.parse(dataset_xml)['oml:data_set_description']['oml:url'], 
+        request_method='get'
     )
 
 

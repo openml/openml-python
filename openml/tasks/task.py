@@ -94,7 +94,8 @@ class OpenMLSupervisedTask(OpenMLTask):
                 pass
         except (OSError, IOError):
             split_url = self.estimation_procedure["data_splits_url"]
-            split_arff = openml._api_calls._read_url(split_url)
+            split_arff = openml._api_calls._read_url(split_url,
+                                                     request_method='get')
 
             with io.open(cache_file, "w", encoding='utf8') as fh:
                 fh.write(split_arff)

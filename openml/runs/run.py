@@ -222,7 +222,9 @@ class OpenMLRun(object):
             predictions_file_url = openml._api_calls._file_id_to_url(
                 self.output_files['predictions'], 'predictions.arff',
             )
-            predictions_arff = arff.loads(openml._api_calls._read_url(predictions_file_url))
+            response = openml._api_calls._read_url(predictions_file_url, 
+                                                   request_method='get')
+            predictions_arff = arff.loads(response)
             # TODO: make this a stream reader
         else:
             raise ValueError('Run should have been locally executed or contain outputfile reference.')
