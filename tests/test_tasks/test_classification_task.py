@@ -18,3 +18,10 @@ class OpenMLClassificationTest(OpenMLSupervisedTaskTest):
         self.assertEqual((3196, ), Y.shape)
         self.assertIsInstance(Y, np.ndarray)
         self.assertEqual(Y.dtype, int)
+
+    def test_download_task(self):
+
+        task = super(OpenMLClassificationTest, self).test_download_task()
+        self.assertEqual(task.task_id, self.task_id)
+        self.assertEqual(task.task_type_id, 1)
+        self.assertEqual(task.dataset_id, 11)

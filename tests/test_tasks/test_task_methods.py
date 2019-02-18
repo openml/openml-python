@@ -3,8 +3,8 @@ from time import time
 import openml
 from openml.testing import TestBase
 
-
-class OpenMLStatTest(TestBase):
+# Common methods between tasks
+class OpenMLTaskMethodsTest(TestBase):
 
     def test_tagging(self):
         task = openml.tasks.get_task(1)

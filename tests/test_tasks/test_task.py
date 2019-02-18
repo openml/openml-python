@@ -26,7 +26,8 @@ class OpenMLTaskTest(TestBase):
 
     def test_download_task(self):
 
-        openml.tasks.get_task(self.task_id)
+        task = openml.tasks.get_task(self.task_id)
+        return task
 
     def test_upload_task(self):
 

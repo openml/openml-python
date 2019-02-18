@@ -102,11 +102,8 @@ class OpenMLTask(object):
         task_dict = OrderedDict([
             ('@xmlns:oml', 'http://openml.org/openml')
         ])
+
         task_container['oml:task_inputs'] = task_dict
-
-        if self.task_id is not None:
-            task_dict['oml:task_id'] = self.task_id
-
         task_dict['oml:task_type_id'] = self.task_type_id
 
         source_data = OrderedDict([
@@ -114,22 +111,7 @@ class OpenMLTask(object):
             ('#text', str(self.dataset_id))
         ])
 
-        # not a clustering task
-        if self.task_type_id == 5:
-            task_dict['oml:input'] = source_data
-        else:
-            task_dict['oml:input'] = [source_data]
-
-        # has an evaluation measure
-        if self.evaluation_measure is not None:
-            task_dict['oml:input'].append(
-                OrderedDict([
-                    ('@name', 'evaluation_measures'),
-                    ('#text', self.evaluation_measure)
-                ])
-            )
-
-        return task_container
+        return task_container, source_data
 
     def _to_xml(self):
         """Generate xml representation of self for upload to server.
@@ -145,6 +127,7 @@ class OpenMLTask(object):
         # A task may not be uploaded with the xml encoding specification:
         # <?xml version="1.0" encoding="utf-8"?>
         task_xml = task_xml.split('\n', 1)[-1]
+
         return task_xml
 
     def publish(self):
@@ -220,9 +203,20 @@ class OpenMLSupervisedTask(OpenMLTask):
 
     def _to_dict(self):
 
-        task_container = super(OpenMLSupervisedTask, self)._to_dict()
+        task_container, source_data = super(OpenMLSupervisedTask, self)._to_dict()
+        task_dict = task_container['oml:task_inputs']
+        task_dict['oml:input'] = [source_data]
 
-        task_container['oml:task_inputs'].get('oml:input').extend(
+        # has an evaluation measure
+        if self.evaluation_measure is not None:
+            task_dict['oml:input'].append(
+                OrderedDict([
+                    ('@name', 'evaluation_measures'),
+                    ('#text', self.evaluation_measure)
+                ])
+            )
+
+        task_dict['oml:input'].extend(
             [
                 OrderedDict([
                     ('@name', 'target_feature'),
@@ -316,6 +310,14 @@ class OpenMLClusteringTask(OpenMLTask):
             dataset_format=dataset_format, target=None,
         )
         return X_and_y
+
+    def _to_dict(self):
+
+        task_container, source_data = super(OpenMLClusteringTask, self)._to_dict()
+        task_dict = task_container['oml:task_inputs']
+        task_dict['oml:input'] = source_data
+
+        return task_container
 
 
 class OpenMLLearningCurveTask(OpenMLClassificationTask):
