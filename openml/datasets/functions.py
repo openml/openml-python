@@ -2,17 +2,20 @@ import hashlib
 import io
 import os
 import re
+import warnings
 
 import numpy as np
-import six
 import arff
 import pandas as pd
 
 import xmltodict
 from scipy.sparse import coo_matrix
-from oslo_concurrency import lockutils
+# Currently, importing oslo raises a lot of warning that it will stop working
+# under python3.8; remove this once they disappear
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    from oslo_concurrency import lockutils
 from collections import OrderedDict
-from warnings import warn
 
 import openml.utils
 import openml._api_calls
@@ -348,7 +351,7 @@ def get_dataset(dataset_id):
         except OpenMLServerException as e:
             # if there was an exception, check if the user had access to the dataset
             if e.code == 112:
-                six.raise_from(PrivateDatasetError(e.message), None)
+                raise PrivateDatasetError(e.message) from None
             else:
                 raise e
         finally:

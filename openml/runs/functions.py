@@ -8,7 +8,6 @@ import warnings
 
 import numpy as np
 import sklearn.pipeline
-import six
 import xmltodict
 import sklearn.metrics
 
@@ -776,7 +775,7 @@ def _extract_arfftrace_attributes(model):
         if key.startswith('param_'):
             # supported types should include all types, including bool,
             # int float
-            supported_basic_types = (bool, int, float, six.string_types)
+            supported_basic_types = (bool, int, float, str)
             for param_value in model.cv_results_[key]:
                 if isinstance(param_value, supported_basic_types) or \
                         param_value is None or param_value is np.ma.masked:

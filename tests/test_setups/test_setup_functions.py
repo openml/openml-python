@@ -88,7 +88,7 @@ class TestSetupFunctions(TestBase):
 
         # execute the function we are interested in
         setup_id = openml.setups.setup_exists(flow)
-        self.assertEquals(setup_id, run.setup_id)
+        self.assertEqual(setup_id, run.setup_id)
 
     def test_existing_setup_exists_1(self):
         # Check a flow with zero hyperparameters
@@ -124,7 +124,7 @@ class TestSetupFunctions(TestBase):
             if num_params[idx] == 0:
                 self.assertIsNone(current.parameters)
             else:
-                self.assertEquals(len(current.parameters), num_params[idx])
+                self.assertEqual(len(current.parameters), num_params[idx])
 
     def test_setup_list_filter_flow(self):
         openml.config.server = self.production_server
@@ -135,7 +135,7 @@ class TestSetupFunctions(TestBase):
 
         self.assertGreater(len(setups), 0) # TODO: please adjust 0
         for setup_id in setups.keys():
-            self.assertEquals(setups[setup_id].flow_id, flow_id)
+            self.assertEqual(setups[setup_id].flow_id, flow_id)
 
     def test_list_setups_empty(self):
         setups = openml.setups.list_setups(setup=[0])
@@ -150,9 +150,9 @@ class TestSetupFunctions(TestBase):
 
         size = 10
         setups = openml.setups.list_setups(offset=0, size=size)
-        self.assertEquals(len(setups), size)
+        self.assertEqual(len(setups), size)
         setups2 = openml.setups.list_setups(offset=size, size=size)
-        self.assertEquals(len(setups2), size)
+        self.assertEqual(len(setups2), size)
 
         all = set(setups.keys()).union(setups2.keys())
 

@@ -1,7 +1,6 @@
 import dateutil.parser
 
 import xmltodict
-import six
 
 import openml._api_calls
 from . import OpenMLFlow
@@ -119,9 +118,9 @@ def flow_exists(name, external_version):
     -----
     see http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
     """
-    if not (isinstance(name, six.string_types) and len(name) > 0):
+    if not (isinstance(name, str) and len(name) > 0):
         raise ValueError('Argument \'name\' should be a non-empty string')
-    if not (isinstance(name, six.string_types) and len(external_version) > 0):
+    if not (isinstance(name, str) and len(external_version) > 0):
         raise ValueError('Argument \'version\' should be a non-empty string')
 
     xml_response = openml._api_calls._perform_api_call(

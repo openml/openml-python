@@ -4,9 +4,9 @@ Stores module level information like the API key, cache directory and the server
 import logging
 import os
 
-from six import StringIO
-from six.moves import configparser
-from six.moves.urllib_parse import urlparse
+from io import StringIO
+import configparser
+from urllib.parse import urlparse
 
 
 logger = logging.getLogger(__name__)
@@ -91,7 +91,7 @@ def _parse_config():
             for line in fh:
                 config_file_.write(line)
         config_file_.seek(0)
-        config.readfp(config_file_)
+        config.read_file(config_file_)
     except OSError as e:
         logging.info("Error opening file %s: %s", config_file, e.message)
     return config

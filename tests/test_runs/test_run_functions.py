@@ -102,7 +102,11 @@ class TestRun(TestBase):
                 val_1 = predictions['data'][idx][col_idx]
                 val_2 = predictions_prime['data'][idx][col_idx]
                 if type(val_1) == float or type(val_2) == float:
-                    self.assertAlmostEqual(float(val_1), float(val_2))
+                    self.assertAlmostEqual(
+                        float(val_1),
+                        float(val_2),
+                        places=6,
+                    )
                 else:
                     self.assertEqual(val_1, val_2)
 
@@ -368,19 +372,17 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(task_id)
 
         # Invalid parameter values
-        clf = LogisticRegression(C='abc')
-        self.assertRaisesRegexp(ValueError,
-                                "Penalty term must be positive; got "
-                                # u? for 2.7/3.4-6 compability
-                                "\(C=u?'abc'\)",
-                                openml.runs.run_model_on_task, task=task,
-                                model=clf)
+        clf = LogisticRegression(C='abc', solver='lbfgs')
+        self.assertRaisesRegex(
+            ValueError,
+            r"Penalty term must be positive; got \(C=u?'abc'\)",
+            # u? for 2.7/3.4-6 compability,
+            openml.runs.run_model_on_task, task=task,
+            model=clf,
+        )
 
     def test__publish_flow_if_necessary(self):
-        task_id = 115
-        task = openml.tasks.get_task(task_id)
-
-        clf = LogisticRegression()
+        clf = LogisticRegression(solver='lbfgs')
         flow = sklearn_to_flow(clf)
         flow, sentinel = self._add_sentinel_to_flow_name(flow, None)
         openml.runs.functions._publish_flow_if_necessary(flow)
@@ -505,7 +507,7 @@ class TestRun(TestBase):
                              task_type=task_type, sentinel=sentinel)
 
     def test_run_and_upload_logistic_regression(self):
-        lr = LogisticRegression()
+        lr = LogisticRegression(solver='lbfgs')
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
@@ -696,8 +698,12 @@ class TestRun(TestBase):
             n_iter=2)
 
         task = openml.tasks.get_task(11)
-        run = openml.runs.run_model_on_task(task, randomsearch,
-                                            avoid_duplicate_runs=False, seed=1)
+        run = openml.runs.run_model_on_task(
+            model=randomsearch,
+            task=task,
+            avoid_duplicate_runs=False,
+            seed=1,
+        )
         run_ = run.publish()
         run = openml.runs.get_run(run_.run_id)
 
@@ -773,7 +779,7 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(7)
 
         # invoke OpenML run
-        run = openml.runs.run_model_on_task(task, clf)
+        run = openml.runs.run_model_on_task(clf, task)
 
         self._test_local_evaluations(run)
 
@@ -792,7 +798,7 @@ class TestRun(TestBase):
             ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
             ('Estimator', GaussianNB())])
         task = openml.tasks.get_task(11)
-        run = openml.runs.run_model_on_task(task, clf,
+        run = openml.runs.run_model_on_task(clf, task,
                                             avoid_duplicate_runs=False)
         run_ = run.publish()
         run = openml.runs.get_run(run_.run_id)
@@ -835,7 +841,7 @@ class TestRun(TestBase):
         # from the past
         try:
             # in case the run did not exists yet
-            run = openml.runs.run_model_on_task(task, clf,
+            run = openml.runs.run_model_on_task(clf, task,
                                                 avoid_duplicate_runs=True)
 
             self.assertEqual(
@@ -895,8 +901,12 @@ class TestRun(TestBase):
             try:
                 # first populate the server with this run.
                 # skip run if it was already performed.
-                run = openml.runs.run_model_on_task(task, clf, seed=rs,
-                                                    avoid_duplicate_runs=True)
+                run = openml.runs.run_model_on_task(
+                    model=clf,
+                    task=task,
+                    seed=rs,
+                    avoid_duplicate_runs=True,
+                )
                 run.publish()
             except openml.exceptions.PyOpenMLError as e:
                 # run already existed. Great.
@@ -1101,13 +1111,19 @@ class TestRun(TestBase):
         flow = sklearn_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.flow_id = -1
-        expected_message_regex = 'flow.flow_id is not None, but the flow ' \
-                                 'does not exist on the server according to ' \
-                                 'flow_exists'
-        self.assertRaisesRegexp(ValueError, expected_message_regex,
-                                openml.runs.run_flow_on_task,
-                                task=task, flow=flow,
-                                avoid_duplicate_runs=False)
+        expected_message_regex = (
+            'flow.flow_id is not None, but the flow '
+            'does not exist on the server according to '
+            'flow_exists'
+        )
+        self.assertRaisesRegex(
+            ValueError,
+            expected_message_regex,
+            openml.runs.run_flow_on_task,
+            task=task,
+            flow=flow,
+            avoid_duplicate_runs=False,
+        )
 
     def test_run_with_illegal_flow_id_1(self):
         # Check the case where the user adds an illegal flow id to an existing
@@ -1127,7 +1143,7 @@ class TestRun(TestBase):
             "Result from API call flow_exists and flow.flow_id are not same: "
             "'-1' vs '[0-9]+'"
         )
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             ValueError,
             expected_message_regex,
             openml.runs.run_flow_on_task,

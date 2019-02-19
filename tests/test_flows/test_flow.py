@@ -1,15 +1,10 @@
 import collections
 import copy
+from distutils.version import LooseVersion
 import hashlib
 import re
-import sys
 import time
-from distutils.version import LooseVersion
-
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
+from unittest import mock
 
 import scipy.stats
 import sklearn
@@ -173,21 +168,27 @@ class TestFlow(TestBase):
         flow = openml.flows.sklearn_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.publish()
-        self.assertRaisesRegexp(openml.exceptions.OpenMLServerException,
+        self.assertRaisesRegex(openml.exceptions.OpenMLServerException,
                                 'flow already exists', flow.publish)
 
     def test_publish_flow_with_similar_components(self):
-        clf = sklearn.ensemble.VotingClassifier(
-            [('lr', sklearn.linear_model.LogisticRegression())])
+        clf = sklearn.ensemble.VotingClassifier([
+            ('lr', sklearn.linear_model.LogisticRegression(solver='lbfgs')),
+        ])
         flow = openml.flows.sklearn_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.publish()
         # For a flow where both components are published together, the upload
         # date should be equal
-        self.assertEqual(flow.upload_date,
-                         flow.components['lr'].upload_date,
-                         (flow.name, flow.flow_id,
-                          flow.components['lr'].name, flow.components['lr'].flow_id))
+        self.assertEqual(
+            flow.upload_date,
+            flow.components['lr'].upload_date,
+            msg=(
+                flow.name,
+                flow.flow_id,
+                flow.components['lr'].name, flow.components['lr'].flow_id,
+            ),
+        )
 
         clf1 = sklearn.tree.DecisionTreeClassifier(max_depth=2)
         flow1 = openml.flows.sklearn_to_flow(clf1)

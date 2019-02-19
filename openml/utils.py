@@ -1,6 +1,5 @@
 import os
 import xmltodict
-import six
 import shutil
 
 import openml._api_calls
@@ -30,7 +29,7 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
     if xml_tag_name in node and node[xml_tag_name] is not None:
         if isinstance(node[xml_tag_name], dict):
             rval = [node[xml_tag_name]]
-        elif isinstance(node[xml_tag_name], six.string_types):
+        elif isinstance(node[xml_tag_name], str):
             rval = [node[xml_tag_name]]
         elif isinstance(node[xml_tag_name], list):
             rval = node[xml_tag_name]
@@ -99,7 +98,7 @@ def _list_all(listing_call, *args, **filters):
     Example usage:
 
     ``evaluations = list_all(list_evaluations, "predictive_accuracy", task=mytask)``
-    
+
     Parameters
     ----------
     listing_call : callable
@@ -192,7 +191,7 @@ def _create_cache_directory_for_id(key, id_):
     Parameters
     ----------
     key : str
-    
+
     id_ : int
 
     Returns
@@ -220,7 +219,7 @@ def _remove_cache_dir_for_id(key, cache_dir):
     Parameters
     ----------
     key : str
-    
+
     cache_dir : str
     """
     try:
