@@ -20,6 +20,53 @@ class OpenMLTask(object):
         """Download dataset associated with task"""
         return datasets.get_dataset(self.dataset_id)
 
+    def get_train_test_split_indices(self, fold=0, repeat=0, sample=0):
+        # Replace with retrieve from cache
+        if self.split is None:
+            self.split = self.download_split()
+
+        train_indices, test_indices = self.split.get(
+            repeat=repeat,
+            fold=fold,
+            sample=sample,
+        )
+        return train_indices, test_indices
+
+    def _download_split(self, cache_file):
+        try:
+            with io.open(cache_file, encoding='utf8'):
+                pass
+        except (OSError, IOError):
+            split_url = self.estimation_procedure["data_splits_url"]
+            split_arff = openml._api_calls._read_url(split_url, request_method='get')
+
+            with io.open(cache_file, "w", encoding='utf8') as fh:
+                fh.write(split_arff)
+            del split_arff
+
+    def download_split(self):
+        """Download the OpenML split for a given task.
+        """
+        cached_split_file = os.path.join(
+            _create_cache_directory_for_id('tasks', self.task_id),
+            "datasplits.arff",
+        )
+
+        try:
+            split = OpenMLSplit._from_arff_file(cached_split_file)
+        except (OSError, IOError):
+            # Next, download and cache the associated split file
+            self._download_split(cached_split_file)
+            split = OpenMLSplit._from_arff_file(cached_split_file)
+
+        return split
+
+    def get_split_dimensions(self):
+        if self.split is None:
+            self.split = self.download_split()
+
+        return self.split.repeats, self.split.folds, self.split.samples
+
     def push_tag(self, tag):
         """Annotates this task with a tag on the server.
 
@@ -75,54 +122,6 @@ class OpenMLSupervisedTask(OpenMLTask):
             raise NotImplementedError(self.task_type)
         X_and_y = dataset.get_data(target=self.target_name)
         return X_and_y
-
-    def get_train_test_split_indices(self, fold=0, repeat=0, sample=0):
-        # Replace with retrieve from cache
-        if self.split is None:
-            self.split = self.download_split()
-
-        train_indices, test_indices = self.split.get(
-            repeat=repeat,
-            fold=fold,
-            sample=sample,
-        )
-        return train_indices, test_indices
-
-    def _download_split(self, cache_file):
-        try:
-            with io.open(cache_file, encoding='utf8'):
-                pass
-        except (OSError, IOError):
-            split_url = self.estimation_procedure["data_splits_url"]
-            split_arff = openml._api_calls._read_url(split_url,
-                                                     request_method='get')
-
-            with io.open(cache_file, "w", encoding='utf8') as fh:
-                fh.write(split_arff)
-            del split_arff
-
-    def download_split(self):
-        """Download the OpenML split for a given task.
-        """
-        cached_split_file = os.path.join(
-            _create_cache_directory_for_id('tasks', self.task_id),
-            "datasplits.arff",
-        )
-
-        try:
-            split = OpenMLSplit._from_arff_file(cached_split_file)
-        except (OSError, IOError):
-            # Next, download and cache the associated split file
-            self._download_split(cached_split_file)
-            split = OpenMLSplit._from_arff_file(cached_split_file)
-
-        return split
-
-    def get_split_dimensions(self):
-        if self.split is None:
-            self.split = self.download_split()
-
-        return self.split.repeats, self.split.folds, self.split.samples
 
 
 class OpenMLClassificationTask(OpenMLSupervisedTask):
@@ -196,3 +195,22 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
             class_labels=class_labels,
             cost_matrix=cost_matrix
         )
+        self.target_name = target_name
+        self.class_labels = class_labels
+        self.cost_matrix = cost_matrix
+        self.estimation_procedure["data_splits_url"] = data_splits_url
+        self.split = None
+
+        if cost_matrix is not None:
+            raise NotImplementedError("Costmatrix")
+
+
+class TaskTypeEnum(object):
+    SUPERVISED_CLASSIFICATION = 1
+    SUPERVISED_REGRESSION = 2
+    LEARNING_CURVE = 3
+    SUPERVISED_DATASTREAM_CLASSIFICATION = 4
+    CLUSTERING = 5
+    MACHINE_LEARNING_CHALLENGE = 6
+    SURVIVAL_ANALYSIS = 7
+    SUBGROUP_DISCOVERY = 8

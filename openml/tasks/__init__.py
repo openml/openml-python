@@ -5,6 +5,7 @@ from .task import (
     OpenMLRegressionTask,
     OpenMLClusteringTask,
     OpenMLLearningCurveTask,
+    TaskTypeEnum,
 )
 from .split import OpenMLSplit
 from .functions import (get_task, get_tasks, list_tasks)
