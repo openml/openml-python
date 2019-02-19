@@ -9,6 +9,12 @@ Progress
 Changelog
 =========
 
+0.9.0
+~~~~~
+
+* ADD #560: OpenML-Python can now handle regression tasks as well.
+* MAINT #184: Dropping Python2 support.
+
 0.8.0
 ~~~~~
 
