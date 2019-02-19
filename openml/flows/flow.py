@@ -1,6 +1,5 @@
 from collections import OrderedDict
 
-import six
 import xmltodict
 
 import openml._api_calls
@@ -192,14 +191,15 @@ class OpenMLFlow(object):
                              meta_info['description'])
 
             for key_, value in param_dict.items():
-                if key_ is not None and not isinstance(key_, six.string_types):
+                if key_ is not None and not isinstance(key_, str):
                     raise ValueError('Parameter name %s cannot be serialized '
                                      'because it is of type %s. Only strings '
                                      'can be serialized.' % (key_, type(key_)))
-                if value is not None and not isinstance(value, six.string_types):
+                if value is not None and not isinstance(value, str):
                     raise ValueError('Parameter value %s cannot be serialized '
                                      'because it is of type %s. Only strings '
-                                     'can be serialized.' % (value, type(value)))
+                                     'can be serialized.'
+                                     % (value, type(value)))
 
             flow_parameters.append(param_dict)
 
@@ -215,7 +215,7 @@ class OpenMLFlow(object):
             for key_ in component_dict:
                 # We only need to check if the key is a string, because the
                 # value is a flow. The flow itself is valid by recursion
-                if key_ is not None and not isinstance(key_, six.string_types):
+                if key_ is not None and not isinstance(key_, str):
                     raise ValueError('Parameter name %s cannot be serialized '
                                      'because it is of type %s. Only strings '
                                      'can be serialized.' % (key_, type(key_)))

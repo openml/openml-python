@@ -40,10 +40,10 @@ git remote --verbose
 
 echo "Travis variables:"
 echo '--------------------------------------------------------------------------------'
-echo "$TRAVIS"
-echo "$TRAVIS_BRANCH"
-echo "$TRAVIS_PULL_REQUEST"
-echo "$TRAVIS_REPO_SLUG"
+echo "On travis: $TRAVIS"
+echo "Current branch: $TRAVIS_BRANCH"
+echo "Is a pull request test: $TRAVIS_PULL_REQUEST"
+echo "Repository: $TRAVIS_REPO_SLUG"
 
 # Travis does the git clone with a limited depth (50 at the time of
 # writing). This may not be enough to find the common ancestor with
@@ -131,7 +131,7 @@ echo -e '\nRunning flake8 on the diff in the range' "$COMMIT_RANGE" \
 echo '--------------------------------------------------------------------------------'
 # We need the following command to exit with 0 hence the echo in case
 # there is no match
-MODIFIED_FILES="$(git diff --name-only $COMMIT_RANGE || echo "no_match")"
+MODIFIED_FILES="$(git diff --no-ext-diff --name-only $COMMIT_RANGE || echo "no_match")"
 
 check_files() {
     files="$1"
@@ -140,7 +140,7 @@ check_files() {
     if [ -n "$files" ]; then
         # Conservative approach: diff without context (--unified=0) so that code
         # that was not changed does not create failures
-        git diff --unified=0 $COMMIT_RANGE -- $files | flake8 --ignore E402 --diff --show-source $options
+        git diff --no-ext-diff --unified=0 $COMMIT_RANGE -- $files | flake8 --ignore E402 --diff --show-source $options
     fi
 }
 

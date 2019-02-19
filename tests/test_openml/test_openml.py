@@ -12,7 +12,13 @@ class TestInit(TestBase):
     @mock.patch('openml.datasets.functions.get_dataset')
     @mock.patch('openml.flows.functions.get_flow')
     @mock.patch('openml.runs.functions.get_run')
-    def test_populate_cache(self, run_mock, flow_mock, dataset_mock, task_mock):
+    def test_populate_cache(
+        self,
+        run_mock,
+        flow_mock,
+        dataset_mock,
+        task_mock,
+    ):
         openml.populate_cache(task_ids=[1, 2], dataset_ids=[3, 4],
                               flow_ids=[5, 6], run_ids=[7, 8])
         self.assertEqual(run_mock.call_count, 2)
@@ -24,7 +30,10 @@ class TestInit(TestBase):
             self.assertEqual(argument[0], fixture)
 
         self.assertEqual(dataset_mock.call_count, 2)
-        for argument, fixture in zip(dataset_mock.call_args_list, [(3,), (4,)]):
+        for argument, fixture in zip(
+                dataset_mock.call_args_list,
+                [(3,), (4,)],
+        ):
             self.assertEqual(argument[0], fixture)
 
         self.assertEqual(task_mock.call_count, 2)

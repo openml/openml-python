@@ -90,7 +90,7 @@ class OpenMLSplit(object):
                 meta._attrnames.index('sample')
                 if 'sample' in meta._attrnames
                 else None
-            ) # can be None
+            )  # can be None
 
             for line in splits:
                 # A line looks like type, rowid, repeat, fold

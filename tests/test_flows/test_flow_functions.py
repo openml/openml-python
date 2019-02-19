@@ -17,8 +17,8 @@ class TestFlowFunctions(TestBase):
         self.assertIsInstance(flow['version'], str)
         # There are some runs on openml.org that can have an empty external
         # version
-        self.assertTrue(isinstance(flow['external_version'], str) or
-                        flow['external_version'] is None)
+        self.assertTrue(isinstance(flow['external_version'], str)
+                        or flow['external_version'] is None)
 
     def test_list_flows(self):
         openml.config.server = self.production_server
@@ -160,28 +160,33 @@ class TestFlowFunctions(TestBase):
 
         new_flow = copy.deepcopy(flow)
         new_flow.parameters['a'] = 7
-        self.assertRaisesRegexp(ValueError, "values for attribute 'parameters' "
-                                            "differ: 'OrderedDict\(\[\('a', "
-                                            "5\), \('b', 6\)\]\)'\nvs\n"
-                                            "'OrderedDict\(\[\('a', 7\), "
-                                            "\('b', 6\)\]\)'",
-                                openml.flows.functions.assert_flows_equal,
-                                flow, new_flow)
+        self.assertRaisesRegex(
+            ValueError,
+            r"values for attribute 'parameters' differ: "
+            r"'OrderedDict\(\[\('a', 5\), \('b', 6\)\]\)'\nvs\n"
+            "'OrderedDict\(\[\('a', 7\), \('b', 6\)\]\)'",
+            openml.flows.functions.assert_flows_equal,
+            flow, new_flow,
+        )
         openml.flows.functions.assert_flows_equal(flow, new_flow,
                                                   ignore_parameter_values=True)
 
         del new_flow.parameters['a']
-        self.assertRaisesRegexp(ValueError, "values for attribute 'parameters' "
-                                            "differ: 'OrderedDict\(\[\('a', "
-                                            "5\), \('b', 6\)\]\)'\nvs\n"
-                                            "'OrderedDict\(\[\('b', 6\)\]\)'",
-                                openml.flows.functions.assert_flows_equal,
-                                flow, new_flow)
-        self.assertRaisesRegexp(ValueError, "Flow Test: parameter set of flow "
-                                            "differs from the parameters stored "
-                                            "on the server.",
-                                openml.flows.functions.assert_flows_equal,
-                                flow, new_flow, ignore_parameter_values=True)
+        self.assertRaisesRegex(
+            ValueError,
+            r"values for attribute 'parameters' differ: "
+            r"'OrderedDict\(\[\('a', 5\), \('b', 6\)\]\)'\nvs\n"
+            r"'OrderedDict\(\[\('b', 6\)\]\)'",
+            openml.flows.functions.assert_flows_equal,
+            flow, new_flow,
+        )
+        self.assertRaisesRegex(
+            ValueError,
+            r"Flow Test: parameter set of flow differs from the parameters "
+            r"stored on the server.",
+            openml.flows.functions.assert_flows_equal,
+            flow, new_flow, ignore_parameter_values=True,
+        )
 
     def test_are_flows_equal_ignore_if_older(self):
         paramaters = OrderedDict((('a', 5), ('b', 6)))

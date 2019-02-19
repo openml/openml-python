@@ -25,7 +25,7 @@ class TestTask(TestBase):
 
     def test__get_cached_task_not_cached(self):
         openml.config.cache_directory = self.static_cache_dir
-        self.assertRaisesRegexp(OpenMLCacheException,
+        self.assertRaisesRegex(OpenMLCacheException,
                                 'Task file for tid 2 not cached',
                                 openml.tasks.functions._get_cached_task, 2)
 
@@ -58,7 +58,7 @@ class TestTask(TestBase):
         tasks = openml.tasks.list_tasks(task_type_id=ttid)
         self.assertGreaterEqual(len(tasks), num_curves_tasks)
         for tid in tasks:
-            self.assertEquals(ttid, tasks[tid]["ttid"])
+            self.assertEqual(ttid, tasks[tid]["ttid"])
             self._check_task(tasks[tid])
 
     def test_list_tasks_empty(self):
@@ -99,7 +99,7 @@ class TestTask(TestBase):
                 tasks = openml.tasks.list_tasks(task_type_id=j, offset=i, size=size)
                 self.assertGreaterEqual(size, len(tasks))
                 for tid in tasks:
-                    self.assertEquals(j, tasks[tid]["ttid"])
+                    self.assertEqual(j, tasks[tid]["ttid"])
                     self._check_task(tasks[tid])
 
     def test__get_task(self):

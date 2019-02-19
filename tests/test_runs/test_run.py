@@ -139,8 +139,8 @@ class TestRun(TestBase):
 
         task = openml.tasks.get_task(119)
         run = openml.runs.run_model_on_task(
-            model,
-            task,
+            model=model,
+            task=task,
             add_local_measures=False,
             avoid_duplicate_runs=False,
         )
@@ -163,8 +163,8 @@ class TestRun(TestBase):
         ])
         task = openml.tasks.get_task(119)
         run = openml.runs.run_model_on_task(
-            task,
-            model,
+            model=model,
+            task=task,
             add_local_measures=False,
         )
 

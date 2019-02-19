@@ -168,12 +168,12 @@ class TestFlow(TestBase):
         flow = openml.flows.sklearn_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.publish()
-        self.assertRaisesRegexp(openml.exceptions.OpenMLServerException,
+        self.assertRaisesRegex(openml.exceptions.OpenMLServerException,
                                 'flow already exists', flow.publish)
 
     def test_publish_flow_with_similar_components(self):
         clf = sklearn.ensemble.VotingClassifier(
-            [('lr', sklearn.linear_model.LogisticRegression())])
+            [('lr', sklearn.linear_model.LogisticRegression(solver='lbfgs'))])
         flow = openml.flows.sklearn_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.publish()
