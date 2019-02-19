@@ -108,9 +108,8 @@ class TestStudyFunctions(TestBase):
                                      list(run_list_additional.keys()))
         study_downloaded = openml.study.get_study(study_id)
         # verify again
-        self.assertSetEqual(set(study_downloaded.runs),
-                            set(run_list_additional.keys()) | \
-                            set(run_list.keys()))
+        all_run_ids = set(run_list_additional.keys()) | set(run_list.keys())
+        self.assertSetEqual(set(study_downloaded.runs), all_run_ids)
         
         # test detach function
         openml.study.detach_from_study(study_id, list(run_list.keys()))
