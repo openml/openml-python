@@ -53,8 +53,6 @@ class TestRun(TestBase):
             np.array(np.array(run_prime.data_content)[:, 0:-2], dtype=float)
         string_part = np.array(run.data_content)[:, -2:]
         string_part_prime = np.array(run_prime.data_content)[:, -2:]
-        # JvR: Python 2.7 requires an almost equal check,
-        # rather than an equals check
         np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
         np.testing.assert_array_equal(string_part, string_part_prime)
 
@@ -95,8 +93,6 @@ class TestRun(TestBase):
             string_part = np.array(run_trace_content)[:, 5:]
             string_part_prime = np.array(run_prime_trace_content)[:, 5:]
 
-            # JvR: Python 2.7 requires an almost equal check, rather than an
-            # equals check
             np.testing.assert_array_almost_equal(int_part, int_part_prime)
             np.testing.assert_array_almost_equal(float_part, float_part_prime)
             self.assertEqual(bool_part, bool_part_prime)
@@ -143,8 +139,8 @@ class TestRun(TestBase):
 
         task = openml.tasks.get_task(119)
         run = openml.runs.run_model_on_task(
-            model,
-            task,
+            model=model,
+            task=task,
             add_local_measures=False,
             avoid_duplicate_runs=False,
         )
@@ -167,8 +163,8 @@ class TestRun(TestBase):
         ])
         task = openml.tasks.get_task(119)
         run = openml.runs.run_model_on_task(
-            task,
-            model,
+            model=model,
+            task=task,
             add_local_measures=False,
         )
 

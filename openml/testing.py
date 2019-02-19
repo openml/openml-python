@@ -4,9 +4,13 @@ import os
 import shutil
 import time
 import unittest
+import warnings
 
-from oslo_concurrency import lockutils
-import six
+# Currently, importing oslo raises a lot of warning that it will stop working
+# under python3.8; remove this once they disappear
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    from oslo_concurrency import lockutils
 
 import openml
 
@@ -112,7 +116,7 @@ class TestBase(unittest.TestCase):
         self.assertIn('did', dataset)
         self.assertIsInstance(dataset['did'], int)
         self.assertIn('status', dataset)
-        self.assertIsInstance(dataset['status'], six.string_types)
+        self.assertIsInstance(dataset['status'], str)
         self.assertIn(dataset['status'], ['in_preparation', 'active',
                                           'deactivated'])
 

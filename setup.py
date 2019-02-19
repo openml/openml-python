@@ -36,7 +36,6 @@ setuptools.setup(name="openml",
                  install_requires=[
                      'numpy>=1.6.2',
                      'scipy>=0.13.3',
-                     'mock',
                      'liac-arff>=2.2.2',
                      'xmltodict',
                      'pytest',
@@ -64,9 +63,8 @@ setuptools.setup(name="openml",
                               'Operating System :: POSIX',
                               'Operating System :: Unix',
                               'Operating System :: MacOS',
-                              'Programming Language :: Python :: 2',
-                              'Programming Language :: Python :: 2.7',
                               'Programming Language :: Python :: 3',
                               'Programming Language :: Python :: 3.4',
                               'Programming Language :: Python :: 3.5',
-                              'Programming Language :: Python :: 3.6'])
+                              'Programming Language :: Python :: 3.6'
+                              'Programming Language :: Python :: 3.7'])

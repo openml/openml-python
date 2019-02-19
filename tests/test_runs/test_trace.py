@@ -22,7 +22,7 @@ class TestTrace(TestBase):
         trace = OpenMLRunTrace(-1, trace_iterations=trace_iterations)
         # This next one should simply not fail
         self.assertEqual(trace.get_selected_iteration(2, 2), 2)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
                 'Could not find the selected iteration for rep/fold 3/3',
         ):
@@ -31,22 +31,22 @@ class TestTrace(TestBase):
 
     def test_initialization(self):
         """Check all different ways to fail the initialization """
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Trace content not available.',
         ):
             OpenMLRunTrace.generate(attributes='foo', content=None)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Trace attributes not available.',
         ):
             OpenMLRunTrace.generate(attributes=None, content='foo')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Trace content is empty.'
         ):
             OpenMLRunTrace.generate(attributes='foo', content=[])
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Trace_attributes and trace_content not compatible:'
         ):
@@ -64,7 +64,7 @@ class TestTrace(TestBase):
             ('repeat', 'NUMERICAL'),
         ]
         trace_content = [[0, 0, 0, 0.5, 'true', 1], [0, 0, 0, 0.9, 'false', 2]]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Either setup_string or parameters needs to be passed as argument.'
         ):
@@ -79,7 +79,7 @@ class TestTrace(TestBase):
             ('sunshine', 'NUMERICAL'),
         ]
         trace_content = [[0, 0, 0, 0.5, 'true', 1], [0, 0, 0, 0.9, 'false', 2]]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Encountered unknown attribute sunshine that does not start with '
             'prefix parameter_'

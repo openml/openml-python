@@ -817,9 +817,12 @@ class TestSklearn(TestBase):
         kernel = sklearn.gaussian_process.kernels.Matern()
         gp = sklearn.gaussian_process.GaussianProcessClassifier(
             kernel=kernel, optimizer=opt)
-        self.assertRaisesRegexp(TypeError, "Matern\(length_scale=1, nu=1.5\), "
-                                           "<class 'sklearn.gaussian_process.kernels.Matern'>",
-                                sklearn_to_flow, gp)
+        self.assertRaisesRegex(
+            TypeError,
+            r"Matern\(length_scale=1, nu=1.5\), "
+            "<class 'sklearn.gaussian_process.kernels.Matern'>",
+            sklearn_to_flow, gp,
+        )
 
     def test_error_on_adding_component_multiple_times_to_flow(self):
         # this function implicitly checks
@@ -829,19 +832,19 @@ class TestSklearn(TestBase):
         pipeline = sklearn.pipeline.Pipeline((('pca1', pca), ('pca2', pca2)))
         fixture = "Found a second occurence of component .*.PCA when trying " \
                   "to serialize Pipeline"
-        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline)
+        self.assertRaisesRegex(ValueError, fixture, sklearn_to_flow, pipeline)
 
         fu = sklearn.pipeline.FeatureUnion((('pca1', pca), ('pca2', pca2)))
         fixture = "Found a second occurence of component .*.PCA when trying " \
                   "to serialize FeatureUnion"
-        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, fu)
+        self.assertRaisesRegex(ValueError, fixture, sklearn_to_flow, fu)
 
         fs = sklearn.feature_selection.SelectKBest()
         fu2 = sklearn.pipeline.FeatureUnion((('pca1', pca), ('fs', fs)))
         pipeline2 = sklearn.pipeline.Pipeline((('fu', fu2), ('pca2', pca2)))
         fixture = "Found a second occurence of component .*.PCA when trying " \
                   "to serialize Pipeline"
-        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline2)
+        self.assertRaisesRegex(ValueError, fixture, sklearn_to_flow, pipeline2)
 
     def test_subflow_version_propagated(self):
         this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -1087,21 +1090,31 @@ class TestSklearn(TestBase):
             self.assertEqual(parameter.full_name, openml_name)
 
     def test_obtain_parameter_values_flow_not_from_server(self):
-        model = sklearn.linear_model.LogisticRegression()
+        model = sklearn.linear_model.LogisticRegression(solver='lbfgs')
         flow = sklearn_to_flow(model)
         msg = 'Flow sklearn.linear_model.logistic.LogisticRegression has no ' \
               'flow_id!'
 
-        self.assertRaisesRegexp(ValueError, msg,
-                                openml.flows.obtain_parameter_values, flow)
+        self.assertRaisesRegex(
+            ValueError,
+            msg,
+            openml.flows.obtain_parameter_values,
+            flow,
+        )
 
         model = sklearn.ensemble.AdaBoostClassifier(
-            base_estimator=sklearn.linear_model.LogisticRegression()
+            base_estimator=sklearn.linear_model.LogisticRegression(
+                solver='lbfgs',
+            )
         )
         flow = sklearn_to_flow(model)
         flow.flow_id = 1
-        self.assertRaisesRegexp(ValueError, msg,
-                                openml.flows.obtain_parameter_values, flow)
+        self.assertRaisesRegex(
+            ValueError,
+            msg,
+            openml.flows.obtain_parameter_values,
+            flow,
+        )
 
     def test_obtain_parameter_values(self):
 

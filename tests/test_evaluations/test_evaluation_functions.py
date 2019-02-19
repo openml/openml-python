@@ -15,7 +15,7 @@ class TestEvaluationFunctions(TestBase):
 
         self.assertGreater(len(evaluations), 100)
         for run_id in evaluations.keys():
-            self.assertEquals(evaluations[run_id].task_id, task_id)
+            self.assertEqual(evaluations[run_id].task_id, task_id)
             # default behaviour of this method: return aggregated results (not
             # per fold)
             self.assertIsNotNone(evaluations[run_id].value)
@@ -39,7 +39,7 @@ class TestEvaluationFunctions(TestBase):
 
         self.assertGreater(len(evaluations), 50)
         for run_id in evaluations.keys():
-            self.assertEquals(evaluations[run_id].setup_id, setup_id)
+            self.assertEqual(evaluations[run_id].setup_id, setup_id)
             # default behaviour of this method: return aggregated results (not
             # per fold)
             self.assertIsNotNone(evaluations[run_id].value)
@@ -54,7 +54,7 @@ class TestEvaluationFunctions(TestBase):
 
         self.assertGreater(len(evaluations), 2)
         for run_id in evaluations.keys():
-            self.assertEquals(evaluations[run_id].flow_id, flow_id)
+            self.assertEqual(evaluations[run_id].flow_id, flow_id)
             # default behaviour of this method: return aggregated results (not
             # per fold)
             self.assertIsNotNone(evaluations[run_id].value)
@@ -67,9 +67,9 @@ class TestEvaluationFunctions(TestBase):
 
         evaluations = openml.evaluations.list_evaluations("predictive_accuracy", id=[run_id])
 
-        self.assertEquals(len(evaluations), 1)
+        self.assertEqual(len(evaluations), 1)
         for run_id in evaluations.keys():
-            self.assertEquals(evaluations[run_id].run_id, run_id)
+            self.assertEqual(evaluations[run_id].run_id, run_id)
             # default behaviour of this method: return aggregated results (not
             # per fold)
             self.assertIsNotNone(evaluations[run_id].value)
@@ -79,7 +79,7 @@ class TestEvaluationFunctions(TestBase):
         openml.config.server = self.production_server
 
         evaluations = openml.evaluations.list_evaluations("predictive_accuracy", size=100, offset=100)
-        self.assertEquals(len(evaluations), 100)
+        self.assertEqual(len(evaluations), 100)
 
     def test_list_evaluations_empty(self):
         evaluations = openml.evaluations.list_evaluations('unexisting_measure')
@@ -99,7 +99,7 @@ class TestEvaluationFunctions(TestBase):
             "predictive_accuracy", size=size, offset=0, task=task_ids,
             flow=flow_ids, uploader=uploader_ids, per_fold=True)
 
-        self.assertEquals(len(evaluations), size)
+        self.assertEqual(len(evaluations), size)
         for run_id in evaluations.keys():
             self.assertIsNone(evaluations[run_id].value)
             self.assertIsNotNone(evaluations[run_id].values)

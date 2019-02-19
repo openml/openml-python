@@ -1,22 +1,16 @@
 import unittest
 import os
-import sys
 import random
 from itertools import product
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
+from unittest import mock
 
 import arff
-import six
 
 import pytest
 import numpy as np
 import pandas as pd
 import scipy.sparse
 from oslo_concurrency import lockutils
-from warnings import filterwarnings, catch_warnings
 
 import openml
 from openml import OpenMLDataset
@@ -114,7 +108,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_get_cached_dataset_description_not_cached(self):
         openml.config.cache_directory = self.static_cache_dir
-        self.assertRaisesRegexp(OpenMLCacheException, "Dataset description for "
+        self.assertRaisesRegex(OpenMLCacheException, "Dataset description for "
                                                       "dataset id 3 not cached",
                                 openml.datasets.functions._get_cached_dataset_description,
                                 3)
@@ -127,7 +121,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_get_cached_dataset_arff_not_cached(self):
         openml.config.cache_directory = self.static_cache_dir
-        self.assertRaisesRegexp(OpenMLCacheException, "ARFF file for "
+        self.assertRaisesRegex(OpenMLCacheException, "ARFF file for "
                                                       "dataset id 3 not cached",
                                 openml.datasets.functions._get_cached_dataset_arff,
                                 3)
@@ -138,7 +132,7 @@ class TestOpenMLDataset(TestBase):
             self.assertIn('did', dataset)
             self.assertIsInstance(dataset['did'], int)
             self.assertIn('status', dataset)
-            self.assertIsInstance(dataset['status'], six.string_types)
+            self.assertIsInstance(dataset['status'], str)
             self.assertIn(dataset['status'], ['in_preparation', 'active',
                                               'deactivated'])
     def _check_datasets(self, datasets):
@@ -215,9 +209,12 @@ class TestOpenMLDataset(TestBase):
         active = openml.datasets.check_datasets_active([1, 17])
         self.assertTrue(active[1])
         self.assertFalse(active[17])
-        self.assertRaisesRegexp(ValueError, 'Could not find dataset 79 in OpenML'
-                                            ' dataset list.',
-                                openml.datasets.check_datasets_active, [79])
+        self.assertRaisesRegex(
+            ValueError,
+            'Could not find dataset 79 in OpenML dataset list.',
+            openml.datasets.check_datasets_active,
+            [79],
+        )
 
     def test_get_datasets(self):
         dids = [1, 2]
@@ -297,7 +294,7 @@ class TestOpenMLDataset(TestBase):
             'oml:md5_checksum': 'abc',
             'oml:url': 'https://www.openml.org/data/download/61',
         }
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             OpenMLHashException,
             'Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded dataset 5 '
             'is unequal to the checksum abc sent by the server.',
@@ -332,7 +329,7 @@ class TestOpenMLDataset(TestBase):
     @mock.patch('openml.datasets.functions._get_dataset_arff')
     def test_deletion_of_cache_dir_faulty_download(self, patch):
         patch.side_effect = Exception('Boom!')
-        self.assertRaisesRegexp(Exception, 'Boom!', openml.datasets.get_dataset,
+        self.assertRaisesRegex(Exception, 'Boom!', openml.datasets.get_dataset,
                                 1)
         datasets_cache_dir = os.path.join(
             self.workdir, 'org', 'openml', 'test', 'datasets'

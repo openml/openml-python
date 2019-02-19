@@ -1,7 +1,6 @@
 from time import time
 
 import numpy as np
-import six
 from scipy import sparse
 from warnings import filterwarnings, catch_warnings
 
@@ -33,7 +32,7 @@ class OpenMLDatasetTest(TestBase):
         rval, attribute_names = self.dataset.get_data(
             return_attribute_names=True)
         self.assertEqual(len(attribute_names), 39)
-        self.assertTrue(all([isinstance(att, six.string_types)
+        self.assertTrue(all([isinstance(att, str)
                              for att in attribute_names]))
 
     def test_get_data_with_rowid(self):
@@ -170,7 +169,7 @@ class OpenMLDatasetTestSparse(TestBase):
             return_attribute_names=True)
         self.assertTrue(sparse.issparse(rval))
         self.assertEqual(len(attribute_names), 20001)
-        self.assertTrue(all([isinstance(att, six.string_types)
+        self.assertTrue(all([isinstance(att, str)
                              for att in attribute_names]))
 
     def test_get_sparse_dataset_with_rowid(self):
