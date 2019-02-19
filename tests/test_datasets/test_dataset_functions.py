@@ -209,9 +209,12 @@ class TestOpenMLDataset(TestBase):
         active = openml.datasets.check_datasets_active([1, 17])
         self.assertTrue(active[1])
         self.assertFalse(active[17])
-        self.assertRaisesRegex(ValueError, 'Could not find dataset 79 in OpenML'
-                                            ' dataset list.',
-                                openml.datasets.check_datasets_active, [79])
+        self.assertRaisesRegex(
+            ValueError,
+            'Could not find dataset 79 in OpenML dataset list.',
+            openml.datasets.check_datasets_active,
+            [79],
+        )
 
     def test_get_datasets(self):
         dids = [1, 2]

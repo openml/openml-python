@@ -18,7 +18,7 @@ class TestFlowFunctions(TestBase):
         # There are some runs on openml.org that can have an empty external
         # version
         self.assertTrue(isinstance(flow['external_version'], str)
-                        or flow['external_version'] is None)
+                        or flow['external_version'] is None)  # noqa W503
 
     def test_list_flows(self):
         openml.config.server = self.production_server
@@ -164,7 +164,7 @@ class TestFlowFunctions(TestBase):
             ValueError,
             r"values for attribute 'parameters' differ: "
             r"'OrderedDict\(\[\('a', 5\), \('b', 6\)\]\)'\nvs\n"
-            "'OrderedDict\(\[\('a', 7\), \('b', 6\)\]\)'",
+            r"'OrderedDict\(\[\('a', 7\), \('b', 6\)\]\)'",
             openml.flows.functions.assert_flows_equal,
             flow, new_flow,
         )
