@@ -25,9 +25,12 @@ class TestTask(TestBase):
 
     def test__get_cached_task_not_cached(self):
         openml.config.cache_directory = self.static_cache_dir
-        self.assertRaisesRegex(OpenMLCacheException,
-                                'Task file for tid 2 not cached',
-                                openml.tasks.functions._get_cached_task, 2)
+        self.assertRaisesRegex(
+            OpenMLCacheException,
+            'Task file for tid 2 not cached',
+            openml.tasks.functions._get_cached_task,
+            2,
+        )
 
     def test__get_estimation_procedure_list(self):
         estimation_procedures = openml.tasks.functions.\

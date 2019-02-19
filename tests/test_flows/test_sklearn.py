@@ -1095,8 +1095,12 @@ class TestSklearn(TestBase):
         msg = 'Flow sklearn.linear_model.logistic.LogisticRegression has no ' \
               'flow_id!'
 
-        self.assertRaisesRegex(ValueError, msg,
-                                openml.flows.obtain_parameter_values, flow)
+        self.assertRaisesRegex(
+            ValueError,
+            msg,
+            openml.flows.obtain_parameter_values,
+            flow,
+        )
 
         model = sklearn.ensemble.AdaBoostClassifier(
             base_estimator=sklearn.linear_model.LogisticRegression(
@@ -1105,8 +1109,12 @@ class TestSklearn(TestBase):
         )
         flow = sklearn_to_flow(model)
         flow.flow_id = 1
-        self.assertRaisesRegex(ValueError, msg,
-                                openml.flows.obtain_parameter_values, flow)
+        self.assertRaisesRegex(
+            ValueError,
+            msg,
+            openml.flows.obtain_parameter_values,
+            flow,
+        )
 
     def test_obtain_parameter_values(self):
 

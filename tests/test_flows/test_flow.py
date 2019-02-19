@@ -172,17 +172,23 @@ class TestFlow(TestBase):
                                 'flow already exists', flow.publish)
 
     def test_publish_flow_with_similar_components(self):
-        clf = sklearn.ensemble.VotingClassifier(
-            [('lr', sklearn.linear_model.LogisticRegression(solver='lbfgs'))])
+        clf = sklearn.ensemble.VotingClassifier([
+            ('lr', sklearn.linear_model.LogisticRegression(solver='lbfgs')),
+        ])
         flow = openml.flows.sklearn_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.publish()
         # For a flow where both components are published together, the upload
         # date should be equal
-        self.assertEqual(flow.upload_date,
-                         flow.components['lr'].upload_date,
-                         (flow.name, flow.flow_id,
-                          flow.components['lr'].name, flow.components['lr'].flow_id))
+        self.assertEqual(
+            flow.upload_date,
+            flow.components['lr'].upload_date,
+            msg=(
+                flow.name,
+                flow.flow_id,
+                flow.components['lr'].name, flow.components['lr'].flow_id,
+            ),
+        )
 
         clf1 = sklearn.tree.DecisionTreeClassifier(max_depth=2)
         flow1 = openml.flows.sklearn_to_flow(clf1)

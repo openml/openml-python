@@ -1111,13 +1111,19 @@ class TestRun(TestBase):
         flow = sklearn_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.flow_id = -1
-        expected_message_regex = 'flow.flow_id is not None, but the flow ' \
-                                 'does not exist on the server according to ' \
-                                 'flow_exists'
-        self.assertRaisesRegex(ValueError, expected_message_regex,
-                                openml.runs.run_flow_on_task,
-                                task=task, flow=flow,
-                                avoid_duplicate_runs=False)
+        expected_message_regex = (
+            'flow.flow_id is not None, but the flow '
+            'does not exist on the server according to '
+            'flow_exists'
+        )
+        self.assertRaisesRegex(
+            ValueError,
+            expected_message_regex,
+            openml.runs.run_flow_on_task,
+            task=task,
+            flow=flow,
+            avoid_duplicate_runs=False,
+        )
 
     def test_run_with_illegal_flow_id_1(self):
         # Check the case where the user adds an illegal flow id to an existing
