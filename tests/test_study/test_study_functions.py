@@ -25,10 +25,10 @@ class TestStudyFunctions(TestBase):
         self.assertGreater(len(study.tasks), 0)
         # note that other entities are None, even though this study has
         # datasets
-        self.assertNone(study.data)
-        self.assertNone(study.flows)
-        self.assertNone(study.setups)
-        self.assertNone(study.runs)
+        self.assertIsNone(study.data)
+        self.assertIsNone(study.flows)
+        self.assertIsNone(study.setups)
+        self.assertIsNone(study.runs)
     
     def test_publish_benchmark_suite(self):
         fixture_alias = None
@@ -51,9 +51,9 @@ class TestStudyFunctions(TestBase):
         self.assertEqual(study_downloaded.name, fixture_name)
         self.assertEqual(study_downloaded.description, fixture_descr)
         # verify resources
-        self.assertNone(study_downloaded.flows)
-        self.assertNone(study_downloaded.setups)
-        self.assertNone(study_downloaded.runs)
+        self.assertIsNone(study_downloaded.flows)
+        self.assertIsNone(study_downloaded.setups)
+        self.assertIsNone(study_downloaded.runs)
         self.assertGreater(len(study_downloaded.data), 0)
         self.assertLessEqual(len(study_downloaded.data), len(fixture_task_ids))
         self.assertSetEqual(set(study_downloaded.tasks), set(fixture_task_ids))
