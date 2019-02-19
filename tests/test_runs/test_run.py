@@ -5,15 +5,11 @@ from time import time
 
 from sklearn.dummy import DummyClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, StratifiedKFold
+from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Imputer
 
 from openml.testing import TestBase
-from openml.flows.sklearn_converter import sklearn_to_flow
-from openml import OpenMLRun
 import openml
 
 
@@ -38,21 +34,27 @@ class TestRun(TestBase):
         self.assertEqual(len(run_list), 0)
 
     def _test_run_obj_equals(self, run, run_prime):
-        for dictionary in ['evaluations', 'fold_evaluations', 'sample_evaluations']:
+        for dictionary in ['evaluations', 'fold_evaluations',
+                           'sample_evaluations']:
             if getattr(run, dictionary) is not None:
-                self.assertDictEqual(getattr(run, dictionary), getattr(run_prime, dictionary))
+                self.assertDictEqual(getattr(run, dictionary),
+                                     getattr(run_prime, dictionary))
             else:
                 # should be none or empty
                 other = getattr(run_prime, dictionary)
                 if other is not None:
                     self.assertDictEqual(other, dict())
-        self.assertEqual(run._create_description_xml(), run_prime._create_description_xml())
+        self.assertEqual(run._create_description_xml(),
+                         run_prime._create_description_xml())
 
-        numeric_part = np.array(np.array(run.data_content)[:, 0:-2], dtype=float)
-        numeric_part_prime = np.array(np.array(run_prime.data_content)[:, 0:-2], dtype=float)
+        numeric_part = \
+            np.array(np.array(run.data_content)[:, 0:-2], dtype=float)
+        numeric_part_prime = \
+            np.array(np.array(run_prime.data_content)[:, 0:-2], dtype=float)
         string_part = np.array(run.data_content)[:, -2:]
         string_part_prime = np.array(run_prime.data_content)[:, -2:]
-        # JvR: Python 2.7 requires an almost equal check, rather than an equals check
+        # JvR: Python 2.7 requires an almost equal check,
+        # rather than an equals check
         np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
         np.testing.assert_array_equal(string_part, string_part_prime)
 
@@ -92,6 +94,7 @@ class TestRun(TestBase):
                 self.assertIn(bpp, ['true', 'false'])
             string_part = np.array(run_trace_content)[:, 5:]
             string_part_prime = np.array(run_prime_trace_content)[:, 5:]
+
             # JvR: Python 2.7 requires an almost equal check, rather than an
             # equals check
             np.testing.assert_array_almost_equal(int_part, int_part_prime)
@@ -111,6 +114,7 @@ class TestRun(TestBase):
             model=model,
             task=task,
             add_local_measures=False,
+            avoid_duplicate_runs=False,
         )
 
         cache_path = os.path.join(
@@ -142,6 +146,7 @@ class TestRun(TestBase):
             model,
             task,
             add_local_measures=False,
+            avoid_duplicate_runs=False,
         )
 
         cache_path = os.path.join(
