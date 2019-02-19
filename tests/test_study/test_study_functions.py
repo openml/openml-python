@@ -22,10 +22,13 @@ class TestStudyFunctions(TestBase):
         study_id = 14
 
         study = openml.study.get_study(study_id, 'tasks')
-        self.assertEqual(study.data, None)
         self.assertGreater(len(study.tasks), 0)
-        self.assertEqual(study.flows, None)
-        self.assertEqual(study.setups, None)
+        # note that other entities are None, even though this study has
+        # datasets
+        self.assertNone(study.data)
+        self.assertNone(study.flows)
+        self.assertNone(study.setups)
+        self.assertNone(study.runs)
     
     def test_publish_benchmark_suite(self):
         fixture_alias = None
@@ -48,9 +51,9 @@ class TestStudyFunctions(TestBase):
         self.assertEqual(study_downloaded.name, fixture_name)
         self.assertEqual(study_downloaded.description, fixture_descr)
         # verify resources
-        self.assertEqual(study_downloaded.flows, None)
-        self.assertEqual(study_downloaded.setups, None)
-        self.assertEqual(study_downloaded.runs, None)
+        self.assertNone(study_downloaded.flows)
+        self.assertNone(study_downloaded.setups)
+        self.assertNone(study_downloaded.runs)
         self.assertGreater(len(study_downloaded.data), 0)
         self.assertLessEqual(len(study_downloaded.data), len(fixture_task_ids))
         self.assertSetEqual(set(study_downloaded.tasks), set(fixture_task_ids))
@@ -75,6 +78,7 @@ class TestStudyFunctions(TestBase):
     def test_publish_study(self):
         # get some random runs to attach
         run_list = openml.runs.list_runs(size=10)
+        self.assertEqual(len(run_list), 10)
         
         fixt_alias = None
         fixt_name = 'unit tested study'

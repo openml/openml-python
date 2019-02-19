@@ -9,6 +9,20 @@ def get_study(study_id, knowledge_type=None):
     Retrieves all relevant information of an OpenML study from the server
     Note that some of the (data, tasks, flows, setups) fields can be empty
     (depending on information on the server)
+    
+    Parameters
+    ----------
+    study id : int, str
+        study id (numeric or alias)
+    
+    knowledge_type : str (optional)
+        Which knowledge type to return. Either {data, tasks, flows, setups,
+        runs}. Give None to return all knowledge types. 
+    
+    Return
+    ------
+    OpenMLStudy
+        The OpenML study object
     """
     call_suffix = "study/%s" % str(study_id)
     if knowledge_type is not None:
@@ -83,8 +97,9 @@ def get_study(study_id, knowledge_type=None):
 
 def create_study(alias, benchmark_suite, name, description, run_ids):
     """
-    Creates an OpenML study (collection of knowledge types, where the runs
-    are the linked entity)
+    Creates an OpenML study (collection of data, tasks, flows, setups and run),
+    where the runs are the main entity (collection consists of runs and all 
+    entities (flows, tasks, etc) that are related to these runs)
     
     Parameters:
     -----------
