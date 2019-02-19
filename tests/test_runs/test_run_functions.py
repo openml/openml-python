@@ -102,7 +102,7 @@ class TestRun(TestBase):
                 val_1 = predictions['data'][idx][col_idx]
                 val_2 = predictions_prime['data'][idx][col_idx]
                 if type(val_1) == float or type(val_2) == float:
-                    self.assertAlmostEqual(float(val_1), float(val_2))
+                    self.assertAlmostEqual(float(val_1), float(val_2), places=6)
                 else:
                     self.assertEqual(val_1, val_2)
 

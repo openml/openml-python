@@ -6,7 +6,6 @@ import time
 import unittest
 
 from oslo_concurrency import lockutils
-import six
 
 import openml
 
@@ -112,7 +111,7 @@ class TestBase(unittest.TestCase):
         self.assertIn('did', dataset)
         self.assertIsInstance(dataset['did'], int)
         self.assertIn('status', dataset)
-        self.assertIsInstance(dataset['status'], six.string_types)
+        self.assertIsInstance(dataset['status'], str)
         self.assertIn(dataset['status'], ['in_preparation', 'active',
                                           'deactivated'])
 

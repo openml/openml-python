@@ -1,17 +1,12 @@
 from collections import namedtuple, OrderedDict
 import os
-import six
+import pickle
 
 import numpy as np
 import scipy.io.arff
-from six.moves import cPickle as pickle
 
 
 Split = namedtuple("Split", ["train", "test"])
-
-
-if six.PY2:
-    FileNotFoundError = IOError
 
 
 class OpenMLSplit(object):
@@ -28,7 +23,8 @@ class OpenMLSplit(object):
             for fold in split[repetition]:
                 self.split[repetition][fold] = OrderedDict()
                 for sample in split[repetition][fold]:
-                    self.split[repetition][fold][sample] = split[repetition][fold][sample]
+                    self.split[repetition][fold][sample] = split[
+                        repetition][fold][sample]
 
         self.repeats = len(self.split)
         if any([len(self.split[0]) != len(self.split[i])
@@ -66,10 +62,7 @@ class OpenMLSplit(object):
 
         repetitions = None
 
-        if six.PY2:
-            pkl_filename = filename.replace(".arff", ".pkl.py2")
-        else:
-            pkl_filename = filename.replace(".arff", ".pkl.py3")
+        pkl_filename = filename.replace(".arff", ".pkl.py3")
 
         if os.path.exists(pkl_filename):
             with open(pkl_filename, "rb") as fh:
@@ -81,7 +74,9 @@ class OpenMLSplit(object):
         if repetitions is None:
             # Faster than liac-arff and sufficient in this situation!
             if not os.path.exists(filename):
-                raise FileNotFoundError('Split arff %s does not exist!' % filename)
+                raise FileNotFoundError(
+                    'Split arff %s does not exist!' % filename
+                )
             splits, meta = scipy.io.arff.loadarff(filename)
             name = meta.name
 
@@ -91,7 +86,11 @@ class OpenMLSplit(object):
             rowid_idx = meta._attrnames.index('rowid')
             repeat_idx = meta._attrnames.index('repeat')
             fold_idx = meta._attrnames.index('fold')
-            sample_idx = (meta._attrnames.index('sample') if 'sample' in meta._attrnames else None) # can be None
+            sample_idx = (
+                meta._attrnames.index('sample')
+                if 'sample' in meta._attrnames
+                else None
+            ) # can be None
 
             for line in splits:
                 # A line looks like type, rowid, repeat, fold

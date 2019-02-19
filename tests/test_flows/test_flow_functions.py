@@ -1,8 +1,5 @@
 from collections import OrderedDict
 import copy
-import unittest
-
-import six
 
 import openml
 from openml.testing import TestBase
@@ -15,12 +12,12 @@ class TestFlowFunctions(TestBase):
         self.assertEqual(type(flow), dict)
         self.assertEqual(len(flow), 6)
         self.assertIsInstance(flow['id'], int)
-        self.assertIsInstance(flow['name'], six.string_types)
-        self.assertIsInstance(flow['full_name'], six.string_types)
-        self.assertIsInstance(flow['version'], six.string_types)
+        self.assertIsInstance(flow['name'], str)
+        self.assertIsInstance(flow['full_name'], str)
+        self.assertIsInstance(flow['version'], str)
         # There are some runs on openml.org that can have an empty external
         # version
-        self.assertTrue(isinstance(flow['external_version'], six.string_types) or
+        self.assertTrue(isinstance(flow['external_version'], str) or
                         flow['external_version'] is None)
 
     def test_list_flows(self):
@@ -37,7 +34,9 @@ class TestFlowFunctions(TestBase):
         openml.config.server = self.production_server
         flows = openml.flows.list_flows(tag='NoOneEverUsesThisTag123')
         if len(flows) > 0:
-            raise ValueError('UnitTest Outdated, got somehow results (please adapt)')
+            raise ValueError(
+                'UnitTest Outdated, got somehow results (please adapt)'
+            )
 
         self.assertIsInstance(flows, dict)
 
@@ -51,8 +50,8 @@ class TestFlowFunctions(TestBase):
     def test_list_flows_paginate(self):
         openml.config.server = self.production_server
         size = 10
-        max = 100
-        for i in range(0, max, size):
+        maximum = 100
+        for i in range(0, maximum, size):
             flows = openml.flows.list_flows(offset=i, size=size)
             self.assertGreaterEqual(size, len(flows))
             for did in flows:
@@ -83,9 +82,16 @@ class TestFlowFunctions(TestBase):
                                      ('custom_name', 'Tes')]:
             new_flow = copy.deepcopy(flow)
             setattr(new_flow, attribute, new_value)
-            self.assertNotEqual(getattr(flow, attribute), getattr(new_flow, attribute))
-            self.assertRaises(ValueError, openml.flows.functions.assert_flows_equal,
-                              flow, new_flow)
+            self.assertNotEqual(
+                getattr(flow, attribute),
+                getattr(new_flow, attribute),
+            )
+            self.assertRaises(
+                ValueError,
+                openml.flows.functions.assert_flows_equal,
+                flow,
+                new_flow,
+            )
 
         # Test that the API ignores several keys when comparing flows
         openml.flows.functions.assert_flows_equal(flow, flow)
@@ -100,7 +106,10 @@ class TestFlowFunctions(TestBase):
                                      ('tags', ['abc', 'de'])]:
             new_flow = copy.deepcopy(flow)
             setattr(new_flow, attribute, new_value)
-            self.assertNotEqual(getattr(flow, attribute), getattr(new_flow, attribute))
+            self.assertNotEqual(
+                getattr(flow, attribute),
+                getattr(new_flow, attribute),
+            )
             openml.flows.functions.assert_flows_equal(flow, new_flow)
 
         # Now test for parameters
@@ -130,18 +139,20 @@ class TestFlowFunctions(TestBase):
         paramaters = OrderedDict((('a', 5), ('b', 6)))
         parameters_meta_info = OrderedDict((('a', None), ('b', None)))
 
-        flow = openml.flows.OpenMLFlow(name='Test',
-                                       description='Test flow',
-                                       model=None,
-                                       components=OrderedDict(),
-                                       parameters=paramaters,
-                                       parameters_meta_info=parameters_meta_info,
-                                       external_version='1',
-                                       tags=['abc', 'def'],
-                                       language='English',
-                                       dependencies='abc',
-                                       class_name='Test',
-                                       custom_name='Test')
+        flow = openml.flows.OpenMLFlow(
+            name='Test',
+            description='Test flow',
+            model=None,
+            components=OrderedDict(),
+            parameters=paramaters,
+            parameters_meta_info=parameters_meta_info,
+            external_version='1',
+            tags=['abc', 'def'],
+            language='English',
+            dependencies='abc',
+            class_name='Test',
+            custom_name='Test',
+        )
 
         openml.flows.functions.assert_flows_equal(flow, flow)
         openml.flows.functions.assert_flows_equal(flow, flow,

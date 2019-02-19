@@ -1,15 +1,10 @@
 import collections
 import copy
+from distutils.version import LooseVersion
 import hashlib
 import re
-import sys
 import time
-from distutils.version import LooseVersion
-
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
+from unittest import mock
 
 import scipy.stats
 import sklearn

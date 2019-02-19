@@ -4,7 +4,6 @@ import os
 import re
 
 import numpy as np
-import six
 import arff
 import pandas as pd
 
@@ -12,7 +11,6 @@ import xmltodict
 from scipy.sparse import coo_matrix
 from oslo_concurrency import lockutils
 from collections import OrderedDict
-from warnings import warn
 
 import openml.utils
 import openml._api_calls
@@ -348,7 +346,7 @@ def get_dataset(dataset_id):
         except OpenMLServerException as e:
             # if there was an exception, check if the user had access to the dataset
             if e.code == 112:
-                six.raise_from(PrivateDatasetError(e.message), None)
+                raise PrivateDatasetError(e.message) from None
             else:
                 raise e
         finally:

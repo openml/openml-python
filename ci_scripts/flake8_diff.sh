@@ -38,6 +38,13 @@ echo "Remotes:"
 echo '--------------------------------------------------------------------------------'
 git remote --verbose
 
+echo "Travis variables:"
+echo '--------------------------------------------------------------------------------'
+echo "$TRAVIS"
+echo "$TRAVIS_BRANCH"
+echo "$TRAVIS_PULL_REQUEST"
+echo "$TRAVIS_REPO_SLUG"
+
 # Travis does the git clone with a limited depth (50 at the time of
 # writing). This may not be enough to find the common ancestor with
 # $REMOTE/develop so we unshallow the git checkout
@@ -48,6 +55,14 @@ if [[ -a .git/shallow ]]; then
 fi
 
 if [[ "$TRAVIS" == "true" ]]; then
+    if [[ "$TRAVIS_BRANCH" == "master" ]]
+    then
+        # We do not test PEP8 on the master branch (or for the PR test into
+        # master) as this results in failures which are only shown for the
+        # pull request to finish a release (development to master) and are
+        # therefore a pain to fix
+        exit 0
+    fi
     if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]
     then
         # In main repo, using TRAVIS_COMMIT_RANGE to test the commits

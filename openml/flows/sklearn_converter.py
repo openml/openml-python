@@ -9,7 +9,6 @@ import json
 import json.decoder
 import logging
 import re
-import six
 import warnings
 import sys
 
@@ -17,8 +16,7 @@ import numpy as np
 import scipy.stats.distributions
 import sklearn.base
 import sklearn.model_selection
-# Necessary to have signature available in python 2.7
-from sklearn.utils.fixes import signature
+from inspect import signature
 
 import openml
 from openml.flows import OpenMLFlow
@@ -46,7 +44,7 @@ def sklearn_to_flow(o, parent_model=None):
         rval = [sklearn_to_flow(element, parent_model) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif isinstance(o, (bool, int, float, six.string_types)) or o is None:
+    elif isinstance(o, (bool, int, float, str)) or o is None:
         # base parameter values
         rval = o
     elif isinstance(o, dict):
@@ -56,7 +54,7 @@ def sklearn_to_flow(o, parent_model=None):
 
         rval = OrderedDict()
         for key, value in o.items():
-            if not isinstance(key, six.string_types):
+            if not isinstance(key, str):
                 raise TypeError('Can only use string as keys, you passed '
                                 'type %s for value %s.' %
                                 (type(key), str(key)))
@@ -104,7 +102,7 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False,
         parameter value that is accepted by)
 
     components : dict
-    
+
 
     initialize_with_defaults : bool, optional (default=False)
         If this flag is set, the hyperparameter values of flows will be
@@ -129,7 +127,7 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False,
     # json strings for parameters, we make sure that we can flow_to_sklearn
     # the parameter values to the correct type.
 
-    if isinstance(o, six.string_types):
+    if isinstance(o, str):
         try:
             o = json.loads(o)
         except JSONDecodeError:
@@ -191,7 +189,7 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False,
                                 depth_pp) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif isinstance(o, (bool, int, float, six.string_types)) or o is None:
+    elif isinstance(o, (bool, int, float, str)) or o is None:
         rval = o
     elif isinstance(o, OpenMLFlow):
         rval = _deserialize_model(o,
@@ -327,7 +325,7 @@ def obtain_parameter_values(flow):
 
                     subcomponent_identifier = subcomponent[0]
                     subcomponent_flow = subcomponent[1]
-                    if not isinstance(subcomponent_identifier, six.string_types):
+                    if not isinstance(subcomponent_identifier, str):
                         raise TypeError('Subcomponent identifier should be '
                                         'string')
                     if not isinstance(subcomponent_flow,

@@ -1,12 +1,5 @@
 import os
-import sys
-
-import six
-
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
+from unittest import mock
 
 from openml.testing import TestBase
 from openml import OpenMLSplit, OpenMLTask
@@ -55,7 +48,7 @@ class TestTask(TestBase):
         self.assertIn('did', task)
         self.assertIsInstance(task['did'], int)
         self.assertIn('status', task)
-        self.assertIsInstance(task['status'], six.string_types)
+        self.assertIsInstance(task['status'], str)
         self.assertIn(task['status'],
                       ['in_preparation', 'active', 'deactivated'])
 

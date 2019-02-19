@@ -4,9 +4,9 @@ Stores module level information like the API key, cache directory and the server
 import logging
 import os
 
-from six import StringIO
-from six.moves import configparser
-from six.moves.urllib_parse import urlparse
+from io import StringIO
+import configparser
+from urllib.parse import urlparse
 
 
 logger = logging.getLogger(__name__)

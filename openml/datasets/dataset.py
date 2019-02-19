@@ -2,14 +2,13 @@ import gzip
 import io
 import logging
 import os
+import pickle
 from collections import OrderedDict
 
 import arff
 import numpy as np
 import scipy.sparse
 import xmltodict
-import six
-from six.moves import cPickle as pickle
 from warnings import warn
 
 import openml._api_calls
@@ -122,7 +121,7 @@ class OpenMLDataset(object):
         self.default_target_attribute = default_target_attribute
         self.row_id_attribute = row_id_attribute
         self.ignore_attributes = None
-        if isinstance(ignore_attribute, six.string_types):
+        if isinstance(ignore_attribute, str):
             self.ignore_attributes = [ignore_attribute]
         elif isinstance(ignore_attribute, list):
             self.ignore_attributes = ignore_attribute
@@ -159,10 +158,7 @@ class OpenMLDataset(object):
 
         if data_file is not None:
             if self._data_features_supported():
-                if six.PY2:
-                    self.data_pickle_file = data_file.replace('.arff', '.pkl.py2')
-                else:
-                    self.data_pickle_file = data_file.replace('.arff', '.pkl.py3')
+                self.data_pickle_file = data_file.replace('.arff', '.pkl.py3')
 
                 if os.path.exists(self.data_pickle_file):
                     logger.debug("Data pickle file already exists.")
@@ -327,7 +323,7 @@ class OpenMLDataset(object):
             if not self.row_id_attribute:
                 pass
             else:
-                if isinstance(self.row_id_attribute, six.string_types):
+                if isinstance(self.row_id_attribute, str):
                     to_exclude.append(self.row_id_attribute)
                 else:
                     to_exclude.extend(self.row_id_attribute)
@@ -336,7 +332,7 @@ class OpenMLDataset(object):
             if not self.ignore_attributes:
                 pass
             else:
-                if isinstance(self.ignore_attributes, six.string_types):
+                if isinstance(self.ignore_attributes, str):
                     to_exclude.append(self.ignore_attributes)
                 else:
                     to_exclude.extend(self.ignore_attributes)
@@ -354,7 +350,7 @@ class OpenMLDataset(object):
         if target is None:
             rval.append(data)
         else:
-            if isinstance(target, six.string_types):
+            if isinstance(target, str):
                 if ',' in target:
                     target = target.split(',')
                 else:
@@ -368,7 +364,7 @@ class OpenMLDataset(object):
                 )
             target_categorical = [
                 cat for cat, column in
-                six.moves.zip(categorical, attribute_names)
+                zip(categorical, attribute_names)
                 if column in target
             ]
             target_dtype = int if target_categorical[0] else float
@@ -475,7 +471,7 @@ class OpenMLDataset(object):
             if not isinstance(self.ignore_attributes, list):
                 raise TypeError("ignore_attributes should be a list")
         if self.row_id_attribute is not None:
-            if not isinstance(self.row_id_attribute, six.string_types):
+            if not isinstance(self.row_id_attribute, str):
                 raise TypeError("row id attribute should be a str")
         if exclude is not None:
             if not isinstance(exclude, list):

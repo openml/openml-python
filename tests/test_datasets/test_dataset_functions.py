@@ -1,22 +1,16 @@
 import unittest
 import os
-import sys
 import random
 from itertools import product
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
+from unittest import mock
 
 import arff
-import six
 
 import pytest
 import numpy as np
 import pandas as pd
 import scipy.sparse
 from oslo_concurrency import lockutils
-from warnings import filterwarnings, catch_warnings
 
 import openml
 from openml import OpenMLDataset
@@ -138,7 +132,7 @@ class TestOpenMLDataset(TestBase):
             self.assertIn('did', dataset)
             self.assertIsInstance(dataset['did'], int)
             self.assertIn('status', dataset)
-            self.assertIsInstance(dataset['status'], six.string_types)
+            self.assertIsInstance(dataset['status'], str)
             self.assertIn(dataset['status'], ['in_preparation', 'active',
                                               'deactivated'])
     def _check_datasets(self, datasets):
