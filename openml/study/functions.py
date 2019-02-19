@@ -15,9 +15,9 @@ def get_study(study_id, knowledge_type=None):
         call_suffix += "/" + knowledge_type
     xml_string = openml._api_calls._perform_api_call(call_suffix, 'get')
     force_list_tags = (
-            'oml:data_id', 'oml:flow_id', 'oml:task_id', 
+            'oml:data_id', 'oml:flow_id', 'oml:task_id',
             'oml:setup_id', 'oml:run_id',
-            'oml:tag'  # legacy. 
+            'oml:tag'  # legacy.
     )
     result_dict = xmltodict.parse(xml_string, 
                                   force_list=force_list_tags)['oml:study']
@@ -185,15 +185,15 @@ def attach_to_study(study_id, entity_ids):
           runs (study)
         - provide task ids of existing tasks if the main knowledge type is
           tasks (benchmark suite)
-    
+
     Parameters
     ----------
     study_id : int
         OpenML id of the study
-    
+
     entity_ids : list (int)
         List of entities to link to the collection
-    
+
     Returns
     -------
     int
@@ -201,11 +201,12 @@ def attach_to_study(study_id, entity_ids):
     """
     uri = 'study/%d/attach' % study_id
     post_variables = {'ids': ','.join(str(x) for x in entity_ids)}
-    result_xml = openml._api_calls._perform_api_call(uri, 
-                                                     'post', 
+    result_xml = openml._api_calls._perform_api_call(uri,
+                                                     'post',
                                                      post_variables)
     result = xmltodict.parse(result_xml)['oml:study_attach']
     return int(result['oml:linked_entities'])
+
 
 def detach_from_study(study_id, entity_ids):
     """
@@ -214,15 +215,15 @@ def detach_from_study(study_id, entity_ids):
           runs (study)
         - provide task ids of existing tasks if the main knowledge type is
           tasks (benchmark suite)
-    
+
     Parameters
     ----------
     study_id : int
         OpenML id of the study
-    
+
     entity_ids : list (int)
         List of entities to link to the collection
-    
+
     Returns
     -------
     int
@@ -230,8 +231,8 @@ def detach_from_study(study_id, entity_ids):
     """
     uri = 'study/%d/detach' % study_id
     post_variables = {'ids': ','.join(str(x) for x in entity_ids)}
-    result_xml = openml._api_calls._perform_api_call(uri, 
-                                                     'post', 
+    result_xml = openml._api_calls._perform_api_call(uri,
+                                                     'post',
                                                      post_variables)
     result = xmltodict.parse(result_xml)['oml:study_detach']
     return int(result['oml:linked_entities'])

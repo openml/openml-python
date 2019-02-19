@@ -60,14 +60,14 @@ class TestStudyFunctions(TestBase):
         openml.study.attach_to_study(study_id, tasks_additional)
         study_downloaded = openml.study.get_study(study_id)
         # verify again
-        self.assertSetEqual(set(study_downloaded.tasks), 
+        self.assertSetEqual(set(study_downloaded.tasks),
                             set(fixture_task_ids + tasks_additional))
         # test detach function
         openml.study.detach_from_study(study_id, fixture_task_ids)
         study_downloaded = openml.study.get_study(study_id)
-        self.assertSetEqual(set(study_downloaded.tasks), 
+        self.assertSetEqual(set(study_downloaded.tasks),
                             set(tasks_additional))
-        
+
         # test delete function
         result = openml.study.delete_study(study_id)
         self.assertTrue(result)
@@ -104,20 +104,20 @@ class TestStudyFunctions(TestBase):
         
         # attach more runs
         run_list_additional = openml.runs.list_runs(size=10, offset=10)
-        openml.study.attach_to_study(study_id, 
+        openml.study.attach_to_study(study_id,
                                      list(run_list_additional.keys()))
         study_downloaded = openml.study.get_study(study_id)
         # verify again
-        self.assertSetEqual(set(study_downloaded.runs), 
-                            set(run_list_additional.keys()) | 
+        self.assertSetEqual(set(study_downloaded.runs),
+                            set(run_list_additional.keys()) | \
                             set(run_list.keys()))
         
         # test detach function
         openml.study.detach_from_study(study_id, list(run_list.keys()))
         study_downloaded = openml.study.get_study(study_id)
-        self.assertSetEqual(set(study_downloaded.runs), 
+        self.assertSetEqual(set(study_downloaded.runs),
                             set(run_list_additional.keys()))
-        
+
         # test delete function
         result = openml.study.delete_study(study_id)
         self.assertTrue(result)
