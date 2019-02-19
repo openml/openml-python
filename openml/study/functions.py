@@ -15,9 +15,9 @@ def get_study(study_id, knowledge_type=None):
         call_suffix += "/" + knowledge_type
     xml_string = openml._api_calls._perform_api_call(call_suffix, 'get')
     force_list_tags = (
-            'oml:data_id', 'oml:flow_id', 'oml:task_id',
-            'oml:setup_id', 'oml:run_id',
-            'oml:tag'  # legacy.
+        'oml:data_id', 'oml:flow_id', 'oml:task_id', 'oml:setup_id',
+        'oml:run_id',
+        'oml:tag'  # legacy.
     )
     result_dict = xmltodict.parse(xml_string, 
                                   force_list=force_list_tags)['oml:study']
