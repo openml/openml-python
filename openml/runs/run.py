@@ -202,7 +202,7 @@ class OpenMLRun(object):
             arff_dict['attributes'] = [('repeat', 'NUMERIC'),
                                        ('fold', 'NUMERIC'),
                                        ('sample', 'NUMERIC'),  # Legacy
-                                       # ('row_id', 'NUMERIC')] + \
+                                       ('row_id', 'NUMERIC')] + \
                                       [('confidence.' + class_labels[i],
                                         'NUMERIC') for i in
                                        range(len(class_labels))] + \
