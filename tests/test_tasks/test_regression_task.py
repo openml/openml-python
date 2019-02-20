@@ -3,19 +3,26 @@ import numpy as np
 from tests.test_tasks import OpenMLSupervisedTaskTest
 
 
-class OpenMLRegressionTest(OpenMLSupervisedTaskTest):
+class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
 
     def setUp(self):
 
-        super(OpenMLRegressionTest, self).setUp()
+        super(OpenMLRegressionTaskTest, self).setUp()
         self.task_id = 625
-        self.estimation_procedure = 12
+        self.estimation_procedure = 9
 
     def test_get_X_and_Y(self):
 
-        X, Y = super(OpenMLRegressionTest, self).test_get_X_and_Y()
+        X, Y = super(OpenMLRegressionTaskTest, self).test_get_X_and_Y()
         self.assertEqual((194, 32), X.shape)
         self.assertIsInstance(X, np.ndarray)
         self.assertEqual((194,), Y.shape)
         self.assertIsInstance(Y, np.ndarray)
         self.assertEqual(Y.dtype, float)
+
+    def test_download_task(self):
+
+        task = super(OpenMLRegressionTaskTest, self).test_download_task()
+        self.assertEqual(task.task_id, self.task_id)
+        self.assertEqual(task.task_type_id, 2)
+        self.assertEqual(task.dataset_id, 105)

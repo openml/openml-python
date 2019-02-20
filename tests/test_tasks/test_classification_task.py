@@ -3,16 +3,16 @@ import numpy as np
 from tests.test_tasks import OpenMLSupervisedTaskTest
 
 
-class OpenMLClassificationTest(OpenMLSupervisedTaskTest):
+class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
 
     def setUp(self):
 
-        super(OpenMLClassificationTest, self).setUp()
+        super(OpenMLClassificationTaskTest, self).setUp()
         self.task_id = 11
 
     def test_get_X_and_Y(self):
 
-        X, Y = super(OpenMLClassificationTest, self).test_get_X_and_Y()
+        X, Y = super(OpenMLClassificationTaskTest, self).test_get_X_and_Y()
         self.assertEqual((3196, 36), X.shape)
         self.assertIsInstance(X, np.ndarray)
         self.assertEqual((3196, ), Y.shape)
@@ -21,7 +21,7 @@ class OpenMLClassificationTest(OpenMLSupervisedTaskTest):
 
     def test_download_task(self):
 
-        task = super(OpenMLClassificationTest, self).test_download_task()
+        task = super(OpenMLClassificationTaskTest, self).test_download_task()
         self.assertEqual(task.task_id, self.task_id)
         self.assertEqual(task.task_type_id, 1)
-        self.assertEqual(task.dataset_id, 11)
+        self.assertEqual(task.dataset_id, 2)

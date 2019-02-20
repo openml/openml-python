@@ -3,7 +3,9 @@ import unittest
 import openml
 from tests.test_tasks import OpenMLTaskTest
 
-
+# Helper class
+# The test methods in this class
+# are not supposed to be executed.
 class OpenMLSupervisedTaskTest(OpenMLTaskTest):
     # task id will be set from the
     # extending classes

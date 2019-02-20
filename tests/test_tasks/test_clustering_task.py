@@ -4,11 +4,11 @@ from openml.exceptions import OpenMLServerException
 from tests.test_tasks import OpenMLTaskTest
 
 
-class OpenMLClusteringTest(OpenMLTaskTest):
+class OpenMLClusteringTaskTest(OpenMLTaskTest):
 
     def setUp(self):
 
-        super(OpenMLClusteringTest, self).setUp()
+        super(OpenMLClusteringTaskTest, self).setUp()
         # no clustering tasks on test server
         self.production_server = 'https://openml.org/api/v1/xml'
         self.test_server = 'https://test.openml.org/api/v1/xml'
@@ -20,6 +20,13 @@ class OpenMLClusteringTest(OpenMLTaskTest):
         task = openml.tasks.get_task(self.task_id)
         task.get_dataset()
 
+    def test_download_task(self):
+
+        task = super(OpenMLClusteringTaskTest, self).test_download_task()
+        self.assertEqual(task.task_id, self.task_id)
+        self.assertEqual(task.task_type_id, 5)
+        self.assertEqual(task.dataset_id, 77)
+
     # overriding the method from the base
     # class. Ugly workaround but currently
     # there are no clustering tasks on the
@@ -30,7 +37,10 @@ class OpenMLClusteringTest(OpenMLTaskTest):
 
         task = openml.tasks.get_task(self.task_id)
         openml.config.server = self.test_server
-        task.estimation_procedure_id = 23
+        # adding sentinel so we can have a new dataset
+        # hence a "new task" to upload
+        task.dataset_id = self._upload_dataset(task.dataset_id)
+        task.estimation_procedure_id = 17
         try:
             task.publish()
         except OpenMLServerException as e:
