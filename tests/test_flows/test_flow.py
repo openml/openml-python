@@ -113,7 +113,7 @@ class TestFlow(TestBase):
         # TODO maybe get this via get_flow(), which would have to be refactored to allow getting only the xml dictionary
         # TODO: no sklearn flows.
         for flow_id in [3, 5, 7, 9, ]:
-            flow_xml = _perform_api_call("flow/%d" % flow_id, 
+            flow_xml = _perform_api_call("flow/%d" % flow_id,
                                          request_method='get')
             flow_dict = xmltodict.parse(flow_xml)
 

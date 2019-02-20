@@ -18,7 +18,7 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
     call : str
         The API call. For example data/list
     request_method : str
-        The HTTP request method to perform the API call with. Legal values: 
+        The HTTP request method to perform the API call with. Legal values:
             - get (reading functions, api key optional)
             - post (writing functions, generaly require api key)
             - delete (deleting functions, require api key)
@@ -88,11 +88,10 @@ def _read_url_files(url, data=None, file_elements=None):
 
 
 def _read_url(url, request_method, data=None):
-
     data = {} if data is None else data
     if config.apikey is not None:
         data['api_key'] = config.apikey
-    
+
     response = send_request(request_method=request_method, url=url, data=data)
     if response.status_code != 200:
         raise _parse_server_exception(response, url=url)

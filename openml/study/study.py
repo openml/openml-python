@@ -5,19 +5,19 @@ import xmltodict
 
 class OpenMLStudy(object):
 
-    def __init__(self, study_id, alias, main_entity_type, benchmark_suite, 
-                 name, description, creation_date, creator, tags, data, tasks, 
+    def __init__(self, study_id, alias, main_entity_type, benchmark_suite,
+                 name, description, creation_date, creator, tags, data, tasks,
                  flows, setups, runs):
         """
         An OpenMLStudy represents the OpenML concept of a study. It contains
         the following information: name, id, description, creation date,
         creator id and a set of tags.
-    
+
         According to this list of tags, the study object receives a list of
         OpenML object ids (datasets, flows, tasks and setups).
-    
+
         Can be used to obtain all relevant information from a study at once.
-    
+
         Parameters
         ----------
         study_id : int
@@ -29,7 +29,7 @@ class OpenMLStudy(object):
             only entities of this type can be added explicitly
         benchmark_suite : int (optional)
             the benchmark suite (another study) upon which this study is ran.
-            can only be active if main entity type is runs. 
+            can only be active if main entity type is runs.
         name : str
             the name of the study (meta-info)
         description : str
@@ -67,7 +67,7 @@ class OpenMLStudy(object):
         self.setups = setups
         self.runs = runs
         pass
-    
+
     def publish(self):
         """
         Publish the study on the OpenML server.
@@ -86,7 +86,8 @@ class OpenMLStudy(object):
             'post',
             file_elements=file_elements,
         )
-        self.study_id = int(xmltodict.parse(return_value)['oml:study_upload']['oml:id'])
+        study_res = xmltodict.parse(return_value)
+        self.study_id = int(study_res['oml:study_upload']['oml:id'])
         return self.study_id
     
     def _to_xml(self):
@@ -107,24 +108,25 @@ class OpenMLStudy(object):
             'runs': 'run_id',
         }
 
-        data_container = collections.OrderedDict()
-        data_dict = collections.OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])
-        data_container['oml:study'] = data_dict
-        
+        study_container = collections.OrderedDict()
+        namespace_list = [('@xmlns:oml', 'http://openml.org/openml')]
+        study_dict = collections.OrderedDict(namespace_list)
+        study_container['oml:study'] = study_dict
+
         for prop_name in simple_props:
             content = getattr(self, prop_name, None)
             if content is not None:
-                data_dict["oml:" + prop_name] = content
+                study_dict["oml:" + prop_name] = content
         for prop_name, inner_name in complex_props.items():
             content = getattr(self, prop_name, None)
             if content is not None:
                 sub_dict = {
                     'oml:' + inner_name: content
                 }
-                data_dict["oml:" + prop_name] = sub_dict
+                study_dict["oml:" + prop_name] = sub_dict
 
         xml_string = xmltodict.unparse(
-            input_dict=data_container,
+            input_dict=study_container,
             pretty=True,
         )
         # A flow may not be uploaded with the xml encoding specification:

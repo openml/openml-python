@@ -398,12 +398,12 @@ class OpenMLRun(object):
         if self.trace is not None:
             trace_arff = arff.dumps(self.trace.trace_to_arff())
             file_elements['trace'] = ("trace.arff", trace_arff)
-        
+
         return_value = openml._api_calls._perform_api_call(
-                "/run/", 'post', file_elements=file_elements
+            "/run/", 'post', file_elements=file_elements
         )
-        run_id = int(xmltodict.parse(return_value)['oml:upload_run']['oml:run_id'])
-        self.run_id = run_id
+        result = xmltodict.parse(return_value)
+        self.run_id = int(result['oml:upload_run']['oml:run_id'])
         return self
 
     def _create_description_xml(self):

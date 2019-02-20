@@ -863,7 +863,7 @@ def _get_online_dataset_arff(dataset_id):
     str
         A string representation of an ARFF file.
     """
-    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id, 
+    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id,
                                                       'get')
     # build a dict from the xml.
     # use the url from the dataset description and return the ARFF string

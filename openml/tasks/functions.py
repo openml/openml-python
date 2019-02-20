@@ -92,7 +92,7 @@ def _get_estimation_procedure_list():
         name, type, repeats, folds, stratified.
     """
     url_suffix = "estimationprocedure/list"
-    xml_string = openml._api_calls._perform_api_call(url_suffix, 
+    xml_string = openml._api_calls._perform_api_call(url_suffix,
                                                      'get')
     
     procs_dict = xmltodict.parse(xml_string)
@@ -207,8 +207,8 @@ def _list_tasks(task_type_id=None, **kwargs):
 
 def __list_tasks(api_call):
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
-    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task', 'oml:input'))
-    
+    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task', 
+                                                         'oml:input'))
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s'

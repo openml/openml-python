@@ -26,7 +26,7 @@ def get_flow(flow_id, reinstantiate=False):
         the flow
     """
     flow_id = int(flow_id)
-    flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id, 
+    flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id,
                                                    'get')
 
     flow_dict = xmltodict.parse(flow_xml)

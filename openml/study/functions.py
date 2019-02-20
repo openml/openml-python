@@ -9,16 +9,16 @@ def get_study(study_id, entity_type=None):
     Retrieves all relevant information of an OpenML study from the server
     Note that some of the (data, tasks, flows, setups) fields can be empty
     (depending on information on the server)
-    
+
     Parameters
     ----------
     study id : int, str
         study id (numeric or alias)
-    
+
     entity_type : str (optional)
         Which entity type to return. Either {data, tasks, flows, setups,
-        runs}. Give None to return all entity types. 
-    
+        runs}. Give None to return all entity types.
+
     Return
     ------
     OpenMLStudy
@@ -33,7 +33,7 @@ def get_study(study_id, entity_type=None):
         'oml:run_id',
         'oml:tag'  # legacy.
     )
-    result_dict = xmltodict.parse(xml_string, 
+    result_dict = xmltodict.parse(xml_string,
                                   force_list=force_list_tags)['oml:study']
     study_id = int(result_dict['oml:id'])
     alias = result_dict['oml:alias'] if 'oml:alias' in result_dict else None
@@ -44,7 +44,7 @@ def get_study(study_id, entity_type=None):
     description = result_dict['oml:description']
     creation_date = result_dict['oml:creation_date']
     creator = result_dict['oml:creator']
-    
+
     # tags is legacy. remove once no longer needed.
     tags = []
     if 'oml:tag' in result_dict:
@@ -60,37 +60,33 @@ def get_study(study_id, entity_type=None):
     flows = None
     setups = None
     runs = None
-    
+
     if 'oml:data' in result_dict:
         datasets = [int(x) for x in result_dict['oml:data']['oml:data_id']]
-
     if 'oml:tasks' in result_dict:
         tasks = [int(x) for x in result_dict['oml:tasks']['oml:task_id']]
-
     if 'oml:flows' in result_dict:
         flows = [int(x) for x in result_dict['oml:flows']['oml:flow_id']]
-
     if 'oml:setups' in result_dict:
         setups = [int(x) for x in result_dict['oml:setups']['oml:setup_id']]
-    
     if 'oml:runs' in result_dict:
         runs = [int(x) for x in result_dict['oml:runs']['oml:run_id']]
 
     study = OpenMLStudy(
-            study_id=study_id,
-            alias=alias,
-            main_entity_type=main_entity_type,
-            benchmark_suite=benchmark_suite,
-            name=name, 
-            description=description, 
-            creation_date=creation_date, 
-            creator=creator, 
-            tags=tags,
-            data=datasets, 
-            tasks=tasks, 
-            flows=flows, 
-            setups=setups,
-            runs=runs
+        study_id=study_id,
+        alias=alias,
+        main_entity_type=main_entity_type,
+        benchmark_suite=benchmark_suite,
+        name=name,
+        description=description,
+        creation_date=creation_date,
+        creator=creator,
+        tags=tags,
+        data=datasets,
+        tasks=tasks,
+        flows=flows,
+        setups=setups,
+        runs=runs
     )
     return study
 
@@ -98,9 +94,9 @@ def get_study(study_id, entity_type=None):
 def create_study(alias, benchmark_suite, name, description, run_ids):
     """
     Creates an OpenML study (collection of data, tasks, flows, setups and run),
-    where the runs are the main entity (collection consists of runs and all 
+    where the runs are the main entity (collection consists of runs and all
     entities (flows, tasks, etc) that are related to these runs)
-    
+
     Parameters:
     -----------
     alias : str (optional)
@@ -113,35 +109,35 @@ def create_study(alias, benchmark_suite, name, description, run_ids):
         brief description (meta-info)
     run_ids : list
         a list of run ids associated with this study
-    
+
     Returns:
     --------
     OpenMLStudy
         A local OpenML study object (call publish method to upload to server)
     """
     return OpenMLStudy(
-            study_id=None,
-            alias=alias,
-            main_entity_type='run',
-            benchmark_suite=benchmark_suite,
-            name=name, 
-            description=description,
-            creation_date=None,
-            creator=None,
-            tags=None,
-            data=None,
-            tasks=None,
-            flows=None,
-            setups=None,
-            runs=run_ids
+        study_id=None,
+        alias=alias,
+        main_entity_type='run',
+        benchmark_suite=benchmark_suite,
+        name=name,
+        description=description,
+        creation_date=None,
+        creator=None,
+        tags=None,
+        data=None,
+        tasks=None,
+        flows=None,
+        setups=None,
+        runs=run_ids
     )
 
 
 def create_benchmark_suite(alias, name, description, task_ids):
     """
-    Creates an OpenML benchmark suite (collection of entity types, where 
+    Creates an OpenML benchmark suite (collection of entity types, where
     the tasks are the linked entity)
-    
+
     Parameters:
     -----------
     alias : str (optional)
@@ -152,34 +148,34 @@ def create_benchmark_suite(alias, name, description, task_ids):
         brief description (meta-info)
     task_ids : list
         a list of task ids associated with this study
-    
+
     Returns:
     --------
     OpenMLStudy
         A local OpenML study object (call publish method to upload to server)
     """
     return OpenMLStudy(
-            study_id=None,
-            alias=alias,
-            main_entity_type='task',
-            benchmark_suite=None,
-            name=name, 
-            description=description, 
-            creation_date=None,
-            creator=None,
-            tags=None,
-            data=None,
-            tasks=task_ids,
-            flows=None,
-            setups=None,
-            runs=None
+        study_id=None,
+        alias=alias,
+        main_entity_type='task',
+        benchmark_suite=None,
+        name=name, 
+        description=description, 
+        creation_date=None,
+        creator=None,
+        tags=None,
+        data=None,
+        tasks=task_ids,
+        flows=None,
+        setups=None,
+        runs=None
     )
 
 
 def delete_study(study_id):
     """
     Deletes an study from the OpenML server.
-    
+
     Parameters
     ----------
     study_id : int

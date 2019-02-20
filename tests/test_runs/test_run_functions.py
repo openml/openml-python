@@ -121,7 +121,7 @@ class TestRun(TestBase):
         # downloads the predictions of the old task
         file_id = run.output_files['predictions']
         predictions_url = openml._api_calls._file_id_to_url(file_id)
-        response = openml._api_calls._read_url(predictions_url, 
+        response = openml._api_calls._read_url(predictions_url,
                                                request_method='get')
         predictions = arff.loads(response)
         run_prime = openml.runs.run_model_on_task(model_prime, task,
