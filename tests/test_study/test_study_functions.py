@@ -51,6 +51,7 @@ class TestStudyFunctions(TestBase):
         self.assertEqual(study_downloaded.alias, fixture_alias)
         self.assertEqual(study_downloaded.name, fixture_name)
         self.assertEqual(study_downloaded.description, fixture_descr)
+        self.assertEqual(study_downloaded.main_entity_type, 'task')
         # verify resources
         self.assertIsNone(study_downloaded.flows)
         self.assertIsNone(study_downloaded.setups)
@@ -101,6 +102,7 @@ class TestStudyFunctions(TestBase):
         self.assertEqual(study_downloaded.alias, fixt_alias)
         self.assertEqual(study_downloaded.name, fixt_name)
         self.assertEqual(study_downloaded.description, fixt_descr)
+        self.assertEqual(study_downloaded.main_entity_type, 'run')
         
         self.assertSetEqual(set(study_downloaded.runs), set(run_list.keys()))
         self.assertSetEqual(set(study_downloaded.setups), set(fixt_setup_ids))
