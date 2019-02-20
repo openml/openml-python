@@ -5,7 +5,7 @@ import xmltodict
 
 class OpenMLStudy(object):
 
-    def __init__(self, study_id, alias, main_knowledge_type, benchmark_suite, 
+    def __init__(self, study_id, alias, main_entity_type, benchmark_suite, 
                  name, description, creation_date, creator, tags, data, tasks, 
                  flows, setups, runs):
         """
@@ -24,12 +24,12 @@ class OpenMLStudy(object):
             the study id
         alias : str (optional)
             a string ID, unique on server (url-friendly)
-        main_knowledge_type : str
-            the knowledge type (e.g., task, run) that is core in this study.
+        main_entity_type : str
+            the entity type (e.g., task, run) that is core in this study.
             only entities of this type can be added explicitly
         benchmark_suite : int (optional)
             the benchmark suite (another study) upon which this study is ran.
-            can only be active if main knowledge type is runs. 
+            can only be active if main entity type is runs. 
         name : str
             the name of the study (meta-info)
         description : str
@@ -54,7 +54,7 @@ class OpenMLStudy(object):
         """
         self.id = study_id
         self.alias = alias
-        self.main_knowledge_type = main_knowledge_type
+        self.main_entity_type = main_entity_type
         self.benchmark_suite = benchmark_suite
         self.name = name
         self.description = description
@@ -98,7 +98,7 @@ class OpenMLStudy(object):
             XML description of the data.
         """
         # some can not be uploaded, e.g., id, creator, creation_date
-        simple_props = ['alias', 'main_knowledge_type', 'name', 'description']
+        simple_props = ['alias', 'main_entity_type', 'name', 'description']
         # maps from attribute name (which is used as outer tag name) to immer
         # tag name (e.g., self.tasks -> <oml:tasks><oml:task_id>1987
         # </oml:task_id></oml:tasks>)

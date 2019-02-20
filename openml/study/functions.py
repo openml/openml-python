@@ -4,7 +4,7 @@ from openml.study import OpenMLStudy
 import openml._api_calls
 
 
-def get_study(study_id, knowledge_type=None):
+def get_study(study_id, entity_type=None):
     """
     Retrieves all relevant information of an OpenML study from the server
     Note that some of the (data, tasks, flows, setups) fields can be empty
@@ -15,9 +15,9 @@ def get_study(study_id, knowledge_type=None):
     study id : int, str
         study id (numeric or alias)
     
-    knowledge_type : str (optional)
-        Which knowledge type to return. Either {data, tasks, flows, setups,
-        runs}. Give None to return all knowledge types. 
+    entity_type : str (optional)
+        Which entity type to return. Either {data, tasks, flows, setups,
+        runs}. Give None to return all entity types. 
     
     Return
     ------
@@ -25,8 +25,8 @@ def get_study(study_id, knowledge_type=None):
         The OpenML study object
     """
     call_suffix = "study/%s" % str(study_id)
-    if knowledge_type is not None:
-        call_suffix += "/" + knowledge_type
+    if entity_type is not None:
+        call_suffix += "/" + entity_type
     xml_string = openml._api_calls._perform_api_call(call_suffix, 'get')
     force_list_tags = (
         'oml:data_id', 'oml:flow_id', 'oml:task_id', 'oml:setup_id',
@@ -37,7 +37,7 @@ def get_study(study_id, knowledge_type=None):
                                   force_list=force_list_tags)['oml:study']
     study_id = int(result_dict['oml:id'])
     alias = result_dict['oml:alias'] if 'oml:alias' in result_dict else None
-    main_knowledge_type = result_dict['oml:main_knowledge_type']
+    main_entity_type = result_dict['oml:main_entity_type']
     benchmark_suite = result_dict['oml:benchmark_suite'] \
         if 'oml:benchmark_suite' in result_dict else None
     name = result_dict['oml:name']
@@ -79,7 +79,7 @@ def get_study(study_id, knowledge_type=None):
     study = OpenMLStudy(
             study_id=study_id,
             alias=alias,
-            main_knowledge_type=main_knowledge_type,
+            main_entity_type=main_entity_type,
             benchmark_suite=benchmark_suite,
             name=name, 
             description=description, 
@@ -122,7 +122,7 @@ def create_study(alias, benchmark_suite, name, description, run_ids):
     return OpenMLStudy(
             study_id=None,
             alias=alias,
-            main_knowledge_type='run',
+            main_entity_type='run',
             benchmark_suite=benchmark_suite,
             name=name, 
             description=description,
@@ -139,7 +139,7 @@ def create_study(alias, benchmark_suite, name, description, run_ids):
 
 def create_benchmark_suite(alias, name, description, task_ids):
     """
-    Creates an OpenML benchmark suite (collection of knowledge types, where 
+    Creates an OpenML benchmark suite (collection of entity types, where 
     the tasks are the linked entity)
     
     Parameters:
@@ -161,7 +161,7 @@ def create_benchmark_suite(alias, name, description, task_ids):
     return OpenMLStudy(
             study_id=None,
             alias=alias,
-            main_knowledge_type='task',
+            main_entity_type='task',
             benchmark_suite=None,
             name=name, 
             description=description, 
@@ -196,9 +196,9 @@ def delete_study(study_id):
 def attach_to_study(study_id, entity_ids):
     """
     Attaches a set of entities to a collection
-        - provide run ids of existsing runs if the main knowledge type is
+        - provide run ids of existsing runs if the main entity type is
           runs (study)
-        - provide task ids of existing tasks if the main knowledge type is
+        - provide task ids of existing tasks if the main entity type is
           tasks (benchmark suite)
 
     Parameters
@@ -226,9 +226,9 @@ def attach_to_study(study_id, entity_ids):
 def detach_from_study(study_id, entity_ids):
     """
     Detaches a set of entities to a collection
-        - provide run ids of existsing runs if the main knowledge type is
+        - provide run ids of existsing runs if the main entity type is
           runs (study)
-        - provide task ids of existing tasks if the main knowledge type is
+        - provide task ids of existing tasks if the main entity type is
           tasks (benchmark suite)
 
     Parameters
