@@ -1,13 +1,10 @@
 import openml
 import openml.study
-import unittest
 from openml.testing import TestBase
 
 class TestStudyFunctions(TestBase):
     _multiprocess_can_split_ = True
 
-    @unittest.skip('Production server does not yet return entity types (This \
-                    line should not be merged in develop)')
     def test_get_study(self):
         openml.config.server = self.production_server
 

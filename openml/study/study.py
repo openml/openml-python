@@ -89,7 +89,7 @@ class OpenMLStudy(object):
         study_res = xmltodict.parse(return_value)
         self.study_id = int(study_res['oml:study_upload']['oml:id'])
         return self.study_id
-    
+
     def _to_xml(self):
         """Serialize object to xml for upload
 

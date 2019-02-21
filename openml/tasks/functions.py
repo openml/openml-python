@@ -94,7 +94,7 @@ def _get_estimation_procedure_list():
     url_suffix = "estimationprocedure/list"
     xml_string = openml._api_calls._perform_api_call(url_suffix,
                                                      'get')
-    
+
     procs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
     if 'oml:estimationprocedures' not in procs_dict:
