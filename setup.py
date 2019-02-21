@@ -34,25 +34,26 @@ setuptools.setup(name="openml",
                  packages=setuptools.find_packages(),
                  package_data={'': ['*.txt', '*.md']},
                  install_requires=[
-                     'mock',
                      'numpy>=1.6.2',
                      'scipy>=0.13.3',
                      'liac-arff>=2.2.2',
                      'xmltodict',
-                     'nose',
+                     'pytest',
                      'requests',
                      'scikit-learn>=0.18',
                      'nbformat',
                      'python-dateutil',
                      'oslo.concurrency',
+                     'pandas>=0.19.2',
                  ],
                  extras_require={
                      'test': [
                          'nbconvert',
-                         'jupyter_client'
+                         'jupyter_client',
+                         'matplotlib'
                      ]
                  },
-                 test_suite="nose.collector",
+                 test_suite="pytest",
                  classifiers=['Intended Audience :: Science/Research',
                               'Intended Audience :: Developers',
                               'License :: OSI Approved :: BSD License',
@@ -62,9 +63,8 @@ setuptools.setup(name="openml",
                               'Operating System :: POSIX',
                               'Operating System :: Unix',
                               'Operating System :: MacOS',
-                              'Programming Language :: Python :: 2',
-                              'Programming Language :: Python :: 2.7',
                               'Programming Language :: Python :: 3',
                               'Programming Language :: Python :: 3.4',
                               'Programming Language :: Python :: 3.5',
-                              'Programming Language :: Python :: 3.6'])
+                              'Programming Language :: Python :: 3.6'
+                              'Programming Language :: Python :: 3.7'])

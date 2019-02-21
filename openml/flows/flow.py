@@ -1,6 +1,5 @@
 from collections import OrderedDict
 
-import six
 import xmltodict
 
 import openml._api_calls
@@ -192,14 +191,15 @@ class OpenMLFlow(object):
                              meta_info['description'])
 
             for key_, value in param_dict.items():
-                if key_ is not None and not isinstance(key_, six.string_types):
+                if key_ is not None and not isinstance(key_, str):
                     raise ValueError('Parameter name %s cannot be serialized '
                                      'because it is of type %s. Only strings '
                                      'can be serialized.' % (key_, type(key_)))
-                if value is not None and not isinstance(value, six.string_types):
+                if value is not None and not isinstance(value, str):
                     raise ValueError('Parameter value %s cannot be serialized '
                                      'because it is of type %s. Only strings '
-                                     'can be serialized.' % (value, type(value)))
+                                     'can be serialized.'
+                                     % (value, type(value)))
 
             flow_parameters.append(param_dict)
 
@@ -215,7 +215,7 @@ class OpenMLFlow(object):
             for key_ in component_dict:
                 # We only need to check if the key is a string, because the
                 # value is a flow. The flow itself is valid by recursion
-                if key_ is not None and not isinstance(key_, six.string_types):
+                if key_ is not None and not isinstance(key_, str):
                     raise ValueError('Parameter name %s cannot be serialized '
                                      'because it is of type %s. Only strings '
                                      'can be serialized.' % (key_, type(key_)))
@@ -310,19 +310,6 @@ class OpenMLFlow(object):
         arguments['model'] = None
         flow = cls(**arguments)
 
-        # try to parse to a model because not everything that can be
-        # deserialized has to come from scikit-learn. If it can't be
-        # serialized, but comes from scikit-learn this is worth an exception
-        if (
-            arguments['external_version'].startswith('sklearn==')
-            or ',sklearn==' in arguments['external_version']
-        ):
-            from .sklearn_converter import flow_to_sklearn
-            model = flow_to_sklearn(flow)
-        else:
-            model = None
-        flow.model = model
-
         return flow
 
     def publish(self):
@@ -350,7 +337,9 @@ class OpenMLFlow(object):
         flow = openml.flows.functions.get_flow(flow_id)
         _copy_server_fields(flow, self)
         try:
-            openml.flows.functions.assert_flows_equal(self, flow, flow.upload_date)
+            openml.flows.functions.assert_flows_equal(
+                self, flow, flow.upload_date, ignore_parameter_values=True
+            )
         except ValueError as e:
             message = e.args[0]
             raise ValueError("Flow was not stored correctly on the server. "
@@ -358,6 +347,63 @@ class OpenMLFlow(object):
                              "remove the flow if necessary! Error is:\n'%s'" %
                              (flow_id, message))
         return self
+
+    def get_structure(self, key_item):
+        """
+        Returns for each sub-component of the flow the path of identifiers that
+        should be traversed to reach this component. The resulting dict maps a
+        key (identifying a flow by either its id, name or fullname) to the
+        parameter prefix.
+
+        Parameters
+        ----------
+        key_item: str
+            The flow attribute that will be used to identify flows in the
+            structure. Allowed values {flow_id, name}
+
+        Returns
+        -------
+        dict[str, List[str]]
+            The flow structure
+        """
+        if key_item not in ['flow_id', 'name']:
+            raise ValueError('key_item should be in {flow_id, name}')
+        structure = dict()
+        for key, sub_flow in self.components.items():
+            sub_structure = sub_flow.get_structure(key_item)
+            for flow_name, flow_sub_structure in sub_structure.items():
+                structure[flow_name] = [key] + flow_sub_structure
+        structure[getattr(self, key_item)] = []
+        return structure
+
+    def get_subflow(self, structure):
+        """
+        Returns a subflow from the tree of dependencies.
+
+        Parameters
+        ----------
+        structure: list[str]
+            A list of strings, indicating the location of the subflow
+
+        Returns
+        -------
+        OpenMLFlow
+            The OpenMLFlow that corresponds to the structure
+        """
+        # make a copy of structure, as we don't want to change it in the
+        # outer scope
+        structure = list(structure)
+        if len(structure) < 1:
+            raise ValueError('Please provide a structure list of size >= 1')
+        sub_identifier = structure[0]
+        if sub_identifier not in self.components:
+            raise ValueError('Flow %s does not contain component with '
+                             'identifier %s' % (self.name, sub_identifier))
+        if len(structure) == 1:
+            return self.components[sub_identifier]
+        else:
+            structure.pop(0)
+            return self.components[sub_identifier].get_subflow(structure)
 
     def push_tag(self, tag):
         """Annotates this flow with a tag on the server.

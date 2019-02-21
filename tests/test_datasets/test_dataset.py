@@ -1,10 +1,11 @@
-import numpy as np
-from scipy import sparse
-import six
 from time import time
 
-from openml.testing import TestBase
+import numpy as np
+from scipy import sparse
+from warnings import filterwarnings, catch_warnings
+
 import openml
+from openml.testing import TestBase
 
 
 class OpenMLDatasetTest(TestBase):
@@ -31,7 +32,7 @@ class OpenMLDatasetTest(TestBase):
         rval, attribute_names = self.dataset.get_data(
             return_attribute_names=True)
         self.assertEqual(len(attribute_names), 39)
-        self.assertTrue(all([isinstance(att, six.string_types)
+        self.assertTrue(all([isinstance(att, str)
                              for att in attribute_names]))
 
     def test_get_data_with_rowid(self):
@@ -97,6 +98,18 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual(len(categorical), 38)
         # TODO test multiple ignore attributes!
 
+    def test_dataset_format_constructor(self):
+
+        with catch_warnings():
+            filterwarnings('error')
+            self.assertRaises(
+                DeprecationWarning,
+                openml.OpenMLDataset,
+                'Test',
+                'Test',
+                format='arff'
+            )
+
 
 class OpenMLDatasetTestOnTestServer(TestBase):
     def setUp(self):
@@ -156,7 +169,7 @@ class OpenMLDatasetTestSparse(TestBase):
             return_attribute_names=True)
         self.assertTrue(sparse.issparse(rval))
         self.assertEqual(len(attribute_names), 20001)
-        self.assertTrue(all([isinstance(att, six.string_types)
+        self.assertTrue(all([isinstance(att, str)
                              for att in attribute_names]))
 
     def test_get_sparse_dataset_with_rowid(self):

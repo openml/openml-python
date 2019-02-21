@@ -1,12 +1,5 @@
 import os
-import sys
-
-import six
-
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
+from unittest import mock
 
 from openml.testing import TestBase
 from openml import OpenMLSplit, OpenMLTask
@@ -32,9 +25,12 @@ class TestTask(TestBase):
 
     def test__get_cached_task_not_cached(self):
         openml.config.cache_directory = self.static_cache_dir
-        self.assertRaisesRegexp(OpenMLCacheException,
-                                'Task file for tid 2 not cached',
-                                openml.tasks.functions._get_cached_task, 2)
+        self.assertRaisesRegex(
+            OpenMLCacheException,
+            'Task file for tid 2 not cached',
+            openml.tasks.functions._get_cached_task,
+            2,
+        )
 
     def test__get_estimation_procedure_list(self):
         estimation_procedures = openml.tasks.functions.\
@@ -55,7 +51,7 @@ class TestTask(TestBase):
         self.assertIn('did', task)
         self.assertIsInstance(task['did'], int)
         self.assertIn('status', task)
-        self.assertIsInstance(task['status'], six.string_types)
+        self.assertIsInstance(task['status'], str)
         self.assertIn(task['status'],
                       ['in_preparation', 'active', 'deactivated'])
 
@@ -65,7 +61,7 @@ class TestTask(TestBase):
         tasks = openml.tasks.list_tasks(task_type_id=ttid)
         self.assertGreaterEqual(len(tasks), num_curves_tasks)
         for tid in tasks:
-            self.assertEquals(ttid, tasks[tid]["ttid"])
+            self.assertEqual(ttid, tasks[tid]["ttid"])
             self._check_task(tasks[tid])
 
     def test_list_tasks_empty(self):
@@ -106,7 +102,7 @@ class TestTask(TestBase):
                 tasks = openml.tasks.list_tasks(task_type_id=j, offset=i, size=size)
                 self.assertGreaterEqual(size, len(tasks))
                 for tid in tasks:
-                    self.assertEquals(j, tasks[tid]["ttid"])
+                    self.assertEqual(j, tasks[tid]["ttid"])
                     self._check_task(tasks[tid])
 
     def test__get_task(self):
@@ -155,6 +151,15 @@ class TestTask(TestBase):
         openml.config.cache_directory = self.static_cache_dir
         task = openml.tasks.get_task(1)
         self.assertIsInstance(task, OpenMLTask)
+
+    def test_get_task_different_types(self):
+        openml.config.server = self.production_server
+        # Regression task
+        openml.tasks.functions.get_task(5001)
+        # Learning curve
+        openml.tasks.functions.get_task(64)
+        # Issue 538, get_task failing with clustering task.
+        openml.tasks.functions.get_task(126033)
 
     def test_download_split(self):
         task = openml.tasks.get_task(1)

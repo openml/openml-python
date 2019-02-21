@@ -4,7 +4,6 @@ import os
 import io
 import re
 import xmltodict
-import six
 from oslo_concurrency import lockutils
 
 from ..exceptions import OpenMLCacheException
@@ -69,24 +68,38 @@ def _get_cached_flow(fid):
                                    "cached" % fid)
 
 
-def get_flow(flow_id):
-    """Get the Flow for a given ID.
+def get_flow(flow_id: int, reinstantiate: bool=False) -> OpenMLFlow:
+    """Download the OpenML flow for a given flow ID.
 
     Parameters
     ----------
     flow_id : int
         The OpenML flow id.
 
+    reinstantiate: bool
+        Whether to reinstantiate the flow to a sklearn model.
+        Note that this can only be done with sklearn flows, and
+        when
+
     Returns
     -------
-    OpenMLFlow
+    flow : OpenMLFlow
+        the flow
     """
     flow_id = int(flow_id)
     with lockutils.external_lock(
             name='flows.functions.get_flow:%d' % flow_id,
             lock_path=openml.utils._create_lockfiles_dir(),
     ):
-        return _get_flow_description(flow_id)
+        flow = _get_flow_description(flow_id)
+
+    if reinstantiate and flow:
+        if not (flow.external_version.startswith('sklearn==') or
+                ',sklearn==' in flow.external_version):
+            raise ValueError('Only sklearn flows can be reinstantiated')
+        flow.model = openml.flows.flow_to_sklearn(flow)
+
+    return flow
 
 
 def _get_flow_description(flow_id):
@@ -117,7 +130,6 @@ def _get_flow_description(flow_id):
         flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id)
         with io.open(xml_file, "w", encoding='utf8') as fh:
             fh.write(flow_xml)
-
 
         return _create_flow_from_xml(flow_xml)
 
@@ -200,9 +212,9 @@ def flow_exists(name, external_version):
     -----
     see http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
     """
-    if not (isinstance(name, six.string_types) and len(name) > 0):
+    if not (isinstance(name, str) and len(name) > 0):
         raise ValueError('Argument \'name\' should be a non-empty string')
-    if not (isinstance(name, six.string_types) and len(external_version) > 0):
+    if not (isinstance(name, str) and len(external_version) > 0):
         raise ValueError('Argument \'version\' should be a non-empty string')
 
     xml_response = openml._api_calls._perform_api_call(

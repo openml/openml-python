@@ -30,7 +30,7 @@ in python, `scikit-learn <http://scikit-learn.org/stable/index.html>`_.
 Thereby it will automatically be compatible with many machine learning
 libraries written in Python.
 
-We aim to keep the package as leight-weight as possible and we will try to
+We aim to keep the package as light-weight as possible and we will try to
 keep the number of potential installation dependencies as low as possible.
 Therefore, the connection to other machine learning libraries such as
 *pytorch*, *keras* or *tensorflow* should not be done directly inside this
@@ -43,7 +43,7 @@ Open issues and potential todos
 
 We collect open issues and feature requests in an `issue tracker on github <https://github.com/openml/openml-python/issues>`_.
 The issue tracker contains issues marked as *Good first issue*, which shows
-issues which are good for beginers. We also maintain a somewhat up-to-date
+issues which are good for beginners. We also maintain a somewhat up-to-date
 `roadmap <https://github.com/openml/openml-python/issues/410>`_ which
 contains longer-term goals.
 
@@ -66,7 +66,7 @@ especially:
 * Use the package and spread the word.
 * `Cite OpenML <https://www.openml.org/cite>`_ if you use it in a scientific
   publication.
-* Visit one of our `hackathons <https://hackathon.openml.org/>`_.
+* Visit one of our `hackathons <https://meet.openml.org/>`_.
 * Check out how to `contribute to the main OpenML project <https://github.com/openml/OpenML/blob/master/CONTRIBUTING.md>`_.
 
 Contributing code
@@ -98,15 +98,66 @@ execute
     python setup.py install
 
 Testing
-~~~~~~~
+=======
 
 From within the directory of the cloned package, execute:
 
 .. code:: bash
 
-    nosetests tests/
+    pytest tests/
 
 .. _extending:
+
+Executing a specific test can be done by specifying the module, test case, and test.  
+To obtain a hierarchical list of all tests, run
+
+.. code:: bash
+
+    pytest --collect-only
+
+.. _extending:
+
+.. code:: bash
+
+    <Module 'tests/test_datasets/test_dataset.py'>
+      <UnitTestCase 'OpenMLDatasetTest'>
+        <TestCaseFunction 'test_dataset_format_constructor'>
+        <TestCaseFunction 'test_get_data'>
+        <TestCaseFunction 'test_get_data_rowid_and_ignore_and_target'>
+        <TestCaseFunction 'test_get_data_with_ignore_attributes'>
+        <TestCaseFunction 'test_get_data_with_rowid'>
+        <TestCaseFunction 'test_get_data_with_target'>
+      <UnitTestCase 'OpenMLDatasetTestOnTestServer'>
+        <TestCaseFunction 'test_tagging'>
+        
+.. _extending:
+
+To run a specific module, add the module name, for instance:
+
+.. code:: bash
+
+    pytest tests/test_datasets/test_dataset.py
+
+.. _extending:
+
+To run a specific unit test case, add the test case name, for instance:
+
+.. code:: bash
+
+    pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest
+
+.. _extending:
+
+To run a specific unit test, add the test name, for instance:
+
+.. code:: bash
+
+    pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest::test_get_data
+
+.. _extending:
+
+Happy testing!
+
 
 Connecting new machine learning libraries
 =========================================

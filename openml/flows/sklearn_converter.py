@@ -7,18 +7,16 @@ import importlib
 import inspect
 import json
 import json.decoder
+import logging
 import re
-import six
 import warnings
 import sys
-import inspect
 
 import numpy as np
 import scipy.stats.distributions
 import sklearn.base
 import sklearn.model_selection
-# Necessary to have signature available in python 2.7
-from sklearn.utils.fixes import signature
+from inspect import signature
 
 import openml
 from openml.flows import OpenMLFlow
@@ -32,7 +30,9 @@ else:
 
 
 DEPENDENCIES_PATTERN = re.compile(
-    '^(?P<name>[\w\-]+)((?P<operation>==|>=|>)(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?[0-9]*))?$')
+    r'^(?P<name>[\w\-]+)((?P<operation>==|>=|>)'
+    r'(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?[0-9]*))?$'
+)
 
 
 def sklearn_to_flow(o, parent_model=None):
@@ -46,7 +46,7 @@ def sklearn_to_flow(o, parent_model=None):
         rval = [sklearn_to_flow(element, parent_model) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif isinstance(o, (bool, int, float, six.string_types)) or o is None:
+    elif isinstance(o, (bool, int, float, str)) or o is None:
         # base parameter values
         rval = o
     elif isinstance(o, dict):
@@ -56,7 +56,7 @@ def sklearn_to_flow(o, parent_model=None):
 
         rval = OrderedDict()
         for key, value in o.items():
-            if not isinstance(key, six.string_types):
+            if not isinstance(key, str):
                 raise TypeError('Can only use string as keys, you passed '
                                 'type %s for value %s.' %
                                 (type(key), str(key)))
@@ -93,7 +93,8 @@ def _is_cross_validator(o):
     return isinstance(o, sklearn.model_selection.BaseCrossValidator)
 
 
-def flow_to_sklearn(o, components=None, initialize_with_defaults=False):
+def flow_to_sklearn(o, components=None, initialize_with_defaults=False,
+                    recursion_depth=0):
     """Initializes a sklearn model based on a flow.
 
     Parameters
@@ -103,24 +104,32 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False):
         parameter value that is accepted by)
 
     components : dict
-    
+
 
     initialize_with_defaults : bool, optional (default=False)
         If this flag is set, the hyperparameter values of flows will be
         ignored and a flow with its defaults is returned.
+
+    recursion_depth : int
+        The depth at which this flow is called, mostly for debugging
+        purposes
 
     Returns
     -------
     mixed
 
     """
+    logging.info('-%s flow_to_sklearn START o=%s, components=%s, '
+                 'init_defaults=%s' % ('-' * recursion_depth, o, components,
+                                       initialize_with_defaults))
+    depth_pp = recursion_depth + 1  # shortcut var, depth plus plus
 
     # First, we need to check whether the presented object is a json string.
     # JSON strings are used to encoder parameter values. By passing around
     # json strings for parameters, we make sure that we can flow_to_sklearn
     # the parameter values to the correct type.
 
-    if isinstance(o, six.string_types):
+    if isinstance(o, str):
         try:
             o = json.loads(o)
         except JSONDecodeError:
@@ -140,39 +149,227 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False):
             elif serialized_type == 'function':
                 rval = deserialize_function(value)
             elif serialized_type == 'component_reference':
-                value = flow_to_sklearn(value)
+                value = flow_to_sklearn(value, recursion_depth=depth_pp)
                 step_name = value['step_name']
                 key = value['key']
-                component = flow_to_sklearn(components[key], initialize_with_defaults=initialize_with_defaults)
+                component = flow_to_sklearn(
+                    components[key],
+                    initialize_with_defaults=initialize_with_defaults,
+                    recursion_depth=depth_pp
+                )
                 # The component is now added to where it should be used
                 # later. It should not be passed to the constructor of the
                 # main flow object.
                 del components[key]
                 if step_name is None:
                     rval = component
-                else:
+                elif 'argument_1' not in value:
                     rval = (step_name, component)
+                else:
+                    rval = (step_name, component, value['argument_1'])
             elif serialized_type == 'cv_object':
-                rval = _deserialize_cross_validator(value)
+                rval = _deserialize_cross_validator(
+                    value, recursion_depth=recursion_depth
+                )
             else:
                 raise ValueError('Cannot flow_to_sklearn %s' % serialized_type)
 
         else:
-            rval = OrderedDict((flow_to_sklearn(key, components, initialize_with_defaults),
-                                flow_to_sklearn(value, components, initialize_with_defaults))
+            rval = OrderedDict((flow_to_sklearn(key,
+                                                components,
+                                                initialize_with_defaults,
+                                                recursion_depth=depth_pp),
+                                flow_to_sklearn(value,
+                                                components,
+                                                initialize_with_defaults,
+                                                recursion_depth=depth_pp))
                                for key, value in sorted(o.items()))
     elif isinstance(o, (list, tuple)):
-        rval = [flow_to_sklearn(element, components, initialize_with_defaults) for element in o]
+        rval = [flow_to_sklearn(element,
+                                components,
+                                initialize_with_defaults,
+                                depth_pp) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif isinstance(o, (bool, int, float, six.string_types)) or o is None:
+    elif isinstance(o, (bool, int, float, str)) or o is None:
         rval = o
     elif isinstance(o, OpenMLFlow):
-        rval = _deserialize_model(o, initialize_with_defaults)
+        rval = _deserialize_model(o,
+                                  initialize_with_defaults,
+                                  recursion_depth=recursion_depth)
     else:
         raise TypeError(o)
-
+    logging.info('-%s flow_to_sklearn END   o=%s, rval=%s'
+                 % ('-' * recursion_depth, o, rval))
     return rval
+
+
+def openml_param_name_to_sklearn(openml_parameter, flow):
+    """
+    Converts the name of an OpenMLParameter into the sklean name, given a flow.
+
+    Parameters
+    ----------
+    openml_parameter: OpenMLParameter
+        The parameter under consideration
+
+    flow: OpenMLFlow
+        The flow that provides context.
+
+    Returns
+    -------
+    sklearn_parameter_name: str
+        The name the parameter will have once used in scikit-learn
+    """
+    if not isinstance(openml_parameter, openml.setups.OpenMLParameter):
+        raise ValueError('openml_parameter should be an instance of '
+                         'OpenMLParameter')
+    if not isinstance(flow, OpenMLFlow):
+        raise ValueError('flow should be an instance of OpenMLFlow')
+
+    flow_structure = flow.get_structure('name')
+    if openml_parameter.flow_name not in flow_structure:
+        raise ValueError('Obtained OpenMLParameter and OpenMLFlow do not '
+                         'correspond. ')
+    name = openml_parameter.flow_name  # for PEP8
+    return '__'.join(flow_structure[name] + [openml_parameter.parameter_name])
+
+
+def obtain_parameter_values(flow):
+    """
+    Extracts all parameter settings from the model inside a flow in OpenML
+    format.
+
+    Parameters
+    ----------
+    flow : OpenMLFlow
+        openml flow object (containing flow ids, i.e., it has to be downloaded
+        from the server)
+
+    Returns
+    -------
+    list
+        A list of dicts, where each dict has the following names:
+         - oml:name (str): The OpenML parameter name
+         - oml:value (mixed): A representation of the parameter value
+         - oml:component (int): flow id to which the parameter belongs
+    """
+
+    openml.flows.functions._check_flow_for_server_id(flow)
+
+    def get_flow_dict(_flow):
+        flow_map = {_flow.name: _flow.flow_id}
+        for subflow in _flow.components:
+            flow_map.update(get_flow_dict(_flow.components[subflow]))
+        return flow_map
+
+    def extract_parameters(_flow, _flow_dict, component_model,
+                           _main_call=False, main_id=None):
+        def is_subcomponent_specification(values):
+            # checks whether the current value can be a specification of
+            # subcomponents, as for example the value for steps parameter
+            # (in Pipeline) or transformers parameter (in
+            # ColumnTransformer). These are always lists/tuples of lists/
+            # tuples, size bigger than 2 and an OpenMLFlow item involved.
+            if not isinstance(values, (tuple, list)):
+                return False
+            for item in values:
+                if not isinstance(item, (tuple, list)):
+                    return False
+                if len(item) < 2:
+                    return False
+                if not isinstance(item[1], openml.flows.OpenMLFlow):
+                    return False
+            return True
+
+        # _flow is openml flow object, _param dict maps from flow name to flow
+        # id for the main call, the param dict can be overridden (useful for
+        # unit tests / sentinels) this way, for flows without subflows we do
+        # not have to rely on _flow_dict
+        exp_parameters = set(_flow.parameters)
+        exp_components = set(_flow.components)
+        model_parameters = set([mp for mp in component_model.get_params()
+                                if '__' not in mp])
+        if len((exp_parameters | exp_components) ^ model_parameters) != 0:
+            flow_params = sorted(exp_parameters | exp_components)
+            model_params = sorted(model_parameters)
+            raise ValueError('Parameters of the model do not match the '
+                             'parameters expected by the '
+                             'flow:\nexpected flow parameters: '
+                             '%s\nmodel parameters: %s' % (flow_params,
+                                                           model_params))
+
+        _params = []
+        for _param_name in _flow.parameters:
+            _current = OrderedDict()
+            _current['oml:name'] = _param_name
+
+            current_param_values = openml.flows.sklearn_to_flow(
+                component_model.get_params()[_param_name])
+
+            # Try to filter out components (a.k.a. subflows) which are
+            # handled further down in the code (by recursively calling
+            # this function)!
+            if isinstance(current_param_values, openml.flows.OpenMLFlow):
+                continue
+
+            if is_subcomponent_specification(current_param_values):
+                # complex parameter value, with subcomponents
+                parsed_values = list()
+                for subcomponent in current_param_values:
+                    # scikit-learn stores usually tuples in the form
+                    # (name (str), subcomponent (mixed), argument
+                    # (mixed)). OpenML replaces the subcomponent by an
+                    # OpenMLFlow object.
+                    if len(subcomponent) < 2 or len(subcomponent) > 3:
+                        raise ValueError('Component reference should be '
+                                         'size {2,3}. ')
+
+                    subcomponent_identifier = subcomponent[0]
+                    subcomponent_flow = subcomponent[1]
+                    if not isinstance(subcomponent_identifier, str):
+                        raise TypeError('Subcomponent identifier should be '
+                                        'string')
+                    if not isinstance(subcomponent_flow,
+                                      openml.flows.OpenMLFlow):
+                        raise TypeError('Subcomponent flow should be string')
+
+                    current = {
+                        "oml-python:serialized_object": "component_reference",
+                        "value": {
+                            "key": subcomponent_identifier,
+                            "step_name": subcomponent_identifier
+                        }
+                    }
+                    if len(subcomponent) == 3:
+                        if not isinstance(subcomponent[2], list):
+                            raise TypeError('Subcomponent argument should be'
+                                            'list')
+                        current['value']['argument_1'] = subcomponent[2]
+                    parsed_values.append(current)
+                parsed_values = json.dumps(parsed_values)
+            else:
+                # vanilla parameter value
+                parsed_values = json.dumps(current_param_values)
+
+            _current['oml:value'] = parsed_values
+            if _main_call:
+                _current['oml:component'] = main_id
+            else:
+                _current['oml:component'] = _flow_dict[_flow.name]
+            _params.append(_current)
+
+        for _identifier in _flow.components:
+            subcomponent_model = component_model.get_params()[_identifier]
+            _params.extend(extract_parameters(_flow.components[_identifier],
+                                              _flow_dict, subcomponent_model))
+        return _params
+
+    flow_dict = get_flow_dict(flow)
+    parameters = extract_parameters(flow, flow_dict, flow.model,
+                                    True, flow.flow_id)
+
+    return parameters
 
 
 def _serialize_model(model):
@@ -305,21 +502,36 @@ def _extract_information_from_model(model):
 
         if (isinstance(rval, (list, tuple)) and len(rval) > 0 and
                 isinstance(rval[0], (list, tuple)) and
-                [type(rval[0]) == type(rval[i]) for i in range(len(rval))]):
+                all([isinstance(rval[i], type(rval[0]))
+                     for i in range(len(rval))])):
 
-            # Steps in a pipeline or feature union, or base classifiers in voting classifier
+            # Steps in a pipeline or feature union, or base classifiers in
+            # voting classifier
             parameter_value = list()
             reserved_keywords = set(model.get_params(deep=False).keys())
 
             for sub_component_tuple in rval:
-                identifier, sub_component = sub_component_tuple
+                identifier = sub_component_tuple[0]
+                sub_component = sub_component_tuple[1]
                 sub_component_type = type(sub_component_tuple)
+                if not 2 <= len(sub_component_tuple) <= 3:
+                    # length 2 is for {VotingClassifier.estimators,
+                    # Pipeline.steps, FeatureUnion.transformer_list}
+                    # length 3 is for ColumnTransformer
+                    msg = 'Length of tuple does not match assumptions'
+                    raise ValueError(msg)
+                if not isinstance(sub_component, (OpenMLFlow, type(None))):
+                    msg = 'Second item of tuple does not match assumptions. '\
+                          'Expected OpenMLFlow, got %s' % type(sub_component)
+                    raise TypeError(msg)
 
                 if identifier in reserved_keywords:
                     parent_model_name = model.__module__ + "." + \
                                         model.__class__.__name__
-                    raise PyOpenMLError('Found element shadowing official ' + \
-                                        'parameter for %s: %s' % (parent_model_name, identifier))
+                    msg = 'Found element shadowing official '\
+                          'parameter for %s: %s' % (parent_model_name,
+                                                    identifier)
+                    raise PyOpenMLError(msg)
 
                 if sub_component is None:
                     # In a FeatureUnion it is legal to have a None step
@@ -342,6 +554,8 @@ def _extract_information_from_model(model):
                     cr_value = OrderedDict()
                     cr_value['key'] = identifier
                     cr_value['step_name'] = identifier
+                    if len(sub_component_tuple) == 3:
+                        cr_value['argument_1'] = sub_component_tuple[2]
                     component_reference['value'] = cr_value
                     parameter_value.append(component_reference)
 
@@ -417,8 +631,8 @@ def _get_fn_arguments_with_defaults(fn_name):
     return params_with_defaults, params_without_defaults
 
 
-def _deserialize_model(flow, keep_defaults):
-
+def _deserialize_model(flow, keep_defaults, recursion_depth):
+    logging.info('-%s deserialize %s' % ('-' * recursion_depth, flow.name))
     model_name = flow.class_name
     _check_dependencies(flow.dependencies)
 
@@ -435,7 +649,12 @@ def _deserialize_model(flow, keep_defaults):
 
     for name in parameters:
         value = parameters.get(name)
-        rval = flow_to_sklearn(value, components=components_, initialize_with_defaults=keep_defaults)
+        logging.info('--%s flow_parameter=%s, value=%s' %
+                     ('-' * recursion_depth, name, value))
+        rval = flow_to_sklearn(value,
+                               components=components_,
+                               initialize_with_defaults=keep_defaults,
+                               recursion_depth=recursion_depth + 1)
         parameter_dict[name] = rval
 
     for name in components:
@@ -444,7 +663,10 @@ def _deserialize_model(flow, keep_defaults):
         if name not in components_:
             continue
         value = components[name]
-        rval = flow_to_sklearn(value, **kwargs)
+        logging.info('--%s flow_component=%s, value=%s'
+                     % ('-' * recursion_depth, name, value))
+        rval = flow_to_sklearn(value,
+                               recursion_depth=recursion_depth + 1)
         parameter_dict[name] = rval
 
     module_name = model_name.rsplit('.', 1)
@@ -625,28 +847,35 @@ def _serialize_cross_validator(o):
 
 
 def _check_n_jobs(model):
-    '''
+    """
     Returns True if the parameter settings of model are chosen s.t. the model
-     will run on a single core (in that case, openml-python can measure runtimes)
-    '''
-    def check(param_dict, disallow_parameter=False):
-        for param, value in param_dict.items():
-            # n_jobs is scikitlearn parameter for paralizing jobs
-            if param.split('__')[-1] == 'n_jobs':
-                # 0 = illegal value (?), 1 = use one core,  n = use n cores
-                # -1 = use all available cores -> this makes it hard to
-                # measure runtime in a fair way
-                if value != 1 or disallow_parameter:
+    will run on a single core (in that case, openml-python can measure runtimes)
+    """
+    def check(param_grid, restricted_parameter_name, legal_values):
+        if isinstance(param_grid, dict):
+            for param, value in param_grid.items():
+                # n_jobs is scikitlearn parameter for paralizing jobs
+                if param.split('__')[-1] == restricted_parameter_name:
+                    # 0 = illegal value (?), 1 / None = use one core,
+                    # n = use n cores,
+                    # -1 = use all available cores -> this makes it hard to
+                    # measure runtime in a fair way
+                    if legal_values is None or value not in legal_values:
+                        return False
+            return True
+        elif isinstance(param_grid, list):
+            for sub_grid in param_grid:
+                if not check(sub_grid, restricted_parameter_name, legal_values):
                     return False
-        return True
+            return True
 
     if not (isinstance(model, sklearn.base.BaseEstimator) or
             isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
         raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
-    # make sure that n_jobs is not in the parameter grid of optimization procedure
+    # make sure that n_jobs is not in the parameter grid of optimization
+    # procedure
     if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
-        param_distributions = None
         if isinstance(model, sklearn.model_selection.GridSearchCV):
             param_distributions = model.param_grid
         elif isinstance(model, sklearn.model_selection.RandomizedSearchCV):
@@ -658,16 +887,16 @@ def _check_n_jobs(model):
                 raise AttributeError('Using subclass BaseSearchCV other than {GridSearchCV, RandomizedSearchCV}. Could not find attribute param_distributions. ')
             print('Warning! Using subclass BaseSearchCV other than ' \
                   '{GridSearchCV, RandomizedSearchCV}. Should implement param check. ')
-            
-        if not check(param_distributions, True):
+
+        if not check(param_distributions, 'n_jobs', None):
             raise PyOpenMLError('openml-python should not be used to '
                                 'optimize the n_jobs parameter.')
 
     # check the parameters for n_jobs
-    return check(model.get_params(), False)
+    return check(model.get_params(), 'n_jobs', [1, None])
 
 
-def _deserialize_cross_validator(value):
+def _deserialize_cross_validator(value, recursion_depth):
     model_name = value['name']
     parameters = value['parameters']
 
@@ -675,7 +904,9 @@ def _deserialize_cross_validator(value):
     model_class = getattr(importlib.import_module(module_name[0]),
                           module_name[1])
     for parameter in parameters:
-        parameters[parameter] = flow_to_sklearn(parameters[parameter])
+        parameters[parameter] = flow_to_sklearn(
+            parameters[parameter], recursion_depth=recursion_depth + 1
+        )
     return model_class(**parameters)
 
 

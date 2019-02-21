@@ -1,6 +1,5 @@
 import os
 import xmltodict
-import six
 import shutil
 
 import openml._api_calls
@@ -30,7 +29,7 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
     if xml_tag_name in node and node[xml_tag_name] is not None:
         if isinstance(node[xml_tag_name], dict):
             rval = [node[xml_tag_name]]
-        elif isinstance(node[xml_tag_name], six.string_types):
+        elif isinstance(node[xml_tag_name], str):
             rval = [node[xml_tag_name]]
         elif isinstance(node[xml_tag_name], list):
             rval = node[xml_tag_name]
@@ -99,7 +98,7 @@ def _list_all(listing_call, *args, **filters):
     Example usage:
 
     ``evaluations = list_all(list_evaluations, "predictive_accuracy", task=mytask)``
-    
+
     Parameters
     ----------
     listing_call : callable
@@ -126,7 +125,6 @@ def _list_all(listing_call, *args, **filters):
     if 'batch_size' in active_filters:
         BATCH_SIZE_ORIG = active_filters['batch_size']
         del active_filters['batch_size']
-    batch_size = BATCH_SIZE_ORIG
 
     # max number of results to be shown
     LIMIT = None
@@ -137,22 +135,26 @@ def _list_all(listing_call, *args, **filters):
     # check if the batch size is greater than the number of results that need to be returned.
     if LIMIT is not None:
         if BATCH_SIZE_ORIG > LIMIT:
-            batch_size = LIMIT
+            BATCH_SIZE_ORIG = min(LIMIT, BATCH_SIZE_ORIG)
     if 'offset' in active_filters:
         offset = active_filters['offset']
         del active_filters['offset']
+    batch_size = BATCH_SIZE_ORIG
     while True:
         try:
+            current_offset = offset + BATCH_SIZE_ORIG * page
             new_batch = listing_call(
                 *args,
                 limit=batch_size,
-                offset=offset + BATCH_SIZE_ORIG * page,
+                offset=current_offset,
                 **active_filters
             )
         except openml.exceptions.OpenMLServerNoResult:
             # we want to return an empty dict in this case
             break
         result.update(new_batch)
+        if len(new_batch) < batch_size:
+            break
         page += 1
         if LIMIT is not None:
             # check if the number of required results has been achieved
@@ -189,7 +191,7 @@ def _create_cache_directory_for_id(key, id_):
     Parameters
     ----------
     key : str
-    
+
     id_ : int
 
     Returns
@@ -217,7 +219,7 @@ def _remove_cache_dir_for_id(key, cache_dir):
     Parameters
     ----------
     key : str
-    
+
     cache_dir : str
     """
     try:
