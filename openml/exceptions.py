@@ -30,6 +30,7 @@ class OpenMLServerException(OpenMLServerError):
             self.url, self.code, self.message,
         )
 
+
 class OpenMLServerNoResult(OpenMLServerException):
     """exception for when the result of the server is empty. """
     pass
@@ -47,6 +48,6 @@ class OpenMLHashException(PyOpenMLError):
 
 
 class PrivateDatasetError(PyOpenMLError):
-    "Exception thrown when the user has no rights to access the dataset"
+    """ Exception thrown when the user has no rights to access the dataset. """
     def __init__(self, message):
         super(PrivateDatasetError, self).__init__(message)
