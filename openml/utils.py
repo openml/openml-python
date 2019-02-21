@@ -72,15 +72,15 @@ def _tag_entity(entity_type, entity_id, tag, untag=False):
         """
     legal_entities = {'data', 'task', 'flow', 'setup', 'run'}
     if entity_type not in legal_entities:
-        raise ValueError('Can\'t tag a %s' %entity_type)
+        raise ValueError('Can\'t tag a %s' % entity_type)
 
-    uri = '%s/tag' %entity_type
-    main_tag = 'oml:%s_tag' %entity_type
+    uri = '%s/tag' % entity_type
+    main_tag = 'oml:%s_tag' % entity_type
     if untag:
-        uri = '%s/untag' %entity_type
-        main_tag = 'oml:%s_untag' %entity_type
+        uri = '%s/untag' % entity_type
+        main_tag = 'oml:%s_untag' % entity_type
 
-    post_variables = {'%s_id'%entity_type: entity_id, 'tag': tag}
+    post_variables = {'%s_id' % entity_type: entity_id, 'tag': tag}
     result_xml = openml._api_calls._perform_api_call(uri, post_variables)
 
     result = xmltodict.parse(result_xml, force_list={'oml:tag'})[main_tag]
@@ -115,12 +115,14 @@ def _list_all(listing_call, *args, **filters):
     """
 
     # eliminate filters that have a None value
-    active_filters = {key: value for key, value in filters.items() if value is not None}
+    active_filters = {key: value for key, value in filters.items()
+                      if value is not None}
     page = 0
     result = {}
 
-    # default batch size per paging. This one can be set in filters (batch_size),
-    # but should not be changed afterwards. the derived batch_size can be changed.
+    # Default batch size per paging.
+    # This one can be set in filters (batch_size), but should not be
+    # changed afterwards. The derived batch_size can be changed.
     BATCH_SIZE_ORIG = 10000
     if 'batch_size' in active_filters:
         BATCH_SIZE_ORIG = active_filters['batch_size']
@@ -132,7 +134,8 @@ def _list_all(listing_call, *args, **filters):
     if 'size' in active_filters:
         LIMIT = active_filters['size']
         del active_filters['size']
-    # check if the batch size is greater than the number of results that need to be returned.
+    # check if the batch size is greater than
+    # the number of results that need to be returned.
     if LIMIT is not None:
         if BATCH_SIZE_ORIG > LIMIT:
             BATCH_SIZE_ORIG = min(LIMIT, BATCH_SIZE_ORIG)
@@ -158,7 +161,8 @@ def _list_all(listing_call, *args, **filters):
         page += 1
         if LIMIT is not None:
             # check if the number of required results has been achieved
-            # always do a 'bigger than' check, in case of bugs to prevent infinite loops
+            # always do a 'bigger than' check,
+            # in case of bugs to prevent infinite loops
             if len(result) >= LIMIT:
                 break
             # check if there are enough results to fulfill a batch
@@ -173,7 +177,7 @@ def _create_cache_directory(key):
     cache_dir = os.path.join(cache, key)
     try:
         os.makedirs(cache_dir)
-    except:
+    except OSError:
         pass
     return cache_dir
 
@@ -233,6 +237,6 @@ def _create_lockfiles_dir():
     dir = os.path.join(config.get_cache_directory(), 'locks')
     try:
         os.makedirs(dir)
-    except:
+    except OSError:
         pass
     return dir
