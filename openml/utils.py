@@ -134,14 +134,14 @@ def _list_all(listing_call, *args, **filters):
     if 'size' in active_filters:
         LIMIT = active_filters['size']
         del active_filters['size']
-    # check if the batch size is greater than
-    # the number of results that need to be returned.
-    if LIMIT is not None:
-        if BATCH_SIZE_ORIG > LIMIT:
-            BATCH_SIZE_ORIG = min(LIMIT, BATCH_SIZE_ORIG)
+
+    if LIMIT is not None and BATCH_SIZE_ORIG > LIMIT:
+        BATCH_SIZE_ORIG = LIMIT
+
     if 'offset' in active_filters:
         offset = active_filters['offset']
         del active_filters['offset']
+    
     batch_size = BATCH_SIZE_ORIG
     while True:
         try:
