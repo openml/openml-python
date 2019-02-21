@@ -74,7 +74,8 @@ def _read_url_files(url, data=None, file_elements=None):
         raise _parse_server_exception(response, url=url)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
-        warnings.warn('Received uncompressed content from OpenML for %s.' % url)
+        warnings.warn('Received uncompressed content from OpenML for {}.'
+                      .format(url))
     return response.text
 
 
@@ -100,7 +101,8 @@ def _read_url(url, data=None):
         raise _parse_server_exception(response, url=url)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
-        warnings.warn('Received uncompressed content from OpenML for %s.' % url)
+        warnings.warn('Received uncompressed content from OpenML for {}.'
+                      .format(url))
     return response.text
 
 
@@ -137,27 +139,26 @@ def send_request(
 
 
 def _parse_server_exception(response, url=None):
-    # OpenML has a sopisticated error system
+    # OpenML has a sophisticated error system
     # where information about failures is provided. try to parse this
     try:
         server_exception = xmltodict.parse(response.text)
     except Exception:
-        raise OpenMLServerError(('Unexpected server error. Please '
-                                 'contact the developers!\nStatus code: '
-                                 '%d\n' % response.status_code) + response.text)
+        raise OpenMLServerError(
+            'Unexpected server error. Please contact the developers!\n'
+            'Status code: {}\n{}'.format(response.status_code, response.text))
 
-    code = int(server_exception['oml:error']['oml:code'])
-    message = server_exception['oml:error']['oml:message']
-    additional = None
-    if 'oml:additional_information' in server_exception['oml:error']:
-        additional = server_exception['oml:error']['oml:additional_information']
+    server_error = server_exception['oml:error']
+    code = int(server_error['oml:code'])
+    message = server_error['oml:message']
+    additional_information = server_error.get('oml:additional_information')
     if code in [372, 512, 500, 482, 542, 674]:
         # 512 for runs, 372 for datasets, 500 for flows
         # 482 for tasks, 542 for evaluations, 674 for setups
-        return OpenMLServerNoResult(code, message, additional)
+        return OpenMLServerNoResult(code, message, additional_information)
     return OpenMLServerException(
         code=code,
         message=message,
-        additional=additional,
+        additional=additional_information,
         url=url
     )
