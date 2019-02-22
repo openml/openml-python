@@ -135,9 +135,8 @@ def _list_all(listing_call, *args, **filters):
         LIMIT = active_filters['size']
         del active_filters['size']
 
-    if LIMIT is not None:
-        if BATCH_SIZE_ORIG > LIMIT:
-            BATCH_SIZE_ORIG = min(LIMIT, BATCH_SIZE_ORIG)
+    if LIMIT is not None and BATCH_SIZE_ORIG > LIMIT:
+        BATCH_SIZE_ORIG = LIMIT
 
     if 'offset' in active_filters:
         offset = active_filters['offset']
