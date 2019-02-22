@@ -34,27 +34,27 @@ class OpenMLSplit(object):
         self.samples = len(self.split[0][0])
 
     def __eq__(self, other):
-        if type(self) != type(other):
+        if (type(self) != type(other)
+                or self.name != other.name
+                or self.description != other.description
+                or self.split.keys() != other.split.keys()):
             return False
-        elif self.name != other.name:
+
+        if any(self.split[repetition].keys() != other.split[repetition].keys()
+                for repetition in self.split):
             return False
-        elif self.description != other.description:
-            return False
-        elif self.split.keys() != other.split.keys():
-            return False
-        else:
-            for repetition in self.split:
-                if self.split[repetition].keys() != other.split[repetition].keys():
-                    return False
-                else:
-                    for fold in self.split[repetition]:
-                        for sample in self.split[repetition][fold]:
-                            if np.all(self.split[repetition][fold][sample].test !=
-                                      other.split[repetition][fold][sample].test)\
-                                    and \
-                                    np.all(self.split[repetition][fold][sample].train
-                                           != other.split[repetition][fold][sample].train):
-                                return False
+
+        samples = [(repetition, fold, sample)
+                   for repetition in self.split
+                   for fold in self.split[repetition]
+                   for sample in self.split[repetition][fold]]
+
+        for repetition, fold, sample in samples:
+            self_train, self_test = self.split[repetition][fold][sample]
+            other_train, other_test = other.split[repetition][fold][sample]
+            if not (np.all(self_train == other_train)
+                    and np.all(self_test == other_test)):
+                return False
         return True
 
     @classmethod
