@@ -22,7 +22,6 @@ from . import tasks
 from . import runs
 from . import flows
 from . import setups
-from . import study
 from . import evaluations
 
 from .runs import OpenMLRun
