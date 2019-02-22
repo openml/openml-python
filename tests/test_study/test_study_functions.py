@@ -74,6 +74,7 @@ class TestStudyFunctions(TestBase):
         openml.study.status_update(study_id, 'deactivated')
         study_downloaded = openml.study.get_study(study_id)
         self.assertEqual(study_downloaded.status, 'deactivated')
+        # can't delete study, now it's not longer in preparation
 
     def test_publish_study(self):
         # get some random runs to attach
@@ -126,3 +127,6 @@ class TestStudyFunctions(TestBase):
         openml.study.status_update(study_id, 'deactivated')
         study_downloaded = openml.study.get_study(study_id)
         self.assertEqual(study_downloaded.status, 'deactivated')
+        
+        res = openml.study.delete_study(study_id)
+        self.assertTrue(res)

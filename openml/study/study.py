@@ -60,7 +60,7 @@ class OpenMLStudy(object):
         self.benchmark_suite = benchmark_suite
         self.name = name
         self.description = description
-        self.status = status,
+        self.status = status
         self.creation_date = creation_date
         self.creator = creator
         self.tags = tags  # LEGACY. Can be removed soon

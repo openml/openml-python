@@ -203,6 +203,23 @@ def status_update(study_id, status):
         raise ValueError('Study id/status does not collide')
 
 
+def delete_study(study_id):
+    """
+    Deletes an study from the OpenML server.
+
+    Parameters
+    ----------
+    study_id : int
+        OpenML id of the study
+
+    Returns
+    -------
+    bool
+        True iff the deletion was successful. False otherwse
+    """
+    return openml.utils._delete_entity('study', study_id)
+
+
 def attach_to_study(study_id, entity_ids):
     """
     Attaches a set of entities to a collection
