@@ -5,4 +5,5 @@ from .functions import get_study, create_study, create_benchmark_suite, \
 
 __all__ = [
     'OpenMLStudy', 'attach_to_study', 'create_benchmark_suite', 'create_study',
-    'delete_study', 'detach_from_study', 'get_study', 'status_update'
+    'delete_study', 'detach_from_study', 'get_study', 'status_update',
+]
