@@ -19,7 +19,7 @@ def get_study(study_id, type=None):
     Note that some of the (data, tasks, flows, setups) fields can be empty
     (depending on information on the server)
     '''
-    call_suffix = "study/%s" %str(study_id)
+    call_suffix = "study/%s" % str(study_id)
     if type is not None:
         call_suffix += "/" + type
     xml_string = openml._api_calls._perform_api_call(call_suffix)

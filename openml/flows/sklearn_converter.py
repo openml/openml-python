@@ -601,8 +601,8 @@ def _extract_information_from_model(model):
         parameters_meta_info[k] = OrderedDict((('description', None),
                                                ('data_type', None)))
 
-    return parameters, parameters_meta_info,\
-           sub_components, sub_components_explicit
+    return (parameters, parameters_meta_info,
+            sub_components, sub_components_explicit)
 
 
 def _get_fn_arguments_with_defaults(fn_name):

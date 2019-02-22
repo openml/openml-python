@@ -106,12 +106,13 @@ class OpenMLSplit(object):
                     repetitions[repetition][fold] = OrderedDict()
                 if sample not in repetitions[repetition][fold]:
                     repetitions[repetition][fold][sample] = ([], [])
+                split = repetitions[repetition][fold][sample]
 
                 type_ = line[type_idx].decode('utf-8')
                 if type_ == 'TRAIN':
-                    repetitions[repetition][fold][sample][0].append(line[rowid_idx])
+                    split[0].append(line[rowid_idx])
                 elif type_ == 'TEST':
-                    repetitions[repetition][fold][sample][1].append(line[rowid_idx])
+                    split[1].append(line[rowid_idx])
                 else:
                     raise ValueError(type_)
 
@@ -119,8 +120,10 @@ class OpenMLSplit(object):
                 for fold in repetitions[repetition]:
                     for sample in repetitions[repetition][fold]:
                         repetitions[repetition][fold][sample] = Split(
-                            np.array(repetitions[repetition][fold][sample][0], dtype=np.int32),
-                            np.array(repetitions[repetition][fold][sample][1], dtype=np.int32))
+                            np.array(repetitions[repetition][fold][sample][0],
+                                     dtype=np.int32),
+                            np.array(repetitions[repetition][fold][sample][1],
+                                     dtype=np.int32))
 
             with open(pkl_filename, "wb") as fh:
                 pickle.dump({"name": name, "repetitions": repetitions}, fh,

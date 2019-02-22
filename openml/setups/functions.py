@@ -127,6 +127,7 @@ def list_setups(offset=None, size=None, flow=None, tag=None, setup=None):
                                   flow=flow, tag=tag,
                                   setup=setup, batch_size=batch_size)
 
+
 def _list_setups(setup=None, **kwargs):
     """
     Perform API call `/setup/list/{filters}`
