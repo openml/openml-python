@@ -672,7 +672,7 @@ def _get_dataset_description(did_cache_dir, dataset_id):
         return _get_cached_dataset_description(dataset_id)
     except OpenMLCacheException:
         url_extension = "data/{}".format(dataset_id)
-        dataset_xml = openml._api_calls._perform_api_call(url_extension, 'get'
+        dataset_xml = openml._api_calls._perform_api_call(url_extension, 'get')
         with io.open(description_file, "w", encoding='utf8') as fh:
             fh.write(dataset_xml)
 
