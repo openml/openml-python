@@ -82,7 +82,6 @@ def _tag_entity(entity_type, entity_id, tag, untag=False):
         main_tag = 'oml:%s_untag' % entity_type
 
     post_variables = {'%s_id' % entity_type: entity_id, 'tag': tag}
-    result_xml = openml._api_calls._perform_api_call(uri, post_variables)
     result_xml = openml._api_calls._perform_api_call(uri,
                                                      'post',
                                                      post_variables)
