@@ -398,9 +398,7 @@ def _serialize_model(model):
     _check_multiple_occurence_of_component_in_flow(model, subcomponents)
 
     # Create a flow name, which contains all components in brackets, e.g.:
-    # RandomizedSearchCV(Pipeline(StandardScaler,
-    # AdaBoostClassifier(DecisionTreeClassifier)), StandardScaler,
-    # AdaBoostClassifier(DecisionTreeClassifier))
+    # RandomizedSearchCV(Pipeline(StandardScaler,AdaBoostClassifier(DecisionTreeClassifier)),StandardScaler,AdaBoostClassifier(DecisionTreeClassifier))
     class_name = model.__module__ + "." + model.__class__.__name__
 
     # will be part of the name (in brackets)
