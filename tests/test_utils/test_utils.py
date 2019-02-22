@@ -45,8 +45,10 @@ class OpenMLTaskTest(TestBase):
     def test_list_datasets_with_high_size_parameter(self):
         datasets_a = openml.datasets.list_datasets()
         datasets_b = openml.datasets.list_datasets(size=np.inf)
-
-        self.assertEqual(len(datasets_a), len(datasets_b))
+        
+        # note that in the meantime the number of datasets could have increased
+        # due to tests that run in parralel. 
+        self.assertGreaterEqual(len(datasets_b), len(datasets_a))
 
     def test_list_all_for_tasks(self):
         required_size = 1068  # default test server reset value
