@@ -26,7 +26,8 @@ def get_flow(flow_id, reinstantiate=False):
         the flow
     """
     flow_id = int(flow_id)
-    flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id)
+    flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id,
+                                                   'get')
 
     flow_dict = xmltodict.parse(flow_xml)
     flow = OpenMLFlow._from_dict(flow_dict)
@@ -125,6 +126,7 @@ def flow_exists(name, external_version):
 
     xml_response = openml._api_calls._perform_api_call(
         "flow/exists",
+        'post',
         data={'name': name, 'external_version': external_version},
     )
 
@@ -138,7 +140,7 @@ def flow_exists(name, external_version):
 
 def __list_flows(api_call):
 
-    xml_string = openml._api_calls._perform_api_call(api_call)
+    xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     flows_dict = xmltodict.parse(xml_string, force_list=('oml:flow',))
 
     # Minimalistic check if the XML is useful

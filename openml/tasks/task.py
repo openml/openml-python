@@ -38,7 +38,8 @@ class OpenMLTask(object):
                 pass
         except (OSError, IOError):
             split_url = self.estimation_procedure["data_splits_url"]
-            split_arff = openml._api_calls._read_url(split_url)
+            split_arff = openml._api_calls._read_url(split_url,
+                                                     request_method='get')
 
             with io.open(cache_file, "w", encoding='utf8') as fh:
                 fh.write(split_arff)
@@ -76,7 +77,7 @@ class OpenMLTask(object):
             Tag to attach to the task.
         """
         data = {'task_id': self.task_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/task/tag", data=data)
+        openml._api_calls._perform_api_call("/task/tag", 'post', data=data)
 
     def remove_tag(self, tag):
         """Removes a tag from this task on the server.
@@ -87,7 +88,7 @@ class OpenMLTask(object):
             Tag to attach to the task.
         """
         data = {'task_id': self.task_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/task/untag", data=data)
+        openml._api_calls._perform_api_call("/task/untag", 'post', data=data)
 
 
 class OpenMLSupervisedTask(OpenMLTask):

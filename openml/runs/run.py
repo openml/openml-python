@@ -265,8 +265,9 @@ class OpenMLRun(object):
             predictions_file_url = openml._api_calls._file_id_to_url(
                 self.output_files['predictions'], 'predictions.arff',
             )
-            predictions_arff = \
-                arff.loads(openml._api_calls._read_url(predictions_file_url))
+            response = openml._api_calls._read_url(predictions_file_url,
+                                                   request_method='get')
+            predictions_arff = arff.loads(response)
             # TODO: make this a stream reader
         else:
             raise ValueError('Run should have been locally executed or '
@@ -398,12 +399,11 @@ class OpenMLRun(object):
             trace_arff = arff.dumps(self.trace.trace_to_arff())
             file_elements['trace'] = ("trace.arff", trace_arff)
 
-        return_value = \
-            openml._api_calls._perform_api_call("/run/",
-                                                file_elements=file_elements)
-        run_id = \
-            int(xmltodict.parse(return_value)['oml:upload_run']['oml:run_id'])
-        self.run_id = run_id
+        return_value = openml._api_calls._perform_api_call(
+            "/run/", 'post', file_elements=file_elements
+        )
+        result = xmltodict.parse(return_value)
+        self.run_id = int(result['oml:upload_run']['oml:run_id'])
         return self
 
     def _create_description_xml(self):
@@ -440,7 +440,7 @@ class OpenMLRun(object):
             Tag to attach to the run.
         """
         data = {'run_id': self.run_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/run/tag", data=data)
+        openml._api_calls._perform_api_call("/run/tag", 'post', data=data)
 
     def remove_tag(self, tag):
         """Removes a tag from this run on the server.
@@ -451,7 +451,7 @@ class OpenMLRun(object):
             Tag to attach to the run.
         """
         data = {'run_id': self.run_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/run/untag", data=data)
+        openml._api_calls._perform_api_call("/run/untag", 'post', data=data)
 
 
 ###############################################################################

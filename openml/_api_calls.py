@@ -9,7 +9,7 @@ from .exceptions import (OpenMLServerError, OpenMLServerException,
                          OpenMLServerNoResult)
 
 
-def _perform_api_call(call, data=None, file_elements=None):
+def _perform_api_call(call, request_method, data=None, file_elements=None):
     """
     Perform an API call at the OpenML server.
 
@@ -17,6 +17,12 @@ def _perform_api_call(call, data=None, file_elements=None):
     ----------
     call : str
         The API call. For example data/list
+    request_method : str
+        The HTTP request method to perform the API call with. Legal values:
+            - get (reading functions, api key optional)
+            - post (writing functions, generaly require api key)
+            - delete (deleting functions, require api key)
+        See REST api documentation which request method is applicable.
     data : dict
         Dictionary with post-request payload.
     file_elements : dict
@@ -38,8 +44,11 @@ def _perform_api_call(call, data=None, file_elements=None):
     url = url.replace('=', '%3d')
 
     if file_elements is not None:
+        if request_method != 'post':
+            raise ValueError('request method must be post when file elements '
+                             'are present')
         return _read_url_files(url, data=data, file_elements=file_elements)
-    return _read_url(url, data)
+    return _read_url(url, request_method, data)
 
 
 def _file_id_to_url(file_id, filename=None):
@@ -78,24 +87,12 @@ def _read_url_files(url, data=None, file_elements=None):
     return response.text
 
 
-def _read_url(url, data=None):
-
+def _read_url(url, request_method, data=None):
     data = {} if data is None else data
     if config.apikey is not None:
         data['api_key'] = config.apikey
 
-    if len(data) == 0 or (len(data) == 1 and 'api_key' in data):
-        response = send_request(
-            request_method='get', url=url, data=data,
-        )
-
-    else:
-        # Using requests.post sets header 'Accept-encoding' automatically to
-        #  'gzip,deflate'
-        response = send_request(
-            request_method='post', url=url, data=data,
-        )
-
+    response = send_request(request_method=request_method, url=url, data=data)
     if response.status_code != 200:
         raise _parse_server_exception(response, url=url)
     if 'Content-Encoding' not in response.headers or \
@@ -118,6 +115,8 @@ def send_request(
             try:
                 if request_method == 'get':
                     response = session.get(url, params=data)
+                elif request_method == 'delete':
+                    response = session.delete(url, params=data)
                 elif request_method == 'post':
                     response = session.post(url, data=data, files=files)
                 else:

@@ -91,9 +91,10 @@ def _get_estimation_procedure_list():
         a dictionary containing the following information: id, task type id,
         name, type, repeats, folds, stratified.
     """
+    url_suffix = "estimationprocedure/list"
+    xml_string = openml._api_calls._perform_api_call(url_suffix,
+                                                     'get')
 
-    xml_string = \
-        openml._api_calls._perform_api_call("estimationprocedure/list")
     procs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
     if 'oml:estimationprocedures' not in procs_dict:
@@ -205,8 +206,7 @@ def _list_tasks(task_type_id=None, **kwargs):
 
 
 def __list_tasks(api_call):
-
-    xml_string = openml._api_calls._perform_api_call(api_call)
+    xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task',
                                                          'oml:input'))
     # Minimalistic check if the XML is useful
@@ -341,7 +341,8 @@ def _get_task_description(task_id):
             ),
             "task.xml",
         )
-        task_xml = openml._api_calls._perform_api_call("task/%d" % task_id)
+        task_xml = openml._api_calls._perform_api_call("task/%d" % task_id,
+                                                       'get')
 
         with io.open(xml_file, "w", encoding='utf8') as fh:
             fh.write(task_xml)

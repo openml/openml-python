@@ -121,7 +121,9 @@ class TestRun(TestBase):
         # downloads the predictions of the old task
         file_id = run.output_files['predictions']
         predictions_url = openml._api_calls._file_id_to_url(file_id)
-        predictions = arff.loads(openml._api_calls._read_url(predictions_url))
+        response = openml._api_calls._read_url(predictions_url,
+                                               request_method='get')
+        predictions = arff.loads(response)
         run_prime = openml.runs.run_model_on_task(model_prime, task,
                                                   avoid_duplicate_runs=False,
                                                   seed=seed)
@@ -454,7 +456,8 @@ class TestRun(TestBase):
             # suboptimal (slow), and not guaranteed to work if evaluation
             # engine is behind.
             # TODO: mock this? We have the arff already on the server
-            self._wait_for_processed_run(run.run_id, 200)
+            print(run.run_id)
+            self._wait_for_processed_run(run.run_id, 10)
             try:
                 model_prime = openml.runs.initialize_model_from_trace(
                     run.run_id, 0, 0)

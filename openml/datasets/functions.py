@@ -232,7 +232,7 @@ def _list_datasets(**kwargs):
 
 def __list_datasets(api_call):
 
-    xml_string = openml._api_calls._perform_api_call(api_call)
+    xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     datasets_dict = xmltodict.parse(xml_string, force_list=('oml:dataset',))
 
     # Minimalistic check if the XML is useful
@@ -621,6 +621,7 @@ def status_update(data_id, status):
                          'Legal values: %s' % legal_status)
     data = {'data_id': data_id, 'status': status}
     result_xml = openml._api_calls._perform_api_call("data/status/update",
+                                                     'post',
                                                      data=data)
     result = xmltodict.parse(result_xml)
     server_data_id = result['oml:data_status_update']['oml:id']
@@ -659,7 +660,8 @@ def _get_dataset_description(did_cache_dir, dataset_id):
     try:
         return _get_cached_dataset_description(dataset_id)
     except OpenMLCacheException:
-        dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id)
+        url_suffix = "data/%d" % dataset_id
+        dataset_xml = openml._api_calls._perform_api_call(url_suffix, 'get')
         with io.open(description_file, "w", encoding='utf8') as fh:
             fh.write(dataset_xml)
 
@@ -704,7 +706,7 @@ def _get_dataset_arff(did_cache_dir, description):
         pass
 
     url = description['oml:url']
-    arff_string = openml._api_calls._read_url(url)
+    arff_string = openml._api_calls._read_url(url, request_method='get')
     md5 = hashlib.md5()
     md5.update(arff_string.encode('utf-8'))
     md5_checksum = md5.hexdigest()
@@ -751,7 +753,8 @@ def _get_dataset_features(did_cache_dir, dataset_id):
         with io.open(features_file, encoding='utf8') as fh:
             features_xml = fh.read()
     except (OSError, IOError):
-        features_xml = openml._api_calls._perform_api_call("data/features/%d" % dataset_id)
+        url_suffix = "data/features/%d" % dataset_id
+        features_xml = openml._api_calls._perform_api_call(url_suffix, 'get')
 
         with io.open(features_file, "w", encoding='utf8') as fh:
             fh.write(features_xml)
@@ -787,7 +790,8 @@ def _get_dataset_qualities(did_cache_dir, dataset_id):
         with io.open(qualities_file, encoding='utf8') as fh:
             qualities_xml = fh.read()
     except (OSError, IOError):
-        qualities_xml = openml._api_calls._perform_api_call("data/qualities/%d" % dataset_id)
+        url_suffix = "data/qualities/%d" % dataset_id
+        qualities_xml = openml._api_calls._perform_api_call(url_suffix, 'get')
 
         with io.open(qualities_file, "w", encoding='utf8') as fh:
             fh.write(qualities_xml)
@@ -859,11 +863,13 @@ def _get_online_dataset_arff(dataset_id):
     str
         A string representation of an ARFF file.
     """
-    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id)
+    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id,
+                                                      'get')
     # build a dict from the xml.
     # use the url from the dataset description and return the ARFF string
     return openml._api_calls._read_url(
-        xmltodict.parse(dataset_xml)['oml:data_set_description']['oml:url']
+        xmltodict.parse(dataset_xml)['oml:data_set_description']['oml:url'],
+        request_method='get'
     )
 
 
@@ -881,7 +887,8 @@ def _get_online_dataset_format(dataset_id):
     str
         Dataset format.
     """
-    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id)
+    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id,
+                                                      'get')
     # build a dict from the xml and get the format from the dataset description
     return xmltodict\
         .parse(dataset_xml)['oml:data_set_description']['oml:format']\
