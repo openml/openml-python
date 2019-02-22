@@ -32,8 +32,8 @@ def get_flow(flow_id, reinstantiate=False):
     flow = OpenMLFlow._from_dict(flow_dict)
 
     if reinstantiate:
-        if not (flow.external_version.startswith('sklearn==') or
-                ',sklearn==' in flow.external_version):
+        if not (flow.external_version.startswith('sklearn==')
+                or ',sklearn==' in flow.external_version):
             raise ValueError('Only sklearn flows can be reinstantiated')
         flow.model = openml.flows.flow_to_sklearn(flow)
 
@@ -72,7 +72,11 @@ def list_flows(offset=None, size=None, tag=None, **kwargs):
         - external version
         - uploader
     """
-    return openml.utils._list_all(_list_flows, offset=offset, size=size, tag=tag, **kwargs)
+    return openml.utils._list_all(_list_flows,
+                                  offset=offset,
+                                  size=size,
+                                  tag=tag,
+                                  **kwargs)
 
 
 def _list_flows(**kwargs):
@@ -236,9 +240,9 @@ def assert_flows_equal(flow1, flow2,
             if key == 'parameters':
                 if ignore_parameter_values or \
                         ignore_parameter_values_on_older_children:
-                    parameters_flow_1 = set(flow1.parameters.keys())
-                    parameters_flow_2 = set(flow2.parameters.keys())
-                    symmetric_difference = parameters_flow_1 ^ parameters_flow_2
+                    params_flow_1 = set(flow1.parameters.keys())
+                    params_flow_2 = set(flow2.parameters.keys())
+                    symmetric_difference = params_flow_1 ^ params_flow_2
                     if len(symmetric_difference) > 0:
                         raise ValueError('Flow %s: parameter set of flow '
                                          'differs from the parameters stored '
@@ -260,4 +264,5 @@ def assert_flows_equal(flow1, flow2,
             if attr1 != attr2:
                 raise ValueError("Flow %s: values for attribute '%s' differ: "
                                  "'%s'\nvs\n'%s'." %
-                                 (str(flow1.name), str(key), str(attr1), str(attr2)))
+                                 (str(flow1.name), str(key),
+                                  str(attr1), str(attr2)))
