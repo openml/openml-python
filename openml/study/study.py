@@ -48,4 +48,3 @@ class OpenMLStudy(object):
         self.flows = flows
         self.setups = setups
         pass
-

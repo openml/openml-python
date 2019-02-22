@@ -601,7 +601,8 @@ def _extract_information_from_model(model):
         parameters_meta_info[k] = OrderedDict((('description', None),
                                                ('data_type', None)))
 
-    return parameters, parameters_meta_info, sub_components, sub_components_explicit
+    return parameters, parameters_meta_info,\
+           sub_components, sub_components_explicit
 
 
 def _get_fn_arguments_with_defaults(fn_name):
@@ -894,7 +895,8 @@ def _check_n_jobs(model):
                                      'Could not find attribute '
                                      'param_distributions.')
             print('Warning! Using subclass BaseSearchCV other than '
-                  '{GridSearchCV, RandomizedSearchCV}. Should implement param check. ')
+                  '{GridSearchCV, RandomizedSearchCV}. '
+                  'Should implement param check. ')
 
         if not check(param_distributions, 'n_jobs', None):
             raise PyOpenMLError('openml-python should not be used to '
