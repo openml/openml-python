@@ -130,3 +130,31 @@ class TestStudyFunctions(TestBase):
         
         res = openml.study.delete_study(study_id)
         self.assertTrue(res)
+
+    def test_study_attach_illegal(self):
+        run_list = openml.runs.list_runs(size=10)
+        self.assertEqual(len(run_list), 10)
+        run_list_more = openml.runs.list_runs(size=20)
+        self.assertEqual(len(run_list_more), 20)
+
+        study = openml.study.create_study(
+            alias=None,
+            benchmark_suite=None,
+            name='study with illegal runs',
+            description='none',
+            run_ids=list(run_list.keys())
+        )
+        study_id = study.publish()
+        study_original = openml.study.get_study(study_id)
+
+        with self.assertRaisesRegex(openml.exceptions.OpenMLServerException, 
+                                    'Problem attaching entities.'):
+            # run id does not exists
+            openml.study.attach_to_study(study_id, [0])
+
+        with self.assertRaisesRegex(openml.exceptions.OpenMLServerException, 
+                                    'Problem attaching entities.'):
+            # some runs already attached
+            openml.study.attach_to_study(study_id, list(run_list_more.keys()))
+        study_downloaded = openml.study.get_study(study_id)
+        self.assertListEqual(study_original.runs, study_downloaded.runs)
