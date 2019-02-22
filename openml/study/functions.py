@@ -42,6 +42,7 @@ def get_study(study_id, entity_type=None):
         if 'oml:benchmark_suite' in result_dict else None
     name = result_dict['oml:name']
     description = result_dict['oml:description']
+    status = result_dict['oml:status']
     creation_date = result_dict['oml:creation_date']
     creator = result_dict['oml:creator']
 
@@ -79,6 +80,7 @@ def get_study(study_id, entity_type=None):
         benchmark_suite=benchmark_suite,
         name=name,
         description=description,
+        status=status,
         creation_date=creation_date,
         creator=creator,
         tags=tags,
@@ -122,6 +124,7 @@ def create_study(alias, benchmark_suite, name, description, run_ids):
         benchmark_suite=benchmark_suite,
         name=name,
         description=description,
+        status=None,
         creation_date=None,
         creator=None,
         tags=None,
@@ -161,6 +164,7 @@ def create_benchmark_suite(alias, name, description, task_ids):
         benchmark_suite=None,
         name=name,
         description=description,
+        status=None,
         creation_date=None,
         creator=None,
         tags=None,
@@ -172,21 +176,31 @@ def create_benchmark_suite(alias, name, description, task_ids):
     )
 
 
-def delete_study(study_id):
+def status_update(study_id, status):
     """
-    Deletes an study from the OpenML server.
+    Updates the status of a study to either 'active' or 'deactivated'. 
 
     Parameters
     ----------
     study_id : int
-        OpenML id of the study
-
-    Returns
-    -------
-    bool
-        True iff the deletion was successful. False otherwse
+        The data id of the dataset
+    status : str,
+        'active' or 'deactivated'
     """
-    return openml.utils._delete_entity('study', study_id)
+    legal_status = {'active', 'deactivated'}
+    if status not in legal_status:
+        raise ValueError('Illegal status value. '
+                         'Legal values: %s' % legal_status)
+    data = {'study_id': study_id, 'status': status}
+    result_xml = openml._api_calls._perform_api_call("study/status/update",
+                                                     'post',
+                                                     data=data)
+    result = xmltodict.parse(result_xml)
+    server_study_id = result['oml:study_status_update']['oml:id']
+    server_status = result['oml:study_status_update']['oml:status']
+    if status != server_status or int(study_id) != int(server_study_id):
+        # This should never happen
+        raise ValueError('Study id/status does not collide')
 
 
 def attach_to_study(study_id, entity_ids):

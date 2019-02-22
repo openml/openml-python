@@ -6,8 +6,8 @@ import xmltodict
 class OpenMLStudy(object):
 
     def __init__(self, study_id, alias, main_entity_type, benchmark_suite,
-                 name, description, creation_date, creator, tags, data, tasks,
-                 flows, setups, runs):
+                 name, description, status, creation_date, creator, tags, data,
+                 tasks, flows, setups, runs):
         """
         An OpenMLStudy represents the OpenML concept of a study. It contains
         the following information: name, id, description, creation date,
@@ -34,6 +34,8 @@ class OpenMLStudy(object):
             the name of the study (meta-info)
         description : str
             brief description (meta-info)
+        status : str
+            Whether the study is in preparation, active or deactivated
         creation_date : str
             date of creation (meta-info)
         creator : int
@@ -58,6 +60,7 @@ class OpenMLStudy(object):
         self.benchmark_suite = benchmark_suite
         self.name = name
         self.description = description
+        self.status = status,
         self.creation_date = creation_date
         self.creator = creator
         self.tags = tags  # LEGACY. Can be removed soon

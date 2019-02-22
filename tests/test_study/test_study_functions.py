@@ -70,9 +70,10 @@ class TestStudyFunctions(TestBase):
         self.assertSetEqual(set(study_downloaded.tasks),
                             set(tasks_additional))
 
-        # test delete function
-        result = openml.study.delete_study(study_id)
-        self.assertTrue(result)
+        # test status update function
+        openml.study.status_update(study_id, 'deactivated')
+        study_downloaded = openml.study.get_study(study_id)
+        self.assertEqual(study_downloaded.status, 'deactivated')
 
     def test_publish_study(self):
         # get some random runs to attach
@@ -121,6 +122,7 @@ class TestStudyFunctions(TestBase):
         self.assertSetEqual(set(study_downloaded.runs),
                             set(run_list_additional.keys()))
 
-        # test delete function
-        result = openml.study.delete_study(study_id)
-        self.assertTrue(result)
+        # test status update function
+        openml.study.status_update(study_id, 'deactivated')
+        study_downloaded = openml.study.get_study(study_id)
+        self.assertEqual(study_downloaded.status, 'deactivated')
