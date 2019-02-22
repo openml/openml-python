@@ -46,30 +46,31 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
 
 
 def _tag_entity(entity_type, entity_id, tag, untag=False):
-    """Function that tags or untags a given entity on OpenML. As the OpenML
-       API tag functions all consist of the same format, this function covers
-       all entity types (currently: dataset, task, flow, setup, run). Could
-       be used in a partial to provide dataset_tag, dataset_untag, etc.
+    """
+    Function that tags or untags a given entity on OpenML. As the OpenML
+    API tag functions all consist of the same format, this function covers
+    all entity types (currently: dataset, task, flow, setup, run). Could
+    be used in a partial to provide dataset_tag, dataset_untag, etc.
 
-        Parameters
-        ----------
-        entity_type : str
-            Name of the entity to tag (e.g., run, flow, data)
+    Parameters
+    ----------
+    entity_type : str
+        Name of the entity to tag (e.g., run, flow, data)
 
-        entity_id : int
-            OpenML id of the entity
+    entity_id : int
+        OpenML id of the entity
 
-        tag : str
-            The tag
+    tag : str
+        The tag
 
-        untag : bool
-            Set to true if needed to untag, rather than tag
+    untag : bool
+        Set to true if needed to untag, rather than tag
 
-        Returns
-        -------
-        tags : list
-            List of tags that the entity is (still) tagged with
-        """
+    Returns
+    -------
+    tags : list
+        List of tags that the entity is (still) tagged with
+    """
     legal_entities = {'data', 'task', 'flow', 'setup', 'run'}
     if entity_type not in legal_entities:
         raise ValueError('Can\'t tag a %s' % entity_type)
@@ -82,6 +83,9 @@ def _tag_entity(entity_type, entity_id, tag, untag=False):
 
     post_variables = {'%s_id' % entity_type: entity_id, 'tag': tag}
     result_xml = openml._api_calls._perform_api_call(uri, post_variables)
+    result_xml = openml._api_calls._perform_api_call(uri,
+                                                     'post',
+                                                     post_variables)
 
     result = xmltodict.parse(result_xml, force_list={'oml:tag'})[main_tag]
 
@@ -90,6 +94,47 @@ def _tag_entity(entity_type, entity_id, tag, untag=False):
     else:
         # no tags, return empty list
         return []
+
+
+def _delete_entity(entity_type, entity_id):
+    """
+    Function that deletes a given entity on OpenML. As the OpenML
+    API tag functions all consist of the same format, this function covers
+    all entity types that can be deleted (currently: dataset, task, flow,
+    run, study and user).
+
+    Parameters
+    ----------
+    entity_type : str
+        Name of the entity to tag (e.g., run, flow, data)
+
+    entity_id : int
+        OpenML id of the entity
+
+    Returns
+    -------
+    bool
+        True iff the deletion was successful. False otherwse
+    """
+    legal_entities = {
+        'data',
+        'flow',
+        'task',
+        'run',
+        'study',
+        'user',
+    }
+    if entity_type not in legal_entities:
+        raise ValueError('Can\'t delete a %s' % entity_type)
+
+    url_suffix = '%s/%d' % (entity_type, entity_id)
+    result_xml = openml._api_calls._perform_api_call(url_suffix,
+                                                     'delete')
+    result = xmltodict.parse(result_xml)
+    if 'oml:%s_delete' % entity_type in result:
+        return True
+    else:
+        return False
 
 
 def _list_all(listing_call, *args, **filters):

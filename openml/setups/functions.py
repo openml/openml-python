@@ -46,6 +46,7 @@ def setup_exists(flow):
                                     pretty=True)
     file_elements = {'description': ('description.arff', description)}
     result = openml._api_calls._perform_api_call('/setup/exists/',
+                                                 'post',
                                                  file_elements=file_elements)
     result_dict = xmltodict.parse(result)
     setup_id = int(result_dict['oml:setup_exists']['oml:id'])
@@ -96,9 +97,9 @@ def get_setup(setup_id):
 
     try:
         return _get_cached_setup(setup_id)
-
-    except openml.exceptions.OpenMLCacheException:
-        setup_xml = openml._api_calls._perform_api_call('/setup/%d' % setup_id)
+    except (openml.exceptions.OpenMLCacheException):
+        url_suffix = '/setup/%d' % setup_id
+        setup_xml = openml._api_calls._perform_api_call(url_suffix, 'get')
         with io.open(setup_file, "w", encoding='utf8') as fh:
             fh.write(setup_xml)
 
@@ -159,7 +160,7 @@ def _list_setups(setup=None, **kwargs):
 
 def __list_setups(api_call):
     """Helper function to parse API calls which are lists of setups"""
-    xml_string = openml._api_calls._perform_api_call(api_call)
+    xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     setups_dict = xmltodict.parse(xml_string, force_list=('oml:setup',))
     openml_uri = 'http://openml.org/openml'
     # Minimalistic check if the XML is useful

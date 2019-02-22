@@ -331,6 +331,7 @@ class OpenMLFlow(object):
         file_elements = {'description': xml_description}
         return_value = openml._api_calls._perform_api_call(
             "flow/",
+            'post',
             file_elements=file_elements,
         )
         server_response = xmltodict.parse(return_value)
@@ -415,7 +416,7 @@ class OpenMLFlow(object):
             Tag to attach to the flow.
         """
         data = {'flow_id': self.flow_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/flow/tag", data=data)
+        openml._api_calls._perform_api_call("/flow/tag", 'post', data=data)
 
     def remove_tag(self, tag):
         """Removes a tag from this flow on the server.
@@ -426,7 +427,7 @@ class OpenMLFlow(object):
             Tag to attach to the flow.
         """
         data = {'flow_id': self.flow_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/flow/untag", data=data)
+        openml._api_calls._perform_api_call("/flow/untag", 'post', data=data)
 
 
 def _copy_server_fields(source_flow, target_flow):

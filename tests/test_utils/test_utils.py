@@ -13,10 +13,10 @@ class OpenMLTaskTest(TestBase):
     _multiprocess_can_split_ = True
     _batch_size = 25
 
-    def mocked_perform_api_call(call):
+    def mocked_perform_api_call(call, request_method):
         # TODO: JvR: Why is this not a staticmethod?
         url = openml.config.server + '/' + call
-        return openml._api_calls._read_url(url)
+        return openml._api_calls._read_url(url, request_method=request_method)
 
     def test_list_all(self):
         openml.utils._list_all(openml.tasks.functions._list_tasks)
