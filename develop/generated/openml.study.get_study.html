@@ -113,10 +113,27 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.study</span></code>.get_study<a class="headerlink" href="#openml-study-get-study" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.study.get_study">
-<code class="descclassname">openml.study.</code><code class="descname">get_study</code><span class="sig-paren">(</span><em>study_id</em>, <em>type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.study.get_study" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.study.</code><code class="descname">get_study</code><span class="sig-paren">(</span><em>study_id</em>, <em>entity_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.study.get_study" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves all relevant information of an OpenML study from the server
 Note that some of the (data, tasks, flows, setups) fields can be empty
 (depending on information on the server)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>study id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, str</span></dt>
+<dd><p class="first last">study id (numeric or alias)</p>
+</dd>
+<dt><strong>entity_type</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str (optional)</span></dt>
+<dd><p class="first last">Which entity type to return. Either {data, tasks, flows, setups,
+runs}. Give None to return all entity types.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <div class="clearer"></div></div>
