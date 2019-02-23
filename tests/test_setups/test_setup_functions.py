@@ -1,4 +1,3 @@
-import sys
 import hashlib
 import time
 
@@ -6,9 +5,7 @@ import openml
 import openml.exceptions
 from openml.testing import TestBase
 
-from sklearn.ensemble import BaggingClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.base import BaseEstimator, ClassifierMixin
 
@@ -133,7 +130,7 @@ class TestSetupFunctions(TestBase):
 
         setups = openml.setups.list_setups(flow=flow_id)
 
-        self.assertGreater(len(setups), 0) # TODO: please adjust 0
+        self.assertGreater(len(setups), 0)  # TODO: please adjust 0
         for setup_id in setups.keys():
             self.assertEqual(setups[setup_id].flow_id, flow_id)
 
