@@ -178,7 +178,7 @@ def create_benchmark_suite(alias, name, description, task_ids):
 
 def status_update(study_id, status):
     """
-    Updates the status of a study to either 'active' or 'deactivated'. 
+    Updates the status of a study to either 'active' or 'deactivated'.
 
     Parameters
     ----------

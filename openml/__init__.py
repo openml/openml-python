@@ -30,7 +30,7 @@ from .flows import OpenMLFlow
 from .evaluations import OpenMLEvaluation
 from .study import OpenMLStudy
 
-from .__version__ import __version__
+from .__version__ import __version__  # noqa: F401
 
 
 def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None,

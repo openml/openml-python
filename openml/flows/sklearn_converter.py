@@ -873,8 +873,8 @@ def _check_n_jobs(model):
                              legal_values)
                        for sub_grid in param_grid)
 
-    if not (isinstance(model, sklearn.base.BaseEstimator) or
-            isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
+    if not (isinstance(model, sklearn.base.BaseEstimator)
+            or isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
         raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
     # make sure that n_jobs is not in the parameter grid of optimization

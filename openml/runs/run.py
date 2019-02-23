@@ -280,17 +280,17 @@ class OpenMLRun(object):
         task = get_task(self.task_id)
 
         attribute_names = [att[0] for att in predictions_arff['attributes']]
-        if ('correct' not in attribute_names and
-            task.task_type_id in [TaskTypeEnum.SUPERVISED_CLASSIFICATION,
-                                  TaskTypeEnum.LEARNING_CURVE]):
+        if (task.task_type_id in [TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+                                  TaskTypeEnum.LEARNING_CURVE]
+                and 'correct' not in attribute_names):
             raise ValueError('Attribute "correct" should be set for '
                              'classification task runs')
-        if task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION and \
-                'truth' not in attribute_names:
+        if (task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION
+                and 'truth' not in attribute_names):
             raise ValueError('Attribute "truth" should be set for '
                              'regression task runs')
-        if task.task_type_id != TaskTypeEnum.CLUSTERING and \
-                'prediction' not in attribute_names:
+        if (task.task_type_id != TaskTypeEnum.CLUSTERING
+                and 'prediction' not in attribute_names):
             raise ValueError('Attribute "predict" should be set for '
                              'supervised task runs')
 
@@ -511,7 +511,7 @@ def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
     Returns
     -------
     result : an array with version information of the above packages
-    """
+    """  # noqa: W605
     description = OrderedDict()
     description['oml:run'] = OrderedDict()
     description['oml:run']['@xmlns:oml'] = 'http://openml.org/openml'

@@ -185,7 +185,7 @@ def _list_all(listing_call, *args, **filters):
     if 'offset' in active_filters:
         offset = active_filters['offset']
         del active_filters['offset']
-    
+
     batch_size = BATCH_SIZE_ORIG
     while True:
         try:
