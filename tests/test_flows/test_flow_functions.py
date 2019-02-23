@@ -220,4 +220,4 @@ class TestFlowFunctions(TestBase):
         new_flow.upload_date = '2016-01-31T12-01-01'
         self.assertRaises(ValueError, assert_flows_equal, flow, new_flow,
                           ignore_parameter_values_on_older_children=flow_upload_date)
-        assert_flows_equal(flow, flow, gnore_parameter_values_on_older_children=None)
+        assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=None)

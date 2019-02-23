@@ -1,6 +1,5 @@
 import inspect
 import os
-import unittest
 
 import numpy as np
 
@@ -26,7 +25,8 @@ class OpenMLSplitTest(TestBase):
     def tearDown(self):
         try:
             os.remove(self.pd_filename)
-        except:
+        except (OSError, FileNotFoundError):
+            #  Replaced bare except. Not sure why these exceptions are acceptable.
             pass
 
     def test_eq(self):
@@ -64,8 +64,9 @@ class OpenMLSplitTest(TestBase):
             for j in range(10):
                 self.assertGreaterEqual(split.split[i][j][0].train.shape[0], 808)
                 self.assertGreaterEqual(split.split[i][j][0].test.shape[0], 89)
-                self.assertEqual(split.split[i][j][0].train.shape[0] +
-                                 split.split[i][j][0].test.shape[0], 898)
+                self.assertEqual(split.split[i][j][0].train.shape[0]
+                                 + split.split[i][j][0].test.shape[0],
+                                 898)
 
     def test_get_split(self):
         split = OpenMLSplit._from_arff_file(self.arff_filename)
