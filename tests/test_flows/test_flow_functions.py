@@ -15,10 +15,10 @@ class TestFlowFunctions(TestBase):
         self.assertIsInstance(flow['name'], str)
         self.assertIsInstance(flow['full_name'], str)
         self.assertIsInstance(flow['version'], str)
-        # There are some runs on openml.org that can have an empty external
-        # version
-        self.assertTrue(isinstance(flow['external_version'], str)
-                        or flow['external_version'] is None)  # noqa W503
+        # There are some runs on openml.org that can have an empty external version
+        ext_version_str_or_none = (isinstance(flow['external_version'], str)
+                                   or flow['external_version'] is None)
+        self.assertTrue(ext_version_str_or_none)
 
     def test_list_flows(self):
         openml.config.server = self.production_server
@@ -191,6 +191,8 @@ class TestFlowFunctions(TestBase):
     def test_are_flows_equal_ignore_if_older(self):
         paramaters = OrderedDict((('a', 5), ('b', 6)))
         parameters_meta_info = OrderedDict((('a', None), ('b', None)))
+        flow_upload_date = '2017-01-31T12-01-01'
+        assert_flows_equal = openml.flows.functions.assert_flows_equal
 
         flow = openml.flows.OpenMLFlow(name='Test',
                                        description='Test flow',
@@ -204,22 +206,18 @@ class TestFlowFunctions(TestBase):
                                        dependencies='abc',
                                        class_name='Test',
                                        custom_name='Test',
-                                       upload_date='2017-01-31T12-01-01')
+                                       upload_date=flow_upload_date)
 
-        openml.flows.functions.assert_flows_equal(flow, flow,
-                                                  ignore_parameter_values_on_older_children='2017-01-31T12-01-01')
-        openml.flows.functions.assert_flows_equal(flow, flow,
-                                                  ignore_parameter_values_on_older_children=None)
+        assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=flow_upload_date)
+        assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=None)
         new_flow = copy.deepcopy(flow)
         new_flow.parameters['a'] = 7
-        self.assertRaises(ValueError, openml.flows.functions.assert_flows_equal,
-                          flow, new_flow, ignore_parameter_values_on_older_children='2017-01-31T12-01-01')
-        self.assertRaises(ValueError, openml.flows.functions.assert_flows_equal,
-                          flow, new_flow, ignore_parameter_values_on_older_children=None)
+        self.assertRaises(ValueError, assert_flows_equal, flow, new_flow,
+                          ignore_parameter_values_on_older_children=flow_upload_date)
+        self.assertRaises(ValueError, assert_flows_equal, flow, new_flow,
+                          ignore_parameter_values_on_older_children=None)
 
         new_flow.upload_date = '2016-01-31T12-01-01'
-        self.assertRaises(ValueError, openml.flows.functions.assert_flows_equal,
-                          flow, new_flow,
-                          ignore_parameter_values_on_older_children='2017-01-31T12-01-01')
-        openml.flows.functions.assert_flows_equal(flow, flow,
-                                                  ignore_parameter_values_on_older_children=None)
+        self.assertRaises(ValueError, assert_flows_equal, flow, new_flow,
+                          ignore_parameter_values_on_older_children=flow_upload_date)
+        assert_flows_equal(flow, flow, gnore_parameter_values_on_older_children=None)

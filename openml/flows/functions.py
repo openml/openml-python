@@ -197,7 +197,7 @@ def assert_flows_equal(flow1, flow2,
 
     flow2 : OpenMLFlow
 
-    ignore_parameter_values_on_older_children : str
+    ignore_parameter_values_on_older_children : str (optional)
         If set to ``OpenMLFlow.upload_date``, ignores parameters in a child
         flow if it's upload date predates the upload date of the parent flow.
 
