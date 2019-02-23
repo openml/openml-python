@@ -54,8 +54,9 @@ print(dataset.description[:500])
 
 ############################################################################
 # Get the actual data.
-#
-# Returned as numpy array, with meta-info (e.g. target feature, feature names,...)
+# 
+# Returned as numpy array, with meta-info
+# (e.g. target feature, feature names, ...)
 X, y, attribute_names = dataset.get_data(
     target=dataset.default_target_attribute,
     return_attribute_names=True,

@@ -6,8 +6,6 @@ How to train/run a model and how to upload the results.
 """
 
 import openml
-import pandas as pd
-import seaborn as sns
 from pprint import pprint
 from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
 
@@ -60,7 +58,7 @@ run = openml.runs.run_flow_on_task(flow, task)
 ############################################################################
 # Share the run on the OpenML server
 #
-# So far the run is only available locally. By calling the publish function, the run is send to the OpenML server:
+# So far the run is only available locally. By calling the publish function, the run is sent to the OpenML server:
 
 myrun = run.publish()
 # For this tutorial, our configuration publishes to the test server

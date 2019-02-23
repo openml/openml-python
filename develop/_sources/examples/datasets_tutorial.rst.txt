@@ -57,7 +57,7 @@ List datasets
 
  .. code-block:: none
 
-    First 10 of 1885 datasets...
+    First 10 of 4255 datasets...
 
 
 Exercise 1
@@ -138,7 +138,8 @@ Download datasets
 
 Get the actual data.
 
-Returned as numpy array, with meta-info (e.g. target feature, feature names,...)
+Returned as numpy array, with meta-info
+(e.g. target feature, feature names, ...)
 
 
 
@@ -197,13 +198,14 @@ Exercise 2
     )
 
 
+
 .. image:: /examples/images/sphx_glr_datasets_tutorial_001.png
     :class: sphx-glr-single-img
 
 
 
 
-**Total running time of the script:** ( 0 minutes  2.106 seconds)
+**Total running time of the script:** ( 0 minutes  3.060 seconds)
 
 
 .. _sphx_glr_download_examples_datasets_tutorial.py:

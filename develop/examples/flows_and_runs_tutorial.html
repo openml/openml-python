@@ -125,8 +125,6 @@
 <span id="sphx-glr-examples-flows-and-runs-tutorial-py"></span><h1>Flows and Runs<a class="headerlink" href="#flows-and-runs" title="Permalink to this headline">¶</a></h1>
 <p>How to train/run a model and how to upload the results.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="kn">as</span> <span class="nn">sns</span>
 <span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">ensemble</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">,</span> <span class="n">preprocessing</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">tree</span>
 </pre></div>
@@ -181,7 +179,7 @@
 </pre></div>
 </div>
 <p>Share the run on the OpenML server</p>
-<p>So far the run is only available locally. By calling the publish function, the run is send to the OpenML server:</p>
+<p>So far the run is only available locally. By calling the publish function, the run is sent to the OpenML server:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">myrun</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
 <span class="c1"># For this tutorial, our configuration publishes to the test server</span>
 <span class="c1"># as to not pollute the main server.</span>
@@ -189,7 +187,7 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/52037
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/55667
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -236,7 +234,7 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/52038
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/55668
 </pre></div>
 </div>
 </div>
@@ -266,10 +264,10 @@ them. Some tasks you could try (or browse openml.org):</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/52039
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/55669
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  14.218 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  14.461 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/27a5bee6ab807de4cd881f6693fcb2aa/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></div>
