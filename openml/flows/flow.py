@@ -334,7 +334,8 @@ class OpenMLFlow(object):
             'post',
             file_elements=file_elements,
         )
-        flow_id = int(xmltodict.parse(return_value)['oml:upload_flow']['oml:id'])
+        server_response = xmltodict.parse(return_value)
+        flow_id = int(server_response['oml:upload_flow']['oml:id'])
         flow = openml.flows.functions.get_flow(flow_id)
         _copy_server_fields(flow, self)
         try:
@@ -351,10 +352,10 @@ class OpenMLFlow(object):
 
     def get_structure(self, key_item):
         """
-        Returns for each sub-component of the flow the path of identifiers that
-        should be traversed to reach this component. The resulting dict maps a
-        key (identifying a flow by either its id, name or fullname) to the
-        parameter prefix.
+        Returns for each sub-component of the flow the path of identifiers
+        that should be traversed to reach this component. The resulting dict
+        maps a key (identifying a flow by either its id, name or fullname) to
+        the parameter prefix.
 
         Parameters
         ----------

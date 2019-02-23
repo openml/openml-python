@@ -8,7 +8,7 @@ import xmltodict
 from .. import config
 from .setup import OpenMLSetup, OpenMLParameter
 from openml.flows import flow_exists
-from openml.exceptions import OpenMLServerNoResult
+import openml.exceptions
 import openml.utils
 
 
@@ -68,7 +68,8 @@ def _get_cached_setup(setup_id):
         return setup
 
     except (OSError, IOError):
-        raise openml.exceptions.OpenMLCacheException("Setup file for setup id %d not cached" % setup_id)
+        raise openml.exceptions.OpenMLCacheException(
+            "Setup file for setup id %d not cached" % setup_id)
 
 
 def get_setup(setup_id):
@@ -86,7 +87,9 @@ def get_setup(setup_id):
     OpenMLSetup
         an initialized openml setup object
     """
-    setup_dir = os.path.join(config.get_cache_directory(), "setups", str(setup_id))
+    setup_dir = os.path.join(config.get_cache_directory(),
+                             "setups",
+                             str(setup_id))
     setup_file = os.path.join(setup_dir, "description.xml")
 
     if not os.path.exists(setup_dir):
@@ -94,7 +97,6 @@ def get_setup(setup_id):
 
     try:
         return _get_cached_setup(setup_id)
-
     except (openml.exceptions.OpenMLCacheException):
         url_suffix = '/setup/%d' % setup_id
         setup_xml = openml._api_calls._perform_api_call(url_suffix, 'get')
@@ -121,9 +123,10 @@ def list_setups(offset=None, size=None, flow=None, tag=None, setup=None):
     -------
     dict
         """
-
+    batch_size = 1000  # batch size for setups is lower
     return openml.utils._list_all(_list_setups, offset=offset, size=size,
-                                  flow=flow, tag=tag, setup=setup, batch_size=1000)  #batch size for setups is lower
+                                  flow=flow, tag=tag,
+                                  setup=setup, batch_size=batch_size)
 
 
 def _list_setups(setup=None, **kwargs):
@@ -159,19 +162,20 @@ def __list_setups(api_call):
     """Helper function to parse API calls which are lists of setups"""
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     setups_dict = xmltodict.parse(xml_string, force_list=('oml:setup',))
+    openml_uri = 'http://openml.org/openml'
     # Minimalistic check if the XML is useful
     if 'oml:setups' not in setups_dict:
-        raise ValueError('Error in return XML, does not contain "oml:setups": %s'
-                         % str(setups_dict))
+        raise ValueError('Error in return XML, does not contain "oml:setups":'
+                         ' %s' % str(setups_dict))
     elif '@xmlns:oml' not in setups_dict['oml:setups']:
         raise ValueError('Error in return XML, does not contain '
                          '"oml:setups"/@xmlns:oml: %s'
                          % str(setups_dict))
-    elif setups_dict['oml:setups']['@xmlns:oml'] != 'http://openml.org/openml':
+    elif setups_dict['oml:setups']['@xmlns:oml'] != openml_uri:
         raise ValueError('Error in return XML, value of  '
                          '"oml:seyups"/@xmlns:oml is not '
-                         '"http://openml.org/openml": %s'
-                         % str(setups_dict))
+                         '"%s": %s'
+                         % (openml_uri, str(setups_dict)))
 
     assert type(setups_dict['oml:setups']['oml:setup']) == list, \
         type(setups_dict['oml:setups'])
@@ -248,9 +252,11 @@ def _create_setup_from_xml(result_dict):
         elif isinstance(xml_parameters, list):
             for xml_parameter in xml_parameters:
                 id = int(xml_parameter['oml:id'])
-                parameters[id] = _create_setup_parameter_from_xml(xml_parameter)
+                parameters[id] = \
+                    _create_setup_parameter_from_xml(xml_parameter)
         else:
-            raise ValueError('Expected None, list or dict, received someting else: %s' %str(type(xml_parameters)))
+            raise ValueError('Expected None, list or dict, received '
+                             'something else: %s' % str(type(xml_parameters)))
 
     return OpenMLSetup(setup_id, flow_id, parameters)
 

@@ -85,8 +85,9 @@ def sklearn_to_flow(o, parent_model=None):
 
 
 def _is_estimator(o):
-    return (hasattr(o, 'fit') and hasattr(o, 'get_params') and
-            hasattr(o, 'set_params'))
+    return (hasattr(o, 'fit')
+            and hasattr(o, 'get_params')
+            and hasattr(o, 'set_params'))
 
 
 def _is_cross_validator(o):
@@ -389,24 +390,24 @@ def _serialize_model(model):
     """
 
     # Get all necessary information about the model objects itself
-    parameters, parameters_meta_info, sub_components, sub_components_explicit =\
+    parameters, parameters_meta_info, subcomponents, subcomponents_explicit =\
         _extract_information_from_model(model)
 
     # Check that a component does not occur multiple times in a flow as this
     # is not supported by OpenML
-    _check_multiple_occurence_of_component_in_flow(model, sub_components)
+    _check_multiple_occurence_of_component_in_flow(model, subcomponents)
 
-    # Create a flow name, which contains all components in brackets, for
-    # example RandomizedSearchCV(Pipeline(StandardScaler,AdaBoostClassifier(DecisionTreeClassifier)),StandardScaler,AdaBoostClassifier(DecisionTreeClassifier))
+    # Create a flow name, which contains all components in brackets, e.g.:
+    # RandomizedSearchCV(Pipeline(StandardScaler,AdaBoostClassifier(DecisionTreeClassifier)),StandardScaler,AdaBoostClassifier(DecisionTreeClassifier))
     class_name = model.__module__ + "." + model.__class__.__name__
 
     # will be part of the name (in brackets)
     sub_components_names = ""
-    for key in sub_components:
-        if key in sub_components_explicit:
-            sub_components_names += "," + key + "=" + sub_components[key].name
+    for key in subcomponents:
+        if key in subcomponents_explicit:
+            sub_components_names += "," + key + "=" + subcomponents[key].name
         else:
-            sub_components_names += "," + sub_components[key].name
+            sub_components_names += "," + subcomponents[key].name
 
     if sub_components_names:
         # slice operation on string in order to get rid of leading comma
@@ -415,24 +416,24 @@ def _serialize_model(model):
         name = class_name
 
     # Get the external versions of all sub-components
-    external_version = _get_external_version_string(model, sub_components)
+    external_version = _get_external_version_string(model, subcomponents)
 
     dependencies = [_format_external_version('sklearn', sklearn.__version__),
                     'numpy>=1.6.1', 'scipy>=0.9']
     dependencies = '\n'.join(dependencies)
 
+    sklearn_version = _format_external_version('sklearn', sklearn.__version__)
+    sklearn_version_formatted = sklearn_version.replace('==', '_')
     flow = OpenMLFlow(name=name,
                       class_name=class_name,
                       description='Automatically created scikit-learn flow.',
                       model=model,
-                      components=sub_components,
+                      components=subcomponents,
                       parameters=parameters,
                       parameters_meta_info=parameters_meta_info,
                       external_version=external_version,
                       tags=['openml-python', 'sklearn', 'scikit-learn',
-                            'python',
-                            _format_external_version('sklearn',
-                                                     sklearn.__version__).replace('==', '_'),
+                            'python', sklearn_version_formatted,
                             # TODO: add more tags based on the scikit-learn
                             # module a flow is in? For example automatically
                             # annotate a class of sklearn.svm.SVC() with the
@@ -500,9 +501,10 @@ def _extract_information_from_model(model):
     for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
         rval = sklearn_to_flow(v, model)
 
-        if (isinstance(rval, (list, tuple)) and len(rval) > 0 and
-                isinstance(rval[0], (list, tuple)) and
-                all([isinstance(rval[i], type(rval[0]))
+        if (isinstance(rval, (list, tuple))
+            and len(rval) > 0
+            and isinstance(rval[0], (list, tuple))
+            and all([isinstance(rval[i], type(rval[0]))
                      for i in range(len(rval))])):
 
             # Steps in a pipeline or feature union, or base classifiers in
@@ -526,10 +528,10 @@ def _extract_information_from_model(model):
                     raise TypeError(msg)
 
                 if identifier in reserved_keywords:
-                    parent_model_name = model.__module__ + "." + \
-                                        model.__class__.__name__
+                    parent_model = "{}.{}".format(model.__module__,
+                                                  model.__class__.__name__)
                     msg = 'Found element shadowing official '\
-                          'parameter for %s: %s' % (parent_model_name,
+                          'parameter for %s: %s' % (parent_model,
                                                     identifier)
                     raise PyOpenMLError(msg)
 
@@ -597,13 +599,15 @@ def _extract_information_from_model(model):
         parameters_meta_info[k] = OrderedDict((('description', None),
                                                ('data_type', None)))
 
-    return parameters, parameters_meta_info, sub_components, sub_components_explicit
+    return (parameters, parameters_meta_info,
+            sub_components, sub_components_explicit)
 
 
 def _get_fn_arguments_with_defaults(fn_name):
     """
-    Returns i) a dict with all parameter names (as key) that have a default value (as value) and ii) a set with all
-    parameter names that do not have a default
+    Returns:
+        i) a dict with all parameter names that have a default value, and
+        ii) a set with all parameter names that do not have a default
 
     Parameters
     ----------
@@ -614,21 +618,18 @@ def _get_fn_arguments_with_defaults(fn_name):
     -------
     params_with_defaults: dict
         a dict mapping parameter name to the default value
-    params_without_defaults: dict
+    params_without_defaults: set
         a set with all parameters that do not have a default value
     """
-    if sys.version_info[0] >= 3:
-        signature = inspect.getfullargspec(fn_name)
-    else:
-        signature = inspect.getargspec(fn_name)
-
-    # len(signature.defaults) <= len(signature.args). Thus, by definition, the last entrees of signature.args
-    # actually have defaults. Iterate backwards over both arrays to keep them in sync
-    len_defaults = len(signature.defaults) if signature.defaults is not None else 0
-    params_with_defaults = {signature.args[-1*i]: signature.defaults[-1*i] for i in range(1, len_defaults + 1)}
-    # retrieve the params without defaults
-    params_without_defaults = {signature.args[i] for i in range(len(signature.args) - len_defaults)}
-    return params_with_defaults, params_without_defaults
+    # parameters with defaults are optional, all others are required.
+    signature = inspect.getfullargspec(fn_name)
+    optional_params, required_params = dict(), set()
+    if signature.defaults:
+        optional_params =\
+            dict(zip(reversed(signature.args), reversed(signature.defaults)))
+    required_params = {arg for arg in signature.args
+                       if arg not in optional_params}
+    return optional_params, required_params
 
 
 def _deserialize_model(flow, keep_defaults, recursion_depth):
@@ -675,15 +676,18 @@ def _deserialize_model(flow, keep_defaults, recursion_depth):
 
     if keep_defaults:
         # obtain all params with a default
-        param_defaults, _ = _get_fn_arguments_with_defaults(model_class.__init__)
+        param_defaults, _ =\
+            _get_fn_arguments_with_defaults(model_class.__init__)
 
         # delete the params that have a default from the dict,
         # so they get initialized with their default value
         # except [...]
         for param in param_defaults:
-            # [...] the ones that also have a key in the components dict. As OpenML stores different flows for ensembles
-            # with different (base-)components, in OpenML terms, these are not considered hyperparameters but rather
-            # constants (i.e., changing them would result in a different flow)
+            # [...] the ones that also have a key in the components dict.
+            # As OpenML stores different flows for ensembles with different
+            # (base-)components, in OpenML terms, these are not considered
+            # hyperparameters but rather constants (i.e., changing them would
+            # result in a different flow)
             if param not in components.keys():
                 del parameter_dict[param]
     return model_class(**parameter_dict)
@@ -709,8 +713,8 @@ def _check_dependencies(dependencies):
         elif operation == '>':
             check = installed_version > required_version
         elif operation == '>=':
-            check = installed_version > required_version or \
-                    installed_version == required_version
+            check = (installed_version > required_version
+                     or installed_version == required_version)
         else:
             raise NotImplementedError(
                 'operation \'%s\' is not supported' % operation)
@@ -770,7 +774,7 @@ def deserialize_rv_frozen(o):
     try:
         rv_class = getattr(importlib.import_module(module_name[0]),
                            module_name[1])
-    except:
+    except AttributeError:
         warnings.warn('Cannot create model %s for flow.' % dist_name)
         return None
 
@@ -849,7 +853,7 @@ def _serialize_cross_validator(o):
 def _check_n_jobs(model):
     """
     Returns True if the parameter settings of model are chosen s.t. the model
-    will run on a single core (in that case, openml-python can measure runtimes)
+    will run on a single core (if so, openml-python can measure runtimes)
     """
     def check(param_grid, restricted_parameter_name, legal_values):
         if isinstance(param_grid, dict):
@@ -864,13 +868,13 @@ def _check_n_jobs(model):
                         return False
             return True
         elif isinstance(param_grid, list):
-            for sub_grid in param_grid:
-                if not check(sub_grid, restricted_parameter_name, legal_values):
-                    return False
-            return True
+            return all(check(sub_grid,
+                             restricted_parameter_name,
+                             legal_values)
+                       for sub_grid in param_grid)
 
-    if not (isinstance(model, sklearn.base.BaseEstimator) or
-            isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
+    if not (isinstance(model, sklearn.base.BaseEstimator)
+            or isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
         raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
     # make sure that n_jobs is not in the parameter grid of optimization
@@ -884,9 +888,13 @@ def _check_n_jobs(model):
             if hasattr(model, 'param_distributions'):
                 param_distributions = model.param_distributions
             else:
-                raise AttributeError('Using subclass BaseSearchCV other than {GridSearchCV, RandomizedSearchCV}. Could not find attribute param_distributions. ')
-            print('Warning! Using subclass BaseSearchCV other than ' \
-                  '{GridSearchCV, RandomizedSearchCV}. Should implement param check. ')
+                raise AttributeError('Using subclass BaseSearchCV other than '
+                                     '{GridSearchCV, RandomizedSearchCV}. '
+                                     'Could not find attribute '
+                                     'param_distributions.')
+            print('Warning! Using subclass BaseSearchCV other than '
+                  '{GridSearchCV, RandomizedSearchCV}. '
+                  'Should implement param check. ')
 
         if not check(param_distributions, 'n_jobs', None):
             raise PyOpenMLError('openml-python should not be used to '

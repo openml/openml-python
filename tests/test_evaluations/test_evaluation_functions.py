@@ -11,7 +11,8 @@ class TestEvaluationFunctions(TestBase):
 
         task_id = 7312
 
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", task=[task_id])
+        evaluations = openml.evaluations.list_evaluations("predictive_accuracy",
+                                                          task=[task_id])
 
         self.assertGreater(len(evaluations), 100)
         for run_id in evaluations.keys():
@@ -25,8 +26,8 @@ class TestEvaluationFunctions(TestBase):
         openml.config.server = self.production_server
 
         uploader_id = 16
-
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", uploader=[uploader_id])
+        evaluations = openml.evaluations.list_evaluations("predictive_accuracy",
+                                                          uploader=[uploader_id])
 
         self.assertGreater(len(evaluations), 50)
 
@@ -34,8 +35,8 @@ class TestEvaluationFunctions(TestBase):
         openml.config.server = self.production_server
 
         setup_id = 10
-
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", setup=[setup_id])
+        evaluations = openml.evaluations.list_evaluations("predictive_accuracy",
+                                                          setup=[setup_id])
 
         self.assertGreater(len(evaluations), 50)
         for run_id in evaluations.keys():
@@ -50,7 +51,8 @@ class TestEvaluationFunctions(TestBase):
 
         flow_id = 100
 
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", flow=[flow_id])
+        evaluations = openml.evaluations.list_evaluations("predictive_accuracy",
+                                                          flow=[flow_id])
 
         self.assertGreater(len(evaluations), 2)
         for run_id in evaluations.keys():
@@ -65,7 +67,8 @@ class TestEvaluationFunctions(TestBase):
 
         run_id = 12
 
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", id=[run_id])
+        evaluations = openml.evaluations.list_evaluations("predictive_accuracy",
+                                                          id=[run_id])
 
         self.assertEqual(len(evaluations), 1)
         for run_id in evaluations.keys():
@@ -78,7 +81,8 @@ class TestEvaluationFunctions(TestBase):
     def test_evaluation_list_limit(self):
         openml.config.server = self.production_server
 
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", size=100, offset=100)
+        evaluations = openml.evaluations.list_evaluations("predictive_accuracy",
+                                                          size=100, offset=100)
         self.assertEqual(len(evaluations), 100)
 
     def test_list_evaluations_empty(self):

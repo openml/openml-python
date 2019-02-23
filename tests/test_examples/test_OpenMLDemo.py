@@ -30,12 +30,12 @@ class OpenMLDemoTest(TestBase):
 
         try:
             shutil.rmtree(self.notebook_output_directory)
-        except:
+        except OSError:
             pass
 
         try:
             os.makedirs(self.notebook_output_directory)
-        except:
+        except OSError:
             pass
 
     def _tst_notebook(self, notebook_name):

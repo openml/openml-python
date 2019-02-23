@@ -1,5 +1,5 @@
 """
-Stores module level information like the API key, cache directory and the server.
+Store module level information like the API key, cache directory and the server
 """
 import logging
 import os
@@ -60,8 +60,12 @@ def _setup():
     config = _parse_config()
     apikey = config.get('FAKE_SECTION', 'apikey')
     server = config.get('FAKE_SECTION', 'server')
-    cache_directory = os.path.expanduser(config.get('FAKE_SECTION', 'cachedir'))
-    avoid_duplicate_runs = config.getboolean('FAKE_SECTION', 'avoid_duplicate_runs')
+
+    short_cache_dir = config.get('FAKE_SECTION', 'cachedir')
+    cache_directory = os.path.expanduser(short_cache_dir)
+
+    avoid_duplicate_runs = config.getboolean('FAKE_SECTION',
+                                             'avoid_duplicate_runs')
     connection_n_retries = config.get('FAKE_SECTION', 'connection_n_retries')
     if connection_n_retries > 20:
         raise ValueError(

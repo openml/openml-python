@@ -34,27 +34,27 @@ class OpenMLSplit(object):
         self.samples = len(self.split[0][0])
 
     def __eq__(self, other):
-        if type(self) != type(other):
+        if (type(self) != type(other)
+                or self.name != other.name
+                or self.description != other.description
+                or self.split.keys() != other.split.keys()):
             return False
-        elif self.name != other.name:
+
+        if any(self.split[repetition].keys() != other.split[repetition].keys()
+                for repetition in self.split):
             return False
-        elif self.description != other.description:
-            return False
-        elif self.split.keys() != other.split.keys():
-            return False
-        else:
-            for repetition in self.split:
-                if self.split[repetition].keys() != other.split[repetition].keys():
-                    return False
-                else:
-                    for fold in self.split[repetition]:
-                        for sample in self.split[repetition][fold]:
-                            if np.all(self.split[repetition][fold][sample].test !=
-                                      other.split[repetition][fold][sample].test)\
-                                    and \
-                                    np.all(self.split[repetition][fold][sample].train
-                                           != other.split[repetition][fold][sample].train):
-                                return False
+
+        samples = [(repetition, fold, sample)
+                   for repetition in self.split
+                   for fold in self.split[repetition]
+                   for sample in self.split[repetition][fold]]
+
+        for repetition, fold, sample in samples:
+            self_train, self_test = self.split[repetition][fold][sample]
+            other_train, other_test = other.split[repetition][fold][sample]
+            if not (np.all(self_train == other_train)
+                    and np.all(self_test == other_test)):
+                return False
         return True
 
     @classmethod
@@ -106,12 +106,13 @@ class OpenMLSplit(object):
                     repetitions[repetition][fold] = OrderedDict()
                 if sample not in repetitions[repetition][fold]:
                     repetitions[repetition][fold][sample] = ([], [])
+                split = repetitions[repetition][fold][sample]
 
                 type_ = line[type_idx].decode('utf-8')
                 if type_ == 'TRAIN':
-                    repetitions[repetition][fold][sample][0].append(line[rowid_idx])
+                    split[0].append(line[rowid_idx])
                 elif type_ == 'TEST':
-                    repetitions[repetition][fold][sample][1].append(line[rowid_idx])
+                    split[1].append(line[rowid_idx])
                 else:
                     raise ValueError(type_)
 
@@ -119,8 +120,10 @@ class OpenMLSplit(object):
                 for fold in repetitions[repetition]:
                     for sample in repetitions[repetition][fold]:
                         repetitions[repetition][fold][sample] = Split(
-                            np.array(repetitions[repetition][fold][sample][0], dtype=np.int32),
-                            np.array(repetitions[repetition][fold][sample][1], dtype=np.int32))
+                            np.array(repetitions[repetition][fold][sample][0],
+                                     dtype=np.int32),
+                            np.array(repetitions[repetition][fold][sample][1],
+                                     dtype=np.int32))
 
             with open(pkl_filename, "wb") as fh:
                 pickle.dump({"name": name, "repetitions": repetitions}, fh,

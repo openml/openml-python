@@ -9,13 +9,13 @@ with open("openml/__version__.py") as fh:
 dependency_links = []
 
 try:
-    import numpy
+    import numpy  # noqa: F401
 except ImportError:
     print('numpy is required during installation')
     sys.exit(1)
 
 try:
-    import scipy
+    import scipy  # noqa: F401
 except ImportError:
     print('scipy is required during installation')
     sys.exit(1)

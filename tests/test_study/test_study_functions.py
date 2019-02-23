@@ -2,6 +2,7 @@ import openml
 import openml.study
 from openml.testing import TestBase
 
+
 class TestStudyFunctions(TestBase):
     _multiprocess_can_split_ = True
 
@@ -127,6 +128,6 @@ class TestStudyFunctions(TestBase):
         openml.study.status_update(study_id, 'deactivated')
         study_downloaded = openml.study.get_study(study_id)
         self.assertEqual(study_downloaded.status, 'deactivated')
-        
+
         res = openml.study.delete_study(study_id)
         self.assertTrue(res)
