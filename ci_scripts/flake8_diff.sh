@@ -140,7 +140,8 @@ check_files() {
     if [ -n "$files" ]; then
         # Conservative approach: diff without context (--unified=0) so that code
         # that was not changed does not create failures
-        git diff --no-ext-diff --unified=0 $COMMIT_RANGE -- $files | flake8 --ignore E402 --diff --show-source $options
+        # git diff --no-ext-diff --unified=0 $COMMIT_RANGE -- $files | flake8 --ignore E402 --diff --show-source $options
+        flake8 --ignore E402,W503 --show-source --max-line-length 100 $options
     fi
 }
 
