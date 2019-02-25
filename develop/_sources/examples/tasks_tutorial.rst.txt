@@ -29,9 +29,16 @@ A tutorial on how to list and download tasks.
 
 Tasks are identified by IDs and can be accessed in two different ways:
 
-1. In a list providing basic information on all tasks available on OpenML. This function will not download the actual tasks, but will instead download meta data that can be used to filter the tasks and retrieve a set of IDs. We can filter this list, for example, we can only list tasks having a special tag or only tasks for a specific target such as *supervised classification*.
+1. In a list providing basic information on all tasks available on OpenML.
+This function will not download the actual tasks, but will instead download
+meta data that can be used to filter the tasks and retrieve a set of IDs.
+We can filter this list, for example, we can only list tasks having a
+special tag or only tasks for a specific target such as
+*supervised classification*.
 
-2. A single task by its ID. It contains all meta information, the target metric, the splits and an iterator which can be used to access the splits in a useful manner.
+2. A single task by its ID. It contains all meta information, the target
+metric, the splits and an iterator which can be used to access the
+splits in a useful manner.
 
 
 Listing tasks
@@ -94,7 +101,8 @@ to have better visualization and easier access:
     [5 rows x 19 columns]
 
 
-We can filter the list of tasks to only contain datasets with more than 500 samples, but less than 1000 samples:
+We can filter the list of tasks to only contain datasets with more than
+500 samples, but less than 1000 samples:
 
 
 
@@ -180,7 +188,8 @@ Then, we can further restrict the tasks to all have the same resampling strategy
     26
 
 
-Resampling strategies can be found on the `OpenML Website <http://www.openml.org/search?type=measure&q=estimation%20procedure>`_.
+Resampling strategies can be found on the
+`OpenML Website <http://www.openml.org/search?type=measure&q=estimation%20procedure>`_.
 
 Similar to listing tasks by task type, we can list tasks by tags:
 
@@ -331,7 +340,9 @@ Search for the tasks on the 'eeg-eye-state' dataset.
 Downloading tasks
 ^^^^^^^^^^^^^^^^^
 
-We provide two functions to download tasks, one which downloads only a single task by its ID, and one which takes a list of IDs and downloads all of these tasks:
+We provide two functions to download tasks, one which downloads only a
+single task by its ID, and one which takes a list of IDs and downloads
+all of these tasks:
 
 
 
@@ -401,18 +412,16 @@ And:
 
 
 
-
-
 .. rst-class:: sphx-glr-script-out
 
  Out:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLClassificationTask object at 0x2b9428275780>
+    <openml.tasks.task.OpenMLClassificationTask object at 0x2acf2d4d02e8>
 
 
-**Total running time of the script:** ( 0 minutes  19.041 seconds)
+**Total running time of the script:** ( 0 minutes  18.842 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:

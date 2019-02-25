@@ -129,10 +129,15 @@
 </pre></div>
 </div>
 <p>Tasks are identified by IDs and can be accessed in two different ways:</p>
-<ol class="arabic simple">
-<li>In a list providing basic information on all tasks available on OpenML. This function will not download the actual tasks, but will instead download meta data that can be used to filter the tasks and retrieve a set of IDs. We can filter this list, for example, we can only list tasks having a special tag or only tasks for a specific target such as <em>supervised classification</em>.</li>
-<li>A single task by its ID. It contains all meta information, the target metric, the splits and an iterator which can be used to access the splits in a useful manner.</li>
-</ol>
+<p>1. In a list providing basic information on all tasks available on OpenML.
+This function will not download the actual tasks, but will instead download
+meta data that can be used to filter the tasks and retrieve a set of IDs.
+We can filter this list, for example, we can only list tasks having a
+special tag or only tasks for a specific target such as
+<em>supervised classification</em>.</p>
+<p>2. A single task by its ID. It contains all meta information, the target
+metric, the splits and an iterator which can be used to access the
+splits in a useful manner.</p>
 <div class="section" id="listing-tasks">
 <h2>Listing tasks<a class="headerlink" href="#listing-tasks" title="Permalink to this headline">¶</a></h2>
 <p>We will start by simply listing only <em>supervised classification</em> tasks:</p>
@@ -167,7 +172,8 @@ First 5 of 614 tasks:
 [5 rows x 19 columns]
 </pre></div>
 </div>
-<p>We can filter the list of tasks to only contain datasets with more than 500 samples, but less than 1000 samples:</p>
+<p>We can filter the list of tasks to only contain datasets with more than
+500 samples, but less than 1000 samples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;NumberOfInstances &gt; 500 and NumberOfInstances &lt; 1000&#39;</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
 </pre></div>
@@ -201,7 +207,8 @@ First 5 of 614 tasks:
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>26
 </pre></div>
 </div>
-<p>Resampling strategies can be found on the <a class="reference external" href="http://www.openml.org/search?type=measure&amp;q=estimation%20procedure">OpenML Website</a>.</p>
+<p>Resampling strategies can be found on the
+<a class="reference external" href="http://www.openml.org/search?type=measure&amp;q=estimation%20procedure">OpenML Website</a>.</p>
 <p>Similar to listing tasks by task type, we can list tasks by tags:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s1">&#39;OpenML100&#39;</span><span class="p">)</span>
 <span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
@@ -284,7 +291,9 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </div>
 <div class="section" id="downloading-tasks">
 <h2>Downloading tasks<a class="headerlink" href="#downloading-tasks" title="Permalink to this headline">¶</a></h2>
-<p>We provide two functions to download tasks, one which downloads only a single task by its ID, and one which takes a list of IDs and downloads all of these tasks:</p>
+<p>We provide two functions to download tasks, one which downloads only a
+single task by its ID, and one which takes a list of IDs and downloads
+all of these tasks:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 </pre></div>
@@ -322,10 +331,10 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLClassificationTask object at 0x2b9428275780&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLClassificationTask object at 0x2acf2d4d02e8&gt;
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  19.041 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  18.842 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-tasks-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/204148be48b3a7d6b2cc72a9fc63c69e/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></div>

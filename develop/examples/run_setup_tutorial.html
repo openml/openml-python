@@ -104,6 +104,7 @@
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
 <li><a class="reference internal" href="#">Run Setup</a><ul>
 <li><a class="reference internal" href="#create-a-flow-and-use-it-to-solve-a-task">1) Create a flow and use it to solve a task</a></li>
+<li><a class="reference internal" href="#download-the-flow-and-solve-the-same-task-again">2) Download the flow and solve the same task again.</a></li>
 <li><a class="reference internal" href="#we-will-verify-that-the-obtained-results-are-exactly-the-same">3) We will verify that the obtained results are exactly the same.</a></li>
 </ul>
 </li>
@@ -191,14 +192,9 @@ and solve the same task again;</li>
 <span class="n">run_original</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>  <span class="c1"># this implicitly uploads the flow</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="2">
-<li><dl class="first docutils">
-<dt>Download the flow, reinstantiate the model with same hyperparameters,</dt>
-<dd>and solve the same task again.</dd>
-</dl>
-</li>
-</ol>
-<hr class="docutils" />
+</div>
+<div class="section" id="download-the-flow-and-solve-the-same-task-again">
+<h2>2) Download the flow and solve the same task again.<a class="headerlink" href="#download-the-flow-and-solve-the-same-task-again" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># obtain setup id (note that the setup id is assigned by the OpenML server -</span>
 <span class="c1"># therefore it was not yet available in our local copy of the run)</span>
 <span class="n">run_downloaded</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_original</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>
@@ -221,7 +217,7 @@ and solve the same task again;</li>
                               <span class="n">run_duplicate</span><span class="o">.</span><span class="n">data_content</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  5.894 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  5.981 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-run-setup-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/1362ba2cd69c0b482a5c32fba04ee0d1/run_setup_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">run_setup_tutorial.py</span></code></a></div>

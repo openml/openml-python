@@ -31,13 +31,16 @@ Installation is done via ``pip``:
 
     pip install openml
 
-For further information, please check out the installation guide at https://openml.github.io/openml-python/stable/contributing.html#installation
+For further information, please check out the installation guide at
+https://openml.github.io/openml-python/master/contributing.html#installation
 
 Authentication
 ^^^^^^^^^^^^^^
 
-The OpenML server can only be accessed by users who have signed up on the OpenML platform. If you don’t have an account yet, sign up now.
-You will receive an API key, which will authenticate you to the server and allow you to download and upload datasets, tasks, runs and flows.
+The OpenML server can only be accessed by users who have signed up on the
+OpenML platform. If you don’t have an account yet, sign up now.
+You will receive an API key, which will authenticate you to the server
+and allow you to download and upload datasets, tasks, runs and flows.
 
 * Create an OpenML account (free) on http://www.openml.org.
 * After logging in, open your account page (avatar on the top right)
@@ -45,7 +48,10 @@ You will receive an API key, which will authenticate you to the server and allow
 
 There are two ways to authenticate:
 
-* Create a plain text file **~/.openml/config** with the line **'apikey=MYKEY'**, replacing **MYKEY** with your API key. The config file must be in the directory ~/.openml/config and exist prior to importing the openml module
+* Create a plain text file **~/.openml/config** with the line
+  **'apikey=MYKEY'**, replacing **MYKEY** with your API key. The config
+  file must be in the directory ~/.openml/config and exist prior to
+  importing the openml module.
 * Run the code below, replacing 'YOURKEY' with your API key.
 
 
@@ -66,9 +72,14 @@ There are two ways to authenticate:
 
 Caching
 ^^^^^^^
-When downloading datasets, tasks, runs and flows, they will be cached to retrieve them without calling the server later. As with the API key, the cache directory can be either specified through the config file or through the API:
+When downloading datasets, tasks, runs and flows, they will be cached to
+retrieve them without calling the server later. As with the API key,
+the cache directory can be either specified through the config file or
+through the API:
 
-* Add the  line **cachedir = 'MYDIR'** to the config file, replacing 'MYDIR' with the path to the cache directory. By default, OpenML will use **~/.openml/cache** as the cache directory.
+* Add the  line **cachedir = 'MYDIR'** to the config file, replacing
+  'MYDIR' with the path to the cache directory. By default, OpenML
+  will use **~/.openml/cache** as the cache directory.
 * Run the code below, replacing 'YOURDIR' with the path to the cache directory.
 
 
@@ -76,8 +87,8 @@ When downloading datasets, tasks, runs and flows, they will be cached to retriev
 .. code-block:: python
 
 
-    import os
     # Uncomment and set your OpenML cache directory
+    # import os
     # openml.config.cache_directory = os.path.expanduser('YOURDIR')
 
 
@@ -114,10 +125,10 @@ Download the OpenML task for the eeg-eye-state.
 
  .. code-block:: none
 
-    kNN on eeg-eye-state: http://test.openml.org/r/56856
+    kNN on eeg-eye-state: http://test.openml.org/r/57209
 
 
-**Total running time of the script:** ( 0 minutes  13.835 seconds)
+**Total running time of the script:** ( 0 minutes  13.746 seconds)
 
 
 .. _sphx_glr_download_examples_introduction_tutorial.py:

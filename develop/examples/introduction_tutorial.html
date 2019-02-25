@@ -138,12 +138,15 @@ you to:</p>
 <div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">openml</span>
 </pre></div>
 </div>
-<p>For further information, please check out the installation guide at <a class="reference external" href="https://openml.github.io/openml-python/stable/contributing.html#installation">https://openml.github.io/openml-python/stable/contributing.html#installation</a></p>
+<p>For further information, please check out the installation guide at
+<a class="reference external" href="https://openml.github.io/openml-python/master/contributing.html#installation">https://openml.github.io/openml-python/master/contributing.html#installation</a></p>
 </div>
 <div class="section" id="authentication">
 <h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
-<p>The OpenML server can only be accessed by users who have signed up on the OpenML platform. If you don’t have an account yet, sign up now.
-You will receive an API key, which will authenticate you to the server and allow you to download and upload datasets, tasks, runs and flows.</p>
+<p>The OpenML server can only be accessed by users who have signed up on the
+OpenML platform. If you don’t have an account yet, sign up now.
+You will receive an API key, which will authenticate you to the server
+and allow you to download and upload datasets, tasks, runs and flows.</p>
 <ul class="simple">
 <li>Create an OpenML account (free) on <a class="reference external" href="http://www.openml.org">http://www.openml.org</a>.</li>
 <li>After logging in, open your account page (avatar on the top right)</li>
@@ -151,7 +154,10 @@ You will receive an API key, which will authenticate you to the server and allow
 </ul>
 <p>There are two ways to authenticate:</p>
 <ul class="simple">
-<li>Create a plain text file <strong>~/.openml/config</strong> with the line <strong>‘apikey=MYKEY’</strong>, replacing <strong>MYKEY</strong> with your API key. The config file must be in the directory ~/.openml/config and exist prior to importing the openml module</li>
+<li>Create a plain text file <strong>~/.openml/config</strong> with the line
+<strong>‘apikey=MYKEY’</strong>, replacing <strong>MYKEY</strong> with your API key. The config
+file must be in the directory ~/.openml/config and exist prior to
+importing the openml module.</li>
 <li>Run the code below, replacing ‘YOURKEY’ with your API key.</li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
@@ -164,13 +170,18 @@ You will receive an API key, which will authenticate you to the server and allow
 </div>
 <div class="section" id="caching">
 <h2>Caching<a class="headerlink" href="#caching" title="Permalink to this headline">¶</a></h2>
-<p>When downloading datasets, tasks, runs and flows, they will be cached to retrieve them without calling the server later. As with the API key, the cache directory can be either specified through the config file or through the API:</p>
+<p>When downloading datasets, tasks, runs and flows, they will be cached to
+retrieve them without calling the server later. As with the API key,
+the cache directory can be either specified through the config file or
+through the API:</p>
 <ul class="simple">
-<li>Add the  line <strong>cachedir = ‘MYDIR’</strong> to the config file, replacing ‘MYDIR’ with the path to the cache directory. By default, OpenML will use <strong>~/.openml/cache</strong> as the cache directory.</li>
+<li>Add the  line <strong>cachedir = ‘MYDIR’</strong> to the config file, replacing
+‘MYDIR’ with the path to the cache directory. By default, OpenML
+will use <strong>~/.openml/cache</strong> as the cache directory.</li>
 <li>Run the code below, replacing ‘YOURDIR’ with the path to the cache directory.</li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="c1"># Uncomment and set your OpenML cache directory</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Uncomment and set your OpenML cache directory</span>
+<span class="c1"># import os</span>
 <span class="c1"># openml.config.cache_directory = os.path.expanduser(&#39;YOURDIR&#39;)</span>
 </pre></div>
 </div>
@@ -191,10 +202,10 @@ You will receive an API key, which will authenticate you to the server and allow
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: http://test.openml.org/r/56856
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: http://test.openml.org/r/57209
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  13.835 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  13.746 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-introduction-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/401c39eb686323be5e9bb1b8948e4e0e/introduction_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">introduction_tutorial.py</span></code></a></div>

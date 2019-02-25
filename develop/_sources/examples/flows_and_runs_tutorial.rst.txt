@@ -112,7 +112,8 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
 
 Share the run on the OpenML server
 
-So far the run is only available locally. By calling the publish function, the run is sent to the OpenML server:
+So far the run is only available locally. By calling the publish function,
+the run is sent to the OpenML server:
 
 
 
@@ -134,7 +135,7 @@ So far the run is only available locally. By calling the publish function, the r
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/56857
+    Uploaded to http://test.openml.org/r/57213
 
 
 We can now also inspect the flow object which was automatically created:
@@ -209,7 +210,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/56858
+    Uploaded to http://test.openml.org/r/57216
 
 
 Challenge
@@ -219,11 +220,16 @@ Try to build the best possible models on several OpenML tasks,
 compare your results with the rest of the class and learn from
 them. Some tasks you could try (or browse openml.org):
 
-* EEG eye state: data_id:`1471 <http://www.openml.org/d/1471>`_, task_id:`14951 <http://www.openml.org/t/14951>`_
-* Volcanoes on Venus: data_id:`1527 <http://www.openml.org/d/1527>`_, task_id:`10103 <http://www.openml.org/t/10103>`_
-* Walking activity: data_id:`1509 <http://www.openml.org/d/1509>`_, task_id:`9945 <http://www.openml.org/t/9945>`_, 150k instances.
-* Covertype (Satellite): data_id:`150 <http://www.openml.org/d/150>`_, task_id:`218 <http://www.openml.org/t/218>`_, 500k instances.
-* Higgs (Physics): data_id:`23512 <http://www.openml.org/d/23512>`_, task_id:`52950 <http://www.openml.org/t/52950>`_, 100k instances, missing values.
+* EEG eye state: data_id:`1471 <http://www.openml.org/d/1471>`_,
+  task_id:`14951 <http://www.openml.org/t/14951>`_
+* Volcanoes on Venus: data_id:`1527 <http://www.openml.org/d/1527>`_,
+  task_id:`10103 <http://www.openml.org/t/10103>`_
+* Walking activity: data_id:`1509 <http://www.openml.org/d/1509>`_,
+  task_id:`9945 <http://www.openml.org/t/9945>`_, 150k instances.
+* Covertype (Satellite): data_id:`150 <http://www.openml.org/d/150>`_,
+  task_id:`218 <http://www.openml.org/t/218>`_, 500k instances.
+* Higgs (Physics): data_id:`23512 <http://www.openml.org/d/23512>`_,
+  task_id:`52950 <http://www.openml.org/t/52950>`_, 100k instances, missing values.
 
 
 
@@ -250,10 +256,10 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/56859
+    kNN on diabetes: http://test.openml.org/r/57217
 
 
-**Total running time of the script:** ( 0 minutes  15.395 seconds)
+**Total running time of the script:** ( 0 minutes  15.233 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:
