@@ -137,19 +137,29 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
 
     flow.model = _set_model_seed_where_none(flow.model, seed=seed)
 
-    # skips the run if it already exists and the user opts for this in the
-    # config file. Also, if the flow is not present on the server, the check
-    # is not needed.
-    flow_id = flow_exists(flow.name, flow.external_version)
-    if avoid_duplicate_runs and flow_id:
-        flow_from_server = get_flow(flow_id)
-        flow_from_server.model = flow.model
-        setup_id = setup_exists(flow_from_server)
-        ids = _run_exists(task.task_id, setup_id)
-        if ids:
-            error_message = "One or more runs of this setup were already performed on the task."
-            raise RunsExistsError(ids, error_message)
-        _copy_server_fields(flow_from_server, flow)
+    # We only need to sync with the server right now if we want to upload the flow,
+    # or ensure no duplicate runs exist. Otherwise it can be synced at upload time.
+    flow_id = None
+    if upload_flow or avoid_duplicate_runs:
+        flow_id = flow_exists(flow.name, flow.external_version)
+
+        if upload_flow and not flow_id:
+            flow.publish()
+            flow_id = flow.flow_id
+        elif avoid_duplicate_runs and flow_id is not None:
+            flow_from_server = get_flow(flow_id)
+            flow_from_server.model = flow.model
+            setup_id = setup_exists(flow_from_server)
+            ids = _run_exists(task.task_id, setup_id)
+            if ids:
+                error_message = "One or more runs of this setup were already performed on the task."
+                raise RunsExistsError(ids, error_message)
+            _copy_server_fields(flow_from_server, flow)
+
+    if flow_id is None:
+        # Happens if (1) no sync happened OR (2) flow did not exist `upload_flow` is False.
+        # Cache flow someone
+        raise NotImplementedError("Should cache flow to system here.")
 
     dataset = task.get_dataset()
 
@@ -160,37 +170,7 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
     res = _run_task_get_arffcontent(flow.model, task,
                                     add_local_measures=add_local_measures)
 
-    # in case the flow not exists, flow_id will be False (as returned by
-    # flow_exists). Also check whether there are no illegal flow.flow_id values
-    # (compared to result of openml.flows.flow_exists)
-    if flow_id is False and upload_flow:
-        if flow.flow_id is not None:
-            raise ValueError('flow.flow_id is not None, but the flow does not '
-                             'exist on the server according to flow_exists')
-        _publish_flow_if_necessary(flow)
-        # if the flow was published successfully
-        # and has an id
-        if flow.flow_id is not None:
-            flow_id = flow.flow_id
-
     data_content, trace, fold_evaluations, sample_evaluations = res
-    if not isinstance(flow.flow_id, int):
-        # This is the usual behaviour, where the flow object was initiated off
-        # line and requires some additional information (flow_id, input_id for
-        # each hyperparameter) to be usable by this library
-        server_flow = get_flow(flow_id)
-        openml.flows.flow._copy_server_fields(server_flow, flow)
-        openml.flows.assert_flows_equal(flow, server_flow,
-                                        ignore_parameter_values=True)
-    else:
-        # This can only happen when the function is called directly, and not
-        # through "run_model_on_task"
-        if flow.flow_id != flow_id:
-            # This should never happen, unless user made a flow-creation fault
-            raise ValueError(
-                "Result from API call flow_exists and flow.flow_id are not "
-                "same: '%s' vs '%s'" % (str(flow.flow_id), str(flow_id))
-            )
 
     run = OpenMLRun(
         task_id=task.task_id,
