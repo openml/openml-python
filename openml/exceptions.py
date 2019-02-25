@@ -51,3 +51,10 @@ class PrivateDatasetError(PyOpenMLError):
     """ Exception thrown when the user has no rights to access the dataset. """
     def __init__(self, message):
         super(PrivateDatasetError, self).__init__(message)
+
+
+class RunExistsError(PyOpenMLError):
+    """ Indicates a run already exists on the server when avoiding them is preferred. """
+    def __init__(self, run_id: int, message: str):
+        super().__init__(message)
+        self.run_id = run_id
