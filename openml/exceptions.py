@@ -53,7 +53,7 @@ class PrivateDatasetError(PyOpenMLError):
         super(PrivateDatasetError, self).__init__(message)
 
 
-class RunExistsError(PyOpenMLError):
+class RunsExistError(PyOpenMLError):
     """ Indicates run(s) already exists on the server when avoiding them is preferred. """
     def __init__(self, run_ids: set, message: str):
         if len(run_ids) < 1:

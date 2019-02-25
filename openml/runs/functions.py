@@ -21,7 +21,7 @@ from openml.flows.sklearn_converter import _check_n_jobs
 from openml.flows.flow import _copy_server_fields
 from ..flows import sklearn_to_flow, get_flow, flow_exists, OpenMLFlow
 from ..setups import setup_exists, initialize_model
-from ..exceptions import OpenMLCacheException, OpenMLServerException, RunsExistsError
+from ..exceptions import OpenMLCacheException, OpenMLServerException, RunsExistError
 from ..tasks import OpenMLTask
 from .run import OpenMLRun, _get_version_information
 from .trace import OpenMLRunTrace
