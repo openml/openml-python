@@ -278,3 +278,100 @@ def detach_from_study(study_id, entity_ids):
                                                      post_variables)
     result = xmltodict.parse(result_xml)['oml:study_detach']
     return int(result['oml:linked_entities'])
+
+
+def list_studies(offset=None, size=None, main_entity_type=None,status=None,
+                 uploader=None):
+    """
+    Return a list of all studies which are on OpenML.
+
+    Parameters
+    ----------
+    offset : int, optional
+        The number of studies to skip, starting from the first.
+    size : int, optional
+        The maximum number of studies to show.
+    main_entity_type : str, optional
+        Can be `task` or `run`. In case of `task`, only benchmark suites are
+        returned. In case of `run`, only studies are returned. 
+    status : str, optional
+        Should be {active, in_preparation, deactivated, all}. By default active
+        studies are returned.
+    uploader : list (int), optional
+        Result filter. Will only return studies created by these users.
+
+    Returns
+    -------
+    datasets : dict of dicts
+        A mapping from dataset ID to dict.
+
+        Every dataset is represented by a dictionary containing
+        the following information:
+        - id
+        - name
+        - main_entity_type
+        - status
+        - creator
+        - creation_date
+
+        If qualities are calculated for the dataset, some of
+        these are also returned.
+    """
+    return openml.utils._list_all(_list_studies,
+                                  offset=offset,
+                                  size=size,
+                                  main_entity_type=main_entity_type,
+                                  status=status,
+                                  uploader=uploader)
+
+
+def _list_studies(**kwargs):
+    """
+    Perform api call to return a list of studies.
+
+    Parameters
+    ----------
+    kwargs : dict, optional
+        Legal filter operators (keys in the dict):
+        status, limit, offset, main_entity_type, uploader
+
+    Returns
+    -------
+    studies : dict of dicts
+    """
+    api_call = "study/list"
+    if kwargs is not None:
+        for operator, value in kwargs.items():
+            api_call += "/%s/%s" % (operator, value)
+    return __list_studies(api_call)
+
+
+def __list_studies(api_call):
+    xml_string = openml._api_calls._perform_api_call(api_call, 'get')
+    study_dict = xmltodict.parse(xml_string, force_list=('oml:study',))
+
+    # Minimalistic check if the XML is useful
+    assert type(study_dict['oml:study_list']['oml:study']) == list, \
+        type(study_dict['oml:study_list'])
+    assert study_dict['oml:study_list']['@xmlns:oml'] == \
+        'http://openml.org/openml', study_dict['oml:study_list']['@xmlns:oml']
+
+    studies = dict()
+    for study_ in study_dict['oml:study_list']['oml:study']:
+        expected_fields = {
+            'oml:id': 'id',
+            'oml:alias': 'alias',
+            'oml:main_entity_type': 'main_entity_type',
+            'oml:name': 'name',
+            'oml:status': 'status',
+            'oml:creation_date': 'creation_date',
+            'oml:creator': 'creator'
+        }
+        study_id = int(study_['oml:id'])
+        current_study = dict()
+        for oml_field_name, real_field_name in expected_fields.items():
+            if oml_field_name in study_:
+                current_study[real_field_name] = study_[oml_field_name]
+        current_study['id'] = int(current_study['id'])
+        studies[study_id] = current_study
+    return studies

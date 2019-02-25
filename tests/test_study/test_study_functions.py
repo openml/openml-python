@@ -159,3 +159,8 @@ class TestStudyFunctions(TestBase):
             openml.study.attach_to_study(study_id, list(run_list_more.keys()))
         study_downloaded = openml.study.get_study(study_id)
         self.assertListEqual(study_original.runs, study_downloaded.runs)
+
+    def test_study_list(self):
+        study_list = openml.study.list_studies(status='in_preparation')
+        # might fail if server is recently resetted
+        self.assertGreater(len(study_list), 2)
