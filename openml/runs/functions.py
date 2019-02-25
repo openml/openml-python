@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import time
+from typing import List
 import warnings
 
 import numpy as np
@@ -20,7 +21,7 @@ from openml.flows.sklearn_converter import _check_n_jobs
 from openml.flows.flow import _copy_server_fields
 from ..flows import sklearn_to_flow, get_flow, flow_exists, OpenMLFlow
 from ..setups import setup_exists, initialize_model
-from ..exceptions import OpenMLCacheException, OpenMLServerException
+from ..exceptions import OpenMLCacheException, OpenMLServerException, RunsExistsError
 from ..tasks import OpenMLTask
 from .run import OpenMLRun, _get_version_information
 from .trace import OpenMLRunTrace
@@ -80,8 +81,12 @@ def run_model_on_task(model, task, avoid_duplicate_runs=True, flow_tags=None,
                             add_local_measures=add_local_measures)
 
 
-def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
-                     seed=None, add_local_measures=True, upload_flow=False):
+def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
+                     avoid_duplicate_runs: bool=True,
+                     flow_tags: List[str]=None,
+                     seed: int=None,
+                     add_local_measures: bool=True,
+                     upload_flow: bool=False):
     """Run the model provided by the flow on the dataset defined by task.
 
     Takes the flow and repeat information into account. In case a flow is not
@@ -142,8 +147,8 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
         setup_id = setup_exists(flow_from_server)
         ids = _run_exists(task.task_id, setup_id)
         if ids:
-            raise PyOpenMLError("Run already exists in server. "
-                                "Run id(s): %s" % str(ids))
+            error_message = "One or more runs of this setup were already performed on the task."
+            raise RunsExistsError(ids, error_message)
         _copy_server_fields(flow_from_server, flow)
 
     dataset = task.get_dataset()
@@ -158,7 +163,7 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
     # in case the flow not exists, flow_id will be False (as returned by
     # flow_exists). Also check whether there are no illegal flow.flow_id values
     # (compared to result of openml.flows.flow_exists)
-    if flow_id is False:  #  and upload_flow
+    if flow_id is False and upload_flow:
         if flow.flow_id is not None:
             raise ValueError('flow.flow_id is not None, but the flow does not '
                              'exist on the server according to flow_exists')
