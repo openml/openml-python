@@ -148,12 +148,12 @@ class TestStudyFunctions(TestBase):
         study_id = study.publish()
         study_original = openml.study.get_study(study_id)
 
-        with self.assertRaisesRegex(openml.exceptions.OpenMLServerException, 
+        with self.assertRaisesRegex(openml.exceptions.OpenMLServerException,
                                     'Problem attaching entities.'):
             # run id does not exists
             openml.study.attach_to_study(study_id, [0])
 
-        with self.assertRaisesRegex(openml.exceptions.OpenMLServerException, 
+        with self.assertRaisesRegex(openml.exceptions.OpenMLServerException,
                                     'Problem attaching entities.'):
             # some runs already attached
             openml.study.attach_to_study(study_id, list(run_list_more.keys()))
