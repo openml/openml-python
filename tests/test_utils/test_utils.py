@@ -47,7 +47,7 @@ class OpenMLTaskTest(TestBase):
         datasets_b = openml.datasets.list_datasets(size=np.inf)
 
         # note that in the meantime the number of datasets could have increased
-        # due to tests that run in parralel.
+        # due to tests that run in parallel.
         self.assertGreaterEqual(len(datasets_b), len(datasets_a))
 
     def test_list_all_for_tasks(self):
