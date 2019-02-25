@@ -81,7 +81,7 @@ def run_model_on_task(model, task, avoid_duplicate_runs=True, flow_tags=None,
 
 
 def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
-                     seed=None, add_local_measures=True):
+                     seed=None, add_local_measures=True, upload_flow=False):
     """Run the model provided by the flow on the dataset defined by task.
 
     Takes the flow and repeat information into account. In case a flow is not
@@ -110,6 +110,9 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
     add_local_measures : bool
         Determines whether to calculate a set of evaluation measures locally,
         to later verify server behaviour. Defaults to True
+    upload_flow: bool (default: False)
+        If True, upload the flow to OpenML if it does not exist yet.
+        If False, do not upload the flow to OpenML and only cache it locally.
 
     Returns
     -------
@@ -119,8 +122,7 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
     if flow_tags is not None and not isinstance(flow_tags, list):
         raise ValueError("flow_tags should be a list")
 
-    # TODO: At some point in the future do not allow for arguments in old order
-    # (order changed 6-2018).
+    # TODO: At some point in the future do not allow for arguments in old order (changed 6-2018).
     if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
         # We want to allow either order of argument (to avoid confusion).
         warnings.warn("The old argument order (Flow, model) is deprecated and "
@@ -128,7 +130,7 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
                       "order (model, Flow).", DeprecationWarning)
         task, flow = flow, task
 
-    flow.model = _get_seeded_model(flow.model, seed=seed)
+    flow.model = _set_model_seed_where_none(flow.model, seed=seed)
 
     # skips the run if it already exists and the user opts for this in the
     # config file. Also, if the flow is not present on the server, the check
@@ -156,7 +158,7 @@ def run_flow_on_task(flow, task, avoid_duplicate_runs=True, flow_tags=None,
     # in case the flow not exists, flow_id will be False (as returned by
     # flow_exists). Also check whether there are no illegal flow.flow_id values
     # (compared to result of openml.flows.flow_exists)
-    if flow_id is False:
+    if flow_id is False:  #  and upload_flow
         if flow.flow_id is not None:
             raise ValueError('flow.flow_id is not None, but the flow does not '
                              'exist on the server according to flow_exists')
@@ -348,7 +350,7 @@ def _run_exists(task_id, setup_id):
         return set()
 
 
-def _get_seeded_model(model, seed=None):
+def _set_model_seed_where_none(model, seed=None):
     """Sets all the non-seeded components of a model with a seed.
        Models that are already seeded will maintain the seed. In
        this case, only integer seeds are allowed (An exception

@@ -18,7 +18,7 @@ import warnings
 
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent, \
-    _get_seeded_model, _run_exists, _extract_arfftrace, \
+    _set_model_seed_where_none, _run_exists, _extract_arfftrace, \
     _extract_arfftrace_attributes, _prediction_to_row
 from openml.flows.sklearn_converter import sklearn_to_flow
 from openml.runs.trace import OpenMLRunTrace
@@ -953,7 +953,7 @@ class TestRun(TestBase):
                 self.assertIsNone(all_params[param])
 
             # now seed the params
-            clf_seeded = _get_seeded_model(clf, const_probe)
+            clf_seeded = _set_model_seed_where_none(clf, const_probe)
             new_params = clf_seeded.get_params()
 
             randstate_params = [key for key in new_params if
@@ -968,7 +968,7 @@ class TestRun(TestBase):
                 self.assertEqual(clf.cv.random_state, 56422)
 
     def test__get_seeded_model_raises(self):
-        # the _get_seeded_model should raise exception if random_state is
+        # the _set_model_seed_where_none should raise exception if random_state is
         # anything else than an int
         randomized_clfs = [
             BaggingClassifier(random_state=np.random.RandomState(42)),
@@ -976,7 +976,7 @@ class TestRun(TestBase):
         ]
 
         for clf in randomized_clfs:
-            self.assertRaises(ValueError, _get_seeded_model, model=clf,
+            self.assertRaises(ValueError, _set_model_seed_where_none, model=clf,
                               seed=42)
 
     def test__extract_arfftrace(self):
