@@ -281,7 +281,7 @@ def detach_from_study(study_id, entity_ids):
 
 
 def list_studies(offset=None, size=None, main_entity_type=None, status=None,
-                 uploader=None):
+                 uploader=None, benchmark_suite=None):
     """
     Return a list of all studies which are on OpenML.
 
@@ -308,8 +308,10 @@ def list_studies(offset=None, size=None, main_entity_type=None, status=None,
         Every dataset is represented by a dictionary containing
         the following information:
         - id
+        - alias (optional)
         - name
         - main_entity_type
+        - benchmark_suite (optional)
         - status
         - creator
         - creation_date
@@ -322,7 +324,8 @@ def list_studies(offset=None, size=None, main_entity_type=None, status=None,
                                   size=size,
                                   main_entity_type=main_entity_type,
                                   status=status,
-                                  uploader=uploader)
+                                  uploader=uploader,
+                                  benchmark_suite=benchmark_suite)
 
 
 def _list_studies(**kwargs):
@@ -362,6 +365,7 @@ def __list_studies(api_call):
             'oml:id': 'id',
             'oml:alias': 'alias',
             'oml:main_entity_type': 'main_entity_type',
+            'oml:benchmark_suite': 'benchmark_suite',
             'oml:name': 'name',
             'oml:status': 'status',
             'oml:creation_date': 'creation_date',
