@@ -280,7 +280,7 @@ def detach_from_study(study_id, entity_ids):
     return int(result['oml:linked_entities'])
 
 
-def list_studies(offset=None, size=None, main_entity_type=None,status=None,
+def list_studies(offset=None, size=None, main_entity_type=None, status=None,
                  uploader=None):
     """
     Return a list of all studies which are on OpenML.
@@ -293,7 +293,7 @@ def list_studies(offset=None, size=None, main_entity_type=None,status=None,
         The maximum number of studies to show.
     main_entity_type : str, optional
         Can be `task` or `run`. In case of `task`, only benchmark suites are
-        returned. In case of `run`, only studies are returned. 
+        returned. In case of `run`, only studies are returned.
     status : str, optional
         Should be {active, in_preparation, deactivated, all}. By default active
         studies are returned.
