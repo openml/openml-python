@@ -19,7 +19,7 @@ import warnings
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent, \
     _get_seeded_model, _run_exists, _extract_arfftrace, \
-    _extract_arfftrace_attributes, _prediction_to_row, _check_n_jobs
+    _extract_arfftrace_attributes, _prediction_to_row
 from openml.flows.sklearn_converter import sklearn_to_flow
 from openml.runs.trace import OpenMLRunTrace
 from openml.tasks import TaskTypeEnum
@@ -121,7 +121,9 @@ class TestRun(TestBase):
         # downloads the predictions of the old task
         file_id = run.output_files['predictions']
         predictions_url = openml._api_calls._file_id_to_url(file_id)
-        predictions = arff.loads(openml._api_calls._read_url(predictions_url))
+        response = openml._api_calls._read_url(predictions_url,
+                                               request_method='get')
+        predictions = arff.loads(response)
         run_prime = openml.runs.run_model_on_task(model_prime, task,
                                                   avoid_duplicate_runs=False,
                                                   seed=seed)
@@ -908,7 +910,7 @@ class TestRun(TestBase):
                     avoid_duplicate_runs=True,
                 )
                 run.publish()
-            except openml.exceptions.PyOpenMLError as e:
+            except openml.exceptions.PyOpenMLError:
                 # run already existed. Great.
                 pass
 
@@ -1397,12 +1399,11 @@ class TestRun(TestBase):
         # actual data
 
         task = openml.tasks.get_task(2)
-        class_labels = task.class_labels
 
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
-        data_content,  _, _, _ = _run_task_get_arffcontent(
+        data_content, _, _, _ = _run_task_get_arffcontent(
             model,
             task,
             add_local_measures=True,

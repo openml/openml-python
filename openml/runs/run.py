@@ -1,6 +1,5 @@
 from collections import OrderedDict
 import errno
-import json
 import pickle
 import sys
 import time
@@ -187,27 +186,31 @@ class OpenMLRun(object):
         if self.data_content is None:
             raise ValueError('Run has not been executed.')
 
-        run_environment = (_get_version_information() +
-                           [time.strftime("%c")] + ['Created by run_task()'])
+        run_environment = (_get_version_information()
+                           + [time.strftime("%c")]
+                           + ['Created by run_task()'])
         task = get_task(self.task_id)
 
         arff_dict = OrderedDict()
         arff_dict['data'] = self.data_content
         arff_dict['description'] = "\n".join(run_environment)
-        arff_dict['relation'] = 'openml_task_' + str(task.task_id) + \
-                                '_predictions'
+        arff_dict['relation'] =\
+            'openml_task_{}_predictions'.format(task.task_id)
 
         if task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION:
             class_labels = task.class_labels
-            arff_dict['attributes'] = [('repeat', 'NUMERIC'),
+            instance_specifications = [('repeat', 'NUMERIC'),
                                        ('fold', 'NUMERIC'),
                                        ('sample', 'NUMERIC'),  # Legacy
-                                       ('row_id', 'NUMERIC')] + \
-                                      [('confidence.' + class_labels[i],
-                                        'NUMERIC') for i in
-                                       range(len(class_labels))] + \
-                                      [('prediction', class_labels),
-                                       ('correct', class_labels)]
+                                       ('row_id', 'NUMERIC')]
+            prediction_confidences = [('confidence.' + class_labels[i],
+                                       'NUMERIC')
+                                      for i in range(len(class_labels))]
+            prediction_and_true = [('prediction', class_labels),
+                                   ('correct', class_labels)]
+            arff_dict['attributes'] = (instance_specifications
+                                       + prediction_confidences
+                                       + prediction_and_true)
 
         elif task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
             class_labels = task.class_labels
@@ -265,8 +268,9 @@ class OpenMLRun(object):
             predictions_file_url = openml._api_calls._file_id_to_url(
                 self.output_files['predictions'], 'predictions.arff',
             )
-            predictions_arff = \
-                arff.loads(openml._api_calls._read_url(predictions_file_url))
+            response = openml._api_calls._read_url(predictions_file_url,
+                                                   request_method='get')
+            predictions_arff = arff.loads(response)
             # TODO: make this a stream reader
         else:
             raise ValueError('Run should have been locally executed or '
@@ -276,17 +280,17 @@ class OpenMLRun(object):
         task = get_task(self.task_id)
 
         attribute_names = [att[0] for att in predictions_arff['attributes']]
-        if (task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION or
-                task.task_type_id == TaskTypeEnum.LEARNING_CURVE) and \
-                'correct' not in attribute_names:
+        if (task.task_type_id in [TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+                                  TaskTypeEnum.LEARNING_CURVE]
+                and 'correct' not in attribute_names):
             raise ValueError('Attribute "correct" should be set for '
                              'classification task runs')
-        if task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION and \
-                'truth' not in attribute_names:
+        if (task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION
+                and 'truth' not in attribute_names):
             raise ValueError('Attribute "truth" should be set for '
                              'regression task runs')
-        if task.task_type_id != TaskTypeEnum.CLUSTERING and \
-                'prediction' not in attribute_names:
+        if (task.task_type_id != TaskTypeEnum.CLUSTERING
+                and 'prediction' not in attribute_names):
             raise ValueError('Attribute "predict" should be set for '
                              'supervised task runs')
 
@@ -305,7 +309,7 @@ class OpenMLRun(object):
 
         repeat_idx = attribute_dict['repeat']
         fold_idx = attribute_dict['fold']
-        predicted_idx = attribute_dict['prediction']  # Assume supervised tasks
+        predicted_idx = attribute_dict['prediction']  # Assume supervised task
 
         if task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION or \
                 task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
@@ -321,8 +325,8 @@ class OpenMLRun(object):
                 predictions_arff['attributes'][correct_idx][1]:
             pred = predictions_arff['attributes'][predicted_idx][1]
             corr = predictions_arff['attributes'][correct_idx][1]
-            raise ValueError('Predicted and Correct do not have equal values: '
-                             '%s Vs. %s' % (str(pred), str(corr)))
+            raise ValueError('Predicted and Correct do not have equal values:'
+                             ' %s Vs. %s' % (str(pred), str(corr)))
 
         # TODO: these could be cached
         values_predict = {}
@@ -335,8 +339,8 @@ class OpenMLRun(object):
             else:
                 samp = 0  # No learning curve sample, always 0
 
-            if task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION or \
-                    task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
+            if task.task_type_id in [TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+                                     TaskTypeEnum.LEARNING_CURVE]:
                 prediction = predictions_arff['attributes'][predicted_idx][
                     1].index(line[predicted_idx])
                 correct = predictions_arff['attributes'][predicted_idx][1]. \
@@ -398,12 +402,11 @@ class OpenMLRun(object):
             trace_arff = arff.dumps(self.trace.trace_to_arff())
             file_elements['trace'] = ("trace.arff", trace_arff)
 
-        return_value = \
-            openml._api_calls._perform_api_call("/run/",
-                                                file_elements=file_elements)
-        run_id = \
-            int(xmltodict.parse(return_value)['oml:upload_run']['oml:run_id'])
-        self.run_id = run_id
+        return_value = openml._api_calls._perform_api_call(
+            "/run/", 'post', file_elements=file_elements
+        )
+        result = xmltodict.parse(return_value)
+        self.run_id = int(result['oml:upload_run']['oml:run_id'])
         return self
 
     def _create_description_xml(self):
@@ -440,7 +443,7 @@ class OpenMLRun(object):
             Tag to attach to the run.
         """
         data = {'run_id': self.run_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/run/tag", data=data)
+        openml._api_calls._perform_api_call("/run/tag", 'post', data=data)
 
     def remove_tag(self, tag):
         """Removes a tag from this run on the server.
@@ -451,7 +454,7 @@ class OpenMLRun(object):
             Tag to attach to the run.
         """
         data = {'run_id': self.run_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/run/untag", data=data)
+        openml._api_calls._perform_api_call("/run/untag", 'post', data=data)
 
 
 ###############################################################################
@@ -508,7 +511,7 @@ def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
     Returns
     -------
     result : an array with version information of the above packages
-    """
+    """  # noqa: W605
     description = OrderedDict()
     description['oml:run'] = OrderedDict()
     description['oml:run']['@xmlns:oml'] = 'http://openml.org/openml'

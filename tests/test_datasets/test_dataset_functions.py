@@ -54,7 +54,8 @@ class TestOpenMLDataset(TestBase):
                                            'dataset.pkl')
                 try:
                     os.remove(pickle_path)
-                except:
+                except (OSError, FileNotFoundError):
+                    #  Replaced a bare except. Not sure why either of these would be acceptable.
                     pass
 
     def _get_empty_param_for_dataset(self):
@@ -108,39 +109,38 @@ class TestOpenMLDataset(TestBase):
 
     def test_get_cached_dataset_description_not_cached(self):
         openml.config.cache_directory = self.static_cache_dir
-        self.assertRaisesRegex(OpenMLCacheException, "Dataset description for "
-                                                      "dataset id 3 not cached",
-                                openml.datasets.functions._get_cached_dataset_description,
-                                3)
+        self.assertRaisesRegex(OpenMLCacheException,
+                               "Dataset description for dataset id 3 not cached",
+                               openml.datasets.functions._get_cached_dataset_description,
+                               dataset_id=3)
 
     def test_get_cached_dataset_arff(self):
         openml.config.cache_directory = self.static_cache_dir
-        description = openml.datasets.functions._get_cached_dataset_arff(
-            dataset_id=2)
+        description = openml.datasets.functions._get_cached_dataset_arff(dataset_id=2)
         self.assertIsInstance(description, str)
 
     def test_get_cached_dataset_arff_not_cached(self):
         openml.config.cache_directory = self.static_cache_dir
-        self.assertRaisesRegex(OpenMLCacheException, "ARFF file for "
-                                                      "dataset id 3 not cached",
-                                openml.datasets.functions._get_cached_dataset_arff,
-                                3)
+        self.assertRaisesRegex(OpenMLCacheException,
+                               "ARFF file for dataset id 3 not cached",
+                               openml.datasets.functions._get_cached_dataset_arff,
+                               dataset_id=3)
 
     def _check_dataset(self, dataset):
-            self.assertEqual(type(dataset), dict)
-            self.assertGreaterEqual(len(dataset), 2)
-            self.assertIn('did', dataset)
-            self.assertIsInstance(dataset['did'], int)
-            self.assertIn('status', dataset)
-            self.assertIsInstance(dataset['status'], str)
-            self.assertIn(dataset['status'], ['in_preparation', 'active',
-                                              'deactivated'])
+        self.assertEqual(type(dataset), dict)
+        self.assertGreaterEqual(len(dataset), 2)
+        self.assertIn('did', dataset)
+        self.assertIsInstance(dataset['did'], int)
+        self.assertIn('status', dataset)
+        self.assertIsInstance(dataset['status'], str)
+        self.assertIn(dataset['status'], ['in_preparation', 'active', 'deactivated'])
+
     def _check_datasets(self, datasets):
         for did in datasets:
             self._check_dataset(datasets[did])
 
     def test_tag_untag_dataset(self):
-        tag = 'test_tag_%d' %random.randint(1, 1000000)
+        tag = 'test_tag_%d' % random.randint(1, 1000000)
         all_tags = _tag_entity('data', 1, tag)
         self.assertTrue(tag in all_tags)
         all_tags = _tag_entity('data', 1, tag, untag=True)
@@ -185,7 +185,9 @@ class TestOpenMLDataset(TestBase):
         self._check_datasets(datasets)
 
     def test_list_datasets_combined_filters(self):
-        datasets = openml.datasets.list_datasets(tag='study_14', number_instances="100..1000", number_missing_values="800..1000")
+        datasets = openml.datasets.list_datasets(tag='study_14',
+                                                 number_instances="100..1000",
+                                                 number_missing_values="800..1000")
         self.assertGreaterEqual(len(datasets), 1)
         self._check_datasets(datasets)
 
@@ -256,7 +258,6 @@ class TestOpenMLDataset(TestBase):
         # Issue324 Properly handle private datasets when trying to access them
         openml.config.server = self.production_server
         self.assertRaises(PrivateDatasetError, openml.datasets.get_dataset, 45)
-
 
     def test_get_dataset_with_string(self):
         dataset = openml.datasets.get_dataset(101)
@@ -329,8 +330,7 @@ class TestOpenMLDataset(TestBase):
     @mock.patch('openml.datasets.functions._get_dataset_arff')
     def test_deletion_of_cache_dir_faulty_download(self, patch):
         patch.side_effect = Exception('Boom!')
-        self.assertRaisesRegex(Exception, 'Boom!', openml.datasets.get_dataset,
-                                1)
+        self.assertRaisesRegex(Exception, 'Boom!', openml.datasets.get_dataset, dataset_id=1)
         datasets_cache_dir = os.path.join(
             self.workdir, 'org', 'openml', 'test', 'datasets'
         )
@@ -951,7 +951,7 @@ class TestOpenMLDataset(TestBase):
         citation = 'None'
         original_data_url = 'http://openml.github.io/openml-python'
         paper_url = 'http://openml.github.io/openml-python'
-        err_msg = "Automatically inferring the attributes required a pandas"
+        err_msg = "Automatically inferring attributes requires a pandas"
         with pytest.raises(ValueError, match=err_msg):
             openml.datasets.functions.create_dataset(
                 name=name,

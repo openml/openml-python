@@ -288,11 +288,21 @@ class TestSklearn(TestBase):
             self.assertEqual(len(serialization.parameters), 2)
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
-        self.assertEqual(json.loads(serialization.parameters['steps']),
-                         [{'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'scaler', 'step_name': 'scaler'}},
-                          {'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'dummy', 'step_name': 'dummy'}}])
+        self.assertEqual(
+            json.loads(serialization.parameters['steps']),
+            [
+                {
+                    'oml-python:serialized_object':
+                        'component_reference',
+                    'value': {'key': 'scaler', 'step_name': 'scaler'}
+                },
+                {
+                    'oml-python:serialized_object':
+                        'component_reference',
+                    'value': {'key': 'dummy', 'step_name': 'dummy'}
+                }
+            ]
+        )
 
         # Checking the sub-component
         self.assertEqual(len(serialization.components), 2)
@@ -301,7 +311,6 @@ class TestSklearn(TestBase):
         self.assertIsInstance(serialization.components['dummy'],
                               OpenMLFlow)
 
-        #del serialization.model
         new_model = flow_to_sklearn(serialization)
         # compares string representations of the dict, as it potentially
         # contains complex objects that can not be compared with == op
@@ -363,11 +372,19 @@ class TestSklearn(TestBase):
             self.assertEqual(len(serialization.parameters), 2)
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
-        self.assertEqual(json.loads(serialization.parameters['steps']),
-                         [{'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'scaler', 'step_name': 'scaler'}},
-                          {'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'clusterer', 'step_name': 'clusterer'}}])
+        self.assertEqual(
+            json.loads(serialization.parameters['steps']),
+            [
+                {
+                    'oml-python:serialized_object': 'component_reference',
+                    'value': {'key': 'scaler', 'step_name': 'scaler'}
+                },
+                {
+                    'oml-python:serialized_object': 'component_reference',
+                    'value': {'key': 'clusterer', 'step_name': 'clusterer'}
+                },
+            ]
+        )
 
         # Checking the sub-component
         self.assertEqual(len(serialization.components), 2)
@@ -684,21 +701,33 @@ class TestSklearn(TestBase):
                              supported_rv.__dict__)
 
     def test_serialize_function(self):
-        serialized =  sklearn_to_flow(sklearn.feature_selection.chi2)
+        serialized = sklearn_to_flow(sklearn.feature_selection.chi2)
         deserialized = flow_to_sklearn(serialized)
         self.assertEqual(deserialized, sklearn.feature_selection.chi2)
 
     def test_serialize_cvobject(self):
         methods = [sklearn.model_selection.KFold(3),
                    sklearn.model_selection.LeaveOneOut()]
-        fixtures = [OrderedDict([('oml-python:serialized_object', 'cv_object'),
-                                 ('value', OrderedDict([('name', 'sklearn.model_selection._split.KFold'),
-                                                        ('parameters', OrderedDict([('n_splits', '3'),
-                                                                                    ('random_state', 'null'),
-                                                                                    ('shuffle', 'false')]))]))]),
-                    OrderedDict([('oml-python:serialized_object', 'cv_object'),
-                                 ('value', OrderedDict([('name', 'sklearn.model_selection._split.LeaveOneOut'),
-                                                        ('parameters', OrderedDict())]))])]
+        fixtures = [
+            OrderedDict([
+                ('oml-python:serialized_object', 'cv_object'),
+                ('value', OrderedDict([
+                    ('name', 'sklearn.model_selection._split.KFold'),
+                    ('parameters', OrderedDict([
+                        ('n_splits', '3'),
+                        ('random_state', 'null'),
+                        ('shuffle', 'false'),
+                    ]))
+                ]))
+            ]),
+            OrderedDict([
+                ('oml-python:serialized_object', 'cv_object'),
+                ('value', OrderedDict([
+                    ('name', 'sklearn.model_selection._split.LeaveOneOut'),
+                    ('parameters', OrderedDict())
+                ]))
+            ]),
+        ]
         for method, fixture in zip(methods, fixtures):
             m = sklearn_to_flow(method)
             self.assertEqual(m, fixture)
@@ -794,7 +823,7 @@ class TestSklearn(TestBase):
     def test_serialize_resampling(self):
         kfold = sklearn.model_selection.StratifiedKFold(
             n_splits=4, shuffle=True)
-        serialized =  sklearn_to_flow(kfold)
+        serialized = sklearn_to_flow(kfold)
         deserialized = flow_to_sklearn(serialized)
         # Best approximation to get_params()
         self.assertEqual(str(deserialized), str(kfold))
@@ -967,7 +996,9 @@ class TestSklearn(TestBase):
             ]
 
         for fn, num_params_with_defaults in fns:
-            defaults, defaultless = openml.flows.sklearn_converter._get_fn_arguments_with_defaults(fn)
+            defaults, defaultless = (
+                openml.flows.sklearn_converter._get_fn_arguments_with_defaults(fn)
+            )
             self.assertIsInstance(defaults, dict)
             self.assertIsInstance(defaultless, set)
             # check whether we have both defaults and defaultless params
@@ -1030,12 +1061,20 @@ class TestSklearn(TestBase):
         # used the 'initialize_with_defaults' flag of the deserialization
         # method to return a flow that contains default hyperparameter
         # settings.
-        steps = [('Imputer', Imputer()),
-                 ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
-                 ('Estimator', sklearn.ensemble.AdaBoostClassifier(
-                     sklearn.ensemble.BaggingClassifier(
+        steps = [
+            ('Imputer', Imputer()),
+            ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
+            (
+                'Estimator',
+                sklearn.ensemble.AdaBoostClassifier(
+                    sklearn.ensemble.BaggingClassifier(
                         sklearn.ensemble.GradientBoostingClassifier(
-                            sklearn.neighbors.KNeighborsClassifier()))))]
+                            sklearn.neighbors.KNeighborsClassifier()
+                        )
+                    )
+                )
+            ),
+        ]
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
 
         pipe_adjusted = sklearn.clone(pipe_orig)
@@ -1047,7 +1086,10 @@ class TestSklearn(TestBase):
                   'Estimator__base_estimator__base_estimator__loss__n_neighbors': 13}
         pipe_adjusted.set_params(**params)
         flow = openml.flows.sklearn_to_flow(pipe_adjusted)
-        pipe_deserialized = openml.flows.flow_to_sklearn(flow, initialize_with_defaults=True)
+        pipe_deserialized = openml.flows.flow_to_sklearn(
+            flow,
+            initialize_with_defaults=True,
+        )
 
         # we want to compare pipe_deserialized and pipe_orig. We use the flow
         # equals function for this

@@ -56,8 +56,8 @@ class TestTask(TestBase):
                       ['in_preparation', 'active', 'deactivated'])
 
     def test_list_tasks_by_type(self):
-        num_curves_tasks = 200 # number is flexible, check server if fails
-        ttid=3
+        num_curves_tasks = 200  # number is flexible, check server if fails
+        ttid = 3
         tasks = openml.tasks.list_tasks(task_type_id=ttid)
         self.assertGreaterEqual(len(tasks), num_curves_tasks)
         for tid in tasks:
@@ -72,7 +72,7 @@ class TestTask(TestBase):
         self.assertIsInstance(tasks, dict)
 
     def test_list_tasks_by_tag(self):
-        num_basic_tasks = 100 # number is flexible, check server if fails
+        num_basic_tasks = 100  # number is flexible, check server if fails
         tasks = openml.tasks.list_tasks(tag='study_14')
         self.assertGreaterEqual(len(tasks), num_basic_tasks)
         for tid in tasks:
@@ -97,7 +97,7 @@ class TestTask(TestBase):
         size = 10
         max = 100
         task_types = 4
-        for j in range(1,task_types):
+        for j in range(1, task_types):
             for i in range(0, max, size):
                 tasks = openml.tasks.list_tasks(task_type_id=j, offset=i, size=size)
                 self.assertGreaterEqual(size, len(tasks))
@@ -109,7 +109,7 @@ class TestTask(TestBase):
         openml.config.cache_directory = self.static_cache_dir
         openml.tasks.get_task(1882)
 
-    @unittest.skip("Please await outcome of discussion: https://github.com/openml/OpenML/issues/776")
+    @unittest.skip("Please await outcome of discussion: https://github.com/openml/OpenML/issues/776")  # noqa: E501
     def test__get_task_live(self):
         # Test the following task as it used to throw an Unicode Error.
         # https://github.com/openml/openml-python/issues/378
@@ -133,10 +133,12 @@ class TestTask(TestBase):
     def test_removal_upon_download_failure(self, get_dataset):
         class WeirdException(Exception):
             pass
+
         def assert_and_raise(*args, **kwargs):
             # Make sure that the file was created!
             assert os.path.join(os.getcwd(), "tasks", "1", "tasks.xml")
             raise WeirdException()
+
         get_dataset.side_effect = assert_and_raise
         try:
             openml.tasks.get_task(1)

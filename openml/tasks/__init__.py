@@ -21,4 +21,5 @@ __all__ = [
     'get_tasks',
     'list_tasks',
     'OpenMLSplit',
+    'TaskTypeEnum'
 ]

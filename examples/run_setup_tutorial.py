@@ -24,6 +24,7 @@ In this tutorial we will
     2) Download the flow, reinstantiate the model with same hyperparameters,
        and solve the same task again;
     3) We will verify that the obtained results are exactly the same.
+
 """
 import logging
 import numpy as np
@@ -75,8 +76,7 @@ run = openml.runs.run_model_on_task(
 run_original = run.publish()  # this implicitly uploads the flow
 
 ###############################################################################
-# 2) Download the flow, reinstantiate the model with same hyperparameters,
-#    and solve the same task again.
+# 2) Download the flow and solve the same task again.
 ###############################################################################
 
 # obtain setup id (note that the setup id is assigned by the OpenML server -

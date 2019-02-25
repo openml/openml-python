@@ -243,7 +243,8 @@ def get_run_trace(run_id):
     -------
     openml.runs.OpenMLTrace
     """
-    trace_xml = openml._api_calls._perform_api_call('run/trace/%d' % run_id)
+    trace_xml = openml._api_calls._perform_api_call('run/trace/%d' % run_id,
+                                                    'get')
     run_trace = OpenMLRunTrace.trace_from_xml(trace_xml)
     return run_trace
 
@@ -862,8 +863,9 @@ def get_run(run_id):
     try:
         return _get_cached_run(run_id)
 
-    except OpenMLCacheException:
-        run_xml = openml._api_calls._perform_api_call("run/%d" % run_id)
+    except (OpenMLCacheException):
+        run_xml = openml._api_calls._perform_api_call("run/%d" % run_id,
+                                                      'get')
         with io.open(run_file, "w", encoding='utf8') as fh:
             fh.write(run_xml)
 
@@ -1142,7 +1144,7 @@ def _list_runs(id=None, task=None, setup=None,
 
 def __list_runs(api_call):
     """Helper function to parse API calls which are lists of runs"""
-    xml_string = openml._api_calls._perform_api_call(api_call)
+    xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     runs_dict = xmltodict.parse(xml_string, force_list=('oml:run',))
     # Minimalistic check if the XML is useful
     if 'oml:runs' not in runs_dict:

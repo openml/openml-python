@@ -110,18 +110,26 @@ class TestFlow(TestBase):
 
     def test_from_xml_to_xml(self):
         # Get the raw xml thing
-        # TODO maybe get this via get_flow(), which would have to be refactored to allow getting only the xml dictionary
+        # TODO maybe get this via get_flow(), which would have to be refactored
+        # to allow getting only the xml dictionary
         # TODO: no sklearn flows.
         for flow_id in [3, 5, 7, 9, ]:
-            flow_xml = _perform_api_call("flow/%d" % flow_id)
+            flow_xml = _perform_api_call("flow/%d" % flow_id,
+                                         request_method='get')
             flow_dict = xmltodict.parse(flow_xml)
 
             flow = openml.OpenMLFlow._from_dict(flow_dict)
             new_xml = flow._to_xml()
 
-            flow_xml = flow_xml.replace('  ', '').replace('\t', '').strip().replace('\n\n', '\n').replace('&quot;', '"')
+            flow_xml = (
+                flow_xml.replace('  ', '').replace('\t', '').
+                strip().replace('\n\n', '\n').replace('&quot;', '"')
+            )
             flow_xml = re.sub(r'^$', '', flow_xml)
-            new_xml = new_xml.replace('  ', '').replace('\t', '').strip().replace('\n\n', '\n').replace('&quot;', '"')
+            new_xml = (
+                new_xml.replace('  ', '').replace('\t', '').
+                strip().replace('\n\n', '\n').replace('&quot;', '"')
+            )
             new_xml = re.sub(r'^$', '', new_xml)
 
             self.assertEqual(new_xml, flow_xml)
@@ -168,8 +176,11 @@ class TestFlow(TestBase):
         flow = openml.flows.sklearn_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.publish()
-        self.assertRaisesRegex(openml.exceptions.OpenMLServerException,
-                                'flow already exists', flow.publish)
+        self.assertRaisesRegex(
+            openml.exceptions.OpenMLServerException,
+            'flow already exists',
+            flow.publish,
+        )
 
     def test_publish_flow_with_similar_components(self):
         clf = sklearn.ensemble.VotingClassifier([
@@ -218,8 +229,8 @@ class TestFlow(TestBase):
 
     def test_semi_legal_flow(self):
         # TODO: Test if parameters are set correctly!
-        # should not throw error as it contains two differentiable forms of Bagging
-        # i.e., Bagging(Bagging(J48)) and Bagging(J48)
+        # should not throw error as it contains two differentiable forms of
+        # Bagging i.e., Bagging(Bagging(J48)) and Bagging(J48)
         semi_legal = sklearn.ensemble.BaggingClassifier(
             base_estimator=sklearn.ensemble.BaggingClassifier(
                 base_estimator=sklearn.tree.DecisionTreeClassifier()))
@@ -249,12 +260,15 @@ class TestFlow(TestBase):
         with self.assertRaises(ValueError) as context_manager:
             flow.publish()
 
-        fixture = "Flow was not stored correctly on the server. " \
-                  "New flow ID is 1. Please check manually and remove " \
-                  "the flow if necessary! Error is:\n" \
-                  "'Flow sklearn.ensemble.forest.RandomForestClassifier: values for attribute 'name' differ: " \
-                  "'sklearn.ensemble.forest.RandomForestClassifier'" \
-                  "\nvs\n'sklearn.ensemble.forest.RandomForestClassifie'.'"
+        fixture = (
+            "Flow was not stored correctly on the server. "
+            "New flow ID is 1. Please check manually and remove "
+            "the flow if necessary! Error is:\n"
+            "'Flow sklearn.ensemble.forest.RandomForestClassifier: "
+            "values for attribute 'name' differ: "
+            "'sklearn.ensemble.forest.RandomForestClassifier'"
+            "\nvs\n'sklearn.ensemble.forest.RandomForestClassifie'.'"
+        )
 
         self.assertEqual(context_manager.exception.args[0], fixture)
         self.assertEqual(api_call_mock.call_count, 2)
@@ -262,16 +276,20 @@ class TestFlow(TestBase):
 
     def test_illegal_flow(self):
         # should throw error as it contains two imputers
-        illegal = sklearn.pipeline.Pipeline(steps=[('imputer1', Imputer()),
-                                                   ('imputer2', Imputer()),
-                                                   ('classif', sklearn.tree.DecisionTreeClassifier())])
+        illegal = sklearn.pipeline.Pipeline(
+            steps=[
+                ('imputer1', Imputer()),
+                ('imputer2', Imputer()),
+                ('classif', sklearn.tree.DecisionTreeClassifier())
+            ]
+        )
         self.assertRaises(ValueError, openml.flows.sklearn_to_flow, illegal)
 
     def test_nonexisting_flow_exists(self):
         def get_sentinel():
-            # Create a unique prefix for the flow. Necessary because the flow is
-            # identified by its name and external version online. Having a unique
-            #  name allows us to publish the same flow in each test run
+            # Create a unique prefix for the flow. Necessary because the flow
+            # is identified by its name and external version online. Having a
+            # unique name allows us to publish the same flow in each test run
             md5 = hashlib.md5()
             md5.update(str(time.time()).encode('utf-8'))
             sentinel = md5.hexdigest()[:10]
@@ -291,10 +309,15 @@ class TestFlow(TestBase):
         ohe_params = {'sparse': False, 'handle_unknown': 'ignore'}
         if LooseVersion(sklearn.__version__) >= '0.20':
             ohe_params['categories'] = 'auto'
-        steps = [('imputation', Imputer(strategy='median')),
-                 ('hotencoding', sklearn.preprocessing.OneHotEncoder(**ohe_params)),
-                 ('variencethreshold', sklearn.feature_selection.VarianceThreshold()),
-                 ('classifier', sklearn.tree.DecisionTreeClassifier())]
+        steps = [
+            ('imputation', Imputer(strategy='median')),
+            ('hotencoding', sklearn.preprocessing.OneHotEncoder(**ohe_params)),
+            (
+                'variencethreshold',
+                sklearn.feature_selection.VarianceThreshold(),
+            ),
+            ('classifier', sklearn.tree.DecisionTreeClassifier())
+        ]
         complicated = sklearn.pipeline.Pipeline(steps=steps)
 
         for classifier in [nb, complicated]:
@@ -307,7 +330,10 @@ class TestFlow(TestBase):
 
             # check if flow exists can find it
             flow = openml.flows.get_flow(flow.flow_id)
-            downloaded_flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
+            downloaded_flow_id = openml.flows.flow_exists(
+                flow.name,
+                flow.external_version,
+            )
             self.assertEqual(downloaded_flow_id, flow.flow_id)
 
     def test_sklearn_to_upload_to_flow(self):
@@ -328,11 +354,19 @@ class TestFlow(TestBase):
             ('pca', pca), ('fs', fs)])
         boosting = sklearn.ensemble.AdaBoostClassifier(
             base_estimator=sklearn.tree.DecisionTreeClassifier())
-        model = sklearn.pipeline.Pipeline(steps=[('ohe', ohe), ('scaler', scaler),
-                                                 ('fu', fu), ('boosting', boosting)])
-        parameter_grid = {'boosting__n_estimators': [1, 5, 10, 100],
-                          'boosting__learning_rate': scipy.stats.uniform(0.01, 0.99),
-                          'boosting__base_estimator__max_depth': scipy.stats.randint(1, 10)}
+        model = sklearn.pipeline.Pipeline(
+            steps=[
+                ('ohe', ohe),
+                ('scaler', scaler),
+                ('fu', fu),
+                ('boosting', boosting),
+            ]
+        )
+        parameter_grid = {
+            'boosting__n_estimators': [1, 5, 10, 100],
+            'boosting__learning_rate': scipy.stats.uniform(0.01, 0.99),
+            'boosting__base_estimator__max_depth': scipy.stats.randint(1, 10),
+        }
         cv = sklearn.model_selection.StratifiedKFold(n_splits=5, shuffle=True)
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
@@ -363,10 +397,16 @@ class TestFlow(TestBase):
         for i in range(10):
             # Make sure that we replace all occurences of two newlines
             local_xml = local_xml.replace(sentinel, '')
-            local_xml = local_xml.replace('  ', '').replace('\t', '').strip().replace('\n\n', '\n').replace('&quot;', '"')
+            local_xml = (
+                local_xml.replace('  ', '').replace('\t', '').
+                strip().replace('\n\n', '\n').replace('&quot;', '"')
+            )
             local_xml = re.sub(r'(^$)', '', local_xml)
             server_xml = server_xml.replace(sentinel, '')
-            server_xml = server_xml.replace('  ', '').replace('\t', '').strip().replace('\n\n', '\n').replace('&quot;', '"')
+            server_xml = (
+                server_xml.replace('  ', '').replace('\t', '').
+                strip().replace('\n\n', '\n').replace('&quot;', '"')
+            )
             server_xml = re.sub(r'^$', '', server_xml)
 
         self.assertEqual(server_xml, local_xml)
@@ -379,16 +419,19 @@ class TestFlow(TestBase):
         module_name_encoder = ('_encoders'
                                if LooseVersion(sklearn.__version__) >= "0.20"
                                else 'data')
-        fixture_name = '%ssklearn.model_selection._search.RandomizedSearchCV(' \
-                       'estimator=sklearn.pipeline.Pipeline(' \
-                       'ohe=sklearn.preprocessing.%s.OneHotEncoder,' \
-                       'scaler=sklearn.preprocessing.data.StandardScaler,' \
-                       'fu=sklearn.pipeline.FeatureUnion(' \
-                       'pca=sklearn.decomposition.truncated_svd.TruncatedSVD,' \
-                       'fs=sklearn.feature_selection.univariate_selection.SelectPercentile),' \
-                       'boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier(' \
-                       'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))' \
-                        % (sentinel, module_name_encoder)
+        fixture_name = (
+            '%ssklearn.model_selection._search.RandomizedSearchCV('
+            'estimator=sklearn.pipeline.Pipeline('
+            'ohe=sklearn.preprocessing.%s.OneHotEncoder,'
+            'scaler=sklearn.preprocessing.data.StandardScaler,'
+            'fu=sklearn.pipeline.FeatureUnion('
+            'pca=sklearn.decomposition.truncated_svd.TruncatedSVD,'
+            'fs='
+            'sklearn.feature_selection.univariate_selection.SelectPercentile),'
+            'boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier('
+            'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))'
+            % (sentinel, module_name_encoder)
+        )
         self.assertEqual(new_flow.name, fixture_name)
         new_flow.model.fit(X, y)
 
