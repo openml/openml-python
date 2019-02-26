@@ -107,8 +107,12 @@ class OpenMLRun(object):
 
         with open(description_path, 'r') as fp:
             xml_string = fp.read()
-            run = openml.runs.functions._create_run_from_xml(xml_string,
-                                                             from_server=False)
+        run = openml.runs.functions._create_run_from_xml(xml_string, from_server=False)
+
+        if run.flow_id is None:
+            flow = openml.flows.OpenMLFlow.from_filesystem(folder)
+            run.flow = flow
+            run.flow_name = flow.name
 
         with open(predictions_path, 'r') as fp:
             predictions = arff.load(fp)
@@ -125,7 +129,7 @@ class OpenMLRun(object):
 
         return run
 
-    def to_filesystem(self, output_directory, store_model=True):
+    def to_filesystem(self, output_directory: str, store_model: bool=True) -> None:
         """
         The inverse of the from_filesystem method. Serializes a run
         on the filesystem, to be uploaded later.
@@ -136,7 +140,7 @@ class OpenMLRun(object):
             a path leading to the folder where the results
             will be stored. Should be empty
 
-        store_model : bool
+        store_model : bool, optional (default=True)
             if True, a model will be pickled as well. As this is the most
             storage expensive part, it is often desirable to not store the
             model.
@@ -145,14 +149,7 @@ class OpenMLRun(object):
             raise ValueError('Run should have been executed (and contain '
                              'model / predictions)')
 
-        try:
-            os.makedirs(output_directory)
-        except OSError as e:
-            if e.errno == errno.EEXIST:
-                pass
-            else:
-                raise e
-
+        os.makedirs(output_directory, exist_ok=True)
         if not os.listdir(output_directory) == []:
             raise ValueError('Output directory should be empty')
 
@@ -161,12 +158,14 @@ class OpenMLRun(object):
 
         with open(os.path.join(output_directory, 'description.xml'), 'w') as f:
             f.write(run_xml)
-        with open(os.path.join(output_directory, 'predictions.arff'), 'w') as \
-                f:
+        with open(os.path.join(output_directory, 'predictions.arff'), 'w') as f:
             f.write(predictions_arff)
         if store_model:
             with open(os.path.join(output_directory, 'model.pkl'), 'wb') as f:
                 pickle.dump(self.model, f)
+
+        if self.flow_id is None:
+            self.flow.to_filesystem(output_directory)
 
         if self.trace is not None:
             self.trace._to_filesystem(output_directory)
