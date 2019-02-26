@@ -153,7 +153,7 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
             ids = _run_exists(task.task_id, setup_id)
             if ids:
                 error_message = "One or more runs of this setup were already performed on the task."
-                raise RunsExistsError(ids, error_message)
+                raise RunsExistError(ids, error_message)
             _copy_server_fields(flow_from_server, flow)
 
     if flow_id is None:
