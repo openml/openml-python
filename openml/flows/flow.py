@@ -313,12 +313,6 @@ class OpenMLFlow(object):
 
         return flow
 
-    def exists_on_server(self) -> Optional[int]:
-        """ Get the flow id if it exists on the server, otherwise None. """
-        from openml.flows.functions import flow_exists
-        flow_id = flow_exists(self.name, self.external_version)
-        return flow_id if flow_id else None
-
     def publish(self, raise_error_if_exists: bool=False):
         """Publish flow to OpenML server.
 
@@ -339,7 +333,7 @@ class OpenMLFlow(object):
         # instantiate an OpenMLFlow.
         import openml.flows.functions
 
-        flow_id = self.exists_on_server()
+        flow_id = openml.flows.functions.flow_exists(self.name, self.external_version)
         if not flow_id:
             xml_description = self._to_xml()
             file_elements = {'description': xml_description}
