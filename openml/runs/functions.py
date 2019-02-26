@@ -921,22 +921,29 @@ def _create_run_from_xml(xml, from_server=True):
     else:
         task_evaluation_measure = None
 
-    flow_id = int(run['oml:flow_id'])
+    if not from_server and run['oml:flow_id'] is None:
+        # This can happen for a locally stored run of which the flow is not yet published.
+        flow_id = None
+        parameters = None
+    else:
+        flow_id = obtain_field(run, 'oml:flow_id', from_server, cast=int)
+        # parameters are only properly formatted once the flow is established on the server.
+        # thus they are also not stored for runs with local flows.
+        parameters = []
+        if 'oml:parameter_setting' in run:
+            obtained_parameter_settings = run['oml:parameter_setting']
+            for parameter_dict in obtained_parameter_settings:
+                current_parameter = collections.OrderedDict()
+                current_parameter['oml:name'] = parameter_dict['oml:name']
+                current_parameter['oml:value'] = parameter_dict['oml:value']
+                if 'oml:component' in parameter_dict:
+                    current_parameter['oml:component'] = \
+                        parameter_dict['oml:component']
+                parameters.append(current_parameter)
+
     flow_name = obtain_field(run, 'oml:flow_name', from_server)
     setup_id = obtain_field(run, 'oml:setup_id', from_server, cast=int)
     setup_string = obtain_field(run, 'oml:setup_string', from_server)
-
-    parameters = []
-    if 'oml:parameter_setting' in run:
-        obtained_parameter_settings = run['oml:parameter_setting']
-        for parameter_dict in obtained_parameter_settings:
-            current_parameter = collections.OrderedDict()
-            current_parameter['oml:name'] = parameter_dict['oml:name']
-            current_parameter['oml:value'] = parameter_dict['oml:value']
-            if 'oml:component' in parameter_dict:
-                current_parameter['oml:component'] = \
-                    parameter_dict['oml:component']
-            parameters.append(current_parameter)
 
     if 'oml:input_data' in run:
         dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
