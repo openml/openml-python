@@ -83,7 +83,6 @@ class OpenMLStudy(object):
         file_elements = {
             'description': self._to_xml()
         }
-
         return_value = openml._api_calls._perform_api_call(
             "study/",
             'post',
