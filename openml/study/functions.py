@@ -292,8 +292,8 @@ def list_studies(offset=None, size=None, main_entity_type=None, status=None,
     size : int, optional
         The maximum number of studies to show.
     main_entity_type : str, optional
-        Can be `task` or `run`. In case of `task`, only benchmark suites are
-        returned. In case of `run`, only studies are returned.
+        Can be ``'task'`` or ``'run'``. In case of `task`, only benchmark
+        suites are returned. In case of `run`, only studies are returned.
     status : str, optional
         Should be {active, in_preparation, deactivated, all}. By default active
         studies are returned.
@@ -361,21 +361,22 @@ def __list_studies(api_call):
 
     studies = dict()
     for study_ in study_dict['oml:study_list']['oml:study']:
+        # maps from xml name to a tuple of (dict name, casting fn)
         expected_fields = {
-            'oml:id': 'id',
-            'oml:alias': 'alias',
-            'oml:main_entity_type': 'main_entity_type',
-            'oml:benchmark_suite': 'benchmark_suite',
-            'oml:name': 'name',
-            'oml:status': 'status',
-            'oml:creation_date': 'creation_date',
-            'oml:creator': 'creator'
+            'oml:id': ('id', int),
+            'oml:alias': ('alias', str),
+            'oml:main_entity_type': ('main_entity_type', str),
+            'oml:benchmark_suite': ('benchmark_suite', int),
+            'oml:name': ('name', str),
+            'oml:status': ('status', str),
+            'oml:creation_date': ('creation_date', str),
+            'oml:creator': ('creator', int),
         }
         study_id = int(study_['oml:id'])
         current_study = dict()
-        for oml_field_name, real_field_name in expected_fields.items():
+        for oml_field_name, (real_field_name, cast_fn) in expected_fields.items():
             if oml_field_name in study_:
-                current_study[real_field_name] = study_[oml_field_name]
+                current_study[real_field_name] = cast_fn(study_[oml_field_name])
         current_study['id'] = int(current_study['id'])
         studies[study_id] = current_study
     return studies
