@@ -18,13 +18,13 @@ class TestStudyFunctions(TestBase):
         self.assertEqual(len(study.setups), 30)
 
     def test_get_tasks(self):
-        study_id = 14
+        study_id = 1
 
         study = openml.study.get_study(study_id, 'tasks')
-        self.assertGreater(len(study.tasks), 0)
+        self.assertGreater(len(study.data), 0)
+        self.assertGreaterEqual(len(study.tasks), len(study.data))
         # note that other entities are None, even though this study has
         # datasets
-        self.assertIsNone(study.data)
         self.assertIsNone(study.flows)
         self.assertIsNone(study.setups)
         self.assertIsNone(study.runs)
@@ -159,3 +159,8 @@ class TestStudyFunctions(TestBase):
             openml.study.attach_to_study(study_id, list(run_list_more.keys()))
         study_downloaded = openml.study.get_study(study_id)
         self.assertListEqual(study_original.runs, study_downloaded.runs)
+
+    def test_study_list(self):
+        study_list = openml.study.list_studies(status='in_preparation')
+        # might fail if server is recently resetted
+        self.assertGreater(len(study_list), 2)
