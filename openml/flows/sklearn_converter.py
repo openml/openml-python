@@ -236,7 +236,7 @@ def openml_param_name_to_sklearn(openml_parameter, flow):
     return '__'.join(flow_structure[name] + [openml_parameter.parameter_name])
 
 
-def obtain_parameter_values(flow):
+def obtain_parameter_values(flow, model: object=None):
     """
     Extracts all parameter settings from the model inside a flow in OpenML format.
 
@@ -244,6 +244,10 @@ def obtain_parameter_values(flow):
     ----------
     flow : OpenMLFlow
         OpenMLFlow object (containing flow ids, i.e., it has to be downloaded from the server)
+
+    model: object, optional (default=None)
+        The model from which to obtain the parameter values. Must match the flow signature.
+        If None, use the model specified in `OpenMLFlow.model`
 
     Returns
     -------
@@ -365,7 +369,8 @@ def obtain_parameter_values(flow):
         return _params
 
     flow_dict = get_flow_dict(flow)
-    parameters = extract_parameters(flow, flow_dict, flow.model,
+    model = model if model else flow.model
+    parameters = extract_parameters(flow, flow_dict, model,
                                     True, flow.flow_id)
 
     return parameters
