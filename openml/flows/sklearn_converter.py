@@ -238,14 +238,12 @@ def openml_param_name_to_sklearn(openml_parameter, flow):
 
 def obtain_parameter_values(flow):
     """
-    Extracts all parameter settings from the model inside a flow in OpenML
-    format.
+    Extracts all parameter settings from the model inside a flow in OpenML format.
 
     Parameters
     ----------
     flow : OpenMLFlow
-        openml flow object (containing flow ids, i.e., it has to be downloaded
-        from the server)
+        OpenMLFlow object (containing flow ids, i.e., it has to be downloaded from the server)
 
     Returns
     -------

@@ -33,8 +33,13 @@ from ..tasks import TaskTypeEnum
 RUNS_CACHE_DIR_NAME = 'runs'
 
 
-def run_model_on_task(model, task, avoid_duplicate_runs=True, flow_tags=None,
-                      seed=None, add_local_measures=True):
+def run_model_on_task(model: object, task: OpenMLTask,
+                      avoid_duplicate_runs: bool=True,
+                      flow_tags: List[str]=None,
+                      seed: int=None,
+                      add_local_measures: bool=True,
+                      upload_flow: bool=False,
+                      return_flow: bool=False):
     """Run the model on the dataset defined by the task.
 
     Parameters
@@ -58,11 +63,18 @@ def run_model_on_task(model, task, avoid_duplicate_runs=True, flow_tags=None,
     add_local_measures : bool
         Determines whether to calculate a set of evaluation measures locally,
         to later verify server behaviour. Defaults to True
+    upload_flow: bool (default: False)
+        If True, upload the flow to OpenML if it does not exist yet.
+        If False, do not upload the flow to OpenML and only cache it locally.
+    return_flow: bool (default: False)
+        If True, returns the OpenMLFlow generated from the model in addition to the OpenMLRun.
 
     Returns
     -------
     run : OpenMLRun
         Result of the run.
+    flow: OpenMLFlow (optional, only if `return_flow` is True.
+        Flow generated from the model.
     """
     # TODO: At some point in the future do not allow for arguments in old order
     # (order changed 6-2018).
@@ -75,10 +87,13 @@ def run_model_on_task(model, task, avoid_duplicate_runs=True, flow_tags=None,
 
     flow = sklearn_to_flow(model)
 
-    return run_flow_on_task(task=task, flow=flow,
-                            avoid_duplicate_runs=avoid_duplicate_runs,
-                            flow_tags=flow_tags, seed=seed,
-                            add_local_measures=add_local_measures)
+    run = run_flow_on_task(task=task, flow=flow,
+                           avoid_duplicate_runs=avoid_duplicate_runs,
+                           flow_tags=flow_tags, seed=seed,
+                           add_local_measures=add_local_measures)
+    if return_flow:
+        return run, flow
+    return run
 
 
 def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
@@ -156,11 +171,6 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
                 raise RunsExistError(ids, error_message)
             _copy_server_fields(flow_from_server, flow)
 
-    if flow_id is None:
-        # Happens if (1) no sync happened OR (2) flow did not exist `upload_flow` is False.
-        # Cache flow someone
-        raise NotImplementedError("Should cache flow to system here.")
-
     dataset = task.get_dataset()
 
     run_environment = _get_version_information()
@@ -174,16 +184,21 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
 
     run = OpenMLRun(
         task_id=task.task_id,
-        flow_id=flow.flow_id,
+        flow_id=flow_id,
         dataset_id=dataset.dataset_id,
         model=flow.model,
         flow_name=flow.name,
         tags=tags,
         trace=trace,
         data_content=data_content,
+        flow=flow
     )
-    # TODO: currently hard-coded sklearn assumption.
-    run.parameter_settings = openml.flows.obtain_parameter_values(flow)
+
+    if flow_id is not None:
+        # We only extract the parameter settings if a sync happened with the server.
+        # I.e. when the flow was uploaded or we found it in the avoid_duplicate check.
+        # Otherwise, we will do this at upload time.
+        run.parameter_settings = openml.flows.obtain_parameter_values(flow)
 
     # now we need to attach the detailed evaluations
     if task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
@@ -191,8 +206,11 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
     else:
         run.fold_evaluations = fold_evaluations
 
-    config.logger.info('Executed Task %d with Flow id: %d' % (task.task_id,
-                                                              run.flow_id))
+    if flow_id:
+        message = 'Executed Task {} with Flow id:{}'.format(task.task_id, run.flow_id)
+    else:
+        message = 'Executed Task {} on local Flow with name {}.'.format(task.task_id, flow.name)
+    config.logger.info(message)
 
     return run
 
