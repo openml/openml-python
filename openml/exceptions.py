@@ -1,15 +1,15 @@
 class PyOpenMLError(Exception):
-    def __init__(self, message):
+    def __init__(self, message: str):
         self.message = message
-        super(PyOpenMLError, self).__init__(message)
+        super().__init__(message)
 
 
 class OpenMLServerError(PyOpenMLError):
     """class for when something is really wrong on the server
        (result did not parse to dict), contains unparsed error."""
 
-    def __init__(self, message):
-        super(OpenMLServerError, self).__init__(message)
+    def __init__(self, message: str):
+        super().__init__(message)
 
 
 class OpenMLServerException(OpenMLServerError):
@@ -17,13 +17,13 @@ class OpenMLServerException(OpenMLServerError):
        not 200 (e.g., listing call w/o results). """
 
     # Code needs to be optional to allow the exceptino to be picklable:
-    # https://stackoverflow.com/questions/16244923/how-to-make-a-custom-exception-class-with-multiple-init-args-pickleable
-    def __init__(self, message, code=None, additional=None, url=None):
+    # https://stackoverflow.com/questions/16244923/how-to-make-a-custom-exception-class-with-multiple-init-args-pickleable  # noqa: E501
+    def __init__(self, message: str, code: str=None, additional: str=None, url: str=None):
         self.message = message
         self.code = code
         self.additional = additional
         self.url = url
-        super(OpenMLServerException, self).__init__(message)
+        super().__init__(message)
 
     def __str__(self):
         return '%s returned code %s: %s' % (
@@ -38,8 +38,8 @@ class OpenMLServerNoResult(OpenMLServerException):
 
 class OpenMLCacheException(PyOpenMLError):
     """Dataset / task etc not found in cache"""
-    def __init__(self, message):
-        super(OpenMLCacheException, self).__init__(message)
+    def __init__(self, message: str):
+        super().__init__(message)
 
 
 class OpenMLHashException(PyOpenMLError):
@@ -49,8 +49,8 @@ class OpenMLHashException(PyOpenMLError):
 
 class PrivateDatasetError(PyOpenMLError):
     """ Exception thrown when the user has no rights to access the dataset. """
-    def __init__(self, message):
-        super(PrivateDatasetError, self).__init__(message)
+    def __init__(self, message: str):
+        super().__init__(message)
 
 
 class RunsExistError(PyOpenMLError):
@@ -58,5 +58,5 @@ class RunsExistError(PyOpenMLError):
     def __init__(self, run_ids: set, message: str):
         if len(run_ids) < 1:
             raise ValueError("Set of run ids must be non-empty.")
-        super().__init__(message)
         self.run_ids = run_ids
+        super().__init__(message)
