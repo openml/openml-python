@@ -371,10 +371,11 @@ class OpenMLRun(object):
         return np.array(scores)
 
     def publish(self):
-        """Publish a run to the OpenML server.
+        """ Publish a run (and if necessary, its flow) to the OpenML server.
 
         Uploads the results of a run to OpenML.
-        Sets the run_id on self
+        If the run is of an unpublished OpenMLFlow, the flow will be uploaded too.
+        Sets the run_id on self.
 
         Returns
         -------
@@ -386,10 +387,15 @@ class OpenMLRun(object):
                 "(This should never happen.) "
             )
         if self.flow_id is None:
-            raise PyOpenMLError(
-                "OpenMLRun obj does not contain a flow id. "
-                "(Should have been added while executing the task.) "
-            )
+            if self.flow is None:
+                raise PyOpenMLError(
+                    "OpenMLRun object does not contain a flow id or reference to OpenMLFlow "
+                    "(these should have been added while executing the task). "
+                )
+            else:
+                # publish the linked Flow before publishing the run.
+                self.flow.publish()
+                self.flow_id = self.flow.flow_id
 
         description_xml = self._create_description_xml()
         file_elements = {'description': ("description.xml", description_xml)}
