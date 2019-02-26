@@ -313,13 +313,13 @@ class OpenMLFlow(object):
 
         return flow
 
-    def publish(self, raise_error_if_exists: bool=False):
-        """Publish flow to OpenML server.
+    def publish(self, raise_error_if_exists: bool=False) -> 'OpenMLFlow':
+        """ Publish flow to OpenML server.
 
         Parameters
         ----------
             raise_error_if_exists : bool, optional (default=False)
-                If True, raise RuntimeError if the flow exists on the server.
+                If True, raise PyOpenMLError if the flow exists on the server.
                 If False, update the local flow to match the server flow.
 
         Returns
@@ -345,7 +345,7 @@ class OpenMLFlow(object):
             server_response = xmltodict.parse(return_value)
             flow_id = int(server_response['oml:upload_flow']['oml:id'])
         elif raise_error_if_exists:
-            raise RuntimeError("This OpenMLFlow already exists with id: {}.".format(flow_id))
+            raise PyOpenMLError("This OpenMLFlow already exists with id: {}.".format(flow_id))
 
         flow = openml.flows.functions.get_flow(flow_id)
         _copy_server_fields(flow, self)
