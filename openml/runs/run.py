@@ -398,6 +398,12 @@ class OpenMLRun(object):
                 self.flow.publish()
                 self.flow_id = self.flow.flow_id
 
+        if self.parameter_settings is None:
+            if self.flow is None:
+                self.flow = openml.flows.get_flow(self.flow_id, reinstantiate=True)
+            # TODO: There should be a better method to retrieve them, e.g. from self.model?
+            self.parameter_settings = openml.flows.obtain_parameter_values(self.flow)
+
         description_xml = self._create_description_xml()
         file_elements = {'description': ("description.xml", description_xml)}
 
