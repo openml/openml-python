@@ -1,4 +1,6 @@
 from collections import OrderedDict
+import os
+import errno
 
 import xmltodict
 
@@ -129,7 +131,7 @@ class OpenMLFlow(object):
         self.dependencies = dependencies
         self.flow_id = flow_id
 
-    def _to_xml(self):
+    def _to_xml(self) -> str:
         """Generate xml representation of self for upload to server.
 
         Returns
@@ -145,7 +147,7 @@ class OpenMLFlow(object):
         flow_xml = flow_xml.split('\n', 1)[-1]
         return flow_xml
 
-    def _to_dict(self):
+    def _to_dict(self) -> dict:
         """ Helper function used by _to_xml and itself.
 
         Creates a dictionary representation of self which can be serialized
@@ -312,6 +314,21 @@ class OpenMLFlow(object):
         flow = cls(**arguments)
 
         return flow
+
+    def to_filesystem(self, output_directory: str) -> None:
+        os.makedirs(output_directory, exist_ok=True)
+        if 'flow.xml' in os.listdir(output_directory):
+            raise ValueError('Output directory already contains a flow.xml file.')
+
+        run_xml = self._to_xml()
+        with open(os.path.join(output_directory, 'flow.xml'), 'w') as f:
+            f.write(run_xml)
+
+    @classmethod
+    def from_filesystem(cls, input_directory) -> 'OpenMLFlow':
+        with open(os.path.join(input_directory, 'flow.xml'), 'r') as f:
+            xml_string = f.read()
+        return OpenMLFlow._from_dict(xmltodict.parse(xml_string))
 
     def publish(self, raise_error_if_exists: bool=False) -> 'OpenMLFlow':
         """ Publish flow to OpenML server.
