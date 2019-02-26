@@ -853,24 +853,9 @@ class TestRun(TestBase):
             run = run.publish()
             self._wait_for_processed_run(run.run_id, 200)
             run_id = run.run_id
-        except openml.exceptions.PyOpenMLError as e:
-            if 'Run already exists in server' not in e.message:
-                # in this case the error was not the one we expected
-                raise e
-            # run was already performed
-            message = e.message
-            if sys.version_info[0] == 2:
-                # Parse a string like:
-                # 'Run already exists in server. Run id(s): set([37501])'
-                run_ids = (
-                    message.split('[')[1].replace(']', '').
-                    replace(')', '').split(',')
-                )
-            else:
-                # Parse a string like:
-                # "Run already exists in server. Run id(s): {36980}"
-                run_ids = message.split('{')[1].replace('}', '').split(',')
-            run_ids = [int(run_id) for run_id in run_ids]
+        except openml.exceptions.RunsExistError as e:
+            # The only error we expect, should fail otherwise.
+            run_ids = [int(run_id) for run_id in e.run_ids]
             self.assertGreater(len(run_ids), 0)
             run_id = random.choice(list(run_ids))
 
