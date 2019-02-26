@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from typing import Optional
 
 import xmltodict
 
@@ -312,8 +313,20 @@ class OpenMLFlow(object):
 
         return flow
 
-    def publish(self):
+    def exists_on_server(self) -> Optional[int]:
+        """ Get the flow id if it exists on the server, otherwise None. """
+        from openml.flows.functions import flow_exists
+        flow_id = flow_exists(self.name, self.external_version)
+        return flow_id if flow_id else None
+
+    def publish(self, raise_error_if_exists: bool=False):
         """Publish flow to OpenML server.
+
+        Parameters
+        ----------
+            raise_error_if_exists : bool, optional (default=False)
+                If True, raise RuntimeError if the flow exists on the server.
+                If False, update the local flow to match the server flow.
 
         Returns
         -------
@@ -326,16 +339,20 @@ class OpenMLFlow(object):
         # instantiate an OpenMLFlow.
         import openml.flows.functions
 
-        xml_description = self._to_xml()
+        flow_id = self.exists_on_server()
+        if not flow_id:
+            xml_description = self._to_xml()
+            file_elements = {'description': xml_description}
+            return_value = openml._api_calls._perform_api_call(
+                "flow/",
+                'post',
+                file_elements=file_elements,
+            )
+            server_response = xmltodict.parse(return_value)
+            flow_id = int(server_response['oml:upload_flow']['oml:id'])
+        elif raise_error_if_exists:
+            raise RuntimeError("This OpenMLFlow already exists with id: {}.".format(flow_id))
 
-        file_elements = {'description': xml_description}
-        return_value = openml._api_calls._perform_api_call(
-            "flow/",
-            'post',
-            file_elements=file_elements,
-        )
-        server_response = xmltodict.parse(return_value)
-        flow_id = int(server_response['oml:upload_flow']['oml:id'])
         flow = openml.flows.functions.get_flow(flow_id)
         _copy_server_fields(flow, self)
         try:
