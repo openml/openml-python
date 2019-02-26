@@ -1,9 +1,9 @@
 from collections import OrderedDict
-from typing import Optional
 
 import xmltodict
 
 import openml._api_calls
+import openml.exceptions
 from ..utils import extract_xml_tags
 
 
@@ -345,7 +345,8 @@ class OpenMLFlow(object):
             server_response = xmltodict.parse(return_value)
             flow_id = int(server_response['oml:upload_flow']['oml:id'])
         elif raise_error_if_exists:
-            raise PyOpenMLError("This OpenMLFlow already exists with id: {}.".format(flow_id))
+            error_message = "This OpenMLFlow already exists with id: {}.".format(flow_id)
+            raise openml.exceptions.PyOpenMLError(error_message)
 
         flow = openml.flows.functions.get_flow(flow_id)
         _copy_server_fields(flow, self)
