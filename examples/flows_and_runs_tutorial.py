@@ -110,7 +110,7 @@ run = openml.runs.run_model_on_task(
 run.to_filesystem(output_directory='myrun')
 
 # They made later be loaded and uploaded
-run = openml.run.OpenMLRun.from_filesystem(folder='myrun')
+run = openml.runs.OpenMLRun.from_filesystem(folder='myrun')
 run.publish()
 
 # Publishing the run will automatically upload the related flow if
