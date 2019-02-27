@@ -90,7 +90,7 @@ to have better visualization and easier access:
            'NumberOfInstancesWithMissingValues', 'NumberOfMissingValues',
            'NumberOfNumericFeatures', 'NumberOfSymbolicFeatures'],
           dtype='object')
-    First 5 of 612 tasks:
+    First 5 of 613 tasks:
        tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
     1    1     1  ...                      6.0                     33.0
     2    2     1  ...                      6.0                     33.0
@@ -321,7 +321,7 @@ Finally, it is also possible to list all tasks on OpenML with:
 
  .. code-block:: none
 
-    1068
+    1069
 
 
 Exercise
@@ -423,10 +423,10 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLClassificationTask object at 0x2b7fe5bcb518>
+    <openml.tasks.task.OpenMLClassificationTask object at 0x2b9ed5b85b00>
 
 
-**Total running time of the script:** ( 0 minutes  19.283 seconds)
+**Total running time of the script:** ( 0 minutes  19.524 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:
