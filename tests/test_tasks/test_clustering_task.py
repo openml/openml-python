@@ -14,6 +14,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         self.test_server = 'https://test.openml.org/api/v1/xml'
         openml.config.server = self.production_server
         self.task_id = 126101
+        self.estimation_procedure = 17
 
     def test_get_dataset(self):
 
@@ -36,11 +37,14 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
     def test_upload_task(self):
 
         task = openml.tasks.get_task(self.task_id)
+        # https://github.com/openml/OpenML/issues/925
+        #TODO should be removed when issue is resolved
+        task.target_name = 'Class'
+        task.estimation_procedure_id = self.estimation_procedure
         openml.config.server = self.test_server
         # adding sentinel so we can have a new dataset
         # hence a "new task" to upload
         task.dataset_id = self._upload_dataset(task.dataset_id)
-        task.estimation_procedure_id = 17
         try:
             task.publish()
         except OpenMLServerException as e:

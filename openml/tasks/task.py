@@ -279,7 +279,7 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
 
 class OpenMLClusteringTask(OpenMLTask):
     def __init__(self, task_id, task_type_id, task_type, data_set_id,
-                 evaluation_measure):
+                 evaluation_measure, target_name=None):
         super(OpenMLClusteringTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
@@ -287,6 +287,7 @@ class OpenMLClusteringTask(OpenMLTask):
             data_set_id=data_set_id,
             evaluation_measure=evaluation_measure,
         )
+        self.target_name = target_name
 
     def get_X(
         self,
@@ -315,7 +316,17 @@ class OpenMLClusteringTask(OpenMLTask):
 
         task_container, source_data = super(OpenMLClusteringTask, self)._to_dict()
         task_dict = task_container['oml:task_inputs']
-        task_dict['oml:input'] = source_data
+
+        if self.target_name != None:
+            task_dict['oml:input'] = [
+                source_data,
+                OrderedDict([
+                    ('@name', 'target_feature'),
+                    ('#text', self.target_name)
+                ])
+            ]
+        else:
+            task_dict['oml:input'] = source_data
 
         return task_container
 
