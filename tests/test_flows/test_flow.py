@@ -171,16 +171,16 @@ class TestFlow(TestBase):
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)
 
-    def test_publish_existing_flow(self):
+    @mock.patch('openml.flows.functions.flow_exists')
+    def test_publish_existing_flow(self, flow_exists_mock):
         clf = sklearn.tree.DecisionTreeClassifier(max_depth=2)
         flow = openml.flows.sklearn_to_flow(clf)
-        flow, _ = self._add_sentinel_to_flow_name(flow, None)
-        flow.publish()
-        self.assertRaisesRegex(
-            openml.exceptions.OpenMLServerException,
-            'flow already exists',
-            flow.publish,
-        )
+        flow_exists_mock.return_value = 1
+
+        with self.assertRaises(openml.exceptions.PyOpenMLError) as context_manager:
+            flow.publish(raise_error_if_exists=True)
+
+        self.assertTrue('OpenMLFlow already exists' in context_manager.exception.message)
 
     def test_publish_flow_with_similar_components(self):
         clf = sklearn.ensemble.VotingClassifier([
