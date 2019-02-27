@@ -240,22 +240,26 @@ class TestFlow(TestBase):
         flow.publish()
 
     @mock.patch('openml.flows.functions.get_flow')
+    @mock.patch('openml.flows.functions.flow_exists')
     @mock.patch('openml._api_calls._perform_api_call')
-    def test_publish_error(self, api_call_mock, get_flow_mock):
+    def test_publish_error(self, api_call_mock, flow_exists_mock, get_flow_mock):
         model = sklearn.ensemble.RandomForestClassifier()
         flow = openml.flows.sklearn_to_flow(model)
         api_call_mock.return_value = "<oml:upload_flow>\n" \
                                      "    <oml:id>1</oml:id>\n" \
                                      "</oml:upload_flow>"
+        flow_exists_mock.return_value = False
         get_flow_mock.return_value = flow
 
         flow.publish()
         self.assertEqual(api_call_mock.call_count, 1)
         self.assertEqual(get_flow_mock.call_count, 1)
+        self.assertEqual(flow_exists_mock.call_count, 1)
 
         flow_copy = copy.deepcopy(flow)
         flow_copy.name = flow_copy.name[:-1]
         get_flow_mock.return_value = flow_copy
+        flow_exists_mock.return_value = 1
 
         with self.assertRaises(ValueError) as context_manager:
             flow.publish()
@@ -272,6 +276,45 @@ class TestFlow(TestBase):
 
         self.assertEqual(context_manager.exception.args[0], fixture)
         self.assertEqual(api_call_mock.call_count, 2)
+        self.assertEqual(get_flow_mock.call_count, 2)
+
+    @mock.patch('openml.flows.functions.get_flow')
+    @mock.patch('openml.flows.functions.flow_exists')
+    @mock.patch('openml._api_calls._perform_api_call')
+    def test_publish_error(self, api_call_mock, flow_exists_mock, get_flow_mock):
+        model = sklearn.ensemble.RandomForestClassifier()
+        flow = openml.flows.sklearn_to_flow(model)
+        api_call_mock.return_value = "<oml:upload_flow>\n" \
+                                     "    <oml:id>1</oml:id>\n" \
+                                     "</oml:upload_flow>"
+        flow_exists_mock.return_value = False
+        get_flow_mock.return_value = flow
+
+        flow.publish()
+        self.assertEqual(api_call_mock.call_count, 1)
+        self.assertEqual(get_flow_mock.call_count, 1)
+        self.assertEqual(flow_exists_mock.call_count, 1)
+
+        flow_copy = copy.deepcopy(flow)
+        flow_copy.name = flow_copy.name[:-1]
+        get_flow_mock.return_value = flow_copy
+        flow_exists_mock.return_value = 1
+
+        with self.assertRaises(ValueError) as context_manager:
+            flow.publish()
+
+        fixture = (
+            "Flow was not stored correctly on the server. "
+            "New flow ID is 1. Please check manually and remove "
+            "the flow if necessary! Error is:\n"
+            "'Flow sklearn.ensemble.forest.RandomForestClassifier: "
+            "values for attribute 'name' differ: "
+            "'sklearn.ensemble.forest.RandomForestClassifier'"
+            "\nvs\n'sklearn.ensemble.forest.RandomForestClassifie'.'"
+        )
+
+        self.assertEqual(context_manager.exception.args[0], fixture)
+        self.assertEqual(flow_exists_mock.call_count, 2)
         self.assertEqual(get_flow_mock.call_count, 2)
 
     def test_illegal_flow(self):
