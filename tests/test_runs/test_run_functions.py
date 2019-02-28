@@ -752,7 +752,9 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(7)
 
         # invoke OpenML run
-        run = openml.runs.run_model_on_task(clf, task)
+        run = openml.runs.run_model_on_task(task, clf,
+                                            avoid_duplicate_runs=False,
+                                            upload_flow=False)
 
         self._test_local_evaluations(run)
 
@@ -767,7 +769,9 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(7)
 
         # invoke OpenML run
-        run = openml.runs.run_flow_on_task(flow, task)
+        run = openml.runs.run_flow_on_task(task, flow,
+                                           avoid_duplicate_runs=False,
+                                           upload_flow=False)
 
         self._test_local_evaluations(run)
 
@@ -781,7 +785,9 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(7)
 
         # invoke OpenML run
-        run = openml.runs.run_model_on_task(clf, task)
+        run = openml.runs.run_model_on_task(clf, task,
+                                            avoid_duplicate_runs=False,
+                                            upload_flow=False)
 
         self._test_local_evaluations(run)
 
