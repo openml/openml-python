@@ -1,6 +1,5 @@
 from collections import OrderedDict
 import os
-import errno
 
 import xmltodict
 
@@ -330,7 +329,7 @@ class OpenMLFlow(object):
             xml_string = f.read()
         return OpenMLFlow._from_dict(xmltodict.parse(xml_string))
 
-    def publish(self, raise_error_if_exists: bool=False) -> 'OpenMLFlow':
+    def publish(self, raise_error_if_exists: bool = False) -> 'OpenMLFlow':
         """ Publish flow to OpenML server.
 
         Parameters

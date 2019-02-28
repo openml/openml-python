@@ -34,12 +34,12 @@ RUNS_CACHE_DIR_NAME = 'runs'
 
 
 def run_model_on_task(model: object, task: OpenMLTask,
-                      avoid_duplicate_runs: bool=True,
-                      flow_tags: List[str]=None,
-                      seed: int=None,
-                      add_local_measures: bool=True,
-                      upload_flow: bool=False,
-                      return_flow: bool=False):
+                      avoid_duplicate_runs: bool = True,
+                      flow_tags: List[str] = None,
+                      seed: int = None,
+                      add_local_measures: bool = True,
+                      upload_flow: bool = False,
+                      return_flow: bool = False):
     """Run the model on the dataset defined by the task.
 
     Parameters
@@ -90,18 +90,19 @@ def run_model_on_task(model: object, task: OpenMLTask,
     run = run_flow_on_task(task=task, flow=flow,
                            avoid_duplicate_runs=avoid_duplicate_runs,
                            flow_tags=flow_tags, seed=seed,
-                           add_local_measures=add_local_measures)
+                           add_local_measures=add_local_measures,
+                           upload_flow=upload_flow)
     if return_flow:
         return run, flow
     return run
 
 
 def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
-                     avoid_duplicate_runs: bool=True,
-                     flow_tags: List[str]=None,
-                     seed: int=None,
-                     add_local_measures: bool=True,
-                     upload_flow: bool=False):
+                     avoid_duplicate_runs: bool = True,
+                     flow_tags: List[str] = None,
+                     seed: int = None,
+                     add_local_measures: bool = True,
+                     upload_flow: bool = False):
     """Run the model provided by the flow on the dataset defined by task.
 
     Takes the flow and repeat information into account. In case a flow is not

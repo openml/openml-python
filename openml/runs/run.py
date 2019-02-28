@@ -1,5 +1,4 @@
 from collections import OrderedDict
-import errno
 import pickle
 import sys
 import time
@@ -129,7 +128,7 @@ class OpenMLRun(object):
 
         return run
 
-    def to_filesystem(self, output_directory: str, store_model: bool=True) -> None:
+    def to_filesystem(self, output_directory: str, store_model: bool = True) -> None:
         """
         The inverse of the from_filesystem method. Serializes a run
         on the filesystem, to be uploaded later.

@@ -18,7 +18,7 @@ class OpenMLServerException(OpenMLServerError):
 
     # Code needs to be optional to allow the exceptino to be picklable:
     # https://stackoverflow.com/questions/16244923/how-to-make-a-custom-exception-class-with-multiple-init-args-pickleable  # noqa: E501
-    def __init__(self, message: str, code: str=None, additional: str=None, url: str=None):
+    def __init__(self, message: str, code: str = None, additional: str = None, url: str = None):
         self.message = message
         self.code = code
         self.additional = additional
