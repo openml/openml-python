@@ -162,7 +162,7 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
         if upload_flow and not flow_id:
             flow.publish()
             flow_id = flow.flow_id
-        elif avoid_duplicate_runs and flow_id is not None:
+        elif avoid_duplicate_runs and flow_id:
             flow_from_server = get_flow(flow_id)
             flow_from_server.model = flow.model
             setup_id = setup_exists(flow_from_server)
