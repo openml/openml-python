@@ -275,7 +275,6 @@ class TestFlow(TestBase):
         )
 
         self.assertEqual(context_manager.exception.args[0], fixture)
-        self.assertEqual(api_call_mock.call_count, 2)
         self.assertEqual(get_flow_mock.call_count, 2)
 
     def test_illegal_flow(self):
