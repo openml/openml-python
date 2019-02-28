@@ -893,6 +893,7 @@ class TestRun(TestBase):
                     task=task,
                     seed=rs,
                     avoid_duplicate_runs=True,
+                    upload_flow=True
                 )
                 run.publish()
             except openml.exceptions.PyOpenMLError:
