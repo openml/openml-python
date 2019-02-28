@@ -4,6 +4,7 @@ import os
 import io
 import re
 import xmltodict
+from typing import Union
 from oslo_concurrency import lockutils
 
 from ..exceptions import OpenMLCacheException
@@ -195,7 +196,7 @@ def _list_flows(**kwargs):
     return __list_flows(api_call)
 
 
-def flow_exists(name, external_version):
+def flow_exists(name: str, external_version: str) -> Union[int, bool]:
     """Retrieves the flow id.
 
     A flow is uniquely identified by name + external_version.
@@ -209,7 +210,7 @@ def flow_exists(name, external_version):
 
     Returns
     -------
-    flow_exist : int
+    flow_exist : int or bool
         flow id iff exists, False otherwise
 
     Notes
