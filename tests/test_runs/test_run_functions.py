@@ -1100,30 +1100,25 @@ class TestRun(TestBase):
     def test_run_with_illegal_flow_id(self):
         # check the case where the user adds an illegal flow id to a
         # non-existing flow
-        return  # changes need to be made according to #634
         task = openml.tasks.get_task(115)
         clf = DecisionTreeClassifier()
         flow = sklearn_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.flow_id = -1
-        expected_message_regex = (
-            'flow.flow_id is not None, but the flow '
-            'does not exist on the server according to '
-            'flow_exists'
-        )
+        expected_message_regex = ("Flow does not exist on the server, "
+                                  "but 'flow.flow_id' is not None.")
         self.assertRaisesRegex(
-            ValueError,
+            openml.exceptions.PyOpenMLError,
             expected_message_regex,
             openml.runs.run_flow_on_task,
             task=task,
             flow=flow,
-            avoid_duplicate_runs=False,
+            avoid_duplicate_runs=True,
         )
 
     def test_run_with_illegal_flow_id_1(self):
         # Check the case where the user adds an illegal flow id to an existing
         # flow. Comes to a different value error than the previous test
-        return  # changes need to be made according to #634
         task = openml.tasks.get_task(115)
         clf = DecisionTreeClassifier()
         flow_orig = sklearn_to_flow(clf)
@@ -1136,16 +1131,16 @@ class TestRun(TestBase):
 
         flow_new.flow_id = -1
         expected_message_regex = (
-            "Result from API call flow_exists and flow.flow_id are not same: "
+            "Local flow_id does not match server flow_id: "
             "'-1' vs '[0-9]+'"
         )
         self.assertRaisesRegex(
-            ValueError,
+            openml.exceptions.PyOpenMLError,
             expected_message_regex,
             openml.runs.run_flow_on_task,
             task=task,
             flow=flow_new,
-            avoid_duplicate_runs=False,
+            avoid_duplicate_runs=True,
         )
 
     def test__run_task_get_arffcontent(self):

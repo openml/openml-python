@@ -351,6 +351,9 @@ class OpenMLFlow(object):
 
         flow_id = openml.flows.functions.flow_exists(self.name, self.external_version)
         if not flow_id:
+            if self.flow_id:
+                raise openml.exceptions.PyOpenMLError("Flow does not exist on the server, "
+                                                      "but 'flow.flow_id' is not None.")
             xml_description = self._to_xml()
             file_elements = {'description': xml_description}
             return_value = openml._api_calls._perform_api_call(

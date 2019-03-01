@@ -158,11 +158,18 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
     flow_id = None
     if upload_flow or avoid_duplicate_runs:
         flow_id = flow_exists(flow.name, flow.external_version)
+        if isinstance(flow.flow_id, int) and flow_id != flow.flow_id:
+            if flow_id:
+                raise PyOpenMLError("Local flow_id does not match server flow_id: "
+                                    "'{}' vs '{}'".format(flow.flow_id, flow_id))
+            else:
+                raise PyOpenMLError("Flow does not exist on the server, "
+                                    "but 'flow.flow_id' is not None.")
 
         if upload_flow and not flow_id:
             flow.publish()
             flow_id = flow.flow_id
-        elif avoid_duplicate_runs and isinstance(flow_id, int):
+        elif avoid_duplicate_runs and flow_id:
             flow_from_server = get_flow(flow_id)
             flow_from_server.model = flow.model
             setup_id = setup_exists(flow_from_server)
