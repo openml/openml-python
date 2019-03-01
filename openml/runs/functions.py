@@ -192,7 +192,7 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
 
     run = OpenMLRun(
         task_id=task.task_id,
-        flow_id=flow_id,
+        flow_id=flow.flow_id,
         dataset_id=dataset.dataset_id,
         model=flow.model,
         flow_name=flow.name,
@@ -202,7 +202,7 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
         flow=flow
     )
 
-    if flow_id is not None:
+    if (upload_flow or avoid_duplicate_runs) and flow.flow_id is not None:
         # We only extract the parameter settings if a sync happened with the server.
         # I.e. when the flow was uploaded or we found it in the avoid_duplicate check.
         # Otherwise, we will do this at upload time.
