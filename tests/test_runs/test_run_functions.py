@@ -1116,6 +1116,37 @@ class TestRun(TestBase):
             avoid_duplicate_runs=True,
         )
 
+    def test_run_with_illegal_flow_id_after_load(self):
+        # Same as `test_run_with_illegal_flow_id`, but test this error is also
+        # caught if the run is stored to and loaded from disk first.
+        task = openml.tasks.get_task(115)
+        clf = DecisionTreeClassifier()
+        flow = sklearn_to_flow(clf)
+        flow, _ = self._add_sentinel_to_flow_name(flow, None)
+        flow.flow_id = -1
+        run = openml.runs.run_flow_on_task(
+            task=task,
+            flow=flow,
+            avoid_duplicate_runs=False,
+            upload_flow=False
+        )
+
+        cache_path = os.path.join(
+            self.workdir,
+            'runs',
+            str(random.getrandbits(128)),
+        )
+        run.to_filesystem(cache_path)
+        loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
+
+        expected_message_regex = ("Flow does not exist on the server, "
+                                  "but 'flow.flow_id' is not None.")
+        self.assertRaisesRegex(
+            openml.exceptions.PyOpenMLError,
+            expected_message_regex,
+            loaded_run.publish
+        )
+
     def test_run_with_illegal_flow_id_1(self):
         # Check the case where the user adds an illegal flow id to an existing
         # flow. Comes to a different value error than the previous test
@@ -1141,6 +1172,45 @@ class TestRun(TestBase):
             task=task,
             flow=flow_new,
             avoid_duplicate_runs=True,
+        )
+
+    def test_run_with_illegal_flow_id_1_after_load(self):
+        # Same as `test_run_with_illegal_flow_id_1`, but test this error is
+        # also caught if the run is stored to and loaded from disk first.
+        task = openml.tasks.get_task(115)
+        clf = DecisionTreeClassifier()
+        flow_orig = sklearn_to_flow(clf)
+        try:
+            flow_orig.publish()  # ensures flow exist on server
+        except openml.exceptions.OpenMLServerException:
+            # flow already exists
+            pass
+        flow_new = sklearn_to_flow(clf)
+        flow_new.flow_id = -1
+
+        run = openml.runs.run_flow_on_task(
+            task=task,
+            flow=flow_new,
+            avoid_duplicate_runs=False,
+            upload_flow=False
+        )
+
+        cache_path = os.path.join(
+            self.workdir,
+            'runs',
+            str(random.getrandbits(128)),
+        )
+        run.to_filesystem(cache_path)
+        loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
+
+        expected_message_regex = (
+            "Local flow_id does not match server flow_id: "
+            "'-1' vs '[0-9]+'"
+        )
+        self.assertRaisesRegex(
+            openml.exceptions.PyOpenMLError,
+            expected_message_regex,
+            loaded_run.publish
         )
 
     def test__run_task_get_arffcontent(self):
