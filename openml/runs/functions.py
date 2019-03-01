@@ -169,15 +169,20 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
         if upload_flow and not flow_id:
             flow.publish()
             flow_id = flow.flow_id
-        elif avoid_duplicate_runs and flow_id:
+        elif flow_id:
             flow_from_server = get_flow(flow_id)
-            flow_from_server.model = flow.model
-            setup_id = setup_exists(flow_from_server)
-            ids = _run_exists(task.task_id, setup_id)
-            if ids:
-                error_message = "One or more runs of this setup were already performed on the task."
-                raise RunsExistError(ids, error_message)
             _copy_server_fields(flow_from_server, flow)
+            if avoid_duplicate_runs:
+                flow_from_server.model = flow.model
+                setup_id = setup_exists(flow_from_server)
+                ids = _run_exists(task.task_id, setup_id)
+                if ids:
+                    error_message = "One or more runs of this setup were already performed on the task."
+                    raise RunsExistError(ids, error_message)
+        else:
+            # Flow does not exist on server and we do not want to upload it.
+            # No sync with the server happens.
+            pass
 
     dataset = task.get_dataset()
 
@@ -192,7 +197,7 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
 
     run = OpenMLRun(
         task_id=task.task_id,
-        flow_id=flow.flow_id,
+        flow_id=flow_id,
         dataset_id=dataset.dataset_id,
         model=flow.model,
         flow_name=flow.name,
