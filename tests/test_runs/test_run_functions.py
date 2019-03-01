@@ -383,18 +383,6 @@ class TestRun(TestBase):
             model=clf,
         )
 
-    def test__publish_flow_if_necessary(self):
-        clf = LogisticRegression(solver='lbfgs')
-        flow = sklearn_to_flow(clf)
-        flow, sentinel = self._add_sentinel_to_flow_name(flow, None)
-        openml.runs.functions._publish_flow_if_necessary(flow)
-        self.assertIsNotNone(flow.flow_id)
-
-        flow2 = sklearn_to_flow(clf)
-        flow2, _ = self._add_sentinel_to_flow_name(flow2, sentinel)
-        openml.runs.functions._publish_flow_if_necessary(flow2)
-        self.assertEqual(flow2.flow_id, flow.flow_id)
-
     ###########################################################################
     # These unit tests are meant to test the following functions, using a
     # variety of flows:

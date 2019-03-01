@@ -4,7 +4,7 @@ import json
 import os
 import sys
 import time
-from typing import List
+from typing import List, Union, Tuple
 import warnings
 
 import numpy as np
@@ -39,7 +39,8 @@ def run_model_on_task(model: object, task: OpenMLTask,
                       seed: int = None,
                       add_local_measures: bool = True,
                       upload_flow: bool = False,
-                      return_flow: bool = False):
+                      return_flow: bool = False) -> Union[OpenMLRun,
+                                                          Tuple[OpenMLRun, OpenMLFlow]]:
     """Run the model on the dataset defined by the task.
 
     Parameters
@@ -50,23 +51,20 @@ def run_model_on_task(model: object, task: OpenMLTask,
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
     task : OpenMLTask
         Task to perform. This may be a model instead if the first argument is an OpenMLTask.
-    avoid_duplicate_runs : bool
-        If this flag is set to True, the run will throw an error if the
-        setup/task combination is already present on the server. Works only
-        if the flow is already published on the server. This feature requires an
-        internet connection.
-        This may be an OpenMLTask instead if the first argument is the OpenMLFlow.
-    flow_tags : list(str)
+    avoid_duplicate_runs : bool, optional (default=True)
+        If True, the run will throw an error if the setup/task combination is already present on
+        the server. This feature requires an internet connection.
+    flow_tags : List[str], optional (default=None)
         A list of tags that the flow should have at creation.
-    seed: int
+    seed: int, optional (default=None)
         Models that are not seeded will get this seed.
-    add_local_measures : bool
+    add_local_measures : bool, optional (default=True)
         Determines whether to calculate a set of evaluation measures locally,
-        to later verify server behaviour. Defaults to True
-    upload_flow: bool (default: False)
+        to later verify server behaviour.
+    upload_flow: bool (default=False)
         If True, upload the flow to OpenML if it does not exist yet.
-        If False, do not upload the flow to OpenML and only cache it locally.
-    return_flow: bool (default: False)
+        If False, do not upload the flow to OpenML.
+    return_flow: bool (default=False)
         If True, returns the OpenMLFlow generated from the model in addition to the OpenMLRun.
 
     Returns
@@ -76,8 +74,8 @@ def run_model_on_task(model: object, task: OpenMLTask,
     flow: OpenMLFlow (optional, only if `return_flow` is True.
         Flow generated from the model.
     """
-    # TODO: At some point in the future do not allow for arguments in old order
-    # (order changed 6-2018).
+    # TODO: At some point in the future do not allow for arguments in old order (6-2018).
+    # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
     if isinstance(model, OpenMLTask) and hasattr(task, 'fit') and \
             hasattr(task, 'predict'):
         warnings.warn("The old argument order (task, model) is deprecated and "
@@ -102,12 +100,11 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
                      flow_tags: List[str] = None,
                      seed: int = None,
                      add_local_measures: bool = True,
-                     upload_flow: bool = False):
+                     upload_flow: bool = False) -> OpenMLRun:
     """Run the model provided by the flow on the dataset defined by task.
 
-    Takes the flow and repeat information into account. In case a flow is not
-    yet published, it is published after executing the run (requires
-    internet connection).
+    Takes the flow and repeat information into account.
+    The Flow may optionally be published.
 
     Parameters
     ----------
@@ -118,22 +115,22 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
     task : OpenMLTask
         Task to perform. This may be an OpenMLFlow instead if the first argument is an OpenMLTask.
-    avoid_duplicate_runs : bool
-        If this flag is set to True, the run will throw an error if the
-        setup/task combination is already present on the server. Works only
-        if the flow is already published on the server. This feature requires an
-        internet connection.
-    flow_tags : list(str)
+        avoid_duplicate_runs : bool, optional (default=True)
+        If True, the run will throw an error if the setup/task combination is already present on
+        the server. This feature requires an internet connection.
+    avoid_duplicate_runs : bool, optional (default=True)
+        If True, the run will throw an error if the setup/task combination is already present on
+        the server. This feature requires an internet connection.
+    flow_tags : List[str], optional (default=None)
         A list of tags that the flow should have at creation.
-    seed: int
-        Models that are not seeded will be automatically seeded by a RNG. The
-        RBG will be seeded with this seed.
-    add_local_measures : bool
+    seed: int, optional (default=None)
+        Models that are not seeded will get this seed.
+    add_local_measures : bool, optional (default=True)
         Determines whether to calculate a set of evaluation measures locally,
-        to later verify server behaviour. Defaults to True
-    upload_flow: bool (default: False)
+        to later verify server behaviour.
+    upload_flow: bool (default=False)
         If True, upload the flow to OpenML if it does not exist yet.
-        If False, do not upload the flow to OpenML and only cache it locally.
+        If False, do not upload the flow to OpenML.
 
     Returns
     -------
@@ -144,6 +141,7 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
         raise ValueError("flow_tags should be a list")
 
     # TODO: At some point in the future do not allow for arguments in old order (changed 6-2018).
+    # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
     if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
         # We want to allow either order of argument (to avoid confusion).
         warnings.warn("The old argument order (Flow, model) is deprecated and "
@@ -229,28 +227,7 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
     return run
 
 
-def _publish_flow_if_necessary(flow):
-    # try publishing the flow if one has to assume it doesn't exist yet. It
-    # might fail because it already exists, then the flow is currently not
-    # reused
-    try:
-        flow.publish()
-    except OpenMLServerException as e:
-        if e.message == "flow already exists":
-            # TODO: JvR: the following lines of code can be replaced by
-            # a pass (after changing the unit tests) as run_flow_on_task does
-            # not longer rely on it
-            flow_id = openml.flows.flow_exists(flow.name,
-                                               flow.external_version)
-            server_flow = get_flow(flow_id)
-            openml.flows.flow._copy_server_fields(server_flow, flow)
-            openml.flows.assert_flows_equal(flow, server_flow,
-                                            ignore_parameter_values=True)
-        else:
-            raise e
-
-
-def get_run_trace(run_id):
+def get_run_trace(run_id: int) -> OpenMLRunTrace:
     """
     Get the optimization trace object for a given run id.
 
@@ -268,7 +245,7 @@ def get_run_trace(run_id):
     return run_trace
 
 
-def initialize_model_from_run(run_id):
+def initialize_model_from_run(run_id: int) -> object:
     """
     Initialized a model based on a run_id (i.e., using the exact
     same parameter settings)
