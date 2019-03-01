@@ -111,6 +111,7 @@ class TestRun(TestBase):
             task=task,
             add_local_measures=False,
             avoid_duplicate_runs=False,
+            upload_flow=True
         )
 
         cache_path = os.path.join(
@@ -121,6 +122,9 @@ class TestRun(TestBase):
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
+        # The flow has been uploaded to server, so only the reference flow_id should be present
+        self.assertTrue(run_prime.flow_id is not None)
+        self.assertTrue(run_prime.flow is None)
         self._test_run_obj_equals(run, run_prime)
         run_prime.publish()
 
@@ -179,3 +183,31 @@ class TestRun(TestBase):
         # assert default behaviour is throwing an error
         with self.assertRaises(ValueError, msg='Could not find model.pkl'):
             openml.runs.OpenMLRun.from_filesystem(cache_path)
+
+    def test_publish_with_local_loaded_flow(self):
+        """
+        Publish a run tied to a local flow after it has first been saved to
+         and loaded from disk.
+        """
+        model = Pipeline([
+            ('imputer', Imputer(strategy='mean')),
+            ('classifier', DummyClassifier()),
+        ])
+        task = openml.tasks.get_task(119)
+        run = openml.runs.run_model_on_task(
+            model=model,
+            task=task,
+            add_local_measures=False,
+            avoid_duplicate_runs=False,
+            upload_flow=False
+        )
+
+        cache_path = os.path.join(
+            self.workdir,
+            'runs',
+            str(random.getrandbits(128)),
+        )
+        run.to_filesystem(cache_path)
+        # obtain run from filesystem
+        loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
+        loaded_run.publish()
