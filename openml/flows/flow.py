@@ -332,6 +332,9 @@ class OpenMLFlow(object):
     def publish(self, raise_error_if_exists: bool = False) -> 'OpenMLFlow':
         """ Publish flow to OpenML server.
 
+        Raises a PyOpenMLError if the flow exists on the server, but
+        `self.flow_id` does not match the server known flow id.
+
         Parameters
         ----------
             raise_error_if_exists : bool, optional (default=False)
@@ -366,6 +369,9 @@ class OpenMLFlow(object):
         elif raise_error_if_exists:
             error_message = "This OpenMLFlow already exists with id: {}.".format(flow_id)
             raise openml.exceptions.PyOpenMLError(error_message)
+        elif self.flow_id is not None and self.flow_id != flow_id:
+            raise openml.exceptions.PyOpenMLError("Local flow_id does not match server flow_id: "
+                                                  "'{}' vs '{}'".format(self.flow_id, flow_id))
 
         flow = openml.flows.functions.get_flow(flow_id)
         _copy_server_fields(flow, self)
