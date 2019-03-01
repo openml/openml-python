@@ -177,7 +177,8 @@ def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
                 setup_id = setup_exists(flow_from_server)
                 ids = _run_exists(task.task_id, setup_id)
                 if ids:
-                    error_message = "One or more runs of this setup were already performed on the task."
+                    error_message = ("One or more runs of this setup were "
+                                     "already performed on the task.")
                     raise RunsExistError(ids, error_message)
         else:
             # Flow does not exist on server and we do not want to upload it.
