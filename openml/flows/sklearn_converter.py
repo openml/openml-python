@@ -37,7 +37,10 @@ DEPENDENCIES_PATTERN = re.compile(
 
 def sklearn_to_flow(o, parent_model=None):
     # TODO: assert that only on first recursion lvl `parent_model` can be None
-
+    simple_numpy_types = [nptype for type_cat, nptypes in np.sctypes.items()
+                          for nptype in nptypes
+                          if type_cat != 'others']
+    simple_types = tuple([bool, int, float, str] + simple_numpy_types)
     if _is_estimator(o):
         # is the main model or a submodel
         rval = _serialize_model(o)
@@ -46,7 +49,9 @@ def sklearn_to_flow(o, parent_model=None):
         rval = [sklearn_to_flow(element, parent_model) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif isinstance(o, (bool, int, float, str)) or o is None:
+    elif isinstance(o, simple_types) or o is None:
+        if isinstance(o, tuple(simple_numpy_types)):
+            o = o.item()
         # base parameter values
         rval = o
     elif isinstance(o, dict):
