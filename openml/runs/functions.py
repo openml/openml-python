@@ -63,17 +63,17 @@ def run_model_on_task(
     add_local_measures : bool, optional (default=True)
         Determines whether to calculate a set of evaluation measures locally,
         to later verify server behaviour.
-    upload_flow: bool (default=False)
+    upload_flow : bool (default=False)
         If True, upload the flow to OpenML if it does not exist yet.
         If False, do not upload the flow to OpenML.
-    return_flow: bool (default=False)
+    return_flow : bool (default=False)
         If True, returns the OpenMLFlow generated from the model in addition to the OpenMLRun.
 
     Returns
     -------
     run : OpenMLRun
         Result of the run.
-    flow: OpenMLFlow (optional, only if `return_flow` is True.
+    flow : OpenMLFlow (optional, only if `return_flow` is True.
         Flow generated from the model.
     """
     # TODO: At some point in the future do not allow for arguments in old order (6-2018).
@@ -133,7 +133,7 @@ def run_flow_on_task(
     add_local_measures : bool, optional (default=True)
         Determines whether to calculate a set of evaluation measures locally,
         to later verify server behaviour.
-    upload_flow: bool (default=False)
+    upload_flow : bool (default=False)
         If True, upload the flow to OpenML if it does not exist yet.
         If False, do not upload the flow to OpenML.
 
@@ -281,13 +281,13 @@ def initialize_model_from_trace(run_id, repeat, fold, iteration=None):
         The Openml run_id. Should contain a trace file,
         otherwise a OpenMLServerException is raised
 
-    repeat: int
+    repeat : int
         The repeat nr (column in trace file)
 
-    fold: int
+    fold : int
         The fold nr (column in trace file)
 
-    iteration: int
+    iteration : int
         The iteration nr (column in trace file). If None, the
         best (selected) iteration will be searched (slow),
         according to the selection criteria implemented in
@@ -324,9 +324,9 @@ def _run_exists(task_id, setup_id):
 
     Parameters
     ----------
-    task_id: int
+    task_id : int
 
-    setup_id: int
+    setup_id : int
 
     Returns
     -------
@@ -883,6 +883,10 @@ def _create_run_from_xml(xml, from_server=True):
     xml : string
         XML describing a run.
 
+    from_server : bool, optional (default=True)
+        If True, an AttributeError is raised if any of the fields required by the server is not
+        present in the xml. If False, those absent fields will be treated as None.
+
     Returns
     -------
     run : OpenMLRun
@@ -1080,7 +1084,7 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         Whether to list runs which have an error (for example a missing
         prediction file).
 
-    kwargs: dict, optional
+    kwargs : dict, optional
         Legal filter operators: task_type.
 
     Returns
@@ -1122,7 +1126,7 @@ def _list_runs(id=None, task=None, setup=None,
         Whether to list runs which have an error (for example a missing
         prediction file).
 
-    kwargs: dict, optional
+    kwargs : dict, optional
         Legal filter operators: task_type.
 
     Returns
