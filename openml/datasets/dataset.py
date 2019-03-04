@@ -356,12 +356,25 @@ class OpenMLDataset(object):
         NumPy array instead, respectively.
         """
         if array_format == "array" and not scipy.sparse.issparse(data):
+            # We encode the categories such that they are integer to be able
+            # to make a conversion to numeric for backward compatibility
+            def _encode_if_category(column):
+                if column.dtype.name == 'category':
+                    column = column.cat.codes
+                    column = column.apply(lambda x: np.nan if x == -1 else x)
+                return column
+            if data.ndim == 2:
+                for column_name in data.columns:
+                    data[column_name] = _encode_if_category(data[column_name])
+            else:
+                data = _encode_if_category(data)
             try:
-                # for back-compatibility, we try try to convert the data to
-                # float 32 bits.
                 return np.asarray(data, dtype=np.float32)
             except ValueError:
-                return np.asarray(data)
+                raise PyOpenMLError(
+                    'PyOpenML cannot handle string when returning numpy'
+                    ' arrays. Use dataset_format="dataframe".'
+                )
         if array_format == "dataframe" and scipy.sparse.issparse(data):
             return pd.SparseDataFrame(data, columns=attribute_names)
         return data

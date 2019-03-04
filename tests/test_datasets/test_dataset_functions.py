@@ -80,7 +80,7 @@ class TestOpenMLDataset(TestBase):
         openml.config.cache_directory = self.static_cache_dir
         cached_datasets = openml.datasets.functions._list_cached_datasets()
         self.assertIsInstance(cached_datasets, list)
-        self.assertEqual(len(cached_datasets), 2)
+        self.assertEqual(len(cached_datasets), 3)
         self.assertIsInstance(cached_datasets[0], int)
 
     @mock.patch('openml.datasets.functions._list_cached_datasets')
