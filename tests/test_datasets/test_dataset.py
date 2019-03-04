@@ -1,4 +1,4 @@
-from time import time, sleep
+from time import time
 from warnings import filterwarnings, catch_warnings
 
 import numpy as np
@@ -8,10 +8,6 @@ from scipy import sparse
 
 import openml
 from openml.testing import TestBase
-from openml.datasets.functions import _get_online_dataset_arff
-from openml.datasets.functions import attributes_arff_from_df
-from openml.datasets import get_dataset
-from openml.exceptions import OpenMLServerException
 from openml.exceptions import PyOpenMLError
 
 

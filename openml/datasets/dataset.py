@@ -195,8 +195,8 @@ class OpenMLDataset(object):
                 for name, type_ in data['attributes']:
                     # if the feature is nominal and the a sparse matrix is
                     # requested, the categories need to be numeric
-                    if (isinstance(type_, list) and
-                            self.format.lower() == 'sparse_arff'):
+                    if (isinstance(type_, list)
+                            and self.format.lower() == 'sparse_arff'):
                         try:
                             np.array(type_, dtype=np.float32)
                         except ValueError:
@@ -205,8 +205,8 @@ class OpenMLDataset(object):
                                 "using sparse ARFF."
                             )
                     # string can only be supported with pandas DataFrame
-                    elif (type_ == 'STRING' and
-                          self.format.lower() == 'sparse_arff'):
+                    elif (type_ == 'STRING'
+                          and self.format.lower() == 'sparse_arff'):
                         raise ValueError(
                             "Dataset containing strings is not supported "
                             "with sparse ARFF."

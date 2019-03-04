@@ -14,8 +14,8 @@ from oslo_concurrency import lockutils
 
 import openml
 from openml import OpenMLDataset
-from openml.exceptions import OpenMLCacheException, PyOpenMLError, \
-    OpenMLHashException, PrivateDatasetError
+from openml.exceptions import OpenMLCacheException, OpenMLHashException, \
+     PrivateDatasetError
 from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (create_dataset,
