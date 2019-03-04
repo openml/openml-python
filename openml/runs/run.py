@@ -68,14 +68,14 @@ class OpenMLRun(object):
         pp.text(str(self))
 
     @classmethod
-    def from_filesystem(cls, folder, expect_model=True):
+    def from_filesystem(cls, directory, expect_model=True):
         """
         The inverse of the to_filesystem method. Instantiates an OpenMLRun
         object based on files stored on the file system.
 
         Parameters
         ----------
-        folder : str
+        directory : str
             a path leading to the folder where the results
             are stored
 
@@ -89,13 +89,13 @@ class OpenMLRun(object):
         run : OpenMLRun
             the re-instantiated run object
         """
-        if not os.path.isdir(folder):
+        if not os.path.isdir(directory):
             raise ValueError('Could not find folder')
 
-        description_path = os.path.join(folder, 'description.xml')
-        predictions_path = os.path.join(folder, 'predictions.arff')
-        trace_path = os.path.join(folder, 'trace.arff')
-        model_path = os.path.join(folder, 'model.pkl')
+        description_path = os.path.join(directory, 'description.xml')
+        predictions_path = os.path.join(directory, 'predictions.arff')
+        trace_path = os.path.join(directory, 'trace.arff')
+        model_path = os.path.join(directory, 'model.pkl')
 
         if not os.path.isfile(description_path):
             raise ValueError('Could not find description.xml')
@@ -109,7 +109,7 @@ class OpenMLRun(object):
         run = openml.runs.functions._create_run_from_xml(xml_string, from_server=False)
 
         if run.flow_id is None:
-            flow = openml.flows.OpenMLFlow.from_filesystem(folder)
+            flow = openml.flows.OpenMLFlow.from_filesystem(directory)
             run.flow = flow
             run.flow_name = flow.name
 
@@ -128,14 +128,14 @@ class OpenMLRun(object):
 
         return run
 
-    def to_filesystem(self, output_directory: str, store_model: bool = True) -> None:
+    def to_filesystem(self, directory: str, store_model: bool = True) -> None:
         """
         The inverse of the from_filesystem method. Serializes a run
         on the filesystem, to be uploaded later.
 
         Parameters
         ----------
-        output_directory : str
+        directory : str
             a path leading to the folder where the results
             will be stored. Should be empty
 
@@ -148,26 +148,26 @@ class OpenMLRun(object):
             raise ValueError('Run should have been executed (and contain '
                              'model / predictions)')
 
-        os.makedirs(output_directory, exist_ok=True)
-        if not os.listdir(output_directory) == []:
+        os.makedirs(directory, exist_ok=True)
+        if not os.listdir(directory) == []:
             raise ValueError('Output directory should be empty')
 
         run_xml = self._create_description_xml()
         predictions_arff = arff.dumps(self._generate_arff_dict())
 
-        with open(os.path.join(output_directory, 'description.xml'), 'w') as f:
+        with open(os.path.join(directory, 'description.xml'), 'w') as f:
             f.write(run_xml)
-        with open(os.path.join(output_directory, 'predictions.arff'), 'w') as f:
+        with open(os.path.join(directory, 'predictions.arff'), 'w') as f:
             f.write(predictions_arff)
         if store_model:
-            with open(os.path.join(output_directory, 'model.pkl'), 'wb') as f:
+            with open(os.path.join(directory, 'model.pkl'), 'wb') as f:
                 pickle.dump(self.model, f)
 
         if self.flow_id is None:
-            self.flow.to_filesystem(output_directory)
+            self.flow.to_filesystem(directory)
 
         if self.trace is not None:
-            self.trace._to_filesystem(output_directory)
+            self.trace._to_filesystem(directory)
 
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the
