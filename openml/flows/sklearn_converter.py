@@ -502,13 +502,12 @@ def _extract_information_from_model(model):
         rval = sklearn_to_flow(v, model)
 
         def flatten_all(list_):
-            flattened = []
+            """ Flattens arbitrary depth lists of lists. """
             for el in list_:
                 if isinstance(el, (list, tuple)):
-                    flattened += flatten_all(el)
+                    yield from flatten_all(el)
                 else:
-                    flattened.append(el)
-            return flattened
+                    yield el
 
         if isinstance(rval, (list, tuple)):
             nested_list_of_simple_types = all([isinstance(el, (bool, str, int, float))
