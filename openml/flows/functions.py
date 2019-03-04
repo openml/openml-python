@@ -4,7 +4,7 @@ import os
 import io
 import re
 import xmltodict
-from typing import Union
+from typing import Union, Dict
 from oslo_concurrency import lockutils
 
 from ..exceptions import OpenMLCacheException
@@ -15,7 +15,7 @@ import openml.utils
 FLOWS_CACHE_DIR_NAME = 'flows'
 
 
-def _get_cached_flows():
+def _get_cached_flows() -> OrderedDict:
     """Return all the cached flows.
 
     Returns
@@ -41,7 +41,7 @@ def _get_cached_flows():
     return flows
 
 
-def _get_cached_flow(fid):
+def _get_cached_flow(fid: int) -> OpenMLFlow:
     """Get the cached flow with the given id.
 
     Parameters
@@ -103,7 +103,7 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
     return flow
 
 
-def _get_flow_description(flow_id):
+def _get_flow_description(flow_id: int):
     """Get the Flow for a given  ID.
 
     Does the real work for get_flow. It returns a cached flow
@@ -135,7 +135,8 @@ def _get_flow_description(flow_id):
         return _create_flow_from_xml(flow_xml)
 
 
-def list_flows(offset=None, size=None, tag=None, **kwargs):
+def list_flows(offset: int = None, size: int = None, tag: str = None, **kwargs) \
+        -> Dict[int, Dict]:
 
     """
     Return a list of all flows which are on OpenML.
@@ -174,7 +175,7 @@ def list_flows(offset=None, size=None, tag=None, **kwargs):
                                   **kwargs)
 
 
-def _list_flows(**kwargs):
+def _list_flows(**kwargs) -> Dict[int, Dict]:
     """
     Perform the api call that return a list of all flows.
 
@@ -236,7 +237,7 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
         return False
 
 
-def __list_flows(api_call):
+def __list_flows(api_call: str) -> Dict[int, Dict]:
 
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     flows_dict = xmltodict.parse(xml_string, force_list=('oml:flow',))
@@ -261,8 +262,8 @@ def __list_flows(api_call):
     return flows
 
 
-def _check_flow_for_server_id(flow):
-    """Check if the given flow and it's components have a flow_id."""
+def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
+    """ Raises a ValueError of the flow or any of its subflows has no flow id. """
 
     # Depth-first search to check if all components were uploaded to the
     # server before parsing the parameters
@@ -277,9 +278,9 @@ def _check_flow_for_server_id(flow):
                 stack.append(component)
 
 
-def assert_flows_equal(flow1, flow2,
-                       ignore_parameter_values_on_older_children=None,
-                       ignore_parameter_values=False):
+def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
+                       ignore_parameter_values_on_older_children: str = None,
+                       ignore_parameter_values: bool = False) -> None:
     """Check equality of two flows.
 
     Two flows are equal if their all keys which are not set by the server
@@ -363,7 +364,7 @@ def assert_flows_equal(flow1, flow2,
                                  (str(flow1.name), str(key), str(attr1), str(attr2)))
 
 
-def _create_flow_from_xml(flow_xml):
+def _create_flow_from_xml(flow_xml: str) -> OpenMLFlow:
     """Create flow object from xml
 
     Parameters
