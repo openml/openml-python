@@ -33,6 +33,7 @@ else:
     from sklearn.impute import SimpleImputer as Imputer
 
 import openml
+from openml.testing import TestBase
 from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
 from openml.flows.functions import assert_flows_equal
 from openml.flows.sklearn_converter import _format_external_version, \
@@ -56,11 +57,12 @@ class Model(sklearn.base.BaseEstimator):
         pass
 
 
-class TestSklearn(unittest.TestCase):
+class TestSklearn(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take less
     # than 1 seconds
 
     def setUp(self):
+        super(TestSklearn, self).setUp()
         iris = sklearn.datasets.load_iris()
         self.X = iris.data
         self.y = iris.target
@@ -106,16 +108,25 @@ class TestSklearn(unittest.TestCase):
                             ('presort', 'false'),
                             ('random_state', 'null'),
                             ('splitter', '"best"')))
+        structure_fixture = {'sklearn.tree.tree.DecisionTreeClassifier': []}
 
         serialization = sklearn_to_flow(model)
+        structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.class_name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertEqual(serialization.parameters, fixture_parameters)
         self.assertEqual(serialization.dependencies, version_fixture)
+        self.assertDictEqual(structure, structure_fixture)
 
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -160,16 +171,25 @@ class TestSklearn(unittest.TestCase):
                              ('random_state', 'null'),
                              ('tol', '0.0001'),
                              ('verbose', '0')))
+        fixture_structure = {'sklearn.cluster.k_means_.KMeans': []}
 
         serialization = sklearn_to_flow(model)
+        structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.class_name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertEqual(serialization.parameters, fixture_parameters)
         self.assertEqual(serialization.dependencies, version_fixture)
+        self.assertDictEqual(structure, fixture_structure)
 
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -190,8 +210,13 @@ class TestSklearn(unittest.TestCase):
         fixture_subcomponent_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_subcomponent_class_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_subcomponent_description = 'Automatically created scikit-learn flow.'
+        fixture_structure = {
+            fixture_name: [],
+            'sklearn.tree.tree.DecisionTreeClassifier': ['base_estimator']
+        }
 
-        serialization =  sklearn_to_flow(model)
+        serialization = sklearn_to_flow(model)
+        structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.class_name, fixture_class_name)
@@ -206,8 +231,15 @@ class TestSklearn(unittest.TestCase):
                          fixture_subcomponent_class_name)
         self.assertEqual(serialization.components['base_estimator'].description,
                          fixture_subcomponent_description)
+        self.assertDictEqual(structure, fixture_structure)
 
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -233,11 +265,18 @@ class TestSklearn(unittest.TestCase):
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
                        'dummy=sklearn.dummy.DummyClassifier)'
         fixture_description = 'Automatically created scikit-learn flow.'
+        fixture_structure = {
+            fixture_name: [],
+            'sklearn.preprocessing.data.StandardScaler': ['scaler'],
+            'sklearn.dummy.DummyClassifier': ['dummy']
+        }
 
         serialization = sklearn_to_flow(model)
+        structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
+        self.assertDictEqual(structure, fixture_structure)
 
         # Comparing the pipeline
         # The parameters only have the name of base objects(not the whole flow)
@@ -249,11 +288,21 @@ class TestSklearn(unittest.TestCase):
             self.assertEqual(len(serialization.parameters), 2)
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
-        self.assertEqual(json.loads(serialization.parameters['steps']),
-                         [{'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'scaler', 'step_name': 'scaler'}},
-                          {'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'dummy', 'step_name': 'dummy'}}])
+        self.assertEqual(
+            json.loads(serialization.parameters['steps']),
+            [
+                {
+                    'oml-python:serialized_object':
+                        'component_reference',
+                    'value': {'key': 'scaler', 'step_name': 'scaler'}
+                },
+                {
+                    'oml-python:serialized_object':
+                        'component_reference',
+                    'value': {'key': 'dummy', 'step_name': 'dummy'}
+                }
+            ]
+        )
 
         # Checking the sub-component
         self.assertEqual(len(serialization.components), 2)
@@ -262,8 +311,13 @@ class TestSklearn(unittest.TestCase):
         self.assertIsInstance(serialization.components['dummy'],
                               OpenMLFlow)
 
-        #del serialization.model
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -295,11 +349,18 @@ class TestSklearn(unittest.TestCase):
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
                        'clusterer=sklearn.cluster.k_means_.KMeans)'
         fixture_description = 'Automatically created scikit-learn flow.'
+        fixture_structure = {
+            fixture_name: [],
+            'sklearn.preprocessing.data.StandardScaler': ['scaler'],
+            'sklearn.cluster.k_means_.KMeans': ['clusterer']
+        }
 
         serialization = sklearn_to_flow(model)
+        structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
+        self.assertDictEqual(structure, fixture_structure)
 
         # Comparing the pipeline
         # The parameters only have the name of base objects(not the whole flow)
@@ -311,11 +372,19 @@ class TestSklearn(unittest.TestCase):
             self.assertEqual(len(serialization.parameters), 2)
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
-        self.assertEqual(json.loads(serialization.parameters['steps']),
-                         [{'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'scaler', 'step_name': 'scaler'}},
-                          {'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'clusterer', 'step_name': 'clusterer'}}])
+        self.assertEqual(
+            json.loads(serialization.parameters['steps']),
+            [
+                {
+                    'oml-python:serialized_object': 'component_reference',
+                    'value': {'key': 'scaler', 'step_name': 'scaler'}
+                },
+                {
+                    'oml-python:serialized_object': 'component_reference',
+                    'value': {'key': 'clusterer', 'step_name': 'clusterer'}
+                },
+            ]
+        )
 
         # Checking the sub-component
         self.assertEqual(len(serialization.components), 2)
@@ -326,6 +395,12 @@ class TestSklearn(unittest.TestCase):
 
         # del serialization.model
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -362,11 +437,25 @@ class TestSklearn(unittest.TestCase):
                   'numeric=sklearn.preprocessing.data.StandardScaler,' \
                   'nominal=sklearn.preprocessing._encoders.OneHotEncoder)'
         fixture_description = 'Automatically created scikit-learn flow.'
+        fixture_structure = {
+            fixture: [],
+            'sklearn.preprocessing.data.StandardScaler': ['numeric'],
+            'sklearn.preprocessing._encoders.OneHotEncoder': ['nominal']
+        }
+
         serialization = sklearn_to_flow(model)
+        structure = serialization.get_structure('name')
         self.assertEqual(serialization.name, fixture)
         self.assertEqual(serialization.description, fixture_description)
+        self.assertDictEqual(structure, fixture_structure)
         # del serialization.model
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
         serialization2 = sklearn_to_flow(new_model)
@@ -393,13 +482,32 @@ class TestSklearn(unittest.TestCase):
             'numeric=sklearn.preprocessing.data.StandardScaler,'\
             'nominal=sklearn.preprocessing._encoders.OneHotEncoder),'\
             'classifier=sklearn.tree.tree.DecisionTreeClassifier)'
+        fixture_structure = {
+            'sklearn.preprocessing.data.StandardScaler':
+                ['transformer', 'numeric'],
+            'sklearn.preprocessing._encoders.OneHotEncoder':
+                ['transformer', 'nominal'],
+            'sklearn.compose._column_transformer.ColumnTransformer(numeric='
+            'sklearn.preprocessing.data.StandardScaler,nominal=sklearn.'
+            'preprocessing._encoders.OneHotEncoder)': ['transformer'],
+            'sklearn.tree.tree.DecisionTreeClassifier': ['classifier'],
+            fixture_name: [],
+        }
 
         fixture_description = 'Automatically created scikit-learn flow.'
         serialization = sklearn_to_flow(model)
+        structure = serialization.get_structure('name')
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
+        self.assertDictEqual(structure, fixture_structure)
         # del serialization.model
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(model.get_params()),
+                             str(new_model.get_params()))
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
         serialization2 = sklearn_to_flow(new_model)
@@ -415,16 +523,30 @@ class TestSklearn(unittest.TestCase):
         fu = sklearn.pipeline.FeatureUnion(
             transformer_list=[('ohe', ohe), ('scaler', scaler)])
         serialization = sklearn_to_flow(fu)
+        structure = serialization.get_structure('name')
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = ('_encoders'
                                if LooseVersion(sklearn.__version__) >= "0.20"
                                else 'data')
-        self.assertEqual(serialization.name,
-                         'sklearn.pipeline.FeatureUnion('
-                         'ohe=sklearn.preprocessing.{}.OneHotEncoder,'
-                         'scaler=sklearn.preprocessing.data.StandardScaler)'
-                         .format(module_name_encoder))
+        fixture_name = ('sklearn.pipeline.FeatureUnion('
+                        'ohe=sklearn.preprocessing.{}.OneHotEncoder,'
+                        'scaler=sklearn.preprocessing.data.StandardScaler)'
+                        .format(module_name_encoder))
+        fixture_structure = {
+            fixture_name: [],
+            'sklearn.preprocessing.{}.'
+            'OneHotEncoder'.format(module_name_encoder): ['ohe'],
+            'sklearn.preprocessing.data.StandardScaler': ['scaler']
+        }
+        self.assertEqual(serialization.name, fixture_name)
+        self.assertDictEqual(structure, fixture_structure)
         new_model = flow_to_sklearn(serialization)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(str(fu.get_params()),
+                             str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(fu))
         self.assertIsNot(new_model, fu)
@@ -503,29 +625,51 @@ class TestSklearn(unittest.TestCase):
         model = sklearn.pipeline.Pipeline(steps=[
             ('ohe', ohe), ('scaler', scaler), ('boosting', boosting)])
         parameter_grid = {
-            'n_estimators': [1, 5, 10, 100],
+            'base_estimator__max_depth': scipy.stats.randint(1, 10),
             'learning_rate': scipy.stats.uniform(0.01, 0.99),
-            'base_estimator__max_depth': scipy.stats.randint(1, 10)}
+            'n_estimators': [1, 5, 10, 100]
+        }
+        # convert to ordered dict, sorted by keys) due to param grid check
+        parameter_grid = OrderedDict(sorted(parameter_grid.items()))
         cv = sklearn.model_selection.StratifiedKFold(n_splits=5, shuffle=True)
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
         serialized = sklearn_to_flow(rs)
+        structure = serialized.get_structure('name')
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = ('_encoders'
                                if LooseVersion(sklearn.__version__) >= "0.20"
                                else 'data')
-        fixture_name = \
-            ('sklearn.model_selection._search.RandomizedSearchCV('
-             'estimator=sklearn.pipeline.Pipeline('
-             'ohe=sklearn.preprocessing.{}.OneHotEncoder,'
-             'scaler=sklearn.preprocessing.data.StandardScaler,'
-             'boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier('
-             'base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))'.
-             format(module_name_encoder))
+        ohe_name = 'sklearn.preprocessing.%s.OneHotEncoder' % \
+                   module_name_encoder
+        scaler_name = 'sklearn.preprocessing.data.StandardScaler'
+        tree_name = 'sklearn.tree.tree.DecisionTreeClassifier'
+        boosting_name = 'sklearn.ensemble.weight_boosting.AdaBoostClassifier' \
+                        '(base_estimator=%s)' % tree_name
+        pipeline_name = 'sklearn.pipeline.Pipeline(ohe=%s,scaler=%s,' \
+                        'boosting=%s)' % (ohe_name, scaler_name, boosting_name)
+        fixture_name = 'sklearn.model_selection._search.RandomizedSearchCV' \
+                       '(estimator=%s)' % pipeline_name
+        fixture_structure = {
+            ohe_name: ['estimator', 'ohe'],
+            scaler_name: ['estimator', 'scaler'],
+            tree_name: ['estimator', 'boosting', 'base_estimator'],
+            boosting_name: ['estimator', 'boosting'],
+            pipeline_name: ['estimator'],
+            fixture_name: []
+        }
         self.assertEqual(serialized.name, fixture_name)
+        self.assertEqual(structure, fixture_structure)
 
         # now do deserialization
         deserialized = flow_to_sklearn(serialized)
+        # compares string representations of the dict, as it potentially
+        # contains complex objects that can not be compared with == op
+        # JvR: compare str length, due to memory address of distribution
+        # Only in Python 3.x, as Python 2 has Unicode issues
+        if sys.version_info[0] >= 3:
+            self.assertEqual(len(str(rs.get_params())),
+                             len(str(deserialized.get_params())))
 
         # Checks that sklearn_to_flow is idempotent.
         serialized2 = sklearn_to_flow(deserialized)
@@ -557,21 +701,33 @@ class TestSklearn(unittest.TestCase):
                              supported_rv.__dict__)
 
     def test_serialize_function(self):
-        serialized =  sklearn_to_flow(sklearn.feature_selection.chi2)
+        serialized = sklearn_to_flow(sklearn.feature_selection.chi2)
         deserialized = flow_to_sklearn(serialized)
         self.assertEqual(deserialized, sklearn.feature_selection.chi2)
 
     def test_serialize_cvobject(self):
         methods = [sklearn.model_selection.KFold(3),
                    sklearn.model_selection.LeaveOneOut()]
-        fixtures = [OrderedDict([('oml-python:serialized_object', 'cv_object'),
-                                 ('value', OrderedDict([('name', 'sklearn.model_selection._split.KFold'),
-                                                        ('parameters', OrderedDict([('n_splits', '3'),
-                                                                                    ('random_state', 'null'),
-                                                                                    ('shuffle', 'false')]))]))]),
-                    OrderedDict([('oml-python:serialized_object', 'cv_object'),
-                                 ('value', OrderedDict([('name', 'sklearn.model_selection._split.LeaveOneOut'),
-                                                        ('parameters', OrderedDict())]))])]
+        fixtures = [
+            OrderedDict([
+                ('oml-python:serialized_object', 'cv_object'),
+                ('value', OrderedDict([
+                    ('name', 'sklearn.model_selection._split.KFold'),
+                    ('parameters', OrderedDict([
+                        ('n_splits', '3'),
+                        ('random_state', 'null'),
+                        ('shuffle', 'false'),
+                    ]))
+                ]))
+            ]),
+            OrderedDict([
+                ('oml-python:serialized_object', 'cv_object'),
+                ('value', OrderedDict([
+                    ('name', 'sklearn.model_selection._split.LeaveOneOut'),
+                    ('parameters', OrderedDict())
+                ]))
+            ]),
+        ]
         for method, fixture in zip(methods, fixtures):
             m = sklearn_to_flow(method)
             self.assertEqual(m, fixture)
@@ -667,7 +823,7 @@ class TestSklearn(unittest.TestCase):
     def test_serialize_resampling(self):
         kfold = sklearn.model_selection.StratifiedKFold(
             n_splits=4, shuffle=True)
-        serialized =  sklearn_to_flow(kfold)
+        serialized = sklearn_to_flow(kfold)
         deserialized = flow_to_sklearn(serialized)
         # Best approximation to get_params()
         self.assertEqual(str(deserialized), str(kfold))
@@ -690,9 +846,12 @@ class TestSklearn(unittest.TestCase):
         kernel = sklearn.gaussian_process.kernels.Matern()
         gp = sklearn.gaussian_process.GaussianProcessClassifier(
             kernel=kernel, optimizer=opt)
-        self.assertRaisesRegexp(TypeError, "Matern\(length_scale=1, nu=1.5\), "
-                                           "<class 'sklearn.gaussian_process.kernels.Matern'>",
-                                sklearn_to_flow, gp)
+        self.assertRaisesRegex(
+            TypeError,
+            r"Matern\(length_scale=1, nu=1.5\), "
+            "<class 'sklearn.gaussian_process.kernels.Matern'>",
+            sklearn_to_flow, gp,
+        )
 
     def test_error_on_adding_component_multiple_times_to_flow(self):
         # this function implicitly checks
@@ -702,19 +861,19 @@ class TestSklearn(unittest.TestCase):
         pipeline = sklearn.pipeline.Pipeline((('pca1', pca), ('pca2', pca2)))
         fixture = "Found a second occurence of component .*.PCA when trying " \
                   "to serialize Pipeline"
-        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline)
+        self.assertRaisesRegex(ValueError, fixture, sklearn_to_flow, pipeline)
 
         fu = sklearn.pipeline.FeatureUnion((('pca1', pca), ('pca2', pca2)))
         fixture = "Found a second occurence of component .*.PCA when trying " \
                   "to serialize FeatureUnion"
-        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, fu)
+        self.assertRaisesRegex(ValueError, fixture, sklearn_to_flow, fu)
 
         fs = sklearn.feature_selection.SelectKBest()
         fu2 = sklearn.pipeline.FeatureUnion((('pca1', pca), ('fs', fs)))
         pipeline2 = sklearn.pipeline.Pipeline((('fu', fu2), ('pca2', pca2)))
         fixture = "Found a second occurence of component .*.PCA when trying " \
                   "to serialize Pipeline"
-        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline2)
+        self.assertRaisesRegex(ValueError, fixture, sklearn_to_flow, pipeline2)
 
     def test_subflow_version_propagated(self):
         this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -837,7 +996,9 @@ class TestSklearn(unittest.TestCase):
             ]
 
         for fn, num_params_with_defaults in fns:
-            defaults, defaultless = openml.flows.sklearn_converter._get_fn_arguments_with_defaults(fn)
+            defaults, defaultless = (
+                openml.flows.sklearn_converter._get_fn_arguments_with_defaults(fn)
+            )
             self.assertIsInstance(defaults, dict)
             self.assertIsInstance(defaultless, set)
             # check whether we have both defaults and defaultless params
@@ -900,12 +1061,20 @@ class TestSklearn(unittest.TestCase):
         # used the 'initialize_with_defaults' flag of the deserialization
         # method to return a flow that contains default hyperparameter
         # settings.
-        steps = [('Imputer', Imputer()),
-                 ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
-                 ('Estimator', sklearn.ensemble.AdaBoostClassifier(
-                     sklearn.ensemble.BaggingClassifier(
+        steps = [
+            ('Imputer', Imputer()),
+            ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
+            (
+                'Estimator',
+                sklearn.ensemble.AdaBoostClassifier(
+                    sklearn.ensemble.BaggingClassifier(
                         sklearn.ensemble.GradientBoostingClassifier(
-                            sklearn.neighbors.KNeighborsClassifier()))))]
+                            sklearn.neighbors.KNeighborsClassifier()
+                        )
+                    )
+                )
+            ),
+        ]
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
 
         pipe_adjusted = sklearn.clone(pipe_orig)
@@ -917,9 +1086,97 @@ class TestSklearn(unittest.TestCase):
                   'Estimator__base_estimator__base_estimator__loss__n_neighbors': 13}
         pipe_adjusted.set_params(**params)
         flow = openml.flows.sklearn_to_flow(pipe_adjusted)
-        pipe_deserialized = openml.flows.flow_to_sklearn(flow, initialize_with_defaults=True)
+        pipe_deserialized = openml.flows.flow_to_sklearn(
+            flow,
+            initialize_with_defaults=True,
+        )
 
         # we want to compare pipe_deserialized and pipe_orig. We use the flow
         # equals function for this
         assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig),
                            openml.flows.sklearn_to_flow(pipe_deserialized))
+
+    def test_openml_param_name_to_sklearn(self):
+        scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
+        boosting = sklearn.ensemble.AdaBoostClassifier(
+            base_estimator=sklearn.tree.DecisionTreeClassifier())
+        model = sklearn.pipeline.Pipeline(steps=[
+            ('scaler', scaler), ('boosting', boosting)])
+        flow = openml.flows.sklearn_to_flow(model)
+        task = openml.tasks.get_task(115)
+        run = openml.runs.run_flow_on_task(flow, task)
+        run = run.publish()
+        run = openml.runs.get_run(run.run_id)
+        setup = openml.setups.get_setup(run.setup_id)
+
+        # make sure to test enough parameters
+        self.assertGreater(len(setup.parameters), 15)
+
+        for parameter in setup.parameters.values():
+            sklearn_name = openml.flows.openml_param_name_to_sklearn(
+                parameter, flow)
+
+            # test the inverse. Currently, OpenML stores the hyperparameter
+            # fullName as flow.name + flow.version + parameter.name on the
+            # server (but this behaviour is not documented and might or might
+            # not change in the future. Hence, we won't offer this
+            # transformation functionality in the main package yet.)
+            splitted = sklearn_name.split("__")
+            if len(splitted) > 1:  # if len is 1, it is part of root flow
+                subflow = flow.get_subflow(splitted[0:-1])
+            else:
+                subflow = flow
+            openml_name = "%s(%s)_%s" % (subflow.name,
+                                         subflow.version,
+                                         splitted[-1])
+            self.assertEqual(parameter.full_name, openml_name)
+
+    def test_obtain_parameter_values_flow_not_from_server(self):
+        model = sklearn.linear_model.LogisticRegression(solver='lbfgs')
+        flow = sklearn_to_flow(model)
+        msg = 'Flow sklearn.linear_model.logistic.LogisticRegression has no ' \
+              'flow_id!'
+
+        self.assertRaisesRegex(
+            ValueError,
+            msg,
+            openml.flows.obtain_parameter_values,
+            flow,
+        )
+
+        model = sklearn.ensemble.AdaBoostClassifier(
+            base_estimator=sklearn.linear_model.LogisticRegression(
+                solver='lbfgs',
+            )
+        )
+        flow = sklearn_to_flow(model)
+        flow.flow_id = 1
+        self.assertRaisesRegex(
+            ValueError,
+            msg,
+            openml.flows.obtain_parameter_values,
+            flow,
+        )
+
+    def test_obtain_parameter_values(self):
+
+        model = sklearn.model_selection.RandomizedSearchCV(
+            estimator=sklearn.ensemble.RandomForestClassifier(n_estimators=5),
+            param_distributions={
+                "max_depth": [3, None],
+                "max_features": [1, 2, 3, 4],
+                "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
+                "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                "bootstrap": [True, False], "criterion": ["gini", "entropy"]},
+            cv=sklearn.model_selection.StratifiedKFold(n_splits=2,
+                                                       random_state=1),
+            n_iter=5)
+        flow = sklearn_to_flow(model)
+        flow.flow_id = 1
+        flow.components['estimator'].flow_id = 2
+        parameters = openml.flows.obtain_parameter_values(flow)
+        for parameter in parameters:
+            self.assertIsNotNone(parameter['oml:component'], msg=parameter)
+            if parameter['oml:name'] == 'n_estimators':
+                self.assertEqual(parameter['oml:value'], '5')
+                self.assertEqual(parameter['oml:component'], 2)

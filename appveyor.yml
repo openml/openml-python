@@ -32,19 +32,19 @@ install:
   # XXX: setuptools>23 is currently broken on Win+py3 with numpy
   # (https://github.com/pypa/setuptools/issues/728)
   - conda update --all --yes setuptools=23
-  - conda install --yes nb_conda nb_conda_kernels
 
   # Install the build and runtime dependencies of the project.
   - "cd C:\\projects\\openml-python"
-  - conda install --quiet --yes scikit-learn=0.18.2
-  - conda install --quiet --yes mock numpy scipy pytest requests nbformat python-dateutil nbconvert pandas matplotlib seaborn
+  - conda install --quiet --yes scikit-learn=0.20.0 nb_conda nb_conda_kernels numpy scipy requests nbformat python-dateutil nbconvert pandas matplotlib seaborn
   - pip install liac-arff xmltodict oslo.concurrency
+  # Packages for (parallel) unit tests with pytest
+  - pip install pytest pytest-xdist pytest-timeout
   - "pip install .[test]"
-  
+
 
 # Not a .NET project, we build scikit-learn in the install step instead
 build: false
 
 test_script:
   - "cd C:\\projects\\openml-python"
-  - "%CMD_IN_ENV% pytest"
+  - "%CMD_IN_ENV% pytest -n 4 --timeout=600 --timeout-method=thread -sv --ignore='test_OpenMLDemo.py'"

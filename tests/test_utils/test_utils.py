@@ -13,15 +13,15 @@ class OpenMLTaskTest(TestBase):
     _multiprocess_can_split_ = True
     _batch_size = 25
 
-    def mocked_perform_api_call(call):
+    def mocked_perform_api_call(call, request_method):
         # TODO: JvR: Why is this not a staticmethod?
         url = openml.config.server + '/' + call
-        return openml._api_calls._read_url(url)
+        return openml._api_calls._read_url(url, request_method=request_method)
 
     def test_list_all(self):
         openml.utils._list_all(openml.tasks.functions._list_tasks)
 
-    @mock.patch('openml._api_calls._perform_api_call', 
+    @mock.patch('openml._api_calls._perform_api_call',
                 side_effect=mocked_perform_api_call)
     def test_list_all_few_results_available(self, _perform_api_call):
         # we want to make sure that the number of api calls is only 1.
@@ -46,7 +46,9 @@ class OpenMLTaskTest(TestBase):
         datasets_a = openml.datasets.list_datasets()
         datasets_b = openml.datasets.list_datasets(size=np.inf)
 
-        self.assertEqual(len(datasets_a), len(datasets_b))
+        # note that in the meantime the number of datasets could have increased
+        # due to tests that run in parallel.
+        self.assertGreaterEqual(len(datasets_b), len(datasets_a))
 
     def test_list_all_for_tasks(self):
         required_size = 1068  # default test server reset value

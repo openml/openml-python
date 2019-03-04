@@ -7,12 +7,8 @@ matplotlib.use('AGG')
 import nbformat
 from nbconvert.exporters import export
 from nbconvert.exporters.python import PythonExporter
-import six
 
-if six.PY2:
-    import mock
-else:
-    import unittest.mock as mock
+import unittest.mock as mock
 
 from unittest import skip
 import openml._api_calls
@@ -34,12 +30,12 @@ class OpenMLDemoTest(TestBase):
 
         try:
             shutil.rmtree(self.notebook_output_directory)
-        except:
+        except OSError:
             pass
 
         try:
             os.makedirs(self.notebook_output_directory)
-        except:
+        except OSError:
             pass
 
     def _tst_notebook(self, notebook_name):

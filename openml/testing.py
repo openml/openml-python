@@ -4,9 +4,13 @@ import os
 import shutil
 import time
 import unittest
+import warnings
 
-from oslo_concurrency import lockutils
-import six
+# Currently, importing oslo raises a lot of warning that it will stop working
+# under python3.8; remove this once they disappear
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    from oslo_concurrency import lockutils
 
 import openml
 
@@ -25,8 +29,10 @@ class TestBase(unittest.TestCase):
         # cache
         self.maxDiff = None
         self.static_cache_dir = None
-        static_cache_dir = os.path.dirname(os.path.abspath(inspect.getfile(self.__class__)))
-        static_cache_dir = os.path.abspath(os.path.join(static_cache_dir, '..'))
+        abspath_this_file = os.path.abspath(inspect.getfile(self.__class__))
+        static_cache_dir = os.path.dirname(abspath_this_file)
+        static_cache_dir = os.path.abspath(os.path.join(static_cache_dir,
+                                                        '..'))
         content = os.listdir(static_cache_dir)
         if 'files' in content:
             self.static_cache_dir = os.path.join(static_cache_dir, 'files')
@@ -38,10 +44,7 @@ class TestBase(unittest.TestCase):
         workdir = os.path.dirname(os.path.abspath(__file__))
         tmp_dir_name = self.id()
         self.workdir = os.path.join(workdir, tmp_dir_name)
-        try:
-            shutil.rmtree(self.workdir)
-        except:
-            pass
+        shutil.rmtree(self.workdir, ignore_errors=True)
 
         os.mkdir(self.workdir)
         os.chdir(self.workdir)
@@ -65,6 +68,10 @@ class TestBase(unittest.TestCase):
                 with open(openml.config.config_file, 'w') as fh:
                     fh.write('apikey = %s' % openml.config.apikey)
 
+        # Increase the number of retries to avoid spurios server failures
+        self.connection_n_retries = openml.config.connection_n_retries
+        openml.config.connection_n_retries = 10
+
     def tearDown(self):
         os.chdir(self.cwd)
         try:
@@ -76,17 +83,22 @@ class TestBase(unittest.TestCase):
             else:
                 raise
         openml.config.server = self.production_server
+        openml.config.connection_n_retries = self.connection_n_retries
 
-    def _add_sentinel_to_flow_name(self, flow, sentinel=None):
+    def _get_sentinel(self, sentinel=None):
         if sentinel is None:
-            # Create a unique prefix for the flow. Necessary because the flow is
-            # identified by its name and external version online. Having a unique
-            #  name allows us to publish the same flow in each test run
+            # Create a unique prefix for the flow. Necessary because the flow
+            # is identified by its name and external version online. Having a
+            # unique name allows us to publish the same flow in each test run.
             md5 = hashlib.md5()
             md5.update(str(time.time()).encode('utf-8'))
+            md5.update(str(os.getpid()).encode('utf-8'))
             sentinel = md5.hexdigest()[:10]
             sentinel = 'TEST%s' % sentinel
+        return sentinel
 
+    def _add_sentinel_to_flow_name(self, flow, sentinel=None):
+        sentinel = self._get_sentinel(sentinel=sentinel)
         flows_to_visit = list()
         flows_to_visit.append(flow)
         while len(flows_to_visit) > 0:
@@ -103,7 +115,7 @@ class TestBase(unittest.TestCase):
         self.assertIn('did', dataset)
         self.assertIsInstance(dataset['did'], int)
         self.assertIn('status', dataset)
-        self.assertIsInstance(dataset['status'], six.string_types)
+        self.assertIsInstance(dataset['status'], str)
         self.assertIn(dataset['status'], ['in_preparation', 'active',
                                           'deactivated'])
 

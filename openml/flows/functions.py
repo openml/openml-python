@@ -1,26 +1,42 @@
 import dateutil.parser
 
 import xmltodict
-import six
 
 import openml._api_calls
 from . import OpenMLFlow
 import openml.utils
 
 
-def get_flow(flow_id):
+def get_flow(flow_id, reinstantiate=False):
     """Download the OpenML flow for a given flow ID.
 
     Parameters
     ----------
     flow_id : int
         The OpenML flow id.
+
+    reinstantiate: bool
+        Whether to reinstantiate the flow to a sklearn model.
+        Note that this can only be done with sklearn flows, and
+        when
+
+    Returns
+    -------
+    flow : OpenMLFlow
+        the flow
     """
     flow_id = int(flow_id)
-    flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id)
+    flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id,
+                                                   'get')
 
     flow_dict = xmltodict.parse(flow_xml)
     flow = OpenMLFlow._from_dict(flow_dict)
+
+    if reinstantiate:
+        if not (flow.external_version.startswith('sklearn==')
+                or ',sklearn==' in flow.external_version):
+            raise ValueError('Only sklearn flows can be reinstantiated')
+        flow.model = openml.flows.flow_to_sklearn(flow)
 
     return flow
 
@@ -57,7 +73,11 @@ def list_flows(offset=None, size=None, tag=None, **kwargs):
         - external version
         - uploader
     """
-    return openml.utils._list_all(_list_flows, offset=offset, size=size, tag=tag, **kwargs)
+    return openml.utils._list_all(_list_flows,
+                                  offset=offset,
+                                  size=size,
+                                  tag=tag,
+                                  **kwargs)
 
 
 def _list_flows(**kwargs):
@@ -103,13 +123,14 @@ def flow_exists(name, external_version):
     -----
     see http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
     """
-    if not (isinstance(name, six.string_types) and len(name) > 0):
+    if not (isinstance(name, str) and len(name) > 0):
         raise ValueError('Argument \'name\' should be a non-empty string')
-    if not (isinstance(name, six.string_types) and len(external_version) > 0):
+    if not (isinstance(name, str) and len(external_version) > 0):
         raise ValueError('Argument \'version\' should be a non-empty string')
 
     xml_response = openml._api_calls._perform_api_call(
         "flow/exists",
+        'post',
         data={'name': name, 'external_version': external_version},
     )
 
@@ -123,7 +144,7 @@ def flow_exists(name, external_version):
 
 def __list_flows(api_call):
 
-    xml_string = openml._api_calls._perform_api_call(api_call)
+    xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     flows_dict = xmltodict.parse(xml_string, force_list=('oml:flow',))
 
     # Minimalistic check if the XML is useful
@@ -176,7 +197,7 @@ def assert_flows_equal(flow1, flow2,
 
     flow2 : OpenMLFlow
 
-    ignore_parameter_values_on_older_children : str
+    ignore_parameter_values_on_older_children : str (optional)
         If set to ``OpenMLFlow.upload_date``, ignores parameters in a child
         flow if it's upload date predates the upload date of the parent flow.
 
@@ -221,9 +242,9 @@ def assert_flows_equal(flow1, flow2,
             if key == 'parameters':
                 if ignore_parameter_values or \
                         ignore_parameter_values_on_older_children:
-                    parameters_flow_1 = set(flow1.parameters.keys())
-                    parameters_flow_2 = set(flow2.parameters.keys())
-                    symmetric_difference = parameters_flow_1 ^ parameters_flow_2
+                    params_flow_1 = set(flow1.parameters.keys())
+                    params_flow_2 = set(flow2.parameters.keys())
+                    symmetric_difference = params_flow_1 ^ params_flow_2
                     if len(symmetric_difference) > 0:
                         raise ValueError('Flow %s: parameter set of flow '
                                          'differs from the parameters stored '
@@ -245,4 +266,5 @@ def assert_flows_equal(flow1, flow2,
             if attr1 != attr2:
                 raise ValueError("Flow %s: values for attribute '%s' differ: "
                                  "'%s'\nvs\n'%s'." %
-                                 (str(flow1.name), str(key), str(attr1), str(attr2)))
+                                 (str(flow1.name), str(key),
+                                  str(attr1), str(attr2)))

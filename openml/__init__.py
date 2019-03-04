@@ -9,7 +9,7 @@ learning. OpenML can be used to
 * analyze experiments (uploaded by you and other collaborators) and conduct
   meta studies
 
-In particular, this module implemts a python interface for the
+In particular, this module implements a python interface for the
 `OpenML REST API <https://www.openml.org/guide#!rest_services>`_
 (`REST on wikipedia
 <http://en.wikipedia.org/wiki/Representational_state_transfer>`_).
@@ -22,15 +22,15 @@ from . import tasks
 from . import runs
 from . import flows
 from . import setups
-from . import study
 from . import evaluations
-from . import utils
+
 from .runs import OpenMLRun
 from .tasks import OpenMLTask, OpenMLSplit
 from .flows import OpenMLFlow
 from .evaluations import OpenMLEvaluation
+from .study import OpenMLStudy
 
-from .__version__ import __version__
+from .__version__ import __version__  # noqa: F401
 
 
 def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None,
@@ -71,5 +71,5 @@ def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None,
 
 __all__ = ['OpenMLDataset', 'OpenMLDataFeature', 'OpenMLRun',
            'OpenMLSplit', 'OpenMLEvaluation', 'OpenMLSetup',
-           'OpenMLTask', 'OpenMLFlow', 'datasets', 'evaluations',
-           'config', 'runs', 'flows', 'tasks', 'setups']
+           'OpenMLTask', 'OpenMLFlow', 'OpenMLStudy', 'datasets',
+           'evaluations', 'config', 'runs', 'flows', 'tasks', 'setups']

@@ -1,13 +1,13 @@
 import inspect
 import os
-import unittest
 
 import numpy as np
 
 from openml import OpenMLSplit
+from openml.testing import TestBase
 
 
-class OpenMLSplitTest(unittest.TestCase):
+class OpenMLSplitTest(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take less
     # than 5 seconds + rebuilding the test would potentially be costly
 
@@ -25,7 +25,8 @@ class OpenMLSplitTest(unittest.TestCase):
     def tearDown(self):
         try:
             os.remove(self.pd_filename)
-        except:
+        except (OSError, FileNotFoundError):
+            #  Replaced bare except. Not sure why these exceptions are acceptable.
             pass
 
     def test_eq(self):
@@ -63,15 +64,24 @@ class OpenMLSplitTest(unittest.TestCase):
             for j in range(10):
                 self.assertGreaterEqual(split.split[i][j][0].train.shape[0], 808)
                 self.assertGreaterEqual(split.split[i][j][0].test.shape[0], 89)
-                self.assertEqual(split.split[i][j][0].train.shape[0] +
-                                 split.split[i][j][0].test.shape[0], 898)
+                self.assertEqual(split.split[i][j][0].train.shape[0]
+                                 + split.split[i][j][0].test.shape[0],
+                                 898)
 
     def test_get_split(self):
         split = OpenMLSplit._from_arff_file(self.arff_filename)
         train_split, test_split = split.get(fold=5, repeat=2)
         self.assertEqual(train_split.shape[0], 808)
         self.assertEqual(test_split.shape[0], 90)
-        self.assertRaisesRegexp(ValueError, "Repeat 10 not known",
-                                split.get, 10, 2)
-        self.assertRaisesRegexp(ValueError, "Fold 10 not known",
-                                split.get, 2, 10)
+        self.assertRaisesRegex(
+            ValueError,
+            "Repeat 10 not known",
+            split.get,
+            10, 2,
+        )
+        self.assertRaisesRegex(
+            ValueError,
+            "Fold 10 not known",
+            split.get,
+            2, 10,
+        )

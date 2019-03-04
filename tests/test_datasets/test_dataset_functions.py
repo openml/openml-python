@@ -1,22 +1,16 @@
 import unittest
 import os
-import sys
 import random
 from itertools import product
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
+from unittest import mock
 
 import arff
-import six
 
 import pytest
 import numpy as np
 import pandas as pd
 import scipy.sparse
 from oslo_concurrency import lockutils
-from warnings import filterwarnings, catch_warnings
 
 import openml
 from openml import OpenMLDataset
@@ -60,7 +54,8 @@ class TestOpenMLDataset(TestBase):
                                            'dataset.pkl')
                 try:
                     os.remove(pickle_path)
-                except:
+                except (OSError, FileNotFoundError):
+                    #  Replaced a bare except. Not sure why either of these would be acceptable.
                     pass
 
     def _get_empty_param_for_dataset(self):
@@ -114,39 +109,38 @@ class TestOpenMLDataset(TestBase):
 
     def test_get_cached_dataset_description_not_cached(self):
         openml.config.cache_directory = self.static_cache_dir
-        self.assertRaisesRegexp(OpenMLCacheException, "Dataset description for "
-                                                      "dataset id 3 not cached",
-                                openml.datasets.functions._get_cached_dataset_description,
-                                3)
+        self.assertRaisesRegex(OpenMLCacheException,
+                               "Dataset description for dataset id 3 not cached",
+                               openml.datasets.functions._get_cached_dataset_description,
+                               dataset_id=3)
 
     def test_get_cached_dataset_arff(self):
         openml.config.cache_directory = self.static_cache_dir
-        description = openml.datasets.functions._get_cached_dataset_arff(
-            dataset_id=2)
+        description = openml.datasets.functions._get_cached_dataset_arff(dataset_id=2)
         self.assertIsInstance(description, str)
 
     def test_get_cached_dataset_arff_not_cached(self):
         openml.config.cache_directory = self.static_cache_dir
-        self.assertRaisesRegexp(OpenMLCacheException, "ARFF file for "
-                                                      "dataset id 3 not cached",
-                                openml.datasets.functions._get_cached_dataset_arff,
-                                3)
+        self.assertRaisesRegex(OpenMLCacheException,
+                               "ARFF file for dataset id 3 not cached",
+                               openml.datasets.functions._get_cached_dataset_arff,
+                               dataset_id=3)
 
     def _check_dataset(self, dataset):
-            self.assertEqual(type(dataset), dict)
-            self.assertGreaterEqual(len(dataset), 2)
-            self.assertIn('did', dataset)
-            self.assertIsInstance(dataset['did'], int)
-            self.assertIn('status', dataset)
-            self.assertIsInstance(dataset['status'], six.string_types)
-            self.assertIn(dataset['status'], ['in_preparation', 'active',
-                                              'deactivated'])
+        self.assertEqual(type(dataset), dict)
+        self.assertGreaterEqual(len(dataset), 2)
+        self.assertIn('did', dataset)
+        self.assertIsInstance(dataset['did'], int)
+        self.assertIn('status', dataset)
+        self.assertIsInstance(dataset['status'], str)
+        self.assertIn(dataset['status'], ['in_preparation', 'active', 'deactivated'])
+
     def _check_datasets(self, datasets):
         for did in datasets:
             self._check_dataset(datasets[did])
 
     def test_tag_untag_dataset(self):
-        tag = 'test_tag_%d' %random.randint(1, 1000000)
+        tag = 'test_tag_%d' % random.randint(1, 1000000)
         all_tags = _tag_entity('data', 1, tag)
         self.assertTrue(tag in all_tags)
         all_tags = _tag_entity('data', 1, tag, untag=True)
@@ -191,7 +185,9 @@ class TestOpenMLDataset(TestBase):
         self._check_datasets(datasets)
 
     def test_list_datasets_combined_filters(self):
-        datasets = openml.datasets.list_datasets(tag='study_14', number_instances="100..1000", number_missing_values="800..1000")
+        datasets = openml.datasets.list_datasets(tag='study_14',
+                                                 number_instances="100..1000",
+                                                 number_missing_values="800..1000")
         self.assertGreaterEqual(len(datasets), 1)
         self._check_datasets(datasets)
 
@@ -215,9 +211,12 @@ class TestOpenMLDataset(TestBase):
         active = openml.datasets.check_datasets_active([1, 17])
         self.assertTrue(active[1])
         self.assertFalse(active[17])
-        self.assertRaisesRegexp(ValueError, 'Could not find dataset 79 in OpenML'
-                                            ' dataset list.',
-                                openml.datasets.check_datasets_active, [79])
+        self.assertRaisesRegex(
+            ValueError,
+            'Could not find dataset 79 in OpenML dataset list.',
+            openml.datasets.check_datasets_active,
+            [79],
+        )
 
     def test_get_datasets(self):
         dids = [1, 2]
@@ -291,7 +290,7 @@ class TestOpenMLDataset(TestBase):
             'oml:md5_checksum': 'abc',
             'oml:url': 'https://www.openml.org/data/download/61',
         }
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             OpenMLHashException,
             'Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded dataset 5 '
             'is unequal to the checksum abc sent by the server.',
@@ -326,8 +325,7 @@ class TestOpenMLDataset(TestBase):
     @mock.patch('openml.datasets.functions._get_dataset_arff')
     def test_deletion_of_cache_dir_faulty_download(self, patch):
         patch.side_effect = Exception('Boom!')
-        self.assertRaisesRegexp(Exception, 'Boom!', openml.datasets.get_dataset,
-                                1)
+        self.assertRaisesRegex(Exception, 'Boom!', openml.datasets.get_dataset, dataset_id=1)
         datasets_cache_dir = os.path.join(
             self.workdir, 'org', 'openml', 'test', 'datasets'
         )
@@ -361,7 +359,7 @@ class TestOpenMLDataset(TestBase):
     def test_upload_dataset_with_url(self):
 
         dataset = OpenMLDataset(
-            "UploadTestWithURL",
+            "%s-UploadTestWithURL" % self._get_sentinel(),
             "test",
             data_format="arff",
             version=1,
@@ -372,7 +370,8 @@ class TestOpenMLDataset(TestBase):
 
     def test_data_status(self):
         dataset = OpenMLDataset(
-            "UploadTestWithURL", "test", "ARFF",
+            "%s-UploadTestWithURL" % self._get_sentinel(),
+            "test", "ARFF",
             version=1,
             url="https://www.openml.org/data/download/61/dataset_61_iris.arff")
         dataset.publish()
@@ -470,7 +469,7 @@ class TestOpenMLDataset(TestBase):
                       for i in range(data.shape[1])]
 
         dataset = create_dataset(
-            name='NumPy_testing_dataset',
+            name='%s-NumPy_testing_dataset' % self._get_sentinel(),
             description='Synthetic dataset created from a NumPy array',
             creator='OpenML tester',
             contributor=None,
@@ -530,7 +529,7 @@ class TestOpenMLDataset(TestBase):
         ]
 
         dataset = create_dataset(
-            name="ModifiedWeather",
+            name="%s-ModifiedWeather" % self._get_sentinel(),
             description=(
                 'Testing dataset upload when the data is a list of lists'
             ),
@@ -577,7 +576,7 @@ class TestOpenMLDataset(TestBase):
         ]
 
         xor_dataset = create_dataset(
-            name="XOR",
+            name="%s-XOR" % self._get_sentinel(),
             description='Dataset representing the XOR operation',
             creator=None,
             contributor=None,
@@ -614,7 +613,7 @@ class TestOpenMLDataset(TestBase):
         ]
 
         xor_dataset = create_dataset(
-            name="XOR",
+            name="%s-XOR" % self._get_sentinel(),
             description='Dataset representing the XOR operation',
             creator=None,
             contributor=None,
@@ -677,18 +676,6 @@ class TestOpenMLDataset(TestBase):
             **param
         )
 
-    def test_create_dataset_warning(self):
-
-        parameters = self._get_empty_param_for_dataset()
-        parameters['format'] = 'arff'
-        with catch_warnings():
-            filterwarnings('error')
-            self.assertRaises(
-                DeprecationWarning,
-                create_dataset,
-                **parameters
-            )
-
     def test_get_online_dataset_arff(self):
 
         # Australian dataset
@@ -738,7 +725,7 @@ class TestOpenMLDataset(TestBase):
         df['windy'] = df['windy'].astype('bool')
         df['play'] = df['play'].astype('category')
         # meta-information
-        name = 'Pandas_testing_dataset'
+        name = '%s-pandas_testing_dataset' % self._get_sentinel()
         description = 'Synthetic dataset created from a Pandas DataFrame'
         creator = 'OpenML tester'
         collection_date = '01-01-2018'
@@ -762,7 +749,6 @@ class TestOpenMLDataset(TestBase):
             citation=citation,
             attributes='auto',
             data=df,
-            format=None,
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url
@@ -797,7 +783,6 @@ class TestOpenMLDataset(TestBase):
             citation=citation,
             attributes='auto',
             data=df,
-            format=None,
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url
@@ -834,7 +819,6 @@ class TestOpenMLDataset(TestBase):
             citation=citation,
             attributes=attributes,
             data=df,
-            format=None,
             version_label='test',
             original_data_url=original_data_url,
             paper_url=paper_url
@@ -851,7 +835,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_create_dataset_row_id_attribute_error(self):
         # meta-information
-        name = 'Pandas_testing_dataset'
+        name = '%s-pandas_testing_dataset' % self._get_sentinel()
         description = 'Synthetic dataset created from a Pandas DataFrame'
         creator = 'OpenML tester'
         collection_date = '01-01-2018'
@@ -886,7 +870,6 @@ class TestOpenMLDataset(TestBase):
                 attributes='auto',
                 data=df,
                 row_id_attribute='unknown_row_id',
-                format=None,
                 version_label='test',
                 original_data_url=original_data_url,
                 paper_url=paper_url
@@ -894,7 +877,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_create_dataset_row_id_attribute_inference(self):
         # meta-information
-        name = 'Pandas_testing_dataset'
+        name = '%s-pandas_testing_dataset' % self._get_sentinel()
         description = 'Synthetic dataset created from a Pandas DataFrame'
         creator = 'OpenML tester'
         collection_date = '01-01-2018'
@@ -933,7 +916,6 @@ class TestOpenMLDataset(TestBase):
                 attributes='auto',
                 data=df,
                 row_id_attribute=row_id,
-                format=None,
                 version_label='test',
                 original_data_url=original_data_url,
                 paper_url=paper_url
@@ -964,7 +946,7 @@ class TestOpenMLDataset(TestBase):
         citation = 'None'
         original_data_url = 'http://openml.github.io/openml-python'
         paper_url = 'http://openml.github.io/openml-python'
-        err_msg = "Automatically inferring the attributes required a pandas"
+        err_msg = "Automatically inferring attributes requires a pandas"
         with pytest.raises(ValueError, match=err_msg):
             openml.datasets.functions.create_dataset(
                 name=name,
@@ -980,7 +962,6 @@ class TestOpenMLDataset(TestBase):
                 citation=citation,
                 attributes=attributes,
                 data=data,
-                format=None,
                 version_label='test',
                 original_data_url=original_data_url,
                 paper_url=paper_url

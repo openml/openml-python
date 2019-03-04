@@ -1,17 +1,12 @@
 from collections import namedtuple, OrderedDict
 import os
-import six
+import pickle
 
 import numpy as np
 import scipy.io.arff
-from six.moves import cPickle as pickle
 
 
 Split = namedtuple("Split", ["train", "test"])
-
-
-if six.PY2:
-    FileNotFoundError = IOError
 
 
 class OpenMLSplit(object):
@@ -28,7 +23,8 @@ class OpenMLSplit(object):
             for fold in split[repetition]:
                 self.split[repetition][fold] = OrderedDict()
                 for sample in split[repetition][fold]:
-                    self.split[repetition][fold][sample] = split[repetition][fold][sample]
+                    self.split[repetition][fold][sample] = split[
+                        repetition][fold][sample]
 
         self.repeats = len(self.split)
         if any([len(self.split[0]) != len(self.split[i])
@@ -38,27 +34,27 @@ class OpenMLSplit(object):
         self.samples = len(self.split[0][0])
 
     def __eq__(self, other):
-        if type(self) != type(other):
+        if (type(self) != type(other)
+                or self.name != other.name
+                or self.description != other.description
+                or self.split.keys() != other.split.keys()):
             return False
-        elif self.name != other.name:
+
+        if any(self.split[repetition].keys() != other.split[repetition].keys()
+                for repetition in self.split):
             return False
-        elif self.description != other.description:
-            return False
-        elif self.split.keys() != other.split.keys():
-            return False
-        else:
-            for repetition in self.split:
-                if self.split[repetition].keys() != other.split[repetition].keys():
-                    return False
-                else:
-                    for fold in self.split[repetition]:
-                        for sample in self.split[repetition][fold]:
-                            if np.all(self.split[repetition][fold][sample].test !=
-                                      other.split[repetition][fold][sample].test)\
-                                    and \
-                                    np.all(self.split[repetition][fold][sample].train
-                                           != other.split[repetition][fold][sample].train):
-                                return False
+
+        samples = [(repetition, fold, sample)
+                   for repetition in self.split
+                   for fold in self.split[repetition]
+                   for sample in self.split[repetition][fold]]
+
+        for repetition, fold, sample in samples:
+            self_train, self_test = self.split[repetition][fold][sample]
+            other_train, other_test = other.split[repetition][fold][sample]
+            if not (np.all(self_train == other_train)
+                    and np.all(self_test == other_test)):
+                return False
         return True
 
     @classmethod
@@ -66,10 +62,7 @@ class OpenMLSplit(object):
 
         repetitions = None
 
-        if six.PY2:
-            pkl_filename = filename.replace(".arff", ".pkl.py2")
-        else:
-            pkl_filename = filename.replace(".arff", ".pkl.py3")
+        pkl_filename = filename.replace(".arff", ".pkl.py3")
 
         if os.path.exists(pkl_filename):
             with open(pkl_filename, "rb") as fh:
@@ -81,7 +74,9 @@ class OpenMLSplit(object):
         if repetitions is None:
             # Faster than liac-arff and sufficient in this situation!
             if not os.path.exists(filename):
-                raise FileNotFoundError('Split arff %s does not exist!' % filename)
+                raise FileNotFoundError(
+                    'Split arff %s does not exist!' % filename
+                )
             splits, meta = scipy.io.arff.loadarff(filename)
             name = meta.name
 
@@ -91,7 +86,11 @@ class OpenMLSplit(object):
             rowid_idx = meta._attrnames.index('rowid')
             repeat_idx = meta._attrnames.index('repeat')
             fold_idx = meta._attrnames.index('fold')
-            sample_idx = (meta._attrnames.index('sample') if 'sample' in meta._attrnames else None) # can be None
+            sample_idx = (
+                meta._attrnames.index('sample')
+                if 'sample' in meta._attrnames
+                else None
+            )  # can be None
 
             for line in splits:
                 # A line looks like type, rowid, repeat, fold
@@ -107,12 +106,13 @@ class OpenMLSplit(object):
                     repetitions[repetition][fold] = OrderedDict()
                 if sample not in repetitions[repetition][fold]:
                     repetitions[repetition][fold][sample] = ([], [])
+                split = repetitions[repetition][fold][sample]
 
                 type_ = line[type_idx].decode('utf-8')
                 if type_ == 'TRAIN':
-                    repetitions[repetition][fold][sample][0].append(line[rowid_idx])
+                    split[0].append(line[rowid_idx])
                 elif type_ == 'TEST':
-                    repetitions[repetition][fold][sample][1].append(line[rowid_idx])
+                    split[1].append(line[rowid_idx])
                 else:
                     raise ValueError(type_)
 
@@ -120,8 +120,10 @@ class OpenMLSplit(object):
                 for fold in repetitions[repetition]:
                     for sample in repetitions[repetition][fold]:
                         repetitions[repetition][fold][sample] = Split(
-                            np.array(repetitions[repetition][fold][sample][0], dtype=np.int32),
-                            np.array(repetitions[repetition][fold][sample][1], dtype=np.int32))
+                            np.array(repetitions[repetition][fold][sample][0],
+                                     dtype=np.int32),
+                            np.array(repetitions[repetition][fold][sample][1],
+                                     dtype=np.int32))
 
             with open(pkl_filename, "wb") as fh:
                 pickle.dump({"name": name, "repetitions": repetitions}, fh,

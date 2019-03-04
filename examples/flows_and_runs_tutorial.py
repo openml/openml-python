@@ -6,8 +6,6 @@ How to train/run a model and how to upload the results.
 """
 
 import openml
-import pandas as pd
-import seaborn as sns
 from pprint import pprint
 from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
 
@@ -60,7 +58,8 @@ run = openml.runs.run_flow_on_task(flow, task)
 ############################################################################
 # Share the run on the OpenML server
 #
-# So far the run is only available locally. By calling the publish function, the run is send to the OpenML server:
+# So far the run is only available locally. By calling the publish function,
+# the run is sent to the OpenML server:
 
 myrun = run.publish()
 # For this tutorial, our configuration publishes to the test server
@@ -98,11 +97,16 @@ print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 # compare your results with the rest of the class and learn from
 # them. Some tasks you could try (or browse openml.org):
 #
-# * EEG eye state: data_id:`1471 <http://www.openml.org/d/1471>`_, task_id:`14951 <http://www.openml.org/t/14951>`_
-# * Volcanoes on Venus: data_id:`1527 <http://www.openml.org/d/1527>`_, task_id:`10103 <http://www.openml.org/t/10103>`_
-# * Walking activity: data_id:`1509 <http://www.openml.org/d/1509>`_, task_id:`9945 <http://www.openml.org/t/9945>`_, 150k instances.
-# * Covertype (Satellite): data_id:`150 <http://www.openml.org/d/150>`_, task_id:`218 <http://www.openml.org/t/218>`_, 500k instances.
-# * Higgs (Physics): data_id:`23512 <http://www.openml.org/d/23512>`_, task_id:`52950 <http://www.openml.org/t/52950>`_, 100k instances, missing values.
+# * EEG eye state: data_id:`1471 <http://www.openml.org/d/1471>`_,
+#   task_id:`14951 <http://www.openml.org/t/14951>`_
+# * Volcanoes on Venus: data_id:`1527 <http://www.openml.org/d/1527>`_,
+#   task_id:`10103 <http://www.openml.org/t/10103>`_
+# * Walking activity: data_id:`1509 <http://www.openml.org/d/1509>`_,
+#   task_id:`9945 <http://www.openml.org/t/9945>`_, 150k instances.
+# * Covertype (Satellite): data_id:`150 <http://www.openml.org/d/150>`_,
+#   task_id:`218 <http://www.openml.org/t/218>`_, 500k instances.
+# * Higgs (Physics): data_id:`23512 <http://www.openml.org/d/23512>`_,
+#   task_id:`52950 <http://www.openml.org/t/52950>`_, 100k instances, missing values.
 
 # Easy benchmarking:
 for task_id in [115, ]:  # Add further tasks. Disclaimer: they might take some time

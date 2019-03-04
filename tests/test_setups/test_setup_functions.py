@@ -1,4 +1,3 @@
-import sys
 import hashlib
 import time
 
@@ -6,9 +5,7 @@ import openml
 import openml.exceptions
 from openml.testing import TestBase
 
-from sklearn.ensemble import BaggingClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.base import BaseEstimator, ClassifierMixin
 
@@ -74,7 +71,7 @@ class TestSetupFunctions(TestBase):
         # setups (yet) as it hasn't been ran
         setup_id = openml.setups.setup_exists(flow)
         self.assertFalse(setup_id)
-        setup_id = openml.setups.setup_exists(flow, classif)
+        setup_id = openml.setups.setup_exists(flow)
         self.assertFalse(setup_id)
 
         # now run the flow on an easy task:
@@ -88,7 +85,7 @@ class TestSetupFunctions(TestBase):
 
         # execute the function we are interested in
         setup_id = openml.setups.setup_exists(flow)
-        self.assertEquals(setup_id, run.setup_id)
+        self.assertEqual(setup_id, run.setup_id)
 
     def test_existing_setup_exists_1(self):
         # Check a flow with zero hyperparameters
@@ -124,7 +121,7 @@ class TestSetupFunctions(TestBase):
             if num_params[idx] == 0:
                 self.assertIsNone(current.parameters)
             else:
-                self.assertEquals(len(current.parameters), num_params[idx])
+                self.assertEqual(len(current.parameters), num_params[idx])
 
     def test_setup_list_filter_flow(self):
         openml.config.server = self.production_server
@@ -133,9 +130,9 @@ class TestSetupFunctions(TestBase):
 
         setups = openml.setups.list_setups(flow=flow_id)
 
-        self.assertGreater(len(setups), 0) # TODO: please adjust 0
+        self.assertGreater(len(setups), 0)  # TODO: please adjust 0
         for setup_id in setups.keys():
-            self.assertEquals(setups[setup_id].flow_id, flow_id)
+            self.assertEqual(setups[setup_id].flow_id, flow_id)
 
     def test_list_setups_empty(self):
         setups = openml.setups.list_setups(setup=[0])
@@ -150,9 +147,9 @@ class TestSetupFunctions(TestBase):
 
         size = 10
         setups = openml.setups.list_setups(offset=0, size=size)
-        self.assertEquals(len(setups), size)
+        self.assertEqual(len(setups), size)
         setups2 = openml.setups.list_setups(offset=size, size=size)
-        self.assertEquals(len(setups2), size)
+        self.assertEqual(len(setups2), size)
 
         all = set(setups.keys()).union(setups2.keys())
 
@@ -161,7 +158,6 @@ class TestSetupFunctions(TestBase):
     def test_get_cached_setup(self):
         openml.config.cache_directory = self.static_cache_dir
         openml.setups.functions._get_cached_setup(1)
-
 
     def test_get_uncached_setup(self):
         openml.config.cache_directory = self.static_cache_dir

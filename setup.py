@@ -9,13 +9,13 @@ with open("openml/__version__.py") as fh:
 dependency_links = []
 
 try:
-    import numpy
+    import numpy  # noqa: F401
 except ImportError:
     print('numpy is required during installation')
     sys.exit(1)
 
 try:
-    import scipy
+    import scipy  # noqa: F401
 except ImportError:
     print('scipy is required during installation')
     sys.exit(1)
@@ -36,7 +36,6 @@ setuptools.setup(name="openml",
                  install_requires=[
                      'numpy>=1.6.2',
                      'scipy>=0.13.3',
-                     'mock',
                      'liac-arff>=2.2.2',
                      'xmltodict',
                      'pytest',
@@ -64,9 +63,8 @@ setuptools.setup(name="openml",
                               'Operating System :: POSIX',
                               'Operating System :: Unix',
                               'Operating System :: MacOS',
-                              'Programming Language :: Python :: 2',
-                              'Programming Language :: Python :: 2.7',
                               'Programming Language :: Python :: 3',
                               'Programming Language :: Python :: 3.4',
                               'Programming Language :: Python :: 3.5',
-                              'Programming Language :: Python :: 3.6'])
+                              'Programming Language :: Python :: 3.6'
+                              'Programming Language :: Python :: 3.7'])

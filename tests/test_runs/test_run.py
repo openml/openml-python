@@ -5,58 +5,17 @@ from time import time
 
 from sklearn.dummy import DummyClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, StratifiedKFold
+from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Imputer
 
 from openml.testing import TestBase
-from openml.flows.sklearn_converter import sklearn_to_flow
-from openml import OpenMLRun
 import openml
 
 
 class TestRun(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take
     # less than 1 seconds
-
-    def test_parse_parameters_flow_not_on_server(self):
-
-        model = LogisticRegression()
-        flow = sklearn_to_flow(model)
-        self.assertRaisesRegexp(
-            ValueError, 'Flow sklearn.linear_model.logistic.LogisticRegression'
-            ' has no flow_id!', OpenMLRun._parse_parameters, flow)
-
-        model = AdaBoostClassifier(base_estimator=LogisticRegression())
-        flow = sklearn_to_flow(model)
-        flow.flow_id = 1
-        self.assertRaisesRegexp(
-            ValueError, 'Flow sklearn.linear_model.logistic.LogisticRegression'
-            ' has no flow_id!', OpenMLRun._parse_parameters, flow)
-
-    def test_parse_parameters(self):
-
-        model = RandomizedSearchCV(
-            estimator=RandomForestClassifier(n_estimators=5),
-            param_distributions={
-                "max_depth": [3, None],
-                "max_features": [1, 2, 3, 4],
-                "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
-                "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                "bootstrap": [True, False], "criterion": ["gini", "entropy"]},
-            cv=StratifiedKFold(n_splits=2, random_state=1),
-            n_iter=5)
-        flow = sklearn_to_flow(model)
-        flow.flow_id = 1
-        flow.components['estimator'].flow_id = 2
-        parameters = OpenMLRun._parse_parameters(flow)
-        for parameter in parameters:
-            self.assertIsNotNone(parameter['oml:component'], msg=parameter)
-            if parameter['oml:name'] == 'n_estimators':
-                self.assertEqual(parameter['oml:value'], '5')
-                self.assertEqual(parameter['oml:component'], 2)
 
     def test_tagging(self):
 
@@ -75,21 +34,25 @@ class TestRun(TestBase):
         self.assertEqual(len(run_list), 0)
 
     def _test_run_obj_equals(self, run, run_prime):
-        for dictionary in ['evaluations', 'fold_evaluations', 'sample_evaluations']:
+        for dictionary in ['evaluations', 'fold_evaluations',
+                           'sample_evaluations']:
             if getattr(run, dictionary) is not None:
-                self.assertDictEqual(getattr(run, dictionary), getattr(run_prime, dictionary))
+                self.assertDictEqual(getattr(run, dictionary),
+                                     getattr(run_prime, dictionary))
             else:
                 # should be none or empty
                 other = getattr(run_prime, dictionary)
                 if other is not None:
                     self.assertDictEqual(other, dict())
-        self.assertEqual(run._create_description_xml(), run_prime._create_description_xml())
+        self.assertEqual(run._create_description_xml(),
+                         run_prime._create_description_xml())
 
-        numeric_part = np.array(np.array(run.data_content)[:, 0:-2], dtype=float)
-        numeric_part_prime = np.array(np.array(run_prime.data_content)[:, 0:-2], dtype=float)
+        numeric_part = \
+            np.array(np.array(run.data_content)[:, 0:-2], dtype=float)
+        numeric_part_prime = \
+            np.array(np.array(run_prime.data_content)[:, 0:-2], dtype=float)
         string_part = np.array(run.data_content)[:, -2:]
         string_part_prime = np.array(run_prime.data_content)[:, -2:]
-        # JvR: Python 2.7 requires an almost equal check, rather than an equals check
         np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
         np.testing.assert_array_equal(string_part, string_part_prime)
 
@@ -129,8 +92,7 @@ class TestRun(TestBase):
                 self.assertIn(bpp, ['true', 'false'])
             string_part = np.array(run_trace_content)[:, 5:]
             string_part_prime = np.array(run_prime_trace_content)[:, 5:]
-            # JvR: Python 2.7 requires an almost equal check, rather than an
-            # equals check
+
             np.testing.assert_array_almost_equal(int_part, int_part_prime)
             np.testing.assert_array_almost_equal(float_part, float_part_prime)
             self.assertEqual(bool_part, bool_part_prime)
@@ -148,6 +110,7 @@ class TestRun(TestBase):
             model=model,
             task=task,
             add_local_measures=False,
+            avoid_duplicate_runs=False,
         )
 
         cache_path = os.path.join(
@@ -176,9 +139,10 @@ class TestRun(TestBase):
 
         task = openml.tasks.get_task(119)
         run = openml.runs.run_model_on_task(
-            model,
-            task,
+            model=model,
+            task=task,
             add_local_measures=False,
+            avoid_duplicate_runs=False,
         )
 
         cache_path = os.path.join(
@@ -199,8 +163,8 @@ class TestRun(TestBase):
         ])
         task = openml.tasks.get_task(119)
         run = openml.runs.run_model_on_task(
-            task,
-            model,
+            model=model,
+            task=task,
             add_local_measures=False,
         )
 
