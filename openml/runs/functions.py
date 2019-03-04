@@ -33,14 +33,16 @@ from ..tasks import TaskTypeEnum
 RUNS_CACHE_DIR_NAME = 'runs'
 
 
-def run_model_on_task(model: object, task: OpenMLTask,
-                      avoid_duplicate_runs: bool = True,
-                      flow_tags: List[str] = None,
-                      seed: int = None,
-                      add_local_measures: bool = True,
-                      upload_flow: bool = False,
-                      return_flow: bool = False) -> Union[OpenMLRun,
-                                                          Tuple[OpenMLRun, OpenMLFlow]]:
+def run_model_on_task(
+    model: object,
+    task: OpenMLTask,
+    avoid_duplicate_runs: bool = True,
+    flow_tags: List[str] = None,
+    seed: int = None,
+    add_local_measures: bool = True,
+    upload_flow: bool = False,
+    return_flow: bool = False,
+) -> Union[OpenMLRun, Tuple[OpenMLRun, OpenMLFlow]]:
     """Run the model on the dataset defined by the task.
 
     Parameters
@@ -95,12 +97,15 @@ def run_model_on_task(model: object, task: OpenMLTask,
     return run
 
 
-def run_flow_on_task(flow: OpenMLFlow, task: OpenMLTask,
-                     avoid_duplicate_runs: bool = True,
-                     flow_tags: List[str] = None,
-                     seed: int = None,
-                     add_local_measures: bool = True,
-                     upload_flow: bool = False) -> OpenMLRun:
+def run_flow_on_task(
+    flow: OpenMLFlow,
+    task: OpenMLTask,
+    avoid_duplicate_runs: bool = True,
+    flow_tags: List[str] = None,
+    seed: int = None,
+    add_local_measures: bool = True,
+    upload_flow: bool = False,
+) -> OpenMLRun:
     """Run the model provided by the flow on the dataset defined by task.
 
     Takes the flow and repeat information into account.
