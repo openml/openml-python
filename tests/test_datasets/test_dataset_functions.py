@@ -833,6 +833,99 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(
             '@ATTRIBUTE rnd_str {a, b, c, d, e, f, g}' in downloaded_data)
 
+    def test_ignore_attributes_dataset(self):
+        data = [
+            ['a', 'sunny', 85.0, 85.0, 'FALSE', 'no'],
+            ['b', 'sunny', 80.0, 90.0, 'TRUE', 'no'],
+            ['c', 'overcast', 83.0, 86.0, 'FALSE', 'yes'],
+            ['d', 'rainy', 70.0, 96.0, 'FALSE', 'yes'],
+            ['e', 'rainy', 68.0, 80.0, 'FALSE', 'yes']
+        ]
+        column_names = ['rnd_str', 'outlook', 'temperature', 'humidity',
+                        'windy', 'play']
+        df = pd.DataFrame(data, columns=column_names)
+        # enforce the type of each column
+        df['outlook'] = df['outlook'].astype('category')
+        df['windy'] = df['windy'].astype('bool')
+        df['play'] = df['play'].astype('category')
+        # meta-information
+        name = '%s-pandas_testing_dataset' % self._get_sentinel()
+        description = 'Synthetic dataset created from a Pandas DataFrame'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'play'
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+
+        # we use the create_dataset function which call the OpenMLDataset
+        # constructor
+        # pass a string to ignore_attribute
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute='outlook',
+            citation=citation,
+            attributes='auto',
+            data=df,
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        self.assertEqual(dataset.ignore_attributes, ['outlook'])
+
+        # pass a list to ignore_attribute
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute=['outlook', 'windy'],
+            citation=citation,
+            attributes='auto',
+            data=df,
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        self.assertEqual(dataset.ignore_attributes, ['outlook', 'windy'])
+
+        # raise an error if unknown type
+        err_msg = 'Wrong data type for ignore_attribute. Should be list.'
+        with pytest.raises(ValueError, match=err_msg):
+            openml.datasets.functions.create_dataset(
+                name=name,
+                description=description,
+                creator=creator,
+                contributor=None,
+                collection_date=collection_date,
+                language=language,
+                licence=licence,
+                default_target_attribute=default_target_attribute,
+                row_id_attribute=None,
+                ignore_attribute=tuple(['outlook', 'windy']),
+                citation=citation,
+                attributes='auto',
+                data=df,
+                version_label='test',
+                original_data_url=original_data_url,
+                paper_url=paper_url
+            )
+
     def test_create_dataset_row_id_attribute_error(self):
         # meta-information
         name = '%s-pandas_testing_dataset' % self._get_sentinel()

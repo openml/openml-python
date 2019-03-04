@@ -129,13 +129,10 @@ class OpenMLDataset(object):
         self.url = url
         self.default_target_attribute = default_target_attribute
         self.row_id_attribute = row_id_attribute
-        self.ignore_attributes = None
         if isinstance(ignore_attribute, str):
             self.ignore_attributes = [ignore_attribute]
-        elif isinstance(ignore_attribute, list):
+        elif isinstance(ignore_attribute, list) or ignore_attribute is None:
             self.ignore_attributes = ignore_attribute
-        elif ignore_attribute is None:
-            pass
         else:
             raise ValueError('Wrong data type for ignore_attribute. '
                              'Should be list.')
