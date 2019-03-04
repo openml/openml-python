@@ -94,7 +94,7 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
     ):
         flow = _get_flow_description(flow_id)
 
-    if reinstantiate and flow:
+    if reinstantiate:
         if not (flow.external_version.startswith('sklearn==')
                 or ',sklearn==' in flow.external_version):
             raise ValueError('Only sklearn flows can be reinstantiated')
