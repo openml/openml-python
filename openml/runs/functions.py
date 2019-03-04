@@ -73,7 +73,7 @@ def run_model_on_task(
     -------
     run : OpenMLRun
         Result of the run.
-    flow : OpenMLFlow (optional, only if `return_flow` is True.
+    flow : OpenMLFlow (optional, only if `return_flow` is True).
         Flow generated from the model.
     """
     # TODO: At some point in the future do not allow for arguments in old order (6-2018).
