@@ -388,7 +388,7 @@ class OpenMLDataset(object):
                  include_ignore_attributes=False,
                  return_categorical_indicator=False,
                  return_attribute_names=False,
-                 dataset_format='array'):
+                 dataset_format=None):
         """Returns dataset content as dataframes or sparse matrices.
 
         Parameters
@@ -424,6 +424,11 @@ class OpenMLDataset(object):
             True.
 
         """
+        if dataset_format is None:
+            warn('The default of "dataset_format" will change from "array" to'
+                 ' "dataframe" in 0.9', FutureWarning)
+            dataset_format = 'array'
+
         rval = []
 
         path = self.data_pickle_file

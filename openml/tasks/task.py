@@ -121,7 +121,9 @@ class OpenMLSupervisedTask(OpenMLTask):
         dataset = self.get_dataset()
         if self.task_type_id not in (1, 2, 3):
             raise NotImplementedError(self.task_type)
-        X_and_y = dataset.get_data(target=self.target_name)
+        X_and_y = dataset.get_data(
+            dataset_format='array', target=self.target_name
+        )
         return X_and_y
 
 

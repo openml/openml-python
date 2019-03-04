@@ -17,6 +17,7 @@ from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
 
 dataset = openml.datasets.get_dataset(68)
 X, y = dataset.get_data(
+    dataset_format='array',
     target=dataset.default_target_attribute
 )
 clf = neighbors.KNeighborsClassifier(n_neighbors=1)
@@ -28,6 +29,7 @@ clf.fit(X, y)
 # * e.g. categorical features -> do feature encoding
 dataset = openml.datasets.get_dataset(17)
 X, y, categorical = dataset.get_data(
+    dataset_format='array',
     target=dataset.default_target_attribute,
     return_categorical_indicator=True,
 )

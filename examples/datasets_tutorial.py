@@ -60,7 +60,8 @@ print(dataset.description[:500])
 # controlled with the parameter ``dataset_format`` which can be either 'array'
 # (default) or 'dataframe'. Let's first build our dataset from a NumPy array
 # and manually create a dataframe.
-X, y, attribute_names = dataset.get_data(
+X, y, attribute_names = dataset.
+    dataset_format='array',
     target=dataset.default_target_attribute,
     return_attribute_names=True,
 )
