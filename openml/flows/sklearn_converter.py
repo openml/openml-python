@@ -501,11 +501,27 @@ def _extract_information_from_model(model):
     for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
         rval = sklearn_to_flow(v, model)
 
+        def flatten_all(list_):
+            flattened = []
+            for el in list_:
+                if isinstance(el, (list, tuple)):
+                    flattened += flatten_all(el)
+                else:
+                    flattened.append(el)
+            return flattened
+
+        if isinstance(rval, (list, tuple)):
+            nested_list_of_simple_types = all([isinstance(el, (bool, str, int, float))
+                                               for el in flatten_all(rval)])
+        else:
+            nested_list_of_simple_types = False
+
         if (isinstance(rval, (list, tuple))
             and len(rval) > 0
             and isinstance(rval[0], (list, tuple))
             and all([isinstance(rval[i], type(rval[0]))
-                     for i in range(len(rval))])):
+                     for i in range(len(rval))])
+                and not nested_list_of_simple_types):
 
             # Steps in a pipeline or feature union, or base classifiers in
             # voting classifier
@@ -588,7 +604,6 @@ def _extract_information_from_model(model):
             parameters[k] = json.dumps(component_reference)
 
         else:
-
             # a regular hyperparameter
             if not (hasattr(rval, '__len__') and len(rval) == 0):
                 rval = json.dumps(rval)

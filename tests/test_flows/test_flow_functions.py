@@ -221,3 +221,9 @@ class TestFlowFunctions(TestBase):
         self.assertRaises(ValueError, assert_flows_equal, flow, new_flow,
                           ignore_parameter_values_on_older_children=flow_upload_date)
         assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=None)
+
+    def test_sklearn_to_flow_list_of_lists(self):
+        from sklearn.preprocessing import OrdinalEncoder
+        ordinal_encoder = OrdinalEncoder(categories=[[0, 1], [0, 1]])
+        flow = openml.flows.sklearn_to_flow(ordinal_encoder)
+        flow.publish()
