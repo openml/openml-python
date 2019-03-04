@@ -330,16 +330,16 @@ class OpenMLFlow(object):
         return OpenMLFlow._from_dict(xmltodict.parse(xml_string))
 
     def publish(self, raise_error_if_exists: bool = False) -> 'OpenMLFlow':
-        """ Publish flow to OpenML server.
+        """ Publish this flow to OpenML server.
 
         Raises a PyOpenMLError if the flow exists on the server, but
         `self.flow_id` does not match the server known flow id.
 
         Parameters
         ----------
-            raise_error_if_exists : bool, optional (default=False)
-                If True, raise PyOpenMLError if the flow exists on the server.
-                If False, update the local flow to match the server flow.
+        raise_error_if_exists : bool, optional (default=False)
+            If True, raise PyOpenMLError if the flow exists on the server.
+            If False, update the local flow to match the server flow.
 
         Returns
         -------

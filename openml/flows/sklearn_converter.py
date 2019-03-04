@@ -238,7 +238,8 @@ def openml_param_name_to_sklearn(openml_parameter, flow):
 
 def obtain_parameter_values(flow, model: object = None):
     """
-    Extracts all parameter settings from the model inside a flow in OpenML format.
+    Extracts all parameter settings required for the flow from the model.
+    If no explicit model is provided, the parameters will be extracted from `flow.model` instead.
 
     Parameters
     ----------

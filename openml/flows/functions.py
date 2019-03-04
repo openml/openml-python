@@ -103,7 +103,7 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
     return flow
 
 
-def _get_flow_description(flow_id: int):
+def _get_flow_description(flow_id: int) -> OpenMLFlow:
     """Get the Flow for a given  ID.
 
     Does the real work for get_flow. It returns a cached flow
