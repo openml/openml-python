@@ -217,6 +217,22 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertTrue(all([isinstance(att, str)
                              for att in attribute_names]))
 
+    def test_get_sparse_dataframe(self):
+        rval = self.sparse_dataset.get_data(dataset_format='dataframe')
+        self.assertTrue(isinstance(rval, pd.SparseDataFrame))
+        self.assertEqual((600, 20001), rval.shape)
+        rval, categorical = self.sparse_dataset.get_data(
+            return_categorical_indicator=True)
+        self.assertTrue(sparse.issparse(rval))
+        self.assertEqual(len(categorical), 20001)
+        self.assertTrue(all([isinstance(cat, bool) for cat in categorical]))
+        rval, attribute_names = self.sparse_dataset.get_data(
+            return_attribute_names=True)
+        self.assertTrue(sparse.issparse(rval))
+        self.assertEqual(len(attribute_names), 20001)
+        self.assertTrue(all([isinstance(att, str)
+                             for att in attribute_names]))
+
     def test_get_sparse_dataset_with_rowid(self):
         self.sparse_dataset.row_id_attribute = ["V256"]
         rval, categorical = self.sparse_dataset.get_data(

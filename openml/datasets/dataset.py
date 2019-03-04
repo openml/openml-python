@@ -241,8 +241,6 @@ class OpenMLDataset(object):
                         else:
                             col.append(X[column_name])
                     X = pd.concat(col, axis=1)
-                else:
-                    raise Exception()
 
                 # Pickle the dataframe or the sparse matrix.
                 with open(self.data_pickle_file, "wb") as fh:
@@ -296,10 +294,6 @@ class OpenMLDataset(object):
         # check that values of the common keys are identical
         return all(self.__dict__[key] == other.__dict__[key]
                    for key in self_keys)
-
-    def __ne__(self, other):
-        """Only needed for python 2, unnecessary in Python 3"""
-        return not self.__eq__(other)
 
     def _get_arff(self, format):
         """Read ARFF file and return decoded arff.
@@ -362,7 +356,9 @@ class OpenMLDataset(object):
                 return column
             if data.ndim == 2:
                 for column_name in data.columns:
-                    data[column_name] = _encode_if_category(data[column_name])
+                    data.loc[:, column_name] = _encode_if_category(
+                        data.loc[:, column_name]
+                    )
             else:
                 data = _encode_if_category(data)
             try:
