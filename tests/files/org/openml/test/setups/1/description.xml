@@ -1,0 +1,25 @@
+<oml:setup_parameters xmlns:oml="http://openml.org/openml">
+  <oml:setup_id>100</oml:setup_id>
+  <oml:flow_id>60</oml:flow_id>
+	<oml:parameter>
+		<oml:id>3432</oml:id>
+		<oml:flow_id>60</oml:flow_id>
+		<oml:flow_name>weka.J48</oml:flow_name>
+		<oml:full_name>weka.J48(1)_C</oml:full_name>
+		<oml:parameter_name>C</oml:parameter_name>
+		<oml:data_type>option</oml:data_type>
+		<oml:default_value>0.25</oml:default_value>
+		<oml:value>0.9</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3435</oml:id>
+		<oml:flow_id>60</oml:flow_id>
+		<oml:flow_name>weka.J48</oml:flow_name>
+		<oml:full_name>weka.J48(1)_M</oml:full_name>
+		<oml:parameter_name>M</oml:parameter_name>
+		<oml:data_type>option</oml:data_type>
+		<oml:default_value>2</oml:default_value>
+		<oml:value>2</oml:value>
+	</oml:parameter>
+</oml:setup_parameters>
+
