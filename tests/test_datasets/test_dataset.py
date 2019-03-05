@@ -30,7 +30,7 @@ class OpenMLDatasetTest(TestBase):
     def test_get_data_future_warning(self):
         warn_msg = 'will change from "array" to "dataframe"'
         with pytest.warns(FutureWarning, match=warn_msg):
-            rval = self.dataset.get_data()
+            self.dataset.get_data()
 
     def test_get_data(self):
         # Basic usage
