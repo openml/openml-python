@@ -1504,3 +1504,15 @@ class TestRun(TestBase):
         openml.config.cache_directory = self.static_cache_dir
         with self.assertRaises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)
+
+    def test_run_model_on_task_downloaded_flow(self):
+        model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
+        task = openml.tasks.get_task(12)
+        run = openml.runs.run_model_on_task(
+            model=model,
+            task=task,
+            avoid_duplicate_runs=False,
+            upload_flow=False,
+        )
+
+        run.publish()
