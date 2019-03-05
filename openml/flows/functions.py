@@ -263,7 +263,7 @@ def __list_flows(api_call: str) -> Dict[int, Dict]:
 
 
 def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
-    """ Raises a ValueError of the flow or any of its subflows has no flow id. """
+    """ Raises a ValueError if the flow or any of its subflows has no flow id. """
 
     # Depth-first search to check if all components were uploaded to the
     # server before parsing the parameters
