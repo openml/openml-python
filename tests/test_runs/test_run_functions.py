@@ -847,7 +847,7 @@ class TestRun(TestBase):
             run = run.publish()
             self._wait_for_processed_run(run.run_id, 200)
             run_id = run.run_id
-        except openml.exceptions.RunsExistError as e:
+        except openml.exceptions.OpenMLRunsExistError as e:
             # The only error we expect, should fail otherwise.
             run_ids = [int(run_id) for run_id in e.run_ids]
             self.assertGreater(len(run_ids), 0)

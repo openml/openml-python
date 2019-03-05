@@ -47,13 +47,13 @@ class OpenMLHashException(PyOpenMLError):
     pass
 
 
-class PrivateDatasetError(PyOpenMLError):
+class OpenMLPrivateDatasetError(PyOpenMLError):
     """ Exception thrown when the user has no rights to access the dataset. """
     def __init__(self, message: str):
         super().__init__(message)
 
 
-class RunsExistError(PyOpenMLError):
+class OpenMLRunsExistError(PyOpenMLError):
     """ Indicates run(s) already exists on the server when they should not be duplicated. """
     def __init__(self, run_ids: set, message: str):
         if len(run_ids) < 1:

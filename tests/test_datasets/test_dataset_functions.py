@@ -15,7 +15,7 @@ from oslo_concurrency import lockutils
 import openml
 from openml import OpenMLDataset
 from openml.exceptions import OpenMLCacheException, PyOpenMLError, \
-    OpenMLHashException, PrivateDatasetError
+    OpenMLHashException, OpenMLPrivateDatasetError
 from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (create_dataset,
@@ -257,7 +257,7 @@ class TestOpenMLDataset(TestBase):
 
         # Issue324 Properly handle private datasets when trying to access them
         openml.config.server = self.production_server
-        self.assertRaises(PrivateDatasetError, openml.datasets.get_dataset, 45)
+        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
 
     def test_get_dataset_with_string(self):
         dataset = openml.datasets.get_dataset(101)
