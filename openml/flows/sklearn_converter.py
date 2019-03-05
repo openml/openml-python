@@ -370,7 +370,7 @@ def obtain_parameter_values(flow, model: object = None):
         return _params
 
     flow_dict = get_flow_dict(flow)
-    model = model if model else flow.model
+    model = model if model is not None else flow.model
     parameters = extract_parameters(flow, flow_dict, model,
                                     True, flow.flow_id)
 
