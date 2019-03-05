@@ -21,7 +21,11 @@ class OpenMLDatasetTest(TestBase):
         # Load dataset id 2 - dataset 2 is interesting because it contains
         # missing values, categorical features etc.
         self.dataset = openml.datasets.get_dataset(2)
+        # titanic as missing values, categories, and string
         self.titanic = openml.datasets.get_dataset(40945)
+        # these datasets have some boolean features
+        self.pc4 = openml.datasets.get_dataset(1049)
+        self.jm1 = openml.datasets.get_dataset(1053)
 
     def test_get_data_future_warning(self):
         warn_msg = 'will change from "array" to "dataframe"'
@@ -163,6 +167,18 @@ class OpenMLDatasetTest(TestBase):
         for col_name in X.columns:
             self.assertTrue(X[col_name].dtype.name == col_dtype[col_name])
         self.assertTrue(y.dtype.name == col_dtype['survived'])
+
+    def test_get_data_boolean_pandas(self):
+        # test to check that we are converting properly True and False even
+        # with some inconsistency when dumping the data on openml
+        data = self.jm1.get_data(dataset_format='dataframe')
+        self.assertTrue(data['defects'].dtype.name == 'category')
+        self.assertTrue(
+            set(data['defects'].cat.categories) == set([True, False])
+        )
+        data = self.pc4.get_data(dataset_format='dataframe')
+        self.assertTrue(data['c'].dtype.name == 'category')
+        self.assertTrue(set(data['c'].cat.categories) == set([True, False]))
 
     def test_dataset_format_constructor(self):
 

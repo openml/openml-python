@@ -213,8 +213,17 @@ class OpenMLDataset(object):
                     if isinstance(type_, list):
                         categorical.append(True)
                         categories_names[name] = type_
-                        if set(['True', 'False']) == set(type_):
-                            attribute_dtype[name] = 'boolean'
+                        if len(type_) == 2:
+                            type_norm = [cat.lower().capitalize()
+                                         for cat in type_]
+                            if set(['True', 'False']) == set(type_norm):
+                                categories_names[name] = [
+                                    True if cat == 'True' else False
+                                    for cat in type_norm
+                                ]
+                                attribute_dtype[name] = 'boolean'
+                            else:
+                                attribute_dtype[name] = 'categorical'
                         else:
                             attribute_dtype[name] = 'categorical'
                     else:
