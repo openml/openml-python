@@ -1507,9 +1507,13 @@ class TestRun(TestBase):
 
     def test_run_model_on_task_downloaded_flow(self):
         model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
-        task = openml.tasks.get_task(12)
-        run = openml.runs.run_model_on_task(
-            model=model,
+        flow = openml.flows.sklearn_to_flow(model)
+        flow.publish(raise_error_if_exists=False)
+
+        downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
+        task = openml.tasks.get_task(119)  # diabetes
+        run = openml.runs.run_flow_on_task(
+            flow=downloaded_flow,
             task=task,
             avoid_duplicate_runs=False,
             upload_flow=False,
