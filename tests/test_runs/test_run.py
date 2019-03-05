@@ -194,13 +194,22 @@ class TestRun(TestBase):
             ('classifier', DummyClassifier()),
         ])
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(
+
+        # Make sure the flow does not exist on the server yet.
+        flow = openml.flows.sklearn_to_flow(model)
+        self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
+
+        run, flow = openml.runs.run_model_on_task(
             model=model,
             task=task,
             add_local_measures=False,
             avoid_duplicate_runs=False,
-            upload_flow=False
+            upload_flow=False,
+            return_flow=True
         )
+
+        # Make sure that the flow has not been uploaded as requested.
+        self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
 
         cache_path = os.path.join(
             self.workdir,
@@ -211,3 +220,7 @@ class TestRun(TestBase):
         # obtain run from filesystem
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
         loaded_run.publish()
+
+        # make sure the flow is published as part of publishing the run.
+        self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))
+        openml.runs.get_run(loaded_run.run_id)
