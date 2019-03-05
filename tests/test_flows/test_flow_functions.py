@@ -233,4 +233,5 @@ class TestFlowFunctions(TestBase):
         from sklearn.preprocessing import OrdinalEncoder
         ordinal_encoder = OrdinalEncoder(categories=[[0, 1], [0, 1]])
         flow = openml.flows.sklearn_to_flow(ordinal_encoder)
+        self._add_sentinel_to_flow_name(flow)
         flow.publish()
