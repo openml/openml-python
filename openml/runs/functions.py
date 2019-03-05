@@ -186,6 +186,7 @@ def run_flow_on_task(
         else:
             # Flow does not exist on server and we do not want to upload it.
             # No sync with the server happens.
+            flow_id = None
             pass
 
     dataset = task.get_dataset()
