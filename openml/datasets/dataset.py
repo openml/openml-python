@@ -360,7 +360,7 @@ class OpenMLDataset(object):
             # to make a conversion to numeric for backward compatibility
             def _encode_if_category(column):
                 if column.dtype.name == 'category':
-                    column = column.cat.codes.astye(np.float32)
+                    column = column.cat.codes.astype(np.float32)
                     mask_nan = column == -1
                     column[mask_nan] = np.nan
                 return column
