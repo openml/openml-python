@@ -1,5 +1,9 @@
 from collections import OrderedDict
 import copy
+import unittest
+
+from distutils.version import LooseVersion
+import sklearn
 
 import openml
 from openml.testing import TestBase
@@ -221,3 +225,22 @@ class TestFlowFunctions(TestBase):
         self.assertRaises(ValueError, assert_flows_equal, flow, new_flow,
                           ignore_parameter_values_on_older_children=flow_upload_date)
         assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=None)
+
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
+                     reason="OrdinalEncoder introduced in 0.20. "
+                            "No known models with list of lists parameters in older versions.")
+    def test_sklearn_to_flow_list_of_lists(self):
+        from sklearn.preprocessing import OrdinalEncoder
+        ordinal_encoder = OrdinalEncoder(categories=[[0, 1], [0, 1]])
+
+        # Test serialization works
+        flow = openml.flows.sklearn_to_flow(ordinal_encoder)
+
+        # Test flow is accepted by server
+        self._add_sentinel_to_flow_name(flow)
+        flow.publish()
+
+        # Test deserialization works
+        server_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
+        self.assertEqual(server_flow.parameters['categories'], '[[0, 1], [0, 1]]')
+        self.assertEqual(server_flow.model.categories, flow.model.categories)

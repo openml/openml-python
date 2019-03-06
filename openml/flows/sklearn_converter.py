@@ -35,12 +35,13 @@ DEPENDENCIES_PATTERN = re.compile(
 )
 
 
+SIMPLE_NUMPY_TYPES = [nptype for type_cat, nptypes in np.sctypes.items()
+                      for nptype in nptypes if type_cat != 'others']
+SIMPLE_TYPES = tuple([bool, int, float, str] + SIMPLE_NUMPY_TYPES)
+
+
 def sklearn_to_flow(o, parent_model=None):
     # TODO: assert that only on first recursion lvl `parent_model` can be None
-    simple_numpy_types = [nptype for type_cat, nptypes in np.sctypes.items()
-                          for nptype in nptypes
-                          if type_cat != 'others']
-    simple_types = tuple([bool, int, float, str] + simple_numpy_types)
     if _is_estimator(o):
         # is the main model or a submodel
         rval = _serialize_model(o)
@@ -49,8 +50,8 @@ def sklearn_to_flow(o, parent_model=None):
         rval = [sklearn_to_flow(element, parent_model) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif isinstance(o, simple_types) or o is None:
-        if isinstance(o, tuple(simple_numpy_types)):
+    elif isinstance(o, SIMPLE_TYPES) or o is None:
+        if isinstance(o, tuple(SIMPLE_NUMPY_TYPES)):
             o = o.item()
         # base parameter values
         rval = o
@@ -510,14 +511,36 @@ def _extract_information_from_model(model):
     for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
         rval = sklearn_to_flow(v, model)
 
-        if (isinstance(rval, (list, tuple))
+        def flatten_all(list_):
+            """ Flattens arbitrary depth lists of lists (e.g. [[1,2],[3,[1]]] -> [1,2,3,1]). """
+            for el in list_:
+                if isinstance(el, (list, tuple)):
+                    yield from flatten_all(el)
+                else:
+                    yield el
+
+        # In case rval is a list of lists (or tuples), we need to identify two situations:
+        # - sklearn pipeline steps, feature union or base classifiers in voting classifier.
+        #   They look like e.g. [("imputer", Imputer()), ("classifier", SVC())]
+        # - a list of lists with simple types (e.g. int or str), such as for an OrdinalEncoder
+        #   where all possible values for each feature are described: [[0,1,2], [1,2,5]]
+        is_non_empty_list_of_lists_with_same_type = (
+            isinstance(rval, (list, tuple))
             and len(rval) > 0
             and isinstance(rval[0], (list, tuple))
-            and all([isinstance(rval[i], type(rval[0]))
-                     for i in range(len(rval))])):
+            and all([isinstance(rval_i, type(rval[0])) for rval_i in rval])
+        )
 
-            # Steps in a pipeline or feature union, or base classifiers in
-            # voting classifier
+        # Check that all list elements are of simple types.
+        nested_list_of_simple_types = (
+            is_non_empty_list_of_lists_with_same_type
+            and all([isinstance(el, SIMPLE_TYPES) for el in flatten_all(rval)])
+        )
+
+        if is_non_empty_list_of_lists_with_same_type and not nested_list_of_simple_types:
+            # If a list of lists is identified that include 'non-simple' types (e.g. objects),
+            # we assume they are steps in a pipeline, feature union, or base classifiers in
+            # a voting classifier.
             parameter_value = list()
             reserved_keywords = set(model.get_params(deep=False).keys())
 
@@ -597,7 +620,6 @@ def _extract_information_from_model(model):
             parameters[k] = json.dumps(component_reference)
 
         else:
-
             # a regular hyperparameter
             if not (hasattr(rval, '__len__') and len(rval) == 0):
                 rval = json.dumps(rval)
