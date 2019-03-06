@@ -232,6 +232,15 @@ class TestFlowFunctions(TestBase):
     def test_sklearn_to_flow_list_of_lists(self):
         from sklearn.preprocessing import OrdinalEncoder
         ordinal_encoder = OrdinalEncoder(categories=[[0, 1], [0, 1]])
+
+        # Test serialization works
         flow = openml.flows.sklearn_to_flow(ordinal_encoder)
+
+        # Test flow is accepted by server
         self._add_sentinel_to_flow_name(flow)
         flow.publish()
+
+        # Test deserialization works
+        server_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
+        self.assertEqual(server_flow.parameters['categories'], '[[0, 1], [0, 1]]')
+        self.assertEqual(server_flow.model.categories, flow.model.categories)
