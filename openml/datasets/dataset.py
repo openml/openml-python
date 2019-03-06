@@ -360,14 +360,16 @@ class OpenMLDataset(object):
             # to make a conversion to numeric for backward compatibility
             def _encode_if_category(column):
                 if column.dtype.name == 'category':
-                    column = column.cat.codes
-                    column = column.apply(lambda x: np.nan if x == -1 else x)
+                    column = column.cat.codes.astye(np.float32)
+                    mask_nan = column == -1
+                    column[mask_nan] = np.nan
                 return column
             if data.ndim == 2:
-                for column_name in data.columns:
-                    data.loc[:, column_name] = _encode_if_category(
-                        data.loc[:, column_name]
-                    )
+                columns = {
+                    column_name: _encode_if_category(data.loc[:, column_name]) 
+                    for column_name in data.columns
+                }
+                data = pd.DataFrame(columns)
             else:
                 data = _encode_if_category(data)
             try:
