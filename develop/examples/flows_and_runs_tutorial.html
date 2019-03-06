@@ -108,6 +108,7 @@
 <li><a class="reference internal" href="#it-also-works-with-pipelines">It also works with pipelines</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#running-flows-on-tasks-offline-for-later-upload">Running flows on tasks offline for later upload</a></li>
 <li><a class="reference internal" href="#challenge">Challenge</a></li>
 </ul>
 </li>
@@ -188,7 +189,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/13583
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/14396
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -235,9 +236,36 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/13585
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/14400
 </pre></div>
 </div>
+</div>
+</div>
+<div class="section" id="running-flows-on-tasks-offline-for-later-upload">
+<h2>Running flows on tasks offline for later upload<a class="headerlink" href="#running-flows-on-tasks-offline-for-later-upload" title="Permalink to this headline">¶</a></h2>
+<p>For those scenarios where there is no access to internet, it is possible to run
+a model on a task without uploading results or flows to the server immediately.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># To perform the following line offline, it is required to have been called before</span>
+<span class="c1"># such that the task is cached on the local openml cache directory:</span>
+<span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="c1"># The following lines can then be executed offline:</span>
+<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
+    <span class="n">pipe</span><span class="p">,</span>
+    <span class="n">task</span><span class="p">,</span>
+    <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+    <span class="n">upload_flow</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># The run may be stored offline, and the flow will be stored along with it:</span>
+<span class="n">run</span><span class="o">.</span><span class="n">to_filesystem</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="s1">&#39;myrun&#39;</span><span class="p">)</span>
+
+<span class="c1"># They made later be loaded and uploaded</span>
+<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">OpenMLRun</span><span class="o">.</span><span class="n">from_filesystem</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="s1">&#39;myrun&#39;</span><span class="p">)</span>
+<span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+
+<span class="c1"># Publishing the run will automatically upload the related flow if</span>
+<span class="c1"># it does not yet exist on the server.</span>
+</pre></div>
 </div>
 </div>
 <div class="section" id="challenge">
@@ -270,10 +298,10 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/13586
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/14402
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  14.487 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  14.749 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/27a5bee6ab807de4cd881f6693fcb2aa/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></div>

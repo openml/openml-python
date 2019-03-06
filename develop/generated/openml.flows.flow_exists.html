@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>.flow_exists<a class="headerlink" href="#openml-flows-flow-exists" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.flows.flow_exists">
-<code class="descclassname">openml.flows.</code><code class="descname">flow_exists</code><span class="sig-paren">(</span><em>name</em>, <em>external_version</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.flows.flow_exists" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.flows.</code><code class="descname">flow_exists</code><span class="sig-paren">(</span><em>name: str</em>, <em>external_version: str</em><span class="sig-paren">)</span> &#x2192; Union[int, bool]<a class="headerlink" href="#openml.flows.flow_exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves the flow id.</p>
 <p>A flow is uniquely identified by name + external_version.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -131,7 +131,7 @@
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>flow_exist</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dt><strong>flow_exist</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or bool</span></dt>
 <dd><p class="first last">flow id iff exists, False otherwise</p>
 </dd>
 </dl>

@@ -207,10 +207,10 @@
 <tr class="row-even"><td><a class="reference internal" href="generated/openml.flows.flow_to_sklearn.html#openml.flows.flow_to_sklearn" title="openml.flows.flow_to_sklearn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flow_to_sklearn</span></code></a>(o[,&nbsp;components,&nbsp;…])</td>
 <td>Initializes a sklearn model based on a flow.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/openml.flows.get_flow.html#openml.flows.get_flow" title="openml.flows.get_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_flow</span></code></a>(flow_id[,&nbsp;reinstantiate])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.flows.get_flow.html#openml.flows.get_flow" title="openml.flows.get_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_flow</span></code></a>(flow_id,&nbsp;reinstantiate)</td>
 <td>Download the OpenML flow for a given flow ID.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/openml.flows.list_flows.html#openml.flows.list_flows" title="openml.flows.list_flows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_flows</span></code></a>([offset,&nbsp;size,&nbsp;tag])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.flows.list_flows.html#openml.flows.list_flows" title="openml.flows.list_flows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_flows</span></code></a>(offset,&nbsp;size,&nbsp;tag,&nbsp;**kwargs)</td>
 <td>Return a list of all flows which are on OpenML.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/openml.flows.sklearn_to_flow.html#openml.flows.sklearn_to_flow" title="openml.flows.sklearn_to_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn_to_flow</span></code></a>(o[,&nbsp;parent_model])</td>
@@ -245,10 +245,10 @@
 <tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.list_runs.html#openml.runs.list_runs" title="openml.runs.list_runs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_runs</span></code></a>([offset,&nbsp;size,&nbsp;id,&nbsp;task,&nbsp;setup,&nbsp;…])</td>
 <td>List all runs matching all of the given filters.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/openml.runs.run_model_on_task.html#openml.runs.run_model_on_task" title="openml.runs.run_model_on_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_model_on_task</span></code></a>(model,&nbsp;task[,&nbsp;…])</td>
-<td>See <code class="docutils literal notranslate"><span class="pre">run_flow_on_task</span> <span class="pre">for</span> <span class="pre">a</span> <span class="pre">documentation</span></code>.</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/openml.runs.run_model_on_task.html#openml.runs.run_model_on_task" title="openml.runs.run_model_on_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_model_on_task</span></code></a>(model,&nbsp;task,&nbsp;…)</td>
+<td>Run the model on the dataset defined by the task.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.run_flow_on_task.html#openml.runs.run_flow_on_task" title="openml.runs.run_flow_on_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow_on_task</span></code></a>(flow,&nbsp;task[,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/openml.runs.run_flow_on_task.html#openml.runs.run_flow_on_task" title="openml.runs.run_flow_on_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow_on_task</span></code></a>(flow,&nbsp;task,&nbsp;…)</td>
 <td>Run the model provided by the flow on the dataset defined by task.</td>
 </tr>
 </tbody>

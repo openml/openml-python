@@ -129,7 +129,7 @@
 </table>
 <dl class="classmethod">
 <dt id="openml.OpenMLRun.from_filesystem">
-<em class="property">classmethod </em><code class="descname">from_filesystem</code><span class="sig-paren">(</span><em>folder</em>, <em>expect_model=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.from_filesystem" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">from_filesystem</code><span class="sig-paren">(</span><em>directory</em>, <em>expect_model=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.from_filesystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>The inverse of the to_filesystem method. Instantiates an OpenMLRun
 object based on files stored on the file system.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -137,7 +137,7 @@ object based on files stored on the file system.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>folder</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dt><strong>directory</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
 <dd><p class="first last">a path leading to the folder where the results
 are stored</p>
 </dd>
@@ -162,7 +162,7 @@ be present.</p>
 
 <dl class="method">
 <dt id="openml.OpenMLRun.get_metric_fn">
-<code class="descname">get_metric_fn</code><span class="sig-paren">(</span><em>sklearn_fn</em>, <em>kwargs={}</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.get_metric_fn" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_metric_fn</code><span class="sig-paren">(</span><em>sklearn_fn</em>, <em>kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.get_metric_fn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates metric scores based on predicted values. Assumes the
 run has been executed locally (and contains run_data). Furthermore,
 it assumes that the ‘correct’ or ‘truth’ attribute is specified in
@@ -194,9 +194,10 @@ accepts <code class="docutils literal notranslate"><span class="pre">y_true</spa
 <dl class="method">
 <dt id="openml.OpenMLRun.publish">
 <code class="descname">publish</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.publish" title="Permalink to this definition">¶</a></dt>
-<dd><p>Publish a run to the OpenML server.</p>
+<dd><p>Publish a run (and if necessary, its flow) to the OpenML server.</p>
 <p>Uploads the results of a run to OpenML.
-Sets the run_id on self</p>
+If the run is of an unpublished OpenMLFlow, the flow will be uploaded too.
+Sets the run_id on self.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -251,7 +252,7 @@ Sets the run_id on self</p>
 
 <dl class="method">
 <dt id="openml.OpenMLRun.to_filesystem">
-<code class="descname">to_filesystem</code><span class="sig-paren">(</span><em>output_directory</em>, <em>store_model=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.to_filesystem" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_filesystem</code><span class="sig-paren">(</span><em>directory: str</em>, <em>store_model: bool = True</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#openml.OpenMLRun.to_filesystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>The inverse of the from_filesystem method. Serializes a run
 on the filesystem, to be uploaded later.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -259,11 +260,11 @@ on the filesystem, to be uploaded later.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>output_directory</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dt><strong>directory</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
 <dd><p class="first last">a path leading to the folder where the results
 will be stored. Should be empty</p>
 </dd>
-<dt><strong>store_model</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dt><strong>store_model</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=True)</span></dt>
 <dd><p class="first last">if True, a model will be pickled as well. As this is the most
 storage expensive part, it is often desirable to not store the
 model.</p>

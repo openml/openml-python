@@ -69,26 +69,6 @@ General examples for OpenML usage.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="How to train/run a model and how to upload the results. ">
-
-.. only:: html
-
-    .. figure:: /examples/images/thumb/sphx_glr_flows_and_runs_tutorial_thumb.png
-
-        :ref:`sphx_glr_examples_flows_and_runs_tutorial.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /examples/flows_and_runs_tutorial
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="By: Jan N. van Rijn">
 
 .. only:: html
@@ -106,6 +86,26 @@ General examples for OpenML usage.
    :hidden:
 
    /examples/run_setup_tutorial
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="How to train/run a model and how to upload the results. ">
+
+.. only:: html
+
+    .. figure:: /examples/images/thumb/sphx_glr_flows_and_runs_tutorial_thumb.png
+
+        :ref:`sphx_glr_examples_flows_and_runs_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/flows_and_runs_tutorial
 
 .. raw:: html
 

@@ -135,7 +135,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/13583
+    Uploaded to http://test.openml.org/r/14396
 
 
 We can now also inspect the flow object which was automatically created:
@@ -210,7 +210,44 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/13585
+    Uploaded to http://test.openml.org/r/14400
+
+
+Running flows on tasks offline for later upload
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+For those scenarios where there is no access to internet, it is possible to run
+a model on a task without uploading results or flows to the server immediately.
+
+
+
+.. code-block:: python
+
+
+    # To perform the following line offline, it is required to have been called before
+    # such that the task is cached on the local openml cache directory:
+    task = openml.tasks.get_task(6)
+
+    # The following lines can then be executed offline:
+    run = openml.runs.run_model_on_task(
+        pipe,
+        task,
+        avoid_duplicate_runs=False,
+        upload_flow=False)
+
+    # The run may be stored offline, and the flow will be stored along with it:
+    run.to_filesystem(directory='myrun')
+
+    # They made later be loaded and uploaded
+    run = openml.runs.OpenMLRun.from_filesystem(directory='myrun')
+    run.publish()
+
+    # Publishing the run will automatically upload the related flow if
+    # it does not yet exist on the server.
+
+
+
+
+
 
 
 Challenge
@@ -256,10 +293,10 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/13586
+    kNN on diabetes: http://test.openml.org/r/14402
 
 
-**Total running time of the script:** ( 0 minutes  14.487 seconds)
+**Total running time of the script:** ( 0 minutes  14.749 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:

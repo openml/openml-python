@@ -264,13 +264,23 @@ structure. Allowed values {flow_id, name}</p>
 
 <dl class="method">
 <dt id="openml.OpenMLFlow.publish">
-<code class="descname">publish</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.publish" title="Permalink to this definition">¶</a></dt>
-<dd><p>Publish flow to OpenML server.</p>
+<code class="descname">publish</code><span class="sig-paren">(</span><em>raise_error_if_exists: bool = False</em><span class="sig-paren">)</span> &#x2192; openml.flows.flow.OpenMLFlow<a class="headerlink" href="#openml.OpenMLFlow.publish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Publish this flow to OpenML server.</p>
+<p>Raises a PyOpenMLError if the flow exists on the server, but
+<cite>self.flow_id</cite> does not match the server known flow id.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>raise_error_if_exists</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=False)</span></dt>
+<dd><p class="first last">If True, raise PyOpenMLError if the flow exists on the server.
+If False, update the local flow to match the server flow.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>self</strong> <span class="classifier-delimiter">:</span> <span class="classifier">OpenMLFlow</span></dt>
 <dd></dd>
 </dl>
