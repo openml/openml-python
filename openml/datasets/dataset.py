@@ -366,7 +366,7 @@ class OpenMLDataset(object):
                 return column
             if data.ndim == 2:
                 columns = {
-                    column_name: _encode_if_category(data.loc[:, column_name]) 
+                    column_name: _encode_if_category(data.loc[:, column_name])
                     for column_name in data.columns
                 }
                 data = pd.DataFrame(columns)
