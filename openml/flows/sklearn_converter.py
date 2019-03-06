@@ -37,7 +37,10 @@ DEPENDENCIES_PATTERN = re.compile(
 
 def sklearn_to_flow(o, parent_model=None):
     # TODO: assert that only on first recursion lvl `parent_model` can be None
-
+    simple_numpy_types = [nptype for type_cat, nptypes in np.sctypes.items()
+                          for nptype in nptypes
+                          if type_cat != 'others']
+    simple_types = tuple([bool, int, float, str] + simple_numpy_types)
     if _is_estimator(o):
         # is the main model or a submodel
         rval = _serialize_model(o)
@@ -46,7 +49,9 @@ def sklearn_to_flow(o, parent_model=None):
         rval = [sklearn_to_flow(element, parent_model) for element in o]
         if isinstance(o, tuple):
             rval = tuple(rval)
-    elif isinstance(o, (bool, int, float, str)) or o is None:
+    elif isinstance(o, simple_types) or o is None:
+        if isinstance(o, tuple(simple_numpy_types)):
+            o = o.item()
         # base parameter values
         rval = o
     elif isinstance(o, dict):
@@ -236,16 +241,19 @@ def openml_param_name_to_sklearn(openml_parameter, flow):
     return '__'.join(flow_structure[name] + [openml_parameter.parameter_name])
 
 
-def obtain_parameter_values(flow):
+def obtain_parameter_values(flow, model: object = None):
     """
-    Extracts all parameter settings from the model inside a flow in OpenML
-    format.
+    Extracts all parameter settings required for the flow from the model.
+    If no explicit model is provided, the parameters will be extracted from `flow.model` instead.
 
     Parameters
     ----------
     flow : OpenMLFlow
-        openml flow object (containing flow ids, i.e., it has to be downloaded
-        from the server)
+        OpenMLFlow object (containing flow ids, i.e., it has to be downloaded from the server)
+
+    model: object, optional (default=None)
+        The model from which to obtain the parameter values. Must match the flow signature.
+        If None, use the model specified in `OpenMLFlow.model`
 
     Returns
     -------
@@ -367,7 +375,8 @@ def obtain_parameter_values(flow):
         return _params
 
     flow_dict = get_flow_dict(flow)
-    parameters = extract_parameters(flow, flow_dict, flow.model,
+    model = model if model is not None else flow.model
+    parameters = extract_parameters(flow, flow_dict, model,
                                     True, flow.flow_id)
 
     return parameters

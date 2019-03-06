@@ -1180,3 +1180,18 @@ class TestSklearn(TestBase):
             if parameter['oml:name'] == 'n_estimators':
                 self.assertEqual(parameter['oml:value'], '5')
                 self.assertEqual(parameter['oml:component'], 2)
+
+    def test_numpy_type_allowed_in_flow(self):
+        """ Simple numpy types should be serializable. """
+        dt = sklearn.tree.DecisionTreeClassifier(
+            max_depth=np.float64(3.0),
+            min_samples_leaf=np.int32(5)
+        )
+        sklearn_to_flow(dt)
+
+    def test_numpy_array_not_allowed_in_flow(self):
+        """ Simple numpy arrays should not be serializable. """
+        bin = sklearn.preprocessing.MultiLabelBinarizer(
+            classes=np.asarray([1, 2, 3])
+        )
+        self.assertRaises(TypeError, sklearn_to_flow, bin)
