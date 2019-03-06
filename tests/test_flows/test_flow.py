@@ -171,16 +171,16 @@ class TestFlow(TestBase):
         flow.publish()
         self.assertIsInstance(flow.flow_id, int)
 
-    def test_publish_existing_flow(self):
+    @mock.patch('openml.flows.functions.flow_exists')
+    def test_publish_existing_flow(self, flow_exists_mock):
         clf = sklearn.tree.DecisionTreeClassifier(max_depth=2)
         flow = openml.flows.sklearn_to_flow(clf)
-        flow, _ = self._add_sentinel_to_flow_name(flow, None)
-        flow.publish()
-        self.assertRaisesRegex(
-            openml.exceptions.OpenMLServerException,
-            'flow already exists',
-            flow.publish,
-        )
+        flow_exists_mock.return_value = 1
+
+        with self.assertRaises(openml.exceptions.PyOpenMLError) as context_manager:
+            flow.publish(raise_error_if_exists=True)
+
+        self.assertTrue('OpenMLFlow already exists' in context_manager.exception.message)
 
     def test_publish_flow_with_similar_components(self):
         clf = sklearn.ensemble.VotingClassifier([
@@ -240,22 +240,26 @@ class TestFlow(TestBase):
         flow.publish()
 
     @mock.patch('openml.flows.functions.get_flow')
+    @mock.patch('openml.flows.functions.flow_exists')
     @mock.patch('openml._api_calls._perform_api_call')
-    def test_publish_error(self, api_call_mock, get_flow_mock):
+    def test_publish_error(self, api_call_mock, flow_exists_mock, get_flow_mock):
         model = sklearn.ensemble.RandomForestClassifier()
         flow = openml.flows.sklearn_to_flow(model)
         api_call_mock.return_value = "<oml:upload_flow>\n" \
                                      "    <oml:id>1</oml:id>\n" \
                                      "</oml:upload_flow>"
+        flow_exists_mock.return_value = False
         get_flow_mock.return_value = flow
 
         flow.publish()
         self.assertEqual(api_call_mock.call_count, 1)
         self.assertEqual(get_flow_mock.call_count, 1)
+        self.assertEqual(flow_exists_mock.call_count, 1)
 
         flow_copy = copy.deepcopy(flow)
         flow_copy.name = flow_copy.name[:-1]
         get_flow_mock.return_value = flow_copy
+        flow_exists_mock.return_value = 1
 
         with self.assertRaises(ValueError) as context_manager:
             flow.publish()
@@ -271,7 +275,6 @@ class TestFlow(TestBase):
         )
 
         self.assertEqual(context_manager.exception.args[0], fixture)
-        self.assertEqual(api_call_mock.call_count, 2)
         self.assertEqual(get_flow_mock.call_count, 2)
 
     def test_illegal_flow(self):

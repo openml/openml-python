@@ -24,7 +24,7 @@ from ..exceptions import (
     OpenMLCacheException,
     OpenMLHashException,
     OpenMLServerException,
-    PrivateDatasetError,
+    OpenMLPrivateDatasetError,
 )
 from ..utils import (
     _create_cache_directory,
@@ -360,7 +360,7 @@ def get_dataset(dataset_id):
             # if there was an exception,
             # check if the user had access to the dataset
             if e.code == 112:
-                raise PrivateDatasetError(e.message) from None
+                raise OpenMLPrivateDatasetError(e.message) from None
             else:
                 raise e
         finally:
