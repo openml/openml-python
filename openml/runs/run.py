@@ -1,5 +1,4 @@
 from collections import OrderedDict
-import errno
 import pickle
 import sys
 import time
@@ -69,14 +68,14 @@ class OpenMLRun(object):
         pp.text(str(self))
 
     @classmethod
-    def from_filesystem(cls, folder, expect_model=True):
+    def from_filesystem(cls, directory, expect_model=True):
         """
         The inverse of the to_filesystem method. Instantiates an OpenMLRun
         object based on files stored on the file system.
 
         Parameters
         ----------
-        folder : str
+        directory : str
             a path leading to the folder where the results
             are stored
 
@@ -90,13 +89,13 @@ class OpenMLRun(object):
         run : OpenMLRun
             the re-instantiated run object
         """
-        if not os.path.isdir(folder):
+        if not os.path.isdir(directory):
             raise ValueError('Could not find folder')
 
-        description_path = os.path.join(folder, 'description.xml')
-        predictions_path = os.path.join(folder, 'predictions.arff')
-        trace_path = os.path.join(folder, 'trace.arff')
-        model_path = os.path.join(folder, 'model.pkl')
+        description_path = os.path.join(directory, 'description.xml')
+        predictions_path = os.path.join(directory, 'predictions.arff')
+        trace_path = os.path.join(directory, 'trace.arff')
+        model_path = os.path.join(directory, 'model.pkl')
 
         if not os.path.isfile(description_path):
             raise ValueError('Could not find description.xml')
@@ -107,8 +106,12 @@ class OpenMLRun(object):
 
         with open(description_path, 'r') as fp:
             xml_string = fp.read()
-            run = openml.runs.functions._create_run_from_xml(xml_string,
-                                                             from_server=False)
+        run = openml.runs.functions._create_run_from_xml(xml_string, from_server=False)
+
+        if run.flow_id is None:
+            flow = openml.flows.OpenMLFlow.from_filesystem(directory)
+            run.flow = flow
+            run.flow_name = flow.name
 
         with open(predictions_path, 'r') as fp:
             predictions = arff.load(fp)
@@ -125,18 +128,18 @@ class OpenMLRun(object):
 
         return run
 
-    def to_filesystem(self, output_directory, store_model=True):
+    def to_filesystem(self, directory: str, store_model: bool = True) -> None:
         """
         The inverse of the from_filesystem method. Serializes a run
         on the filesystem, to be uploaded later.
 
         Parameters
         ----------
-        output_directory : str
+        directory : str
             a path leading to the folder where the results
             will be stored. Should be empty
 
-        store_model : bool
+        store_model : bool, optional (default=True)
             if True, a model will be pickled as well. As this is the most
             storage expensive part, it is often desirable to not store the
             model.
@@ -145,31 +148,26 @@ class OpenMLRun(object):
             raise ValueError('Run should have been executed (and contain '
                              'model / predictions)')
 
-        try:
-            os.makedirs(output_directory)
-        except OSError as e:
-            if e.errno == errno.EEXIST:
-                pass
-            else:
-                raise e
-
-        if not os.listdir(output_directory) == []:
+        os.makedirs(directory, exist_ok=True)
+        if not os.listdir(directory) == []:
             raise ValueError('Output directory should be empty')
 
         run_xml = self._create_description_xml()
         predictions_arff = arff.dumps(self._generate_arff_dict())
 
-        with open(os.path.join(output_directory, 'description.xml'), 'w') as f:
+        with open(os.path.join(directory, 'description.xml'), 'w') as f:
             f.write(run_xml)
-        with open(os.path.join(output_directory, 'predictions.arff'), 'w') as \
-                f:
+        with open(os.path.join(directory, 'predictions.arff'), 'w') as f:
             f.write(predictions_arff)
         if store_model:
-            with open(os.path.join(output_directory, 'model.pkl'), 'wb') as f:
+            with open(os.path.join(directory, 'model.pkl'), 'wb') as f:
                 pickle.dump(self.model, f)
 
+        if self.flow_id is None:
+            self.flow.to_filesystem(directory)
+
         if self.trace is not None:
-            self.trace._to_filesystem(output_directory)
+            self.trace._to_filesystem(directory)
 
     def _generate_arff_dict(self):
         """Generates the arff dictionary for uploading predictions to the
@@ -244,7 +242,7 @@ class OpenMLRun(object):
 
         return arff_dict
 
-    def get_metric_fn(self, sklearn_fn, kwargs={}):
+    def get_metric_fn(self, sklearn_fn, kwargs=None):
         """Calculates metric scores based on predicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
         it assumes that the 'correct' or 'truth' attribute is specified in
@@ -262,6 +260,7 @@ class OpenMLRun(object):
         scores : list
             a list of floats, of length num_folds * num_repeats
         """
+        kwargs = kwargs if kwargs else dict()
         if self.data_content is not None and self.task_id is not None:
             predictions_arff = self._generate_arff_dict()
         elif 'predictions' in self.output_files:
@@ -371,10 +370,11 @@ class OpenMLRun(object):
         return np.array(scores)
 
     def publish(self):
-        """Publish a run to the OpenML server.
+        """ Publish a run (and if necessary, its flow) to the OpenML server.
 
         Uploads the results of a run to OpenML.
-        Sets the run_id on self
+        If the run is of an unpublished OpenMLFlow, the flow will be uploaded too.
+        Sets the run_id on self.
 
         Returns
         -------
@@ -386,10 +386,20 @@ class OpenMLRun(object):
                 "(This should never happen.) "
             )
         if self.flow_id is None:
-            raise PyOpenMLError(
-                "OpenMLRun obj does not contain a flow id. "
-                "(Should have been added while executing the task.) "
-            )
+            if self.flow is None:
+                raise PyOpenMLError(
+                    "OpenMLRun object does not contain a flow id or reference to OpenMLFlow "
+                    "(these should have been added while executing the task). "
+                )
+            else:
+                # publish the linked Flow before publishing the run.
+                self.flow.publish()
+                self.flow_id = self.flow.flow_id
+
+        if self.parameter_settings is None:
+            if self.flow is None:
+                self.flow = openml.flows.get_flow(self.flow_id)
+            self.parameter_settings = openml.flows.obtain_parameter_values(self.flow, self.model)
 
         description_xml = self._create_description_xml()
         file_elements = {'description': ("description.xml", description_xml)}

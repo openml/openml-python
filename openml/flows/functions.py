@@ -1,13 +1,75 @@
 import dateutil.parser
-
+from collections import OrderedDict
+import os
+import io
+import re
 import xmltodict
+from typing import Union, Dict
+from oslo_concurrency import lockutils
 
+from ..exceptions import OpenMLCacheException
 import openml._api_calls
 from . import OpenMLFlow
 import openml.utils
 
+FLOWS_CACHE_DIR_NAME = 'flows'
 
-def get_flow(flow_id, reinstantiate=False):
+
+def _get_cached_flows() -> OrderedDict:
+    """Return all the cached flows.
+
+    Returns
+    -------
+    flows : OrderedDict
+        Dictionary with flows. Each flow is an instance of OpenMLFlow.
+    """
+    flows = OrderedDict()
+
+    flow_cache_dir = openml.utils._create_cache_directory(FLOWS_CACHE_DIR_NAME)
+    directory_content = os.listdir(flow_cache_dir)
+    directory_content.sort()
+    # Find all flow ids for which we have downloaded
+    # the flow description
+
+    for filename in directory_content:
+        if not re.match(r"[0-9]*", filename):
+            continue
+
+        fid = int(filename)
+        flows[fid] = _get_cached_flow(fid)
+
+    return flows
+
+
+def _get_cached_flow(fid: int) -> OpenMLFlow:
+    """Get the cached flow with the given id.
+
+    Parameters
+    ----------
+    fid : int
+        Flow id.
+
+    Returns
+    -------
+    OpenMLFlow.
+    """
+
+    fid_cache_dir = openml.utils._create_cache_directory_for_id(
+        FLOWS_CACHE_DIR_NAME,
+        fid
+    )
+    flow_file = os.path.join(fid_cache_dir, "flow.xml")
+
+    try:
+        with io.open(flow_file, encoding='utf8') as fh:
+            return _create_flow_from_xml(fh.read())
+    except (OSError, IOError):
+        openml.utils._remove_cache_dir_for_id(FLOWS_CACHE_DIR_NAME, fid_cache_dir)
+        raise OpenMLCacheException("Flow file for fid %d not "
+                                   "cached" % fid)
+
+
+def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
     """Download the OpenML flow for a given flow ID.
 
     Parameters
@@ -26,11 +88,11 @@ def get_flow(flow_id, reinstantiate=False):
         the flow
     """
     flow_id = int(flow_id)
-    flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id,
-                                                   'get')
-
-    flow_dict = xmltodict.parse(flow_xml)
-    flow = OpenMLFlow._from_dict(flow_dict)
+    with lockutils.external_lock(
+            name='flows.functions.get_flow:%d' % flow_id,
+            lock_path=openml.utils._create_lockfiles_dir(),
+    ):
+        flow = _get_flow_description(flow_id)
 
     if reinstantiate:
         if not (flow.external_version.startswith('sklearn==')
@@ -41,7 +103,40 @@ def get_flow(flow_id, reinstantiate=False):
     return flow
 
 
-def list_flows(offset=None, size=None, tag=None, **kwargs):
+def _get_flow_description(flow_id: int) -> OpenMLFlow:
+    """Get the Flow for a given  ID.
+
+    Does the real work for get_flow. It returns a cached flow
+    instance if the flow exists locally, otherwise it downloads the
+    flow and returns an instance created from the xml representation.
+
+    Parameters
+    ----------
+    flow_id : int
+        The OpenML flow id.
+
+    Returns
+    -------
+    OpenMLFlow
+    """
+    try:
+        return _get_cached_flow(flow_id)
+    except OpenMLCacheException:
+
+        xml_file = os.path.join(
+            openml.utils._create_cache_directory_for_id(FLOWS_CACHE_DIR_NAME, flow_id),
+            "flow.xml",
+        )
+
+        flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id, request_method='get')
+        with io.open(xml_file, "w", encoding='utf8') as fh:
+            fh.write(flow_xml)
+
+        return _create_flow_from_xml(flow_xml)
+
+
+def list_flows(offset: int = None, size: int = None, tag: str = None, **kwargs) \
+        -> Dict[int, Dict]:
 
     """
     Return a list of all flows which are on OpenML.
@@ -80,7 +175,7 @@ def list_flows(offset=None, size=None, tag=None, **kwargs):
                                   **kwargs)
 
 
-def _list_flows(**kwargs):
+def _list_flows(**kwargs) -> Dict[int, Dict]:
     """
     Perform the api call that return a list of all flows.
 
@@ -102,7 +197,7 @@ def _list_flows(**kwargs):
     return __list_flows(api_call)
 
 
-def flow_exists(name, external_version):
+def flow_exists(name: str, external_version: str) -> Union[int, bool]:
     """Retrieves the flow id.
 
     A flow is uniquely identified by name + external_version.
@@ -116,7 +211,7 @@ def flow_exists(name, external_version):
 
     Returns
     -------
-    flow_exist : int
+    flow_exist : int or bool
         flow id iff exists, False otherwise
 
     Notes
@@ -142,7 +237,7 @@ def flow_exists(name, external_version):
         return False
 
 
-def __list_flows(api_call):
+def __list_flows(api_call: str) -> Dict[int, Dict]:
 
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     flows_dict = xmltodict.parse(xml_string, force_list=('oml:flow',))
@@ -167,8 +262,8 @@ def __list_flows(api_call):
     return flows
 
 
-def _check_flow_for_server_id(flow):
-    """Check if the given flow and it's components have a flow_id."""
+def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
+    """ Raises a ValueError if the flow or any of its subflows has no flow id. """
 
     # Depth-first search to check if all components were uploaded to the
     # server before parsing the parameters
@@ -183,9 +278,9 @@ def _check_flow_for_server_id(flow):
                 stack.append(component)
 
 
-def assert_flows_equal(flow1, flow2,
-                       ignore_parameter_values_on_older_children=None,
-                       ignore_parameter_values=False):
+def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
+                       ignore_parameter_values_on_older_children: str = None,
+                       ignore_parameter_values: bool = False) -> None:
     """Check equality of two flows.
 
     Two flows are equal if their all keys which are not set by the server
@@ -266,5 +361,19 @@ def assert_flows_equal(flow1, flow2,
             if attr1 != attr2:
                 raise ValueError("Flow %s: values for attribute '%s' differ: "
                                  "'%s'\nvs\n'%s'." %
-                                 (str(flow1.name), str(key),
-                                  str(attr1), str(attr2)))
+                                 (str(flow1.name), str(key), str(attr1), str(attr2)))
+
+
+def _create_flow_from_xml(flow_xml: str) -> OpenMLFlow:
+    """Create flow object from xml
+
+    Parameters
+    ----------
+    flow_xml: xml representation of a flow
+
+    Returns
+    -------
+    OpenMLFlow
+    """
+
+    return OpenMLFlow._from_dict(xmltodict.parse(flow_xml))

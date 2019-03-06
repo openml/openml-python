@@ -18,7 +18,7 @@ import warnings
 
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent, \
-    _get_seeded_model, _run_exists, _extract_arfftrace, \
+    _set_model_seed_where_none, _run_exists, _extract_arfftrace, \
     _extract_arfftrace_attributes, _prediction_to_row
 from openml.flows.sklearn_converter import sklearn_to_flow
 from openml.runs.trace import OpenMLRunTrace
@@ -383,18 +383,6 @@ class TestRun(TestBase):
             model=clf,
         )
 
-    def test__publish_flow_if_necessary(self):
-        clf = LogisticRegression(solver='lbfgs')
-        flow = sklearn_to_flow(clf)
-        flow, sentinel = self._add_sentinel_to_flow_name(flow, None)
-        openml.runs.functions._publish_flow_if_necessary(flow)
-        self.assertIsNotNone(flow.flow_id)
-
-        flow2 = sklearn_to_flow(clf)
-        flow2, _ = self._add_sentinel_to_flow_name(flow2, sentinel)
-        openml.runs.functions._publish_flow_if_necessary(flow2)
-        self.assertEqual(flow2.flow_id, flow.flow_id)
-
     ###########################################################################
     # These unit tests are meant to test the following functions, using a
     # variety of flows:
@@ -752,7 +740,9 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(7)
 
         # invoke OpenML run
-        run = openml.runs.run_model_on_task(clf, task)
+        run = openml.runs.run_model_on_task(task, clf,
+                                            avoid_duplicate_runs=False,
+                                            upload_flow=False)
 
         self._test_local_evaluations(run)
 
@@ -767,7 +757,9 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(7)
 
         # invoke OpenML run
-        run = openml.runs.run_flow_on_task(flow, task)
+        run = openml.runs.run_flow_on_task(task, flow,
+                                           avoid_duplicate_runs=False,
+                                           upload_flow=False)
 
         self._test_local_evaluations(run)
 
@@ -781,7 +773,9 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(7)
 
         # invoke OpenML run
-        run = openml.runs.run_model_on_task(clf, task)
+        run = openml.runs.run_model_on_task(clf, task,
+                                            avoid_duplicate_runs=False,
+                                            upload_flow=False)
 
         self._test_local_evaluations(run)
 
@@ -853,24 +847,9 @@ class TestRun(TestBase):
             run = run.publish()
             self._wait_for_processed_run(run.run_id, 200)
             run_id = run.run_id
-        except openml.exceptions.PyOpenMLError as e:
-            if 'Run already exists in server' not in e.message:
-                # in this case the error was not the one we expected
-                raise e
-            # run was already performed
-            message = e.message
-            if sys.version_info[0] == 2:
-                # Parse a string like:
-                # 'Run already exists in server. Run id(s): set([37501])'
-                run_ids = (
-                    message.split('[')[1].replace(']', '').
-                    replace(')', '').split(',')
-                )
-            else:
-                # Parse a string like:
-                # "Run already exists in server. Run id(s): {36980}"
-                run_ids = message.split('{')[1].replace('}', '').split(',')
-            run_ids = [int(run_id) for run_id in run_ids]
+        except openml.exceptions.OpenMLRunsExistError as e:
+            # The only error we expect, should fail otherwise.
+            run_ids = [int(run_id) for run_id in e.run_ids]
             self.assertGreater(len(run_ids), 0)
             run_id = random.choice(list(run_ids))
 
@@ -908,6 +887,7 @@ class TestRun(TestBase):
                     task=task,
                     seed=rs,
                     avoid_duplicate_runs=True,
+                    upload_flow=True
                 )
                 run.publish()
             except openml.exceptions.PyOpenMLError:
@@ -953,7 +933,7 @@ class TestRun(TestBase):
                 self.assertIsNone(all_params[param])
 
             # now seed the params
-            clf_seeded = _get_seeded_model(clf, const_probe)
+            clf_seeded = _set_model_seed_where_none(clf, const_probe)
             new_params = clf_seeded.get_params()
 
             randstate_params = [key for key in new_params if
@@ -968,7 +948,7 @@ class TestRun(TestBase):
                 self.assertEqual(clf.cv.random_state, 56422)
 
     def test__get_seeded_model_raises(self):
-        # the _get_seeded_model should raise exception if random_state is
+        # the _set_model_seed_where_none should raise exception if random_state is
         # anything else than an int
         randomized_clfs = [
             BaggingClassifier(random_state=np.random.RandomState(42)),
@@ -976,7 +956,7 @@ class TestRun(TestBase):
         ]
 
         for clf in randomized_clfs:
-            self.assertRaises(ValueError, _get_seeded_model, model=clf,
+            self.assertRaises(ValueError, _set_model_seed_where_none, model=clf,
                               seed=42)
 
     def test__extract_arfftrace(self):
@@ -1113,18 +1093,46 @@ class TestRun(TestBase):
         flow = sklearn_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.flow_id = -1
-        expected_message_regex = (
-            'flow.flow_id is not None, but the flow '
-            'does not exist on the server according to '
-            'flow_exists'
-        )
+        expected_message_regex = ("Flow does not exist on the server, "
+                                  "but 'flow.flow_id' is not None.")
         self.assertRaisesRegex(
-            ValueError,
+            openml.exceptions.PyOpenMLError,
             expected_message_regex,
             openml.runs.run_flow_on_task,
             task=task,
             flow=flow,
+            avoid_duplicate_runs=True,
+        )
+
+    def test_run_with_illegal_flow_id_after_load(self):
+        # Same as `test_run_with_illegal_flow_id`, but test this error is also
+        # caught if the run is stored to and loaded from disk first.
+        task = openml.tasks.get_task(115)
+        clf = DecisionTreeClassifier()
+        flow = sklearn_to_flow(clf)
+        flow, _ = self._add_sentinel_to_flow_name(flow, None)
+        flow.flow_id = -1
+        run = openml.runs.run_flow_on_task(
+            task=task,
+            flow=flow,
             avoid_duplicate_runs=False,
+            upload_flow=False
+        )
+
+        cache_path = os.path.join(
+            self.workdir,
+            'runs',
+            str(random.getrandbits(128)),
+        )
+        run.to_filesystem(cache_path)
+        loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
+
+        expected_message_regex = ("Flow does not exist on the server, "
+                                  "but 'flow.flow_id' is not None.")
+        self.assertRaisesRegex(
+            openml.exceptions.PyOpenMLError,
+            expected_message_regex,
+            loaded_run.publish
         )
 
     def test_run_with_illegal_flow_id_1(self):
@@ -1142,16 +1150,55 @@ class TestRun(TestBase):
 
         flow_new.flow_id = -1
         expected_message_regex = (
-            "Result from API call flow_exists and flow.flow_id are not same: "
+            "Local flow_id does not match server flow_id: "
             "'-1' vs '[0-9]+'"
         )
         self.assertRaisesRegex(
-            ValueError,
+            openml.exceptions.PyOpenMLError,
             expected_message_regex,
             openml.runs.run_flow_on_task,
             task=task,
             flow=flow_new,
+            avoid_duplicate_runs=True,
+        )
+
+    def test_run_with_illegal_flow_id_1_after_load(self):
+        # Same as `test_run_with_illegal_flow_id_1`, but test this error is
+        # also caught if the run is stored to and loaded from disk first.
+        task = openml.tasks.get_task(115)
+        clf = DecisionTreeClassifier()
+        flow_orig = sklearn_to_flow(clf)
+        try:
+            flow_orig.publish()  # ensures flow exist on server
+        except openml.exceptions.OpenMLServerException:
+            # flow already exists
+            pass
+        flow_new = sklearn_to_flow(clf)
+        flow_new.flow_id = -1
+
+        run = openml.runs.run_flow_on_task(
+            task=task,
+            flow=flow_new,
             avoid_duplicate_runs=False,
+            upload_flow=False
+        )
+
+        cache_path = os.path.join(
+            self.workdir,
+            'runs',
+            str(random.getrandbits(128)),
+        )
+        run.to_filesystem(cache_path)
+        loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
+
+        expected_message_regex = (
+            "Local flow_id does not match server flow_id: "
+            "'-1' vs '[0-9]+'"
+        )
+        self.assertRaisesRegex(
+            openml.exceptions.PyOpenMLError,
+            expected_message_regex,
+            loaded_run.publish
         )
 
     def test__run_task_get_arffcontent(self):
@@ -1457,3 +1504,19 @@ class TestRun(TestBase):
         openml.config.cache_directory = self.static_cache_dir
         with self.assertRaises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)
+
+    def test_run_model_on_task_downloaded_flow(self):
+        model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
+        flow = openml.flows.sklearn_to_flow(model)
+        flow.publish(raise_error_if_exists=False)
+
+        downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
+        task = openml.tasks.get_task(119)  # diabetes
+        run = openml.runs.run_flow_on_task(
+            flow=downloaded_flow,
+            task=task,
+            avoid_duplicate_runs=False,
+            upload_flow=False,
+        )
+
+        run.publish()

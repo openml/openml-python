@@ -111,6 +111,7 @@ class TestRun(TestBase):
             task=task,
             add_local_measures=False,
             avoid_duplicate_runs=False,
+            upload_flow=True
         )
 
         cache_path = os.path.join(
@@ -121,6 +122,9 @@ class TestRun(TestBase):
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
+        # The flow has been uploaded to server, so only the reference flow_id should be present
+        self.assertTrue(run_prime.flow_id is not None)
+        self.assertTrue(run_prime.flow is None)
         self._test_run_obj_equals(run, run_prime)
         run_prime.publish()
 
@@ -179,3 +183,44 @@ class TestRun(TestBase):
         # assert default behaviour is throwing an error
         with self.assertRaises(ValueError, msg='Could not find model.pkl'):
             openml.runs.OpenMLRun.from_filesystem(cache_path)
+
+    def test_publish_with_local_loaded_flow(self):
+        """
+        Publish a run tied to a local flow after it has first been saved to
+         and loaded from disk.
+        """
+        model = Pipeline([
+            ('imputer', Imputer(strategy='mean')),
+            ('classifier', DummyClassifier()),
+        ])
+        task = openml.tasks.get_task(119)
+
+        # Make sure the flow does not exist on the server yet.
+        flow = openml.flows.sklearn_to_flow(model)
+        self._add_sentinel_to_flow_name(flow)
+        self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
+
+        run = openml.runs.run_flow_on_task(
+            flow=flow,
+            task=task,
+            add_local_measures=False,
+            avoid_duplicate_runs=False,
+            upload_flow=False
+        )
+
+        # Make sure that the flow has not been uploaded as requested.
+        self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
+
+        cache_path = os.path.join(
+            self.workdir,
+            'runs',
+            str(random.getrandbits(128)),
+        )
+        run.to_filesystem(cache_path)
+        # obtain run from filesystem
+        loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
+        loaded_run.publish()
+
+        # make sure the flow is published as part of publishing the run.
+        self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))
+        openml.runs.get_run(loaded_run.run_id)

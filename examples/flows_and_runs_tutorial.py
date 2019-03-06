@@ -89,6 +89,33 @@ run = openml.runs.run_flow_on_task(flow, task, avoid_duplicate_runs=False)
 myrun = run.publish()
 print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 
+###############################################################################
+# Running flows on tasks offline for later upload
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# For those scenarios where there is no access to internet, it is possible to run
+# a model on a task without uploading results or flows to the server immediately.
+
+# To perform the following line offline, it is required to have been called before
+# such that the task is cached on the local openml cache directory:
+task = openml.tasks.get_task(6)
+
+# The following lines can then be executed offline:
+run = openml.runs.run_model_on_task(
+    pipe,
+    task,
+    avoid_duplicate_runs=False,
+    upload_flow=False)
+
+# The run may be stored offline, and the flow will be stored along with it:
+run.to_filesystem(directory='myrun')
+
+# They made later be loaded and uploaded
+run = openml.runs.OpenMLRun.from_filesystem(directory='myrun')
+run.publish()
+
+# Publishing the run will automatically upload the related flow if
+# it does not yet exist on the server.
+
 ############################################################################
 # Challenge
 # ^^^^^^^^^
