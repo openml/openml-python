@@ -527,6 +527,7 @@ def _extract_information_from_model(model):
             and all([isinstance(rval_i, type(rval[0])) for rval_i in rval])
         )
 
+        # Check that all list elements are of simple types.
         nested_list_of_simple_types = (
             is_non_empty_list_of_lists_with_same_type
             and all([isinstance(el, SIMPLE_TYPES) for el in flatten_all(rval)])
