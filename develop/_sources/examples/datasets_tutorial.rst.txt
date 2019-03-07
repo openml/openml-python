@@ -57,7 +57,7 @@ List datasets
 
  .. code-block:: none
 
-    First 10 of 2789 datasets...
+    First 10 of 519 datasets...
 
 
 Exercise 1
@@ -138,14 +138,18 @@ Download datasets
 
 Get the actual data.
 
-Returned as numpy array, with meta-info
-(e.g. target feature, feature names, ...)
+The dataset can be returned in 2 possible formats: as a NumPy array, a SciPy
+sparse matrix, or as a Pandas DataFrame (or SparseDataFrame). The format is
+controlled with the parameter ``dataset_format`` which can be either 'array'
+(default) or 'dataframe'. Let's first build our dataset from a NumPy array
+and manually create a dataframe.
 
 
 
 .. code-block:: python
 
     X, y, attribute_names = dataset.get_data(
+        dataset_format='array',
         target=dataset.default_target_attribute,
         return_attribute_names=True,
     )
@@ -178,6 +182,58 @@ Returned as numpy array, with meta-info
     [10 rows x 15 columns]
 
 
+Instead of manually creating the dataframe, you can already request a
+dataframe with the correct dtypes.
+
+
+
+.. code-block:: python
+
+    X, y = dataset.get_data(target=dataset.default_target_attribute,
+                            dataset_format='dataframe')
+    print(X.head())
+    print(X.info())
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    V1       V2       V3       V4  ...      V11      V12      V13      V14
+    0  4329.23  4009.23  4289.23  4148.21  ...  4211.28  4280.51  4635.90  4393.85
+    1  4324.62  4004.62  4293.85  4148.72  ...  4207.69  4279.49  4632.82  4384.10
+    2  4327.69  4006.67  4295.38  4156.41  ...  4206.67  4282.05  4628.72  4389.23
+    3  4328.72  4011.79  4296.41  4155.90  ...  4210.77  4287.69  4632.31  4396.41
+    4  4326.15  4011.79  4292.31  4151.28  ...  4212.82  4288.21  4632.82  4398.46
+
+    [5 rows x 14 columns]
+    <class 'pandas.core.frame.DataFrame'>
+    RangeIndex: 14980 entries, 0 to 14979
+    Data columns (total 14 columns):
+    V1     14980 non-null float64
+    V2     14980 non-null float64
+    V3     14980 non-null float64
+    V4     14980 non-null float64
+    V5     14980 non-null float64
+    V6     14980 non-null float64
+    V7     14980 non-null float64
+    V8     14980 non-null float64
+    V9     14980 non-null float64
+    V10    14980 non-null float64
+    V11    14980 non-null float64
+    V12    14980 non-null float64
+    V13    14980 non-null float64
+    V14    14980 non-null float64
+    dtypes: float64(14)
+    memory usage: 1.6 MB
+    None
+
+
 Exercise 2
 **********
 * Explore the data visually.
@@ -205,7 +261,7 @@ Exercise 2
 
 
 
-**Total running time of the script:** ( 0 minutes  2.710 seconds)
+**Total running time of the script:** ( 0 minutes  1.406 seconds)
 
 
 .. _sphx_glr_download_examples_datasets_tutorial.py:

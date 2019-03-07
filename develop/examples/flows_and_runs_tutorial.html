@@ -135,6 +135,7 @@
 <p>Train a scikit-learn model on the data manually.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">68</span><span class="p">)</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+    <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">,</span>
     <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
 <span class="p">)</span>
 <span class="n">clf</span> <span class="o">=</span> <span class="n">neighbors</span><span class="o">.</span><span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -147,6 +148,7 @@
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">17</span><span class="p">)</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+    <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">,</span>
     <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="p">,</span>
     <span class="n">return_categorical_indicator</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
 <span class="p">)</span>
@@ -189,7 +191,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/15798
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/15970
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -207,14 +209,14 @@ the run is sent to the OpenML server:</p>
  &#39;dependencies&#39;: &#39;sklearn==0.20.0\nnumpy&gt;=1.6.1\nscipy&gt;=0.9&#39;,
  &#39;description&#39;: &#39;Automatically created scikit-learn flow.&#39;,
  &#39;external_version&#39;: &#39;openml==0.8.0,sklearn==0.20.0&#39;,
- &#39;flow_id&#39;: 36910,
+ &#39;flow_id&#39;: 48545,
  &#39;language&#39;: &#39;English&#39;,
  &#39;model&#39;: None,
  &#39;name&#39;: &#39;sklearn.tree.tree.ExtraTreeClassifier&#39;,
  &#39;parameters&#39;: OrderedDict([...]),
  &#39;parameters_meta_info&#39;: OrderedDict([...]),
  &#39;tags&#39;: [...],
- &#39;upload_date&#39;: &#39;2019-03-05T14:04:40&#39;,
+ &#39;upload_date&#39;: &#39;2019-03-07T16:29:47&#39;,
  &#39;uploader&#39;: &#39;1159&#39;,
  &#39;version&#39;: &#39;1&#39;}
 </pre></div>
@@ -236,7 +238,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/15799
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/15971
 </pre></div>
 </div>
 </div>
@@ -298,10 +300,10 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/15801
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/15973
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  14.597 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  17.013 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/27a5bee6ab807de4cd881f6693fcb2aa/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></div>

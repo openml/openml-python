@@ -39,6 +39,7 @@ Train a scikit-learn model on the data manually.
 
     dataset = openml.datasets.get_dataset(68)
     X, y = dataset.get_data(
+        dataset_format='array',
         target=dataset.default_target_attribute
     )
     clf = neighbors.KNeighborsClassifier(n_neighbors=1)
@@ -60,6 +61,7 @@ You can also ask for meta-data to automatically preprocess the data.
 
     dataset = openml.datasets.get_dataset(17)
     X, y, categorical = dataset.get_data(
+        dataset_format='array',
         target=dataset.default_target_attribute,
         return_categorical_indicator=True,
     )
@@ -135,7 +137,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/15798
+    Uploaded to http://test.openml.org/r/15970
 
 
 We can now also inspect the flow object which was automatically created:
@@ -167,14 +169,14 @@ We can now also inspect the flow object which was automatically created:
      'dependencies': 'sklearn==0.20.0\nnumpy>=1.6.1\nscipy>=0.9',
      'description': 'Automatically created scikit-learn flow.',
      'external_version': 'openml==0.8.0,sklearn==0.20.0',
-     'flow_id': 36910,
+     'flow_id': 48545,
      'language': 'English',
      'model': None,
      'name': 'sklearn.tree.tree.ExtraTreeClassifier',
      'parameters': OrderedDict([...]),
      'parameters_meta_info': OrderedDict([...]),
      'tags': [...],
-     'upload_date': '2019-03-05T14:04:40',
+     'upload_date': '2019-03-07T16:29:47',
      'uploader': '1159',
      'version': '1'}
 
@@ -210,7 +212,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/15799
+    Uploaded to http://test.openml.org/r/15971
 
 
 Running flows on tasks offline for later upload
@@ -293,10 +295,10 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/15801
+    kNN on diabetes: http://test.openml.org/r/15973
 
 
-**Total running time of the script:** ( 0 minutes  14.597 seconds)
+**Total running time of the script:** ( 0 minutes  17.013 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:

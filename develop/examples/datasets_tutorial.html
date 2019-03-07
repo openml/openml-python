@@ -146,7 +146,7 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 2789 datasets...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 519 datasets...
 </pre></div>
 </div>
 <div class="section" id="exercise-1">
@@ -191,9 +191,13 @@ All data is from one continuous EEG measurement with the Emotiv EEG Neuroheadset
 </pre></div>
 </div>
 <p>Get the actual data.</p>
-<p>Returned as numpy array, with meta-info
-(e.g. target feature, feature names, …)</p>
+<p>The dataset can be returned in 2 possible formats: as a NumPy array, a SciPy
+sparse matrix, or as a Pandas DataFrame (or SparseDataFrame). The format is
+controlled with the parameter <code class="docutils literal notranslate"><span class="pre">dataset_format</span></code> which can be either ‘array’
+(default) or ‘dataframe’. Let’s first build our dataset from a NumPy array
+and manually create a dataframe.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+    <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">,</span>
     <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="p">,</span>
     <span class="n">return_attribute_names</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
 <span class="p">)</span>
@@ -218,6 +222,45 @@ All data is from one continuous EEG measurement with the Emotiv EEG Neuroheadset
 [10 rows x 15 columns]
 </pre></div>
 </div>
+<p>Instead of manually creating the dataframe, you can already request a
+dataframe with the correct dtypes.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="p">,</span>
+                        <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>V1       V2       V3       V4  ...      V11      V12      V13      V14
+0  4329.23  4009.23  4289.23  4148.21  ...  4211.28  4280.51  4635.90  4393.85
+1  4324.62  4004.62  4293.85  4148.72  ...  4207.69  4279.49  4632.82  4384.10
+2  4327.69  4006.67  4295.38  4156.41  ...  4206.67  4282.05  4628.72  4389.23
+3  4328.72  4011.79  4296.41  4155.90  ...  4210.77  4287.69  4632.31  4396.41
+4  4326.15  4011.79  4292.31  4151.28  ...  4212.82  4288.21  4632.82  4398.46
+
+[5 rows x 14 columns]
+&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 14980 entries, 0 to 14979
+Data columns (total 14 columns):
+V1     14980 non-null float64
+V2     14980 non-null float64
+V3     14980 non-null float64
+V4     14980 non-null float64
+V5     14980 non-null float64
+V6     14980 non-null float64
+V7     14980 non-null float64
+V8     14980 non-null float64
+V9     14980 non-null float64
+V10    14980 non-null float64
+V11    14980 non-null float64
+V12    14980 non-null float64
+V13    14980 non-null float64
+V14    14980 non-null float64
+dtypes: float64(14)
+memory usage: 1.6 MB
+None
+</pre></div>
+</div>
 <div class="section" id="exercise-2">
 <h3>Exercise 2<a class="headerlink" href="#exercise-2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
@@ -236,7 +279,7 @@ All data is from one continuous EEG measurement with the Emotiv EEG Neuroheadset
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_datasets_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_datasets_tutorial_001.png" />
-<p><strong>Total running time of the script:</strong> ( 0 minutes  2.710 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  1.406 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-datasets-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/ea68bafc2f0d401c0e0139e9c46c83d5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></div>
