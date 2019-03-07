@@ -7,6 +7,7 @@ from collections import OrderedDict
 
 import arff
 import numpy as np
+import pandas as pd
 import scipy.sparse
 import xmltodict
 from warnings import warn
@@ -128,13 +129,10 @@ class OpenMLDataset(object):
         self.url = url
         self.default_target_attribute = default_target_attribute
         self.row_id_attribute = row_id_attribute
-        self.ignore_attributes = None
         if isinstance(ignore_attribute, str):
             self.ignore_attributes = [ignore_attribute]
-        elif isinstance(ignore_attribute, list):
+        elif isinstance(ignore_attribute, list) or ignore_attribute is None:
             self.ignore_attributes = ignore_attribute
-        elif ignore_attribute is None:
-            pass
         else:
             raise ValueError('Wrong data type for ignore_attribute. '
                              'Should be list.')
@@ -169,42 +167,96 @@ class OpenMLDataset(object):
         self.qualities = _check_qualities(qualities)
 
         if data_file is not None:
-            if self._data_features_supported():
-                self.data_pickle_file = data_file.replace('.arff', '.pkl.py3')
+            self.data_pickle_file = data_file.replace('.arff', '.pkl.py3')
 
-                if os.path.exists(self.data_pickle_file):
-                    logger.debug("Data pickle file already exists.")
-                else:
-                    try:
-                        data = self._get_arff(self.format)
-                    except OSError as e:
-                        logger.critical("Please check that the data file "
-                                        "{}* is there and can be read."
-                                        .format(self.data_file))
-                        raise e
+            if os.path.exists(self.data_pickle_file):
+                logger.debug("Data pickle file already exists.")
+            else:
+                try:
+                    data = self._get_arff(self.format)
+                except OSError as e:
+                    logger.critical("Please check that the data file %s is "
+                                    "there and can be read.", self.data_file)
+                    raise e
 
-                    categorical = [False if type(type_) != list else True
-                                   for name, type_ in data['attributes']]
-                    attribute_names = [name for name, _ in data['attributes']]
+                ARFF_DTYPES_TO_PD_DTYPE = {
+                    'INTEGER': 'integer',
+                    'REAL': 'floating',
+                    'NUMERIC': 'floating',
+                    'STRING': 'string'
+                }
+                attribute_dtype = {}
+                attribute_names = []
+                categories_names = {}
+                categorical = []
+                for name, type_ in data['attributes']:
+                    # if the feature is nominal and the a sparse matrix is
+                    # requested, the categories need to be numeric
+                    if (isinstance(type_, list)
+                            and self.format.lower() == 'sparse_arff'):
+                        try:
+                            np.array(type_, dtype=np.float32)
+                        except ValueError:
+                            raise ValueError(
+                                "Categorical data needs to be numeric when "
+                                "using sparse ARFF."
+                            )
+                    # string can only be supported with pandas DataFrame
+                    elif (type_ == 'STRING'
+                          and self.format.lower() == 'sparse_arff'):
+                        raise ValueError(
+                            "Dataset containing strings is not supported "
+                            "with sparse ARFF."
+                        )
 
-                    if self.format.lower() == 'sparse_arff':
-                        X = data['data']
-                        X_shape = (max(X[1]) + 1, max(X[2]) + 1)
-                        X = scipy.sparse.coo_matrix(
-                            (X[0], (X[1], X[2])),
-                            shape=X_shape, dtype=np.float32)
-                        X = X.tocsr()
-                    elif self.format.lower() == 'arff':
-                        X = np.array(data['data'], dtype=np.float32)
+                    # infer the dtype from the ARFF header
+                    if isinstance(type_, list):
+                        categorical.append(True)
+                        categories_names[name] = type_
+                        if len(type_) == 2:
+                            type_norm = [cat.lower().capitalize()
+                                         for cat in type_]
+                            if set(['True', 'False']) == set(type_norm):
+                                categories_names[name] = [
+                                    True if cat == 'True' else False
+                                    for cat in type_norm
+                                ]
+                                attribute_dtype[name] = 'boolean'
+                            else:
+                                attribute_dtype[name] = 'categorical'
+                        else:
+                            attribute_dtype[name] = 'categorical'
                     else:
-                        raise Exception()
+                        categorical.append(False)
+                        attribute_dtype[name] = ARFF_DTYPES_TO_PD_DTYPE[type_]
+                    attribute_names.append(name)
 
-                    with open(self.data_pickle_file, "wb") as fh:
-                        pickle.dump((X, categorical, attribute_names), fh, -1)
-                    logger.debug("Saved dataset {}: {} to file {}"
-                                 .format(int(self.dataset_id or -1),
-                                         self.name,
-                                         self.data_pickle_file))
+                if self.format.lower() == 'sparse_arff':
+                    X = data['data']
+                    X_shape = (max(X[1]) + 1, max(X[2]) + 1)
+                    X = scipy.sparse.coo_matrix(
+                        (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
+                    X = X.tocsr()
+
+                elif self.format.lower() == 'arff':
+                    X = pd.DataFrame(data['data'], columns=attribute_names)
+
+                    col = []
+                    for column_name in X.columns:
+                        if attribute_dtype[column_name] in ('categorical',
+                                                            'boolean'):
+                            col.append(self._unpack_categories(
+                                X[column_name], categories_names[column_name]))
+                        else:
+                            col.append(X[column_name])
+                    X = pd.concat(col, axis=1)
+
+                # Pickle the dataframe or the sparse matrix.
+                with open(self.data_pickle_file, "wb") as fh:
+                    pickle.dump((X, categorical, attribute_names), fh, -1)
+                logger.debug("Saved dataset %d: %s to file %s" %
+                             (int(self.dataset_id or -1), self.name,
+                              self.data_pickle_file))
 
     def push_tag(self, tag):
         """Annotates this data set with a tag on the server.
@@ -252,10 +304,6 @@ class OpenMLDataset(object):
         return all(self.__dict__[key] == other.__dict__[key]
                    for key in self_keys)
 
-    def __ne__(self, other):
-        """Only needed for python 2, unnecessary in Python 3"""
-        return not self.__eq__(other)
-
     def _get_arff(self, format):
         """Read ARFF file and return decoded arff.
 
@@ -271,10 +319,6 @@ class OpenMLDataset(object):
         # TODO: add a partial read method which only returns the attribute
         # headers of the corresponding .arff file!
         import struct
-
-        if not self._data_features_supported():
-            raise PyOpenMLError('Dataset not compatible, '
-                                'PyOpenML cannot handle string features')
 
         filename = self.data_file
         bits = (8 * struct.calcsize("P"))
@@ -303,28 +347,100 @@ class OpenMLDataset(object):
             with io.open(filename, encoding='utf8') as fh:
                 return decode_arff(fh)
 
+    @staticmethod
+    def _convert_array_format(data, array_format, attribute_names):
+        """Convert a dataset to a given array format.
+
+        By default, the data are stored as a sparse matrix or a pandas
+        dataframe. One might be interested to get a pandas SparseDataFrame or a
+        NumPy array instead, respectively.
+        """
+        if array_format == "array" and not scipy.sparse.issparse(data):
+            # We encode the categories such that they are integer to be able
+            # to make a conversion to numeric for backward compatibility
+            def _encode_if_category(column):
+                if column.dtype.name == 'category':
+                    column = column.cat.codes.astype(np.float32)
+                    mask_nan = column == -1
+                    column[mask_nan] = np.nan
+                return column
+            if data.ndim == 2:
+                columns = {
+                    column_name: _encode_if_category(data.loc[:, column_name])
+                    for column_name in data.columns
+                }
+                data = pd.DataFrame(columns)
+            else:
+                data = _encode_if_category(data)
+            try:
+                return np.asarray(data, dtype=np.float32)
+            except ValueError:
+                raise PyOpenMLError(
+                    'PyOpenML cannot handle string when returning numpy'
+                    ' arrays. Use dataset_format="dataframe".'
+                )
+        if array_format == "dataframe" and scipy.sparse.issparse(data):
+            return pd.SparseDataFrame(data, columns=attribute_names)
+        return data
+
+    @staticmethod
+    def _unpack_categories(series, categories):
+        col = []
+        for x in series:
+            try:
+                col.append(categories[int(x)])
+            except (TypeError, ValueError):
+                col.append(np.nan)
+        return pd.Series(col, index=series.index, dtype='category',
+                         name=series.name)
+
     def get_data(self, target=None,
                  include_row_id=False,
                  include_ignore_attributes=False,
                  return_categorical_indicator=False,
-                 return_attribute_names=False):
-        """Returns dataset content as numpy arrays / sparse matrices.
+                 return_attribute_names=False,
+                 dataset_format=None):
+        """Returns dataset content as dataframes or sparse matrices.
 
         Parameters
         ----------
-
+        target : string, list of strings or None (default=None)
+            Name of target column(s) to separate from the data.
+        include_row_id : boolean (default=False)
+            Whether to include row ids in the returned dataset.
+        include_ignore_attributes : boolean (default=False)
+            Whether to include columns that are marked as "ignore"
+            on the server in the dataset.
+        return_categorical_indicator : boolean (default=False)
+            Whether to return a boolean mask indicating which features are
+            categorical.
+        return_attribute_names : boolean (default=False)
+            Whether to return attribute names.
+        dataset_format : string
+            The format of returned dataset. If ``array``, the returned dataset
+            will be a NumPy array or a SciPy sparse matrix. If ``dataframe``,
+            the returned dataset will be a Pandas DataFrame or SparseDataFrame.
 
         Returns
         -------
+        X : ndarray, dataframe, or sparse matrix, shape (n_samples, n_columns)
+            Dataset
+        y : ndarray or series, shape (n_samples,)
+            Target column(s). Only returned if target is not None.
+        categorical_indicator : boolean ndarray
+            Mask that indicate categorical features. Only returned if
+            return_categorical_indicator is True.
+        return_attribute_names : list of strings
+            List of attribute names. Returned only if return_attribute_names is
+            True.
 
         """
-        rval = []
+        if dataset_format is None:
+            warn('The default of "dataset_format" will change from "array" to'
+                 ' "dataframe" in 0.9', FutureWarning)
+            dataset_format = 'array'
 
-        if not self._data_features_supported():
-            raise PyOpenMLError(
-                'Dataset %d not compatible, PyOpenML cannot handle string '
-                'features' % self.dataset_id
-            )
+        rval = []
 
         path = self.data_pickle_file
         if not os.path.exists(path):
@@ -358,12 +474,17 @@ class OpenMLDataset(object):
                         " %s" % to_exclude)
             keep = np.array([True if column not in to_exclude else False
                              for column in attribute_names])
-            data = data[:, keep]
+            if hasattr(data, 'iloc'):
+                data = data.iloc[:, keep]
+            else:
+                data = data[:, keep]
             categorical = [cat for cat, k in zip(categorical, keep) if k]
             attribute_names = [att for att, k in
                                zip(attribute_names, keep) if k]
 
         if target is None:
+            data = self._convert_array_format(data, dataset_format,
+                                              attribute_names)
             rval.append(data)
         else:
             if isinstance(target, str):
@@ -379,30 +500,29 @@ class OpenMLDataset(object):
                     np.sum(targets)
                 )
             target_categorical = [
-                cat for cat, column in
-                zip(categorical, attribute_names)
+                cat for cat, column in zip(categorical, attribute_names)
                 if column in target
             ]
             target_dtype = int if target_categorical[0] else float
 
-            try:
+            if hasattr(data, 'iloc'):
+                x = data.iloc[:, ~targets]
+                y = data.iloc[:, targets]
+            else:
                 x = data[:, ~targets]
                 y = data[:, targets].astype(target_dtype)
 
-                if len(y.shape) == 2 and y.shape[1] == 1:
-                    y = y[:, 0]
+            categorical = [cat for cat, t in zip(categorical, targets)
+                           if not t]
+            attribute_names = [att for att, k in zip(attribute_names, targets)
+                               if not k]
 
-                categorical = [cat for cat, t in
-                               zip(categorical, targets) if not t]
-                attribute_names = [att for att, k in
-                                   zip(attribute_names, targets) if not k]
-            except KeyError as e:
-                import sys
-                sys.stdout.flush()
-                raise e
-
+            x = self._convert_array_format(x, dataset_format, attribute_names)
             if scipy.sparse.issparse(y):
                 y = np.asarray(y.todense()).astype(target_dtype).flatten()
+            y = y.squeeze()
+            y = self._convert_array_format(y, dataset_format, attribute_names)
+            y = y.astype(target_dtype) if dataset_format == 'array' else y
 
             rval.append(x)
             rval.append(y)
@@ -589,14 +709,6 @@ class OpenMLDataset(object):
         # <?xml version="1.0" encoding="utf-8"?>
         xml_string = xml_string.split('\n', 1)[-1]
         return xml_string
-
-    def _data_features_supported(self):
-        if self.features is not None:
-            for idx in self.features:
-                if self.features[idx].data_type not in ['numeric', 'nominal']:
-                    return False
-            return True
-        return True
 
 
 def _check_qualities(qualities):
