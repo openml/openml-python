@@ -137,7 +137,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/16446
+    Uploaded to http://test.openml.org/r/16906
 
 
 We can now also inspect the flow object which was automatically created:
@@ -212,7 +212,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/16447
+    Uploaded to http://test.openml.org/r/16907
 
 
 Running flows on tasks offline for later upload
@@ -295,10 +295,10 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/16449
+    kNN on diabetes: http://test.openml.org/r/16909
 
 
-**Total running time of the script:** ( 0 minutes  14.901 seconds)
+**Total running time of the script:** ( 0 minutes  15.139 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:
