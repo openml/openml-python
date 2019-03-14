@@ -159,17 +159,18 @@ to have better visualization and easier access:</p>
        &#39;MajorityClassSize&#39;, &#39;MaxNominalAttDistinctValues&#39;, &#39;MinorityClassSize&#39;,
        &#39;NumberOfClasses&#39;, &#39;NumberOfFeatures&#39;, &#39;NumberOfInstances&#39;,
        &#39;NumberOfInstancesWithMissingValues&#39;, &#39;NumberOfMissingValues&#39;,
-       &#39;NumberOfNumericFeatures&#39;, &#39;NumberOfSymbolicFeatures&#39;],
+       &#39;NumberOfNumericFeatures&#39;, &#39;NumberOfSymbolicFeatures&#39;,
+       &#39;evaluation_measures&#39;],
       dtype=&#39;object&#39;)
-First 5 of 660 tasks:
-   tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
-1    1     1  ...                      6.0                     33.0
-2    2     1  ...                      6.0                     33.0
-3    3     1  ...                      6.0                     33.0
-4    4     1  ...                      6.0                     33.0
-5    5     1  ...                      6.0                     33.0
+First 5 of 661 tasks:
+   tid  ttid  ...  NumberOfSymbolicFeatures evaluation_measures
+1    1     1  ...                      33.0                 NaN
+2    2     1  ...                      33.0                 NaN
+3    3     1  ...                      33.0                 NaN
+4    4     1  ...                      33.0                 NaN
+5    5     1  ...                      33.0                 NaN
 
-[5 rows x 19 columns]
+[5 rows x 20 columns]
 </pre></div>
 </div>
 <p>We can filter the list of tasks to only contain datasets with more than
@@ -283,7 +284,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1117
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1118
 </pre></div>
 </div>
 <div class="section" id="exercise">
@@ -336,10 +337,10 @@ all of these tasks:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLClassificationTask object at 0x2ac8857e0358&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLClassificationTask object at 0x2b3bd0d81400&gt;
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  21.252 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  19.170 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-tasks-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/204148be48b3a7d6b2cc72a9fc63c69e/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></div>

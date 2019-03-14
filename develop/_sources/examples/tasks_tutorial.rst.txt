@@ -88,17 +88,18 @@ to have better visualization and easier access:
            'MajorityClassSize', 'MaxNominalAttDistinctValues', 'MinorityClassSize',
            'NumberOfClasses', 'NumberOfFeatures', 'NumberOfInstances',
            'NumberOfInstancesWithMissingValues', 'NumberOfMissingValues',
-           'NumberOfNumericFeatures', 'NumberOfSymbolicFeatures'],
+           'NumberOfNumericFeatures', 'NumberOfSymbolicFeatures',
+           'evaluation_measures'],
           dtype='object')
-    First 5 of 660 tasks:
-       tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
-    1    1     1  ...                      6.0                     33.0
-    2    2     1  ...                      6.0                     33.0
-    3    3     1  ...                      6.0                     33.0
-    4    4     1  ...                      6.0                     33.0
-    5    5     1  ...                      6.0                     33.0
+    First 5 of 661 tasks:
+       tid  ttid  ...  NumberOfSymbolicFeatures evaluation_measures
+    1    1     1  ...                      33.0                 NaN
+    2    2     1  ...                      33.0                 NaN
+    3    3     1  ...                      33.0                 NaN
+    4    4     1  ...                      33.0                 NaN
+    5    5     1  ...                      33.0                 NaN
 
-    [5 rows x 19 columns]
+    [5 rows x 20 columns]
 
 
 We can filter the list of tasks to only contain datasets with more than
@@ -321,7 +322,7 @@ Finally, it is also possible to list all tasks on OpenML with:
 
  .. code-block:: none
 
-    1117
+    1118
 
 
 Exercise
@@ -423,10 +424,10 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLClassificationTask object at 0x2ac8857e0358>
+    <openml.tasks.task.OpenMLClassificationTask object at 0x2b3bd0d81400>
 
 
-**Total running time of the script:** ( 0 minutes  21.252 seconds)
+**Total running time of the script:** ( 0 minutes  19.170 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:
