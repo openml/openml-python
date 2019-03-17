@@ -32,8 +32,8 @@ install:
   # XXX: setuptools>23 is currently broken on Win+py3 with numpy
   # (https://github.com/pypa/setuptools/issues/728)
   - conda clean --packages
-  - conda update conda
-  - conda update --all
+  - conda update conda --yes
+  - conda update --all --yes
   - conda update --all --yes setuptools=23
 
   # Install the build and runtime dependencies of the project.
