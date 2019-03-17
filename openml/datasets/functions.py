@@ -284,7 +284,7 @@ def check_datasets_active(dataset_ids: List[int]) -> Dict[int, bool]:
     """
     dataset_list = list_datasets(status='all')
     active = {}
-    
+
     for did in dataset_ids:
         dataset = dataset_list.get(did, None)
         if dataset is None:
