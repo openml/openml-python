@@ -239,6 +239,28 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(os.path.exists(os.path.join(
             openml.config.get_cache_directory(), "datasets", "2", "qualities.xml")))
 
+    def test_get_datasets_lazy(self):
+        dids = [1, 2]
+        datasets = openml.datasets.get_datasets(dids, download_data=False)
+        self.assertEqual(len(datasets), 2)
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "description.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "2", "description.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "2", "features.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "2", "qualities.xml")))
+
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")))
+
     def test_get_dataset(self):
         dataset = openml.datasets.get_dataset(1)
         self.assertEqual(type(dataset), OpenMLDataset)
@@ -251,6 +273,27 @@ class TestOpenMLDataset(TestBase):
             openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
         self.assertTrue(os.path.exists(os.path.join(
             openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
+
+        self.assertGreater(len(dataset.features), 1)
+        self.assertGreater(len(dataset.qualities), 4)
+
+        # Issue324 Properly handle private datasets when trying to access them
+        openml.config.server = self.production_server
+        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
+
+    def test_get_dataset_lazy(self):
+        dataset = openml.datasets.get_dataset(1, download_data=False)
+        self.assertEqual(type(dataset), OpenMLDataset)
+        self.assertEqual(dataset.name, 'anneal')
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "description.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
+
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
 
         self.assertGreater(len(dataset.features), 1)
         self.assertGreater(len(dataset.qualities), 4)
