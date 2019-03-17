@@ -323,7 +323,7 @@ class TestOpenMLDataset(TestBase):
     def test__getarff_path_dataset_arff(self):
         openml.config.cache_directory = self.static_cache_dir
         description = openml.datasets.functions._get_cached_dataset_description(2)
-        arff_path = _get_dataset_arff(self.workdir, description)
+        arff_path = _get_dataset_arff(description, cache_directory=self.workdir)
         self.assertIsInstance(arff_path, str)
         self.assertTrue(os.path.exists(arff_path))
 
@@ -339,7 +339,7 @@ class TestOpenMLDataset(TestBase):
             'is unequal to the expected checksum abc. '
             'Raised when downloading dataset 5.',
             _get_dataset_arff,
-            self.workdir, description,
+            description,
         )
 
     def test__get_dataset_features(self):

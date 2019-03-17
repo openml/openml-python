@@ -375,7 +375,7 @@ def get_dataset(dataset_id: int, download_data: bool = True) -> OpenMLDataset:
             qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
 
             if download_data:
-                arff_file = _get_dataset_arff(did_cache_dir, description)
+                arff_file = _get_dataset_arff(description)
             else:
                 arff_file = None
 
@@ -706,30 +706,43 @@ def _get_dataset_description(did_cache_dir, dataset_id):
     return description
 
 
-def _get_dataset_arff(did_cache_dir, description):
-    """Get the filepath to the dataset ARFF
+def _get_dataset_arff(description: Union[Dict, OpenMLDataset], cache_directory: str=None) -> str:
+    """ Return the path to the local arff file of the dataset. If is not cached, it is downloaded.
 
     Checks if the file is in the cache, if yes, return the path to the file.
     If not, downloads the file and caches it, then returns the file path.
+    The cache directory is generated based on dataset information, but can also be specified.
 
     This function is NOT thread/multiprocessing safe.
 
     Parameters
     ----------
-    did_cache_dir : str
-        Cache subdirectory for this dataset.
+    description : dictionary or OpenMLDataset
+        Either a dataset description as dict or OpenMLDataset.
 
-    description : dictionary
-        Dataset description dict.
+    cache_directory: str, optional (default=None)
+        Folder to store the arff file in.
+        If None, use the default cache directory for the dataset.
 
     Returns
     -------
     output_filename : string
         Location of ARFF file.
     """
-    output_file_path = os.path.join(did_cache_dir, "dataset.arff")
-    md5_checksum_fixture = description.get("oml:md5_checksum")
-    url = description['oml:url']
+    if isinstance(description, dict):
+        md5_checksum_fixture = description.get("oml:md5_checksum")
+        url = description['oml:url']
+        did = description.get('oml:id')
+    elif isinstance(description, OpenMLDataset):
+        md5_checksum_fixture = description.md5_checksum
+        url = description.url
+        did = description.dataset_id
+    else:
+        raise TypeError("`description` should be either OpenMLDataset or Dict.")
+
+    if cache_directory is None:
+        cache_directory = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, did)
+    output_file_path = os.path.join(cache_directory, "dataset.arff")
 
     try:
         openml.utils._download_text_file(
@@ -738,7 +751,7 @@ def _get_dataset_arff(did_cache_dir, description):
             md5_checksum=md5_checksum_fixture
         )
     except OpenMLHashException as e:
-        additional_info = " Raised when downloading dataset {}.".format(description.get('oml:id'))
+        additional_info = " Raised when downloading dataset {}.".format(did)
         e.args = (e.args[0] + additional_info,)
         raise
 

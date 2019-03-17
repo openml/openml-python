@@ -167,11 +167,11 @@ class OpenMLDataset(object):
         self.qualities = _check_qualities(qualities)
 
         if data_file is not None:
-            self.data_pickle_file = self.data_arff_to_pickle(data_file)
+            self.data_pickle_file = self._data_arff_to_pickle(data_file)
         else:
             self.data_pickle_file = None
 
-    def data_arff_to_pickle(self, data_file):
+    def _data_arff_to_pickle(self, data_file):
         data_pickle_file = data_file.replace('.arff', '.pkl.py3')
         if os.path.exists(data_pickle_file):
             logger.debug("Data pickle file already exists.")
@@ -447,6 +447,13 @@ class OpenMLDataset(object):
             dataset_format = 'array'
 
         rval = []
+
+        if self.data_pickle_file is None:
+            if self.data_file is None:
+                # import required hero to avoid circular import.
+                from .functions import _get_dataset_arff
+                self.data_file = _get_dataset_arff(self)
+            self.data_pickle_file = self._data_arff_to_pickle(self.data_file)
 
         path = self.data_pickle_file
         if not os.path.exists(path):
