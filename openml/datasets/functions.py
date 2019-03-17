@@ -1,4 +1,3 @@
-import hashlib
 import io
 import os
 import re
@@ -306,7 +305,7 @@ def check_datasets_active(dataset_ids):
 
 def get_datasets(
         dataset_ids: List[Union[str, int]],
-        download_data: bool=True,
+        download_data: bool = True,
 ) -> List[OpenMLDataset]:
     """Download datasets.
 
@@ -706,7 +705,8 @@ def _get_dataset_description(did_cache_dir, dataset_id):
     return description
 
 
-def _get_dataset_arff(description: Union[Dict, OpenMLDataset], cache_directory: str=None) -> str:
+def _get_dataset_arff(description: Union[Dict, OpenMLDataset],
+                      cache_directory: str = None) -> str:
     """ Return the path to the local arff file of the dataset. If is not cached, it is downloaded.
 
     Checks if the file is in the cache, if yes, return the path to the file.
@@ -840,7 +840,7 @@ def _create_dataset_from_description(
         description: Dict[str, str],
         features: Dict,
         qualities: List,
-        arff_file: str=None,
+        arff_file: str = None,
 ) -> OpenMLDataset:
     """Create a dataset object from a description dict.
 

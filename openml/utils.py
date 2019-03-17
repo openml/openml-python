@@ -290,9 +290,9 @@ def _create_lockfiles_dir():
 
 def _download_text_file(source: str,
                         output_path: str,
-                        md5_checksum: str=None,
-                        exists_ok: bool=True,
-                        encoding: str='utf8',
+                        md5_checksum: str = None,
+                        exists_ok: bool = True,
+                        encoding: str = 'utf8',
                         ) -> None:
     """ Download the text file at `source` and store it in `output_path`.
 

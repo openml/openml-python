@@ -407,12 +407,12 @@ class OpenMLDataset(object):
         from .functions import _get_dataset_arff
         self.data_file = _get_dataset_arff(self)
 
-    def get_data(self, target: str=None,
-                 include_row_id: bool=False,
-                 include_ignore_attributes: bool=False,
-                 return_categorical_indicator: bool=False,
-                 return_attribute_names: bool=False,
-                 dataset_format: str=None):
+    def get_data(self, target: str = None,
+                 include_row_id: bool = False,
+                 include_ignore_attributes: bool = False,
+                 return_categorical_indicator: bool = False,
+                 return_attribute_names: bool = False,
+                 dataset_format: str = None):
         """ Returns dataset content as dataframes or sparse matrices.
 
         Parameters
