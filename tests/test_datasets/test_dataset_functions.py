@@ -261,6 +261,14 @@ class TestOpenMLDataset(TestBase):
         self.assertFalse(os.path.exists(os.path.join(
             openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")))
 
+        datasets[0].get_data()
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+
+        datasets[1].get_data()
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")))
+
     def test_get_dataset(self):
         dataset = openml.datasets.get_dataset(1)
         self.assertEqual(type(dataset), OpenMLDataset)
@@ -297,6 +305,10 @@ class TestOpenMLDataset(TestBase):
 
         self.assertGreater(len(dataset.features), 1)
         self.assertGreater(len(dataset.qualities), 4)
+
+        dataset.get_data()
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
 
         # Issue324 Properly handle private datasets when trying to access them
         openml.config.server = self.production_server
