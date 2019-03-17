@@ -401,6 +401,12 @@ class OpenMLDataset(object):
         return pd.Series(col, index=series.index, dtype='category',
                          name=series.name)
 
+    def _download_data(self) -> None:
+        """ Download ARFF data file to standard cache directory. Set `self.data_file`. """
+        # import required here to avoid circular import.
+        from .functions import _get_dataset_arff
+        self.data_file = _get_dataset_arff(self)
+
     def get_data(self, target: str=None,
                  include_row_id: bool=False,
                  include_ignore_attributes: bool=False,
@@ -450,9 +456,7 @@ class OpenMLDataset(object):
 
         if self.data_pickle_file is None:
             if self.data_file is None:
-                # import required hero to avoid circular import.
-                from .functions import _get_dataset_arff
-                self.data_file = _get_dataset_arff(self)
+                self._download_data()
             self.data_pickle_file = self._data_arff_to_pickle(self.data_file)
 
         path = self.data_pickle_file
@@ -570,6 +574,9 @@ class OpenMLDataset(object):
 
         # TODO improve performance, currently reads the whole file
         # Should make a method that only reads the attributes
+        if self.data_file is None:
+            self._download_data()
+
         arffFileName = self.data_file
 
         if self.format.lower() == 'arff':
