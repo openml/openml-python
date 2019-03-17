@@ -314,6 +314,32 @@ class TestOpenMLDataset(TestBase):
         openml.config.server = self.production_server
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
 
+    def test_get_dataset_lazy_all_functions(self):
+        """ Test that all expected functionality is available without downloading the dataset. """
+        dataset = openml.datasets.get_dataset(1, download_data=False)
+        # We only tests functions as general integrity is tested by test_get_dataset_lazy
+
+        dataset.push_tag('lazy_tag')
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+
+        dataset.remove_tag('lazy_tag')
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+
+        nominal_indices = dataset.get_features_by_type('nominal')
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+        correct = [0, 1, 2, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                   20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 35, 36, 37, 38]
+        self.assertEqual(nominal_indices, correct)
+
+        # Due to the current implementation, retrieve_class_labels must download the file
+        classes = dataset.retrieve_class_labels()
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+        self.assertEqual(classes, ['1', '2', '3', '4', '5', 'U'])
+
     def test_get_dataset_sparse(self):
         dataset = openml.datasets.get_dataset(102)
         X = dataset.get_data(dataset_format='array')
@@ -493,7 +519,7 @@ class TestOpenMLDataset(TestBase):
             attributes_arff_from_df(df)
 
     def test_attributes_arff_from_df_unknown_dtype(self):
-        # check that an error is raised when the dtype is not supported by
+        # check that an error is raised when the dtype is not supptagorted by
         # liac-arff
         data = [
             [[1], ['2'], [3.]],
