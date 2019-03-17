@@ -3,6 +3,7 @@ import io
 import os
 import re
 import warnings
+from typing import Dict, List
 
 import numpy as np
 import arff
@@ -268,24 +269,23 @@ def __list_datasets(api_call):
     return datasets
 
 
-def check_datasets_active(dataset_ids):
-    """Check if the dataset ids provided are active.
+def check_datasets_active(dataset_ids: List[int]) -> Dict[int, bool]:
+    """ Check if the dataset ids provided are active.
 
     Parameters
     ----------
-    dataset_ids : iterable
-        Integers representing dataset ids.
+    dataset_ids : List[int]
+        A list of integers representing dataset ids.
 
     Returns
     -------
     dict
         A dictionary with items {did: bool}
     """
-    dataset_list = list_datasets()
-    dataset_ids = sorted(dataset_ids)
+    dataset_list = list_datasets(status='all')
     active = {}
 
-    for dataset in dataset_list:
+    for dataset in dataset_list.values():
         active[dataset['did']] = dataset['status'] == 'active'
 
     for did in dataset_ids:
