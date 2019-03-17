@@ -335,8 +335,9 @@ class TestOpenMLDataset(TestBase):
         }
         self.assertRaisesRegex(
             OpenMLHashException,
-            'Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded dataset 5 '
-            'is unequal to the checksum abc sent by the server.',
+            'Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded file '
+            'is unequal to the expected checksum abc. '
+            'Raised when downloading dataset 5.',
             _get_dataset_arff,
             self.workdir, description,
         )

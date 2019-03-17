@@ -1,8 +1,10 @@
 import os
+import hashlib
 import xmltodict
 import shutil
 
 import openml._api_calls
+import openml.exceptions
 from . import config
 
 
@@ -284,3 +286,53 @@ def _create_lockfiles_dir():
     except OSError:
         pass
     return dir
+
+
+def _download_text_file(source: str,
+                        output_path: str,
+                        md5_checksum: str=None,
+                        exists_ok: bool=True,
+                        encoding: str='utf8',
+                        ) -> None:
+    """ Download the text file at `source` and store it in `output_path`.
+
+    By default, do nothing if a file already exists in `output_path`.
+    The downloaded file can be checked against an expected md5 checksum.
+
+    Parameters
+    ----------
+    source : str
+        url of the file to be downloaded
+    output_path : str
+        full path, including filename, of where the file should be stored.
+    md5_checksum : str, optional (default=None)
+        If not None, should be a string of hexidecimal digits of the expected digest value.
+    exists_ok : bool, optional (default=True)
+        If False, raise an FileExistsError if there already exists a file at `output_path`.
+    encoding : str, optional (default='utf8')
+        The encoding with which the file should be stored.
+    """
+    try:
+        with open(output_path, encoding=encoding):
+            if exists_ok:
+                return
+            else:
+                raise FileExistsError
+    except FileNotFoundError:
+        pass
+
+    downloaded_file = openml._api_calls._read_url(source, request_method='get')
+
+    if md5_checksum is not None:
+        md5 = hashlib.md5()
+        md5.update(downloaded_file.encode('utf-8'))
+        md5_checksum_download = md5.hexdigest()
+        if md5_checksum != md5_checksum_download:
+            raise openml.exceptions.OpenMLHashException(
+                'Checksum {} of downloaded file is unequal to the expected checksum {}.'
+                .format(md5_checksum_download, md5_checksum))
+
+    with open(output_path, "w", encoding=encoding) as fh:
+        fh.write(downloaded_file)
+
+    del downloaded_file
