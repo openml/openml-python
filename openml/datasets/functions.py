@@ -315,7 +315,7 @@ def get_datasets(
     Parameters
     ----------
     dataset_ids : iterable
-        Integers representing dataset ids.
+        Integers or strings representing dataset ids.
     download_data : bool, optional
         If True, also download the data file. Beware that some datasets are large and it might
         make the operation noticeably slower. Metadata is also still retrieved.
@@ -333,7 +333,7 @@ def get_datasets(
     return datasets
 
 
-def get_dataset(dataset_id: int, download_data: bool = True) -> OpenMLDataset:
+def get_dataset(dataset_id: Union[int, str], download_data: bool = True) -> OpenMLDataset:
     """ Download the OpenML dataset representation, optionally also download actual data file.
 
     This function is thread/multiprocessing safe.
@@ -342,7 +342,7 @@ def get_dataset(dataset_id: int, download_data: bool = True) -> OpenMLDataset:
 
     Parameters
     ----------
-    dataset_id : int
+    dataset_id : int or str
         Dataset ID of the dataset to download
     download_data : bool, optional (default=True)
         If True, also download the data file. Beware that some datasets are large and it might
