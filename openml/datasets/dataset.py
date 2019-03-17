@@ -175,6 +175,7 @@ class OpenMLDataset(object):
         data_pickle_file = data_file.replace('.arff', '.pkl.py3')
         if os.path.exists(data_pickle_file):
             logger.debug("Data pickle file already exists.")
+            return data_pickle_file
         else:
             try:
                 data = self._get_arff(self.format)
