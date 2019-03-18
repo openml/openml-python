@@ -336,7 +336,7 @@ class TestOpenMLDataset(TestBase):
 
         classes = dataset.retrieve_class_labels()
         self.assertEqual(classes, ['1', '2', '3', '4', '5', 'U'])
-        
+
         self.assertFalse(os.path.exists(os.path.join(
             openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
 
