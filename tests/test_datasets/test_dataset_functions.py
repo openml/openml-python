@@ -334,11 +334,11 @@ class TestOpenMLDataset(TestBase):
                    20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 35, 36, 37, 38]
         self.assertEqual(nominal_indices, correct)
 
-        # Due to the current implementation, retrieve_class_labels must download the file
         classes = dataset.retrieve_class_labels()
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
         self.assertEqual(classes, ['1', '2', '3', '4', '5', 'U'])
+        
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
 
     def test_get_dataset_sparse(self):
         dataset = openml.datasets.get_dataset(102)
