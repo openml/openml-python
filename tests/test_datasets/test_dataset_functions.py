@@ -239,6 +239,36 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(os.path.exists(os.path.join(
             openml.config.get_cache_directory(), "datasets", "2", "qualities.xml")))
 
+    def test_get_datasets_lazy(self):
+        dids = [1, 2]
+        datasets = openml.datasets.get_datasets(dids, download_data=False)
+        self.assertEqual(len(datasets), 2)
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "description.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "2", "description.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "2", "features.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "2", "qualities.xml")))
+
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")))
+
+        datasets[0].get_data()
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+
+        datasets[1].get_data()
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")))
+
     def test_get_dataset(self):
         dataset = openml.datasets.get_dataset(1)
         self.assertEqual(type(dataset), OpenMLDataset)
@@ -258,6 +288,58 @@ class TestOpenMLDataset(TestBase):
         # Issue324 Properly handle private datasets when trying to access them
         openml.config.server = self.production_server
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
+
+    def test_get_dataset_lazy(self):
+        dataset = openml.datasets.get_dataset(1, download_data=False)
+        self.assertEqual(type(dataset), OpenMLDataset)
+        self.assertEqual(dataset.name, 'anneal')
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "description.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
+
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+
+        self.assertGreater(len(dataset.features), 1)
+        self.assertGreater(len(dataset.qualities), 4)
+
+        dataset.get_data()
+        self.assertTrue(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+
+        # Issue324 Properly handle private datasets when trying to access them
+        openml.config.server = self.production_server
+        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
+
+    def test_get_dataset_lazy_all_functions(self):
+        """ Test that all expected functionality is available without downloading the dataset. """
+        dataset = openml.datasets.get_dataset(1, download_data=False)
+        # We only tests functions as general integrity is tested by test_get_dataset_lazy
+
+        tag = 'test_lazy_tag_%d' % random.randint(1, 1000000)
+        dataset.push_tag(tag)
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+
+        dataset.remove_tag(tag)
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+
+        nominal_indices = dataset.get_features_by_type('nominal')
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+        correct = [0, 1, 2, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                   20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 35, 36, 37, 38]
+        self.assertEqual(nominal_indices, correct)
+
+        classes = dataset.retrieve_class_labels()
+        self.assertEqual(classes, ['1', '2', '3', '4', '5', 'U'])
+
+        self.assertFalse(os.path.exists(os.path.join(
+            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
 
     def test_get_dataset_sparse(self):
         dataset = openml.datasets.get_dataset(102)
@@ -280,7 +362,7 @@ class TestOpenMLDataset(TestBase):
     def test__getarff_path_dataset_arff(self):
         openml.config.cache_directory = self.static_cache_dir
         description = openml.datasets.functions._get_cached_dataset_description(2)
-        arff_path = _get_dataset_arff(self.workdir, description)
+        arff_path = _get_dataset_arff(description, cache_directory=self.workdir)
         self.assertIsInstance(arff_path, str)
         self.assertTrue(os.path.exists(arff_path))
 
@@ -292,10 +374,11 @@ class TestOpenMLDataset(TestBase):
         }
         self.assertRaisesRegex(
             OpenMLHashException,
-            'Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded dataset 5 '
-            'is unequal to the checksum abc sent by the server.',
+            'Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded file '
+            'is unequal to the expected checksum abc. '
+            'Raised when downloading dataset 5.',
             _get_dataset_arff,
-            self.workdir, description,
+            description,
         )
 
     def test__get_dataset_features(self):
@@ -437,7 +520,7 @@ class TestOpenMLDataset(TestBase):
             attributes_arff_from_df(df)
 
     def test_attributes_arff_from_df_unknown_dtype(self):
-        # check that an error is raised when the dtype is not supported by
+        # check that an error is raised when the dtype is not supptagorted by
         # liac-arff
         data = [
             [[1], ['2'], [3.]],
