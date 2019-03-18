@@ -278,7 +278,7 @@ def _load_features_from_file(features_file: str) -> Dict:
                                    force_list=('oml:feature', 'oml:nominal_value'))
         return xml_dict["oml:data_features"]
 
-      
+
 def check_datasets_active(dataset_ids: List[int]) -> Dict[int, bool]:
     """ Check if the dataset ids provided are active.
 
