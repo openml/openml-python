@@ -1,4 +1,3 @@
-import unittest
 import os
 import random
 from itertools import product
@@ -206,10 +205,11 @@ class TestOpenMLDataset(TestBase):
 
         self.assertIsInstance(datasets, dict)
 
-    @unittest.skip('See https://github.com/openml/openml-python/issues/149')
     def test_check_datasets_active(self):
-        active = openml.datasets.check_datasets_active([1, 17])
-        self.assertTrue(active[1])
+        # Have to test on live because there is no deactivated dataset on the test server.
+        openml.config.server = self.production_server
+        active = openml.datasets.check_datasets_active([2, 17])
+        self.assertTrue(active[2])
         self.assertFalse(active[17])
         self.assertRaisesRegex(
             ValueError,
@@ -217,6 +217,7 @@ class TestOpenMLDataset(TestBase):
             openml.datasets.check_datasets_active,
             [79],
         )
+        openml.config.server = self.test_server
 
     def test_get_datasets(self):
         dids = [1, 2]
