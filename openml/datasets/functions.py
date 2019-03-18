@@ -792,7 +792,7 @@ def _get_dataset_features(did_cache_dir, dataset_id):
         with io.open(features_file, "w", encoding='utf8') as fh:
             fh.write(features_xml)
 
-    xml_as_dict = xmltodict.parse(features_xml, force_list=('oml:feature',))
+    xml_as_dict = xmltodict.parse(features_xml, force_list=('oml:feature','oml:nominal_value'))
     features = xml_as_dict["oml:data_features"]
 
     return features
