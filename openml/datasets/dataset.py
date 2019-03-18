@@ -157,7 +157,7 @@ class OpenMLDataset(object):
                 feature = OpenMLDataFeature(int(xmlfeature['oml:index']),
                                             xmlfeature['oml:name'],
                                             xmlfeature['oml:data_type'],
-                                            None,
+                                            xmlfeature.get('oml:nominal_value'),
                                             int(nr_missing))
                 if idx != feature.index:
                     raise ValueError('Data features not provided '
@@ -572,29 +572,10 @@ class OpenMLDataset(object):
         -------
         list
         """
-
-        # TODO improve performance, currently reads the whole file
-        # Should make a method that only reads the attributes
-        if self.data_file is None:
-            self._download_data()
-
-        arffFileName = self.data_file
-
-        if self.format.lower() == 'arff':
-            return_type = arff.DENSE
-        elif self.format.lower() == 'sparse_arff':
-            return_type = arff.COO
-        else:
-            raise ValueError('Unknown data format %s' % self.format)
-
-        with io.open(arffFileName, encoding='utf8') as fh:
-            arffData = arff.ArffDecoder().decode(fh, return_type=return_type)
-
-        dataAttributes = dict(arffData['attributes'])
-        if target_name in dataAttributes:
-            return dataAttributes[target_name]
-        else:
-            return None
+        for feature in self.features.values():
+            if (feature.name == target_name) and (feature.data_type == 'nominal'):
+                return feature.nominal_values
+        return None
 
     def get_features_by_type(self, data_type, exclude=None,
                              exclude_ignore_attributes=True,
