@@ -129,9 +129,7 @@ def _get_cached_dataset_features(dataset_id):
     )
     features_file = os.path.join(did_cache_dir, "features.xml")
     try:
-        with io.open(features_file, encoding='utf8') as fh:
-            features_xml = fh.read()
-            return xmltodict.parse(features_xml)["oml:data_features"]
+        return _load_features_from_file(features_file)
     except (IOError, OSError):
         raise OpenMLCacheException("Dataset features for dataset id %d not "
                                    "cached" % dataset_id)
@@ -271,6 +269,14 @@ def __list_datasets(api_call):
         datasets[did] = dataset
 
     return datasets
+
+
+def _load_features_from_file(features_file: str) -> Dict:
+    with io.open(features_file, encoding='utf8') as fh:
+        features_xml = fh.read()
+        xml_dict = xmltodict.parse(features_xml,
+                                   force_list=('oml:feature', 'oml:nominal_value'))
+        return xml_dict["oml:data_features"]
 
 
 def check_datasets_active(dataset_ids):
@@ -782,20 +788,13 @@ def _get_dataset_features(did_cache_dir, dataset_id):
     features_file = os.path.join(did_cache_dir, "features.xml")
 
     # Dataset features aren't subject to change...
-    try:
-        with io.open(features_file, encoding='utf8') as fh:
-            features_xml = fh.read()
-    except (OSError, IOError):
+    if not os.path.isfile(features_file):
         url_extension = "data/features/{}".format(dataset_id)
         features_xml = openml._api_calls._perform_api_call(url_extension, 'get')
-
         with io.open(features_file, "w", encoding='utf8') as fh:
             fh.write(features_xml)
 
-    xml_as_dict = xmltodict.parse(features_xml, force_list=('oml:feature','oml:nominal_value'))
-    features = xml_as_dict["oml:data_features"]
-
-    return features
+    return _load_features_from_file(features_file)
 
 
 def _get_dataset_qualities(did_cache_dir, dataset_id):
