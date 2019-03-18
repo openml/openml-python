@@ -34,7 +34,6 @@ install:
   - conda clean --packages
   - conda update conda --yes
   - conda update --all --yes
-  - conda update --all --yes setuptools=23
 
   # Install the build and runtime dependencies of the project.
   - "cd C:\\projects\\openml-python"
