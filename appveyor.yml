@@ -29,9 +29,8 @@ install:
   - rmdir C:\\cygwin /s /q
 
   # Update previous packages and install the build and runtime dependencies of the project.
-  # XXX: setuptools>23 is currently broken on Win+py3 with numpy
-  # (https://github.com/pypa/setuptools/issues/728)
-  - conda update --all --yes setuptools=23
+  - conda update conda --yes
+  - conda update --all --yes
 
   # Install the build and runtime dependencies of the project.
   - "cd C:\\projects\\openml-python"

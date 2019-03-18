@@ -78,6 +78,15 @@ print(X.head())
 print(X.info())
 
 ############################################################################
+# Sometimes you only need access to a dataset's metadata.
+# In those cases, you can download the dataset without downloading the
+# data file. The dataset object can be used as normal.
+# Whenever you use any functionality that requires the data,
+# such as `get_data`, the data will be downloaded.
+dataset = openml.datasets.get_dataset(68, download_data=False)
+
+
+############################################################################
 # Exercise 2
 # **********
 # * Explore the data visually.
