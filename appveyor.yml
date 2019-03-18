@@ -29,7 +29,6 @@ install:
   - rmdir C:\\cygwin /s /q
 
   # Update previous packages and install the build and runtime dependencies of the project.
-  - conda update conda --yes
   - conda update --all --yes
 
   # Install the build and runtime dependencies of the project.
