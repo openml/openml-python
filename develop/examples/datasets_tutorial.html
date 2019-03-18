@@ -146,7 +146,7 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 3204 datasets...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 3290 datasets...
 </pre></div>
 </div>
 <div class="section" id="exercise-1">
@@ -261,6 +261,14 @@ memory usage: 1.6 MB
 None
 </pre></div>
 </div>
+<p>Sometimes you only need access to a dataset’s metadata.
+In those cases, you can download the dataset without downloading the
+data file. The dataset object can be used as normal.
+Whenever you use any functionality that requires the data,
+such as <cite>get_data</cite>, the data will be downloaded.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">68</span><span class="p">,</span> <span class="n">download_data</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="section" id="exercise-2">
 <h3>Exercise 2<a class="headerlink" href="#exercise-2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
@@ -279,7 +287,7 @@ None
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_datasets_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_datasets_tutorial_001.png" />
-<p><strong>Total running time of the script:</strong> ( 0 minutes  3.012 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  3.115 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-datasets-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/ea68bafc2f0d401c0e0139e9c46c83d5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></div>

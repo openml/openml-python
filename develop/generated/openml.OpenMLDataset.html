@@ -223,7 +223,7 @@ which maps a quality name to a quality value.</p>
 </table>
 <dl class="method">
 <dt id="openml.OpenMLDataset.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>target=None</em>, <em>include_row_id=False</em>, <em>include_ignore_attributes=False</em>, <em>return_categorical_indicator=False</em>, <em>return_attribute_names=False</em>, <em>dataset_format=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>target: str = None</em>, <em>include_row_id: bool = False</em>, <em>include_ignore_attributes: bool = False</em>, <em>return_categorical_indicator: bool = False</em>, <em>return_attribute_names: bool = False</em>, <em>dataset_format: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns dataset content as dataframes or sparse matrices.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -247,10 +247,10 @@ categorical.</p>
 <dt><strong>return_attribute_names</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean (default=False)</span></dt>
 <dd><p class="first last">Whether to return attribute names.</p>
 </dd>
-<dt><strong>dataset_format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
-<dd><p class="first last">The format of returned dataset. If <code class="docutils literal notranslate"><span class="pre">array</span></code>, the returned dataset
-will be a NumPy array or a SciPy sparse matrix. If <code class="docutils literal notranslate"><span class="pre">dataframe</span></code>,
-the returned dataset will be a Pandas DataFrame or SparseDataFrame.</p>
+<dt><strong>dataset_format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">The format of returned dataset.
+If <code class="docutils literal notranslate"><span class="pre">array</span></code>, the returned dataset will be a NumPy array or a SciPy sparse matrix.
+If <code class="docutils literal notranslate"><span class="pre">dataframe</span></code>, the returned dataset will be a Pandas DataFrame or SparseDataFrame.</p>
 </dd>
 </dl>
 </td>
@@ -263,12 +263,12 @@ the returned dataset will be a Pandas DataFrame or SparseDataFrame.</p>
 <dd><p class="first last">Target column(s). Only returned if target is not None.</p>
 </dd>
 <dt><strong>categorical_indicator</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean ndarray</span></dt>
-<dd><p class="first last">Mask that indicate categorical features. Only returned if
-return_categorical_indicator is True.</p>
+<dd><p class="first last">Mask that indicate categorical features.
+Only returned if return_categorical_indicator is True.</p>
 </dd>
 <dt><strong>return_attribute_names</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings</span></dt>
-<dd><p class="first last">List of attribute names. Returned only if return_attribute_names is
-True.</p>
+<dd><p class="first last">List of attribute names.
+Only returned if return_attribute_names is True.</p>
 </dd>
 </dl>
 </td>

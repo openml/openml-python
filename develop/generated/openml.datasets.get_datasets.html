@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.get_datasets<a class="headerlink" href="#openml-datasets-get-datasets" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.datasets.get_datasets">
-<code class="descclassname">openml.datasets.</code><code class="descname">get_datasets</code><span class="sig-paren">(</span><em>dataset_ids</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.get_datasets" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.datasets.</code><code class="descname">get_datasets</code><span class="sig-paren">(</span><em>dataset_ids: List[Union[str, int]], download_data: bool = True</em><span class="sig-paren">)</span> &#x2192; List[openml.datasets.dataset.OpenMLDataset]<a class="headerlink" href="#openml.datasets.get_datasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download datasets.</p>
 <p>This function iterates <a class="reference internal" href="openml.datasets.get_dataset.html#openml.datasets.get_dataset" title="openml.datasets.get_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">openml.datasets.get_dataset()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -122,7 +122,13 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>dataset_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">iterable</span></dt>
-<dd><p class="first last">Integers representing dataset ids.</p>
+<dd><p class="first last">Integers or strings representing dataset ids.</p>
+</dd>
+<dt><strong>download_data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd><p class="first last">If True, also download the data file. Beware that some datasets are large and it might
+make the operation noticeably slower. Metadata is also still retrieved.
+If False, create the OpenMLDataset and only populate it with the metadata.
+The data may later be retrieved through the <cite>OpenMLDataset.get_data</cite> method.</p>
 </dd>
 </dl>
 </td>
