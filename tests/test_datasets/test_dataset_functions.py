@@ -319,11 +319,12 @@ class TestOpenMLDataset(TestBase):
         dataset = openml.datasets.get_dataset(1, download_data=False)
         # We only tests functions as general integrity is tested by test_get_dataset_lazy
 
-        dataset.push_tag('lazy_tag')
+        tag = 'test_lazy_tag_%d' % random.randint(1, 1000000)
+        dataset.push_tag(tag)
         self.assertFalse(os.path.exists(os.path.join(
             openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
 
-        dataset.remove_tag('lazy_tag')
+        dataset.remove_tag(tag)
         self.assertFalse(os.path.exists(os.path.join(
             openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
 
