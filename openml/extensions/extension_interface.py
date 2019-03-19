@@ -1,12 +1,11 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import Any, List, Optional, Tuple
 
 from openml import OpenMLTask, OpenMLFlow
 from openml.runs.trace import OpenMLTraceIteration, OpenMLRunTrace
 
 
-class Extension:
-    __metaclass__ = ABCMeta
+class Extension(ABC):
 
     """Defines the interface to connect machine learning libraries to OpenML-Python.
     """
