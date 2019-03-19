@@ -29,6 +29,17 @@ class TestStudyFunctions(TestBase):
         self.assertIsNone(study.setups)
         self.assertIsNone(study.runs)
 
+    def test_get_tasks_new_studies(self):
+        study_id = 99
+
+        study = openml.study.get_study(study_id, 'tasks')
+        self.assertGreater(len(study.data), 0)
+        self.assertGreaterEqual(len(study.tasks), len(study.data))
+        # other entities should be None because of the tasks filter
+        self.assertIsNone(study.flows)
+        self.assertIsNone(study.setups)
+        self.assertIsNone(study.runs)
+
     def test_publish_benchmark_suite(self):
         fixture_alias = None
         fixture_name = 'unit tested benchmark suite'
