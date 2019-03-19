@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import os
+from typing import Dict, List, Union  # noqa: F401
 
 import xmltodict
 
@@ -165,8 +166,8 @@ class OpenMLFlow(object):
             Flow represented as OrderedDict.
 
         """
-        flow_container = OrderedDict()
-        flow_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])
+        flow_container = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
+        flow_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])  # type: 'OrderedDict[str, Union[List, str]]'  # noqa E501
         flow_container['oml:flow'] = flow_dict
         _add_if_nonempty(flow_dict, 'oml:id', self.flow_id)
 
@@ -182,7 +183,7 @@ class OpenMLFlow(object):
 
         flow_parameters = []
         for key in self.parameters:
-            param_dict = OrderedDict()
+            param_dict = OrderedDict()  # type: 'OrderedDict[str, str]'
             param_dict['oml:name'] = key
             meta_info = self.parameters_meta_info[key]
 
@@ -209,10 +210,9 @@ class OpenMLFlow(object):
 
         components = []
         for key in self.components:
-            component_dict = OrderedDict()
+            component_dict = OrderedDict()  # type: 'OrderedDict[str, Dict]'
             component_dict['oml:identifier'] = key
-            component_dict['oml:flow'] = \
-                self.components[key]._to_dict()['oml:flow']
+            component_dict['oml:flow'] = self.components[key]._to_dict()['oml:flow']
 
             for key_ in component_dict:
                 # We only need to check if the key is a string, because the

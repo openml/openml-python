@@ -10,6 +10,7 @@ from oslo_concurrency import lockutils
 from ..exceptions import OpenMLCacheException
 import openml._api_calls
 from . import OpenMLFlow
+from openml.extensions import Extension
 import openml.utils
 
 FLOWS_CACHE_DIR_NAME = 'flows'
@@ -23,7 +24,7 @@ def _get_cached_flows() -> OrderedDict:
     flows : OrderedDict
         Dictionary with flows. Each flow is an instance of OpenMLFlow.
     """
-    flows = OrderedDict()
+    flows = OrderedDict()  # type: 'OrderedDict[int, OpenMLFlow]'
 
     flow_cache_dir = openml.utils._create_cache_directory(FLOWS_CACHE_DIR_NAME)
     directory_content = os.listdir(flow_cache_dir)
@@ -69,7 +70,11 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
                                    "cached" % fid)
 
 
-def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
+def get_flow(
+    flow_id: int,
+    reinstantiate: bool = False,
+    extension: Extension = None,
+) -> OpenMLFlow:
     """Download the OpenML flow for a given flow ID.
 
     Parameters
@@ -81,6 +86,10 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
         Whether to reinstantiate the flow to a sklearn model.
         Note that this can only be done with sklearn flows, and
         when
+
+    extension: openml.extension.Extension
+        Reinstantiate the flow with the given extension. Does not reinstantiate the flow if the
+        extension is ``None``.
 
     Returns
     -------
@@ -94,11 +103,8 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
     ):
         flow = _get_flow_description(flow_id)
 
-    if reinstantiate:
-        if not (flow.external_version.startswith('sklearn==')
-                or ',sklearn==' in flow.external_version):
-            raise ValueError('Only sklearn flows can be reinstantiated')
-        flow.model = openml.flows.flow_to_sklearn(flow)
+    if reinstantiate and extension is not None:
+        flow.model = extension.flow_to_model(flow)
 
     return flow
 

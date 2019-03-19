@@ -1,11 +1,13 @@
 from collections import OrderedDict
-
 import io
-import openml
 import os
+import typing
+
 import xmltodict
 
+import openml
 from .. import config
+from openml.extensions import Extension
 from .setup import OpenMLSetup, OpenMLParameter
 from openml.flows import flow_exists
 import openml.exceptions
@@ -189,7 +191,10 @@ def __list_setups(api_call):
     return setups
 
 
-def initialize_model(setup_id):
+def initialize_model(
+    setup_id: int,
+    extension: Extension,
+) -> typing.Any:
     """
     Initialized a model based on a setup_id (i.e., using the exact
     same parameter settings)
@@ -199,17 +204,18 @@ def initialize_model(setup_id):
     setup_id : int
         The Openml setup_id
 
+    extension :
+
     Returns
     -------
-    model : sklearn model
-        the scikitlearn model with all parameters initialized
+    model
     """
     setup = get_setup(setup_id)
     flow = openml.flows.get_flow(setup.flow_id)
 
-    # instead of using scikit-learns "set_params" function, we override the
+    # instead of using scikit-learns or any other library's "set_params" function, we override the
     # OpenMLFlow objects default parameter value so we can utilize the
-    # flow_to_sklearn function to reinitialize the flow with the set defaults.
+    # Extension.flow_to_model() function to reinitialize the flow with the set defaults.
     for hyperparameter in setup.parameters.values():
         structure = flow.get_structure('flow_id')
         if len(structure[hyperparameter.flow_id]) > 0:
@@ -219,7 +225,7 @@ def initialize_model(setup_id):
         subflow.parameters[hyperparameter.parameter_name] = \
             hyperparameter.value
 
-    model = openml.flows.flow_to_sklearn(flow)
+    model = extension.flow_to_model(flow)
     return model
 
 

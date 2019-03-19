@@ -2,6 +2,7 @@ from collections import OrderedDict
 import pickle
 import sys
 import time
+from typing import TextIO, IO  # noqa: F401
 import numpy as np
 
 import arff
@@ -155,13 +156,14 @@ class OpenMLRun(object):
         run_xml = self._create_description_xml()
         predictions_arff = arff.dumps(self._generate_arff_dict())
 
-        with open(os.path.join(directory, 'description.xml'), 'w') as f:
-            f.write(run_xml)
-        with open(os.path.join(directory, 'predictions.arff'), 'w') as f:
-            f.write(predictions_arff)
+        # It seems like typing does not allow to define the same variable multiple times
+        with open(os.path.join(directory, 'description.xml'), 'w') as fh_1:  # type: TextIO
+            fh_1.write(run_xml)
+        with open(os.path.join(directory, 'predictions.arff'), 'w') as fh_2:  # type: TextIO
+            fh_2.write(predictions_arff)
         if store_model:
-            with open(os.path.join(directory, 'model.pkl'), 'wb') as f:
-                pickle.dump(self.model, f)
+            with open(os.path.join(directory, 'model.pkl'), 'wb') as fh_b:  # type: IO[bytes]
+                pickle.dump(self.model, fh_b)
 
         if self.flow_id is None:
             self.flow.to_filesystem(directory)
