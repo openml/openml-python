@@ -1,17 +1,19 @@
 from collections import OrderedDict
 import io
 import os
-import typing
+from typing import Any, TYPE_CHECKING
 
 import xmltodict
 
 import openml
 from .. import config
-from openml.extensions import Extension
 from .setup import OpenMLSetup, OpenMLParameter
 from openml.flows import flow_exists
 import openml.exceptions
 import openml.utils
+
+if TYPE_CHECKING:
+    from openml.extensions.extension_interface import Extension
 
 
 def setup_exists(flow):
@@ -42,7 +44,7 @@ def setup_exists(flow):
         raise ValueError('This should not happen!')
 
     # TODO: currently hard-coded sklearn assumption
-    openml_param_settings = openml.flows.obtain_parameter_values(flow)
+    openml_param_settings = openml.flows.sklearn_converter.obtain_parameter_values(flow)
     description = xmltodict.unparse(_to_dict(flow.flow_id,
                                              openml_param_settings),
                                     pretty=True)
@@ -193,8 +195,8 @@ def __list_setups(api_call):
 
 def initialize_model(
     setup_id: int,
-    extension: Extension,
-) -> typing.Any:
+    extension: 'Extension',
+) -> Any:
     """
     Initialized a model based on a setup_id (i.e., using the exact
     same parameter settings)

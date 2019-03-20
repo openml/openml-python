@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-from openml import OpenMLTask, OpenMLFlow
-from openml.runs.trace import OpenMLTraceIteration, OpenMLRunTrace
+from ..tasks.task import OpenMLTask
+from ..flows.flow import OpenMLFlow
+from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration
 
 
 class Extension(ABC):
@@ -25,6 +26,9 @@ class Extension(ABC):
     def flow_to_parameters(self, model: Any) -> List:
         pass
 
+    ################################################################################################
+    # Abstract methods for performing runs with extension modules
+
     @abstractmethod
     def is_estimator(self, model: Any) -> bool:
         pass
@@ -43,8 +47,20 @@ class Extension(ABC):
         sample_no: int,
         can_measure_runtime: bool,
         add_local_measures: bool,
-        extension: 'Extension',
     ) -> Tuple:
+        pass
+
+    @abstractmethod
+    def obtain_parameter_values(
+        self,
+        flow: OpenMLFlow,
+        model: Any = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Extracts all parameter settings required for the flow from the model.
+        If no explicit model is provided, the parameters will be extracted from `flow.model`
+        instead.
+        """
         pass
 
     ################################################################################################
@@ -75,7 +91,6 @@ class Extension(ABC):
     @abstractmethod
     def obtain_arff_trace(
         self,
-        extension: 'Extension',
         model: Any,
         trace_content: List,
     ) -> OpenMLRunTrace:

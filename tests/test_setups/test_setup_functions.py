@@ -3,6 +3,8 @@ import time
 
 import openml
 import openml.exceptions
+import openml.extensions.sklearn_extension
+import openml.flows.sklearn_converter
 from openml.testing import TestBase
 
 from sklearn.tree import DecisionTreeClassifier
@@ -52,7 +54,7 @@ class TestSetupFunctions(TestBase):
         sentinel = get_sentinel()
         # because of the sentinel, we can not use flows that contain subflows
         dectree = DecisionTreeClassifier()
-        flow = openml.flows.sklearn_to_flow(dectree)
+        flow = openml.flows.sklearn_converter.sklearn_to_flow(dectree)
         flow.name = 'TEST%s%s' % (sentinel, flow.name)
         flow.publish()
 
@@ -63,7 +65,9 @@ class TestSetupFunctions(TestBase):
         self.assertFalse(setup_id)
 
     def _existing_setup_exists(self, classif):
-        flow = openml.flows.sklearn_to_flow(classif)
+        extension = openml.extensions.sklearn_extension.SklearnExtension()
+
+        flow = openml.flows.sklearn_converter.sklearn_to_flow(classif)
         flow.name = 'TEST%s%s' % (get_sentinel(), flow.name)
         flow.publish()
 
@@ -76,7 +80,7 @@ class TestSetupFunctions(TestBase):
 
         # now run the flow on an easy task:
         task = openml.tasks.get_task(115)  # diabetes
-        run = openml.runs.run_flow_on_task(task, flow)
+        run = openml.runs.run_flow_on_task(task, flow, extension=extension)
         # spoof flow id, otherwise the sentinel is ignored
         run.flow_id = flow.flow_id
         run.publish()

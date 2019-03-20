@@ -11,6 +11,8 @@ from sklearn.preprocessing import Imputer
 
 from openml.testing import TestBase
 import openml
+import openml.flows.sklearn_converter
+import openml.extensions.sklearn_extension
 
 
 class TestRun(TestBase):
@@ -101,6 +103,8 @@ class TestRun(TestBase):
             self.assertIsNone(run_prime_trace_content)
 
     def test_to_from_filesystem_vanilla(self):
+        extension = openml.extensions.sklearn_extension.SklearnExtension()
+
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
             ('classifier', DecisionTreeClassifier(max_depth=1)),
@@ -109,6 +113,7 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(
             model=model,
             task=task,
+            extension=extension,
             add_local_measures=False,
             avoid_duplicate_runs=False,
             upload_flow=True
@@ -129,6 +134,8 @@ class TestRun(TestBase):
         run_prime.publish()
 
     def test_to_from_filesystem_search(self):
+        extension = openml.extensions.sklearn_extension.SklearnExtension()
+
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
             ('classifier', DecisionTreeClassifier(max_depth=1)),
@@ -145,6 +152,7 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(
             model=model,
             task=task,
+            extension=extension,
             add_local_measures=False,
             avoid_duplicate_runs=False,
         )
@@ -161,6 +169,8 @@ class TestRun(TestBase):
         run_prime.publish()
 
     def test_to_from_filesystem_no_model(self):
+        extension = openml.extensions.sklearn_extension.SklearnExtension()
+
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
             ('classifier', DummyClassifier()),
@@ -169,6 +179,7 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(
             model=model,
             task=task,
+            extension=extension,
             add_local_measures=False,
         )
 
@@ -189,6 +200,8 @@ class TestRun(TestBase):
         Publish a run tied to a local flow after it has first been saved to
          and loaded from disk.
         """
+        extension = openml.extensions.sklearn_extension.SklearnExtension()
+
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
             ('classifier', DummyClassifier()),
@@ -196,13 +209,14 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(119)
 
         # Make sure the flow does not exist on the server yet.
-        flow = openml.flows.sklearn_to_flow(model)
+        flow = openml.flows.sklearn_converter.sklearn_to_flow(model)
         self._add_sentinel_to_flow_name(flow)
         self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
 
         run = openml.runs.run_flow_on_task(
             flow=flow,
             task=task,
+            extension=extension,
             add_local_measures=False,
             avoid_duplicate_runs=False,
             upload_flow=False

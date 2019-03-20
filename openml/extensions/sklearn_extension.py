@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import json
 import time
-from typing import Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 import warnings
 
 import numpy as np
@@ -21,6 +21,7 @@ from openml.flows.sklearn_converter import (
     flow_to_sklearn,
     obtain_parameter_values,
 )
+from openml.flows import OpenMLFlow
 from openml.runs.trace import OpenMLRunTrace, PREFIX
 
 
@@ -101,7 +102,7 @@ class SklearnExtension(Extension):
         model.set_params(**random_states)
         return model
 
-    def _run_model_on_fold(
+    def run_model_on_fold(
         self,
         model: Any,
         task: OpenMLTask,
@@ -110,7 +111,6 @@ class SklearnExtension(Extension):
         sample_no: int,
         can_measure_runtime: bool,
         add_local_measures: bool,
-        extension: Extension,
     ) -> Tuple:
         """Internal function that executes a model on a fold (and possibly
            subsample) of the dataset. It returns the data that is necessary
@@ -139,8 +139,6 @@ class SklearnExtension(Extension):
             add_local_measures : bool
                 Determines whether to calculate a set of measures (i.e., predictive
                 accuracy) locally, to later verify server behaviour
-            extension : openml.extensions.Extension
-                BLABLABLA
 
             Returns
             -------
@@ -237,7 +235,7 @@ class SklearnExtension(Extension):
 
         # extract trace, if applicable
         arff_tracecontent = []  # type: List[List]
-        if extension.is_hpo_class(model_copy):
+        if self.is_hpo_class(model_copy):
             arff_tracecontent.extend(self._extract_trace_data(model_copy, rep_no, fold_no))
 
         if task.task_type_id in (
@@ -404,6 +402,18 @@ class SklearnExtension(Extension):
             arff_tracecontent.append(arff_line)
         return arff_tracecontent
 
+    def obtain_parameter_values(
+        self,
+        flow: OpenMLFlow,
+        model: Any = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Extracts all parameter settings required for the flow from the model.
+        If no explicit model is provided, the parameters will be extracted from `flow.model`
+        instead.
+        """
+        return obtain_parameter_values(flow=flow, model=model)
+
     def is_hpo_class(self, model):
         return isinstance(model, sklearn.model_selection._search.BaseSearchCV)
 
@@ -423,7 +433,7 @@ class SklearnExtension(Extension):
         base_estimator.set_params(**trace_iteration.get_parameters())
         return base_estimator
 
-    def obtain_arff_trace(self, extension, model, trace_content):
+    def obtain_arff_trace(self, model, trace_content):
         self.assert_hpo_class(model)
         self.assert_hpo_class_has_trace(model)
 

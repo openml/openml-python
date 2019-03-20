@@ -4,14 +4,17 @@ import os
 import io
 import re
 import xmltodict
-from typing import Union, Dict
+from typing import Union, Dict, TYPE_CHECKING
 from oslo_concurrency import lockutils
 
+import openml._api_calls
 from ..exceptions import OpenMLCacheException
 import openml._api_calls
 from . import OpenMLFlow
-from openml.extensions import Extension
 import openml.utils
+
+if TYPE_CHECKING:
+    from openml.extensions.extension_interface import Extension
 
 FLOWS_CACHE_DIR_NAME = 'flows'
 
@@ -72,7 +75,7 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
 
 def get_flow(
     flow_id: int,
-    extension: Extension = None,
+    extension: 'Extension' = None,
 ) -> OpenMLFlow:
     """Download the OpenML flow for a given flow ID.
 

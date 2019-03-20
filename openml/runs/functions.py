@@ -3,7 +3,7 @@ import io
 import json
 import os
 import sys
-from typing import Any, List, Optional, Tuple, Union  # noqa F401
+from typing import Any, List, Optional, Tuple, Union, TYPE_CHECKING  # noqa F401
 import warnings
 
 import numpy as np
@@ -15,7 +15,6 @@ import openml
 import openml.utils
 import openml._api_calls
 from openml.exceptions import PyOpenMLError
-from openml.extensions import Extension
 from openml import config
 from openml.flows.sklearn_converter import _check_n_jobs
 from openml.flows.flow import _copy_server_fields
@@ -27,6 +26,9 @@ from .run import OpenMLRun, _get_version_information
 from .trace import OpenMLRunTrace
 from ..tasks import TaskTypeEnum
 
+if TYPE_CHECKING:
+    from openml.extensions.extension_interface import Extension
+
 # _get_version_info, _get_dict and _create_setup_string are in run.py to avoid
 # circular imports
 
@@ -36,7 +38,7 @@ RUNS_CACHE_DIR_NAME = 'runs'
 def run_model_on_task(
     model: Any,
     task: OpenMLTask,
-    extension: Extension,
+    extension: 'Extension',
     avoid_duplicate_runs: bool = True,
     flow_tags: List[str] = None,
     seed: int = None,
@@ -105,7 +107,7 @@ def run_model_on_task(
 def run_flow_on_task(
     flow: OpenMLFlow,
     task: OpenMLTask,
-    extension: Extension,
+    extension: 'Extension',
     avoid_duplicate_runs: bool = True,
     flow_tags: List[str] = None,
     seed: int = None,
@@ -266,7 +268,7 @@ def get_run_trace(run_id: int) -> OpenMLRunTrace:
 
 def initialize_model_from_run(
     run_id: int,
-    extension: Extension,
+    extension: 'Extension',
 ) -> Any:
     """
     Initialized a model based on a run_id (i.e., using the exact
@@ -291,7 +293,7 @@ def initialize_model_from_trace(
     run_id: int,
     repeat: int,
     fold: int,
-    extension: Extension,
+    extension: 'Extension',
     iteration=None,
 ):
     """
@@ -373,7 +375,7 @@ def _run_exists(task_id, setup_id):
 def _run_task_get_arffcontent(
     model: Any,
     task: OpenMLTask,
-    extension: Extension,
+    extension: 'Extension',
     add_local_measures: bool,
 ):
     arff_datacontent = []  # type: List[List]
@@ -407,7 +409,6 @@ def _run_task_get_arffcontent(
                 ) = extension.run_model_on_fold(
                     model=model,
                     task=task,
-                    extension=extension,
                     rep_no=rep_no,
                     fold_no=fold_no,
                     sample_no=sample_no,
@@ -441,7 +442,7 @@ def _run_task_get_arffcontent(
     # Note that we need to use a fitted model (i.e., model_fold, and not model)
     # here, to ensure it contains the hyperparameter data (in cv_results_)
     if extension.is_hpo_class(model):
-        trace = extension.obtain_arff_trace(extension, model_fold, arff_tracecontent)  # type: Optional[OpenMLRunTrace]  # noqa E501
+        trace = extension.obtain_arff_trace(model_fold, arff_tracecontent)  # type: Optional[OpenMLRunTrace]  # noqa E501
     else:
         trace = None
 

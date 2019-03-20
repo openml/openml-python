@@ -90,6 +90,10 @@ class OpenMLRun(object):
         run : OpenMLRun
             the re-instantiated run object
         """
+
+        # Avoiding cyclic imports
+        import openml.runs.functions
+
         if not os.path.isdir(directory):
             raise ValueError('Could not find folder')
 
@@ -401,7 +405,9 @@ class OpenMLRun(object):
         if self.parameter_settings is None:
             if self.flow is None:
                 self.flow = openml.flows.get_flow(self.flow_id)
-            self.parameter_settings = openml.flows.obtain_parameter_values(self.flow, self.model)
+            self.parameter_settings = openml.flows.sklearn_converter.obtain_parameter_values(
+                self.flow, self.model,
+            )
 
         description_xml = self._create_description_xml()
         file_elements = {'description': ("description.xml", description_xml)}
