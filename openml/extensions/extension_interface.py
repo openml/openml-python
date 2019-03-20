@@ -54,10 +54,11 @@ class Extension(ABC):
     def is_hpo_class(self, model: Any) -> bool:
         pass
 
-    @abstractmethod
     def assert_hpo_class(self, model: Any) -> None:
         if not self.is_hpo_class(model):
-            raise ValueError("Flow model is not a hyperparameter optimization algorithm.")
+            raise AssertionError(
+                "Flow model %s is not a hyperparameter optimization algorithm." % model
+            )
 
     @abstractmethod
     def assert_hpo_class_has_trace(self, model: Any) -> None:

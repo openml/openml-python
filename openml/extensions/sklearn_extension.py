@@ -388,9 +388,10 @@ class SklearnExtension(Extension):
         return isinstance(model, sklearn.model_selection._search.BaseSearchCV)
 
     def assert_hpo_class(self, model):
-        if not isinstance(model, sklearn.model_selection._search.BaseSearchCV):
-            raise ValueError(
-                'Flow model is not an instance of sklearn.model_selection._search.BaseSearchCV'
+        if not self.is_hpo_class(model):
+            raise AssertionError(
+                'Flow model %s is not an instance of sklearn.model_selection._search.BaseSearchCV'
+                % model
             )
 
     def assert_hpo_class_has_trace(self, model):
@@ -403,11 +404,8 @@ class SklearnExtension(Extension):
         return base_estimator
 
     def obtain_arff_trace(self, extension, model, trace_content):
-        if not isinstance(model, sklearn.model_selection._search.BaseSearchCV):
-            raise ValueError('model should be instance of'
-                             ' sklearn.model_selection._search.BaseSearchCV')
-        if not hasattr(model, 'cv_results_'):
-            raise ValueError('model should contain `cv_results_`')
+        self.assert_hpo_class(model)
+        self.assert_hpo_class_has_trace(model)
 
         # attributes that will be in trace arff, regardless of the model
         trace_attributes = [('repeat', 'NUMERIC'),

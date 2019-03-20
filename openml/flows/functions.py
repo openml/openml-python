@@ -72,7 +72,6 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
 
 def get_flow(
     flow_id: int,
-    reinstantiate: bool = False,
     extension: Extension = None,
 ) -> OpenMLFlow:
     """Download the OpenML flow for a given flow ID.
@@ -81,11 +80,6 @@ def get_flow(
     ----------
     flow_id : int
         The OpenML flow id.
-
-    reinstantiate: bool
-        Whether to reinstantiate the flow to a sklearn model.
-        Note that this can only be done with sklearn flows, and
-        when
 
     extension: openml.extension.Extension
         Reinstantiate the flow with the given extension. Does not reinstantiate the flow if the
@@ -103,7 +97,7 @@ def get_flow(
     ):
         flow = _get_flow_description(flow_id)
 
-    if reinstantiate and extension is not None:
+    if extension is not None:
         flow.model = extension.flow_to_model(flow)
 
     return flow

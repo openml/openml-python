@@ -3,8 +3,7 @@ import io
 import json
 import os
 import sys
-from typing import List, Optional, Tuple, Union  # noqa F401
-import typing
+from typing import Any, List, Optional, Tuple, Union  # noqa F401
 import warnings
 
 import numpy as np
@@ -35,7 +34,7 @@ RUNS_CACHE_DIR_NAME = 'runs'
 
 
 def run_model_on_task(
-    model: typing.Any,
+    model: Any,
     task: OpenMLTask,
     extension: Extension,
     avoid_duplicate_runs: bool = True,
@@ -268,7 +267,7 @@ def get_run_trace(run_id: int) -> OpenMLRunTrace:
 def initialize_model_from_run(
     run_id: int,
     extension: Extension,
-) -> typing.Any:
+) -> Any:
     """
     Initialized a model based on a run_id (i.e., using the exact
     same parameter settings)
@@ -372,7 +371,7 @@ def _run_exists(task_id, setup_id):
 
 
 def _run_task_get_arffcontent(
-    model: typing.Any,
+    model: Any,
     task: OpenMLTask,
     extension: Extension,
     add_local_measures: bool,

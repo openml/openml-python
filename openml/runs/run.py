@@ -157,10 +157,10 @@ class OpenMLRun(object):
         predictions_arff = arff.dumps(self._generate_arff_dict())
 
         # It seems like typing does not allow to define the same variable multiple times
-        with open(os.path.join(directory, 'description.xml'), 'w') as fh_1:  # type: TextIO
-            fh_1.write(run_xml)
-        with open(os.path.join(directory, 'predictions.arff'), 'w') as fh_2:  # type: TextIO
-            fh_2.write(predictions_arff)
+        with open(os.path.join(directory, 'description.xml'), 'w') as fh:  # type: TextIO
+            fh.write(run_xml)
+        with open(os.path.join(directory, 'predictions.arff'), 'w') as fh:
+            fh.write(predictions_arff)
         if store_model:
             with open(os.path.join(directory, 'model.pkl'), 'wb') as fh_b:  # type: IO[bytes]
                 pickle.dump(self.model, fh_b)
