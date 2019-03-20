@@ -238,7 +238,7 @@ class SklearnExtension(Extension):
         # extract trace, if applicable
         arff_tracecontent = []  # type: List[List]
         if extension.is_hpo_class(model_copy):
-            arff_tracecontent.extend(extension.extract_trace_data(model_copy, rep_no, fold_no))
+            arff_tracecontent.extend(self._extract_trace_data(model_copy, rep_no, fold_no))
 
         if task.task_type_id in (
                 TaskTypeEnum.SUPERVISED_CLASSIFICATION,
@@ -253,8 +253,7 @@ class SklearnExtension(Extension):
             else:
                 used_estimator = model_copy
 
-            if isinstance(used_estimator,
-                          sklearn.model_selection._search.BaseSearchCV):
+            if self.is_hpo_class(used_estimator):
                 model_classes = used_estimator.best_estimator_.classes_
             else:
                 model_classes = used_estimator.classes_
@@ -384,6 +383,27 @@ class SklearnExtension(Extension):
         arff_line.append(correct_label)
         return arff_line
 
+    def _extract_trace_data(self, model, rep_no, fold_no):
+        arff_tracecontent = []
+        for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
+            # we use the string values for True and False, as it is defined in
+            # this way by the OpenML server
+            selected = 'false'
+            if itt_no == model.best_index_:
+                selected = 'true'
+            test_score = model.cv_results_['mean_test_score'][itt_no]
+            arff_line = [rep_no, fold_no, itt_no, test_score, selected]
+            for key in model.cv_results_:
+                if key.startswith('param_'):
+                    value = model.cv_results_[key][itt_no]
+                    if value is not np.ma.masked:
+                        serialized_value = json.dumps(value)
+                    else:
+                        serialized_value = np.nan
+                    arff_line.append(serialized_value)
+            arff_tracecontent.append(arff_line)
+        return arff_tracecontent
+
     def is_hpo_class(self, model):
         return isinstance(model, sklearn.model_selection._search.BaseSearchCV)
 
@@ -442,24 +462,3 @@ class SklearnExtension(Extension):
             trace_attributes,
             trace_content,
         )
-
-    def extract_trace_data(self, model, rep_no, fold_no):
-        arff_tracecontent = []
-        for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
-            # we use the string values for True and False, as it is defined in
-            # this way by the OpenML server
-            selected = 'false'
-            if itt_no == model.best_index_:
-                selected = 'true'
-            test_score = model.cv_results_['mean_test_score'][itt_no]
-            arff_line = [rep_no, fold_no, itt_no, test_score, selected]
-            for key in model.cv_results_:
-                if key.startswith('param_'):
-                    value = model.cv_results_[key][itt_no]
-                    if value is not np.ma.masked:
-                        serialized_value = json.dumps(value)
-                    else:
-                        serialized_value = np.nan
-                    arff_line.append(serialized_value)
-            arff_tracecontent.append(arff_line)
-        return arff_tracecontent

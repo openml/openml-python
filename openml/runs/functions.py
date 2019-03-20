@@ -391,8 +391,7 @@ def _run_task_get_arffcontent(
     # sys.version_info returns a tuple, the following line compares the entry
     # of tuples
     # https://docs.python.org/3.6/reference/expressions.html#value-comparisons
-    can_measure_runtime = sys.version_info[:2] >= (3, 3) and \
-        _check_n_jobs(model)
+    can_measure_runtime = sys.version_info[:2] >= (3, 3) and _check_n_jobs(model)
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
     num_reps, num_folds, num_samples = task.get_split_dimensions()
@@ -400,7 +399,12 @@ def _run_task_get_arffcontent(
     for rep_no in range(num_reps):
         for fold_no in range(num_folds):
             for sample_no in range(num_samples):
-                res = extension.run_model_on_fold(
+                (
+                    arff_datacontent_fold,
+                    arff_tracecontent_fold,
+                    user_defined_measures_fold,
+                    model_fold,
+                ) = extension.run_model_on_fold(
                     model=model,
                     task=task,
                     extension=extension,
@@ -410,8 +414,6 @@ def _run_task_get_arffcontent(
                     can_measure_runtime=can_measure_runtime,
                     add_local_measures=add_local_measures,
                 )
-                arff_datacontent_fold, arff_tracecontent_fold, \
-                    user_defined_measures_fold, model_fold = res
 
                 arff_datacontent.extend(arff_datacontent_fold)
                 arff_tracecontent.extend(arff_tracecontent_fold)

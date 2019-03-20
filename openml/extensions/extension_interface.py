@@ -80,12 +80,3 @@ class Extension(ABC):
         trace_content: List,
     ) -> OpenMLRunTrace:
         pass
-
-    @abstractmethod
-    def extract_trace_data(
-        self,
-        model: Any,
-        rep_no: int,
-        fold_no: int,
-    ) -> List:
-        pass
