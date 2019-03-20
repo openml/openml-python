@@ -189,7 +189,7 @@ def run_flow_on_task(
             if avoid_duplicate_runs:
                 flow_from_server.model = flow.model
                 setup_id = setup_exists(flow_from_server)
-                ids = _run_exists(task.task_id, setup_id)
+                ids = run_exists(task.task_id, setup_id)
                 if ids:
                     error_message = ("One or more runs of this setup were "
                                      "already performed on the task.")
@@ -341,7 +341,7 @@ def initialize_model_from_trace(
     return model
 
 
-def _run_exists(task_id, setup_id):
+def run_exists(task_id, setup_id):
     """Checks whether a task/setup combination is already present on the
     server.
 

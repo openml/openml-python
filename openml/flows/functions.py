@@ -7,7 +7,6 @@ import xmltodict
 from typing import Union, Dict, TYPE_CHECKING
 from oslo_concurrency import lockutils
 
-import openml._api_calls
 from ..exceptions import OpenMLCacheException
 import openml._api_calls
 from . import OpenMLFlow

@@ -317,7 +317,7 @@ def obtain_parameter_values(flow, model: object = None):
             _current = OrderedDict()
             _current['oml:name'] = _param_name
 
-            current_param_values = openml.flows.sklearn_to_flow(
+            current_param_values = openml.flows.sklearn_converter.sklearn_to_flow(
                 component_model.get_params()[_param_name])
 
             # Try to filter out components (a.k.a. subflows) which are

@@ -108,5 +108,6 @@ __all__ = [
     'setups',
     'study',
     'utils',
+    '_api_calls',
     '__version__',
 ]
