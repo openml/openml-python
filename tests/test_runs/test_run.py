@@ -11,8 +11,8 @@ from sklearn.preprocessing import Imputer
 
 from openml.testing import TestBase
 import openml
-import openml.flows.sklearn_converter
-import openml.extensions.sklearn_extension
+import openml.extensions.sklearn.functions
+import openml.extensions.sklearn
 
 
 class TestRun(TestBase):
@@ -103,7 +103,7 @@ class TestRun(TestBase):
             self.assertIsNone(run_prime_trace_content)
 
     def test_to_from_filesystem_vanilla(self):
-        extension = openml.extensions.sklearn_extension.SklearnExtension()
+        extension = openml.extensions.sklearn.SklearnExtension()
 
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
@@ -124,17 +124,17 @@ class TestRun(TestBase):
             'runs',
             str(random.getrandbits(128)),
         )
-        run.to_filesystem(cache_path)
+        run.to_filesystem(cache_path, extension=extension)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
         # The flow has been uploaded to server, so only the reference flow_id should be present
         self.assertTrue(run_prime.flow_id is not None)
         self.assertTrue(run_prime.flow is None)
         self._test_run_obj_equals(run, run_prime)
-        run_prime.publish()
+        run_prime.publish(extension=extension)
 
     def test_to_from_filesystem_search(self):
-        extension = openml.extensions.sklearn_extension.SklearnExtension()
+        extension = openml.extensions.sklearn.SklearnExtension()
 
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
@@ -162,14 +162,14 @@ class TestRun(TestBase):
             'runs',
             str(random.getrandbits(128)),
         )
-        run.to_filesystem(cache_path)
+        run.to_filesystem(cache_path, extension=extension)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
         self._test_run_obj_equals(run, run_prime)
-        run_prime.publish()
+        run_prime.publish(extension=extension)
 
     def test_to_from_filesystem_no_model(self):
-        extension = openml.extensions.sklearn_extension.SklearnExtension()
+        extension = openml.extensions.sklearn.SklearnExtension()
 
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
@@ -188,7 +188,7 @@ class TestRun(TestBase):
             'runs',
             str(random.getrandbits(128)),
         )
-        run.to_filesystem(cache_path, store_model=False)
+        run.to_filesystem(cache_path, extension=extension, store_model=False)
         # obtain run from filesystem
         openml.runs.OpenMLRun.from_filesystem(cache_path, expect_model=False)
         # assert default behaviour is throwing an error
@@ -200,7 +200,7 @@ class TestRun(TestBase):
         Publish a run tied to a local flow after it has first been saved to
          and loaded from disk.
         """
-        extension = openml.extensions.sklearn_extension.SklearnExtension()
+        extension = openml.extensions.sklearn.SklearnExtension()
 
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
@@ -209,7 +209,7 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(119)
 
         # Make sure the flow does not exist on the server yet.
-        flow = openml.flows.sklearn_converter.sklearn_to_flow(model)
+        flow = extension.model_to_flow(model)
         self._add_sentinel_to_flow_name(flow)
         self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
 
@@ -230,10 +230,10 @@ class TestRun(TestBase):
             'runs',
             str(random.getrandbits(128)),
         )
-        run.to_filesystem(cache_path)
+        run.to_filesystem(cache_path, extension=extension)
         # obtain run from filesystem
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
-        loaded_run.publish()
+        loaded_run.publish(extension=extension)
 
         # make sure the flow is published as part of publishing the run.
         self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))

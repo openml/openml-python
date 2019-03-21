@@ -33,12 +33,12 @@ else:
     from sklearn.impute import SimpleImputer as Imputer
 
 import openml
-from openml.extensions.sklearn_extension import sklearn_to_flow, flow_to_sklearn
+from openml.extensions.sklearn.functions import sklearn_to_flow, flow_to_sklearn
 from openml.testing import TestBase
 from openml.flows import OpenMLFlow
 from openml.flows.functions import assert_flows_equal
-from openml.flows.sklearn_converter import _format_external_version, \
-    _check_dependencies, _check_n_jobs
+from openml.extensions.sklearn.functions import _format_external_version, \
+    _check_dependencies, check_n_jobs
 from openml.exceptions import PyOpenMLError
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -68,7 +68,7 @@ class TestSklearn(TestBase):
         self.X = iris.data
         self.y = iris.target
 
-    @mock.patch('openml.flows.sklearn_converter._check_dependencies')
+    @mock.patch('openml.extensions.sklearn.functions._check_dependencies')
     def test_serialize_model(self, check_dependencies_mock):
         model = sklearn.tree.DecisionTreeClassifier(criterion='entropy',
                                                     max_features='auto',
@@ -137,7 +137,7 @@ class TestSklearn(TestBase):
 
         self.assertEqual(check_dependencies_mock.call_count, 1)
 
-    @mock.patch('openml.flows.sklearn_converter._check_dependencies')
+    @mock.patch('openml.extensions.sklearn.functions._check_dependencies')
     def test_serialize_model_clustering(self, check_dependencies_mock):
         model = sklearn.cluster.KMeans()
 
@@ -978,10 +978,11 @@ class TestSklearn(TestBase):
         answers = [True, False, False, True, False, False, True, False]
 
         for model, expected_answer in zip(legal_models, answers):
-            self.assertTrue(_check_n_jobs(model) == expected_answer)
+            self.assertEqual(check_n_jobs(model), expected_answer)
 
         for model in illegal_models:
-            self.assertRaises(PyOpenMLError, _check_n_jobs, model)
+            with self.assertRaises(PyOpenMLError):
+                check_n_jobs(model)
 
     def test__get_fn_arguments_with_defaults(self):
         if LooseVersion(sklearn.__version__) < "0.19":
@@ -999,7 +1000,7 @@ class TestSklearn(TestBase):
 
         for fn, num_params_with_defaults in fns:
             defaults, defaultless = (
-                openml.flows.sklearn_converter._get_fn_arguments_with_defaults(fn)
+                openml.extensions.sklearn.functions._get_fn_arguments_with_defaults(fn)
             )
             self.assertIsInstance(defaults, dict)
             self.assertIsInstance(defaultless, set)
@@ -1026,14 +1027,14 @@ class TestSklearn(TestBase):
                   'OneHotEncoder__sparse': False,
                   'Estimator__min_samples_leaf': 42}
         pipe_adjusted.set_params(**params)
-        flow = openml.flows.sklearn_converter.sklearn_to_flow(pipe_adjusted)
-        pipe_deserialized = openml.flows.sklearn_converter.flow_to_sklearn(
+        flow = openml.extensions.sklearn.functions.sklearn_to_flow(pipe_adjusted)
+        pipe_deserialized = openml.extensions.sklearn.functions.flow_to_sklearn(
             flow, initialize_with_defaults=True)
 
         # we want to compare pipe_deserialized and pipe_orig. We use the flow
         # equals function for this
-        assert_flows_equal(openml.flows.sklearn_converter.sklearn_to_flow(pipe_orig),
-                           openml.flows.sklearn_converter.sklearn_to_flow(pipe_deserialized))
+        assert_flows_equal(openml.extensions.sklearn.functions.sklearn_to_flow(pipe_orig),
+                           openml.extensions.sklearn.functions.sklearn_to_flow(pipe_deserialized))
 
     def test_deserialize_adaboost_with_defaults(self):
         # used the 'initialize_with_defaults' flag of the deserialization
@@ -1050,14 +1051,14 @@ class TestSklearn(TestBase):
                   'OneHotEncoder__sparse': False,
                   'Estimator__n_estimators': 10}
         pipe_adjusted.set_params(**params)
-        flow = openml.flows.sklearn_converter.sklearn_to_flow(pipe_adjusted)
-        pipe_deserialized = openml.flows.sklearn_converter.flow_to_sklearn(
+        flow = openml.extensions.sklearn.functions.sklearn_to_flow(pipe_adjusted)
+        pipe_deserialized = openml.extensions.sklearn.functions.flow_to_sklearn(
             flow, initialize_with_defaults=True)
 
         # we want to compare pipe_deserialized and pipe_orig. We use the flow
         # equals function for this
-        assert_flows_equal(openml.flows.sklearn_converter.sklearn_to_flow(pipe_orig),
-                           openml.flows.sklearn_converter.sklearn_to_flow(pipe_deserialized))
+        assert_flows_equal(openml.extensions.sklearn.functions.sklearn_to_flow(pipe_orig),
+                           openml.extensions.sklearn.functions.sklearn_to_flow(pipe_deserialized))
 
     def test_deserialize_complex_with_defaults(self):
         # used the 'initialize_with_defaults' flag of the deserialization
@@ -1087,28 +1088,28 @@ class TestSklearn(TestBase):
                   'Estimator__base_estimator__base_estimator__learning_rate': 0.1,
                   'Estimator__base_estimator__base_estimator__loss__n_neighbors': 13}
         pipe_adjusted.set_params(**params)
-        flow = openml.flows.sklearn_converter.sklearn_to_flow(pipe_adjusted)
-        pipe_deserialized = openml.flows.sklearn_converter.flow_to_sklearn(
+        flow = openml.extensions.sklearn.functions.sklearn_to_flow(pipe_adjusted)
+        pipe_deserialized = openml.extensions.sklearn.functions.flow_to_sklearn(
             flow,
             initialize_with_defaults=True,
         )
 
         # we want to compare pipe_deserialized and pipe_orig. We use the flow
         # equals function for this
-        assert_flows_equal(openml.flows.sklearn_converter.sklearn_to_flow(pipe_orig),
-                           openml.flows.sklearn_converter.sklearn_to_flow(pipe_deserialized))
+        assert_flows_equal(openml.extensions.sklearn.functions.sklearn_to_flow(pipe_orig),
+                           openml.extensions.sklearn.functions.sklearn_to_flow(pipe_deserialized))
 
     def test_openml_param_name_to_sklearn(self):
-        extension = openml.extensions.sklearn_extension.SklearnExtension()
+        extension = openml.extensions.sklearn.sklearn_extension.SklearnExtension()
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         boosting = sklearn.ensemble.AdaBoostClassifier(
             base_estimator=sklearn.tree.DecisionTreeClassifier())
         model = sklearn.pipeline.Pipeline(steps=[
             ('scaler', scaler), ('boosting', boosting)])
-        flow = openml.flows.sklearn_converter.sklearn_to_flow(model)
+        flow = openml.extensions.sklearn.functions.sklearn_to_flow(model)
         task = openml.tasks.get_task(115)
         run = openml.runs.run_flow_on_task(flow, task, extension=extension)
-        run = run.publish()
+        run = run.publish(extension=extension)
         run = openml.runs.get_run(run.run_id)
         setup = openml.setups.get_setup(run.setup_id)
 
@@ -1116,7 +1117,7 @@ class TestSklearn(TestBase):
         self.assertGreater(len(setup.parameters), 15)
 
         for parameter in setup.parameters.values():
-            sklearn_name = openml.flows.sklearn_converter.openml_param_name_to_sklearn(
+            sklearn_name = openml.extensions.sklearn.functions.openml_param_name_to_sklearn(
                 parameter, flow)
 
             # test the inverse. Currently, OpenML stores the hyperparameter
@@ -1143,7 +1144,7 @@ class TestSklearn(TestBase):
         self.assertRaisesRegex(
             ValueError,
             msg,
-            openml.flows.sklearn_converter.obtain_parameter_values,
+            openml.extensions.sklearn.functions.obtain_parameter_values,
             flow,
         )
 
@@ -1157,7 +1158,7 @@ class TestSklearn(TestBase):
         self.assertRaisesRegex(
             ValueError,
             msg,
-            openml.flows.sklearn_converter.obtain_parameter_values,
+            openml.extensions.sklearn.functions.obtain_parameter_values,
             flow,
         )
 
@@ -1177,7 +1178,7 @@ class TestSklearn(TestBase):
         flow = sklearn_to_flow(model)
         flow.flow_id = 1
         flow.components['estimator'].flow_id = 2
-        parameters = openml.flows.sklearn_converter.obtain_parameter_values(flow)
+        parameters = openml.extensions.sklearn.functions.obtain_parameter_values(flow)
         for parameter in parameters:
             self.assertIsNotNone(parameter['oml:component'], msg=parameter)
             if parameter['oml:name'] == 'n_estimators':

@@ -1,36 +1,30 @@
 from collections import OrderedDict
 import io
-import json
 import os
 import sys
 from typing import Any, List, Optional, Tuple, Union, TYPE_CHECKING  # noqa F401
 import warnings
 
-import numpy as np
-import sklearn.pipeline
 import xmltodict
-import sklearn.metrics
 
 import openml
 import openml.utils
 import openml._api_calls
 from openml.exceptions import PyOpenMLError
 from openml import config
-from openml.flows.sklearn_converter import _check_n_jobs
 from openml.flows.flow import _copy_server_fields
 from ..flows import get_flow, flow_exists, OpenMLFlow
 from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException, OpenMLRunsExistError
 from ..tasks import OpenMLTask
-from .run import OpenMLRun, _get_version_information
+from .run import OpenMLRun
 from .trace import OpenMLRunTrace
 from ..tasks import TaskTypeEnum
 
 if TYPE_CHECKING:
     from openml.extensions.extension_interface import Extension
 
-# _get_version_info, _get_dict and _create_setup_string are in run.py to avoid
-# circular imports
+# get_dict is in run.py to avoid circular imports
 
 RUNS_CACHE_DIR_NAME = 'runs'
 
@@ -188,7 +182,7 @@ def run_flow_on_task(
             _copy_server_fields(flow_from_server, flow)
             if avoid_duplicate_runs:
                 flow_from_server.model = flow.model
-                setup_id = setup_exists(flow_from_server)
+                setup_id = setup_exists(flow_from_server, extension=extension)
                 ids = run_exists(task.task_id, setup_id)
                 if ids:
                     error_message = ("One or more runs of this setup were "
@@ -202,7 +196,7 @@ def run_flow_on_task(
 
     dataset = task.get_dataset()
 
-    run_environment = _get_version_information()
+    run_environment = extension.get_version_information()
     tags = ['openml-python', run_environment[1]]
 
     # execute the run
@@ -224,7 +218,8 @@ def run_flow_on_task(
         tags=tags,
         trace=trace,
         data_content=data_content,
-        flow=flow
+        flow=flow,
+        setup_string=extension.create_setup_string(flow.model)
     )
 
     if (upload_flow or avoid_duplicate_runs) and flow.flow_id is not None:
@@ -393,7 +388,9 @@ def _run_task_get_arffcontent(
     # sys.version_info returns a tuple, the following line compares the entry
     # of tuples
     # https://docs.python.org/3.6/reference/expressions.html#value-comparisons
-    can_measure_runtime = sys.version_info[:2] >= (3, 3) and _check_n_jobs(model)
+    can_measure_runtime = (
+        sys.version_info[:2] >= (3, 3) and extension.will_model_train_parallel(model)
+    )
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
     num_reps, num_folds, num_samples = task.get_split_dimensions()
@@ -452,72 +449,6 @@ def _run_task_get_arffcontent(
         user_defined_measures_per_fold,
         user_defined_measures_per_sample,
     )
-
-
-def _extract_arfftrace(extension, model, rep_no, fold_no):
-    extension.assert_hpo_class(model)
-    extension.assert_hpo_class_has_trace(model)
-
-    arff_tracecontent = []
-    for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
-        # we use the string values for True and False, as it is defined in
-        # this way by the OpenML server
-        selected = 'false'
-        if itt_no == model.best_index_:
-            selected = 'true'
-        test_score = model.cv_results_['mean_test_score'][itt_no]
-        arff_line = [rep_no, fold_no, itt_no, test_score, selected]
-        for key in model.cv_results_:
-            if key.startswith('param_'):
-                value = model.cv_results_[key][itt_no]
-                if value is not np.ma.masked:
-                    serialized_value = json.dumps(value)
-                else:
-                    serialized_value = np.nan
-                arff_line.append(serialized_value)
-        arff_tracecontent.append(arff_line)
-    return arff_tracecontent
-
-
-def _extract_arfftrace_attributes(model):
-    if not isinstance(model, sklearn.model_selection._search.BaseSearchCV):
-        raise ValueError('model should be instance of'
-                         ' sklearn.model_selection._search.BaseSearchCV')
-    if not hasattr(model, 'cv_results_'):
-        raise ValueError('model should contain `cv_results_`')
-
-    # attributes that will be in trace arff, regardless of the model
-    trace_attributes = [('repeat', 'NUMERIC'),
-                        ('fold', 'NUMERIC'),
-                        ('iteration', 'NUMERIC'),
-                        ('evaluation', 'NUMERIC'),
-                        ('selected', ['true', 'false'])]
-
-    # model dependent attributes for trace arff
-    for key in model.cv_results_:
-        if key.startswith('param_'):
-            # supported types should include all types, including bool,
-            # int float
-            supported_basic_types = (bool, int, float, str)
-            for param_value in model.cv_results_[key]:
-                if isinstance(param_value, supported_basic_types) or \
-                        param_value is None or param_value is np.ma.masked:
-                    # basic string values
-                    type = 'STRING'
-                elif isinstance(param_value, list) and \
-                        all(isinstance(i, int) for i in param_value):
-                    # list of integers
-                    type = 'STRING'
-                else:
-                    raise TypeError('Unsupported param type in param grid: '
-                                    '%s' % key)
-
-            # renamed the attribute param to parameter, as this is a required
-            # OpenML convention - this also guards against name collisions
-            # with the required trace attributes
-            attribute = (openml.runs.trace.PREFIX + key[6:], type)
-            trace_attributes.append(attribute)
-    return trace_attributes
 
 
 def get_runs(run_ids):

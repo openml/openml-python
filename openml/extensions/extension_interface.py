@@ -26,6 +26,14 @@ class Extension(ABC):
     def flow_to_parameters(self, model: Any) -> List:
         pass
 
+    @abstractmethod
+    def get_version_information(self) -> str:
+        pass
+
+    @abstractmethod
+    def create_setup_string(self, model: Any) -> str:
+        pass
+
     ################################################################################################
     # Abstract methods for performing runs with extension modules
 
@@ -61,6 +69,10 @@ class Extension(ABC):
         If no explicit model is provided, the parameters will be extracted from `flow.model`
         instead.
         """
+        pass
+
+    @abstractmethod
+    def will_model_train_parallel(self, model: Any) -> bool:
         pass
 
     ################################################################################################

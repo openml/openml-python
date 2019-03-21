@@ -29,13 +29,18 @@ import xmltodict
 import openml
 from openml._api_calls import _perform_api_call
 import openml.exceptions
-import openml.extensions.sklearn_extension
+import openml.extensions.sklearn
+import openml.extensions.sklearn.functions
 from openml.testing import TestBase
 import openml.utils
 
 
 class TestFlow(TestBase):
     _multiprocess_can_split_ = True
+
+    def setUp(self):
+        super().setUp()
+        self.extension = openml.extensions.sklearn.SklearnExtension()
 
     def test_get_flow(self):
         # We need to use the production server here because 4024 is not the
@@ -140,7 +145,7 @@ class TestFlow(TestBase):
             base_estimator=sklearn.tree.DecisionTreeClassifier())
         model = sklearn.pipeline.Pipeline(steps=(
             ('scaler', scaler), ('boosting', boosting)))
-        flow = openml.extensions.sklearn_extension.sklearn_to_flow(model)
+        flow = self.extension.model_to_flow(model)
         flow.flow_id = -234
         # end of setup
 
@@ -161,7 +166,7 @@ class TestFlow(TestBase):
             components=collections.OrderedDict(),
             parameters=collections.OrderedDict(),
             parameters_meta_info=collections.OrderedDict(),
-            external_version=openml.flows.sklearn_converter._format_external_version(
+            external_version=openml.extensions.sklearn.functions._format_external_version(
                 'sklearn',
                 sklearn.__version__,
             ),
@@ -178,7 +183,7 @@ class TestFlow(TestBase):
     @mock.patch('openml.flows.functions.flow_exists')
     def test_publish_existing_flow(self, flow_exists_mock):
         clf = sklearn.tree.DecisionTreeClassifier(max_depth=2)
-        flow = openml.extensions.sklearn_extension.sklearn_to_flow(clf)
+        flow = self.extension.model_to_flow(clf)
         flow_exists_mock.return_value = 1
 
         with self.assertRaises(openml.exceptions.PyOpenMLError) as context_manager:
@@ -190,7 +195,7 @@ class TestFlow(TestBase):
         clf = sklearn.ensemble.VotingClassifier([
             ('lr', sklearn.linear_model.LogisticRegression(solver='lbfgs')),
         ])
-        flow = openml.extensions.sklearn_extension.sklearn_to_flow(clf)
+        flow = self.extension.model_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.publish()
         # For a flow where both components are published together, the upload
@@ -206,7 +211,7 @@ class TestFlow(TestBase):
         )
 
         clf1 = sklearn.tree.DecisionTreeClassifier(max_depth=2)
-        flow1 = openml.extensions.sklearn_extension.sklearn_to_flow(clf1)
+        flow1 = self.extension.model_to_flow(clf1)
         flow1, sentinel = self._add_sentinel_to_flow_name(flow1, None)
         flow1.publish()
 
@@ -215,7 +220,7 @@ class TestFlow(TestBase):
 
         clf2 = sklearn.ensemble.VotingClassifier(
             [('dt', sklearn.tree.DecisionTreeClassifier(max_depth=2))])
-        flow2 = openml.extensions.sklearn_extension.sklearn_to_flow(clf2)
+        flow2 = self.extension.model_to_flow(clf2)
         flow2, _ = self._add_sentinel_to_flow_name(flow2, sentinel)
         flow2.publish()
         # If one component was published before the other, the components in
@@ -225,7 +230,7 @@ class TestFlow(TestBase):
 
         clf3 = sklearn.ensemble.AdaBoostClassifier(
             sklearn.tree.DecisionTreeClassifier(max_depth=3))
-        flow3 = openml.extensions.sklearn_extension.sklearn_to_flow(clf3)
+        flow3 = self.extension.model_to_flow(clf3)
         flow3, _ = self._add_sentinel_to_flow_name(flow3, sentinel)
         # Child flow has different parameter. Check for storing the flow
         # correctly on the server should thus not check the child's parameters!
@@ -238,7 +243,7 @@ class TestFlow(TestBase):
         semi_legal = sklearn.ensemble.BaggingClassifier(
             base_estimator=sklearn.ensemble.BaggingClassifier(
                 base_estimator=sklearn.tree.DecisionTreeClassifier()))
-        flow = openml.extensions.sklearn_extension.sklearn_to_flow(semi_legal)
+        flow = self.extension.model_to_flow(semi_legal)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
 
         flow.publish()
@@ -248,7 +253,7 @@ class TestFlow(TestBase):
     @mock.patch('openml._api_calls._perform_api_call')
     def test_publish_error(self, api_call_mock, flow_exists_mock, get_flow_mock):
         model = sklearn.ensemble.RandomForestClassifier()
-        flow = openml.extensions.sklearn_extension.sklearn_to_flow(model)
+        flow = self.extension.model_to_flow(model)
         api_call_mock.return_value = "<oml:upload_flow>\n" \
                                      "    <oml:id>1</oml:id>\n" \
                                      "</oml:upload_flow>"
@@ -290,7 +295,7 @@ class TestFlow(TestBase):
                 ('classif', sklearn.tree.DecisionTreeClassifier())
             ]
         )
-        self.assertRaises(ValueError, openml.extensions.sklearn_extension.sklearn_to_flow, illegal)
+        self.assertRaises(ValueError, self.extension.model_to_flow, illegal)
 
     def test_nonexisting_flow_exists(self):
         def get_sentinel():
@@ -328,7 +333,7 @@ class TestFlow(TestBase):
         complicated = sklearn.pipeline.Pipeline(steps=steps)
 
         for classifier in [nb, complicated]:
-            flow = openml.extensions.sklearn_extension.sklearn_to_flow(classifier)
+            flow = self.extension.model_to_flow(classifier)
             flow, _ = self._add_sentinel_to_flow_name(flow, None)
             # publish the flow
             flow = flow.publish()
@@ -378,7 +383,7 @@ class TestFlow(TestBase):
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
         rs.fit(X, y)
-        flow = openml.extensions.sklearn_extension.sklearn_to_flow(rs)
+        flow = self.extension.model_to_flow(rs)
         # Tags may be sorted in any order (by the server). Just using one tag
         # makes sure that the xml comparison does not fail because of that.
         subflows = [flow]
@@ -395,7 +400,7 @@ class TestFlow(TestBase):
         # Check whether we can load the flow again
         # Remove the sentinel from the name again so that we can reinstantiate
         # the object again
-        extension = openml.extensions.sklearn_extension.SklearnExtension()
+        extension = openml.extensions.sklearn.sklearn_extension.SklearnExtension()
         new_flow = openml.flows.get_flow(flow_id=flow.flow_id, extension=extension)
 
         local_xml = flow._to_xml()

@@ -317,7 +317,7 @@ def obtain_parameter_values(flow, model: object = None):
             _current = OrderedDict()
             _current['oml:name'] = _param_name
 
-            current_param_values = openml.flows.sklearn_converter.sklearn_to_flow(
+            current_param_values = openml.extensions.sklearn.functions.sklearn_to_flow(
                 component_model.get_params()[_param_name])
 
             # Try to filter out components (a.k.a. subflows) which are
@@ -884,11 +884,49 @@ def _serialize_cross_validator(o):
     return ret
 
 
-def _check_n_jobs(model):
+def _deserialize_cross_validator(value, recursion_depth):
+    model_name = value['name']
+    parameters = value['parameters']
+
+    module_name = model_name.rsplit('.', 1)
+    model_class = getattr(importlib.import_module(module_name[0]),
+                          module_name[1])
+    for parameter in parameters:
+        parameters[parameter] = flow_to_sklearn(
+            parameters[parameter], recursion_depth=recursion_depth + 1
+        )
+    return model_class(**parameters)
+
+
+def _format_external_version(model_package_name, model_package_version_number):
+    return '%s==%s' % (model_package_name, model_package_version_number)
+
+
+# This can possibly be done by a package such as pyxb, but I could not get
+# it to work properly.
+def get_version_information():
+    """Gets versions of python, sklearn, numpy and scipy, returns them in an
+    array,
+
+    Returns
+    -------
+    result : an array with version information of the above packages
     """
-    Returns True if the parameter settings of model are chosen s.t. the model
-    will run on a single core (if so, openml-python can measure runtimes)
-    """
+    import sklearn
+    import scipy
+    import numpy
+
+    major, minor, micro, _, _ = sys.version_info
+    python_version = 'Python_{}.'.format(
+        ".".join([str(major), str(minor), str(micro)]))
+    sklearn_version = 'Sklearn_{}.'.format(sklearn.__version__)
+    numpy_version = 'NumPy_{}.'.format(numpy.__version__)
+    scipy_version = 'SciPy_{}.'.format(scipy.__version__)
+
+    return [python_version, sklearn_version, numpy_version, scipy_version]
+
+
+def check_n_jobs(model):
     def check(param_grid, restricted_parameter_name, legal_values):
         if isinstance(param_grid, dict):
             for param, value in param_grid.items():
@@ -902,13 +940,15 @@ def _check_n_jobs(model):
                         return False
             return True
         elif isinstance(param_grid, list):
-            return all(check(sub_grid,
-                             restricted_parameter_name,
-                             legal_values)
-                       for sub_grid in param_grid)
+            return all(
+                check(sub_grid, restricted_parameter_name, legal_values)
+                for sub_grid in param_grid
+            )
 
-    if not (isinstance(model, sklearn.base.BaseEstimator)
-            or isinstance(model, sklearn.model_selection._search.BaseSearchCV)):
+    if not (
+        isinstance(model, sklearn.base.BaseEstimator)
+        or isinstance(model, sklearn.model_selection._search.BaseSearchCV)
+    ):
         raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
     # make sure that n_jobs is not in the parameter grid of optimization
@@ -936,21 +976,3 @@ def _check_n_jobs(model):
 
     # check the parameters for n_jobs
     return check(model.get_params(), 'n_jobs', [1, None])
-
-
-def _deserialize_cross_validator(value, recursion_depth):
-    model_name = value['name']
-    parameters = value['parameters']
-
-    module_name = model_name.rsplit('.', 1)
-    model_class = getattr(importlib.import_module(module_name[0]),
-                          module_name[1])
-    for parameter in parameters:
-        parameters[parameter] = flow_to_sklearn(
-            parameters[parameter], recursion_depth=recursion_depth + 1
-        )
-    return model_class(**parameters)
-
-
-def _format_external_version(model_package_name, model_package_version_number):
-    return '%s==%s' % (model_package_name, model_package_version_number)

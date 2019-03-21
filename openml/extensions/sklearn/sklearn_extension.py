@@ -16,10 +16,12 @@ from openml.tasks import (
 )
 from openml.exceptions import PyOpenMLError
 from openml.extensions import Extension
-from openml.flows.sklearn_converter import (
+from openml.extensions.sklearn.functions import (
     sklearn_to_flow,
     flow_to_sklearn,
     obtain_parameter_values,
+    get_version_information,
+    check_n_jobs,
 )
 from openml.flows import OpenMLFlow
 from openml.runs.trace import OpenMLRunTrace, PREFIX
@@ -35,6 +37,15 @@ class SklearnExtension(Extension):
 
     def flow_to_parameters(self, flow):
         return obtain_parameter_values(flow)
+
+    def get_version_information(self):
+        return get_version_information()
+
+    def create_setup_string(self, model: Any):
+        """Create a string representing the model"""
+        run_environment = " ".join(self.get_version_information())
+        # fixme str(model) might contain (...)
+        return run_environment + " " + str(model)
 
     def is_estimator(self, model):
         return hasattr(model, 'fit') and hasattr(model, 'predict')
@@ -328,35 +339,35 @@ class SklearnExtension(Extension):
         """Util function that turns probability estimates of a classifier for a
         given instance into the right arff format to upload to openml.
 
-            Parameters
-            ----------
-            rep_no : int
-                The repeat of the experiment (0-based; in case of 1 time CV,
-                always 0)
-            fold_no : int
-                The fold nr of the experiment (0-based; in case of holdout,
-                always 0)
-            sample_no : int
-                In case of learning curves, the index of the subsample (0-based;
-                in case of no learning curve, always 0)
-            row_id : int
-                row id in the initial dataset
-            correct_label : str
-                original label of the instance
-            predicted_label : str
-                the label that was predicted
-            predicted_probabilities : array (size=num_classes)
-                probabilities per class
-            class_labels : array (size=num_classes)
-            model_classes_mapping : list
-                A list of classes the model produced.
-                Obtained by BaseEstimator.classes_
+        Parameters
+        ----------
+        rep_no : int
+            The repeat of the experiment (0-based; in case of 1 time CV,
+            always 0)
+        fold_no : int
+            The fold nr of the experiment (0-based; in case of holdout,
+            always 0)
+        sample_no : int
+            In case of learning curves, the index of the subsample (0-based;
+            in case of no learning curve, always 0)
+        row_id : int
+            row id in the initial dataset
+        correct_label : str
+            original label of the instance
+        predicted_label : str
+            the label that was predicted
+        predicted_probabilities : array (size=num_classes)
+            probabilities per class
+        class_labels : array (size=num_classes)
+        model_classes_mapping : list
+            A list of classes the model produced.
+            Obtained by BaseEstimator.classes_
 
-            Returns
-            -------
-            arff_line : list
-                representation of the current prediction in OpenML format
-            """
+        Returns
+        -------
+        arff_line : list
+            representation of the current prediction in OpenML format
+        """
         if not isinstance(rep_no, (int, np.integer)):
             raise ValueError('rep_no should be int')
         if not isinstance(fold_no, (int, np.integer)):
@@ -413,6 +424,13 @@ class SklearnExtension(Extension):
         instead.
         """
         return obtain_parameter_values(flow=flow, model=model)
+
+    def will_model_train_parallel(self, model: Any) -> bool:
+        """
+        Returns True if the parameter settings of model are chosen s.t. the model
+        will run on a single core (if so, openml-python can measure runtimes)
+        """
+        return check_n_jobs(model)
 
     def is_hpo_class(self, model):
         return isinstance(model, sklearn.model_selection._search.BaseSearchCV)

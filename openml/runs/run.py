@@ -133,7 +133,7 @@ class OpenMLRun(object):
 
         return run
 
-    def to_filesystem(self, directory: str, store_model: bool = True) -> None:
+    def to_filesystem(self, directory: str, extension, store_model: bool = True) -> None:
         """
         The inverse of the from_filesystem method. Serializes a run
         on the filesystem, to be uploaded later.
@@ -158,7 +158,7 @@ class OpenMLRun(object):
             raise ValueError('Output directory should be empty')
 
         run_xml = self._create_description_xml()
-        predictions_arff = arff.dumps(self._generate_arff_dict())
+        predictions_arff = arff.dumps(self._generate_arff_dict(extension=extension))
 
         # It seems like typing does not allow to define the same variable multiple times
         with open(os.path.join(directory, 'description.xml'), 'w') as fh:  # type: TextIO
@@ -175,7 +175,7 @@ class OpenMLRun(object):
         if self.trace is not None:
             self.trace._to_filesystem(directory)
 
-    def _generate_arff_dict(self):
+    def _generate_arff_dict(self, extension):
         """Generates the arff dictionary for uploading predictions to the
         server.
 
@@ -190,7 +190,7 @@ class OpenMLRun(object):
         if self.data_content is None:
             raise ValueError('Run has not been executed.')
 
-        run_environment = (_get_version_information()
+        run_environment = (extension.get_version_information()
                            + [time.strftime("%c")]
                            + ['Created by run_task()'])
         task = get_task(self.task_id)
@@ -248,7 +248,7 @@ class OpenMLRun(object):
 
         return arff_dict
 
-    def get_metric_fn(self, sklearn_fn, kwargs=None):
+    def get_metric_fn(self, sklearn_fn, extension, kwargs=None):
         """Calculates metric scores based on predicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
         it assumes that the 'correct' or 'truth' attribute is specified in
@@ -268,7 +268,7 @@ class OpenMLRun(object):
         """
         kwargs = kwargs if kwargs else dict()
         if self.data_content is not None and self.task_id is not None:
-            predictions_arff = self._generate_arff_dict()
+            predictions_arff = self._generate_arff_dict(extension=extension)
         elif 'predictions' in self.output_files:
             predictions_file_url = openml._api_calls._file_id_to_url(
                 self.output_files['predictions'], 'predictions.arff',
@@ -375,7 +375,7 @@ class OpenMLRun(object):
                 scores.append(sklearn_fn(y_true, y_pred, **kwargs))
         return np.array(scores)
 
-    def publish(self):
+    def publish(self, extension=None):
         """ Publish a run (and if necessary, its flow) to the OpenML server.
 
         Uploads the results of a run to OpenML.
@@ -405,15 +405,22 @@ class OpenMLRun(object):
         if self.parameter_settings is None:
             if self.flow is None:
                 self.flow = openml.flows.get_flow(self.flow_id)
-            self.parameter_settings = openml.flows.sklearn_converter.obtain_parameter_values(
-                self.flow, self.model,
-            )
+            if extension is None:
+                raise ValueError(
+                    'Requires an extension to obtain parameter values from the model inside the '
+                    'flow.'
+                )
+            self.parameter_settings = extension.obtain_parameter_values(self.flow, self.model)
 
         description_xml = self._create_description_xml()
         file_elements = {'description': ("description.xml", description_xml)}
 
         if self.error_message is None:
-            predictions = arff.dumps(self._generate_arff_dict())
+            if extension is None:
+                raise ValueError(
+                    'Requires an extension to generate the predictions arff file.'
+                )
+            predictions = arff.dumps(self._generate_arff_dict(extension=extension))
             file_elements['predictions'] = ("predictions.arff", predictions)
 
         if self.trace is not None:
@@ -443,7 +450,7 @@ class OpenMLRun(object):
         # tags = run_environment + [well_formatted_time] + ['run_task'] + \
         #     [self.model.__module__ + "." + self.model.__class__.__name__]
         description = _to_dict(taskid=self.task_id, flow_id=self.flow_id,
-                               setup_string=_create_setup_string(self.model),
+                               setup_string=self.setup_string,
                                parameter_settings=self.parameter_settings,
                                error_message=self.error_message,
                                fold_evaluations=self.fold_evaluations,
@@ -477,31 +484,6 @@ class OpenMLRun(object):
 
 ###############################################################################
 # Functions which cannot be in runs/functions due to circular imports
-
-
-# This can possibly be done by a package such as pyxb, but I could not get
-# it to work properly.
-def _get_version_information():
-    """Gets versions of python, sklearn, numpy and scipy, returns them in an
-    array,
-
-    Returns
-    -------
-    result : an array with version information of the above packages
-    """
-    import sklearn
-    import scipy
-    import numpy
-
-    major, minor, micro, _, _ = sys.version_info
-    python_version = 'Python_{}.'.format(
-        ".".join([str(major), str(minor), str(micro)]))
-    sklearn_version = 'Sklearn_{}.'.format(sklearn.__version__)
-    numpy_version = 'NumPy_{}.'.format(numpy.__version__)
-    scipy_version = 'SciPy_{}.'.format(scipy.__version__)
-
-    return [python_version, sklearn_version, numpy_version, scipy_version]
-
 
 def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
              tags=None, fold_evaluations=None, sample_evaluations=None):
@@ -566,10 +548,3 @@ def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
                         description['oml:run']['oml:output_data'][
                             'oml:evaluation'].append(current)
     return description
-
-
-def _create_setup_string(model):
-    """Create a string representing the model"""
-    run_environment = " ".join(_get_version_information())
-    # fixme str(model) might contain (...)
-    return run_environment + " " + str(model)

@@ -3,8 +3,7 @@ import time
 
 import openml
 import openml.exceptions
-import openml.extensions.sklearn_extension
-import openml.flows.sklearn_converter
+import openml.extensions.sklearn
 from openml.testing import TestBase
 
 from sklearn.tree import DecisionTreeClassifier
@@ -49,46 +48,49 @@ class ParameterFreeClassifier(BaseEstimator, ClassifierMixin):
 class TestSetupFunctions(TestBase):
     _multiprocess_can_split_ = True
 
+    def setUp(self):
+        self.extension = openml.extensions.sklearn.SklearnExtension()
+        super().setUp()
+
     def test_nonexisting_setup_exists(self):
         # first publish a non-existing flow
         sentinel = get_sentinel()
         # because of the sentinel, we can not use flows that contain subflows
         dectree = DecisionTreeClassifier()
-        flow = openml.flows.sklearn_converter.sklearn_to_flow(dectree)
+        flow = self.extension.model_to_flow(dectree)
         flow.name = 'TEST%s%s' % (sentinel, flow.name)
         flow.publish()
 
         # although the flow exists (created as of previous statement),
         # we can be sure there are no setups (yet) as it was just created
         # and hasn't been ran
-        setup_id = openml.setups.setup_exists(flow)
+        setup_id = openml.setups.setup_exists(flow, extension=self.extension)
         self.assertFalse(setup_id)
 
     def _existing_setup_exists(self, classif):
-        extension = openml.extensions.sklearn_extension.SklearnExtension()
 
-        flow = openml.flows.sklearn_converter.sklearn_to_flow(classif)
+        flow = self.extension.model_to_flow(classif)
         flow.name = 'TEST%s%s' % (get_sentinel(), flow.name)
         flow.publish()
 
         # although the flow exists, we can be sure there are no
         # setups (yet) as it hasn't been ran
-        setup_id = openml.setups.setup_exists(flow)
+        setup_id = openml.setups.setup_exists(flow, extension=self.extension)
         self.assertFalse(setup_id)
-        setup_id = openml.setups.setup_exists(flow)
+        setup_id = openml.setups.setup_exists(flow, extension=self.extension)
         self.assertFalse(setup_id)
 
         # now run the flow on an easy task:
         task = openml.tasks.get_task(115)  # diabetes
-        run = openml.runs.run_flow_on_task(task, flow, extension=extension)
+        run = openml.runs.run_flow_on_task(task, flow, extension=self.extension)
         # spoof flow id, otherwise the sentinel is ignored
         run.flow_id = flow.flow_id
-        run.publish()
+        run.publish(extension=self.extension)
         # download the run, as it contains the right setup id
         run = openml.runs.get_run(run.run_id)
 
         # execute the function we are interested in
-        setup_id = openml.setups.setup_exists(flow)
+        setup_id = openml.setups.setup_exists(flow, extension=self.extension)
         self.assertEqual(setup_id, run.setup_id)
 
     def test_existing_setup_exists_1(self):

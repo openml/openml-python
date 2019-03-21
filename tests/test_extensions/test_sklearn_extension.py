@@ -1,20 +1,24 @@
 import collections
+import json
 import sys
+import warnings
 
 import numpy as np
-from sklearn.naive_bayes import GaussianNB
-from sklearn.preprocessing.imputation import Imputer
 from sklearn.dummy import DummyClassifier
+from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.linear_model import SGDClassifier
-from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing.imputation import Imputer
 
 import openml
-from openml.extensions.sklearn_extension import SklearnExtension
+from openml.extensions.sklearn.sklearn_extension import SklearnExtension
 from openml.tasks import TaskTypeEnum
 from openml.testing import TestBase
+from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration
 
 
 class TestRun(TestBase):
@@ -220,3 +224,48 @@ class TestRun(TestBase):
                         self.assertIsInstance(evaluation, float)
                         self.assertGreaterEqual(evaluation, min_val)
                         self.assertLessEqual(evaluation, max_val)
+
+    def test__extract_arfftrace(self):
+
+        param_grid = {"hidden_layer_sizes": [[5, 5], [10, 10], [20, 20]],
+                      "activation": ['identity', 'logistic', 'tanh', 'relu'],
+                      "learning_rate_init": [0.1, 0.01, 0.001, 0.0001],
+                      "max_iter": [10, 20, 40, 80]}
+        num_iters = 10
+        task = openml.tasks.get_task(20)
+        clf = RandomizedSearchCV(MLPClassifier(), param_grid, num_iters)
+        # just run the task
+        train, _ = task.get_train_test_split_indices(0, 0)
+        X, y = task.get_X_and_y()
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            clf.fit(X[train], y[train])
+
+        # check num layers of MLP
+        self.assertIn(clf.best_estimator_.hidden_layer_sizes, param_grid['hidden_layer_sizes'])
+
+        trace_list = self.extension._extract_trace_data(clf, rep_no=0, fold_no=0)
+        trace = self.extension.obtain_arff_trace(clf, trace_list)
+
+        self.assertIsInstance(trace, OpenMLRunTrace)
+        self.assertIsInstance(trace_list, list)
+        self.assertEqual(len(trace_list), num_iters)
+
+        for trace_iteration in iter(trace):
+            self.assertEqual(trace_iteration.repeat, 0)
+            self.assertEqual(trace_iteration.fold, 0)
+            self.assertGreaterEqual(trace_iteration.iteration, 0)
+            self.assertLessEqual(trace_iteration.iteration, num_iters)
+            self.assertIsNone(trace_iteration.setup_string)
+            self.assertIsInstance(trace_iteration.evaluation, float)
+            self.assertTrue(np.isfinite(trace_iteration.evaluation))
+            self.assertIsInstance(trace_iteration.selected, bool)
+
+            self.assertEqual(len(trace_iteration.parameters), len(param_grid))
+            for param in param_grid:
+
+                # Prepend with the "parameter_" prefix
+                param_in_trace = "parameter_%s" % param
+                self.assertIn(param_in_trace, trace_iteration.parameters)
+                param_value = json.loads(trace_iteration.parameters[param_in_trace])
+                self.assertTrue(param_value in param_grid[param])

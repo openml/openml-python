@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from openml.extensions.extension_interface import Extension
 
 
-def setup_exists(flow):
+def setup_exists(flow, extension):
     """
     Checks whether a hyperparameter configuration already exists on the server.
 
@@ -43,8 +43,7 @@ def setup_exists(flow):
     if exists != flow.flow_id:
         raise ValueError('This should not happen!')
 
-    # TODO: currently hard-coded sklearn assumption
-    openml_param_settings = openml.flows.sklearn_converter.obtain_parameter_values(flow)
+    openml_param_settings = extension.obtain_parameter_values(flow)
     description = xmltodict.unparse(_to_dict(flow.flow_id,
                                              openml_param_settings),
                                     pretty=True)
