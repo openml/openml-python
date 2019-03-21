@@ -27,7 +27,9 @@ class TestStudyFunctions(TestBase):
             print('URL for run: %s/run/%d' %(openml.config.server,run.run_id))
         """  # noqa: E501
         import openml
+        import sklearn.pipeline
         import sklearn.preprocessing
+        import sklearn.tree
         benchmark_suite = openml.study.get_study(
             'OpenML100', 'tasks'
         )  # obtain the benchmark suite
@@ -37,16 +39,18 @@ class TestStudyFunctions(TestBase):
                 ('estimator', sklearn.tree.DecisionTreeClassifier())
             ]
         )  # build a sklearn classifier
+        extension = SklearnExtension()
         for task_id in benchmark_suite.tasks[:1]:  # iterate over all tasks
             task = openml.tasks.get_task(task_id)  # download the OpenML task
             X, y = task.get_X_and_y()  # get the data (not used in this example)
             openml.config.apikey = openml.config.apikey  # set the OpenML Api Key
             run = openml.runs.run_model_on_task(
-                clf, task, extension=SklearnExtension(), avoid_duplicate_runs=False
+                clf, task, extension=extension, avoid_duplicate_runs=False
             )  # run classifier on splits (requires API key)
             score = run.get_metric_fn(
-                sklearn.metrics.accuracy_score
+                sklearn.metrics.accuracy_score,
+                extension=extension,
             )  # print accuracy score
             print('Data set: %s; Accuracy: %0.2f' % (task.get_dataset().name, score.mean()))
-            run.publish()  # publish the experiment on OpenML (optional)
+            run.publish(extension=extension)  # publish the experiment on OpenML (optional)
             print('URL for run: %s/run/%d' % (openml.config.server, run.run_id))

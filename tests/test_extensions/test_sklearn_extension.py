@@ -18,7 +18,7 @@ import openml
 from openml.extensions.sklearn.sklearn_extension import SklearnExtension
 from openml.tasks import TaskTypeEnum
 from openml.testing import TestBase
-from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration
+from openml.runs.trace import OpenMLRunTrace
 
 
 class TestRun(TestBase):

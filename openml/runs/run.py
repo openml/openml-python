@@ -1,6 +1,5 @@
 from collections import OrderedDict
 import pickle
-import sys
 import time
 from typing import TextIO, IO  # noqa: F401
 import numpy as np
