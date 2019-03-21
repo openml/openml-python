@@ -940,7 +940,7 @@ class TestRun(TestBase):
                     avoid_duplicate_runs=True,
                     upload_flow=True
                 )
-                run.publish()
+                run.publish(extension=self.extension)
             except openml.exceptions.PyOpenMLError:
                 # run already existed. Great.
                 pass
