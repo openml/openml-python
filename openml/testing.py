@@ -26,14 +26,15 @@ class TestBase(unittest.TestCase):
     Hopefully soon allows using a test server, not the production server.
     """
 
-    def setUp(self):
+    def setUp(self, n_levels=1):
         # This cache directory is checked in to git to simulate a populated
         # cache
         self.maxDiff = None
         self.static_cache_dir = None
         abspath_this_file = os.path.abspath(inspect.getfile(self.__class__))
         static_cache_dir = os.path.dirname(abspath_this_file)
-        static_cache_dir = os.path.abspath(os.path.join(static_cache_dir, '..', '..'))
+        for _ in range(n_levels):
+            static_cache_dir = os.path.abspath(os.path.join(static_cache_dir, '..'))
         content = os.listdir(static_cache_dir)
         if 'files' in content:
             self.static_cache_dir = os.path.join(static_cache_dir, 'files')

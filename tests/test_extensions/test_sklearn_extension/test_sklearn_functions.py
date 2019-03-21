@@ -59,7 +59,7 @@ class TestFunctions(TestBase):
     # than 1 seconds
 
     def setUp(self):
-        super().setUp()
+        super().setUp(n_levels=2)
         iris = sklearn.datasets.load_iris()
         self.X = iris.data
         self.y = iris.target

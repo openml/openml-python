@@ -24,7 +24,7 @@ class TestRun(TestBase):
     _multiprocess_can_split_ = True
 
     def setUp(self):
-        super().setUp()
+        super().setUp(n_levels=2)
         self.extension = SklearnExtension()
 
     ################################################################################################
