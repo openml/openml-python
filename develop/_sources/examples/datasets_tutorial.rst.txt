@@ -57,7 +57,7 @@ List datasets
 
  .. code-block:: none
 
-    First 10 of 839 datasets...
+    First 10 of 730 datasets...
 
 
 Exercise 1
@@ -280,7 +280,7 @@ Exercise 2
 
 
 
-**Total running time of the script:** ( 0 minutes  1.427 seconds)
+**Total running time of the script:** ( 0 minutes  1.383 seconds)
 
 
 .. _sphx_glr_download_examples_datasets_tutorial.py:
