@@ -1,3 +1,4 @@
+from openml.extensions.sklearn_extension import SklearnExtension
 from openml.testing import TestBase
 
 
@@ -41,7 +42,7 @@ class TestStudyFunctions(TestBase):
             X, y = task.get_X_and_y()  # get the data (not used in this example)
             openml.config.apikey = openml.config.apikey  # set the OpenML Api Key
             run = openml.runs.run_model_on_task(
-                task, clf, avoid_duplicate_runs=False
+                clf, task, extension=SklearnExtension(), avoid_duplicate_runs=False
             )  # run classifier on splits (requires API key)
             score = run.get_metric_fn(
                 sklearn.metrics.accuracy_score

@@ -1074,6 +1074,7 @@ class TestRun(TestBase):
         run = openml.runs.run_flow_on_task(
             task=task,
             flow=flow,
+            extension=self.extension,
             avoid_duplicate_runs=False,
             upload_flow=False
         )
