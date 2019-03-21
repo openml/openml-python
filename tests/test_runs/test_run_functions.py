@@ -274,56 +274,6 @@ class TestRun(TestBase):
         # self.assertEqual(run_trace, downloaded_run_trace)
         return run
 
-    def _check_fold_evaluations(self, fold_evaluations, num_repeats, num_folds,
-                                max_time_allowed=60000,
-                                task_type=(TaskTypeEnum.
-                                           SUPERVISED_CLASSIFICATION)):
-        """
-        Checks whether the right timing measures are attached to the run
-        (before upload). Test is only performed for versions >= Python3.3
-
-        In case of check_n_jobs(clf) == false, please do not perform this
-        check (check this condition outside of this function. )
-        default max_time_allowed (per fold, in milli seconds) = 1 minute,
-        quite pessimistic
-        """
-
-        # a dict mapping from openml measure to a tuple with the minimum and
-        # maximum allowed value
-        check_measures = {
-            'usercpu_time_millis_testing': (0, max_time_allowed),
-            'usercpu_time_millis_training': (0, max_time_allowed),
-            # should take at least one millisecond (?)
-            'usercpu_time_millis': (0, max_time_allowed)}
-
-        if task_type == TaskTypeEnum.SUPERVISED_CLASSIFICATION or \
-                task_type == TaskTypeEnum.LEARNING_CURVE:
-            check_measures['predictive_accuracy'] = (0, 1)
-        elif task_type == TaskTypeEnum.SUPERVISED_REGRESSION:
-            check_measures['mean_absolute_error'] = (0, float("inf"))
-
-        self.assertIsInstance(fold_evaluations, dict)
-        if sys.version_info[:2] >= (3, 3):
-            # this only holds if we are allowed to record time (otherwise some
-            # are missing)
-            self.assertEqual(set(fold_evaluations.keys()),
-                             set(check_measures.keys()))
-
-        for measure in check_measures.keys():
-            if measure in fold_evaluations:
-                num_rep_entrees = len(fold_evaluations[measure])
-                self.assertEqual(num_rep_entrees, num_repeats)
-                min_val = check_measures[measure][0]
-                max_val = check_measures[measure][1]
-                for rep in range(num_rep_entrees):
-                    num_fold_entrees = len(fold_evaluations[measure][rep])
-                    self.assertEqual(num_fold_entrees, num_folds)
-                    for fold in range(num_fold_entrees):
-                        evaluation = fold_evaluations[measure][rep][fold]
-                        self.assertIsInstance(evaluation, float)
-                        self.assertGreaterEqual(evaluation, min_val)
-                        self.assertLessEqual(evaluation, max_val)
-
     def _check_sample_evaluations(self, sample_evaluations, num_repeats,
                                   num_folds, num_samples,
                                   max_time_allowed=60000):
@@ -395,15 +345,15 @@ class TestRun(TestBase):
 
         # Invalid parameter values
         clf = LogisticRegression(C='abc', solver='lbfgs')
-        self.assertRaisesRegex(
+        with self.assertRaisesRegex(
             ValueError,
-            r"Penalty term must be positive; got \(C=u?'abc'\)",
-            # u? for 2.7/3.4-6 compability,
-            openml.runs.run_model_on_task,
-            extension=self.extension,
-            task=task,
-            model=clf,
-        )
+            r"Penalty term must be positive; got \(C=u?'abc'\)",  # u? for 2.7/3.4-6 compability
+        ):
+            openml.runs.run_model_on_task(
+                extension=self.extension,
+                task=task,
+                model=clf,
+            )
 
     ###########################################################################
     # These unit tests are meant to test the following functions, using a

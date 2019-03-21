@@ -29,6 +29,9 @@ from openml.runs.trace import OpenMLRunTrace, PREFIX
 
 class SklearnExtension(Extension):
 
+    ################################################################################################
+    # Methods for flow serialization and de-serialization
+
     def flow_to_model(self, flow):
         return flow_to_sklearn(flow)
 
@@ -46,6 +49,9 @@ class SklearnExtension(Extension):
         run_environment = " ".join(self.get_version_information())
         # fixme str(model) might contain (...)
         return run_environment + " " + str(model)
+
+    ################################################################################################
+    # Methods for performing runs with extension modules
 
     def is_estimator(self, model):
         return hasattr(model, 'fit') and hasattr(model, 'predict')
@@ -431,6 +437,9 @@ class SklearnExtension(Extension):
         will run on a single core (if so, openml-python can measure runtimes)
         """
         return check_n_jobs(model)
+
+    ################################################################################################
+    # Methods for hyperparameter optimization
 
     def is_hpo_class(self, model):
         return isinstance(model, sklearn.model_selection._search.BaseSearchCV)

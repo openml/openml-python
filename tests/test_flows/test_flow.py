@@ -400,7 +400,7 @@ class TestFlow(TestBase):
         # Check whether we can load the flow again
         # Remove the sentinel from the name again so that we can reinstantiate
         # the object again
-        extension = openml.extensions.sklearn.sklearn_extension.SklearnExtension()
+        extension = openml.extensions.sklearn.extension.SklearnExtension()
         new_flow = openml.flows.get_flow(flow_id=flow.flow_id, extension=extension)
 
         local_xml = flow._to_xml()

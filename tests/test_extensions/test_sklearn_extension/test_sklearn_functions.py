@@ -4,11 +4,7 @@ import sys
 import unittest
 from distutils.version import LooseVersion
 from collections import OrderedDict
-
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
+from unittest import mock
 
 import numpy as np
 import scipy.optimize
@@ -58,12 +54,12 @@ class Model(sklearn.base.BaseEstimator):
         pass
 
 
-class TestSklearn(TestBase):
+class TestFunctions(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take less
     # than 1 seconds
 
     def setUp(self):
-        super(TestSklearn, self).setUp()
+        super().setUp()
         iris = sklearn.datasets.load_iris()
         self.X = iris.data
         self.y = iris.target
@@ -505,10 +501,7 @@ class TestSklearn(TestBase):
         new_model = flow_to_sklearn(serialization)
         # compares string representations of the dict, as it potentially
         # contains complex objects that can not be compared with == op
-        # Only in Python 3.x, as Python 2 has Unicode issues
-        if sys.version_info[0] >= 3:
-            self.assertEqual(str(model.get_params()),
-                             str(new_model.get_params()))
+        self.assertEqual(str(model.get_params()), str(new_model.get_params()))
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
         serialization2 = sklearn_to_flow(new_model)
@@ -1100,7 +1093,7 @@ class TestSklearn(TestBase):
                            openml.extensions.sklearn.functions.sklearn_to_flow(pipe_deserialized))
 
     def test_openml_param_name_to_sklearn(self):
-        extension = openml.extensions.sklearn.sklearn_extension.SklearnExtension()
+        extension = openml.extensions.sklearn.extension.SklearnExtension()
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         boosting = sklearn.ensemble.AdaBoostClassifier(
             base_estimator=sklearn.tree.DecisionTreeClassifier())
