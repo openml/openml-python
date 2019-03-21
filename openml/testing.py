@@ -33,8 +33,7 @@ class TestBase(unittest.TestCase):
         self.static_cache_dir = None
         abspath_this_file = os.path.abspath(inspect.getfile(self.__class__))
         static_cache_dir = os.path.dirname(abspath_this_file)
-        static_cache_dir = os.path.abspath(os.path.join(static_cache_dir,
-                                                        '..'))
+        static_cache_dir = os.path.abspath(os.path.join(static_cache_dir, '..', '..'))
         content = os.listdir(static_cache_dir)
         if 'files' in content:
             self.static_cache_dir = os.path.join(static_cache_dir, 'files')
