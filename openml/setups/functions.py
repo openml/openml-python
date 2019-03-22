@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from openml.extensions.extension_interface import Extension
 
 
-def setup_exists(flow, extension):
+def setup_exists(flow, extension: 'Extension') -> int:
     """
     Checks whether a hyperparameter configuration already exists on the server.
 

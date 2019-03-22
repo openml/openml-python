@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import json
 import time
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 import warnings
 
 import numpy as np
@@ -22,9 +22,11 @@ from openml.extensions.sklearn.functions import (
     obtain_parameter_values,
     get_version_information,
     check_n_jobs,
+    is_estimator,
+    is_cross_validator,
 )
 from openml.flows import OpenMLFlow
-from openml.runs.trace import OpenMLRunTrace, PREFIX
+from openml.runs.trace import OpenMLRunTrace, PREFIX, OpenMLTraceIteration
 
 
 class SklearnExtension(Extension):
@@ -32,19 +34,19 @@ class SklearnExtension(Extension):
     ################################################################################################
     # Methods for flow serialization and de-serialization
 
-    def flow_to_model(self, flow):
+    def flow_to_model(self, flow: OpenMLFlow) -> Any:
         return flow_to_sklearn(flow)
 
-    def model_to_flow(self, model):
+    def model_to_flow(self, model: Any) -> OpenMLFlow:
         return sklearn_to_flow(model)
 
-    def flow_to_parameters(self, flow):
+    def flow_to_parameters(self, flow: Any) -> List:
         return obtain_parameter_values(flow)
 
-    def get_version_information(self):
+    def get_version_information(self) -> List[str]:
         return get_version_information()
 
-    def create_setup_string(self, model: Any):
+    def create_setup_string(self, model: Any) -> str:
         """Create a string representing the model"""
         run_environment = " ".join(self.get_version_information())
         # fixme str(model) might contain (...)
@@ -53,10 +55,10 @@ class SklearnExtension(Extension):
     ################################################################################################
     # Methods for performing runs with extension modules
 
-    def is_estimator(self, model):
-        return hasattr(model, 'fit') and hasattr(model, 'predict')
+    def is_estimator(self, model: Any) -> bool:
+        return is_estimator(model)
 
-    def seed_model(self, model, seed=None):
+    def seed_model(self, model: Any, seed: Optional[int] = None) -> Any:
         """Sets all the non-seeded components of a model with a seed.
            Models that are already seeded will maintain the seed. In
            this case, only integer seeds are allowed (An exception
@@ -339,9 +341,18 @@ class SklearnExtension(Extension):
 
         return arff_datacontent, arff_tracecontent, user_defined_measures, model_copy
 
-    def _prediction_to_row(self, rep_no, fold_no, sample_no, row_id, correct_label,
-                           predicted_label, predicted_probabilities, class_labels,
-                           model_classes_mapping):
+    def _prediction_to_row(
+        self,
+        rep_no: int,
+        fold_no: int,
+        sample_no: int,
+        row_id: int,
+        correct_label: str,
+        predicted_label: int,
+        predicted_probabilities: np.ndarray,
+        class_labels: List,
+        model_classes_mapping: List,
+    ) -> List:
         """Util function that turns probability estimates of a classifier for a
         given instance into the right arff format to upload to openml.
 
@@ -385,7 +396,7 @@ class SklearnExtension(Extension):
         if not len(predicted_probabilities) == len(model_classes_mapping):
             raise ValueError('len(predicted_probabilities) != len(class_labels)')
 
-        arff_line = [rep_no, fold_no, sample_no, row_id]
+        arff_line = [rep_no, fold_no, sample_no, row_id]  # type: List[Any]
         for class_label_idx in range(len(class_labels)):
             if class_label_idx in model_classes_mapping:
                 index = np.where(model_classes_mapping == class_label_idx)[0][0]
@@ -441,26 +452,34 @@ class SklearnExtension(Extension):
     ################################################################################################
     # Methods for hyperparameter optimization
 
-    def is_hpo_class(self, model):
-        return isinstance(model, sklearn.model_selection._search.BaseSearchCV)
+    def is_hpo_class(self, model: Any) -> bool:
+        return is_cross_validator(model)
 
-    def assert_hpo_class(self, model):
-        if not self.is_hpo_class(model):
+    def assert_hpo_class(self, model: Any) -> None:
+        if not isinstance(model, sklearn.model_selection._search.BaseSearchCV):
             raise AssertionError(
                 'Flow model %s is not an instance of sklearn.model_selection._search.BaseSearchCV'
                 % model
             )
 
-    def assert_hpo_class_has_trace(self, model):
+    def assert_hpo_class_has_trace(self, model: Any) -> None:
         if not hasattr(model, 'cv_results_'):
             raise ValueError('model should contain `cv_results_`')
 
-    def instantiate_model_from_hpo_class(self, model, trace_iteration):
+    def instantiate_model_from_hpo_class(
+        self,
+        model: Any,
+        trace_iteration: OpenMLTraceIteration,
+    ) -> Any:
         base_estimator = model.estimator
         base_estimator.set_params(**trace_iteration.get_parameters())
         return base_estimator
 
-    def obtain_arff_trace(self, model, trace_content):
+    def obtain_arff_trace(
+        self,
+        model: Any,
+        trace_content: List,
+    ) -> OpenMLRunTrace:
         self.assert_hpo_class(model)
         self.assert_hpo_class_has_trace(model)
 

@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import pickle
 import time
-from typing import TextIO, IO  # noqa: F401
+from typing import Any, IO, Optional, TextIO, TYPE_CHECKING  # noqa: F401
 import numpy as np
 
 import arff
@@ -13,6 +13,9 @@ import openml._api_calls
 from ..tasks import get_task
 from ..exceptions import PyOpenMLError
 from ..tasks import TaskTypeEnum
+
+if TYPE_CHECKING:
+    from openml.extensions.extension_interface import Extension
 
 
 class OpenMLRun(object):
@@ -132,7 +135,12 @@ class OpenMLRun(object):
 
         return run
 
-    def to_filesystem(self, directory: str, extension, store_model: bool = True) -> None:
+    def to_filesystem(
+        self,
+        directory: str,
+        extension: 'Extension',
+        store_model: bool = True,
+    ) -> None:
         """
         The inverse of the from_filesystem method. Serializes a run
         on the filesystem, to be uploaded later.
@@ -174,7 +182,7 @@ class OpenMLRun(object):
         if self.trace is not None:
             self.trace._to_filesystem(directory)
 
-    def _generate_arff_dict(self, extension):
+    def _generate_arff_dict(self, extension: 'Extension') -> 'OrderedDict[str, Any]':
         """Generates the arff dictionary for uploading predictions to the
         server.
 
@@ -194,7 +202,7 @@ class OpenMLRun(object):
                            + ['Created by run_task()'])
         task = get_task(self.task_id)
 
-        arff_dict = OrderedDict()
+        arff_dict = OrderedDict()  # type: 'OrderedDict[str, Any]'
         arff_dict['data'] = self.data_content
         arff_dict['description'] = "\n".join(run_environment)
         arff_dict['relation'] =\
@@ -374,7 +382,7 @@ class OpenMLRun(object):
                 scores.append(sklearn_fn(y_true, y_pred, **kwargs))
         return np.array(scores)
 
-    def publish(self, extension=None):
+    def publish(self, extension: Optional['Extension'] = None) -> 'OpenMLRun':
         """ Publish a run (and if necessary, its flow) to the OpenML server.
 
         Uploads the results of a run to OpenML.

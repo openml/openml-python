@@ -27,7 +27,7 @@ class Extension(ABC):
         pass
 
     @abstractmethod
-    def get_version_information(self) -> str:
+    def get_version_information(self) -> List[str]:
         pass
 
     @abstractmethod

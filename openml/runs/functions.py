@@ -2,7 +2,7 @@ from collections import OrderedDict
 import io
 import os
 import sys
-from typing import Any, List, Optional, Tuple, Union, TYPE_CHECKING  # noqa F401
+from typing import Any, List, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
 import warnings
 
 import xmltodict
@@ -289,8 +289,8 @@ def initialize_model_from_trace(
     repeat: int,
     fold: int,
     extension: 'Extension',
-    iteration=None,
-):
+    iteration: Optional[int] = None,
+) -> None:
     """
     Initialize a model based on the parameters that were set
     by an optimization procedure (i.e., using the exact same
@@ -308,13 +308,13 @@ def initialize_model_from_trace(
     fold : int
         The fold nr (column in trace file)
 
+    extension: openml.extensions.Extension
+
     iteration : int
         The iteration nr (column in trace file). If None, the
         best (selected) iteration will be searched (slow),
         according to the selection criteria implemented in
         OpenMLRunTrace.get_selected_iteration
-
-    extension: openml.extensions.Extension
 
     Returns
     -------
@@ -336,7 +336,7 @@ def initialize_model_from_trace(
     return model
 
 
-def run_exists(task_id, setup_id):
+def run_exists(task_id: int, setup_id: int) -> Set[int]:
     """Checks whether a task/setup combination is already present on the
     server.
 
@@ -372,7 +372,12 @@ def _run_task_get_arffcontent(
     task: OpenMLTask,
     extension: 'Extension',
     add_local_measures: bool,
-):
+) -> Tuple[
+    List[List],
+    Optional[OpenMLRunTrace],
+    'OrderedDict[str, OrderedDict]',
+    'OrderedDict[str, OrderedDict]',
+]:
     arff_datacontent = []  # type: List[List]
     arff_tracecontent = []  # type: List[List]
     # stores fold-based evaluation measures. In case of a sample based task,

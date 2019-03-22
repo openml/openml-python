@@ -11,6 +11,7 @@ import logging
 import re
 import warnings
 import sys
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
 import scipy.stats.distributions
@@ -40,9 +41,12 @@ SIMPLE_NUMPY_TYPES = [nptype for type_cat, nptypes in np.sctypes.items()
 SIMPLE_TYPES = tuple([bool, int, float, str] + SIMPLE_NUMPY_TYPES)
 
 
-def sklearn_to_flow(o, parent_model=None):
+def sklearn_to_flow(o: Any, parent_model: Any = None) -> Any:
+    # Necessary to make pypy not complain about all the different possible return types
+    rval = None  # type: Any
+
     # TODO: assert that only on first recursion lvl `parent_model` can be None
-    if _is_estimator(o):
+    if is_estimator(o):
         # is the main model or a submodel
         rval = _serialize_model(o)
     elif isinstance(o, (list, tuple)):
@@ -81,7 +85,7 @@ def sklearn_to_flow(o, parent_model=None):
     elif inspect.isfunction(o):
         # TODO: explain what type of parameter is here
         rval = serialize_function(o)
-    elif _is_cross_validator(o):
+    elif is_cross_validator(o):
         # TODO: explain what type of parameter is here
         rval = _serialize_cross_validator(o)
     else:
@@ -90,24 +94,26 @@ def sklearn_to_flow(o, parent_model=None):
     return rval
 
 
-def _is_estimator(o):
-    return (hasattr(o, 'fit')
-            and hasattr(o, 'get_params')
-            and hasattr(o, 'set_params'))
+def is_estimator(o: Any) -> bool:
+    return hasattr(o, 'fit') and hasattr(o, 'get_params') and hasattr(o, 'set_params')
 
 
-def _is_cross_validator(o):
+def is_cross_validator(o: Any) -> bool:
     return isinstance(o, sklearn.model_selection.BaseCrossValidator)
 
 
-def flow_to_sklearn(o, components=None, initialize_with_defaults=False,
-                    recursion_depth=0):
+def flow_to_sklearn(
+    o: Any,
+    components: Optional[Dict] = None,
+    initialize_with_defaults: bool = False,
+    recursion_depth: int = 0,
+) -> Any:
     """Initializes a sklearn model based on a flow.
 
     Parameters
     ----------
     o : mixed
-        the object to deserialize (can be flow object, or any serialzied
+        the object to deserialize (can be flow object, or any serialized
         parameter value that is accepted by)
 
     components : dict
@@ -156,6 +162,7 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False,
             elif serialized_type == 'function':
                 rval = deserialize_function(value)
             elif serialized_type == 'component_reference':
+                assert components is not None  # Necessary for mypy
                 value = flow_to_sklearn(value, recursion_depth=depth_pp)
                 step_name = value['step_name']
                 key = value['key']
@@ -214,7 +221,10 @@ def flow_to_sklearn(o, components=None, initialize_with_defaults=False,
     return rval
 
 
-def openml_param_name_to_sklearn(openml_parameter, flow):
+def openml_param_name_to_sklearn(
+    openml_parameter: openml.setups.OpenMLParameter,
+    flow: OpenMLFlow,
+) -> str:
     """
     Converts the name of an OpenMLParameter into the sklean name, given a flow.
 
@@ -245,7 +255,7 @@ def openml_param_name_to_sklearn(openml_parameter, flow):
     return '__'.join(flow_structure[name] + [openml_parameter.parameter_name])
 
 
-def obtain_parameter_values(flow, model: object = None):
+def obtain_parameter_values(flow: OpenMLFlow, model: object = None) -> List[Dict[str, Any]]:
     """
     Extracts all parameter settings required for the flow from the model.
     If no explicit model is provided, the parameters will be extracted from `flow.model` instead.
@@ -386,7 +396,7 @@ def obtain_parameter_values(flow, model: object = None):
     return parameters
 
 
-def _serialize_model(model):
+def _serialize_model(model: Any) -> OpenMLFlow:
     """Create an OpenMLFlow.
 
     Calls `sklearn_to_flow` recursively to properly serialize the
@@ -431,9 +441,11 @@ def _serialize_model(model):
     # Get the external versions of all sub-components
     external_version = _get_external_version_string(model, subcomponents)
 
-    dependencies = [_format_external_version('sklearn', sklearn.__version__),
-                    'numpy>=1.6.1', 'scipy>=0.9']
-    dependencies = '\n'.join(dependencies)
+    dependencies = '\n'.join([
+        _format_external_version('sklearn', sklearn.__version__),
+        'numpy>=1.6.1',
+        'scipy>=0.9',
+    ])
 
     sklearn_version = _format_external_version('sklearn', sklearn.__version__)
     sklearn_version_formatted = sklearn_version.replace('==', '_')
@@ -459,7 +471,7 @@ def _serialize_model(model):
     return flow
 
 
-def _get_external_version_string(model, sub_components):
+def _get_external_version_string(model: Any, sub_components: Dict[str, OpenMLFlow]) -> str:
     # Create external version string for a flow, given the model and the
     # already parsed dictionary of sub_components. Retrieves the external
     # version of all subcomponents, which themselves already contain all
@@ -467,7 +479,7 @@ def _get_external_version_string(model, sub_components):
     # sorted concatenation of all modules which are present in this run.
     model_package_name = model.__module__.split('.')[0]
     module = importlib.import_module(model_package_name)
-    model_package_version_number = module.__version__
+    model_package_version_number = module.__version__  # type: ignore
     external_version = _format_external_version(model_package_name,
                                                 model_package_version_number)
     openml_version = _format_external_version('openml', openml.__version__)
@@ -477,15 +489,16 @@ def _get_external_version_string(model, sub_components):
     for visitee in sub_components.values():
         for external_version in visitee.external_version.split(','):
             external_versions.add(external_version)
-    external_versions = list(sorted(external_versions))
-    external_version = ','.join(external_versions)
-    return external_version
+    return ','.join(list(sorted(external_versions)))
 
 
-def _check_multiple_occurence_of_component_in_flow(model, sub_components):
-    to_visit_stack = []
+def _check_multiple_occurence_of_component_in_flow(
+    model: Any,
+    sub_components: Dict[str, OpenMLFlow],
+) -> None:
+    to_visit_stack = []  # type: List[OpenMLFlow]
     to_visit_stack.extend(sub_components.values())
-    known_sub_components = set()
+    known_sub_components = set()  # type: Set[OpenMLFlow]
     while len(to_visit_stack) > 0:
         visitee = to_visit_stack.pop()
         if visitee.name in known_sub_components:
@@ -496,7 +509,14 @@ def _check_multiple_occurence_of_component_in_flow(model, sub_components):
             to_visit_stack.extend(visitee.components.values())
 
 
-def _extract_information_from_model(model):
+def _extract_information_from_model(
+    model: Any,
+) -> Tuple[
+    'OrderedDict[str, Optional[str]]',
+    'OrderedDict[str, Optional[Dict]]',
+    'OrderedDict[str, OpenMLFlow]',
+    Set,
+]:
     # This function contains four "global" states and is quite long and
     # complicated. If it gets to complicated to ensure it's correctness,
     # it would be best to make it a class with the four "global" states being
@@ -504,11 +524,11 @@ def _extract_information_from_model(model):
     # separate class methods
 
     # stores all entities that should become subcomponents
-    sub_components = OrderedDict()
+    sub_components = OrderedDict()  # type: OrderedDict[str, OpenMLFlow]
     # stores the keys of all subcomponents that should become
     sub_components_explicit = set()
-    parameters = OrderedDict()
-    parameters_meta_info = OrderedDict()
+    parameters = OrderedDict()  # type: OrderedDict[str, Optional[str]]
+    parameters_meta_info = OrderedDict()  # type: OrderedDict[str, Optional[Dict]]
 
     model_parameters = model.get_params(deep=False)
     for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
@@ -544,7 +564,7 @@ def _extract_information_from_model(model):
             # If a list of lists is identified that include 'non-simple' types (e.g. objects),
             # we assume they are steps in a pipeline, feature union, or base classifiers in
             # a voting classifier.
-            parameter_value = list()
+            parameter_value = list()  # type: List
             reserved_keywords = set(model.get_params(deep=False).keys())
 
             for sub_component_tuple in rval:
@@ -575,8 +595,9 @@ def _extract_information_from_model(model):
 
                     pv = [identifier, None]
                     if sub_component_type is tuple:
-                        pv = tuple(pv)
-                    parameter_value.append(pv)
+                        parameter_value.append(tuple(pv))
+                    else:
+                        parameter_value.append(pv)
 
                 else:
                     # Add the component to the list of components, add a
@@ -585,10 +606,9 @@ def _extract_information_from_model(model):
                     # when deserializing the parameter
                     sub_components_explicit.add(identifier)
                     sub_components[identifier] = sub_component
-                    component_reference = OrderedDict()
-                    component_reference[
-                        'oml-python:serialized_object'] = 'component_reference'
-                    cr_value = OrderedDict()
+                    component_reference = OrderedDict()  # type: Dict[str, Union[str, Dict]]
+                    component_reference['oml-python:serialized_object'] = 'component_reference'
+                    cr_value = OrderedDict()  # type: Dict[str, Any]
                     cr_value['key'] = identifier
                     cr_value['step_name'] = identifier
                     if len(sub_component_tuple) == 3:
@@ -596,15 +616,15 @@ def _extract_information_from_model(model):
                     component_reference['value'] = cr_value
                     parameter_value.append(component_reference)
 
-            if isinstance(rval, tuple):
-                parameter_value = tuple(parameter_value)
-
             # Here (and in the elif and else branch below) are the only
             # places where we encode a value as json to make sure that all
             # parameter values still have the same type after
             # deserialization
-            parameter_value = json.dumps(parameter_value)
-            parameters[k] = parameter_value
+            if isinstance(rval, tuple):
+                parameter_json = json.dumps(tuple(parameter_value))
+            else:
+                parameter_json = json.dumps(parameter_value)
+            parameters[k] = parameter_json
 
         elif isinstance(rval, OpenMLFlow):
 
@@ -613,8 +633,7 @@ def _extract_information_from_model(model):
             sub_components[k] = rval
             sub_components_explicit.add(k)
             component_reference = OrderedDict()
-            component_reference[
-                'oml-python:serialized_object'] = 'component_reference'
+            component_reference['oml-python:serialized_object'] = 'component_reference'
             cr_value = OrderedDict()
             cr_value['key'] = k
             cr_value['step_name'] = None
@@ -630,14 +649,12 @@ def _extract_information_from_model(model):
             else:
                 parameters[k] = None
 
-        parameters_meta_info[k] = OrderedDict((('description', None),
-                                               ('data_type', None)))
+        parameters_meta_info[k] = OrderedDict((('description', None), ('data_type', None)))
 
-    return (parameters, parameters_meta_info,
-            sub_components, sub_components_explicit)
+    return parameters, parameters_meta_info, sub_components, sub_components_explicit
 
 
-def _get_fn_arguments_with_defaults(fn_name):
+def _get_fn_arguments_with_defaults(fn_name: Callable) -> Tuple[Dict, Set]:
     """
     Returns:
         i) a dict with all parameter names that have a default value, and
@@ -657,23 +674,26 @@ def _get_fn_arguments_with_defaults(fn_name):
     """
     # parameters with defaults are optional, all others are required.
     signature = inspect.getfullargspec(fn_name)
-    optional_params, required_params = dict(), set()
     if signature.defaults:
-        optional_params =\
-            dict(zip(reversed(signature.args), reversed(signature.defaults)))
-    required_params = {arg for arg in signature.args
-                       if arg not in optional_params}
+        optional_params = dict(zip(reversed(signature.args), reversed(signature.defaults)))
+    else:
+        optional_params = dict()
+    required_params = {arg for arg in signature.args if arg not in optional_params}
     return optional_params, required_params
 
 
-def _deserialize_model(flow, keep_defaults, recursion_depth):
+def _deserialize_model(
+    flow: OpenMLFlow,
+    keep_defaults: bool,
+    recursion_depth: int,
+) -> Any:
     logging.info('-%s deserialize %s' % ('-' * recursion_depth, flow.name))
     model_name = flow.class_name
     _check_dependencies(flow.dependencies)
 
     parameters = flow.parameters
     components = flow.components
-    parameter_dict = OrderedDict()
+    parameter_dict = OrderedDict()  # type: Dict[str, Any]
 
     # Do a shallow copy of the components dictionary so we can remove the
     # components from this copy once we added them into the pipeline. This
@@ -727,20 +747,23 @@ def _deserialize_model(flow, keep_defaults, recursion_depth):
     return model_class(**parameter_dict)
 
 
-def _check_dependencies(dependencies):
+def _check_dependencies(dependencies: str) -> None:
     if not dependencies:
         return
 
-    dependencies = dependencies.split('\n')
-    for dependency_string in dependencies:
+    dependencies_list = dependencies.split('\n')
+    for dependency_string in dependencies_list:
         match = DEPENDENCIES_PATTERN.match(dependency_string)
+        if not match:
+            raise ValueError('Cannot parse dependency %s' % dependency_string)
+
         dependency_name = match.group('name')
         operation = match.group('operation')
         version = match.group('version')
 
         module = importlib.import_module(dependency_name)
         required_version = LooseVersion(version)
-        installed_version = LooseVersion(module.__version__)
+        installed_version = LooseVersion(module.__version__)  # type: ignore
 
         if operation == '==':
             check = required_version == installed_version
@@ -757,7 +780,7 @@ def _check_dependencies(dependencies):
                              '%s not satisfied.' % dependency_string)
 
 
-def serialize_type(o):
+def serialize_type(o: Any) -> 'OrderedDict[str, str]':
     mapping = {float: 'float',
                np.float: 'np.float',
                np.float32: 'np.float32',
@@ -766,13 +789,13 @@ def serialize_type(o):
                np.int: 'np.int',
                np.int32: 'np.int32',
                np.int64: 'np.int64'}
-    ret = OrderedDict()
+    ret = OrderedDict()  # type: 'OrderedDict[str, str]'
     ret['oml-python:serialized_object'] = 'type'
     ret['value'] = mapping[o]
     return ret
 
 
-def deserialize_type(o):
+def deserialize_type(o: str) -> Any:
     mapping = {'float': float,
                'np.float': np.float,
                'np.float32': np.float32,
@@ -784,20 +807,20 @@ def deserialize_type(o):
     return mapping[o]
 
 
-def serialize_rv_frozen(o):
+def serialize_rv_frozen(o: Any) -> 'OrderedDict[str, Union[str, Dict]]':
     args = o.args
     kwds = o.kwds
     a = o.a
     b = o.b
     dist = o.dist.__class__.__module__ + '.' + o.dist.__class__.__name__
-    ret = OrderedDict()
+    ret = OrderedDict()  # type: 'OrderedDict[str, Union[str, Dict]]'
     ret['oml-python:serialized_object'] = 'rv_frozen'
     ret['value'] = OrderedDict((('dist', dist), ('a', a), ('b', b),
                                 ('args', args), ('kwds', kwds)))
     return ret
 
 
-def deserialize_rv_frozen(o):
+def deserialize_rv_frozen(o: 'OrderedDict[str, str]') -> Any:
     args = o['args']
     kwds = o['kwds']
     a = o['a']
@@ -819,29 +842,24 @@ def deserialize_rv_frozen(o):
     return dist
 
 
-def serialize_function(o):
+def serialize_function(o: Callable) -> 'OrderedDict[str, str]':
     name = o.__module__ + '.' + o.__name__
-    ret = OrderedDict()
+    ret = OrderedDict()  # type: 'OrderedDict[str, str]'
     ret['oml-python:serialized_object'] = 'function'
     ret['value'] = name
     return ret
 
 
-def deserialize_function(name):
+def deserialize_function(name: str) -> Callable:
     module_name = name.rsplit('.', 1)
-    try:
-        function_handle = getattr(importlib.import_module(module_name[0]),
-                                  module_name[1])
-    except Exception as e:
-        warnings.warn('Cannot load function %s due to %s.' % (name, e))
-        return None
+    function_handle = getattr(importlib.import_module(module_name[0]), module_name[1])
     return function_handle
 
 
-def _serialize_cross_validator(o):
-    ret = OrderedDict()
+def _serialize_cross_validator(o: Any) -> 'OrderedDict[str, Union[str, Dict]]':
+    ret = OrderedDict()  # type: 'OrderedDict[str, Union[str, Dict]]'
 
-    parameters = OrderedDict()
+    parameters = OrderedDict()  # type: 'OrderedDict[str, Any]'
 
     # XXX this is copied from sklearn.model_selection._split
     cls = o.__class__
@@ -850,7 +868,7 @@ def _serialize_cross_validator(o):
     init_signature = signature(init)
     # Consider the constructor parameters excluding 'self'
     if init is object.__init__:
-        args = []
+        args = []  # type: List
     else:
         args = sorted([p.name for p in init_signature.parameters.values()
                        if p.name != 'self' and p.kind != p.VAR_KEYWORD])
@@ -860,15 +878,12 @@ def _serialize_cross_validator(o):
         # catch deprecated param values.
         # This is set in utils/__init__.py but it gets overwritten
         # when running under python3 somehow.
-        warnings.simplefilter("always", DeprecationWarning)
-        try:
-            with warnings.catch_warnings(record=True) as w:
-                value = getattr(o, key, None)
-            if len(w) and w[0].category == DeprecationWarning:
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always", DeprecationWarning)
+            value = getattr(o, key, None)
+            if w is not None and len(w) and w[0].category == DeprecationWarning:
                 # if the parameter is deprecated, don't show it
                 continue
-        finally:
-            warnings.filters.pop(0)
 
         if not (hasattr(value, '__len__') and len(value) == 0):
             value = json.dumps(value)
@@ -878,13 +893,13 @@ def _serialize_cross_validator(o):
 
     ret['oml-python:serialized_object'] = 'cv_object'
     name = o.__module__ + "." + o.__class__.__name__
-    value = OrderedDict([['name', name], ['parameters', parameters]])
+    value = OrderedDict([('name', name), ('parameters', parameters)])
     ret['value'] = value
 
     return ret
 
 
-def _deserialize_cross_validator(value, recursion_depth):
+def _deserialize_cross_validator(value: 'OrderedDict[str, Any]', recursion_depth: int) -> Any:
     model_name = value['name']
     parameters = value['parameters']
 
@@ -898,13 +913,13 @@ def _deserialize_cross_validator(value, recursion_depth):
     return model_class(**parameters)
 
 
-def _format_external_version(model_package_name, model_package_version_number):
+def _format_external_version(model_package_name: str, model_package_version_number: str) -> str:
     return '%s==%s' % (model_package_name, model_package_version_number)
 
 
 # This can possibly be done by a package such as pyxb, but I could not get
 # it to work properly.
-def get_version_information():
+def get_version_information() -> List[str]:
     """Gets versions of python, sklearn, numpy and scipy, returns them in an
     array,
 
@@ -926,7 +941,7 @@ def get_version_information():
     return [python_version, sklearn_version, numpy_version, scipy_version]
 
 
-def check_n_jobs(model):
+def check_n_jobs(model: Any) -> bool:
     def check(param_grid, restricted_parameter_name, legal_values):
         if isinstance(param_grid, dict):
             for param, value in param_grid.items():

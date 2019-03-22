@@ -4,6 +4,7 @@ import os
 import shutil
 import sys
 import time
+from typing import Dict
 import unittest
 import warnings
 
@@ -26,7 +27,7 @@ class TestBase(unittest.TestCase):
     Hopefully soon allows using a test server, not the production server.
     """
 
-    def setUp(self, n_levels=1):
+    def setUp(self, n_levels: int = 1):
         # This cache directory is checked in to git to simulate a populated
         # cache
         self.maxDiff = None
@@ -56,11 +57,9 @@ class TestBase(unittest.TestCase):
         openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
         self.production_server = "https://openml.org/api/v1/xml"
         self.test_server = "https://test.openml.org/api/v1/xml"
-        openml.config.cache_directory = None
 
         openml.config.server = self.test_server
         openml.config.avoid_duplicate_runs = False
-
         openml.config.cache_directory = self.workdir
 
         # If we're on travis, we save the api key in the config file to allow
@@ -123,11 +122,11 @@ class TestBase(unittest.TestCase):
 
     def _check_fold_evaluations(
         self,
-        fold_evaluations,
-        num_repeats,
-        num_folds,
-        max_time_allowed=60000,
-        task_type=(TaskTypeEnum.SUPERVISED_CLASSIFICATION),
+        fold_evaluations: Dict,
+        num_repeats: int,
+        num_folds: int,
+        max_time_allowed: float = 60000.0,
+        task_type: int = TaskTypeEnum.SUPERVISED_CLASSIFICATION,
     ):
         """
         Checks whether the right timing measures are attached to the run
@@ -147,9 +146,8 @@ class TestBase(unittest.TestCase):
             # should take at least one millisecond (?)
             'usercpu_time_millis': (0, max_time_allowed)}
 
-        if task_type == TaskTypeEnum.SUPERVISED_CLASSIFICATION or \
-                task_type == TaskTypeEnum.LEARNING_CURVE:
-            check_measures['predictive_accuracy'] = (0, 1)
+        if task_type in (TaskTypeEnum.SUPERVISED_CLASSIFICATION, TaskTypeEnum.LEARNING_CURVE):
+            check_measures['predictive_accuracy'] = (0, 1.)
         elif task_type == TaskTypeEnum.SUPERVISED_REGRESSION:
             check_measures['mean_absolute_error'] = (0, float("inf"))
 
