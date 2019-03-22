@@ -78,6 +78,9 @@ class Extension(ABC):
     ################################################################################################
     # Abstract methods for hyperparameter optimization
 
+    def is_hpo_class(self, model: Any) -> bool:
+        pass
+
     @abstractmethod
     def instantiate_model_from_hpo_class(
         self,

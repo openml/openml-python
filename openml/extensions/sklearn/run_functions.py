@@ -8,7 +8,7 @@ import numpy as np
 import sklearn.model_selection
 
 from openml.exceptions import PyOpenMLError
-from openml.runs.trace import OpenMLRunTrace, PREFIX, OpenMLTraceIteration
+from openml.runs.trace import OpenMLRunTrace, PREFIX
 from openml.tasks import (
     OpenMLSupervisedTask,
     TaskTypeEnum,
@@ -318,7 +318,6 @@ def run_model_on_fold(
 
 
 def _prediction_to_row(
-    self,
     rep_no: int,
     fold_no: int,
     sample_no: int,
@@ -385,7 +384,8 @@ def _prediction_to_row(
     arff_line.append(correct_label)
     return arff_line
 
-def _extract_trace_data(self, model, rep_no, fold_no):
+
+def _extract_trace_data(model, rep_no, fold_no):
     arff_tracecontent = []
     for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
         # we use the string values for True and False, as it is defined in

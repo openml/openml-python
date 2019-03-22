@@ -15,8 +15,9 @@ from openml.extensions.sklearn.flow_functions import (
 from openml.extensions.sklearn.run_functions import (
     seed_model,
     run_model_on_fold,
-    obtain_arff_trace,
+    is_hpo_class,
     assert_is_hpo_class,
+    obtain_arff_trace,
 )
 from openml.flows import OpenMLFlow
 from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration
@@ -92,6 +93,9 @@ class SklearnExtension(Extension):
 
     ################################################################################################
     # Methods for hyperparameter optimization
+
+    def is_hpo_class(self, model: Any) -> bool:
+        return is_hpo_class(model)
 
     def instantiate_model_from_hpo_class(
         self,

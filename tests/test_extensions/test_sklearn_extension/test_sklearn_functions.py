@@ -1026,8 +1026,10 @@ class TestFunctions(TestBase):
 
         # we want to compare pipe_deserialized and pipe_orig. We use the flow
         # equals function for this
-        assert_flows_equal(openml.extensions.sklearn.flow_functions.sklearn_to_flow(pipe_orig),
-                           openml.extensions.sklearn.flow_functions.sklearn_to_flow(pipe_deserialized))
+        assert_flows_equal(
+            openml.extensions.sklearn.flow_functions.sklearn_to_flow(pipe_orig),
+            openml.extensions.sklearn.flow_functions.sklearn_to_flow(pipe_deserialized),
+        )
 
     def test_deserialize_adaboost_with_defaults(self):
         # used the 'initialize_with_defaults' flag of the deserialization
@@ -1050,8 +1052,10 @@ class TestFunctions(TestBase):
 
         # we want to compare pipe_deserialized and pipe_orig. We use the flow
         # equals function for this
-        assert_flows_equal(openml.extensions.sklearn.flow_functions.sklearn_to_flow(pipe_orig),
-                           openml.extensions.sklearn.flow_functions.sklearn_to_flow(pipe_deserialized))
+        assert_flows_equal(
+            openml.extensions.sklearn.flow_functions.sklearn_to_flow(pipe_orig),
+            openml.extensions.sklearn.flow_functions.sklearn_to_flow(pipe_deserialized),
+        )
 
     def test_deserialize_complex_with_defaults(self):
         # used the 'initialize_with_defaults' flag of the deserialization
@@ -1089,8 +1093,10 @@ class TestFunctions(TestBase):
 
         # we want to compare pipe_deserialized and pipe_orig. We use the flow
         # equals function for this
-        assert_flows_equal(openml.extensions.sklearn.flow_functions.sklearn_to_flow(pipe_orig),
-                           openml.extensions.sklearn.flow_functions.sklearn_to_flow(pipe_deserialized))
+        assert_flows_equal(
+            openml.extensions.sklearn.flow_functions.sklearn_to_flow(pipe_orig),
+            openml.extensions.sklearn.flow_functions.sklearn_to_flow(pipe_deserialized),
+        )
 
     def test_openml_param_name_to_sklearn(self):
         extension = openml.extensions.sklearn.extension.SklearnExtension()

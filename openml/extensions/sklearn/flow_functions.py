@@ -327,7 +327,7 @@ def obtain_parameter_values(flow: OpenMLFlow, model: object = None) -> List[Dict
             _current = OrderedDict()
             _current['oml:name'] = _param_name
 
-            current_param_values = openml.extensions.sklearn.functions.sklearn_to_flow(
+            current_param_values = openml.extensions.sklearn.flow_functions.sklearn_to_flow(
                 component_model.get_params()[_param_name])
 
             # Try to filter out components (a.k.a. subflows) which are
@@ -991,3 +991,10 @@ def check_n_jobs(model: Any) -> bool:
 
     # check the parameters for n_jobs
     return check(model.get_params(), 'n_jobs', [1, None])
+
+
+def create_setup_string(model: Any) -> str:
+    """Create a string representing the model"""
+    run_environment = " ".join(get_version_information())
+    # fixme str(model) might contain (...)
+    return run_environment + " " + str(model)
