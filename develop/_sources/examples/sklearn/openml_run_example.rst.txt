@@ -12,9 +12,7 @@ OpenML Run Example
 
 An example of an automated machine learning experiment.
 
-
-
-.. code-block:: python
+.. code-block:: default
 
     import openml
     from sklearn import tree, preprocessing, pipeline
@@ -38,8 +36,7 @@ An example of an automated machine learning experiment.
 Download the OpenML task for the german credit card dataset.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
     task = openml.tasks.get_task(97)
 
@@ -51,8 +48,7 @@ Download the OpenML task for the german credit card dataset.
 Run the scikit-learn model on the task (requires an API key).
 
 
-
-.. code-block:: python
+.. code-block:: default
 
     run = openml.runs.run_model_on_task(clf, task)
     # Publish the experiment on OpenML (optional, requires an API key).
@@ -69,10 +65,13 @@ Run the scikit-learn model on the task (requires an API key).
 
  .. code-block:: none
 
-    URL for run: https://test.openml.org/api/v1/xml/run/7840
+    URL for run: https://test.openml.org/api/v1/xml/run/9122
 
 
-**Total running time of the script:** ( 0 minutes  3.996 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  3.817 seconds)
 
 
 .. _sphx_glr_download_examples_sklearn_openml_run_example.py:

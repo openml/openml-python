@@ -1,5 +1,9 @@
 :orphan:
 
+
+
+.. _sphx_glr_examples:
+
 Introductory Examples
 =====================
 
@@ -9,7 +13,7 @@ General examples for OpenML usage.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="An introduction to OpenML, followed up by a simple example. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="An introduction to OpenML, followed up by a simple example.">
 
 .. only:: html
 
@@ -29,7 +33,7 @@ General examples for OpenML usage.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to list and download tasks. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to list and download tasks.">
 
 .. only:: html
 
@@ -49,7 +53,7 @@ General examples for OpenML usage.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="How to list and download datasets. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="How to list and download datasets.">
 
 .. only:: html
 
@@ -89,7 +93,7 @@ General examples for OpenML usage.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="How to train/run a model and how to upload the results. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="How to train/run a model and how to upload the results.">
 
 .. only:: html
 
@@ -109,7 +113,7 @@ General examples for OpenML usage.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to create and upload a dataset to OpenML. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to create and upload a dataset to OpenML.">
 
 .. only:: html
 
@@ -130,6 +134,10 @@ General examples for OpenML usage.
 
     <div style='clear:both'></div>
 
+
+
+.. _sphx_glr_examples_sklearn:
+
 Experiment Examples
 ===================
 
@@ -139,7 +147,7 @@ OpenML experiment examples using a sklearn classifier/pipeline.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="An example of an automated machine learning experiment. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="An example of an automated machine learning experiment.">
 
 .. only:: html
 

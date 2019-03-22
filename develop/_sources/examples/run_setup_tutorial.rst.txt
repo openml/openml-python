@@ -33,10 +33,7 @@ In this tutorial we will
        and solve the same task again;
     3) We will verify that the obtained results are exactly the same.
 
-
-
-
-.. code-block:: python
+.. code-block:: default
 
     import logging
     import numpy as np
@@ -59,8 +56,7 @@ In this tutorial we will
 ##############################################################################
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     # first, let's download the task that we are interested in
@@ -107,8 +103,7 @@ In this tutorial we will
 ##############################################################################
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     # obtain setup id (note that the setup id is assigned by the OpenML server -
@@ -135,8 +130,7 @@ In this tutorial we will
 ##############################################################################
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     # the run has stored all predictions in the field data content
@@ -148,7 +142,10 @@ In this tutorial we will
 
 
 
-**Total running time of the script:** ( 0 minutes  5.100 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  4.532 seconds)
 
 
 .. _sphx_glr_download_examples_run_setup_tutorial.py:

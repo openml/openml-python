@@ -121,8 +121,8 @@
 </div>
 <div class="sphx-glr-example-title section" id="introduction">
 <span id="sphx-glr-examples-introduction-tutorial-py"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>An introduction to OpenML, followed up by a simple example.</p>
-<p>OpenML is an online collaboration platform for machine learning which allows
+<p>An introduction to OpenML, followed up by a simple example.
+OpenML is an online collaboration platform for machine learning which allows
 you to:</p>
 <ul class="simple">
 <li>Find or share interesting, well-documented datasets</li>
@@ -160,8 +160,8 @@ file must be in the directory ~/.openml/config and exist prior to
 importing the openml module.</li>
 <li>Run the code below, replacing ‘YOURKEY’ with your API key.</li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
-<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">neighbors</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="k">import</span> <span class="n">neighbors</span>
 
 <span class="c1"># Uncomment and set your OpenML key. Don&#39;t share your key with others.</span>
 <span class="c1"># openml.config.apikey = &#39;YOURKEY&#39;</span>
@@ -180,7 +180,7 @@ through the API:</p>
 will use <strong>~/.openml/cache</strong> as the cache directory.</li>
 <li>Run the code below, replacing ‘YOURDIR’ with the path to the cache directory.</li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Uncomment and set your OpenML cache directory</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Uncomment and set your OpenML cache directory</span>
 <span class="c1"># import os</span>
 <span class="c1"># openml.config.cache_directory = os.path.expanduser(&#39;YOURDIR&#39;)</span>
 </pre></div>
@@ -189,23 +189,23 @@ will use <strong>~/.openml/cache</strong> as the cache directory.</li>
 <div class="section" id="simple-example">
 <h2>Simple Example<a class="headerlink" href="#simple-example" title="Permalink to this headline">¶</a></h2>
 <p>Download the OpenML task for the eeg-eye-state.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">)</span>
 <span class="n">clf</span> <span class="o">=</span> <span class="n">neighbors</span><span class="o">.</span><span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">flow</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">sklearn_to_flow</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span>
-<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_flow_on_task</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_flow_on_task</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="c1"># Publish the experiment on OpenML (optional, requires an API key).</span>
 <span class="c1"># For this tutorial, our configuration publishes to the test server</span>
 <span class="c1"># as to not pollute the main server.</span>
 <span class="n">myrun</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;kNN on </span><span class="si">%s</span><span class="s2">: http://test.openml.org/r/</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">myrun</span><span class="o">.</span><span class="n">run_id</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;kNN on </span><span class="si">%s</span><span class="s2">: http://test.openml.org/r/</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">myrun</span><span class="o">.</span><span class="n">run_id</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: http://test.openml.org/r/7831
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: http://test.openml.org/r/9116
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  14.142 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  14.071 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-introduction-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/401c39eb686323be5e9bb1b8948e4e0e/introduction_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">introduction_tutorial.py</span></code></a></div>

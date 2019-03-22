@@ -126,13 +126,13 @@
 <div class="sphx-glr-example-title section" id="datasets">
 <span id="sphx-glr-examples-datasets-tutorial-py"></span><h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h1>
 <p>How to list and download datasets.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 </pre></div>
 </div>
 <div class="section" id="list-datasets">
 <h2>List datasets<a class="headerlink" href="#list-datasets" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">openml_list</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">()</span>  <span class="c1"># returns a dict</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml_list</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">()</span>  <span class="c1"># returns a dict</span>
 
 <span class="c1"># Show a nice table with some key data properties</span>
 <span class="n">datalist</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">openml_list</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
@@ -141,12 +141,12 @@
     <span class="s1">&#39;NumberOfFeatures&#39;</span><span class="p">,</span> <span class="s1">&#39;NumberOfClasses&#39;</span>
 <span class="p">]]</span>
 
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;First 10 of </span><span class="si">%s</span><span class="s2"> datasets...&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">datalist</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 10 of </span><span class="si">%s</span><span class="s2"> datasets...&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">datalist</span><span class="p">))</span>
 <span class="n">datalist</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 730 datasets...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 1514 datasets...
 </pre></div>
 </div>
 <div class="section" id="exercise-1">
@@ -156,28 +156,28 @@
 <li>Find a dataset called ‘eeg_eye_state’.</li>
 <li>Find all datasets with more than 50 classes.</li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="p">[</span><span class="n">datalist</span><span class="o">.</span><span class="n">NumberOfInstances</span> <span class="o">&gt;</span> <span class="mi">10000</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="p">[</span><span class="n">datalist</span><span class="o">.</span><span class="n">NumberOfInstances</span> <span class="o">&gt;</span> <span class="mi">10000</span>
          <span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;NumberOfInstances&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;name == &quot;eeg-eye-state&quot;&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;name == &quot;eeg-eye-state&quot;&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;NumberOfClasses &gt; 50&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;NumberOfClasses &gt; 50&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="section" id="download-datasets">
 <h2>Download datasets<a class="headerlink" href="#download-datasets" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is done based on the dataset ID (&#39;did&#39;).</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is done based on the dataset ID (&#39;did&#39;).</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">68</span><span class="p">)</span>
 
 <span class="c1"># Print a summary</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;This is dataset &#39;</span><span class="si">%s</span><span class="s2">&#39;, the target feature is &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This is dataset &#39;</span><span class="si">%s</span><span class="s2">&#39;, the target feature is &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span>
       <span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="p">))</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;URL: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">dataset</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">description</span><span class="p">[:</span><span class="mi">500</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;URL: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">dataset</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">description</span><span class="p">[:</span><span class="mi">500</span><span class="p">])</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -196,14 +196,14 @@ sparse matrix, or as a Pandas DataFrame (or SparseDataFrame). The format is
 controlled with the parameter <code class="docutils literal notranslate"><span class="pre">dataset_format</span></code> which can be either ‘array’
 (default) or ‘dataframe’. Let’s first build our dataset from a NumPy array
 and manually create a dataframe.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
     <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">,</span>
     <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="p">,</span>
-    <span class="n">return_attribute_names</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">return_attribute_names</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">eeg</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">attribute_names</span><span class="p">)</span>
 <span class="n">eeg</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
-<span class="k">print</span><span class="p">(</span><span class="n">eeg</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">eeg</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -224,10 +224,10 @@ and manually create a dataframe.</p>
 </div>
 <p>Instead of manually creating the dataframe, you can already request a
 dataframe with the correct dtypes.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="p">,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="p">,</span>
                         <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
-<span class="k">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -266,7 +266,7 @@ In those cases, you can download the dataset without downloading the
 data file. The dataset object can be used as normal.
 Whenever you use any functionality that requires the data,
 such as <cite>get_data</cite>, the data will be downloaded.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">68</span><span class="p">,</span> <span class="n">download_data</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">68</span><span class="p">,</span> <span class="n">download_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="section" id="exercise-2">
@@ -274,7 +274,7 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 <ul class="simple">
 <li>Explore the data visually.</li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">eegs</span> <span class="o">=</span> <span class="n">eeg</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eegs</span> <span class="o">=</span> <span class="n">eeg</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">_</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">(</span>
     <span class="n">eegs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">100</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">],</span>
     <span class="n">c</span><span class="o">=</span><span class="n">eegs</span><span class="p">[:</span><span class="mi">100</span><span class="p">][</span><span class="s1">&#39;class&#39;</span><span class="p">],</span>
@@ -287,7 +287,7 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_datasets_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_datasets_tutorial_001.png" />
-<p><strong>Total running time of the script:</strong> ( 0 minutes  1.383 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.265 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-datasets-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/ea68bafc2f0d401c0e0139e9c46c83d5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></div>

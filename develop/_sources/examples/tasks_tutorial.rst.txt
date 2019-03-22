@@ -12,9 +12,7 @@ Tasks
 
 A tutorial on how to list and download tasks.
 
-
-
-.. code-block:: python
+.. code-block:: default
 
 
     import openml
@@ -40,15 +38,13 @@ special tag or only tasks for a specific target such as
 metric, the splits and an iterator which can be used to access the
 splits in a useful manner.
 
-
 Listing tasks
 ^^^^^^^^^^^^^
 
 We will start by simply listing only *supervised classification* tasks:
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     tasks = openml.tasks.list_tasks(task_type_id=1)
@@ -64,8 +60,7 @@ We will start by simply listing only *supervised classification* tasks:
 to have better visualization and easier access:
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     tasks = pd.DataFrame.from_dict(tasks, orient='index')
@@ -105,8 +100,7 @@ We can filter the list of tasks to only contain datasets with more than
 500 samples, but less than 1000 samples:
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     filtered_tasks = tasks.query('NumberOfInstances > 500 and NumberOfInstances < 1000')
@@ -126,7 +120,7 @@ We can filter the list of tasks to only contain datasets with more than
 
 
 
-.. code-block:: python
+.. code-block:: default
 
 
     # Number of tasks
@@ -148,8 +142,7 @@ We can filter the list of tasks to only contain datasets with more than
 Then, we can further restrict the tasks to all have the same resampling strategy:
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     filtered_tasks = filtered_tasks.query('estimation_procedure == "10-fold Crossvalidation"')
@@ -169,7 +162,7 @@ Then, we can further restrict the tasks to all have the same resampling strategy
 
 
 
-.. code-block:: python
+.. code-block:: default
 
 
     # Number of tasks
@@ -194,8 +187,7 @@ Resampling strategies can be found on the
 Similar to listing tasks by task type, we can list tasks by tags:
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     tasks = openml.tasks.list_tasks(tag='OpenML100')
@@ -227,8 +219,7 @@ Similar to listing tasks by task type, we can list tasks by tags:
 Furthermore, we can list tasks based on the dataset id:
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     tasks = openml.tasks.list_tasks(data_id=61)
@@ -260,8 +251,7 @@ Furthermore, we can list tasks based on the dataset id:
 In addition, a size limit and an offset can be applied both separately and simultaneously:
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     tasks = openml.tasks.list_tasks(size=10, offset=50)
@@ -304,8 +294,7 @@ categorical features. You can find out more about the *OpenML 100* on
 Finally, it is also possible to list all tasks on OpenML with:
 
 
-
-.. code-block:: python
+.. code-block:: default
 
     tasks = openml.tasks.list_tasks()
     tasks = pd.DataFrame.from_dict(tasks, orient='index')
@@ -330,8 +319,7 @@ Exercise
 Search for the tasks on the 'eeg-eye-state' dataset.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     tasks.query('name=="eeg-eye-state"')
@@ -350,8 +338,7 @@ single task by its ID, and one which takes a list of IDs and downloads
 all of these tasks:
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     task_id = 1
@@ -366,8 +353,7 @@ all of these tasks:
 Properties of the task are stored as member variables:
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     pprint(vars(task))
@@ -406,8 +392,7 @@ Properties of the task are stored as member variables:
 And:
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     ids = [1, 2, 19, 97, 403]
@@ -423,10 +408,13 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLClassificationTask object at 0x2b50c1b09d68>
+    <openml.tasks.task.OpenMLClassificationTask object at 0x2ac69c8dd898>
 
 
-**Total running time of the script:** ( 0 minutes  19.023 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  19.069 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:

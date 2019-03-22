@@ -123,9 +123,9 @@
 <div class="sphx-glr-example-title section" id="tasks">
 <span id="sphx-glr-examples-tasks-tutorial-py"></span><h1>Tasks<a class="headerlink" href="#tasks" title="Permalink to this headline">¶</a></h1>
 <p>A tutorial on how to list and download tasks.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pprint</span>
 </pre></div>
 </div>
 <p>Tasks are identified by IDs and can be accessed in two different ways:</p>
@@ -141,15 +141,15 @@ splits in a useful manner.</p>
 <div class="section" id="listing-tasks">
 <h2>Listing tasks<a class="headerlink" href="#listing-tasks" title="Permalink to this headline">¶</a></h2>
 <p>We will start by simply listing only <em>supervised classification</em> tasks:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">task_type_id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">task_type_id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>openml.tasks.list_tasks()</strong> returns a dictionary of dictionaries, we convert it into a
 <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html">pandas dataframe</a>
 to have better visualization and easier access:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;First 5 of </span><span class="si">%s</span><span class="s2"> tasks:&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 5 of </span><span class="si">%s</span><span class="s2"> tasks:&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
 <span class="n">pprint</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -174,16 +174,16 @@ First 5 of 727 tasks:
 </div>
 <p>We can filter the list of tasks to only contain datasets with more than
 500 samples, but less than 1000 samples:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;NumberOfInstances &gt; 500 and NumberOfInstances &lt; 1000&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;NumberOfInstances &gt; 500 and NumberOfInstances &lt; 1000&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1, 2, 3, 4, 5, 6, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 41, 42, 91, 92, 93, 94, 95, 96, 115, 116, 117, 118, 119, 120, 127, 128, 129, 130, 131, 132, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 181, 182, 183, 184, 185, 186, 193, 194, 195, 196, 197, 198, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 229, 230, 231, 232, 233, 234, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 307, 308, 309, 310, 311, 312, 379, 380, 381, 382, 383, 384, 391, 392, 393, 394, 395, 396, 433, 434, 435, 436, 437, 438, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 565, 566, 567, 568, 569, 570, 595, 596, 597, 598, 599, 600, 607, 608, 609, 610, 611, 612, 1069, 1072, 1075, 1084, 1088, 1090, 1093, 1094, 1099, 1101, 1103, 1104, 1105, 1107, 1109, 1110, 1111, 1120, 1132, 1134, 1141, 1154, 1155, 1163, 1168]
 </pre></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
-<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -191,16 +191,16 @@ First 5 of 727 tasks:
 </pre></div>
 </div>
 <p>Then, we can further restrict the tasks to all have the same resampling strategy:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_tasks</span> <span class="o">=</span> <span class="n">filtered_tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;estimation_procedure == &quot;10-fold Crossvalidation&quot;&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_tasks</span> <span class="o">=</span> <span class="n">filtered_tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;estimation_procedure == &quot;10-fold Crossvalidation&quot;&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1, 19, 37, 91, 115, 127, 145, 151, 181, 193, 205, 211, 217, 229, 241, 247, 253, 307, 379, 391, 433, 511, 517, 565, 595, 607]
 </pre></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
-<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -210,9 +210,9 @@ First 5 of 727 tasks:
 <p>Resampling strategies can be found on the
 <a class="reference external" href="http://www.openml.org/search?type=measure&amp;q=estimation%20procedure">OpenML Website</a>.</p>
 <p>Similar to listing tasks by task type, we can list tasks by tags:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s1">&#39;OpenML100&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s1">&#39;OpenML100&#39;</span><span class="p">)</span>
 <span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;First 5 of </span><span class="si">%s</span><span class="s2"> tasks:&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 5 of </span><span class="si">%s</span><span class="s2"> tasks:&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
 <span class="n">pprint</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -229,9 +229,9 @@ First 5 of 727 tasks:
 </pre></div>
 </div>
 <p>Furthermore, we can list tasks based on the dataset id:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="mi">61</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="mi">61</span><span class="p">)</span>
 <span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;First 5 of </span><span class="si">%s</span><span class="s2"> tasks:&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 5 of </span><span class="si">%s</span><span class="s2"> tasks:&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
 <span class="n">pprint</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -248,7 +248,7 @@ First 5 of 727 tasks:
 </pre></div>
 </div>
 <p>In addition, a size limit and an offset can be applied both separately and simultaneously:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 <span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
 <span class="n">pprint</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
 </pre></div>
@@ -277,9 +277,9 @@ unbalanced data and sparse data. However, the tasks include missing values and
 categorical features. You can find out more about the <em>OpenML 100</em> on
 <a class="reference external" href="https://www.openml.org/guide/benchmark">the OpenML benchmarking page</a>.</p>
 <p>Finally, it is also possible to list all tasks on OpenML with:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">()</span>
 <span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -289,7 +289,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 <div class="section" id="exercise">
 <h3>Exercise<a class="headerlink" href="#exercise" title="Permalink to this headline">¶</a></h3>
 <p>Search for the tasks on the ‘eeg-eye-state’ dataset.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;name==&quot;eeg-eye-state&quot;&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;name==&quot;eeg-eye-state&quot;&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -299,12 +299,12 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 <p>We provide two functions to download tasks, one which downloads only a
 single task by its ID, and one which takes a list of IDs and downloads
 all of these tasks:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">1</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Properties of the task are stored as member variables:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pprint</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">task</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pprint</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">task</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -330,16 +330,16 @@ all of these tasks:</p>
 </pre></div>
 </div>
 <p>And:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">97</span><span class="p">,</span> <span class="mi">403</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">97</span><span class="p">,</span> <span class="mi">403</span><span class="p">]</span>
 <span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_tasks</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 <span class="n">pprint</span><span class="p">(</span><span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLClassificationTask object at 0x2b50c1b09d68&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLClassificationTask object at 0x2ac69c8dd898&gt;
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  19.023 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  19.069 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-tasks-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/204148be48b3a7d6b2cc72a9fc63c69e/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></div>

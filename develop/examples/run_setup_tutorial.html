@@ -143,8 +143,8 @@ and solve the same task again;</li>
 </ol>
 </dd>
 </dl>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">import</span> <span class="nn">sklearn.ensemble</span>
 <span class="kn">import</span> <span class="nn">sklearn.impute</span>
@@ -157,7 +157,7 @@ and solve the same task again;</li>
 </div>
 <div class="section" id="create-a-flow-and-use-it-to-solve-a-task">
 <h2>1) Create a flow and use it to solve a task<a class="headerlink" href="#create-a-flow-and-use-it-to-solve-a-task" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># first, let&#39;s download the task that we are interested in</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># first, let&#39;s download the task that we are interested in</span>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
 
 
@@ -188,14 +188,14 @@ and solve the same task again;</li>
 <span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
     <span class="n">model_original</span><span class="p">,</span>
     <span class="n">task</span><span class="p">,</span>
-    <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">run_original</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>  <span class="c1"># this implicitly uploads the flow</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="download-the-flow-and-solve-the-same-task-again">
 <h2>2) Download the flow and solve the same task again.<a class="headerlink" href="#download-the-flow-and-solve-the-same-task-again" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># obtain setup id (note that the setup id is assigned by the OpenML server -</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># obtain setup id (note that the setup id is assigned by the OpenML server -</span>
 <span class="c1"># therefore it was not yet available in our local copy of the run)</span>
 <span class="n">run_downloaded</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_original</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>
 <span class="n">setup_id</span> <span class="o">=</span> <span class="n">run_downloaded</span><span class="o">.</span><span class="n">setup_id</span>
@@ -206,18 +206,18 @@ and solve the same task again;</li>
 
 <span class="c1"># and run the task again</span>
 <span class="n">run_duplicate</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
-    <span class="n">model_duplicate</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">model_duplicate</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="we-will-verify-that-the-obtained-results-are-exactly-the-same">
 <h2>3) We will verify that the obtained results are exactly the same.<a class="headerlink" href="#we-will-verify-that-the-obtained-results-are-exactly-the-same" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># the run has stored all predictions in the field data content</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># the run has stored all predictions in the field data content</span>
 <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">run_original</span><span class="o">.</span><span class="n">data_content</span><span class="p">,</span>
                               <span class="n">run_duplicate</span><span class="o">.</span><span class="n">data_content</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  5.100 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.532 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-run-setup-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/1362ba2cd69c0b482a5c32fba04ee0d1/run_setup_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">run_setup_tutorial.py</span></code></a></div>

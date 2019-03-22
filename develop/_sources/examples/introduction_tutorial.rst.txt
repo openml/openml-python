@@ -11,8 +11,6 @@ Introduction
 ===================
 
 An introduction to OpenML, followed up by a simple example.
-
-
 OpenML is an online collaboration platform for machine learning which allows
 you to:
 
@@ -55,8 +53,7 @@ There are two ways to authenticate:
 * Run the code below, replacing 'YOURKEY' with your API key.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
     import openml
     from sklearn import neighbors
@@ -83,8 +80,7 @@ through the API:
 * Run the code below, replacing 'YOURDIR' with the path to the cache directory.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     # Uncomment and set your OpenML cache directory
@@ -102,8 +98,7 @@ Simple Example
 Download the OpenML task for the eeg-eye-state.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
     task = openml.tasks.get_task(403)
     data = openml.datasets.get_dataset(task.dataset_id)
@@ -125,10 +120,13 @@ Download the OpenML task for the eeg-eye-state.
 
  .. code-block:: none
 
-    kNN on eeg-eye-state: http://test.openml.org/r/7831
+    kNN on eeg-eye-state: http://test.openml.org/r/9116
 
 
-**Total running time of the script:** ( 0 minutes  14.142 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  14.071 seconds)
 
 
 .. _sphx_glr_download_examples_introduction_tutorial.py:

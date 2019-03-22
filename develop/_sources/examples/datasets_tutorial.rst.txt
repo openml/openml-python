@@ -13,9 +13,7 @@ Datasets
 
 How to list and download datasets.
 
-
-
-.. code-block:: python
+.. code-block:: default
 
 
     import openml
@@ -31,8 +29,7 @@ List datasets
 =============
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     openml_list = openml.datasets.list_datasets()  # returns a dict
@@ -57,7 +54,7 @@ List datasets
 
  .. code-block:: none
 
-    First 10 of 730 datasets...
+    First 10 of 1514 datasets...
 
 
 Exercise 1
@@ -68,8 +65,7 @@ Exercise 1
 * Find all datasets with more than 50 classes.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
     datalist[datalist.NumberOfInstances > 10000
              ].sort_values(['NumberOfInstances']).head(n=20)
@@ -80,7 +76,7 @@ Exercise 1
 
 
 
-.. code-block:: python
+.. code-block:: default
 
     datalist.query('name == "eeg-eye-state"')
 
@@ -90,7 +86,7 @@ Exercise 1
 
 
 
-.. code-block:: python
+.. code-block:: default
 
     datalist.query('NumberOfClasses > 50')
 
@@ -104,8 +100,7 @@ Download datasets
 =================
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     # This is done based on the dataset ID ('did').
@@ -145,8 +140,7 @@ controlled with the parameter ``dataset_format`` which can be either 'array'
 and manually create a dataframe.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
     X, y, attribute_names = dataset.get_data(
         dataset_format='array',
@@ -186,8 +180,7 @@ Instead of manually creating the dataframe, you can already request a
 dataframe with the correct dtypes.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
     X, y = dataset.get_data(target=dataset.default_target_attribute,
                             dataset_format='dataframe')
@@ -241,8 +234,7 @@ Whenever you use any functionality that requires the data,
 such as `get_data`, the data will be downloaded.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
     dataset = openml.datasets.get_dataset(68, download_data=False)
 
@@ -258,8 +250,7 @@ Exercise 2
 * Explore the data visually.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
     eegs = eeg.sample(n=1000)
     _ = pd.plotting.scatter_matrix(
@@ -280,7 +271,10 @@ Exercise 2
 
 
 
-**Total running time of the script:** ( 0 minutes  1.383 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  2.265 seconds)
 
 
 .. _sphx_glr_download_examples_datasets_tutorial.py:
