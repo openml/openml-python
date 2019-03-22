@@ -64,7 +64,7 @@ class TestFunctions(TestBase):
         self.X = iris.data
         self.y = iris.target
 
-    @mock.patch('openml.extensions.sklearn.functions._check_dependencies')
+    @mock.patch('openml.extensions.sklearn.flow_functions._check_dependencies')
     def test_serialize_model(self, check_dependencies_mock):
         model = sklearn.tree.DecisionTreeClassifier(criterion='entropy',
                                                     max_features='auto',
@@ -133,7 +133,7 @@ class TestFunctions(TestBase):
 
         self.assertEqual(check_dependencies_mock.call_count, 1)
 
-    @mock.patch('openml.extensions.sklearn.functions._check_dependencies')
+    @mock.patch('openml.extensions.sklearn.flow_functions._check_dependencies')
     def test_serialize_model_clustering(self, check_dependencies_mock):
         model = sklearn.cluster.KMeans()
 
