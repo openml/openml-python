@@ -331,7 +331,6 @@ def initialize_model_from_trace(
     current = run_trace.trace_iterations[(repeat, fold, iteration)]
 
     search_model = initialize_model_from_run(run_id, extension)
-    extension.assert_hpo_class(search_model)
     model = extension.instantiate_model_from_hpo_class(search_model, current)
     return model
 

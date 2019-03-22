@@ -11,7 +11,7 @@ from sklearn.preprocessing import Imputer
 
 from openml.testing import TestBase
 import openml
-import openml.extensions.sklearn.functions
+import openml.extensions.sklearn.flow_functions
 import openml.extensions.sklearn
 
 
