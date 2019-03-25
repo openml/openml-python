@@ -1,4 +1,3 @@
-from openml.extensions.sklearn import SklearnExtension
 from openml.testing import TestBase
 
 

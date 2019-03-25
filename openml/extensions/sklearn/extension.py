@@ -132,4 +132,3 @@ class SklearnExtension(Extension):
 
 
 register_extension(SklearnExtension)
-

@@ -75,6 +75,14 @@ def run_model_on_task(
     flow : OpenMLFlow (optional, only if `return_flow` is True).
         Flow generated from the model.
     """
+
+    if extension is None:
+        extension = get_extension_by_model(model, raise_if_no_extension=True)
+    if extension is None:
+        # This should never happen and is only here to please mypy will be gone soon once the
+        # whole function is removed
+        raise TypeError(extension)
+
     # TODO: At some point in the future do not allow for arguments in old order (6-2018).
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
     if isinstance(model, OpenMLTask) and extension.is_estimator(model):
@@ -82,9 +90,6 @@ def run_model_on_task(
                       "will not be supported in the future. Please use the "
                       "order (model, task).", DeprecationWarning)
         task, model = model, task
-
-    if extension is None:
-        extension = get_extension_by_model(model, raise_if_no_extension=True)
 
     flow = extension.model_to_flow(model)
 

@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import io
 import os
-from typing import Any, TYPE_CHECKING
+from typing import Any
 
 import xmltodict
 

@@ -1099,7 +1099,6 @@ class TestFunctions(TestBase):
         )
 
     def test_openml_param_name_to_sklearn(self):
-        extension = openml.extensions.sklearn.extension.SklearnExtension()
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         boosting = sklearn.ensemble.AdaBoostClassifier(
             base_estimator=sklearn.tree.DecisionTreeClassifier())
