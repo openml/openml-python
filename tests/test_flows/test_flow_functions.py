@@ -244,6 +244,6 @@ class TestFlowFunctions(TestBase):
         flow.publish()
 
         # Test deserialization works
-        server_flow = openml.flows.get_flow(flow.flow_id, extension=extension)
+        server_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
         self.assertEqual(server_flow.parameters['categories'], '[[0, 1], [0, 1]]')
         self.assertEqual(server_flow.model.categories, flow.model.categories)

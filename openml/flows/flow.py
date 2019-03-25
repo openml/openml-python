@@ -6,6 +6,7 @@ import xmltodict
 
 import openml._api_calls
 import openml.exceptions
+from ..extensions import get_extension_by_flow
 from ..utils import extract_xml_tags
 
 
@@ -130,6 +131,8 @@ class OpenMLFlow(object):
         self.language = language
         self.dependencies = dependencies
         self.flow_id = flow_id
+
+        self.extension = get_extension_by_flow(self)
 
     def _to_xml(self) -> str:
         """Generate xml representation of self for upload to server.

@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 
-from ..tasks.task import OpenMLTask
-from ..flows.flow import OpenMLFlow
-from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration
+
+if TYPE_CHECKING:
+    from openml.flows import OpenMLFlow
+    from openml.tasks.task import OpenMLTask
+    from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration
 
 
 class Extension(ABC):
@@ -12,14 +14,27 @@ class Extension(ABC):
     """
 
     ################################################################################################
+    # General setup
+
+    @staticmethod
+    @abstractmethod
+    def can_handle_flow(flow: 'OpenMLFlow') -> bool:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def can_handle_model(model: Any) -> bool:
+        pass
+
+    ################################################################################################
     # Abstract methods for flow serialization and de-serialization
 
     @abstractmethod
-    def flow_to_model(self, flow: OpenMLFlow) -> Any:
+    def flow_to_model(self, flow: 'OpenMLFlow') -> Any:
         pass
 
     @abstractmethod
-    def model_to_flow(self, model: Any) -> OpenMLFlow:
+    def model_to_flow(self, model: Any) -> 'OpenMLFlow':
         pass
 
     @abstractmethod
@@ -49,7 +64,7 @@ class Extension(ABC):
     def run_model_on_fold(
         self,
         model: Any,
-        task: OpenMLTask,
+        task: 'OpenMLTask',
         rep_no: int,
         fold_no: int,
         sample_no: int,
@@ -61,7 +76,7 @@ class Extension(ABC):
     @abstractmethod
     def obtain_parameter_values(
         self,
-        flow: OpenMLFlow,
+        flow: 'OpenMLFlow',
         model: Any = None,
     ) -> List[Dict[str, Any]]:
         """
@@ -85,7 +100,7 @@ class Extension(ABC):
     def instantiate_model_from_hpo_class(
         self,
         model: Any,
-        trace_iteration: OpenMLTraceIteration,
+        trace_iteration: 'OpenMLTraceIteration',
     ) -> Any:
         pass
 
@@ -94,5 +109,5 @@ class Extension(ABC):
         self,
         model: Any,
         trace_content: List,
-    ) -> OpenMLRunTrace:
+    ) -> 'OpenMLRunTrace':
         pass

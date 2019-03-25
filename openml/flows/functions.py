@@ -12,8 +12,6 @@ import openml._api_calls
 from . import OpenMLFlow
 import openml.utils
 
-if TYPE_CHECKING:
-    from openml.extensions.extension_interface import Extension
 
 FLOWS_CACHE_DIR_NAME = 'flows'
 
@@ -72,10 +70,7 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
                                    "cached" % fid)
 
 
-def get_flow(
-    flow_id: int,
-    extension: 'Extension' = None,
-) -> OpenMLFlow:
+def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
     """Download the OpenML flow for a given flow ID.
 
     Parameters
@@ -83,9 +78,8 @@ def get_flow(
     flow_id : int
         The OpenML flow id.
 
-    extension: openml.extension.Extension
-        Reinstantiate the flow with the given extension. Does not reinstantiate the flow if the
-        extension is ``None``.
+    reinstantiate: bool
+        Whether to reinstantiate the flow to a sklearn model.
 
     Returns
     -------
@@ -99,8 +93,8 @@ def get_flow(
     ):
         flow = _get_flow_description(flow_id)
 
-    if extension is not None:
-        flow.model = extension.flow_to_model(flow)
+    if reinstantiate:
+        flow.model = flow.extension.flow_to_model(flow)
 
     return flow
 
@@ -334,7 +328,8 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                 assert_flows_equal(attr1[name], attr2[name],
                                    ignore_parameter_values_on_older_children,
                                    ignore_parameter_values)
-
+        elif key == 'extension':
+            continue
         else:
             if key == 'parameters':
                 if ignore_parameter_values or \

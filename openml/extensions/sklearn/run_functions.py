@@ -6,6 +6,7 @@ import warnings
 
 import numpy as np
 import sklearn.model_selection
+import sklearn.pipeline
 
 from openml.exceptions import PyOpenMLError
 from openml.runs.trace import OpenMLRunTrace, PREFIX
@@ -32,24 +33,24 @@ def assert_is_hpo_class(model: Any) -> None:
 
 def seed_model(model: Any, seed: Optional[int] = None) -> Any:
     """Sets all the non-seeded components of a model with a seed.
-               Models that are already seeded will maintain the seed. In
-               this case, only integer seeds are allowed (An exception
-               is thrown when a RandomState was used as seed)
+       Models that are already seeded will maintain the seed. In
+       this case, only integer seeds are allowed (An exception
+       is thrown when a RandomState was used as seed)
 
-                Parameters
-                ----------
-                model : sklearn model
-                    The model to be seeded
-                seed : int
-                    The seed to initialize the RandomState with. Unseeded subcomponents
-                    will be seeded with a random number from the RandomState.
+        Parameters
+        ----------
+        model : sklearn model
+            The model to be seeded
+        seed : int
+            The seed to initialize the RandomState with. Unseeded subcomponents
+            will be seeded with a random number from the RandomState.
 
-                Returns
-                -------
-                model : sklearn model
-                    a version of the model where all (sub)components have
-                    a seed
-            """
+        Returns
+        -------
+        model : sklearn model
+            a version of the model where all (sub)components have
+            a seed
+    """
 
     def _seed_current_object(current_value):
         if isinstance(current_value, int):  # acceptable behaviour

@@ -1,8 +1,8 @@
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 
+import sklearn.base
 
-from openml.tasks import OpenMLTask
-from openml.extensions import Extension
+from openml.extensions import Extension, register_extension
 from openml.extensions.sklearn.flow_functions import (
     sklearn_to_flow,
     flow_to_sklearn,
@@ -11,6 +11,7 @@ from openml.extensions.sklearn.flow_functions import (
     check_n_jobs,
     is_estimator,
     create_setup_string,
+    is_sklearn_flow,
 )
 from openml.extensions.sklearn.run_functions import (
     seed_model,
@@ -19,19 +20,34 @@ from openml.extensions.sklearn.run_functions import (
     assert_is_hpo_class,
     obtain_arff_trace,
 )
-from openml.flows import OpenMLFlow
-from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration
+
+
+if TYPE_CHECKING:
+    from openml.flows import OpenMLFlow
+    from openml.tasks.task import OpenMLTask
+    from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration
 
 
 class SklearnExtension(Extension):
 
     ################################################################################################
+    # General setup
+
+    @staticmethod
+    def can_handle_flow(flow: 'OpenMLFlow') -> bool:
+        return is_sklearn_flow(flow)
+
+    @staticmethod
+    def can_handle_model(model: Any) -> bool:
+        return isinstance(model, sklearn.base.BaseEstimator)
+
+    ################################################################################################
     # Methods for flow serialization and de-serialization
 
-    def flow_to_model(self, flow: OpenMLFlow) -> Any:
+    def flow_to_model(self, flow: 'OpenMLFlow') -> Any:
         return flow_to_sklearn(flow)
 
-    def model_to_flow(self, model: Any) -> OpenMLFlow:
+    def model_to_flow(self, model: Any) -> 'OpenMLFlow':
         return sklearn_to_flow(model)
 
     def flow_to_parameters(self, flow: Any) -> List:
@@ -55,7 +71,7 @@ class SklearnExtension(Extension):
     def run_model_on_fold(
         self,
         model: Any,
-        task: OpenMLTask,
+        task: 'OpenMLTask',
         rep_no: int,
         fold_no: int,
         sample_no: int,
@@ -74,7 +90,7 @@ class SklearnExtension(Extension):
 
     def obtain_parameter_values(
         self,
-        flow: OpenMLFlow,
+        flow: 'OpenMLFlow',
         model: Any = None,
     ) -> List[Dict[str, Any]]:
         """
@@ -100,7 +116,7 @@ class SklearnExtension(Extension):
     def instantiate_model_from_hpo_class(
         self,
         model: Any,
-        trace_iteration: OpenMLTraceIteration,
+        trace_iteration: 'OpenMLTraceIteration',
     ) -> Any:
         assert_is_hpo_class(model)
         base_estimator = model.estimator
@@ -111,5 +127,9 @@ class SklearnExtension(Extension):
         self,
         model: Any,
         trace_content: List,
-    ) -> OpenMLRunTrace:
+    ) -> 'OpenMLRunTrace':
         return obtain_arff_trace(model, trace_content)
+
+
+register_extension(SklearnExtension)
+

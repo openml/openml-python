@@ -10,12 +10,9 @@ import xmltodict
 
 import openml
 import openml._api_calls
-from ..tasks import get_task
 from ..exceptions import PyOpenMLError
-from ..tasks import TaskTypeEnum
-
-if TYPE_CHECKING:
-    from openml.extensions.extension_interface import Extension
+from ..flows import get_flow
+from ..tasks import get_task, TaskTypeEnum
 
 
 class OpenMLRun(object):
@@ -138,7 +135,6 @@ class OpenMLRun(object):
     def to_filesystem(
         self,
         directory: str,
-        extension: 'Extension',
         store_model: bool = True,
     ) -> None:
         """
@@ -165,7 +161,7 @@ class OpenMLRun(object):
             raise ValueError('Output directory should be empty')
 
         run_xml = self._create_description_xml()
-        predictions_arff = arff.dumps(self._generate_arff_dict(extension=extension))
+        predictions_arff = arff.dumps(self._generate_arff_dict())
 
         # It seems like typing does not allow to define the same variable multiple times
         with open(os.path.join(directory, 'description.xml'), 'w') as fh:  # type: TextIO
@@ -182,7 +178,7 @@ class OpenMLRun(object):
         if self.trace is not None:
             self.trace._to_filesystem(directory)
 
-    def _generate_arff_dict(self, extension: 'Extension') -> 'OrderedDict[str, Any]':
+    def _generate_arff_dict(self) -> 'OrderedDict[str, Any]':
         """Generates the arff dictionary for uploading predictions to the
         server.
 
@@ -196,8 +192,10 @@ class OpenMLRun(object):
         """
         if self.data_content is None:
             raise ValueError('Run has not been executed.')
+        if self.flow is None:
+            self.flow = get_flow(self.flow_id)
 
-        run_environment = (extension.get_version_information()
+        run_environment = (self.flow.extension.get_version_information()
                            + [time.strftime("%c")]
                            + ['Created by run_task()'])
         task = get_task(self.task_id)
@@ -255,7 +253,7 @@ class OpenMLRun(object):
 
         return arff_dict
 
-    def get_metric_fn(self, sklearn_fn, extension, kwargs=None):
+    def get_metric_fn(self, sklearn_fn, kwargs=None):
         """Calculates metric scores based on predicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
         it assumes that the 'correct' or 'truth' attribute is specified in
@@ -275,7 +273,7 @@ class OpenMLRun(object):
         """
         kwargs = kwargs if kwargs else dict()
         if self.data_content is not None and self.task_id is not None:
-            predictions_arff = self._generate_arff_dict(extension=extension)
+            predictions_arff = self._generate_arff_dict()
         elif 'predictions' in self.output_files:
             predictions_file_url = openml._api_calls._file_id_to_url(
                 self.output_files['predictions'], 'predictions.arff',
@@ -382,7 +380,7 @@ class OpenMLRun(object):
                 scores.append(sklearn_fn(y_true, y_pred, **kwargs))
         return np.array(scores)
 
-    def publish(self, extension: Optional['Extension'] = None) -> 'OpenMLRun':
+    def publish(self) -> 'OpenMLRun':
         """ Publish a run (and if necessary, its flow) to the OpenML server.
 
         Uploads the results of a run to OpenML.
@@ -412,22 +410,16 @@ class OpenMLRun(object):
         if self.parameter_settings is None:
             if self.flow is None:
                 self.flow = openml.flows.get_flow(self.flow_id)
-            if extension is None:
-                raise ValueError(
-                    'Requires an extension to obtain parameter values from the model inside the '
-                    'flow.'
-                )
-            self.parameter_settings = extension.obtain_parameter_values(self.flow, self.model)
+            self.parameter_settings = self.flow.extension.obtain_parameter_values(
+                self.flow,
+                self.model,
+            )
 
         description_xml = self._create_description_xml()
         file_elements = {'description': ("description.xml", description_xml)}
 
         if self.error_message is None:
-            if extension is None:
-                raise ValueError(
-                    'Requires an extension to generate the predictions arff file.'
-                )
-            predictions = arff.dumps(self._generate_arff_dict(extension=extension))
+            predictions = arff.dumps(self._generate_arff_dict())
             file_elements['predictions'] = ("predictions.arff", predictions)
 
         if self.trace is not None:

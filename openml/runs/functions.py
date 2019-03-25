@@ -11,6 +11,7 @@ import openml
 import openml.utils
 import openml._api_calls
 from openml.exceptions import PyOpenMLError
+from openml.extensions import get_extension_by_model
 from openml import config
 from openml.flows.flow import _copy_server_fields
 from ..flows import get_flow, flow_exists, OpenMLFlow
@@ -32,7 +33,7 @@ RUNS_CACHE_DIR_NAME = 'runs'
 def run_model_on_task(
     model: Any,
     task: OpenMLTask,
-    extension: 'Extension',
+    extension: Optional['Extension'] = None,
     avoid_duplicate_runs: bool = True,
     flow_tags: List[str] = None,
     seed: int = None,
@@ -50,6 +51,7 @@ def run_model_on_task(
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
     task : OpenMLTask
         Task to perform. This may be a model instead if the first argument is an OpenMLTask.
+    extension : Extension
     avoid_duplicate_runs : bool, optional (default=True)
         If True, the run will throw an error if the setup/task combination is already present on
         the server. This feature requires an internet connection.
@@ -81,12 +83,14 @@ def run_model_on_task(
                       "order (model, task).", DeprecationWarning)
         task, model = model, task
 
+    if extension is None:
+        extension = get_extension_by_model(model, raise_if_no_extension=True)
+
     flow = extension.model_to_flow(model)
 
     run = run_flow_on_task(
         task=task,
         flow=flow,
-        extension=extension,
         avoid_duplicate_runs=avoid_duplicate_runs,
         flow_tags=flow_tags,
         seed=seed,
@@ -101,7 +105,6 @@ def run_model_on_task(
 def run_flow_on_task(
     flow: OpenMLFlow,
     task: OpenMLTask,
-    extension: 'Extension',
     avoid_duplicate_runs: bool = True,
     flow_tags: List[str] = None,
     seed: int = None,
@@ -123,8 +126,6 @@ def run_flow_on_task(
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
     task : OpenMLTask
         Task to perform. This may be an OpenMLFlow instead if the first argument is an OpenMLTask.
-    extension : openml.extensions.Extension
-        3rd-party library extension.
     avoid_duplicate_runs : bool, optional (default=True)
         If True, the run will throw an error if the setup/task combination is already present on
         the server. This feature requires an internet connection.
@@ -159,7 +160,7 @@ def run_flow_on_task(
                       "order (model, Flow).", DeprecationWarning)
         task, flow = flow, task
 
-    flow.model = extension.seed_model(flow.model, seed=seed)
+    flow.model = flow.extension.seed_model(flow.model, seed=seed)
 
     # We only need to sync with the server right now if we want to upload the flow,
     # or ensure no duplicate runs exist. Otherwise it can be synced at upload time.
@@ -182,7 +183,7 @@ def run_flow_on_task(
             _copy_server_fields(flow_from_server, flow)
             if avoid_duplicate_runs:
                 flow_from_server.model = flow.model
-                setup_id = setup_exists(flow_from_server, extension=extension)
+                setup_id = setup_exists(flow_from_server)
                 ids = run_exists(task.task_id, setup_id)
                 if ids:
                     error_message = ("One or more runs of this setup were "
@@ -196,14 +197,14 @@ def run_flow_on_task(
 
     dataset = task.get_dataset()
 
-    run_environment = extension.get_version_information()
+    run_environment = flow.extension.get_version_information()
     tags = ['openml-python', run_environment[1]]
 
     # execute the run
     res = _run_task_get_arffcontent(
         model=flow.model,
         task=task,
-        extension=extension,
+        extension=flow.extension,
         add_local_measures=add_local_measures,
     )
 
@@ -219,14 +220,14 @@ def run_flow_on_task(
         trace=trace,
         data_content=data_content,
         flow=flow,
-        setup_string=extension.create_setup_string(flow.model)
+        setup_string=flow.extension.create_setup_string(flow.model)
     )
 
     if (upload_flow or avoid_duplicate_runs) and flow.flow_id is not None:
         # We only extract the parameter settings if a sync happened with the server.
         # I.e. when the flow was uploaded or we found it in the avoid_duplicate check.
         # Otherwise, we will do this at upload time.
-        run.parameter_settings = extension.flow_to_parameters(flow)
+        run.parameter_settings = flow.extension.flow_to_parameters(flow)
 
     # now we need to attach the detailed evaluations
     if task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
@@ -261,10 +262,7 @@ def get_run_trace(run_id: int) -> OpenMLRunTrace:
     return run_trace
 
 
-def initialize_model_from_run(
-    run_id: int,
-    extension: 'Extension',
-) -> Any:
+def initialize_model_from_run(run_id: int) -> Any:
     """
     Initialized a model based on a run_id (i.e., using the exact
     same parameter settings)
@@ -274,23 +272,20 @@ def initialize_model_from_run(
     run_id : int
         The Openml run_id
 
-    extension : openml.extensions.Extension
-
     Returns
     -------
     model
     """
     run = get_run(run_id)
-    return initialize_model(run.setup_id, extension)
+    return initialize_model(run.setup_id)
 
 
 def initialize_model_from_trace(
     run_id: int,
     repeat: int,
     fold: int,
-    extension: 'Extension',
     iteration: Optional[int] = None,
-) -> None:
+) -> Any:
     """
     Initialize a model based on the parameters that were set
     by an optimization procedure (i.e., using the exact same
@@ -308,8 +303,6 @@ def initialize_model_from_trace(
     fold : int
         The fold nr (column in trace file)
 
-    extension: openml.extensions.Extension
-
     iteration : int
         The iteration nr (column in trace file). If None, the
         best (selected) iteration will be searched (slow),
@@ -320,6 +313,8 @@ def initialize_model_from_trace(
     -------
     model
     """
+    run = get_run(run_id)
+    flow = get_flow(run.flow_id)
     run_trace = get_run_trace(run_id)
 
     if iteration is None:
@@ -330,8 +325,8 @@ def initialize_model_from_trace(
         raise ValueError('Combination repeat, fold, iteration not available')
     current = run_trace.trace_iterations[(repeat, fold, iteration)]
 
-    search_model = initialize_model_from_run(run_id, extension)
-    model = extension.instantiate_model_from_hpo_class(search_model, current)
+    search_model = initialize_model_from_run(run_id)
+    model = flow.extension.instantiate_model_from_hpo_class(search_model, current)
     return model
 
 

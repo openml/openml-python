@@ -12,11 +12,8 @@ from openml.flows import flow_exists
 import openml.exceptions
 import openml.utils
 
-if TYPE_CHECKING:
-    from openml.extensions.extension_interface import Extension
 
-
-def setup_exists(flow, extension: 'Extension') -> int:
+def setup_exists(flow) -> int:
     """
     Checks whether a hyperparameter configuration already exists on the server.
 
@@ -35,15 +32,16 @@ def setup_exists(flow, extension: 'Extension') -> int:
     # sadly, this api call relies on a run object
     openml.flows.functions._check_flow_for_server_id(flow)
     if flow.model is None:
-        raise ValueError('Flow should have model field set with the actual '
-                         'model. ')
+        raise ValueError('Flow should have model field set with the actual model.')
+    if flow.extension is None:
+        raise ValueError('Flow should have model field set with the correct extension.')
 
     # checks whether the flow exists on the server and flow ids align
     exists = flow_exists(flow.name, flow.external_version)
     if exists != flow.flow_id:
         raise ValueError('This should not happen!')
 
-    openml_param_settings = extension.obtain_parameter_values(flow)
+    openml_param_settings = flow.extension.obtain_parameter_values(flow)
     description = xmltodict.unparse(_to_dict(flow.flow_id,
                                              openml_param_settings),
                                     pretty=True)
@@ -192,10 +190,7 @@ def __list_setups(api_call):
     return setups
 
 
-def initialize_model(
-    setup_id: int,
-    extension: 'Extension',
-) -> Any:
+def initialize_model(setup_id: int) -> Any:
     """
     Initialized a model based on a setup_id (i.e., using the exact
     same parameter settings)
@@ -204,8 +199,6 @@ def initialize_model(
     ----------
     setup_id : int
         The Openml setup_id
-
-    extension :
 
     Returns
     -------
@@ -226,7 +219,7 @@ def initialize_model(
         subflow.parameters[hyperparameter.parameter_name] = \
             hyperparameter.value
 
-    model = extension.flow_to_model(flow)
+    model = flow.extension.flow_to_model(flow)
     return model
 
 

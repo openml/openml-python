@@ -133,7 +133,7 @@ class TestRun(TestBase):
             avoid_duplicate_runs=False,
             seed=seed,
         )
-        predictions_prime = run_prime._generate_arff_dict(extension=self.extension)
+        predictions_prime = run_prime._generate_arff_dict()
 
         self._compare_predictions(predictions, predictions_prime)
 
@@ -198,13 +198,12 @@ class TestRun(TestBase):
         X, y = task.get_X_and_y()
         self.assertEqual(np.count_nonzero(np.isnan(X)), n_missing_vals)
         run = openml.runs.run_flow_on_task(
-            extension=self.extension,
             flow=flow,
             task=task,
             seed=seed,
             avoid_duplicate_runs=openml.config.avoid_duplicate_runs,
         )
-        run_ = run.publish(extension=self.extension)
+        run_ = run.publish()
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
 
@@ -225,7 +224,6 @@ class TestRun(TestBase):
             run_server = openml.runs.get_run(run_id)
             clf_server = openml.setups.initialize_model(
                 setup_id=run_server.setup_id,
-                extension=self.extension,
             )
             flow_local = self.extension.model_to_flow(clf)
             flow_server = self.extension.model_to_flow(clf_server)
@@ -250,7 +248,6 @@ class TestRun(TestBase):
             # and test the initialize setup from run function
             clf_server2 = openml.runs.initialize_model_from_run(
                 run_id=run_server.run_id,
-                extension=self.extension,
             )
             flow_server2 = self.extension.model_to_flow(clf_server2)
             if flow.class_name not in classes_without_random_state:
@@ -393,7 +390,7 @@ class TestRun(TestBase):
                                 sentinel=sentinel)
 
         # obtain scores using get_metric_score:
-        scores = run.get_metric_fn(metric, extension=self.extension)
+        scores = run.get_metric_fn(metric)
         # compare with the scores in user defined measures
         scores_provided = []
         for rep in run.fold_evaluations[metric_name].keys():
@@ -419,7 +416,9 @@ class TestRun(TestBase):
             self._wait_for_processed_run(run.run_id, 200)
             try:
                 model_prime = openml.runs.initialize_model_from_trace(
-                    extension=self.extension, run_id=run.run_id, repeat=0, fold=0,
+                    run_id=run.run_id,
+                    repeat=0,
+                    fold=0,
                 )
             except openml.exceptions.OpenMLServerException as e:
                 e.additional = "%s; run_id %d" % (e.additional, run.run_id)
@@ -430,7 +429,7 @@ class TestRun(TestBase):
         else:
             run_downloaded = openml.runs.get_run(run.run_id)
             sid = run_downloaded.setup_id
-            model_prime = openml.setups.initialize_model(sid, extension=self.extension)
+            model_prime = openml.setups.initialize_model(sid)
             self._rerun_model_and_compare_predictions(run.run_id,
                                                       model_prime, seed)
 
@@ -668,11 +667,11 @@ class TestRun(TestBase):
             avoid_duplicate_runs=False,
             seed=1,
         )
-        run_ = run.publish(extension=self.extension)
+        run_ = run.publish()
         run = openml.runs.get_run(run_.run_id)
 
-        modelR = openml.runs.initialize_model_from_run(run_id=run.run_id, extension=self.extension)
-        modelS = openml.setups.initialize_model(setup_id=run.setup_id, extension=self.extension)
+        modelR = openml.runs.initialize_model_from_run(run_id=run.run_id)
+        modelS = openml.setups.initialize_model(setup_id=run.setup_id)
 
         self.assertEqual(modelS.cv.random_state, 62501)
         self.assertEqual(modelR.cv.random_state, 62501)
@@ -686,10 +685,7 @@ class TestRun(TestBase):
                     keys():
                 accuracy_scores_provided.append(
                     run.fold_evaluations['predictive_accuracy'][rep][fold])
-        accuracy_scores = run.get_metric_fn(
-            sklearn.metrics.accuracy_score,
-            extension=self.extension,
-        )
+        accuracy_scores = run.get_metric_fn(sklearn.metrics.accuracy_score)
         np.testing.assert_array_almost_equal(accuracy_scores_provided,
                                              accuracy_scores)
 
@@ -704,7 +700,6 @@ class TestRun(TestBase):
             alt_scores = run.get_metric_fn(
                 sklearn_fn=test[0],
                 kwargs=test[1],
-                extension=self.extension,
             )
             self.assertEqual(len(alt_scores), 10)
             for idx in range(len(alt_scores)):
@@ -745,7 +740,6 @@ class TestRun(TestBase):
         run = openml.runs.run_flow_on_task(
             flow=flow,
             task=task,
-            extension=self.extension,
             avoid_duplicate_runs=False,
             upload_flow=False,
         )
@@ -793,11 +787,11 @@ class TestRun(TestBase):
             task=task,
             avoid_duplicate_runs=False,
         )
-        run_ = run.publish(extension=self.extension)
+        run_ = run.publish()
         run = openml.runs.get_run(run_.run_id)
 
-        modelR = openml.runs.initialize_model_from_run(run_id=run.run_id, extension=self.extension)
-        modelS = openml.setups.initialize_model(setup_id=run.setup_id, extension=self.extension)
+        modelR = openml.runs.initialize_model_from_run(run_id=run.run_id)
+        modelS = openml.setups.initialize_model(setup_id=run.setup_id)
 
         flowR = self.extension.model_to_flow(modelR)
         flowS = self.extension.model_to_flow(modelS)
@@ -890,7 +884,7 @@ class TestRun(TestBase):
                     avoid_duplicate_runs=True,
                     upload_flow=True
                 )
-                run.publish(extension=self.extension)
+                run.publish()
             except openml.exceptions.PyOpenMLError:
                 # run already existed. Great.
                 pass
@@ -902,7 +896,7 @@ class TestRun(TestBase):
             # hyperparameter values wrong. Rather use the local model.
             downloaded_flow = openml.flows.get_flow(flow_exists)
             downloaded_flow.model = clf
-            setup_exists = openml.setups.setup_exists(downloaded_flow, extension=self.extension)
+            setup_exists = openml.setups.setup_exists(downloaded_flow)
             self.assertGreater(setup_exists, 0)
             run_ids = run_exists(task.task_id, setup_exists)
             self.assertTrue(run_ids, msg=(run_ids, clf))
@@ -937,7 +931,6 @@ class TestRun(TestBase):
             openml.runs.run_flow_on_task(
                 task=task,
                 flow=flow,
-                extension=self.extension,
                 avoid_duplicate_runs=True,
             )
 
@@ -952,7 +945,6 @@ class TestRun(TestBase):
         run = openml.runs.run_flow_on_task(
             task=task,
             flow=flow,
-            extension=self.extension,
             avoid_duplicate_runs=False,
             upload_flow=False
         )
@@ -962,7 +954,7 @@ class TestRun(TestBase):
             'runs',
             str(random.getrandbits(128)),
         )
-        run.to_filesystem(cache_path, extension=self.extension)
+        run.to_filesystem(cache_path)
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 
         expected_message_regex = ("Flow does not exist on the server, "
@@ -992,7 +984,6 @@ class TestRun(TestBase):
             openml.runs.run_flow_on_task(
                 task=task,
                 flow=flow_new,
-                extension=self.extension,
                 avoid_duplicate_runs=True,
             )
 
@@ -1013,7 +1004,6 @@ class TestRun(TestBase):
         run = openml.runs.run_flow_on_task(
             task=task,
             flow=flow_new,
-            extension=self.extension,
             avoid_duplicate_runs=False,
             upload_flow=False
         )
@@ -1023,7 +1013,7 @@ class TestRun(TestBase):
             'runs',
             str(random.getrandbits(128)),
         )
-        run.to_filesystem(cache_path, extension=self.extension)
+        run.to_filesystem(cache_path)
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 
         expected_message_regex = (
@@ -1303,14 +1293,13 @@ class TestRun(TestBase):
         flow = self.extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
 
-        downloaded_flow = openml.flows.get_flow(flow.flow_id, extension=self.extension)
+        downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
         task = openml.tasks.get_task(119)  # diabetes
         run = openml.runs.run_flow_on_task(
             flow=downloaded_flow,
             task=task,
-            extension=self.extension,
             avoid_duplicate_runs=False,
             upload_flow=False,
         )
 
-        run.publish(extension=self.extension)
+        run.publish()

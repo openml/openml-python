@@ -124,14 +124,14 @@ class TestRun(TestBase):
             'runs',
             str(random.getrandbits(128)),
         )
-        run.to_filesystem(cache_path, extension=extension)
+        run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
         # The flow has been uploaded to server, so only the reference flow_id should be present
         self.assertTrue(run_prime.flow_id is not None)
         self.assertTrue(run_prime.flow is None)
         self._test_run_obj_equals(run, run_prime)
-        run_prime.publish(extension=extension)
+        run_prime.publish()
 
     def test_to_from_filesystem_search(self):
         extension = openml.extensions.sklearn.SklearnExtension()
@@ -162,11 +162,11 @@ class TestRun(TestBase):
             'runs',
             str(random.getrandbits(128)),
         )
-        run.to_filesystem(cache_path, extension=extension)
+        run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
         self._test_run_obj_equals(run, run_prime)
-        run_prime.publish(extension=extension)
+        run_prime.publish()
 
     def test_to_from_filesystem_no_model(self):
         extension = openml.extensions.sklearn.SklearnExtension()
@@ -188,7 +188,7 @@ class TestRun(TestBase):
             'runs',
             str(random.getrandbits(128)),
         )
-        run.to_filesystem(cache_path, extension=extension, store_model=False)
+        run.to_filesystem(cache_path, store_model=False)
         # obtain run from filesystem
         openml.runs.OpenMLRun.from_filesystem(cache_path, expect_model=False)
         # assert default behaviour is throwing an error
@@ -216,7 +216,6 @@ class TestRun(TestBase):
         run = openml.runs.run_flow_on_task(
             flow=flow,
             task=task,
-            extension=extension,
             add_local_measures=False,
             avoid_duplicate_runs=False,
             upload_flow=False
@@ -230,10 +229,10 @@ class TestRun(TestBase):
             'runs',
             str(random.getrandbits(128)),
         )
-        run.to_filesystem(cache_path, extension=extension)
+        run.to_filesystem(cache_path)
         # obtain run from filesystem
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
-        loaded_run.publish(extension=extension)
+        loaded_run.publish()
 
         # make sure the flow is published as part of publishing the run.
         self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))

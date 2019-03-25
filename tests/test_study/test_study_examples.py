@@ -39,18 +39,16 @@ class TestStudyFunctions(TestBase):
                 ('estimator', sklearn.tree.DecisionTreeClassifier())
             ]
         )  # build a sklearn classifier
-        extension = SklearnExtension()
         for task_id in benchmark_suite.tasks[:1]:  # iterate over all tasks
             task = openml.tasks.get_task(task_id)  # download the OpenML task
             X, y = task.get_X_and_y()  # get the data (not used in this example)
             openml.config.apikey = openml.config.apikey  # set the OpenML Api Key
             run = openml.runs.run_model_on_task(
-                clf, task, extension=extension, avoid_duplicate_runs=False
+                clf, task, avoid_duplicate_runs=False
             )  # run classifier on splits (requires API key)
             score = run.get_metric_fn(
-                sklearn.metrics.accuracy_score,
-                extension=extension,
+                sklearn.metrics.accuracy_score
             )  # print accuracy score
             print('Data set: %s; Accuracy: %0.2f' % (task.get_dataset().name, score.mean()))
-            run.publish(extension=extension)  # publish the experiment on OpenML (optional)
+            run.publish()  # publish the experiment on OpenML (optional)
             print('URL for run: %s/run/%d' % (openml.config.server, run.run_id))

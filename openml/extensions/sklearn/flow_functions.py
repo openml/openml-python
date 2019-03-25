@@ -208,8 +208,7 @@ def flow_to_sklearn(
     elif isinstance(o, (bool, int, float, str)) or o is None:
         rval = o
     elif isinstance(o, OpenMLFlow):
-        if not (o.external_version.startswith('sklearn==')
-                or ',sklearn==' in o.external_version):
+        if not is_sklearn_flow(o):
             raise ValueError('Only sklearn flows can be reinstantiated')
         rval = _deserialize_model(o,
                                   initialize_with_defaults,
@@ -219,6 +218,10 @@ def flow_to_sklearn(
     logging.info('-%s flow_to_sklearn END   o=%s, rval=%s'
                  % ('-' * recursion_depth, o, rval))
     return rval
+
+
+def is_sklearn_flow(flow: OpenMLFlow) -> bool:
+    return flow.external_version.startswith('sklearn==') or ',sklearn==' in flow.external_version
 
 
 def openml_param_name_to_sklearn(

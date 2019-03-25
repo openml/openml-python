@@ -1107,8 +1107,8 @@ class TestFunctions(TestBase):
             ('scaler', scaler), ('boosting', boosting)])
         flow = openml.extensions.sklearn.flow_functions.sklearn_to_flow(model)
         task = openml.tasks.get_task(115)
-        run = openml.runs.run_flow_on_task(flow, task, extension=extension)
-        run = run.publish(extension=extension)
+        run = openml.runs.run_flow_on_task(flow, task)
+        run = run.publish()
         run = openml.runs.get_run(run.run_id)
         setup = openml.setups.get_setup(run.setup_id)
 
