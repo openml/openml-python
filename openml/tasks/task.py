@@ -195,7 +195,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
             data_splits_url: str,
             task_id: Optional[Union[int, str]] = None,
             estimation_procedure_id: int = 1,
-        ):
+    ):
         super(OpenMLSupervisedTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
