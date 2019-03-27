@@ -5,7 +5,7 @@ from openml.testing import TestBase
 from openml.datasets import OpenMLDataset
 from openml.tasks import OpenMLTask
 from openml.exceptions import OpenMLServerException
-
+from .test_supervised_task import OpenMLSupervisedTaskTest
 
 # Helper class
 # The test methods in this class
@@ -25,7 +25,7 @@ class OpenMLTaskTest(TestBase):
     @classmethod
     def setUpClass(cls):
 
-        if cls is OpenMLTaskTest:
+        if cls is OpenMLTaskTest or OpenMLSupervisedTaskTest:
             raise unittest.SkipTest(
                 "Skip OpenMLTaskTest tests,"
                 " it's a base class"
