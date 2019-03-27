@@ -258,7 +258,7 @@ def openml_param_name_to_sklearn(
     return '__'.join(flow_structure[name] + [openml_parameter.parameter_name])
 
 
-def obtain_parameter_values(flow: OpenMLFlow, model: object = None) -> List[Dict[str, Any]]:
+def obtain_parameter_values(flow: OpenMLFlow, model: Optional[Any] = None) -> List[Dict[str, Any]]:
     """
     Extracts all parameter settings required for the flow from the model.
     If no explicit model is provided, the parameters will be extracted from `flow.model` instead.
@@ -268,17 +268,17 @@ def obtain_parameter_values(flow: OpenMLFlow, model: object = None) -> List[Dict
     flow : OpenMLFlow
         OpenMLFlow object (containing flow ids, i.e., it has to be downloaded from the server)
 
-    model: object, optional (default=None)
+    model: Any, optional (default=None)
         The model from which to obtain the parameter values. Must match the flow signature.
         If None, use the model specified in `OpenMLFlow.model`
 
     Returns
     -------
     list
-        A list of dicts, where each dict has the following names:
-         - oml:name (str): The OpenML parameter name
-         - oml:value (mixed): A representation of the parameter value
-         - oml:component (int): flow id to which the parameter belongs
+        A list of dicts, where each dict has the following entries:
+        - ``oml:name`` : str: The OpenML parameter name
+        - ``oml:value`` : mixed: A representation of the parameter value
+        - ``oml:component`` : int: flow id to which the parameter belongs
     """
 
     openml.flows.functions._check_flow_for_server_id(flow)
@@ -393,8 +393,7 @@ def obtain_parameter_values(flow: OpenMLFlow, model: object = None) -> List[Dict
 
     flow_dict = get_flow_dict(flow)
     model = model if model is not None else flow.model
-    parameters = extract_parameters(flow, flow_dict, model,
-                                    True, flow.flow_id)
+    parameters = extract_parameters(flow, flow_dict, model, True, flow.flow_id)
 
     return parameters
 
@@ -944,6 +943,10 @@ def get_version_information() -> List[str]:
     return [python_version, sklearn_version, numpy_version, scipy_version]
 
 
+def is_hpo_class(model: Any) -> bool:
+    return isinstance(model, sklearn.model_selection._search.BaseSearchCV)
+
+
 def check_n_jobs(model: Any) -> bool:
     def check(param_grid, restricted_parameter_name, legal_values):
         if isinstance(param_grid, dict):
@@ -964,14 +967,13 @@ def check_n_jobs(model: Any) -> bool:
             )
 
     if not (
-        isinstance(model, sklearn.base.BaseEstimator)
-        or isinstance(model, sklearn.model_selection._search.BaseSearchCV)
+        isinstance(model, sklearn.base.BaseEstimator) or is_hpo_class(model)
     ):
         raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
     # make sure that n_jobs is not in the parameter grid of optimization
     # procedure
-    if isinstance(model, sklearn.model_selection._search.BaseSearchCV):
+    if is_hpo_class(model):
         if isinstance(model, sklearn.model_selection.GridSearchCV):
             param_distributions = model.param_grid
         elif isinstance(model, sklearn.model_selection.RandomizedSearchCV):

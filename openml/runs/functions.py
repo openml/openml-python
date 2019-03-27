@@ -1,7 +1,6 @@
 from collections import OrderedDict
 import io
 import os
-import sys
 from typing import Any, List, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
 import warnings
 
@@ -85,6 +84,8 @@ def run_model_on_task(
 
     # TODO: At some point in the future do not allow for arguments in old order (6-2018).
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
+    # When removing this please also remove the method `is_estimator` from the extension
+    # interface as it is only used here (MF, 3-2019)
     if isinstance(model, OpenMLTask) and extension.is_estimator(model):
         warnings.warn("The old argument order (task, model) is deprecated and "
                       "will not be supported in the future. Please use the "
@@ -232,7 +233,7 @@ def run_flow_on_task(
         # We only extract the parameter settings if a sync happened with the server.
         # I.e. when the flow was uploaded or we found it in the avoid_duplicate check.
         # Otherwise, we will do this at upload time.
-        run.parameter_settings = flow.extension.flow_to_parameters(flow)
+        run.parameter_settings = flow.extension.obtain_parameter_values(flow)
 
     # now we need to attach the detailed evaluations
     if task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
@@ -389,12 +390,6 @@ def _run_task_get_arffcontent(
     # is the same as the fold-based measures, and disregarded in that case
     user_defined_measures_per_sample = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
 
-    # sys.version_info returns a tuple, the following line compares the entry
-    # of tuples
-    # https://docs.python.org/3.6/reference/expressions.html#value-comparisons
-    can_measure_runtime = (
-        sys.version_info[:2] >= (3, 3) and extension.will_model_train_parallel(model)
-    )
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
     num_reps, num_folds, num_samples = task.get_split_dimensions()
@@ -413,7 +408,6 @@ def _run_task_get_arffcontent(
                     rep_no=rep_no,
                     fold_no=fold_no,
                     sample_no=sample_no,
-                    can_measure_runtime=can_measure_runtime,
                     add_local_measures=add_local_measures,
                 )
 
