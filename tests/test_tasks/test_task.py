@@ -2,6 +2,8 @@ import unittest
 
 import openml
 from openml.testing import TestBase
+from openml.datasets import OpenMLDataset
+from openml.tasks import OpenMLTask
 from openml.exceptions import OpenMLServerException
 
 
@@ -30,7 +32,7 @@ class OpenMLTaskTest(TestBase):
             )
         super(OpenMLTaskTest, cls).setUpClass()
 
-    def test_download_task(self):
+    def test_download_task(self) -> OpenMLTask:
 
         task = openml.tasks.get_task(self.task_id)
         return task
@@ -40,7 +42,8 @@ class OpenMLTaskTest(TestBase):
         task = openml.tasks.get_task(self.task_id)
         # adding sentinel so we can have a new dataset
         # hence a "new task" to upload
-        task.dataset_id = self._upload_dataset(task.dataset_id)
+        task_dataset = openml.datasets.get_dataset(task.dataset_id)
+        task.dataset_id = self._upload_dataset(task_dataset)
         task.estimation_procedure_id = self.estimation_procedure
         try:
             task.publish()
@@ -51,15 +54,13 @@ class OpenMLTaskTest(TestBase):
             if e.code != 614:
                 raise e
 
-    def _upload_dataset(self, dataset_id):
+    def _upload_dataset(self, dataset: OpenMLDataset) -> int:
 
-        dataset = openml.datasets.get_dataset(dataset_id)
         dataset.name = '%s%s' % (self._get_sentinel(), dataset.name)
         try:
-            new_dataset_id = dataset.publish()
-            return new_dataset_id
+            return dataset.publish()
         except openml.exceptions.OpenMLServerException:
             # something went wrong
             # test dataset was not
             # published. Return old id.
-            return dataset_id
+            return dataset.dataset_id

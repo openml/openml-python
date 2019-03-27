@@ -9,7 +9,7 @@ class OpenMLLearningCurveTaskTest(OpenMLSupervisedTaskTest):
 
         super(OpenMLLearningCurveTaskTest, self).setUp()
         self.task_id = 801
-        self.estimation_procedure = 14
+        self.estimation_procedure = 13
 
     def test_get_X_and_Y(self):
 
