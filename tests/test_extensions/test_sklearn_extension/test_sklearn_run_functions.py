@@ -95,10 +95,9 @@ class TestRun(TestBase):
         num_repeats = 1
 
         clf = SGDClassifier(loss='log', random_state=1)
-        can_measure_runtime = sys.version_info[:2] >= (3, 3)
         # TODO add some mocking here to actually test the innards of this function, too!
         res = run_model_on_fold(
-            clf, task, 0, 0, 0, can_measure_runtime=can_measure_runtime,
+            clf, task, 0, 0, 0,
             add_local_measures=True)
 
         arff_datacontent, arff_tracecontent, user_defined_measures, model = res
