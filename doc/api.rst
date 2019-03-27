@@ -20,6 +20,32 @@ Top-level Classes
    OpenMLFlow
    OpenMLEvaluation
 
+.. _api_extensions:
+
+Extensions
+----------
+
+.. currentmodule:: openml.extensions
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   Extension
+   sklearn.SklearnExtension
+
+.. currentmodule:: openml.extensions
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+    register_extension
+    get_extension_by_model
+    get_extension_by_flow
+
+Modules
+-------
 
 :mod:`openml.datasets`: Dataset Functions
 -----------------------------------------
@@ -55,10 +81,8 @@ Top-level Classes
    :template: function.rst
 
     flow_exists
-    flow_to_sklearn
     get_flow
     list_flows
-    sklearn_to_flow
 
 :mod:`openml.runs`: Run Functions
 ----------------------------------
@@ -112,5 +136,3 @@ Top-level Classes
     get_tasks
     list_tasks
 
-
- 

@@ -111,3 +111,6 @@ __all__ = [
     '_api_calls',
     '__version__',
 ]
+
+# Load the scikit-learn extension by default
+import openml.extensions.sklearn

@@ -2,10 +2,10 @@ from collections import OrderedDict
 import pickle
 import time
 from typing import Any, IO, Optional, TextIO, TYPE_CHECKING  # noqa: F401
-import numpy as np
+import os
 
 import arff
-import os
+import numpy as np
 import xmltodict
 
 import openml
@@ -158,7 +158,7 @@ class OpenMLRun(object):
 
         os.makedirs(directory, exist_ok=True)
         if not os.listdir(directory) == []:
-            raise ValueError('Output directory should be empty')
+            raise ValueError('Output directory %s should be empty' % os.path.abspath(directory))
 
         run_xml = self._create_description_xml()
         predictions_arff = arff.dumps(self._generate_arff_dict())

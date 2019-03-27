@@ -87,6 +87,6 @@ def get_extension_by_model(
 __all__ = [
     'Extension',
     'register_extension',
-    'get_extension_by_flow',
     'get_extension_by_model',
+    'get_extension_by_flow',
 ]
