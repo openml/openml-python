@@ -32,7 +32,6 @@ RUNS_CACHE_DIR_NAME = 'runs'
 def run_model_on_task(
     model: Any,
     task: OpenMLTask,
-    extension: Optional['Extension'] = None,
     avoid_duplicate_runs: bool = True,
     flow_tags: List[str] = None,
     seed: int = None,
@@ -50,7 +49,6 @@ def run_model_on_task(
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
     task : OpenMLTask
         Task to perform. This may be a model instead if the first argument is an OpenMLTask.
-    extension : Extension
     avoid_duplicate_runs : bool, optional (default=True)
         If True, the run will throw an error if the setup/task combination is already present on
         the server. This feature requires an internet connection.
@@ -75,8 +73,7 @@ def run_model_on_task(
         Flow generated from the model.
     """
 
-    if extension is None:
-        extension = get_extension_by_model(model, raise_if_no_extension=True)
+    extension = get_extension_by_model(model, raise_if_no_extension=True)
     if extension is None:
         # This should never happen and is only here to please mypy will be gone soon once the
         # whole function is removed

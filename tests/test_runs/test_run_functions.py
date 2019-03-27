@@ -129,7 +129,6 @@ class TestRun(TestBase):
         run_prime = openml.runs.run_model_on_task(
             model=model_prime,
             task=task,
-            extension=self.extension,
             avoid_duplicate_runs=False,
             seed=seed,
         )
@@ -332,7 +331,6 @@ class TestRun(TestBase):
             openml.runs.run_model_on_task(
                 model=clf,
                 task=task,
-                extension=self.extension,
                 avoid_duplicate_runs=False,
             )
 
@@ -347,7 +345,6 @@ class TestRun(TestBase):
             r"Penalty term must be positive; got \(C=u?'abc'\)",  # u? for 2.7/3.4-6 compability
         ):
             openml.runs.run_model_on_task(
-                extension=self.extension,
                 task=task,
                 model=clf,
             )
@@ -661,7 +658,6 @@ class TestRun(TestBase):
 
         task = openml.tasks.get_task(11)
         run = openml.runs.run_model_on_task(
-            extension=self.extension,
             model=randomsearch,
             task=task,
             avoid_duplicate_runs=False,
@@ -719,7 +715,6 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(
             model=clf,
             task=task,
-            extension=self.extension,
             avoid_duplicate_runs=False,
             upload_flow=False,
         )
@@ -759,7 +754,6 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(
             model=clf,
             task=task,
-            extension=self.extension,
             avoid_duplicate_runs=False,
             upload_flow=False,
         )
@@ -782,7 +776,6 @@ class TestRun(TestBase):
             ('Estimator', GaussianNB())])
         task = openml.tasks.get_task(11)
         run = openml.runs.run_model_on_task(
-            extension=self.extension,
             model=clf,
             task=task,
             avoid_duplicate_runs=False,
@@ -829,7 +822,6 @@ class TestRun(TestBase):
         try:
             # in case the run did not exists yet
             run = openml.runs.run_model_on_task(
-                extension=self.extension,
                 model=clf,
                 task=task,
                 avoid_duplicate_runs=True,
@@ -877,7 +869,6 @@ class TestRun(TestBase):
                 # first populate the server with this run.
                 # skip run if it was already performed.
                 run = openml.runs.run_model_on_task(
-                    extension=self.extension,
                     model=clf,
                     task=task,
                     seed=rs,
@@ -913,7 +904,6 @@ class TestRun(TestBase):
             openml.runs.run_model_on_task(
                 task=task,
                 model=clf,
-                extension=self.extension,
                 avoid_duplicate_runs=False,
             )
 

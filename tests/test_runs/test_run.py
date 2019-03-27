@@ -103,7 +103,6 @@ class TestRun(TestBase):
             self.assertIsNone(run_prime_trace_content)
 
     def test_to_from_filesystem_vanilla(self):
-        extension = openml.extensions.sklearn.SklearnExtension()
 
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
@@ -113,7 +112,6 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(
             model=model,
             task=task,
-            extension=extension,
             add_local_measures=False,
             avoid_duplicate_runs=False,
             upload_flow=True
@@ -134,7 +132,6 @@ class TestRun(TestBase):
         run_prime.publish()
 
     def test_to_from_filesystem_search(self):
-        extension = openml.extensions.sklearn.SklearnExtension()
 
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
@@ -152,7 +149,6 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(
             model=model,
             task=task,
-            extension=extension,
             add_local_measures=False,
             avoid_duplicate_runs=False,
         )
@@ -169,7 +165,6 @@ class TestRun(TestBase):
         run_prime.publish()
 
     def test_to_from_filesystem_no_model(self):
-        extension = openml.extensions.sklearn.SklearnExtension()
 
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
@@ -179,7 +174,6 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(
             model=model,
             task=task,
-            extension=extension,
             add_local_measures=False,
         )
 

@@ -86,7 +86,7 @@ class Extension(ABC):
 
     @abstractmethod
     def get_version_information(self) -> List[str]:
-        """Get a list versions of libraries required by the flow.
+        """List versions of libraries required by the flow.
 
         Returns
         -------
@@ -96,7 +96,7 @@ class Extension(ABC):
 
     @abstractmethod
     def create_setup_string(self, model: Any) -> str:
-        """Create a string representing which can be used to reinstantiate the given model.
+        """Create a string which can be used to reinstantiate the given model.
 
         Parameters
         ----------
@@ -130,7 +130,7 @@ class Extension(ABC):
 
     @abstractmethod
     def seed_model(self, model: Any, seed: Optional[int]) -> Any:
-        """Set a seed of all the unseeded components of a model and return the seeded model.
+        """Set the seed of all the unseeded components of a model and return the seeded model.
 
         Required so that all seed information can be uploaded to OpenML for reproducible results.
 
@@ -176,7 +176,7 @@ class Extension(ABC):
             learning curve, always 0)
         add_local_measures : bool
             Determines whether to calculate a set of measures (i.e., predictive accuracy) locally,
-            to later verify server behaviour
+            to later verify server behaviour.
 
         Returns
         -------
@@ -190,8 +190,8 @@ class Extension(ABC):
         user_defined_measures : OrderedDict[str, float]
             User defined measures that were generated on this fold
         model : Any
-            The model trained on this fold. Will be used to generate trace information later on (
-            in ``obtain_arff_trace``).
+            The model trained on this repeat,fold,subsample triple. Will be used to generate trace
+            information later on (in ``obtain_arff_trace``).
         """
         pass
 
@@ -213,7 +213,7 @@ class Extension(ABC):
 
         model: Any, optional (default=None)
             The model from which to obtain the parameter values. Must match the flow signature.
-            If None, use the model specified in `OpenMLFlow.model`
+            If None, use the model specified in ``OpenMLFlow.model``.
 
         Returns
         -------
@@ -229,7 +229,7 @@ class Extension(ABC):
     # Abstract methods for hyperparameter optimization
 
     def is_hpo_class(self, model: Any) -> bool:
-        """Check whether the model class performs hyperparameter optimization.
+        """Check whether the model performs hyperparameter optimization.
 
         Used to check whether an optimization trace can be extracted from the model after running
         it.

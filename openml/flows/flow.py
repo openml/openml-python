@@ -350,8 +350,8 @@ class OpenMLFlow(object):
 
         """
         # Import at top not possible because of cyclic dependencies. In
-        # particular, flow.py tries to import flow_functions.py in order to call
-        # get_flow(), while flow_functions.py tries to import flow.py in order to
+        # particular, flow.py tries to import functions.py in order to call
+        # get_flow(), while functions.py tries to import flow.py in order to
         # instantiate an OpenMLFlow.
         import openml.flows.functions
 
