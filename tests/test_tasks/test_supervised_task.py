@@ -4,7 +4,7 @@ from typing import Tuple
 import numpy as np
 
 import openml
-from tests.test_tasks import OpenMLTaskTest
+from .test_task import OpenMLTaskTest
 
 
 class OpenMLSupervisedTaskTest(OpenMLTaskTest):

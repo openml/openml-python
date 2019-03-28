@@ -1,7 +1,6 @@
 import openml
-from openml.exceptions import OpenMLServerException
 
-from tests.test_tasks import OpenMLTaskTest
+from .test_task import OpenMLTaskTest
 
 
 class OpenMLClusteringTaskTest(OpenMLTaskTest):

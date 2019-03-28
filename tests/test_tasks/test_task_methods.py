@@ -3,6 +3,7 @@ from time import time
 import openml
 from openml.testing import TestBase
 
+
 # Common methods between tasks
 class OpenMLTaskMethodsTest(TestBase):
 

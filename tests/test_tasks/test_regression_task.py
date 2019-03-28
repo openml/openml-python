@@ -1,6 +1,6 @@
 import numpy as np
 
-from tests.test_tasks import OpenMLSupervisedTaskTest
+from .test_supervised_task import OpenMLSupervisedTaskTest
 
 
 class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
