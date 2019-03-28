@@ -2,8 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Flows and Runs &#8212; OpenML 0.8.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -119,8 +118,8 @@
     <div class="col-md-9 content">
       
   <div class="sphx-glr-download-link-note admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Click <a class="reference internal" href="#sphx-glr-download-examples-flows-and-runs-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-flows-and-runs-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="flows-and-runs">
 <span id="sphx-glr-examples-flows-and-runs-tutorial-py"></span><h1>Flows and Runs<a class="headerlink" href="#flows-and-runs" title="Permalink to this headline">¶</a></h1>
@@ -144,7 +143,7 @@
 </div>
 <p>You can also ask for meta-data to automatically preprocess the data.</p>
 <ul class="simple">
-<li>e.g. categorical features -&gt; do feature encoding</li>
+<li><p>e.g. categorical features -&gt; do feature encoding</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">17</span><span class="p">)</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
@@ -191,7 +190,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/11434
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/12590
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -238,7 +237,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/11435
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/12591
 </pre></div>
 </div>
 </div>
@@ -276,16 +275,16 @@ a model on a task without uploading results or flows to the server immediately.<
 compare your results with the rest of the class and learn from
 them. Some tasks you could try (or browse openml.org):</p>
 <ul class="simple">
-<li>EEG eye state: data_id:<a class="reference external" href="http://www.openml.org/d/1471">1471</a>,
-task_id:<a class="reference external" href="http://www.openml.org/t/14951">14951</a></li>
-<li>Volcanoes on Venus: data_id:<a class="reference external" href="http://www.openml.org/d/1527">1527</a>,
-task_id:<a class="reference external" href="http://www.openml.org/t/10103">10103</a></li>
-<li>Walking activity: data_id:<a class="reference external" href="http://www.openml.org/d/1509">1509</a>,
-task_id:<a class="reference external" href="http://www.openml.org/t/9945">9945</a>, 150k instances.</li>
-<li>Covertype (Satellite): data_id:<a class="reference external" href="http://www.openml.org/d/150">150</a>,
-task_id:<a class="reference external" href="http://www.openml.org/t/218">218</a>, 500k instances.</li>
-<li>Higgs (Physics): data_id:<a class="reference external" href="http://www.openml.org/d/23512">23512</a>,
-task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950</a>, 100k instances, missing values.</li>
+<li><p>EEG eye state: data_id:<a class="reference external" href="http://www.openml.org/d/1471">1471</a>,
+task_id:<a class="reference external" href="http://www.openml.org/t/14951">14951</a></p></li>
+<li><p>Volcanoes on Venus: data_id:<a class="reference external" href="http://www.openml.org/d/1527">1527</a>,
+task_id:<a class="reference external" href="http://www.openml.org/t/10103">10103</a></p></li>
+<li><p>Walking activity: data_id:<a class="reference external" href="http://www.openml.org/d/1509">1509</a>,
+task_id:<a class="reference external" href="http://www.openml.org/t/9945">9945</a>, 150k instances.</p></li>
+<li><p>Covertype (Satellite): data_id:<a class="reference external" href="http://www.openml.org/d/150">150</a>,
+task_id:<a class="reference external" href="http://www.openml.org/t/218">218</a>, 500k instances.</p></li>
+<li><p>Higgs (Physics): data_id:<a class="reference external" href="http://www.openml.org/d/23512">23512</a>,
+task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950</a>, 100k instances, missing values.</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Easy benchmarking:</span>
 <span class="k">for</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">115</span><span class="p">,</span> <span class="p">]:</span>  <span class="c1"># Add further tasks. Disclaimer: they might take some time</span>
@@ -300,15 +299,17 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/11437
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/12593
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  15.756 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  15.018 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/27a5bee6ab807de4cd881f6693fcb2aa/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></div>
+<p><a class="reference download internal" download="" href="../_downloads/27a5bee6ab807de4cd881f6693fcb2aa/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></p>
+</div>
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/8ea66fb4dd851d4b9550bbf3764bec4d/flows_and_runs_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">flows_and_runs_tutorial.ipynb</span></code></a></div>
+<p><a class="reference download internal" download="" href="../_downloads/8ea66fb4dd851d4b9550bbf3764bec4d/flows_and_runs_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">flows_and_runs_tutorial.ipynb</span></code></a></p>
+</div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>
@@ -327,7 +328,7 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
     </p>
     <p>
         &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.0.<br/>
     </p>
   </div>
 </footer>

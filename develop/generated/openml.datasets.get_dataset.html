@@ -2,8 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>openml.datasets.get_dataset &#8212; OpenML 0.8.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -102,7 +101,7 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">openml.datasets</span></code>.get_dataset</a></li>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.get_dataset</a></li>
 </ul>
 
         </div>
@@ -118,32 +117,25 @@
 <p>This function is thread/multiprocessing safe.
 This function uses caching. A check will be performed to determine if the information has
 previously been downloaded, and if so be loaded from disk instead of retrieved from the server.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>dataset_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or str</span></dt>
-<dd><p class="first last">Dataset ID of the dataset to download</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dataset_id</strong><span class="classifier">int or str</span></dt><dd><p>Dataset ID of the dataset to download</p>
 </dd>
-<dt><strong>download_data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=True)</span></dt>
-<dd><p class="first last">If True, also download the data file. Beware that some datasets are large and it might
+<dt><strong>download_data</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, also download the data file. Beware that some datasets are large and it might
 make the operation noticeably slower. Metadata is also still retrieved.
 If False, create the OpenMLDataset and only populate it with the metadata.
 The data may later be retrieved through the <cite>OpenMLDataset.get_data</cite> method.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>dataset</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="openml.OpenMLDataset.html#openml.OpenMLDataset" title="openml.OpenMLDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.OpenMLDataset</span></code></a></span></dt>
-<dd><p class="first last">The downloaded dataset.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>dataset</strong><span class="classifier"><a class="reference internal" href="openml.OpenMLDataset.html#openml.OpenMLDataset" title="openml.OpenMLDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.OpenMLDataset</span></code></a></span></dt><dd><p>The downloaded dataset.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <div class="clearer"></div></div>
@@ -161,7 +153,7 @@ The data may later be retrieved through the <cite>OpenMLDataset.get_data</cite> 
     </p>
     <p>
         &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.0.<br/>
     </p>
   </div>
 </footer>

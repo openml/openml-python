@@ -2,8 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Introduction &#8212; OpenML 0.8.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -116,8 +115,8 @@
     <div class="col-md-9 content">
       
   <div class="sphx-glr-download-link-note admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Click <a class="reference internal" href="#sphx-glr-download-examples-introduction-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-introduction-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="introduction">
 <span id="sphx-glr-examples-introduction-tutorial-py"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
@@ -125,17 +124,17 @@
 OpenML is an online collaboration platform for machine learning which allows
 you to:</p>
 <ul class="simple">
-<li>Find or share interesting, well-documented datasets</li>
-<li>Define research / modelling goals (tasks)</li>
-<li>Explore large amounts of machine learning algorithms, with APIs in Java, R, Python</li>
-<li>Log and share reproducible experiments, models, results</li>
-<li>Works seamlessly with scikit-learn and other libraries</li>
-<li>Large scale benchmarking, compare to state of the art</li>
+<li><p>Find or share interesting, well-documented datasets</p></li>
+<li><p>Define research / modelling goals (tasks)</p></li>
+<li><p>Explore large amounts of machine learning algorithms, with APIs in Java, R, Python</p></li>
+<li><p>Log and share reproducible experiments, models, results</p></li>
+<li><p>Works seamlessly with scikit-learn and other libraries</p></li>
+<li><p>Large scale benchmarking, compare to state of the art</p></li>
 </ul>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>Installation is done via <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">openml</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install openml
 </pre></div>
 </div>
 <p>For further information, please check out the installation guide at
@@ -148,17 +147,17 @@ OpenML platform. If you don’t have an account yet, sign up now.
 You will receive an API key, which will authenticate you to the server
 and allow you to download and upload datasets, tasks, runs and flows.</p>
 <ul class="simple">
-<li>Create an OpenML account (free) on <a class="reference external" href="http://www.openml.org">http://www.openml.org</a>.</li>
-<li>After logging in, open your account page (avatar on the top right)</li>
-<li>Open ‘Account Settings’, then ‘API authentication’ to find your API key.</li>
+<li><p>Create an OpenML account (free) on <a class="reference external" href="http://www.openml.org">http://www.openml.org</a>.</p></li>
+<li><p>After logging in, open your account page (avatar on the top right)</p></li>
+<li><p>Open ‘Account Settings’, then ‘API authentication’ to find your API key.</p></li>
 </ul>
 <p>There are two ways to authenticate:</p>
 <ul class="simple">
-<li>Create a plain text file <strong>~/.openml/config</strong> with the line
+<li><p>Create a plain text file <strong>~/.openml/config</strong> with the line
 <strong>‘apikey=MYKEY’</strong>, replacing <strong>MYKEY</strong> with your API key. The config
 file must be in the directory ~/.openml/config and exist prior to
-importing the openml module.</li>
-<li>Run the code below, replacing ‘YOURKEY’ with your API key.</li>
+importing the openml module.</p></li>
+<li><p>Run the code below, replacing ‘YOURKEY’ with your API key.</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="k">import</span> <span class="n">neighbors</span>
@@ -175,10 +174,10 @@ retrieve them without calling the server later. As with the API key,
 the cache directory can be either specified through the config file or
 through the API:</p>
 <ul class="simple">
-<li>Add the  line <strong>cachedir = ‘MYDIR’</strong> to the config file, replacing
+<li><p>Add the  line <strong>cachedir = ‘MYDIR’</strong> to the config file, replacing
 ‘MYDIR’ with the path to the cache directory. By default, OpenML
-will use <strong>~/.openml/cache</strong> as the cache directory.</li>
-<li>Run the code below, replacing ‘YOURDIR’ with the path to the cache directory.</li>
+will use <strong>~/.openml/cache</strong> as the cache directory.</p></li>
+<li><p>Run the code below, replacing ‘YOURDIR’ with the path to the cache directory.</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Uncomment and set your OpenML cache directory</span>
 <span class="c1"># import os</span>
@@ -202,15 +201,17 @@ will use <strong>~/.openml/cache</strong> as the cache directory.</li>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: http://test.openml.org/r/11432
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: http://test.openml.org/r/12585
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  14.182 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.773 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-introduction-tutorial-py">
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/401c39eb686323be5e9bb1b8948e4e0e/introduction_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">introduction_tutorial.py</span></code></a></div>
+<p><a class="reference download internal" download="" href="../_downloads/401c39eb686323be5e9bb1b8948e4e0e/introduction_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">introduction_tutorial.py</span></code></a></p>
+</div>
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/29d590a10434dd0af9ac4e3d01a1cd8f/introduction_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">introduction_tutorial.ipynb</span></code></a></div>
+<p><a class="reference download internal" download="" href="../_downloads/29d590a10434dd0af9ac4e3d01a1cd8f/introduction_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">introduction_tutorial.ipynb</span></code></a></p>
+</div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>
@@ -229,7 +230,7 @@ will use <strong>~/.openml/cache</strong> as the cache directory.</li>
     </p>
     <p>
         &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.0.<br/>
     </p>
   </div>
 </footer>

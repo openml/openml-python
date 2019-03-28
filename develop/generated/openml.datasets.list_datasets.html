@@ -2,8 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>openml.datasets.list_datasets &#8212; OpenML 0.8.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -102,7 +101,7 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">openml.datasets</span></code>.list_datasets</a></li>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.list_datasets</a></li>
 </ul>
 
         </div>
@@ -116,49 +115,39 @@
 <code class="descclassname">openml.datasets.</code><code class="descname">list_datasets</code><span class="sig-paren">(</span><em>offset=None</em>, <em>size=None</em>, <em>status=None</em>, <em>tag=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.list_datasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of all dataset which are on OpenML.
 Supports large amount of results.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>offset</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
-<dd><p class="first last">The number of datasets to skip, starting from the first.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>offset</strong><span class="classifier">int, optional</span></dt><dd><p>The number of datasets to skip, starting from the first.</p>
 </dd>
-<dt><strong>size</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
-<dd><p class="first last">The maximum number of datasets to show.</p>
+<dt><strong>size</strong><span class="classifier">int, optional</span></dt><dd><p>The maximum number of datasets to show.</p>
 </dd>
-<dt><strong>status</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
-<dd><p class="first last">Should be {active, in_preparation, deactivated}. By
+<dt><strong>status</strong><span class="classifier">str, optional</span></dt><dd><p>Should be {active, in_preparation, deactivated}. By
 default active datasets are returned, but also datasets
 from another status can be requested.</p>
 </dd>
-<dt><strong>tag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
-<dd></dd>
-<dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict, optional</span></dt>
-<dd><p class="first last">Legal filter operators (keys in the dict):
+<dt><strong>tag</strong><span class="classifier">str, optional</span></dt><dd></dd>
+<dt><strong>kwargs</strong><span class="classifier">dict, optional</span></dt><dd><p>Legal filter operators (keys in the dict):
 data_name, data_version, number_instances,
 number_features, number_classes, number_missing_values.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>datasets</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict of dicts</span></dt>
-<dd><p class="first">A mapping from dataset ID to dict.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>datasets</strong><span class="classifier">dict of dicts</span></dt><dd><p>A mapping from dataset ID to dict.</p>
 <p>Every dataset is represented by a dictionary containing
 the following information:
 - dataset id
 - name
 - format
 - status</p>
-<p class="last">If qualities are calculated for the dataset, some of
+<p>If qualities are calculated for the dataset, some of
 these are also returned.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <div class="clearer"></div></div>
@@ -176,7 +165,7 @@ these are also returned.</p>
     </p>
     <p>
         &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.0.<br/>
     </p>
   </div>
 </footer>

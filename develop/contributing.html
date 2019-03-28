@@ -2,8 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Contributing &#8212; OpenML 0.8.0 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -162,18 +161,18 @@ contains longer-term goals.</p>
 connector and OpenML in general. We welcome all kinds of contributions,
 especially:</p>
 <ul class="simple">
-<li>Source code which fixes an issue, improves usability or implements a new
-feature.</li>
-<li>Improvements to the documentation, which can be found in the <code class="docutils literal notranslate"><span class="pre">doc</span></code>
-directory.</li>
-<li>New examples - current examples can be found in the <code class="docutils literal notranslate"><span class="pre">examples</span></code> directory.</li>
-<li>Bug reports - if something doesn’t work for you or is cumbersome, please
-open a new issue to let us know about the problem.</li>
-<li>Use the package and spread the word.</li>
-<li><a class="reference external" href="https://www.openml.org/cite">Cite OpenML</a> if you use it in a scientific
-publication.</li>
-<li>Visit one of our <a class="reference external" href="https://meet.openml.org/">hackathons</a>.</li>
-<li>Check out how to <a class="reference external" href="https://github.com/openml/OpenML/blob/master/CONTRIBUTING.md">contribute to the main OpenML project</a>.</li>
+<li><p>Source code which fixes an issue, improves usability or implements a new
+feature.</p></li>
+<li><p>Improvements to the documentation, which can be found in the <code class="docutils literal notranslate"><span class="pre">doc</span></code>
+directory.</p></li>
+<li><p>New examples - current examples can be found in the <code class="docutils literal notranslate"><span class="pre">examples</span></code> directory.</p></li>
+<li><p>Bug reports - if something doesn’t work for you or is cumbersome, please
+open a new issue to let us know about the problem.</p></li>
+<li><p>Use the package and spread the word.</p></li>
+<li><p><a class="reference external" href="https://www.openml.org/cite">Cite OpenML</a> if you use it in a scientific
+publication.</p></li>
+<li><p>Visit one of our <a class="reference external" href="https://meet.openml.org/">hackathons</a>.</p></li>
+<li><p>Check out how to <a class="reference external" href="https://github.com/openml/OpenML/blob/master/CONTRIBUTING.md">contribute to the main OpenML project</a>.</p></li>
 </ul>
 <div class="section" id="contributing-code">
 <h3>Contributing code<a class="headerlink" href="#contributing-code" title="Permalink to this headline">¶</a></h3>
@@ -186,12 +185,12 @@ publication.</li>
 <h3>Installation from github<a class="headerlink" href="#installation-from-github" title="Permalink to this headline">¶</a></h3>
 <p>The package source code is available from
 <a class="reference external" href="https://github.com/openml/openml-python">github</a> and can be obtained with:</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">openml</span><span class="o">/</span><span class="n">openml</span><span class="o">-</span><span class="n">python</span><span class="o">.</span><span class="n">git</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/openml/openml-python.git
 </pre></div>
 </div>
 <p>Once you cloned the package, change into the new directory <code class="docutils literal notranslate"><span class="pre">python</span></code> and
 execute</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python setup.py install
 </pre></div>
 </div>
 </div>
@@ -199,36 +198,36 @@ execute</p>
 <div class="section" id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
 <p>From within the directory of the cloned package, execute:</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="n">tests</span><span class="o">/</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest tests/
 </pre></div>
 </div>
 <p id="extending">Executing a specific test can be done by specifying the module, test case, and test.
 To obtain a hierarchical list of all tests, run</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="o">--</span><span class="n">collect</span><span class="o">-</span><span class="n">only</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest --collect-only
 </pre></div>
 </div>
-<div class="code bash highlight-default notranslate" id="id4"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Module</span> <span class="s1">&#39;tests/test_datasets/test_dataset.py&#39;</span><span class="o">&gt;</span>
-  <span class="o">&lt;</span><span class="n">UnitTestCase</span> <span class="s1">&#39;OpenMLDatasetTest&#39;</span><span class="o">&gt;</span>
-    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_dataset_format_constructor&#39;</span><span class="o">&gt;</span>
-    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_get_data&#39;</span><span class="o">&gt;</span>
-    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_get_data_rowid_and_ignore_and_target&#39;</span><span class="o">&gt;</span>
-    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_get_data_with_ignore_attributes&#39;</span><span class="o">&gt;</span>
-    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_get_data_with_rowid&#39;</span><span class="o">&gt;</span>
-    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_get_data_with_target&#39;</span><span class="o">&gt;</span>
-  <span class="o">&lt;</span><span class="n">UnitTestCase</span> <span class="s1">&#39;OpenMLDatasetTestOnTestServer&#39;</span><span class="o">&gt;</span>
-    <span class="o">&lt;</span><span class="n">TestCaseFunction</span> <span class="s1">&#39;test_tagging&#39;</span><span class="o">&gt;</span>
+<div class="highlight-bash notranslate" id="id4"><div class="highlight"><pre><span></span>&lt;Module <span class="s1">&#39;tests/test_datasets/test_dataset.py&#39;</span>&gt;
+  &lt;UnitTestCase <span class="s1">&#39;OpenMLDatasetTest&#39;</span>&gt;
+    &lt;TestCaseFunction <span class="s1">&#39;test_dataset_format_constructor&#39;</span>&gt;
+    &lt;TestCaseFunction <span class="s1">&#39;test_get_data&#39;</span>&gt;
+    &lt;TestCaseFunction <span class="s1">&#39;test_get_data_rowid_and_ignore_and_target&#39;</span>&gt;
+    &lt;TestCaseFunction <span class="s1">&#39;test_get_data_with_ignore_attributes&#39;</span>&gt;
+    &lt;TestCaseFunction <span class="s1">&#39;test_get_data_with_rowid&#39;</span>&gt;
+    &lt;TestCaseFunction <span class="s1">&#39;test_get_data_with_target&#39;</span>&gt;
+  &lt;UnitTestCase <span class="s1">&#39;OpenMLDatasetTestOnTestServer&#39;</span>&gt;
+    &lt;TestCaseFunction <span class="s1">&#39;test_tagging&#39;</span>&gt;
 </pre></div>
 </div>
 <p id="id5">To run a specific module, add the module name, for instance:</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="n">tests</span><span class="o">/</span><span class="n">test_datasets</span><span class="o">/</span><span class="n">test_dataset</span><span class="o">.</span><span class="n">py</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest tests/test_datasets/test_dataset.py
 </pre></div>
 </div>
 <p id="id6">To run a specific unit test case, add the test case name, for instance:</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="n">tests</span><span class="o">/</span><span class="n">test_datasets</span><span class="o">/</span><span class="n">test_dataset</span><span class="o">.</span><span class="n">py</span><span class="p">::</span><span class="n">OpenMLDatasetTest</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest
 </pre></div>
 </div>
 <p id="id7">To run a specific unit test, add the test name, for instance:</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="n">tests</span><span class="o">/</span><span class="n">test_datasets</span><span class="o">/</span><span class="n">test_dataset</span><span class="o">.</span><span class="n">py</span><span class="p">::</span><span class="n">OpenMLDatasetTest</span><span class="p">::</span><span class="n">test_get_data</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest::test_get_data
 </pre></div>
 </div>
 <p id="id8">Happy testing!</p>
@@ -252,7 +251,7 @@ To obtain a hierarchical list of all tests, run</p>
     </p>
     <p>
         &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.0.<br/>
     </p>
   </div>
 </footer>

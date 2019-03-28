@@ -2,8 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Datasets &#8212; OpenML 0.8.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -120,8 +119,8 @@
     <div class="col-md-9 content">
       
   <div class="sphx-glr-download-link-note admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Click <a class="reference internal" href="#sphx-glr-download-examples-datasets-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-datasets-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="datasets">
 <span id="sphx-glr-examples-datasets-tutorial-py"></span><h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h1>
@@ -146,15 +145,15 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 2891 datasets...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 3558 datasets...
 </pre></div>
 </div>
 <div class="section" id="exercise-1">
 <h3>Exercise 1<a class="headerlink" href="#exercise-1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Find datasets with more than 10000 examples.</li>
-<li>Find a dataset called ‘eeg_eye_state’.</li>
-<li>Find all datasets with more than 50 classes.</li>
+<li><p>Find datasets with more than 10000 examples.</p></li>
+<li><p>Find a dataset called ‘eeg_eye_state’.</p></li>
+<li><p>Find all datasets with more than 50 classes.</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="p">[</span><span class="n">datalist</span><span class="o">.</span><span class="n">NumberOfInstances</span> <span class="o">&gt;</span> <span class="mi">10000</span>
          <span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;NumberOfInstances&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
@@ -272,7 +271,7 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 <div class="section" id="exercise-2">
 <h3>Exercise 2<a class="headerlink" href="#exercise-2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Explore the data visually.</li>
+<li><p>Explore the data visually.</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eegs</span> <span class="o">=</span> <span class="n">eeg</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">_</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">(</span>
@@ -290,9 +289,11 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.351 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-datasets-tutorial-py">
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/ea68bafc2f0d401c0e0139e9c46c83d5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></div>
+<p><a class="reference download internal" download="" href="../_downloads/ea68bafc2f0d401c0e0139e9c46c83d5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>
+</div>
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/a9d1be18c5b16cb5ba6b36ae1a2388a4/datasets_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">datasets_tutorial.ipynb</span></code></a></div>
+<p><a class="reference download internal" download="" href="../_downloads/a9d1be18c5b16cb5ba6b36ae1a2388a4/datasets_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">datasets_tutorial.ipynb</span></code></a></p>
+</div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>
@@ -312,7 +313,7 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
     </p>
     <p>
         &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.0.<br/>
     </p>
   </div>
 </footer>
