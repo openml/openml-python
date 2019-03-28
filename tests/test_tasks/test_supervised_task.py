@@ -6,16 +6,17 @@ import numpy as np
 import openml
 from tests.test_tasks import OpenMLTaskTest
 
-# Helper class
-# The test methods in this class
-# are not supposed to be executed.
-class OpenMLSupervisedTaskTest(OpenMLTaskTest):
-    # task id will be set from the
-    # extending classes
 
+class OpenMLSupervisedTaskTest(OpenMLTaskTest):
+    """
+    A helper class. The methods of the test case
+    are only executed in subclasses of the test case.
+    """
     def setUp(self):
 
         super(OpenMLSupervisedTaskTest, self).setUp()
+        # task_id acts as a placeholder variable
+        # and it is set from the extending classes.
         self.task_id = 1
 
     @classmethod
@@ -27,8 +28,7 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
             )
         super(OpenMLSupervisedTaskTest, cls).setUpClass()
 
-    def test_get_X_and_Y(self) -> \
-            Tuple[np.ndarray, np.ndarray]:
+    def test_get_X_and_Y(self) -> Tuple[np.ndarray, np.ndarray]:
 
         task = openml.tasks.get_task(self.task_id)
         X, Y = task.get_X_and_y()

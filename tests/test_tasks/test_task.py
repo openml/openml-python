@@ -7,18 +7,17 @@ from openml.tasks import OpenMLTask
 from openml.exceptions import OpenMLServerException
 from .test_supervised_task import OpenMLSupervisedTaskTest
 
-# Helper class
-# The test methods in this class
-# are not supposed to be executed.
+
 class OpenMLTaskTest(TestBase):
-    # task id, dataset_id,
-    # estimation_procedure
-    # will be set from the
-    # extending classes
-
+    """
+    A helper class. The methods of the test case
+    are only executed in subclasses of the test case.
+    """
     def setUp(self):
-
         super(OpenMLTaskTest, self).setUp()
+        # task_id and estimation_procedure
+        # act as placeholder variables.
+        # They are set from the extending classes.
         self.task_id = 11
         self.estimation_procedure = 23
 
@@ -40,27 +39,36 @@ class OpenMLTaskTest(TestBase):
     def test_upload_task(self):
 
         task = openml.tasks.get_task(self.task_id)
-        # adding sentinel so we can have a new dataset
-        # hence a "new task" to upload
         task_dataset = openml.datasets.get_dataset(task.dataset_id)
         task.dataset_id = self._upload_dataset(task_dataset)
         task.estimation_procedure_id = self.estimation_procedure
-        try:
-            task.publish()
-        except OpenMLServerException as e:
-            # 614 is the error code
-            # when the task already
-            # exists
-            if e.code != 614:
-                raise e
+        task.publish()
 
     def _upload_dataset(self, dataset: OpenMLDataset) -> int:
+        """Reupload the dataset.
 
+        Add a sentinel to the dataset name to achieve a
+        successful upload every time without creating a
+        new dataset.
+
+        Parameters
+        ----------
+        dataset: OpenMLDataset
+            The dataset from OpenML that will be
+            reuploaded.
+
+        Returns
+        -------
+        int
+            Dataset id. If the reupload is successful,
+            the new id. Otherwise, the old id of the
+            dataset.
+        """
         dataset.name = '%s%s' % (self._get_sentinel(), dataset.name)
         try:
             return dataset.publish()
         except openml.exceptions.OpenMLServerException:
-            # something went wrong
-            # test dataset was not
+            # Something went wrong.
+            # Test dataset was not
             # published. Return old id.
             return dataset.dataset_id

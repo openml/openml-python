@@ -28,28 +28,18 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         self.assertEqual(task.task_type_id, 5)
         self.assertEqual(task.dataset_id, 77)
 
-    # overriding the method from the base
-    # class. Ugly workaround but currently
-    # there are no clustering tasks on the
-    # test server. The task will be retrieved
-    # from the main server and published on the
-    # test server.
     def test_upload_task(self):
-
+        """
+        Overrides test_upload_task from the base class.
+        Ugly workaround but currently there are no clustering
+        tasks on the test server. The task will be retrieved
+        from the main server and published on the test server.
+        """
         task = openml.tasks.get_task(self.task_id)
         dataset = openml.datasets.get_dataset(task.dataset_id)
         # No clustering tasks in the test server
         # TODO should be removed when issue is resolved
         openml.config.server = self.test_server
-        # adding sentinel so we can have a new dataset
-        # hence a "new task" to upload
         task.dataset_id = self._upload_dataset(dataset)
         task.estimation_procedure_id = self.estimation_procedure
-        try:
-            task.publish()
-        except OpenMLServerException as e:
-            # 614 is the error code
-            # when the task already
-            # exists
-            if e.code != 614:
-                raise e
+        task.publish()
