@@ -271,6 +271,7 @@ class TestOpenMLDataset(TestBase):
             openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")))
 
     def test_get_dataset(self):
+        # This is the only non-lazy load to ensure default behaviour works.
         dataset = openml.datasets.get_dataset(1)
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, 'anneal')
@@ -313,7 +314,7 @@ class TestOpenMLDataset(TestBase):
 
         # Issue324 Properly handle private datasets when trying to access them
         openml.config.server = self.production_server
-        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
+        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45, False)
 
     def test_get_dataset_lazy_all_functions(self):
         """ Test that all expected functionality is available without downloading the dataset. """
@@ -343,14 +344,14 @@ class TestOpenMLDataset(TestBase):
             openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
 
     def test_get_dataset_sparse(self):
-        dataset = openml.datasets.get_dataset(102)
+        dataset = openml.datasets.get_dataset(102, download_data=False)
         X = dataset.get_data(dataset_format='array')
         self.assertIsInstance(X, scipy.sparse.csr_matrix)
 
     def test_download_rowid(self):
         # Smoke test which checks that the dataset has the row-id set correctly
         did = 44
-        dataset = openml.datasets.get_dataset(did)
+        dataset = openml.datasets.get_dataset(did, download_data=False)
         self.assertEqual(dataset.row_id_attribute, 'Counter')
 
     def test__get_dataset_description(self):
@@ -416,7 +417,7 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(len(os.listdir(datasets_cache_dir)), 0)
 
     def test_publish_dataset(self):
-
+        # lazy loading not possible as we need the arff-file.
         openml.datasets.get_dataset(3)
         file_path = os.path.join(openml.config.get_cache_directory(),
                                  "datasets", "3", "dataset.arff")
@@ -434,9 +435,9 @@ class TestOpenMLDataset(TestBase):
 
     def test__retrieve_class_labels(self):
         openml.config.cache_directory = self.static_cache_dir
-        labels = openml.datasets.get_dataset(2).retrieve_class_labels()
+        labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels()
         self.assertEqual(labels, ['1', '2', '3', '4', '5', 'U'])
-        labels = openml.datasets.get_dataset(2).retrieve_class_labels(
+        labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels(
             target_name='product-type')
         self.assertEqual(labels, ['C', 'H', 'G'])
 
@@ -761,9 +762,8 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test_get_online_dataset_arff(self):
-
-        # Australian dataset
-        dataset_id = 100
+        dataset_id = 100  # Australian
+        # lazy loading not used as arff file is checked.
         dataset = openml.datasets.get_dataset(dataset_id)
         decoder = arff.ArffDecoder()
         # check if the arff from the dataset is
@@ -785,7 +785,7 @@ class TestOpenMLDataset(TestBase):
 
         # Phoneme dataset
         dataset_id = 77
-        dataset = openml.datasets.get_dataset(dataset_id)
+        dataset = openml.datasets.get_dataset(dataset_id, download_data=False)
 
         self.assertEqual(
             (dataset.format).lower(),
