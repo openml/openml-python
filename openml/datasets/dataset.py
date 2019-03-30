@@ -174,97 +174,106 @@ class OpenMLDataset(object):
     def _data_arff_to_pickle(self, data_file):
         data_pickle_file = data_file.replace('.arff', '.pkl.py3')
         if os.path.exists(data_pickle_file):
-            logger.debug("Data pickle file already exists.")
-            return data_pickle_file
-        else:
-            try:
-                data = self._get_arff(self.format)
-            except OSError as e:
-                logger.critical("Please check that the data file %s is "
-                                "there and can be read.", data_file)
-                raise e
+            with open(data_pickle_file, "rb") as fh:
+                data, categorical, attribute_names = pickle.load(fh)
 
-            ARFF_DTYPES_TO_PD_DTYPE = {
-                'INTEGER': 'integer',
-                'REAL': 'floating',
-                'NUMERIC': 'floating',
-                'STRING': 'string'
-            }
-            attribute_dtype = {}
-            attribute_names = []
-            categories_names = {}
-            categorical = []
-            for name, type_ in data['attributes']:
-                # if the feature is nominal and the a sparse matrix is
-                # requested, the categories need to be numeric
-                if (isinstance(type_, list)
-                        and self.format.lower() == 'sparse_arff'):
-                    try:
-                        np.array(type_, dtype=np.float32)
-                    except ValueError:
-                        raise ValueError(
-                            "Categorical data needs to be numeric when "
-                            "using sparse ARFF."
-                        )
-                # string can only be supported with pandas DataFrame
-                elif (type_ == 'STRING'
-                      and self.format.lower() == 'sparse_arff'):
+            # Between v0.8 and v0.9 the format of pickled data changed from
+            # np.ndarray to pd.DataFrame. This breaks some backwards compatibility,
+            # e.g. for `run_model_on_task`. If a local file still exists with
+            # np.ndarray data, we reprocess the data file to store a pickled
+            # pd.DataFrame blob. See also #646.
+            if isinstance(data, pd.DataFrame) or scipy.sparse.issparse(data):
+                logger.debug("Data pickle file already exists.")
+                return data_pickle_file
+
+        try:
+            data = self._get_arff(self.format)
+        except OSError as e:
+            logger.critical("Please check that the data file %s is "
+                            "there and can be read.", data_file)
+            raise e
+
+        ARFF_DTYPES_TO_PD_DTYPE = {
+            'INTEGER': 'integer',
+            'REAL': 'floating',
+            'NUMERIC': 'floating',
+            'STRING': 'string'
+        }
+        attribute_dtype = {}
+        attribute_names = []
+        categories_names = {}
+        categorical = []
+        for name, type_ in data['attributes']:
+            # if the feature is nominal and the a sparse matrix is
+            # requested, the categories need to be numeric
+            if (isinstance(type_, list)
+                    and self.format.lower() == 'sparse_arff'):
+                try:
+                    np.array(type_, dtype=np.float32)
+                except ValueError:
                     raise ValueError(
-                        "Dataset containing strings is not supported "
-                        "with sparse ARFF."
+                        "Categorical data needs to be numeric when "
+                        "using sparse ARFF."
                     )
+            # string can only be supported with pandas DataFrame
+            elif (type_ == 'STRING'
+                  and self.format.lower() == 'sparse_arff'):
+                raise ValueError(
+                    "Dataset containing strings is not supported "
+                    "with sparse ARFF."
+                )
 
-                # infer the dtype from the ARFF header
-                if isinstance(type_, list):
-                    categorical.append(True)
-                    categories_names[name] = type_
-                    if len(type_) == 2:
-                        type_norm = [cat.lower().capitalize()
-                                     for cat in type_]
-                        if set(['True', 'False']) == set(type_norm):
-                            categories_names[name] = [
-                                True if cat == 'True' else False
-                                for cat in type_norm
-                            ]
-                            attribute_dtype[name] = 'boolean'
-                        else:
-                            attribute_dtype[name] = 'categorical'
+            # infer the dtype from the ARFF header
+            if isinstance(type_, list):
+                categorical.append(True)
+                categories_names[name] = type_
+                if len(type_) == 2:
+                    type_norm = [cat.lower().capitalize()
+                                 for cat in type_]
+                    if set(['True', 'False']) == set(type_norm):
+                        categories_names[name] = [
+                            True if cat == 'True' else False
+                            for cat in type_norm
+                        ]
+                        attribute_dtype[name] = 'boolean'
                     else:
                         attribute_dtype[name] = 'categorical'
                 else:
-                    categorical.append(False)
-                    attribute_dtype[name] = ARFF_DTYPES_TO_PD_DTYPE[type_]
-                attribute_names.append(name)
+                    attribute_dtype[name] = 'categorical'
+            else:
+                categorical.append(False)
+                attribute_dtype[name] = ARFF_DTYPES_TO_PD_DTYPE[type_]
+            attribute_names.append(name)
 
-            if self.format.lower() == 'sparse_arff':
-                X = data['data']
-                X_shape = (max(X[1]) + 1, max(X[2]) + 1)
-                X = scipy.sparse.coo_matrix(
-                    (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
-                X = X.tocsr()
+        if self.format.lower() == 'sparse_arff':
+            X = data['data']
+            X_shape = (max(X[1]) + 1, max(X[2]) + 1)
+            X = scipy.sparse.coo_matrix(
+                (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
+            X = X.tocsr()
 
-            elif self.format.lower() == 'arff':
-                X = pd.DataFrame(data['data'], columns=attribute_names)
+        elif self.format.lower() == 'arff':
+            X = pd.DataFrame(data['data'], columns=attribute_names)
 
-                col = []
-                for column_name in X.columns:
-                    if attribute_dtype[column_name] in ('categorical',
-                                                        'boolean'):
-                        col.append(self._unpack_categories(
-                            X[column_name], categories_names[column_name]))
-                    else:
-                        col.append(X[column_name])
-                X = pd.concat(col, axis=1)
+            col = []
+            for column_name in X.columns:
+                if attribute_dtype[column_name] in ('categorical',
+                                                    'boolean'):
+                    col.append(self._unpack_categories(
+                        X[column_name], categories_names[column_name]))
+                else:
+                    col.append(X[column_name])
+            X = pd.concat(col, axis=1)
 
-            # Pickle the dataframe or the sparse matrix.
-            with open(data_pickle_file, "wb") as fh:
-                pickle.dump((X, categorical, attribute_names), fh, -1)
-            logger.debug("Saved dataset {did}: {name} to file {path}"
-                         .format(did=int(self.dataset_id or -1),
-                                 name=self.name,
-                                 path=data_pickle_file)
-                         )
-            return data_pickle_file
+        # Pickle the dataframe or the sparse matrix.
+        with open(data_pickle_file, "wb") as fh:
+            pickle.dump((X, categorical, attribute_names), fh, -1)
+        logger.debug("Saved dataset {did}: {name} to file {path}"
+                     .format(did=int(self.dataset_id or -1),
+                             name=self.name,
+                             path=data_pickle_file)
+                     )
+        return data_pickle_file
 
     def push_tag(self, tag):
         """Annotates this data set with a tag on the server.
