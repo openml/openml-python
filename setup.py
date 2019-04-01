@@ -8,19 +8,6 @@ with open("openml/__version__.py") as fh:
 
 dependency_links = []
 
-try:
-    import numpy  # noqa: F401
-except ImportError:
-    print('numpy is required during installation')
-    sys.exit(1)
-
-try:
-    import scipy  # noqa: F401
-except ImportError:
-    print('scipy is required during installation')
-    sys.exit(1)
-
-
 setuptools.setup(name="openml",
                  author="Matthias Feurer, Andreas Müller, Farzan Majdani, "
                         "Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers",
@@ -34,8 +21,6 @@ setuptools.setup(name="openml",
                  packages=setuptools.find_packages(),
                  package_data={'': ['*.txt', '*.md']},
                  install_requires=[
-                     'numpy>=1.6.2',
-                     'scipy>=0.13.3',
                      'liac-arff>=2.2.2',
                      'xmltodict',
                      'pytest',
@@ -45,6 +30,8 @@ setuptools.setup(name="openml",
                      'python-dateutil',
                      'oslo.concurrency',
                      'pandas>=0.19.2',
+                     'scipy>=0.13.3',
+                     'numpy>=1.6.2'
                  ],
                  extras_require={
                      'test': [
