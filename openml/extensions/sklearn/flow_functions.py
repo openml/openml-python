@@ -948,6 +948,9 @@ def is_hpo_class(model: Any) -> bool:
 
 
 def check_n_jobs(model: Any) -> bool:
+    """Returns True if the parameter settings of model are chosen s.t. the model
+    will run on a single core (if so, openml-python can measure runtimes)"""
+
     def check(param_grid, restricted_parameter_name, legal_values):
         if isinstance(param_grid, dict):
             for param, value in param_grid.items():

@@ -431,8 +431,8 @@ class TestRun(TestBase):
                                                       model_prime, seed)
 
         # todo: check if runtime is present
-        self._check_fold_evaluations(run.fold_evaluations, 1, num_folds,
-                                     task_type=task_type)
+        self._check_fold_timing_evaluations(run.fold_evaluations, 1, num_folds,
+                                            task_type=task_type)
         pass
 
     def _run_and_upload_classification(self, clf, task_id, n_missing_vals,
@@ -1036,8 +1036,8 @@ class TestRun(TestBase):
         self.assertIsInstance(trace, type(None))
 
         task_type = TaskTypeEnum.SUPERVISED_CLASSIFICATION
-        self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds,
-                                     task_type=task_type)
+        self._check_fold_timing_evaluations(fold_evaluations, num_repeats, num_folds,
+                                            task_type=task_type)
 
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), num_instances * num_repeats)

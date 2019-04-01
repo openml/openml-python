@@ -22,6 +22,7 @@ from openml.extensions.sklearn.run_functions import (
 )
 
 
+# Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
     from openml.flows import OpenMLFlow
     from openml.tasks.task import OpenMLTask
@@ -160,7 +161,7 @@ class SklearnExtension(Extension):
         """
         return seed_model(model, seed)
 
-    def run_model_on_fold(
+    def _run_model_on_fold(
         self,
         model: Any,
         task: 'OpenMLTask',

@@ -26,7 +26,7 @@ from openml.testing import TestBase
 from openml.runs.trace import OpenMLRunTrace
 
 
-class TestRun(TestBase):
+class TestSklearnExtensionRunFunctions(TestBase):
     _multiprocess_can_split_ = True
 
     def setUp(self):
@@ -111,8 +111,8 @@ class TestRun(TestBase):
         for measure in user_defined_measures:
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
-        self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds,
-                                     task_type=task.task_type_id)
+        self._check_fold_timing_evaluations(fold_evaluations, num_repeats, num_folds,
+                                            task_type=task.task_type_id)
 
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), num_instances * num_repeats)

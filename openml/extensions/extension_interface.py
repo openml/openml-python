@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from collections import OrderedDict  # noqa: F401
 from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 
-
+# Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
     from openml.flows import OpenMLFlow
     from openml.tasks.task import OpenMLTask
@@ -34,7 +34,6 @@ class Extension(ABC):
         -------
         bool
         """
-        pass
 
     @staticmethod
     @abstractmethod
@@ -51,7 +50,6 @@ class Extension(ABC):
         -------
         bool
         """
-        pass
 
     ################################################################################################
     # Abstract methods for flow serialization and de-serialization
@@ -68,7 +66,6 @@ class Extension(ABC):
         -------
         Any
         """
-        pass
 
     @abstractmethod
     def model_to_flow(self, model: Any) -> 'OpenMLFlow':
@@ -82,7 +79,6 @@ class Extension(ABC):
         -------
         OpenMLFlow
         """
-        pass
 
     @abstractmethod
     def get_version_information(self) -> List[str]:
@@ -92,7 +88,6 @@ class Extension(ABC):
         -------
         List
         """
-        pass
 
     @abstractmethod
     def create_setup_string(self, model: Any) -> str:
@@ -106,7 +101,6 @@ class Extension(ABC):
         -------
         str
         """
-        pass
 
     ################################################################################################
     # Abstract methods for performing runs with extension modules
@@ -126,7 +120,6 @@ class Extension(ABC):
         -------
         bool
         """
-        pass
 
     @abstractmethod
     def seed_model(self, model: Any, seed: Optional[int]) -> Any:
@@ -144,10 +137,9 @@ class Extension(ABC):
         -------
         model
         """
-        pass
 
     @abstractmethod
-    def run_model_on_fold(
+    def _run_model_on_fold(
         self,
         model: Any,
         task: 'OpenMLTask',
@@ -159,7 +151,7 @@ class Extension(ABC):
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction information.
 
         Returns the data that is necessary to construct the OpenML Run object. Is used by
-        run_task_get_arff_content. Do not use this function unless you know what you are doing.
+        run_task_get_arff_content.
 
         Parameters
         ----------
@@ -193,7 +185,6 @@ class Extension(ABC):
             The model trained on this repeat,fold,subsample triple. Will be used to generate trace
             information later on (in ``obtain_arff_trace``).
         """
-        pass
 
     @abstractmethod
     def obtain_parameter_values(
@@ -223,7 +214,6 @@ class Extension(ABC):
             - ``oml:value`` : mixed: A representation of the parameter value
             - ``oml:component`` : int: flow id to which the parameter belongs
         """
-        pass
 
     ################################################################################################
     # Abstract methods for hyperparameter optimization
@@ -242,7 +232,6 @@ class Extension(ABC):
         -------
         bool
         """
-        pass
 
     @abstractmethod
     def instantiate_model_from_hpo_class(
@@ -265,7 +254,6 @@ class Extension(ABC):
         Any
         """
         # TODO a trace belongs to a run and therefore a flow -> simplify this part of the interface!
-        pass
 
     @abstractmethod
     def obtain_arff_trace(
@@ -288,4 +276,3 @@ class Extension(ABC):
         -------
         OpenMLRunTrace
         """
-        pass

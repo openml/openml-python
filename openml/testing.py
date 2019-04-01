@@ -28,6 +28,23 @@ class TestBase(unittest.TestCase):
     """
 
     def setUp(self, n_levels: int = 1):
+        """Setup variables and temporary directories.
+
+        In particular, this methods:
+
+        * creates a temporary working directory
+        * figures out a path to a few static test files
+        * set the default server to be the test server
+        * set a static API key for the test server
+        * increases the maximal number of retries
+
+        Parameters
+        ----------
+        n_levels : int
+            Number of nested directories the test is in. Necessary to resolve the path to the
+            ``files`` directory, which is located directly under the ``tests`` directory.
+        """
+
         # This cache directory is checked in to git to simulate a populated
         # cache
         self.maxDiff = None
@@ -120,7 +137,7 @@ class TestBase(unittest.TestCase):
         self.assertIn(dataset['status'], ['in_preparation', 'active',
                                           'deactivated'])
 
-    def _check_fold_evaluations(
+    def _check_fold_timing_evaluations(
         self,
         fold_evaluations: Dict,
         num_repeats: int,

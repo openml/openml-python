@@ -21,6 +21,7 @@ from .run import OpenMLRun
 from .trace import OpenMLRunTrace
 from ..tasks import TaskTypeEnum
 
+# Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
     from openml.extensions.extension_interface import Extension
 
@@ -223,7 +224,7 @@ def run_flow_on_task(
         trace=trace,
         data_content=data_content,
         flow=flow,
-        setup_string=flow.extension.create_setup_string(flow.model)
+        setup_string=flow.extension.create_setup_string(flow.model),
     )
 
     if (upload_flow or avoid_duplicate_runs) and flow.flow_id is not None:
@@ -399,7 +400,7 @@ def _run_task_get_arffcontent(
                     arff_tracecontent_fold,
                     user_defined_measures_fold,
                     model_fold,
-                ) = extension.run_model_on_fold(
+                ) = extension._run_model_on_fold(
                     model=model,
                     task=task,
                     rep_no=rep_no,
