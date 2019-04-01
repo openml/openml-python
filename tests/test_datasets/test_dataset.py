@@ -20,12 +20,12 @@ class OpenMLDatasetTest(TestBase):
 
         # Load dataset id 2 - dataset 2 is interesting because it contains
         # missing values, categorical features etc.
-        self.dataset = openml.datasets.get_dataset(2)
+        self.dataset = openml.datasets.get_dataset(2, download_data=False)
         # titanic as missing values, categories, and string
-        self.titanic = openml.datasets.get_dataset(40945)
+        self.titanic = openml.datasets.get_dataset(40945, download_data=False)
         # these datasets have some boolean features
-        self.pc4 = openml.datasets.get_dataset(1049)
-        self.jm1 = openml.datasets.get_dataset(1053)
+        self.pc4 = openml.datasets.get_dataset(1049, download_data=False)
+        self.jm1 = openml.datasets.get_dataset(1053, download_data=False)
 
     def test_get_data_future_warning(self):
         warn_msg = 'will change from "array" to "dataframe"'
@@ -197,7 +197,7 @@ class OpenMLDatasetTestOnTestServer(TestBase):
     def setUp(self):
         super(OpenMLDatasetTestOnTestServer, self).setUp()
         # longley, really small dataset
-        self.dataset = openml.datasets.get_dataset(125)
+        self.dataset = openml.datasets.get_dataset(125, download_data=False)
 
     def test_tagging(self):
         tag = "testing_tag_{}_{}".format(self.id(), time())
@@ -219,7 +219,7 @@ class OpenMLDatasetTestSparse(TestBase):
         super(OpenMLDatasetTestSparse, self).setUp()
         openml.config.server = self.production_server
 
-        self.sparse_dataset = openml.datasets.get_dataset(4136)
+        self.sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
 
     def test_get_sparse_dataset_with_target(self):
         X, y = self.sparse_dataset.get_data(
