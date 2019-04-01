@@ -1434,6 +1434,7 @@ class TestRun(TestBase):
 
         runs = openml.runs.list_runs(id=ids, task=tasks, uploader=uploaders_1)
 
+    @unittest.skip("API currently broken: https://github.com/openml/OpenML/issues/948")
     def test_get_runs_list_by_tag(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
