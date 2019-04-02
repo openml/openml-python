@@ -64,7 +64,6 @@ class TestInit(openml.testing.TestBase):
         super().setUp()
         _unregister()
 
-
     def test_get_extension_by_flow(self):
         self.assertIsNone(get_extension_by_flow(DummyFlow()))
         with self.assertRaisesRegex(ValueError, 'No extension registered which can handle flow:'):

@@ -14,16 +14,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing.imputation import Imputer
 
 import openml
-from openml.extensions.sklearn.run_functions import (
-    _extract_trace_data,
-    _prediction_to_row,
-    seed_model,
-    run_model_on_fold,
-    obtain_arff_trace,
-)
-
-from openml.testing import TestBase
+from openml.extensions.sklearn import SklearnExtension
 from openml.runs.trace import OpenMLRunTrace
+from openml.testing import TestBase
 
 
 class TestSklearnExtensionRunFunctions(TestBase):
@@ -31,6 +24,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
     def setUp(self):
         super().setUp(n_levels=2)
+        self.extension = SklearnExtension()
 
     ################################################################################################
     # Test methods for performing runs with this extension module
@@ -61,7 +55,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 self.assertIsNone(all_params[param])
 
             # now seed the params
-            clf_seeded = seed_model(clf, const_probe)
+            clf_seeded = self.extension.seed_model(clf, const_probe)
             new_params = clf_seeded.get_params()
 
             randstate_params = [key for key in new_params if
@@ -85,7 +79,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
         for clf in randomized_clfs:
             with self.assertRaises(ValueError):
-                seed_model(model=clf, seed=42)
+                self.extension.seed_model(model=clf, seed=42)
 
     def test_run_model_on_fold(self):
         task = openml.tasks.get_task(7)
@@ -95,7 +89,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
         clf = SGDClassifier(loss='log', random_state=1)
         # TODO add some mocking here to actually test the innards of this function, too!
-        res = run_model_on_fold(
+        res = self.extension._run_model_on_fold(
             clf, task, 0, 0, 0,
             add_local_measures=True)
 
@@ -152,7 +146,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         predY = clf.predict(test_X)
         sample_nr = 0  # default for this task
         for idx in range(0, len(test_X)):
-            arff_line = _prediction_to_row(
+            arff_line = self.extension._prediction_to_row(
                 rep_no=repeat_nr,
                 fold_no=fold_nr,
                 sample_no=sample_nr,
@@ -201,8 +195,8 @@ class TestSklearnExtensionRunFunctions(TestBase):
         # check num layers of MLP
         self.assertIn(clf.best_estimator_.hidden_layer_sizes, param_grid['hidden_layer_sizes'])
 
-        trace_list = _extract_trace_data(clf, rep_no=0, fold_no=0)
-        trace = obtain_arff_trace(clf, trace_list)
+        trace_list = self.extension._extract_trace_data(clf, rep_no=0, fold_no=0)
+        trace = self.extension.obtain_arff_trace(clf, trace_list)
 
         self.assertIsInstance(trace, OpenMLRunTrace)
         self.assertIsInstance(trace_list, list)

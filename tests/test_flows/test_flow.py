@@ -30,7 +30,6 @@ import openml
 from openml._api_calls import _perform_api_call
 import openml.exceptions
 import openml.extensions.sklearn
-import openml.extensions.sklearn.flow_functions
 from openml.testing import TestBase
 import openml.utils
 
@@ -166,7 +165,7 @@ class TestFlow(TestBase):
             components=collections.OrderedDict(),
             parameters=collections.OrderedDict(),
             parameters_meta_info=collections.OrderedDict(),
-            external_version=openml.extensions.sklearn.flow_functions._format_external_version(
+            external_version=self.extension._format_external_version(
                 'sklearn',
                 sklearn.__version__,
             ),

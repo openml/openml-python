@@ -19,9 +19,9 @@ class Extension(ABC):
     ################################################################################################
     # General setup
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def can_handle_flow(flow: 'OpenMLFlow') -> bool:
+    def can_handle_flow(cls, flow: 'OpenMLFlow') -> bool:
         """Check whether a given flow can be handled by this extension.
 
         This is typically done by parsing the ``external_version`` field.
@@ -35,9 +35,9 @@ class Extension(ABC):
         bool
         """
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def can_handle_model(model: Any) -> bool:
+    def can_handle_model(cls, model: Any) -> bool:
         """Check whether a model flow can be handled by this extension.
 
         This is typically done by checking the type of the model, or the package it belongs to.
