@@ -275,29 +275,37 @@ def __list_tasks(api_call):
     return tasks
 
 
-def get_tasks(task_ids):
-    """Download tasks.
+def get_tasks(task_ids, download_data=True):
+    """Download task representation and data splits optionally.
     This function iterates :meth:`openml.tasks.get_task`.
     Parameters
     ----------
     task_ids : iterable
-        Integers representing task ids.
+        Integers/Strings representing task ids.
+    download_data : bool
+        Option to trigger download of data along with the meta data.
     Returns
     -------
     list
     """
     tasks = []
     for task_id in task_ids:
-        tasks.append(get_task(task_id))
+        tasks.append(get_task(task_id, download_data))
     return tasks
 
 
-def get_task(task_id):
-    """Download the OpenML task for a given task ID.
+def get_task(task_id, download_data=True):
+    """Download the OpenML task representation for a given task ID, optionally
+        also download actual data along with data splits if applicable.
     Parameters
     ----------
-    task_id : int
+    task_id : int or str
         The OpenML task id.
+    download_data : bool
+        Option to trigger download of data along with the meta data.
+    Returns
+    -------
+    task
     """
     task_id = int(task_id)
 
@@ -311,14 +319,20 @@ def get_task(task_id):
 
         try:
             task = _get_task_description(task_id)
-            dataset = get_dataset(task.dataset_id)
+            dataset = get_dataset(task.dataset_id, download_data)
+            # List of class labels availaible in dataset description
+            # Including class labels as part of task meta data handles
+            #   the case where data download was initially disabled
+            # The other alternative would be to abstract away this check
+            #   as part of download_split()
+            if isinstance(task, OpenMLClassificationTask):
+                task.class_labels = \
+                    dataset.retrieve_class_labels(task.target_name)
             # Clustering tasks do not have class labels
             # and do not offer download_split
-            if isinstance(task, OpenMLSupervisedTask):
-                task.download_split()
-                if isinstance(task, OpenMLClassificationTask):
-                    task.class_labels = \
-                        dataset.retrieve_class_labels(task.target_name)
+            if download_data:
+                if isinstance(task, OpenMLSupervisedTask):
+                    task.download_split()
         except Exception as e:
             openml.utils._remove_cache_dir_for_id(
                 TASKS_CACHE_DIR_NAME,
