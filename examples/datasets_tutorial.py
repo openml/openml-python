@@ -45,6 +45,7 @@ datalist.query('NumberOfClasses > 50')
 
 # This is done based on the dataset ID ('did').
 dataset = openml.datasets.get_dataset(68)
+# NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68
 
 # Print a summary
 print("This is dataset '%s', the target feature is '%s'" %
@@ -84,7 +85,7 @@ print(X.info())
 # Whenever you use any functionality that requires the data,
 # such as `get_data`, the data will be downloaded.
 dataset = openml.datasets.get_dataset(68, download_data=False)
-
+# NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68
 
 ############################################################################
 # Exercise 2
