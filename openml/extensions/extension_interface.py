@@ -55,12 +55,16 @@ class Extension(ABC):
     # Abstract methods for flow serialization and de-serialization
 
     @abstractmethod
-    def flow_to_model(self, flow: 'OpenMLFlow') -> Any:
+    def flow_to_model(self, flow: 'OpenMLFlow', initialize_with_defaults: bool = False) -> Any:
         """Instantiate a model from the flow representation.
 
         Parameters
         ----------
         flow : OpenMLFlow
+
+        initialize_with_defaults : bool, optional (default=False)
+            If this flag is set, the hyperparameter values of flows will be
+            ignored and a flow with its defaults is returned.
 
         Returns
         -------

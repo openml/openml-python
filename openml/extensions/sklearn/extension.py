@@ -14,6 +14,8 @@ import warnings
 import numpy as np
 import scipy.stats
 import sklearn.base
+import sklearn.model_selection
+import sklearn.pipeline
 
 import openml
 from openml.exceptions import PyOpenMLError
@@ -86,14 +88,36 @@ class SklearnExtension(Extension):
     ################################################################################################
     # Methods for flow serialization and de-serialization
 
-    def flow_to_model(
+    def flow_to_model(self, flow: 'OpenMLFlow', initialize_with_defaults: bool = False) -> Any:
+        """Initializes a sklearn model based on a flow.
+
+        Parameters
+        ----------
+        o : mixed
+            the object to deserialize (can be flow object, or any serialized
+            parameter value that is accepted by)
+
+        initialize_with_defaults : bool, optional (default=False)
+            If this flag is set, the hyperparameter values of flows will be
+            ignored and a flow with its defaults is returned.
+
+        Returns
+        -------
+        mixed
+        """
+        return self._deserialize_sklearn(flow, initialize_with_defaults=initialize_with_defaults)
+
+    def _deserialize_sklearn(
         self,
-        flow: 'OpenMLFlow',
+        o: Any,
         components: Optional[Dict] = None,
         initialize_with_defaults: bool = False,
         recursion_depth: int = 0,
     ) -> Any:
-        """Initializes a sklearn model based on a flow.
+        """Recursive function to deserialize a scikit-learn flow.
+
+        This function delegates all work to the respective functions to deserialize special data
+        structures etc.
 
         Parameters
         ----------
@@ -115,9 +139,7 @@ class SklearnExtension(Extension):
         Returns
         -------
         mixed
-
         """
-        o = flow
 
         logging.info('-%s flow_to_sklearn START o=%s, components=%s, '
                      'init_defaults=%s' % ('-' * recursion_depth, o, components,
@@ -150,10 +172,10 @@ class SklearnExtension(Extension):
                     rval = self._deserialize_function(value)
                 elif serialized_type == 'component_reference':
                     assert components is not None  # Necessary for mypy
-                    value = self.flow_to_model(value, recursion_depth=depth_pp)
+                    value = self._deserialize_sklearn(value, recursion_depth=depth_pp)
                     step_name = value['step_name']
                     key = value['key']
-                    component = self.flow_to_model(
+                    component = self._deserialize_sklearn(
                         components[key],
                         initialize_with_defaults=initialize_with_defaults,
                         recursion_depth=depth_pp
@@ -178,14 +200,14 @@ class SklearnExtension(Extension):
             else:
                 rval = OrderedDict(
                     (
-                        self.flow_to_model(
-                            flow=key,
+                        self._deserialize_sklearn(
+                            o=key,
                             components=components,
                             initialize_with_defaults=initialize_with_defaults,
                             recursion_depth=depth_pp,
                         ),
-                        self.flow_to_model(
-                            flow=value,
+                        self._deserialize_sklearn(
+                            o=value,
                             components=components,
                             initialize_with_defaults=initialize_with_defaults,
                             recursion_depth=depth_pp,
@@ -195,8 +217,8 @@ class SklearnExtension(Extension):
                 )
         elif isinstance(o, (list, tuple)):
             rval = [
-                self.flow_to_model(
-                    flow=element,
+                self._deserialize_sklearn(
+                    o=element,
                     components=components,
                     initialize_with_defaults=initialize_with_defaults,
                     recursion_depth=depth_pp,
@@ -221,7 +243,7 @@ class SklearnExtension(Extension):
                      % ('-' * recursion_depth, o, rval))
         return rval
 
-    def model_to_flow(self, model: Any, parent_model: Optional[Any] = None) -> 'OpenMLFlow':
+    def model_to_flow(self, model: Any) -> 'OpenMLFlow':
         """Transform a scikit-learn model to a flow for uploading it to OpenML.
 
         Parameters
@@ -233,8 +255,10 @@ class SklearnExtension(Extension):
         OpenMLFlow
         """
         # Necessary to make pypy not complain about all the different possible return types
+        return self._serialize_sklearn(model)
+
+    def _serialize_sklearn(self, o: Any, parent_model: Optional[Any] = None) -> Any:
         rval = None  # type: Any
-        o = model
 
         # TODO: assert that only on first recursion lvl `parent_model` can be None
         if self.is_estimator(o):
@@ -242,7 +266,7 @@ class SklearnExtension(Extension):
             rval = self._serialize_model(o)
         elif isinstance(o, (list, tuple)):
             # TODO: explain what type of parameter is here
-            rval = [self.model_to_flow(element, parent_model) for element in o]
+            rval = [self._serialize_sklearn(element, parent_model) for element in o]
             if isinstance(o, tuple):
                 rval = tuple(rval)
         elif isinstance(o, SIMPLE_TYPES) or o is None:
@@ -261,8 +285,8 @@ class SklearnExtension(Extension):
                     raise TypeError('Can only use string as keys, you passed '
                                     'type %s for value %s.' %
                                     (type(key), str(key)))
-                key = self.model_to_flow(key, parent_model)
-                value = self.model_to_flow(value, parent_model)
+                key = self._serialize_sklearn(key, parent_model)
+                value = self._serialize_sklearn(value, parent_model)
                 rval[key] = value
             rval = rval
         elif isinstance(o, type):
@@ -478,7 +502,7 @@ class SklearnExtension(Extension):
 
         model_parameters = model.get_params(deep=False)
         for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
-            rval = self.model_to_flow(v, model)
+            rval = self._serialize_sklearn(v, model)
 
             def flatten_all(list_):
                 """ Flattens arbitrary depth lists of lists (e.g. [[1,2],[3,[1]]] -> [1,2,3,1]). """
@@ -584,7 +608,7 @@ class SklearnExtension(Extension):
                 cr_value['key'] = k
                 cr_value['step_name'] = None
                 component_reference['value'] = cr_value
-                cr = self.model_to_flow(component_reference, model)
+                cr = self._serialize_sklearn(component_reference, model)
                 parameters[k] = json.dumps(cr)
 
             else:
@@ -651,7 +675,7 @@ class SklearnExtension(Extension):
             value = parameters.get(name)
             logging.info('--%s flow_parameter=%s, value=%s' %
                          ('-' * recursion_depth, name, value))
-            rval = self.flow_to_model(
+            rval = self._deserialize_sklearn(
                 value,
                 components=components_,
                 initialize_with_defaults=keep_defaults,
@@ -667,7 +691,7 @@ class SklearnExtension(Extension):
             value = components[name]
             logging.info('--%s flow_component=%s, value=%s'
                          % ('-' * recursion_depth, name, value))
-            rval = self.flow_to_model(
+            rval = self._deserialize_sklearn(
                 value,
                 recursion_depth=recursion_depth + 1,
             )
@@ -851,7 +875,7 @@ class SklearnExtension(Extension):
         model_class = getattr(importlib.import_module(module_name[0]),
                               module_name[1])
         for parameter in parameters:
-            parameters[parameter] = self.flow_to_model(
+            parameters[parameter] = self._deserialize_sklearn(
                 parameters[parameter],
                 recursion_depth=recursion_depth + 1,
             )
