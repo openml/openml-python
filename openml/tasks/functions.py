@@ -295,10 +295,12 @@ def get_tasks(task_ids, download_data=True):
 
 
 def get_task(task_id, download_data=True):
-    """Download the OpenML task representation for a given task ID, optionally
-        also download actual data along with data splits if applicable.
+    """Download task representation for a given task ID
     Parameters
     ----------
+    The task representation is downloaded while the download of data
+
+    splits is optionally controlled by the download_data parameter
     task_id : int or str
         The OpenML task id.
     download_data : bool

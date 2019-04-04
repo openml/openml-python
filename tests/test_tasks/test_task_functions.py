@@ -135,17 +135,22 @@ class TestTask(TestBase):
         self.assertTrue(os.path.exists(os.path.join(
             self.workdir, 'org', 'openml', 'test', "tasks", "2", "task.xml",
         )))
+        self.assertEqual(task.class_labels, ['1', '2', '3', '4', '5', 'U'])
 
         self.assertFalse(os.path.exists(os.path.join(
             self.workdir, 'org', 'openml', 'test', "tasks", "2", "datasplits.arff"
         )))
-        # Not checking datasets/ as other test cases might interfere
+        self.assertFalse(os.path.exists(os.path.join(
+            self.workdir, 'org', 'openml', 'test', "datasets", "2", "dataset.arff"
+        )))
 
         task.download_split()
         self.assertTrue(os.path.exists(os.path.join(
             self.workdir, 'org', 'openml', 'test', "tasks", "2", "datasplits.arff"
         )))
-        # Not checking datasets/ as other test cases might interfere
+        self.assertTrue(os.path.exists(os.path.join(
+            self.workdir, 'org', 'openml', 'test', "datasets", "2", "dataset.arff"
+        )))
 
     @mock.patch('openml.tasks.functions.get_dataset')
     def test_removal_upon_download_failure(self, get_dataset):
