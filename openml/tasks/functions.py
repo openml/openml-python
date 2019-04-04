@@ -307,7 +307,11 @@ def get_task(task_id, download_data=True):
     -------
     task
     """
-    task_id = int(task_id)
+    try:
+        task_id = int(task_id)
+    except (ValueError, TypeError):
+        raise ValueError("Dataset ID is neither an Integer nor can be "
+                         "cast to an Integer.")
 
     with lockutils.external_lock(
             name='task.functions.get_task:%d' % task_id,
@@ -323,8 +327,6 @@ def get_task(task_id, download_data=True):
             # List of class labels availaible in dataset description
             # Including class labels as part of task meta data handles
             #   the case where data download was initially disabled
-            # The other alternative would be to abstract away this check
-            #   as part of download_split()
             if isinstance(task, OpenMLClassificationTask):
                 task.class_labels = \
                     dataset.retrieve_class_labels(task.target_name)
