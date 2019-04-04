@@ -3,7 +3,6 @@ from typing import Tuple
 
 import numpy as np
 
-import openml
 from .test_task import OpenMLTaskTest
 
 
@@ -30,6 +29,6 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
 
     def test_get_X_and_Y(self) -> Tuple[np.ndarray, np.ndarray]:
 
-        task = openml.tasks.get_task(self.task_id)
+        task = super(OpenMLSupervisedTaskTest, self).test_download_task()
         X, Y = task.get_X_and_y()
         return X, Y

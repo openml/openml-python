@@ -9,6 +9,7 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
 
         super(OpenMLClassificationTaskTest, self).setUp()
         self.task_id = 119
+        self.task = super(OpenMLClassificationTaskTest, self).test_download_task()
 
     def test_get_X_and_Y(self):
 
@@ -21,7 +22,10 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
 
     def test_download_task(self):
 
-        task = super(OpenMLClassificationTaskTest, self).test_download_task()
-        self.assertEqual(task.task_id, self.task_id)
-        self.assertEqual(task.task_type_id, 1)
-        self.assertEqual(task.dataset_id, 20)
+        self.assertEqual(self.task.task_id, self.task_id)
+        self.assertEqual(self.task.task_type_id, 1)
+        self.assertEqual(self.task.dataset_id, 20)
+
+    def test_class_labels(self):
+
+        self.assertEqual(self.task.class_labels, ['tested_negative', 'tested_positive'])

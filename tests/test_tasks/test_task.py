@@ -5,7 +5,6 @@ from openml.testing import TestBase
 from openml.datasets import OpenMLDataset
 from openml.tasks import OpenMLTask
 from openml.exceptions import OpenMLServerException
-from .test_supervised_task import OpenMLSupervisedTaskTest
 
 
 class OpenMLTaskTest(TestBase):
@@ -23,8 +22,9 @@ class OpenMLTaskTest(TestBase):
 
     @classmethod
     def setUpClass(cls):
-
-        if cls is OpenMLTaskTest or OpenMLSupervisedTaskTest:
+        # placed here to avoid a circular import
+        from .test_supervised_task import OpenMLSupervisedTaskTest
+        if cls is OpenMLTaskTest or cls is OpenMLSupervisedTaskTest:
             raise unittest.SkipTest(
                 "Skip OpenMLTaskTest tests,"
                 " it's a base class"
@@ -65,6 +65,10 @@ class OpenMLTaskTest(TestBase):
             dataset.
         """
         dataset.name = '%s%s' % (self._get_sentinel(), dataset.name)
+        # Providing both dataset file and url
+        # raises an error when uploading.
+        dataset.url = None
+        dataset.status = 'active'
         try:
             return dataset.publish()
         except openml.exceptions.OpenMLServerException:
