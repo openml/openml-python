@@ -8,7 +8,7 @@ from ..evaluations import OpenMLEvaluation
 
 def list_evaluations(function, offset=None, size=None, id=None, task=None,
                      setup=None, flow=None, uploader=None, tag=None,
-                     per_fold=None):
+                     per_fold=None, output_format='dict'):
     """
     List all run-evaluation pairs matching all of the given filters.
     (Supports large amount of results)
@@ -36,17 +36,22 @@ def list_evaluations(function, offset=None, size=None, id=None, task=None,
 
     per_fold : bool, optional
 
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
+
     Returns
     -------
-    dict
+    dict or dataframe
     """
     if per_fold is not None:
         per_fold = str(per_fold).lower()
 
-    return openml.utils._list_all(_list_evaluations, function, offset=offset,
-                                  size=size, id=id, task=task, setup=setup,
-                                  flow=flow, uploader=uploader, tag=tag,
-                                  per_fold=per_fold)
+    return openml.utils._list_all(output_format, _list_evaluations, function,
+                                  offset=offset, size=size, id=id, task=task,
+                                  setup=setup, flow=flow, uploader=uploader,
+                                  tag=tag, per_fold=per_fold)
 
 
 def _list_evaluations(function, id=None, task=None,

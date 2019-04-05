@@ -2,6 +2,13 @@ from collections import OrderedDict
 import io
 import re
 import os
+import warnings
+
+# Currently, importing oslo raises a lot of warning that it will stop working
+# under python3.8; remove this once they disappear
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    from oslo_concurrency import lockutils
 import xmltodict
 
 from ..exceptions import OpenMLCacheException
@@ -120,9 +127,10 @@ def _get_estimation_procedure_list():
     return procs
 
 
-def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
-    """Return a number of tasks having the given tag and task_type_id
-
+def list_tasks(task_type_id=None, offset=None, size=None, tag=None,
+               output_format='dict', **kwargs):
+    """
+    Return a number of tasks having the given tag and task_type_id
     Parameters
     ----------
     Filter task_type_id is separated from the other filters because
@@ -145,11 +153,14 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
         the maximum number of tasks to show
     tag : str, optional
         the tag to include
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
     kwargs: dict, optional
         Legal filter operators: data_tag, status, data_id, data_name,
         number_instances, number_features,
         number_classes, number_missing_values.
-
     Returns
     -------
     dict
@@ -158,13 +169,14 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
         task id, dataset id, task_type and status. If qualities are calculated
         for the associated dataset, some of these are also returned.
     """
-    return openml.utils._list_all(_list_tasks, task_type_id=task_type_id,
-                                  offset=offset, size=size, tag=tag, **kwargs)
+    return openml.utils._list_all(output_format, _list_tasks,
+                                  task_type_id=task_type_id, offset=offset,
+                                  size=size, tag=tag, **kwargs)
 
 
 def _list_tasks(task_type_id=None, **kwargs):
-    """Perform the api call to return a number of tasks having the given filters.
-
+    """
+    Perform the api call to return a number of tasks having the given filters.
     Parameters
     ----------
     Filter task_type_id is separated from the other filters because

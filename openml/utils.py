@@ -3,6 +3,7 @@ import hashlib
 import xmltodict
 import shutil
 import warnings
+import pandas as pd
 
 import openml._api_calls
 import openml.exceptions
@@ -150,17 +151,21 @@ def _delete_entity(entity_type, entity_id):
         return False
 
 
-def _list_all(listing_call, *args, **filters):
+def _list_all(output_format, listing_call, *args, **filters):
     """Helper to handle paged listing requests.
 
     Example usage:
 
-    ``evaluations = list_all(list_evaluations, "predictive_accuracy", task=mytask)``
+    ``evaluations = _list_all(list_evaluations, "predictive_accuracy", task=mytask)``
 
     Parameters
     ----------
     listing_call : callable
         Call listing, e.g. list_evaluations.
+    output_format : str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
     *args : Variable length argument list
         Any required arguments for the listing call.
     **filters : Arbitrary keyword arguments
@@ -169,7 +174,7 @@ def _list_all(listing_call, *args, **filters):
         useful for testing purposes.
     Returns
     -------
-    dict
+    dict or dataframe
     """
 
     # eliminate filters that have a None value
@@ -227,7 +232,42 @@ def _list_all(listing_call, *args, **filters):
             if BATCH_SIZE_ORIG > LIMIT - len(result):
                 batch_size = LIMIT - len(result)
 
+    # Checking and converting to dataframe
+    if output_format is not None and output_format == 'dataframe':
+        result = _unwrap_object_to_dict(result)
+        result = pd.DataFrame.from_dict(result, orient='index')
     return result
+
+
+def _unwrap_object_to_dict(result_dict):
+    """Converts a dict to object mapping to dict of dict
+
+    If the elements of the dict keys are class objects, it converts
+    the objects into dicts to create a dict of dict.
+    Else, it returns the dict as is.
+
+    Parameters
+    ----------
+    result_dict: dict
+
+    Returns
+    -------
+    dict
+    """
+    # Checking first entry of dict
+    val = next(iter(result_dict.values()))
+    # Checking if dict contains class object
+    if not hasattr(val, '__dict__'):
+        return result_dict
+    # Extracting class name
+    obj_type = str(type(next(iter(result_dict.values()))))
+    obj_type = obj_type.split('.')[-1].split('\'')[0]
+    for key in result_dict:
+        obj = result_dict[key]
+        result_dict[key] = vars(obj)
+        # Retaining the original object as a dataframe entry
+        result_dict[key].update({obj_type: obj})
+    return result_dict
 
 
 def _create_cache_directory(key):

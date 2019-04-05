@@ -163,7 +163,7 @@ def _get_cache_directory(dataset: OpenMLDataset) -> str:
     return _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset.dataset_id)
 
 
-def list_datasets(offset=None, size=None, status=None, tag=None, **kwargs):
+def list_datasets(offset=None, size=None, status=None, tag=None, output_format='dict', **kwargs):
 
     """
     Return a list of all dataset which are on OpenML.
@@ -180,6 +180,10 @@ def list_datasets(offset=None, size=None, status=None, tag=None, **kwargs):
         default active datasets are returned, but also datasets
         from another status can be requested.
     tag : str, optional
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
     kwargs : dict, optional
         Legal filter operators (keys in the dict):
         data_name, data_version, number_instances,
@@ -187,21 +191,32 @@ def list_datasets(offset=None, size=None, status=None, tag=None, **kwargs):
 
     Returns
     -------
-    datasets : dict of dicts
-        A mapping from dataset ID to dict.
+    datasets : dict of dicts, or dataframe
+        - If output_format='dict'
+            A mapping from dataset ID to dict.
 
-        Every dataset is represented by a dictionary containing
-        the following information:
-        - dataset id
-        - name
-        - format
-        - status
+            Every dataset is represented by a dictionary containing
+            the following information:
+            - dataset id
+            - name
+            - format
+            - status
+            If qualities are calculated for the dataset, some of
+            these are also returned.
 
-        If qualities are calculated for the dataset, some of
-        these are also returned.
+        - If output_format='dataframe'
+            Each row maps to a dataset
+            Each column contains the following information:
+            - dataset id
+            - name
+            - format
+            - status
+            If qualities are calculated for the dataset, some of
+            these are also included as columns.
     """
 
-    return openml.utils._list_all(_list_datasets,
+    return openml.utils._list_all(output_format,
+                                  _list_datasets,
                                   offset=offset,
                                   size=size,
                                   status=status,

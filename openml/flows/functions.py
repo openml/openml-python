@@ -127,7 +127,8 @@ def _get_flow_description(flow_id: int) -> OpenMLFlow:
         return _create_flow_from_xml(flow_xml)
 
 
-def list_flows(offset: int = None, size: int = None, tag: str = None, **kwargs) \
+def list_flows(offset: int = None, size: int = None, tag: str = None,
+               output_format: str = 'dict', **kwargs) \
         -> Dict[int, Dict]:
 
     """
@@ -142,25 +143,40 @@ def list_flows(offset: int = None, size: int = None, tag: str = None, **kwargs) 
         the maximum number of flows to return
     tag : str, optional
         the tag to include
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
     kwargs: dict, optional
         Legal filter operators: uploader.
 
     Returns
     -------
-    flows : dict
-        A mapping from flow_id to a dict giving a brief overview of the
-        respective flow.
+    flows : dict of dicts, or dataframe
+        - If output_format='dict'
+            A mapping from flow_id to a dict giving a brief overview of the
+            respective flow.
+            Every flow is represented by a dictionary containing
+            the following information:
+            - flow id
+            - full name
+            - name
+            - version
+            - external version
+            - uploader
 
-        Every flow is represented by a dictionary containing
-        the following information:
-        - flow id
-        - full name
-        - name
-        - version
-        - external version
-        - uploader
+        - If output_format='dataframe'
+            Each row maps to a dataset
+            Each column contains the following information:
+            - flow id
+            - full name
+            - name
+            - version
+            - external version
+            - uploader
     """
-    return openml.utils._list_all(_list_flows,
+    return openml.utils._list_all(output_format,
+                                  _list_flows,
                                   offset=offset,
                                   size=size,
                                   tag=tag,

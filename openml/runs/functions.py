@@ -763,7 +763,7 @@ def _get_cached_run(run_id):
 
 def list_runs(offset=None, size=None, id=None, task=None, setup=None,
               flow=None, uploader=None, tag=None, display_errors=False,
-              **kwargs):
+              output_format='dict', **kwargs):
     """
     List all runs matching all of the given filters.
     (Supports large amount of results)
@@ -791,6 +791,11 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         Whether to list runs which have an error (for example a missing
         prediction file).
 
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
+
     kwargs : dict, optional
         Legal filter operators: task_type.
 
@@ -812,9 +817,9 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         raise TypeError('uploader must be of type list.')
 
     return openml.utils._list_all(
-        _list_runs, offset=offset, size=size, id=id, task=task, setup=setup,
-        flow=flow, uploader=uploader, tag=tag, display_errors=display_errors,
-        **kwargs)
+        output_format, _list_runs, offset=offset, size=size, id=id, task=task,
+        setup=setup, flow=flow, uploader=uploader, tag=tag,
+        display_errors=display_errors, **kwargs)
 
 
 def _list_runs(id=None, task=None, setup=None,

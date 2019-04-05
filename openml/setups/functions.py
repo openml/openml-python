@@ -108,7 +108,8 @@ def get_setup(setup_id):
     return _create_setup_from_xml(result_dict)
 
 
-def list_setups(offset=None, size=None, flow=None, tag=None, setup=None):
+def list_setups(offset=None, size=None, flow=None, tag=None, setup=None,
+                output_format: str = 'dict'):
     """
     List all setups matching all of the given filters.
 
@@ -119,14 +120,18 @@ def list_setups(offset=None, size=None, flow=None, tag=None, setup=None):
     flow : int, optional
     tag : str, optional
     setup : list(int), optional
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
 
     Returns
     -------
-    dict
+    dict or dataframe
         """
     batch_size = 1000  # batch size for setups is lower
-    return openml.utils._list_all(_list_setups, offset=offset, size=size,
-                                  flow=flow, tag=tag,
+    return openml.utils._list_all(output_format, _list_setups, offset=offset,
+                                  size=size, flow=flow, tag=tag,
                                   setup=setup, batch_size=batch_size)
 
 
