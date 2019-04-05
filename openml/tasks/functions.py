@@ -286,7 +286,7 @@ def get_tasks(task_ids, download_data=True):
         Integers/Strings representing task ids.
     download_data : bool
         Option to trigger download of data along with the meta data.
-        
+
     Returns
     -------
     list
