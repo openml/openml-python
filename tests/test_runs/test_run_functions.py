@@ -1316,7 +1316,7 @@ class TestRun(TestBase):
 
     def _check_run(self, run):
         self.assertIsInstance(run, dict)
-        self.assertEqual(len(run), 5)
+        self.assertEqual(len(run), 7)
 
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
@@ -1346,6 +1346,7 @@ class TestRun(TestBase):
 
         task_ids.append(21)
         runs = openml.runs.list_runs(task=task_ids)
+       # print(runs)
         self.assertGreaterEqual(len(runs), num_runs + 1)
         for rid in runs:
             self.assertIn(runs[rid]['task_id'], task_ids)
