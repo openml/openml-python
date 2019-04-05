@@ -1346,7 +1346,6 @@ class TestRun(TestBase):
 
         task_ids.append(21)
         runs = openml.runs.list_runs(task=task_ids)
-       # print(runs)
         self.assertGreaterEqual(len(runs), num_runs + 1)
         for rid in runs:
             self.assertIn(runs[rid]['task_id'], task_ids)
