@@ -276,14 +276,17 @@ def __list_tasks(api_call):
 
 
 def get_tasks(task_ids, download_data=True):
-    """Download task representation and data splits optionally.
+    """Download tasks.
+
     This function iterates :meth:`openml.tasks.get_task`.
+
     Parameters
     ----------
     task_ids : iterable
         Integers/Strings representing task ids.
     download_data : bool
         Option to trigger download of data along with the meta data.
+        
     Returns
     -------
     list
@@ -295,16 +298,19 @@ def get_tasks(task_ids, download_data=True):
 
 
 def get_task(task_id, download_data=True):
-    """Download task representation for a given task ID
+    """Download OpenML task for a given task ID.
+
+    Downloads the task representation, while the data splits can be
+    downloaded optionally based on the additional parameter. Else,
+    splits will either way be downloaded when the task is being used.
+
     Parameters
     ----------
-    The task representation is downloaded while the download of data
-
-    splits is optionally controlled by the download_data parameter
     task_id : int or str
         The OpenML task id.
     download_data : bool
         Option to trigger download of data along with the meta data.
+
     Returns
     -------
     task
