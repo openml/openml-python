@@ -117,9 +117,9 @@
 <p>This function creates an OpenMLDataset object.
 The OpenMLDataset object contains information related to the dataset
 and the actual data file.</p>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Name of the dataset.</p>
 </dd>
 <dt><strong>description</strong><span class="classifier">str</span></dt><dd><p>Description of the dataset.</p>
@@ -163,11 +163,7 @@ such as identifiers and indexes.</p>
 dataset. If <code class="docutils literal notranslate"><span class="pre">data</span></code> is a dataframe and <code class="docutils literal notranslate"><span class="pre">row_id_attribute</span></code> is not
 specified, the index of the dataframe will be used as the
 <code class="docutils literal notranslate"><span class="pre">row_id_attribute</span></code>. If the name of the index is <code class="docutils literal notranslate"><span class="pre">None</span></code>, it will
-be discarded.
-.. versionadded: 0.8</p>
-<blockquote>
-<div><p>Inference of <code class="docutils literal notranslate"><span class="pre">row_id_attribute</span></code> from a dataframe.</p>
-</div></blockquote>
+be discarded.</p>
 </dd>
 <dt><strong>original_data_url</strong><span class="classifier">str, optional</span></dt><dd><p>For derived data, the url to the original dataset.</p>
 </dd>

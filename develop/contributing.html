@@ -201,12 +201,12 @@ execute</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest tests/
 </pre></div>
 </div>
-<p id="extending">Executing a specific test can be done by specifying the module, test case, and test.
+<p>Executing a specific test can be done by specifying the module, test case, and test.
 To obtain a hierarchical list of all tests, run</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest --collect-only
 </pre></div>
 </div>
-<div class="highlight-bash notranslate" id="id4"><div class="highlight"><pre><span></span>&lt;Module <span class="s1">&#39;tests/test_datasets/test_dataset.py&#39;</span>&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;Module <span class="s1">&#39;tests/test_datasets/test_dataset.py&#39;</span>&gt;
   &lt;UnitTestCase <span class="s1">&#39;OpenMLDatasetTest&#39;</span>&gt;
     &lt;TestCaseFunction <span class="s1">&#39;test_dataset_format_constructor&#39;</span>&gt;
     &lt;TestCaseFunction <span class="s1">&#39;test_get_data&#39;</span>&gt;
@@ -218,19 +218,19 @@ To obtain a hierarchical list of all tests, run</p>
     &lt;TestCaseFunction <span class="s1">&#39;test_tagging&#39;</span>&gt;
 </pre></div>
 </div>
-<p id="id5">To run a specific module, add the module name, for instance:</p>
+<p>To run a specific module, add the module name, for instance:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest tests/test_datasets/test_dataset.py
 </pre></div>
 </div>
-<p id="id6">To run a specific unit test case, add the test case name, for instance:</p>
+<p>To run a specific unit test case, add the test case name, for instance:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest
 </pre></div>
 </div>
-<p id="id7">To run a specific unit test, add the test name, for instance:</p>
+<p>To run a specific unit test, add the test name, for instance:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest::test_get_data
 </pre></div>
 </div>
-<p id="id8">Happy testing!</p>
+<p>Happy testing!</p>
 </div>
 <div class="section" id="connecting-new-machine-learning-libraries">
 <h2>Connecting new machine learning libraries<a class="headerlink" href="#connecting-new-machine-learning-libraries" title="Permalink to this headline">¶</a></h2>

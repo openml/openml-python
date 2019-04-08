@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>openml.flows.flow_to_sklearn &#8212; OpenML 0.8.0 documentation</title>
+    <title>openml.extensions.register_extension &#8212; OpenML 0.8.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -101,37 +101,30 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>.flow_to_sklearn</a></li>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.extensions</span></code>.register_extension</a></li>
 </ul>
 
         </div>
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="openml-flows-flow-to-sklearn">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>.flow_to_sklearn<a class="headerlink" href="#openml-flows-flow-to-sklearn" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="openml-extensions-register-extension">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.extensions</span></code>.register_extension<a class="headerlink" href="#openml-extensions-register-extension" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="openml.flows.flow_to_sklearn">
-<code class="descclassname">openml.flows.</code><code class="descname">flow_to_sklearn</code><span class="sig-paren">(</span><em>o</em>, <em>components=None</em>, <em>initialize_with_defaults=False</em>, <em>recursion_depth=0</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.flows.flow_to_sklearn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes a sklearn model based on a flow.</p>
+<dt id="openml.extensions.register_extension">
+<code class="descclassname">openml.extensions.</code><code class="descname">register_extension</code><span class="sig-paren">(</span><em>extension: Type[openml.extensions.extension_interface.Extension]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#openml.extensions.register_extension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register an extension.</p>
+<p>Registered extensions are considered by <code class="docutils literal notranslate"><span class="pre">get_extension_by_flow</span></code> and
+<code class="docutils literal notranslate"><span class="pre">get_extension_by_model</span></code>, which are used by <code class="docutils literal notranslate"><span class="pre">openml.flow</span></code> and <code class="docutils literal notranslate"><span class="pre">openml.runs</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>o</strong><span class="classifier">mixed</span></dt><dd><p>the object to deserialize (can be flow object, or any serialzied
-parameter value that is accepted by)</p>
-</dd>
-<dt><strong>components</strong><span class="classifier">dict</span></dt><dd></dd>
-<dt><strong>initialize_with_defaults</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If this flag is set, the hyperparameter values of flows will be
-ignored and a flow with its defaults is returned.</p>
-</dd>
-<dt><strong>recursion_depth</strong><span class="classifier">int</span></dt><dd><p>The depth at which this flow is called, mostly for debugging
-purposes</p>
-</dd>
+<dt><strong>extension</strong><span class="classifier">Type[Extension]</span></dt><dd></dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>mixed</strong></dt><dd></dd>
+<dt><strong>None</strong></dt><dd></dd>
 </dl>
 </dd>
 </dl>

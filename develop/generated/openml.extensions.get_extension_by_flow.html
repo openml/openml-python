@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>openml.runs.run_flow_on_task &#8212; OpenML 0.8.0 documentation</title>
+    <title>openml.extensions.get_extension_by_flow &#8212; OpenML 0.8.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -101,53 +101,32 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>.run_flow_on_task</a></li>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.extensions</span></code>.get_extension_by_flow</a></li>
 </ul>
 
         </div>
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="openml-runs-run-flow-on-task">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>.run_flow_on_task<a class="headerlink" href="#openml-runs-run-flow-on-task" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="openml-extensions-get-extension-by-flow">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.extensions</span></code>.get_extension_by_flow<a class="headerlink" href="#openml-extensions-get-extension-by-flow" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="openml.runs.run_flow_on_task">
-<code class="descclassname">openml.runs.</code><code class="descname">run_flow_on_task</code><span class="sig-paren">(</span><em>flow: openml.flows.flow.OpenMLFlow</em>, <em>task: openml.tasks.task.OpenMLTask</em>, <em>avoid_duplicate_runs: bool = True</em>, <em>flow_tags: List[str] = None</em>, <em>seed: int = None</em>, <em>add_local_measures: bool = True</em>, <em>upload_flow: bool = False</em><span class="sig-paren">)</span> &#x2192; openml.runs.run.OpenMLRun<a class="headerlink" href="#openml.runs.run_flow_on_task" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the model provided by the flow on the dataset defined by task.</p>
-<p>Takes the flow and repeat information into account.
-The Flow may optionally be published.</p>
+<dt id="openml.extensions.get_extension_by_flow">
+<code class="descclassname">openml.extensions.</code><code class="descname">get_extension_by_flow</code><span class="sig-paren">(</span><em>flow: OpenMLFlow</em>, <em>raise_if_no_extension: bool = False</em><span class="sig-paren">)</span> &#x2192; Optional[openml.extensions.extension_interface.Extension]<a class="headerlink" href="#openml.extensions.get_extension_by_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an extension which can handle the given flow.</p>
+<p>Iterates all registered extensions and checks whether they can handle the presented flow.
+Raises an exception if two extensions can handle a flow.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>flow</strong><span class="classifier">OpenMLFlow</span></dt><dd><p>A flow wraps a machine learning model together with relevant information.
-The model has a function fit(X,Y) and predict(X),
-all supervised estimators of scikit learn follow this definition of a model [1]
-[1](<a class="reference external" href="http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html">http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html</a>)</p>
-</dd>
-<dt><strong>task</strong><span class="classifier">OpenMLTask</span></dt><dd><p>Task to perform. This may be an OpenMLFlow instead if the first argument is an OpenMLTask.</p>
-</dd>
-<dt><strong>avoid_duplicate_runs</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, the run will throw an error if the setup/task combination is already present on
-the server. This feature requires an internet connection.</p>
-</dd>
-<dt><strong>avoid_duplicate_runs</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, the run will throw an error if the setup/task combination is already present on
-the server. This feature requires an internet connection.</p>
-</dd>
-<dt><strong>flow_tags</strong><span class="classifier">List[str], optional (default=None)</span></dt><dd><p>A list of tags that the flow should have at creation.</p>
-</dd>
-<dt><strong>seed: int, optional (default=None)</strong></dt><dd><p>Models that are not seeded will get this seed.</p>
-</dd>
-<dt><strong>add_local_measures</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>Determines whether to calculate a set of evaluation measures locally,
-to later verify server behaviour.</p>
-</dd>
-<dt><strong>upload_flow</strong><span class="classifier">bool (default=False)</span></dt><dd><p>If True, upload the flow to OpenML if it does not exist yet.
-If False, do not upload the flow to OpenML.</p>
+<dt><strong>flow</strong><span class="classifier">OpenMLFlow</span></dt><dd></dd>
+<dt><strong>raise_if_no_extension</strong><span class="classifier">bool (optional, default=False)</span></dt><dd><p>Raise an exception if no registered extension can handle the presented flow.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>run</strong><span class="classifier">OpenMLRun</span></dt><dd><p>Result of the run.</p>
-</dd>
+<dt><strong>Extension or None</strong></dt><dd></dd>
 </dl>
 </dd>
 </dl>
