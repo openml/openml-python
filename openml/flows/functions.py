@@ -12,6 +12,7 @@ import openml._api_calls
 from . import OpenMLFlow
 import openml.utils
 
+
 FLOWS_CACHE_DIR_NAME = 'flows'
 
 
@@ -23,7 +24,7 @@ def _get_cached_flows() -> OrderedDict:
     flows : OrderedDict
         Dictionary with flows. Each flow is an instance of OpenMLFlow.
     """
-    flows = OrderedDict()
+    flows = OrderedDict()  # type: 'OrderedDict[int, OpenMLFlow]'
 
     flow_cache_dir = openml.utils._create_cache_directory(FLOWS_CACHE_DIR_NAME)
     directory_content = os.listdir(flow_cache_dir)
@@ -79,8 +80,6 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
 
     reinstantiate: bool
         Whether to reinstantiate the flow to a sklearn model.
-        Note that this can only be done with sklearn flows, and
-        when
 
     Returns
     -------
@@ -95,10 +94,7 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
         flow = _get_flow_description(flow_id)
 
     if reinstantiate:
-        if not (flow.external_version.startswith('sklearn==')
-                or ',sklearn==' in flow.external_version):
-            raise ValueError('Only sklearn flows can be reinstantiated')
-        flow.model = openml.flows.flow_to_sklearn(flow)
+        flow.model = flow.extension.flow_to_model(flow)
 
     return flow
 
@@ -332,7 +328,8 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                 assert_flows_equal(attr1[name], attr2[name],
                                    ignore_parameter_values_on_older_children,
                                    ignore_parameter_values)
-
+        elif key == 'extension':
+            continue
         else:
             if key == 'parameters':
                 if ignore_parameter_values or \

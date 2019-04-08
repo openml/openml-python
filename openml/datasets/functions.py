@@ -511,8 +511,9 @@ def create_dataset(name, description, creator, contributor,
         specified, the index of the dataframe will be used as the
         ``row_id_attribute``. If the name of the index is ``None``, it will
         be discarded.
+
         .. versionadded: 0.8
-           Inference of ``row_id_attribute`` from a dataframe.
+            Inference of ``row_id_attribute`` from a dataframe.
     original_data_url : str, optional
         For derived data, the url to the original dataset.
     paper_url : str, optional

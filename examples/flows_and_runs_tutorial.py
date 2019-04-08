@@ -49,11 +49,8 @@ task = openml.tasks.get_task(403)
 # Build any classifier or pipeline
 clf = tree.ExtraTreeClassifier()
 
-# Create a flow
-flow = openml.flows.sklearn_to_flow(clf)
-
 # Run the flow
-run = openml.runs.run_flow_on_task(flow, task)
+run = openml.runs.run_model_on_task(clf, task)
 
 # pprint(vars(run), depth=2)
 
@@ -85,9 +82,8 @@ pipe = pipeline.Pipeline(steps=[
     ('OneHotEncoder', preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore')),
     ('Classifier', ensemble.RandomForestClassifier())
 ])
-flow = openml.flows.sklearn_to_flow(pipe)
 
-run = openml.runs.run_flow_on_task(flow, task, avoid_duplicate_runs=False)
+run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
 myrun = run.publish()
 print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 
@@ -119,6 +115,22 @@ run.publish()
 # it does not yet exist on the server.
 
 ############################################################################
+# Alternatively, one can also directly run flows.
+
+# Get a task
+task = openml.tasks.get_task(403)
+
+# Build any classifier or pipeline
+clf = tree.ExtraTreeClassifier()
+
+# Obtain the scikit-learn extension interface to convert the classifier
+# into a flow object.
+extension = openml.extensions.get_extension_by_model(clf)
+flow = extension.model_to_flow(clf)
+
+run = openml.runs.run_flow_on_task(flow, task)
+
+############################################################################
 # Challenge
 # ^^^^^^^^^
 #
@@ -142,8 +154,7 @@ for task_id in [115, ]:  # Add further tasks. Disclaimer: they might take some t
     task = openml.tasks.get_task(task_id)
     data = openml.datasets.get_dataset(task.dataset_id)
     clf = neighbors.KNeighborsClassifier(n_neighbors=5)
-    flow = openml.flows.sklearn_to_flow(clf)
 
-    run = openml.runs.run_flow_on_task(flow, task, avoid_duplicate_runs=False)
+    run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
     myrun = run.publish()
     print("kNN on %s: http://test.openml.org/r/%d" % (data.name, myrun.run_id))

@@ -106,16 +106,12 @@ From within the directory of the cloned package, execute:
 
     pytest tests/
 
-.. _extending:
-
-Executing a specific test can be done by specifying the module, test case, and test.  
+Executing a specific test can be done by specifying the module, test case, and test.
 To obtain a hierarchical list of all tests, run
 
 .. code:: bash
 
     pytest --collect-only
-
-.. _extending:
 
 .. code:: bash
 
@@ -129,8 +125,7 @@ To obtain a hierarchical list of all tests, run
         <TestCaseFunction 'test_get_data_with_target'>
       <UnitTestCase 'OpenMLDatasetTestOnTestServer'>
         <TestCaseFunction 'test_tagging'>
-        
-.. _extending:
+
 
 To run a specific module, add the module name, for instance:
 
@@ -138,23 +133,17 @@ To run a specific module, add the module name, for instance:
 
     pytest tests/test_datasets/test_dataset.py
 
-.. _extending:
-
 To run a specific unit test case, add the test case name, for instance:
 
 .. code:: bash
 
     pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest
 
-.. _extending:
-
 To run a specific unit test, add the test name, for instance:
 
 .. code:: bash
 
     pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest::test_get_data
-
-.. _extending:
 
 Happy testing!
 

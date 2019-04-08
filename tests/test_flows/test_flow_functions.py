@@ -7,6 +7,7 @@ import sklearn
 
 import openml
 from openml.testing import TestBase
+import openml.extensions.sklearn
 
 
 class TestFlowFunctions(TestBase):
@@ -233,8 +234,10 @@ class TestFlowFunctions(TestBase):
         from sklearn.preprocessing import OrdinalEncoder
         ordinal_encoder = OrdinalEncoder(categories=[[0, 1], [0, 1]])
 
+        extension = openml.extensions.sklearn.SklearnExtension()
+
         # Test serialization works
-        flow = openml.flows.sklearn_to_flow(ordinal_encoder)
+        flow = extension.model_to_flow(ordinal_encoder)
 
         # Test flow is accepted by server
         self._add_sentinel_to_flow_name(flow)

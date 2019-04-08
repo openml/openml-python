@@ -77,8 +77,7 @@ from sklearn import neighbors
 task = openml.tasks.get_task(403)
 data = openml.datasets.get_dataset(task.dataset_id)
 clf = neighbors.KNeighborsClassifier(n_neighbors=5)
-flow = openml.flows.sklearn_to_flow(clf)
-run = openml.runs.run_flow_on_task(flow, task, avoid_duplicate_runs=False)
+run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
 # Publish the experiment on OpenML (optional, requires an API key).
 # For this tutorial, our configuration publishes to the test server
 # as to not pollute the main server.

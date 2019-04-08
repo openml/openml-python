@@ -11,6 +11,7 @@ from sklearn.preprocessing import Imputer
 
 from openml.testing import TestBase
 import openml
+import openml.extensions.sklearn
 
 
 class TestRun(TestBase):
@@ -101,6 +102,7 @@ class TestRun(TestBase):
             self.assertIsNone(run_prime_trace_content)
 
     def test_to_from_filesystem_vanilla(self):
+
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
             ('classifier', DecisionTreeClassifier(max_depth=1)),
@@ -129,6 +131,7 @@ class TestRun(TestBase):
         run_prime.publish()
 
     def test_to_from_filesystem_search(self):
+
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
             ('classifier', DecisionTreeClassifier(max_depth=1)),
@@ -161,6 +164,7 @@ class TestRun(TestBase):
         run_prime.publish()
 
     def test_to_from_filesystem_no_model(self):
+
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
             ('classifier', DummyClassifier()),
@@ -189,6 +193,8 @@ class TestRun(TestBase):
         Publish a run tied to a local flow after it has first been saved to
          and loaded from disk.
         """
+        extension = openml.extensions.sklearn.SklearnExtension()
+
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
             ('classifier', DummyClassifier()),
@@ -196,7 +202,7 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(119)
 
         # Make sure the flow does not exist on the server yet.
-        flow = openml.flows.sklearn_to_flow(model)
+        flow = extension.model_to_flow(model)
         self._add_sentinel_to_flow_name(flow)
         self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
 
