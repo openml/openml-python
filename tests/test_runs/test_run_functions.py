@@ -1,7 +1,5 @@
 import arff
-import collections
 from distutils.version import LooseVersion
-import json
 import os
 import random
 import time
@@ -16,11 +14,12 @@ import sklearn
 import unittest
 import warnings
 
+import openml.extensions.sklearn
 from openml.testing import TestBase
-from openml.runs.functions import _run_task_get_arffcontent, \
-    _set_model_seed_where_none, _run_exists, _extract_arfftrace, \
-    _extract_arfftrace_attributes, _prediction_to_row
-from openml.flows.sklearn_converter import sklearn_to_flow
+from openml.runs.functions import (
+    _run_task_get_arffcontent,
+    run_exists,
+)
 from openml.runs.trace import OpenMLRunTrace
 from openml.tasks import TaskTypeEnum
 
@@ -33,7 +32,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.linear_model import LogisticRegression, SGDClassifier, \
     LinearRegression
-from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.svm import SVC
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
@@ -70,6 +68,10 @@ class TestRun(TestBase):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
         warnings.filterwarnings("ignore", category=FutureWarning)
         warnings.filterwarnings("ignore", category=UserWarning)
+
+    def setUp(self):
+        super().setUp()
+        self.extension = openml.extensions.sklearn.SklearnExtension()
 
     def _wait_for_processed_run(self, run_id, max_waiting_time_seconds):
         # it can take a while for a run to be processed on the OpenML (test)
@@ -124,9 +126,12 @@ class TestRun(TestBase):
         response = openml._api_calls._read_url(predictions_url,
                                                request_method='get')
         predictions = arff.loads(response)
-        run_prime = openml.runs.run_model_on_task(model_prime, task,
-                                                  avoid_duplicate_runs=False,
-                                                  seed=seed)
+        run_prime = openml.runs.run_model_on_task(
+            model=model_prime,
+            task=task,
+            avoid_duplicate_runs=False,
+            seed=seed,
+        )
         predictions_prime = run_prime._generate_arff_dict()
 
         self._compare_predictions(predictions, predictions_prime)
@@ -182,7 +187,7 @@ class TestRun(TestBase):
             for component in flow.components.values():
                 _remove_random_state(component)
 
-        flow = sklearn_to_flow(clf)
+        flow = self.extension.model_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, sentinel)
         if not openml.flows.flow_exists(flow.name, flow.external_version):
             flow.publish()
@@ -191,9 +196,12 @@ class TestRun(TestBase):
 
         X, y = task.get_X_and_y()
         self.assertEqual(np.count_nonzero(np.isnan(X)), n_missing_vals)
-        run = openml.runs.run_flow_on_task(flow, task, seed=seed,
-                                           avoid_duplicate_runs=openml
-                                           .config.avoid_duplicate_runs)
+        run = openml.runs.run_flow_on_task(
+            flow=flow,
+            task=task,
+            seed=seed,
+            avoid_duplicate_runs=openml.config.avoid_duplicate_runs,
+        )
         run_ = run.publish()
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
@@ -213,9 +221,11 @@ class TestRun(TestBase):
             # test the initialize setup function
             run_id = run_.run_id
             run_server = openml.runs.get_run(run_id)
-            clf_server = openml.setups.initialize_model(run_server.setup_id)
-            flow_local = openml.flows.sklearn_to_flow(clf)
-            flow_server = openml.flows.sklearn_to_flow(clf_server)
+            clf_server = openml.setups.initialize_model(
+                setup_id=run_server.setup_id,
+            )
+            flow_local = self.extension.model_to_flow(clf)
+            flow_server = self.extension.model_to_flow(clf_server)
 
             if flow.class_name not in classes_without_random_state:
                 error_msg = 'Flow class %s (id=%d) does not have a random ' \
@@ -236,8 +246,9 @@ class TestRun(TestBase):
 
             # and test the initialize setup from run function
             clf_server2 = openml.runs.initialize_model_from_run(
-                run_server.run_id)
-            flow_server2 = openml.flows.sklearn_to_flow(clf_server2)
+                run_id=run_server.run_id,
+            )
+            flow_server2 = self.extension.model_to_flow(clf_server2)
             if flow.class_name not in classes_without_random_state:
                 self.assertEqual(flow_server2.parameters['random_state'],
                                  flow_expected_rsv)
@@ -258,56 +269,6 @@ class TestRun(TestBase):
         # downloaded_run_trace = downloaded._generate_trace_arff_dict()
         # self.assertEqual(run_trace, downloaded_run_trace)
         return run
-
-    def _check_fold_evaluations(self, fold_evaluations, num_repeats, num_folds,
-                                max_time_allowed=60000,
-                                task_type=(TaskTypeEnum.
-                                           SUPERVISED_CLASSIFICATION)):
-        """
-        Checks whether the right timing measures are attached to the run
-        (before upload). Test is only performed for versions >= Python3.3
-
-        In case of check_n_jobs(clf) == false, please do not perform this
-        check (check this condition outside of this function. )
-        default max_time_allowed (per fold, in milli seconds) = 1 minute,
-        quite pessimistic
-        """
-
-        # a dict mapping from openml measure to a tuple with the minimum and
-        # maximum allowed value
-        check_measures = {
-            'usercpu_time_millis_testing': (0, max_time_allowed),
-            'usercpu_time_millis_training': (0, max_time_allowed),
-            # should take at least one millisecond (?)
-            'usercpu_time_millis': (0, max_time_allowed)}
-
-        if task_type == TaskTypeEnum.SUPERVISED_CLASSIFICATION or \
-                task_type == TaskTypeEnum.LEARNING_CURVE:
-            check_measures['predictive_accuracy'] = (0, 1)
-        elif task_type == TaskTypeEnum.SUPERVISED_REGRESSION:
-            check_measures['mean_absolute_error'] = (0, float("inf"))
-
-        self.assertIsInstance(fold_evaluations, dict)
-        if sys.version_info[:2] >= (3, 3):
-            # this only holds if we are allowed to record time (otherwise some
-            # are missing)
-            self.assertEqual(set(fold_evaluations.keys()),
-                             set(check_measures.keys()))
-
-        for measure in check_measures.keys():
-            if measure in fold_evaluations:
-                num_rep_entrees = len(fold_evaluations[measure])
-                self.assertEqual(num_rep_entrees, num_repeats)
-                min_val = check_measures[measure][0]
-                max_val = check_measures[measure][1]
-                for rep in range(num_rep_entrees):
-                    num_fold_entrees = len(fold_evaluations[measure][rep])
-                    self.assertEqual(num_fold_entrees, num_folds)
-                    for fold in range(num_fold_entrees):
-                        evaluation = fold_evaluations[measure][rep][fold]
-                        self.assertIsInstance(evaluation, float)
-                        self.assertGreaterEqual(evaluation, min_val)
-                        self.assertLessEqual(evaluation, max_val)
 
     def _check_sample_evaluations(self, sample_evaluations, num_repeats,
                                   num_folds, num_samples,
@@ -366,8 +327,12 @@ class TestRun(TestBase):
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
-        self.assertRaises(AttributeError, openml.runs.run_model_on_task,
-                          model=clf, task=task, avoid_duplicate_runs=False)
+        with self.assertRaises(AttributeError):
+            openml.runs.run_model_on_task(
+                model=clf,
+                task=task,
+                avoid_duplicate_runs=False,
+            )
 
     def test_check_erronous_sklearn_flow_fails(self):
         task_id = 115
@@ -375,13 +340,14 @@ class TestRun(TestBase):
 
         # Invalid parameter values
         clf = LogisticRegression(C='abc', solver='lbfgs')
-        self.assertRaisesRegex(
+        with self.assertRaisesRegex(
             ValueError,
-            r"Penalty term must be positive; got \(C=u?'abc'\)",
-            # u? for 2.7/3.4-6 compability,
-            openml.runs.run_model_on_task, task=task,
-            model=clf,
-        )
+            r"Penalty term must be positive; got \(C=u?'abc'\)",  # u? for 2.7/3.4-6 compability
+        ):
+            openml.runs.run_model_on_task(
+                task=task,
+                model=clf,
+            )
 
     ###########################################################################
     # These unit tests are meant to test the following functions, using a
@@ -447,7 +413,10 @@ class TestRun(TestBase):
             self._wait_for_processed_run(run.run_id, 200)
             try:
                 model_prime = openml.runs.initialize_model_from_trace(
-                    run.run_id, 0, 0)
+                    run_id=run.run_id,
+                    repeat=0,
+                    fold=0,
+                )
             except openml.exceptions.OpenMLServerException as e:
                 e.additional = "%s; run_id %d" % (e.additional, run.run_id)
                 raise e
@@ -462,8 +431,8 @@ class TestRun(TestBase):
                                                       model_prime, seed)
 
         # todo: check if runtime is present
-        self._check_fold_evaluations(run.fold_evaluations, 1, num_folds,
-                                     task_type=task_type)
+        self._check_fold_timing_evaluations(run.fold_evaluations, 1, num_folds,
+                                            task_type=task_type)
         pass
 
     def _run_and_upload_classification(self, clf, task_id, n_missing_vals,
@@ -697,8 +666,8 @@ class TestRun(TestBase):
         run_ = run.publish()
         run = openml.runs.get_run(run_.run_id)
 
-        modelR = openml.runs.initialize_model_from_run(run.run_id)
-        modelS = openml.setups.initialize_model(run.setup_id)
+        modelR = openml.runs.initialize_model_from_run(run_id=run.run_id)
+        modelS = openml.setups.initialize_model(setup_id=run.setup_id)
 
         self.assertEqual(modelS.cv.random_state, 62501)
         self.assertEqual(modelR.cv.random_state, 62501)
@@ -724,7 +693,10 @@ class TestRun(TestBase):
                  (sklearn.metrics.precision_score, {'average': 'macro'}),
                  (sklearn.metrics.brier_score_loss, {})]
         for test_idx, test in enumerate(tests):
-            alt_scores = run.get_metric_fn(test[0], test[1])
+            alt_scores = run.get_metric_fn(
+                sklearn_fn=test[0],
+                kwargs=test[1],
+            )
             self.assertEqual(len(alt_scores), 10)
             for idx in range(len(alt_scores)):
                 self.assertGreaterEqual(alt_scores[idx], 0)
@@ -740,9 +712,12 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(7)
 
         # invoke OpenML run
-        run = openml.runs.run_model_on_task(task, clf,
-                                            avoid_duplicate_runs=False,
-                                            upload_flow=False)
+        run = openml.runs.run_model_on_task(
+            model=clf,
+            task=task,
+            avoid_duplicate_runs=False,
+            upload_flow=False,
+        )
 
         self._test_local_evaluations(run)
 
@@ -752,14 +727,17 @@ class TestRun(TestBase):
         clf = Pipeline(steps=[('imputer', Imputer(strategy='median')),
                               ('estimator', RandomForestClassifier())])
 
-        flow = sklearn_to_flow(clf)
+        flow = self.extension.model_to_flow(clf)
         # download task
         task = openml.tasks.get_task(7)
 
         # invoke OpenML run
-        run = openml.runs.run_flow_on_task(task, flow,
-                                           avoid_duplicate_runs=False,
-                                           upload_flow=False)
+        run = openml.runs.run_flow_on_task(
+            flow=flow,
+            task=task,
+            avoid_duplicate_runs=False,
+            upload_flow=False,
+        )
 
         self._test_local_evaluations(run)
 
@@ -773,9 +751,12 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(7)
 
         # invoke OpenML run
-        run = openml.runs.run_model_on_task(clf, task,
-                                            avoid_duplicate_runs=False,
-                                            upload_flow=False)
+        run = openml.runs.run_model_on_task(
+            model=clf,
+            task=task,
+            avoid_duplicate_runs=False,
+            upload_flow=False,
+        )
 
         self._test_local_evaluations(run)
 
@@ -794,17 +775,20 @@ class TestRun(TestBase):
             ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
             ('Estimator', GaussianNB())])
         task = openml.tasks.get_task(11)
-        run = openml.runs.run_model_on_task(clf, task,
-                                            avoid_duplicate_runs=False)
+        run = openml.runs.run_model_on_task(
+            model=clf,
+            task=task,
+            avoid_duplicate_runs=False,
+        )
         run_ = run.publish()
         run = openml.runs.get_run(run_.run_id)
 
-        modelR = openml.runs.initialize_model_from_run(run.run_id)
-        modelS = openml.setups.initialize_model(run.setup_id)
+        modelR = openml.runs.initialize_model_from_run(run_id=run.run_id)
+        modelS = openml.setups.initialize_model(setup_id=run.setup_id)
 
-        flowR = openml.flows.sklearn_to_flow(modelR)
-        flowS = openml.flows.sklearn_to_flow(modelS)
-        flowL = openml.flows.sklearn_to_flow(clf)
+        flowR = self.extension.model_to_flow(modelR)
+        flowS = self.extension.model_to_flow(modelS)
+        flowL = self.extension.model_to_flow(clf)
         openml.flows.assert_flows_equal(flowR, flowL)
         openml.flows.assert_flows_equal(flowS, flowL)
 
@@ -837,8 +821,11 @@ class TestRun(TestBase):
         # from the past
         try:
             # in case the run did not exists yet
-            run = openml.runs.run_model_on_task(clf, task,
-                                                avoid_duplicate_runs=True)
+            run = openml.runs.run_model_on_task(
+                model=clf,
+                task=task,
+                avoid_duplicate_runs=True,
+            )
 
             self.assertEqual(
                 len(run.trace.trace_iterations),
@@ -855,8 +842,7 @@ class TestRun(TestBase):
 
         # now the actual unit test ...
         run_trace = openml.runs.get_run_trace(run_id)
-        self.assertEqual(len(run_trace.trace_iterations),
-                         num_iterations * num_folds)
+        self.assertEqual(len(run_trace.trace_iterations), num_iterations * num_folds)
 
     def test__run_exists(self):
         # would be better to not sentinel these clfs,
@@ -894,9 +880,8 @@ class TestRun(TestBase):
                 # run already existed. Great.
                 pass
 
-            flow = openml.flows.sklearn_to_flow(clf)
-            flow_exists = openml.flows.flow_exists(flow.name,
-                                                   flow.external_version)
+            flow = self.extension.model_to_flow(clf)
+            flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
             self.assertGreater(flow_exists, 0)
             # Do NOT use get_flow reinitialization, this potentially sets
             # hyperparameter values wrong. Rather use the local model.
@@ -904,175 +889,8 @@ class TestRun(TestBase):
             downloaded_flow.model = clf
             setup_exists = openml.setups.setup_exists(downloaded_flow)
             self.assertGreater(setup_exists, 0)
-            run_ids = _run_exists(task.task_id, setup_exists)
+            run_ids = run_exists(task.task_id, setup_exists)
             self.assertTrue(run_ids, msg=(run_ids, clf))
-
-    def test__get_seeded_model(self):
-        # randomized models that are initialized without seeds, can be seeded
-        randomized_clfs = [
-            BaggingClassifier(),
-            RandomizedSearchCV(RandomForestClassifier(),
-                               {"max_depth": [3, None],
-                                "max_features": [1, 2, 3, 4],
-                                "bootstrap": [True, False],
-                                "criterion": ["gini", "entropy"],
-                                "random_state": [-1, 0, 1, 2]},
-                               cv=StratifiedKFold(n_splits=2, shuffle=True)),
-            DummyClassifier()
-        ]
-
-        for idx, clf in enumerate(randomized_clfs):
-            const_probe = 42
-            all_params = clf.get_params()
-            params = [key for key in all_params if
-                      key.endswith('random_state')]
-            self.assertGreater(len(params), 0)
-
-            # before param value is None
-            for param in params:
-                self.assertIsNone(all_params[param])
-
-            # now seed the params
-            clf_seeded = _set_model_seed_where_none(clf, const_probe)
-            new_params = clf_seeded.get_params()
-
-            randstate_params = [key for key in new_params if
-                                key.endswith('random_state')]
-
-            # afterwards, param value is set
-            for param in randstate_params:
-                self.assertIsInstance(new_params[param], int)
-                self.assertIsNotNone(new_params[param])
-
-            if idx == 1:
-                self.assertEqual(clf.cv.random_state, 56422)
-
-    def test__get_seeded_model_raises(self):
-        # the _set_model_seed_where_none should raise exception if random_state is
-        # anything else than an int
-        randomized_clfs = [
-            BaggingClassifier(random_state=np.random.RandomState(42)),
-            DummyClassifier(random_state="OpenMLIsGreat")
-        ]
-
-        for clf in randomized_clfs:
-            self.assertRaises(ValueError, _set_model_seed_where_none, model=clf,
-                              seed=42)
-
-    def test__extract_arfftrace(self):
-        param_grid = {"hidden_layer_sizes": [[5, 5], [10, 10], [20, 20]],
-                      "activation": ['identity', 'logistic', 'tanh', 'relu'],
-                      "learning_rate_init": [0.1, 0.01, 0.001, 0.0001],
-                      "max_iter": [10, 20, 40, 80]}
-        num_iters = 10
-        task = openml.tasks.get_task(20)
-        clf = RandomizedSearchCV(MLPClassifier(), param_grid, num_iters)
-        # just run the task
-        train, _ = task.get_train_test_split_indices(0, 0)
-        X, y = task.get_X_and_y()
-        clf.fit(X[train], y[train])
-
-        # check num layers of MLP
-        self.assertIn(clf.best_estimator_.hidden_layer_sizes,
-                      param_grid['hidden_layer_sizes'])
-
-        trace_attribute_list = _extract_arfftrace_attributes(clf)
-        trace_list = _extract_arfftrace(clf, 0, 0)
-        self.assertIsInstance(trace_attribute_list, list)
-        self.assertEqual(len(trace_attribute_list), 5 + len(param_grid))
-        self.assertIsInstance(trace_list, list)
-        self.assertEqual(len(trace_list), num_iters)
-
-        # found parameters
-        optimized_params = set()
-
-        for att_idx in range(len(trace_attribute_list)):
-            att_type = trace_attribute_list[att_idx][1]
-            att_name = trace_attribute_list[att_idx][0]
-            # They no longer start with parameter_ if they come from
-            # extract_arff_trace!
-            if att_name.startswith("parameter_"):
-                # add this to the found parameters
-                param_name = att_name[len("parameter_"):]
-                optimized_params.add(param_name)
-
-                for line_idx in range(len(trace_list)):
-                    val = json.loads(trace_list[line_idx][att_idx])
-                    legal_values = param_grid[param_name]
-                    self.assertIn(val, legal_values)
-            else:
-                # repeat, fold, itt, bool
-                for line_idx in range(len(trace_list)):
-                    val = trace_list[line_idx][att_idx]
-                    if isinstance(att_type, list):
-                        self.assertIn(val, att_type)
-                    elif att_name in [
-                        'hidden_layer_sizes',
-                        'activation',
-                        'learning_rate_init',
-                        'max_iter',
-                    ]:
-                        self.assertIsInstance(
-                            trace_list[line_idx][att_idx],
-                            str,
-                            msg=att_name
-                        )
-                        optimized_params.add(att_name)
-                    elif att_name in ['repeat', 'fold', 'iteration']:
-                        self.assertIsInstance(
-                            trace_list[line_idx][att_idx],
-                            int,
-                            msg=att_name
-                        )
-                    else:  # att_type = real
-                        self.assertIsInstance(
-                            trace_list[line_idx][att_idx],
-                            float,
-                            msg=att_name
-                        )
-        self.assertEqual(set(param_grid.keys()), optimized_params)
-
-    def test__prediction_to_row(self):
-        repeat_nr = 0
-        fold_nr = 0
-        clf = sklearn.pipeline.Pipeline(steps=[
-            ('Imputer', Imputer(strategy='mean')),
-            ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
-            ('Estimator', GaussianNB())])
-        task = openml.tasks.get_task(20)
-        train, test = task.get_train_test_split_indices(repeat_nr, fold_nr)
-        X, y = task.get_X_and_y()
-        clf.fit(X[train], y[train])
-
-        test_X = X[test]
-        test_y = y[test]
-
-        probaY = clf.predict_proba(test_X)
-        predY = clf.predict(test_X)
-        sample_nr = 0  # default for this task
-        for idx in range(0, len(test_X)):
-            arff_line = _prediction_to_row(repeat_nr, fold_nr, sample_nr, idx,
-                                           task.class_labels[test_y[idx]],
-                                           predY[idx], probaY[idx],
-                                           task.class_labels, clf.classes_)
-
-            self.assertIsInstance(arff_line, list)
-            self.assertEqual(len(arff_line), 6 + len(task.class_labels))
-            self.assertEqual(arff_line[0], repeat_nr)
-            self.assertEqual(arff_line[1], fold_nr)
-            self.assertEqual(arff_line[2], sample_nr)
-            self.assertEqual(arff_line[3], idx)
-            sum = 0.0
-            for att_idx in range(4, 4 + len(task.class_labels)):
-                self.assertIsInstance(arff_line[att_idx], float)
-                self.assertGreaterEqual(arff_line[att_idx], 0.0)
-                self.assertLessEqual(arff_line[att_idx], 1.0)
-                sum += arff_line[att_idx]
-            self.assertAlmostEqual(sum, 1.0)
-
-            self.assertIn(arff_line[-1], task.class_labels)
-            self.assertIn(arff_line[-2], task.class_labels)
-        pass
 
     def test_run_with_classifiers_in_param_grid(self):
         task = openml.tasks.get_task(115)
@@ -1082,34 +900,36 @@ class TestRun(TestBase):
         }
 
         clf = GridSearchCV(BaggingClassifier(), param_grid=param_grid)
-        self.assertRaises(TypeError, openml.runs.run_model_on_task,
-                          task=task, model=clf, avoid_duplicate_runs=False)
+        with self.assertRaises(TypeError):
+            openml.runs.run_model_on_task(
+                task=task,
+                model=clf,
+                avoid_duplicate_runs=False,
+            )
 
     def test_run_with_illegal_flow_id(self):
         # check the case where the user adds an illegal flow id to a
         # non-existing flow
         task = openml.tasks.get_task(115)
         clf = DecisionTreeClassifier()
-        flow = sklearn_to_flow(clf)
+        flow = self.extension.model_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.flow_id = -1
         expected_message_regex = ("Flow does not exist on the server, "
                                   "but 'flow.flow_id' is not None.")
-        self.assertRaisesRegex(
-            openml.exceptions.PyOpenMLError,
-            expected_message_regex,
-            openml.runs.run_flow_on_task,
-            task=task,
-            flow=flow,
-            avoid_duplicate_runs=True,
-        )
+        with self.assertRaisesRegex(openml.exceptions.PyOpenMLError, expected_message_regex):
+            openml.runs.run_flow_on_task(
+                task=task,
+                flow=flow,
+                avoid_duplicate_runs=True,
+            )
 
     def test_run_with_illegal_flow_id_after_load(self):
         # Same as `test_run_with_illegal_flow_id`, but test this error is also
         # caught if the run is stored to and loaded from disk first.
         task = openml.tasks.get_task(115)
         clf = DecisionTreeClassifier()
-        flow = sklearn_to_flow(clf)
+        flow = self.extension.model_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.flow_id = -1
         run = openml.runs.run_flow_on_task(
@@ -1129,51 +949,46 @@ class TestRun(TestBase):
 
         expected_message_regex = ("Flow does not exist on the server, "
                                   "but 'flow.flow_id' is not None.")
-        self.assertRaisesRegex(
-            openml.exceptions.PyOpenMLError,
-            expected_message_regex,
-            loaded_run.publish
-        )
+        with self.assertRaisesRegex(openml.exceptions.PyOpenMLError, expected_message_regex):
+            loaded_run.publish()
 
     def test_run_with_illegal_flow_id_1(self):
         # Check the case where the user adds an illegal flow id to an existing
         # flow. Comes to a different value error than the previous test
         task = openml.tasks.get_task(115)
         clf = DecisionTreeClassifier()
-        flow_orig = sklearn_to_flow(clf)
+        flow_orig = self.extension.model_to_flow(clf)
         try:
             flow_orig.publish()  # ensures flow exist on server
         except openml.exceptions.OpenMLServerException:
             # flow already exists
             pass
-        flow_new = sklearn_to_flow(clf)
+        flow_new = self.extension.model_to_flow(clf)
 
         flow_new.flow_id = -1
         expected_message_regex = (
             "Local flow_id does not match server flow_id: "
             "'-1' vs '[0-9]+'"
         )
-        self.assertRaisesRegex(
-            openml.exceptions.PyOpenMLError,
-            expected_message_regex,
-            openml.runs.run_flow_on_task,
-            task=task,
-            flow=flow_new,
-            avoid_duplicate_runs=True,
-        )
+        with self.assertRaisesRegex(openml.exceptions.PyOpenMLError, expected_message_regex):
+            openml.runs.run_flow_on_task(
+                task=task,
+                flow=flow_new,
+                avoid_duplicate_runs=True,
+            )
 
     def test_run_with_illegal_flow_id_1_after_load(self):
         # Same as `test_run_with_illegal_flow_id_1`, but test this error is
         # also caught if the run is stored to and loaded from disk first.
         task = openml.tasks.get_task(115)
         clf = DecisionTreeClassifier()
-        flow_orig = sklearn_to_flow(clf)
+        flow_orig = self.extension.model_to_flow(clf)
         try:
             flow_orig.publish()  # ensures flow exist on server
         except openml.exceptions.OpenMLServerException:
             # flow already exists
             pass
-        flow_new = sklearn_to_flow(clf)
+        flow_new = self.extension.model_to_flow(clf)
         flow_new.flow_id = -1
 
         run = openml.runs.run_flow_on_task(
@@ -1209,8 +1024,9 @@ class TestRun(TestBase):
 
         clf = SGDClassifier(loss='log', random_state=1)
         res = openml.runs.functions._run_task_get_arffcontent(
-            clf,
-            task,
+            extension=self.extension,
+            model=clf,
+            task=task,
             add_local_measures=True,
         )
         arff_datacontent, trace, fold_evaluations, _ = res
@@ -1220,54 +1036,8 @@ class TestRun(TestBase):
         self.assertIsInstance(trace, type(None))
 
         task_type = TaskTypeEnum.SUPERVISED_CLASSIFICATION
-        self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds,
-                                     task_type=task_type)
-
-        # 10 times 10 fold CV of 150 samples
-        self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
-        for arff_line in arff_datacontent:
-            # check number columns
-            self.assertEqual(len(arff_line), 8)
-            # check repeat
-            self.assertGreaterEqual(arff_line[0], 0)
-            self.assertLessEqual(arff_line[0], num_repeats - 1)
-            # check fold
-            self.assertGreaterEqual(arff_line[1], 0)
-            self.assertLessEqual(arff_line[1], num_folds - 1)
-            # check row id
-            self.assertGreaterEqual(arff_line[2], 0)
-            self.assertLessEqual(arff_line[2], num_instances - 1)
-            # check confidences
-            self.assertAlmostEqual(sum(arff_line[4:6]), 1.0)
-            self.assertIn(arff_line[6], ['won', 'nowin'])
-            self.assertIn(arff_line[7], ['won', 'nowin'])
-
-    def test__run_model_on_fold(self):
-        task = openml.tasks.get_task(7)
-        num_instances = 320
-        num_folds = 1
-        num_repeats = 1
-
-        clf = SGDClassifier(loss='log', random_state=1)
-        can_measure_runtime = sys.version_info[:2] >= (3, 3)
-        res = openml.runs.functions._run_model_on_fold(
-            clf, task, 0, 0, 0, can_measure_runtime=can_measure_runtime,
-            add_local_measures=True)
-
-        arff_datacontent, arff_tracecontent, user_defined_measures, model = res
-        # predictions
-        self.assertIsInstance(arff_datacontent, list)
-        # trace. SGD does not produce any
-        self.assertIsInstance(arff_tracecontent, list)
-        self.assertEqual(len(arff_tracecontent), 0)
-
-        fold_evaluations = collections.defaultdict(
-            lambda: collections.defaultdict(dict))
-        for measure in user_defined_measures:
-            fold_evaluations[measure][0][0] = user_defined_measures[measure]
-
-        self._check_fold_evaluations(fold_evaluations, num_repeats, num_folds,
-                                     task_type=task.task_type_id)
+        self._check_fold_timing_evaluations(fold_evaluations, num_repeats, num_folds,
+                                            task_type=task_type)
 
         # 10 times 10 fold CV of 150 samples
         self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
@@ -1452,8 +1222,9 @@ class TestRun(TestBase):
                                 ('Estimator', DecisionTreeClassifier())])
 
         data_content, _, _, _ = _run_task_get_arffcontent(
-            model,
-            task,
+            model=model,
+            task=task,
+            extension=self.extension,
             add_local_measures=True,
         )
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
@@ -1479,13 +1250,15 @@ class TestRun(TestBase):
             ])
 
             arff_content1, _, _, _ = _run_task_get_arffcontent(
-                clf1,
-                task,
+                model=clf1,
+                task=task,
+                extension=self.extension,
                 add_local_measures=True,
             )
             arff_content2, _, _, _ = _run_task_get_arffcontent(
-                clf2,
-                task,
+                model=clf2,
+                task=task,
+                extension=self.extension,
                 add_local_measures=True,
             )
 
@@ -1508,7 +1281,7 @@ class TestRun(TestBase):
 
     def test_run_model_on_task_downloaded_flow(self):
         model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
-        flow = openml.flows.sklearn_to_flow(model)
+        flow = self.extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)

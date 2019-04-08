@@ -1,18 +1,18 @@
 from collections import OrderedDict
 import pickle
-import sys
 import time
-import numpy as np
+from typing import Any, IO, Optional, TextIO, TYPE_CHECKING  # noqa: F401
+import os
 
 import arff
-import os
+import numpy as np
 import xmltodict
 
 import openml
 import openml._api_calls
-from ..tasks import get_task
 from ..exceptions import PyOpenMLError
-from ..tasks import TaskTypeEnum
+from ..flows import get_flow
+from ..tasks import get_task, TaskTypeEnum
 
 
 class OpenMLRun(object):
@@ -89,6 +89,10 @@ class OpenMLRun(object):
         run : OpenMLRun
             the re-instantiated run object
         """
+
+        # Avoiding cyclic imports
+        import openml.runs.functions
+
         if not os.path.isdir(directory):
             raise ValueError('Could not find folder')
 
@@ -128,7 +132,11 @@ class OpenMLRun(object):
 
         return run
 
-    def to_filesystem(self, directory: str, store_model: bool = True) -> None:
+    def to_filesystem(
+        self,
+        directory: str,
+        store_model: bool = True,
+    ) -> None:
         """
         The inverse of the from_filesystem method. Serializes a run
         on the filesystem, to be uploaded later.
@@ -150,18 +158,21 @@ class OpenMLRun(object):
 
         os.makedirs(directory, exist_ok=True)
         if not os.listdir(directory) == []:
-            raise ValueError('Output directory should be empty')
+            raise ValueError(
+                'Output directory {} should be empty'.format(os.path.abspath(directory))
+            )
 
         run_xml = self._create_description_xml()
         predictions_arff = arff.dumps(self._generate_arff_dict())
 
-        with open(os.path.join(directory, 'description.xml'), 'w') as f:
-            f.write(run_xml)
-        with open(os.path.join(directory, 'predictions.arff'), 'w') as f:
-            f.write(predictions_arff)
+        # It seems like typing does not allow to define the same variable multiple times
+        with open(os.path.join(directory, 'description.xml'), 'w') as fh:  # type: TextIO
+            fh.write(run_xml)
+        with open(os.path.join(directory, 'predictions.arff'), 'w') as fh:
+            fh.write(predictions_arff)
         if store_model:
-            with open(os.path.join(directory, 'model.pkl'), 'wb') as f:
-                pickle.dump(self.model, f)
+            with open(os.path.join(directory, 'model.pkl'), 'wb') as fh_b:  # type: IO[bytes]
+                pickle.dump(self.model, fh_b)
 
         if self.flow_id is None:
             self.flow.to_filesystem(directory)
@@ -169,7 +180,7 @@ class OpenMLRun(object):
         if self.trace is not None:
             self.trace._to_filesystem(directory)
 
-    def _generate_arff_dict(self):
+    def _generate_arff_dict(self) -> 'OrderedDict[str, Any]':
         """Generates the arff dictionary for uploading predictions to the
         server.
 
@@ -183,13 +194,15 @@ class OpenMLRun(object):
         """
         if self.data_content is None:
             raise ValueError('Run has not been executed.')
+        if self.flow is None:
+            self.flow = get_flow(self.flow_id)
 
-        run_environment = (_get_version_information()
+        run_environment = (self.flow.extension.get_version_information()
                            + [time.strftime("%c")]
                            + ['Created by run_task()'])
         task = get_task(self.task_id)
 
-        arff_dict = OrderedDict()
+        arff_dict = OrderedDict()  # type: 'OrderedDict[str, Any]'
         arff_dict['data'] = self.data_content
         arff_dict['description'] = "\n".join(run_environment)
         arff_dict['relation'] =\
@@ -369,7 +382,7 @@ class OpenMLRun(object):
                 scores.append(sklearn_fn(y_true, y_pred, **kwargs))
         return np.array(scores)
 
-    def publish(self):
+    def publish(self) -> 'OpenMLRun':
         """ Publish a run (and if necessary, its flow) to the OpenML server.
 
         Uploads the results of a run to OpenML.
@@ -399,7 +412,10 @@ class OpenMLRun(object):
         if self.parameter_settings is None:
             if self.flow is None:
                 self.flow = openml.flows.get_flow(self.flow_id)
-            self.parameter_settings = openml.flows.obtain_parameter_values(self.flow, self.model)
+            self.parameter_settings = self.flow.extension.obtain_parameter_values(
+                self.flow,
+                self.model,
+            )
 
         description_xml = self._create_description_xml()
         file_elements = {'description': ("description.xml", description_xml)}
@@ -435,7 +451,7 @@ class OpenMLRun(object):
         # tags = run_environment + [well_formatted_time] + ['run_task'] + \
         #     [self.model.__module__ + "." + self.model.__class__.__name__]
         description = _to_dict(taskid=self.task_id, flow_id=self.flow_id,
-                               setup_string=_create_setup_string(self.model),
+                               setup_string=self.setup_string,
                                parameter_settings=self.parameter_settings,
                                error_message=self.error_message,
                                fold_evaluations=self.fold_evaluations,
@@ -469,31 +485,6 @@ class OpenMLRun(object):
 
 ###############################################################################
 # Functions which cannot be in runs/functions due to circular imports
-
-
-# This can possibly be done by a package such as pyxb, but I could not get
-# it to work properly.
-def _get_version_information():
-    """Gets versions of python, sklearn, numpy and scipy, returns them in an
-    array,
-
-    Returns
-    -------
-    result : an array with version information of the above packages
-    """
-    import sklearn
-    import scipy
-    import numpy
-
-    major, minor, micro, _, _ = sys.version_info
-    python_version = 'Python_{}.'.format(
-        ".".join([str(major), str(minor), str(micro)]))
-    sklearn_version = 'Sklearn_{}.'.format(sklearn.__version__)
-    numpy_version = 'NumPy_{}.'.format(numpy.__version__)
-    scipy_version = 'SciPy_{}.'.format(scipy.__version__)
-
-    return [python_version, sklearn_version, numpy_version, scipy_version]
-
 
 def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
              tags=None, fold_evaluations=None, sample_evaluations=None):
@@ -558,10 +549,3 @@ def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
                         description['oml:run']['oml:output_data'][
                             'oml:evaluation'].append(current)
     return description
-
-
-def _create_setup_string(model):
-    """Create a string representing the model"""
-    run_environment = " ".join(_get_version_information())
-    # fixme str(model) might contain (...)
-    return run_environment + " " + str(model)

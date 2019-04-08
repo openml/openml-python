@@ -1,10 +1,12 @@
 from collections import OrderedDict
 import os
+from typing import Dict, List, Union  # noqa: F401
 
 import xmltodict
 
 import openml._api_calls
 import openml.exceptions
+from ..extensions import get_extension_by_flow
 from ..utils import extract_xml_tags
 
 
@@ -130,6 +132,8 @@ class OpenMLFlow(object):
         self.dependencies = dependencies
         self.flow_id = flow_id
 
+        self.extension = get_extension_by_flow(self)
+
     def _to_xml(self) -> str:
         """Generate xml representation of self for upload to server.
 
@@ -165,8 +169,8 @@ class OpenMLFlow(object):
             Flow represented as OrderedDict.
 
         """
-        flow_container = OrderedDict()
-        flow_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])
+        flow_container = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
+        flow_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])  # type: 'OrderedDict[str, Union[List, str]]'  # noqa E501
         flow_container['oml:flow'] = flow_dict
         _add_if_nonempty(flow_dict, 'oml:id', self.flow_id)
 
@@ -182,7 +186,7 @@ class OpenMLFlow(object):
 
         flow_parameters = []
         for key in self.parameters:
-            param_dict = OrderedDict()
+            param_dict = OrderedDict()  # type: 'OrderedDict[str, str]'
             param_dict['oml:name'] = key
             meta_info = self.parameters_meta_info[key]
 
@@ -209,10 +213,9 @@ class OpenMLFlow(object):
 
         components = []
         for key in self.components:
-            component_dict = OrderedDict()
+            component_dict = OrderedDict()  # type: 'OrderedDict[str, Dict]'
             component_dict['oml:identifier'] = key
-            component_dict['oml:flow'] = \
-                self.components[key]._to_dict()['oml:flow']
+            component_dict['oml:flow'] = self.components[key]._to_dict()['oml:flow']
 
             for key_ in component_dict:
                 # We only need to check if the key is a string, because the

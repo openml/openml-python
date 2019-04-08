@@ -352,6 +352,10 @@ class OpenMLRunTrace(object):
             len(self.trace_iterations),
         )
 
+    def __iter__(self):
+        for val in self.trace_iterations.values():
+            yield val
+
 
 class OpenMLTraceIteration(object):
     """OpenML Trace Iteration: parsed output from Run Trace call

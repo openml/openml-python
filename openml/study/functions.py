@@ -19,8 +19,8 @@ def get_study(study_id, entity_type=None):
         Which entity type to return. Either {data, tasks, flows, setups,
         runs}. Give None to return all entity types.
 
-    Return
-    ------
+    Returns
+    -------
     OpenMLStudy
         The OpenML study object
     """

@@ -2,7 +2,9 @@ import hashlib
 import inspect
 import os
 import shutil
+import sys
 import time
+from typing import Dict
 import unittest
 import warnings
 
@@ -13,6 +15,7 @@ with warnings.catch_warnings():
     from oslo_concurrency import lockutils
 
 import openml
+from openml.tasks import TaskTypeEnum
 
 
 class TestBase(unittest.TestCase):
@@ -24,15 +27,32 @@ class TestBase(unittest.TestCase):
     Hopefully soon allows using a test server, not the production server.
     """
 
-    def setUp(self):
+    def setUp(self, n_levels: int = 1):
+        """Setup variables and temporary directories.
+
+        In particular, this methods:
+
+        * creates a temporary working directory
+        * figures out a path to a few static test files
+        * set the default server to be the test server
+        * set a static API key for the test server
+        * increases the maximal number of retries
+
+        Parameters
+        ----------
+        n_levels : int
+            Number of nested directories the test is in. Necessary to resolve the path to the
+            ``files`` directory, which is located directly under the ``tests`` directory.
+        """
+
         # This cache directory is checked in to git to simulate a populated
         # cache
         self.maxDiff = None
         self.static_cache_dir = None
         abspath_this_file = os.path.abspath(inspect.getfile(self.__class__))
         static_cache_dir = os.path.dirname(abspath_this_file)
-        static_cache_dir = os.path.abspath(os.path.join(static_cache_dir,
-                                                        '..'))
+        for _ in range(n_levels):
+            static_cache_dir = os.path.abspath(os.path.join(static_cache_dir, '..'))
         content = os.listdir(static_cache_dir)
         if 'files' in content:
             self.static_cache_dir = os.path.join(static_cache_dir, 'files')
@@ -54,11 +74,9 @@ class TestBase(unittest.TestCase):
         openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
         self.production_server = "https://openml.org/api/v1/xml"
         self.test_server = "https://test.openml.org/api/v1/xml"
-        openml.config.cache_directory = None
 
         openml.config.server = self.test_server
         openml.config.avoid_duplicate_runs = False
-
         openml.config.cache_directory = self.workdir
 
         # If we're on travis, we save the api key in the config file to allow
@@ -118,6 +136,59 @@ class TestBase(unittest.TestCase):
         self.assertIsInstance(dataset['status'], str)
         self.assertIn(dataset['status'], ['in_preparation', 'active',
                                           'deactivated'])
+
+    def _check_fold_timing_evaluations(
+        self,
+        fold_evaluations: Dict,
+        num_repeats: int,
+        num_folds: int,
+        max_time_allowed: float = 60000.0,
+        task_type: int = TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+    ):
+        """
+        Checks whether the right timing measures are attached to the run
+        (before upload). Test is only performed for versions >= Python3.3
+
+        In case of check_n_jobs(clf) == false, please do not perform this
+        check (check this condition outside of this function. )
+        default max_time_allowed (per fold, in milli seconds) = 1 minute,
+        quite pessimistic
+        """
+
+        # a dict mapping from openml measure to a tuple with the minimum and
+        # maximum allowed value
+        check_measures = {
+            'usercpu_time_millis_testing': (0, max_time_allowed),
+            'usercpu_time_millis_training': (0, max_time_allowed),
+            # should take at least one millisecond (?)
+            'usercpu_time_millis': (0, max_time_allowed)}
+
+        if task_type in (TaskTypeEnum.SUPERVISED_CLASSIFICATION, TaskTypeEnum.LEARNING_CURVE):
+            check_measures['predictive_accuracy'] = (0, 1.)
+        elif task_type == TaskTypeEnum.SUPERVISED_REGRESSION:
+            check_measures['mean_absolute_error'] = (0, float("inf"))
+
+        self.assertIsInstance(fold_evaluations, dict)
+        if sys.version_info[:2] >= (3, 3):
+            # this only holds if we are allowed to record time (otherwise some
+            # are missing)
+            self.assertEqual(set(fold_evaluations.keys()),
+                             set(check_measures.keys()))
+
+        for measure in check_measures.keys():
+            if measure in fold_evaluations:
+                num_rep_entrees = len(fold_evaluations[measure])
+                self.assertEqual(num_rep_entrees, num_repeats)
+                min_val = check_measures[measure][0]
+                max_val = check_measures[measure][1]
+                for rep in range(num_rep_entrees):
+                    num_fold_entrees = len(fold_evaluations[measure][rep])
+                    self.assertEqual(num_fold_entrees, num_folds)
+                    for fold in range(num_fold_entrees):
+                        evaluation = fold_evaluations[measure][rep][fold]
+                        self.assertIsInstance(evaluation, float)
+                        self.assertGreaterEqual(evaluation, min_val)
+                        self.assertLessEqual(evaluation, max_val)
 
 
 __all__ = ['TestBase']

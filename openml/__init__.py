@@ -14,23 +14,36 @@ In particular, this module implements a python interface for the
 (`REST on wikipedia
 <http://en.wikipedia.org/wiki/Representational_state_transfer>`_).
 """
-from . import config
 
+from . import _api_calls
+from . import config
 from .datasets import OpenMLDataset, OpenMLDataFeature
 from . import datasets
-from . import tasks
-from . import runs
-from . import flows
-from . import setups
 from . import evaluations
-
-from .runs import OpenMLRun
-from .tasks import OpenMLTask, OpenMLSplit
-from .flows import OpenMLFlow
 from .evaluations import OpenMLEvaluation
+from . import extensions
+from . import exceptions
+from . import tasks
+from .tasks import (
+    OpenMLTask,
+    OpenMLSplit,
+    OpenMLSupervisedTask,
+    OpenMLClassificationTask,
+    OpenMLRegressionTask,
+    OpenMLClusteringTask,
+    OpenMLLearningCurveTask,
+)
+from . import runs
+from .runs import OpenMLRun
+from . import flows
+from .flows import OpenMLFlow
+from . import setups
+from . import study
 from .study import OpenMLStudy
+from . import utils
 
-from .__version__ import __version__  # noqa: F401
+
+from .__version__ import __version__
 
 
 def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None,
@@ -69,7 +82,35 @@ def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None,
             runs.functions.get_run(run_id)
 
 
-__all__ = ['OpenMLDataset', 'OpenMLDataFeature', 'OpenMLRun',
-           'OpenMLSplit', 'OpenMLEvaluation', 'OpenMLSetup',
-           'OpenMLTask', 'OpenMLFlow', 'OpenMLStudy', 'datasets',
-           'evaluations', 'config', 'runs', 'flows', 'tasks', 'setups']
+__all__ = [
+    'OpenMLDataset',
+    'OpenMLDataFeature',
+    'OpenMLRun',
+    'OpenMLSplit',
+    'OpenMLEvaluation',
+    'OpenMLSetup',
+    'OpenMLTask',
+    'OpenMLSupervisedTask',
+    'OpenMLClusteringTask',
+    'OpenMLLearningCurveTask',
+    'OpenMLRegressionTask',
+    'OpenMLClassificationTask',
+    'OpenMLFlow',
+    'OpenMLStudy',
+    'datasets',
+    'evaluations',
+    'exceptions',
+    'extensions',
+    'config',
+    'runs',
+    'flows',
+    'tasks',
+    'setups',
+    'study',
+    'utils',
+    '_api_calls',
+    '__version__',
+]
+
+# Load the scikit-learn extension by default
+import openml.extensions.sklearn  # noqa: F401
