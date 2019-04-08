@@ -1094,18 +1094,14 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         List of found runs.
     """
 
-    if id is not None and (not type(id) is list):
-        raise Exception('id must be of type list.')
-        return None
-    if task is not None and (not type(task) is list):
-        raise Exception('task must be of type list.')
-        return None
-    if setup is not None and (not type(setup) is list):
-        raise Exception('task must be of type list.')
-        return None
-    if uploader is not None and (not type(uploader) is list):
-        raise Exception('task must be of type list.')
-        return None
+    if id is not None and (not isinstance(id, list)):
+        raise TypeError('id must be of type list.')
+    if task is not None and (not isinstance(task, list)):
+        raise TypeError('task must be of type list.')
+    if setup is not None and (not isinstance(setup, list)):
+        raise TypeError('task must be of type list.')
+    if uploader is not None and (not isinstance(uploader, list)):
+        raise TypeError('task must be of type list.')
 
     return openml.utils._list_all(
         _list_runs, offset=offset, size=size, id=id, task=task, setup=setup,
