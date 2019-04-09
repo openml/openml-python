@@ -13,6 +13,7 @@ import openml._api_calls
 from ..exceptions import PyOpenMLError
 from ..flows import get_flow
 from ..tasks import get_task, TaskTypeEnum
+from ..utils import _tag_entity
 
 
 class OpenMLRun(object):
@@ -468,8 +469,7 @@ class OpenMLRun(object):
         tag : str
             Tag to attach to the run.
         """
-        data = {'run_id': self.run_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/run/tag", 'post', data=data)
+        _tag_entity('run', self.run_id, tag)
 
     def remove_tag(self, tag):
         """Removes a tag from this run on the server.
@@ -479,8 +479,7 @@ class OpenMLRun(object):
         tag : str
             Tag to attach to the run.
         """
-        data = {'run_id': self.run_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/run/untag", 'post', data=data)
+        _tag_entity('run', self.run_id, tag, untag=True)
 
 
 ###############################################################################

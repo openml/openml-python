@@ -4,7 +4,7 @@ import os
 from .. import datasets
 from .split import OpenMLSplit
 import openml._api_calls
-from ..utils import _create_cache_directory_for_id
+from ..utils import _create_cache_directory_for_id, _tag_entity
 
 
 class OpenMLTask(object):
@@ -76,8 +76,7 @@ class OpenMLTask(object):
         tag : str
             Tag to attach to the task.
         """
-        data = {'task_id': self.task_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/task/tag", 'post', data=data)
+        _tag_entity('task', self.task_id, tag)
 
     def remove_tag(self, tag):
         """Removes a tag from this task on the server.
@@ -87,8 +86,7 @@ class OpenMLTask(object):
         tag : str
             Tag to attach to the task.
         """
-        data = {'task_id': self.task_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/task/untag", 'post', data=data)
+        _tag_entity('task', self.task_id, tag, untag=True)
 
 
 class OpenMLSupervisedTask(OpenMLTask):
