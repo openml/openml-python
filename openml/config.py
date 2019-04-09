@@ -28,13 +28,14 @@ config_file = os.path.expanduser(os.path.join('~', '.openml' 'config'))
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
-server = ""
-apikey = ""
+server = _defaults['server']
+apikey = _defaults['apikey']
 # The current cache directory (without the server name)
-cache_directory = ""
+cache_directory = _defaults['cachedir']
+avoid_duplicate_runs = True if _defaults['avoid_duplicate_runs'] == 'True' else False
 
 # Number of retries if the connection breaks
-connection_n_retries = 2
+connection_n_retries = _defaults['connection_n_retries']
 
 
 def _setup():

@@ -1,10 +1,11 @@
 from collections import OrderedDict
-
 import io
-import openml
 import os
+from typing import Any
+
 import xmltodict
 
+import openml
 from .. import config
 from .setup import OpenMLSetup, OpenMLParameter
 from openml.flows import flow_exists
@@ -12,7 +13,7 @@ import openml.exceptions
 import openml.utils
 
 
-def setup_exists(flow):
+def setup_exists(flow) -> int:
     """
     Checks whether a hyperparameter configuration already exists on the server.
 
@@ -31,16 +32,16 @@ def setup_exists(flow):
     # sadly, this api call relies on a run object
     openml.flows.functions._check_flow_for_server_id(flow)
     if flow.model is None:
-        raise ValueError('Flow should have model field set with the actual '
-                         'model. ')
+        raise ValueError('Flow should have model field set with the actual model.')
+    if flow.extension is None:
+        raise ValueError('Flow should have model field set with the correct extension.')
 
     # checks whether the flow exists on the server and flow ids align
     exists = flow_exists(flow.name, flow.external_version)
     if exists != flow.flow_id:
         raise ValueError('This should not happen!')
 
-    # TODO: currently hard-coded sklearn assumption
-    openml_param_settings = openml.flows.obtain_parameter_values(flow)
+    openml_param_settings = flow.extension.obtain_parameter_values(flow)
     description = xmltodict.unparse(_to_dict(flow.flow_id,
                                              openml_param_settings),
                                     pretty=True)
@@ -189,7 +190,7 @@ def __list_setups(api_call):
     return setups
 
 
-def initialize_model(setup_id):
+def initialize_model(setup_id: int) -> Any:
     """
     Initialized a model based on a setup_id (i.e., using the exact
     same parameter settings)
@@ -201,15 +202,14 @@ def initialize_model(setup_id):
 
     Returns
     -------
-    model : sklearn model
-        the scikitlearn model with all parameters initialized
+    model
     """
     setup = get_setup(setup_id)
     flow = openml.flows.get_flow(setup.flow_id)
 
-    # instead of using scikit-learns "set_params" function, we override the
+    # instead of using scikit-learns or any other library's "set_params" function, we override the
     # OpenMLFlow objects default parameter value so we can utilize the
-    # flow_to_sklearn function to reinitialize the flow with the set defaults.
+    # Extension.flow_to_model() function to reinitialize the flow with the set defaults.
     for hyperparameter in setup.parameters.values():
         structure = flow.get_structure('flow_id')
         if len(structure[hyperparameter.flow_id]) > 0:
@@ -219,7 +219,7 @@ def initialize_model(setup_id):
         subflow.parameters[hyperparameter.parameter_name] = \
             hyperparameter.value
 
-    model = openml.flows.flow_to_sklearn(flow)
+    model = flow.extension.flow_to_model(flow)
     return model
 
 

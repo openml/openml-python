@@ -26,7 +26,9 @@ class TestStudyFunctions(TestBase):
             print('URL for run: %s/run/%d' %(openml.config.server,run.run_id))
         """  # noqa: E501
         import openml
+        import sklearn.pipeline
         import sklearn.preprocessing
+        import sklearn.tree
         benchmark_suite = openml.study.get_study(
             'OpenML100', 'tasks'
         )  # obtain the benchmark suite
@@ -41,7 +43,7 @@ class TestStudyFunctions(TestBase):
             X, y = task.get_X_and_y()  # get the data (not used in this example)
             openml.config.apikey = openml.config.apikey  # set the OpenML Api Key
             run = openml.runs.run_model_on_task(
-                task, clf, avoid_duplicate_runs=False
+                clf, task, avoid_duplicate_runs=False
             )  # run classifier on splits (requires API key)
             score = run.get_metric_fn(
                 sklearn.metrics.accuracy_score

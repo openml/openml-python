@@ -127,8 +127,8 @@ def _get_estimation_procedure_list():
 
 
 def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
-    """
-    Return a number of tasks having the given tag and task_type_id
+    """Return a number of tasks having the given tag and task_type_id
+
     Parameters
     ----------
     Filter task_type_id is separated from the other filters because
@@ -155,6 +155,7 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
         Legal filter operators: data_tag, status, data_id, data_name,
         number_instances, number_features,
         number_classes, number_missing_values.
+
     Returns
     -------
     dict
@@ -168,8 +169,8 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
 
 
 def _list_tasks(task_type_id=None, **kwargs):
-    """
-    Perform the api call to return a number of tasks having the given filters.
+    """Perform the api call to return a number of tasks having the given filters.
+
     Parameters
     ----------
     Filter task_type_id is separated from the other filters because
@@ -190,6 +191,7 @@ def _list_tasks(task_type_id=None, **kwargs):
         Legal filter operators: tag, task_id (list), data_tag, status, limit,
         offset, data_id, data_name, number_instances, number_features,
         number_classes, number_missing_values.
+
     Returns
     -------
     dict
