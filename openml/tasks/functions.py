@@ -277,7 +277,7 @@ def __list_tasks(api_call):
     return tasks
 
 
-def get_tasks(task_ids):
+def get_tasks(task_ids, download_data=True):
     """Download tasks.
 
     This function iterates :meth:`openml.tasks.get_task`.
@@ -285,7 +285,9 @@ def get_tasks(task_ids):
     Parameters
     ----------
     task_ids : iterable
-        Integers representing task ids.
+        Integers/Strings representing task ids.
+    download_data : bool
+        Option to trigger download of data along with the meta data.
 
     Returns
     -------
@@ -293,19 +295,33 @@ def get_tasks(task_ids):
     """
     tasks = []
     for task_id in task_ids:
-        tasks.append(get_task(task_id))
+        tasks.append(get_task(task_id, download_data))
     return tasks
 
 
-def get_task(task_id):
-    """Download the OpenML task for a given task ID.
+def get_task(task_id, download_data=True):
+    """Download OpenML task for a given task ID.
+
+    Downloads the task representation, while the data splits can be
+    downloaded optionally based on the additional parameter. Else,
+    splits will either way be downloaded when the task is being used.
 
     Parameters
     ----------
-    task_id : int
+    task_id : int or str
         The OpenML task id.
+    download_data : bool
+        Option to trigger download of data along with the meta data.
+
+    Returns
+    -------
+    task
     """
-    task_id = int(task_id)
+    try:
+        task_id = int(task_id)
+    except (ValueError, TypeError):
+        raise ValueError("Dataset ID is neither an Integer nor can be "
+                         "cast to an Integer.")
 
     with lockutils.external_lock(
             name='task.functions.get_task:%d' % task_id,
@@ -317,14 +333,18 @@ def get_task(task_id):
 
         try:
             task = _get_task_description(task_id)
-            dataset = get_dataset(task.dataset_id)
+            dataset = get_dataset(task.dataset_id, download_data)
+            # List of class labels availaible in dataset description
+            # Including class labels as part of task meta data handles
+            #   the case where data download was initially disabled
+            if isinstance(task, OpenMLClassificationTask):
+                task.class_labels = \
+                    dataset.retrieve_class_labels(task.target_name)
             # Clustering tasks do not have class labels
             # and do not offer download_split
-            if isinstance(task, OpenMLSupervisedTask):
-                task.download_split()
-                if isinstance(task, OpenMLClassificationTask):
-                    task.class_labels = \
-                        dataset.retrieve_class_labels(task.target_name)
+            if download_data:
+                if isinstance(task, OpenMLSupervisedTask):
+                    task.download_split()
         except Exception as e:
             openml.utils._remove_cache_dir_for_id(
                 TASKS_CACHE_DIR_NAME,
