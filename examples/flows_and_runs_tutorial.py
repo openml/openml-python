@@ -15,6 +15,7 @@ from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
 #
 # Train a scikit-learn model on the data manually.
 
+# NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68
 dataset = openml.datasets.get_dataset(68)
 X, y = dataset.get_data(
     dataset_format='array',
