@@ -54,7 +54,7 @@ List datasets
 
  .. code-block:: none
 
-    First 10 of 778 datasets...
+    First 10 of 1355 datasets...
 
 
 Exercise 1
@@ -105,6 +105,7 @@ Download datasets
 
     # This is done based on the dataset ID ('did').
     dataset = openml.datasets.get_dataset(68)
+    # NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68
 
     # Print a summary
     print("This is dataset '%s', the target feature is '%s'" %
@@ -237,7 +238,7 @@ such as `get_data`, the data will be downloaded.
 .. code-block:: default
 
     dataset = openml.datasets.get_dataset(68, download_data=False)
-
+    # NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68
 
 
 
@@ -274,7 +275,7 @@ Exercise 2
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.793 seconds)
+   **Total running time of the script:** ( 0 minutes  2.191 seconds)
 
 
 .. _sphx_glr_download_examples_datasets_tutorial.py:

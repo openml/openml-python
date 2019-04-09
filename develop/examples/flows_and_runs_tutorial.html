@@ -132,7 +132,8 @@
 <div class="section" id="train-machine-learning-models">
 <h2>Train machine learning models<a class="headerlink" href="#train-machine-learning-models" title="Permalink to this headline">¶</a></h2>
 <p>Train a scikit-learn model on the data manually.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">68</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">68</span><span class="p">)</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
     <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">,</span>
     <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
@@ -187,7 +188,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/21956
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/23001
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -204,7 +205,7 @@ the run is sent to the OpenML server:</p>
  &#39;custom_name&#39;: None,
  &#39;dependencies&#39;: &#39;sklearn==0.20.0\nnumpy&gt;=1.6.1\nscipy&gt;=0.9&#39;,
  &#39;description&#39;: &#39;Automatically created scikit-learn flow.&#39;,
- &#39;extension&#39;: &lt;openml.extensions.sklearn.extension.SklearnExtension object at 0x2af0c9a34978&gt;,
+ &#39;extension&#39;: &lt;openml.extensions.sklearn.extension.SklearnExtension object at 0x2ad3b69447f0&gt;,
  &#39;external_version&#39;: &#39;openml==0.8.0,sklearn==0.20.0&#39;,
  &#39;flow_id&#39;: 61129,
  &#39;language&#39;: &#39;English&#39;,
@@ -234,7 +235,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/21957
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/23002
 </pre></div>
 </div>
 </div>
@@ -310,10 +311,10 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/21959
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/23004
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  16.822 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  17.328 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/27a5bee6ab807de4cd881f6693fcb2aa/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></p>

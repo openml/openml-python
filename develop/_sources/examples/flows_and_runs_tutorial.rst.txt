@@ -34,6 +34,7 @@ Train a scikit-learn model on the data manually.
 .. code-block:: default
 
 
+    # NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68
     dataset = openml.datasets.get_dataset(68)
     X, y = dataset.get_data(
         dataset_format='array',
@@ -128,7 +129,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/21956
+    Uploaded to http://test.openml.org/r/23001
 
 
 We can now also inspect the flow object which was automatically created:
@@ -158,7 +159,7 @@ We can now also inspect the flow object which was automatically created:
      'custom_name': None,
      'dependencies': 'sklearn==0.20.0\nnumpy>=1.6.1\nscipy>=0.9',
      'description': 'Automatically created scikit-learn flow.',
-     'extension': <openml.extensions.sklearn.extension.SklearnExtension object at 0x2af0c9a34978>,
+     'extension': <openml.extensions.sklearn.extension.SklearnExtension object at 0x2ad3b69447f0>,
      'external_version': 'openml==0.8.0,sklearn==0.20.0',
      'flow_id': 61129,
      'language': 'English',
@@ -201,7 +202,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/21957
+    Uploaded to http://test.openml.org/r/23002
 
 
 Running flows on tasks offline for later upload
@@ -306,13 +307,13 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/21959
+    kNN on diabetes: http://test.openml.org/r/23004
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  16.822 seconds)
+   **Total running time of the script:** ( 0 minutes  17.328 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:
