@@ -7,8 +7,8 @@ with open("openml/__version__.py") as fh:
     version = fh.readlines()[-1].split()[-1].strip("\"'")
 
 if len(sys.argv) > 1 and sys.argv[1] == 'install':
-    print('Please install this package with pip: `pip install -e .`'
-          'Installation requires pip>=10.0')
+    print('Please install this package with pip: `pip install -e .` '
+          'Installation requires pip>=10.0.')
     sys.exit(1)
 
 setuptools.setup(name="openml",
