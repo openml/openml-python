@@ -129,6 +129,27 @@ class TestTask(TestBase):
             self.workdir, 'org', 'openml', 'test', "datasets", "1", "dataset.arff"
         )))
 
+    def test_get_task_lazy(self):
+        task = openml.tasks.get_task(2, download_data=False)
+        self.assertIsInstance(task, OpenMLTask)
+        self.assertTrue(os.path.exists(os.path.join(
+            self.workdir, 'org', 'openml', 'test', "tasks", "2", "task.xml",
+        )))
+        self.assertEqual(task.class_labels, ['1', '2', '3', '4', '5', 'U'])
+
+        self.assertFalse(os.path.exists(os.path.join(
+            self.workdir, 'org', 'openml', 'test', "tasks", "2", "datasplits.arff"
+        )))
+        # Since the download_data=False is propagated to get_dataset
+        self.assertFalse(os.path.exists(os.path.join(
+            self.workdir, 'org', 'openml', 'test', "datasets", "2", "dataset.arff"
+        )))
+
+        task.download_split()
+        self.assertTrue(os.path.exists(os.path.join(
+            self.workdir, 'org', 'openml', 'test', "tasks", "2", "datasplits.arff"
+        )))
+
     @mock.patch('openml.tasks.functions.get_dataset')
     def test_removal_upon_download_failure(self, get_dataset):
         class WeirdException(Exception):
