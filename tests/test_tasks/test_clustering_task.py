@@ -40,7 +40,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         # TODO should be removed when issue is resolved
         openml.config.server = self.test_server
         new_dataset_id = self._upload_dataset(dataset)
-        OpenMLClusteringTaskTest._wait_dataset_activation(new_dataset_id, 120)
+        OpenMLClusteringTaskTest._wait_dataset_activation(new_dataset_id, 240)
         task.dataset_id = new_dataset_id
         task.estimation_procedure_id = self.estimation_procedure
         task.publish()
