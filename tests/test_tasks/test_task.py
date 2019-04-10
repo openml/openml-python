@@ -1,10 +1,16 @@
 import unittest
+from time import time
 
-import openml
 from openml.testing import TestBase
-from openml.datasets import OpenMLDataset
-from openml.tasks import OpenMLTask
-from openml.exceptions import OpenMLServerException
+from openml.datasets import (
+    get_dataset,
+    OpenMLDataset,
+    check_datasets_active,
+)
+from openml.tasks import (
+    get_task,
+    OpenMLTask,
+)
 
 
 class OpenMLTaskTest(TestBase):
@@ -33,14 +39,16 @@ class OpenMLTaskTest(TestBase):
 
     def test_download_task(self) -> OpenMLTask:
 
-        task = openml.tasks.get_task(self.task_id)
+        task = get_task(self.task_id)
         return task
 
     def test_upload_task(self):
 
-        task = openml.tasks.get_task(self.task_id)
-        task_dataset = openml.datasets.get_dataset(task.dataset_id)
-        task.dataset_id = self._upload_dataset(task_dataset)
+        task = get_task(self.task_id)
+        dataset = get_dataset(task.dataset_id)
+        new_dataset_id = self._upload_dataset(dataset)
+        OpenMLTaskTest._wait_dataset_activation(new_dataset_id, 10)
+        task.dataset_id = new_dataset_id
         task.estimation_procedure_id = self.estimation_procedure
         task.publish()
 
@@ -68,11 +76,28 @@ class OpenMLTaskTest(TestBase):
         # Providing both dataset file and url
         # raises an error when uploading.
         dataset.url = None
-        dataset.status = 'active'
-        try:
-            return dataset.publish()
-        except openml.exceptions.OpenMLServerException:
-            # Something went wrong.
-            # Test dataset was not
-            # published. Return old id.
-            return dataset.dataset_id
+        return dataset.publish()
+
+    @staticmethod
+    def _wait_dataset_activation(
+            dataset_id: int,
+            max_wait_time: int
+    ):
+        """Wait until the dataset status is changed
+        to activated, given a max wait time.
+
+        Parameters
+        ----------
+        dataset_id: int
+            The id of the dataset whose status
+            activation will be observed.
+        max_wait_time: int
+            Maximal amount of time to wait in
+            seconds.
+        """
+        start_time = time()
+        # Check while the status of the dataset is not activated
+        while not check_datasets_active([dataset_id]).get(dataset_id):
+            # break if the time so far exceeds max wait time
+            if time() - start_time > max_wait_time:
+                break
