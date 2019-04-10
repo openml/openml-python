@@ -5,8 +5,6 @@ import setuptools
 with open("openml/__version__.py") as fh:
     version = fh.readlines()[-1].split()[-1].strip("\"'")
 
-dependency_links = []
-
 setuptools.setup(name="openml",
                  author="Matthias Feurer, Andreas Müller, Farzan Majdani, "
                         "Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers",
@@ -16,6 +14,10 @@ setuptools.setup(name="openml",
                  description="Python API for OpenML",
                  license="BSD 3-clause",
                  url="http://openml.org/",
+                 project_urls={
+                     "Documentation": "https://openml.github.io/openml-python/master/",
+                     "Source Code": "https://github.com/openml/openml-python"
+                 },
                  version=version,
                  packages=setuptools.find_packages(),
                  package_data={'': ['*.txt', '*.md']},
