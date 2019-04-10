@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import pickle
 import time
-from typing import Any, IO, Optional, TextIO, TYPE_CHECKING  # noqa: F401
+from typing import Any, IO, TextIO  
 import os
 
 import arff

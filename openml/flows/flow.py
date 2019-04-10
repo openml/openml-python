@@ -1,10 +1,8 @@
 from collections import OrderedDict
 import os
-from typing import Dict, List, Union  # noqa: F401
 
 import xmltodict
 
-import openml._api_calls
 from ..extensions import get_extension_by_flow
 from ..utils import extract_xml_tags
 from ..utils import _tag_entity
