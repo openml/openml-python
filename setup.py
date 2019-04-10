@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import setuptools
-import sys
 
 with open("openml/__version__.py") as fh:
     version = fh.readlines()[-1].split()[-1].strip("\"'")
