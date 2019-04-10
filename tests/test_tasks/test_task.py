@@ -47,7 +47,7 @@ class OpenMLTaskTest(TestBase):
         task = get_task(self.task_id)
         dataset = get_dataset(task.dataset_id)
         new_dataset_id = self._upload_dataset(dataset)
-        OpenMLTaskTest._wait_dataset_activation(new_dataset_id, 10)
+        OpenMLTaskTest._wait_dataset_activation(new_dataset_id, 60)
         task.dataset_id = new_dataset_id
         task.estimation_procedure_id = self.estimation_procedure
         task.publish()

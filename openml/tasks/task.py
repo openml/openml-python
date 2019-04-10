@@ -188,6 +188,7 @@ class OpenMLTask(ABC):
 
         return_value = openml._api_calls._perform_api_call(
             "task/",
+            'post',
             file_elements=file_elements,
         )
 
