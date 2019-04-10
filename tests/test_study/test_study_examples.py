@@ -26,6 +26,7 @@ class TestStudyFunctions(TestBase):
             print('URL for run: %s/run/%d' %(openml.config.server,run.run_id))
         """  # noqa: E501
         import openml
+        import sklearn.metrics
         import sklearn.pipeline
         import sklearn.preprocessing
         import sklearn.tree

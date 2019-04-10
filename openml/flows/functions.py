@@ -79,7 +79,7 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
         The OpenML flow id.
 
     reinstantiate: bool
-        Whether to reinstantiate the flow to a sklearn model.
+        Whether to reinstantiate the flow to a model instance.
 
     Returns
     -------

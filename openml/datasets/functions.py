@@ -375,10 +375,7 @@ def get_dataset(dataset_id: Union[int, str], download_data: bool = True) -> Open
             features = _get_dataset_features(did_cache_dir, dataset_id)
             qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
 
-            if download_data:
-                arff_file = _get_dataset_arff(description)
-            else:
-                arff_file = None
+            arff_file = _get_dataset_arff(description) if download_data else None
 
             remove_dataset_cache = False
         except OpenMLServerException as e:
