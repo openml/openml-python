@@ -12,7 +12,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         self.production_server = 'https://openml.org/api/v1/xml'
         self.test_server = 'https://test.openml.org/api/v1/xml'
         openml.config.server = self.production_server
-        self.task_id = 126101
+        self.task_id = 146714
         self.estimation_procedure = 17
 
     def test_get_dataset(self):
@@ -25,7 +25,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         task = super(OpenMLClusteringTaskTest, self).test_download_task()
         self.assertEqual(task.task_id, self.task_id)
         self.assertEqual(task.task_type_id, 5)
-        self.assertEqual(task.dataset_id, 77)
+        self.assertEqual(task.dataset_id, 36)
 
     def test_upload_task(self):
         """
@@ -40,7 +40,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         # TODO should be removed when issue is resolved
         openml.config.server = self.test_server
         new_dataset_id = self._upload_dataset(dataset)
-        OpenMLClusteringTaskTest._wait_dataset_activation(new_dataset_id, 60)
+        OpenMLClusteringTaskTest._wait_dataset_activation(new_dataset_id, 80)
         task.dataset_id = new_dataset_id
         task.estimation_procedure_id = self.estimation_procedure
         task.publish()
