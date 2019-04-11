@@ -4,10 +4,8 @@ from typing import Dict, List, Union  # noqa: F401
 
 import xmltodict
 
-import openml._api_calls
-import openml.exceptions
 from ..extensions import get_extension_by_flow
-from ..utils import extract_xml_tags
+from ..utils import extract_xml_tags, _tag_entity
 
 
 class OpenMLFlow(object):
@@ -455,8 +453,7 @@ class OpenMLFlow(object):
         tag : str
             Tag to attach to the flow.
         """
-        data = {'flow_id': self.flow_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/flow/tag", 'post', data=data)
+        _tag_entity('flow', self.flow_id, tag)
 
     def remove_tag(self, tag):
         """Removes a tag from this flow on the server.
@@ -466,8 +463,7 @@ class OpenMLFlow(object):
         tag : str
             Tag to attach to the flow.
         """
-        data = {'flow_id': self.flow_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/flow/untag", 'post', data=data)
+        _tag_entity('flow', self.flow_id, tag, untag=True)
 
 
 def _copy_server_fields(source_flow, target_flow):
