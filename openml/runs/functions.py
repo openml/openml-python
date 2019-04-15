@@ -381,6 +381,7 @@ def _run_task_get_arffcontent(
 ]:
     arff_datacontent = []  # type: List[List]
     arff_tracecontent = []  # type: List[List]
+    traces = []  # type: List[OpenMLRunTrace]
     # stores fold-based evaluation measures. In case of a sample based task,
     # this information is multiple times overwritten, but due to the ordering
     # of tne loops, eventually it contains the information based on the full
@@ -396,9 +397,11 @@ def _run_task_get_arffcontent(
     num_reps, num_folds, num_samples = task.get_split_dimensions()
     n_classes = None
 
+    n_fit = 0
     for rep_no in range(num_reps):
         for fold_no in range(num_folds):
             for sample_no in range(num_samples):
+                n_fit += 1
 
                 train_indices, test_indices = task.get_train_test_split_indices(
                     repeat=rep_no, fold=fold_no, sample=sample_no)
@@ -422,7 +425,7 @@ def _run_task_get_arffcontent(
                     pred_y,
                     proba_y,
                     user_defined_measures_fold,
-                    model_fold,
+                    trace,
                 ) = extension._run_model_on_fold(
                     model=model,
                     task=task,
@@ -437,12 +440,8 @@ def _run_task_get_arffcontent(
                 )
 
                 arff_datacontent_fold = []  # type: List[List]
-                # extract trace, if applicable
-                arff_tracecontent_fold = []  # type: List[List]
-                if extension.is_hpo_class(model_fold):
-                    arff_tracecontent_fold.extend(
-                        extension._extract_trace_data(model_fold, rep_no, fold_no)
-                    )
+                if trace is not None:
+                    traces.append(trace)
 
                 # add client-side calculated metrics. These is used on the server as
                 # consistency check, only useful for supervised tasks
@@ -489,7 +488,6 @@ def _run_task_get_arffcontent(
                     raise TypeError(type(task))
 
                 arff_datacontent.extend(arff_datacontent_fold)
-                arff_tracecontent.extend(arff_tracecontent_fold)
 
                 for measure in user_defined_measures_fold:
 
@@ -511,10 +509,13 @@ def _run_task_get_arffcontent(
                     user_defined_measures_per_sample[measure][rep_no][fold_no][
                         sample_no] = user_defined_measures_fold[measure]
 
-    # Note that we need to use a fitted model (i.e., model_fold, and not model)
-    # here, to ensure it contains the hyperparameter data (in cv_results_)
-    if extension.is_hpo_class(model):
-        trace = extension.obtain_arff_trace(model_fold, arff_tracecontent)  # type: Optional[OpenMLRunTrace]  # noqa E501
+    if len(traces) > 0:
+        if len(traces) != n_fit:
+            raise ValueError(
+                'Did not find enough traces (expected %d, found %d)' % (n_fit, len(traces))
+            )
+        else:
+            trace = OpenMLRunTrace.merge_traces(traces)
     else:
         trace = None
 

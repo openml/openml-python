@@ -1,8 +1,10 @@
-import arff
+from collections import OrderedDict
 import json
 import os
+from typing import List
+
+import arff
 import xmltodict
-from collections import OrderedDict
 
 PREFIX = 'parameter_'
 REQUIRED_ATTRIBUTES = [
@@ -344,11 +346,26 @@ class OpenMLRunTrace(object):
             )
             trace[(repeat, fold, iteration)] = current
 
-        return cls(run_id, trace)
+        return cls(None, trace)
+
+    @classmethod
+    def merge_traces(cls, traces: List['OpenMLRunTrace']):
+        for i in range(1, len(traces)):
+            if traces[i] != traces[i - 1]:
+                raise ValueError('Cannot merge traces!')
+
+        merged_trace = OrderedDict()
+
+        for trace in traces:
+            for iteration in trace:
+                merged_trace[(iteration.repeat, iteration.fold, iteration.iteration)] = iteration
+
+        return cls(None, merged_trace)
+
 
     def __str__(self):
         return '[Run id: %d, %d trace iterations]' % (
-            self.run_id,
+            -1 if self.run_id is None else self.run_id,
             len(self.trace_iterations),
         )
 
@@ -448,3 +465,14 @@ class OpenMLTraceIteration(object):
             self.evaluation,
             self.selected,
         )
+
+    def __eq__(self, other):
+        if not isinstance(other, OpenMLTraceIteration):
+            return False
+        attributes = [
+            'repeat', 'fold', 'iteration', 'setup_string', 'evaluation', 'selected', 'paramaters',
+        ]
+        for attr in attributes:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+        return True

@@ -937,7 +937,7 @@ class SklearnExtension(Extension):
         model:
             The model that will be fitted
         """
-        if self.is_hpo_class(model):
+        if self._is_hpo_class(model):
             if isinstance(model, sklearn.model_selection.GridSearchCV):
                 param_distributions = model.param_grid
             elif isinstance(model, sklearn.model_selection.RandomizedSearchCV):
@@ -975,7 +975,7 @@ class SklearnExtension(Extension):
             True if all n_jobs parameters will be either set to None or 1, False otherwise
         """
         if not (
-                isinstance(model, sklearn.base.BaseEstimator) or self.is_hpo_class(model)
+                isinstance(model, sklearn.base.BaseEstimator) or self._is_hpo_class(model)
         ):
             raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
@@ -1002,7 +1002,7 @@ class SklearnExtension(Extension):
             True if no n_jobs parameters is set to -1, False otherwise
         """
         if not (
-                isinstance(model, sklearn.base.BaseEstimator) or self.is_hpo_class(model)
+                isinstance(model, sklearn.base.BaseEstimator) or self._is_hpo_class(model)
         ):
             raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
@@ -1231,7 +1231,7 @@ class SklearnExtension(Extension):
             else:
                 used_estimator = model_copy
 
-            if self.is_hpo_class(used_estimator):
+            if self._is_hpo_class(used_estimator):
                 model_classes = used_estimator.best_estimator_.classes_
             else:
                 model_classes = used_estimator.classes_
@@ -1283,28 +1283,13 @@ class SklearnExtension(Extension):
         else:
             raise TypeError(type(task))
 
-        return pred_y, proba_y, user_defined_measures, model_copy
+        if self._is_hpo_class(model_copy):
+            trace_data = self._extract_trace_data(model_copy, rep_no, fold_no)
+            trace = self._obtain_arff_trace(model_copy, trace_data)
+        else:
+            trace = None
 
-    def _extract_trace_data(self, model, rep_no, fold_no):
-        arff_tracecontent = []
-        for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
-            # we use the string values for True and False, as it is defined in
-            # this way by the OpenML server
-            selected = 'false'
-            if itt_no == model.best_index_:
-                selected = 'true'
-            test_score = model.cv_results_['mean_test_score'][itt_no]
-            arff_line = [rep_no, fold_no, itt_no, test_score, selected]
-            for key in model.cv_results_:
-                if key.startswith('param_'):
-                    value = model.cv_results_[key][itt_no]
-                    if value is not np.ma.masked:
-                        serialized_value = json.dumps(value)
-                    else:
-                        serialized_value = np.nan
-                    arff_line.append(serialized_value)
-            arff_tracecontent.append(arff_line)
-        return arff_tracecontent
+        return pred_y, proba_y, user_defined_measures, trace
 
     def obtain_parameter_values(
         self,
@@ -1483,7 +1468,7 @@ class SklearnExtension(Extension):
     ################################################################################################
     # Methods for hyperparameter optimization
 
-    def is_hpo_class(self, model: Any) -> bool:
+    def _is_hpo_class(self, model: Any) -> bool:
         """Check whether the model performs hyperparameter optimization.
 
         Used to check whether an optimization trace can be extracted from the model after
@@ -1518,7 +1503,7 @@ class SklearnExtension(Extension):
         -------
         Any
         """
-        if not self.is_hpo_class(model):
+        if not self._is_hpo_class(model):
             raise AssertionError(
                 'Flow model %s is not an instance of sklearn.model_selection._search.BaseSearchCV'
                 % model
@@ -1527,7 +1512,28 @@ class SklearnExtension(Extension):
         base_estimator.set_params(**trace_iteration.get_parameters())
         return base_estimator
 
-    def obtain_arff_trace(
+    def _extract_trace_data(self, model, rep_no, fold_no):
+        arff_tracecontent = []
+        for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
+            # we use the string values for True and False, as it is defined in
+            # this way by the OpenML server
+            selected = 'false'
+            if itt_no == model.best_index_:
+                selected = 'true'
+            test_score = model.cv_results_['mean_test_score'][itt_no]
+            arff_line = [rep_no, fold_no, itt_no, test_score, selected]
+            for key in model.cv_results_:
+                if key.startswith('param_'):
+                    value = model.cv_results_[key][itt_no]
+                    if value is not np.ma.masked:
+                        serialized_value = json.dumps(value)
+                    else:
+                        serialized_value = np.nan
+                    arff_line.append(serialized_value)
+            arff_tracecontent.append(arff_line)
+        return arff_tracecontent
+
+    def _obtain_arff_trace(
         self,
         model: Any,
         trace_content: List,
@@ -1547,7 +1553,7 @@ class SklearnExtension(Extension):
         -------
         OpenMLRunTrace
         """
-        if not self.is_hpo_class(model):
+        if not self._is_hpo_class(model):
             raise AssertionError(
                 'Flow model %s is not an instance of sklearn.model_selection._search.BaseSearchCV'
                 % model

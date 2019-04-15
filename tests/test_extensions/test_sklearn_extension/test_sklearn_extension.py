@@ -1374,7 +1374,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         self.assertIn(clf.best_estimator_.hidden_layer_sizes, param_grid['hidden_layer_sizes'])
 
         trace_list = self.extension._extract_trace_data(clf, rep_no=0, fold_no=0)
-        trace = self.extension.obtain_arff_trace(clf, trace_list)
+        trace = self.extension._obtain_arff_trace(clf, trace_list)
 
         self.assertIsInstance(trace, OpenMLRunTrace)
         self.assertIsInstance(trace_list, list)

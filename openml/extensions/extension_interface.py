@@ -159,7 +159,7 @@ class Extension(ABC):
         add_local_measures: bool,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
         n_classes: Optional[int] = None,
-    ) -> Tuple[List[List], List[List], 'OrderedDict[str, float]', Any]:
+    ) -> Tuple[List[List], List[List], 'OrderedDict[str, float]', Optional['OpenMLRunTrace']]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction information.
 
         Returns the data that is necessary to construct the OpenML Run object. Is used by
@@ -230,21 +230,6 @@ class Extension(ABC):
     ################################################################################################
     # Abstract methods for hyperparameter optimization
 
-    def is_hpo_class(self, model: Any) -> bool:
-        """Check whether the model performs hyperparameter optimization.
-
-        Used to check whether an optimization trace can be extracted from the model after running
-        it.
-
-        Parameters
-        ----------
-        model : Any
-
-        Returns
-        -------
-        bool
-        """
-
     @abstractmethod
     def instantiate_model_from_hpo_class(
         self,
@@ -266,25 +251,3 @@ class Extension(ABC):
         Any
         """
         # TODO a trace belongs to a run and therefore a flow -> simplify this part of the interface!
-
-    @abstractmethod
-    def obtain_arff_trace(
-        self,
-        model: Any,
-        trace_content: List[List],
-    ) -> 'OpenMLRunTrace':
-        """Create arff trace object from a fitted model and the trace content obtained by
-        repeatedly calling ``run_model_on_task``.
-
-        Parameters
-        ----------
-        model : Any
-            A fitted hyperparameter optimization model.
-
-        trace_content : List[List]
-            Trace content obtained by ``openml.runs.run_flow_on_task``.
-
-        Returns
-        -------
-        OpenMLRunTrace
-        """

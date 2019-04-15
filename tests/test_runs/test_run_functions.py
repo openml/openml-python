@@ -437,7 +437,7 @@ class TestRun(TestBase):
         # todo: check if runtime is present
         self._check_fold_timing_evaluations(run.fold_evaluations, 1, num_folds,
                                             task_type=task_type)
-        pass
+        return run
 
     def _run_and_upload_classification(self, clf, task_id, n_missing_vals,
                                        n_test_obs, flow_expected_rsv,
@@ -448,11 +448,19 @@ class TestRun(TestBase):
         metric_name = 'predictive_accuracy'  # openml metric name
         task_type = TaskTypeEnum.SUPERVISED_CLASSIFICATION  # task type
 
-        self._run_and_upload(clf, task_id, n_missing_vals, n_test_obs,
-                             flow_expected_rsv, num_folds=num_folds,
-                             num_iterations=num_iterations,
-                             metric=metric, metric_name=metric_name,
-                             task_type=task_type, sentinel=sentinel)
+        return self._run_and_upload(
+            clf=clf,
+            task_id=task_id,
+            n_missing_vals=n_missing_vals,
+            n_test_obs=n_test_obs,
+            flow_expected_rsv=flow_expected_rsv,
+            num_folds=num_folds,
+            num_iterations=num_iterations,
+            metric=metric,
+            metric_name=metric_name,
+            task_type=task_type,
+            sentinel=sentinel,
+        )
 
     def _run_and_upload_regression(self, clf, task_id, n_missing_vals,
                                    n_test_obs, flow_expected_rsv,
@@ -463,11 +471,19 @@ class TestRun(TestBase):
         metric_name = 'mean_absolute_error'  # openml metric name
         task_type = TaskTypeEnum.SUPERVISED_REGRESSION  # task type
 
-        self._run_and_upload(clf, task_id, n_missing_vals, n_test_obs,
-                             flow_expected_rsv, num_folds=num_folds,
-                             num_iterations=num_iterations,
-                             metric=metric, metric_name=metric_name,
-                             task_type=task_type, sentinel=sentinel)
+        return self._run_and_upload(
+            clf=clf,
+            task_id=task_id,
+            n_missing_vals=n_missing_vals,
+            n_test_obs=n_test_obs,
+            flow_expected_rsv=flow_expected_rsv,
+            num_folds=num_folds,
+            num_iterations=num_iterations,
+            metric=metric,
+            metric_name=metric_name,
+            task_type=task_type,
+            sentinel=sentinel,
+        )
 
     def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression(solver='lbfgs')
@@ -559,9 +575,14 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        self._run_and_upload_classification(gridsearch, task_id,
-                                            n_missing_vals, n_test_obs,
-                                            '62501')
+        run = self._run_and_upload_classification(
+            clf=gridsearch,
+            task_id=task_id,
+            n_missing_vals=n_missing_vals,
+            n_test_obs=n_test_obs,
+            flow_expected_rsv='62501',
+        )
+        self.assertEqual(len(run.trace.trace_iterations), 9)
 
     def test_run_and_upload_randomsearch(self):
         randomsearch = RandomizedSearchCV(
@@ -580,9 +601,14 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        self._run_and_upload_classification(randomsearch, task_id,
-                                            n_missing_vals, n_test_obs,
-                                            '12172')
+        run = self._run_and_upload_classification(
+            clf=randomsearch,
+            task_id=task_id,
+            n_missing_vals=n_missing_vals,
+            n_test_obs=n_test_obs,
+            flow_expected_rsv='12172',
+        )
+        self.assertEqual(len(run.trace.trace_iterations), 5)
 
     def test_run_and_upload_maskedarrays(self):
         # This testcase is important for 2 reasons:
