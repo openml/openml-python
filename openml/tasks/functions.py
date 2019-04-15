@@ -55,7 +55,7 @@ def _get_cached_tasks():
     return tasks
 
 
-def _get_cached_task(tid):
+def _get_cached_task(tid: int) -> OpenMLTask:
     """Return a cached task based on the given id.
 
     Parameters
