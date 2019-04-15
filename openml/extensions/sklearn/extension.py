@@ -1101,6 +1101,12 @@ class SklearnExtension(Extension):
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction
         information.
 
+        Furthermore, it will measure run time measures in case multi-core behaviour allows this.
+        * exact user cpu time will be measured if the number of cores is set (recursive throughout the model)
+        exactly to 1
+        * wall clock time will be measured if the number of cores is set (recursive throughout the model) to any given
+        number (but not when it is set to -1)
+
         Returns the data that is necessary to construct the OpenML Run object. Is used by
         run_task_get_arff_content. Do not use this function unless you know what you are doing.
 
