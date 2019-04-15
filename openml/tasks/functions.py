@@ -19,7 +19,8 @@ from .task import (
     OpenMLLearningCurveTask,
     TaskTypeEnum,
     OpenMLRegressionTask,
-    OpenMLSupervisedTask
+    OpenMLSupervisedTask,
+    OpenMLTask
 )
 import openml.utils
 import openml._api_calls
@@ -299,7 +300,7 @@ def get_tasks(task_ids, download_data=True):
     return tasks
 
 
-def get_task(task_id, download_data=True):
+def get_task(task_id: int, download_data: bool = True) -> OpenMLTask:
     """Download OpenML task for a given task ID.
 
     Downloads the task representation, while the data splits can be
