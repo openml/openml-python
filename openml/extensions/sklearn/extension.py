@@ -1013,10 +1013,9 @@ class SklearnExtension(Extension):
         # of n_jobs (the negate will make this fn return false). For that
         # reason, we need to add clause 2 that returns True if n_jobs does not
         # exist in the flow
-        return not SklearnExtension._check_parameter_value_recursive(
-            model.get_params(), 'n_jobs', [-1]) or \
-               SklearnExtension._check_parameter_value_recursive(
-                   model.get_params(), 'n_jobs', None)
+        clause1 = not SklearnExtension._check_parameter_value_recursive(model.get_params(), 'n_jobs', [-1])
+        clause2 = SklearnExtension._check_parameter_value_recursive(model.get_params(), 'n_jobs', None)
+        return clause1 or clause2
 
     ################################################################################################
     # Methods for performing runs with extension modules
@@ -1219,30 +1218,21 @@ class SklearnExtension(Extension):
 
         try:
             # for measuring runtime. Only available since Python 3.3
-            modelfit_start_cputime = None
-            modelfit_duration_cputime = None
-            modelpredict_start_cputime = None
-
-            modelfit_start_walltime = None
-            modelfit_duration_walltime = None
-            modelpredict_start_walltime = None
-            if can_measure_cputime:
-                modelfit_start_cputime = time.process_time()
-            if can_measure_wallclocktime:
-                modelfit_start_walltime = time.time()
+            modelfit_start_cputime = time.process_time()
+            modelfit_start_walltime = time.time()
 
             if isinstance(task, OpenMLSupervisedTask):
                 model_copy.fit(train_x, train_y)
             elif isinstance(task, OpenMLClusteringTask):
                 model_copy.fit(train_x)
 
+            modelfit_dur_cputime = (time.process_time() - modelfit_start_cputime) * 1000
             if can_measure_cputime:
-                modelfit_duration_cputime = (time.process_time() - modelfit_start_cputime) * 1000
-                user_defined_measures['usercpu_time_millis_training'] = modelfit_duration_cputime
+                user_defined_measures['usercpu_time_millis_training'] = modelfit_dur_cputime
+
+            modelfit_dur_walltime = (time.time() - modelfit_start_walltime) * 1000
             if can_measure_wallclocktime:
-                modelfit_duration_walltime = (time.time() - modelfit_start_walltime) * 1000
-                user_defined_measures['wall_clock_time_millis_training'] = \
-                    modelfit_duration_walltime
+                user_defined_measures['wall_clock_time_millis_training'] = modelfit_dur_walltime
 
         except AttributeError as e:
             # typically happens when training a regressor on classification task
@@ -1268,26 +1258,24 @@ class SklearnExtension(Extension):
             else:
                 model_classes = used_estimator.classes_
 
-        if can_measure_cputime:
-            modelpredict_start_cputime = time.process_time()
-        if can_measure_wallclocktime:
-            modelpredict_start_walltime = time.time()
+        modelpredict_start_cputime = time.process_time()
+        modelpredict_start_walltime = time.time()
 
         # In supervised learning this returns the predictions for Y, in clustering
         # it returns the clusters
         pred_y = model_copy.predict(test_x)
 
         if can_measure_cputime:
-            modelpredict_duration_cputime = (time.process_time() -
-                                             modelpredict_start_cputime) * 1000
+            modelpredict_duration_cputime = (time.process_time()
+                                             - modelpredict_start_cputime) * 1000
             user_defined_measures['usercpu_time_millis_testing'] = modelpredict_duration_cputime
-            user_defined_measures['usercpu_time_millis'] = (
-                    modelfit_duration_cputime + modelpredict_duration_cputime)
+            user_defined_measures['usercpu_time_millis'] = (modelfit_dur_cputime
+                                                            + modelpredict_duration_cputime)
         if can_measure_wallclocktime:
             modelpredict_duration_walltime = (time.time() - modelpredict_start_walltime) * 1000
             user_defined_measures['wall_clock_time_millis_testing'] = modelpredict_duration_walltime
-            user_defined_measures['wall_clock_time_millis'] = (
-                    modelfit_duration_walltime + modelpredict_duration_walltime)
+            user_defined_measures['wall_clock_time_millis'] = (modelfit_dur_walltime
+                                                               + modelpredict_duration_walltime)
 
         # add client-side calculated metrics. These is used on the server as
         # consistency check, only useful for supervised tasks
