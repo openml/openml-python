@@ -565,7 +565,7 @@ class OpenMLDataset(object):
         else:
             return rval
 
-    def retrieve_class_labels(self, target_name='class'):
+    def retrieve_class_labels(self, target_name: str ='class') -> Union[None, List[str]]:
         """Reads the datasets arff to determine the class-labels.
 
         If the task has no class labels (for example a regression problem)
