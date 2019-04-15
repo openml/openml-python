@@ -12,7 +12,13 @@ import openml
 import openml._api_calls
 from ..exceptions import PyOpenMLError
 from ..flows import get_flow
-from ..tasks import get_task, TaskTypeEnum
+from ..tasks import (get_task,
+                     TaskTypeEnum,
+                     OpenMLClassificationTask,
+                     OpenMLLearningCurveTask,
+                     OpenMLClusteringTask,
+                     OpenMLRegressionTask
+                     )
 
 
 class OpenMLRun(object):
@@ -108,8 +114,8 @@ class OpenMLRun(object):
         if not os.path.isfile(model_path) and expect_model:
             raise ValueError('Could not find model.pkl')
 
-        with open(description_path, 'r') as fp:
-            xml_string = fp.read()
+        with open(description_path, 'r') as fht:
+            xml_string = fht.read()
         run = openml.runs.functions._create_run_from_xml(xml_string, from_server=False)
 
         if run.flow_id is None:
@@ -117,15 +123,15 @@ class OpenMLRun(object):
             run.flow = flow
             run.flow_name = flow.name
 
-        with open(predictions_path, 'r') as fp:
-            predictions = arff.load(fp)
+        with open(predictions_path, 'r') as fht:
+            predictions = arff.load(fht)
             run.data_content = predictions['data']
 
         if os.path.isfile(model_path):
             # note that it will load the model if the file exists, even if
             # expect_model is False
-            with open(model_path, 'rb') as fp:
-                run.model = pickle.load(fp)
+            with open(model_path, 'rb') as fhb:
+                run.model = pickle.load(fhb)
 
         if os.path.isfile(trace_path):
             run.trace = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
@@ -208,7 +214,18 @@ class OpenMLRun(object):
         arff_dict['relation'] =\
             'openml_task_{}_predictions'.format(task.task_id)
 
-        if task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION:
+        if isinstance(task, OpenMLLearningCurveTask):
+            class_labels = task.class_labels  # type: ignore
+            arff_dict['attributes'] = [('repeat', 'NUMERIC'),
+                                       ('fold', 'NUMERIC'),
+                                       ('sample', 'NUMERIC'),
+                                       ('row_id', 'NUMERIC')] + \
+                                      [('confidence.' + class_labels[i],
+                                        'NUMERIC') for i in
+                                       range(len(class_labels))] + \
+                                      [('prediction', class_labels),
+                                       ('correct', class_labels)]
+        elif isinstance(task, OpenMLClassificationTask):
             class_labels = task.class_labels
             instance_specifications = [('repeat', 'NUMERIC'),
                                        ('fold', 'NUMERIC'),
@@ -222,27 +239,14 @@ class OpenMLRun(object):
             arff_dict['attributes'] = (instance_specifications
                                        + prediction_confidences
                                        + prediction_and_true)
-
-        elif task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
-            class_labels = task.class_labels
-            arff_dict['attributes'] = [('repeat', 'NUMERIC'),
-                                       ('fold', 'NUMERIC'),
-                                       ('sample', 'NUMERIC'),
-                                       ('row_id', 'NUMERIC')] + \
-                                      [('confidence.' + class_labels[i],
-                                        'NUMERIC') for i in
-                                       range(len(class_labels))] + \
-                                      [('prediction', class_labels),
-                                       ('correct', class_labels)]
-
-        elif task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION:
+        elif isinstance(task, OpenMLRegressionTask):
             arff_dict['attributes'] = [('repeat', 'NUMERIC'),
                                        ('fold', 'NUMERIC'),
                                        ('row_id', 'NUMERIC'),
                                        ('prediction', 'NUMERIC'),
                                        ('truth', 'NUMERIC')]
 
-        elif task.task_type == TaskTypeEnum.CLUSTERING:
+        elif isinstance(task, OpenMLClusteringTask):
             arff_dict['attributes'] = [('repeat', 'NUMERIC'),
                                        ('fold', 'NUMERIC'),
                                        ('row_id', 'NUMERIC'),

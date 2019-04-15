@@ -32,7 +32,7 @@ class OpenMLRunTrace(object):
         self.run_id = run_id
         self.trace_iterations = trace_iterations
 
-    def get_selected_iteration(self, fold: int, repeat: int) -> 'OpenMLTraceIteration':
+    def get_selected_iteration(self, fold: int, repeat: int) -> int:
         """
         Returns the trace iteration that was marked as selected. In
         case multiple are marked as selected (should not happen) the
@@ -46,7 +46,7 @@ class OpenMLRunTrace(object):
 
         Returns
         ----------
-        OpenMLTraceIteration
+        int
             The trace iteration from the given fold and repeat that was
             selected as the best iteration by the search procedure
         """
