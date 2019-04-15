@@ -964,14 +964,18 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                                                  illegal_param_dist)
         ]
 
-        answers = [True, False, False, True, False, False, True, False]
+        can_measure_cputime_answers = [True, False, False, True, False, False, True, False]
+        can_measure_walltime_answers = [True, True, False, True, True, False, True, True]
 
-        for model, expected_answer in zip(legal_models, answers):
-            self.assertEqual(self.extension._check_n_jobs(model), expected_answer)
+        for model, allowed_cputime, allowed_walltime in zip(legal_models,
+                                                            can_measure_cputime_answers,
+                                                            can_measure_walltime_answers):
+            self.assertEqual(self.extension._can_measure_cputime(model), allowed_cputime)
+            self.assertEqual(self.extension._can_measure_wallclocktime(model), allowed_walltime)
 
         for model in illegal_models:
             with self.assertRaises(PyOpenMLError):
-                self.extension._check_n_jobs(model)
+                self.extension._prevent_optimize_n_jobs(model)
 
     def test__get_fn_arguments_with_defaults(self):
         if LooseVersion(sklearn.__version__) < "0.19":
