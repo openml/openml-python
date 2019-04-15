@@ -1,6 +1,7 @@
 import io
 import os
 import re
+import warnings
 from typing import List, Dict, Union, Optional
 
 import numpy as np
@@ -82,7 +83,9 @@ def _get_cached_datasets():
     return datasets
 
 
-def _get_cached_dataset(dataset_id):
+def _get_cached_dataset(
+        dataset_id: int
+) -> OpenMLDataset:
     """Get cached dataset for ID.
 
     Returns
@@ -163,7 +166,14 @@ def _get_cache_directory(dataset: OpenMLDataset) -> str:
     return _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset.dataset_id)
 
 
-def list_datasets(offset=None, size=None, status=None, tag=None, output_format='dict', **kwargs):
+def list_datasets(
+        offset: int = None,
+        size: int = None,
+        status: str = None,
+        tag: str = None,
+        output_format: str = 'dict',
+        **kwargs: dict
+) -> Union[Dict, pd.DataFrame]:
 
     """
     Return a list of all dataset which are on OpenML.
@@ -214,9 +224,12 @@ def list_datasets(offset=None, size=None, status=None, tag=None, output_format='
             If qualities are calculated for the dataset, some of
             these are also included as columns.
     """
+    if output_format != 'dataframe' and output_format != 'dict':
+        raise ValueError("Invalid output format selected. "
+                         "Only 'dict' or 'dataframe' applicable.")
 
-    return openml.utils._list_all(output_format,
-                                  _list_datasets,
+    return openml.utils._list_all(output_format=output_format,
+                                  listing_call=_list_datasets,
                                   offset=offset,
                                   size=size,
                                   status=status,
@@ -224,13 +237,17 @@ def list_datasets(offset=None, size=None, status=None, tag=None, output_format='
                                   **kwargs)
 
 
-def _list_datasets(**kwargs):
+def _list_datasets(output_format='dict', **kwargs):
 
     """
     Perform api call to return a list of all datasets.
 
     Parameters
     ----------
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
     kwargs : dict, optional
         Legal filter operators (keys in the dict):
         tag, status, limit, offset, data_name, data_version, number_instances,
@@ -238,7 +255,7 @@ def _list_datasets(**kwargs):
 
     Returns
     -------
-    datasets : dict of dicts
+    datasets : dict of dicts, or dataframe
     """
 
     api_call = "data/list"
@@ -246,10 +263,10 @@ def _list_datasets(**kwargs):
     if kwargs is not None:
         for operator, value in kwargs.items():
             api_call += "/%s/%s" % (operator, value)
-    return __list_datasets(api_call)
+    return __list_datasets(api_call=api_call, output_format=output_format)
 
 
-def __list_datasets(api_call):
+def __list_datasets(api_call, output_format='dict'):
 
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     datasets_dict = xmltodict.parse(xml_string, force_list=('oml:dataset',))
@@ -276,6 +293,9 @@ def __list_datasets(api_call):
             except ValueError:
                 dataset[quality['@name']] = float(quality['#text'])
         datasets[dataset['did']] = dataset
+
+    if output_format == 'dataframe':
+        datasets = pd.DataFrame.from_dict(datasets, orient='index')
 
     return datasets
 
@@ -682,8 +702,8 @@ def create_dataset(name, description, creator, contributor,
                              do not construct a valid ARFF file")
 
     return OpenMLDataset(
-        name,
-        description,
+        name=name,
+        description=description,
         data_format=data_format,
         creator=creator,
         contributor=contributor,
@@ -702,7 +722,10 @@ def create_dataset(name, description, creator, contributor,
     )
 
 
-def status_update(data_id, status):
+def status_update(
+        data_id: int,
+        status: str
+) -> None:
     """
     Updates the status of a dataset to either 'active' or 'deactivated'.
     Please see the OpenML API documentation for a description of the status
@@ -732,7 +755,10 @@ def status_update(data_id, status):
         raise ValueError('Data id/status does not collide')
 
 
-def _get_dataset_description(did_cache_dir, dataset_id):
+def _get_dataset_description(
+        did_cache_dir: str,
+        dataset_id: int
+) -> dict:
     """Get the dataset description as xml dictionary.
 
     This function is NOT thread/multiprocessing safe.
@@ -771,8 +797,11 @@ def _get_dataset_description(did_cache_dir, dataset_id):
     return description
 
 
-def _get_dataset_arff(description: Union[Dict, OpenMLDataset],
-                      cache_directory: str = None) -> str:
+def _get_dataset_arff(
+        description: Union[Dict, OpenMLDataset],
+        cache_directory: str = None
+) -> str:
+
     """ Return the path to the local arff file of the dataset. If is not cached, it is downloaded.
 
     Checks if the file is in the cache, if yes, return the path to the file.
@@ -824,7 +853,10 @@ def _get_dataset_arff(description: Union[Dict, OpenMLDataset],
     return output_file_path
 
 
-def _get_dataset_features(did_cache_dir, dataset_id):
+def _get_dataset_features(
+        did_cache_dir: str,
+        dataset_id: int
+) -> str:
     """API call to get dataset features (cached)
 
     Features are feature descriptions for each column.
@@ -857,7 +889,10 @@ def _get_dataset_features(did_cache_dir, dataset_id):
     return _load_features_from_file(features_file)
 
 
-def _get_dataset_qualities(did_cache_dir, dataset_id):
+def _get_dataset_qualities(
+        did_cache_dir: str,
+        dataset_id: int
+) -> dict:
     """API call to get dataset qualities (cached)
 
     Features are metafeatures (number of features, number of classes, ...)
@@ -949,7 +984,9 @@ def _create_dataset_from_description(
     )
 
 
-def _get_online_dataset_arff(dataset_id):
+def _get_online_dataset_arff(
+        dataset_id: int
+) -> str:
     """Download the ARFF file for a given dataset id
     from the OpenML website.
 
@@ -973,7 +1010,9 @@ def _get_online_dataset_arff(dataset_id):
     )
 
 
-def _get_online_dataset_format(dataset_id):
+def _get_online_dataset_format(
+        dataset_id: int
+) -> str:
     """Get the dataset format for a given dataset id
     from the OpenML website.
 

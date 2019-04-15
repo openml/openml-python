@@ -182,6 +182,8 @@ def _list_all(output_format, listing_call, *args, **filters):
                       if value is not None}
     page = 0
     result = {}
+    if output_format == 'dataframe':
+        result = pd.DataFrame()
 
     # Default batch size per paging.
     # This one can be set in filters (batch_size), but should not be
@@ -213,12 +215,20 @@ def _list_all(output_format, listing_call, *args, **filters):
                 *args,
                 limit=batch_size,
                 offset=current_offset,
+                output_format=output_format,
                 **active_filters
             )
         except openml.exceptions.OpenMLServerNoResult:
             # we want to return an empty dict in this case
             break
-        result.update(new_batch)
+        if output_format == 'dataframe':
+            if len(result) == 0:
+                result = new_batch
+            else:
+                result = result.append(new_batch, ignore_index=True)
+        else:
+            # For output_format = 'dict' or 'object'
+            result.update(new_batch)
         if len(new_batch) < batch_size:
             break
         page += 1
@@ -233,9 +243,9 @@ def _list_all(output_format, listing_call, *args, **filters):
                 batch_size = LIMIT - len(result)
 
     # Checking and converting to dataframe
-    if output_format is not None and output_format == 'dataframe':
-        result = _unwrap_object_to_dict(result)
-        result = pd.DataFrame.from_dict(result, orient='index')
+    # if output_format is not None and output_format == 'dataframe':
+    #     result = _unwrap_object_to_dict(result)
+    #     result = pd.DataFrame.from_dict(result, orient='index')
     return result
 
 

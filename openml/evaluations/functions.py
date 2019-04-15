@@ -1,14 +1,26 @@
 import json
 import xmltodict
+import pandas as pd
+from typing import Union
 
 import openml.utils
 import openml._api_calls
 from ..evaluations import OpenMLEvaluation
 
 
-def list_evaluations(function, offset=None, size=None, id=None, task=None,
-                     setup=None, flow=None, uploader=None, tag=None,
-                     per_fold=None, output_format='dict'):
+def list_evaluations(
+        function: str,
+        offset: int = None,
+        size: int = None,
+        id: list = None,
+        task: list = None,
+        setup: list = None,
+        flow: list = None,
+        uploader: list = None,
+        tag: str = None,
+        per_fold: bool = None,
+        output_format: str = 'dict'
+) -> Union[dict, pd.DataFrame]:
     """
     List all run-evaluation pairs matching all of the given filters.
     (Supports large amount of results)
@@ -48,14 +60,30 @@ def list_evaluations(function, offset=None, size=None, id=None, task=None,
     if per_fold is not None:
         per_fold = str(per_fold).lower()
 
-    return openml.utils._list_all(output_format, _list_evaluations, function,
-                                  offset=offset, size=size, id=id, task=task,
-                                  setup=setup, flow=flow, uploader=uploader,
-                                  tag=tag, per_fold=per_fold)
+    return openml.utils._list_all(output_format=output_format,
+                                  listing_call=_list_evaluations,
+                                  function=function,
+                                  offset=offset,
+                                  size=size,
+                                  id=id,
+                                  task=task,
+                                  setup=setup,
+                                  flow=flow,
+                                  uploader=uploader,
+                                  tag=tag,
+                                  per_fold=per_fold)
 
 
-def _list_evaluations(function, id=None, task=None,
-                      setup=None, flow=None, uploader=None, **kwargs):
+def _list_evaluations(
+        function: str,
+        id: list = None,
+        task: list = None,
+        setup: list = None,
+        flow: list = None,
+        uploader: list = None,
+        output_format: str = 'dict',
+        **kwargs: dict
+) -> Union[dict, pd.DataFrame]:
     """
     Perform API call ``/evaluation/function{function}/{filters}``
 
@@ -80,9 +108,17 @@ def _list_evaluations(function, id=None, task=None,
     kwargs: dict, optional
         Legal filter operators: tag, limit, offset.
 
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
+        - If 'dataframe' the output is a pandas DataFrame
+
     Returns
     -------
-    dict
+    dict of objects, or dataframe
     """
 
     api_call = "evaluation/list/function/%s" % function
@@ -100,10 +136,10 @@ def _list_evaluations(function, id=None, task=None,
     if uploader is not None:
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
 
-    return __list_evaluations(api_call)
+    return __list_evaluations(api_call, output_format=output_format)
 
 
-def __list_evaluations(api_call):
+def __list_evaluations(api_call, output_format='dict'):
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     evals_dict = xmltodict.parse(xml_string, force_list=('oml:evaluation',))
@@ -115,7 +151,10 @@ def __list_evaluations(api_call):
     assert type(evals_dict['oml:evaluations']['oml:evaluation']) == list, \
         type(evals_dict['oml:evaluations'])
 
+    # For output_format = 'dict'
     evals = dict()
+    # if output_format == 'dataframe':
+    #     evals = []
     for eval_ in evals_dict['oml:evaluations']['oml:evaluation']:
         run_id = int(eval_['oml:run_id'])
         value = None
@@ -128,15 +167,50 @@ def __list_evaluations(api_call):
         if 'oml:array_data' in eval_:
             array_data = eval_['oml:array_data']
 
-        evals[run_id] = OpenMLEvaluation(int(eval_['oml:run_id']),
-                                         int(eval_['oml:task_id']),
-                                         int(eval_['oml:setup_id']),
-                                         int(eval_['oml:flow_id']),
-                                         eval_['oml:flow_name'],
-                                         eval_['oml:data_id'],
-                                         eval_['oml:data_name'],
-                                         eval_['oml:function'],
-                                         eval_['oml:upload_time'],
-                                         value, values, array_data)
+        if output_format == 'object':
+            evals[run_id] = OpenMLEvaluation(int(eval_['oml:run_id']),
+                                             int(eval_['oml:task_id']),
+                                             int(eval_['oml:setup_id']),
+                                             int(eval_['oml:flow_id']),
+                                             eval_['oml:flow_name'],
+                                             eval_['oml:data_id'],
+                                             eval_['oml:data_name'],
+                                             eval_['oml:function'],
+                                             eval_['oml:upload_time'],
+                                             value, values, array_data)
+        # elif output_format == 'dataframe':
+        #     evals.append([int(eval_['oml:run_id']),
+        #                   int(eval_['oml:task_id']),
+        #                   int(eval_['oml:setup_id']),
+        #                   int(eval_['oml:flow_id']),
+        #                   eval_['oml:flow_name'],
+        #                   eval_['oml:data_id'],
+        #                   eval_['oml:data_name'],
+        #                   eval_['oml:function'],
+        #                   eval_['oml:upload_time'],
+        #                   value, values, array_data])
+        elif output_format == 'dict' or output_format == 'dataframe':
+            evals[run_id] = {'run_id': int(eval_['oml:run_id']),
+                             'task_id': int(eval_['oml:task_id']),
+                             'setup_id': int(eval_['oml:setup_id']),
+                             'flow_id': int(eval_['oml:flow_id']),
+                             'flow_name': eval_['oml:flow_name'],
+                             'data_id': eval_['oml:data_id'],
+                             'data_name': eval_['oml:data_name'],
+                             'function': eval_['oml:function'],
+                             'upload_time': eval_['oml:upload_time'],
+                             'value': value,
+                             'values': values,
+                             'array_data': array_data}
+        else:
+            raise ValueError("Invalid output format selected. "
+                             "Only 'object', 'dataframe', or 'dict' applicable.")
+
+    if output_format == 'dataframe':
+        # column_names = ['run_id', 'task_id', 'setup_id', 'flow_id',
+        #                 'flow_name', 'data_id', 'data_name', 'function',
+        #                 'upload_time', 'value', 'values', 'array_data']
+        evals = pd.DataFrame.from_dict(evals, orient='index')
+        # evals.columns = column_names
 
     return evals

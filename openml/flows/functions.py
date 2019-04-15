@@ -4,6 +4,7 @@ import os
 import io
 import re
 import xmltodict
+import pandas as pd
 from typing import Union, Dict
 
 from ..exceptions import OpenMLCacheException
@@ -127,9 +128,13 @@ def _get_flow_description(flow_id: int) -> OpenMLFlow:
         return _create_flow_from_xml(flow_xml)
 
 
-def list_flows(offset: int = None, size: int = None, tag: str = None,
-               output_format: str = 'dict', **kwargs) \
-        -> Dict[int, Dict]:
+def list_flows(
+        offset: int = None,
+        size: int = None,
+        tag: str = None,
+        output_format: str = 'dict',
+        **kwargs: dict
+) -> Dict[int, Dict]:
 
     """
     Return a list of all flows which are on OpenML.
@@ -175,26 +180,35 @@ def list_flows(offset: int = None, size: int = None, tag: str = None,
             - external version
             - uploader
     """
-    return openml.utils._list_all(output_format,
-                                  _list_flows,
+    if output_format != 'dataframe' and output_format != 'dict':
+        raise ValueError("Invalid output format selected. "
+                         "Only 'dict' or 'dataframe' applicable.")
+
+    return openml.utils._list_all(output_format=output_format,
+                                  listing_call=_list_flows,
                                   offset=offset,
                                   size=size,
                                   tag=tag,
                                   **kwargs)
 
 
-def _list_flows(**kwargs) -> Dict[int, Dict]:
+def _list_flows(output_format='dict', **kwargs) -> Dict[int, Dict]:
     """
     Perform the api call that return a list of all flows.
 
     Parameters
     ----------
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
+
     kwargs: dict, optional
         Legal filter operators: uploader, tag, limit, offset.
 
     Returns
     -------
-    flows : dict
+    flows : dict, or dataframe
     """
     api_call = "flow/list"
 
@@ -202,7 +216,7 @@ def _list_flows(**kwargs) -> Dict[int, Dict]:
         for operator, value in kwargs.items():
             api_call += "/%s/%s" % (operator, value)
 
-    return __list_flows(api_call)
+    return __list_flows(api_call=api_call, output_format=output_format)
 
 
 def flow_exists(name: str, external_version: str) -> Union[int, bool]:
@@ -245,7 +259,10 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
         return False
 
 
-def __list_flows(api_call: str) -> Dict[int, Dict]:
+def __list_flows(
+        api_call: str,
+        output_format: str = 'dict'
+) -> Union[dict, pd.DataFrame]:
 
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     flows_dict = xmltodict.parse(xml_string, force_list=('oml:flow',))
@@ -266,6 +283,9 @@ def __list_flows(api_call: str) -> Dict[int, Dict]:
                 'external_version': flow_['oml:external_version'],
                 'uploader': flow_['oml:uploader']}
         flows[fid] = flow
+
+    if output_format == 'dataframe':
+        flows = pd.DataFrame.from_dict(flows, orient='index')
 
     return flows
 
