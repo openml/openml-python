@@ -34,11 +34,12 @@ install:
 
   # Install the build and runtime dependencies of the project.
   - "cd C:\\projects\\openml-python"
-  - conda install --quiet --yes scikit-learn=0.20.0 nb_conda nb_conda_kernels numpy scipy requests nbformat python-dateutil nbconvert pandas matplotlib seaborn
-  - pip install liac-arff xmltodict oslo.concurrency
+  #- conda install --quiet --yes scikit-learn=0.20.0 nb_conda nb_conda_kernels numpy scipy requests nbformat python-dateutil nbconvert pandas matplotlib seaborn
+  # - pip install liac-arff xmltodict oslo.concurrency
   # Packages for (parallel) unit tests with pytest
-  - pip install pytest pytest-xdist pytest-timeout
-  - "pip install .[test]"
+  # - pip install pytest pytest-xdist pytest-timeout
+  - "pip install .[examples,test]"
+  - conda install --quiet --yes scikit-learn=0.20.0
 
 
 # Not a .NET project, we build scikit-learn in the install step instead
