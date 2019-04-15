@@ -12,7 +12,9 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 import warnings
 
 import numpy as np
+import pandas as pd
 import scipy.stats
+import scipy.sparse
 import sklearn.base
 import sklearn.model_selection
 import sklearn.pipeline
@@ -1096,11 +1098,15 @@ class SklearnExtension(Extension):
         self,
         model: Any,
         task: 'OpenMLTask',
+        X_train: Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame],
+        y_train: np.ndarray,
         rep_no: int,
         fold_no: int,
         sample_no: int,
         add_local_measures: bool,
-    ) -> Tuple[List[List], List[List], 'OrderedDict[str, float]', Any]:
+        X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
+        n_classes: Optional[int] = None,
+    ) -> Tuple[np.ndarray, np.ndarray, 'OrderedDict[str, float]', Any]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction
         information.
 
@@ -1191,20 +1197,6 @@ class SklearnExtension(Extension):
         can_measure_cputime = self._can_measure_cputime(model_copy)
         can_measure_wallclocktime = self._can_measure_wallclocktime(model_copy)
 
-        train_indices, test_indices = task.get_train_test_split_indices(
-            repeat=rep_no, fold=fold_no, sample=sample_no)
-        if isinstance(task, OpenMLSupervisedTask):
-            x, y = task.get_X_and_y()
-            train_x = x[train_indices]
-            train_y = y[train_indices]
-            test_x = x[test_indices]
-            test_y = y[test_indices]
-        elif isinstance(task, OpenMLClusteringTask):
-            train_x = train_indices
-            test_x = test_indices
-        else:
-            raise NotImplementedError(task.task_type)
-
         user_defined_measures = OrderedDict()  # type: 'OrderedDict[str, float]'
 
         try:
@@ -1213,9 +1205,9 @@ class SklearnExtension(Extension):
             modelfit_start_walltime = time.time()
 
             if isinstance(task, OpenMLSupervisedTask):
-                model_copy.fit(train_x, train_y)
+                model_copy.fit(X_train, y_train)
             elif isinstance(task, OpenMLClusteringTask):
-                model_copy.fit(train_x)
+                model_copy.fit(X_train)
 
             modelfit_dur_cputime = (time.process_time() - modelfit_start_cputime) * 1000
             if can_measure_cputime:
@@ -1228,11 +1220,6 @@ class SklearnExtension(Extension):
         except AttributeError as e:
             # typically happens when training a regressor on classification task
             raise PyOpenMLError(str(e))
-
-        # extract trace, if applicable
-        arff_tracecontent = []  # type: List[List]
-        if self.is_hpo_class(model_copy):
-            arff_tracecontent.extend(self._extract_trace_data(model_copy, rep_no, fold_no))
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
             # search for model classes_ (might differ depending on modeltype)
@@ -1254,7 +1241,7 @@ class SklearnExtension(Extension):
 
         # In supervised learning this returns the predictions for Y, in clustering
         # it returns the clusters
-        pred_y = model_copy.predict(test_x)
+        pred_y = model_copy.predict(X_test)
 
         if can_measure_cputime:
             modelpredict_duration_cputime = (time.process_time()
@@ -1268,133 +1255,35 @@ class SklearnExtension(Extension):
             user_defined_measures['wall_clock_time_millis'] = (modelfit_dur_walltime
                                                                + modelpredict_duration_walltime)
 
-        # add client-side calculated metrics. These is used on the server as
-        # consistency check, only useful for supervised tasks
-        def _calculate_local_measure(sklearn_fn, openml_name):
-            user_defined_measures[openml_name] = sklearn_fn(test_y, pred_y)
-
-        # Task type specific outputs
-        arff_datacontent = []
-
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
 
             try:
-                proba_y = model_copy.predict_proba(test_x)
+                proba_y = model_copy.predict_proba(X_test)
             except AttributeError:
                 proba_y = _prediction_to_probabilities(pred_y, list(model_classes))
 
+            pred_y = np.array([model_classes[label] for label in pred_y], dtype=pred_y.dtype)
+            proba_y_new = np.zeros((proba_y.shape[0], n_classes))
+            for idx, class_idx in enumerate(model_classes):
+                proba_y_new[:, class_idx] = proba_y[:, idx]
+            proba_y = proba_y_new
+
             if proba_y.shape[1] != len(task.class_labels):
                 warnings.warn(
-                    "Repeat %d Fold %d: estimator only predicted for %d/%d classes!"
-                    % (rep_no, fold_no, proba_y.shape[1], len(task.class_labels))
+                    "Repeat %d fold %d sample %d: estimator only predicted for %d/%d classes!"
+                    % (rep_no, fold_no, sample_no, proba_y.shape[1], len(task.class_labels))
                 )
-
-            if add_local_measures:
-                _calculate_local_measure(sklearn.metrics.accuracy_score,
-                                         'predictive_accuracy')
-
-            for i in range(0, len(test_indices)):
-                arff_line = self._prediction_to_row(
-                    rep_no=rep_no,
-                    fold_no=fold_no,
-                    sample_no=sample_no,
-                    row_id=test_indices[i],
-                    correct_label=task.class_labels[test_y[i]],
-                    predicted_label=pred_y[i],
-                    predicted_probabilities=proba_y[i],
-                    class_labels=task.class_labels,
-                    model_classes_mapping=model_classes,
-                )
-                arff_datacontent.append(arff_line)
 
         elif isinstance(task, OpenMLRegressionTask):
-            if add_local_measures:
-                _calculate_local_measure(
-                    sklearn.metrics.mean_absolute_error,
-                    'mean_absolute_error',
-                )
-
-            for i in range(0, len(test_indices)):
-                arff_line = [rep_no, fold_no, test_indices[i], pred_y[i], test_y[i]]
-                arff_datacontent.append(arff_line)
+            proba_y = None
 
         elif isinstance(task, OpenMLClusteringTask):
-            for i in range(0, len(test_indices)):
-                arff_line = [test_indices[i], pred_y[i]]  # row_id, cluster ID
-                arff_datacontent.append(arff_line)
+            proba_y = None
 
         else:
             raise TypeError(type(task))
 
-        return arff_datacontent, arff_tracecontent, user_defined_measures, model_copy
-
-    def _prediction_to_row(
-        self,
-        rep_no: int,
-        fold_no: int,
-        sample_no: int,
-        row_id: int,
-        correct_label: str,
-        predicted_label: int,
-        predicted_probabilities: np.ndarray,
-        class_labels: List,
-        model_classes_mapping: List,
-    ) -> List:
-        """Util function that turns probability estimates of a classifier for a
-        given instance into the right arff format to upload to openml.
-
-        Parameters
-        ----------
-        rep_no : int
-            The repeat of the experiment (0-based; in case of 1 time CV,
-            always 0)
-        fold_no : int
-            The fold nr of the experiment (0-based; in case of holdout,
-            always 0)
-        sample_no : int
-            In case of learning curves, the index of the subsample (0-based;
-            in case of no learning curve, always 0)
-        row_id : int
-            row id in the initial dataset
-        correct_label : str
-            original label of the instance
-        predicted_label : str
-            the label that was predicted
-        predicted_probabilities : array (size=num_classes)
-            probabilities per class
-        class_labels : array (size=num_classes)
-        model_classes_mapping : list
-            A list of classes the model produced.
-            Obtained by BaseEstimator.classes_
-
-        Returns
-        -------
-        arff_line : list
-            representation of the current prediction in OpenML format
-        """
-        if not isinstance(rep_no, (int, np.integer)):
-            raise ValueError('rep_no should be int')
-        if not isinstance(fold_no, (int, np.integer)):
-            raise ValueError('fold_no should be int')
-        if not isinstance(sample_no, (int, np.integer)):
-            raise ValueError('sample_no should be int')
-        if not isinstance(row_id, (int, np.integer)):
-            raise ValueError('row_id should be int')
-        if not len(predicted_probabilities) == len(model_classes_mapping):
-            raise ValueError('len(predicted_probabilities) != len(class_labels)')
-
-        arff_line = [rep_no, fold_no, sample_no, row_id]  # type: List[Any]
-        for class_label_idx in range(len(class_labels)):
-            if class_label_idx in model_classes_mapping:
-                index = np.where(model_classes_mapping == class_label_idx)[0][0]
-                # TODO: WHY IS THIS 2D???
-                arff_line.append(predicted_probabilities[index])
-            else:
-                arff_line.append(0.0)
-
-        arff_line.append(class_labels[predicted_label])
-        arff_line.append(correct_label)
-        return arff_line
+        return pred_y, proba_y, user_defined_measures, model_copy
 
     def _extract_trace_data(self, model, rep_no, fold_no):
         arff_tracecontent = []

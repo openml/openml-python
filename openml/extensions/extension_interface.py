@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
 from collections import OrderedDict  # noqa: F401
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union
+
+import numpy as np
+import scipy.sparse
+import pandas as pd
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
@@ -147,10 +151,14 @@ class Extension(ABC):
         self,
         model: Any,
         task: 'OpenMLTask',
+        X_train: Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame],
+        y_train: np.ndarray,
         rep_no: int,
         fold_no: int,
         sample_no: int,
         add_local_measures: bool,
+        X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
+        n_classes: Optional[int] = None,
     ) -> Tuple[List[List], List[List], 'OrderedDict[str, float]', Any]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction information.
 

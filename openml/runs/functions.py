@@ -4,6 +4,8 @@ import os
 from typing import Any, List, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
 import warnings
 
+import numpy as np
+import sklearn.metrics
 import xmltodict
 
 import openml
@@ -16,7 +18,8 @@ from openml.flows.flow import _copy_server_fields
 from ..flows import get_flow, flow_exists, OpenMLFlow
 from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException, OpenMLRunsExistError
-from ..tasks import OpenMLTask
+from ..tasks import OpenMLTask, OpenMLClassificationTask, OpenMLClusteringTask, \
+    OpenMLRegressionTask, OpenMLSupervisedTask, OpenMLLearningCurveTask
 from .run import OpenMLRun
 from .trace import OpenMLRunTrace
 from ..tasks import TaskTypeEnum
@@ -391,23 +394,99 @@ def _run_task_get_arffcontent(
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
     num_reps, num_folds, num_samples = task.get_split_dimensions()
+    n_classes = None
 
     for rep_no in range(num_reps):
         for fold_no in range(num_folds):
             for sample_no in range(num_samples):
+
+                train_indices, test_indices = task.get_train_test_split_indices(
+                    repeat=rep_no, fold=fold_no, sample=sample_no)
+                if isinstance(task, OpenMLSupervisedTask):
+                    x, y = task.get_X_and_y()
+                    train_x = x[train_indices]
+                    train_y = y[train_indices]
+                    test_x = x[test_indices]
+                    test_y = y[test_indices]
+                    if isinstance(task, (OpenMLClassificationTask, OpenMLClassificationTask)):
+                        n_classes = len(task.class_labels)
+                elif isinstance(task, OpenMLClusteringTask):
+                    train_x = train_indices
+                    train_y = None
+                    test_x = test_indices
+                    test_y = None
+                else:
+                    raise NotImplementedError(task.task_type)
+
                 (
-                    arff_datacontent_fold,
-                    arff_tracecontent_fold,
+                    pred_y,
+                    proba_y,
                     user_defined_measures_fold,
                     model_fold,
                 ) = extension._run_model_on_fold(
                     model=model,
                     task=task,
+                    X_train=train_x,
+                    y_train=train_y,
                     rep_no=rep_no,
                     fold_no=fold_no,
                     sample_no=sample_no,
                     add_local_measures=add_local_measures,
+                    X_test=test_x,
+                    n_classes=n_classes,
                 )
+
+                arff_datacontent_fold = []  # type: List[List]
+                # extract trace, if applicable
+                arff_tracecontent_fold = []  # type: List[List]
+                if extension.is_hpo_class(model_fold):
+                    arff_tracecontent_fold.extend(
+                        extension._extract_trace_data(model_fold, rep_no, fold_no)
+                    )
+
+                # add client-side calculated metrics. These is used on the server as
+                # consistency check, only useful for supervised tasks
+                def _calculate_local_measure(sklearn_fn, openml_name):
+                    user_defined_measures_fold[openml_name] = sklearn_fn(test_y, pred_y)
+
+                if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
+
+                    for i in range(0, len(test_indices)):
+
+                        arff_line = [rep_no, fold_no, sample_no, i]  # type: List[Any]
+                        for j, class_label in enumerate(task.class_labels):
+                            arff_line.append(proba_y[i][j])
+
+                        arff_line.append(task.class_labels[pred_y[i]])
+                        arff_line.append(task.class_labels[test_y[i]])
+
+                        arff_datacontent.append(arff_line)
+
+                    if add_local_measures:
+                        _calculate_local_measure(
+                            sklearn.metrics.accuracy_score,
+                            'predictive_accuracy',
+                        )
+
+                elif isinstance(task, OpenMLRegressionTask):
+
+                    for i in range(0, len(test_indices)):
+                        arff_line = [rep_no, fold_no, test_indices[i], pred_y[i], test_y[i]]
+                        arff_datacontent.append(arff_line)
+
+                    if add_local_measures:
+                        _calculate_local_measure(
+                            sklearn.metrics.mean_absolute_error,
+                            'mean_absolute_error',
+                        )
+
+                elif isinstance(task, OpenMLClusteringTask):
+                    for i in range(0, len(test_indices)):
+                        arff_line = [test_indices[i], pred_y[i]]  # row_id, cluster ID
+                        arff_datacontent.append(arff_line)
+
+                else:
+                    raise TypeError(type(task))
 
                 arff_datacontent.extend(arff_datacontent_fold)
                 arff_tracecontent.extend(arff_tracecontent_fold)
