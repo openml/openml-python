@@ -24,7 +24,7 @@ _defaults = {
     'connection_n_retries': 2,
 }
 
-config_file = os.path.expanduser(os.path.join('~', '.openml' 'config'))
+config_file = os.path.expanduser(os.path.join('~', '.openml', 'config'))
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module

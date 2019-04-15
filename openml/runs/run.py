@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import pickle
 import time
-from typing import Any, IO, Optional, TextIO, TYPE_CHECKING  # noqa: F401
+from typing import Any, IO, TextIO
 import os
 
 import arff
@@ -19,6 +19,7 @@ from ..tasks import (get_task,
                      OpenMLClusteringTask,
                      OpenMLRegressionTask
                      )
+from ..utils import _tag_entity
 
 
 class OpenMLRun(object):
@@ -472,8 +473,7 @@ class OpenMLRun(object):
         tag : str
             Tag to attach to the run.
         """
-        data = {'run_id': self.run_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/run/tag", 'post', data=data)
+        _tag_entity('run', self.run_id, tag)
 
     def remove_tag(self, tag: str) -> None:
         """Removes a tag from this run on the server.
@@ -483,8 +483,7 @@ class OpenMLRun(object):
         tag : str
             Tag to attach to the run.
         """
-        data = {'run_id': self.run_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/run/untag", 'post', data=data)
+        _tag_entity('run', self.run_id, tag, untag=True)
 
 
 ###############################################################################
