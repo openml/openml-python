@@ -889,49 +889,52 @@ class SklearnExtension(Extension):
         return '%s==%s' % (model_package_name, model_package_version_number)
 
     @staticmethod
-    def _check_parameter_value_recursive(param_grid: Union[Dict, List[Dict]], parameter_name: str, legal_values: Optional[List]):
+    def _check_parameter_value_recursive(param_grid: Union[Dict, List[Dict]],
+                                         parameter_name: str,
+                                         legal_values: Optional[List]):
         """
-        Checks within a flow (recursively) whether a given hyperparameter complies to one of the values presented in a
-        grid. If the hyperparameter does not exist in the grid, True is returned.
+        Checks within a flow (recursively) whether a given hyperparameter
+        complies to one of the values presented in a grid. If the
+        hyperparameter does not exist in the grid, True is returned.
 
         Parameters
         ----------
         param_grid: Union[Dict, List[Dict]]
-            Dict mapping from hyperparameter list to value, to a list of such dicts
+            Dict mapping from hyperparameter list to value, to a list of
+            such dicts
 
         parameter_name: str
             The hyperparameter that needs to be inspected
 
         legal_values: List
-            The values that are accepted. None if no values are legal (the presence of the hyperparameter will trigger
-            to return False)
+            The values that are accepted. None if no values are legal (the
+            presence of the hyperparameter will trigger to return False)
 
         Returns
         -------
         bool
-            True if all occurrences of the hyperparameter only have legal values, False otherwise
+            True if all occurrences of the hyperparameter only have legal
+            values, False otherwise
 
         """
         if isinstance(param_grid, dict):
             for param, value in param_grid.items():
                 # n_jobs is scikitlearn parameter for paralizing jobs
                 if param.split('__')[-1] == parameter_name:
-                    # 0 = illegal value (?), 1 / None = use one core,
-                    # n = use n cores,
-                    # -1 = use all available cores -> this makes it hard to
-                    # measure runtime in a fair way
                     if legal_values is None or value not in legal_values:
                         return False
             return True
         elif isinstance(param_grid, list):
             return all(
-                SklearnExtension._check_parameter_value_recursive(sub_grid, parameter_name, legal_values)
+                SklearnExtension._check_parameter_value_recursive(sub_grid,
+                                                                  parameter_name,
+                                                                  legal_values)
                 for sub_grid in param_grid
             )
 
     def _prevent_optimize_n_jobs(self, model):
         """
-        Ensures that HPO classess will not optimize the n_jobs hyperparameter
+        Ensures that HPO classes will not optimize the n_jobs hyperparameter
 
         Parameters:
         -----------
@@ -955,7 +958,8 @@ class SklearnExtension(Extension):
                       '{GridSearchCV, RandomizedSearchCV}. '
                       'Should implement param check. ')
 
-            if not SklearnExtension._check_parameter_value_recursive(param_distributions, 'n_jobs', None):
+            if not SklearnExtension._check_parameter_value_recursive(param_distributions,
+                                                                     'n_jobs', None):
                 raise PyOpenMLError('openml-python should not be used to '
                                     'optimize the n_jobs parameter.')
 
@@ -980,12 +984,14 @@ class SklearnExtension(Extension):
             raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
         # check the parameters for n_jobs
-        return SklearnExtension._check_parameter_value_recursive(model.get_params(), 'n_jobs', [1, None])
+        return SklearnExtension._check_parameter_value_recursive(model.get_params(),
+                                                                 'n_jobs',
+                                                                 [1, None])
 
     def _can_measure_wallclocktime(self, model: Any) -> bool:
         """
         Returns True if the parameter settings of model are chosen s.t. the model
-        will run on a preset number of cores (if so, openml-python can measure wallclock time)
+        will run on a preset number of cores (if so, openml-python can measure wall-clock time)
 
         Parameters:
         -----------
@@ -1003,7 +1009,14 @@ class SklearnExtension(Extension):
             raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
         # check the parameters for n_jobs
-        return not SklearnExtension._check_parameter_value_recursive(model.get_params(), 'n_jobs', [-1])
+        # note that clause 1 will return True also when there is no occurrence
+        # of n_jobs (the negate will make this fn return false). For that
+        # reason, we need to add clause 2 that returns True if n_jobs does not
+        # exist in the flow
+        return not SklearnExtension._check_parameter_value_recursive(
+            model.get_params(), 'n_jobs', [-1]) or \
+               SklearnExtension._check_parameter_value_recursive(
+                   model.get_params(), 'n_jobs', None)
 
     ################################################################################################
     # Methods for performing runs with extension modules
@@ -1102,10 +1115,10 @@ class SklearnExtension(Extension):
         information.
 
         Furthermore, it will measure run time measures in case multi-core behaviour allows this.
-        * exact user cpu time will be measured if the number of cores is set (recursive throughout the model)
-        exactly to 1
-        * wall clock time will be measured if the number of cores is set (recursive throughout the model) to any given
-        number (but not when it is set to -1)
+        * exact user cpu time will be measured if the number of cores is set (recursive throughout
+        the model) exactly to 1
+        * wall clock time will be measured if the number of cores is set (recursive throughout the
+        model) to any given number (but not when it is set to -1)
 
         Returns the data that is necessary to construct the OpenML Run object. Is used by
         run_task_get_arff_content. Do not use this function unless you know what you are doing.
@@ -1182,7 +1195,7 @@ class SklearnExtension(Extension):
         # but not desirable if we want to upload to OpenML).
 
         model_copy = sklearn.base.clone(model, safe=True)
-        # security check
+        # sanity check: prohibit users from optimizing n_jobs
         self._prevent_optimize_n_jobs(model_copy)
         # Runtime can be measured if the model is run sequentially
         can_measure_cputime = self._can_measure_cputime(model_copy)
@@ -1228,7 +1241,8 @@ class SklearnExtension(Extension):
                 user_defined_measures['usercpu_time_millis_training'] = modelfit_duration_cputime
             if can_measure_wallclocktime:
                 modelfit_duration_walltime = (time.time() - modelfit_start_walltime) * 1000
-                user_defined_measures['wall_clock_time_millis_training'] = modelfit_duration_walltime
+                user_defined_measures['wall_clock_time_millis_training'] = \
+                    modelfit_duration_walltime
 
         except AttributeError as e:
             # typically happens when training a regressor on classification task
@@ -1264,14 +1278,16 @@ class SklearnExtension(Extension):
         pred_y = model_copy.predict(test_x)
 
         if can_measure_cputime:
-            modelpredict_duration_cputime = (time.process_time() - modelpredict_start_cputime) * 1000
+            modelpredict_duration_cputime = (time.process_time() -
+                                             modelpredict_start_cputime) * 1000
             user_defined_measures['usercpu_time_millis_testing'] = modelpredict_duration_cputime
-            user_defined_measures['usercpu_time_millis'] = modelfit_duration_cputime + modelpredict_duration_cputime
+            user_defined_measures['usercpu_time_millis'] = (
+                    modelfit_duration_cputime + modelpredict_duration_cputime)
         if can_measure_wallclocktime:
             modelpredict_duration_walltime = (time.time() - modelpredict_start_walltime) * 1000
             user_defined_measures['wall_clock_time_millis_testing'] = modelpredict_duration_walltime
-            user_defined_measures['wall_clock_time_millis'] = modelfit_duration_walltime + \
-                                                              modelpredict_duration_walltime
+            user_defined_measures['wall_clock_time_millis'] = (
+                    modelfit_duration_walltime + modelpredict_duration_walltime)
 
         # add client-side calculated metrics. These is used on the server as
         # consistency check, only useful for supervised tasks

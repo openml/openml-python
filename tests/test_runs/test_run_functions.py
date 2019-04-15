@@ -293,7 +293,8 @@ class TestRun(TestBase):
             'wall_clock_time_millis_training': (0, max_time_allowed),
             'wall_clock_time_millis_testing': (0, max_time_allowed),
             'wall_clock_time_millis': (0, max_time_allowed),
-            'predictive_accuracy': (0, 1)}
+            'predictive_accuracy': (0, 1)
+        }
 
         self.assertIsInstance(sample_evaluations, dict)
         if sys.version_info[:2] >= (3, 3):
