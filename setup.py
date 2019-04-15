@@ -11,6 +11,12 @@ if len(sys.argv) > 1 and sys.argv[1] == 'install':
           'Installation requires pip>=10.0.')
     sys.exit(1)
 
+if sys.version_info < (3, 5):
+    raise ValueError(
+        'Unsupported Python version {}.{}.{} found. OpenML requires Python 3.5 or higher.'
+        .format(sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
+    )
+
 setuptools.setup(name="openml",
                  author="Matthias Feurer, Andreas Müller, Farzan Majdani, "
                         "Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers",
@@ -51,15 +57,15 @@ setuptools.setup(name="openml",
 
                      ],
                      'examples': [
-                        'matplotlib',
-                        'jupyter',
-                        'notebook',
-                        'nbconvert',
-                        'nbformat',
-                        'jupyter_client',
-                        'ipython',
-                        'ipykernel',
-                        'seaborn'
+                         'matplotlib',
+                         'jupyter',
+                         'notebook',
+                         'nbconvert',
+                         'nbformat',
+                         'jupyter_client',
+                         'ipython',
+                         'ipykernel',
+                         'seaborn'
                      ]
                  },
                  test_suite="pytest",
