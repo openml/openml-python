@@ -68,7 +68,7 @@ class OpenMLRun(object):
         pp.text(str(self))
 
     @classmethod
-    def from_filesystem(cls, directory, expect_model=True):
+    def from_filesystem(cls, directory: str, expect_model: bool = True) -> 'OpenMLRun':
         """
         The inverse of the to_filesystem method. Instantiates an OpenMLRun
         object based on files stored on the file system.
