@@ -6,6 +6,8 @@ import sys
 with open("openml/__version__.py") as fh:
     version = fh.readlines()[-1].split()[-1].strip("\"'")
 
+# Using Python setup.py install will try to build numpy which prone to failure and
+# very time consuming anyway.
 if len(sys.argv) > 1 and sys.argv[1] == 'install':
     print('Please install this package with pip: `pip install -e .` '
           'Installation requires pip>=10.0.')

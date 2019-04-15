@@ -26,7 +26,6 @@ popd
 # provided versions
 conda create -n testenv --yes python=$PYTHON_VERSION pip
 source activate testenv
-pip install scikit-learn==$SKLEARN_VERSION
 
 python --version
 pip install -e '.[test]'
@@ -45,3 +44,7 @@ fi
 if [[ "$RUN_FLAKE8" == "true" ]]; then
     pip install flake8 mypy
 fi
+
+# Install scikit-learn last to make sure the openml package installation works
+# from a clean environment without scikit-learn.
+pip install scikit-learn==$SKLEARN_VERSION
