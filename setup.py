@@ -44,7 +44,22 @@ setuptools.setup(name="openml",
                      'test': [
                          'nbconvert',
                          'jupyter_client',
-                         'matplotlib'
+                         'matplotlib',
+                         'pytest',
+                         'pytest-xdist',
+                         'pytest-timeout',
+
+                     ],
+                     'examples': [
+                        'matplotlib',
+                        'jupyter',
+                        'notebook',
+                        'nbconvert',
+                        'nbformat',
+                        'jupyter_client',
+                        'ipython',
+                        'ipykernel',
+                        'seaborn'
                      ]
                  },
                  test_suite="pytest",
