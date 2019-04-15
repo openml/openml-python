@@ -460,7 +460,7 @@ class OpenMLRun(object):
         description_xml = xmltodict.unparse(description, pretty=True)
         return description_xml
 
-    def push_tag(self, tag):
+    def push_tag(self, tag: str) -> None:
         """Annotates this run with a tag on the server.
 
         Parameters
@@ -471,7 +471,7 @@ class OpenMLRun(object):
         data = {'run_id': self.run_id, 'tag': tag}
         openml._api_calls._perform_api_call("/run/tag", 'post', data=data)
 
-    def remove_tag(self, tag):
+    def remove_tag(self, tag: str) -> None:
         """Removes a tag from this run on the server.
 
         Parameters
