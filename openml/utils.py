@@ -242,42 +242,7 @@ def _list_all(output_format, listing_call, *args, **filters):
             if BATCH_SIZE_ORIG > LIMIT - len(result):
                 batch_size = LIMIT - len(result)
 
-    # Checking and converting to dataframe
-    # if output_format is not None and output_format == 'dataframe':
-    #     result = _unwrap_object_to_dict(result)
-    #     result = pd.DataFrame.from_dict(result, orient='index')
     return result
-
-
-def _unwrap_object_to_dict(result_dict):
-    """Converts a dict to object mapping to dict of dict
-
-    If the elements of the dict keys are class objects, it converts
-    the objects into dicts to create a dict of dict.
-    Else, it returns the dict as is.
-
-    Parameters
-    ----------
-    result_dict: dict
-
-    Returns
-    -------
-    dict
-    """
-    # Checking first entry of dict
-    val = next(iter(result_dict.values()))
-    # Checking if dict contains class object
-    if not hasattr(val, '__dict__'):
-        return result_dict
-    # Extracting class name
-    obj_type = str(type(next(iter(result_dict.values()))))
-    obj_type = obj_type.split('.')[-1].split('\'')[0]
-    for key in result_dict:
-        obj = result_dict[key]
-        result_dict[key] = vars(obj)
-        # Retaining the original object as a dataframe entry
-        result_dict[key].update({obj_type: obj})
-    return result_dict
 
 
 def _create_cache_directory(key):

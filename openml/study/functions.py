@@ -463,12 +463,12 @@ def list_suites(
 
 
 def list_studies(
-        offset: int = None,
-        size: int = None,
-        status: str = None,
-        uploader: list = None,
-        benchmark_suite: str = None,
-        output_format: str = 'dict'
+    offset: int = None,
+    size: int = None,
+    status: str = None,
+    uploader: list = None,
+    benchmark_suite: str = None,
+    output_format: str = 'dict'
 ) -> Union[dict, pd.DataFrame]:
     """
     Return a list of all studies which are on OpenML.
@@ -518,7 +518,7 @@ def list_studies(
             If qualities are calculated for the dataset, some of
             these are also returned.
     """
-    if (output_format != 'dataframe' and output_format != 'dict'):
+    if output_format not in ['dataframe', 'dict']:
         raise ValueError("Invalid output format selected. "
                          "Only 'dict' or 'dataframe' applicable.")
 

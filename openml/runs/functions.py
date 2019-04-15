@@ -768,17 +768,17 @@ def _get_cached_run(run_id):
 
 
 def list_runs(
-        offset: int = None,
-        size: int = None,
-        id: list = None,
-        task: list = None,
-        setup: list = None,
-        flow: list = None,
-        uploader: list = None,
-        tag: str = None,
-        display_errors: bool = False,
-        output_format: str = 'dict',
-        **kwargs: dict
+    offset: int = None,
+    size: int = None,
+    id: list = None,
+    task: list = None,
+    setup: list = None,
+    flow: list = None,
+    uploader: list = None,
+    tag: str = None,
+    display_errors: bool = False,
+    output_format: str = 'dict',
+    **kwargs: dict
 ) -> Union[dict, pd.DataFrame]:
     """
     List all runs matching all of the given filters.
@@ -819,7 +819,7 @@ def list_runs(
     -------
     dict of dicts, or dataframe
     """
-    if output_format != 'dataframe' and output_format != 'dict':
+    if output_format not in ['dataframe', 'dict']:
         raise ValueError("Invalid output format selected. "
                          "Only 'dict' or 'dataframe' applicable.")
 
@@ -849,14 +849,14 @@ def list_runs(
 
 
 def _list_runs(
-        id: list = None,
-        task: list = None,
-        setup: list = None,
-        flow: list = None,
-        uploader: list = None,
-        display_errors: bool = False,
-        output_format: str = 'dict',
-        **kwargs
+    id: list = None,
+    task: list = None,
+    setup: list = None,
+    flow: list = None,
+    uploader: list = None,
+    display_errors: bool = False,
+    output_format: str = 'dict',
+    **kwargs
 ) -> Union[dict, pd.DataFrame]:
     """
     Perform API call `/run/list/{filters}'

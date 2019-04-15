@@ -129,11 +129,11 @@ def _get_flow_description(flow_id: int) -> OpenMLFlow:
 
 
 def list_flows(
-        offset: int = None,
-        size: int = None,
-        tag: str = None,
-        output_format: str = 'dict',
-        **kwargs: dict
+    offset: int = None,
+    size: int = None,
+    tag: str = None,
+    output_format: str = 'dict',
+    **kwargs: dict
 ) -> Dict[int, Dict]:
 
     """
@@ -180,7 +180,7 @@ def list_flows(
             - external version
             - uploader
     """
-    if output_format != 'dataframe' and output_format != 'dict':
+    if output_format not in ['dataframe', 'dict']:
         raise ValueError("Invalid output format selected. "
                          "Only 'dict' or 'dataframe' applicable.")
 
@@ -260,8 +260,8 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
 
 
 def __list_flows(
-        api_call: str,
-        output_format: str = 'dict'
+    api_call: str,
+    output_format: str = 'dict'
 ) -> Union[dict, pd.DataFrame]:
 
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')

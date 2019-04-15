@@ -9,17 +9,17 @@ from ..evaluations import OpenMLEvaluation
 
 
 def list_evaluations(
-        function: str,
-        offset: int = None,
-        size: int = None,
-        id: list = None,
-        task: list = None,
-        setup: list = None,
-        flow: list = None,
-        uploader: list = None,
-        tag: str = None,
-        per_fold: bool = None,
-        output_format: str = 'dict'
+    function: str,
+    offset: int = None,
+    size: int = None,
+    id: list = None,
+    task: list = None,
+    setup: list = None,
+    flow: list = None,
+    uploader: list = None,
+    tag: str = None,
+    per_fold: bool = None,
+    output_format: str = 'dict'
 ) -> Union[dict, pd.DataFrame]:
     """
     List all run-evaluation pairs matching all of the given filters.
@@ -57,6 +57,10 @@ def list_evaluations(
     -------
     dict or dataframe
     """
+    if output_format not in ['dataframe', 'dict', 'object']:
+        raise ValueError("Invalid output format selected. "
+                         "Only 'object', 'dataframe', or 'dict' applicable.")
+
     if per_fold is not None:
         per_fold = str(per_fold).lower()
 
@@ -75,14 +79,14 @@ def list_evaluations(
 
 
 def _list_evaluations(
-        function: str,
-        id: list = None,
-        task: list = None,
-        setup: list = None,
-        flow: list = None,
-        uploader: list = None,
-        output_format: str = 'dict',
-        **kwargs: dict
+    function: str,
+    id: list = None,
+    task: list = None,
+    setup: list = None,
+    flow: list = None,
+    uploader: list = None,
+    output_format: str = 'dict',
+    **kwargs: dict
 ) -> Union[dict, pd.DataFrame]:
     """
     Perform API call ``/evaluation/function{function}/{filters}``
@@ -151,10 +155,7 @@ def __list_evaluations(api_call, output_format='dict'):
     assert type(evals_dict['oml:evaluations']['oml:evaluation']) == list, \
         type(evals_dict['oml:evaluations'])
 
-    # For output_format = 'dict'
     evals = dict()
-    # if output_format == 'dataframe':
-    #     evals = []
     for eval_ in evals_dict['oml:evaluations']['oml:evaluation']:
         run_id = int(eval_['oml:run_id'])
         value = None
@@ -178,18 +179,8 @@ def __list_evaluations(api_call, output_format='dict'):
                                              eval_['oml:function'],
                                              eval_['oml:upload_time'],
                                              value, values, array_data)
-        # elif output_format == 'dataframe':
-        #     evals.append([int(eval_['oml:run_id']),
-        #                   int(eval_['oml:task_id']),
-        #                   int(eval_['oml:setup_id']),
-        #                   int(eval_['oml:flow_id']),
-        #                   eval_['oml:flow_name'],
-        #                   eval_['oml:data_id'],
-        #                   eval_['oml:data_name'],
-        #                   eval_['oml:function'],
-        #                   eval_['oml:upload_time'],
-        #                   value, values, array_data])
-        elif output_format == 'dict' or output_format == 'dataframe':
+        else:
+            # for output_format in ['dict', 'dataframe']
             evals[run_id] = {'run_id': int(eval_['oml:run_id']),
                              'task_id': int(eval_['oml:task_id']),
                              'setup_id': int(eval_['oml:setup_id']),
@@ -202,15 +193,8 @@ def __list_evaluations(api_call, output_format='dict'):
                              'value': value,
                              'values': values,
                              'array_data': array_data}
-        else:
-            raise ValueError("Invalid output format selected. "
-                             "Only 'object', 'dataframe', or 'dict' applicable.")
 
     if output_format == 'dataframe':
-        # column_names = ['run_id', 'task_id', 'setup_id', 'flow_id',
-        #                 'flow_name', 'data_id', 'data_name', 'function',
-        #                 'upload_time', 'value', 'values', 'array_data']
         evals = pd.DataFrame.from_dict(evals, orient='index')
-        # evals.columns = column_names
 
     return evals

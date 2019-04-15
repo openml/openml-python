@@ -130,12 +130,12 @@ def _get_estimation_procedure_list():
 
 
 def list_tasks(
-        task_type_id: int = None,
-        offset: int = None,
-        size: int = None,
-        tag: str = None,
-        output_format: str = 'dict',
-        **kwargs
+    task_type_id: int = None,
+    offset: int = None,
+    size: int = None,
+    tag: str = None,
+    output_format: str = 'dict',
+    **kwargs
 ) -> Union[dict, pd.DataFrame]:
     """
     Return a number of tasks having the given tag and task_type_id
@@ -182,7 +182,7 @@ def list_tasks(
         as columns: task id, dataset id, task_type and status. If qualities are
         calculated for the associated dataset, some of these are also returned.
     """
-    if output_format != 'dataframe' and output_format != 'dict':
+    if output_format not in ['dataframe', 'dict']:
         raise ValueError("Invalid output format selected. "
                          "Only 'dict' or 'dataframe' applicable.")
     return openml.utils._list_all(output_format=output_format,

@@ -111,12 +111,12 @@ def get_setup(setup_id: int) -> OpenMLSetup:
 
 
 def list_setups(
-        offset: int = None,
-        size: int = None,
-        flow: int = None,
-        tag: str = None,
-        setup: list = None,
-        output_format: str = 'dict'
+    offset: int = None,
+    size: int = None,
+    flow: int = None,
+    tag: str = None,
+    setup: list = None,
+    output_format: str = 'dict'
 ) -> Union[dict, pd.DataFrame]:
     """
     List all setups matching all of the given filters.
@@ -137,7 +137,7 @@ def list_setups(
     -------
     dict or dataframe
     """
-    if (output_format != 'dataframe' and output_format != 'dict' and output_format != 'object'):
+    if output_format not in ['dataframe', 'dict', 'object']:
         raise ValueError("Invalid output format selected. "
                          "Only 'dict', 'object', or 'dataframe' applicable.")
 
@@ -294,27 +294,14 @@ def _create_setup_from_xml(result_dict, output_format='object'):
             raise ValueError('Expected None, list or dict, received '
                              'something else: %s' % str(type(xml_parameters)))
 
-    if output_format == 'dataframe' or output_format == 'dict':
+    if output_format in ['dataframe', 'dict']:
         return_dict = {'setup_id': setup_id, 'flow_id': flow_id}
         return_dict['parameters'] = parameters
-        # if parameters is not None:
-        #     for key in parameters:
-        #         return_dict[key] = parameters[key]
-        # return_dict.append(parameters)
         return(return_dict)
     return OpenMLSetup(setup_id, flow_id, parameters)
 
 
 def _create_setup_parameter_from_xml(result_dict, output_format='object'):
-    # if output_format == 'dataframe' or output_format == 'dict':
-    #     return({'input:id': int(result_dict['oml:id']),
-    #             'flow_id': int(result_dict['oml:flow_id']),
-    #             'flow_name': result_dict['oml:flow_name'],
-    #             'full_name': result_dict['oml:full_name'],
-    #             'parameter_name': result_dict['oml:parameter_name'],
-    #             'data_type': result_dict['oml:data_type'],
-    #             'default_value': result_dict['oml:default_value'],
-    #             'value': result_dict['oml:value']})
     return OpenMLParameter(input_id=int(result_dict['oml:id']),
                            flow_id=int(result_dict['oml:flow_id']),
                            flow_name=result_dict['oml:flow_name'],
