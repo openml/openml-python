@@ -1220,7 +1220,7 @@ class SklearnExtension(Extension):
             if can_measure_cputime:
                 modelfit_duration_cputime = (time.process_time() - modelfit_start_cputime) * 1000
                 user_defined_measures['usercpu_time_millis_training'] = modelfit_duration_cputime
-            elif can_measure_wallclocktime:
+            if can_measure_wallclocktime:
                 modelfit_duration_walltime = (time.time() - modelfit_start_walltime) * 1000
                 user_defined_measures['wall_clock_time_millis_training'] = modelfit_duration_walltime
 
