@@ -104,7 +104,7 @@ class OpenMLRunTrace(object):
         )
 
     @classmethod
-    def _from_filesystem(cls, file_path):
+    def _from_filesystem(cls, file_path: str) -> 'OpenMLRunTrace':
         """
         Logic to deserialize the trace from the filesystem.
 
