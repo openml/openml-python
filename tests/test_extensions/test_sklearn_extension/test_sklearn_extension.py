@@ -955,7 +955,11 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             sklearn.model_selection.GridSearchCV(singlecore_bagging,
                                                  legal_param_dist),
             sklearn.model_selection.GridSearchCV(multicore_bagging,
-                                                 legal_param_dist)
+                                                 legal_param_dist),
+            sklearn.ensemble.BaggingClassifier(
+                n_jobs=-1,
+                base_estimator=sklearn.ensemble.RandomForestClassifier(n_jobs=5)
+            )
         ]
         illegal_models = [
             sklearn.model_selection.GridSearchCV(singlecore_bagging,
@@ -964,8 +968,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                                                  illegal_param_dist)
         ]
 
-        can_measure_cputime_answers = [True, False, False, True, False, False, True, False]
-        can_measure_walltime_answers = [True, True, False, True, True, False, True, True]
+        can_measure_cputime_answers = [True, False, False, True, False, False, True, False, False]
+        can_measure_walltime_answers = [True, True, False, True, True, False, True, True, False]
 
         for model, allowed_cputime, allowed_walltime in zip(legal_models,
                                                             can_measure_cputime_answers,

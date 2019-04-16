@@ -889,13 +889,12 @@ class SklearnExtension(Extension):
         return '%s==%s' % (model_package_name, model_package_version_number)
 
     @staticmethod
-    def _check_parameter_value_recursive(param_grid: Union[Dict, List[Dict]],
-                                         parameter_name: str,
-                                         legal_values: Optional[List]):
+    def _get_parameter_values_recursive(param_grid: Union[Dict, List[Dict]],
+                                        parameter_name: str) -> List[Any]:
         """
-        Checks within a flow (recursively) whether a given hyperparameter
-        complies to one of the values presented in a grid. If the
-        hyperparameter does not exist in the grid, True is returned.
+        Returns a list of values for a given hyperparameter, encountered
+        recursively throughout the flow. (e.g., n_jobs can be defined
+        for various flows)
 
         Parameters
         ----------
@@ -906,31 +905,22 @@ class SklearnExtension(Extension):
         parameter_name: str
             The hyperparameter that needs to be inspected
 
-        legal_values: List
-            The values that are accepted. None if no values are legal (the
-            presence of the hyperparameter will trigger to return False)
-
         Returns
         -------
-        bool
-            True if all occurrences of the hyperparameter only have legal
-            values, False otherwise
-
+        List
+            A list of all values of hyperparameters with this name
         """
         if isinstance(param_grid, dict):
+            result = list()
             for param, value in param_grid.items():
-                # n_jobs is scikitlearn parameter for paralizing jobs
+                # n_jobs is scikit-learn parameter for parallelizing jobs
                 if param.split('__')[-1] == parameter_name:
-                    if legal_values is None or value not in legal_values:
-                        return False
-            return True
+                    result.append(value)
+            return result
         elif isinstance(param_grid, list):
-            return all(
-                SklearnExtension._check_parameter_value_recursive(sub_grid,
-                                                                  parameter_name,
-                                                                  legal_values)
-                for sub_grid in param_grid
-            )
+            result = []
+            result.extend(SklearnExtension._get_parameter_values_recursive(
+                sub_grid, parameter_name) for sub_grid in param_grid)
 
     def _prevent_optimize_n_jobs(self, model):
         """
@@ -958,8 +948,8 @@ class SklearnExtension(Extension):
                       '{GridSearchCV, RandomizedSearchCV}. '
                       'Should implement param check. ')
 
-            if not SklearnExtension._check_parameter_value_recursive(param_distributions,
-                                                                     'n_jobs', None):
+            if len(SklearnExtension._get_parameter_values_recursive(param_distributions,
+                                                                    'n_jobs')) > 0:
                 raise PyOpenMLError('openml-python should not be used to '
                                     'optimize the n_jobs parameter.')
 
@@ -984,9 +974,11 @@ class SklearnExtension(Extension):
             raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
         # check the parameters for n_jobs
-        return SklearnExtension._check_parameter_value_recursive(model.get_params(),
-                                                                 'n_jobs',
-                                                                 [1, None])
+        n_jobs_vals = SklearnExtension._get_parameter_values_recursive(model.get_params(), 'n_jobs')
+        for val in n_jobs_vals:
+            if val is not None and val != 1:
+                return False
+        return True
 
     def _can_measure_wallclocktime(self, model: Any) -> bool:
         """
@@ -1008,11 +1000,9 @@ class SklearnExtension(Extension):
         ):
             raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
-        n_jobs_not_specified = \
-            SklearnExtension._check_parameter_value_recursive(model.get_params(), 'n_jobs', None)
-        n_jobs_is_minus_one = \
-            SklearnExtension._check_parameter_value_recursive(model.get_params(), 'n_jobs', [-1])
-        return n_jobs_not_specified or not n_jobs_is_minus_one
+        # check the parameters for n_jobs
+        n_jobs_vals = SklearnExtension._get_parameter_values_recursive(model.get_params(), 'n_jobs')
+        return -1 not in n_jobs_vals
 
     ################################################################################################
     # Methods for performing runs with extension modules
