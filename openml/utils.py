@@ -291,24 +291,26 @@ def _remove_cache_dir_for_id(key, cache_dir):
                          'Please do this manually!' % (key, cache_dir))
 
 
-def thread_safe_if_oslo_installed(func, *args, **kwargs):
+def thread_safe_if_oslo_installed(func):
     if oslo_installed:
-        # Lock directories use the id that is passed as either a first argument, or as a keyword.
-        id_parameters = ['_id' in parameter_name for parameter_name in kwargs]
-        if len(id_parameters) == 1:
-            id_ = kwargs[id_parameters[0]]
-        elif len(args) > 0:
-            id_ = args[0]
-        else:
-            raise RuntimeError("An id must be specified for {}, was passed: ({}, {}).".format(
-                func.__name__, args, kwargs
-            ))
-        # The [7:] gets rid of the 'openml.' prefix
-        lock_name = "{}.{}:{}".format(func.__module__[7:], func.__name__, id_)
-        with lockutils.external_lock(name=lock_name, lock_path=_create_lockfiles_dir()):
-            return func(*args, **kwargs)
+        def safe_func(*args, **kwargs):
+            # Lock directories use the id that is passed as either a first argument, or as a keyword.
+            id_parameters = [parameter_name for parameter_name in kwargs if '_id' in parameter_name]
+            if len(id_parameters) == 1:
+                id_ = kwargs[id_parameters[0]]
+            elif len(args) > 0:
+                id_ = args[0]
+            else:
+                raise RuntimeError("An id must be specified for {}, was passed: ({}, {}).".format(
+                    func.__name__, args, kwargs
+                ))
+            # The [7:] gets rid of the 'openml.' prefix
+            lock_name = "{}.{}:{}".format(func.__module__[7:], func.__name__, id_)
+            with lockutils.external_lock(name=lock_name, lock_path=_create_lockfiles_dir()):
+                return func(*args, **kwargs)
+        return safe_func
     else:
-        return func(*args, **kwargs)
+        return func
 
 
 def _create_lockfiles_dir():
