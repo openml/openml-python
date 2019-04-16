@@ -95,7 +95,8 @@ execute
 
 .. code:: bash
 
-    python setup.py install
+    pip install -e ".[test]"
+
 
 Testing
 =======
