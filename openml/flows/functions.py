@@ -5,7 +5,6 @@ import io
 import re
 import xmltodict
 from typing import Union, Dict
-from oslo_concurrency import lockutils
 
 from ..exceptions import OpenMLCacheException
 import openml._api_calls
