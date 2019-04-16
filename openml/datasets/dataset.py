@@ -419,7 +419,7 @@ class OpenMLDataset(object):
         from .functions import _get_dataset_arff
         self.data_file = _get_dataset_arff(self)
 
-    def get_data(self, target: Optional[Union[List[str], str]] = None,
+    def get_data(self, separate: Optional[Union[List[str], str], bool] = False,
                  include_row_id: bool = False,
                  include_ignore_attributes: bool = False,
                  return_categorical_indicator: bool = False,
@@ -429,7 +429,7 @@ class OpenMLDataset(object):
 
         Parameters
         ----------
-        target : string, list of strings or None (default=None)
+        separate : string, list of strings or None (default=None)
             Name of target column(s) to separate from the data.
         include_row_id : boolean (default=False)
             Whether to include row ids in the returned dataset.
@@ -450,7 +450,7 @@ class OpenMLDataset(object):
         -------
         X : ndarray, dataframe, or sparse matrix, shape (n_samples, n_columns)
             Dataset
-        y : ndarray or series, shape (n_samples,)
+        y : ndarray or series, shape (n_samples,) or None
             Target column(s). Only returned if target is not None.
         categorical_indicator : boolean ndarray
             Mask that indicate categorical features.
@@ -511,16 +511,16 @@ class OpenMLDataset(object):
             attribute_names = [att for att, k in
                                zip(attribute_names, keep) if k]
 
-        if target is None:
+        if isinstance(separate, bool) and not separate:
             data = self._convert_array_format(data, dataset_format,
                                               attribute_names)
             rval.append(data)
         else:
-            if isinstance(target, str):
-                if ',' in target:
-                    target = target.split(',')
+            if isinstance(separate, str):
+                if ',' in separate:
+                    target = separate.split(',')
                 else:
-                    target = [target]
+                    target = [separate]
             targets = np.array([True if column in target else False
                                 for column in attribute_names])
             if np.sum(targets) > 1:
