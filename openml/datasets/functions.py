@@ -1,7 +1,6 @@
 import io
 import os
 import re
-import warnings
 from typing import List, Dict, Union
 
 import numpy as np
@@ -10,11 +9,6 @@ import pandas as pd
 
 import xmltodict
 from scipy.sparse import coo_matrix
-# Currently, importing oslo raises a lot of warning that it will stop working
-# under python3.8; remove this once they disappear
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    from oslo_concurrency import lockutils
 from collections import OrderedDict
 
 import openml.utils
@@ -334,6 +328,7 @@ def get_datasets(
     return datasets
 
 
+@openml.utils.thread_safe_if_oslo_installed
 def get_dataset(dataset_id: Union[int, str], download_data: bool = True) -> OpenMLDataset:
     """ Download the OpenML dataset representation, optionally also download actual data file.
 
@@ -361,38 +356,34 @@ def get_dataset(dataset_id: Union[int, str], download_data: bool = True) -> Open
         raise ValueError("Dataset ID is neither an Integer nor can be "
                          "cast to an Integer.")
 
-    with lockutils.external_lock(
-        name='datasets.functions.get_dataset:%d' % dataset_id,
-        lock_path=_create_lockfiles_dir(),
-    ):
-        did_cache_dir = _create_cache_directory_for_id(
-            DATASETS_CACHE_DIR_NAME, dataset_id,
-        )
+    did_cache_dir = _create_cache_directory_for_id(
+        DATASETS_CACHE_DIR_NAME, dataset_id,
+    )
 
-        try:
-            remove_dataset_cache = True
-            description = _get_dataset_description(did_cache_dir, dataset_id)
-            features = _get_dataset_features(did_cache_dir, dataset_id)
-            qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
+    try:
+        remove_dataset_cache = True
+        description = _get_dataset_description(did_cache_dir, dataset_id)
+        features = _get_dataset_features(did_cache_dir, dataset_id)
+        qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
 
-            arff_file = _get_dataset_arff(description) if download_data else None
+        arff_file = _get_dataset_arff(description) if download_data else None
 
-            remove_dataset_cache = False
-        except OpenMLServerException as e:
-            # if there was an exception,
-            # check if the user had access to the dataset
-            if e.code == 112:
-                raise OpenMLPrivateDatasetError(e.message) from None
-            else:
-                raise e
-        finally:
-            if remove_dataset_cache:
-                _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME,
-                                         did_cache_dir)
+        remove_dataset_cache = False
+    except OpenMLServerException as e:
+        # if there was an exception,
+        # check if the user had access to the dataset
+        if e.code == 112:
+            raise OpenMLPrivateDatasetError(e.message) from None
+        else:
+            raise e
+    finally:
+        if remove_dataset_cache:
+            _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME,
+                                     did_cache_dir)
 
-        dataset = _create_dataset_from_description(
-            description, features, qualities, arff_file
-        )
+    dataset = _create_dataset_from_description(
+        description, features, qualities, arff_file
+    )
     return dataset
 
 

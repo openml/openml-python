@@ -41,7 +41,6 @@ setuptools.setup(name="openml",
                      'requests',
                      'scikit-learn>=0.18',
                      'python-dateutil',  # Installed through pandas anyway.
-                     'oslo.concurrency',
                      'pandas>=0.19.2',
                      'scipy>=0.13.3',
                      'numpy>=1.6.2'
@@ -54,7 +53,8 @@ setuptools.setup(name="openml",
                          'pytest',
                          'pytest-xdist',
                          'pytest-timeout',
-                         'nbformat'
+                         'nbformat',
+                         'oslo.concurrency'
                      ],
                      'examples': [
                          'matplotlib',
