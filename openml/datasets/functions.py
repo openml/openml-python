@@ -23,8 +23,7 @@ from ..exceptions import (
 from ..utils import (
     _create_cache_directory,
     _remove_cache_dir_for_id,
-    _create_cache_directory_for_id,
-    _create_lockfiles_dir,
+    _create_cache_directory_for_id
 )
 
 
