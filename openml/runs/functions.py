@@ -4,7 +4,6 @@ import os
 from typing import Any, List, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
 import warnings
 
-import numpy as np
 import sklearn.metrics
 import xmltodict
 
@@ -382,7 +381,6 @@ def _run_task_get_arffcontent(
     'OrderedDict[str, OrderedDict]',
 ]:
     arff_datacontent = []  # type: List[List]
-    arff_tracecontent = []  # type: List[List]
     traces = []  # type: List[OpenMLRunTrace]
     # stores fold-based evaluation measures. In case of a sample based task,
     # this information is multiple times overwritten, but due to the ordering

@@ -4,6 +4,7 @@ import os
 import random
 import time
 import sys
+import unittest.mock
 
 import numpy as np
 
@@ -1052,8 +1053,11 @@ class TestRun(TestBase):
         num_folds = 10
         num_repeats = 1
 
+        flow = unittest.mock.Mock()
+        flow.name = 'dummy'
         clf = SGDClassifier(loss='log', random_state=1)
         res = openml.runs.functions._run_task_get_arffcontent(
+            flow=flow,
             extension=self.extension,
             model=clf,
             task=task,
@@ -1246,12 +1250,15 @@ class TestRun(TestBase):
         # labels only declared in the arff file, but is not present in the
         # actual data
 
+        flow = unittest.mock.Mock()
+        flow.name = 'dummy'
         task = openml.tasks.get_task(2)
 
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
         data_content, _, _, _ = _run_task_get_arffcontent(
+            flow=flow,
             model=model,
             task=task,
             extension=self.extension,
@@ -1267,6 +1274,8 @@ class TestRun(TestBase):
     def test_predict_proba_hardclassifier(self):
         # task 1 (test server) is important: it is a task with an unused class
         tasks = [1, 3, 115]
+        flow = unittest.mock.Mock()
+        flow.name = 'dummy'
 
         for task_id in tasks:
             task = openml.tasks.get_task(task_id)
@@ -1280,12 +1289,14 @@ class TestRun(TestBase):
             ])
 
             arff_content1, _, _, _ = _run_task_get_arffcontent(
+                flow=flow,
                 model=clf1,
                 task=task,
                 extension=self.extension,
                 add_local_measures=True,
             )
             arff_content2, _, _, _ = _run_task_get_arffcontent(
+                flow=flow,
                 model=clf2,
                 task=task,
                 extension=self.extension,

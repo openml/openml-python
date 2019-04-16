@@ -1264,7 +1264,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
             clf, task, 0, 0, 0,
-            add_local_measures=True)
+        )
 
         arff_datacontent, arff_tracecontent, user_defined_measures, model = res
         # predictions

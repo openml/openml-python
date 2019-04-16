@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import json
 import os
-from typing import List
+from typing import List, Tuple  # noqa F401
 
 import arff
 import xmltodict
@@ -346,7 +346,7 @@ class OpenMLRunTrace(object):
             )
             trace[(repeat, fold, iteration)] = current
 
-        return cls(None, trace)
+        return cls(run_id, trace)
 
     @classmethod
     def merge_traces(cls, traces: List['OpenMLRunTrace']):
@@ -354,14 +354,13 @@ class OpenMLRunTrace(object):
             if traces[i] != traces[i - 1]:
                 raise ValueError('Cannot merge traces!')
 
-        merged_trace = OrderedDict()
+        merged_trace = OrderedDict()  # type: OrderedDict[Tuple[int, int, int], OpenMLTraceIteration]  # noqa E501
 
         for trace in traces:
             for iteration in trace:
                 merged_trace[(iteration.repeat, iteration.fold, iteration.iteration)] = iteration
 
         return cls(None, merged_trace)
-
 
     def __str__(self):
         return '[Run id: %d, %d trace iterations]' % (

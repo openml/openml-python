@@ -1268,8 +1268,8 @@ class SklearnExtension(Extension):
 
             if proba_y.shape[1] != len(task.class_labels):
                 message = "Estimator only predicted for {}/{} classes!".format(
-                        proba_y.shape[1], len(task.class_labels),
-                    )
+                    proba_y.shape[1], len(task.class_labels),
+                )
                 warnings.warn(message)
                 openml.config.logger.warn(message)
 
@@ -1284,7 +1284,7 @@ class SklearnExtension(Extension):
 
         if self._is_hpo_class(model_copy):
             trace_data = self._extract_trace_data(model_copy, rep_no, fold_no)
-            trace = self._obtain_arff_trace(model_copy, trace_data)
+            trace = self._obtain_arff_trace(model_copy, trace_data)  # type: Optional[OpenMLRunTrace]  # noqa E501
         else:
             trace = None
 

@@ -10,7 +10,7 @@ import pandas as pd
 if TYPE_CHECKING:
     from openml.flows import OpenMLFlow
     from openml.tasks.task import OpenMLTask
-    from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration
+    from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration  # noqa F401
 
 
 class Extension(ABC):
