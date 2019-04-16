@@ -38,11 +38,9 @@ setuptools.setup(name="openml",
                  install_requires=[
                      'liac-arff>=2.2.2',
                      'xmltodict',
-                     'pytest',
                      'requests',
                      'scikit-learn>=0.18',
-                     'nbformat',
-                     'python-dateutil',
+                     'python-dateutil',  # Installed through pandas anyway.
                      'oslo.concurrency',
                      'pandas>=0.19.2',
                      'scipy>=0.13.3',
@@ -56,7 +54,7 @@ setuptools.setup(name="openml",
                          'pytest',
                          'pytest-xdist',
                          'pytest-timeout',
-
+                         'nbformat'
                      ],
                      'examples': [
                          'matplotlib',
