@@ -2,10 +2,22 @@ import os
 import hashlib
 import xmltodict
 import shutil
+import warnings
 
 import openml._api_calls
 import openml.exceptions
 from . import config
+
+oslo_installed = False
+try:
+    # Currently, importing oslo raises a lot of warning that it will stop working
+    # under python3.8; remove this once they disappear
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        from oslo_concurrency import lockutils
+        oslo_installed = True
+except ImportError:
+    pass
 
 
 def extract_xml_tags(xml_tag_name, node, allow_none=True):
@@ -277,6 +289,28 @@ def _remove_cache_dir_for_id(key, cache_dir):
     except (OSError, IOError):
         raise ValueError('Cannot remove faulty %s cache directory %s.'
                          'Please do this manually!' % (key, cache_dir))
+
+
+def thread_safe_if_oslo_installed(func):
+    if oslo_installed:
+        def safe_func(*args, **kwargs):
+            # Lock directories use the id that is passed as either positional or keyword argument.
+            id_parameters = [parameter_name for parameter_name in kwargs if '_id' in parameter_name]
+            if len(id_parameters) == 1:
+                id_ = kwargs[id_parameters[0]]
+            elif len(args) > 0:
+                id_ = args[0]
+            else:
+                raise RuntimeError("An id must be specified for {}, was passed: ({}, {}).".format(
+                    func.__name__, args, kwargs
+                ))
+            # The [7:] gets rid of the 'openml.' prefix
+            lock_name = "{}.{}:{}".format(func.__module__[7:], func.__name__, id_)
+            with lockutils.external_lock(name=lock_name, lock_path=_create_lockfiles_dir()):
+                return func(*args, **kwargs)
+        return safe_func
+    else:
+        return func
 
 
 def _create_lockfiles_dir():

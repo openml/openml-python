@@ -2,13 +2,6 @@ from collections import OrderedDict
 import io
 import re
 import os
-import warnings
-
-# Currently, importing oslo raises a lot of warning that it will stop working
-# under python3.8; remove this once they disappear
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    from oslo_concurrency import lockutils
 import xmltodict
 
 from ..exceptions import OpenMLCacheException
@@ -300,6 +293,7 @@ def get_tasks(task_ids, download_data=True):
     return tasks
 
 
+@openml.utils.thread_safe_if_oslo_installed
 def get_task(task_id: int, download_data: bool = True) -> OpenMLTask:
     """Download OpenML task for a given task ID.
 
@@ -324,34 +318,30 @@ def get_task(task_id: int, download_data: bool = True) -> OpenMLTask:
         raise ValueError("Dataset ID is neither an Integer nor can be "
                          "cast to an Integer.")
 
-    with lockutils.external_lock(
-            name='task.functions.get_task:%d' % task_id,
-            lock_path=openml.utils._create_lockfiles_dir(),
-    ):
-        tid_cache_dir = openml.utils._create_cache_directory_for_id(
-            TASKS_CACHE_DIR_NAME, task_id,
-        )
+    tid_cache_dir = openml.utils._create_cache_directory_for_id(
+        TASKS_CACHE_DIR_NAME, task_id,
+    )
 
-        try:
-            task = _get_task_description(task_id)
-            dataset = get_dataset(task.dataset_id, download_data)
-            # List of class labels availaible in dataset description
-            # Including class labels as part of task meta data handles
-            #   the case where data download was initially disabled
-            if isinstance(task, OpenMLClassificationTask):
-                task.class_labels = \
-                    dataset.retrieve_class_labels(task.target_name)
-            # Clustering tasks do not have class labels
-            # and do not offer download_split
-            if download_data:
-                if isinstance(task, OpenMLSupervisedTask):
-                    task.download_split()
-        except Exception as e:
-            openml.utils._remove_cache_dir_for_id(
-                TASKS_CACHE_DIR_NAME,
-                tid_cache_dir,
-            )
-            raise e
+    try:
+        task = _get_task_description(task_id)
+        dataset = get_dataset(task.dataset_id, download_data)
+        # List of class labels availaible in dataset description
+        # Including class labels as part of task meta data handles
+        #   the case where data download was initially disabled
+        if isinstance(task, OpenMLClassificationTask):
+            task.class_labels = \
+                dataset.retrieve_class_labels(task.target_name)
+        # Clustering tasks do not have class labels
+        # and do not offer download_split
+        if download_data:
+            if isinstance(task, OpenMLSupervisedTask):
+                task.download_split()
+    except Exception as e:
+        openml.utils._remove_cache_dir_for_id(
+            TASKS_CACHE_DIR_NAME,
+            tid_cache_dir,
+        )
+        raise e
 
     return task
 

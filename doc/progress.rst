@@ -12,6 +12,8 @@ Changelog
 0.9.0
 ~~~~~
 
+* MAINT #596: Fewer dependencies for regular pip install.
+* MAINT #652: Numpy and Scipy are no longer required before installation.
 * ADD #560: OpenML-Python can now handle regression tasks as well.
 * MAINT #184: Dropping Python2 support.
 

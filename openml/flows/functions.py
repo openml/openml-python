@@ -5,7 +5,6 @@ import io
 import re
 import xmltodict
 from typing import Union, Dict
-from oslo_concurrency import lockutils
 
 from ..exceptions import OpenMLCacheException
 import openml._api_calls
@@ -70,6 +69,7 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
                                    "cached" % fid)
 
 
+@openml.utils.thread_safe_if_oslo_installed
 def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
     """Download the OpenML flow for a given flow ID.
 
@@ -87,11 +87,7 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
         the flow
     """
     flow_id = int(flow_id)
-    with lockutils.external_lock(
-            name='flows.functions.get_flow:%d' % flow_id,
-            lock_path=openml.utils._create_lockfiles_dir(),
-    ):
-        flow = _get_flow_description(flow_id)
+    flow = _get_flow_description(flow_id)
 
     if reinstantiate:
         flow.model = flow.extension.flow_to_model(flow)

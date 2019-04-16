@@ -466,6 +466,7 @@ def get_runs(run_ids):
     return runs
 
 
+@openml.utils.thread_safe_if_oslo_installed
 def get_run(run_id):
     """Gets run corresponding to run_id.
 
