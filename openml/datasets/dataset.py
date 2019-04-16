@@ -408,8 +408,8 @@ class OpenMLDataset(object):
                 col.append(categories[int(x)])
             except (TypeError, ValueError):
                 col.append(np.nan)
-        return pd.Series(col, index=series.index, dtype='category',
-                         name=series.name)
+        raw_cat = pd.Categorical(col, ordered=True, categories=categories)
+        return pd.Series(raw_cat, index=series.index, name=series.name)
 
     def _download_data(self) -> None:
         """ Download ARFF data file to standard cache directory. Set `self.data_file`. """
