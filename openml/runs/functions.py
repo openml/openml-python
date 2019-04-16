@@ -209,6 +209,7 @@ def run_flow_on_task(
 
     # execute the run
     res = _run_task_get_arffcontent(
+        flow=flow,
         model=flow.model,
         task=task,
         extension=flow.extension,
@@ -369,6 +370,7 @@ def run_exists(task_id: int, setup_id: int) -> Set[int]:
 
 
 def _run_task_get_arffcontent(
+    flow: OpenMLFlow,
     model: Any,
     task: OpenMLTask,
     extension: 'Extension',
@@ -421,6 +423,11 @@ def _run_task_get_arffcontent(
                 else:
                     raise NotImplementedError(task.task_type)
 
+                config.logger.info(
+                    "Going to execute flow '%s' on task %d for repeat %d fold %d sample %d.",
+                    flow.name, task.task_id, rep_no, fold_no, sample_no,
+                )
+
                 (
                     pred_y,
                     proba_y,
@@ -433,8 +440,6 @@ def _run_task_get_arffcontent(
                     y_train=train_y,
                     rep_no=rep_no,
                     fold_no=fold_no,
-                    sample_no=sample_no,
-                    add_local_measures=add_local_measures,
                     X_test=test_x,
                     n_classes=n_classes,
                 )

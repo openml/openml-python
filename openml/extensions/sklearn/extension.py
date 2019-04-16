@@ -1102,8 +1102,6 @@ class SklearnExtension(Extension):
         y_train: np.ndarray,
         rep_no: int,
         fold_no: int,
-        sample_no: int,
-        add_local_measures: bool,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
         n_classes: Optional[int] = None,
     ) -> Tuple[np.ndarray, np.ndarray, 'OrderedDict[str, float]', Any]:
@@ -1269,10 +1267,11 @@ class SklearnExtension(Extension):
             proba_y = proba_y_new
 
             if proba_y.shape[1] != len(task.class_labels):
-                warnings.warn(
-                    "Repeat %d fold %d sample %d: estimator only predicted for %d/%d classes!"
-                    % (rep_no, fold_no, sample_no, proba_y.shape[1], len(task.class_labels))
-                )
+                message = "Estimator only predicted for {}/{} classes!".format(
+                        proba_y.shape[1], len(task.class_labels),
+                    )
+                warnings.warn(message)
+                openml.config.logger.warn(message)
 
         elif isinstance(task, OpenMLRegressionTask):
             proba_y = None

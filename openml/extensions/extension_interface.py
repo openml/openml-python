@@ -155,8 +155,6 @@ class Extension(ABC):
         y_train: np.ndarray,
         rep_no: int,
         fold_no: int,
-        sample_no: int,
-        add_local_measures: bool,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
         n_classes: Optional[int] = None,
     ) -> Tuple[List[List], List[List], 'OrderedDict[str, float]', Optional['OpenMLRunTrace']]:
