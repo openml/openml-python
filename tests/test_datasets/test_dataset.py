@@ -192,6 +192,18 @@ class OpenMLDatasetTest(TestBase):
                 format='arff'
             )
 
+    def test_get_data_with_nonexisting_class(self):
+        # This class is using the anneal dataset with labels [1, 2, 3, 4, 5, 'U']. However,
+        # label 4 does not exist and we test that the features 5 and 'U' are correctly mapped to
+        # indices 4 and 5, and that nothing is mapped to index 3.
+        _, y = self.dataset.get_data('class', dataset_format='dataframe')
+        self.assertEqual(list(y.dtype.categories), ['1', '2', '3', '4', '5', 'U'])
+        _, y = self.dataset.get_data('class', dataset_format='array')
+        self.assertEqual(np.min(y), 0)
+        self.assertEqual(np.max(y), 5)
+        # Check that the
+        self.assertEqual(np.sum(y == 3), 0)
+
 
 class OpenMLDatasetTestOnTestServer(TestBase):
     def setUp(self):
