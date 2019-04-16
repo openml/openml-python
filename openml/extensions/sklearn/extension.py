@@ -888,35 +888,53 @@ class SklearnExtension(Extension):
     ) -> str:
         return '%s==%s' % (model_package_name, model_package_version_number)
 
-    def _check_n_jobs(self, model: Any) -> bool:
-        """Returns True if the parameter settings of model are chosen s.t. the model
-        will run on a single core (if so, openml-python can measure runtimes)"""
+    @staticmethod
+    def _get_parameter_values_recursive(param_grid: Union[Dict, List[Dict]],
+                                        parameter_name: str) -> List[Any]:
+        """
+        Returns a list of values for a given hyperparameter, encountered
+        recursively throughout the flow. (e.g., n_jobs can be defined
+        for various flows)
 
-        def check(param_grid, restricted_parameter_name, legal_values):
-            if isinstance(param_grid, dict):
-                for param, value in param_grid.items():
-                    # n_jobs is scikitlearn parameter for paralizing jobs
-                    if param.split('__')[-1] == restricted_parameter_name:
-                        # 0 = illegal value (?), 1 / None = use one core,
-                        # n = use n cores,
-                        # -1 = use all available cores -> this makes it hard to
-                        # measure runtime in a fair way
-                        if legal_values is None or value not in legal_values:
-                            return False
-                return True
-            elif isinstance(param_grid, list):
-                return all(
-                    check(sub_grid, restricted_parameter_name, legal_values)
-                    for sub_grid in param_grid
-                )
+        Parameters
+        ----------
+        param_grid: Union[Dict, List[Dict]]
+            Dict mapping from hyperparameter list to value, to a list of
+            such dicts
 
-        if not (
-                isinstance(model, sklearn.base.BaseEstimator) or self.is_hpo_class(model)
-        ):
-            raise ValueError('model should be BaseEstimator or BaseSearchCV')
+        parameter_name: str
+            The hyperparameter that needs to be inspected
 
-        # make sure that n_jobs is not in the parameter grid of optimization
-        # procedure
+        Returns
+        -------
+        List
+            A list of all values of hyperparameters with this name
+        """
+        if isinstance(param_grid, dict):
+            result = list()
+            for param, value in param_grid.items():
+                # n_jobs is scikit-learn parameter for parallelizing jobs
+                if param.split('__')[-1] == parameter_name:
+                    result.append(value)
+            return result
+        elif isinstance(param_grid, list):
+            result = list()
+            for sub_grid in param_grid:
+                result.extend(SklearnExtension._get_parameter_values_recursive(sub_grid,
+                                                                               parameter_name))
+            return result
+        else:
+            raise ValueError('Param_grid should either be a dict or list of dicts')
+
+    def _prevent_optimize_n_jobs(self, model):
+        """
+        Ensures that HPO classes will not optimize the n_jobs hyperparameter
+
+        Parameters:
+        -----------
+        model:
+            The model that will be fitted
+        """
         if self.is_hpo_class(model):
             if isinstance(model, sklearn.model_selection.GridSearchCV):
                 param_distributions = model.param_grid
@@ -933,13 +951,62 @@ class SklearnExtension(Extension):
                 print('Warning! Using subclass BaseSearchCV other than '
                       '{GridSearchCV, RandomizedSearchCV}. '
                       'Should implement param check. ')
-
-            if not check(param_distributions, 'n_jobs', None):
+            n_jobs_vals = SklearnExtension._get_parameter_values_recursive(param_distributions,
+                                                                           'n_jobs')
+            if len(n_jobs_vals) > 0:
                 raise PyOpenMLError('openml-python should not be used to '
                                     'optimize the n_jobs parameter.')
 
+    def _can_measure_cputime(self, model: Any) -> bool:
+        """
+        Returns True if the parameter settings of model are chosen s.t. the model
+        will run on a single core (if so, openml-python can measure cpu-times)
+
+        Parameters:
+        -----------
+        model:
+            The model that will be fitted
+
+        Returns:
+        --------
+        bool:
+            True if all n_jobs parameters will be either set to None or 1, False otherwise
+        """
+        if not (
+                isinstance(model, sklearn.base.BaseEstimator) or self.is_hpo_class(model)
+        ):
+            raise ValueError('model should be BaseEstimator or BaseSearchCV')
+
         # check the parameters for n_jobs
-        return check(model.get_params(), 'n_jobs', [1, None])
+        n_jobs_vals = SklearnExtension._get_parameter_values_recursive(model.get_params(), 'n_jobs')
+        for val in n_jobs_vals:
+            if val is not None and val != 1:
+                return False
+        return True
+
+    def _can_measure_wallclocktime(self, model: Any) -> bool:
+        """
+        Returns True if the parameter settings of model are chosen s.t. the model
+        will run on a preset number of cores (if so, openml-python can measure wall-clock time)
+
+        Parameters:
+        -----------
+        model:
+            The model that will be fitted
+
+        Returns:
+        --------
+        bool:
+            True if no n_jobs parameters is set to -1, False otherwise
+        """
+        if not (
+                isinstance(model, sklearn.base.BaseEstimator) or self.is_hpo_class(model)
+        ):
+            raise ValueError('model should be BaseEstimator or BaseSearchCV')
+
+        # check the parameters for n_jobs
+        n_jobs_vals = SklearnExtension._get_parameter_values_recursive(model.get_params(), 'n_jobs')
+        return -1 not in n_jobs_vals
 
     ################################################################################################
     # Methods for performing runs with extension modules
@@ -1037,6 +1104,12 @@ class SklearnExtension(Extension):
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction
         information.
 
+        Furthermore, it will measure run time measures in case multi-core behaviour allows this.
+        * exact user cpu time will be measured if the number of cores is set (recursive throughout
+        the model) exactly to 1
+        * wall clock time will be measured if the number of cores is set (recursive throughout the
+        model) to any given number (but not when it is set to -1)
+
         Returns the data that is necessary to construct the OpenML Run object. Is used by
         run_task_get_arff_content. Do not use this function unless you know what you are doing.
 
@@ -1112,8 +1185,11 @@ class SklearnExtension(Extension):
         # but not desirable if we want to upload to OpenML).
 
         model_copy = sklearn.base.clone(model, safe=True)
+        # sanity check: prohibit users from optimizing n_jobs
+        self._prevent_optimize_n_jobs(model_copy)
         # Runtime can be measured if the model is run sequentially
-        can_measure_runtime = self._check_n_jobs(model_copy)
+        can_measure_cputime = self._can_measure_cputime(model_copy)
+        can_measure_wallclocktime = self._can_measure_wallclocktime(model_copy)
 
         train_indices, test_indices = task.get_train_test_split_indices(
             repeat=rep_no, fold=fold_no, sample=sample_no)
@@ -1133,17 +1209,21 @@ class SklearnExtension(Extension):
 
         try:
             # for measuring runtime. Only available since Python 3.3
-            if can_measure_runtime:
-                modelfit_starttime = time.process_time()
+            modelfit_start_cputime = time.process_time()
+            modelfit_start_walltime = time.time()
 
             if isinstance(task, OpenMLSupervisedTask):
                 model_copy.fit(train_x, train_y)
             elif isinstance(task, OpenMLClusteringTask):
                 model_copy.fit(train_x)
 
-            if can_measure_runtime:
-                modelfit_duration = (time.process_time() - modelfit_starttime) * 1000
-                user_defined_measures['usercpu_time_millis_training'] = modelfit_duration
+            modelfit_dur_cputime = (time.process_time() - modelfit_start_cputime) * 1000
+            if can_measure_cputime:
+                user_defined_measures['usercpu_time_millis_training'] = modelfit_dur_cputime
+
+            modelfit_dur_walltime = (time.time() - modelfit_start_walltime) * 1000
+            if can_measure_wallclocktime:
+                user_defined_measures['wall_clock_time_millis_training'] = modelfit_dur_walltime
 
         except AttributeError as e:
             # typically happens when training a regressor on classification task
@@ -1169,17 +1249,24 @@ class SklearnExtension(Extension):
             else:
                 model_classes = used_estimator.classes_
 
-        if can_measure_runtime:
-            modelpredict_starttime = time.process_time()
+        modelpredict_start_cputime = time.process_time()
+        modelpredict_start_walltime = time.time()
 
         # In supervised learning this returns the predictions for Y, in clustering
         # it returns the clusters
         pred_y = model_copy.predict(test_x)
 
-        if can_measure_runtime:
-            modelpredict_duration = (time.process_time() - modelpredict_starttime) * 1000
-            user_defined_measures['usercpu_time_millis_testing'] = modelpredict_duration
-            user_defined_measures['usercpu_time_millis'] = modelfit_duration + modelpredict_duration
+        if can_measure_cputime:
+            modelpredict_duration_cputime = (time.process_time()
+                                             - modelpredict_start_cputime) * 1000
+            user_defined_measures['usercpu_time_millis_testing'] = modelpredict_duration_cputime
+            user_defined_measures['usercpu_time_millis'] = (modelfit_dur_cputime
+                                                            + modelpredict_duration_cputime)
+        if can_measure_wallclocktime:
+            modelpredict_duration_walltime = (time.time() - modelpredict_start_walltime) * 1000
+            user_defined_measures['wall_clock_time_millis_testing'] = modelpredict_duration_walltime
+            user_defined_measures['wall_clock_time_millis'] = (modelfit_dur_walltime
+                                                               + modelpredict_duration_walltime)
 
         # add client-side calculated metrics. These is used on the server as
         # consistency check, only useful for supervised tasks
