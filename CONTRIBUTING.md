@@ -19,7 +19,7 @@ local disk:
    $ cd openml-python
    ```
 
-3. Swith to the ``develop`` branch:
+3. Switch to the ``develop`` branch:
 
    ```bash
    $ git checkout develop
