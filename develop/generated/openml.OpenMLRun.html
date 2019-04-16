@@ -123,7 +123,7 @@
 </dl>
 <dl class="classmethod">
 <dt id="openml.OpenMLRun.from_filesystem">
-<em class="property">classmethod </em><code class="descname">from_filesystem</code><span class="sig-paren">(</span><em>directory</em>, <em>expect_model=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.from_filesystem" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">from_filesystem</code><span class="sig-paren">(</span><em>directory: str</em>, <em>expect_model: bool = True</em><span class="sig-paren">)</span> &#x2192; openml.runs.run.OpenMLRun<a class="headerlink" href="#openml.OpenMLRun.from_filesystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>The inverse of the to_filesystem method. Instantiates an OpenMLRun
 object based on files stored on the file system.</p>
 <dl class="field-list simple">
@@ -190,7 +190,7 @@ Sets the run_id on self.</p>
 
 <dl class="method">
 <dt id="openml.OpenMLRun.push_tag">
-<code class="descname">push_tag</code><span class="sig-paren">(</span><em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.push_tag" title="Permalink to this definition">¶</a></dt>
+<code class="descname">push_tag</code><span class="sig-paren">(</span><em>tag: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#openml.OpenMLRun.push_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Annotates this run with a tag on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -204,7 +204,7 @@ Sets the run_id on self.</p>
 
 <dl class="method">
 <dt id="openml.OpenMLRun.remove_tag">
-<code class="descname">remove_tag</code><span class="sig-paren">(</span><em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.remove_tag" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove_tag</code><span class="sig-paren">(</span><em>tag: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#openml.OpenMLRun.remove_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes a tag from this run on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

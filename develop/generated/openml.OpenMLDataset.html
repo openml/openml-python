@@ -307,7 +307,7 @@ return values as if these indices are not present)</p>
 
 <dl class="method">
 <dt id="openml.OpenMLDataset.retrieve_class_labels">
-<code class="descname">retrieve_class_labels</code><span class="sig-paren">(</span><em>target_name='class'</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.retrieve_class_labels" title="Permalink to this definition">¶</a></dt>
+<code class="descname">retrieve_class_labels</code><span class="sig-paren">(</span><em>target_name: str = 'class'</em><span class="sig-paren">)</span> &#x2192; Union[None, List[str]]<a class="headerlink" href="#openml.OpenMLDataset.retrieve_class_labels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the datasets arff to determine the class-labels.</p>
 <p>If the task has no class labels (for example a regression problem)
 it returns None. Necessary because the data returned by get_data
