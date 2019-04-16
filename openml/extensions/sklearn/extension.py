@@ -1001,21 +1001,18 @@ class SklearnExtension(Extension):
         Returns:
         --------
         bool:
-            True if none n_jobs parameters is set ot -1, False otherwise
+            True if no n_jobs parameters is set to -1, False otherwise
         """
         if not (
                 isinstance(model, sklearn.base.BaseEstimator) or self.is_hpo_class(model)
         ):
             raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
-        # check the parameters for n_jobs
-        # note that clause 1 will return True also when there is no occurrence
-        # of n_jobs (the negate will make this fn return false). For that
-        # reason, we need to add clause 2 that returns True if n_jobs does not
-        # exist in the flow
-        clause1 = not SklearnExtension._check_parameter_value_recursive(model.get_params(), 'n_jobs', [-1])
-        clause2 = SklearnExtension._check_parameter_value_recursive(model.get_params(), 'n_jobs', None)
-        return clause1 or clause2
+        n_jobs_not_specified = \
+            SklearnExtension._check_parameter_value_recursive(model.get_params(), 'n_jobs', None)
+        n_jobs_is_minus_one = \
+            SklearnExtension._check_parameter_value_recursive(model.get_params(), 'n_jobs', [-1])
+        return n_jobs_not_specified or not n_jobs_is_minus_one
 
     ################################################################################################
     # Methods for performing runs with extension modules
