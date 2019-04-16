@@ -923,6 +923,8 @@ class SklearnExtension(Extension):
                 result.extend(SklearnExtension._get_parameter_values_recursive(sub_grid,
                                                                                parameter_name))
             return result
+        else:
+            raise ValueError('Param_grid should either be a dict or list of dicts')
 
     def _prevent_optimize_n_jobs(self, model):
         """
