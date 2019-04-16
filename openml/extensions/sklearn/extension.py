@@ -918,9 +918,11 @@ class SklearnExtension(Extension):
                     result.append(value)
             return result
         elif isinstance(param_grid, list):
-            result = []
-            result.extend(SklearnExtension._get_parameter_values_recursive(
-                sub_grid, parameter_name) for sub_grid in param_grid)
+            result = list()
+            for sub_grid in param_grid:
+                result.extend(SklearnExtension._get_parameter_values_recursive(sub_grid,
+                                                                               parameter_name))
+            return result
 
     def _prevent_optimize_n_jobs(self, model):
         """
@@ -947,9 +949,9 @@ class SklearnExtension(Extension):
                 print('Warning! Using subclass BaseSearchCV other than '
                       '{GridSearchCV, RandomizedSearchCV}. '
                       'Should implement param check. ')
-
-            if len(SklearnExtension._get_parameter_values_recursive(param_distributions,
-                                                                    'n_jobs')) > 0:
+            n_jobs_vals = SklearnExtension._get_parameter_values_recursive(param_distributions,
+                                                                           'n_jobs')
+            if len(n_jobs_vals) > 0:
                 raise PyOpenMLError('openml-python should not be used to '
                                     'optimize the n_jobs parameter.')
 
