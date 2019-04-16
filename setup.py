@@ -6,20 +6,18 @@ import sys
 with open("openml/__version__.py") as fh:
     version = fh.readlines()[-1].split()[-1].strip("\"'")
 
-dependency_links = []
-
-try:
-    import numpy  # noqa: F401
-except ImportError:
-    print('numpy is required during installation')
+# Using Python setup.py install will try to build numpy which is prone to failure and
+# very time consuming anyway.
+if len(sys.argv) > 1 and sys.argv[1] == 'install':
+    print('Please install this package with pip: `pip install -e .` '
+          'Installation requires pip>=10.0.')
     sys.exit(1)
 
-try:
-    import scipy  # noqa: F401
-except ImportError:
-    print('scipy is required during installation')
-    sys.exit(1)
-
+if sys.version_info < (3, 5):
+    raise ValueError(
+        'Unsupported Python version {}.{}.{} found. OpenML requires Python 3.5 or higher.'
+        .format(sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
+    )
 
 setuptools.setup(name="openml",
                  author="Matthias Feurer, Andreas Müller, Farzan Majdani, "
@@ -30,12 +28,14 @@ setuptools.setup(name="openml",
                  description="Python API for OpenML",
                  license="BSD 3-clause",
                  url="http://openml.org/",
+                 project_urls={
+                     "Documentation": "https://openml.github.io/openml-python/master/",
+                     "Source Code": "https://github.com/openml/openml-python"
+                 },
                  version=version,
                  packages=setuptools.find_packages(),
                  package_data={'': ['*.txt', '*.md']},
                  install_requires=[
-                     'numpy>=1.6.2',
-                     'scipy>=0.13.3',
                      'liac-arff>=2.2.2',
                      'xmltodict',
                      'pytest',
@@ -45,12 +45,29 @@ setuptools.setup(name="openml",
                      'python-dateutil',
                      'oslo.concurrency',
                      'pandas>=0.19.2',
+                     'scipy>=0.13.3',
+                     'numpy>=1.6.2'
                  ],
                  extras_require={
                      'test': [
                          'nbconvert',
                          'jupyter_client',
-                         'matplotlib'
+                         'matplotlib',
+                         'pytest',
+                         'pytest-xdist',
+                         'pytest-timeout',
+
+                     ],
+                     'examples': [
+                         'matplotlib',
+                         'jupyter',
+                         'notebook',
+                         'nbconvert',
+                         'nbformat',
+                         'jupyter_client',
+                         'ipython',
+                         'ipykernel',
+                         'seaborn'
                      ]
                  },
                  test_suite="pytest",
@@ -66,5 +83,5 @@ setuptools.setup(name="openml",
                               'Programming Language :: Python :: 3',
                               'Programming Language :: Python :: 3.4',
                               'Programming Language :: Python :: 3.5',
-                              'Programming Language :: Python :: 3.6'
+                              'Programming Language :: Python :: 3.6',
                               'Programming Language :: Python :: 3.7'])

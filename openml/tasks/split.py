@@ -58,7 +58,7 @@ class OpenMLSplit(object):
         return True
 
     @classmethod
-    def _from_arff_file(cls, filename):
+    def _from_arff_file(cls, filename: str) -> 'OpenMLSplit':
 
         repetitions = None
 
