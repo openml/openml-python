@@ -31,7 +31,8 @@ local disk:
    $ git checkout -b feature/my-feature
    ```
 
-   Always use a ``feature`` branch. It's good practice to never work on the ``master`` or ``develop`` branch! To make the nature of your pull request easily visible, please perpend the name of the branch with the type of changes you want to merge, such as ``feature`` if it contains a new feature, ``fix`` for a bugfix, ``doc`` for documentation and ``maint`` for other maintenance on the package.
+   Always use a ``feature`` branch. It's good practice to never work on the ``master`` or ``develop`` branch! 
+   To make the nature of your pull request easily visible, please prepend the name of the branch with the type of changes you want to merge, such as ``feature`` if it contains a new feature, ``fix`` for a bugfix, ``doc`` for documentation and ``maint`` for other maintenance on the package.
 
 4. Develop the feature on your feature branch. Add changed files using ``git add`` and then ``git commit`` files:
 
@@ -59,7 +60,15 @@ We recommended that your contribution complies with the
 following rules before you submit a pull request:
 
 -  Follow the
-   [pep8 style guilde](https://www.python.org/dev/peps/pep-0008/).
+   [pep8 style guide](https://www.python.org/dev/peps/pep-0008/).
+   With the following exceptions or additions:
+    - The max line length is 100 characters instead of 80.
+    - When creating a multi-line expression with binary operators, break before the operator.
+    - Add type hints to all function signatures.
+    (note: not all functions have type hints yet, this is work in progress.)
+    - Use the [`str.format`](https://docs.python.org/3/library/stdtypes.html#str.format) over [`printf`](https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting) style formatting.
+     E.g. use `"{} {}".format('hello', 'world')` not `"%s %s" % ('hello', 'world')`.
+     (note: old code may still use `printf`-formatting, this is work in progress.)
 
 -  If your pull request addresses an issue, please use the pull request title
    to describe the issue and mention the issue number in the pull request description. This will make sure a link back to the original issue is
@@ -105,18 +114,18 @@ tools:
   $ pytest --cov=. path/to/tests_for_package
   ```
 
--  No pyflakes warnings, check with:
+-  No style warnings, check with:
 
   ```bash
-  $ pip install pyflakes
-  $ pyflakes path/to/module.py
+  $ pip install flake8
+  $ flake8 --ignore E402,W503 --show-source --max-line-length 100
   ```
 
--  No PEP8 warnings, check with:
+-  No mypy (typing) issues, check with:
 
   ```bash
-  $ pip install pep8
-  $ pep8 path/to/module.py
+  $ pip install mypy
+  $ mypy openml --ignore-missing-imports --follow-imports skip
   ```
 
 Filing bugs
@@ -151,8 +160,8 @@ following rules before submitting:
 New contributor tips
 --------------------
 
-A great way to start contributing to scikit-learn is to pick an item
-from the list of [Easy issues](https://github.com/openml/openml-python/issues?q=label%3Aeasy)
+A great way to start contributing to openml-python is to pick an item
+from the list of [Good First Issues](https://github.com/openml/openml-python/labels/Good%20first%20issue)
 in the issue tracker. Resolving these issues allow you to start
 contributing to the project without much prior knowledge. Your
 assistance in this area will be greatly appreciated by the more
@@ -175,6 +184,14 @@ information.
 
 For building the documentation, you will need
 [sphinx](http://sphinx.pocoo.org/),
-[matplotlib](http://matplotlib.org/), and
-[pillow](http://pillow.readthedocs.io/en/latest/).
-[sphinx-bootstrap-theme](https://ryan-roemer.github.io/sphinx-bootstrap-theme/)
+[sphinx-bootstrap-theme](https://ryan-roemer.github.io/sphinx-bootstrap-theme/),
+[sphinx-gallery](https://sphinx-gallery.github.io/)
+and
+[numpydoc](https://numpydoc.readthedocs.io/en/latest/).
+```bash
+$ pip install sphinx sphinx-bootstrap-theme sphinx-gallery numpydoc
+```
+When dependencies are installed, run
+```bash
+$ sphinx-build -b html doc YOUR_PREFERRED_OUTPUT_DIRECTORY
+```
