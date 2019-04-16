@@ -188,9 +188,13 @@ publication.</p></li>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/openml/openml-python.git
 </pre></div>
 </div>
-<p>Once you cloned the package, change into the new directory <code class="docutils literal notranslate"><span class="pre">python</span></code> and
-execute</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python setup.py install
+<p>Once you cloned the package, change into the new directory.
+If you are a regular user, install with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -e .
+</pre></div>
+</div>
+<p>If you are a contributor, you will also need to install test dependencies</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -e <span class="s2">&quot;.[test]&quot;</span>
 </pre></div>
 </div>
 </div>

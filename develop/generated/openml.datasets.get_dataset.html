@@ -112,31 +112,8 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.get_dataset<a class="headerlink" href="#openml-datasets-get-dataset" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.datasets.get_dataset">
-<code class="descclassname">openml.datasets.</code><code class="descname">get_dataset</code><span class="sig-paren">(</span><em>dataset_id: Union[int, str], download_data: bool = True</em><span class="sig-paren">)</span> &#x2192; openml.datasets.dataset.OpenMLDataset<a class="headerlink" href="#openml.datasets.get_dataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download the OpenML dataset representation, optionally also download actual data file.</p>
-<p>This function is thread/multiprocessing safe.
-This function uses caching. A check will be performed to determine if the information has
-previously been downloaded, and if so be loaded from disk instead of retrieved from the server.</p>
-<dl class="field-list">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>dataset_id</strong><span class="classifier">int or str</span></dt><dd><p>Dataset ID of the dataset to download</p>
-</dd>
-<dt><strong>download_data</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, also download the data file. Beware that some datasets are large and it might
-make the operation noticeably slower. Metadata is also still retrieved.
-If False, create the OpenMLDataset and only populate it with the metadata.
-The data may later be retrieved through the <cite>OpenMLDataset.get_data</cite> method.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl>
-<dt><strong>dataset</strong><span class="classifier"><a class="reference internal" href="openml.OpenMLDataset.html#openml.OpenMLDataset" title="openml.OpenMLDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.OpenMLDataset</span></code></a></span></dt><dd><p>The downloaded dataset.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
+<code class="descclassname">openml.datasets.</code><code class="descname">get_dataset</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.datasets.get_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <div class="clearer"></div></div>
 
