@@ -90,8 +90,14 @@ The package source code is available from
     git clone https://github.com/openml/openml-python.git
 
 
-Once you cloned the package, change into the new directory ``python`` and
-execute
+Once you cloned the package, change into the new directory.
+If you are a regular user, install with
+
+.. code:: bash
+
+    pip install -e .
+
+If you are a contributor, you will also need to install test dependencies
 
 .. code:: bash
 
