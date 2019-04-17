@@ -38,17 +38,7 @@ from sklearn.svm import SVC
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
     StratifiedKFold
 from sklearn.pipeline import Pipeline
-
-
-class HardNaiveBayes(GaussianNB):
-    # class for testing a naive bayes classifier that does not allow soft
-    # predictions
-    def __init__(self, priors=None):
-        super(HardNaiveBayes, self).__init__(priors)
-
-    def predict_proba(*args, **kwargs):
-        raise AttributeError('predict_proba is not available when '
-                             'probability=False')
+from sklearn.cluster import KMeans
 
 
 class TestRun(TestBase):
@@ -494,6 +484,11 @@ class TestRun(TestBase):
         self._run_and_upload_classification(lr, task_id, n_missing_vals,
                                             n_test_obs, '62501')
 
+    def test_run_and_upload_kmeans(self):
+        kmeans = KMeans()
+        task_id = 126034
+
+
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
         task_id = self.TEST_SERVER_TASK_REGRESSION[0]
@@ -923,21 +918,6 @@ class TestRun(TestBase):
             run_ids = run_exists(task.task_id, setup_exists)
             self.assertTrue(run_ids, msg=(run_ids, clf))
 
-    def test_run_with_classifiers_in_param_grid(self):
-        task = openml.tasks.get_task(115)
-
-        param_grid = {
-            "base_estimator": [DecisionTreeClassifier(), ExtraTreeClassifier()]
-        }
-
-        clf = GridSearchCV(BaggingClassifier(), param_grid=param_grid)
-        with self.assertRaises(TypeError):
-            openml.runs.run_model_on_task(
-                task=task,
-                model=clf,
-                avoid_duplicate_runs=False,
-            )
-
     def test_run_with_illegal_flow_id(self):
         # check the case where the user adds an illegal flow id to a
         # non-existing flow
@@ -1270,46 +1250,6 @@ class TestRun(TestBase):
         for row in data_content:
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             self.assertEqual(len(row), 12)
-
-    def test_predict_proba_hardclassifier(self):
-        # task 1 (test server) is important: it is a task with an unused class
-        tasks = [1, 3, 115]
-        flow = unittest.mock.Mock()
-        flow.name = 'dummy'
-
-        for task_id in tasks:
-            task = openml.tasks.get_task(task_id)
-            clf1 = sklearn.pipeline.Pipeline(steps=[
-                ('imputer', sklearn.preprocessing.Imputer()),
-                ('estimator', GaussianNB())
-            ])
-            clf2 = sklearn.pipeline.Pipeline(steps=[
-                ('imputer', sklearn.preprocessing.Imputer()),
-                ('estimator', HardNaiveBayes())
-            ])
-
-            arff_content1, _, _, _ = _run_task_get_arffcontent(
-                flow=flow,
-                model=clf1,
-                task=task,
-                extension=self.extension,
-                add_local_measures=True,
-            )
-            arff_content2, _, _, _ = _run_task_get_arffcontent(
-                flow=flow,
-                model=clf2,
-                task=task,
-                extension=self.extension,
-                add_local_measures=True,
-            )
-
-            # verifies last two arff indices (predict and correct)
-            # TODO: programmatically check wether these are indeed features
-            # (predict, correct)
-            predictionsA = np.array(arff_content1)[:, -2:]
-            predictionsB = np.array(arff_content2)[:, -2:]
-
-            np.testing.assert_array_equal(predictionsA, predictionsB)
 
     def test_get_cached_run(self):
         openml.config.cache_directory = self.static_cache_dir

@@ -108,7 +108,7 @@ class OpenMLSupervisedTask(OpenMLTask):
         self.target_name = target_name
         self.split = None
 
-    def get_X_and_y(self):
+    def get_X_and_y(self, dataset_format='array'):
         """Get data associated with the current task.
 
         Returns
@@ -120,7 +120,7 @@ class OpenMLSupervisedTask(OpenMLTask):
         if self.task_type_id not in (1, 2, 3):
             raise NotImplementedError(self.task_type)
         X_and_y = dataset.get_data(
-            dataset_format='array', target=self.target_name
+            dataset_format=dataset_format, target=self.target_name,
         )
         return X_and_y
 
@@ -176,6 +176,20 @@ class OpenMLClusteringTask(OpenMLTask):
             evaluation_measure=evaluation_measure,
         )
         self.number_of_clusters = number_of_clusters
+
+    def get_X(self, dataset_format='array'):
+        """Get data associated with the current task.
+
+        Returns
+        -------
+        tuple - X and y
+
+        """
+        dataset = self.get_dataset()
+        X_and_y = dataset.get_data(
+            dataset_format=dataset_format, target=None,
+        )
+        return X_and_y
 
 
 class OpenMLLearningCurveTask(OpenMLClassificationTask):

@@ -395,7 +395,7 @@ def _run_task_get_arffcontent(
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
     num_reps, num_folds, num_samples = task.get_split_dimensions()
-    n_classes = None
+    classes = None
 
     n_fit = 0
     for rep_no in range(num_reps):
@@ -406,14 +406,15 @@ def _run_task_get_arffcontent(
                 train_indices, test_indices = task.get_train_test_split_indices(
                     repeat=rep_no, fold=fold_no, sample=sample_no)
                 if isinstance(task, OpenMLSupervisedTask):
-                    x, y = task.get_X_and_y()
+                    x, y = task.get_X_and_y(dataset_format='array')
                     train_x = x[train_indices]
                     train_y = y[train_indices]
                     test_x = x[test_indices]
                     test_y = y[test_indices]
                     if isinstance(task, (OpenMLClassificationTask, OpenMLClassificationTask)):
-                        n_classes = len(task.class_labels)
+                        classes = task.class_labels
                 elif isinstance(task, OpenMLClusteringTask):
+                    x = task.get_X(dataset_format='array')
                     train_x = train_indices
                     train_y = None
                     test_x = test_indices
@@ -439,7 +440,7 @@ def _run_task_get_arffcontent(
                     rep_no=rep_no,
                     fold_no=fold_no,
                     X_test=test_x,
-                    n_classes=n_classes,
+                    classes=classes,
                 )
 
                 arff_datacontent_fold = []  # type: List[List]

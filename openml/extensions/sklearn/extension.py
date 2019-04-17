@@ -1099,11 +1099,11 @@ class SklearnExtension(Extension):
         model: Any,
         task: 'OpenMLTask',
         X_train: Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame],
-        y_train: np.ndarray,
         rep_no: int,
         fold_no: int,
+        y_train: Optional[np.ndarray] = None,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
-        n_classes: Optional[int] = None,
+        classes: Optional[int] = None,
     ) -> Tuple[np.ndarray, np.ndarray, 'OrderedDict[str, float]', Any]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction
         information.
@@ -1156,7 +1156,7 @@ class SklearnExtension(Extension):
 
         def _prediction_to_probabilities(
                 y: np.ndarray,
-                model_classes: List,
+                classes: List,
         ) -> np.ndarray:
             """Transforms predicted probabilities to match with OpenML class indices.
 
@@ -1175,13 +1175,12 @@ class SklearnExtension(Extension):
             # y: list or numpy array of predictions
             # model_classes: sklearn classifier mapping from original array id to
             # prediction index id
-            if not isinstance(model_classes, list):
+            if not isinstance(classes, list):
                 raise ValueError('please convert model classes to list prior to '
                                  'calling this fn')
-            result = np.zeros((len(y), len(model_classes)), dtype=np.float32)
+            result = np.zeros((len(y), len(classes)), dtype=np.float32)
             for obs, prediction_idx in enumerate(y):
-                array_idx = model_classes.index(prediction_idx)
-                result[obs][array_idx] = 1.0
+                result[obs][prediction_idx] = 1.0
             return result
 
         # TODO: if possible, give a warning if model is already fitted (acceptable
@@ -1239,7 +1238,12 @@ class SklearnExtension(Extension):
 
         # In supervised learning this returns the predictions for Y, in clustering
         # it returns the clusters
-        pred_y = model_copy.predict(X_test)
+        if isinstance(task, OpenMLSupervisedTask):
+            pred_y = model_copy.predict(X_test)
+        elif isinstance(task, OpenMLClusteringTask):
+            pred_y = model_copy.predict(X_train)
+        else:
+            raise ValueError(task)
 
         if can_measure_cputime:
             modelpredict_duration_cputime = (time.process_time()
@@ -1258,13 +1262,18 @@ class SklearnExtension(Extension):
             try:
                 proba_y = model_copy.predict_proba(X_test)
             except AttributeError:
-                proba_y = _prediction_to_probabilities(pred_y, list(model_classes))
+                proba_y = _prediction_to_probabilities(pred_y, list(classes))
 
-            pred_y = np.array([model_classes[label] for label in pred_y], dtype=pred_y.dtype)
-            proba_y_new = np.zeros((proba_y.shape[0], n_classes))
-            for idx, class_idx in enumerate(model_classes):
-                proba_y_new[:, class_idx] = proba_y[:, idx]
-            proba_y = proba_y_new
+            if proba_y.shape[1] != len(classes):
+                # Remap the probabilities in case there was a class missing at training time
+                # By default, the classification targets are mapped to be zero-based indices to the
+                # actual classes. Therefore, the model_classes contain the correct indices to the
+                # correct probability array (the actualy array might be incorrect if there are some
+                # classes not present during train time).
+                proba_y_new = np.zeros((proba_y.shape[0], len(classes)))
+                for idx, model_class in enumerate(model_classes):
+                    proba_y_new[:, model_class] = proba_y[:, idx]
+                proba_y = proba_y_new
 
             if proba_y.shape[1] != len(task.class_labels):
                 message = "Estimator only predicted for {}/{} classes!".format(

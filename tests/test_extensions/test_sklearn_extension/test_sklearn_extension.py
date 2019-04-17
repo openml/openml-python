@@ -810,6 +810,25 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(grid[1]['classify__C'],
                          deserialized[1]['classify__C'])
 
+    def test_serialize_advanced_grid_fails(self):
+        # This unit test is checking that the test we skip above would actually fail
+
+        param_grid = {
+            "base_estimator": [
+                sklearn.tree.DecisionTreeClassifier(),
+                sklearn.tree.ExtraTreeClassifier()]
+        }
+
+        clf = sklearn.model_selection.GridSearchCV(
+            sklearn.ensemble.BaggingClassifier(),
+            param_grid=param_grid,
+        )
+        with self.assertRaisesRegex(
+            TypeError,
+            "Object of type 'OpenMLFlow' is not JSON serializable",
+        ):
+            self.extension.model_to_flow(clf)
+
     def test_serialize_resampling(self):
         kfold = sklearn.model_selection.StratifiedKFold(
             n_splits=4, shuffle=True)
@@ -1254,101 +1273,259 @@ class TestSklearnExtensionRunFunctions(TestBase):
             with self.assertRaises(ValueError):
                 self.extension.seed_model(model=clf, seed=42)
 
-    def test_run_model_on_fold(self):
-        task = openml.tasks.get_task(7)
-        num_instances = 320
+    def test_run_model_on_fold_classification_1(self):
+        task = openml.tasks.get_task(1)
         num_folds = 1
         num_repeats = 1
 
-        clf = sklearn.linear_model.SGDClassifier(loss='log', random_state=1)
+        X, y = task.get_X_and_y()
+        train_indices, test_indices = task.get_train_test_split_indices(
+            repeat=0, fold=0, sample=0)
+        X_train = X[train_indices]
+        y_train = y[train_indices]
+        X_test = X[test_indices]
+        y_test = y[test_indices]
+
+        pipeline = sklearn.pipeline.Pipeline(steps=[
+            ('imp', sklearn.preprocessing.Imputer()),
+            ('clf', sklearn.tree.DecisionTreeClassifier()),
+        ])
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
-            clf, task, 0, 0, 0,
+            model=pipeline,
+            task=task,
+            fold_no=0,
+            rep_no=0,
+            X_train=X_train,
+            y_train=y_train,
+            X_test=X_test,
+            classes=task.class_labels,
         )
 
-        arff_datacontent, arff_tracecontent, user_defined_measures, model = res
-        # predictions
-        self.assertIsInstance(arff_datacontent, list)
-        # trace. SGD does not produce any
-        self.assertIsInstance(arff_tracecontent, list)
-        self.assertEqual(len(arff_tracecontent), 0)
+        y_hat, y_hat_proba, user_defined_measures, trace = res
 
-        fold_evaluations = collections.defaultdict(
-            lambda: collections.defaultdict(dict))
+        # predictions
+        self.assertIsInstance(y_hat, np.ndarray)
+        self.assertEqual(y_hat.shape, y_test.shape)
+        self.assertIsInstance(y_hat_proba, np.ndarray)
+        self.assertEqual(y_hat_proba.shape, (y_test.shape[0], 6))
+        np.testing.assert_array_almost_equal(np.sum(y_hat_proba, axis=1), np.ones(y_test.shape))
+        # The class '4' (at index 3) is not present in the training data. We check that the
+        # predicted probabilities for that class are zero!
+        np.testing.assert_array_almost_equal(y_hat_proba[:, 3], np.zeros(y_test.shape))
+        for i in (0, 1, 2, 4, 5):
+            self.assertTrue(np.any(y_hat_proba[:, i] != np.zeros(y_test.shape)))
+
+        # check user defined measures
+        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
         for measure in user_defined_measures:
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
+        # trace. SGD does not produce any
+        self.assertIsNone(trace)
+
         self._check_fold_timing_evaluations(fold_evaluations, num_repeats, num_folds,
-                                            task_type=task.task_type_id)
+                                            task_type=task.task_type_id, check_scores=False)
 
-        # 10 times 10 fold CV of 150 samples
-        self.assertEqual(len(arff_datacontent), num_instances * num_repeats)
-        for arff_line in arff_datacontent:
-            # check number columns
-            self.assertEqual(len(arff_line), 8)
-            # check repeat
-            self.assertGreaterEqual(arff_line[0], 0)
-            self.assertLessEqual(arff_line[0], num_repeats - 1)
-            # check fold
-            self.assertGreaterEqual(arff_line[1], 0)
-            self.assertLessEqual(arff_line[1], num_folds - 1)
-            # check row id
-            self.assertGreaterEqual(arff_line[2], 0)
-            self.assertLessEqual(arff_line[2], num_instances - 1)
-            # check confidences
-            self.assertAlmostEqual(sum(arff_line[4:6]), 1.0)
-            self.assertIn(arff_line[6], ['won', 'nowin'])
-            self.assertIn(arff_line[7], ['won', 'nowin'])
+    def test_run_model_on_fold_classification_2(self):
+        task = openml.tasks.get_task(7)
+        num_folds = 1
+        num_repeats = 1
 
-    def test__prediction_to_row(self):
-        repeat_nr = 0
-        fold_nr = 0
-        clf = sklearn.pipeline.Pipeline(steps=[
-            ('Imputer', Imputer(strategy='mean')),
-            ('VarianceThreshold', sklearn.feature_selection.VarianceThreshold(threshold=0.05)),
-            ('Estimator', sklearn.naive_bayes.GaussianNB())]
-        )
-        task = openml.tasks.get_task(20)
-        train, test = task.get_train_test_split_indices(repeat_nr, fold_nr)
         X, y = task.get_X_and_y()
-        clf.fit(X[train], y[train])
+        train_indices, test_indices = task.get_train_test_split_indices(
+            repeat=0, fold=0, sample=0)
+        X_train = X[train_indices]
+        y_train = y[train_indices]
+        X_test = X[test_indices]
+        y_test = y[test_indices]
 
-        test_X = X[test]
-        test_y = y[test]
+        pipeline = sklearn.model_selection.GridSearchCV(
+            sklearn.tree.DecisionTreeClassifier(),
+            {
+                "max_depth": [1, 2],
+            },
+        )
+        # TODO add some mocking here to actually test the innards of this function, too!
+        res = self.extension._run_model_on_fold(
+            model=pipeline,
+            task=task,
+            fold_no=0,
+            rep_no=0,
+            X_train=X_train,
+            y_train=y_train,
+            X_test=X_test,
+            classes=task.class_labels,
+        )
 
-        probaY = clf.predict_proba(test_X)
-        predY = clf.predict(test_X)
-        sample_nr = 0  # default for this task
-        for idx in range(0, len(test_X)):
-            arff_line = self.extension._prediction_to_row(
-                rep_no=repeat_nr,
-                fold_no=fold_nr,
-                sample_no=sample_nr,
-                row_id=idx,
-                correct_label=task.class_labels[test_y[idx]],
-                predicted_label=predY[idx],
-                predicted_probabilities=probaY[idx],
-                class_labels=task.class_labels,
-                model_classes_mapping=clf.classes_,
+        y_hat, y_hat_proba, user_defined_measures, trace = res
+
+        # predictions
+        self.assertIsInstance(y_hat, np.ndarray)
+        self.assertEqual(y_hat.shape, y_test.shape)
+        self.assertIsInstance(y_hat_proba, np.ndarray)
+        self.assertEqual(y_hat_proba.shape, (y_test.shape[0], 2))
+        np.testing.assert_array_almost_equal(np.sum(y_hat_proba, axis=1), np.ones(y_test.shape))
+        for i in (0, 1):
+            self.assertTrue(np.any(y_hat_proba[:, i] != np.zeros(y_test.shape)))
+
+        # check user defined measures
+        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        for measure in user_defined_measures:
+            fold_evaluations[measure][0][0] = user_defined_measures[measure]
+
+        # check that it produced and returned a trace object of the correct length
+        self.assertIsInstance(trace, OpenMLRunTrace)
+        self.assertEqual(len(trace.trace_iterations), 2)
+
+        self._check_fold_timing_evaluations(fold_evaluations, num_repeats, num_folds,
+                                            task_type=task.task_type_id, check_scores=False)
+
+    def test_run_model_on_fold_classification_3(self):
+
+        class HardNaiveBayes(sklearn.naive_bayes.GaussianNB):
+            # class for testing a naive bayes classifier that does not allow soft
+            # predictions
+            def __init__(self, priors=None):
+                super(HardNaiveBayes, self).__init__(priors)
+
+            def predict_proba(*args, **kwargs):
+                raise AttributeError('predict_proba is not available when '
+                                     'probability=False')
+
+        # task 1 (test server) is important: it is a task with an unused class
+        tasks = [1, 3, 115]
+        flow = unittest.mock.Mock()
+        flow.name = 'dummy'
+
+        for task_id in tasks:
+            task = openml.tasks.get_task(task_id)
+            X, y = task.get_X_and_y()
+            train_indices, test_indices = task.get_train_test_split_indices(
+                repeat=0, fold=0, sample=0)
+            X_train = X[train_indices]
+            y_train = y[train_indices]
+            X_test = X[test_indices]
+            clf1 = sklearn.pipeline.Pipeline(steps=[
+                ('imputer', sklearn.preprocessing.Imputer()),
+                ('estimator', sklearn.naive_bayes.GaussianNB())
+            ])
+            clf2 = sklearn.pipeline.Pipeline(steps=[
+                ('imputer', sklearn.preprocessing.Imputer()),
+                ('estimator', HardNaiveBayes())
+            ])
+
+            pred_1, proba_1, _, _ = self.extension._run_model_on_fold(
+                model=clf1,
+                task=task,
+                X_train=X_train,
+                y_train=y_train,
+                X_test=X_test,
+                fold_no=0,
+                rep_no=0,
+                classes=task.class_labels,
+            )
+            pred_2, proba_2, _, _ = self.extension._run_model_on_fold(
+                model=clf2,
+                task=task,
+                X_train=X_train,
+                y_train=y_train,
+                X_test=X_test,
+                fold_no=0,
+                rep_no=0,
+                classes=task.class_labels,
             )
 
-            self.assertIsInstance(arff_line, list)
-            self.assertEqual(len(arff_line), 6 + len(task.class_labels))
-            self.assertEqual(arff_line[0], repeat_nr)
-            self.assertEqual(arff_line[1], fold_nr)
-            self.assertEqual(arff_line[2], sample_nr)
-            self.assertEqual(arff_line[3], idx)
-            sum_ = 0.0
-            for att_idx in range(4, 4 + len(task.class_labels)):
-                self.assertIsInstance(arff_line[att_idx], float)
-                self.assertGreaterEqual(arff_line[att_idx], 0.0)
-                self.assertLessEqual(arff_line[att_idx], 1.0)
-                sum_ += arff_line[att_idx]
-            self.assertAlmostEqual(sum_, 1.0)
+            # verifies that the predictions are identical
+            np.testing.assert_array_equal(pred_1, pred_2)
 
-            self.assertIn(arff_line[-1], task.class_labels)
-            self.assertIn(arff_line[-2], task.class_labels)
-        pass
+    def test_run_model_on_fold_regression(self):
+        # There aren't any regression tasks on the test server
+        openml.config.server = self.production_server
+        task = openml.tasks.get_task(2999)
+        num_folds = 1
+        num_repeats = 1
+
+        X, y = task.get_X_and_y()
+        train_indices, test_indices = task.get_train_test_split_indices(
+            repeat=0, fold=0, sample=0)
+        X_train = X[train_indices]
+        y_train = y[train_indices]
+        X_test = X[test_indices]
+        y_test = y[test_indices]
+
+        pipeline = sklearn.pipeline.Pipeline(steps=[
+            ('imp', sklearn.preprocessing.Imputer()),
+            ('clf', sklearn.tree.DecisionTreeRegressor()),
+        ])
+        # TODO add some mocking here to actually test the innards of this function, too!
+        res = self.extension._run_model_on_fold(
+            model=pipeline,
+            task=task,
+            fold_no=0,
+            rep_no=0,
+            X_train=X_train,
+            y_train=y_train,
+            X_test=X_test,
+        )
+
+        y_hat, y_hat_proba, user_defined_measures, trace = res
+
+        # predictions
+        self.assertIsInstance(y_hat, np.ndarray)
+        self.assertEqual(y_hat.shape, y_test.shape)
+        self.assertIsNone(y_hat_proba)
+
+        # check user defined measures
+        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        for measure in user_defined_measures:
+            fold_evaluations[measure][0][0] = user_defined_measures[measure]
+
+        # trace. SGD does not produce any
+        self.assertIsNone(trace)
+
+        self._check_fold_timing_evaluations(fold_evaluations, num_repeats, num_folds,
+                                            task_type=task.task_type_id, check_scores=False)
+
+    def test_run_model_on_fold_clustering(self):
+        # There aren't any regression tasks on the test server
+        openml.config.server = self.production_server
+        task = openml.tasks.get_task(126033)
+        num_folds = 1
+        num_repeats = 1
+
+        X = task.get_X(dataset_format='array')
+
+        pipeline = sklearn.pipeline.Pipeline(steps=[
+            ('imp', sklearn.preprocessing.Imputer()),
+            ('clf', sklearn.cluster.KMeans()),
+        ])
+        # TODO add some mocking here to actually test the innards of this function, too!
+        res = self.extension._run_model_on_fold(
+            model=pipeline,
+            task=task,
+            fold_no=0,
+            rep_no=0,
+            X_train=X,
+        )
+
+        y_hat, y_hat_proba, user_defined_measures, trace = res
+
+        # predictions
+        self.assertIsInstance(y_hat, np.ndarray)
+        self.assertEqual(y_hat.shape, (X.shape[0], ))
+        self.assertIsNone(y_hat_proba)
+
+        # check user defined measures
+        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        for measure in user_defined_measures:
+            fold_evaluations[measure][0][0] = user_defined_measures[measure]
+
+        # trace. SGD does not produce any
+        self.assertIsNone(trace)
+
+        self._check_fold_timing_evaluations(fold_evaluations, num_repeats, num_folds,
+                                            task_type=task.task_type_id, check_scores=False)
 
     def test__extract_trace_data(self):
 
@@ -1363,7 +1540,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             param_grid,
             num_iters,
         )
-        # just run the task
+        # just run the task on the model (without invoking any fancy extension & openml code)
         train, _ = task.get_train_test_split_indices(0, 0)
         X, y = task.get_X_and_y()
         with warnings.catch_warnings():

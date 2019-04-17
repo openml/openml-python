@@ -144,6 +144,7 @@ class TestBase(unittest.TestCase):
         num_folds: int,
         max_time_allowed: float = 60000.0,
         task_type: int = TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+        check_scores: bool = True,
     ):
         """
         Checks whether the right timing measures are attached to the run
@@ -167,10 +168,11 @@ class TestBase(unittest.TestCase):
             'wall_clock_time_millis': (0, max_time_allowed),
         }
 
-        if task_type in (TaskTypeEnum.SUPERVISED_CLASSIFICATION, TaskTypeEnum.LEARNING_CURVE):
-            check_measures['predictive_accuracy'] = (0, 1.)
-        elif task_type == TaskTypeEnum.SUPERVISED_REGRESSION:
-            check_measures['mean_absolute_error'] = (0, float("inf"))
+        if check_scores:
+            if task_type in (TaskTypeEnum.SUPERVISED_CLASSIFICATION, TaskTypeEnum.LEARNING_CURVE):
+                check_measures['predictive_accuracy'] = (0, 1.)
+            elif task_type == TaskTypeEnum.SUPERVISED_REGRESSION:
+                check_measures['mean_absolute_error'] = (0, float("inf"))
 
         self.assertIsInstance(fold_evaluations, dict)
         if sys.version_info[:2] >= (3, 3):
