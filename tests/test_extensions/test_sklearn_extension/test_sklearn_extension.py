@@ -825,7 +825,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         with self.assertRaisesRegex(
             TypeError,
-            "Object of type 'OpenMLFlow' is not JSON serializable",
+            ".*OpenMLFlow.*is not JSON serializable",
         ):
             self.extension.model_to_flow(clf)
 
