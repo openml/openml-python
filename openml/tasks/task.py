@@ -43,7 +43,7 @@ class OpenMLTask(ABC):
         self.estimation_procedure["parameters"] = estimation_parameters
         self.estimation_procedure["data_splits_url"] = data_splits_url
         self.estimation_procedure_id = estimation_procedure_id
-        self.split = None
+        self.split = None # type: Optional[OpenMLSplit]
 
     def get_dataset(self) -> datasets.OpenMLDataset:
         """Download dataset associated with task"""
