@@ -87,13 +87,20 @@ class OpenMLTaskTest(TestBase):
 
         return compatible_datasets[random_dataset_pos]
 
-    @staticmethod
-    def _get_random_feature(dataset_id: int) -> str:
+    def _get_random_feature(self, dataset_id: int) -> str:
 
         random_dataset = get_dataset(dataset_id)
-        random_feature_index = randint(0, len(random_dataset.features) - 1)
-        random_feature = random_dataset.features[random_feature_index]
-
+        # necessary loop to overcome string and date type
+        # features.
+        while True:
+            random_feature_index = randint(0, len(random_dataset.features) - 1)
+            random_feature = random_dataset.features[random_feature_index]
+            if self.task_type_id == 2:
+                if random_feature.data_type == 'numeric':
+                    break
+            else:
+                if random_feature.data_type == 'nominal':
+                    break
         return random_feature.name
 
     def _reupload_dataset(self, dataset: OpenMLDataset) -> int:
