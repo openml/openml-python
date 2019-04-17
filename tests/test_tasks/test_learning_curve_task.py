@@ -9,6 +9,7 @@ class OpenMLLearningCurveTaskTest(OpenMLSupervisedTaskTest):
 
         super(OpenMLLearningCurveTaskTest, self).setUp()
         self.task_id = 801
+        self.task_type_id = 3
         self.estimation_procedure = 13
         self.task = super(OpenMLLearningCurveTaskTest, self)\
             .test_download_task()

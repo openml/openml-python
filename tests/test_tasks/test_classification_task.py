@@ -9,6 +9,7 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
 
         super(OpenMLClassificationTaskTest, self).setUp()
         self.task_id = 119
+        self.task_type_id = 1
         self.task = super(OpenMLClassificationTaskTest, self)\
             .test_download_task()
 

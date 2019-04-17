@@ -13,7 +13,9 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         self.test_server = 'https://test.openml.org/api/v1/xml'
         openml.config.server = self.production_server
         self.task_id = 146714
+        self.task_type_id = 5
         self.estimation_procedure = 17
+        self.dataset_id_test = 19
 
     def test_get_dataset(self):
 
@@ -26,21 +28,3 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         self.assertEqual(task.task_id, self.task_id)
         self.assertEqual(task.task_type_id, 5)
         self.assertEqual(task.dataset_id, 36)
-
-    def test_upload_task(self):
-        """
-        Overrides test_upload_task from the base class.
-        Ugly workaround but currently there are no clustering
-        tasks on the test server. The task will be retrieved
-        from the main server and published on the test server.
-        """
-        task = openml.tasks.get_task(self.task_id)
-        dataset = openml.datasets.get_dataset(task.dataset_id)
-        # No clustering tasks in the test server
-        # TODO should be removed when issue is resolved
-        openml.config.server = self.test_server
-        new_dataset_id = self._upload_dataset(dataset)
-        OpenMLClusteringTaskTest._wait_dataset_activation(new_dataset_id, 240)
-        task.dataset_id = new_dataset_id
-        task.estimation_procedure_id = self.estimation_procedure
-        task.publish()

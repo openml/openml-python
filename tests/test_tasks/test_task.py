@@ -1,15 +1,21 @@
 import unittest
+from random import randint
 from time import time
 
 from openml.testing import TestBase
 from openml.datasets import (
-    get_dataset,
-    OpenMLDataset,
     check_datasets_active,
+    get_dataset,
+    list_datasets,
+    OpenMLDataset,
 )
 from openml.tasks import (
+    create_task,
     get_task,
     OpenMLTask,
+)
+from openml.utils import (
+    _delete_entity,
 )
 
 
@@ -24,6 +30,7 @@ class OpenMLTaskTest(TestBase):
         # act as placeholder variables.
         # They are set from the extending classes.
         self.task_id = 11
+        self.task_type_id = 1
         self.estimation_procedure = 23
 
     @classmethod
@@ -39,20 +46,57 @@ class OpenMLTaskTest(TestBase):
 
     def test_download_task(self) -> OpenMLTask:
 
-        task = get_task(self.task_id)
-        return task
+        return get_task(self.task_id)
 
     def test_upload_task(self):
 
-        task = get_task(self.task_id)
-        dataset = get_dataset(task.dataset_id)
-        new_dataset_id = self._upload_dataset(dataset)
-        OpenMLTaskTest._wait_dataset_activation(new_dataset_id, 240)
-        task.dataset_id = new_dataset_id
-        task.estimation_procedure_id = self.estimation_procedure
-        task.publish()
+        dataset_id = self._get_compatible_rand_dataset()
+        # TODO consider implementing on the diff task types.
+        task = create_task(
+            task_type_id=self.task_type_id,
+            dataset_id=dataset_id,
+            target_name=self._get_random_feature(dataset_id),
+            estimation_procedure_id=self.estimation_procedure
+        )
 
-    def _upload_dataset(self, dataset: OpenMLDataset) -> int:
+        task_id = task.publish()
+        _delete_entity('task', task_id)
+
+    def _get_compatible_rand_dataset(self) -> int:
+
+        compatible_datasets = []
+        active_datasets = list_datasets(status='active')
+
+        # depending on the task type, find either datasets
+        # with only symbolic features or datasets with only
+        # numerical features.
+        if self.task_type_id != 2:
+            for dataset_id, dataset_info in active_datasets.items():
+                # extra checks because of:
+                # https://github.com/openml/OpenML/issues/959
+                if 'NumberOfNumericFeatures' in dataset_info:
+                    if dataset_info['NumberOfNumericFeatures'] == 0:
+                        compatible_datasets.append(dataset_id)
+        else:
+            for dataset_id, dataset_info in active_datasets.items():
+                if 'NumberOfSymbolicFeatures' in dataset_info:
+                    if dataset_info['NumberOfSymbolicFeatures'] == 0:
+                        compatible_datasets.append(dataset_id)
+
+        random_dataset_pos = randint(0, len(compatible_datasets) - 1)
+
+        return compatible_datasets[random_dataset_pos]
+
+    @staticmethod
+    def _get_random_feature(dataset_id: int) -> str:
+
+        random_dataset = get_dataset(dataset_id)
+        random_feature_index = randint(0, len(random_dataset.features) - 1)
+        random_feature = random_dataset.features[random_feature_index]
+
+        return random_feature.name
+
+    def _reupload_dataset(self, dataset: OpenMLDataset) -> int:
         """Reupload the dataset.
 
         Add a sentinel to the dataset name to achieve a
@@ -76,6 +120,7 @@ class OpenMLTaskTest(TestBase):
         # Providing both dataset file and url
         # raises an error when uploading.
         dataset.url = None
+
         return dataset.publish()
 
     @staticmethod

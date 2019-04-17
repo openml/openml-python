@@ -17,6 +17,7 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
         # task_id acts as a placeholder variable
         # and it is set from the extending classes.
         self.task_id = 1
+        self.task_type_id = 1
 
     @classmethod
     def setUpClass(cls):
