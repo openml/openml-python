@@ -95,7 +95,7 @@ class SklearnExtension(Extension):
 
         Parameters
         ----------
-        o : mixed
+        flow : mixed
             the object to deserialize (can be flow object, or any serialized
             parameter value that is accepted by)
 
@@ -470,7 +470,7 @@ class SklearnExtension(Extension):
     ) -> None:
         to_visit_stack = []  # type: List[OpenMLFlow]
         to_visit_stack.extend(sub_components.values())
-        known_sub_components = set()  # type: Set[OpenMLFlow]
+        known_sub_components = set()  # type: Set[str]
         while len(to_visit_stack) > 0:
             visitee = to_visit_stack.pop()
             if visitee.name in known_sub_components:
@@ -1103,7 +1103,7 @@ class SklearnExtension(Extension):
         fold_no: int,
         y_train: Optional[np.ndarray] = None,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
-        classes: Optional[int] = None,
+        classes: Optional[List] = None,
     ) -> Tuple[np.ndarray, np.ndarray, 'OrderedDict[str, float]', Any]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction
         information.
@@ -1123,17 +1123,12 @@ class SklearnExtension(Extension):
             The UNTRAINED model to run. The model instance will be copied and not altered.
         task : OpenMLTask
             The task to run the model on.
+        X_train : array-like
+            Training data for the given repetition and fold.
         rep_no : int
             The repeat of the experiment (0-based; in case of 1 time CV, always 0)
         fold_no : int
             The fold nr of the experiment (0-based; in case of holdout, always 0)
-        sample_no : int
-            In case of learning curves, the index of the subsample (0-based; in case of no
-            learning curve, always 0)
-        add_local_measures : bool
-            Determines whether to calculate a set of measures (i.e., predictive accuracy)
-            locally,
-            to later verify server behaviour.
 
         Returns
         -------
@@ -1154,10 +1149,7 @@ class SklearnExtension(Extension):
             information later on (in ``obtain_arff_trace``).
         """
 
-        def _prediction_to_probabilities(
-                y: np.ndarray,
-                classes: List,
-        ) -> np.ndarray:
+        def _prediction_to_probabilities(y: np.ndarray, classes: List[Any]) -> np.ndarray:
             """Transforms predicted probabilities to match with OpenML class indices.
 
             Parameters
@@ -1258,6 +1250,9 @@ class SklearnExtension(Extension):
                                                                + modelpredict_duration_walltime)
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
+
+            if classes is None:
+                raise TypeError("Argument classes must not be of type 'None'")
 
             try:
                 proba_y = model_copy.predict_proba(X_test)

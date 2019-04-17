@@ -26,7 +26,7 @@ from openml.tasks import TaskTypeEnum
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
-from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing.imputation import Imputer
 from sklearn.dummy import DummyClassifier
 from sklearn.preprocessing import StandardScaler
@@ -38,7 +38,6 @@ from sklearn.svm import SVC
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
     StratifiedKFold
 from sklearn.pipeline import Pipeline
-from sklearn.cluster import KMeans
 
 
 class TestRun(TestBase):
@@ -483,11 +482,6 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
         self._run_and_upload_classification(lr, task_id, n_missing_vals,
                                             n_test_obs, '62501')
-
-    def test_run_and_upload_kmeans(self):
-        kmeans = KMeans()
-        task_id = 126034
-
 
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
