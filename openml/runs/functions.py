@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import io
+import itertools
 import os
 from typing import Any, List, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
 import warnings
@@ -395,125 +396,119 @@ def _run_task_get_arffcontent(
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
     num_reps, num_folds, num_samples = task.get_split_dimensions()
-    classes = None
 
-    n_fit = 0
-    for rep_no in range(num_reps):
-        for fold_no in range(num_folds):
-            for sample_no in range(num_samples):
-                n_fit += 1
+    for n_fit, (rep_no, fold_no, sample_no) in enumerate(itertools.product(
+        range(num_reps),
+        range(num_folds),
+        range(num_samples),
+    )):
 
-                train_indices, test_indices = task.get_train_test_split_indices(
-                    repeat=rep_no, fold=fold_no, sample=sample_no)
-                if isinstance(task, OpenMLSupervisedTask):
-                    x, y = task.get_X_and_y(dataset_format='array')
-                    train_x = x[train_indices]
-                    train_y = y[train_indices]
-                    test_x = x[test_indices]
-                    test_y = y[test_indices]
-                    if isinstance(task, (OpenMLClassificationTask, OpenMLClassificationTask)):
-                        classes = task.class_labels
-                elif isinstance(task, OpenMLClusteringTask):
-                    x = task.get_X(dataset_format='array')
-                    train_x = train_indices
-                    train_y = None
-                    test_x = test_indices
-                    test_y = None
-                else:
-                    raise NotImplementedError(task.task_type)
+        train_indices, test_indices = task.get_train_test_split_indices(
+            repeat=rep_no, fold=fold_no, sample=sample_no)
+        if isinstance(task, OpenMLSupervisedTask):
+            x, y = task.get_X_and_y(dataset_format='array')
+            train_x = x[train_indices]
+            train_y = y[train_indices]
+            test_x = x[test_indices]
+            test_y = y[test_indices]
+        elif isinstance(task, OpenMLClusteringTask):
+            x = task.get_X(dataset_format='array')
+            train_x = x[train_indices]
+            train_y = None
+            test_x = None
+            test_y = None
+        else:
+            raise NotImplementedError(task.task_type)
 
-                config.logger.info(
-                    "Going to execute flow '%s' on task %d for repeat %d fold %d sample %d.",
-                    flow.name, task.task_id, rep_no, fold_no, sample_no,
+        config.logger.info(
+            "Going to execute flow '%s' on task %d for repeat %d fold %d sample %d.",
+            flow.name, task.task_id, rep_no, fold_no, sample_no,
+        )
+
+        (
+            pred_y,
+            proba_y,
+            user_defined_measures_fold,
+            trace,
+        ) = extension._run_model_on_fold(
+            model=model,
+            task=task,
+            X_train=train_x,
+            y_train=train_y,
+            rep_no=rep_no,
+            fold_no=fold_no,
+            X_test=test_x,
+        )
+        if trace is not None:
+            traces.append(trace)
+
+        # add client-side calculated metrics. These is used on the server as
+        # consistency check, only useful for supervised tasks
+        def _calculate_local_measure(sklearn_fn, openml_name):
+            user_defined_measures_fold[openml_name] = sklearn_fn(test_y, pred_y)
+
+        if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
+
+            for i in range(0, len(test_indices)):
+
+                arff_line = [rep_no, fold_no, sample_no, i]  # type: List[Any]
+                for j, class_label in enumerate(task.class_labels):
+                    arff_line.append(proba_y[i][j])
+
+                arff_line.append(task.class_labels[pred_y[i]])
+                arff_line.append(task.class_labels[test_y[i]])
+
+                arff_datacontent.append(arff_line)
+
+            if add_local_measures:
+                _calculate_local_measure(
+                    sklearn.metrics.accuracy_score,
+                    'predictive_accuracy',
                 )
 
-                (
-                    pred_y,
-                    proba_y,
-                    user_defined_measures_fold,
-                    trace,
-                ) = extension._run_model_on_fold(
-                    model=model,
-                    task=task,
-                    X_train=train_x,
-                    y_train=train_y,
-                    rep_no=rep_no,
-                    fold_no=fold_no,
-                    X_test=test_x,
+        elif isinstance(task, OpenMLRegressionTask):
+
+            for i in range(0, len(test_indices)):
+                arff_line = [rep_no, fold_no, test_indices[i], pred_y[i], test_y[i]]
+                arff_datacontent.append(arff_line)
+
+            if add_local_measures:
+                _calculate_local_measure(
+                    sklearn.metrics.mean_absolute_error,
+                    'mean_absolute_error',
                 )
 
-                arff_datacontent_fold = []  # type: List[List]
-                if trace is not None:
-                    traces.append(trace)
+        elif isinstance(task, OpenMLClusteringTask):
+            for i in range(0, len(test_indices)):
+                arff_line = [test_indices[i], pred_y[i]]  # row_id, cluster ID
+                arff_datacontent.append(arff_line)
 
-                # add client-side calculated metrics. These is used on the server as
-                # consistency check, only useful for supervised tasks
-                def _calculate_local_measure(sklearn_fn, openml_name):
-                    user_defined_measures_fold[openml_name] = sklearn_fn(test_y, pred_y)
+        else:
+            raise TypeError(type(task))
 
-                if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
+        for measure in user_defined_measures_fold:
 
-                    for i in range(0, len(test_indices)):
+            if measure not in user_defined_measures_per_fold:
+                user_defined_measures_per_fold[measure] = OrderedDict()
+            if rep_no not in user_defined_measures_per_fold[measure]:
+                user_defined_measures_per_fold[measure][rep_no] = OrderedDict()
 
-                        arff_line = [rep_no, fold_no, sample_no, i]  # type: List[Any]
-                        for j, class_label in enumerate(task.class_labels):
-                            arff_line.append(proba_y[i][j])
+            if measure not in user_defined_measures_per_sample:
+                user_defined_measures_per_sample[measure] = OrderedDict()
+            if rep_no not in user_defined_measures_per_sample[measure]:
+                user_defined_measures_per_sample[measure][rep_no] = OrderedDict()
+            if fold_no not in user_defined_measures_per_sample[measure][rep_no]:
+                user_defined_measures_per_sample[measure][rep_no][fold_no] = OrderedDict()
 
-                        arff_line.append(task.class_labels[pred_y[i]])
-                        arff_line.append(task.class_labels[test_y[i]])
-
-                        arff_datacontent.append(arff_line)
-
-                    if add_local_measures:
-                        _calculate_local_measure(
-                            sklearn.metrics.accuracy_score,
-                            'predictive_accuracy',
-                        )
-
-                elif isinstance(task, OpenMLRegressionTask):
-
-                    for i in range(0, len(test_indices)):
-                        arff_line = [rep_no, fold_no, test_indices[i], pred_y[i], test_y[i]]
-                        arff_datacontent.append(arff_line)
-
-                    if add_local_measures:
-                        _calculate_local_measure(
-                            sklearn.metrics.mean_absolute_error,
-                            'mean_absolute_error',
-                        )
-
-                elif isinstance(task, OpenMLClusteringTask):
-                    for i in range(0, len(test_indices)):
-                        arff_line = [test_indices[i], pred_y[i]]  # row_id, cluster ID
-                        arff_datacontent.append(arff_line)
-
-                else:
-                    raise TypeError(type(task))
-
-                arff_datacontent.extend(arff_datacontent_fold)
-
-                for measure in user_defined_measures_fold:
-
-                    if measure not in user_defined_measures_per_fold:
-                        user_defined_measures_per_fold[measure] = OrderedDict()
-                    if rep_no not in user_defined_measures_per_fold[measure]:
-                        user_defined_measures_per_fold[measure][rep_no] = OrderedDict()
-
-                    if measure not in user_defined_measures_per_sample:
-                        user_defined_measures_per_sample[measure] = OrderedDict()
-                    if rep_no not in user_defined_measures_per_sample[measure]:
-                        user_defined_measures_per_sample[measure][rep_no] = OrderedDict()
-                    if fold_no not in user_defined_measures_per_sample[
-                            measure][rep_no]:
-                        user_defined_measures_per_sample[measure][rep_no][fold_no] = OrderedDict()
-
-                    user_defined_measures_per_fold[measure][rep_no][
-                        fold_no] = user_defined_measures_fold[measure]
-                    user_defined_measures_per_sample[measure][rep_no][fold_no][
-                        sample_no] = user_defined_measures_fold[measure]
+            user_defined_measures_per_fold[measure][rep_no][fold_no] = (
+                user_defined_measures_fold[measure]
+            )
+            user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = (
+                user_defined_measures_fold[measure]
+            )
 
     if len(traces) > 0:
-        if len(traces) != n_fit:
+        if len(traces) != n_fit + 1:
             raise ValueError(
                 'Did not find enough traces (expected {}, found {})'.format(n_fit, len(traces))
             )

@@ -1275,8 +1275,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
     def test_run_model_on_fold_classification_1(self):
         task = openml.tasks.get_task(1)
-        num_folds = 1
-        num_repeats = 1
 
         X, y = task.get_X_and_y()
         train_indices, test_indices = task.get_train_test_split_indices(
@@ -1323,13 +1321,16 @@ class TestSklearnExtensionRunFunctions(TestBase):
         # trace. SGD does not produce any
         self.assertIsNone(trace)
 
-        self._check_fold_timing_evaluations(fold_evaluations, num_repeats, num_folds,
-                                            task_type=task.task_type_id, check_scores=False)
+        self._check_fold_timing_evaluations(
+            fold_evaluations,
+            num_repeats=1,
+            num_folds=1,
+            task_type=task.task_type_id,
+            check_scores=False,
+        )
 
     def test_run_model_on_fold_classification_2(self):
         task = openml.tasks.get_task(7)
-        num_folds = 1
-        num_repeats = 1
 
         X, y = task.get_X_and_y()
         train_indices, test_indices = task.get_train_test_split_indices(
@@ -1376,8 +1377,13 @@ class TestSklearnExtensionRunFunctions(TestBase):
         self.assertIsInstance(trace, OpenMLRunTrace)
         self.assertEqual(len(trace.trace_iterations), 2)
 
-        self._check_fold_timing_evaluations(fold_evaluations, num_repeats, num_folds,
-                                            task_type=task.task_type_id, check_scores=False)
+        self._check_fold_timing_evaluations(
+            fold_evaluations,
+            num_repeats=1,
+            num_folds=1,
+            task_type=task.task_type_id,
+            check_scores=False,
+        )
 
     def test_run_model_on_fold_classification_3(self):
 
@@ -1453,8 +1459,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
         # There aren't any regression tasks on the test server
         openml.config.server = self.production_server
         task = openml.tasks.get_task(2999)
-        num_folds = 1
-        num_repeats = 1
 
         X, y = task.get_X_and_y()
         train_indices, test_indices = task.get_train_test_split_indices(
@@ -1494,15 +1498,18 @@ class TestSklearnExtensionRunFunctions(TestBase):
         # trace. SGD does not produce any
         self.assertIsNone(trace)
 
-        self._check_fold_timing_evaluations(fold_evaluations, num_repeats, num_folds,
-                                            task_type=task.task_type_id, check_scores=False)
+        self._check_fold_timing_evaluations(
+            fold_evaluations,
+            num_repeats=1,
+            num_folds=1,
+            task_type=task.task_type_id,
+            check_scores=False,
+        )
 
     def test_run_model_on_fold_clustering(self):
         # There aren't any regression tasks on the test server
         openml.config.server = self.production_server
         task = openml.tasks.get_task(126033)
-        num_folds = 1
-        num_repeats = 1
 
         X = task.get_X(dataset_format='array')
 
@@ -1534,8 +1541,13 @@ class TestSklearnExtensionRunFunctions(TestBase):
         # trace. SGD does not produce any
         self.assertIsNone(trace)
 
-        self._check_fold_timing_evaluations(fold_evaluations, num_repeats, num_folds,
-                                            task_type=task.task_type_id, check_scores=False)
+        self._check_fold_timing_evaluations(
+            fold_evaluations,
+            num_repeats=1,
+            num_folds=1,
+            task_type=task.task_type_id,
+            check_scores=False,
+        )
 
     def test__extract_trace_data(self):
 

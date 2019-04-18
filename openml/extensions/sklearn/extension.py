@@ -1270,8 +1270,12 @@ class SklearnExtension(Extension):
                 # Remap the probabilities in case there was a class missing at training time
                 # By default, the classification targets are mapped to be zero-based indices to the
                 # actual classes. Therefore, the model_classes contain the correct indices to the
-                # correct probability array (the actually array might be incorrect if there are
-                # some classes not present during train time).
+                # correct probability array. Example:
+                # classes in the dataset: 0, 1, 2, 3, 4, 5
+                # classes in the training set: 0, 1, 2, 4, 5
+                # then we need to add a column full of zeros into the probabilities for class 3
+                # (because the rest of the library expects that the probabilities are ordered the
+                # same way as the classes are ordered).
                 proba_y_new = np.zeros((proba_y.shape[0], len(task.class_labels)))
                 for idx, model_class in enumerate(model_classes):
                     proba_y_new[:, model_class] = proba_y[:, idx]
