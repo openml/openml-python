@@ -6,6 +6,8 @@ from .test_supervised_task import OpenMLSupervisedTaskTest
 
 class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
 
+    __test__ = True
+
     def setUp(self, n_levels: int = 1):
 
         super(OpenMLClassificationTaskTest, self).setUp()
