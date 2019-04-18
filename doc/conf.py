@@ -71,8 +71,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'OpenML'
 copyright = (
-    u'2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, '
-    u'Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers'
+    u'2014-2019, the OpenML-Python team.'
 )
 
 # The version info for the project you're documenting, acts as replacement for
