@@ -134,7 +134,7 @@ class OpenMLTask(ABC):
         task_container['oml:task_inputs'] = task_dict
         task_dict['oml:task_type_id'] = self.task_type_id
 
-        task_dict['oml:input'] = [
+        task_input = [
             OrderedDict([
                 ('@name', 'source_data'),
                 ('#text', str(self.dataset_id))
@@ -144,6 +144,7 @@ class OpenMLTask(ABC):
                 ('#text', str(self.estimation_procedure_id))
             ])
         ]  # type: List[OrderedDict]
+        task_dict['oml:input'] = task_input
 
         if self.evaluation_measure is not None:
             task_dict['oml:input'].append(
