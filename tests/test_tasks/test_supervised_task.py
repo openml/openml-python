@@ -1,4 +1,5 @@
 from typing import Tuple
+import unittest
 
 import numpy as np
 
@@ -20,6 +21,11 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
     @classmethod
     def setUpClass(cls):
         super(OpenMLSupervisedTaskTest, cls).setUpClass()
+        if cls is OpenMLSupervisedTaskTest:
+            raise unittest.SkipTest(
+                "Skip OpenMLSupervisedTaskTest tests,"
+                " it's a base class"
+            )
 
     def test_get_X_and_Y(self) -> Tuple[np.ndarray, np.ndarray]:
 

@@ -35,14 +35,11 @@ class OpenMLTaskTest(TestBase):
 
     @classmethod
     def setUpClass(cls):
-        # placed here to avoid a circular import
-        from .test_supervised_task import OpenMLSupervisedTaskTest
-        if cls is OpenMLTaskTest or cls is OpenMLSupervisedTaskTest:
+        if cls is OpenMLTaskTest:
             raise unittest.SkipTest(
                 "Skip OpenMLTaskTest tests,"
                 " it's a base class"
             )
-        super(OpenMLTaskTest, cls).setUpClass()
 
     def test_download_task(self) -> OpenMLTask:
 
