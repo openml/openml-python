@@ -38,7 +38,7 @@ class OpenMLTask(ABC):
         self.task_type = task_type
         self.dataset_id = int(data_set_id)
         self.evaluation_measure = evaluation_measure
-        self.estimation_procedure = dict()
+        self.estimation_procedure = dict()  # type: Dict[str, Optional[Union[str, Dict]]] # noqa E501
         self.estimation_procedure["type"] = estimation_procedure_type
         self.estimation_procedure["parameters"] = estimation_parameters
         self.estimation_procedure["data_splits_url"] = data_splits_url
@@ -124,14 +124,14 @@ class OpenMLTask(ABC):
         """
         _tag_entity('task', self.task_id, tag, untag=True)
 
-    def _to_dict(self) -> Dict[str, OrderedDict]:
+    def _to_dict(self) -> OrderedDict[str, OrderedDict]:
 
-        task_container = OrderedDict()
+        task_container = OrderedDict()  # type: OrderedDict[str, OrderedDict]
         task_dict = OrderedDict([
             ('@xmlns:oml', 'http://openml.org/openml')
         ])
 
-        task_container['oml:task_inputs'] = task_dict
+        task_container['oml:task_inputs'] = task_dict  # type: OrderedDict[str, Union[int, List]] # noqa E501
         task_dict['oml:task_type_id'] = self.task_type_id
 
         task_dict['oml:input'] = [
@@ -143,7 +143,7 @@ class OpenMLTask(ABC):
                 ('@name', 'estimation_procedure'),
                 ('#text', str(self.estimation_procedure_id))
             ])
-        ]
+        ]  # type: OrderedDict[str, str]
 
         if self.evaluation_measure is not None:
             task_dict['oml:input'].append(

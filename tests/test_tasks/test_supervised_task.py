@@ -12,7 +12,6 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
     are only executed in subclasses of the test case.
     """
     def setUp(self):
-
         super(OpenMLSupervisedTaskTest, self).setUp()
         # task_id acts as a placeholder variable
         # and it is set from the extending classes.
@@ -21,11 +20,6 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
 
     @classmethod
     def setUpClass(cls):
-        if cls is OpenMLSupervisedTaskTest:
-            raise unittest.SkipTest(
-                "Skip OpenMLSupervisedTaskTest tests,"
-                " it's a base class"
-            )
         super(OpenMLSupervisedTaskTest, cls).setUpClass()
 
     def test_get_X_and_Y(self) -> Tuple[np.ndarray, np.ndarray]:

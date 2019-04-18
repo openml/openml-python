@@ -8,14 +8,9 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
     def setUp(self):
 
         super(OpenMLClusteringTaskTest, self).setUp()
-        # no clustering tasks on test server
-        self.production_server = 'https://openml.org/api/v1/xml'
-        self.test_server = 'https://test.openml.org/api/v1/xml'
-        openml.config.server = self.production_server
         self.task_id = 146714
         self.task_type_id = 5
         self.estimation_procedure = 17
-        self.dataset_id_test = 19
 
     def test_get_dataset(self):
 
