@@ -1104,7 +1104,7 @@ class SklearnExtension(Extension):
         y_train: Optional[np.ndarray] = None,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
         classes: Optional[List] = None,
-    ) -> Tuple[np.ndarray, np.ndarray, 'OrderedDict[str, float]', Any]:
+    ) -> Tuple[np.ndarray, np.ndarray, 'OrderedDict[str, float]', Optional[OpenMLRunTrace]]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction
         information.
 
@@ -1129,6 +1129,14 @@ class SklearnExtension(Extension):
             The repeat of the experiment (0-based; in case of 1 time CV, always 0)
         fold_no : int
             The fold nr of the experiment (0-based; in case of holdout, always 0)
+        y_train : Optional[np.ndarray] (default=None)
+            Target attributes for supervised tasks. In case of classification, these are integer
+            indices to the potential classes specified by dataset.
+        X_test : Optional, array-like (default=None)
+            Test attributes to test for generalization in supervised tasks.
+        classes : List
+            List of classes for supervised classification tasks (and supervised data stream
+            classification).
 
         Returns
         -------
@@ -1263,8 +1271,8 @@ class SklearnExtension(Extension):
                 # Remap the probabilities in case there was a class missing at training time
                 # By default, the classification targets are mapped to be zero-based indices to the
                 # actual classes. Therefore, the model_classes contain the correct indices to the
-                # correct probability array (the actualy array might be incorrect if there are some
-                # classes not present during train time).
+                # correct probability array (the actually array might be incorrect if there are
+                # some classes not present during train time).
                 proba_y_new = np.zeros((proba_y.shape[0], len(classes)))
                 for idx, model_class in enumerate(model_classes):
                     proba_y_new[:, model_class] = proba_y[:, idx]

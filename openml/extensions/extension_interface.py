@@ -156,7 +156,7 @@ class Extension(ABC):
         y_train: Optional[np.ndarray] = None,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix]] = None,
         classes: Optional[List] = None,
-    ) -> Tuple[np.ndarray, np.ndarray, 'OrderedDict[str, float]', Any]:
+    ) -> Tuple[np.ndarray, np.ndarray, 'OrderedDict[str, float]', Optional['OpenMLRunTrace']]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction information.
 
         Returns the data that is necessary to construct the OpenML Run object. Is used by
