@@ -41,7 +41,7 @@ class OpenMLTaskTest(TestBase):
                 " it's a base class"
             )
 
-    def test_download_task(self) -> OpenMLTask:
+    def test_download_task(self):
 
         return get_task(self.task_id)
 

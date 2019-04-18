@@ -1,5 +1,4 @@
 import openml
-
 from .test_task import OpenMLTaskTest
 
 
@@ -16,7 +15,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
     def test_get_dataset(self):
         # no clustering tasks on test server
         openml.config.server = self.production_server
-        task = super(OpenMLClusteringTaskTest, self).test_download_task()
+        task = openml.tasks.get_task(self.task_id)
         task.get_dataset()
 
     def test_download_task(self):

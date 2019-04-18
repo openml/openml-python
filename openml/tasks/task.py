@@ -410,7 +410,7 @@ class OpenMLClusteringTask(OpenMLTask):
         # in the future.
         # https://github.com/openml/OpenML/issues/925
         '''
-        task_dict = task_container['oml:task_inputs']        
+        task_dict = task_container['oml:task_inputs']
         if self.target_name is not None:
             task_dict['oml:input'].append(
                 OrderedDict([

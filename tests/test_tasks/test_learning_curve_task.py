@@ -1,5 +1,6 @@
 import numpy as np
 
+from openml.tasks import get_task
 from .test_supervised_task import OpenMLSupervisedTaskTest
 
 
@@ -11,8 +12,6 @@ class OpenMLLearningCurveTaskTest(OpenMLSupervisedTaskTest):
         self.task_id = 801
         self.task_type_id = 3
         self.estimation_procedure = 13
-        self.task = super(OpenMLLearningCurveTaskTest, self)\
-            .test_download_task()
 
     def test_get_X_and_Y(self):
 
@@ -25,13 +24,15 @@ class OpenMLLearningCurveTaskTest(OpenMLSupervisedTaskTest):
 
     def test_download_task(self):
 
-        self.assertEqual(self.task.task_id, self.task_id)
-        self.assertEqual(self.task.task_type_id, 3)
-        self.assertEqual(self.task.dataset_id, 20)
+        task = super(OpenMLLearningCurveTaskTest, self).test_download_task()
+        self.assertEqual(task.task_id, self.task_id)
+        self.assertEqual(task.task_type_id, 3)
+        self.assertEqual(task.dataset_id, 20)
 
     def test_class_labels(self):
 
+        task = get_task(self.task_id)
         self.assertEqual(
-            self.task.class_labels,
+            task.class_labels,
             ['tested_negative', 'tested_positive']
         )
