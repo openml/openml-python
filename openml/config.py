@@ -37,6 +37,10 @@ avoid_duplicate_runs = True if _defaults['avoid_duplicate_runs'] == 'True' else 
 # Number of retries if the connection breaks
 connection_n_retries = _defaults['connection_n_retries']
 
+# variables to keep track of last used settings for when `use_example_configuration` is activated
+_last_used_key = None
+_last_used_server = None
+
 
 def _setup():
     """Setup openml package. Called on first import.
@@ -138,6 +142,25 @@ def set_cache_directory(cachedir):
 
     global cache_directory
     cache_directory = cachedir
+
+
+def start_use_example_configuration():
+    global server
+    global apikey
+
+    _last_used_server = server
+    _last_used_key = apikey
+
+    # Test server key for examples
+    server = "https://test.openml.org/api/v1/xml"
+    apikey = "c0c42819af31e706efe1f4b88c23c6c1"
+
+
+def end_use_example_configuration():
+    global server
+    global apikey
+    server = _last_used_server
+    apikey = _last_used_key
 
 
 __all__ = [
