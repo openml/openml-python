@@ -55,13 +55,15 @@ You can install the OpenML package via `pip`:
 For more advanced installation information, please see the
 :ref:`installation` section.
 
------
-Usage
------
+-------
+Content
+-------
 
 * :ref:`usage`
 * :ref:`api`
+* `Examples <examples/index.html>`_
 * :ref:`contributing`
+* :ref:`progress`
 
 -------------------
 Further information
