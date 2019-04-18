@@ -37,32 +37,36 @@ avoid_duplicate_runs = True if _defaults['avoid_duplicate_runs'] == 'True' else 
 # Number of retries if the connection breaks
 connection_n_retries = _defaults['connection_n_retries']
 
-# variables to keep track of last used settings for when `use_example_configuration` is activated
-_last_used_key = None
-_last_used_server = None
 
+class ExampleConfiguration:
+    """ Allows easy switching to and from a test configuration. """
+    _last_used_server = None
+    _last_used_key = None
 
-def start_use_example_configuration():
-    global server
-    global apikey
-    global _last_used_server
-    global _last_used_key
-    _last_used_server = server
-    _last_used_key = apikey
+    @classmethod
+    def start_use_example_configuration(cls):
+        """ Sets the configuration to connect to the test server with valid apikey.
 
-    # Test server key for examples
-    server = "https://test.openml.org/api/v1/xml"
-    apikey = "c0c42819af31e706efe1f4b88c23c6c1"
+        To configuration as was before this call is stored, and can be recovered
+        by using the `stop_use_example_configuration` method.
+        """
+        global server
+        global apikey
+        cls._last_used_server = server
+        cls._last_used_key = apikey
 
+        # Test server key for examples
+        server = "https://test.openml.org/api/v1/xml"
+        apikey = "c0c42819af31e706efe1f4b88c23c6c1"
 
-def stop_use_example_configuration():
-    global server
-    global apikey
-    global _last_used_server
-    global _last_used_key
+    @classmethod
+    def stop_use_example_configuration(cls):
+        """ Return to configuration as it was before `start_use_example_configuration`. """
+        global server
+        global apikey
 
-    server = _last_used_server
-    apikey = _last_used_key
+        server = cls._last_used_server
+        apikey = cls._last_used_key
 
 
 def _setup():
@@ -167,8 +171,12 @@ def set_cache_directory(cachedir):
     cache_directory = cachedir
 
 
+start_use_example_configuration = ExampleConfiguration.start_use_example_configuration
+stop_use_example_configuration = ExampleConfiguration.stop_use_example_configuration
+
 __all__ = [
-    'get_cache_directory', 'set_cache_directory'
+    'get_cache_directory', 'set_cache_directory',
+    'start_use_example_configuration', 'stop_use_example_configuration'
 ]
 
 _setup()
