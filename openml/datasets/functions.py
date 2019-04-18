@@ -247,19 +247,19 @@ def __list_datasets(api_call):
 
     datasets = dict()
     for dataset_ in datasets_dict['oml:data']['oml:dataset']:
-        did = int(dataset_['oml:did'])
-        dataset = {'did': did,
-                   'name': dataset_['oml:name'],
-                   'format': dataset_['oml:format'],
-                   'status': dataset_['oml:status']}
+        ignore_attributes = ['oml:file_id', 'oml:quality']
+        # [4:] skips the 'oml:' prefix.
+        dataset = {k[4:]: v for (k, v) in dataset_.items() if k not in ignore_attributes}
+        dataset['did'] = int(dataset['did'])
+        dataset['version'] = int(dataset['version'])
 
         # The number of qualities can range from 0 to infinity
         for quality in dataset_.get('oml:quality', list()):
-            quality['#text'] = float(quality['#text'])
-            if abs(int(quality['#text']) - quality['#text']) < 0.0000001:
-                quality['#text'] = int(quality['#text'])
-            dataset[quality['@name']] = quality['#text']
-        datasets[did] = dataset
+            try:
+                dataset[quality['@name']] = int(quality['#text'])
+            except ValueError:
+                dataset[quality['@name']] = float(quality['#text'])
+        datasets[dataset['did']] = dataset
 
     return datasets
 
@@ -354,7 +354,10 @@ def get_datasets(
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_dataset(dataset_id: Union[int, str], download_data: bool = True) -> OpenMLDataset:
+def get_dataset(dataset_id: Union[int, str],
+                download_data: bool = True,
+                version: int = None,
+                ) -> OpenMLDataset:
     """ Download the OpenML dataset representation, optionally also download actual data file.
 
     This function is thread/multiprocessing safe.
