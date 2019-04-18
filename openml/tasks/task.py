@@ -143,7 +143,7 @@ class OpenMLTask(ABC):
                 ('@name', 'estimation_procedure'),
                 ('#text', str(self.estimation_procedure_id))
             ])
-        ]
+        ]  # type: List[OrderedDict]
 
         if self.evaluation_measure is not None:
             task_dict['oml:input'].append(
