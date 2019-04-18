@@ -6,7 +6,7 @@ from .test_supervised_task import OpenMLSupervisedTaskTest
 
 class OpenMLLearningCurveTaskTest(OpenMLSupervisedTaskTest):
 
-    def setUp(self):
+    def setUp(self, n_levels: int = 1):
 
         super(OpenMLLearningCurveTaskTest, self).setUp()
         self.task_id = 801

@@ -5,7 +5,7 @@ from .test_supervised_task import OpenMLSupervisedTaskTest
 
 class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
 
-    def setUp(self):
+    def setUp(self, n_levels: int = 1):
 
         super(OpenMLRegressionTaskTest, self).setUp()
         self.task_id = 625

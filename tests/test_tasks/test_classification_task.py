@@ -6,11 +6,12 @@ from .test_supervised_task import OpenMLSupervisedTaskTest
 
 class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
 
-    def setUp(self):
+    def setUp(self, n_levels: int = 1):
 
         super(OpenMLClassificationTaskTest, self).setUp()
         self.task_id = 119
         self.task_type_id = 1
+        self.estimation_procedure = 1
 
     def test_get_X_and_Y(self):
 

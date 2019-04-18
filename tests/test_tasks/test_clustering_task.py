@@ -4,7 +4,7 @@ from .test_task import OpenMLTaskTest
 
 class OpenMLClusteringTaskTest(OpenMLTaskTest):
 
-    def setUp(self):
+    def setUp(self, n_levels: int = 1):
 
         super(OpenMLClusteringTaskTest, self).setUp()
         self.task_id = 146714

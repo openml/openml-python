@@ -30,8 +30,9 @@ class OpenMLTaskTest(TestBase):
                 "Skip OpenMLTaskTest tests,"
                 " it's a base class"
             )
+        super(OpenMLTaskTest, cls).setUpClass()
 
-    def setUp(self):
+    def setUp(self, n_levels: int = 1):
         super(OpenMLTaskTest, self).setUp()
 
     def test_download_task(self):

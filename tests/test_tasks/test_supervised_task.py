@@ -14,14 +14,14 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
     """
     @classmethod
     def setUpClass(cls):
-        super(OpenMLSupervisedTaskTest, cls).setUpClass()
         if cls is OpenMLSupervisedTaskTest:
             raise unittest.SkipTest(
                 "Skip OpenMLSupervisedTaskTest tests,"
                 " it's a base class"
             )
+        super(OpenMLSupervisedTaskTest, cls).setUpClass()
 
-    def setUp(self):
+    def setUp(self, n_levels: int = 1):
         super(OpenMLSupervisedTaskTest, self).setUp()
 
     def test_get_X_and_Y(self) -> Tuple[np.ndarray, np.ndarray]:
