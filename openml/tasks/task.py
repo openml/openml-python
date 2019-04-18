@@ -119,6 +119,12 @@ class OpenMLSupervisedTask(OpenMLTask):
     ) -> Union[np.ndarray, pd.DataFrame, scipy.sparse.spmatrix]:
         """Get data associated with the current task.
 
+        Parameters
+        ----------
+        dataset_format : str
+            Data structure of the returned data. See :meth:`openml.datasets.OpenMLDataset.get_data`
+            for possible options.
+
         Returns
         -------
         tuple - X and y
@@ -190,6 +196,12 @@ class OpenMLClusteringTask(OpenMLTask):
         dataset_format: str = 'array',
     ) -> Union[np.ndarray, pd.DataFrame, scipy.sparse.spmatrix]:
         """Get data associated with the current task.
+
+        Parameters
+        ----------
+        dataset_format : str
+            Data structure of the returned data. See :meth:`openml.datasets.OpenMLDataset.get_data`
+            for possible options.
 
         Returns
         -------

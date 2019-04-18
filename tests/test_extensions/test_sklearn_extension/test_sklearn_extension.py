@@ -1442,7 +1442,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
             np.testing.assert_array_equal(pred_1, pred_2)
             np.testing.assert_array_almost_equal(np.sum(proba_1, axis=1), np.ones(X_test.shape[0]))
             # Test that there are predictions other than ones and zeros
-            print(proba_1, proba_2)
             self.assertLess(
                 np.sum(proba_1 == 0) + np.sum(proba_1 == 1),
                 X_test.shape[0] * len(task.class_labels),

@@ -369,6 +369,12 @@ class OpenMLRunTrace(object):
                                 list(iteration.parameters.keys()),
                             )
                         )
+
+                if key in merged_trace:
+                    raise ValueError(
+                        "Cannot merge traces because key '{}' was encountered twice".format(key)
+                    )
+
                 merged_trace[key] = iteration
                 previous_iteration = key
 
