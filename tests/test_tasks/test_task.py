@@ -11,8 +11,7 @@ from openml.datasets import (
 )
 from openml.tasks import (
     create_task,
-    get_task,
-    OpenMLTask,
+    get_task
 )
 from openml.utils import (
     _delete_entity,
