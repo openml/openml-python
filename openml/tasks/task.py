@@ -129,9 +129,9 @@ class OpenMLTask(ABC):
         task_container = OrderedDict()  # type: OrderedDict[str, OrderedDict]
         task_dict = OrderedDict([
             ('@xmlns:oml', 'http://openml.org/openml')
-        ])
+        ])  # type: OrderedDict[str, Union[Union[int, str], List]]
 
-        task_container['oml:task_inputs'] = task_dict  # type: OrderedDict[str, Union[int, List]] # noqa E501
+        task_container['oml:task_inputs'] = task_dict
         task_dict['oml:task_type_id'] = self.task_type_id
 
         task_dict['oml:input'] = [
@@ -143,7 +143,7 @@ class OpenMLTask(ABC):
                 ('@name', 'estimation_procedure'),
                 ('#text', str(self.estimation_procedure_id))
             ])
-        ]  # type: OrderedDict[str, str]
+        ]
 
         if self.evaluation_measure is not None:
             task_dict['oml:input'].append(
