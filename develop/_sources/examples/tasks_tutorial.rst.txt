@@ -85,7 +85,7 @@ to have better visualization and easier access:
            'NumberOfInstancesWithMissingValues', 'NumberOfMissingValues',
            'NumberOfNumericFeatures', 'NumberOfSymbolicFeatures'],
           dtype='object')
-    First 5 of 932 tasks:
+    First 5 of 931 tasks:
        tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
     1    1     1  ...                      6.0                     33.0
     2    2     1  ...                      6.0                     33.0
@@ -408,13 +408,13 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLClassificationTask object at 0x2b847083fb38>
+    <openml.tasks.task.OpenMLClassificationTask object at 0x2b446f8a3908>
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  20.569 seconds)
+   **Total running time of the script:** ( 0 minutes  19.629 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:
