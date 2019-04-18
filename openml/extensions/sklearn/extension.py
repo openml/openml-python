@@ -1103,7 +1103,6 @@ class SklearnExtension(Extension):
         fold_no: int,
         y_train: Optional[np.ndarray] = None,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
-        classes: Optional[List] = None,
     ) -> Tuple[np.ndarray, np.ndarray, 'OrderedDict[str, float]', Optional[OpenMLRunTrace]]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction
         information.
@@ -1134,9 +1133,6 @@ class SklearnExtension(Extension):
             indices to the potential classes specified by dataset.
         X_test : Optional, array-like (default=None)
             Test attributes to test for generalization in supervised tasks.
-        classes : List
-            List of classes for supervised classification tasks (and supervised data stream
-            classification).
 
         Returns
         -------
@@ -1182,6 +1178,12 @@ class SklearnExtension(Extension):
             for obs, prediction_idx in enumerate(y):
                 result[obs][prediction_idx] = 1.0
             return result
+
+        if isinstance(task, OpenMLSupervisedTask):
+            if y_train is None:
+                raise TypeError('argument y_train must not be of type None')
+            if X_test is None:
+                raise TypeError('argument X_test must not be of type None')
 
         # TODO: if possible, give a warning if model is already fitted (acceptable
         # in case of custom experimentation,
@@ -1259,21 +1261,18 @@ class SklearnExtension(Extension):
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
 
-            if classes is None:
-                raise TypeError("Argument classes must not be of type 'None'")
-
             try:
                 proba_y = model_copy.predict_proba(X_test)
             except AttributeError:
-                proba_y = _prediction_to_probabilities(pred_y, list(classes))
+                proba_y = _prediction_to_probabilities(pred_y, list(task.class_labels))
 
-            if proba_y.shape[1] != len(classes):
+            if proba_y.shape[1] != len(task.class_labels):
                 # Remap the probabilities in case there was a class missing at training time
                 # By default, the classification targets are mapped to be zero-based indices to the
                 # actual classes. Therefore, the model_classes contain the correct indices to the
                 # correct probability array (the actually array might be incorrect if there are
                 # some classes not present during train time).
-                proba_y_new = np.zeros((proba_y.shape[0], len(classes)))
+                proba_y_new = np.zeros((proba_y.shape[0], len(task.class_labels)))
                 for idx, model_class in enumerate(model_classes):
                     proba_y_new[:, model_class] = proba_y[:, idx]
                 proba_y = proba_y_new

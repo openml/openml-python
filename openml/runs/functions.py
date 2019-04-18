@@ -440,7 +440,6 @@ def _run_task_get_arffcontent(
                     rep_no=rep_no,
                     fold_no=fold_no,
                     X_test=test_x,
-                    classes=classes,
                 )
 
                 arff_datacontent_fold = []  # type: List[List]
@@ -516,7 +515,7 @@ def _run_task_get_arffcontent(
     if len(traces) > 0:
         if len(traces) != n_fit:
             raise ValueError(
-                'Did not find enough traces (expected %d, found %d)' % (n_fit, len(traces))
+                'Did not find enough traces (expected {}, found {})'.format(n_fit, len(traces))
             )
         else:
             trace = OpenMLRunTrace.merge_traces(traces)

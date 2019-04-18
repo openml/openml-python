@@ -1,5 +1,10 @@
 import io
 import os
+from typing import Union
+
+import numpy as np
+import pandas as pd
+import scipy.sparse
 
 from .. import datasets
 from .split import OpenMLSplit
@@ -108,7 +113,10 @@ class OpenMLSupervisedTask(OpenMLTask):
         self.target_name = target_name
         self.split = None
 
-    def get_X_and_y(self, dataset_format='array'):
+    def get_X_and_y(
+        self,
+        dataset_format: str = 'array',
+    ) -> Union[np.ndarray, pd.DataFrame, scipy.sparse.spmatrix]:
         """Get data associated with the current task.
 
         Returns
@@ -177,7 +185,10 @@ class OpenMLClusteringTask(OpenMLTask):
         )
         self.number_of_clusters = number_of_clusters
 
-    def get_X(self, dataset_format='array'):
+    def get_X(
+        self,
+        dataset_format: str = 'array',
+    ) -> Union[np.ndarray, pd.DataFrame, scipy.sparse.spmatrix]:
         """Get data associated with the current task.
 
         Returns

@@ -349,7 +349,7 @@ class OpenMLRunTrace(object):
         return cls(run_id, trace)
 
     @classmethod
-    def merge_traces(cls, traces: List['OpenMLRunTrace']):
+    def merge_traces(cls, traces: List['OpenMLRunTrace']) -> 'OpenMLRunTrace':
         for i in range(1, len(traces)):
             if traces[i] != traces[i - 1]:
                 raise ValueError('Cannot merge traces!')
@@ -363,7 +363,7 @@ class OpenMLRunTrace(object):
         return cls(None, merged_trace)
 
     def __str__(self):
-        return '[Run id: %d, %d trace iterations]' % (
+        return '[Run id: %d, %d trace iterations]'.format(
             -1 if self.run_id is None else self.run_id,
             len(self.trace_iterations),
         )

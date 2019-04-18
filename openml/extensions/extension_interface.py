@@ -155,7 +155,6 @@ class Extension(ABC):
         fold_no: int,
         y_train: Optional[np.ndarray] = None,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix]] = None,
-        classes: Optional[List] = None,
     ) -> Tuple[np.ndarray, np.ndarray, 'OrderedDict[str, float]', Optional['OpenMLRunTrace']]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction information.
 
@@ -179,9 +178,6 @@ class Extension(ABC):
             indices to the potential classes specified by dataset.
         X_test : Optional, array-like (default=None)
             Test attributes to test for generalization in supervised tasks.
-        classes : List
-            List of classes for supervised classification tasks (and supervised data stream
-            classification).
 
         Returns
         -------

@@ -1299,7 +1299,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
             X_train=X_train,
             y_train=y_train,
             X_test=X_test,
-            classes=task.class_labels,
         )
 
         y_hat, y_hat_proba, user_defined_measures, trace = res
@@ -1355,7 +1354,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
             X_train=X_train,
             y_train=y_train,
             X_test=X_test,
-            classes=task.class_labels,
         )
 
         y_hat, y_hat_proba, user_defined_measures, trace = res
@@ -1423,7 +1421,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 X_test=X_test,
                 fold_no=0,
                 rep_no=0,
-                classes=task.class_labels,
             )
             pred_2, proba_2, _, _ = self.extension._run_model_on_fold(
                 model=clf2,
@@ -1433,11 +1430,24 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 X_test=X_test,
                 fold_no=0,
                 rep_no=0,
-                classes=task.class_labels,
             )
 
             # verifies that the predictions are identical
             np.testing.assert_array_equal(pred_1, pred_2)
+            np.testing.assert_array_almost_equal(np.sum(proba_1, axis=1), np.ones(X_test.shape[0]))
+            # Test that there are predictions other than ones and zeros
+            print(proba_1, proba_2)
+            self.assertLess(
+                np.sum(proba_1 == 0) + np.sum(proba_1 == 1),
+                X_test.shape[0] * len(task.class_labels),
+            )
+
+            np.testing.assert_array_almost_equal(np.sum(proba_2, axis=1), np.ones(X_test.shape[0]))
+            # Test that there are only ones and zeros predicted
+            self.assertEqual(
+                np.sum(proba_2 == 0) + np.sum(proba_2 == 1),
+                X_test.shape[0] * len(task.class_labels),
+            )
 
     def test_run_model_on_fold_regression(self):
         # There aren't any regression tasks on the test server
