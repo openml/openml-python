@@ -34,6 +34,9 @@ class OpenMLTaskTest(TestBase):
 
     def setUp(self, n_levels: int = 1):
         super(OpenMLTaskTest, self).setUp()
+        self.task_id = None
+        self.task_type_id = None
+        self.estimation_procedure = None
 
     def test_download_task(self):
 
