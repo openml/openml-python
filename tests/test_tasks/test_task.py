@@ -23,15 +23,6 @@ class OpenMLTaskTest(TestBase):
     A helper class. The methods of the test case
     are only executed in subclasses of the test case.
     """
-    def setUp(self):
-        super(OpenMLTaskTest, self).setUp()
-        # task_id and estimation_procedure
-        # act as placeholder variables.
-        # They are set from the extending classes.
-        self.task_id = 11
-        self.task_type_id = 1
-        self.estimation_procedure = 23
-
     @classmethod
     def setUpClass(cls):
         if cls is OpenMLTaskTest:
@@ -39,6 +30,9 @@ class OpenMLTaskTest(TestBase):
                 "Skip OpenMLTaskTest tests,"
                 " it's a base class"
             )
+
+    def setUp(self):
+        super(OpenMLTaskTest, self).setUp()
 
     def test_download_task(self):
 
