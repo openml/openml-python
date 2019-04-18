@@ -42,6 +42,9 @@ class ExampleConfiguration:
     """ Allows easy switching to and from a test configuration. """
     _last_used_server = None
     _last_used_key = None
+    _start_last_called = False
+    _test_server = "https://test.openml.org/api/v1/xml"
+    _test_apikey = "c0c42819af31e706efe1f4b88c23c6c1"
 
     @classmethod
     def start_use_example_configuration(cls):
@@ -52,21 +55,35 @@ class ExampleConfiguration:
         """
         global server
         global apikey
+
+        if cls._start_last_called and server == cls._test_server and apikey == cls._test_apikey:
+            # Method is called more than once in a row without modifying the server or apikey.
+            # We don't want to save the current test configuration as a last used configuration.
+            return
+
         cls._last_used_server = server
         cls._last_used_key = apikey
+        cls._start_last_called = True
 
         # Test server key for examples
-        server = "https://test.openml.org/api/v1/xml"
-        apikey = "c0c42819af31e706efe1f4b88c23c6c1"
+        server = cls._test_server
+        apikey = cls._test_apikey
 
     @classmethod
     def stop_use_example_configuration(cls):
         """ Return to configuration as it was before `start_use_example_configuration`. """
+        if not cls._start_last_called:
+            # We don't want to allow this because it will (likely) result in the `server` and
+            # `apikey` variables being set to None.
+            raise RuntimeError("`stop_use_example_configuration` called without a saved config."
+                               "`start_use_example_configuration` must be called first.")
+
         global server
         global apikey
 
         server = cls._last_used_server
         apikey = cls._last_used_key
+        cls._start_last_called = False
 
 
 def _setup():
