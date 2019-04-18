@@ -124,7 +124,7 @@ class OpenMLTask(ABC):
         """
         _tag_entity('task', self.task_id, tag, untag=True)
 
-    def _to_dict(self) -> OrderedDict[str, OrderedDict]:
+    def _to_dict(self) -> dict:
 
         task_container = OrderedDict()  # type: OrderedDict[str, OrderedDict]
         task_dict = OrderedDict([
