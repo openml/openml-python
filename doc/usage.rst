@@ -8,9 +8,9 @@
 .. role:: python(code)
    :language: python
 
-***********
-Basic Usage
-***********
+**********
+User Guide
+**********
 
 This document will guide you through the most important use cases, functions
 and classes in the OpenML Python API. Throughout this document, we will use
