@@ -401,7 +401,7 @@ def _run_task_get_arffcontent(
         range(num_reps),
         range(num_folds),
         range(num_samples),
-    )):
+    ), start=1):
 
         train_indices, test_indices = task.get_train_test_split_indices(
             repeat=rep_no, fold=fold_no, sample=sample_no)
@@ -508,7 +508,7 @@ def _run_task_get_arffcontent(
             )
 
     if len(traces) > 0:
-        if len(traces) != n_fit + 1:
+        if len(traces) != n_fit:
             raise ValueError(
                 'Did not find enough traces (expected {}, found {})'.format(n_fit, len(traces))
             )
