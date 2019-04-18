@@ -1,14 +1,16 @@
+from typing import cast, Dict, List, Optional, Union
+
+import dateutil.parser
 import xmltodict
 
-from openml.study import OpenMLStudy
+from openml.study import OpenMLStudy, OpenMLBenchmarkSuite
+from openml.study.study import BaseStudy
 import openml._api_calls
 
 
-def get_study(study_id, entity_type=None):
+def get_suite(suite_id: Union[int, str]) -> OpenMLBenchmarkSuite:
     """
-    Retrieves all relevant information of an OpenML study from the server
-    Note that some of the (data, tasks, flows, setups) fields can be empty
-    (depending on information on the server)
+    Retrieves all relevant information of an OpenML benchmarking suite from the server.
 
     Parameters
     ----------
@@ -16,34 +18,67 @@ def get_study(study_id, entity_type=None):
         study id (numeric or alias)
 
     entity_type : str (optional)
-        Which entity type to return. Either {data, tasks, flows, setups,
-        runs}. Give None to return all entity types.
+        Do not change this!
+
+    Returns
+    -------
+    OpenMLSuite
+        The OpenML suite object
+    """
+    suite = cast(OpenMLBenchmarkSuite, _get_study(suite_id, entity_type='tasks'))
+    return suite
+
+
+def get_study(
+    study_id: Union[int, str],
+    arg_for_backwards_compat: Optional[str] = None,
+) -> OpenMLStudy:  # noqa F401
+    """
+    Retrieves all relevant information of an OpenML study from the server.
+
+    Parameters
+    ----------
+    study id : int, str
+        study id (numeric or alias)
 
     Returns
     -------
     OpenMLStudy
         The OpenML study object
     """
-    call_suffix = "study/%s" % str(study_id)
-    if entity_type is not None:
-        call_suffix += "/" + entity_type
+    if study_id == 'OpenML100':
+        study = _get_study(study_id, entity_type='tasks')
+        return cast(OpenMLBenchmarkSuite, study)  # type: ignore
+    else:
+        study = cast(OpenMLStudy, _get_study(study_id, entity_type='runs'))
+        return study
+
+
+def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
+    call_suffix = "study/{}".format(str(id_))
     xml_string = openml._api_calls._perform_api_call(call_suffix, 'get')
     force_list_tags = (
         'oml:data_id', 'oml:flow_id', 'oml:task_id', 'oml:setup_id',
         'oml:run_id',
         'oml:tag'  # legacy.
     )
-    result_dict = xmltodict.parse(xml_string,
-                                  force_list=force_list_tags)['oml:study']
+    result_dict = xmltodict.parse(xml_string, force_list=force_list_tags)['oml:study']
     study_id = int(result_dict['oml:id'])
     alias = result_dict['oml:alias'] if 'oml:alias' in result_dict else None
     main_entity_type = result_dict['oml:main_entity_type']
+    if entity_type != main_entity_type + 's':
+        raise ValueError(
+            "Unexpected entity type '{}' reported by the server, expected '{}'".format(
+                main_entity_type, entity_type,
+            )
+        )
     benchmark_suite = result_dict['oml:benchmark_suite'] \
         if 'oml:benchmark_suite' in result_dict else None
     name = result_dict['oml:name']
     description = result_dict['oml:description']
     status = result_dict['oml:status']
     creation_date = result_dict['oml:creation_date']
+    creation_date_as_date = dateutil.parser.parse(creation_date)
     creator = result_dict['oml:creator']
 
     # tags is legacy. remove once no longer needed.
@@ -56,44 +91,81 @@ def get_study(study_id, entity_type=None):
                 current_tag['window_start'] = tag['oml:window_start']
             tags.append(current_tag)
 
-    datasets = None
-    tasks = None
-    flows = None
-    setups = None
-    runs = None
-
     if 'oml:data' in result_dict:
         datasets = [int(x) for x in result_dict['oml:data']['oml:data_id']]
+    else:
+        raise ValueError('No datasets attached to study {}!'.format(id_))
     if 'oml:tasks' in result_dict:
         tasks = [int(x) for x in result_dict['oml:tasks']['oml:task_id']]
-    if 'oml:flows' in result_dict:
-        flows = [int(x) for x in result_dict['oml:flows']['oml:flow_id']]
-    if 'oml:setups' in result_dict:
-        setups = [int(x) for x in result_dict['oml:setups']['oml:setup_id']]
-    if 'oml:runs' in result_dict:
-        runs = [int(x) for x in result_dict['oml:runs']['oml:run_id']]
+    else:
+        raise ValueError('No tasks attached to study {}!'.format(id_))
 
-    study = OpenMLStudy(
-        study_id=study_id,
-        alias=alias,
-        main_entity_type=main_entity_type,
-        benchmark_suite=benchmark_suite,
-        name=name,
-        description=description,
-        status=status,
-        creation_date=creation_date,
-        creator=creator,
-        tags=tags,
-        data=datasets,
-        tasks=tasks,
-        flows=flows,
-        setups=setups,
-        runs=runs
-    )
+    if main_entity_type in ['runs', 'run']:
+
+        if 'oml:flows' in result_dict:
+            flows = [int(x) for x in result_dict['oml:flows']['oml:flow_id']]
+        else:
+            raise ValueError('No flows attached to study {}!'.format(id_))
+        if 'oml:setups' in result_dict:
+            setups = [int(x) for x in result_dict['oml:setups']['oml:setup_id']]
+        else:
+            raise ValueError('No setups attached to study!'.format(id_))
+        if 'oml:runs' in result_dict:
+            runs = [
+                int(x) for x in result_dict['oml:runs']['oml:run_id']
+            ]  # type: Optional[List[int]]
+        else:
+            if creation_date_as_date < dateutil.parser.parse('2019-01-01'):
+                # Legacy studies did not require runs
+                runs = None
+            else:
+                raise ValueError('No runs attached to study!'.format(id_))
+
+        study = OpenMLStudy(
+            study_id=study_id,
+            alias=alias,
+            benchmark_suite=benchmark_suite,
+            name=name,
+            description=description,
+            status=status,
+            creation_date=creation_date,
+            creator=creator,
+            tags=tags,
+            data=datasets,
+            tasks=tasks,
+            flows=flows,
+            setups=setups,
+            runs=runs,
+        )  # type: BaseStudy
+
+    elif main_entity_type in ['tasks', 'task']:
+
+        study = OpenMLBenchmarkSuite(
+            suite_id=study_id,
+            alias=alias,
+            name=name,
+            description=description,
+            status=status,
+            creation_date=creation_date,
+            creator=creator,
+            tags=tags,
+            data=datasets,
+            tasks=tasks
+        )
+
+    else:
+        raise ValueError('Unknown entity type {}'.format(main_entity_type))
+
     return study
 
 
-def create_study(alias, benchmark_suite, name, description, run_ids):
+def create_study(
+    alias: Optional[str],
+    benchmark_suite: Optional[int],
+    name: str,
+    description: str,
+    run_ids: List[int],
+) -> OpenMLStudy:
     """
     Creates an OpenML study (collection of data, tasks, flows, setups and run),
     where the runs are the main entity (collection consists of runs and all
@@ -120,7 +192,6 @@ def create_study(alias, benchmark_suite, name, description, run_ids):
     return OpenMLStudy(
         study_id=None,
         alias=alias,
-        main_entity_type='run',
         benchmark_suite=benchmark_suite,
         name=name,
         description=description,
@@ -131,12 +202,17 @@ def create_study(alias, benchmark_suite, name, description, run_ids):
         data=None,
         tasks=None,
         flows=None,
+        runs=run_ids,
         setups=None,
-        runs=run_ids
     )
 
 
-def create_benchmark_suite(alias, name, description, task_ids):
+def create_benchmark_suite(
+    alias: Optional[str],
+    name: str,
+    description: str,
+    task_ids: List[int],
+) -> OpenMLBenchmarkSuite:
     """
     Creates an OpenML benchmark suite (collection of entity types, where
     the tasks are the linked entity)
@@ -157,11 +233,9 @@ def create_benchmark_suite(alias, name, description, task_ids):
     OpenMLStudy
         A local OpenML study object (call publish method to upload to server)
     """
-    return OpenMLStudy(
-        study_id=None,
+    return OpenMLBenchmarkSuite(
+        suite_id=None,
         alias=alias,
-        main_entity_type='task',
-        benchmark_suite=None,
         name=name,
         description=description,
         status=None,
@@ -170,13 +244,24 @@ def create_benchmark_suite(alias, name, description, task_ids):
         tags=None,
         data=None,
         tasks=task_ids,
-        flows=None,
-        setups=None,
-        runs=None
     )
 
 
-def status_update(study_id, status):
+def update_suite_status(suite_id: int, status: str) -> None:
+    """
+    Updates the status of a study to either 'active' or 'deactivated'.
+
+    Parameters
+    ----------
+    suite_id : int
+        The data id of the dataset
+    status : str,
+        'active' or 'deactivated'
+    """
+    return update_study_status(suite_id, status)
+
+
+def update_study_status(study_id: int, status: str) -> None:
     """
     Updates the status of a study to either 'active' or 'deactivated'.
 
@@ -203,9 +288,24 @@ def status_update(study_id, status):
         raise ValueError('Study id/status does not collide')
 
 
-def delete_study(study_id):
+def delete_suite(suite_id: int) -> bool:
+    """Deletes a study from the OpenML server.
+
+    Parameters
+    ----------
+    suite_id : int
+        OpenML id of the study
+
+    Returns
+    -------
+    bool
+        True iff the deletion was successful. False otherwse
     """
-    Deletes an study from the OpenML server.
+    return delete_study(suite_id)
+
+
+def delete_study(study_id: int) -> bool:
+    """Deletes a study from the OpenML server.
 
     Parameters
     ----------
@@ -220,20 +320,34 @@ def delete_study(study_id):
     return openml.utils._delete_entity('study', study_id)
 
 
-def attach_to_study(study_id, entity_ids):
+def attach_to_suite(suite_id: int, task_ids: List[int]) -> int:
+    """Attaches a set of tasks to a benchmarking suite.
+
+    Parameters
+    ----------
+    suite_id : int
+        OpenML id of the study
+
+    task_ids : list (int)
+        List of entities to link to the collection
+
+    Returns
+    -------
+    int
+        new size of the suite (in terms of explicitly linked entities)
     """
-    Attaches a set of entities to a collection
-        - provide run ids of existsing runs if the main entity type is
-          runs (study)
-        - provide task ids of existing tasks if the main entity type is
-          tasks (benchmark suite)
+    return attach_to_study(suite_id, task_ids)
+
+
+def attach_to_study(study_id: int, run_ids: List[int]) -> int:
+    """Attaches a set of runs to a study.
 
     Parameters
     ----------
     study_id : int
         OpenML id of the study
 
-    entity_ids : list (int)
+    run_ids : list (int)
         List of entities to link to the collection
 
     Returns
@@ -242,28 +356,39 @@ def attach_to_study(study_id, entity_ids):
         new size of the study (in terms of explicitly linked entities)
     """
     uri = 'study/%d/attach' % study_id
-    post_variables = {'ids': ','.join(str(x) for x in entity_ids)}
-    result_xml = openml._api_calls._perform_api_call(uri,
-                                                     'post',
-                                                     post_variables)
+    post_variables = {'ids': ','.join(str(x) for x in run_ids)}
+    result_xml = openml._api_calls._perform_api_call(uri, 'post', post_variables)
     result = xmltodict.parse(result_xml)['oml:study_attach']
     return int(result['oml:linked_entities'])
 
 
-def detach_from_study(study_id, entity_ids):
-    """
-    Detaches a set of entities to a collection
-        - provide run ids of existsing runs if the main entity type is
-          runs (study)
-        - provide task ids of existing tasks if the main entity type is
-          tasks (benchmark suite)
+def detach_from_suite(suite_id: int, task_ids: List[int]) -> int:
+    """Detaches a set of task ids from a suite.
+
+    Parameters
+    ----------
+    suite_id : int
+        OpenML id of the study
+
+    task_ids : list (int)
+        List of entities to link to the collection
+
+    Returns
+    -------
+    int
+        new size of the study (in terms of explicitly linked entities)"""
+    return detach_from_study(suite_id, task_ids)
+
+
+def detach_from_study(study_id: int, run_ids: List[int]) -> int:
+    """Detaches a set of run ids from a study.
 
     Parameters
     ----------
     study_id : int
         OpenML id of the study
 
-    entity_ids : list (int)
+    run_ids : list (int)
         List of entities to link to the collection
 
     Returns
@@ -272,16 +397,18 @@ def detach_from_study(study_id, entity_ids):
         new size of the study (in terms of explicitly linked entities)
     """
     uri = 'study/%d/detach' % study_id
-    post_variables = {'ids': ','.join(str(x) for x in entity_ids)}
-    result_xml = openml._api_calls._perform_api_call(uri,
-                                                     'post',
-                                                     post_variables)
+    post_variables = {'ids': ','.join(str(x) for x in run_ids)}
+    result_xml = openml._api_calls._perform_api_call(uri, 'post', post_variables)
     result = xmltodict.parse(result_xml)['oml:study_detach']
     return int(result['oml:linked_entities'])
 
 
-def list_studies(offset=None, size=None, main_entity_type=None, status=None,
-                 uploader=None, benchmark_suite=None):
+def list_suites(
+    offset: Optional[int] = None,
+    size: Optional[int] = None,
+    status: Optional[str] = None,
+    uploader: Optional[List[int]] = None,
+) -> Dict[int, Dict]:
     """
     Return a list of all studies which are on OpenML.
 
@@ -291,9 +418,6 @@ def list_studies(offset=None, size=None, main_entity_type=None, status=None,
         The number of studies to skip, starting from the first.
     size : int, optional
         The maximum number of studies to show.
-    main_entity_type : str, optional
-        Can be ``'task'`` or ``'run'``. In case of `task`, only benchmark
-        suites are returned. In case of `run`, only studies are returned.
     status : str, optional
         Should be {active, in_preparation, deactivated, all}. By default active
         studies are returned.
@@ -302,11 +426,55 @@ def list_studies(offset=None, size=None, main_entity_type=None, status=None,
 
     Returns
     -------
-    datasets : dict of dicts
-        A mapping from dataset ID to dict.
+    suites : dict of dicts
+        A mapping from suite ID to dict.
 
-        Every dataset is represented by a dictionary containing
-        the following information:
+        Every suite is represented by a dictionary containing the following information:
+        - id
+        - alias (optional)
+        - name
+        - main_entity_type
+        - status
+        - creator
+        - creation_date
+    """
+    return openml.utils._list_all(_list_studies,
+                                  offset=offset,
+                                  size=size,
+                                  main_entity_type='task',
+                                  status=status,
+                                  uploader=uploader,)
+
+
+def list_studies(
+    offset: Optional[int] = None,
+    size: Optional[int] = None,
+    status: Optional[str] = None,
+    uploader: Optional[List[str]] = None,
+    benchmark_suite: Optional[int] = None,
+) -> Dict[int, Dict]:
+    """
+    Return a list of all studies which are on OpenML.
+
+    Parameters
+    ----------
+    offset : int, optional
+        The number of studies to skip, starting from the first.
+    size : int, optional
+        The maximum number of studies to show.
+    status : str, optional
+        Should be {active, in_preparation, deactivated, all}. By default active
+        studies are returned.
+    uploader : list (int), optional
+        Result filter. Will only return studies created by these users.
+    benchmark_suite : int, optional
+
+    Returns
+    -------
+    studies : dict of dicts
+        A mapping from study ID to dict.
+
+        Every study is represented by a dictionary containing the following information:
         - id
         - alias (optional)
         - name
@@ -315,20 +483,17 @@ def list_studies(offset=None, size=None, main_entity_type=None, status=None,
         - status
         - creator
         - creation_date
-
-        If qualities are calculated for the dataset, some of
-        these are also returned.
     """
     return openml.utils._list_all(_list_studies,
                                   offset=offset,
                                   size=size,
-                                  main_entity_type=main_entity_type,
+                                  main_entity_type='run',
                                   status=status,
                                   uploader=uploader,
                                   benchmark_suite=benchmark_suite)
 
 
-def _list_studies(**kwargs):
+def _list_studies(**kwargs) -> Dict[int, Dict]:
     """
     Perform api call to return a list of studies.
 
@@ -349,7 +514,7 @@ def _list_studies(**kwargs):
     return __list_studies(api_call)
 
 
-def __list_studies(api_call):
+def __list_studies(api_call: str) -> Dict[int, Dict]:
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     study_dict = xmltodict.parse(xml_string, force_list=('oml:study',))
 
