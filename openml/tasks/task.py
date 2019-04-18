@@ -134,7 +134,9 @@ class OpenMLTask(ABC):
         task_container['oml:task_inputs'] = task_dict
         task_dict['oml:task_type_id'] = self.task_type_id
 
-        task_input = [
+        # having task_inputs and adding a type annotation
+        # solves wrong warnings
+        task_inputs = [
             OrderedDict([
                 ('@name', 'source_data'),
                 ('#text', str(self.dataset_id))
@@ -144,15 +146,16 @@ class OpenMLTask(ABC):
                 ('#text', str(self.estimation_procedure_id))
             ])
         ]  # type: List[OrderedDict]
-        task_dict['oml:input'] = task_input
 
         if self.evaluation_measure is not None:
-            task_dict['oml:input'].append(
+            task_inputs.append(
                 OrderedDict([
                     ('@name', 'evaluation_measures'),
                     ('#text', self.evaluation_measure)
                 ])
             )
+
+        task_dict['oml:input'] = task_inputs
 
         return task_container
 
@@ -401,8 +404,14 @@ class OpenMLClusteringTask(OpenMLTask):
     def _to_dict(self) -> Dict[str, OrderedDict]:
 
         task_container = super(OpenMLClusteringTask, self)._to_dict()
-        task_dict = task_container['oml:task_inputs']
 
+        # Right now not supported as a feture
+        # Uncomment if it is supported on the server
+        # in the future.
+        # https://github.com/openml/OpenML/issues/925
+        '''
+        task_dict = task_container['oml:task_inputs']
+        
         if self.target_name is not None:
             task_dict['oml:input'].append(
                 OrderedDict([
@@ -410,7 +419,7 @@ class OpenMLClusteringTask(OpenMLTask):
                     ('#text', self.target_name)
                 ])
             )
-
+        '''
         return task_container
 
 
