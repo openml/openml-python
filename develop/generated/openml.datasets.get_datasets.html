@@ -119,7 +119,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>dataset_ids</strong><span class="classifier">iterable</span></dt><dd><p>Integers or strings representing dataset ids.</p>
+<dt><strong>dataset_ids</strong><span class="classifier">iterable</span></dt><dd><p>Integers or strings representing dataset ids or dataset names.
+If dataset names are specified, the least recent still active dataset version is returned.</p>
 </dd>
 <dt><strong>download_data</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, also download the data file. Beware that some datasets are large and it might
 make the operation noticeably slower. Metadata is also still retrieved.
