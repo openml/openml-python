@@ -47,7 +47,7 @@ class ConfigurationForExamples:
     _test_apikey = "c0c42819af31e706efe1f4b88c23c6c1"
 
     @classmethod
-    def start_use_example_configuration(cls):
+    def start_using_configuration_for_example(cls):
         """ Sets the configuration to connect to the test server with valid apikey.
 
         To configuration as was before this call is stored, and can be recovered
@@ -70,7 +70,7 @@ class ConfigurationForExamples:
         apikey = cls._test_apikey
 
     @classmethod
-    def stop_use_example_configuration(cls):
+    def stop_using_configuration_for_example(cls):
         """ Return to configuration as it was before `start_use_example_configuration`. """
         if not cls._start_last_called:
             # We don't want to allow this because it will (likely) result in the `server` and
@@ -188,12 +188,18 @@ def set_cache_directory(cachedir):
     cache_directory = cachedir
 
 
-start_use_example_configuration = ConfigurationForExamples.start_use_example_configuration
-stop_use_example_configuration = ConfigurationForExamples.stop_use_example_configuration
+start_using_configuration_for_example = (
+    ConfigurationForExamples.start_using_configuration_for_example
+)
+stop_using_configuration_for_example = (
+    ConfigurationForExamples.stop_using_configuration_for_example
+)
 
 __all__ = [
-    'get_cache_directory', 'set_cache_directory',
-    'start_use_example_configuration', 'stop_use_example_configuration'
+    'get_cache_directory',
+    'set_cache_directory',
+    'start_using_configuration_for_example',
+    'stop_using_configuration_for_example',
 ]
 
 _setup()
