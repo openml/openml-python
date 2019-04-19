@@ -1,7 +1,7 @@
 import io
 import os
 import re
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 import numpy as np
 import arff
@@ -248,8 +248,9 @@ def __list_datasets(api_call):
     datasets = dict()
     for dataset_ in datasets_dict['oml:data']['oml:dataset']:
         ignore_attributes = ['oml:file_id', 'oml:quality']
-        # [4:] skips the 'oml:' prefix.
-        dataset = {k[4:]: v for (k, v) in dataset_.items() if k not in ignore_attributes}
+        dataset = {k.replace('oml:', ''): v
+                   for (k, v) in dataset_.items()
+                   if k not in ignore_attributes}
         dataset['did'] = int(dataset['did'])
         dataset['version'] = int(dataset['version'])
 
@@ -298,10 +299,14 @@ def check_datasets_active(dataset_ids: List[int]) -> Dict[int, bool]:
     return active
 
 
-def _name_to_id(dataset_name: str, version: int = None, error_if_multiple: bool = False) -> int:
+def _name_to_id(
+    dataset_name: str,
+    version: Optional[int] = None,
+    error_if_multiple: bool = False
+) -> int:
     """ Attempt to find the dataset id of the dataset with the given name.
 
-    If multiple datasets with the name exist, and `error_if_multiple` is `False`,
+    If multiple datasets with the name exist, and ``error_if_multiple`` is ``False``,
     then return the least recent still active dataset.
 
     Raises an error if no dataset with the name is found.
@@ -366,11 +371,12 @@ def get_datasets(
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_dataset(dataset_id: Union[int, str],
-                download_data: bool = True,
-                version: int = None,
-                error_if_multiple: bool = False
-                ) -> OpenMLDataset:
+def get_dataset(
+    dataset_id: Union[int, str],
+    download_data: bool = True,
+    version: int = None,
+    error_if_multiple: bool = False
+) -> OpenMLDataset:
     """ Download the OpenML dataset representation, optionally also download actual data file.
 
     This function is thread/multiprocessing safe.
@@ -405,7 +411,7 @@ def get_dataset(dataset_id: Union[int, str],
         try:
             dataset_id = int(dataset_id)
         except ValueError:
-            dataset_id = _name_to_id(dataset_id, version, error_if_multiple)
+            dataset_id = _name_to_id(dataset_id, version, error_if_multiple)  # type: ignore
     elif not isinstance(dataset_id, int):
         raise TypeError("`dataset_id` must be one of `str` or `int`, not {}."
                         .format(type(dataset_id)))
