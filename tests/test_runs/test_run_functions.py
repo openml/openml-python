@@ -78,6 +78,8 @@ class TestRun(TestBase):
                 return
             else:
                 time.sleep(10)
+        raise RuntimeError('Could not find any evaluations! Please check whether run {} was '
+                           'evaluated correctly on the server'.format(run_id))
 
     def _compare_predictions(self, predictions, predictions_prime):
         self.assertEqual(np.array(predictions_prime['data']).shape,
