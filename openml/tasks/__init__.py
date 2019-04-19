@@ -12,7 +12,7 @@ from .functions import (
     create_task,
     get_task,
     get_tasks,
-    list_tasks
+    list_tasks,
 )
 
 __all__ = [

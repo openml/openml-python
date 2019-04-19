@@ -451,11 +451,15 @@ def create_task(
         evaluation_measure: str = None,
         **kwargs
 ):
-    """Create a task based on different given
-    attributes.
+    """Create a task based on different given attributes.
 
-    Builds different task objects based on the
-    task type.
+    Builds a task object with the function arguments as
+    attributes. The type of the task object built is
+    determined from the task type id.
+    More information on how the arguments (task attributes),
+    relate to the different possible tasks can be found in
+    the individual task objects at the openml.tasks.task
+    module.
 
     Parameters
     ----------

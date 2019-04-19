@@ -1,21 +1,18 @@
+from abc import ABC
+from collections import OrderedDict
 import io
 import os
-from typing import Union
+from typing import Union, Tuple, Dict, List, Optional
+from warnings import warn
 
 import numpy as np
 import pandas as pd
 import scipy.sparse
-from collections import OrderedDict
-from typing import Union, Tuple, Dict, List, Optional
-from abc import ABC
-from warnings import warn
-
 import xmltodict
-import numpy as np
 
+import openml._api_calls
 from .. import datasets
 from .split import OpenMLSplit
-import openml._api_calls
 from ..utils import _create_cache_directory_for_id, _tag_entity
 
 
@@ -124,7 +121,7 @@ class OpenMLTask(ABC):
         """
         _tag_entity('task', self.task_id, tag, untag=True)
 
-    def _to_dict(self) -> dict:
+    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
 
         task_container = OrderedDict()  # type: OrderedDict[str, OrderedDict]
         task_dict = OrderedDict([
@@ -255,7 +252,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         )
         return X_and_y
 
-    def _to_dict(self) -> Dict[str, OrderedDict]:
+    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
 
         task_container = super(OpenMLSupervisedTask, self)._to_dict()
         task_dict = task_container['oml:task_inputs']
@@ -401,7 +398,7 @@ class OpenMLClusteringTask(OpenMLTask):
         )
         return X_and_y
 
-    def _to_dict(self) -> Dict[str, OrderedDict]:
+    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
 
         task_container = super(OpenMLClusteringTask, self)._to_dict()
 
