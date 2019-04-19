@@ -57,6 +57,7 @@ nosetests.xml
 coverage.xml
 *,cover
 .hypothesis/
+prof/
 
 # Translations
 *.mo
@@ -74,3 +75,11 @@ target/
 # IDE
 .idea
 *.swp
+
+# MYPY
+.mypy_cache
+dmypy.json
+dmypy.sock
+
+# Tests
+.pytest_cache
