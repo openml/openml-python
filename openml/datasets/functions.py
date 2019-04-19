@@ -298,18 +298,21 @@ def check_datasets_active(dataset_ids: List[int]) -> Dict[int, bool]:
     return active
 
 
-def _name_to_id(dataset_name: str, error_if_multiple: bool = False) -> int:
+def _name_to_id(dataset_name: str, version: int = None, error_if_multiple: bool = False) -> int:
     """ Attempt to find the dataset id of the dataset with the given name.
 
     If multiple datasets with the name exist, and `error_if_multiple` is `False`,
     then return the least recent still active dataset.
 
-    Raises an error if no dataset is found.
+    Raises an error if no dataset with the name is found.
+    Raises an error if a version is specified but it could not be found.
 
     Parameters
     ----------
     dataset_name : str
         The name of the dataset for which to find its id.
+    version : int
+        Version to retrieve. If not specified, the oldest active version is returned.
     error_if_multiple : bool (default=False)
         If `False`, if multiple datasets match, return the least recent active dataset.
         If `True`, if multiple datasets match, raise an error.
@@ -319,7 +322,13 @@ def _name_to_id(dataset_name: str, error_if_multiple: bool = False) -> int:
     int
        The id of the dataset.
     """
-    
+    candidates = list_datasets(data_name=dataset_name, status='active', data_version=version)
+    if error_if_multiple and len(candidates) > 1:
+        raise ValueError("Multiple active datasets exist")
+    if len(candidates) == 0:
+        raise OpenMLServerNoResult("")
+
+    return sorted(candidates)[0]
 
 
 
