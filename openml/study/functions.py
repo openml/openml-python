@@ -1,4 +1,5 @@
 from typing import cast, Dict, List, Optional, Union
+import warnings
 
 import dateutil.parser
 import xmltodict
@@ -17,15 +18,12 @@ def get_suite(suite_id: Union[int, str]) -> OpenMLBenchmarkSuite:
     study id : int, str
         study id (numeric or alias)
 
-    entity_type : str (optional)
-        Do not change this!
-
     Returns
     -------
     OpenMLSuite
         The OpenML suite object
     """
-    suite = cast(OpenMLBenchmarkSuite, _get_study(suite_id, entity_type='tasks'))
+    suite = cast(OpenMLBenchmarkSuite, _get_study(suite_id, entity_type='task'))
     return suite
 
 
@@ -41,16 +39,28 @@ def get_study(
     study id : int, str
         study id (numeric or alias)
 
+    arg_for_backwards_compat : str, optional
+        The example given in https://arxiv.org/pdf/1708.03731.pdf uses an older version of the
+        API which required specifying the type of study, i.e. tasks. We changed the
+        implementation of studies since then and split them up into suites (collections of tasks)
+        and studies (collections of runs) so this argument is no longer needed.
+
     Returns
     -------
     OpenMLStudy
         The OpenML study object
     """
     if study_id == 'OpenML100':
-        study = _get_study(study_id, entity_type='tasks')
+        message = (
+            "It looks like you are running code from the OpenML100 paper. It still works, but lots "
+            "of things have changed since then. Please use `get_suite('OpenML100')` instead."
+        )
+        warnings.warn(message, DeprecationWarning)
+        openml.config.logger.warn(message)
+        study = _get_study(study_id, entity_type='task')
         return cast(OpenMLBenchmarkSuite, study)  # type: ignore
     else:
-        study = cast(OpenMLStudy, _get_study(study_id, entity_type='runs'))
+        study = cast(OpenMLStudy, _get_study(study_id, entity_type='run'))
         return study
 
 
@@ -66,7 +76,7 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
     study_id = int(result_dict['oml:id'])
     alias = result_dict['oml:alias'] if 'oml:alias' in result_dict else None
     main_entity_type = result_dict['oml:main_entity_type']
-    if entity_type != main_entity_type + 's':
+    if entity_type != main_entity_type:
         raise ValueError(
             "Unexpected entity type '{}' reported by the server, expected '{}'".format(
                 main_entity_type, entity_type,
@@ -160,11 +170,11 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
 
 
 def create_study(
-    alias: Optional[str],
-    benchmark_suite: Optional[int],
     name: str,
     description: str,
     run_ids: List[int],
+    alias: Optional[str],
+    benchmark_suite: Optional[int],
 ) -> OpenMLStudy:
     """
     Creates an OpenML study (collection of data, tasks, flows, setups and run),
@@ -208,10 +218,10 @@ def create_study(
 
 
 def create_benchmark_suite(
-    alias: Optional[str],
     name: str,
     description: str,
     task_ids: List[int],
+    alias: Optional[str],
 ) -> OpenMLBenchmarkSuite:
     """
     Creates an OpenML benchmark suite (collection of entity types, where
@@ -299,7 +309,7 @@ def delete_suite(suite_id: int) -> bool:
     Returns
     -------
     bool
-        True iff the deletion was successful. False otherwse
+        True iff the deletion was successful. False otherwise
     """
     return delete_study(suite_id)
 
@@ -315,7 +325,7 @@ def delete_study(study_id: int) -> bool:
     Returns
     -------
     bool
-        True iff the deletion was successful. False otherwse
+        True iff the deletion was successful. False otherwise
     """
     return openml.utils._delete_entity('study', study_id)
 
@@ -355,6 +365,8 @@ def attach_to_study(study_id: int, run_ids: List[int]) -> int:
     int
         new size of the study (in terms of explicitly linked entities)
     """
+
+    # Interestingly, there's no need to tell the server about the entity type, it knows by itself
     uri = 'study/%d/attach' % study_id
     post_variables = {'ids': ','.join(str(x) for x in run_ids)}
     result_xml = openml._api_calls._perform_api_call(uri, 'post', post_variables)
@@ -396,6 +408,8 @@ def detach_from_study(study_id: int, run_ids: List[int]) -> int:
     int
         new size of the study (in terms of explicitly linked entities)
     """
+
+    # Interestingly, there's no need to tell the server about the entity type, it knows by itself
     uri = 'study/%d/detach' % study_id
     post_variables = {'ids': ','.join(str(x) for x in run_ids)}
     result_xml = openml._api_calls._perform_api_call(uri, 'post', post_variables)
@@ -410,19 +424,19 @@ def list_suites(
     uploader: Optional[List[int]] = None,
 ) -> Dict[int, Dict]:
     """
-    Return a list of all studies which are on OpenML.
+    Return a list of all suites which are on OpenML.
 
     Parameters
     ----------
     offset : int, optional
-        The number of studies to skip, starting from the first.
+        The number of suites to skip, starting from the first.
     size : int, optional
-        The maximum number of studies to show.
+        The maximum number of suites to show.
     status : str, optional
         Should be {active, in_preparation, deactivated, all}. By default active
-        studies are returned.
+        suites are returned.
     uploader : list (int), optional
-        Result filter. Will only return studies created by these users.
+        Result filter. Will only return suites created by these users.
 
     Returns
     -------

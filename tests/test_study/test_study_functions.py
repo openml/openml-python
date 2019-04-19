@@ -26,12 +26,21 @@ class TestStudyFunctions(TestBase):
         self.assertEqual(len(study.setups), 1253)
         self.assertEqual(len(study.runs), 1693)
 
+    def test_get_openml100(self):
+        openml.config.server = self.production_server
+
+        study = openml.study.get_study('OpenML100', 'tasks')
+        self.assertIsInstance(study, openml.study.OpenMLBenchmarkSuite)
+        study_2 = openml.study.get_suite('OpenML100')
+        self.assertIsInstance(study_2, openml.study.OpenMLBenchmarkSuite)
+        self.assertEqual(study.id, study_2.id)
+
     def test_get_study_error(self):
         openml.config.server = self.production_server
 
         with self.assertRaisesRegex(
             ValueError,
-            "Unexpected entity type 'task' reported by the server, expected 'runs'",
+            "Unexpected entity type 'task' reported by the server, expected 'run'",
         ):
             openml.study.get_study(99)
 
@@ -50,7 +59,7 @@ class TestStudyFunctions(TestBase):
 
         with self.assertRaisesRegex(
             ValueError,
-            "Unexpected entity type 'run' reported by the server, expected 'tasks'",
+            "Unexpected entity type 'run' reported by the server, expected 'task'",
         ):
             openml.study.get_suite(123)
 

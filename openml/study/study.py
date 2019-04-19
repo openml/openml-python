@@ -174,14 +174,13 @@ class OpenMLStudy(BaseStudy):
         setups: Optional[List[int]],
     ):
         """
-        An OpenMLStudy represents the OpenML concept of a study. It contains
-        the following information: name, id, description, creation date,
-        creator id and a set of tags.
+        An OpenMLStudy represents the OpenML concept of a study (a collection of runs).
 
-        According to this list of tags, the study object receives a list of
+        It contains the following information: name, id, description, creation date,
+        creator id and a list of run ids.
+
+        According to this list of run ids, the study object receives a list of
         OpenML object ids (datasets, flows, tasks and setups).
-
-        Can be used to obtain all relevant information from a study at once.
 
         Parameters
         ----------
@@ -251,14 +250,13 @@ class OpenMLBenchmarkSuite(BaseStudy):
         tasks: List[int],
     ):
         """
-        An OpenMLStudy represents the OpenML concept of a study. It contains
-        the following information: name, id, description, creation date,
-        creator id and a set of tags.
+        An OpenMLBenchmarkSuite represents the OpenML concept of a suite (a collection of tasks).
 
-        According to this list of tags, the study object receives a list of
-        OpenML object ids (datasets, flows, tasks and setups).
+        It contains the following information: name, id, description, creation date,
+        creator id and the task ids.
 
-        Can be used to obtain all relevant information from a study at once.
+        According to this list of task ids, the suite object receives a list of
+        OpenML object ids (datasets).
 
         Parameters
         ----------
