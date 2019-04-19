@@ -240,6 +240,50 @@ class TestOpenMLDataset(TestBase):
             data_assert(os.path.exists(os.path.join(
                 openml.config.get_cache_directory(), "datasets", str(did), "dataset.arff")))
 
+    def test__name_to_id_with_deactivated(self):
+        """ Check that an activated dataset is returned if an earlier deactivated one exists. """
+        openml.config.server = self.production_server
+        # /d/1 was deactivated
+        self.assertEqual(openml.datasets.functions._name_to_id('anneal'), 2)
+        openml.config.server = self.test_server
+
+    def test__name_to_id_with_multiple_active(self):
+        """ With multiple active datasets, retrieve the least recent active. """
+        self.assertEqual(openml.datasets.functions._name_to_id('iris'), 128)
+
+    def test__name_to_id_with_version(self):
+        """ With multiple active datasets, retrieve the least recent active. """
+        self.assertEqual(openml.datasets.functions._name_to_id('iris', version=3), 151)
+
+    def test__name_to_id_with_multiple_active_error(self):
+        """ With multiple active datasets, retrieve the least recent active. """
+        self.assertRaisesRegex(
+            ValueError,
+            "Multiple active datasets exist with name iris",
+            openml.datasets.functions._name_to_id,
+            dataset_name='iris',
+            error_if_multiple=True
+        )
+
+    def test__name_to_id_name_does_not_exist(self):
+        """ With multiple active datasets, retrieve the least recent active. """
+        self.assertRaisesRegex(
+            RuntimeError,
+            "No active datasets exist with name does_not_exist",
+            openml.datasets.functions._name_to_id,
+            dataset_name='does_not_exist'
+        )
+
+    def test__name_to_id_version_does_not_exist(self):
+        """ With multiple active datasets, retrieve the least recent active. """
+        self.assertRaisesRegex(
+            RuntimeError,
+            "No active datasets exist with name iris and version 100000",
+            openml.datasets.functions._name_to_id,
+            dataset_name='iris',
+            version=100000
+        )
+
     def test_get_datasets_by_name(self):
         # did 1 and 2 on the test server:
         dids = ['anneal', 'kr-vs-kp']
