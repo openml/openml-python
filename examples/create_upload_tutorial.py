@@ -17,7 +17,7 @@ from openml.datasets.functions import create_dataset
 #   connects to the test server instead. This prevents the live server from
 #   crowding with example datasets, tasks, studies, and so on.
 
-openml.config.start_use_example_configuration()
+openml.config.stop_using_configuration_for_example()
 ############################################################################
 
 ############################################################################
@@ -315,4 +315,4 @@ print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 
 
 ############################################################################
-openml.config.stop_use_example_configuration()
+openml.config.stop_using_configuration_for_example()

@@ -39,7 +39,7 @@ import sklearn.preprocessing
 
 root = logging.getLogger()
 root.setLevel(logging.INFO)
-openml.config.start_use_example_configuration()
+openml.config.start_using_configuration_for_example()
 
 ###############################################################################
 # 1) Create a flow and use it to solve a task
@@ -107,4 +107,4 @@ np.testing.assert_array_equal(run_original.data_content,
 
 ###############################################################################
 
-openml.config.stop_use_example_configuration()
+openml.config.stop_using_configuration_for_example()

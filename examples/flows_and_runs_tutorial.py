@@ -18,8 +18,8 @@ from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
 #   connects to the test server instead. This prevents the live server from
 #   crowding with example datasets, tasks, studies, and so on.
 
-openml.config.start_use_example_configuration()
-# NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68
+openml.config.start_using_configuration_for_example()
+# NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
 dataset = openml.datasets.get_dataset(68)
 X, y = dataset.get_data(
     dataset_format='array',
@@ -166,4 +166,4 @@ for task_id in [115, ]:  # Add further tasks. Disclaimer: they might take some t
 
 
 ############################################################################
-openml.config.stop_use_example_configuration()
+openml.config.stop_using_configuration_for_example()
