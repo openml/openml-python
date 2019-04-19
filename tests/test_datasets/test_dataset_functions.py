@@ -234,7 +234,7 @@ class TestOpenMLDataset(TestBase):
             self.assertTrue(os.path.exists(os.path.join(
                 openml.config.get_cache_directory(), "datasets", str(did), "qualities.xml")))
             self.assertTrue(os.path.exists(os.path.join(
-                    openml.config.get_cache_directory(), "datasets", str(did), "features.xml")))
+                openml.config.get_cache_directory(), "datasets", str(did), "features.xml")))
 
             data_assert = self.assertFalse if metadata_only else self.assertTrue
             data_assert(os.path.exists(os.path.join(
