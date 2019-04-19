@@ -1,7 +1,7 @@
 import io
 import os
 import re
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 import numpy as np
 import arff
@@ -247,19 +247,20 @@ def __list_datasets(api_call):
 
     datasets = dict()
     for dataset_ in datasets_dict['oml:data']['oml:dataset']:
-        did = int(dataset_['oml:did'])
-        dataset = {'did': did,
-                   'name': dataset_['oml:name'],
-                   'format': dataset_['oml:format'],
-                   'status': dataset_['oml:status']}
+        ignore_attributes = ['oml:file_id', 'oml:quality']
+        dataset = {k.replace('oml:', ''): v
+                   for (k, v) in dataset_.items()
+                   if k not in ignore_attributes}
+        dataset['did'] = int(dataset['did'])
+        dataset['version'] = int(dataset['version'])
 
         # The number of qualities can range from 0 to infinity
         for quality in dataset_.get('oml:quality', list()):
-            quality['#text'] = float(quality['#text'])
-            if abs(int(quality['#text']) - quality['#text']) < 0.0000001:
-                quality['#text'] = int(quality['#text'])
-            dataset[quality['@name']] = quality['#text']
-        datasets[did] = dataset
+            try:
+                dataset[quality['@name']] = int(quality['#text'])
+            except ValueError:
+                dataset[quality['@name']] = float(quality['#text'])
+        datasets[dataset['did']] = dataset
 
     return datasets
 
@@ -298,6 +299,47 @@ def check_datasets_active(dataset_ids: List[int]) -> Dict[int, bool]:
     return active
 
 
+def _name_to_id(
+    dataset_name: str,
+    version: Optional[int] = None,
+    error_if_multiple: bool = False
+) -> int:
+    """ Attempt to find the dataset id of the dataset with the given name.
+
+    If multiple datasets with the name exist, and ``error_if_multiple`` is ``False``,
+    then return the least recent still active dataset.
+
+    Raises an error if no dataset with the name is found.
+    Raises an error if a version is specified but it could not be found.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset for which to find its id.
+    version : int
+        Version to retrieve. If not specified, the oldest active version is returned.
+    error_if_multiple : bool (default=False)
+        If `False`, if multiple datasets match, return the least recent active dataset.
+        If `True`, if multiple datasets match, raise an error.
+
+    Returns
+    -------
+    int
+       The id of the dataset.
+    """
+    status = None if version is not None else 'active'
+    candidates = list_datasets(data_name=dataset_name, status=status, data_version=version)
+    if error_if_multiple and len(candidates) > 1:
+        raise ValueError("Multiple active datasets exist with name {}".format(dataset_name))
+    if len(candidates) == 0:
+        no_dataset_for_name = "No active datasets exist with name {}".format(dataset_name)
+        and_version = " and version {}".format(version) if version is not None else ""
+        raise RuntimeError(no_dataset_for_name + and_version)
+
+    # Dataset ids are chronological so we can just sort based on ids (instead of version)
+    return sorted(candidates)[0]
+
+
 def get_datasets(
         dataset_ids: List[Union[str, int]],
         download_data: bool = True,
@@ -309,7 +351,8 @@ def get_datasets(
     Parameters
     ----------
     dataset_ids : iterable
-        Integers or strings representing dataset ids.
+        Integers or strings representing dataset ids or dataset names.
+        If dataset names are specified, the least recent still active dataset version is returned.
     download_data : bool, optional
         If True, also download the data file. Beware that some datasets are large and it might
         make the operation noticeably slower. Metadata is also still retrieved.
@@ -328,12 +371,22 @@ def get_datasets(
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_dataset(dataset_id: Union[int, str], download_data: bool = True) -> OpenMLDataset:
+def get_dataset(
+    dataset_id: Union[int, str],
+    download_data: bool = True,
+    version: int = None,
+    error_if_multiple: bool = False
+) -> OpenMLDataset:
     """ Download the OpenML dataset representation, optionally also download actual data file.
 
     This function is thread/multiprocessing safe.
     This function uses caching. A check will be performed to determine if the information has
     previously been downloaded, and if so be loaded from disk instead of retrieved from the server.
+
+    If dataset is retrieved by name, a version may be specified.
+    If no version is specified and multiple versions of the dataset exist,
+    the earliest version of the dataset that is still active will be returned.
+    This scenario will raise an error instead if `exception_if_multiple` is `True`.
 
     Parameters
     ----------
@@ -344,16 +397,24 @@ def get_dataset(dataset_id: Union[int, str], download_data: bool = True) -> Open
         make the operation noticeably slower. Metadata is also still retrieved.
         If False, create the OpenMLDataset and only populate it with the metadata.
         The data may later be retrieved through the `OpenMLDataset.get_data` method.
+    version : int, optional (default=None)
+        Specifies the version if `dataset_id` is specified by name.
+        If no version is specified, retrieve the least recent still active version.
+    error_if_multiple : bool, optional (default=False)
+        If `True` raise an error if multiple datasets are found with matching criteria.
 
     Returns
     -------
     dataset : :class:`openml.OpenMLDataset`
         The downloaded dataset."""
-    try:
-        dataset_id = int(dataset_id)
-    except (ValueError, TypeError):
-        raise ValueError("Dataset ID is neither an Integer nor can be "
-                         "cast to an Integer.")
+    if isinstance(dataset_id, str):
+        try:
+            dataset_id = int(dataset_id)
+        except ValueError:
+            dataset_id = _name_to_id(dataset_id, version, error_if_multiple)  # type: ignore
+    elif not isinstance(dataset_id, int):
+        raise TypeError("`dataset_id` must be one of `str` or `int`, not {}."
+                        .format(type(dataset_id)))
 
     did_cache_dir = _create_cache_directory_for_id(
         DATASETS_CACHE_DIR_NAME, dataset_id,
