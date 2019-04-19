@@ -11,7 +11,7 @@ class TestConfig(openml.testing.TestBase):
         self.assertTrue(os.path.isdir(os.path.expanduser('~/.openml')))
 
 
-class TestConfig(openml.testing.TestBase):
+class TestConfigurationForExamples(openml.testing.TestBase):
 
     def test_switch_to_example_configuration(self):
         """ Verifies the test configuration is loaded properly. """
