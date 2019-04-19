@@ -219,70 +219,63 @@ class TestOpenMLDataset(TestBase):
         )
         openml.config.server = self.test_server
 
+    def _datasets_retrieved_successfully(self, dids, metadata_only=True):
+        """ Checks that all files for the given dids have been downloaded.
+
+        This includes:
+            - description
+            - qualities
+            - features
+            - absence of data arff if metadata_only, else it must be present too.
+        """
+        for did in dids:
+            self.assertTrue(os.path.exists(os.path.join(
+                openml.config.get_cache_directory(), "datasets", str(did), "description.xml")))
+            self.assertTrue(os.path.exists(os.path.join(
+                openml.config.get_cache_directory(), "datasets", str(did), "qualities.xml")))
+            self.assertTrue(os.path.exists(os.path.join(
+                    openml.config.get_cache_directory(), "datasets", str(did), "features.xml")))
+
+            data_assert = self.assertFalse if metadata_only else self.assertTrue
+            data_assert(os.path.exists(os.path.join(
+                openml.config.get_cache_directory(), "datasets", str(did), "dataset.arff")))
+
+    def test_get_datasets_by_name(self):
+        # did 1 and 2 on the test server:
+        dids = ['anneal', 'kr-vs-kp']
+        datasets = openml.datasets.get_datasets(dids, download_data=False)
+        self.assertEqual(len(datasets), 2)
+        self._datasets_retrieved_successfully([1, 2])
+
+    def test_get_datasets_by_mixed(self):
+        # did 1 and 2 on the test server:
+        dids = ['anneal', 2]
+        datasets = openml.datasets.get_datasets(dids, download_data=False)
+        self.assertEqual(len(datasets), 2)
+        self._datasets_retrieved_successfully([1, 2])
+
     def test_get_datasets(self):
         dids = [1, 2]
         datasets = openml.datasets.get_datasets(dids)
         self.assertEqual(len(datasets), 2)
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "description.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "2", "description.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "2", "features.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "2", "qualities.xml")))
+        self._datasets_retrieved_successfully([1, 2], metadata_only=False)
 
     def test_get_datasets_lazy(self):
         dids = [1, 2]
         datasets = openml.datasets.get_datasets(dids, download_data=False)
         self.assertEqual(len(datasets), 2)
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "description.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "2", "description.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "2", "features.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "2", "qualities.xml")))
-
-        self.assertFalse(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
-        self.assertFalse(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")))
+        self._datasets_retrieved_successfully([1, 2], metadata_only=True)
 
         datasets[0].get_data()
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
-
         datasets[1].get_data()
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")))
+        self._datasets_retrieved_successfully([1, 2], metadata_only=False)
 
     def test_get_dataset(self):
         # This is the only non-lazy load to ensure default behaviour works.
         dataset = openml.datasets.get_dataset(1)
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, 'anneal')
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "description.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
+        self._datasets_retrieved_successfully([1], metadata_only=False)
 
         self.assertGreater(len(dataset.features), 1)
         self.assertGreater(len(dataset.qualities), 4)
@@ -295,22 +288,13 @@ class TestOpenMLDataset(TestBase):
         dataset = openml.datasets.get_dataset(1, download_data=False)
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, 'anneal')
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "description.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
-
-        self.assertFalse(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+        self._datasets_retrieved_successfully([1], metadata_only=True)
 
         self.assertGreater(len(dataset.features), 1)
         self.assertGreater(len(dataset.qualities), 4)
 
         dataset.get_data()
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+        self._datasets_retrieved_successfully([1], metadata_only=False)
 
         # Issue324 Properly handle private datasets when trying to access them
         openml.config.server = self.production_server
@@ -321,27 +305,26 @@ class TestOpenMLDataset(TestBase):
         dataset = openml.datasets.get_dataset(1, download_data=False)
         # We only tests functions as general integrity is tested by test_get_dataset_lazy
 
+        def ensure_absence_of_real_data():
+            self.assertFalse(os.path.exists(os.path.join(
+                openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+
         tag = 'test_lazy_tag_%d' % random.randint(1, 1000000)
         dataset.push_tag(tag)
-        self.assertFalse(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+        ensure_absence_of_real_data()
 
         dataset.remove_tag(tag)
-        self.assertFalse(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+        ensure_absence_of_real_data()
 
         nominal_indices = dataset.get_features_by_type('nominal')
-        self.assertFalse(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
         correct = [0, 1, 2, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
                    20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 35, 36, 37, 38]
         self.assertEqual(nominal_indices, correct)
+        ensure_absence_of_real_data()
 
         classes = dataset.retrieve_class_labels()
         self.assertEqual(classes, ['1', '2', '3', '4', '5', 'U'])
-
-        self.assertFalse(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+        ensure_absence_of_real_data()
 
     def test_get_dataset_sparse(self):
         dataset = openml.datasets.get_dataset(102, download_data=False)
