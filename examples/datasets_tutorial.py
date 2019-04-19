@@ -6,6 +6,14 @@ Datasets
 How to list and download datasets.
 """
 
+############################################################################
+# .. warning:: This example uploads data. For that reason, this example
+#   connects to the test server instead. This prevents the live server from
+#   crowding with example datasets, tasks, studies, and so on.
+
+openml.config.start_use_example_configuration()
+############################################################################
+
 import openml
 import pandas as pd
 
@@ -101,3 +109,7 @@ _ = pd.plotting.scatter_matrix(
     alpha=.8,
     cmap='plasma'
 )
+
+
+############################################################################
+openml.config.stop_use_example_configuration()

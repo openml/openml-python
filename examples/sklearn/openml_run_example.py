@@ -7,6 +7,14 @@ An example of an automated machine learning experiment.
 import openml
 from sklearn import tree, preprocessing, pipeline
 
+############################################################################
+# .. warning:: This example uploads data. For that reason, this example
+#   connects to the test server instead. This prevents the live server from
+#   crowding with example datasets, tasks, studies, and so on.
+
+openml.config.start_use_example_configuration()
+############################################################################
+
 # Uncomment and set your OpenML key. Don't share your key with others.
 # openml.config.apikey = 'YOURKEY'
 
@@ -27,3 +35,6 @@ run = openml.runs.run_model_on_task(clf, task)
 run.publish()
 
 print('URL for run: %s/run/%d' % (openml.config.server, run.run_id))
+
+############################################################################
+openml.config.stop_use_example_configuration()

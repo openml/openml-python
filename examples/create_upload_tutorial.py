@@ -13,9 +13,12 @@ import openml
 from openml.datasets.functions import create_dataset
 
 ############################################################################
-# For this tutorial we will upload to the test server to not pollute the live
-# server with countless copies of the same dataset.
-openml.config.server = 'https://test.openml.org/api/v1/xml'
+# .. warning:: This example uploads data. For that reason, this example
+#   connects to the test server instead. This prevents the live server from
+#   crowding with example datasets, tasks, studies, and so on.
+
+openml.config.start_use_example_configuration()
+############################################################################
 
 ############################################################################
 # Below we will cover the following cases of the dataset object:
@@ -309,3 +312,7 @@ xor_dataset = create_dataset(
 
 upload_did = xor_dataset.publish()
 print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+
+
+############################################################################
+openml.config.stop_use_example_configuration()
