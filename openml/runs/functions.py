@@ -449,9 +449,9 @@ def _run_task_get_arffcontent(
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
 
-            for i in range(0, len(test_indices)):
+            for i, tst_idx in enumerate(test_indices):
 
-                arff_line = [rep_no, fold_no, sample_no, i]  # type: List[Any]
+                arff_line = [rep_no, fold_no, sample_no, tst_idx]  # type: List[Any]
                 for j, class_label in enumerate(task.class_labels):
                     arff_line.append(proba_y[i][j])
 
@@ -545,12 +545,18 @@ def get_runs(run_ids):
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_run(run_id):
+def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:
     """Gets run corresponding to run_id.
 
     Parameters
     ----------
     run_id : int
+
+    ignore_cache : bool
+        Whether to ignore the cache. If ``true`` this will download and overwrite the run xml
+        even if the requested run is already cached.
+
+    ignore_cache
 
     Returns
     -------
@@ -565,11 +571,13 @@ def get_run(run_id):
         os.makedirs(run_dir)
 
     try:
-        return _get_cached_run(run_id)
+        if not ignore_cache:
+            return _get_cached_run(run_id)
+        else:
+            raise OpenMLCacheException(message='dummy')
 
-    except (OpenMLCacheException):
-        run_xml = openml._api_calls._perform_api_call("run/%d" % run_id,
-                                                      'get')
+    except OpenMLCacheException:
+        run_xml = openml._api_calls._perform_api_call("run/%d" % run_id, 'get')
         with io.open(run_file, "w", encoding='utf8') as fh:
             fh.write(run_xml)
 
