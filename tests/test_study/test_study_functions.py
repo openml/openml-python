@@ -6,39 +6,62 @@ from openml.testing import TestBase
 class TestStudyFunctions(TestBase):
     _multiprocess_can_split_ = True
 
-    def test_get_study(self):
+    def test_get_study_old(self):
         openml.config.server = self.production_server
 
-        study_id = 34
-
-        study = openml.study.get_study(study_id)
+        study = openml.study.get_study(34)
         self.assertEqual(len(study.data), 105)
         self.assertEqual(len(study.tasks), 105)
         self.assertEqual(len(study.flows), 27)
         self.assertEqual(len(study.setups), 30)
-
-    def test_get_tasks(self):
-        study_id = 1
-
-        study = openml.study.get_study(study_id, 'tasks')
-        self.assertGreater(len(study.data), 0)
-        self.assertGreaterEqual(len(study.tasks), len(study.data))
-        # note that other entities are None, even though this study has
-        # datasets
-        self.assertIsNone(study.flows)
-        self.assertIsNone(study.setups)
         self.assertIsNone(study.runs)
 
-    def test_get_tasks_new_studies(self):
-        study_id = 99
+    def test_get_study_new(self):
+        openml.config.server = self.production_server
 
-        study = openml.study.get_study(study_id, 'tasks')
-        self.assertGreater(len(study.data), 0)
-        self.assertGreaterEqual(len(study.tasks), len(study.data))
-        # other entities should be None because of the tasks filter
+        study = openml.study.get_study(123)
+        self.assertEqual(len(study.data), 299)
+        self.assertEqual(len(study.tasks), 299)
+        self.assertEqual(len(study.flows), 5)
+        self.assertEqual(len(study.setups), 1253)
+        self.assertEqual(len(study.runs), 1693)
+
+    def test_get_openml100(self):
+        openml.config.server = self.production_server
+
+        study = openml.study.get_study('OpenML100', 'tasks')
+        self.assertIsInstance(study, openml.study.OpenMLBenchmarkSuite)
+        study_2 = openml.study.get_suite('OpenML100')
+        self.assertIsInstance(study_2, openml.study.OpenMLBenchmarkSuite)
+        self.assertEqual(study.id, study_2.id)
+
+    def test_get_study_error(self):
+        openml.config.server = self.production_server
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "Unexpected entity type 'task' reported by the server, expected 'run'",
+        ):
+            openml.study.get_study(99)
+
+    def test_get_suite(self):
+        openml.config.server = self.production_server
+
+        study = openml.study.get_suite(99)
+        self.assertEqual(len(study.data), 72)
+        self.assertEqual(len(study.tasks), 72)
         self.assertIsNone(study.flows)
-        self.assertIsNone(study.setups)
         self.assertIsNone(study.runs)
+        self.assertIsNone(study.setups)
+
+    def test_get_suite_error(self):
+        openml.config.server = self.production_server
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "Unexpected entity type 'run' reported by the server, expected 'task'",
+        ):
+            openml.study.get_suite(123)
 
     def test_publish_benchmark_suite(self):
         fixture_alias = None
@@ -56,7 +79,7 @@ class TestStudyFunctions(TestBase):
         self.assertGreater(study_id, 0)
 
         # verify main meta data
-        study_downloaded = openml.study.get_study(study_id)
+        study_downloaded = openml.study.get_suite(study_id)
         self.assertEqual(study_downloaded.alias, fixture_alias)
         self.assertEqual(study_downloaded.name, fixture_name)
         self.assertEqual(study_downloaded.description, fixture_descr)
@@ -72,19 +95,19 @@ class TestStudyFunctions(TestBase):
         # attach more tasks
         tasks_additional = [4, 5, 6]
         openml.study.attach_to_study(study_id, tasks_additional)
-        study_downloaded = openml.study.get_study(study_id)
+        study_downloaded = openml.study.get_suite(study_id)
         # verify again
         self.assertSetEqual(set(study_downloaded.tasks),
                             set(fixture_task_ids + tasks_additional))
         # test detach function
         openml.study.detach_from_study(study_id, fixture_task_ids)
-        study_downloaded = openml.study.get_study(study_id)
+        study_downloaded = openml.study.get_suite(study_id)
         self.assertSetEqual(set(study_downloaded.tasks),
                             set(tasks_additional))
 
         # test status update function
-        openml.study.status_update(study_id, 'deactivated')
-        study_downloaded = openml.study.get_study(study_id)
+        openml.study.update_suite_status(study_id, 'deactivated')
+        study_downloaded = openml.study.get_suite(study_id)
         self.assertEqual(study_downloaded.status, 'deactivated')
         # can't delete study, now it's not longer in preparation
 
@@ -136,7 +159,7 @@ class TestStudyFunctions(TestBase):
                             set(run_list_additional.keys()))
 
         # test status update function
-        openml.study.status_update(study_id, 'deactivated')
+        openml.study.update_study_status(study_id, 'deactivated')
         study_downloaded = openml.study.get_study(study_id)
         self.assertEqual(study_downloaded.status, 'deactivated')
 

@@ -1,11 +1,37 @@
-from .study import OpenMLStudy
-from .functions import get_study, create_study, create_benchmark_suite, \
-    status_update, attach_to_study, detach_from_study, delete_study, \
-    list_studies
+from .study import OpenMLStudy, OpenMLBenchmarkSuite
+from .functions import (
+    get_study,
+    get_suite,
+    create_study,
+    create_benchmark_suite,
+    update_study_status,
+    update_suite_status,
+    attach_to_study,
+    attach_to_suite,
+    detach_from_study,
+    detach_from_suite,
+    delete_study,
+    delete_suite,
+    list_studies,
+    list_suites,
+)
 
 
 __all__ = [
-    'OpenMLStudy', 'attach_to_study', 'create_benchmark_suite', 'create_study',
-    'delete_study', 'detach_from_study', 'get_study', 'list_studies',
-    'status_update'
+    'OpenMLStudy',
+    'OpenMLBenchmarkSuite',
+    'attach_to_study',
+    'attach_to_suite',
+    'create_benchmark_suite',
+    'create_study',
+    'delete_study',
+    'delete_suite',
+    'detach_from_study',
+    'detach_from_suite',
+    'get_study',
+    'get_suite',
+    'list_studies',
+    'list_suites',
+    'update_suite_status',
+    'update_study_status',
 ]
