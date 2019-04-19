@@ -324,13 +324,14 @@ def _name_to_id(dataset_name: str, version: int = None, error_if_multiple: bool 
     """
     candidates = list_datasets(data_name=dataset_name, status='active', data_version=version)
     if error_if_multiple and len(candidates) > 1:
-        raise ValueError("Multiple active datasets exist")
+        raise ValueError("Multiple active datasets exist with name {}".format(dataset_name))
     if len(candidates) == 0:
-        raise OpenMLServerNoResult("")
+        no_dataset_for_name = "No active datasets exist with name {}".format(dataset_name)
+        and_version = " and version {}".format(version) if version is not None else ""
+        raise RuntimeError(no_dataset_for_name + and_version)
 
+    # Dataset ids are chronological so we can just sort based on ids (instead of version)
     return sorted(candidates)[0]
-
-
 
 
 def get_datasets(
