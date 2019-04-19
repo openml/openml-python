@@ -113,17 +113,17 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.study</span></code>.get_study<a class="headerlink" href="#openml-study-get-study" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.study.get_study">
-<code class="descclassname">openml.study.</code><code class="descname">get_study</code><span class="sig-paren">(</span><em>study_id</em>, <em>entity_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.study.get_study" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves all relevant information of an OpenML study from the server
-Note that some of the (data, tasks, flows, setups) fields can be empty
-(depending on information on the server)</p>
+<code class="descclassname">openml.study.</code><code class="descname">get_study</code><span class="sig-paren">(</span><em>study_id: Union[int, str], arg_for_backwards_compat: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; openml.study.study.OpenMLStudy<a class="headerlink" href="#openml.study.get_study" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves all relevant information of an OpenML study from the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>study id</strong><span class="classifier">int, str</span></dt><dd><p>study id (numeric or alias)</p>
 </dd>
-<dt><strong>entity_type</strong><span class="classifier">str (optional)</span></dt><dd><p>Which entity type to return. Either {data, tasks, flows, setups,
-runs}. Give None to return all entity types.</p>
+<dt><strong>arg_for_backwards_compat</strong><span class="classifier">str, optional</span></dt><dd><p>The example given in <a class="reference external" href="https://arxiv.org/pdf/1708.03731.pdf">https://arxiv.org/pdf/1708.03731.pdf</a> uses an older version of the
+API which required specifying the type of study, i.e. tasks. We changed the
+implementation of studies since then and split them up into suites (collections of tasks)
+and studies (collections of runs) so this argument is no longer needed.</p>
 </dd>
 </dl>
 </dd>
