@@ -38,8 +38,8 @@ avoid_duplicate_runs = True if _defaults['avoid_duplicate_runs'] == 'True' else 
 connection_n_retries = _defaults['connection_n_retries']
 
 
-class ExampleConfiguration:
-    """ Allows easy switching to and from a test configuration. """
+class ConfigurationForExamples:
+    """ Allows easy switching to and from a test configuration, used for examples. """
     _last_used_server = None
     _last_used_key = None
     _start_last_called = False
@@ -188,8 +188,8 @@ def set_cache_directory(cachedir):
     cache_directory = cachedir
 
 
-start_use_example_configuration = ExampleConfiguration.start_use_example_configuration
-stop_use_example_configuration = ExampleConfiguration.stop_use_example_configuration
+start_use_example_configuration = ConfigurationForExamples.start_use_example_configuration
+stop_use_example_configuration = ConfigurationForExamples.stop_use_example_configuration
 
 __all__ = [
     'get_cache_directory', 'set_cache_directory',
