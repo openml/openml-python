@@ -12,7 +12,7 @@ from sklearn import tree, preprocessing, pipeline
 #   connects to the test server instead. This prevents the live server from
 #   crowding with example datasets, tasks, studies, and so on.
 
-openml.config.start_use_example_configuration()
+openml.config.start_using_configuration_for_example()
 ############################################################################
 
 # Uncomment and set your OpenML key. Don't share your key with others.
@@ -37,4 +37,4 @@ run.publish()
 print('URL for run: %s/run/%d' % (openml.config.server, run.run_id))
 
 ############################################################################
-openml.config.stop_use_example_configuration()
+openml.config.stop_using_configuration_for_example()
