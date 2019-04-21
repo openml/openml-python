@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.study</span></code>.get_study<a class="headerlink" href="#openml-study-get-study" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.study.get_study">
-<code class="descclassname">openml.study.</code><code class="descname">get_study</code><span class="sig-paren">(</span><em>study_id: Union[int, str], arg_for_backwards_compat: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; openml.study.study.OpenMLStudy<a class="headerlink" href="#openml.study.get_study" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.study.</code><code class="descname">get_study</code><span class="sig-paren">(</span><em>study_id: Union[int, str], arg_for_backwards_compat: Union[str, NoneType] = None</em><span class="sig-paren">)</span> &#x2192; openml.study.study.OpenMLStudy<a class="headerlink" href="#openml.study.get_study" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves all relevant information of an OpenML study from the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -129,7 +129,7 @@ and studies (collections of runs) so this argument is no longer needed.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>OpenMLStudy</strong></dt><dd><p>The OpenML study object</p>
+<dt>OpenMLStudy</dt><dd><p>The OpenML study object</p>
 </dd>
 </dl>
 </dd>

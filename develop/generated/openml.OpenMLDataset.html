@@ -191,7 +191,7 @@ which maps a quality name to a quality value.</p>
 </dl>
 <dl class="method">
 <dt id="openml.OpenMLDataset.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>target: Union[List[str], str, None] = None, include_row_id: bool = False, include_ignore_attributes: bool = False, return_categorical_indicator: bool = False, return_attribute_names: bool = False, dataset_format: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>self, target: Union[List[str], str, NoneType] = None, include_row_id: bool = False, include_ignore_attributes: bool = False, return_categorical_indicator: bool = False, return_attribute_names: bool = False, dataset_format: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns dataset content as dataframes or sparse matrices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -233,7 +233,7 @@ Only returned if return_attribute_names is True.</p>
 
 <dl class="method">
 <dt id="openml.OpenMLDataset.get_features_by_type">
-<code class="descname">get_features_by_type</code><span class="sig-paren">(</span><em>data_type</em>, <em>exclude=None</em>, <em>exclude_ignore_attributes=True</em>, <em>exclude_row_id_attribute=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_features_by_type" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_features_by_type</code><span class="sig-paren">(</span><em>self</em>, <em>data_type</em>, <em>exclude=None</em>, <em>exclude_ignore_attributes=True</em>, <em>exclude_row_id_attribute=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_features_by_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return indices of features of a given type, e.g. all nominal features.
 Optional parameters to exclude various features by index or ontology.</p>
 <dl class="field-list simple">
@@ -265,13 +265,13 @@ return values as if these indices are not present)</p>
 
 <dl class="method">
 <dt id="openml.OpenMLDataset.publish">
-<code class="descname">publish</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.publish" title="Permalink to this definition">¶</a></dt>
+<code class="descname">publish</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.publish" title="Permalink to this definition">¶</a></dt>
 <dd><p>Publish the dataset on the OpenML server.</p>
 <p>Upload the dataset description and dataset content to openml.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>dataset_id: int</strong></dt><dd><p>Id of the dataset uploaded to the server.</p>
+<dt>dataset_id: int</dt><dd><p>Id of the dataset uploaded to the server.</p>
 </dd>
 </dl>
 </dd>
@@ -280,7 +280,7 @@ return values as if these indices are not present)</p>
 
 <dl class="method">
 <dt id="openml.OpenMLDataset.push_tag">
-<code class="descname">push_tag</code><span class="sig-paren">(</span><em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.push_tag" title="Permalink to this definition">¶</a></dt>
+<code class="descname">push_tag</code><span class="sig-paren">(</span><em>self</em>, <em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.push_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Annotates this data set with a tag on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -294,7 +294,7 @@ return values as if these indices are not present)</p>
 
 <dl class="method">
 <dt id="openml.OpenMLDataset.remove_tag">
-<code class="descname">remove_tag</code><span class="sig-paren">(</span><em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.remove_tag" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove_tag</code><span class="sig-paren">(</span><em>self</em>, <em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.remove_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes a tag from this dataset on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -308,7 +308,7 @@ return values as if these indices are not present)</p>
 
 <dl class="method">
 <dt id="openml.OpenMLDataset.retrieve_class_labels">
-<code class="descname">retrieve_class_labels</code><span class="sig-paren">(</span><em>target_name: str = 'class'</em><span class="sig-paren">)</span> &#x2192; Union[None, List[str]]<a class="headerlink" href="#openml.OpenMLDataset.retrieve_class_labels" title="Permalink to this definition">¶</a></dt>
+<code class="descname">retrieve_class_labels</code><span class="sig-paren">(</span><em>self</em>, <em>target_name: str = 'class'</em><span class="sig-paren">)</span> &#x2192; Union[NoneType, List[str]]<a class="headerlink" href="#openml.OpenMLDataset.retrieve_class_labels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the datasets arff to determine the class-labels.</p>
 <p>If the task has no class labels (for example a regression problem)
 it returns None. Necessary because the data returned by get_data
@@ -323,7 +323,7 @@ classname when uploading the results of a run.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>list</strong></dt><dd></dd>
+<dt>list</dt><dd></dd>
 </dl>
 </dd>
 </dl>

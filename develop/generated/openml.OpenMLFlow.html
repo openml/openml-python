@@ -185,7 +185,7 @@ machines.</p>
 </dl>
 <dl class="method">
 <dt id="openml.OpenMLFlow.get_structure">
-<code class="descname">get_structure</code><span class="sig-paren">(</span><em>key_item: str</em><span class="sig-paren">)</span> &#x2192; Dict[str, List[str]]<a class="headerlink" href="#openml.OpenMLFlow.get_structure" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_structure</code><span class="sig-paren">(</span><em>self</em>, <em>key_item: str</em><span class="sig-paren">)</span> &#x2192; Dict[str, List[str]]<a class="headerlink" href="#openml.OpenMLFlow.get_structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns for each sub-component of the flow the path of identifiers
 that should be traversed to reach this component. The resulting dict
 maps a key (identifying a flow by either its id, name or fullname) to
@@ -200,7 +200,7 @@ structure. Allowed values {flow_id, name}</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>dict[str, List[str]]</strong></dt><dd><p>The flow structure</p>
+<dt>dict[str, List[str]]</dt><dd><p>The flow structure</p>
 </dd>
 </dl>
 </dd>
@@ -209,7 +209,7 @@ structure. Allowed values {flow_id, name}</p>
 
 <dl class="method">
 <dt id="openml.OpenMLFlow.get_subflow">
-<code class="descname">get_subflow</code><span class="sig-paren">(</span><em>structure</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.get_subflow" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_subflow</code><span class="sig-paren">(</span><em>self</em>, <em>structure</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.get_subflow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a subflow from the tree of dependencies.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -220,7 +220,7 @@ structure. Allowed values {flow_id, name}</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>OpenMLFlow</strong></dt><dd><p>The OpenMLFlow that corresponds to the structure</p>
+<dt>OpenMLFlow</dt><dd><p>The OpenMLFlow that corresponds to the structure</p>
 </dd>
 </dl>
 </dd>
@@ -229,7 +229,7 @@ structure. Allowed values {flow_id, name}</p>
 
 <dl class="method">
 <dt id="openml.OpenMLFlow.publish">
-<code class="descname">publish</code><span class="sig-paren">(</span><em>raise_error_if_exists: bool = False</em><span class="sig-paren">)</span> &#x2192; openml.flows.flow.OpenMLFlow<a class="headerlink" href="#openml.OpenMLFlow.publish" title="Permalink to this definition">¶</a></dt>
+<code class="descname">publish</code><span class="sig-paren">(</span><em>self</em>, <em>raise_error_if_exists: bool = False</em><span class="sig-paren">)</span> &#x2192; 'OpenMLFlow'<a class="headerlink" href="#openml.OpenMLFlow.publish" title="Permalink to this definition">¶</a></dt>
 <dd><p>Publish this flow to OpenML server.</p>
 <p>Raises a PyOpenMLError if the flow exists on the server, but
 <cite>self.flow_id</cite> does not match the server known flow id.</p>
@@ -251,7 +251,7 @@ If False, update the local flow to match the server flow.</p>
 
 <dl class="method">
 <dt id="openml.OpenMLFlow.push_tag">
-<code class="descname">push_tag</code><span class="sig-paren">(</span><em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.push_tag" title="Permalink to this definition">¶</a></dt>
+<code class="descname">push_tag</code><span class="sig-paren">(</span><em>self</em>, <em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.push_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Annotates this flow with a tag on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -265,7 +265,7 @@ If False, update the local flow to match the server flow.</p>
 
 <dl class="method">
 <dt id="openml.OpenMLFlow.remove_tag">
-<code class="descname">remove_tag</code><span class="sig-paren">(</span><em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.remove_tag" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove_tag</code><span class="sig-paren">(</span><em>self</em>, <em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.remove_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes a tag from this flow on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

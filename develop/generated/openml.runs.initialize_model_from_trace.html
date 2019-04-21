@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>.initialize_model_from_trace<a class="headerlink" href="#openml-runs-initialize-model-from-trace" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.runs.initialize_model_from_trace">
-<code class="descclassname">openml.runs.</code><code class="descname">initialize_model_from_trace</code><span class="sig-paren">(</span><em>run_id: int</em>, <em>repeat: int</em>, <em>fold: int</em>, <em>iteration: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#openml.runs.initialize_model_from_trace" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.runs.</code><code class="descname">initialize_model_from_trace</code><span class="sig-paren">(</span><em>run_id: int</em>, <em>repeat: int</em>, <em>fold: int</em>, <em>iteration: Union[int</em>, <em>NoneType] = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#openml.runs.initialize_model_from_trace" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a model based on the parameters that were set
 by an optimization procedure (i.e., using the exact same
 parameter settings)</p>
@@ -136,7 +136,7 @@ OpenMLRunTrace.get_selected_iteration</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>model</strong></dt><dd></dd>
+<dt>model</dt><dd></dd>
 </dl>
 </dd>
 </dl>
