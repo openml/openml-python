@@ -45,6 +45,7 @@ An introduction to OpenML, followed up by a simple example.
 #   file must be in the directory ~/.openml/config and exist prior to
 #   importing the openml module.
 # * Run the code below, replacing 'YOURKEY' with your API key.
+#
 # .. warning:: This example uploads data. For that reason, this example
 #   connects to the test server instead. This prevents the live server from
 #   crowding with example datasets, tasks, studies, and so on.
@@ -88,7 +89,7 @@ clf = neighbors.KNeighborsClassifier(n_neighbors=5)
 run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
 # Publish the experiment on OpenML (optional, requires an API key).
 # For this tutorial, our configuration publishes to the test server
-# as to not pollute the main server.
+# as to not crowd the main server with runs created by examples.
 myrun = run.publish()
 print("kNN on %s: http://test.openml.org/r/%d" % (data.name, myrun.run_id))
 

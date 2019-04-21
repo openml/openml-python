@@ -26,8 +26,8 @@ In this tutorial we will
     3) We will verify that the obtained results are exactly the same.
 
 .. warning:: This example uploads data. For that reason, this example
-connects to the test server instead. This prevents the live server from
-crowding with example datasets, tasks, studies, and so on.
+   connects to the test server at test.openml.org. This prevents the main
+   server from crowding with example datasets, tasks, runs, and so on.
 """
 import logging
 import numpy as np

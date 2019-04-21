@@ -14,9 +14,10 @@ from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # Train a scikit-learn model on the data manually.
+#
 # .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server instead. This prevents the live server from
-#   crowding with example datasets, tasks, studies, and so on.
+#   connects to the test server at test.openml.org. This prevents the main
+#   server from crowding with example datasets, tasks, runs, and so on.
 
 openml.config.start_using_configuration_for_example()
 # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68

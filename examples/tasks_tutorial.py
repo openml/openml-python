@@ -79,7 +79,7 @@ pprint(tasks.head())
 ############################################################################
 # Furthermore, we can list tasks based on the dataset id:
 
-tasks = openml.tasks.list_tasks(data_id=61)
+tasks = openml.tasks.list_tasks(data_id=1471)
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
 print("First 5 of %s tasks:" % len(tasks))
 pprint(tasks.head())
