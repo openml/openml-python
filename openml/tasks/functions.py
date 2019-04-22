@@ -2,6 +2,7 @@ from collections import OrderedDict
 import io
 import re
 import os
+from typing import Union
 import xmltodict
 
 from ..exceptions import OpenMLCacheException
@@ -450,7 +451,9 @@ def create_task(
         estimation_procedure_id: int,
         evaluation_measure: str = None,
         **kwargs
-):
+) -> Union[
+    OpenMLClassificationTask, OpenMLRegressionTask,
+    OpenMLLearningCurveTask, OpenMLClusteringTask]:
     """Create a task based on different given attributes.
 
     Builds a task object with the function arguments as
@@ -479,7 +482,8 @@ def create_task(
 
     Returns
     -------
-    OpenMLTask
+    OpenMLClassificationTask, OpenMLRegressionTask,
+    OpenMLLearningCurveTask, OpenMLClusteringTask
     """
     task_cls = {
         TaskTypeEnum.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
