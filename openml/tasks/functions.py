@@ -453,7 +453,8 @@ def create_task(
         **kwargs
 ) -> Union[
     OpenMLClassificationTask, OpenMLRegressionTask,
-    OpenMLLearningCurveTask, OpenMLClusteringTask]:
+    OpenMLLearningCurveTask, OpenMLClusteringTask
+]:
     """Create a task based on different given attributes.
 
     Builds a task object with the function arguments as

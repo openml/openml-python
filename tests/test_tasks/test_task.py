@@ -1,13 +1,10 @@
 import unittest
 from random import randint
-from time import time
 
 from openml.testing import TestBase
 from openml.datasets import (
-    check_datasets_active,
     get_dataset,
     list_datasets,
-    OpenMLDataset,
 )
 from openml.tasks import (
     create_task,

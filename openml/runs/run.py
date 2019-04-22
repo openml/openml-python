@@ -227,11 +227,11 @@ class OpenMLRun(object):
             arff_dict['attributes'] = instance_specifications
             if class_labels is not None:
                 arff_dict['attributes'] = arff_dict['attributes'] + \
-                                          [('confidence.' + class_labels[i],
-                                            'NUMERIC') for i in
+                                         [('confidence.' + class_labels[i],
+                                           'NUMERIC') for i in
                                            range(len(class_labels))] + \
-                                          [('prediction', class_labels),
-                                           ('correct', class_labels)]
+                                         [('prediction', class_labels),
+                                          ('correct', class_labels)]
         elif isinstance(task, OpenMLClassificationTask):
             class_labels = task.class_labels
             instance_specifications = [('repeat', 'NUMERIC'),
@@ -246,9 +246,9 @@ class OpenMLRun(object):
                                           for i in range(len(class_labels))]
                 prediction_and_true = [('prediction', class_labels),
                                        ('correct', class_labels)]
-            arff_dict['attributes'] = arff_dict['attributes']\
-                                      + prediction_confidences \
-                                      + prediction_and_true
+                arff_dict['attributes'] = arff_dict['attributes'] \
+                                        + prediction_confidences \
+                                        + prediction_and_true
         elif isinstance(task, OpenMLRegressionTask):
             arff_dict['attributes'] = [('repeat', 'NUMERIC'),
                                        ('fold', 'NUMERIC'),
