@@ -30,11 +30,16 @@ Train machine learning models
 
 Train a scikit-learn model on the data manually.
 
+.. warning:: This example uploads data. For that reason, this example
+  connects to the test server at test.openml.org. This prevents the main
+  server from crowding with example datasets, tasks, runs, and so on.
+
 
 .. code-block:: default
 
 
-    # NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68
+    openml.config.start_using_configuration_for_example()
+    # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
     dataset = openml.datasets.get_dataset(68)
     X, y = dataset.get_data(
         dataset_format='array',
@@ -129,7 +134,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/48293
+    Uploaded to http://test.openml.org/r/48406
 
 
 We can now also inspect the flow object which was automatically created:
@@ -159,7 +164,7 @@ We can now also inspect the flow object which was automatically created:
      'custom_name': None,
      'dependencies': 'sklearn==0.20.0\nnumpy>=1.6.1\nscipy>=0.9',
      'description': 'Automatically created scikit-learn flow.',
-     'extension': <openml.extensions.sklearn.extension.SklearnExtension object at 0x2ad7cec3ccf8>,
+     'extension': <openml.extensions.sklearn.extension.SklearnExtension object at 0x2aeff9ce37b8>,
      'external_version': 'openml==0.8.0,sklearn==0.20.0',
      'flow_id': 61129,
      'language': 'English',
@@ -202,7 +207,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/48294
+    Uploaded to http://test.openml.org/r/48407
 
 
 Running flows on tasks offline for later upload
@@ -301,19 +306,31 @@ them. Some tasks you could try (or browse openml.org):
 
 
 
+
+
 .. rst-class:: sphx-glr-script-out
 
  Out:
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/48296
+    kNN on diabetes: http://test.openml.org/r/48409
+
+
+
+.. code-block:: default
+
+    openml.config.stop_using_configuration_for_example()
+
+
+
+
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  18.453 seconds)
+   **Total running time of the script:** ( 0 minutes  20.581 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:

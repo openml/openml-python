@@ -45,12 +45,21 @@ An introduction to OpenML, followed up by a simple example.
 #   file must be in the directory ~/.openml/config and exist prior to
 #   importing the openml module.
 # * Run the code below, replacing 'YOURKEY' with your API key.
-
+#
+# .. warning:: This example uploads data. For that reason, this example
+#   connects to the test server instead. This prevents the live server from
+#   crowding with example datasets, tasks, studies, and so on.
 ############################################################################
 import openml
 from sklearn import neighbors
 
-# Uncomment and set your OpenML key. Don't share your key with others.
+openml.config.start_using_configuration_for_example()
+
+############################################################################
+# When using the main server, instead make sure your apikey is configured.
+# This can be done with the following line of code (uncomment it!).
+# Never share your apikey with others.
+
 # openml.config.apikey = 'YOURKEY'
 
 ############################################################################
@@ -80,6 +89,9 @@ clf = neighbors.KNeighborsClassifier(n_neighbors=5)
 run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
 # Publish the experiment on OpenML (optional, requires an API key).
 # For this tutorial, our configuration publishes to the test server
-# as to not pollute the main server.
+# as to not crowd the main server with runs created by examples.
 myrun = run.publish()
 print("kNN on %s: http://test.openml.org/r/%d" % (data.name, myrun.run_id))
+
+############################################################################
+openml.config.stop_using_configuration_for_example()

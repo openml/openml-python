@@ -33,6 +33,10 @@ In this tutorial we will
        and solve the same task again;
     3) We will verify that the obtained results are exactly the same.
 
+.. warning:: This example uploads data. For that reason, this example
+   connects to the test server at test.openml.org. This prevents the main
+   server from crowding with example datasets, tasks, runs, and so on.
+
 .. code-block:: default
 
     import logging
@@ -45,6 +49,7 @@ In this tutorial we will
 
     root = logging.getLogger()
     root.setLevel(logging.INFO)
+    openml.config.start_using_configuration_for_example()
 
 
 
@@ -143,9 +148,21 @@ In this tutorial we will
 
 
 
+
+.. code-block:: default
+
+
+    openml.config.stop_using_configuration_for_example()
+
+
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.874 seconds)
+   **Total running time of the script:** ( 0 minutes  7.397 seconds)
 
 
 .. _sphx_glr_download_examples_run_setup_tutorial.py:

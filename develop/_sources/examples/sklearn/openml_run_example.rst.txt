@@ -17,6 +17,31 @@ An example of an automated machine learning experiment.
     import openml
     from sklearn import tree, preprocessing, pipeline
 
+
+
+
+
+
+
+.. warning:: This example uploads data. For that reason, this example
+  connects to the test server at test.openml.org. This prevents the main
+  server from crowding with example datasets, tasks, runs, and so on.
+
+
+.. code-block:: default
+
+
+    openml.config.start_using_configuration_for_example()
+
+
+
+
+
+
+
+.. code-block:: default
+
+
     # Uncomment and set your OpenML key. Don't share your key with others.
     # openml.config.apikey = 'YOURKEY'
 
@@ -59,19 +84,30 @@ Run the scikit-learn model on the task (requires an API key).
 
 
 
+
 .. rst-class:: sphx-glr-script-out
 
  Out:
 
  .. code-block:: none
 
-    URL for run: https://test.openml.org/api/v1/xml/run/48297
+    URL for run: https://test.openml.org/api/v1/xml/run/48410
+
+
+
+.. code-block:: default
+
+    openml.config.stop_using_configuration_for_example()
+
+
+
+
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.113 seconds)
+   **Total running time of the script:** ( 0 minutes  5.241 seconds)
 
 
 .. _sphx_glr_download_examples_sklearn_openml_run_example.py:

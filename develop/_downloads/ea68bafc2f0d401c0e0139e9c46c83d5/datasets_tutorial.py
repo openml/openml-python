@@ -5,7 +5,7 @@ Datasets
 
 How to list and download datasets.
 """
-
+############################################################################
 import openml
 import pandas as pd
 
@@ -43,9 +43,8 @@ datalist.query('NumberOfClasses > 50')
 # Download datasets
 # =================
 
-# This is done based on the dataset ID ('did').
-dataset = openml.datasets.get_dataset(68)
-# NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68
+# This is done based on the dataset ID.
+dataset = openml.datasets.get_dataset(1471)
 
 # Print a summary
 print("This is dataset '%s', the target feature is '%s'" %
@@ -84,8 +83,7 @@ print(X.info())
 # data file. The dataset object can be used as normal.
 # Whenever you use any functionality that requires the data,
 # such as `get_data`, the data will be downloaded.
-dataset = openml.datasets.get_dataset(68, download_data=False)
-# NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68
+dataset = openml.datasets.get_dataset(1471, download_data=False)
 
 ############################################################################
 # Exercise 2

@@ -155,21 +155,22 @@ to have better visualization and easier access:</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;tid&#39;, &#39;ttid&#39;, &#39;did&#39;, &#39;name&#39;, &#39;task_type&#39;, &#39;status&#39;,
-       &#39;estimation_procedure&#39;, &#39;source_data&#39;, &#39;target_feature&#39;,
-       &#39;MajorityClassSize&#39;, &#39;MaxNominalAttDistinctValues&#39;, &#39;MinorityClassSize&#39;,
-       &#39;NumberOfClasses&#39;, &#39;NumberOfFeatures&#39;, &#39;NumberOfInstances&#39;,
-       &#39;NumberOfInstancesWithMissingValues&#39;, &#39;NumberOfMissingValues&#39;,
-       &#39;NumberOfNumericFeatures&#39;, &#39;NumberOfSymbolicFeatures&#39;],
+       &#39;estimation_procedure&#39;, &#39;evaluation_measures&#39;, &#39;source_data&#39;,
+       &#39;target_feature&#39;, &#39;MajorityClassSize&#39;, &#39;MaxNominalAttDistinctValues&#39;,
+       &#39;MinorityClassSize&#39;, &#39;NumberOfClasses&#39;, &#39;NumberOfFeatures&#39;,
+       &#39;NumberOfInstances&#39;, &#39;NumberOfInstancesWithMissingValues&#39;,
+       &#39;NumberOfMissingValues&#39;, &#39;NumberOfNumericFeatures&#39;,
+       &#39;NumberOfSymbolicFeatures&#39;, &#39;cost_matrix&#39;],
       dtype=&#39;object&#39;)
-First 5 of 931 tasks:
-   tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
-1    1     1  ...                      6.0                     33.0
-2    2     1  ...                      6.0                     33.0
-3    3     1  ...                      6.0                     33.0
-4    4     1  ...                      6.0                     33.0
-5    5     1  ...                      6.0                     33.0
+First 5 of 2929 tasks:
+   tid  ttid  ...  NumberOfSymbolicFeatures cost_matrix
+2    2     1  ...                      33.0         NaN
+3    3     1  ...                      37.0         NaN
+4    4     1  ...                       9.0         NaN
+5    5     1  ...                      74.0         NaN
+6    6     1  ...                       1.0         NaN
 
-[5 rows x 19 columns]
+[5 rows x 21 columns]
 </pre></div>
 </div>
 <p>We can filter the list of tasks to only contain datasets with more than
@@ -179,7 +180,7 @@ First 5 of 931 tasks:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1, 2, 3, 4, 5, 6, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 41, 42, 91, 92, 93, 94, 95, 96, 115, 116, 117, 118, 119, 120, 127, 128, 129, 130, 131, 132, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 181, 182, 183, 184, 185, 186, 193, 194, 195, 196, 197, 198, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 229, 230, 231, 232, 233, 234, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 307, 308, 309, 310, 311, 312, 379, 380, 381, 382, 383, 384, 391, 392, 393, 394, 395, 396, 433, 434, 435, 436, 437, 438, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 565, 566, 567, 568, 569, 570, 595, 596, 597, 598, 599, 600, 607, 608, 609, 610, 611, 612, 1069, 1072, 1075, 1084, 1088, 1090, 1093, 1094, 1099, 1101, 1103, 1104, 1105, 1107, 1109, 1110, 1111, 1120, 1132, 1134, 1141, 1154, 1155, 1163, 1168, 1232, 1234, 1239, 1240, 1242, 1244, 1245, 1248, 1250, 1251, 1252, 1253, 1257, 1258, 1260, 1261, 1263, 1264, 1265, 1268, 1269, 1270, 1273, 1276, 1279, 1280, 1283, 1288, 1289, 1297, 1304, 1307, 1309, 1310, 1314, 1317, 1320, 1321, 1323, 1327, 1329, 1330, 1334, 1337, 1339, 1341, 1342, 1343, 1346, 1347, 1349, 1353, 1354, 1355, 1358, 1359, 1366, 1367, 1369, 1376, 1377, 1378, 1380, 1382, 1383, 1384, 1387, 1396, 1399, 1402, 1405, 1406, 1410, 1412, 1413, 1419, 1423, 1426, 1428, 1430, 1433, 1437, 1438, 1439, 1440, 1442, 1443, 1447, 1448, 1453, 1456, 1459, 1460, 1462, 1466, 1469, 1471, 1473, 1476, 1477, 1478, 1479, 1484, 1485, 1487, 1490, 1494, 1496, 1497, 1498, 1502, 1503, 1507, 1508, 1509, 1512, 1515, 1518, 1519, 1520, 1523, 1524, 1531, 1535, 1537, 1539, 1541, 1543]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 232, 241, 245, 259, 267, 271, 279, 283, 1766, 1775, 1779, 1793, 1801, 1805, 1813, 1817, 1882, 1891, 1895, 1909, 1917, 1921, 1929, 1933, 1945, 1952, 1956, 1967, 1973, 1977, 1983, 1987, 2079, 2125, 2944, 3022, 3034, 3047, 3049, 3053, 3054, 3055, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 4189, 4191, 4197, 4198, 4199, 4217, 4223, 4225, 4226, 4234, 4240, 4254, 4265, 4266, 4288, 4328, 4341, 4345, 4365, 4395, 4396, 4397, 4409, 4411, 4423, 4499, 4508, 4515, 4517, 4518, 4519, 4522, 4538, 4557, 4558, 4562, 4565, 4572, 4582, 4584, 4591, 4618, 4676, 4684, 4697, 4704, 7286, 7307, 7543, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 12738, 12739, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146574, 146576, 146577, 146578, 146583, 146587, 146588, 146593, 146596, 146597, 146600, 146818, 146819, 166859, 166875, 166882, 166884, 166893, 166905, 166906, 166907, 166913, 166915, 166919, 166947, 166953, 166956, 166957, 166958, 166959, 166960, 166967, 166976, 166977, 166978, 166980, 166983, 166988, 166989, 166992, 167016, 167020, 167031, 167037, 167062, 167067, 167068, 167095, 167096, 167100, 167104, 167106, 167151, 167154, 167160, 167163, 167167, 167168, 167171, 167173, 167174, 167175, 167180, 167184, 167187, 167194, 167198, 168300, 168783, 168819, 168820, 168821, 168822, 168823, 168824, 168825, 168907]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
@@ -187,7 +188,7 @@ First 5 of 931 tasks:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>309
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>266
 </pre></div>
 </div>
 <p>Then, we can further restrict the tasks to all have the same resampling strategy:</p>
@@ -196,7 +197,7 @@ First 5 of 931 tasks:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1, 19, 37, 91, 115, 127, 145, 151, 181, 193, 205, 211, 217, 229, 241, 247, 253, 307, 379, 391, 433, 511, 517, 565, 595, 607]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 2079, 3022, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 7286, 7307, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146818, 146819, 168300, 168907]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
@@ -204,7 +205,7 @@ First 5 of 931 tasks:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>26
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>104
 </pre></div>
 </div>
 <p>Resampling strategies can be found on the
@@ -217,34 +218,34 @@ First 5 of 931 tasks:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 5 of 100 tasks:
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 5 of 91 tasks:
     tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
-1     1     1  ...                      6.0                     33.0
-7     7     1  ...                      0.0                     37.0
-13   13     1  ...                     16.0                      1.0
-19   19     1  ...                      4.0                      1.0
-25   25     1  ...                    216.0                      1.0
+3     3     1  ...                        0                       37
+6     6     1  ...                       16                        1
+11   11     1  ...                        4                        1
+12   12     1  ...                      216                        1
+14   14     1  ...                       76                        1
 
 [5 rows x 19 columns]
 </pre></div>
 </div>
 <p>Furthermore, we can list tasks based on the dataset id:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="mi">61</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="mi">1471</span><span class="p">)</span>
 <span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 5 of </span><span class="si">%s</span><span class="s2"> tasks:&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
 <span class="n">pprint</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 5 of 10 tasks:
-     tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
-361  361     1  ...                        7                        1
-362  362     1  ...                        7                        1
-363  363     1  ...                        7                        1
-364  364     1  ...                        7                        1
-365  365     1  ...                        7                        1
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 5 of 16 tasks:
+         tid  ttid   did  ... target_value evaluation_measures number_samples
+9983    9983     1  1471  ...          NaN                 NaN            NaN
+14951  14951     1  1471  ...          NaN                 NaN            NaN
+56483  56483     8  1471  ...            1                 NaN            NaN
+56484  56484     8  1471  ...            1                 NaN            NaN
+56485  56485     8  1471  ...            1                 NaN            NaN
 
-[5 rows x 19 columns]
+[5 rows x 23 columns]
 </pre></div>
 </div>
 <p>In addition, a size limit and an offset can be applied both separately and simultaneously:</p>
@@ -254,19 +255,19 @@ First 5 of 931 tasks:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
-51   51     1  ...                        6                        1
-52   52     1  ...                        6                        1
-53   53     1  ...                        6                        1
-54   54     1  ...                        6                        1
-55   55     1  ...                        0                      241
-56   56     1  ...                        0                      241
-57   57     1  ...                        0                      241
-58   58     1  ...                        0                      241
-59   59     1  ...                        0                      241
-60   60     1  ...                        0                      241
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tid  ttid  ...  NumberOfSymbolicFeatures number_samples
+59   59     1  ...                         1            NaN
+60   60     1  ...                        17            NaN
+62   62     3  ...                        33              9
+63   63     3  ...                        37             12
+64   64     3  ...                         9              1
+65   65     3  ...                        74              7
+66   66     3  ...                        70              5
+67   67     3  ...                         1              6
+68   68     3  ...                        11              5
+69   69     3  ...                        16              4
 
-[10 rows x 19 columns]
+[10 rows x 21 columns]
 </pre></div>
 </div>
 <p><strong>OpenML 100</strong>
@@ -283,7 +284,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1527
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>18743
 </pre></div>
 </div>
 <div class="section" id="exercise">
@@ -299,7 +300,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 <p>We provide two functions to download tasks, one which downloads only a
 single task by its ID, and one which takes a list of IDs and downloads
 all of these tasks:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">1</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">31</span>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -308,14 +309,14 @@ all of these tasks:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;class_labels&#39;: [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;, &#39;4&#39;, &#39;5&#39;, &#39;U&#39;],
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;class_labels&#39;: [&#39;good&#39;, &#39;bad&#39;],
  &#39;cost_matrix&#39;: None,
- &#39;dataset_id&#39;: 1,
+ &#39;dataset_id&#39;: 31,
  &#39;estimation_parameters&#39;: {&#39;number_folds&#39;: &#39;10&#39;,
                            &#39;number_repeats&#39;: &#39;1&#39;,
                            &#39;percentage&#39;: &#39;&#39;,
                            &#39;stratified_sampling&#39;: &#39;true&#39;},
- &#39;estimation_procedure&#39;: {&#39;data_splits_url&#39;: &#39;https://test.openml.org/api_splits/get/1/Task_1_splits.arff&#39;,
+ &#39;estimation_procedure&#39;: {&#39;data_splits_url&#39;: &#39;https://www.openml.org/api_splits/get/31/Task_31_splits.arff&#39;,
                           &#39;parameters&#39;: {&#39;number_folds&#39;: &#39;10&#39;,
                                          &#39;number_repeats&#39;: &#39;1&#39;,
                                          &#39;percentage&#39;: &#39;&#39;,
@@ -324,22 +325,22 @@ all of these tasks:</p>
  &#39;evaluation_measure&#39;: None,
  &#39;split&#39;: None,
  &#39;target_name&#39;: &#39;class&#39;,
- &#39;task_id&#39;: 1,
+ &#39;task_id&#39;: 31,
  &#39;task_type&#39;: &#39;Supervised Classification&#39;,
  &#39;task_type_id&#39;: 1}
 </pre></div>
 </div>
 <p>And:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">97</span><span class="p">,</span> <span class="mi">403</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1891</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">9983</span><span class="p">]</span>
 <span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_tasks</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 <span class="n">pprint</span><span class="p">(</span><span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLClassificationTask object at 0x2ad7cedc21d0&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;openml.tasks.task.OpenMLClassificationTask object at 0x2aeff984ac50&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  19.715 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  31.274 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-tasks-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/204148be48b3a7d6b2cc72a9fc63c69e/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></p>

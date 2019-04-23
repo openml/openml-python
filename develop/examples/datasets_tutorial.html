@@ -146,7 +146,7 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 11586 datasets...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 2615 datasets...
 </pre></div>
 </div>
 <div class="section" id="exercise-1">
@@ -170,9 +170,8 @@
 </div>
 <div class="section" id="download-datasets">
 <h2>Download datasets<a class="headerlink" href="#download-datasets" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is done based on the dataset ID (&#39;did&#39;).</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">68</span><span class="p">)</span>
-<span class="c1"># NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is done based on the dataset ID.</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">)</span>
 
 <span class="c1"># Print a summary</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This is dataset &#39;</span><span class="si">%s</span><span class="s2">&#39;, the target feature is &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span>
@@ -183,12 +182,12 @@
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>This is dataset &#39;eeg-eye-state&#39;, the target feature is &#39;Class&#39;
-URL: https://test.openml.org/data/v1/download/68/eeg-eye-state.arff
-**Author**: Oliver Roesler, it12148&#39;@&#39;lehre.dhbw-stuttgart.de
+URL: https://www.openml.org/data/v1/download/1587924/eeg-eye-state.arff
+**Author**: Oliver Roesler
 **Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/EEG+Eye+State), Baden-Wuerttemberg, Cooperative State University (DHBW), Stuttgart, Germany
-**Please cite**:
+**Please cite**: [UCI](https://archive.ics.uci.edu/ml/citation_policy.html)
 
-All data is from one continuous EEG measurement with the Emotiv EEG Neuroheadset. The duration of the measurement was 117 seconds. The eye state was detected via a camera during the EEG measurement and added later manually to the file after analysing the video fr
+All data is from one continuous EEG measurement with the Emotiv EEG Neuroheadset. The duration of the measurement was 117 seconds. The eye state was detected via a camera during the EEG measurement and added later manually to the file after
 </pre></div>
 </div>
 <p>Get the actual data.</p>
@@ -267,8 +266,7 @@ In those cases, you can download the dataset without downloading the
 data file. The dataset object can be used as normal.
 Whenever you use any functionality that requires the data,
 such as <cite>get_data</cite>, the data will be downloaded.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">68</span><span class="p">,</span> <span class="n">download_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="c1"># NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">,</span> <span class="n">download_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="section" id="exercise-2">
@@ -289,7 +287,7 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_datasets_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_datasets_tutorial_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.586 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.732 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-datasets-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/ea68bafc2f0d401c0e0139e9c46c83d5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>
