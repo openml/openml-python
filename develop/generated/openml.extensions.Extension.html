@@ -249,26 +249,6 @@ near future.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="openml.extensions.Extension.is_hpo_class">
-<code class="descname">is_hpo_class</code><span class="sig-paren">(</span><em>self</em>, <em>model: Any</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#openml.extensions.Extension.is_hpo_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check whether the model performs hyperparameter optimization.</p>
-<p>Used to check whether an optimization trace can be extracted from the model after running
-it.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>model</strong><span class="classifier">Any</span></dt><dd></dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>bool</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
 <dt id="openml.extensions.Extension.model_to_flow">
 <code class="descname">model_to_flow</code><span class="sig-paren">(</span><em>self</em>, <em>model: Any</em><span class="sig-paren">)</span> &#x2192; 'OpenMLFlow'<a class="headerlink" href="#openml.extensions.Extension.model_to_flow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transform a model to a flow for uploading it to OpenML.</p>
@@ -281,28 +261,6 @@ it.</p>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
 <dt>OpenMLFlow</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.extensions.Extension.obtain_arff_trace">
-<code class="descname">obtain_arff_trace</code><span class="sig-paren">(</span><em>self, model: Any, trace_content: List[List]</em><span class="sig-paren">)</span> &#x2192; 'OpenMLRunTrace'<a class="headerlink" href="#openml.extensions.Extension.obtain_arff_trace" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create arff trace object from a fitted model and the trace content obtained by
-repeatedly calling <code class="docutils literal notranslate"><span class="pre">run_model_on_task</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>model</strong><span class="classifier">Any</span></dt><dd><p>A fitted hyperparameter optimization model.</p>
-</dd>
-<dt><strong>trace_content</strong><span class="classifier">List[List]</span></dt><dd><p>Trace content obtained by <code class="docutils literal notranslate"><span class="pre">openml.runs.run_flow_on_task</span></code>.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>OpenMLRunTrace</dt><dd></dd>
 </dl>
 </dd>
 </dl>

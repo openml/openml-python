@@ -134,7 +134,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/48406
+    Uploaded to http://test.openml.org/r/48541
 
 
 We can now also inspect the flow object which was automatically created:
@@ -164,7 +164,7 @@ We can now also inspect the flow object which was automatically created:
      'custom_name': None,
      'dependencies': 'sklearn==0.20.0\nnumpy>=1.6.1\nscipy>=0.9',
      'description': 'Automatically created scikit-learn flow.',
-     'extension': <openml.extensions.sklearn.extension.SklearnExtension object at 0x2aeff9ce37b8>,
+     'extension': <openml.extensions.sklearn.extension.SklearnExtension object at 0x2b2dccbd9588>,
      'external_version': 'openml==0.8.0,sklearn==0.20.0',
      'flow_id': 61129,
      'language': 'English',
@@ -207,7 +207,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/48407
+    Uploaded to http://test.openml.org/r/48542
 
 
 Running flows on tasks offline for later upload
@@ -314,7 +314,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/48409
+    kNN on diabetes: http://test.openml.org/r/48544
 
 
 
@@ -330,7 +330,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  20.581 seconds)
+   **Total running time of the script:** ( 0 minutes  20.217 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:
