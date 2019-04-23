@@ -12,7 +12,9 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 import warnings
 
 import numpy as np
+import pandas as pd
 import scipy.stats
+import scipy.sparse
 import sklearn.base
 import sklearn.model_selection
 import sklearn.pipeline
@@ -93,7 +95,7 @@ class SklearnExtension(Extension):
 
         Parameters
         ----------
-        o : mixed
+        flow : mixed
             the object to deserialize (can be flow object, or any serialized
             parameter value that is accepted by)
 
@@ -468,7 +470,7 @@ class SklearnExtension(Extension):
     ) -> None:
         to_visit_stack = []  # type: List[OpenMLFlow]
         to_visit_stack.extend(sub_components.values())
-        known_sub_components = set()  # type: Set[OpenMLFlow]
+        known_sub_components = set()  # type: Set[str]
         while len(to_visit_stack) > 0:
             visitee = to_visit_stack.pop()
             if visitee.name in known_sub_components:
@@ -935,7 +937,7 @@ class SklearnExtension(Extension):
         model:
             The model that will be fitted
         """
-        if self.is_hpo_class(model):
+        if self._is_hpo_class(model):
             if isinstance(model, sklearn.model_selection.GridSearchCV):
                 param_distributions = model.param_grid
             elif isinstance(model, sklearn.model_selection.RandomizedSearchCV):
@@ -973,7 +975,7 @@ class SklearnExtension(Extension):
             True if all n_jobs parameters will be either set to None or 1, False otherwise
         """
         if not (
-                isinstance(model, sklearn.base.BaseEstimator) or self.is_hpo_class(model)
+                isinstance(model, sklearn.base.BaseEstimator) or self._is_hpo_class(model)
         ):
             raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
@@ -1000,7 +1002,7 @@ class SklearnExtension(Extension):
             True if no n_jobs parameters is set to -1, False otherwise
         """
         if not (
-                isinstance(model, sklearn.base.BaseEstimator) or self.is_hpo_class(model)
+                isinstance(model, sklearn.base.BaseEstimator) or self._is_hpo_class(model)
         ):
             raise ValueError('model should be BaseEstimator or BaseSearchCV')
 
@@ -1096,11 +1098,12 @@ class SklearnExtension(Extension):
         self,
         model: Any,
         task: 'OpenMLTask',
+        X_train: Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame],
         rep_no: int,
         fold_no: int,
-        sample_no: int,
-        add_local_measures: bool,
-    ) -> Tuple[List[List], List[List], 'OrderedDict[str, float]', Any]:
+        y_train: Optional[np.ndarray] = None,
+        X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
+    ) -> Tuple[np.ndarray, np.ndarray, 'OrderedDict[str, float]', Optional[OpenMLRunTrace]]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction
         information.
 
@@ -1119,17 +1122,17 @@ class SklearnExtension(Extension):
             The UNTRAINED model to run. The model instance will be copied and not altered.
         task : OpenMLTask
             The task to run the model on.
+        X_train : array-like
+            Training data for the given repetition and fold.
         rep_no : int
             The repeat of the experiment (0-based; in case of 1 time CV, always 0)
         fold_no : int
             The fold nr of the experiment (0-based; in case of holdout, always 0)
-        sample_no : int
-            In case of learning curves, the index of the subsample (0-based; in case of no
-            learning curve, always 0)
-        add_local_measures : bool
-            Determines whether to calculate a set of measures (i.e., predictive accuracy)
-            locally,
-            to later verify server behaviour.
+        y_train : Optional[np.ndarray] (default=None)
+            Target attributes for supervised tasks. In case of classification, these are integer
+            indices to the potential classes specified by dataset.
+        X_test : Optional, array-like (default=None)
+            Test attributes to test for generalization in supervised tasks.
 
         Returns
         -------
@@ -1150,10 +1153,7 @@ class SklearnExtension(Extension):
             information later on (in ``obtain_arff_trace``).
         """
 
-        def _prediction_to_probabilities(
-                y: np.ndarray,
-                model_classes: List,
-        ) -> np.ndarray:
+        def _prediction_to_probabilities(y: np.ndarray, classes: List[Any]) -> np.ndarray:
             """Transforms predicted probabilities to match with OpenML class indices.
 
             Parameters
@@ -1171,14 +1171,19 @@ class SklearnExtension(Extension):
             # y: list or numpy array of predictions
             # model_classes: sklearn classifier mapping from original array id to
             # prediction index id
-            if not isinstance(model_classes, list):
+            if not isinstance(classes, list):
                 raise ValueError('please convert model classes to list prior to '
                                  'calling this fn')
-            result = np.zeros((len(y), len(model_classes)), dtype=np.float32)
+            result = np.zeros((len(y), len(classes)), dtype=np.float32)
             for obs, prediction_idx in enumerate(y):
-                array_idx = model_classes.index(prediction_idx)
-                result[obs][array_idx] = 1.0
+                result[obs][prediction_idx] = 1.0
             return result
+
+        if isinstance(task, OpenMLSupervisedTask):
+            if y_train is None:
+                raise TypeError('argument y_train must not be of type None')
+            if X_test is None:
+                raise TypeError('argument X_test must not be of type None')
 
         # TODO: if possible, give a warning if model is already fitted (acceptable
         # in case of custom experimentation,
@@ -1191,20 +1196,6 @@ class SklearnExtension(Extension):
         can_measure_cputime = self._can_measure_cputime(model_copy)
         can_measure_wallclocktime = self._can_measure_wallclocktime(model_copy)
 
-        train_indices, test_indices = task.get_train_test_split_indices(
-            repeat=rep_no, fold=fold_no, sample=sample_no)
-        if isinstance(task, OpenMLSupervisedTask):
-            x, y = task.get_X_and_y()
-            train_x = x[train_indices]
-            train_y = y[train_indices]
-            test_x = x[test_indices]
-            test_y = y[test_indices]
-        elif isinstance(task, OpenMLClusteringTask):
-            train_x = train_indices
-            test_x = test_indices
-        else:
-            raise NotImplementedError(task.task_type)
-
         user_defined_measures = OrderedDict()  # type: 'OrderedDict[str, float]'
 
         try:
@@ -1213,9 +1204,9 @@ class SklearnExtension(Extension):
             modelfit_start_walltime = time.time()
 
             if isinstance(task, OpenMLSupervisedTask):
-                model_copy.fit(train_x, train_y)
+                model_copy.fit(X_train, y_train)
             elif isinstance(task, OpenMLClusteringTask):
-                model_copy.fit(train_x)
+                model_copy.fit(X_train)
 
             modelfit_dur_cputime = (time.process_time() - modelfit_start_cputime) * 1000
             if can_measure_cputime:
@@ -1229,11 +1220,6 @@ class SklearnExtension(Extension):
             # typically happens when training a regressor on classification task
             raise PyOpenMLError(str(e))
 
-        # extract trace, if applicable
-        arff_tracecontent = []  # type: List[List]
-        if self.is_hpo_class(model_copy):
-            arff_tracecontent.extend(self._extract_trace_data(model_copy, rep_no, fold_no))
-
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
             # search for model classes_ (might differ depending on modeltype)
             # first, pipelines are a special case (these don't have a classes_
@@ -1244,7 +1230,7 @@ class SklearnExtension(Extension):
             else:
                 used_estimator = model_copy
 
-            if self.is_hpo_class(used_estimator):
+            if self._is_hpo_class(used_estimator):
                 model_classes = used_estimator.best_estimator_.classes_
             else:
                 model_classes = used_estimator.classes_
@@ -1254,7 +1240,12 @@ class SklearnExtension(Extension):
 
         # In supervised learning this returns the predictions for Y, in clustering
         # it returns the clusters
-        pred_y = model_copy.predict(test_x)
+        if isinstance(task, OpenMLSupervisedTask):
+            pred_y = model_copy.predict(X_test)
+        elif isinstance(task, OpenMLClusteringTask):
+            pred_y = model_copy.predict(X_train)
+        else:
+            raise ValueError(task)
 
         if can_measure_cputime:
             modelpredict_duration_cputime = (time.process_time()
@@ -1268,154 +1259,51 @@ class SklearnExtension(Extension):
             user_defined_measures['wall_clock_time_millis'] = (modelfit_dur_walltime
                                                                + modelpredict_duration_walltime)
 
-        # add client-side calculated metrics. These is used on the server as
-        # consistency check, only useful for supervised tasks
-        def _calculate_local_measure(sklearn_fn, openml_name):
-            user_defined_measures[openml_name] = sklearn_fn(test_y, pred_y)
-
-        # Task type specific outputs
-        arff_datacontent = []
-
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
 
             try:
-                proba_y = model_copy.predict_proba(test_x)
+                proba_y = model_copy.predict_proba(X_test)
             except AttributeError:
-                proba_y = _prediction_to_probabilities(pred_y, list(model_classes))
+                proba_y = _prediction_to_probabilities(pred_y, list(task.class_labels))
 
             if proba_y.shape[1] != len(task.class_labels):
-                warnings.warn(
-                    "Repeat %d Fold %d: estimator only predicted for %d/%d classes!"
-                    % (rep_no, fold_no, proba_y.shape[1], len(task.class_labels))
-                )
+                # Remap the probabilities in case there was a class missing at training time
+                # By default, the classification targets are mapped to be zero-based indices to the
+                # actual classes. Therefore, the model_classes contain the correct indices to the
+                # correct probability array. Example:
+                # classes in the dataset: 0, 1, 2, 3, 4, 5
+                # classes in the training set: 0, 1, 2, 4, 5
+                # then we need to add a column full of zeros into the probabilities for class 3
+                # (because the rest of the library expects that the probabilities are ordered the
+                # same way as the classes are ordered).
+                proba_y_new = np.zeros((proba_y.shape[0], len(task.class_labels)))
+                for idx, model_class in enumerate(model_classes):
+                    proba_y_new[:, model_class] = proba_y[:, idx]
+                proba_y = proba_y_new
 
-            if add_local_measures:
-                _calculate_local_measure(sklearn.metrics.accuracy_score,
-                                         'predictive_accuracy')
-
-            for i in range(0, len(test_indices)):
-                arff_line = self._prediction_to_row(
-                    rep_no=rep_no,
-                    fold_no=fold_no,
-                    sample_no=sample_no,
-                    row_id=test_indices[i],
-                    correct_label=task.class_labels[test_y[i]],
-                    predicted_label=pred_y[i],
-                    predicted_probabilities=proba_y[i],
-                    class_labels=task.class_labels,
-                    model_classes_mapping=model_classes,
+            if proba_y.shape[1] != len(task.class_labels):
+                message = "Estimator only predicted for {}/{} classes!".format(
+                    proba_y.shape[1], len(task.class_labels),
                 )
-                arff_datacontent.append(arff_line)
+                warnings.warn(message)
+                openml.config.logger.warn(message)
 
         elif isinstance(task, OpenMLRegressionTask):
-            if add_local_measures:
-                _calculate_local_measure(
-                    sklearn.metrics.mean_absolute_error,
-                    'mean_absolute_error',
-                )
-
-            for i in range(0, len(test_indices)):
-                arff_line = [rep_no, fold_no, test_indices[i], pred_y[i], test_y[i]]
-                arff_datacontent.append(arff_line)
+            proba_y = None
 
         elif isinstance(task, OpenMLClusteringTask):
-            for i in range(0, len(test_indices)):
-                arff_line = [test_indices[i], pred_y[i]]  # row_id, cluster ID
-                arff_datacontent.append(arff_line)
+            proba_y = None
 
         else:
             raise TypeError(type(task))
 
-        return arff_datacontent, arff_tracecontent, user_defined_measures, model_copy
+        if self._is_hpo_class(model_copy):
+            trace_data = self._extract_trace_data(model_copy, rep_no, fold_no)
+            trace = self._obtain_arff_trace(model_copy, trace_data)  # type: Optional[OpenMLRunTrace]  # noqa E501
+        else:
+            trace = None
 
-    def _prediction_to_row(
-        self,
-        rep_no: int,
-        fold_no: int,
-        sample_no: int,
-        row_id: int,
-        correct_label: str,
-        predicted_label: int,
-        predicted_probabilities: np.ndarray,
-        class_labels: List,
-        model_classes_mapping: List,
-    ) -> List:
-        """Util function that turns probability estimates of a classifier for a
-        given instance into the right arff format to upload to openml.
-
-        Parameters
-        ----------
-        rep_no : int
-            The repeat of the experiment (0-based; in case of 1 time CV,
-            always 0)
-        fold_no : int
-            The fold nr of the experiment (0-based; in case of holdout,
-            always 0)
-        sample_no : int
-            In case of learning curves, the index of the subsample (0-based;
-            in case of no learning curve, always 0)
-        row_id : int
-            row id in the initial dataset
-        correct_label : str
-            original label of the instance
-        predicted_label : str
-            the label that was predicted
-        predicted_probabilities : array (size=num_classes)
-            probabilities per class
-        class_labels : array (size=num_classes)
-        model_classes_mapping : list
-            A list of classes the model produced.
-            Obtained by BaseEstimator.classes_
-
-        Returns
-        -------
-        arff_line : list
-            representation of the current prediction in OpenML format
-        """
-        if not isinstance(rep_no, (int, np.integer)):
-            raise ValueError('rep_no should be int')
-        if not isinstance(fold_no, (int, np.integer)):
-            raise ValueError('fold_no should be int')
-        if not isinstance(sample_no, (int, np.integer)):
-            raise ValueError('sample_no should be int')
-        if not isinstance(row_id, (int, np.integer)):
-            raise ValueError('row_id should be int')
-        if not len(predicted_probabilities) == len(model_classes_mapping):
-            raise ValueError('len(predicted_probabilities) != len(class_labels)')
-
-        arff_line = [rep_no, fold_no, sample_no, row_id]  # type: List[Any]
-        for class_label_idx in range(len(class_labels)):
-            if class_label_idx in model_classes_mapping:
-                index = np.where(model_classes_mapping == class_label_idx)[0][0]
-                # TODO: WHY IS THIS 2D???
-                arff_line.append(predicted_probabilities[index])
-            else:
-                arff_line.append(0.0)
-
-        arff_line.append(class_labels[predicted_label])
-        arff_line.append(correct_label)
-        return arff_line
-
-    def _extract_trace_data(self, model, rep_no, fold_no):
-        arff_tracecontent = []
-        for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
-            # we use the string values for True and False, as it is defined in
-            # this way by the OpenML server
-            selected = 'false'
-            if itt_no == model.best_index_:
-                selected = 'true'
-            test_score = model.cv_results_['mean_test_score'][itt_no]
-            arff_line = [rep_no, fold_no, itt_no, test_score, selected]
-            for key in model.cv_results_:
-                if key.startswith('param_'):
-                    value = model.cv_results_[key][itt_no]
-                    if value is not np.ma.masked:
-                        serialized_value = json.dumps(value)
-                    else:
-                        serialized_value = np.nan
-                    arff_line.append(serialized_value)
-            arff_tracecontent.append(arff_line)
-        return arff_tracecontent
+        return pred_y, proba_y, user_defined_measures, trace
 
     def obtain_parameter_values(
         self,
@@ -1594,7 +1482,7 @@ class SklearnExtension(Extension):
     ################################################################################################
     # Methods for hyperparameter optimization
 
-    def is_hpo_class(self, model: Any) -> bool:
+    def _is_hpo_class(self, model: Any) -> bool:
         """Check whether the model performs hyperparameter optimization.
 
         Used to check whether an optimization trace can be extracted from the model after
@@ -1629,7 +1517,7 @@ class SklearnExtension(Extension):
         -------
         Any
         """
-        if not self.is_hpo_class(model):
+        if not self._is_hpo_class(model):
             raise AssertionError(
                 'Flow model %s is not an instance of sklearn.model_selection._search.BaseSearchCV'
                 % model
@@ -1638,7 +1526,28 @@ class SklearnExtension(Extension):
         base_estimator.set_params(**trace_iteration.get_parameters())
         return base_estimator
 
-    def obtain_arff_trace(
+    def _extract_trace_data(self, model, rep_no, fold_no):
+        arff_tracecontent = []
+        for itt_no in range(0, len(model.cv_results_['mean_test_score'])):
+            # we use the string values for True and False, as it is defined in
+            # this way by the OpenML server
+            selected = 'false'
+            if itt_no == model.best_index_:
+                selected = 'true'
+            test_score = model.cv_results_['mean_test_score'][itt_no]
+            arff_line = [rep_no, fold_no, itt_no, test_score, selected]
+            for key in model.cv_results_:
+                if key.startswith('param_'):
+                    value = model.cv_results_[key][itt_no]
+                    if value is not np.ma.masked:
+                        serialized_value = json.dumps(value)
+                    else:
+                        serialized_value = np.nan
+                    arff_line.append(serialized_value)
+            arff_tracecontent.append(arff_line)
+        return arff_tracecontent
+
+    def _obtain_arff_trace(
         self,
         model: Any,
         trace_content: List,
@@ -1658,7 +1567,7 @@ class SklearnExtension(Extension):
         -------
         OpenMLRunTrace
         """
-        if not self.is_hpo_class(model):
+        if not self._is_hpo_class(model):
             raise AssertionError(
                 'Flow model %s is not an instance of sklearn.model_selection._search.BaseSearchCV'
                 % model
