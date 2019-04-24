@@ -1264,7 +1264,8 @@ class SklearnExtension(Extension):
             try:
                 proba_y = model_copy.predict_proba(X_test)
             except AttributeError:
-                proba_y = _prediction_to_probabilities(pred_y, list(task.class_labels))
+                if task.class_labels is not None:
+                    proba_y = _prediction_to_probabilities(pred_y, list(task.class_labels))
 
             if task.class_labels is not None:
                 if proba_y.shape[1] != len(task.class_labels):
