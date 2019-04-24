@@ -6,6 +6,8 @@ import openml
 import openml.exceptions
 import openml.extensions.sklearn
 from openml.testing import TestBase
+from typing import Dict
+import pandas as pd
 
 import sklearn.tree
 import sklearn.naive_bayes
@@ -134,6 +136,16 @@ class TestSetupFunctions(TestBase):
             raise ValueError('UnitTest Outdated, got somehow results')
 
         self.assertIsInstance(setups, dict)
+
+    def test_list_setups_output_format(self):
+        flow_id = 5873
+        setups = openml.setups.list_setups(flow=flow_id, output_format='object')
+        self.assertIsInstance(setups, Dict)
+        self.assertIsInstance(setups[30948], openml.setups.setup.OpenMLSetup)
+
+        setups = openml.setups.list_setups(flow=flow_id, output_format='dataframe')
+        self.assertIsInstance(setups, pd.DataFrame)
+        self.assertEqual(len(setups), 2)
 
     def test_setuplist_offset(self):
         # TODO: remove after pull on live for better testing
