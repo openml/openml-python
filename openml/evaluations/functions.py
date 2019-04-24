@@ -1,7 +1,7 @@
 import json
 import xmltodict
 import pandas as pd
-from typing import Union
+from typing import Union, List
 
 import openml.utils
 import openml._api_calls
@@ -12,11 +12,11 @@ def list_evaluations(
     function: str,
     offset: int = None,
     size: int = None,
-    id: list = None,
-    task: list = None,
-    setup: list = None,
-    flow: list = None,
-    uploader: list = None,
+    id: List = None,
+    task: List = None,
+    setup: List = None,
+    flow: List = None,
+    uploader: List = None,
     tag: str = None,
     per_fold: bool = None,
     output_format: str = 'dict'
@@ -80,11 +80,11 @@ def list_evaluations(
 
 def _list_evaluations(
     function: str,
-    id: list = None,
-    task: list = None,
-    setup: list = None,
-    flow: list = None,
-    uploader: list = None,
+    id: List = None,
+    task: List = None,
+    setup: List = None,
+    flow: List = None,
+    uploader: List = None,
     output_format: str = 'dict',
     **kwargs: dict
 ) -> Union[dict, pd.DataFrame]:

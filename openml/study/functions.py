@@ -3,7 +3,7 @@ import warnings
 
 import dateutil.parser
 import xmltodict
-from typing import Union
+from typing import Union, List
 import pandas as pd
 
 from openml.study import OpenMLStudy, OpenMLBenchmarkSuite
@@ -466,7 +466,7 @@ def list_studies(
     offset: int = None,
     size: int = None,
     status: str = None,
-    uploader: list = None,
+    uploader: List = None,
     benchmark_suite: str = None,
     output_format: str = 'dict'
 ) -> Union[dict, pd.DataFrame]:
