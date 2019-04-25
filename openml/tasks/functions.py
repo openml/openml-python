@@ -2,7 +2,7 @@ from collections import OrderedDict
 import io
 import re
 import os
-from typing import Union
+from typing import Union, Optional
 import xmltodict
 
 from ..exceptions import OpenMLCacheException
@@ -447,7 +447,7 @@ def _create_task_from_xml(xml):
 def create_task(
         task_type_id: int,
         dataset_id: int,
-        target_name: str,
+        target_name: Optional[str],
         estimation_procedure_id: int,
         evaluation_measure: str = None,
         **kwargs
@@ -471,7 +471,7 @@ def create_task(
         Id of the task type.
     dataset_id : int
         The id of the dataset for the task.
-    target_name : str
+    target_name : str, optional
         The name of the feature used as a target.
     estimation_procedure_id : int
         The id of the estimation procedure.
@@ -502,7 +502,7 @@ def create_task(
             task_type_id=task_type_id,
             task_type=None,
             data_set_id=dataset_id,
-            target_name=target_name,
+            target_name=target_name if target_name is not None else None,
             estimation_procedure_id=estimation_procedure_id,
             evaluation_measure=evaluation_measure,
             **kwargs

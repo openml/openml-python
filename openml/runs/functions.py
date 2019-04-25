@@ -461,6 +461,8 @@ def _run_task_get_arffcontent(
 
                     arff_line.append(task.class_labels[pred_y[i]])
                     arff_line.append(task.class_labels[test_y[i]])
+                else:
+                    raise ValueError('The task has no class labels')
 
                 arff_datacontent.append(arff_line)
 

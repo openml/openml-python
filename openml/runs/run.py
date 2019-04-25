@@ -232,6 +232,9 @@ class OpenMLRun(object):
                      for i in range(len(class_labels))] + \
                     [('prediction', class_labels),
                      ('correct', class_labels)]
+            else:
+                raise ValueError('The task has no class labels')
+
         elif isinstance(task, OpenMLClassificationTask):
             class_labels = task.class_labels
             instance_specifications = [('repeat', 'NUMERIC'),
@@ -249,6 +252,9 @@ class OpenMLRun(object):
                 arff_dict['attributes'] = arff_dict['attributes'] + \
                     prediction_confidences + \
                     prediction_and_true
+            else:
+                raise ValueError('The task has no class labels')
+
         elif isinstance(task, OpenMLRegressionTask):
             arff_dict['attributes'] = [('repeat', 'NUMERIC'),
                                        ('fold', 'NUMERIC'),

@@ -402,7 +402,7 @@ class OpenMLClusteringTask(OpenMLTask):
 
         task_container = super(OpenMLClusteringTask, self)._to_dict()
 
-        # Right now not supported as a feture
+        # Right now, it is not supported as a feature.
         # Uncomment if it is supported on the server
         # in the future.
         # https://github.com/openml/OpenML/issues/925

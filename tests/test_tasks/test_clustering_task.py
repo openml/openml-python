@@ -12,7 +12,6 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         self.task_id = 146714
         self.task_type_id = 5
         self.estimation_procedure = 17
-        self.production_server = "https://openml.org/api/v1/xml"
 
     def test_get_dataset(self):
         # no clustering tasks on test server

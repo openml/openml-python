@@ -1266,6 +1266,8 @@ class SklearnExtension(Extension):
             except AttributeError:
                 if task.class_labels is not None:
                     proba_y = _prediction_to_probabilities(pred_y, list(task.class_labels))
+                else:
+                    raise ValueError('The task has no class labels')
 
             if task.class_labels is not None:
                 if proba_y.shape[1] != len(task.class_labels):
@@ -1290,6 +1292,8 @@ class SklearnExtension(Extension):
                     )
                     warnings.warn(message)
                     openml.config.logger.warn(message)
+            else:
+                raise ValueError('The task has no class labels')
 
         elif isinstance(task, OpenMLRegressionTask):
             proba_y = None
