@@ -447,9 +447,9 @@ def _create_task_from_xml(xml):
 def create_task(
         task_type_id: int,
         dataset_id: int,
-        target_name: Optional[str],
         estimation_procedure_id: int,
-        evaluation_measure: str = None,
+        target_name: Optional[str] = None,
+        evaluation_measure: Optional[str] = None,
         **kwargs
 ) -> Union[
     OpenMLClassificationTask, OpenMLRegressionTask,
@@ -473,6 +473,7 @@ def create_task(
         The id of the dataset for the task.
     target_name : str, optional
         The name of the feature used as a target.
+        At the moment, only optional for the clustering tasks.
     estimation_procedure_id : int
         The id of the estimation procedure.
     evaluation_measure : str, optional
@@ -502,7 +503,7 @@ def create_task(
             task_type_id=task_type_id,
             task_type=None,
             data_set_id=dataset_id,
-            target_name=target_name if target_name is not None else None,
+            target_name=target_name,
             estimation_procedure_id=estimation_procedure_id,
             evaluation_measure=evaluation_measure,
             **kwargs
