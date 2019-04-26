@@ -372,16 +372,13 @@ Properties of the task are stored as member variables:
     {'class_labels': ['good', 'bad'],
      'cost_matrix': None,
      'dataset_id': 31,
-     'estimation_parameters': {'number_folds': '10',
-                               'number_repeats': '1',
-                               'percentage': '',
-                               'stratified_sampling': 'true'},
      'estimation_procedure': {'data_splits_url': 'https://www.openml.org/api_splits/get/31/Task_31_splits.arff',
                               'parameters': {'number_folds': '10',
                                              'number_repeats': '1',
                                              'percentage': '',
                                              'stratified_sampling': 'true'},
                               'type': 'crossvalidation'},
+     'estimation_procedure_id': 1,
      'evaluation_measure': None,
      'split': None,
      'target_name': 'class',
@@ -409,13 +406,13 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLClassificationTask object at 0x2b2ee7e602e8>
+    <openml.tasks.task.OpenMLClassificationTask object at 0x2ad6ddd16d30>
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  31.423 seconds)
+   **Total running time of the script:** ( 0 minutes  30.776 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:
