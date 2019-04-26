@@ -27,28 +27,38 @@ class OpenMLDatasetTest(TestBase):
         self.pc4 = openml.datasets.get_dataset(1049, download_data=False)
         self.jm1 = openml.datasets.get_dataset(1053, download_data=False)
 
-    def test_get_data_future_warning(self):
-        warn_msg = 'will change from "array" to "dataframe"'
-        with pytest.warns(FutureWarning, match=warn_msg):
-            self.dataset.get_data()
-
-    def test_get_data(self):
+    def test_get_data_array(self):
         # Basic usage
-        rval = self.dataset.get_data(dataset_format='array')
+        rval, _, categorical, attribute_names = self.dataset.get_data(dataset_format='array')
         self.assertIsInstance(rval, np.ndarray)
         self.assertEqual(rval.dtype, np.float32)
         self.assertEqual((898, 39), rval.shape)
-        rval, categorical = self.dataset.get_data(
-            dataset_format='array', return_categorical_indicator=True
-        )
         self.assertEqual(len(categorical), 39)
         self.assertTrue(all([isinstance(cat, bool) for cat in categorical]))
-        rval, attribute_names = self.dataset.get_data(
-            dataset_format='array', return_attribute_names=True
-        )
         self.assertEqual(len(attribute_names), 39)
         self.assertTrue(all([isinstance(att, str)
                              for att in attribute_names]))
+        self.assertEqual(_, None)
+
+        # check that an error is raised when the dataset contains string
+        err_msg = "PyOpenML cannot handle string when returning numpy arrays"
+        with pytest.raises(PyOpenMLError, match=err_msg):
+            self.titanic.get_data(dataset_format='array')
+
+    def test_get_data(self):
+        # Basic usage
+        rval, _, categorical, attribute_names = self.dataset.get_data()
+        self.assertIsInstance(rval, pd.DataFrame)
+        for (dtype, is_cat) in zip(rval.dtypes, categorical):
+            expected_type = 'category' if is_cat else 'float64'
+            self.assertEqual(dtype.name, expected_type)
+        self.assertTrue(all([isinstance(cat, bool) for cat in categorical]))
+        self.assertTrue(all([isinstance(att, str) for att in attribute_names]))
+
+        self.assertEqual((898, 39), rval.shape)
+        self.assertEqual(_, None)
+        self.assertEqual(len(categorical), 39)
+        self.assertEqual(len(attribute_names), 39)
 
         # check that an error is raised when the dataset contains string
         err_msg = "PyOpenML cannot handle string when returning numpy arrays"
@@ -57,18 +67,11 @@ class OpenMLDatasetTest(TestBase):
 
     def test_get_data_with_rowid(self):
         self.dataset.row_id_attribute = "condition"
-        rval, categorical = self.dataset.get_data(
-            dataset_format='array', include_row_id=True,
-            return_categorical_indicator=True
-        )
-        self.assertEqual(rval.dtype, np.float32)
+        rval, _, categorical, _ = self.dataset.get_data()
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
-        rval, categorical = self.dataset.get_data(
-            dataset_format='array', include_row_id=False,
-            return_categorical_indicator=True
-        )
-        self.assertEqual(rval.dtype, np.float32)
+
+        rval, _, categorical, _ = self.dataset.get_data(include_row_id=False)
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
 
