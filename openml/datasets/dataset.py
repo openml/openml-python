@@ -669,15 +669,17 @@ class OpenMLDataset(object):
                 path = os.path.abspath(self.data_file)
                 if os.path.exists(path):
                     try:
-                        # check if arff is valid
-                        decoder = arff.ArffDecoder()
+
                         with io.open(path, encoding='utf8') as fh:
+                            # check if arff is valid
+                            decoder = arff.ArffDecoder()
                             decoder.decode(fh, encode_nominal=True)
                     except arff.ArffException:
                         raise ValueError("The file you have provided is not "
                                          "a valid arff file.")
 
-                    file_elements['dataset'] = open(path, 'rb')
+                    with open(path, 'rb') as fp:
+                        file_elements['dataset'] = fp.read()
             else:
                 if self.url is None:
                     raise ValueError("No url/path to the data file was given")

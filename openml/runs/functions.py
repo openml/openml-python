@@ -158,6 +158,9 @@ def run_flow_on_task(
     if flow_tags is not None and not isinstance(flow_tags, list):
         raise ValueError("flow_tags should be a list")
 
+    if task.task_id is None:
+        raise ValueError("The task should be published at OpenML")
+
     # TODO: At some point in the future do not allow for arguments in old order (changed 6-2018).
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
     if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
@@ -452,11 +455,14 @@ def _run_task_get_arffcontent(
             for i, tst_idx in enumerate(test_indices):
 
                 arff_line = [rep_no, fold_no, sample_no, tst_idx]  # type: List[Any]
-                for j, class_label in enumerate(task.class_labels):
-                    arff_line.append(proba_y[i][j])
+                if task.class_labels is not None:
+                    for j, class_label in enumerate(task.class_labels):
+                        arff_line.append(proba_y[i][j])
 
-                arff_line.append(task.class_labels[pred_y[i]])
-                arff_line.append(task.class_labels[test_y[i]])
+                    arff_line.append(task.class_labels[pred_y[i]])
+                    arff_line.append(task.class_labels[test_y[i]])
+                else:
+                    raise ValueError('The task has no class labels')
 
                 arff_datacontent.append(arff_line)
 
