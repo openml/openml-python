@@ -474,7 +474,7 @@ class OpenMLDataset(object):
                 data, categorical, attribute_names = pickle.load(fh)
 
         to_exclude = []
-        if include_row_id is False:
+        if not include_row_id:
             if not self.row_id_attribute:
                 pass
             else:
@@ -483,7 +483,7 @@ class OpenMLDataset(object):
                 else:
                     to_exclude.extend(self.row_id_attribute)
 
-        if include_ignore_attributes is False:
+        if not include_ignore_attributes:
             if not self.ignore_attributes:
                 pass
             else:
