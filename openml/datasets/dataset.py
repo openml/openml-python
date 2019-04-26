@@ -435,8 +435,9 @@ class OpenMLDataset(object):
 
         Parameters
         ----------
-        target : string, list of strings or None (default=None)
-            Name of target column(s) to separate from the data.
+        target : string, List[str] or None (default=None)
+            Name of target column to separate from the data.
+            Splitting multiple columns is currently not supported.
         include_row_id : boolean (default=False)
             Whether to include row ids in the returned dataset.
         include_ignore_attributes : boolean (default=False)
@@ -451,10 +452,8 @@ class OpenMLDataset(object):
         -------
         X : ndarray, dataframe, or sparse matrix, shape (n_samples, n_columns)
             Dataset
-        y : ndarray or DataFrame, shape (n_samples, len(target)) or None
-            Target column(s).
-            If only one target is specified with np.ndarray, the shape is (n_samples,) instead.
-            Only returned if target is not None.
+        y : ndarray or pd.Series, shape (n_samples, ) or None
+            Target column
         categorical_indicator : boolean ndarray
             Mask that indicate categorical features.
         return_attribute_names : List[str]
