@@ -1,85 +1,96 @@
-import sys
+import unittest
+from random import randint
 
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
-
-from time import time
-import numpy as np
-
-import openml
 from openml.testing import TestBase
+from openml.datasets import (
+    get_dataset,
+    list_datasets,
+)
+from openml.tasks import (
+    create_task,
+    get_task
+)
+from openml.utils import (
+    _delete_entity,
+)
 
 
 class OpenMLTaskTest(TestBase):
-    _multiprocess_can_split_ = True
+    """
+    A helper class. The methods of the test case
+    are only executed in subclasses of the test case.
+    """
 
-    @mock.patch('openml.tasks.functions.get_dataset', autospec=True)
-    def test_get_dataset(self, patch):
-        patch.return_value = mock.MagicMock()
-        mm = mock.MagicMock()
-        patch.return_value.retrieve_class_labels = mm
-        patch.return_value.retrieve_class_labels.return_value = 'LA'
-        retval = openml.tasks.get_task(1)
-        self.assertEqual(patch.call_count, 1)
-        self.assertIsInstance(retval, openml.OpenMLTask)
-        self.assertEqual(retval.class_labels, 'LA')
+    __test__ = False
 
-    def test_get_X_and_Y(self):
-        # Classification task
-        task = openml.tasks.get_task(1)
-        X, Y = task.get_X_and_y()
-        self.assertEqual((898, 38), X.shape)
-        self.assertIsInstance(X, np.ndarray)
-        self.assertEqual((898, ), Y.shape)
-        self.assertIsInstance(Y, np.ndarray)
-        self.assertEqual(Y.dtype, int)
+    @classmethod
+    def setUpClass(cls):
+        if cls is OpenMLTaskTest:
+            raise unittest.SkipTest(
+                "Skip OpenMLTaskTest tests,"
+                " it's a base class"
+            )
+        super(OpenMLTaskTest, cls).setUpClass()
 
-        # Regression task
-        task = openml.tasks.get_task(631)
-        X, Y = task.get_X_and_y()
-        self.assertEqual((52, 2), X.shape)
-        self.assertIsInstance(X, np.ndarray)
-        self.assertEqual((52,), Y.shape)
-        self.assertIsInstance(Y, np.ndarray)
-        self.assertEqual(Y.dtype, float)
+    def setUp(self, n_levels: int = 1):
 
-    def test_tagging(self):
-        task = openml.tasks.get_task(1)
-        tag = "testing_tag_{}_{}".format(self.id(), time())
-        task_list = openml.tasks.list_tasks(tag=tag)
-        self.assertEqual(len(task_list), 0)
-        task.push_tag(tag)
-        task_list = openml.tasks.list_tasks(tag=tag)
-        self.assertEqual(len(task_list), 1)
-        self.assertIn(1, task_list)
-        task.remove_tag(tag)
-        task_list = openml.tasks.list_tasks(tag=tag)
-        self.assertEqual(len(task_list), 0)
+        super(OpenMLTaskTest, self).setUp()
 
-    def test_get_train_and_test_split_indices(self):
-        openml.config.cache_directory = self.static_cache_dir
-        task = openml.tasks.get_task(1882)
-        train_indices, test_indices = task.get_train_test_split_indices(0, 0)
-        self.assertEqual(16, train_indices[0])
-        self.assertEqual(395, train_indices[-1])
-        self.assertEqual(412, test_indices[0])
-        self.assertEqual(364, test_indices[-1])
-        train_indices, test_indices = task.get_train_test_split_indices(2, 2)
-        self.assertEqual(237, train_indices[0])
-        self.assertEqual(681, train_indices[-1])
-        self.assertEqual(583, test_indices[0])
-        self.assertEqual(24, test_indices[-1])
-        self.assertRaisesRegex(
-            ValueError,
-            "Fold 10 not known",
-            task.get_train_test_split_indices,
-            10, 0,
+    def test_download_task(self):
+
+        return get_task(self.task_id)
+
+    def test_upload_task(self):
+
+        dataset_id = self._get_compatible_rand_dataset()
+        # TODO consider implementing on the diff task types.
+        task = create_task(
+            task_type_id=self.task_type_id,
+            dataset_id=dataset_id,
+            target_name=self._get_random_feature(dataset_id),
+            estimation_procedure_id=self.estimation_procedure
         )
-        self.assertRaisesRegex(
-            ValueError,
-            "Repeat 10 not known",
-            task.get_train_test_split_indices,
-            0, 10,
-        )
+
+        task_id = task.publish()
+        _delete_entity('task', task_id)
+
+    def _get_compatible_rand_dataset(self) -> int:
+
+        compatible_datasets = []
+        active_datasets = list_datasets(status='active')
+
+        # depending on the task type, find either datasets
+        # with only symbolic features or datasets with only
+        # numerical features.
+        if self.task_type_id != 2:
+            for dataset_id, dataset_info in active_datasets.items():
+                # extra checks because of:
+                # https://github.com/openml/OpenML/issues/959
+                if 'NumberOfNumericFeatures' in dataset_info:
+                    if dataset_info['NumberOfNumericFeatures'] == 0:
+                        compatible_datasets.append(dataset_id)
+        else:
+            for dataset_id, dataset_info in active_datasets.items():
+                if 'NumberOfSymbolicFeatures' in dataset_info:
+                    if dataset_info['NumberOfSymbolicFeatures'] == 0:
+                        compatible_datasets.append(dataset_id)
+
+        random_dataset_pos = randint(0, len(compatible_datasets) - 1)
+
+        return compatible_datasets[random_dataset_pos]
+
+    def _get_random_feature(self, dataset_id: int) -> str:
+
+        random_dataset = get_dataset(dataset_id)
+        # necessary loop to overcome string and date type
+        # features.
+        while True:
+            random_feature_index = randint(0, len(random_dataset.features) - 1)
+            random_feature = random_dataset.features[random_feature_index]
+            if self.task_type_id == 2:
+                if random_feature.data_type == 'numeric':
+                    break
+            else:
+                if random_feature.data_type == 'nominal':
+                    break
+        return random_feature.name

@@ -79,7 +79,7 @@ pprint(tasks.head())
 ############################################################################
 # Furthermore, we can list tasks based on the dataset id:
 
-tasks = openml.tasks.list_tasks(data_id=61)
+tasks = openml.tasks.list_tasks(data_id=1471)
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
 print("First 5 of %s tasks:" % len(tasks))
 pprint(tasks.head())
@@ -124,7 +124,7 @@ tasks.query('name=="eeg-eye-state"')
 # single task by its ID, and one which takes a list of IDs and downloads
 # all of these tasks:
 
-task_id = 1
+task_id = 31
 task = openml.tasks.get_task(task_id)
 
 ############################################################################
@@ -135,6 +135,6 @@ pprint(vars(task))
 ############################################################################
 # And:
 
-ids = [1, 2, 19, 97, 403]
+ids = [2, 1891, 31, 9983]
 tasks = openml.tasks.get_tasks(ids)
 pprint(tasks[0])

@@ -1,9 +1,11 @@
 from collections import OrderedDict
 import io
+import itertools
 import os
 from typing import Any, List, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
 import warnings
 
+import sklearn.metrics
 import xmltodict
 
 import openml
@@ -16,7 +18,8 @@ from openml.flows.flow import _copy_server_fields
 from ..flows import get_flow, flow_exists, OpenMLFlow
 from ..setups import setup_exists, initialize_model
 from ..exceptions import OpenMLCacheException, OpenMLServerException, OpenMLRunsExistError
-from ..tasks import OpenMLTask
+from ..tasks import OpenMLTask, OpenMLClassificationTask, OpenMLClusteringTask, \
+    OpenMLRegressionTask, OpenMLSupervisedTask, OpenMLLearningCurveTask
 from .run import OpenMLRun
 from .trace import OpenMLRunTrace
 from ..tasks import TaskTypeEnum
@@ -155,6 +158,9 @@ def run_flow_on_task(
     if flow_tags is not None and not isinstance(flow_tags, list):
         raise ValueError("flow_tags should be a list")
 
+    if task.task_id is None:
+        raise ValueError("The task should be published at OpenML")
+
     # TODO: At some point in the future do not allow for arguments in old order (changed 6-2018).
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
     if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
@@ -206,6 +212,7 @@ def run_flow_on_task(
 
     # execute the run
     res = _run_task_get_arffcontent(
+        flow=flow,
         model=flow.model,
         task=task,
         extension=flow.extension,
@@ -366,6 +373,7 @@ def run_exists(task_id: int, setup_id: int) -> Set[int]:
 
 
 def _run_task_get_arffcontent(
+    flow: OpenMLFlow,
     model: Any,
     task: OpenMLTask,
     extension: 'Extension',
@@ -377,7 +385,7 @@ def _run_task_get_arffcontent(
     'OrderedDict[str, OrderedDict]',
 ]:
     arff_datacontent = []  # type: List[List]
-    arff_tracecontent = []  # type: List[List]
+    traces = []  # type: List[OpenMLRunTrace]
     # stores fold-based evaluation measures. In case of a sample based task,
     # this information is multiple times overwritten, but due to the ordering
     # of tne loops, eventually it contains the information based on the full
@@ -392,50 +400,126 @@ def _run_task_get_arffcontent(
     # methods, less maintenance, less confusion)
     num_reps, num_folds, num_samples = task.get_split_dimensions()
 
-    for rep_no in range(num_reps):
-        for fold_no in range(num_folds):
-            for sample_no in range(num_samples):
-                (
-                    arff_datacontent_fold,
-                    arff_tracecontent_fold,
-                    user_defined_measures_fold,
-                    model_fold,
-                ) = extension._run_model_on_fold(
-                    model=model,
-                    task=task,
-                    rep_no=rep_no,
-                    fold_no=fold_no,
-                    sample_no=sample_no,
-                    add_local_measures=add_local_measures,
+    for n_fit, (rep_no, fold_no, sample_no) in enumerate(itertools.product(
+        range(num_reps),
+        range(num_folds),
+        range(num_samples),
+    ), start=1):
+
+        train_indices, test_indices = task.get_train_test_split_indices(
+            repeat=rep_no, fold=fold_no, sample=sample_no)
+        if isinstance(task, OpenMLSupervisedTask):
+            x, y = task.get_X_and_y(dataset_format='array')
+            train_x = x[train_indices]
+            train_y = y[train_indices]
+            test_x = x[test_indices]
+            test_y = y[test_indices]
+        elif isinstance(task, OpenMLClusteringTask):
+            x = task.get_X(dataset_format='array')
+            train_x = x[train_indices]
+            train_y = None
+            test_x = None
+            test_y = None
+        else:
+            raise NotImplementedError(task.task_type)
+
+        config.logger.info(
+            "Going to execute flow '%s' on task %d for repeat %d fold %d sample %d.",
+            flow.name, task.task_id, rep_no, fold_no, sample_no,
+        )
+
+        (
+            pred_y,
+            proba_y,
+            user_defined_measures_fold,
+            trace,
+        ) = extension._run_model_on_fold(
+            model=model,
+            task=task,
+            X_train=train_x,
+            y_train=train_y,
+            rep_no=rep_no,
+            fold_no=fold_no,
+            X_test=test_x,
+        )
+        if trace is not None:
+            traces.append(trace)
+
+        # add client-side calculated metrics. These is used on the server as
+        # consistency check, only useful for supervised tasks
+        def _calculate_local_measure(sklearn_fn, openml_name):
+            user_defined_measures_fold[openml_name] = sklearn_fn(test_y, pred_y)
+
+        if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
+
+            for i, tst_idx in enumerate(test_indices):
+
+                arff_line = [rep_no, fold_no, sample_no, tst_idx]  # type: List[Any]
+                if task.class_labels is not None:
+                    for j, class_label in enumerate(task.class_labels):
+                        arff_line.append(proba_y[i][j])
+
+                    arff_line.append(task.class_labels[pred_y[i]])
+                    arff_line.append(task.class_labels[test_y[i]])
+                else:
+                    raise ValueError('The task has no class labels')
+
+                arff_datacontent.append(arff_line)
+
+            if add_local_measures:
+                _calculate_local_measure(
+                    sklearn.metrics.accuracy_score,
+                    'predictive_accuracy',
                 )
 
-                arff_datacontent.extend(arff_datacontent_fold)
-                arff_tracecontent.extend(arff_tracecontent_fold)
+        elif isinstance(task, OpenMLRegressionTask):
 
-                for measure in user_defined_measures_fold:
+            for i in range(0, len(test_indices)):
+                arff_line = [rep_no, fold_no, test_indices[i], pred_y[i], test_y[i]]
+                arff_datacontent.append(arff_line)
 
-                    if measure not in user_defined_measures_per_fold:
-                        user_defined_measures_per_fold[measure] = OrderedDict()
-                    if rep_no not in user_defined_measures_per_fold[measure]:
-                        user_defined_measures_per_fold[measure][rep_no] = OrderedDict()
+            if add_local_measures:
+                _calculate_local_measure(
+                    sklearn.metrics.mean_absolute_error,
+                    'mean_absolute_error',
+                )
 
-                    if measure not in user_defined_measures_per_sample:
-                        user_defined_measures_per_sample[measure] = OrderedDict()
-                    if rep_no not in user_defined_measures_per_sample[measure]:
-                        user_defined_measures_per_sample[measure][rep_no] = OrderedDict()
-                    if fold_no not in user_defined_measures_per_sample[
-                            measure][rep_no]:
-                        user_defined_measures_per_sample[measure][rep_no][fold_no] = OrderedDict()
+        elif isinstance(task, OpenMLClusteringTask):
+            for i in range(0, len(test_indices)):
+                arff_line = [test_indices[i], pred_y[i]]  # row_id, cluster ID
+                arff_datacontent.append(arff_line)
 
-                    user_defined_measures_per_fold[measure][rep_no][
-                        fold_no] = user_defined_measures_fold[measure]
-                    user_defined_measures_per_sample[measure][rep_no][fold_no][
-                        sample_no] = user_defined_measures_fold[measure]
+        else:
+            raise TypeError(type(task))
 
-    # Note that we need to use a fitted model (i.e., model_fold, and not model)
-    # here, to ensure it contains the hyperparameter data (in cv_results_)
-    if extension.is_hpo_class(model):
-        trace = extension.obtain_arff_trace(model_fold, arff_tracecontent)  # type: Optional[OpenMLRunTrace]  # noqa E501
+        for measure in user_defined_measures_fold:
+
+            if measure not in user_defined_measures_per_fold:
+                user_defined_measures_per_fold[measure] = OrderedDict()
+            if rep_no not in user_defined_measures_per_fold[measure]:
+                user_defined_measures_per_fold[measure][rep_no] = OrderedDict()
+
+            if measure not in user_defined_measures_per_sample:
+                user_defined_measures_per_sample[measure] = OrderedDict()
+            if rep_no not in user_defined_measures_per_sample[measure]:
+                user_defined_measures_per_sample[measure][rep_no] = OrderedDict()
+            if fold_no not in user_defined_measures_per_sample[measure][rep_no]:
+                user_defined_measures_per_sample[measure][rep_no][fold_no] = OrderedDict()
+
+            user_defined_measures_per_fold[measure][rep_no][fold_no] = (
+                user_defined_measures_fold[measure]
+            )
+            user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = (
+                user_defined_measures_fold[measure]
+            )
+
+    if len(traces) > 0:
+        if len(traces) != n_fit:
+            raise ValueError(
+                'Did not find enough traces (expected {}, found {})'.format(n_fit, len(traces))
+            )
+        else:
+            trace = OpenMLRunTrace.merge_traces(traces)
     else:
         trace = None
 
@@ -467,12 +551,18 @@ def get_runs(run_ids):
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_run(run_id):
+def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:
     """Gets run corresponding to run_id.
 
     Parameters
     ----------
     run_id : int
+
+    ignore_cache : bool
+        Whether to ignore the cache. If ``true`` this will download and overwrite the run xml
+        even if the requested run is already cached.
+
+    ignore_cache
 
     Returns
     -------
@@ -487,11 +577,13 @@ def get_run(run_id):
         os.makedirs(run_dir)
 
     try:
-        return _get_cached_run(run_id)
+        if not ignore_cache:
+            return _get_cached_run(run_id)
+        else:
+            raise OpenMLCacheException(message='dummy')
 
-    except (OpenMLCacheException):
-        run_xml = openml._api_calls._perform_api_call("run/%d" % run_id,
-                                                      'get')
+    except OpenMLCacheException:
+        run_xml = openml._api_calls._perform_api_call("run/%d" % run_id, 'get')
         with io.open(run_file, "w", encoding='utf8') as fh:
             fh.write(run_xml)
 

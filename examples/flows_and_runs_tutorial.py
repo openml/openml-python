@@ -14,8 +14,13 @@ from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # Train a scikit-learn model on the data manually.
+#
+# .. warning:: This example uploads data. For that reason, this example
+#   connects to the test server at test.openml.org. This prevents the main
+#   server from crowding with example datasets, tasks, runs, and so on.
 
-# NOTE: Dataset 68 exists on the test server https://test.openml.org/d/68
+openml.config.start_using_configuration_for_example()
+# NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
 dataset = openml.datasets.get_dataset(68)
 X, y = dataset.get_data(
     dataset_format='array',
@@ -159,3 +164,7 @@ for task_id in [115, ]:  # Add further tasks. Disclaimer: they might take some t
     run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
     myrun = run.publish()
     print("kNN on %s: http://test.openml.org/r/%d" % (data.name, myrun.run_id))
+
+
+############################################################################
+openml.config.stop_using_configuration_for_example()

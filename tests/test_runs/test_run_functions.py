@@ -4,6 +4,7 @@ import os
 import random
 import time
 import sys
+import unittest.mock
 
 import numpy as np
 
@@ -25,7 +26,7 @@ from openml.tasks import TaskTypeEnum
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
-from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing.imputation import Imputer
 from sklearn.dummy import DummyClassifier
 from sklearn.preprocessing import StandardScaler
@@ -37,17 +38,6 @@ from sklearn.svm import SVC
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
     StratifiedKFold
 from sklearn.pipeline import Pipeline
-
-
-class HardNaiveBayes(GaussianNB):
-    # class for testing a naive bayes classifier that does not allow soft
-    # predictions
-    def __init__(self, priors=None):
-        super(HardNaiveBayes, self).__init__(priors)
-
-    def predict_proba(*args, **kwargs):
-        raise AttributeError('predict_proba is not available when '
-                             'probability=False')
 
 
 class TestRun(TestBase):
@@ -83,11 +73,13 @@ class TestRun(TestBase):
         # time.time() works in seconds
         start_time = time.time()
         while time.time() - start_time < max_waiting_time_seconds:
-            run = openml.runs.get_run(run_id)
+            run = openml.runs.get_run(run_id, ignore_cache=True)
             if len(run.evaluations) > 0:
                 return
             else:
                 time.sleep(10)
+        raise RuntimeError('Could not find any evaluations! Please check whether run {} was '
+                           'evaluated correctly on the server'.format(run_id))
 
     def _compare_predictions(self, predictions, predictions_prime):
         self.assertEqual(np.array(predictions_prime['data']).shape,
@@ -437,7 +429,7 @@ class TestRun(TestBase):
         # todo: check if runtime is present
         self._check_fold_timing_evaluations(run.fold_evaluations, 1, num_folds,
                                             task_type=task_type)
-        pass
+        return run
 
     def _run_and_upload_classification(self, clf, task_id, n_missing_vals,
                                        n_test_obs, flow_expected_rsv,
@@ -448,11 +440,19 @@ class TestRun(TestBase):
         metric_name = 'predictive_accuracy'  # openml metric name
         task_type = TaskTypeEnum.SUPERVISED_CLASSIFICATION  # task type
 
-        self._run_and_upload(clf, task_id, n_missing_vals, n_test_obs,
-                             flow_expected_rsv, num_folds=num_folds,
-                             num_iterations=num_iterations,
-                             metric=metric, metric_name=metric_name,
-                             task_type=task_type, sentinel=sentinel)
+        return self._run_and_upload(
+            clf=clf,
+            task_id=task_id,
+            n_missing_vals=n_missing_vals,
+            n_test_obs=n_test_obs,
+            flow_expected_rsv=flow_expected_rsv,
+            num_folds=num_folds,
+            num_iterations=num_iterations,
+            metric=metric,
+            metric_name=metric_name,
+            task_type=task_type,
+            sentinel=sentinel,
+        )
 
     def _run_and_upload_regression(self, clf, task_id, n_missing_vals,
                                    n_test_obs, flow_expected_rsv,
@@ -463,11 +463,19 @@ class TestRun(TestBase):
         metric_name = 'mean_absolute_error'  # openml metric name
         task_type = TaskTypeEnum.SUPERVISED_REGRESSION  # task type
 
-        self._run_and_upload(clf, task_id, n_missing_vals, n_test_obs,
-                             flow_expected_rsv, num_folds=num_folds,
-                             num_iterations=num_iterations,
-                             metric=metric, metric_name=metric_name,
-                             task_type=task_type, sentinel=sentinel)
+        return self._run_and_upload(
+            clf=clf,
+            task_id=task_id,
+            n_missing_vals=n_missing_vals,
+            n_test_obs=n_test_obs,
+            flow_expected_rsv=flow_expected_rsv,
+            num_folds=num_folds,
+            num_iterations=num_iterations,
+            metric=metric,
+            metric_name=metric_name,
+            task_type=task_type,
+            sentinel=sentinel,
+        )
 
     def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression(solver='lbfgs')
@@ -559,9 +567,14 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        self._run_and_upload_classification(gridsearch, task_id,
-                                            n_missing_vals, n_test_obs,
-                                            '62501')
+        run = self._run_and_upload_classification(
+            clf=gridsearch,
+            task_id=task_id,
+            n_missing_vals=n_missing_vals,
+            n_test_obs=n_test_obs,
+            flow_expected_rsv='62501',
+        )
+        self.assertEqual(len(run.trace.trace_iterations), 9)
 
     def test_run_and_upload_randomsearch(self):
         randomsearch = RandomizedSearchCV(
@@ -580,9 +593,14 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        self._run_and_upload_classification(randomsearch, task_id,
-                                            n_missing_vals, n_test_obs,
-                                            '12172')
+        run = self._run_and_upload_classification(
+            clf=randomsearch,
+            task_id=task_id,
+            n_missing_vals=n_missing_vals,
+            n_test_obs=n_test_obs,
+            flow_expected_rsv='12172',
+        )
+        self.assertEqual(len(run.trace.trace_iterations), 5)
 
     def test_run_and_upload_maskedarrays(self):
         # This testcase is important for 2 reasons:
@@ -896,21 +914,6 @@ class TestRun(TestBase):
             run_ids = run_exists(task.task_id, setup_exists)
             self.assertTrue(run_ids, msg=(run_ids, clf))
 
-    def test_run_with_classifiers_in_param_grid(self):
-        task = openml.tasks.get_task(115)
-
-        param_grid = {
-            "base_estimator": [DecisionTreeClassifier(), ExtraTreeClassifier()]
-        }
-
-        clf = GridSearchCV(BaggingClassifier(), param_grid=param_grid)
-        with self.assertRaises(TypeError):
-            openml.runs.run_model_on_task(
-                task=task,
-                model=clf,
-                avoid_duplicate_runs=False,
-            )
-
     def test_run_with_illegal_flow_id(self):
         # check the case where the user adds an illegal flow id to a
         # non-existing flow
@@ -1026,8 +1029,11 @@ class TestRun(TestBase):
         num_folds = 10
         num_repeats = 1
 
+        flow = unittest.mock.Mock()
+        flow.name = 'dummy'
         clf = SGDClassifier(loss='log', random_state=1)
         res = openml.runs.functions._run_task_get_arffcontent(
+            flow=flow,
             extension=self.extension,
             model=clf,
             task=task,
@@ -1220,12 +1226,15 @@ class TestRun(TestBase):
         # labels only declared in the arff file, but is not present in the
         # actual data
 
+        flow = unittest.mock.Mock()
+        flow.name = 'dummy'
         task = openml.tasks.get_task(2)
 
         model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
         data_content, _, _, _ = _run_task_get_arffcontent(
+            flow=flow,
             model=model,
             task=task,
             extension=self.extension,
@@ -1237,42 +1246,6 @@ class TestRun(TestBase):
         for row in data_content:
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             self.assertEqual(len(row), 12)
-
-    def test_predict_proba_hardclassifier(self):
-        # task 1 (test server) is important: it is a task with an unused class
-        tasks = [1, 3, 115]
-
-        for task_id in tasks:
-            task = openml.tasks.get_task(task_id)
-            clf1 = sklearn.pipeline.Pipeline(steps=[
-                ('imputer', sklearn.preprocessing.Imputer()),
-                ('estimator', GaussianNB())
-            ])
-            clf2 = sklearn.pipeline.Pipeline(steps=[
-                ('imputer', sklearn.preprocessing.Imputer()),
-                ('estimator', HardNaiveBayes())
-            ])
-
-            arff_content1, _, _, _ = _run_task_get_arffcontent(
-                model=clf1,
-                task=task,
-                extension=self.extension,
-                add_local_measures=True,
-            )
-            arff_content2, _, _, _ = _run_task_get_arffcontent(
-                model=clf2,
-                task=task,
-                extension=self.extension,
-                add_local_measures=True,
-            )
-
-            # verifies last two arff indices (predict and correct)
-            # TODO: programmatically check wether these are indeed features
-            # (predict, correct)
-            predictionsA = np.array(arff_content1)[:, -2:]
-            predictionsB = np.array(arff_content2)[:, -2:]
-
-            np.testing.assert_array_equal(predictionsA, predictionsB)
 
     def test_get_cached_run(self):
         openml.config.cache_directory = self.static_cache_dir

@@ -1,8 +1,10 @@
-import arff
+from collections import OrderedDict
 import json
 import os
+from typing import List, Tuple  # noqa F401
+
+import arff
 import xmltodict
-from collections import OrderedDict
 
 PREFIX = 'parameter_'
 REQUIRED_ATTRIBUTES = [
@@ -281,7 +283,7 @@ class OpenMLRunTrace(object):
                 setup_string=None,
                 evaluation=evaluation,
                 selected=selected,
-                paramaters=parameters,
+                parameters=parameters,
             )
             trace[(repeat, fold, iteration)] = current
 
@@ -346,9 +348,41 @@ class OpenMLRunTrace(object):
 
         return cls(run_id, trace)
 
+    @classmethod
+    def merge_traces(cls, traces: List['OpenMLRunTrace']) -> 'OpenMLRunTrace':
+
+        merged_trace = OrderedDict()  # type: OrderedDict[Tuple[int, int, int], OpenMLTraceIteration]  # noqa E501
+
+        previous_iteration = None
+        for trace in traces:
+            for iteration in trace:
+                key = (iteration.repeat, iteration.fold, iteration.iteration)
+                if previous_iteration is not None:
+                    if (
+                        list(merged_trace[previous_iteration].parameters.keys())
+                        != list(iteration.parameters.keys())
+                    ):
+                        raise ValueError(
+                            'Cannot merge traces because the parameters are not equal: {} vs {}'.
+                            format(
+                                list(merged_trace[previous_iteration].parameters.keys()),
+                                list(iteration.parameters.keys()),
+                            )
+                        )
+
+                if key in merged_trace:
+                    raise ValueError(
+                        "Cannot merge traces because key '{}' was encountered twice".format(key)
+                    )
+
+                merged_trace[key] = iteration
+                previous_iteration = key
+
+        return cls(None, merged_trace)
+
     def __str__(self):
-        return '[Run id: %d, %d trace iterations]' % (
-            self.run_id,
+        return '[Run id: %d, %d trace iterations]'.format(
+            -1 if self.run_id is None else self.run_id,
             len(self.trace_iterations),
         )
 
@@ -394,25 +428,25 @@ class OpenMLTraceIteration(object):
         setup_string,
         evaluation,
         selected,
-        paramaters=None,
+        parameters=None,
     ):
 
         if not isinstance(selected, bool):
             raise TypeError(type(selected))
-        if setup_string and paramaters:
+        if setup_string and parameters:
             raise ValueError(
                 'Can only be instantiated with either '
                 'setup_string or parameters argument.'
             )
-        elif not setup_string and not paramaters:
+        elif not setup_string and not parameters:
             raise ValueError(
                 'Either setup_string or parameters needs to be passed as '
                 'argument.'
             )
-        if paramaters is not None and not isinstance(paramaters, OrderedDict):
+        if parameters is not None and not isinstance(parameters, OrderedDict):
             raise TypeError(
                 'argument parameters is not an instance of OrderedDict, but %s'
-                % str(type(paramaters))
+                % str(type(parameters))
             )
 
         self.repeat = repeat
@@ -421,7 +455,7 @@ class OpenMLTraceIteration(object):
         self.setup_string = setup_string
         self.evaluation = evaluation
         self.selected = selected
-        self.parameters = paramaters
+        self.parameters = parameters
 
     def get_parameters(self):
         result = {}

@@ -15,7 +15,7 @@ class TestTrace(TestBase):
                         setup_string='parameter_%d%d%d' % (i, j, k),
                         evaluation=1.0 * i + 0.1 * j + 0.01 * k,
                         selected=(i == j and i == k and i == 2),
-                        paramaters=None,
+                        parameters=None,
                     )
                     trace_iterations[(i, j, k)] = t
 
