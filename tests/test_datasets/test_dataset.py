@@ -67,11 +67,11 @@ class OpenMLDatasetTest(TestBase):
 
     def test_get_data_with_rowid(self):
         self.dataset.row_id_attribute = "condition"
-        rval, _, categorical, _ = self.dataset.get_data()
+        rval, _, categorical, _ = self.dataset.get_data(include_row_id=True)
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
 
-        rval, _, categorical, _ = self.dataset.get_data(include_row_id=False)
+        rval, _, categorical, _ = self.dataset.get_data()
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
 
