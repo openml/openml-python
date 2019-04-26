@@ -26,3 +26,21 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         self.assertEqual(task.task_id, self.task_id)
         self.assertEqual(task.task_type_id, 5)
         self.assertEqual(task.dataset_id, 36)
+
+    def test_upload_task(self):
+
+        # The base class uploads a clustering task with a target
+        # feature. A situation where a ground truth is available
+        # to benchmark the clustering algorithm.
+        super(OpenMLClusteringTaskTest, self).test_upload_task()
+
+        dataset_id = self._get_compatible_rand_dataset()
+        # Upload a clustering task without a ground truth.
+        task = openml.tasks.create_task(
+            task_type_id=self.task_type_id,
+            dataset_id=dataset_id,
+            estimation_procedure_id=self.estimation_procedure
+        )
+
+        task_id = task.publish()
+        openml.utils._delete_entity('task', task_id)
