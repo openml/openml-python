@@ -4,7 +4,7 @@ import io
 import logging
 import os
 import pickle
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple
 
 import arff
 import numpy as np
@@ -419,10 +419,18 @@ class OpenMLDataset(object):
         from .functions import _get_dataset_arff
         self.data_file = _get_dataset_arff(self)
 
-    def get_data(self, target: Optional[Union[List[str], str]] = None,
-                 include_row_id: bool = False,
-                 include_ignore_attributes: bool = False,
-                 dataset_format: str = None):
+    def get_data(
+            self,
+            target: Optional[Union[List[str], str]] = None,
+            include_row_id: bool = False,
+            include_ignore_attributes: bool = False,
+            dataset_format: str = "dataframe",
+        ) -> Tuple[
+            Union[np.ndarray, pd.DataFrame, scipy.sparse.csr_matrix],
+            Optional[Union[np.ndarray, pd.DataFrame]],
+            List[bool],
+            List[str]
+    ]:
         """ Returns dataset content as dataframes or sparse matrices.
 
         Parameters
@@ -434,7 +442,7 @@ class OpenMLDataset(object):
         include_ignore_attributes : boolean (default=False)
             Whether to include columns that are marked as "ignore"
             on the server in the dataset.
-        dataset_format : string, optional
+        dataset_format : string, optional (default='dataframe')
             The format of returned dataset.
             If ``array``, the returned dataset will be a NumPy array or a SciPy sparse matrix.
             If ``dataframe``, the returned dataset will be a Pandas DataFrame or SparseDataFrame.
@@ -443,18 +451,15 @@ class OpenMLDataset(object):
         -------
         X : ndarray, dataframe, or sparse matrix, shape (n_samples, n_columns)
             Dataset
-        y : ndarray or series, shape (n_samples,) or None
-            Target column(s). Only returned if target is not None.
+        y : ndarray or DataFrame, shape (n_samples, len(target)) or None
+            Target column(s).
+            If only one target is specified with np.ndarray, the shape is (n_samples,) instead.
+            Only returned if target is not None.
         categorical_indicator : boolean ndarray
             Mask that indicate categorical features.
-        return_attribute_names : list of strings
+        return_attribute_names : List[str]
             List of attribute names.
         """
-        if dataset_format is None:
-            warn('The default of "dataset_format" will change from "array" to'
-                 ' "dataframe" in 0.9', FutureWarning)
-            dataset_format = 'array'
-
         if self.data_pickle_file is None:
             if self.data_file is None:
                 self._download_data()
