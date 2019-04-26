@@ -4,7 +4,7 @@ import io
 import logging
 import os
 import pickle
-from typing import List, Optional, Union, Tuple
+from typing import List, Optional, Union, Tuple, Iterable
 
 import arff
 import numpy as np
@@ -474,23 +474,17 @@ class OpenMLDataset(object):
                 data, categorical, attribute_names = pickle.load(fh)
 
         to_exclude = []
-        if not include_row_id:
-            if not self.row_id_attribute:
-                pass
-            else:
-                if isinstance(self.row_id_attribute, str):
-                    to_exclude.append(self.row_id_attribute)
-                else:
-                    to_exclude.extend(self.row_id_attribute)
+        if not include_row_id and self.row_id_attribute is not None:
+            if isinstance(self.row_id_attribute, str):
+                to_exclude.append(self.row_id_attribute)
+            elif isinstance(self.row_id_attribute, Iterable):
+                to_exclude.extend(self.row_id_attribute)
 
-        if not include_ignore_attributes:
-            if not self.ignore_attributes:
-                pass
-            else:
-                if isinstance(self.ignore_attributes, str):
-                    to_exclude.append(self.ignore_attributes)
-                else:
-                    to_exclude.extend(self.ignore_attributes)
+        if not include_ignore_attributes and self.ignore_attributes is not None:
+            if isinstance(self.ignore_attributes, str):
+                to_exclude.append(self.ignore_attributes)
+            elif isinstance(self.ignore_attributes, Iterable):
+                to_exclude.extend(self.ignore_attributes)
 
         if len(to_exclude) > 0:
             logger.info("Going to remove the following attributes:"
