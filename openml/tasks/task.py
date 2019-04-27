@@ -231,8 +231,8 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         self,
         dataset_format: str = 'array',
     ) -> Tuple[
-         Union[np.ndarray, pd.DataFrame, scipy.sparse.spmatrix],
-         Union[np.ndarray, pd.Series]
+        Union[np.ndarray, pd.DataFrame, scipy.sparse.spmatrix],
+        Union[np.ndarray, pd.Series]
     ]:
         """Get data associated with the current task.
 

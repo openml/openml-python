@@ -425,7 +425,7 @@ class OpenMLDataset(object):
             include_row_id: bool = False,
             include_ignore_attributes: bool = False,
             dataset_format: str = "dataframe",
-        ) -> Tuple[
+    ) -> Tuple[
             Union[np.ndarray, pd.DataFrame, scipy.sparse.csr_matrix],
             Optional[Union[np.ndarray, pd.DataFrame]],
             List[bool],
