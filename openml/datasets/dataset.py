@@ -456,7 +456,7 @@ class OpenMLDataset(object):
             Target column
         categorical_indicator : boolean ndarray
             Mask that indicate categorical features.
-        return_attribute_names : List[str]
+        attribute_names : List[str]
             List of attribute names.
         """
         if self.data_pickle_file is None:

@@ -38,7 +38,7 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual(len(attribute_names), 39)
         self.assertTrue(all([isinstance(att, str)
                              for att in attribute_names]))
-        self.assertEqual(_, None)
+        self.assertIsNone(_)
 
         # check that an error is raised when the dataset contains string
         err_msg = "PyOpenML cannot handle string when returning numpy arrays"
@@ -100,10 +100,18 @@ class OpenMLDatasetTest(TestBase):
     def test_get_data_with_rowid(self):
         self.dataset.row_id_attribute = "condition"
         rval, _, categorical, _ = self.dataset.get_data(include_row_id=True)
+        self.assertIsInstance(rval, pd.DataFrame)
+        for (dtype, is_cat) in zip(rval.dtypes, categorical):
+            expected_type = 'category' if is_cat else 'float64'
+            self.assertEqual(dtype.name, expected_type)
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
 
         rval, _, categorical, _ = self.dataset.get_data()
+        self.assertIsInstance(rval, pd.DataFrame)
+        for (dtype, is_cat) in zip(rval.dtypes, categorical):
+            expected_type = 'category' if is_cat else 'float64'
+            self.assertEqual(dtype.name, expected_type)
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
 
@@ -215,15 +223,17 @@ class OpenMLDatasetTestSparse(TestBase):
         X, y, _, attribute_names = self.sparse_dataset.get_data(
             dataset_format='array', target="class"
         )
+
         self.assertTrue(sparse.issparse(X))
         self.assertEqual(X.dtype, np.float32)
+        self.assertEqual(X.shape, (600, 20000))
+
         self.assertIsInstance(y, np.ndarray)
         self.assertIn(y.dtype, [np.int32, np.int64])
-        self.assertEqual(X.shape, (600, 20000))
-        self.assertTrue(sparse.issparse(X))
+        self.assertEqual(y.shape, (600, ))
+
         self.assertEqual(len(attribute_names), 20000)
         self.assertNotIn("class", attribute_names)
-        self.assertEqual(y.shape, (600, ))
 
     def test_get_sparse_dataset(self):
         rval, _, categorical, attribute_names = self.sparse_dataset.get_data(dataset_format='array')
@@ -238,7 +248,7 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertTrue(all([isinstance(att, str) for att in attribute_names]))
 
     def test_get_sparse_dataframe(self):
-        rval, *_ = self.sparse_dataset.get_data(dataset_format='dataframe')
+        rval, *_ = self.sparse_dataset.get_data()
         self.assertTrue(isinstance(rval, pd.SparseDataFrame))
         self.assertEqual((600, 20001), rval.shape)
 
