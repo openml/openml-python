@@ -151,12 +151,12 @@ def _delete_entity(entity_type, entity_id):
         return False
 
 
-def _list_all(output_format, listing_call, *args, **filters):
+def _list_all(listing_call, output_format='dict', *args, **filters):
     """Helper to handle paged listing requests.
 
     Example usage:
 
-    ``evaluations = _list_all(list_evaluations, "predictive_accuracy", task=mytask)``
+    ``evaluations = list_all(list_evaluations, "predictive_accuracy", task=mytask)``
 
     Parameters
     ----------

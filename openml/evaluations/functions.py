@@ -1,7 +1,7 @@
 import json
 import xmltodict
 import pandas as pd
-from typing import Union, List
+from typing import Union, List, Optional, Dict
 
 import openml.utils
 import openml._api_calls
@@ -10,17 +10,17 @@ from ..evaluations import OpenMLEvaluation
 
 def list_evaluations(
     function: str,
-    offset: int = None,
-    size: int = None,
-    id: List = None,
-    task: List = None,
-    setup: List = None,
-    flow: List = None,
-    uploader: List = None,
-    tag: str = None,
-    per_fold: bool = None,
-    output_format: str = 'dict'
-) -> Union[dict, pd.DataFrame]:
+    offset: Optional[int] = None,
+    size: Optional[int] = None,
+    id: Optional[List] = None,
+    task: Optional[List] = None,
+    setup: Optional[List] = None,
+    flow: Optional[List] = None,
+    uploader: Optional[List] = None,
+    tag: Optional[str] = None,
+    per_fold: Optional[bool] = None,
+    output_format: str = 'object'
+) -> Union[Dict, pd.DataFrame]:
     """
     List all run-evaluation pairs matching all of the given filters.
     (Supports large amount of results)
@@ -48,8 +48,9 @@ def list_evaluations(
 
     per_fold : bool, optional
 
-    output_format: str, optional (default='dict')
+    output_format: str, optional (default='object')
         The parameter decides the format of the output.
+        - If 'object' the output is a dict of OpenMLEvaluation objects
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
 
@@ -61,8 +62,9 @@ def list_evaluations(
         raise ValueError("Invalid output format selected. "
                          "Only 'object', 'dataframe', or 'dict' applicable.")
 
+    per_fold_str = None
     if per_fold is not None:
-        per_fold = str(per_fold).lower()
+        per_fold_str = str(per_fold).lower()
 
     return openml.utils._list_all(output_format=output_format,
                                   listing_call=_list_evaluations,
@@ -75,19 +77,19 @@ def list_evaluations(
                                   flow=flow,
                                   uploader=uploader,
                                   tag=tag,
-                                  per_fold=per_fold)
+                                  per_fold=per_fold_str)
 
 
 def _list_evaluations(
     function: str,
-    id: List = None,
-    task: List = None,
-    setup: List = None,
-    flow: List = None,
-    uploader: List = None,
-    output_format: str = 'dict',
-    **kwargs: dict
-) -> Union[dict, pd.DataFrame]:
+    id: Optional[List] = None,
+    task: Optional[List] = None,
+    setup: Optional[List] = None,
+    flow: Optional[List] = None,
+    uploader: Optional[List] = None,
+    output_format: str = 'object',
+    **kwargs
+) -> Union[Dict, pd.DataFrame]:
     """
     Perform API call ``/evaluation/function{function}/{filters}``
 
@@ -143,7 +145,7 @@ def _list_evaluations(
     return __list_evaluations(api_call, output_format=output_format)
 
 
-def __list_evaluations(api_call, output_format='dict'):
+def __list_evaluations(api_call, output_format='object'):
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     evals_dict = xmltodict.parse(xml_string, force_list=('oml:evaluation',))

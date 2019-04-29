@@ -2,15 +2,8 @@ from collections import OrderedDict
 import io
 import re
 import os
-import warnings
-from typing import Union
+from typing import Union, Dict, Optional
 import pandas as pd
-
-# Currently, importing oslo raises a lot of warning that it will stop working
-# under python3.8; remove this once they disappear
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    from oslo_concurrency import lockutils
 import xmltodict
 
 from ..exceptions import OpenMLCacheException
@@ -130,13 +123,13 @@ def _get_estimation_procedure_list():
 
 
 def list_tasks(
-    task_type_id: int = None,
-    offset: int = None,
-    size: int = None,
-    tag: str = None,
+    task_type_id: Optional[int] = None,
+    offset: Optional[int] = None,
+    size: Optional[int] = None,
+    tag: Optional[str] = None,
     output_format: str = 'dict',
     **kwargs
-) -> Union[dict, pd.DataFrame]:
+) -> Union[Dict, pd.DataFrame]:
     """
     Return a number of tasks having the given tag and task_type_id
     Parameters
@@ -169,6 +162,7 @@ def list_tasks(
         Legal filter operators: data_tag, status, data_id, data_name,
         number_instances, number_features,
         number_classes, number_missing_values.
+
     Returns
     -------
     dict
@@ -224,7 +218,7 @@ def _list_tasks(task_type_id=None, output_format='dict', **kwargs):
 
     Returns
     -------
-    dict
+    dict or dataframe
     """
     api_call = "task/list"
     if task_type_id is not None:

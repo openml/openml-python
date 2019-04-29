@@ -2,7 +2,7 @@ from collections import OrderedDict
 import io
 import itertools
 import os
-from typing import Any, List, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
+from typing import Any, List, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
 import warnings
 
 import sklearn.metrics
@@ -394,11 +394,6 @@ def _run_task_get_arffcontent(
     # is the same as the fold-based measures, and disregarded in that case
     user_defined_measures_per_sample = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
 
-    # sys.version_info returns a tuple, the following line compares the entry
-    # of tuples
-    # https://docs.python.org/3.6/reference/expressions.html#value-comparisons
-    can_measure_runtime = sys.version_info[:2] >= (3, 3) and \
-        _check_n_jobs(model)
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
     num_reps, num_folds, num_samples = task.get_split_dimensions()
@@ -768,18 +763,18 @@ def _get_cached_run(run_id):
 
 
 def list_runs(
-    offset: int = None,
-    size: int = None,
-    id: List = None,
-    task: List = None,
-    setup: List = None,
-    flow: List = None,
-    uploader: List = None,
-    tag: str = None,
+    offset: Optional[int] = None,
+    size: Optional[int] = None,
+    id: Optional[List] = None,
+    task: Optional[List] = None,
+    setup: Optional[List] = None,
+    flow: Optional[List] = None,
+    uploader: Optional[List] = None,
+    tag: Optional[str] = None,
     display_errors: bool = False,
     output_format: str = 'dict',
-    **kwargs: dict
-) -> Union[dict, pd.DataFrame]:
+    **kwargs
+) -> Union[Dict, pd.DataFrame]:
     """
     List all runs matching all of the given filters.
     (Supports large amount of results)
@@ -849,15 +844,15 @@ def list_runs(
 
 
 def _list_runs(
-    id: List = None,
-    task: List = None,
-    setup: List = None,
-    flow: List = None,
-    uploader: List = None,
+    id: Optional[List] = None,
+    task: Optional[List] = None,
+    setup: Optional[List] = None,
+    flow: Optional[List] = None,
+    uploader: Optional[List] = None,
     display_errors: bool = False,
     output_format: str = 'dict',
     **kwargs
-) -> Union[dict, pd.DataFrame]:
+) -> Union[Dict, pd.DataFrame]:
     """
     Perform API call `/run/list/{filters}'
     <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`

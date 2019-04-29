@@ -1,7 +1,6 @@
 import io
 import os
 import re
-import warnings
 from typing import List, Dict, Union, Optional
 
 import numpy as np
@@ -167,12 +166,12 @@ def _get_cache_directory(dataset: OpenMLDataset) -> str:
 
 
 def list_datasets(
-    offset: int = None,
-    size: int = None,
-    status: str = None,
-    tag: str = None,
+    offset: Optional[int] = None,
+    size: Optional[int] = None,
+    status: Optional[str] = None,
+    tag: Optional[str] = None,
     output_format: str = 'dict',
-    **kwargs: dict
+    **kwargs
 ) -> Union[Dict, pd.DataFrame]:
 
     """
@@ -722,10 +721,7 @@ def create_dataset(name, description, creator, contributor,
     )
 
 
-def status_update(
-    data_id: int,
-    status: str
-) -> None:
+def status_update(data_id, status):
     """
     Updates the status of a dataset to either 'active' or 'deactivated'.
     Please see the OpenML API documentation for a description of the status
@@ -755,10 +751,7 @@ def status_update(
         raise ValueError('Data id/status does not collide')
 
 
-def _get_dataset_description(
-    did_cache_dir: str,
-    dataset_id: int
-) -> dict:
+def _get_dataset_description(did_cache_dir, dataset_id):
     """Get the dataset description as xml dictionary.
 
     This function is NOT thread/multiprocessing safe.
@@ -797,11 +790,8 @@ def _get_dataset_description(
     return description
 
 
-def _get_dataset_arff(
-    description: Union[Dict, OpenMLDataset],
-    cache_directory: str = None
-) -> str:
-
+def _get_dataset_arff(description: Union[Dict, OpenMLDataset],
+                      cache_directory: str = None) -> str:
     """ Return the path to the local arff file of the dataset. If is not cached, it is downloaded.
 
     Checks if the file is in the cache, if yes, return the path to the file.
@@ -853,10 +843,7 @@ def _get_dataset_arff(
     return output_file_path
 
 
-def _get_dataset_features(
-    did_cache_dir: str,
-    dataset_id: int
-) -> str:
+def _get_dataset_features(did_cache_dir, dataset_id):
     """API call to get dataset features (cached)
 
     Features are feature descriptions for each column.
@@ -889,10 +876,7 @@ def _get_dataset_features(
     return _load_features_from_file(features_file)
 
 
-def _get_dataset_qualities(
-    did_cache_dir: str,
-    dataset_id: int
-) -> dict:
+def _get_dataset_qualities(did_cache_dir, dataset_id):
     """API call to get dataset qualities (cached)
 
     Features are metafeatures (number of features, number of classes, ...)
@@ -931,10 +915,10 @@ def _get_dataset_qualities(
 
 
 def _create_dataset_from_description(
-    description: Dict[str, str],
-    features: Dict,
-    qualities: List,
-    arff_file: str = None,
+        description: Dict[str, str],
+        features: Dict,
+        qualities: List,
+        arff_file: str = None,
 ) -> OpenMLDataset:
     """Create a dataset object from a description dict.
 
@@ -984,9 +968,7 @@ def _create_dataset_from_description(
     )
 
 
-def _get_online_dataset_arff(
-    dataset_id: int
-) -> str:
+def _get_online_dataset_arff(dataset_id):
     """Download the ARFF file for a given dataset id
     from the OpenML website.
 
@@ -1010,9 +992,7 @@ def _get_online_dataset_arff(
     )
 
 
-def _get_online_dataset_format(
-    dataset_id: int
-) -> str:
+def _get_online_dataset_format(dataset_id):
     """Get the dataset format for a given dataset id
     from the OpenML website.
 

@@ -5,7 +5,7 @@ import io
 import re
 import xmltodict
 import pandas as pd
-from typing import Union, Dict
+from typing import Union, Dict, Optional
 
 from ..exceptions import OpenMLCacheException
 import openml._api_calls
@@ -129,12 +129,12 @@ def _get_flow_description(flow_id: int) -> OpenMLFlow:
 
 
 def list_flows(
-    offset: int = None,
-    size: int = None,
-    tag: str = None,
+    offset: Optional[int] = None,
+    size: Optional[int] = None,
+    tag: Optional[str] = None,
     output_format: str = 'dict',
-    **kwargs: dict
-) -> Dict[int, Dict]:
+    **kwargs
+) -> Union[Dict, pd.DataFrame]:
 
     """
     Return a list of all flows which are on OpenML.
@@ -192,7 +192,7 @@ def list_flows(
                                   **kwargs)
 
 
-def _list_flows(output_format='dict', **kwargs) -> Dict[int, Dict]:
+def _list_flows(output_format='dict', **kwargs) -> Union[Dict, pd.DataFrame]:
     """
     Perform the api call that return a list of all flows.
 
@@ -262,7 +262,7 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
 def __list_flows(
     api_call: str,
     output_format: str = 'dict'
-) -> Union[dict, pd.DataFrame]:
+) -> Union[Dict, pd.DataFrame]:
 
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     flows_dict = xmltodict.parse(xml_string, force_list=('oml:flow',))
