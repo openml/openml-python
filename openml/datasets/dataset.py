@@ -443,7 +443,7 @@ class OpenMLDataset(object):
         include_ignore_attributes : boolean (default=False)
             Whether to include columns that are marked as "ignore"
             on the server in the dataset.
-        dataset_format : string, optional (default='dataframe')
+        dataset_format : string (default='dataframe')
             The format of returned dataset.
             If ``array``, the returned dataset will be a NumPy array or a SciPy sparse matrix.
             If ``dataframe``, the returned dataset will be a Pandas DataFrame or SparseDataFrame.
