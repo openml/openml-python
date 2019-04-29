@@ -22,7 +22,7 @@ from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
 openml.config.start_using_configuration_for_example()
 # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
 dataset = openml.datasets.get_dataset(68)
-X, y = dataset.get_data(
+X, y, categorical_indicator, attribute_names = dataset.get_data(
     dataset_format='array',
     target=dataset.default_target_attribute
 )
@@ -34,13 +34,12 @@ clf.fit(X, y)
 #
 # * e.g. categorical features -> do feature encoding
 dataset = openml.datasets.get_dataset(17)
-X, y, categorical = dataset.get_data(
+X, y, categorical_indicator, attribute_names = dataset.get_data(
     dataset_format='array',
-    target=dataset.default_target_attribute,
-    return_categorical_indicator=True,
+    target=dataset.default_target_attribute
 )
-print("Categorical features: %s" % categorical)
-enc = preprocessing.OneHotEncoder(categorical_features=categorical)
+print("Categorical features: {}".format(categorical_indicator))
+enc = preprocessing.OneHotEncoder(categorical_features=categorical_indicator)
 X = enc.fit_transform(X)
 clf.fit(X, y)
 

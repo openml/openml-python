@@ -4,7 +4,7 @@ import io
 import logging
 import os
 import pickle
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple, Iterable
 
 import arff
 import numpy as np
@@ -419,29 +419,31 @@ class OpenMLDataset(object):
         from .functions import _get_dataset_arff
         self.data_file = _get_dataset_arff(self)
 
-    def get_data(self, target: Optional[Union[List[str], str]] = None,
-                 include_row_id: bool = False,
-                 include_ignore_attributes: bool = False,
-                 return_categorical_indicator: bool = False,
-                 return_attribute_names: bool = False,
-                 dataset_format: str = None):
+    def get_data(
+            self,
+            target: Optional[Union[List[str], str]] = None,
+            include_row_id: bool = False,
+            include_ignore_attributes: bool = False,
+            dataset_format: str = "dataframe",
+    ) -> Tuple[
+            Union[np.ndarray, pd.DataFrame, scipy.sparse.csr_matrix],
+            Optional[Union[np.ndarray, pd.DataFrame]],
+            List[bool],
+            List[str]
+    ]:
         """ Returns dataset content as dataframes or sparse matrices.
 
         Parameters
         ----------
-        target : string, list of strings or None (default=None)
-            Name of target column(s) to separate from the data.
+        target : string, List[str] or None (default=None)
+            Name of target column to separate from the data.
+            Splitting multiple columns is currently not supported.
         include_row_id : boolean (default=False)
             Whether to include row ids in the returned dataset.
         include_ignore_attributes : boolean (default=False)
             Whether to include columns that are marked as "ignore"
             on the server in the dataset.
-        return_categorical_indicator : boolean (default=False)
-            Whether to return a boolean mask indicating which features are
-            categorical.
-        return_attribute_names : boolean (default=False)
-            Whether to return attribute names.
-        dataset_format : string, optional
+        dataset_format : string (default='dataframe')
             The format of returned dataset.
             If ``array``, the returned dataset will be a NumPy array or a SciPy sparse matrix.
             If ``dataframe``, the returned dataset will be a Pandas DataFrame or SparseDataFrame.
@@ -450,22 +452,13 @@ class OpenMLDataset(object):
         -------
         X : ndarray, dataframe, or sparse matrix, shape (n_samples, n_columns)
             Dataset
-        y : ndarray or series, shape (n_samples,)
-            Target column(s). Only returned if target is not None.
+        y : ndarray or pd.Series, shape (n_samples, ) or None
+            Target column
         categorical_indicator : boolean ndarray
             Mask that indicate categorical features.
-            Only returned if return_categorical_indicator is True.
-        return_attribute_names : list of strings
+        attribute_names : List[str]
             List of attribute names.
-            Only returned if return_attribute_names is True.
         """
-        if dataset_format is None:
-            warn('The default of "dataset_format" will change from "array" to'
-                 ' "dataframe" in 0.9', FutureWarning)
-            dataset_format = 'array'
-
-        rval = []
-
         if self.data_pickle_file is None:
             if self.data_file is None:
                 self._download_data()
@@ -480,23 +473,17 @@ class OpenMLDataset(object):
                 data, categorical, attribute_names = pickle.load(fh)
 
         to_exclude = []
-        if include_row_id is False:
-            if not self.row_id_attribute:
-                pass
-            else:
-                if isinstance(self.row_id_attribute, str):
-                    to_exclude.append(self.row_id_attribute)
-                else:
-                    to_exclude.extend(self.row_id_attribute)
+        if not include_row_id and self.row_id_attribute is not None:
+            if isinstance(self.row_id_attribute, str):
+                to_exclude.append(self.row_id_attribute)
+            elif isinstance(self.row_id_attribute, Iterable):
+                to_exclude.extend(self.row_id_attribute)
 
-        if include_ignore_attributes is False:
-            if not self.ignore_attributes:
-                pass
-            else:
-                if isinstance(self.ignore_attributes, str):
-                    to_exclude.append(self.ignore_attributes)
-                else:
-                    to_exclude.extend(self.ignore_attributes)
+        if not include_ignore_attributes and self.ignore_attributes is not None:
+            if isinstance(self.ignore_attributes, str):
+                to_exclude.append(self.ignore_attributes)
+            elif isinstance(self.ignore_attributes, Iterable):
+                to_exclude.extend(self.ignore_attributes)
 
         if len(to_exclude) > 0:
             logger.info("Going to remove the following attributes:"
@@ -514,7 +501,7 @@ class OpenMLDataset(object):
         if target is None:
             data = self._convert_array_format(data, dataset_format,
                                               attribute_names)
-            rval.append(data)
+            targets = None
         else:
             if isinstance(target, str):
                 if ',' in target:
@@ -552,19 +539,9 @@ class OpenMLDataset(object):
             y = y.squeeze()
             y = self._convert_array_format(y, dataset_format, attribute_names)
             y = y.astype(target_dtype) if dataset_format == 'array' else y
+            data, targets = x, y
 
-            rval.append(x)
-            rval.append(y)
-
-        if return_categorical_indicator:
-            rval.append(categorical)
-        if return_attribute_names:
-            rval.append(attribute_names)
-
-        if len(rval) == 1:
-            return rval[0]
-        else:
-            return rval
+        return data, targets, categorical, attribute_names
 
     def retrieve_class_labels(self, target_name: str = 'class') -> Union[None, List[str]]:
         """Reads the datasets arff to determine the class-labels.

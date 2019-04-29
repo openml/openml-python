@@ -230,7 +230,10 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
     def get_X_and_y(
         self,
         dataset_format: str = 'array',
-    ) -> Union[np.ndarray, pd.DataFrame, scipy.sparse.spmatrix]:
+    ) -> Tuple[
+        Union[np.ndarray, pd.DataFrame, scipy.sparse.spmatrix],
+        Union[np.ndarray, pd.Series]
+    ]:
         """Get data associated with the current task.
 
         Parameters
@@ -247,10 +250,10 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         dataset = self.get_dataset()
         if self.task_type_id not in (1, 2, 3):
             raise NotImplementedError(self.task_type)
-        X_and_y = dataset.get_data(
+        X, y, _, _ = dataset.get_data(
             dataset_format=dataset_format, target=self.target_name,
         )
-        return X_and_y
+        return X, y
 
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
 
@@ -393,10 +396,10 @@ class OpenMLClusteringTask(OpenMLTask):
 
         """
         dataset = self.get_dataset()
-        X_and_y = dataset.get_data(
+        data, *_ = dataset.get_data(
             dataset_format=dataset_format, target=None,
         )
-        return X_and_y
+        return data
 
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
 
