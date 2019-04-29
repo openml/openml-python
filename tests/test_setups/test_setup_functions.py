@@ -141,11 +141,18 @@ class TestSetupFunctions(TestBase):
         flow_id = 5873
         setups = openml.setups.list_setups(flow=flow_id, output_format='object')
         self.assertIsInstance(setups, Dict)
-        self.assertIsInstance(setups[30948], openml.setups.setup.OpenMLSetup)
+        self.assertIsInstance(isinstance(setups[list(setups.keys())[1]],
+                                         openml.setups.setup.OpenMLSetup))
+        self.assertGreater(len(setups), 0)
 
         setups = openml.setups.list_setups(flow=flow_id, output_format='dataframe')
         self.assertIsInstance(setups, pd.DataFrame)
-        self.assertEqual(len(setups), 2)
+        self.assertGreater(len(setups), 0)
+
+        setups = openml.setups.list_setups(flow=flow_id, output_format='dict')
+        self.assertIsInstance(setups, Dict)
+        self.assertIsInstance(isinstance(setups[list(setups.keys())[1]], Dict))
+        self.assertGreater(len(setups), 0)
 
     def test_setuplist_offset(self):
         # TODO: remove after pull on live for better testing
