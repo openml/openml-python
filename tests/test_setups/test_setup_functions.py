@@ -141,8 +141,8 @@ class TestSetupFunctions(TestBase):
         flow_id = 18
         setups = openml.setups.list_setups(flow=flow_id, output_format='object')
         self.assertIsInstance(setups, Dict)
-        self.assertIsInstance(isinstance(setups[list(setups.keys())[0]],
-                                         openml.setups.setup.OpenMLSetup))
+        self.assertIsInstance(setups[list(setups.keys())[0]],
+                              openml.setups.setup.OpenMLSetup)
         self.assertGreater(len(setups), 0)
 
         setups = openml.setups.list_setups(flow=flow_id, output_format='dataframe')
@@ -151,7 +151,7 @@ class TestSetupFunctions(TestBase):
 
         setups = openml.setups.list_setups(flow=flow_id, output_format='dict')
         self.assertIsInstance(setups, Dict)
-        self.assertIsInstance(isinstance(setups[list(setups.keys())[0]], Dict))
+        self.assertIsInstance(setups[list(setups.keys())[0]], Dict)
         self.assertGreater(len(setups), 0)
 
     def test_setuplist_offset(self):
