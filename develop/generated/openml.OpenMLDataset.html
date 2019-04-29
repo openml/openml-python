@@ -191,24 +191,20 @@ which maps a quality name to a quality value.</p>
 </dl>
 <dl class="method">
 <dt id="openml.OpenMLDataset.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>self, target: Union[List[str], str, NoneType] = None, include_row_id: bool = False, include_ignore_attributes: bool = False, return_categorical_indicator: bool = False, return_attribute_names: bool = False, dataset_format: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>self, target: Union[List[str], str, NoneType] = None, include_row_id: bool = False, include_ignore_attributes: bool = False, dataset_format: str = 'dataframe'</em><span class="sig-paren">)</span> &#x2192; Tuple[Union[numpy.ndarray, pandas.core.frame.DataFrame, scipy.sparse.csr.csr_matrix], Union[numpy.ndarray, pandas.core.frame.DataFrame, NoneType], List[bool], List[str]]<a class="headerlink" href="#openml.OpenMLDataset.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns dataset content as dataframes or sparse matrices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>target</strong><span class="classifier">string, list of strings or None (default=None)</span></dt><dd><p>Name of target column(s) to separate from the data.</p>
+<dt><strong>target</strong><span class="classifier">string, List[str] or None (default=None)</span></dt><dd><p>Name of target column to separate from the data.
+Splitting multiple columns is currently not supported.</p>
 </dd>
 <dt><strong>include_row_id</strong><span class="classifier">boolean (default=False)</span></dt><dd><p>Whether to include row ids in the returned dataset.</p>
 </dd>
 <dt><strong>include_ignore_attributes</strong><span class="classifier">boolean (default=False)</span></dt><dd><p>Whether to include columns that are marked as “ignore”
 on the server in the dataset.</p>
 </dd>
-<dt><strong>return_categorical_indicator</strong><span class="classifier">boolean (default=False)</span></dt><dd><p>Whether to return a boolean mask indicating which features are
-categorical.</p>
-</dd>
-<dt><strong>return_attribute_names</strong><span class="classifier">boolean (default=False)</span></dt><dd><p>Whether to return attribute names.</p>
-</dd>
-<dt><strong>dataset_format</strong><span class="classifier">string, optional</span></dt><dd><p>The format of returned dataset.
+<dt><strong>dataset_format</strong><span class="classifier">string (default=’dataframe’)</span></dt><dd><p>The format of returned dataset.
 If <code class="docutils literal notranslate"><span class="pre">array</span></code>, the returned dataset will be a NumPy array or a SciPy sparse matrix.
 If <code class="docutils literal notranslate"><span class="pre">dataframe</span></code>, the returned dataset will be a Pandas DataFrame or SparseDataFrame.</p>
 </dd>
@@ -218,13 +214,11 @@ If <code class="docutils literal notranslate"><span class="pre">dataframe</span>
 <dd class="field-even"><dl class="simple">
 <dt><strong>X</strong><span class="classifier">ndarray, dataframe, or sparse matrix, shape (n_samples, n_columns)</span></dt><dd><p>Dataset</p>
 </dd>
-<dt><strong>y</strong><span class="classifier">ndarray or series, shape (n_samples,)</span></dt><dd><p>Target column(s). Only returned if target is not None.</p>
+<dt><strong>y</strong><span class="classifier">ndarray or pd.Series, shape (n_samples, ) or None</span></dt><dd><p>Target column</p>
 </dd>
-<dt><strong>categorical_indicator</strong><span class="classifier">boolean ndarray</span></dt><dd><p>Mask that indicate categorical features.
-Only returned if return_categorical_indicator is True.</p>
+<dt><strong>categorical_indicator</strong><span class="classifier">boolean ndarray</span></dt><dd><p>Mask that indicate categorical features.</p>
 </dd>
-<dt><strong>return_attribute_names</strong><span class="classifier">list of strings</span></dt><dd><p>List of attribute names.
-Only returned if return_attribute_names is True.</p>
+<dt><strong>attribute_names</strong><span class="classifier">List[str]</span></dt><dd><p>List of attribute names.</p>
 </dd>
 </dl>
 </dd>

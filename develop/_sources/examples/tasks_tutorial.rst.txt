@@ -311,7 +311,7 @@ Finally, it is also possible to list all tasks on OpenML with:
 
  .. code-block:: none
 
-    19029
+    19039
 
 
 Exercise
@@ -406,13 +406,13 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLClassificationTask object at 0x2b3e5ff91588>
+    <openml.tasks.task.OpenMLClassificationTask object at 0x2b6705701630>
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  31.118 seconds)
+   **Total running time of the script:** ( 0 minutes  30.747 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:

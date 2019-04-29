@@ -41,7 +41,7 @@ Train a scikit-learn model on the data manually.
     openml.config.start_using_configuration_for_example()
     # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
     dataset = openml.datasets.get_dataset(68)
-    X, y = dataset.get_data(
+    X, y, categorical_indicator, attribute_names = dataset.get_data(
         dataset_format='array',
         target=dataset.default_target_attribute
     )
@@ -62,13 +62,12 @@ You can also ask for meta-data to automatically preprocess the data.
 .. code-block:: default
 
     dataset = openml.datasets.get_dataset(17)
-    X, y, categorical = dataset.get_data(
+    X, y, categorical_indicator, attribute_names = dataset.get_data(
         dataset_format='array',
-        target=dataset.default_target_attribute,
-        return_categorical_indicator=True,
+        target=dataset.default_target_attribute
     )
-    print("Categorical features: %s" % categorical)
-    enc = preprocessing.OneHotEncoder(categorical_features=categorical)
+    print("Categorical features: {}".format(categorical_indicator))
+    enc = preprocessing.OneHotEncoder(categorical_features=categorical_indicator)
     X = enc.fit_transform(X)
     clf.fit(X, y)
 
@@ -134,7 +133,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/51938
+    Uploaded to http://test.openml.org/r/52577
 
 
 We can now also inspect the flow object which was automatically created:
@@ -164,7 +163,7 @@ We can now also inspect the flow object which was automatically created:
      'custom_name': None,
      'dependencies': 'sklearn==0.20.0\nnumpy>=1.6.1\nscipy>=0.9',
      'description': 'Automatically created scikit-learn flow.',
-     'extension': <openml.extensions.sklearn.extension.SklearnExtension object at 0x2b3e653e1518>,
+     'extension': <openml.extensions.sklearn.extension.SklearnExtension object at 0x2b670b22c3c8>,
      'external_version': 'openml==0.8.0,sklearn==0.20.0',
      'flow_id': 61129,
      'language': 'English',
@@ -207,7 +206,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/51939
+    Uploaded to http://test.openml.org/r/52578
 
 
 Running flows on tasks offline for later upload
@@ -314,7 +313,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/51941
+    kNN on diabetes: http://test.openml.org/r/52580
 
 
 
@@ -330,7 +329,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  20.451 seconds)
+   **Total running time of the script:** ( 0 minutes  20.433 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:
