@@ -223,7 +223,7 @@ def __list_setups(api_call, output_format='object'):
     return setups
 
 
-def initialize_model(setup_id: int, output_format: str = 'object') -> Any:
+def initialize_model(setup_id: int) -> Any:
     """
     Initialized a model based on a setup_id (i.e., using the exact
     same parameter settings)
@@ -237,7 +237,7 @@ def initialize_model(setup_id: int, output_format: str = 'object') -> Any:
     -------
     model
     """
-    setup = get_setup(setup_id, output_format=output_format)
+    setup = get_setup(setup_id)
     flow = openml.flows.get_flow(setup.flow_id)
 
     # instead of using scikit-learns or any other library's "set_params" function, we override the
