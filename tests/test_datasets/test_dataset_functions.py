@@ -153,6 +153,11 @@ class TestOpenMLDataset(TestBase):
         self.assertGreaterEqual(len(datasets), 100)
         self._check_datasets(datasets)
 
+    def test_list_datasets_output_format(self):
+        datasets = openml.datasets.list_datasets(output_format='dataframe')
+        self.assertIsInstance(datasets, pd.DataFrame)
+        self.assertGreaterEqual(len(datasets), 100)
+
     def test_list_datasets_by_tag(self):
         datasets = openml.datasets.list_datasets(tag='study_14')
         self.assertGreaterEqual(len(datasets), 100)

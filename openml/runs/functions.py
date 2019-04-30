@@ -2,11 +2,12 @@ from collections import OrderedDict
 import io
 import itertools
 import os
-from typing import Any, List, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
+from typing import Any, List, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
 import warnings
 
 import sklearn.metrics
 import xmltodict
+import pandas as pd
 
 import openml
 import openml.utils
@@ -767,9 +768,19 @@ def _get_cached_run(run_id):
                                    "cached" % run_id)
 
 
-def list_runs(offset=None, size=None, id=None, task=None, setup=None,
-              flow=None, uploader=None, tag=None, display_errors=False,
-              **kwargs):
+def list_runs(
+    offset: Optional[int] = None,
+    size: Optional[int] = None,
+    id: Optional[List] = None,
+    task: Optional[List] = None,
+    setup: Optional[List] = None,
+    flow: Optional[List] = None,
+    uploader: Optional[List] = None,
+    tag: Optional[str] = None,
+    display_errors: bool = False,
+    output_format: str = 'dict',
+    **kwargs
+) -> Union[Dict, pd.DataFrame]:
     """
     List all runs matching all of the given filters.
     (Supports large amount of results)
@@ -797,14 +808,21 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         Whether to list runs which have an error (for example a missing
         prediction file).
 
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
+
     kwargs : dict, optional
         Legal filter operators: task_type.
 
     Returns
     -------
-    dict
-        List of found runs.
+    dict of dicts, or dataframe
     """
+    if output_format not in ['dataframe', 'dict']:
+        raise ValueError("Invalid output format selected. "
+                         "Only 'dict' or 'dataframe' applicable.")
 
     if id is not None and (not isinstance(id, list)):
         raise TypeError('id must be of type list.')
@@ -817,14 +835,30 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
     if uploader is not None and (not isinstance(uploader, list)):
         raise TypeError('uploader must be of type list.')
 
-    return openml.utils._list_all(
-        _list_runs, offset=offset, size=size, id=id, task=task, setup=setup,
-        flow=flow, uploader=uploader, tag=tag, display_errors=display_errors,
-        **kwargs)
+    return openml.utils._list_all(output_format=output_format,
+                                  listing_call=_list_runs,
+                                  offset=offset,
+                                  size=size,
+                                  id=id,
+                                  task=task,
+                                  setup=setup,
+                                  flow=flow,
+                                  uploader=uploader,
+                                  tag=tag,
+                                  display_errors=display_errors,
+                                  **kwargs)
 
 
-def _list_runs(id=None, task=None, setup=None,
-               flow=None, uploader=None, display_errors=False, **kwargs):
+def _list_runs(
+    id: Optional[List] = None,
+    task: Optional[List] = None,
+    setup: Optional[List] = None,
+    flow: Optional[List] = None,
+    uploader: Optional[List] = None,
+    display_errors: bool = False,
+    output_format: str = 'dict',
+    **kwargs
+) -> Union[Dict, pd.DataFrame]:
     """
     Perform API call `/run/list/{filters}'
     <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`
@@ -850,12 +884,17 @@ def _list_runs(id=None, task=None, setup=None,
         Whether to list runs which have an error (for example a missing
         prediction file).
 
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
+
     kwargs : dict, optional
         Legal filter operators: task_type.
 
     Returns
     -------
-    dict
+    dict, or dataframe
         List of found runs.
     """
 
@@ -875,10 +914,10 @@ def _list_runs(id=None, task=None, setup=None,
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
     if display_errors:
         api_call += "/show_errors/true"
-    return __list_runs(api_call)
+    return __list_runs(api_call=api_call, output_format=output_format)
 
 
-def __list_runs(api_call):
+def __list_runs(api_call, output_format='dict'):
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     runs_dict = xmltodict.parse(xml_string, force_list=('oml:run',))
@@ -911,5 +950,8 @@ def __list_runs(api_call):
                'error_message': str((run_['oml:error_message']) or '')}
 
         runs[run_id] = run
+
+    if output_format == 'dataframe':
+        runs = pd.DataFrame.from_dict(runs, orient='index')
 
     return runs

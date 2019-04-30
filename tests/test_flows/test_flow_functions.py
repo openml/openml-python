@@ -4,6 +4,7 @@ import unittest
 
 from distutils.version import LooseVersion
 import sklearn
+import pandas as pd
 
 import openml
 from openml.testing import TestBase
@@ -34,6 +35,14 @@ class TestFlowFunctions(TestBase):
         self.assertGreaterEqual(len(flows), 1500)
         for fid in flows:
             self._check_flow(flows[fid])
+
+    def test_list_flows_output_format(self):
+        openml.config.server = self.production_server
+        # We can only perform a smoke test here because we test on dynamic
+        # data from the internet...
+        flows = openml.flows.list_flows(output_format='dataframe')
+        self.assertIsInstance(flows, pd.DataFrame)
+        self.assertGreaterEqual(len(flows), 1500)
 
     def test_list_flows_empty(self):
         openml.config.server = self.production_server

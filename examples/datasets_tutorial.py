@@ -10,8 +10,12 @@ import openml
 import pandas as pd
 
 ############################################################################
-# List datasets
-# =============
+# Exercise 0
+# **********
+#
+# * List datasets
+#   * Use the output_format parameter to select output type
+#   * Default gives 'dict' (other option: 'dataframe')
 
 openml_list = openml.datasets.list_datasets()  # returns a dict
 
@@ -24,6 +28,10 @@ datalist = datalist[[
 
 print("First 10 of %s datasets..." % len(datalist))
 datalist.head(n=10)
+
+# The same can be done with lesser lines of code
+openml_df = openml.datasets.list_datasets(output_format='dataframe')
+openml_df.head(n=10)
 
 ############################################################################
 # Exercise 1

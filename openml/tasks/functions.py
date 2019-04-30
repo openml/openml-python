@@ -2,7 +2,9 @@ from collections import OrderedDict
 import io
 import re
 import os
-from typing import Union, Optional
+from typing import Union, Dict, Optional
+
+import pandas as pd
 import xmltodict
 
 from ..exceptions import OpenMLCacheException
@@ -121,9 +123,16 @@ def _get_estimation_procedure_list():
     return procs
 
 
-def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
-    """Return a number of tasks having the given tag and task_type_id
-
+def list_tasks(
+    task_type_id: Optional[int] = None,
+    offset: Optional[int] = None,
+    size: Optional[int] = None,
+    tag: Optional[str] = None,
+    output_format: str = 'dict',
+    **kwargs
+) -> Union[Dict, pd.DataFrame]:
+    """
+    Return a number of tasks having the given tag and task_type_id
     Parameters
     ----------
     Filter task_type_id is separated from the other filters because
@@ -146,6 +155,10 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
         the maximum number of tasks to show
     tag : str, optional
         the tag to include
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
     kwargs: dict, optional
         Legal filter operators: data_tag, status, data_id, data_name,
         number_instances, number_features,
@@ -158,14 +171,27 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
         represented by a dictionary containing the following information:
         task id, dataset id, task_type and status. If qualities are calculated
         for the associated dataset, some of these are also returned.
+    dataframe
+        All tasks having the given task_type_id and the give tag. Every task is
+        represented by a row in the data frame containing the following information
+        as columns: task id, dataset id, task_type and status. If qualities are
+        calculated for the associated dataset, some of these are also returned.
     """
-    return openml.utils._list_all(_list_tasks, task_type_id=task_type_id,
-                                  offset=offset, size=size, tag=tag, **kwargs)
+    if output_format not in ['dataframe', 'dict']:
+        raise ValueError("Invalid output format selected. "
+                         "Only 'dict' or 'dataframe' applicable.")
+    return openml.utils._list_all(output_format=output_format,
+                                  listing_call=_list_tasks,
+                                  task_type_id=task_type_id,
+                                  offset=offset,
+                                  size=size,
+                                  tag=tag,
+                                  **kwargs)
 
 
-def _list_tasks(task_type_id=None, **kwargs):
-    """Perform the api call to return a number of tasks having the given filters.
-
+def _list_tasks(task_type_id=None, output_format='dict', **kwargs):
+    """
+    Perform the api call to return a number of tasks having the given filters.
     Parameters
     ----------
     Filter task_type_id is separated from the other filters because
@@ -182,6 +208,10 @@ def _list_tasks(task_type_id=None, **kwargs):
         - Machine Learning Challenge: 6
         - Survival Analysis: 7
         - Subgroup Discovery: 8
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
     kwargs: dict, optional
         Legal filter operators: tag, task_id (list), data_tag, status, limit,
         offset, data_id, data_name, number_instances, number_features,
@@ -189,7 +219,7 @@ def _list_tasks(task_type_id=None, **kwargs):
 
     Returns
     -------
-    dict
+    dict or dataframe
     """
     api_call = "task/list"
     if task_type_id is not None:
@@ -199,10 +229,10 @@ def _list_tasks(task_type_id=None, **kwargs):
             if operator == 'task_id':
                 value = ','.join([str(int(i)) for i in value])
             api_call += "/%s/%s" % (operator, value)
-    return __list_tasks(api_call)
+    return __list_tasks(api_call=api_call, output_format=output_format)
 
 
-def __list_tasks(api_call):
+def __list_tasks(api_call, output_format='dict'):
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task',
                                                          'oml:input'))
@@ -268,6 +298,9 @@ def __list_tasks(api_call):
                 )
             else:
                 raise KeyError('Could not find key %s in %s!' % (e, task_))
+
+    if output_format == 'dataframe':
+        tasks = pd.DataFrame.from_dict(tasks, orient='index')
 
     return tasks
 

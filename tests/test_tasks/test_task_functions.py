@@ -6,6 +6,7 @@ from openml import OpenMLSplit, OpenMLTask
 from openml.exceptions import OpenMLCacheException
 import openml
 import unittest
+import pandas as pd
 
 
 class TestTask(TestBase):
@@ -63,6 +64,12 @@ class TestTask(TestBase):
         for tid in tasks:
             self.assertEqual(ttid, tasks[tid]["ttid"])
             self._check_task(tasks[tid])
+
+    def test_list_tasks_output_format(self):
+        ttid = 3
+        tasks = openml.tasks.list_tasks(task_type_id=ttid, output_format='dataframe')
+        self.assertIsInstance(tasks, pd.DataFrame)
+        self.assertGreater(len(tasks), 100)
 
     def test_list_tasks_empty(self):
         tasks = openml.tasks.list_tasks(tag='NoOneWillEverUseThisTag')

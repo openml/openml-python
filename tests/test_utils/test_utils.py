@@ -19,7 +19,7 @@ class OpenMLTaskTest(TestBase):
         return openml._api_calls._read_url(url, request_method=request_method)
 
     def test_list_all(self):
-        openml.utils._list_all(openml.tasks.functions._list_tasks)
+        openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
 
     @mock.patch('openml._api_calls._perform_api_call',
                 side_effect=mocked_perform_api_call)

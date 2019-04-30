@@ -3,6 +3,7 @@ import hashlib
 import xmltodict
 import shutil
 import warnings
+import pandas as pd
 
 import openml._api_calls
 import openml.exceptions
@@ -150,7 +151,7 @@ def _delete_entity(entity_type, entity_id):
         return False
 
 
-def _list_all(listing_call, *args, **filters):
+def _list_all(listing_call, output_format='dict', *args, **filters):
     """Helper to handle paged listing requests.
 
     Example usage:
@@ -161,6 +162,10 @@ def _list_all(listing_call, *args, **filters):
     ----------
     listing_call : callable
         Call listing, e.g. list_evaluations.
+    output_format : str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
     *args : Variable length argument list
         Any required arguments for the listing call.
     **filters : Arbitrary keyword arguments
@@ -169,7 +174,7 @@ def _list_all(listing_call, *args, **filters):
         useful for testing purposes.
     Returns
     -------
-    dict
+    dict or dataframe
     """
 
     # eliminate filters that have a None value
@@ -177,6 +182,8 @@ def _list_all(listing_call, *args, **filters):
                       if value is not None}
     page = 0
     result = {}
+    if output_format == 'dataframe':
+        result = pd.DataFrame()
 
     # Default batch size per paging.
     # This one can be set in filters (batch_size), but should not be
@@ -208,12 +215,20 @@ def _list_all(listing_call, *args, **filters):
                 *args,
                 limit=batch_size,
                 offset=current_offset,
+                output_format=output_format,
                 **active_filters
             )
         except openml.exceptions.OpenMLServerNoResult:
             # we want to return an empty dict in this case
             break
-        result.update(new_batch)
+        if output_format == 'dataframe':
+            if len(result) == 0:
+                result = new_batch
+            else:
+                result = result.append(new_batch, ignore_index=True)
+        else:
+            # For output_format = 'dict' or 'object'
+            result.update(new_batch)
         if len(new_batch) < batch_size:
             break
         page += 1

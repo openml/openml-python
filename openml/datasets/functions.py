@@ -82,7 +82,9 @@ def _get_cached_datasets():
     return datasets
 
 
-def _get_cached_dataset(dataset_id):
+def _get_cached_dataset(
+    dataset_id: int
+) -> OpenMLDataset:
     """Get cached dataset for ID.
 
     Returns
@@ -163,7 +165,14 @@ def _get_cache_directory(dataset: OpenMLDataset) -> str:
     return _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset.dataset_id)
 
 
-def list_datasets(offset=None, size=None, status=None, tag=None, **kwargs):
+def list_datasets(
+    offset: Optional[int] = None,
+    size: Optional[int] = None,
+    status: Optional[str] = None,
+    tag: Optional[str] = None,
+    output_format: str = 'dict',
+    **kwargs
+) -> Union[Dict, pd.DataFrame]:
 
     """
     Return a list of all dataset which are on OpenML.
@@ -180,6 +189,10 @@ def list_datasets(offset=None, size=None, status=None, tag=None, **kwargs):
         default active datasets are returned, but also datasets
         from another status can be requested.
     tag : str, optional
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
     kwargs : dict, optional
         Legal filter operators (keys in the dict):
         data_name, data_version, number_instances,
@@ -187,21 +200,35 @@ def list_datasets(offset=None, size=None, status=None, tag=None, **kwargs):
 
     Returns
     -------
-    datasets : dict of dicts
-        A mapping from dataset ID to dict.
+    datasets : dict of dicts, or dataframe
+        - If output_format='dict'
+            A mapping from dataset ID to dict.
 
-        Every dataset is represented by a dictionary containing
-        the following information:
-        - dataset id
-        - name
-        - format
-        - status
+            Every dataset is represented by a dictionary containing
+            the following information:
+            - dataset id
+            - name
+            - format
+            - status
+            If qualities are calculated for the dataset, some of
+            these are also returned.
 
-        If qualities are calculated for the dataset, some of
-        these are also returned.
+        - If output_format='dataframe'
+            Each row maps to a dataset
+            Each column contains the following information:
+            - dataset id
+            - name
+            - format
+            - status
+            If qualities are calculated for the dataset, some of
+            these are also included as columns.
     """
+    if output_format not in ['dataframe', 'dict']:
+        raise ValueError("Invalid output format selected. "
+                         "Only 'dict' or 'dataframe' applicable.")
 
-    return openml.utils._list_all(_list_datasets,
+    return openml.utils._list_all(output_format=output_format,
+                                  listing_call=_list_datasets,
                                   offset=offset,
                                   size=size,
                                   status=status,
@@ -209,13 +236,17 @@ def list_datasets(offset=None, size=None, status=None, tag=None, **kwargs):
                                   **kwargs)
 
 
-def _list_datasets(**kwargs):
+def _list_datasets(output_format='dict', **kwargs):
 
     """
     Perform api call to return a list of all datasets.
 
     Parameters
     ----------
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
     kwargs : dict, optional
         Legal filter operators (keys in the dict):
         tag, status, limit, offset, data_name, data_version, number_instances,
@@ -223,7 +254,7 @@ def _list_datasets(**kwargs):
 
     Returns
     -------
-    datasets : dict of dicts
+    datasets : dict of dicts, or dataframe
     """
 
     api_call = "data/list"
@@ -231,10 +262,10 @@ def _list_datasets(**kwargs):
     if kwargs is not None:
         for operator, value in kwargs.items():
             api_call += "/%s/%s" % (operator, value)
-    return __list_datasets(api_call)
+    return __list_datasets(api_call=api_call, output_format=output_format)
 
 
-def __list_datasets(api_call):
+def __list_datasets(api_call, output_format='dict'):
 
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     datasets_dict = xmltodict.parse(xml_string, force_list=('oml:dataset',))
@@ -261,6 +292,9 @@ def __list_datasets(api_call):
             except ValueError:
                 dataset[quality['@name']] = float(quality['#text'])
         datasets[dataset['did']] = dataset
+
+    if output_format == 'dataframe':
+        datasets = pd.DataFrame.from_dict(datasets, orient='index')
 
     return datasets
 
@@ -341,8 +375,8 @@ def _name_to_id(
 
 
 def get_datasets(
-        dataset_ids: List[Union[str, int]],
-        download_data: bool = True,
+    dataset_ids: List[Union[str, int]],
+    download_data: bool = True,
 ) -> List[OpenMLDataset]:
     """Download datasets.
 
@@ -667,8 +701,8 @@ def create_dataset(name, description, creator, contributor,
                              do not construct a valid ARFF file")
 
     return OpenMLDataset(
-        name,
-        description,
+        name=name,
+        description=description,
         data_format=data_format,
         creator=creator,
         contributor=contributor,
