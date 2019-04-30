@@ -74,7 +74,7 @@ def _get_cached_setup(setup_id, output_format='object'):
             "Setup file for setup id %d not cached" % setup_id)
 
 
-def get_setup(setup_id, output_format='object'):
+def get_setup(setup_id):
     """
      Downloads the setup (configuration) description from OpenML
      and returns a structured object
@@ -83,8 +83,6 @@ def get_setup(setup_id, output_format='object'):
     ----------
     setup_id : int
         The Openml setup_id
-    output_format : str, optional (default='object')
-        Describes type of output {'dict', 'dataframe', 'object'}
 
     Returns
     -------
@@ -99,7 +97,7 @@ def get_setup(setup_id, output_format='object'):
         os.makedirs(setup_dir)
 
     try:
-        return _get_cached_setup(setup_id, output_format=output_format)
+        return _get_cached_setup(setup_id, output_format=object')
     except (openml.exceptions.OpenMLCacheException):
         url_suffix = '/setup/%d' % setup_id
         setup_xml = openml._api_calls._perform_api_call(url_suffix, 'get')
@@ -107,7 +105,7 @@ def get_setup(setup_id, output_format='object'):
             fh.write(setup_xml)
 
     result_dict = xmltodict.parse(setup_xml)
-    return _create_setup_from_xml(result_dict, output_format=output_format)
+    return _create_setup_from_xml(result_dict, output_format=object')
 
 
 def list_setups(
