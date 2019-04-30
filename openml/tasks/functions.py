@@ -3,6 +3,7 @@ import io
 import re
 import os
 from typing import Union, Dict, Optional
+
 import pandas as pd
 import xmltodict
 
@@ -474,3 +475,69 @@ def _create_task_from_xml(xml):
         raise NotImplementedError('Task type %s not supported.' %
                                   common_kwargs['task_type'])
     return cls(**common_kwargs)
+
+
+def create_task(
+        task_type_id: int,
+        dataset_id: int,
+        estimation_procedure_id: int,
+        target_name: Optional[str] = None,
+        evaluation_measure: Optional[str] = None,
+        **kwargs
+) -> Union[
+    OpenMLClassificationTask, OpenMLRegressionTask,
+    OpenMLLearningCurveTask, OpenMLClusteringTask
+]:
+    """Create a task based on different given attributes.
+
+    Builds a task object with the function arguments as
+    attributes. The type of the task object built is
+    determined from the task type id.
+    More information on how the arguments (task attributes),
+    relate to the different possible tasks can be found in
+    the individual task objects at the openml.tasks.task
+    module.
+
+    Parameters
+    ----------
+    task_type_id : int
+        Id of the task type.
+    dataset_id : int
+        The id of the dataset for the task.
+    target_name : str, optional
+        The name of the feature used as a target.
+        At the moment, only optional for the clustering tasks.
+    estimation_procedure_id : int
+        The id of the estimation procedure.
+    evaluation_measure : str, optional
+        The name of the evaluation measure.
+    kwargs : dict, optional
+        Other task attributes that are not mandatory
+        for task upload.
+
+    Returns
+    -------
+    OpenMLClassificationTask, OpenMLRegressionTask,
+    OpenMLLearningCurveTask, OpenMLClusteringTask
+    """
+    task_cls = {
+        TaskTypeEnum.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
+        TaskTypeEnum.SUPERVISED_REGRESSION: OpenMLRegressionTask,
+        TaskTypeEnum.CLUSTERING: OpenMLClusteringTask,
+        TaskTypeEnum.LEARNING_CURVE: OpenMLLearningCurveTask,
+    }.get(task_type_id)
+
+    if task_cls is None:
+        raise NotImplementedError(
+            'Task type {0:d} not supported.'.format(task_type_id)
+        )
+    else:
+        return task_cls(
+            task_type_id=task_type_id,
+            task_type=None,
+            data_set_id=dataset_id,
+            target_name=target_name,
+            estimation_procedure_id=estimation_procedure_id,
+            evaluation_measure=evaluation_measure,
+            **kwargs
+        )
