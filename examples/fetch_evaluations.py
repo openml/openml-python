@@ -56,14 +56,17 @@ pprint(evals.head())
 # ^^^^^^^^^^
 #
 from matplotlib import pyplot as plt
+
+
 def plot_cdf(values, metric='predictive_accuracy'):
     plt.hist(values, density=True, histtype='step', cumulative=True)
-    plt.xlim(max(0,min(values)-0.1),1)
+    plt.xlim(max(0, min(values) - 0.1), 1)
     plt.title('CDF')
     plt.xlabel(metric)
     plt.ylabel('Likelihood')
     plt.grid(b=True, which='major', linestyle='-')
     plt.grid(b=True, which='minor', linestyle='--')
     plt.show()
+
 
 plot_cdf(evals.value)
