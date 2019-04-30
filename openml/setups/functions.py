@@ -58,7 +58,7 @@ def setup_exists(flow) -> int:
         return False
 
 
-def _get_cached_setup(setup_id, output_format='object'):
+def _get_cached_setup(setup_id):
     """Load a run from the cache."""
     cache_dir = config.get_cache_directory()
     setup_cache_dir = os.path.join(cache_dir, "setups", str(setup_id))
@@ -66,7 +66,7 @@ def _get_cached_setup(setup_id, output_format='object'):
         setup_file = os.path.join(setup_cache_dir, "description.xml")
         with io.open(setup_file, encoding='utf8') as fh:
             setup_xml = xmltodict.parse(fh.read())
-            setup = _create_setup_from_xml(setup_xml, output_format=output_format)
+            setup = _create_setup_from_xml(setup_xml, output_format='object')
         return setup
 
     except (OSError, IOError):
@@ -97,7 +97,7 @@ def get_setup(setup_id):
         os.makedirs(setup_dir)
 
     try:
-        return _get_cached_setup(setup_id, output_format=object')
+        return _get_cached_setup(setup_id)
     except (openml.exceptions.OpenMLCacheException):
         url_suffix = '/setup/%d' % setup_id
         setup_xml = openml._api_calls._perform_api_call(url_suffix, 'get')
@@ -105,7 +105,7 @@ def get_setup(setup_id):
             fh.write(setup_xml)
 
     result_dict = xmltodict.parse(setup_xml)
-    return _create_setup_from_xml(result_dict, output_format=object')
+    return _create_setup_from_xml(result_dict, output_format='object')
 
 
 def list_setups(
