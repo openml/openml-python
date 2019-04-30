@@ -42,6 +42,10 @@ print(tasks.columns)
 print("First 5 of %s tasks:" % len(tasks))
 pprint(tasks.head())
 
+# The same can be obtained through lesser lines of code
+tasks_df = openml.tasks.list_tasks(task_type_id=1, output_format='dataframe')
+pprint(tasks_df.head())
+
 ############################################################################
 # We can filter the list of tasks to only contain datasets with more than
 # 500 samples, but less than 1000 samples:

@@ -103,14 +103,12 @@
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
 <li><a class="reference internal" href="#">Datasets</a><ul>
-<li><a class="reference internal" href="#list-datasets">List datasets</a><ul>
-<li><a class="reference internal" href="#exercise-1">Exercise 1</a></li>
+<li><a class="reference internal" href="#exercise-0">Exercise 0</a></li>
+<li><a class="reference internal" href="#exercise-1">Exercise 1</a><ul>
+<li><a class="reference internal" href="#download-datasets">Download datasets</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#download-datasets">Download datasets</a><ul>
 <li><a class="reference internal" href="#exercise-2">Exercise 2</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -130,8 +128,13 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 </pre></div>
 </div>
-<div class="section" id="list-datasets">
-<h2>List datasets<a class="headerlink" href="#list-datasets" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="exercise-0">
+<h2>Exercise 0<a class="headerlink" href="#exercise-0" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>List datasets
+* Use the output_format parameter to select output type
+* Default gives ‘dict’ (other option: ‘dataframe’)</p></li>
+</ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml_list</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">()</span>  <span class="c1"># returns a dict</span>
 
 <span class="c1"># Show a nice table with some key data properties</span>
@@ -143,14 +146,19 @@
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 10 of </span><span class="si">%s</span><span class="s2"> datasets...&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">datalist</span><span class="p">))</span>
 <span class="n">datalist</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># The same can be done with lesser lines of code</span>
+<span class="n">openml_df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span>
+<span class="n">openml_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 2617 datasets...
 </pre></div>
 </div>
+</div>
 <div class="section" id="exercise-1">
-<h3>Exercise 1<a class="headerlink" href="#exercise-1" title="Permalink to this headline">¶</a></h3>
+<h2>Exercise 1<a class="headerlink" href="#exercise-1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Find datasets with more than 10000 examples.</p></li>
 <li><p>Find a dataset called ‘eeg_eye_state’.</p></li>
@@ -166,10 +174,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;NumberOfClasses &gt; 50&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
 <div class="section" id="download-datasets">
-<h2>Download datasets<a class="headerlink" href="#download-datasets" title="Permalink to this headline">¶</a></h2>
+<h3>Download datasets<a class="headerlink" href="#download-datasets" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is done based on the dataset ID.</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">)</span>
 
@@ -270,8 +276,10 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">,</span> <span class="n">download_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+</div>
 <div class="section" id="exercise-2">
-<h3>Exercise 2<a class="headerlink" href="#exercise-2" title="Permalink to this headline">¶</a></h3>
+<h2>Exercise 2<a class="headerlink" href="#exercise-2" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Explore the data visually.</p></li>
 </ul>
@@ -288,7 +296,7 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_datasets_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_datasets_tutorial_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.648 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.317 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-datasets-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/ea68bafc2f0d401c0e0139e9c46c83d5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>
@@ -298,7 +306,6 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
 </div>
 </div>
 

@@ -113,15 +113,16 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>.list_tasks<a class="headerlink" href="#openml-tasks-list-tasks" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.tasks.list_tasks">
-<code class="descclassname">openml.tasks.</code><code class="descname">list_tasks</code><span class="sig-paren">(</span><em>task_type_id=None</em>, <em>offset=None</em>, <em>size=None</em>, <em>tag=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.list_tasks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a number of tasks having the given tag and task_type_id</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>Filter task_type_id is separated from the other filters because</strong></dt><dd></dd>
-<dt><strong>it is used as task_type_id in the task description, but it is named</strong></dt><dd></dd>
-<dt><strong>type when used as a filter in list tasks call.</strong></dt><dd></dd>
-<dt><strong>task_type_id</strong><span class="classifier">int, optional</span></dt><dd><p>ID of the task type as detailed
+<code class="descclassname">openml.tasks.</code><code class="descname">list_tasks</code><span class="sig-paren">(</span><em>task_type_id: Union[int</em>, <em>NoneType] = None</em>, <em>offset: Union[int</em>, <em>NoneType] = None</em>, <em>size: Union[int</em>, <em>NoneType] = None</em>, <em>tag: Union[str</em>, <em>NoneType] = None</em>, <em>output_format: str = 'dict'</em>, <em>**kwargs</em><span class="sig-paren">)</span> &#x2192; Union[Dict, pandas.core.frame.DataFrame]<a class="headerlink" href="#openml.tasks.list_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a number of tasks having the given tag and task_type_id
+Parameters
+———-
+Filter task_type_id is separated from the other filters because
+it is used as task_type_id in the task description, but it is named
+type when used as a filter in list tasks call.
+task_type_id : int, optional</p>
+<blockquote>
+<div><p>ID of the task type as detailed
 <a class="reference external" href="https://www.openml.org/search?type=task_type">here</a>.
 - Supervised classification: 1
 - Supervised regression: 2
@@ -131,25 +132,35 @@
 - Machine Learning Challenge: 6
 - Survival Analysis: 7
 - Subgroup Discovery: 8</p>
+</div></blockquote>
+<dl class="simple">
+<dt>offset<span class="classifier">int, optional</span></dt><dd><p>the number of tasks to skip, starting from the first</p>
 </dd>
-<dt><strong>offset</strong><span class="classifier">int, optional</span></dt><dd><p>the number of tasks to skip, starting from the first</p>
+<dt>size<span class="classifier">int, optional</span></dt><dd><p>the maximum number of tasks to show</p>
 </dd>
-<dt><strong>size</strong><span class="classifier">int, optional</span></dt><dd><p>the maximum number of tasks to show</p>
+<dt>tag<span class="classifier">str, optional</span></dt><dd><p>the tag to include</p>
 </dd>
-<dt><strong>tag</strong><span class="classifier">str, optional</span></dt><dd><p>the tag to include</p>
+<dt>output_format: str, optional (default=’dict’)</dt><dd><p>The parameter decides the format of the output.
+- If ‘dict’ the output is a dict of dict
+- If ‘dataframe’ the output is a pandas DataFrame</p>
 </dd>
-<dt><strong>kwargs: dict, optional</strong></dt><dd><p>Legal filter operators: data_tag, status, data_id, data_name,
+<dt>kwargs: dict, optional</dt><dd><p>Legal filter operators: data_tag, status, data_id, data_name,
 number_instances, number_features,
 number_classes, number_missing_values.</p>
 </dd>
 </dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
 <dt>dict</dt><dd><p>All tasks having the given task_type_id and the give tag. Every task is
 represented by a dictionary containing the following information:
 task id, dataset id, task_type and status. If qualities are calculated
 for the associated dataset, some of these are also returned.</p>
+</dd>
+<dt>dataframe</dt><dd><p>All tasks having the given task_type_id and the give tag. Every task is
+represented by a row in the data frame containing the following information
+as columns: task id, dataset id, task_type and status. If qualities are
+calculated for the associated dataset, some of these are also returned.</p>
 </dd>
 </dl>
 </dd>

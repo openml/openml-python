@@ -113,10 +113,10 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>.list_flows<a class="headerlink" href="#openml-flows-list-flows" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.flows.list_flows">
-<code class="descclassname">openml.flows.</code><code class="descname">list_flows</code><span class="sig-paren">(</span><em>offset: int = None</em>, <em>size: int = None</em>, <em>tag: str = None</em>, <em>**kwargs</em><span class="sig-paren">)</span> &#x2192; Dict[int, Dict]<a class="headerlink" href="#openml.flows.list_flows" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.flows.</code><code class="descname">list_flows</code><span class="sig-paren">(</span><em>offset: Union[int</em>, <em>NoneType] = None</em>, <em>size: Union[int</em>, <em>NoneType] = None</em>, <em>tag: Union[str</em>, <em>NoneType] = None</em>, <em>output_format: str = 'dict'</em>, <em>**kwargs</em><span class="sig-paren">)</span> &#x2192; Union[Dict, pandas.core.frame.DataFrame]<a class="headerlink" href="#openml.flows.list_flows" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of all flows which are on OpenML.
 (Supports large amount of results)</p>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>offset</strong><span class="classifier">int, optional</span></dt><dd><p>the number of flows to skip, starting from the first</p>
@@ -125,15 +125,21 @@
 </dd>
 <dt><strong>tag</strong><span class="classifier">str, optional</span></dt><dd><p>the tag to include</p>
 </dd>
+<dt><strong>output_format: str, optional (default=’dict’)</strong></dt><dd><p>The parameter decides the format of the output.
+- If ‘dict’ the output is a dict of dict
+- If ‘dataframe’ the output is a pandas DataFrame</p>
+</dd>
 <dt><strong>kwargs: dict, optional</strong></dt><dd><p>Legal filter operators: uploader.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><dl>
-<dt><strong>flows</strong><span class="classifier">dict</span></dt><dd><p>A mapping from flow_id to a dict giving a brief overview of the
-respective flow.</p>
-<p>Every flow is represented by a dictionary containing
+<dd class="field-even"><dl class="simple">
+<dt><strong>flows</strong><span class="classifier">dict of dicts, or dataframe</span></dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>If output_format=’dict’</dt><dd><p>A mapping from flow_id to a dict giving a brief overview of the
+respective flow.
+Every flow is represented by a dictionary containing
 the following information:
 - flow id
 - full name
@@ -141,6 +147,22 @@ the following information:
 - version
 - external version
 - uploader</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>If output_format=’dataframe’</dt><dd><p>Each row maps to a dataset
+Each column contains the following information:
+- flow id
+- full name
+- name
+- version
+- external version
+- uploader</p>
+</dd>
+</dl>
+</li>
+</ul>
 </dd>
 </dl>
 </dd>

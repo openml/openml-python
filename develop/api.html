@@ -214,7 +214,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.datasets.get_datasets.html#openml.datasets.get_datasets" title="openml.datasets.get_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_datasets</span></code></a>(dataset_ids, int]], download_data)</p></td>
 <td><p>Download datasets.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.datasets.list_datasets.html#openml.datasets.list_datasets" title="openml.datasets.list_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_datasets</span></code></a>([offset, size, status, tag])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.datasets.list_datasets.html#openml.datasets.list_datasets" title="openml.datasets.list_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_datasets</span></code></a>(offset, NoneType] = None, …)</p></td>
 <td><p>Return a list of all dataset which are on OpenML.</p></td>
 </tr>
 </tbody>
@@ -228,7 +228,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.evaluations.list_evaluations.html#openml.evaluations.list_evaluations" title="openml.evaluations.list_evaluations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_evaluations</span></code></a>(function[, offset, size, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.evaluations.list_evaluations.html#openml.evaluations.list_evaluations" title="openml.evaluations.list_evaluations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_evaluations</span></code></a>(function, offset, …)</p></td>
 <td><p>List all run-evaluation pairs matching all of the given filters.</p></td>
 </tr>
 </tbody>
@@ -248,7 +248,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.flows.get_flow.html#openml.flows.get_flow" title="openml.flows.get_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_flow</span></code></a>(\*args, \*\*kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.flows.list_flows.html#openml.flows.list_flows" title="openml.flows.list_flows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_flows</span></code></a>(offset, size, tag, \*\*kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.flows.list_flows.html#openml.flows.list_flows" title="openml.flows.list_flows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_flows</span></code></a>(offset, NoneType] = None, size, …)</p></td>
 <td><p>Return a list of all flows which are on OpenML.</p></td>
 </tr>
 </tbody>
@@ -277,7 +277,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.runs.initialize_model_from_trace.html#openml.runs.initialize_model_from_trace" title="openml.runs.initialize_model_from_trace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_model_from_trace</span></code></a>(run_id, repeat, …)</p></td>
 <td><p>Initialize a model based on the parameters that were set by an optimization procedure (i.e., using the exact same parameter settings)</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.runs.list_runs.html#openml.runs.list_runs" title="openml.runs.list_runs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_runs</span></code></a>([offset, size, id, task, setup, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.runs.list_runs.html#openml.runs.list_runs" title="openml.runs.list_runs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_runs</span></code></a>(offset, NoneType] = None, size, …)</p></td>
 <td><p>List all runs matching all of the given filters.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.runs.run_model_on_task.html#openml.runs.run_model_on_task" title="openml.runs.run_model_on_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_model_on_task</span></code></a>(model, task, …)</p></td>
@@ -303,7 +303,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.setups.initialize_model.html#openml.setups.initialize_model" title="openml.setups.initialize_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_model</span></code></a>(setup_id)</p></td>
 <td><p>Initialized a model based on a setup_id (i.e., using the exact same parameter settings)</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.setups.list_setups.html#openml.setups.list_setups" title="openml.setups.list_setups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_setups</span></code></a>([offset, size, flow, tag, setup])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.setups.list_setups.html#openml.setups.list_setups" title="openml.setups.list_setups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_setups</span></code></a>(offset, NoneType] = None, size, …)</p></td>
 <td><p>List all setups matching all of the given filters.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.setups.setup_exists.html#openml.setups.setup_exists" title="openml.setups.setup_exists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_exists</span></code></a>(flow)</p></td>
@@ -340,8 +340,8 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.tasks.get_tasks.html#openml.tasks.get_tasks" title="openml.tasks.get_tasks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tasks</span></code></a>(task_ids[, download_data])</p></td>
 <td><p>Download tasks.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.tasks.list_tasks.html#openml.tasks.list_tasks" title="openml.tasks.list_tasks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_tasks</span></code></a>([task_type_id, offset, size, tag])</p></td>
-<td><p>Return a number of tasks having the given tag and task_type_id</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.tasks.list_tasks.html#openml.tasks.list_tasks" title="openml.tasks.list_tasks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_tasks</span></code></a>(task_type_id, NoneType] = None, …)</p></td>
+<td><p>Return a number of tasks having the given tag and task_type_id Parameters ———- Filter task_type_id is separated from the other filters because it is used as task_type_id in the task description, but it is named type when used as a filter in list tasks call.</p></td>
 </tr>
 </tbody>
 </table>

@@ -68,6 +68,10 @@ to have better visualization and easier access:
     print("First 5 of %s tasks:" % len(tasks))
     pprint(tasks.head())
 
+    # The same can be obtained through lesser lines of code
+    tasks_df = openml.tasks.list_tasks(task_type_id=1, output_format='dataframe')
+    pprint(tasks_df.head())
+
 
 
 
@@ -87,6 +91,14 @@ to have better visualization and easier access:
            'NumberOfSymbolicFeatures', 'cost_matrix'],
           dtype='object')
     First 5 of 2930 tasks:
+       tid  ttid  ...  NumberOfSymbolicFeatures cost_matrix
+    2    2     1  ...                      33.0         NaN
+    3    3     1  ...                      37.0         NaN
+    4    4     1  ...                       9.0         NaN
+    5    5     1  ...                      74.0         NaN
+    6    6     1  ...                       1.0         NaN
+
+    [5 rows x 21 columns]
        tid  ttid  ...  NumberOfSymbolicFeatures cost_matrix
     2    2     1  ...                      33.0         NaN
     3    3     1  ...                      37.0         NaN
@@ -406,13 +418,13 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLClassificationTask object at 0x2b5f1525be80>
+    <openml.tasks.task.OpenMLClassificationTask object at 0x2b6e0cd93048>
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  30.599 seconds)
+   **Total running time of the script:** ( 0 minutes  33.503 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:

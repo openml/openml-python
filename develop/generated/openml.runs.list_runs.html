@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>.list_runs<a class="headerlink" href="#openml-runs-list-runs" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.runs.list_runs">
-<code class="descclassname">openml.runs.</code><code class="descname">list_runs</code><span class="sig-paren">(</span><em>offset=None</em>, <em>size=None</em>, <em>id=None</em>, <em>task=None</em>, <em>setup=None</em>, <em>flow=None</em>, <em>uploader=None</em>, <em>tag=None</em>, <em>display_errors=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.list_runs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.runs.</code><code class="descname">list_runs</code><span class="sig-paren">(</span><em>offset: Union[int</em>, <em>NoneType] = None</em>, <em>size: Union[int</em>, <em>NoneType] = None</em>, <em>id: Union[List</em>, <em>NoneType] = None</em>, <em>task: Union[List</em>, <em>NoneType] = None</em>, <em>setup: Union[List</em>, <em>NoneType] = None</em>, <em>flow: Union[List</em>, <em>NoneType] = None</em>, <em>uploader: Union[List</em>, <em>NoneType] = None</em>, <em>tag: Union[str</em>, <em>NoneType] = None</em>, <em>display_errors: bool = False</em>, <em>output_format: str = 'dict'</em>, <em>**kwargs</em><span class="sig-paren">)</span> &#x2192; Union[Dict, pandas.core.frame.DataFrame]<a class="headerlink" href="#openml.runs.list_runs" title="Permalink to this definition">¶</a></dt>
 <dd><p>List all runs matching all of the given filters.
 (Supports large amount of results)</p>
 <dl class="field-list simple">
@@ -132,14 +132,17 @@
 <dt><strong>display_errors</strong><span class="classifier">bool, optional (default=None)</span></dt><dd><p>Whether to list runs which have an error (for example a missing
 prediction file).</p>
 </dd>
+<dt><strong>output_format: str, optional (default=’dict’)</strong></dt><dd><p>The parameter decides the format of the output.
+- If ‘dict’ the output is a dict of dict
+- If ‘dataframe’ the output is a pandas DataFrame</p>
+</dd>
 <dt><strong>kwargs</strong><span class="classifier">dict, optional</span></dt><dd><p>Legal filter operators: task_type.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>dict</dt><dd><p>List of found runs.</p>
-</dd>
+<dt>dict of dicts, or dataframe</dt><dd></dd>
 </dl>
 </dd>
 </dl>

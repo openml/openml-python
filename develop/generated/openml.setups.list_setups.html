@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.setups</span></code>.list_setups<a class="headerlink" href="#openml-setups-list-setups" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.setups.list_setups">
-<code class="descclassname">openml.setups.</code><code class="descname">list_setups</code><span class="sig-paren">(</span><em>offset=None</em>, <em>size=None</em>, <em>flow=None</em>, <em>tag=None</em>, <em>setup=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.setups.list_setups" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">openml.setups.</code><code class="descname">list_setups</code><span class="sig-paren">(</span><em>offset: Union[int</em>, <em>NoneType] = None</em>, <em>size: Union[int</em>, <em>NoneType] = None</em>, <em>flow: Union[int</em>, <em>NoneType] = None</em>, <em>tag: Union[str</em>, <em>NoneType] = None</em>, <em>setup: Union[List</em>, <em>NoneType] = None</em>, <em>output_format: str = 'object'</em><span class="sig-paren">)</span> &#x2192; Union[Dict, pandas.core.frame.DataFrame]<a class="headerlink" href="#openml.setups.list_setups" title="Permalink to this definition">¶</a></dt>
 <dd><p>List all setups matching all of the given filters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -123,11 +123,16 @@
 <dt><strong>flow</strong><span class="classifier">int, optional</span></dt><dd></dd>
 <dt><strong>tag</strong><span class="classifier">str, optional</span></dt><dd></dd>
 <dt><strong>setup</strong><span class="classifier">list(int), optional</span></dt><dd></dd>
+<dt><strong>output_format: str, optional (default=’object’)</strong></dt><dd><p>The parameter decides the format of the output.
+- If ‘object’ the output is a dict of OpenMLSetup objects
+- If ‘dict’ the output is a dict of dict
+- If ‘dataframe’ the output is a pandas DataFrame</p>
+</dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>dict</dt><dd></dd>
+<dt>dict or dataframe</dt><dd></dd>
 </dl>
 </dd>
 </dl>
