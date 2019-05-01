@@ -1,0 +1,37 @@
+<oml:task xmlns:oml="http://openml.org/openml">
+	<oml:task_id>403</oml:task_id>
+  <oml:task_name>Task 403: eeg-eye-state (Supervised Classification)</oml:task_name>
+	<oml:task_type_id>1</oml:task_type_id>
+	<oml:task_type>Supervised Classification</oml:task_type>
+	      <oml:input name="source_data">
+    <oml:data_set>
+<oml:data_set_id>68</oml:data_set_id>
+<oml:target_feature>Class</oml:target_feature>
+</oml:data_set>  </oml:input>
+	      <oml:input name="estimation_procedure">
+    <oml:estimation_procedure>
+<oml:id>1</oml:id>
+<oml:type>crossvalidation</oml:type>
+<oml:data_splits_url>https://test.openml.org/api_splits/get/403/Task_403_splits.arff</oml:data_splits_url>
+<oml:parameter name="number_repeats">1</oml:parameter>
+<oml:parameter name="number_folds">10</oml:parameter>
+<oml:parameter name="percentage"></oml:parameter>
+<oml:parameter name="stratified_sampling">true</oml:parameter>
+</oml:estimation_procedure>  </oml:input>
+	      <oml:input name="cost_matrix">
+    <oml:cost_matrix></oml:cost_matrix>  </oml:input>
+	      <oml:input name="evaluation_measures">
+    <oml:evaluation_measures>
+<oml:evaluation_measure></oml:evaluation_measure>
+</oml:evaluation_measures>  </oml:input>
+	      <oml:output name="predictions">
+    <oml:predictions>
+<oml:format>ARFF</oml:format>
+<oml:feature name="repeat" type="integer"/>
+<oml:feature name="fold" type="integer"/>
+<oml:feature name="row_id" type="integer"/>
+<oml:feature name="confidence.classname" type="numeric"/>
+<oml:feature name="prediction" type="string"/>
+</oml:predictions>  </oml:output>
+	    <oml:tag>OpenML100</oml:tag>
+  </oml:task>

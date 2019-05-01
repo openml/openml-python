@@ -16,6 +16,48 @@ Please mark yourself as contributor in a github issue if you start working on
 something to avoid duplicate work. If you're part of the OpenML organization
 you can use github's assign feature, otherwise you can just leave a comment.
 
+How to Contribute
+~~~~~~~~~~~~~~~~~
+
+The preferred workflow for contributing to the OpenML python connector is to fork the [main repository](https://github.com/openml/openml-python) on GitHub, clone, check out the branch `develop`, and develop on a new branch branch. Steps:
+
+* Fork the [project repository](https://github.com/openml/openml-python) by clicking on the 'Fork' button near the top right of the page. This creates a copy of the code under your GitHub user account. For more details on how to fork a repository see [this guide](https://help.github.com/articles/fork-a-repo/).
+
+* Clone your fork of the openml-python repo from your GitHub account to your local disk:
+
+.. code:: bash
+
+	 $ git clone git@github.com:YourLogin/openml-python.git
+	 $ cd openml-python
+
+* Switch to the develop branch:
+
+.. code:: bash
+	
+	 $ git checkout develop
+
+* Create a feature branch to hold your development changes:
+
+.. code:: bash
+
+	$ git checkout -b feature/my-feature
+	
+Always use a feature branch. It's good practice to never work on the master or develop branch! To make the nature of your pull request easily visible, please prepend the name of the branch with the type of changes you want to merge, such as feature if it contains a new feature, fix for a bugfix, doc for documentation and maint for other maintenance on the package.
+
+Develop the feature on your feature branch. Add changed files using git add and then git commit files:
+
+.. code:: bash
+
+	$ git add modified_files
+	$ git commit
+	
+to record your changes in Git, then push the changes to your GitHub account with:
+
+$ git push -u origin my-feature
+Follow these instructions to create a pull request from your fork. This will send an email to the committers.
+
+(If any of the above seems like magic to you, please look up the Git documentation on the web, or ask a friend or another contributor for help.)
+
 .. _scope:
 
 Scope of the package

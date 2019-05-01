@@ -1,0 +1,16 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>68</oml:id>
+  <oml:name>eeg-eye-state</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Oliver Roesler, it12148'@'lehre.dhbw-stuttgart.de  
+**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/EEG+Eye+State), Baden-Wuerttemberg, Cooperative State University (DHBW), Stuttgart, Germany  
+**Please cite**:   
+
+All data is from one continuous EEG measurement with the Emotiv EEG Neuroheadset. The duration of the measurement was 117 seconds. The eye state was detected via a camera during the EEG measurement and added later manually to the file after analysing the video frames. '1' indicates the eye-closed and '0' the eye-open state. All values are in chronological order with the first measured value at the top of the data.
+</oml:description>
+  <oml:format>ARFF</oml:format>
+  			<oml:upload_date>2015-05-22T16:40:04</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://test.openml.org/data/v1/download/68/eeg-eye-state.arff</oml:url>
+  <oml:file_id>68</oml:file_id>  <oml:default_target_attribute>Class</oml:default_target_attribute>          <oml:tag>study_14</oml:tag>  <oml:visibility>public</oml:visibility>      <oml:status>active</oml:status>
+  <oml:processing_date>2019-03-16 14:30:51</oml:processing_date>      <oml:md5_checksum>32086b7bec4daaa9cbe5f19efa63368c</oml:md5_checksum>
+</oml:data_set_description>

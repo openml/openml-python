@@ -1,0 +1,537 @@
+<oml:data_qualities xmlns:oml="http://openml.org/openml">
+        
+  <oml:quality  >
+    <oml:name>AutoCorrelation</oml:name>
+      <oml:value>0.9984645169904534</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>CfsSubsetEval_DecisionStumpAUC</oml:name>
+      <oml:value>0.8154762506306992</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>CfsSubsetEval_DecisionStumpErrRate</oml:name>
+      <oml:value>0.22930574098798398</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>CfsSubsetEval_DecisionStumpKappa</oml:name>
+      <oml:value>0.5342696977625635</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>CfsSubsetEval_NaiveBayesAUC</oml:name>
+      <oml:value>0.8154762506306992</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>CfsSubsetEval_NaiveBayesErrRate</oml:name>
+      <oml:value>0.22930574098798398</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>CfsSubsetEval_NaiveBayesKappa</oml:name>
+      <oml:value>0.5342696977625635</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>CfsSubsetEval_kNN1NAUC</oml:name>
+      <oml:value>0.8154762506306992</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>CfsSubsetEval_kNN1NErrRate</oml:name>
+      <oml:value>0.22930574098798398</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>CfsSubsetEval_kNN1NKappa</oml:name>
+      <oml:value>0.5342696977625635</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>ClassEntropy</oml:name>
+      <oml:value>0.992422373387609</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>DecisionStumpAUC</oml:name>
+      <oml:value>0.5730896889672722</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>DecisionStumpErrRate</oml:name>
+      <oml:value>0.41141522029372496</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>DecisionStumpKappa</oml:name>
+      <oml:value>0.12923993775163797</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Dimensionality</oml:name>
+      <oml:value>0.0010013351134846463</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>EquivalentNumberOfAtts</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>J48.00001.AUC</oml:name>
+      <oml:value>0.8271462175860198</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>J48.00001.ErrRate</oml:name>
+      <oml:value>0.18631508678237652</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>J48.00001.Kappa</oml:name>
+      <oml:value>0.623155313134783</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>J48.0001.AUC</oml:name>
+      <oml:value>0.8271462175860198</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>J48.0001.ErrRate</oml:name>
+      <oml:value>0.18631508678237652</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>J48.0001.Kappa</oml:name>
+      <oml:value>0.623155313134783</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>J48.001.AUC</oml:name>
+      <oml:value>0.8271462175860198</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>J48.001.ErrRate</oml:name>
+      <oml:value>0.18631508678237652</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>J48.001.Kappa</oml:name>
+      <oml:value>0.623155313134783</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MajorityClassPercentage</oml:name>
+      <oml:value>55.12016021361815</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MajorityClassSize</oml:name>
+      <oml:value>8257.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MaxAttributeEntropy</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MaxKurtosisOfNumericAtts</oml:name>
+      <oml:value>14979.178735371073</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MaxMeansOfNumericAtts</oml:name>
+      <oml:value>4644.02237917223</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MaxMutualInformation</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MaxNominalAttDistinctValues</oml:name>
+      <oml:value>2.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MaxSkewnessOfNumericAtts</oml:name>
+      <oml:value>122.38777688436316</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MaxStdDevOfNumericAtts</oml:name>
+      <oml:value>5891.2850425236575</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MeanAttributeEntropy</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MeanKurtosisOfNumericAtts</oml:name>
+      <oml:value>8904.72190163755</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MeanMeansOfNumericAtts</oml:name>
+      <oml:value>4316.882028546157</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MeanMutualInformation</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MeanNoiseToSignalRatio</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MeanNominalAttDistinctValues</oml:name>
+      <oml:value>2.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MeanSkewnessOfNumericAtts</oml:name>
+      <oml:value>71.73726620900297</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MeanStdDevOfNumericAtts</oml:name>
+      <oml:value>1767.2884824189532</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MinAttributeEntropy</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MinKurtosisOfNumericAtts</oml:name>
+      <oml:value>2056.5210594418404</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MinMeansOfNumericAtts</oml:name>
+      <oml:value>4009.767693591455</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MinMutualInformation</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MinNominalAttDistinctValues</oml:name>
+      <oml:value>2.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MinSkewnessOfNumericAtts</oml:name>
+      <oml:value>-13.615160740498586</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MinStdDevOfNumericAtts</oml:name>
+      <oml:value>29.292603201776053</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MinorityClassPercentage</oml:name>
+      <oml:value>44.879839786381844</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>MinorityClassSize</oml:name>
+      <oml:value>6723.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>NaiveBayesAUC</oml:name>
+      <oml:value>0.5441157198060068</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>NaiveBayesErrRate</oml:name>
+      <oml:value>0.4634846461949266</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>NaiveBayesKappa</oml:name>
+      <oml:value>0.11130397334752887</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>NumberOfBinaryFeatures</oml:name>
+      <oml:value>1.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>NumberOfClasses</oml:name>
+      <oml:value>2.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>NumberOfFeatures</oml:name>
+      <oml:value>15.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>NumberOfInstances</oml:name>
+      <oml:value>14980.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>NumberOfInstancesWithMissingValues</oml:name>
+      <oml:value>0.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>NumberOfMissingValues</oml:name>
+      <oml:value>0.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>NumberOfNumericFeatures</oml:name>
+      <oml:value>14.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>NumberOfSymbolicFeatures</oml:name>
+      <oml:value>1.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>PercentageOfBinaryFeatures</oml:name>
+      <oml:value>6.666666666666667</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>PercentageOfInstancesWithMissingValues</oml:name>
+      <oml:value>0.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>PercentageOfMissingValues</oml:name>
+      <oml:value>0.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>PercentageOfNumericFeatures</oml:name>
+      <oml:value>93.33333333333333</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>PercentageOfSymbolicFeatures</oml:name>
+      <oml:value>6.666666666666667</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile1AttributeEntropy</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile1KurtosisOfNumericAtts</oml:name>
+      <oml:value>2713.5598368066608</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile1MeansOfNumericAtts</oml:name>
+      <oml:value>4193.079256508679</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile1MutualInformation</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile1SkewnessOfNumericAtts</oml:name>
+      <oml:value>22.475026893669664</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile1StdDevOfNumericAtts</oml:name>
+      <oml:value>37.98467230942155</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile2AttributeEntropy</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile2KurtosisOfNumericAtts</oml:name>
+      <oml:value>9352.695219763142</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile2MeansOfNumericAtts</oml:name>
+      <oml:value>4271.6276034712955</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile2MutualInformation</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile2SkewnessOfNumericAtts</oml:name>
+      <oml:value>84.61113200877784</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile2StdDevOfNumericAtts</oml:name>
+      <oml:value>627.1558153704191</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile3AttributeEntropy</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile3KurtosisOfNumericAtts</oml:name>
+      <oml:value>14971.654606997874</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile3MeansOfNumericAtts</oml:name>
+      <oml:value>4466.12820822263</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile3MutualInformation</oml:name>
+      <oml:value />
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile3SkewnessOfNumericAtts</oml:name>
+      <oml:value>122.34170603745707</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>Quartile3StdDevOfNumericAtts</oml:name>
+      <oml:value>3343.823788627256</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>REPTreeDepth1AUC</oml:name>
+      <oml:value>0.8585707193015194</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>REPTreeDepth1ErrRate</oml:name>
+      <oml:value>0.19072096128170896</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>REPTreeDepth1Kappa</oml:name>
+      <oml:value>0.6126693923072585</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>REPTreeDepth2AUC</oml:name>
+      <oml:value>0.8585707193015194</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>REPTreeDepth2ErrRate</oml:name>
+      <oml:value>0.19072096128170896</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>REPTreeDepth2Kappa</oml:name>
+      <oml:value>0.6126693923072585</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>REPTreeDepth3AUC</oml:name>
+      <oml:value>0.8585707193015194</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>REPTreeDepth3ErrRate</oml:name>
+      <oml:value>0.19072096128170896</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>REPTreeDepth3Kappa</oml:name>
+      <oml:value>0.6126693923072585</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>RandomTreeDepth1AUC</oml:name>
+      <oml:value>0.8092130970110125</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>RandomTreeDepth1ErrRate</oml:name>
+      <oml:value>0.18845126835781043</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>RandomTreeDepth1Kappa</oml:name>
+      <oml:value>0.6188451689674707</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>RandomTreeDepth2AUC</oml:name>
+      <oml:value>0.8092130970110125</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>RandomTreeDepth2ErrRate</oml:name>
+      <oml:value>0.18845126835781043</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>RandomTreeDepth2Kappa</oml:name>
+      <oml:value>0.6188451689674707</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>RandomTreeDepth3AUC</oml:name>
+      <oml:value>0.8092130970110125</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>RandomTreeDepth3ErrRate</oml:name>
+      <oml:value>0.18845126835781043</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>RandomTreeDepth3Kappa</oml:name>
+      <oml:value>0.6188451689674707</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>StdvNominalAttDistinctValues</oml:name>
+      <oml:value>0.0</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>kNN1NAUC</oml:name>
+      <oml:value>0.8331954978013598</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>kNN1NErrRate</oml:name>
+      <oml:value>0.16355140186915887</oml:value>
+    </oml:quality>
+        
+  <oml:quality  >
+    <oml:name>kNN1NKappa</oml:name>
+      <oml:value>0.6684228094245078</oml:value>
+    </oml:quality>
+  </oml:data_qualities>
