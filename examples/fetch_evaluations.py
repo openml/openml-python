@@ -1,12 +1,12 @@
 """
-Tasks
-=====
+=================
+Fetch Evaluations
+=================
 
-A tutorial on how to fetch evalutions on a task.
+A tutorial on how to fetch evalutions of a task.
 """
-
+############################################################################
 import openml
-# import pandas as pd
 from pprint import pprint
 
 ############################################################################
@@ -21,8 +21,8 @@ from pprint import pprint
 
 ############################################################################
 # Listing evaluations
-# ^^^^^^^^^^^^^^^^^^^
-#
+# *******************
+
 # We shall retrieve a small set to test the listing function for evaluations
 openml.evaluations.list_evaluations(function='predictive_accuracy', size=10,
                                     output_format='dataframe')
@@ -30,17 +30,19 @@ openml.evaluations.list_evaluations(function='predictive_accuracy', size=10,
 openml.evaluations.list_evaluations(function='precision', size=10,
                                     output_format='dataframe')
 
+#############################################################################
 # Listing tasks
-# ^^^^^^^^^^^^^
-#
+# =============
+
 # We will start by displaying a simple *supervised classification* task:
 task_id = 167140        # https://www.openml.org/t/167140
 task = openml.tasks.get_task(task_id)
 pprint(vars(task))
 
+#############################################################################
 # Obtaining all the evaluations for the task
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#
+# ==========================================
+
 metric = 'predictive_accuracy'
 evals = openml.evaluations.list_evaluations(function=metric, task=[task_id],
                                             output_format='dataframe')
@@ -50,9 +52,10 @@ pprint(evals.head(n=10))
 evals = evals.sort_values(by='value', ascending=False)
 pprint(evals.head())
 
+#############################################################################
 # Obtain CDF of metric for chosen task
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#
+# ************************************
+
 from matplotlib import pyplot as plt
 
 
@@ -69,9 +72,10 @@ def plot_cdf(values, metric='predictive_accuracy'):
 
 plot_cdf(evals.value, metric)
 
+#############################################################################
 # Compare top 10 performing flows
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#
+# *******************************
+
 import numpy as np
 import pandas as pd
 
