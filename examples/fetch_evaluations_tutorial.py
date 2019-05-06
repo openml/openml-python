@@ -10,16 +10,6 @@ import openml
 from pprint import pprint
 
 ############################################################################
-#
-# Evalutions contain details (IDs and names) of data, flow, tasks, of all runs
-# and the resulting results that was uploaded for those settings.
-# The listing functions take optional parameters which can be used to filter
-# results and fetch only the evaluations required.
-#
-# In this example, we'll primarily see how to retrieve the results for a
-# particular task and attempt to compare performance of different runs.
-
-############################################################################
 # Listing evaluations
 # *******************
 
@@ -95,10 +85,8 @@ def plot_flow_compare(evaluations, top_n=10, metric='predictive_accuracy'):
     axs.set_xlabel('Flow ID')
     axs.set_xticklabels(flow_list)
     flow_freq = list(df.count(axis=0, numeric_only=True))
-    print(len(flow_freq), flow_freq)
-    print(len(flow_list), flow_list)
     for i in range(len(flow_list)):
-        axs.text(i + 1.05, np.nanmin(df.values), str(flow_freq[i]) + ' run(s)')
+        axs.text(i + 1.05, np.nanmin(df.values), str(flow_freq[i]) + '\nrun(s)', fontsize=7)
     plt.show()
 
 
