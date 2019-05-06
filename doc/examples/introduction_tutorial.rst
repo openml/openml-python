@@ -126,7 +126,7 @@ Download the OpenML task for the eeg-eye-state.
         flow = sklearn_to_flow(model)
       File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/openml-0.6.0-py3.6.egg/openml/flows/sklearn_converter.py", line 81, in sklearn_to_flow
         raise TypeError(o, type(o))
-    TypeError: (<openml.tasks.task.OpenMLTask object at 0x112d00e48>, <class 'openml.tasks.task.OpenMLTask'>)
+    TypeError: (<openml.tasks.task.OpenMLTask object at 0x112bc8c88>, <class 'openml.tasks.task.OpenMLTask'>)
 
 
 
@@ -134,7 +134,7 @@ Download the OpenML task for the eeg-eye-state.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.531 seconds)
+   **Total running time of the script:** ( 0 minutes  0.659 seconds)
 
 
 .. _sphx_glr_download_examples_introduction_tutorial.py:

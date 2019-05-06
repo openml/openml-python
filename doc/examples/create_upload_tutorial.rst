@@ -390,7 +390,7 @@ Dataset is a pandas sparse dataframe
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.139 seconds)
+   **Total running time of the script:** ( 0 minutes  0.153 seconds)
 
 
 .. _sphx_glr_download_examples_create_upload_tutorial.py:

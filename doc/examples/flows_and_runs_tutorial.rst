@@ -231,7 +231,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.044 seconds)
+   **Total running time of the script:** ( 0 minutes  0.051 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:

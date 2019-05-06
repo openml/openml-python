@@ -87,12 +87,12 @@ to have better visualization and easier access:
            'NumberOfNumericFeatures', 'NumberOfSymbolicFeatures'],
           dtype='object')
     First 5 of 932 tasks:
-       tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
-    1    1     1  ...                      6.0                     33.0
-    2    2     1  ...                      6.0                     33.0
-    3    3     1  ...                      6.0                     33.0
-    4    4     1  ...                      6.0                     33.0
-    5    5     1  ...                      6.0                     33.0
+       tid  ttid  did    name                  task_type  status              estimation_procedure  ... NumberOfClasses NumberOfFeatures  NumberOfInstances  NumberOfInstancesWithMissingValues  NumberOfMissingValues  NumberOfNumericFeatures  NumberOfSymbolicFeatures
+    1    1     1    1  anneal  Supervised Classification  active           10-fold Crossvalidation  ...             5.0             39.0              898.0                               898.0                22175.0                      6.0                      33.0
+    2    2     1    1  anneal  Supervised Classification  active    5 times 2-fold Crossvalidation  ...             5.0             39.0              898.0                               898.0                22175.0                      6.0                      33.0
+    3    3     1    1  anneal  Supervised Classification  active  10 times 10-fold Crossvalidation  ...             5.0             39.0              898.0                               898.0                22175.0                      6.0                      33.0
+    4    4     1    1  anneal  Supervised Classification  active                     Leave one out  ...             5.0             39.0              898.0                               898.0                22175.0                      6.0                      33.0
+    5    5     1    1  anneal  Supervised Classification  active                   10% Holdout set  ...             5.0             39.0              898.0                               898.0                22175.0                      6.0                      33.0
 
     [5 rows x 19 columns]
 
@@ -207,12 +207,12 @@ Similar to listing tasks by task type, we can list tasks by tags:
  .. code-block:: none
 
     First 5 of 100 tasks:
-        tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
-    1     1     1  ...                      6.0                     33.0
-    7     7     1  ...                      0.0                     37.0
-    13   13     1  ...                     16.0                      1.0
-    19   19     1  ...                      4.0                      1.0
-    25   25     1  ...                    216.0                      1.0
+        tid  ttid  did           name                  task_type  status     estimation_procedure  ... NumberOfClasses NumberOfFeatures  NumberOfInstances  NumberOfInstancesWithMissingValues  NumberOfMissingValues  NumberOfNumericFeatures  NumberOfSymbolicFeatures
+    1     1     1    1         anneal  Supervised Classification  active  10-fold Crossvalidation  ...             5.0             39.0              898.0                               898.0                22175.0                      6.0                      33.0
+    7     7     1    2       kr-vs-kp  Supervised Classification  active  10-fold Crossvalidation  ...             2.0             37.0             3196.0                                 0.0                    0.0                      0.0                      37.0
+    13   13     1    3         letter  Supervised Classification  active  10-fold Crossvalidation  ...            26.0             17.0            20000.0                                 0.0                    0.0                     16.0                       1.0
+    19   19     1    4  balance-scale  Supervised Classification  active  10-fold Crossvalidation  ...             3.0              5.0              625.0                                 0.0                    0.0                      4.0                       1.0
+    25   25     1    5  mfeat-factors  Supervised Classification  active  10-fold Crossvalidation  ...            10.0            217.0             2000.0                                 0.0                    0.0                    216.0                       1.0
 
     [5 rows x 19 columns]
 
@@ -323,7 +323,7 @@ And:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.049 seconds)
+   **Total running time of the script:** ( 0 minutes  4.633 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:
