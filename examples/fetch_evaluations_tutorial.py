@@ -19,14 +19,14 @@ from pprint import pprint
 ############################################################################
 # Listing evaluations
 # *******************
-# Evaluations can be retrieved from the database in the chosen output format
-# Required filters can be applied to retrieve results from runs as required
+# Evaluations can be retrieved from the database in the chosen output format.
+# Required filters can be applied to retrieve results from runs as required.
 
 # We shall retrieve a small set (only 10 entries) to test the listing function for evaluations
 openml.evaluations.list_evaluations(function='predictive_accuracy', size=10,
                                     output_format='dataframe')
 
-# Using other evaluation metrics, 'precision; in this case
+# Using other evaluation metrics, 'precision' in this case
 evals = openml.evaluations.list_evaluations(function='precision', size=10,
                                             output_format='dataframe')
 
@@ -36,7 +36,7 @@ pprint(evals[evals.value > 0.98])
 #############################################################################
 # View a sample task
 # ==================
-# Over here we shall briefly take a look at the details of the task we'll use in this example
+# Over here we shall briefly take a look at the details of the task.
 
 # We will start by displaying a simple *supervised classification* task:
 task_id = 167140        # https://www.openml.org/t/167140
@@ -46,8 +46,8 @@ pprint(vars(task))
 #############################################################################
 # Obtaining all the evaluations for the task
 # ==========================================
-# We'll now obtain all the runs that were made for the task we displayed previously
-# Note that we now filter the evaluations based on another parameter 'task'
+# We'll now obtain all the runs that were made for the task we displayed previously.
+# Note that we now filter the evaluations based on another parameter 'task'.
 
 metric = 'predictive_accuracy'
 evals = openml.evaluations.list_evaluations(function=metric, task=[task_id],
@@ -62,9 +62,9 @@ pprint(evals.head())
 #############################################################################
 # Obtain CDF of metric for chosen task
 # ************************************
-# We shall now analyse how the performance of various flows have been to address
-# this chosen task, by seeing the likelihood of the accuracy obtained across all runs.
-# We shall now plot a cumulative distributive function (CDF) for the accuracy obtained.
+# We shall now analyse how the performance of various flows have been on this task,
+# by seeing the likelihood of the accuracy obtained across all runs.
+# We shall now plot a cumulative distributive function (CDF) for the accuracies obtained.
 
 from matplotlib import pyplot as plt
 
@@ -117,9 +117,9 @@ def plot_flow_compare(evaluations, top_n=10, metric='predictive_accuracy'):
     axs.set_ylabel(metric)
     axs.set_xlabel('Flow ID')
     axs.set_xticklabels(flow_list)
-    axs.grid(which='majpr', linestyle='-', linewidth='0.5', color='gray')
+    axs.grid(which='major', linestyle='-', linewidth='0.5', color='gray', axis='y')
     axs.minorticks_on()
-    axs.grid(which='minor', linestyle='--', linewidth='0.5', color='gray')
+    axs.grid(which='minor', linestyle='--', linewidth='0.5', color='gray', axis='y')
     # Counting the number of entries for each flow in the data frame
     #   which gives the number of runs for each flow
     flow_freq = list(df.count(axis=0, numeric_only=True))
