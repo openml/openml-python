@@ -8,11 +8,36 @@ Changelog
 
 0.9.0
 ~~~~~
-
+* ADD #560: OpenML-Python can now handle regression tasks as well.
+* ADD #620, #628, #632, #649, #682: Full support for studies and distinguishes suites from studies.
+* ADD #607: Tasks can now be created and uploaded.
+* ADD #647, #673: Introduced the extension interface. This provides an easy way to create a hook for machine learning packages to perform e.g. automated runs.
+* ADD #548, #646, #676: Support for Pandas DataFrame and SparseDataFrame
+* ADD #662: Results of listing functions can now be returned as pandas.DataFrame.
+* ADD #59: Datasets can now also be retrieved by name.
+* ADD #672: Add timing measurements for runs, when possible.
+* ADD #661: Upload time and error messages now displayed with `list_runs`.
+* ADD #644: Datasets can now be downloaded 'lazily', retrieving only metadata at first, and the full dataset only when necessary.
+* ADD #659: Lazy loading of task splits.
+* ADD #516: `run_flow_on_task` flow uploading is now optional.
+* ADD #680: Adds `openml.config.start_using_configuration_for_example` (and resp. stop) to easily connect to the test server.
+* FIX #642: `check_datasets_active` now correctly also returns active status of deactivated datasets.
+* FIX #304, #636: Allow serialization of numpy datatypes and list of lists of more types (e.g. bools, ints) for flows.
+* FIX #651: Fixed a bug that would prevent openml-python from finding the user's config file.
+* DOC #678: Better color scheme for code examples in documentation.
+* DOC #681: Small improvements and removing list of missing functions.
+* DOC #684: Add notice to examples that connect to the test server.
+* DOC #691: Update contributing guidelines to use Github draft feature instead of tags in title.
+* MAINT #184: Dropping Python2 support.
 * MAINT #596: Fewer dependencies for regular pip install.
 * MAINT #652: Numpy and Scipy are no longer required before installation.
-* ADD #560: OpenML-Python can now handle regression tasks as well.
-* MAINT #184: Dropping Python2 support.
+* MAINT #655: Lazy loading is now preferred in unit tests.
+* MAINT #667: Different tag functions now share code.
+* MAINT #666: More descriptive error message for `TypeError` in `list_runs`.
+* MAINT #668: Fix some type hints.
+* MAINT #677: `dataset.get_data` now has consistent behavior in its return type.
+* MAINT #686: Adds ignore directives for several `mypy` folders.
+* MAINT #629, #630: Code now adheres to single PEP8 standard.
 
 0.8.0
 ~~~~~

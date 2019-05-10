@@ -5,8 +5,9 @@ the contribution guidelines: https://github.com/openml/openml-python/blob/master
 Please make sure that:
 
 * this pull requests is against the `develop` branch
-* you updated all docs
+* you updated all docs, this includes the changelog!
 -->
+
 #### Reference Issue
 <!-- Example: Fixes #1234 -->
 
