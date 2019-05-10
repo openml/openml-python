@@ -75,11 +75,10 @@ following rules before you submit a pull request:
    created.
 
 -  An incomplete contribution -- where you expect to do more work before
-   receiving a full review -- should be prefixed `[WIP]` (to indicate a work
-   in progress) and changed to `[MRG]` when it matures. WIPs may be useful
+   receiving a full review -- should be submitted as a `draft`. These may be useful
    to: indicate you are working on something to avoid duplicated work,
    request broad review of functionality or API, or seek collaborators.
-   WIPs often benefit from the inclusion of a
+   Drafts often benefit from the inclusion of a
    [task list](https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments)
    in the PR description.
 
