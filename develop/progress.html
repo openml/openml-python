@@ -121,10 +121,36 @@
 <div class="section" id="id1">
 <h2>0.9.0<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
+<li><p>ADD #560: OpenML-Python can now handle regression tasks as well.</p></li>
+<li><p>ADD #620, #628, #632, #649, #682: Full support for studies and distinguishes suites from studies.</p></li>
+<li><p>ADD #607: Tasks can now be created and uploaded.</p></li>
+<li><p>ADD #647, #673: Introduced the extension interface. This provides an easy way to create a hook for machine learning packages to perform e.g. automated runs.</p></li>
+<li><p>ADD #548, #646, #676: Support for Pandas DataFrame and SparseDataFrame</p></li>
+<li><p>ADD #662: Results of listing functions can now be returned as pandas.DataFrame.</p></li>
+<li><p>ADD #59: Datasets can now also be retrieved by name.</p></li>
+<li><p>ADD #672: Add timing measurements for runs, when possible.</p></li>
+<li><p>ADD #661: Upload time and error messages now displayed with <cite>list_runs</cite>.</p></li>
+<li><p>ADD #644: Datasets can now be downloaded ‘lazily’, retrieving only metadata at first, and the full dataset only when necessary.</p></li>
+<li><p>ADD #659: Lazy loading of task splits.</p></li>
+<li><p>ADD #516: <cite>run_flow_on_task</cite> flow uploading is now optional.</p></li>
+<li><p>ADD #680: Adds <cite>openml.config.start_using_configuration_for_example</cite> (and resp. stop) to easily connect to the test server.</p></li>
+<li><p>FIX #642: <cite>check_datasets_active</cite> now correctly also returns active status of deactivated datasets.</p></li>
+<li><p>FIX #304, #636: Allow serialization of numpy datatypes and list of lists of more types (e.g. bools, ints) for flows.</p></li>
+<li><p>FIX #651: Fixed a bug that would prevent openml-python from finding the user’s config file.</p></li>
+<li><p>DOC #678: Better color scheme for code examples in documentation.</p></li>
+<li><p>DOC #681: Small improvements and removing list of missing functions.</p></li>
+<li><p>DOC #684: Add notice to examples that connect to the test server.</p></li>
+<li><p>DOC #691: Update contributing guidelines to use Github draft feature instead of tags in title.</p></li>
+<li><p>MAINT #184: Dropping Python2 support.</p></li>
 <li><p>MAINT #596: Fewer dependencies for regular pip install.</p></li>
 <li><p>MAINT #652: Numpy and Scipy are no longer required before installation.</p></li>
-<li><p>ADD #560: OpenML-Python can now handle regression tasks as well.</p></li>
-<li><p>MAINT #184: Dropping Python2 support.</p></li>
+<li><p>MAINT #655: Lazy loading is now preferred in unit tests.</p></li>
+<li><p>MAINT #667: Different tag functions now share code.</p></li>
+<li><p>MAINT #666: More descriptive error message for <cite>TypeError</cite> in <cite>list_runs</cite>.</p></li>
+<li><p>MAINT #668: Fix some type hints.</p></li>
+<li><p>MAINT #677: <cite>dataset.get_data</cite> now has consistent behavior in its return type.</p></li>
+<li><p>MAINT #686: Adds ignore directives for several <cite>mypy</cite> folders.</p></li>
+<li><p>MAINT #629, #630: Code now adheres to single PEP8 standard.</p></li>
 </ul>
 </div>
 <div class="section" id="id2">
