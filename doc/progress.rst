@@ -27,6 +27,7 @@ Changelog
 * DOC #678: Better color scheme for code examples in documentation.
 * DOC #681: Small improvements and removing list of missing functions.
 * DOC #684: Add notice to examples that connect to the test server.
+* DOC #691: Update contributing guidelines to use Github draft feature instead of tags in title.
 * MAINT #184: Dropping Python2 support.
 * MAINT #596: Fewer dependencies for regular pip install.
 * MAINT #652: Numpy and Scipy are no longer required before installation.
