@@ -237,7 +237,6 @@ def list_datasets(
 
 
 def _list_datasets(output_format='dict', **kwargs):
-
     """
     Perform api call to return a list of all datasets.
 
@@ -308,7 +307,8 @@ def _load_features_from_file(features_file: str) -> Dict:
 
 
 def check_datasets_active(dataset_ids: List[int]) -> Dict[int, bool]:
-    """ Check if the dataset ids provided are active.
+    """
+    Check if the dataset ids provided are active.
 
     Parameters
     ----------
