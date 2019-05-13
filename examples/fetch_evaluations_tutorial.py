@@ -116,8 +116,8 @@ def plot_flow_compare(evaluations, top_n=10, metric='predictive_accuracy'):
     # Creating a data frame containing only the metric values of the selected flows
     #   assuming evaluations is sorted in decreasing order of metric
     for i in range(len(flow_ids)):
-        flow_values = evaluations[evaluations.flow_id == flow_ids[i]].value.tolist()
-        df = pd.concat([df, pd.DataFrame(flow_values)], ignore_index=True, axis=1)
+        flow_values = evaluations[evaluations.flow_id == flow_ids[i]].value 
+        df = pd.concat([df, flow_values], ignore_index=True, axis=1)
     fig, axs = plt.subplots()
     df.boxplot()
     axs.set_title('Boxplot comparing ' + metric + ' for different flows')
