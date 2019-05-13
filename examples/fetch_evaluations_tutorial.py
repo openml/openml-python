@@ -1,15 +1,21 @@
 """
-=================
-Fetch Evaluations
-=================
-
-A tutorial on how to fetch evalutions of a task.
+====================
+Fetching Evaluations
+====================
 
 Evalutions contain a concise summary of the results of all runs made. Each evaluation
 provides information on the dataset used, the flow applied, the setup used, the metric
 evaluated, and the result obtained on the metric, for each such run made. These collection
 of results can be used for efficient benchmarking of an algorithm and also allow transparent
 reuse of results from previous experiments on similar parameters.
+
+In this example, we shall do the following:
+
+* Retrieve evaluations based on different metrics
+* Fetch evaluations pertaining to a specific task
+* Sort the obtained results in descending order of the metric
+* Plot a cumulative distribution function for the evaluations
+* Compare the top 10 performing flows based on the evaluation performance
 """
 
 ############################################################################
@@ -34,8 +40,8 @@ evals = openml.evaluations.list_evaluations(function='precision', size=10,
 pprint(evals[evals.value > 0.98])
 
 #############################################################################
-# View a sample task
-# ==================
+# Viewing a sample task
+# =====================
 # Over here we shall briefly take a look at the details of the task.
 
 # We will start by displaying a simple *supervised classification* task:
@@ -46,7 +52,8 @@ pprint(vars(task))
 #############################################################################
 # Obtaining all the evaluations for the task
 # ==========================================
-# We'll now obtain all the runs that were made for the task we displayed previously.
+# We'll now obtain all the evaluations that were uploaded for the task
+# we displayed previously.
 # Note that we now filter the evaluations based on another parameter 'task'.
 
 metric = 'predictive_accuracy'
@@ -60,8 +67,8 @@ print("\nDisplaying head of sorted dataframe: ")
 pprint(evals.head())
 
 #############################################################################
-# Obtain CDF of metric for chosen task
-# ************************************
+# Obtaining CDF of metric for chosen task
+# ***************************************
 # We shall now analyse how the performance of various flows have been on this task,
 # by seeing the likelihood of the accuracy obtained across all runs.
 # We shall now plot a cumulative distributive function (CDF) for the accuracies obtained.
@@ -92,10 +99,10 @@ plot_cdf(evals.value, metric)
 # with non-zero probability. While the maximum accuracy seen till now is 96.5%.
 
 #############################################################################
-# Compare top 10 performing flows
-# *******************************
+# Comparing top 10 performing flows
+# *********************************
 # Let us now try to see which flows generally performed the best for this task.
-# To this effect, we shall compare the top performing flows.
+# For this, we shall compare the top performing flows.
 
 import numpy as np
 import pandas as pd
@@ -103,27 +110,27 @@ import pandas as pd
 
 def plot_flow_compare(evaluations, top_n=10, metric='predictive_accuracy'):
     # Collecting the top 10 performing unique flow_id
-    flow_list = evaluations.flow_id.unique()[:top_n]
+    flow_ids = evaluations.flow_id.unique()[:top_n]
 
     df = pd.DataFrame()
     # Creating a data frame containing only the metric values of the selected flows
     #   assuming evaluations is sorted in decreasing order of metric
-    for i in range(len(flow_list)):
-        df = pd.concat([df, pd.DataFrame(evaluations[evaluations.flow_id == flow_list[i]].value)],
-                       ignore_index=True, axis=1)
+    for i in range(len(flow_ids)):
+        flow_values = evaluations[evaluations.flow_id == flow_ids[i]].value.tolist()
+        df = pd.concat([df, pd.DataFrame(flow_values)], ignore_index=True, axis=1)
     fig, axs = plt.subplots()
     df.boxplot()
     axs.set_title('Boxplot comparing ' + metric + ' for different flows')
     axs.set_ylabel(metric)
     axs.set_xlabel('Flow ID')
-    axs.set_xticklabels(flow_list)
+    axs.set_xticklabels(flow_ids)
     axs.grid(which='major', linestyle='-', linewidth='0.5', color='gray', axis='y')
     axs.minorticks_on()
     axs.grid(which='minor', linestyle='--', linewidth='0.5', color='gray', axis='y')
     # Counting the number of entries for each flow in the data frame
     #   which gives the number of runs for each flow
     flow_freq = list(df.count(axis=0, numeric_only=True))
-    for i in range(len(flow_list)):
+    for i in range(len(flow_ids)):
         axs.text(i + 1.05, np.nanmin(df.values), str(flow_freq[i]) + '\nrun(s)', fontsize=7)
     plt.show()
 
@@ -134,3 +141,10 @@ plot_flow_compare(evals, metric=metric, top_n=10)
 # that flow (number of runs denoted at the bottom of the boxplots). The higher the
 # green line, the better the flow is for the task at hand. The ordering of the flows
 # are in the descending order of the higest accuracy value seen under that flow.
+
+# Printing the corresponding flow names for the top 10 performing flow IDs
+top_n = 10
+flow_ids = evals.flow_id.unique()[:top_n]
+flow_names = evals.flow_name.unique()[:top_n]
+for i in range(top_n):
+    pprint((flow_ids[i], flow_names[i]))
