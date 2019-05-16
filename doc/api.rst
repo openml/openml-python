@@ -102,6 +102,7 @@ Modules
     list_runs
     run_model_on_task
     run_flow_on_task
+    run_exists
 
 :mod:`openml.setups`: Setup Functions
 -------------------------------------
