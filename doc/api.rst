@@ -84,6 +84,7 @@ Modules
     flow_exists
     get_flow
     list_flows
+    assert_flows_equal
 
 :mod:`openml.runs`: Run Functions
 ----------------------------------
