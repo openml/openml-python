@@ -126,6 +126,19 @@ Modules
    :template: function.rst
 
     get_study
+    get_suite
+    create_study
+    create_benchmark_suite
+    update_study_status
+    update_suite_status
+    attach_to_study
+    attach_to_suite
+    detach_from_study
+    detach_from_suite
+    delete_study
+    delete_suite
+    list_studies
+    list_suites
 
 :mod:`openml.tasks`: Task Functions
 -----------------------------------
@@ -138,3 +151,16 @@ Modules
     get_task
     get_tasks
     list_tasks
+
+
+:mod:`openml.extensions`: Extension Functions
+-----------------------------------
+.. currentmodule:: openml.extensions
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+    register_extension
+    get_extension_by_model
+    get_extension_by_flow
