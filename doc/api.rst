@@ -149,7 +149,7 @@ Modules
    list_studies
    list_suites
    update_study_status
-   update_suite_status'
+   update_suite_status
 
 :mod:`openml.tasks`: Task Functions
 -----------------------------------
