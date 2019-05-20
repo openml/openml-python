@@ -404,7 +404,7 @@ def get_datasets(
     return datasets
 
 
-# @openml.utils.thread_safe_if_oslo_installed
+@openml.utils.thread_safe_if_oslo_installed
 def get_dataset(
     dataset_id: Union[int, str],
     download_data: bool = True,
