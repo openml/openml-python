@@ -236,7 +236,8 @@ class OpenMLStudy(BaseStudy):
         )
 
 
-class OpenMLBenchmarkSuite(BaseStudy):"""
+class OpenMLBenchmarkSuite(BaseStudy):
+    """
     An OpenMLBenchmarkSuite represents the OpenML concept of a suite (a collection of tasks).
 
     It contains the following information: name, id, description, creation date,

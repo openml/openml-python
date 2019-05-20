@@ -308,8 +308,8 @@ def _remove_cache_dir_for_id(key, cache_dir):
 
 
 def thread_safe_if_oslo_installed(func):
-    @wraps(func)
     if oslo_installed:
+        @wraps(func)
         def safe_func(*args, **kwargs):
             # Lock directories use the id that is passed as either positional or keyword argument.
             id_parameters = [parameter_name for parameter_name in kwargs if '_id' in parameter_name]
