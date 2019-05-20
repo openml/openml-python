@@ -208,6 +208,14 @@ class OpenMLTask(ABC):
 
 
 class OpenMLSupervisedTask(OpenMLTask, ABC):
+    """OpenML Supervised Classification object.
+
+       Inherited from :class:`openml.OpenMLTask`
+
+       Parameters
+       ----------
+       target_name : str
+    """
     def __init__(
             self,
             task_type_id: Union[int, str],
@@ -295,6 +303,15 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
 
 class OpenMLClassificationTask(OpenMLSupervisedTask):
+    """OpenML Classification object.
+
+       Inherited from :class:`openml.OpenMLSupervisedTask`
+
+       Parameters
+       ----------
+       class_labels : List of str (optional)
+       cost_matrix: array (optional)
+    """
     def __init__(
             self,
             task_type_id: Union[int, str],
@@ -331,6 +348,10 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
 
 
 class OpenMLRegressionTask(OpenMLSupervisedTask):
+    """OpenML Regression object.
+
+       Inherited from :class:`openml.OpenMLSupervisedTask`
+    """
     def __init__(
             self,
             task_type_id: Union[int, str],
@@ -359,6 +380,14 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
 
 
 class OpenMLClusteringTask(OpenMLTask):
+    """OpenML Clustering object.
+
+       Inherited from :class:`openml.OpenMLTask`
+
+       Parameters
+       ----------
+       target_name : str
+    """
     def __init__(
             self,
             task_type_id: Union[int, str],
@@ -431,6 +460,10 @@ class OpenMLClusteringTask(OpenMLTask):
 
 
 class OpenMLLearningCurveTask(OpenMLClassificationTask):
+    """OpenML Learning Curve object.
+
+       Inherited from :class:`openml.OpenMLClassificationTask`
+    """
     def __init__(
             self,
             task_type_id: Union[int, str],

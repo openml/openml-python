@@ -70,7 +70,7 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
                                    "cached" % fid)
 
 
-@openml.utils.thread_safe_if_oslo_installed
+# @openml.utils.thread_safe_if_oslo_installed
 def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
     """Download the OpenML flow for a given flow ID.
 

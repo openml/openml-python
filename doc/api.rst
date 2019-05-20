@@ -13,14 +13,21 @@ Top-level Classes
    :toctree: generated/
    :template: class.rst
 
+   OpenMLClassificationTask
+   OpenMLClusteringTask
+   OpenMLDataFeature
    OpenMLDataset
-   OpenMLRun
-   OpenMLTask
-   OpenMLSplit
-   OpenMLFlow
    OpenMLEvaluation
-   OpenMLSetup
+   OpenMLFlow
+   OpenMLLearningCurveTask
    OpenMLParameter
+   OpenMLRegressionTask
+   OpenMLRun
+   OpenMLSetup
+   OpenMLSplit
+   OpenMLStudy
+   OpenMLSupervisedTask
+   OpenMLTask
 
 .. _api_extensions:
 
@@ -42,9 +49,10 @@ Extensions
    :toctree: generated/
    :template: function.rst
 
-    register_extension
-    get_extension_by_model
     get_extension_by_flow
+    get_extension_by_model
+    register_extension
+
 
 Modules
 -------
@@ -83,10 +91,10 @@ Modules
    :toctree: generated/
    :template: function.rst
 
+    assert_flows_equal
     flow_exists
     get_flow
     list_flows
-    assert_flows_equal
 
 :mod:`openml.runs`: Run Functions
 ----------------------------------
@@ -127,20 +135,20 @@ Modules
    :toctree: generated/
    :template: function.rst
 
-    get_study
-    get_suite
-    create_study
-    create_benchmark_suite
-    update_study_status
-    update_suite_status
-    attach_to_study
-    attach_to_suite
-    detach_from_study
-    detach_from_suite
-    delete_study
-    delete_suite
-    list_studies
-    list_suites
+   attach_to_study
+   attach_to_suite
+   create_benchmark_suite
+   create_study
+   delete_study
+   delete_suite
+   detach_from_study
+   detach_from_suite
+   get_study
+   get_suite
+   list_studies
+   list_suites
+   update_study_status
+   update_suite_status'
 
 :mod:`openml.tasks`: Task Functions
 -----------------------------------
@@ -153,16 +161,3 @@ Modules
     get_task
     get_tasks
     list_tasks
-
-
-:mod:`openml.extensions`: Extension Functions
------------------------------------
-.. currentmodule:: openml.extensions
-
-.. autosummary::
-   :toctree: generated/
-   :template: function.rst
-
-    register_extension
-    get_extension_by_model
-    get_extension_by_flow
