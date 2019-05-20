@@ -10,6 +10,14 @@ Split = namedtuple("Split", ["train", "test"])
 
 
 class OpenMLSplit(object):
+    """OpenML Split object.
+
+       Parameters
+       ----------
+       name : int or str
+       description : str
+       split : int
+    """
 
     def __init__(self, name, description, split):
         self.description = description

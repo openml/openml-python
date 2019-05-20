@@ -37,7 +37,6 @@ from . import runs
 from .runs import OpenMLRun
 from . import flows
 from .flows import OpenMLFlow
-from . import setups
 from . import study
 from .study import OpenMLStudy
 from . import utils

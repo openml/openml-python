@@ -17,6 +17,14 @@ from ..utils import _create_cache_directory_for_id, _tag_entity
 
 
 class OpenMLTask(ABC):
+    """OpenML Task object.
+
+       Parameters
+       ----------
+       task_type_id : int or str
+       task_type : str
+       estimation_procedure_id : int
+    """
     def __init__(
             self,
             task_id: Optional[Union[int, str]],
