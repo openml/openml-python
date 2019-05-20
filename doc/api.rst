@@ -19,6 +19,8 @@ Top-level Classes
    OpenMLSplit
    OpenMLFlow
    OpenMLEvaluation
+   OpenMLSetup
+   OpenMLParameter
 
 .. _api_extensions:
 

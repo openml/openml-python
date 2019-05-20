@@ -41,6 +41,8 @@ from . import setups
 from . import study
 from .study import OpenMLStudy
 from . import utils
+from . import setups
+from .setups import OpenMLSetup, OpenMLParameter
 
 
 from .__version__ import __version__
@@ -89,6 +91,7 @@ __all__ = [
     'OpenMLSplit',
     'OpenMLEvaluation',
     'OpenMLSetup',
+    'OpenMLParameter',
     'OpenMLTask',
     'OpenMLSupervisedTask',
     'OpenMLClusteringTask',
