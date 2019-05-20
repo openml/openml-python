@@ -4,6 +4,7 @@ import xmltodict
 import shutil
 import warnings
 import pandas as pd
+from functools import wraps
 
 import openml._api_calls
 import openml.exceptions
@@ -307,6 +308,7 @@ def _remove_cache_dir_for_id(key, cache_dir):
 
 
 def thread_safe_if_oslo_installed(func):
+    @wraps(func)
     if oslo_installed:
         def safe_func(*args, **kwargs):
             # Lock directories use the id that is passed as either positional or keyword argument.

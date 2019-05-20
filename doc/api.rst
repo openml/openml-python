@@ -13,6 +13,7 @@ Top-level Classes
    :toctree: generated/
    :template: class.rst
 
+   OpenMLBenchmarkSuite
    OpenMLClassificationTask
    OpenMLClusteringTask
    OpenMLDataFeature
