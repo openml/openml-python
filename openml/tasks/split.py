@@ -3,7 +3,7 @@ import os
 import pickle
 
 import numpy as np
-import scipy.io.arff
+import arff
 
 
 Split = namedtuple("Split", ["train", "test"])
@@ -77,20 +77,34 @@ class OpenMLSplit(object):
                 raise FileNotFoundError(
                     'Split arff %s does not exist!' % filename
                 )
-            splits, meta = scipy.io.arff.loadarff(filename)
-            name = meta.name
+            # splits, meta = scipy.io.arff.loadarff(filename)
+            # name = meta.name
+            file_data = arff.load(open(filename))
+            splits = file_data['data']
+            name = file_data['relation']
+            attrnames = [attr[0] for attr in file_data['attributes']]
 
             repetitions = OrderedDict()
 
-            type_idx = meta._attrnames.index('type')
-            rowid_idx = meta._attrnames.index('rowid')
-            repeat_idx = meta._attrnames.index('repeat')
-            fold_idx = meta._attrnames.index('fold')
+            # type_idx = meta._attrnames.index('type')
+            # rowid_idx = meta._attrnames.index('rowid')
+            # repeat_idx = meta._attrnames.index('repeat')
+            # fold_idx = meta._attrnames.index('fold')
+            # sample_idx = (
+            #     meta._attrnames.index('sample')
+            #     if 'sample' in meta._attrnames
+            #     else None
+            # )  # can be None
+
+            type_idx = attrnames.index('type')
+            rowid_idx = attrnames.index('rowid')
+            repeat_idx = attrnames.index('repeat')
+            fold_idx = attrnames.index('fold')
             sample_idx = (
-                meta._attrnames.index('sample')
-                if 'sample' in meta._attrnames
+                attrnames.index('sample')
+                if 'sample' in attrnames
                 else None
-            )  # can be None
+            )
 
             for line in splits:
                 # A line looks like type, rowid, repeat, fold
@@ -108,7 +122,11 @@ class OpenMLSplit(object):
                     repetitions[repetition][fold][sample] = ([], [])
                 split = repetitions[repetition][fold][sample]
 
-                type_ = line[type_idx].decode('utf-8')
+                if not isinstance(line[type_idx], str):
+                    type_ = line[type_idx].decode('utf-8')
+                else:
+                    type_ = line[type_idx]
+
                 if type_ == 'TRAIN':
                     split[0].append(line[rowid_idx])
                 elif type_ == 'TEST':
