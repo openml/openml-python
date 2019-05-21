@@ -77,24 +77,12 @@ class OpenMLSplit(object):
                 raise FileNotFoundError(
                     'Split arff %s does not exist!' % filename
                 )
-            # splits, meta = scipy.io.arff.loadarff(filename)
-            # name = meta.name
             file_data = arff.load(open(filename))
             splits = file_data['data']
             name = file_data['relation']
             attrnames = [attr[0] for attr in file_data['attributes']]
 
             repetitions = OrderedDict()
-
-            # type_idx = meta._attrnames.index('type')
-            # rowid_idx = meta._attrnames.index('rowid')
-            # repeat_idx = meta._attrnames.index('repeat')
-            # fold_idx = meta._attrnames.index('fold')
-            # sample_idx = (
-            #     meta._attrnames.index('sample')
-            #     if 'sample' in meta._attrnames
-            #     else None
-            # )  # can be None
 
             type_idx = attrnames.index('type')
             rowid_idx = attrnames.index('rowid')
