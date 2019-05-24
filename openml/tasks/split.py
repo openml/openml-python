@@ -77,7 +77,7 @@ class OpenMLSplit(object):
                 raise FileNotFoundError(
                     'Split arff %s does not exist!' % filename
                 )
-            file_data = arff.load(open(filename))
+            file_data = arff.load(open(filename), return_type=arff.DENSE_GEN)
             splits = file_data['data']
             name = file_data['relation']
             attrnames = [attr[0] for attr in file_data['attributes']]
