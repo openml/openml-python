@@ -47,3 +47,28 @@ class OpenMLEvaluation(object):
         self.value = value
         self.values = values
         self.array_data = array_data
+
+    def __str__(self):
+        object_dict = self.__dict__
+        output_str = ''
+        base_url = 'https://www.openml.org/'
+        upload = '\n%15s: %s\n\n' % ('Upload Time', object_dict['upload_time'])
+        run = '%15s: %d\n' % ('Run ID', object_dict['run_id'])
+        run = run + '%15s: %s\n\n' % ('OpenML Run URL',
+                                    base_url + 'r/' + str(object_dict['run_id']))
+        task = '%15s: %d\n' % ('Task ID', object_dict['task_id'])
+        task = task + '%15s: %s\n\n' % ('OpenML Task URL',
+                                    base_url + 't/' + str(object_dict['task_id']))
+        flow = '%15s: %d\n' % ('Flow ID', object_dict['flow_id'])
+        flow = flow + '%15s: %s\n' % ('Flow Name', object_dict['flow_name'])
+        flow = flow + '%15s: %s\n\n' % ('OpenML Flow URL',
+                                    base_url + 'f/' + str(object_dict['flow_id']))
+        setup = '%15s: %d\n\n' % ('Setup ID', object_dict['setup_id'])
+        data = '%15s: %d\n' % ('Data ID', int(object_dict['data_id']))
+        data = data + '%15s: %s\n' % ('Data Name', object_dict['data_name'])
+        data = data + '%15s: %s\n\n' % ('OpenML Data URL',
+                                    base_url + 'd/' + str(object_dict['data_id']))
+        metric = '%15s: %s\n' % ('Metric Used', object_dict['function'])
+        value = '%15s: %f\n' % ('Result', object_dict['value'])
+
+        return upload + run + task + flow + setup + data + metric + value
