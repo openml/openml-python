@@ -132,6 +132,25 @@ class OpenMLFlow(object):
 
         self.extension = get_extension_by_flow(self)
 
+    def __str__(self):
+        object_dict = self.__dict__
+        output_str = ''
+        id = '\n%16s: %s\n' % ('Flow ID', object_dict['flow_id'])
+        version = '%16s: %s\n' % ('Flow Version', object_dict['version'])
+        url = '%16s: %s\n' % ('Flow URL', 'https://www.openml.org/f/' + str(object_dict['flow_id']))
+        name = '%16s: %s\n' % ('Flow Name', object_dict['name'])
+        description = '%16s: %s\n\n' % ('Flow Description', object_dict['description'])
+        binary = ''
+        if object_dict['binary_url'] is not None:
+            binary = '%16s: %s\n\n' % ('Binary URL', object_dict['binary_url'])
+        upload = '%16s: %s\n' % ('Upload Date', object_dict['upload_date'].replace('T', ' '))
+        language = '%16s: %s\n' % ('Language', object_dict['language'])
+        dependencies = '%16s: %s\n' % ('Dependencies', object_dict['dependencies'])
+        # 3740 for example
+        output_str = id + version + url + name + description + binary + upload + \
+            language + dependencies
+        return output_str
+
     def _to_xml(self) -> str:
         """Generate xml representation of self for upload to server.
 
