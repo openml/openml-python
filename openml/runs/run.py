@@ -64,12 +64,40 @@ class OpenMLRun(object):
         self.predictions_url = predictions_url
 
     def __str__(self):
-        flow_name = self.flow_name
-        if flow_name is not None and len(flow_name) > 26:
-            # long enough to show sklearn.pipeline.Pipeline
-            flow_name = flow_name[:26] + "..."
-        return "[run id: {}, task id: {}, flow id: {}, flow name: {}]".format(
-            self.run_id, self.task_id, self.flow_id, flow_name)
+        object_dict = self.__dict__
+        output_str = ''
+        uploader = '\n%16s: %s\n' % ('Uploader Name', object_dict['uploader_name'])
+        url = 'https://www.openml.org/u/' + str(object_dict['uploader'])
+        uploader = uploader + '%16s: %s\n\n' % ('Uploader Profile', url)
+
+        metric = '%16s: %s\n' % ('Metric', object_dict['task_evaluation_measure'])
+        result = ''
+        if object_dict['task_evaluation_measure'] in object_dict['evaluations']:
+            value = object_dict['evaluations'][object_dict['task_evaluation_measure']]
+            result = '%16s: %s\n' % ('Result', value)
+        run = '%16s: %s\n' % ('Run ID', object_dict['run_id'])
+        url = 'https://www.openml.org/r/' + str(object_dict['run_id'])
+        run = run + '%16s: %s\n\n' % ('Run URL', url)
+
+        task = '%16s: %s\n' % ('Task ID', object_dict['task_id'])
+        task = task + '%16s: %s\n' % ('Task Type', object_dict['task_type'])
+        url = 'https://www.openml.org/t/' + str(object_dict['task_id'])
+        task = task + '%16s: %s\n\n' % ('Task URL', url)
+
+        flow = '%16s: %s\n' % ('Flow ID', object_dict['flow_id'])
+        flow = flow + '%16s: %s\n' % ('Flow Name', object_dict['flow_name'])
+        url = 'https://www.openml.org/f/' + str(object_dict['flow_id'])
+        flow = flow + '%16s: %s\n\n' % ('Flow URL', url)
+
+        setup = '%16s: %s\n' % ('Setup ID', object_dict['setup_id'])
+        setup = setup + '%16s: %s\n\n' % ('Setup String', object_dict['setup_string'])
+
+        dataset = '%16s: %s\n' % ('Dataset ID', object_dict['dataset_id'])
+        url = 'https://www.openml.org/d/' + str(object_dict['dataset_id'])
+        dataset = dataset + '%16s: %s\n' % ('Dataset URL', url)
+
+        output_str = uploader + metric + result + run + task + flow + setup + dataset
+        return output_str
 
     def _repr_pretty_(self, pp, cycle):
         pp.text(str(self))

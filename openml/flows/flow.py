@@ -140,9 +140,11 @@ class OpenMLFlow(object):
         url = '%16s: %s\n' % ('Flow URL', 'https://www.openml.org/f/' + str(object_dict['flow_id']))
         name = '%16s: %s\n' % ('Flow Name', object_dict['name'])
         description = '%16s: %s\n\n' % ('Flow Description', object_dict['description'])
+
         binary = ''
         if object_dict['binary_url'] is not None:
             binary = '%16s: %s\n\n' % ('Binary URL', object_dict['binary_url'])
+            
         upload = '%16s: %s\n' % ('Upload Date', object_dict['upload_date'].replace('T', ' '))
         language = '%16s: %s\n' % ('Language', object_dict['language'])
         dependencies = '%16s: %s\n' % ('Dependencies', object_dict['dependencies'])
