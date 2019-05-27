@@ -72,7 +72,7 @@ class OpenMLEvaluation(object):
         data = data + '%15s: %s\n' % ('Data Name', object_dict['data_name'])
         data = data + '%15s: %s\n\n' % ('OpenML Data URL',
                                         base_url + 'd/' + str(object_dict['data_id']))
-                                        
+
         metric = '%15s: %s\n' % ('Metric Used', object_dict['function'])
         value = '%15s: %f\n' % ('Result', object_dict['value'])
         output_str = upload + run + task + flow + setup + data + metric + value

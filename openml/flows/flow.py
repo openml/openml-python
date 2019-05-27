@@ -144,7 +144,7 @@ class OpenMLFlow(object):
         binary = ''
         if object_dict['binary_url'] is not None:
             binary = '%16s: %s\n\n' % ('Binary URL', object_dict['binary_url'])
-            
+
         upload = '%16s: %s\n' % ('Upload Date', object_dict['upload_date'].replace('T', ' '))
         language = '%16s: %s\n' % ('Language', object_dict['language'])
         dependencies = '%16s: %s\n' % ('Dependencies', object_dict['dependencies'])
