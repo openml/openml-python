@@ -28,8 +28,14 @@ conda create -n testenv --yes python=$PYTHON_VERSION pip
 source activate testenv
 
 if [[ -v SCIPY_VERSION ]]; then
+<<<<<<< HEAD
     conda install --yes scipy=$SCIPY_VERSION
 fi
+=======
+do
+    conda install scipy=$SCIPY_VERSION
+done
+>>>>>>> use older scipy version for older sklearn version
 
 python --version
 pip install -e '.[test]'
