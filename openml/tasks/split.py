@@ -109,7 +109,7 @@ class OpenMLSplit(object):
                 if sample not in repetitions[repetition][fold]:
                     repetitions[repetition][fold][sample] = ([], [])
                 split = repetitions[repetition][fold][sample]
-                
+
                 type_ = line[type_idx]
                 if type_ == 'TRAIN':
                     split[0].append(line[rowid_idx])
