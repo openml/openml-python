@@ -27,6 +27,11 @@ popd
 conda create -n testenv --yes python=$PYTHON_VERSION pip
 source activate testenv
 
+if [[ -v SCIPY_VERSION ]]; then
+do
+    conda install scipy=$SCIPY_VERSION
+done
+
 python --version
 pip install -e '.[test]'
 python -c "import numpy; print('numpy %s' % numpy.__version__)"
