@@ -28,9 +28,8 @@ conda create -n testenv --yes python=$PYTHON_VERSION pip
 source activate testenv
 
 if [[ -v SCIPY_VERSION ]]; then
-do
     conda install scipy=$SCIPY_VERSION
-done
+fi
 
 python --version
 pip install -e '.[test]'
