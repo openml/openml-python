@@ -25,10 +25,14 @@ from ..utils import _tag_entity
 class OpenMLRun(object):
     """OpenML Run: result of running a model on an openml dataset.
 
-    Parameters
-    ----------
-    FIXME
-
+       Parameters
+       ----------
+       task_id : int
+           Refers to the task.
+       flow_id : int
+           Refers to the flow.
+       dataset_id: int
+           Refers to the data.
     """
 
     def __init__(self, task_id, flow_id, dataset_id, setup_string=None,

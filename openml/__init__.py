@@ -38,7 +38,7 @@ from .runs import OpenMLRun
 from . import flows
 from .flows import OpenMLFlow
 from . import study
-from .study import BaseStudy, OpenMLStudy, OpenMLBenchmarkSuite
+from .study import OpenMLStudy, OpenMLBenchmarkSuite
 from . import utils
 from . import setups
 from .setups import OpenMLSetup, OpenMLParameter
@@ -99,7 +99,6 @@ __all__ = [
     'OpenMLClassificationTask',
     'OpenMLFlow',
     'OpenMLStudy',
-    'BaseStudy',
     'OpenMLBenchmarkSuite',
     'datasets',
     'evaluations',

@@ -21,16 +21,21 @@ class OpenMLTask(ABC):
 
        Parameters
        ----------
-       task_type_id : int or str
+       task_type_id : int
+           Refers to the type of task.
        task_type : str
-       estimation_procedure_id : int
+           Refers to the task.
+       data_set_id: int
+           Refers to the data.
+       estimation_procedure_id: int
+           Refers to the type of estimates used.
     """
     def __init__(
             self,
-            task_id: Optional[Union[int, str]],
-            task_type_id: Union[int, str],
+            task_id: Optional[int],
+            task_type_id: int,
             task_type: str,
-            data_set_id: Union[int, str],
+            data_set_id: int,
             estimation_procedure_id: int = 1,
             estimation_procedure_type: Optional[str] = None,
             estimation_parameters: Optional[Dict[str, str]] = None,
@@ -215,10 +220,11 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
        Parameters
        ----------
        target_name : str
+           Name of the target feature (the class variable).
     """
     def __init__(
             self,
-            task_type_id: Union[int, str],
+            task_type_id: int,
             task_type: str,
             data_set_id: int,
             target_name: str,
@@ -227,7 +233,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
             estimation_parameters: Optional[Dict[str, str]] = None,
             evaluation_measure: Optional[str] = None,
             data_splits_url: Optional[str] = None,
-            task_id: Optional[Union[int, str]] = None,
+            task_id: Optional[int] = None,
     ):
         super(OpenMLSupervisedTask, self).__init__(
             task_id=task_id,
@@ -314,7 +320,7 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
     """
     def __init__(
             self,
-            task_type_id: Union[int, str],
+            task_type_id: int,
             task_type: str,
             data_set_id: int,
             target_name: str,
@@ -323,7 +329,7 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
             estimation_parameters: Optional[Dict[str, str]] = None,
             evaluation_measure: Optional[str] = None,
             data_splits_url: Optional[str] = None,
-            task_id: Optional[Union[int, str]] = None,
+            task_id: Optional[int] = None,
             class_labels: Optional[List[str]] = None,
             cost_matrix: Optional[np.ndarray] = None,
     ):
@@ -354,7 +360,7 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
     """
     def __init__(
             self,
-            task_type_id: Union[int, str],
+            task_type_id: int,
             task_type: str,
             data_set_id: int,
             target_name: str,
@@ -362,7 +368,7 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
             estimation_procedure_type: Optional[str] = None,
             estimation_parameters: Optional[Dict[str, str]] = None,
             data_splits_url: Optional[str] = None,
-            task_id: Optional[Union[int, str]] = None,
+            task_id: Optional[int] = None,
             evaluation_measure: Optional[str] = None,
     ):
         super(OpenMLRegressionTask, self).__init__(
@@ -386,15 +392,17 @@ class OpenMLClusteringTask(OpenMLTask):
 
        Parameters
        ----------
-       target_name : str
+       target_name : str (optional)
+           Name of the target feature (class) that is not part of the
+           feature set for the clustering task.
     """
     def __init__(
             self,
-            task_type_id: Union[int, str],
+            task_type_id: int,
             task_type: str,
             data_set_id: int,
             estimation_procedure_id: int = 17,
-            task_id: Optional[Union[int, str]] = None,
+            task_id: Optional[int] = None,
             estimation_procedure_type: Optional[str] = None,
             estimation_parameters: Optional[Dict[str, str]] = None,
             data_splits_url: Optional[str] = None,
@@ -466,7 +474,7 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
     """
     def __init__(
             self,
-            task_type_id: Union[int, str],
+            task_type_id: int,
             task_type: str,
             data_set_id: int,
             target_name: str,
@@ -474,7 +482,7 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
             estimation_procedure_type: Optional[str] = None,
             estimation_parameters: Optional[Dict[str, str]] = None,
             data_splits_url: Optional[str] = None,
-            task_id: Optional[Union[int, str]] = None,
+            task_id: Optional[int] = None,
             evaluation_measure: Optional[str] = None,
             class_labels: Optional[List[str]] = None,
             cost_matrix: Optional[np.ndarray] = None,

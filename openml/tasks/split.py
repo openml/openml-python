@@ -16,7 +16,7 @@ class OpenMLSplit(object):
        ----------
        name : int or str
        description : str
-       split : int
+       split : dict
     """
 
     def __init__(self, name, description, split):
