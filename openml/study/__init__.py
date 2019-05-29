@@ -1,4 +1,4 @@
-from .study import OpenMLStudy, OpenMLBenchmarkSuite, BaseStudy
+from .study import OpenMLStudy, OpenMLBenchmarkSuite
 from .functions import (
     get_study,
     get_suite,
@@ -18,7 +18,6 @@ from .functions import (
 
 
 __all__ = [
-    'BaseStudy',
     'OpenMLStudy',
     'OpenMLBenchmarkSuite',
     'attach_to_study',
