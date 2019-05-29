@@ -25,6 +25,17 @@ class OpenMLSetup(object):
         self.flow_id = flow_id
         self.parameters = parameters
 
+    def __str__(self):
+        object_dict = self.__dict__
+        output_str = ''
+        setup = '\n%-15s: %s\n' % ("Setup ID", object_dict['setup_id'])
+        flow = '%-15s: %s\n' % ("Flow ID", object_dict['flow_id'])
+        url = 'https://www.openml.org/f/' + str(object_dict['flow_id'])
+        flow = flow + '%-15s: %s\n' % ("Flow URL", url)
+        params = '%-15s: %s\n' % ("# of Parameters", len(object_dict['parameters']))
+        output_str = setup + flow + params
+        return(output_str)
+
 
 class OpenMLParameter(object):
     """Parameter object (used in setup).
@@ -60,3 +71,20 @@ class OpenMLParameter(object):
         self.data_type = data_type
         self.default_value = default_value
         self.value = value
+
+    def __str__(self):
+        object_dict = self.__dict__
+        output_str = ''
+        id = '\n%-18s: %s\n' % ("ID", object_dict['id'])
+        flow = '%-18s: %s\n' % ("Flow ID", object_dict['flow_id'])
+        flow = flow + '%-18s: %s\n' % ("Flow Name", object_dict['flow_name'])
+        flow = flow + '%-18s: %s\n' % ("Flow Full Name", object_dict['full_name'])
+        url = 'https://www.openml.org/f/' + str(object_dict['flow_id'])
+        flow = flow + '%-18s: %s\n' % ("Flow URL", url)
+        filler = " "*4
+        params = '%-18s: %s\n' % ("Parameter Name", object_dict['parameter_name'])
+        params = params + filler + '%-14s: %s\n' % ("Data_Type", object_dict['data_type'])
+        params = params + filler + '%-14s: %s\n' % ("Default", object_dict['default_value'])
+        params = params + filler + '%-14s: %s\n' % ("Value", object_dict['value'])
+        output_str = id + flow + params
+        return(output_str)

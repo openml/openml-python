@@ -176,21 +176,21 @@ class OpenMLDataset(object):
     def __str__(self):
         object_dict = self.__dict__
         output_str = ''
-        name = '\n%14s: %s\n' % ("Name", object_dict['name'])
-        version = '%14s: %s\n' % ("Version", object_dict['version'])
-        format = '%14s: %s\n' % ("Format", object_dict['format'])
-        date = '%14s: %s\n' % ("Upload Date", object_dict['upload_date'].replace('T', ' '))
-        licence = '%14s: %s\n' % ("Licence", object_dict['licence'])
-        d_url = '%14s: %s\n' % ("Download URL", object_dict['url'])
+        name = '\n%-14s: %s\n' % ("Name", object_dict['name'])
+        version = '%-14s: %s\n' % ("Version", object_dict['version'])
+        format = '%-14s: %s\n' % ("Format", object_dict['format'])
+        date = '%-14s: %s\n' % ("Upload Date", object_dict['upload_date'].replace('T', ' '))
+        licence = '%-14s: %s\n' % ("Licence", object_dict['licence'])
+        d_url = '%-14s: %s\n' % ("Download URL", object_dict['url'])
         base_url = 'https://www.openml.org/d/'
-        w_url = '%14s: %s\n' % ("OpenML URL", base_url + str(self.dataset_id))
-        local_file = '%14s: %s\n' % ("Data file", object_dict['data_file'])
-        pickle_file = '%14s: %s\n' % ("Pickle file", object_dict['data_pickle_file'])
+        w_url = '%-14s: %s\n' % ("OpenML URL", base_url + str(self.dataset_id))
+        local_file = '%-14s: %s\n' % ("Data file", object_dict['data_file'])
+        pickle_file = '%-14s: %s\n' % ("Pickle file", object_dict['data_pickle_file'])
         num_instances = ''
         if object_dict['qualities']['NumberOfInstances'] is not None:
-            num_instances = '%14s: %d\n' % ("# of instances",
+            num_instances = '%-14s: %d\n' % ("# of instances",
                                             object_dict['qualities']['NumberOfInstances'])
-        num_features = '%14s: %d\n' % ("# of features", len(object_dict['features']))
+        num_features = '%-14s: %d\n' % ("# of features", len(object_dict['features']))
         output_str = name + version + format + date + licence + d_url + w_url + local_file + \
             pickle_file + num_instances + num_features
         return(output_str)
