@@ -254,11 +254,13 @@ class TestOpenMLDataset(TestBase):
 
     def test__name_to_id_with_multiple_active(self):
         """ With multiple active datasets, retrieve the least recent active. """
-        self.assertEqual(openml.datasets.functions._name_to_id('iris'), 128)
+        openml.config.server = self.production_server
+        self.assertEqual(openml.datasets.functions._name_to_id('iris'), 61)
 
     def test__name_to_id_with_version(self):
         """ With multiple active datasets, retrieve the least recent active. """
-        self.assertEqual(openml.datasets.functions._name_to_id('iris', version=3), 151)
+        openml.config.server = self.production_server
+        self.assertEqual(openml.datasets.functions._name_to_id('iris', version=3), 969)
 
     def test__name_to_id_with_multiple_active_error(self):
         """ With multiple active datasets, retrieve the least recent active. """
