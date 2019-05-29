@@ -440,7 +440,8 @@ def get_dataset(
     Returns
     -------
     dataset : :class:`openml.OpenMLDataset`
-        The downloaded dataset."""
+        The downloaded dataset.
+    """
     if isinstance(dataset_id, str):
         try:
             dataset_id = int(dataset_id)

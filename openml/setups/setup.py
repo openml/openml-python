@@ -10,7 +10,7 @@ class OpenMLSetup(object):
             The flow that it is build upon
         parameters : dict
             The setting of the parameters
-           """
+    """
 
     def __init__(self, setup_id, flow_id, parameters):
         if not isinstance(setup_id, int):

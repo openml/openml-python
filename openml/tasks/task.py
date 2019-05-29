@@ -17,12 +17,25 @@ from ..utils import _create_cache_directory_for_id, _tag_entity
 
 
 class OpenMLTask(ABC):
+    """OpenML Task object.
+
+       Parameters
+       ----------
+       task_type_id : int
+           Refers to the type of task.
+       task_type : str
+           Refers to the task.
+       data_set_id: int
+           Refers to the data.
+       estimation_procedure_id: int
+           Refers to the type of estimates used.
+    """
     def __init__(
             self,
-            task_id: Optional[Union[int, str]],
-            task_type_id: Union[int, str],
+            task_id: Optional[int],
+            task_type_id: int,
             task_type: str,
-            data_set_id: Union[int, str],
+            data_set_id: int,
             estimation_procedure_id: int = 1,
             estimation_procedure_type: Optional[str] = None,
             estimation_parameters: Optional[Dict[str, str]] = None,
@@ -200,9 +213,18 @@ class OpenMLTask(ABC):
 
 
 class OpenMLSupervisedTask(OpenMLTask, ABC):
+    """OpenML Supervised Classification object.
+
+       Inherited from :class:`openml.OpenMLTask`
+
+       Parameters
+       ----------
+       target_name : str
+           Name of the target feature (the class variable).
+    """
     def __init__(
             self,
-            task_type_id: Union[int, str],
+            task_type_id: int,
             task_type: str,
             data_set_id: int,
             target_name: str,
@@ -211,7 +233,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
             estimation_parameters: Optional[Dict[str, str]] = None,
             evaluation_measure: Optional[str] = None,
             data_splits_url: Optional[str] = None,
-            task_id: Optional[Union[int, str]] = None,
+            task_id: Optional[int] = None,
     ):
         super(OpenMLSupervisedTask, self).__init__(
             task_id=task_id,
@@ -287,9 +309,18 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
 
 class OpenMLClassificationTask(OpenMLSupervisedTask):
+    """OpenML Classification object.
+
+       Inherited from :class:`openml.OpenMLSupervisedTask`
+
+       Parameters
+       ----------
+       class_labels : List of str (optional)
+       cost_matrix: array (optional)
+    """
     def __init__(
             self,
-            task_type_id: Union[int, str],
+            task_type_id: int,
             task_type: str,
             data_set_id: int,
             target_name: str,
@@ -298,7 +329,7 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
             estimation_parameters: Optional[Dict[str, str]] = None,
             evaluation_measure: Optional[str] = None,
             data_splits_url: Optional[str] = None,
-            task_id: Optional[Union[int, str]] = None,
+            task_id: Optional[int] = None,
             class_labels: Optional[List[str]] = None,
             cost_matrix: Optional[np.ndarray] = None,
     ):
@@ -323,9 +354,13 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
 
 
 class OpenMLRegressionTask(OpenMLSupervisedTask):
+    """OpenML Regression object.
+
+       Inherited from :class:`openml.OpenMLSupervisedTask`
+    """
     def __init__(
             self,
-            task_type_id: Union[int, str],
+            task_type_id: int,
             task_type: str,
             data_set_id: int,
             target_name: str,
@@ -333,7 +368,7 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
             estimation_procedure_type: Optional[str] = None,
             estimation_parameters: Optional[Dict[str, str]] = None,
             data_splits_url: Optional[str] = None,
-            task_id: Optional[Union[int, str]] = None,
+            task_id: Optional[int] = None,
             evaluation_measure: Optional[str] = None,
     ):
         super(OpenMLRegressionTask, self).__init__(
@@ -351,13 +386,23 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
 
 
 class OpenMLClusteringTask(OpenMLTask):
+    """OpenML Clustering object.
+
+       Inherited from :class:`openml.OpenMLTask`
+
+       Parameters
+       ----------
+       target_name : str (optional)
+           Name of the target feature (class) that is not part of the
+           feature set for the clustering task.
+    """
     def __init__(
             self,
-            task_type_id: Union[int, str],
+            task_type_id: int,
             task_type: str,
             data_set_id: int,
             estimation_procedure_id: int = 17,
-            task_id: Optional[Union[int, str]] = None,
+            task_id: Optional[int] = None,
             estimation_procedure_type: Optional[str] = None,
             estimation_parameters: Optional[Dict[str, str]] = None,
             data_splits_url: Optional[str] = None,
@@ -423,9 +468,13 @@ class OpenMLClusteringTask(OpenMLTask):
 
 
 class OpenMLLearningCurveTask(OpenMLClassificationTask):
+    """OpenML Learning Curve object.
+
+       Inherited from :class:`openml.OpenMLClassificationTask`
+    """
     def __init__(
             self,
-            task_type_id: Union[int, str],
+            task_type_id: int,
             task_type: str,
             data_set_id: int,
             target_name: str,
@@ -433,7 +482,7 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
             estimation_procedure_type: Optional[str] = None,
             estimation_parameters: Optional[Dict[str, str]] = None,
             data_splits_url: Optional[str] = None,
-            task_id: Optional[Union[int, str]] = None,
+            task_id: Optional[int] = None,
             evaluation_measure: Optional[str] = None,
             class_labels: Optional[List[str]] = None,
             cost_matrix: Optional[np.ndarray] = None,

@@ -7,6 +7,7 @@ from .functions import (
     list_runs,
     get_runs,
     get_run_trace,
+    run_exists,
     initialize_model_from_run,
     initialize_model_from_trace,
 )
@@ -21,6 +22,7 @@ __all__ = [
     'list_runs',
     'get_runs',
     'get_run_trace',
+    'run_exists',
     'initialize_model_from_run',
     'initialize_model_from_trace'
 ]

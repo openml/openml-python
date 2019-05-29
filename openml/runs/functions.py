@@ -772,7 +772,7 @@ def list_runs(
     offset: Optional[int] = None,
     size: Optional[int] = None,
     id: Optional[List] = None,
-    task: Optional[List] = None,
+    task: Optional[List[int]] = None,
     setup: Optional[List] = None,
     flow: Optional[List] = None,
     uploader: Optional[List] = None,

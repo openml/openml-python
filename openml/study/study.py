@@ -7,7 +7,52 @@ import openml
 
 
 class BaseStudy(object):
+    """
+    An OpenMLStudy represents the OpenML concept of a study. It contains
+    the following information: name, id, description, creation date,
+    creator id and a set of tags.
 
+    According to this list of tags, the study object receives a list of
+    OpenML object ids (datasets, flows, tasks and setups).
+
+    Can be used to obtain all relevant information from a study at once.
+
+    Parameters
+    ----------
+    study_id : int
+        the study id
+    alias : str (optional)
+        a string ID, unique on server (url-friendly)
+    main_entity_type : str
+        the entity type (e.g., task, run) that is core in this study.
+        only entities of this type can be added explicitly
+    benchmark_suite : int (optional)
+        the benchmark suite (another study) upon which this study is ran.
+        can only be active if main entity type is runs.
+    name : str
+        the name of the study (meta-info)
+    description : str
+        brief description (meta-info)
+    status : str
+        Whether the study is in preparation, active or deactivated
+    creation_date : str
+        date of creation (meta-info)
+    creator : int
+        openml user id of the owner / creator
+    tags : list(dict)
+        The list of tags shows which tags are associated with the study.
+        Each tag is a dict of (tag) name, window_start and write_access.
+    data : list
+        a list of data ids associated with this study
+    tasks : list
+        a list of task ids associated with this study
+    flows : list
+        a list of flow ids associated with this study
+    runs : list
+        a list of run ids associated with this study
+    setups : list
+        a list of setup ids associated with this study
+    """
     def __init__(
         self,
         study_id: Optional[int],
@@ -26,52 +71,7 @@ class BaseStudy(object):
         runs: Optional[List[int]],
         setups: Optional[List[int]],
     ):
-        """
-        An OpenMLStudy represents the OpenML concept of a study. It contains
-        the following information: name, id, description, creation date,
-        creator id and a set of tags.
 
-        According to this list of tags, the study object receives a list of
-        OpenML object ids (datasets, flows, tasks and setups).
-
-        Can be used to obtain all relevant information from a study at once.
-
-        Parameters
-        ----------
-        study_id : int
-            the study id
-        alias : str (optional)
-            a string ID, unique on server (url-friendly)
-        main_entity_type : str
-            the entity type (e.g., task, run) that is core in this study.
-            only entities of this type can be added explicitly
-        benchmark_suite : int (optional)
-            the benchmark suite (another study) upon which this study is ran.
-            can only be active if main entity type is runs.
-        name : str
-            the name of the study (meta-info)
-        description : str
-            brief description (meta-info)
-        status : str
-            Whether the study is in preparation, active or deactivated
-        creation_date : str
-            date of creation (meta-info)
-        creator : int
-            openml user id of the owner / creator
-        tags : list(dict)
-            The list of tags shows which tags are associated with the study.
-            Each tag is a dict of (tag) name, window_start and write_access.
-        data : list
-            a list of data ids associated with this study
-        tasks : list
-            a list of task ids associated with this study
-        flows : list
-            a list of flow ids associated with this study
-        runs : list
-            a list of run ids associated with this study
-        setups : list
-            a list of setup ids associated with this study
-        """
         self.id = study_id
         self.alias = alias
         self.main_entity_type = main_entity_type
@@ -156,6 +156,50 @@ class BaseStudy(object):
 
 
 class OpenMLStudy(BaseStudy):
+    """
+    An OpenMLStudy represents the OpenML concept of a study (a collection of runs).
+
+    It contains the following information: name, id, description, creation date,
+    creator id and a list of run ids.
+
+    According to this list of run ids, the study object receives a list of
+    OpenML object ids (datasets, flows, tasks and setups).
+
+    Inherits from :class:`openml.BaseStudy`
+
+    Parameters
+    ----------
+    study_id : int
+        the study id
+    alias : str (optional)
+        a string ID, unique on server (url-friendly)
+    benchmark_suite : int (optional)
+        the benchmark suite (another study) upon which this study is ran.
+        can only be active if main entity type is runs.
+    name : str
+        the name of the study (meta-info)
+    description : str
+        brief description (meta-info)
+    status : str
+        Whether the study is in preparation, active or deactivated
+    creation_date : str
+        date of creation (meta-info)
+    creator : int
+        openml user id of the owner / creator
+    tags : list(dict)
+        The list of tags shows which tags are associated with the study.
+        Each tag is a dict of (tag) name, window_start and write_access.
+    data : list
+        a list of data ids associated with this study
+    tasks : list
+        a list of task ids associated with this study
+    flows : list
+        a list of flow ids associated with this study
+    runs : list
+        a list of run ids associated with this study
+    setups : list
+        a list of setup ids associated with this study
+    """
     def __init__(
         self,
         study_id: Optional[int],
@@ -173,48 +217,6 @@ class OpenMLStudy(BaseStudy):
         runs: Optional[List[int]],
         setups: Optional[List[int]],
     ):
-        """
-        An OpenMLStudy represents the OpenML concept of a study (a collection of runs).
-
-        It contains the following information: name, id, description, creation date,
-        creator id and a list of run ids.
-
-        According to this list of run ids, the study object receives a list of
-        OpenML object ids (datasets, flows, tasks and setups).
-
-        Parameters
-        ----------
-        study_id : int
-            the study id
-        alias : str (optional)
-            a string ID, unique on server (url-friendly)
-        benchmark_suite : int (optional)
-            the benchmark suite (another study) upon which this study is ran.
-            can only be active if main entity type is runs.
-        name : str
-            the name of the study (meta-info)
-        description : str
-            brief description (meta-info)
-        status : str
-            Whether the study is in preparation, active or deactivated
-        creation_date : str
-            date of creation (meta-info)
-        creator : int
-            openml user id of the owner / creator
-        tags : list(dict)
-            The list of tags shows which tags are associated with the study.
-            Each tag is a dict of (tag) name, window_start and write_access.
-        data : list
-            a list of data ids associated with this study
-        tasks : list
-            a list of task ids associated with this study
-        flows : list
-            a list of flow ids associated with this study
-        runs : list
-            a list of run ids associated with this study
-        setups : list
-            a list of setup ids associated with this study
-        """
         super().__init__(
             study_id=study_id,
             alias=alias,
@@ -235,6 +237,44 @@ class OpenMLStudy(BaseStudy):
 
 
 class OpenMLBenchmarkSuite(BaseStudy):
+    """
+    An OpenMLBenchmarkSuite represents the OpenML concept of a suite (a collection of tasks).
+
+    It contains the following information: name, id, description, creation date,
+    creator id and the task ids.
+
+    According to this list of task ids, the suite object receives a list of
+    OpenML object ids (datasets).
+
+    Inherits from :class:`openml.BaseStudy`
+
+    Parameters
+    ----------
+    suite_id : int
+        the study id
+    alias : str (optional)
+        a string ID, unique on server (url-friendly)
+    main_entity_type : str
+        the entity type (e.g., task, run) that is core in this study.
+        only entities of this type can be added explicitly
+    name : str
+        the name of the study (meta-info)
+    description : str
+        brief description (meta-info)
+    status : str
+        Whether the study is in preparation, active or deactivated
+    creation_date : str
+        date of creation (meta-info)
+    creator : int
+        openml user id of the owner / creator
+    tags : list(dict)
+        The list of tags shows which tags are associated with the study.
+        Each tag is a dict of (tag) name, window_start and write_access.
+    data : list
+        a list of data ids associated with this study
+    tasks : list
+        a list of task ids associated with this study
+    """
 
     def __init__(
         self,
@@ -249,42 +289,6 @@ class OpenMLBenchmarkSuite(BaseStudy):
         data: Optional[List[int]],
         tasks: List[int],
     ):
-        """
-        An OpenMLBenchmarkSuite represents the OpenML concept of a suite (a collection of tasks).
-
-        It contains the following information: name, id, description, creation date,
-        creator id and the task ids.
-
-        According to this list of task ids, the suite object receives a list of
-        OpenML object ids (datasets).
-
-        Parameters
-        ----------
-        suite_id : int
-            the study id
-        alias : str (optional)
-            a string ID, unique on server (url-friendly)
-        main_entity_type : str
-            the entity type (e.g., task, run) that is core in this study.
-            only entities of this type can be added explicitly
-        name : str
-            the name of the study (meta-info)
-        description : str
-            brief description (meta-info)
-        status : str
-            Whether the study is in preparation, active or deactivated
-        creation_date : str
-            date of creation (meta-info)
-        creator : int
-            openml user id of the owner / creator
-        tags : list(dict)
-            The list of tags shows which tags are associated with the study.
-            Each tag is a dict of (tag) name, window_start and write_access.
-        data : list
-            a list of data ids associated with this study
-        tasks : list
-            a list of task ids associated with this study
-        """
         super().__init__(
             study_id=suite_id,
             alias=alias,

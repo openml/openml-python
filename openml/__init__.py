@@ -37,10 +37,11 @@ from . import runs
 from .runs import OpenMLRun
 from . import flows
 from .flows import OpenMLFlow
-from . import setups
 from . import study
-from .study import OpenMLStudy
+from .study import OpenMLStudy, OpenMLBenchmarkSuite
 from . import utils
+from . import setups
+from .setups import OpenMLSetup, OpenMLParameter
 
 
 from .__version__ import __version__
@@ -89,6 +90,7 @@ __all__ = [
     'OpenMLSplit',
     'OpenMLEvaluation',
     'OpenMLSetup',
+    'OpenMLParameter',
     'OpenMLTask',
     'OpenMLSupervisedTask',
     'OpenMLClusteringTask',
@@ -97,6 +99,7 @@ __all__ = [
     'OpenMLClassificationTask',
     'OpenMLFlow',
     'OpenMLStudy',
+    'OpenMLBenchmarkSuite',
     'datasets',
     'evaluations',
     'exceptions',

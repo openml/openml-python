@@ -6,6 +6,9 @@ Please make sure that:
 
 * this pull requests is against the `develop` branch
 * you updated all docs, this includes the changelog!
+* for any new function or class added, please add it to doc/api.rst
+    * the list of classes and functions should be alphabetical 
+* for any new functionality, consider adding a relevant example
 -->
 
 #### Reference Issue
