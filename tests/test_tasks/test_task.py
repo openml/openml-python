@@ -1,6 +1,7 @@
 import unittest
 from random import randint
 
+from openml.exceptions import OpenMLServerException
 from openml.testing import TestBase
 from openml.datasets import (
     get_dataset,
@@ -42,16 +43,30 @@ class OpenMLTaskTest(TestBase):
 
     def test_upload_task(self):
 
-        dataset_id = self._get_compatible_rand_dataset()
-        # TODO consider implementing on the diff task types.
-        task = create_task(
-            task_type_id=self.task_type_id,
-            dataset_id=dataset_id,
-            target_name=self._get_random_feature(dataset_id),
-            estimation_procedure_id=self.estimation_procedure
-        )
+        # We don't know if the task in question already exists, so we try a few times. Checking
+        # beforehand would not be an option because a concurrent unit test could potentially
+        # create the same task and make this unit test fail (i.e. getting a dataset and creating
+        # a task for it is not atomic).
+        for i in range(100):
+            try:
+                dataset_id = self._get_compatible_rand_dataset()
+                # TODO consider implementing on the diff task types.
+                task = create_task(
+                    task_type_id=self.task_type_id,
+                    dataset_id=dataset_id,
+                    target_name=self._get_random_feature(dataset_id),
+                    estimation_procedure_id=self.estimation_procedure
+                )
 
-        task_id = task.publish()
+                task_id = task.publish()
+                # success
+                break
+            except OpenMLServerException as e:
+                if e.code == 614:
+                    continue
+                else:
+                    raise e
+
         _delete_entity('task', task_id)
 
     def _get_compatible_rand_dataset(self) -> int:
