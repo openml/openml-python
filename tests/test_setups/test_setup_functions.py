@@ -141,7 +141,6 @@ class TestSetupFunctions(TestBase):
         openml.config.server = self.production_server
         flow_id = 6794
         setups = openml.setups.list_setups(flow=flow_id, output_format='object', size=10)
-        print(setups)
         self.assertIsInstance(setups, Dict)
         self.assertIsInstance(setups[list(setups.keys())[0]],
                               openml.setups.setup.OpenMLSetup)
