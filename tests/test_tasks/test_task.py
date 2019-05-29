@@ -69,6 +69,10 @@ class OpenMLTaskTest(TestBase):
                     continue
                 else:
                     raise e
+        else:
+            raise ValueError(
+                'Could not create a valid task for task type ID {}'.format(self.task_type_id)
+            )
 
         _delete_entity('task', task_id)
 
