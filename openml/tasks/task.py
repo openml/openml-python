@@ -42,6 +42,34 @@ class OpenMLTask(ABC):
         self.estimation_procedure_id = estimation_procedure_id
         self.split = None  # type: Optional[OpenMLSplit]
 
+    def __str__(self):
+        object_dict = self.__dict__
+        output_str = ''
+        task_type = '\n%-20s: %s\n' % ("Task Type", object_dict['task_type'])
+        task_id = '%-20s: %s\n' % ("Task ID", object_dict['task_id'])
+        url = 'https://www.openml.org/t/' + str(object_dict['task_id'])
+        task_url = '%-20s: %s\n' % ("Task URL", url)
+        evaluation_measure = ''
+        if object_dict['evaluation_measure'] is not None:
+            evaluation_measure = '%-20s: %s\n' % ("Evaluation Measure",
+                                                  object_dict['evaluation_measure'])
+        estimation_procedure = ''
+        if object_dict['estimation_procedure'] is not None:
+            estimation_procedure = '%-20s: %s\n' % ("Estimation Procedure",
+                                                    object_dict['estimation_procedure']['type'])
+        target = ''
+        class_labels = ''
+        cost_matrix = ''
+        if object_dict['target_name'] is not None:
+            target = '%-20s: %s\n' % ("Target Feature", object_dict['target_name'])
+            if 'class_labels' in object_dict:
+                class_labels = '%-20s: %s\n' % ("# of Classes", len(object_dict['class_labels']))
+            if 'cost_matrix' in object_dict:
+                cost_matrix = '%-20s: %s\n' % ("Cost Matrix", "Available")
+        output_str = task_type + task_id + task_url + evaluation_measure + estimation_procedure + \
+            target + class_labels + cost_matrix
+        return(output_str)
+
     def get_dataset(self) -> datasets.OpenMLDataset:
         """Download dataset associated with task"""
         return datasets.get_dataset(self.dataset_id)
