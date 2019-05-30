@@ -81,7 +81,7 @@ class OpenMLParameter(object):
         flow = flow + '%-18s: %s\n' % ("Flow Full Name", object_dict['full_name'])
         url = 'https://www.openml.org/f/' + str(object_dict['flow_id'])
         flow = flow + '%-18s: %s\n' % ("Flow URL", url)
-        filler = " "*4
+        filler = " " * 4
         params = '%-18s: %s\n' % ("Parameter Name", object_dict['parameter_name'])
         params = params + filler + '%-14s: %s\n' % ("Data_Type", object_dict['data_type'])
         params = params + filler + '%-14s: %s\n' % ("Default", object_dict['default_value'])

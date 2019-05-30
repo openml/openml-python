@@ -189,7 +189,7 @@ class OpenMLDataset(object):
         num_instances = ''
         if object_dict['qualities']['NumberOfInstances'] is not None:
             num_instances = '%-14s: %d\n' % ("# of instances",
-                                            object_dict['qualities']['NumberOfInstances'])
+                                             object_dict['qualities']['NumberOfInstances'])
         num_features = '%-14s: %d\n' % ("# of features", len(object_dict['features']))
         output_str = name + version + format + date + licence + d_url + w_url + local_file + \
             pickle_file + num_instances + num_features

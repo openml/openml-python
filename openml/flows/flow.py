@@ -137,7 +137,8 @@ class OpenMLFlow(object):
         output_str = ''
         id = '\n%-16s: %s\n' % ('Flow ID', object_dict['flow_id'])
         version = '%-16s: %s\n' % ('Flow Version', object_dict['version'])
-        url = '%-16s: %s\n' % ('Flow URL', 'https://www.openml.org/f/' + str(object_dict['flow_id']))
+        url = '%-16s: %s\n' % ('Flow URL',
+                               'https://www.openml.org/f/' + str(object_dict['flow_id']))
         name = '%-16s: %s\n' % ('Flow Name', object_dict['name'])
         description = '%-16s: %s\n\n' % ('Flow Description', object_dict['description'])
 
