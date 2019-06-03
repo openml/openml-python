@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLFlow<a class="headerlink" href="#openml-openmlflow" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="openml.OpenMLFlow">
-<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLFlow</code><span class="sig-paren">(</span><em>name</em>, <em>description</em>, <em>model</em>, <em>components</em>, <em>parameters</em>, <em>parameters_meta_info</em>, <em>external_version</em>, <em>tags</em>, <em>language</em>, <em>dependencies</em>, <em>class_name=None</em>, <em>custom_name=None</em>, <em>binary_url=None</em>, <em>binary_format=None</em>, <em>binary_md5=None</em>, <em>uploader=None</em>, <em>upload_date=None</em>, <em>flow_id=None</em>, <em>version=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLFlow</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">description</em>, <em class="sig-param">model</em>, <em class="sig-param">components</em>, <em class="sig-param">parameters</em>, <em class="sig-param">parameters_meta_info</em>, <em class="sig-param">external_version</em>, <em class="sig-param">tags</em>, <em class="sig-param">language</em>, <em class="sig-param">dependencies</em>, <em class="sig-param">class_name=None</em>, <em class="sig-param">custom_name=None</em>, <em class="sig-param">binary_url=None</em>, <em class="sig-param">binary_format=None</em>, <em class="sig-param">binary_md5=None</em>, <em class="sig-param">uploader=None</em>, <em class="sig-param">upload_date=None</em>, <em class="sig-param">flow_id=None</em>, <em class="sig-param">version=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow" title="Permalink to this definition">¶</a></dt>
 <dd><p>OpenML Flow. Stores machine learning models.</p>
 <p>Flows should not be generated manually, but by the function
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">openml.flows.create_flow_from_model()</span></code>. Using this helper function
@@ -185,7 +185,7 @@ machines.</p>
 </dl>
 <dl class="method">
 <dt id="openml.OpenMLFlow.get_structure">
-<code class="descname">get_structure</code><span class="sig-paren">(</span><em>self</em>, <em>key_item: str</em><span class="sig-paren">)</span> &#x2192; Dict[str, List[str]]<a class="headerlink" href="#openml.OpenMLFlow.get_structure" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_structure</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">key_item: str</em><span class="sig-paren">)</span> &#x2192; Dict[str, List[str]]<a class="headerlink" href="#openml.OpenMLFlow.get_structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns for each sub-component of the flow the path of identifiers
 that should be traversed to reach this component. The resulting dict
 maps a key (identifying a flow by either its id, name or fullname) to
@@ -209,7 +209,7 @@ structure. Allowed values {flow_id, name}</p>
 
 <dl class="method">
 <dt id="openml.OpenMLFlow.get_subflow">
-<code class="descname">get_subflow</code><span class="sig-paren">(</span><em>self</em>, <em>structure</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.get_subflow" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_subflow</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">structure</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.get_subflow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a subflow from the tree of dependencies.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -229,7 +229,7 @@ structure. Allowed values {flow_id, name}</p>
 
 <dl class="method">
 <dt id="openml.OpenMLFlow.publish">
-<code class="descname">publish</code><span class="sig-paren">(</span><em>self</em>, <em>raise_error_if_exists: bool = False</em><span class="sig-paren">)</span> &#x2192; 'OpenMLFlow'<a class="headerlink" href="#openml.OpenMLFlow.publish" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">publish</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">raise_error_if_exists: bool = False</em><span class="sig-paren">)</span> &#x2192; 'OpenMLFlow'<a class="headerlink" href="#openml.OpenMLFlow.publish" title="Permalink to this definition">¶</a></dt>
 <dd><p>Publish this flow to OpenML server.</p>
 <p>Raises a PyOpenMLError if the flow exists on the server, but
 <cite>self.flow_id</cite> does not match the server known flow id.</p>
@@ -251,7 +251,7 @@ If False, update the local flow to match the server flow.</p>
 
 <dl class="method">
 <dt id="openml.OpenMLFlow.push_tag">
-<code class="descname">push_tag</code><span class="sig-paren">(</span><em>self</em>, <em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.push_tag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">push_tag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.push_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Annotates this flow with a tag on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -265,7 +265,7 @@ If False, update the local flow to match the server flow.</p>
 
 <dl class="method">
 <dt id="openml.OpenMLFlow.remove_tag">
-<code class="descname">remove_tag</code><span class="sig-paren">(</span><em>self</em>, <em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.remove_tag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove_tag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tag</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow.remove_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes a tag from this flow on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -294,7 +294,7 @@ If False, update the local flow to match the server flow.</p>
     </p>
     <p>
         &copy; Copyright 2014-2019, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.0.<br/>
     </p>
   </div>
 </footer>

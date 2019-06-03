@@ -113,8 +113,26 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>.get_run<a class="headerlink" href="#openml-runs-get-run" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.runs.get_run">
-<code class="descclassname">openml.runs.</code><code class="descname">get_run</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.get_run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-prename descclassname">openml.runs.</code><code class="sig-name descname">get_run</code><span class="sig-paren">(</span><em class="sig-param">run_id: int</em>, <em class="sig-param">ignore_cache: bool = False</em><span class="sig-paren">)</span> &#x2192; openml.runs.run.OpenMLRun<a class="headerlink" href="#openml.runs.get_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets run corresponding to run_id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>run_id</strong><span class="classifier">int</span></dt><dd></dd>
+<dt><strong>ignore_cache</strong><span class="classifier">bool</span></dt><dd><p>Whether to ignore the cache. If <code class="docutils literal notranslate"><span class="pre">true</span></code> this will download and overwrite the run xml
+even if the requested run is already cached.</p>
+</dd>
+<dt><strong>ignore_cache</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>run</strong><span class="classifier">OpenMLRun</span></dt><dd><p>Run corresponding to ID, fetched from the server.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <div class="clearer"></div></div>
 
@@ -131,7 +149,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2019, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.0.<br/>
     </p>
   </div>
 </footer>

@@ -113,8 +113,27 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>.get_task<a class="headerlink" href="#openml-tasks-get-task" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.tasks.get_task">
-<code class="descclassname">openml.tasks.</code><code class="descname">get_task</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.get_task" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-prename descclassname">openml.tasks.</code><code class="sig-name descname">get_task</code><span class="sig-paren">(</span><em class="sig-param">task_id: int</em>, <em class="sig-param">download_data: bool = True</em><span class="sig-paren">)</span> &#x2192; openml.tasks.task.OpenMLTask<a class="headerlink" href="#openml.tasks.get_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download OpenML task for a given task ID.</p>
+<p>Downloads the task representation, while the data splits can be
+downloaded optionally based on the additional parameter. Else,
+splits will either way be downloaded when the task is being used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>task_id</strong><span class="classifier">int or str</span></dt><dd><p>The OpenML task id.</p>
+</dd>
+<dt><strong>download_data</strong><span class="classifier">bool</span></dt><dd><p>Option to trigger download of data along with the meta data.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>task</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <div class="clearer"></div></div>
 
@@ -131,7 +150,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2019, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.0.<br/>
     </p>
   </div>
 </footer>

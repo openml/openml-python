@@ -1,0 +1,6 @@
+:mod:`openml`.OpenMLSupervisedTask
+=========================================
+
+.. currentmodule:: openml
+
+.. autoclass:: OpenMLSupervisedTask

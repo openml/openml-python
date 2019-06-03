@@ -113,8 +113,25 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>.get_flow<a class="headerlink" href="#openml-flows-get-flow" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.flows.get_flow">
-<code class="descclassname">openml.flows.</code><code class="descname">get_flow</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.flows.get_flow" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-prename descclassname">openml.flows.</code><code class="sig-name descname">get_flow</code><span class="sig-paren">(</span><em class="sig-param">flow_id: int</em>, <em class="sig-param">reinstantiate: bool = False</em><span class="sig-paren">)</span> &#x2192; openml.flows.flow.OpenMLFlow<a class="headerlink" href="#openml.flows.get_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the OpenML flow for a given flow ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>flow_id</strong><span class="classifier">int</span></dt><dd><p>The OpenML flow id.</p>
+</dd>
+<dt><strong>reinstantiate: bool</strong></dt><dd><p>Whether to reinstantiate the flow to a model instance.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>flow</strong><span class="classifier">OpenMLFlow</span></dt><dd><p>the flow</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <div class="clearer"></div></div>
 
@@ -131,7 +148,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2019, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.0.<br/>
     </p>
   </div>
 </footer>

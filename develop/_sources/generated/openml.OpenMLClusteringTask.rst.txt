@@ -1,0 +1,6 @@
+:mod:`openml`.OpenMLClusteringTask
+=========================================
+
+.. currentmodule:: openml
+
+.. autoclass:: OpenMLClusteringTask

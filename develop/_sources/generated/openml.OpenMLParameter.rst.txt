@@ -1,0 +1,6 @@
+:mod:`openml`.OpenMLParameter
+====================================
+
+.. currentmodule:: openml
+
+.. autoclass:: OpenMLParameter

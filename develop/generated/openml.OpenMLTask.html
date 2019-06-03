@@ -113,22 +113,37 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLTask<a class="headerlink" href="#openml-openmltask" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="openml.OpenMLTask">
-<em class="property">class </em><code class="descclassname">openml.</code><code class="descname">OpenMLTask</code><span class="sig-paren">(</span><em>task_id: Union[int, str, None], task_type_id: Union[int, str], task_type: str, data_set_id: Union[int, str], estimation_procedure_id: int = 1, estimation_procedure_type: Optional[str] = None, estimation_parameters: Optional[Dict[str, str]] = None, evaluation_measure: Optional[str] = None, data_splits_url: Optional[str] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLTask</code><span class="sig-paren">(</span><em class="sig-param">task_id: Optional[int], task_type_id: int, task_type: str, data_set_id: int, estimation_procedure_id: int = 1, estimation_procedure_type: Optional[str] = None, estimation_parameters: Optional[Dict[str, str]] = None, evaluation_measure: Optional[str] = None, data_splits_url: Optional[str] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>OpenML Task object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>task_type_id</strong><span class="classifier">int</span></dt><dd><p>Refers to the type of task.</p>
+</dd>
+<dt><strong>task_type</strong><span class="classifier">str</span></dt><dd><p>Refers to the task.</p>
+</dd>
+<dt><strong>data_set_id: int</strong></dt><dd><p>Refers to the data.</p>
+</dd>
+<dt><strong>estimation_procedure_id: int</strong></dt><dd><p>Refers to the type of estimates used.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="method">
 <dt id="openml.OpenMLTask.download_split">
-<code class="descname">download_split</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span> &#x2192; openml.tasks.split.OpenMLSplit<a class="headerlink" href="#openml.OpenMLTask.download_split" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">download_split</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> &#x2192; openml.tasks.split.OpenMLSplit<a class="headerlink" href="#openml.OpenMLTask.download_split" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download the OpenML split for a given task.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="openml.OpenMLTask.get_dataset">
-<code class="descname">get_dataset</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span> &#x2192; openml.datasets.dataset.OpenMLDataset<a class="headerlink" href="#openml.OpenMLTask.get_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_dataset</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> &#x2192; openml.datasets.dataset.OpenMLDataset<a class="headerlink" href="#openml.OpenMLTask.get_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download dataset associated with task</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="openml.OpenMLTask.publish">
-<code class="descname">publish</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#openml.OpenMLTask.publish" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">publish</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#openml.OpenMLTask.publish" title="Permalink to this definition">¶</a></dt>
 <dd><p>Publish task to OpenML server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -143,7 +158,7 @@ if successful.</p>
 
 <dl class="method">
 <dt id="openml.OpenMLTask.push_tag">
-<code class="descname">push_tag</code><span class="sig-paren">(</span><em>self</em>, <em>tag: str</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask.push_tag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">push_tag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tag: str</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask.push_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Annotates this task with a tag on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -157,7 +172,7 @@ if successful.</p>
 
 <dl class="method">
 <dt id="openml.OpenMLTask.remove_tag">
-<code class="descname">remove_tag</code><span class="sig-paren">(</span><em>self</em>, <em>tag: str</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask.remove_tag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove_tag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tag: str</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLTask.remove_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes a tag from this task on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -186,7 +201,7 @@ if successful.</p>
     </p>
     <p>
         &copy; Copyright 2014-2019, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.0.<br/>
     </p>
   </div>
 </footer>

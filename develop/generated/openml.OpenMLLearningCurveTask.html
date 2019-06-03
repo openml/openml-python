@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>openml.OpenMLLearningCurveTask &#8212; OpenML 0.8.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.8.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../index.html">Start</a></li>
+                <li><a href="../usage.html">User Guide</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../examples/index.html">Examples</a></li>
+                <li><a href="../contributing.html">Contributing</a></li>
+                <li><a href="../progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLLearningCurveTask</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="section" id="openml-openmllearningcurvetask">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLLearningCurveTask<a class="headerlink" href="#openml-openmllearningcurvetask" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="openml.OpenMLLearningCurveTask">
+<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLLearningCurveTask</code><span class="sig-paren">(</span><em class="sig-param">task_type_id: int</em>, <em class="sig-param">task_type: str</em>, <em class="sig-param">data_set_id: int</em>, <em class="sig-param">target_name: str</em>, <em class="sig-param">estimation_procedure_id: int = 13</em>, <em class="sig-param">estimation_procedure_type: Optional[str] = None</em>, <em class="sig-param">estimation_parameters: Optional[Dict[str</em>, <em class="sig-param">str]] = None</em>, <em class="sig-param">data_splits_url: Optional[str] = None</em>, <em class="sig-param">task_id: Optional[int] = None</em>, <em class="sig-param">evaluation_measure: Optional[str] = None</em>, <em class="sig-param">class_labels: Optional[List[str]] = None</em>, <em class="sig-param">cost_matrix: Optional[numpy.ndarray] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLLearningCurveTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>OpenML Learning Curve object.</p>
+<p>Inherited from <a class="reference internal" href="openml.OpenMLClassificationTask.html#openml.OpenMLClassificationTask" title="openml.OpenMLClassificationTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.OpenMLClassificationTask</span></code></a></p>
+<dl class="method">
+<dt id="openml.OpenMLLearningCurveTask.download_split">
+<code class="sig-name descname">download_split</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> &#x2192; openml.tasks.split.OpenMLSplit<a class="headerlink" href="#openml.OpenMLLearningCurveTask.download_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the OpenML split for a given task.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLLearningCurveTask.get_X_and_y">
+<code class="sig-name descname">get_X_and_y</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">dataset_format: str = 'array'</em><span class="sig-paren">)</span> &#x2192; Tuple[Union[numpy.ndarray, pandas.core.frame.DataFrame, scipy.sparse.base.spmatrix], Union[numpy.ndarray, pandas.core.series.Series]]<a class="headerlink" href="#openml.OpenMLLearningCurveTask.get_X_and_y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get data associated with the current task.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dataset_format</strong><span class="classifier">str</span></dt><dd><p>Data structure of the returned data. See <code class="xref py py-meth docutils literal notranslate"><span class="pre">openml.datasets.OpenMLDataset.get_data()</span></code>
+for possible options.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tuple - X and y</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLLearningCurveTask.get_dataset">
+<code class="sig-name descname">get_dataset</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> &#x2192; openml.datasets.dataset.OpenMLDataset<a class="headerlink" href="#openml.OpenMLLearningCurveTask.get_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download dataset associated with task</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLLearningCurveTask.publish">
+<code class="sig-name descname">publish</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#openml.OpenMLLearningCurveTask.publish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Publish task to OpenML server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>task_id: int</dt><dd><p>Returns the id of the uploaded task
+if successful.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLLearningCurveTask.push_tag">
+<code class="sig-name descname">push_tag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tag: str</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLLearningCurveTask.push_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotates this task with a tag on the server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the task.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLLearningCurveTask.remove_tag">
+<code class="sig-name descname">remove_tag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tag: str</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLLearningCurveTask.remove_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a tag from this task on the server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the task.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2019, the OpenML-Python team..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.0.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+:mod:`openml`.OpenMLRegressionTask
+=========================================
+
+.. currentmodule:: openml
+
+.. autoclass:: OpenMLRegressionTask
