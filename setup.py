@@ -20,8 +20,8 @@ if sys.version_info < (3, 5):
     )
 
 setuptools.setup(name="openml",
-                 author="Matthias Feurer, Andreas Müller, Farzan Majdani, "
-                        "Joaquin Vanschoren, Jan van Rijn and Pieter Gijsbers",
+                 author="Matthias Feurer, Jan van Rijn, Arlind Kadra, Andreas Müller, "
+                        "Pieter Gijsbers and Joaquin Vanschoren",
                  author_email="feurerm@informatik.uni-freiburg.de",
                  maintainer="Matthias Feurer",
                  maintainer_email="feurerm@informatik.uni-freiburg.de",
@@ -29,14 +29,14 @@ setuptools.setup(name="openml",
                  license="BSD 3-clause",
                  url="http://openml.org/",
                  project_urls={
-                     "Documentation": "https://openml.github.io/openml-python/master/",
+                     "Documentation": "https://openml.github.io/openml-python/",
                      "Source Code": "https://github.com/openml/openml-python"
                  },
                  version=version,
                  packages=setuptools.find_packages(),
                  package_data={'': ['*.txt', '*.md']},
                  install_requires=[
-                     'liac-arff>=2.2.2',
+                     'liac-arff>=2.4.0',
                      'xmltodict',
                      'requests',
                      'scikit-learn>=0.18',

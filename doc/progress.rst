@@ -24,10 +24,13 @@ Changelog
 * FIX #642: `check_datasets_active` now correctly also returns active status of deactivated datasets.
 * FIX #304, #636: Allow serialization of numpy datatypes and list of lists of more types (e.g. bools, ints) for flows.
 * FIX #651: Fixed a bug that would prevent openml-python from finding the user's config file.
+* FIX #693: OpenML-Python uses liac-arff instead of scipy.io for loading task splits now.
 * DOC #678: Better color scheme for code examples in documentation.
 * DOC #681: Small improvements and removing list of missing functions.
 * DOC #684: Add notice to examples that connect to the test server.
+* DOC #688: Add new example on retrieving evaluations.
 * DOC #691: Update contributing guidelines to use Github draft feature instead of tags in title.
+* DOC #692: All functions are documented now.
 * MAINT #184: Dropping Python2 support.
 * MAINT #596: Fewer dependencies for regular pip install.
 * MAINT #652: Numpy and Scipy are no longer required before installation.
