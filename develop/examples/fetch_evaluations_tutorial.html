@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Fetching Evaluations &#8212; OpenML 0.8.0 documentation</title>
+    <title>Fetching Evaluations &#8212; OpenML 0.9.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.8.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.9.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -228,12 +228,12 @@ Note that we now filter the evaluations based on another parameter ‘task’.</
 [10 rows x 12 columns]
 
 Displaying head of sorted dataframe:
-          run_id  task_id  setup_id  ...     value values array_data
-9161834  9161834   167140   7094257  ...  0.965160   None       None
-9193963  9193963   167140   7124554  ...  0.965160   None       None
-9194969  9194969   167140   7125506  ...  0.965160   None       None
-9162025  9162025   167140   7094448  ...  0.964846   None       None
-9162913  9162913   167140   7095332  ...  0.964846   None       None
+            run_id  task_id  setup_id  ...     value values array_data
+10228369  10228369   167140   8153634  ...  0.965160   None       None
+9161834    9161834   167140   7094257  ...  0.965160   None       None
+9193963    9193963   167140   7124554  ...  0.965160   None       None
+9194969    9194969   167140   7125506  ...  0.965160   None       None
+9198736    9198736   167140   7129205  ...  0.964846   None       None
 
 [5 rows x 12 columns]
 </pre></div>
@@ -325,7 +325,9 @@ For this, we shall compare the top performing flows.</p>
 </div>
 <img alt="../_images/sphx_glr_fetch_evaluations_tutorial_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_fetch_evaluations_tutorial_002.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(8353,
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(12127,
+ &#39;sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)&#39;)
+(8353,
  &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
 (8399,
  &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)&#39;)
@@ -341,13 +343,10 @@ For this, we shall compare the top performing flows.</p>
  &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)&#39;)
 (8885,
  &#39;sklearn.pipeline.Pipeline(imputation=preprocessing.ConditionalImputer2,catencoding=preprocessing.MultiLabelEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)&#39;)
-(8456,
- &#39;sklearn.pipeline.Pipeline(imputation=sklearn.preprocessing.imputation.Imputer,estimator=sklearn.naive_bayes.GaussianNB)(1)&#39;)
-(8455,
- &#39;sklearn.pipeline.Pipeline(imputation=sklearn.preprocessing.imputation.Imputer,estimator=sklearn.tree.tree.DecisionTreeClassifier)(1)&#39;)
+(12126, &#39;sklearn.linear_model.logistic.LogisticRegression(25)&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.540 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.511 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-fetch-evaluations-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/8ebde0963923552ec6438c2732e14fec/fetch_evaluations_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_evaluations_tutorial.py</span></code></a></p>

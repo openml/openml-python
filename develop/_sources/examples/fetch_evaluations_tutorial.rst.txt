@@ -161,12 +161,12 @@ Note that we now filter the evaluations based on another parameter 'task'.
     [10 rows x 12 columns]
 
     Displaying head of sorted dataframe: 
-              run_id  task_id  setup_id  ...     value values array_data
-    9161834  9161834   167140   7094257  ...  0.965160   None       None
-    9193963  9193963   167140   7124554  ...  0.965160   None       None
-    9194969  9194969   167140   7125506  ...  0.965160   None       None
-    9162025  9162025   167140   7094448  ...  0.964846   None       None
-    9162913  9162913   167140   7095332  ...  0.964846   None       None
+                run_id  task_id  setup_id  ...     value values array_data
+    10228369  10228369   167140   8153634  ...  0.965160   None       None
+    9161834    9161834   167140   7094257  ...  0.965160   None       None
+    9193963    9193963   167140   7124554  ...  0.965160   None       None
+    9194969    9194969   167140   7125506  ...  0.965160   None       None
+    9198736    9198736   167140   7129205  ...  0.964846   None       None
 
     [5 rows x 12 columns]
 
@@ -281,6 +281,8 @@ For this, we shall compare the top performing flows.
 
  .. code-block:: none
 
+    (12127,
+     'sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)')
     (8353,
      'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
     (8399,
@@ -297,16 +299,13 @@ For this, we shall compare the top performing flows.
      'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)')
     (8885,
      'sklearn.pipeline.Pipeline(imputation=preprocessing.ConditionalImputer2,catencoding=preprocessing.MultiLabelEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)')
-    (8456,
-     'sklearn.pipeline.Pipeline(imputation=sklearn.preprocessing.imputation.Imputer,estimator=sklearn.naive_bayes.GaussianNB)(1)')
-    (8455,
-     'sklearn.pipeline.Pipeline(imputation=sklearn.preprocessing.imputation.Imputer,estimator=sklearn.tree.tree.DecisionTreeClassifier)(1)')
+    (12126, 'sklearn.linear_model.logistic.LogisticRegression(25)')
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.540 seconds)
+   **Total running time of the script:** ( 0 minutes  6.511 seconds)
 
 
 .. _sphx_glr_download_examples_fetch_evaluations_tutorial.py:
