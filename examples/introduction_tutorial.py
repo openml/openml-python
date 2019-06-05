@@ -23,13 +23,16 @@ An introduction to OpenML, followed up by a simple example.
 #
 #     pip install openml
 #
-# For further information, please check out the installation guide at https://openml.github.io/openml-python/stable/contributing.html#installation
+# For further information, please check out the installation guide at
+# https://openml.github.io/openml-python/master/contributing.html#installation
 #
 # Authentication
 # ^^^^^^^^^^^^^^
 #
-# The OpenML server can only be accessed by users who have signed up on the OpenML platform. If you don’t have an account yet, sign up now.
-# You will receive an API key, which will authenticate you to the server and allow you to download and upload datasets, tasks, runs and flows.
+# The OpenML server can only be accessed by users who have signed up on the
+# OpenML platform. If you don’t have an account yet, sign up now.
+# You will receive an API key, which will authenticate you to the server
+# and allow you to download and upload datasets, tasks, runs and flows.
 #
 # * Create an OpenML account (free) on http://www.openml.org.
 # * After logging in, open your account page (avatar on the top right)
@@ -37,26 +40,43 @@ An introduction to OpenML, followed up by a simple example.
 #
 # There are two ways to authenticate:
 #
-# * Create a plain text file **~/.openml/config** with the line **'apikey=MYKEY'**, replacing **MYKEY** with your API key. The config file must be in the directory ~/.openml/config and exist prior to importing the openml module
+# * Create a plain text file **~/.openml/config** with the line
+#   **'apikey=MYKEY'**, replacing **MYKEY** with your API key. The config
+#   file must be in the directory ~/.openml/config and exist prior to
+#   importing the openml module.
 # * Run the code below, replacing 'YOURKEY' with your API key.
-
+#
+# .. warning:: This example uploads data. For that reason, this example
+#   connects to the test server instead. This prevents the live server from
+#   crowding with example datasets, tasks, studies, and so on.
 ############################################################################
 import openml
 from sklearn import neighbors
 
-# Uncomment and set your OpenML key. Don't share your key with others.
+openml.config.start_using_configuration_for_example()
+
+############################################################################
+# When using the main server, instead make sure your apikey is configured.
+# This can be done with the following line of code (uncomment it!).
+# Never share your apikey with others.
+
 # openml.config.apikey = 'YOURKEY'
 
 ############################################################################
 # Caching
 # ^^^^^^^
-# When downloading datasets, tasks, runs and flows, they will be cached to retrieve them without calling the server later. As with the API key, the cache directory can be either specified through the config file or through the API:
+# When downloading datasets, tasks, runs and flows, they will be cached to
+# retrieve them without calling the server later. As with the API key,
+# the cache directory can be either specified through the config file or
+# through the API:
 #
-# * Add the  line **cachedir = 'MYDIR'** to the config file, replacing 'MYDIR' with the path to the cache directory. By default, OpenML will use **~/.openml/cache** as the cache directory.
+# * Add the  line **cachedir = 'MYDIR'** to the config file, replacing
+#   'MYDIR' with the path to the cache directory. By default, OpenML
+#   will use **~/.openml/cache** as the cache directory.
 # * Run the code below, replacing 'YOURDIR' with the path to the cache directory.
 
-import os
 # Uncomment and set your OpenML cache directory
+# import os
 # openml.config.cache_directory = os.path.expanduser('YOURDIR')
 
 ############################################################################
@@ -66,10 +86,12 @@ import os
 task = openml.tasks.get_task(403)
 data = openml.datasets.get_dataset(task.dataset_id)
 clf = neighbors.KNeighborsClassifier(n_neighbors=5)
-flow = openml.flows.sklearn_to_flow(clf)
-run = openml.runs.run_flow_on_task(flow, task, avoid_duplicate_runs=False)
+run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
 # Publish the experiment on OpenML (optional, requires an API key).
 # For this tutorial, our configuration publishes to the test server
-# as to not pollute the main server.
+# as to not crowd the main server with runs created by examples.
 myrun = run.publish()
 print("kNN on %s: http://test.openml.org/r/%d" % (data.name, myrun.run_id))
+
+############################################################################
+openml.config.stop_using_configuration_for_example()

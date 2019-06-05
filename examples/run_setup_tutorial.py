@@ -24,6 +24,10 @@ In this tutorial we will
     2) Download the flow, reinstantiate the model with same hyperparameters,
        and solve the same task again;
     3) We will verify that the obtained results are exactly the same.
+
+.. warning:: This example uploads data. For that reason, this example
+   connects to the test server at test.openml.org. This prevents the main
+   server from crowding with example datasets, tasks, runs, and so on.
 """
 import logging
 import numpy as np
@@ -35,6 +39,7 @@ import sklearn.preprocessing
 
 root = logging.getLogger()
 root.setLevel(logging.INFO)
+openml.config.start_using_configuration_for_example()
 
 ###############################################################################
 # 1) Create a flow and use it to solve a task
@@ -75,8 +80,7 @@ run = openml.runs.run_model_on_task(
 run_original = run.publish()  # this implicitly uploads the flow
 
 ###############################################################################
-# 2) Download the flow, reinstantiate the model with same hyperparameters,
-#    and solve the same task again.
+# 2) Download the flow and solve the same task again.
 ###############################################################################
 
 # obtain setup id (note that the setup id is assigned by the OpenML server -
@@ -100,3 +104,7 @@ run_duplicate = openml.runs.run_model_on_task(
 # the run has stored all predictions in the field data content
 np.testing.assert_array_equal(run_original.data_content,
                               run_duplicate.data_content)
+
+###############################################################################
+
+openml.config.stop_using_configuration_for_example()

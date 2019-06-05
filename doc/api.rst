@@ -13,13 +13,50 @@ Top-level Classes
    :toctree: generated/
    :template: class.rst
 
+   OpenMLBenchmarkSuite
+   OpenMLClassificationTask
+   OpenMLClusteringTask
+   OpenMLDataFeature
    OpenMLDataset
-   OpenMLRun
-   OpenMLTask
-   OpenMLSplit
-   OpenMLFlow
    OpenMLEvaluation
+   OpenMLFlow
+   OpenMLLearningCurveTask
+   OpenMLParameter
+   OpenMLRegressionTask
+   OpenMLRun
+   OpenMLSetup
+   OpenMLSplit
+   OpenMLStudy
+   OpenMLSupervisedTask
+   OpenMLTask
 
+.. _api_extensions:
+
+Extensions
+----------
+
+.. currentmodule:: openml.extensions
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   Extension
+   sklearn.SklearnExtension
+
+.. currentmodule:: openml.extensions
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+    get_extension_by_flow
+    get_extension_by_model
+    register_extension
+
+
+Modules
+-------
 
 :mod:`openml.datasets`: Dataset Functions
 -----------------------------------------
@@ -35,6 +72,7 @@ Top-level Classes
     get_dataset
     get_datasets
     list_datasets
+    status_update
 
 :mod:`openml.evaluations`: Evaluation Functions
 -----------------------------------------------
@@ -54,11 +92,10 @@ Top-level Classes
    :toctree: generated/
    :template: function.rst
 
+    assert_flows_equal
     flow_exists
-    flow_to_sklearn
     get_flow
     list_flows
-    sklearn_to_flow
 
 :mod:`openml.runs`: Run Functions
 ----------------------------------
@@ -76,6 +113,7 @@ Top-level Classes
     list_runs
     run_model_on_task
     run_flow_on_task
+    run_exists
 
 :mod:`openml.setups`: Setup Functions
 -------------------------------------
@@ -98,7 +136,20 @@ Top-level Classes
    :toctree: generated/
    :template: function.rst
 
-    get_study
+   attach_to_study
+   attach_to_suite
+   create_benchmark_suite
+   create_study
+   delete_study
+   delete_suite
+   detach_from_study
+   detach_from_suite
+   get_study
+   get_suite
+   list_studies
+   list_suites
+   update_study_status
+   update_suite_status
 
 :mod:`openml.tasks`: Task Functions
 -----------------------------------
@@ -111,6 +162,3 @@ Top-level Classes
     get_task
     get_tasks
     list_tasks
-
-
- 

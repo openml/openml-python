@@ -1,27 +1,20 @@
-import unittest
 import os
-import sys
 import random
 from itertools import product
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
+from unittest import mock
 
 import arff
-import six
 
 import pytest
 import numpy as np
 import pandas as pd
 import scipy.sparse
 from oslo_concurrency import lockutils
-from warnings import filterwarnings, catch_warnings
 
 import openml
 from openml import OpenMLDataset
-from openml.exceptions import OpenMLCacheException, PyOpenMLError, \
-    OpenMLHashException, PrivateDatasetError
+from openml.exceptions import OpenMLCacheException, OpenMLHashException, \
+    OpenMLPrivateDatasetError
 from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (create_dataset,
@@ -60,7 +53,8 @@ class TestOpenMLDataset(TestBase):
                                            'dataset.pkl')
                 try:
                     os.remove(pickle_path)
-                except:
+                except (OSError, FileNotFoundError):
+                    #  Replaced a bare except. Not sure why either of these would be acceptable.
                     pass
 
     def _get_empty_param_for_dataset(self):
@@ -114,39 +108,38 @@ class TestOpenMLDataset(TestBase):
 
     def test_get_cached_dataset_description_not_cached(self):
         openml.config.cache_directory = self.static_cache_dir
-        self.assertRaisesRegexp(OpenMLCacheException, "Dataset description for "
-                                                      "dataset id 3 not cached",
-                                openml.datasets.functions._get_cached_dataset_description,
-                                3)
+        self.assertRaisesRegex(OpenMLCacheException,
+                               "Dataset description for dataset id 3 not cached",
+                               openml.datasets.functions._get_cached_dataset_description,
+                               dataset_id=3)
 
     def test_get_cached_dataset_arff(self):
         openml.config.cache_directory = self.static_cache_dir
-        description = openml.datasets.functions._get_cached_dataset_arff(
-            dataset_id=2)
+        description = openml.datasets.functions._get_cached_dataset_arff(dataset_id=2)
         self.assertIsInstance(description, str)
 
     def test_get_cached_dataset_arff_not_cached(self):
         openml.config.cache_directory = self.static_cache_dir
-        self.assertRaisesRegexp(OpenMLCacheException, "ARFF file for "
-                                                      "dataset id 3 not cached",
-                                openml.datasets.functions._get_cached_dataset_arff,
-                                3)
+        self.assertRaisesRegex(OpenMLCacheException,
+                               "ARFF file for dataset id 3 not cached",
+                               openml.datasets.functions._get_cached_dataset_arff,
+                               dataset_id=3)
 
     def _check_dataset(self, dataset):
-            self.assertEqual(type(dataset), dict)
-            self.assertGreaterEqual(len(dataset), 2)
-            self.assertIn('did', dataset)
-            self.assertIsInstance(dataset['did'], int)
-            self.assertIn('status', dataset)
-            self.assertIsInstance(dataset['status'], six.string_types)
-            self.assertIn(dataset['status'], ['in_preparation', 'active',
-                                              'deactivated'])
+        self.assertEqual(type(dataset), dict)
+        self.assertGreaterEqual(len(dataset), 2)
+        self.assertIn('did', dataset)
+        self.assertIsInstance(dataset['did'], int)
+        self.assertIn('status', dataset)
+        self.assertIsInstance(dataset['status'], str)
+        self.assertIn(dataset['status'], ['in_preparation', 'active', 'deactivated'])
+
     def _check_datasets(self, datasets):
         for did in datasets:
             self._check_dataset(datasets[did])
 
     def test_tag_untag_dataset(self):
-        tag = 'test_tag_%d' %random.randint(1, 1000000)
+        tag = 'test_tag_%d' % random.randint(1, 1000000)
         all_tags = _tag_entity('data', 1, tag)
         self.assertTrue(tag in all_tags)
         all_tags = _tag_entity('data', 1, tag, untag=True)
@@ -159,6 +152,11 @@ class TestOpenMLDataset(TestBase):
         # 1087 as the number of datasets on openml.org
         self.assertGreaterEqual(len(datasets), 100)
         self._check_datasets(datasets)
+
+    def test_list_datasets_output_format(self):
+        datasets = openml.datasets.list_datasets(output_format='dataframe')
+        self.assertIsInstance(datasets, pd.DataFrame)
+        self.assertGreaterEqual(len(datasets), 100)
 
     def test_list_datasets_by_tag(self):
         datasets = openml.datasets.list_datasets(tag='study_14')
@@ -191,7 +189,9 @@ class TestOpenMLDataset(TestBase):
         self._check_datasets(datasets)
 
     def test_list_datasets_combined_filters(self):
-        datasets = openml.datasets.list_datasets(tag='study_14', number_instances="100..1000", number_missing_values="800..1000")
+        datasets = openml.datasets.list_datasets(tag='study_14',
+                                                 number_instances="100..1000",
+                                                 number_missing_values="800..1000")
         self.assertGreaterEqual(len(datasets), 1)
         self._check_datasets(datasets)
 
@@ -210,71 +210,195 @@ class TestOpenMLDataset(TestBase):
 
         self.assertIsInstance(datasets, dict)
 
-    @unittest.skip('See https://github.com/openml/openml-python/issues/149')
     def test_check_datasets_active(self):
-        active = openml.datasets.check_datasets_active([1, 17])
-        self.assertTrue(active[1])
+        # Have to test on live because there is no deactivated dataset on the test server.
+        openml.config.server = self.production_server
+        active = openml.datasets.check_datasets_active([2, 17])
+        self.assertTrue(active[2])
         self.assertFalse(active[17])
-        self.assertRaisesRegexp(ValueError, 'Could not find dataset 79 in OpenML'
-                                            ' dataset list.',
-                                openml.datasets.check_datasets_active, [79])
+        self.assertRaisesRegex(
+            ValueError,
+            'Could not find dataset 79 in OpenML dataset list.',
+            openml.datasets.check_datasets_active,
+            [79],
+        )
+        openml.config.server = self.test_server
+
+    def _datasets_retrieved_successfully(self, dids, metadata_only=True):
+        """ Checks that all files for the given dids have been downloaded.
+
+        This includes:
+            - description
+            - qualities
+            - features
+            - absence of data arff if metadata_only, else it must be present too.
+        """
+        for did in dids:
+            self.assertTrue(os.path.exists(os.path.join(
+                openml.config.get_cache_directory(), "datasets", str(did), "description.xml")))
+            self.assertTrue(os.path.exists(os.path.join(
+                openml.config.get_cache_directory(), "datasets", str(did), "qualities.xml")))
+            self.assertTrue(os.path.exists(os.path.join(
+                openml.config.get_cache_directory(), "datasets", str(did), "features.xml")))
+
+            data_assert = self.assertFalse if metadata_only else self.assertTrue
+            data_assert(os.path.exists(os.path.join(
+                openml.config.get_cache_directory(), "datasets", str(did), "dataset.arff")))
+
+    def test__name_to_id_with_deactivated(self):
+        """ Check that an activated dataset is returned if an earlier deactivated one exists. """
+        openml.config.server = self.production_server
+        # /d/1 was deactivated
+        self.assertEqual(openml.datasets.functions._name_to_id('anneal'), 2)
+        openml.config.server = self.test_server
+
+    def test__name_to_id_with_multiple_active(self):
+        """ With multiple active datasets, retrieve the least recent active. """
+        openml.config.server = self.production_server
+        self.assertEqual(openml.datasets.functions._name_to_id('iris'), 61)
+
+    def test__name_to_id_with_version(self):
+        """ With multiple active datasets, retrieve the least recent active. """
+        openml.config.server = self.production_server
+        self.assertEqual(openml.datasets.functions._name_to_id('iris', version=3), 969)
+
+    def test__name_to_id_with_multiple_active_error(self):
+        """ With multiple active datasets, retrieve the least recent active. """
+        self.assertRaisesRegex(
+            ValueError,
+            "Multiple active datasets exist with name iris",
+            openml.datasets.functions._name_to_id,
+            dataset_name='iris',
+            error_if_multiple=True
+        )
+
+    def test__name_to_id_name_does_not_exist(self):
+        """ With multiple active datasets, retrieve the least recent active. """
+        self.assertRaisesRegex(
+            RuntimeError,
+            "No active datasets exist with name does_not_exist",
+            openml.datasets.functions._name_to_id,
+            dataset_name='does_not_exist'
+        )
+
+    def test__name_to_id_version_does_not_exist(self):
+        """ With multiple active datasets, retrieve the least recent active. """
+        self.assertRaisesRegex(
+            RuntimeError,
+            "No active datasets exist with name iris and version 100000",
+            openml.datasets.functions._name_to_id,
+            dataset_name='iris',
+            version=100000
+        )
+
+    def test_get_datasets_by_name(self):
+        # did 1 and 2 on the test server:
+        dids = ['anneal', 'kr-vs-kp']
+        datasets = openml.datasets.get_datasets(dids, download_data=False)
+        self.assertEqual(len(datasets), 2)
+        self._datasets_retrieved_successfully([1, 2])
+
+    def test_get_datasets_by_mixed(self):
+        # did 1 and 2 on the test server:
+        dids = ['anneal', 2]
+        datasets = openml.datasets.get_datasets(dids, download_data=False)
+        self.assertEqual(len(datasets), 2)
+        self._datasets_retrieved_successfully([1, 2])
 
     def test_get_datasets(self):
         dids = [1, 2]
         datasets = openml.datasets.get_datasets(dids)
         self.assertEqual(len(datasets), 2)
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "description.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "2", "description.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "2", "features.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "2", "qualities.xml")))
+        self._datasets_retrieved_successfully([1, 2], metadata_only=False)
 
-    def test_get_dataset(self):
-        dataset = openml.datasets.get_dataset(1)
+    def test_get_datasets_lazy(self):
+        dids = [1, 2]
+        datasets = openml.datasets.get_datasets(dids, download_data=False)
+        self.assertEqual(len(datasets), 2)
+        self._datasets_retrieved_successfully([1, 2], metadata_only=True)
+
+        datasets[0].get_data()
+        datasets[1].get_data()
+        self._datasets_retrieved_successfully([1, 2], metadata_only=False)
+
+    def test_get_dataset_by_name(self):
+        dataset = openml.datasets.get_dataset('anneal')
         self.assertEqual(type(dataset), OpenMLDataset)
-        self.assertEqual(dataset.name, 'anneal')
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "description.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "features.xml")))
-        self.assertTrue(os.path.exists(os.path.join(
-            openml.config.get_cache_directory(), "datasets", "1", "qualities.xml")))
+        self.assertEqual(dataset.dataset_id, 1)
+        self._datasets_retrieved_successfully([1], metadata_only=False)
 
         self.assertGreater(len(dataset.features), 1)
         self.assertGreater(len(dataset.qualities), 4)
 
         # Issue324 Properly handle private datasets when trying to access them
         openml.config.server = self.production_server
-        self.assertRaises(PrivateDatasetError, openml.datasets.get_dataset, 45)
+        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
 
+    def test_get_dataset(self):
+        # This is the only non-lazy load to ensure default behaviour works.
+        dataset = openml.datasets.get_dataset(1)
+        self.assertEqual(type(dataset), OpenMLDataset)
+        self.assertEqual(dataset.name, 'anneal')
+        self._datasets_retrieved_successfully([1], metadata_only=False)
 
-    def test_get_dataset_with_string(self):
-        dataset = openml.datasets.get_dataset(101)
-        self.assertRaises(PyOpenMLError, dataset._get_arff, 'arff')
-        self.assertRaises(PyOpenMLError, dataset.get_data)
+        self.assertGreater(len(dataset.features), 1)
+        self.assertGreater(len(dataset.qualities), 4)
+
+        # Issue324 Properly handle private datasets when trying to access them
+        openml.config.server = self.production_server
+        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
+
+    def test_get_dataset_lazy(self):
+        dataset = openml.datasets.get_dataset(1, download_data=False)
+        self.assertEqual(type(dataset), OpenMLDataset)
+        self.assertEqual(dataset.name, 'anneal')
+        self._datasets_retrieved_successfully([1], metadata_only=True)
+
+        self.assertGreater(len(dataset.features), 1)
+        self.assertGreater(len(dataset.qualities), 4)
+
+        dataset.get_data()
+        self._datasets_retrieved_successfully([1], metadata_only=False)
+
+        # Issue324 Properly handle private datasets when trying to access them
+        openml.config.server = self.production_server
+        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45, False)
+
+    def test_get_dataset_lazy_all_functions(self):
+        """ Test that all expected functionality is available without downloading the dataset. """
+        dataset = openml.datasets.get_dataset(1, download_data=False)
+        # We only tests functions as general integrity is tested by test_get_dataset_lazy
+
+        def ensure_absence_of_real_data():
+            self.assertFalse(os.path.exists(os.path.join(
+                openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")))
+
+        tag = 'test_lazy_tag_%d' % random.randint(1, 1000000)
+        dataset.push_tag(tag)
+        ensure_absence_of_real_data()
+
+        dataset.remove_tag(tag)
+        ensure_absence_of_real_data()
+
+        nominal_indices = dataset.get_features_by_type('nominal')
+        correct = [0, 1, 2, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                   20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 35, 36, 37, 38]
+        self.assertEqual(nominal_indices, correct)
+        ensure_absence_of_real_data()
+
+        classes = dataset.retrieve_class_labels()
+        self.assertEqual(classes, ['1', '2', '3', '4', '5', 'U'])
+        ensure_absence_of_real_data()
 
     def test_get_dataset_sparse(self):
-        dataset = openml.datasets.get_dataset(102)
-        X = dataset.get_data()
+        dataset = openml.datasets.get_dataset(102, download_data=False)
+        X, *_ = dataset.get_data(dataset_format='array')
         self.assertIsInstance(X, scipy.sparse.csr_matrix)
 
     def test_download_rowid(self):
         # Smoke test which checks that the dataset has the row-id set correctly
         did = 44
-        dataset = openml.datasets.get_dataset(did)
+        dataset = openml.datasets.get_dataset(did, download_data=False)
         self.assertEqual(dataset.row_id_attribute, 'Counter')
 
     def test__get_dataset_description(self):
@@ -287,7 +411,7 @@ class TestOpenMLDataset(TestBase):
     def test__getarff_path_dataset_arff(self):
         openml.config.cache_directory = self.static_cache_dir
         description = openml.datasets.functions._get_cached_dataset_description(2)
-        arff_path = _get_dataset_arff(self.workdir, description)
+        arff_path = _get_dataset_arff(description, cache_directory=self.workdir)
         self.assertIsInstance(arff_path, str)
         self.assertTrue(os.path.exists(arff_path))
 
@@ -297,12 +421,13 @@ class TestOpenMLDataset(TestBase):
             'oml:md5_checksum': 'abc',
             'oml:url': 'https://www.openml.org/data/download/61',
         }
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             OpenMLHashException,
-            'Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded dataset 5 '
-            'is unequal to the checksum abc sent by the server.',
+            'Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded file '
+            'is unequal to the expected checksum abc. '
+            'Raised when downloading dataset 5.',
             _get_dataset_arff,
-            self.workdir, description,
+            description,
         )
 
     def test__get_dataset_features(self):
@@ -332,15 +457,14 @@ class TestOpenMLDataset(TestBase):
     @mock.patch('openml.datasets.functions._get_dataset_arff')
     def test_deletion_of_cache_dir_faulty_download(self, patch):
         patch.side_effect = Exception('Boom!')
-        self.assertRaisesRegexp(Exception, 'Boom!', openml.datasets.get_dataset,
-                                1)
+        self.assertRaisesRegex(Exception, 'Boom!', openml.datasets.get_dataset, dataset_id=1)
         datasets_cache_dir = os.path.join(
             self.workdir, 'org', 'openml', 'test', 'datasets'
         )
         self.assertEqual(len(os.listdir(datasets_cache_dir)), 0)
 
     def test_publish_dataset(self):
-
+        # lazy loading not possible as we need the arff-file.
         openml.datasets.get_dataset(3)
         file_path = os.path.join(openml.config.get_cache_directory(),
                                  "datasets", "3", "dataset.arff")
@@ -358,9 +482,9 @@ class TestOpenMLDataset(TestBase):
 
     def test__retrieve_class_labels(self):
         openml.config.cache_directory = self.static_cache_dir
-        labels = openml.datasets.get_dataset(2).retrieve_class_labels()
+        labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels()
         self.assertEqual(labels, ['1', '2', '3', '4', '5', 'U'])
-        labels = openml.datasets.get_dataset(2).retrieve_class_labels(
+        labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels(
             target_name='product-type')
         self.assertEqual(labels, ['C', 'H', 'G'])
 
@@ -445,7 +569,7 @@ class TestOpenMLDataset(TestBase):
             attributes_arff_from_df(df)
 
     def test_attributes_arff_from_df_unknown_dtype(self):
-        # check that an error is raised when the dtype is not supported by
+        # check that an error is raised when the dtype is not supptagorted by
         # liac-arff
         data = [
             [[1], ['2'], [3.]],
@@ -685,9 +809,8 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test_get_online_dataset_arff(self):
-
-        # Australian dataset
-        dataset_id = 100
+        dataset_id = 100  # Australian
+        # lazy loading not used as arff file is checked.
         dataset = openml.datasets.get_dataset(dataset_id)
         decoder = arff.ArffDecoder()
         # check if the arff from the dataset is
@@ -709,7 +832,7 @@ class TestOpenMLDataset(TestBase):
 
         # Phoneme dataset
         dataset_id = 77
-        dataset = openml.datasets.get_dataset(dataset_id)
+        dataset = openml.datasets.get_dataset(dataset_id, download_data=False)
 
         self.assertEqual(
             (dataset.format).lower(),
@@ -841,6 +964,99 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(
             '@ATTRIBUTE rnd_str {a, b, c, d, e, f, g}' in downloaded_data)
 
+    def test_ignore_attributes_dataset(self):
+        data = [
+            ['a', 'sunny', 85.0, 85.0, 'FALSE', 'no'],
+            ['b', 'sunny', 80.0, 90.0, 'TRUE', 'no'],
+            ['c', 'overcast', 83.0, 86.0, 'FALSE', 'yes'],
+            ['d', 'rainy', 70.0, 96.0, 'FALSE', 'yes'],
+            ['e', 'rainy', 68.0, 80.0, 'FALSE', 'yes']
+        ]
+        column_names = ['rnd_str', 'outlook', 'temperature', 'humidity',
+                        'windy', 'play']
+        df = pd.DataFrame(data, columns=column_names)
+        # enforce the type of each column
+        df['outlook'] = df['outlook'].astype('category')
+        df['windy'] = df['windy'].astype('bool')
+        df['play'] = df['play'].astype('category')
+        # meta-information
+        name = '%s-pandas_testing_dataset' % self._get_sentinel()
+        description = 'Synthetic dataset created from a Pandas DataFrame'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'play'
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+
+        # we use the create_dataset function which call the OpenMLDataset
+        # constructor
+        # pass a string to ignore_attribute
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute='outlook',
+            citation=citation,
+            attributes='auto',
+            data=df,
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        self.assertEqual(dataset.ignore_attributes, ['outlook'])
+
+        # pass a list to ignore_attribute
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute=['outlook', 'windy'],
+            citation=citation,
+            attributes='auto',
+            data=df,
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+        self.assertEqual(dataset.ignore_attributes, ['outlook', 'windy'])
+
+        # raise an error if unknown type
+        err_msg = 'Wrong data type for ignore_attribute. Should be list.'
+        with pytest.raises(ValueError, match=err_msg):
+            openml.datasets.functions.create_dataset(
+                name=name,
+                description=description,
+                creator=creator,
+                contributor=None,
+                collection_date=collection_date,
+                language=language,
+                licence=licence,
+                default_target_attribute=default_target_attribute,
+                row_id_attribute=None,
+                ignore_attribute=tuple(['outlook', 'windy']),
+                citation=citation,
+                attributes='auto',
+                data=df,
+                version_label='test',
+                original_data_url=original_data_url,
+                paper_url=paper_url
+            )
+
     def test_create_dataset_row_id_attribute_error(self):
         # meta-information
         name = '%s-pandas_testing_dataset' % self._get_sentinel()
@@ -954,7 +1170,7 @@ class TestOpenMLDataset(TestBase):
         citation = 'None'
         original_data_url = 'http://openml.github.io/openml-python'
         paper_url = 'http://openml.github.io/openml-python'
-        err_msg = "Automatically inferring the attributes required a pandas"
+        err_msg = "Automatically inferring attributes requires a pandas"
         with pytest.raises(ValueError, match=err_msg):
             openml.datasets.functions.create_dataset(
                 name=name,

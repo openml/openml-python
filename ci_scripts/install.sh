@@ -26,24 +26,29 @@ popd
 # provided versions
 conda create -n testenv --yes python=$PYTHON_VERSION pip
 source activate testenv
-pip install pytest pytest-xdist pytest-timeout numpy scipy cython scikit-learn==$SKLEARN_VERSION \
-    oslo.concurrency
+
+if [[ -v SCIPY_VERSION ]]; then
+    conda install --yes scipy=$SCIPY_VERSION
+fi
+
+python --version
+pip install -e '.[test]'
+python -c "import numpy; print('numpy %s' % numpy.__version__)"
+python -c "import scipy; print('scipy %s' % scipy.__version__)"
 
 if [[ "$EXAMPLES" == "true" ]]; then
-    pip install matplotlib jupyter notebook nbconvert nbformat jupyter_client \
-        ipython ipykernel pandas seaborn
+    pip install -e '.[examples]'
 fi
 if [[ "$DOCTEST" == "true" ]]; then
-    pip install pandas sphinx_bootstrap_theme
+    pip install sphinx_bootstrap_theme
 fi
 if [[ "$COVERAGE" == "true" ]]; then
     pip install codecov pytest-cov
 fi
 if [[ "$RUN_FLAKE8" == "true" ]]; then
-    pip install flake8
+    pip install flake8 mypy
 fi
 
-python --version
-python -c "import numpy; print('numpy %s' % numpy.__version__)"
-python -c "import scipy; print('scipy %s' % scipy.__version__)"
-pip install -e '.[test]'
+# Install scikit-learn last to make sure the openml package installation works
+# from a clean environment without scikit-learn.
+pip install scikit-learn==$SKLEARN_VERSION

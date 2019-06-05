@@ -9,26 +9,40 @@ learning. OpenML can be used to
 * analyze experiments (uploaded by you and other collaborators) and conduct
   meta studies
 
-In particular, this module implemts a python interface for the
+In particular, this module implements a python interface for the
 `OpenML REST API <https://www.openml.org/guide#!rest_services>`_
 (`REST on wikipedia
 <http://en.wikipedia.org/wiki/Representational_state_transfer>`_).
 """
-from . import config
 
+from . import _api_calls
+from . import config
 from .datasets import OpenMLDataset, OpenMLDataFeature
 from . import datasets
-from . import tasks
-from . import runs
-from . import flows
-from . import setups
-from . import study
 from . import evaluations
-from . import utils
-from .runs import OpenMLRun
-from .tasks import OpenMLTask, OpenMLSplit
-from .flows import OpenMLFlow
 from .evaluations import OpenMLEvaluation
+from . import extensions
+from . import exceptions
+from . import tasks
+from .tasks import (
+    OpenMLTask,
+    OpenMLSplit,
+    OpenMLSupervisedTask,
+    OpenMLClassificationTask,
+    OpenMLRegressionTask,
+    OpenMLClusteringTask,
+    OpenMLLearningCurveTask,
+)
+from . import runs
+from .runs import OpenMLRun
+from . import flows
+from .flows import OpenMLFlow
+from . import study
+from .study import OpenMLStudy, OpenMLBenchmarkSuite
+from . import utils
+from . import setups
+from .setups import OpenMLSetup, OpenMLParameter
+
 
 from .__version__ import __version__
 
@@ -69,7 +83,37 @@ def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None,
             runs.functions.get_run(run_id)
 
 
-__all__ = ['OpenMLDataset', 'OpenMLDataFeature', 'OpenMLRun',
-           'OpenMLSplit', 'OpenMLEvaluation', 'OpenMLSetup',
-           'OpenMLTask', 'OpenMLFlow', 'datasets', 'evaluations',
-           'config', 'runs', 'flows', 'tasks', 'setups']
+__all__ = [
+    'OpenMLDataset',
+    'OpenMLDataFeature',
+    'OpenMLRun',
+    'OpenMLSplit',
+    'OpenMLEvaluation',
+    'OpenMLSetup',
+    'OpenMLParameter',
+    'OpenMLTask',
+    'OpenMLSupervisedTask',
+    'OpenMLClusteringTask',
+    'OpenMLLearningCurveTask',
+    'OpenMLRegressionTask',
+    'OpenMLClassificationTask',
+    'OpenMLFlow',
+    'OpenMLStudy',
+    'OpenMLBenchmarkSuite',
+    'datasets',
+    'evaluations',
+    'exceptions',
+    'extensions',
+    'config',
+    'runs',
+    'flows',
+    'tasks',
+    'setups',
+    'study',
+    'utils',
+    '_api_calls',
+    '__version__',
+]
+
+# Load the scikit-learn extension by default
+import openml.extensions.sklearn  # noqa: F401

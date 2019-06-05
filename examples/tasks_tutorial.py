@@ -13,9 +13,16 @@ from pprint import pprint
 #
 # Tasks are identified by IDs and can be accessed in two different ways:
 #
-# 1. In a list providing basic information on all tasks available on OpenML. This function will not download the actual tasks, but will instead download meta data that can be used to filter the tasks and retrieve a set of IDs. We can filter this list, for example, we can only list tasks having a special tag or only tasks for a specific target such as *supervised classification*.
+# 1. In a list providing basic information on all tasks available on OpenML.
+# This function will not download the actual tasks, but will instead download
+# meta data that can be used to filter the tasks and retrieve a set of IDs.
+# We can filter this list, for example, we can only list tasks having a
+# special tag or only tasks for a specific target such as
+# *supervised classification*.
 #
-# 2. A single task by its ID. It contains all meta information, the target metric, the splits and an iterator which can be used to access the splits in a useful manner.
+# 2. A single task by its ID. It contains all meta information, the target
+# metric, the splits and an iterator which can be used to access the
+# splits in a useful manner.
 
 ############################################################################
 # Listing tasks
@@ -35,8 +42,13 @@ print(tasks.columns)
 print("First 5 of %s tasks:" % len(tasks))
 pprint(tasks.head())
 
+# The same can be obtained through lesser lines of code
+tasks_df = openml.tasks.list_tasks(task_type_id=1, output_format='dataframe')
+pprint(tasks_df.head())
+
 ############################################################################
-# We can filter the list of tasks to only contain datasets with more than 500 samples, but less than 1000 samples:
+# We can filter the list of tasks to only contain datasets with more than
+# 500 samples, but less than 1000 samples:
 
 filtered_tasks = tasks.query('NumberOfInstances > 500 and NumberOfInstances < 1000')
 print(list(filtered_tasks.index))
@@ -58,7 +70,8 @@ print(list(filtered_tasks.index))
 print(len(filtered_tasks))
 
 ############################################################################
-# Resampling strategies can be found on the `OpenML Website <http://www.openml.org/search?type=measure&q=estimation%20procedure>`_.
+# Resampling strategies can be found on the
+# `OpenML Website <http://www.openml.org/search?type=measure&q=estimation%20procedure>`_.
 #
 # Similar to listing tasks by task type, we can list tasks by tags:
 
@@ -70,7 +83,7 @@ pprint(tasks.head())
 ############################################################################
 # Furthermore, we can list tasks based on the dataset id:
 
-tasks = openml.tasks.list_tasks(data_id=61)
+tasks = openml.tasks.list_tasks(data_id=1471)
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
 print("First 5 of %s tasks:" % len(tasks))
 pprint(tasks.head())
@@ -111,9 +124,11 @@ tasks.query('name=="eeg-eye-state"')
 # Downloading tasks
 # ^^^^^^^^^^^^^^^^^
 #
-# We provide two functions to download tasks, one which downloads only a single task by its ID, and one which takes a list of IDs and downloads all of these tasks:
+# We provide two functions to download tasks, one which downloads only a
+# single task by its ID, and one which takes a list of IDs and downloads
+# all of these tasks:
 
-task_id = 1
+task_id = 31
 task = openml.tasks.get_task(task_id)
 
 ############################################################################
@@ -124,8 +139,6 @@ pprint(vars(task))
 ############################################################################
 # And:
 
-ids = [1, 2, 19, 97, 403]
+ids = [2, 1891, 31, 9983]
 tasks = openml.tasks.get_tasks(ids)
 pprint(tasks[0])
-
-

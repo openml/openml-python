@@ -1,10 +1,11 @@
 from collections import OrderedDict
+import os
+from typing import Dict, List, Union  # noqa: F401
 
-import six
 import xmltodict
 
-import openml._api_calls
-from ..utils import extract_xml_tags
+from ..extensions import get_extension_by_flow
+from ..utils import extract_xml_tags, _tag_entity
 
 
 class OpenMLFlow(object):
@@ -129,7 +130,9 @@ class OpenMLFlow(object):
         self.dependencies = dependencies
         self.flow_id = flow_id
 
-    def _to_xml(self):
+        self.extension = get_extension_by_flow(self)
+
+    def _to_xml(self) -> str:
         """Generate xml representation of self for upload to server.
 
         Returns
@@ -145,7 +148,7 @@ class OpenMLFlow(object):
         flow_xml = flow_xml.split('\n', 1)[-1]
         return flow_xml
 
-    def _to_dict(self):
+    def _to_dict(self) -> dict:
         """ Helper function used by _to_xml and itself.
 
         Creates a dictionary representation of self which can be serialized
@@ -164,8 +167,8 @@ class OpenMLFlow(object):
             Flow represented as OrderedDict.
 
         """
-        flow_container = OrderedDict()
-        flow_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])
+        flow_container = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
+        flow_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])  # type: 'OrderedDict[str, Union[List, str]]'  # noqa E501
         flow_container['oml:flow'] = flow_dict
         _add_if_nonempty(flow_dict, 'oml:id', self.flow_id)
 
@@ -181,7 +184,7 @@ class OpenMLFlow(object):
 
         flow_parameters = []
         for key in self.parameters:
-            param_dict = OrderedDict()
+            param_dict = OrderedDict()  # type: 'OrderedDict[str, str]'
             param_dict['oml:name'] = key
             meta_info = self.parameters_meta_info[key]
 
@@ -192,14 +195,15 @@ class OpenMLFlow(object):
                              meta_info['description'])
 
             for key_, value in param_dict.items():
-                if key_ is not None and not isinstance(key_, six.string_types):
+                if key_ is not None and not isinstance(key_, str):
                     raise ValueError('Parameter name %s cannot be serialized '
                                      'because it is of type %s. Only strings '
                                      'can be serialized.' % (key_, type(key_)))
-                if value is not None and not isinstance(value, six.string_types):
+                if value is not None and not isinstance(value, str):
                     raise ValueError('Parameter value %s cannot be serialized '
                                      'because it is of type %s. Only strings '
-                                     'can be serialized.' % (value, type(value)))
+                                     'can be serialized.'
+                                     % (value, type(value)))
 
             flow_parameters.append(param_dict)
 
@@ -207,15 +211,14 @@ class OpenMLFlow(object):
 
         components = []
         for key in self.components:
-            component_dict = OrderedDict()
+            component_dict = OrderedDict()  # type: 'OrderedDict[str, Dict]'
             component_dict['oml:identifier'] = key
-            component_dict['oml:flow'] = \
-                self.components[key]._to_dict()['oml:flow']
+            component_dict['oml:flow'] = self.components[key]._to_dict()['oml:flow']
 
             for key_ in component_dict:
                 # We only need to check if the key is a string, because the
                 # value is a flow. The flow itself is valid by recursion
-                if key_ is not None and not isinstance(key_, six.string_types):
+                if key_ is not None and not isinstance(key_, str):
                     raise ValueError('Parameter name %s cannot be serialized '
                                      'because it is of type %s. Only strings '
                                      'can be serialized.' % (key_, type(key_)))
@@ -312,8 +315,32 @@ class OpenMLFlow(object):
 
         return flow
 
-    def publish(self):
-        """Publish flow to OpenML server.
+    def to_filesystem(self, output_directory: str) -> None:
+        os.makedirs(output_directory, exist_ok=True)
+        if 'flow.xml' in os.listdir(output_directory):
+            raise ValueError('Output directory already contains a flow.xml file.')
+
+        run_xml = self._to_xml()
+        with open(os.path.join(output_directory, 'flow.xml'), 'w') as f:
+            f.write(run_xml)
+
+    @classmethod
+    def from_filesystem(cls, input_directory) -> 'OpenMLFlow':
+        with open(os.path.join(input_directory, 'flow.xml'), 'r') as f:
+            xml_string = f.read()
+        return OpenMLFlow._from_dict(xmltodict.parse(xml_string))
+
+    def publish(self, raise_error_if_exists: bool = False) -> 'OpenMLFlow':
+        """ Publish this flow to OpenML server.
+
+        Raises a PyOpenMLError if the flow exists on the server, but
+        `self.flow_id` does not match the server known flow id.
+
+        Parameters
+        ----------
+        raise_error_if_exists : bool, optional (default=False)
+            If True, raise PyOpenMLError if the flow exists on the server.
+            If False, update the local flow to match the server flow.
 
         Returns
         -------
@@ -326,14 +353,27 @@ class OpenMLFlow(object):
         # instantiate an OpenMLFlow.
         import openml.flows.functions
 
-        xml_description = self._to_xml()
+        flow_id = openml.flows.functions.flow_exists(self.name, self.external_version)
+        if not flow_id:
+            if self.flow_id:
+                raise openml.exceptions.PyOpenMLError("Flow does not exist on the server, "
+                                                      "but 'flow.flow_id' is not None.")
+            xml_description = self._to_xml()
+            file_elements = {'description': xml_description}
+            return_value = openml._api_calls._perform_api_call(
+                "flow/",
+                'post',
+                file_elements=file_elements,
+            )
+            server_response = xmltodict.parse(return_value)
+            flow_id = int(server_response['oml:upload_flow']['oml:id'])
+        elif raise_error_if_exists:
+            error_message = "This OpenMLFlow already exists with id: {}.".format(flow_id)
+            raise openml.exceptions.PyOpenMLError(error_message)
+        elif self.flow_id is not None and self.flow_id != flow_id:
+            raise openml.exceptions.PyOpenMLError("Local flow_id does not match server flow_id: "
+                                                  "'{}' vs '{}'".format(self.flow_id, flow_id))
 
-        file_elements = {'description': xml_description}
-        return_value = openml._api_calls._perform_api_call(
-            "flow/",
-            file_elements=file_elements,
-        )
-        flow_id = int(xmltodict.parse(return_value)['oml:upload_flow']['oml:id'])
         flow = openml.flows.functions.get_flow(flow_id)
         _copy_server_fields(flow, self)
         try:
@@ -348,12 +388,12 @@ class OpenMLFlow(object):
                              (flow_id, message))
         return self
 
-    def get_structure(self, key_item):
+    def get_structure(self, key_item: str) -> Dict[str, List[str]]:
         """
-        Returns for each sub-component of the flow the path of identifiers that
-        should be traversed to reach this component. The resulting dict maps a
-        key (identifying a flow by either its id, name or fullname) to the
-        parameter prefix.
+        Returns for each sub-component of the flow the path of identifiers
+        that should be traversed to reach this component. The resulting dict
+        maps a key (identifying a flow by either its id, name or fullname) to
+        the parameter prefix.
 
         Parameters
         ----------
@@ -413,8 +453,7 @@ class OpenMLFlow(object):
         tag : str
             Tag to attach to the flow.
         """
-        data = {'flow_id': self.flow_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/flow/tag", data=data)
+        _tag_entity('flow', self.flow_id, tag)
 
     def remove_tag(self, tag):
         """Removes a tag from this flow on the server.
@@ -424,8 +463,7 @@ class OpenMLFlow(object):
         tag : str
             Tag to attach to the flow.
         """
-        data = {'flow_id': self.flow_id, 'tag': tag}
-        openml._api_calls._perform_api_call("/flow/untag", data=data)
+        _tag_entity('flow', self.flow_id, tag, untag=True)
 
 
 def _copy_server_fields(source_flow, target_flow):

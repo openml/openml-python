@@ -5,16 +5,13 @@ from time import time
 
 from sklearn.dummy import DummyClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, StratifiedKFold
+from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Imputer
 
 from openml.testing import TestBase
-from openml.flows.sklearn_converter import sklearn_to_flow
-from openml import OpenMLRun
 import openml
+import openml.extensions.sklearn
 
 
 class TestRun(TestBase):
@@ -38,21 +35,25 @@ class TestRun(TestBase):
         self.assertEqual(len(run_list), 0)
 
     def _test_run_obj_equals(self, run, run_prime):
-        for dictionary in ['evaluations', 'fold_evaluations', 'sample_evaluations']:
+        for dictionary in ['evaluations', 'fold_evaluations',
+                           'sample_evaluations']:
             if getattr(run, dictionary) is not None:
-                self.assertDictEqual(getattr(run, dictionary), getattr(run_prime, dictionary))
+                self.assertDictEqual(getattr(run, dictionary),
+                                     getattr(run_prime, dictionary))
             else:
                 # should be none or empty
                 other = getattr(run_prime, dictionary)
                 if other is not None:
                     self.assertDictEqual(other, dict())
-        self.assertEqual(run._create_description_xml(), run_prime._create_description_xml())
+        self.assertEqual(run._create_description_xml(),
+                         run_prime._create_description_xml())
 
-        numeric_part = np.array(np.array(run.data_content)[:, 0:-2], dtype=float)
-        numeric_part_prime = np.array(np.array(run_prime.data_content)[:, 0:-2], dtype=float)
+        numeric_part = \
+            np.array(np.array(run.data_content)[:, 0:-2], dtype=float)
+        numeric_part_prime = \
+            np.array(np.array(run_prime.data_content)[:, 0:-2], dtype=float)
         string_part = np.array(run.data_content)[:, -2:]
         string_part_prime = np.array(run_prime.data_content)[:, -2:]
-        # JvR: Python 2.7 requires an almost equal check, rather than an equals check
         np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
         np.testing.assert_array_equal(string_part, string_part_prime)
 
@@ -92,8 +93,7 @@ class TestRun(TestBase):
                 self.assertIn(bpp, ['true', 'false'])
             string_part = np.array(run_trace_content)[:, 5:]
             string_part_prime = np.array(run_prime_trace_content)[:, 5:]
-            # JvR: Python 2.7 requires an almost equal check, rather than an
-            # equals check
+
             np.testing.assert_array_almost_equal(int_part, int_part_prime)
             np.testing.assert_array_almost_equal(float_part, float_part_prime)
             self.assertEqual(bool_part, bool_part_prime)
@@ -102,6 +102,7 @@ class TestRun(TestBase):
             self.assertIsNone(run_prime_trace_content)
 
     def test_to_from_filesystem_vanilla(self):
+
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
             ('classifier', DecisionTreeClassifier(max_depth=1)),
@@ -111,6 +112,8 @@ class TestRun(TestBase):
             model=model,
             task=task,
             add_local_measures=False,
+            avoid_duplicate_runs=False,
+            upload_flow=True
         )
 
         cache_path = os.path.join(
@@ -121,10 +124,14 @@ class TestRun(TestBase):
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
+        # The flow has been uploaded to server, so only the reference flow_id should be present
+        self.assertTrue(run_prime.flow_id is not None)
+        self.assertTrue(run_prime.flow is None)
         self._test_run_obj_equals(run, run_prime)
         run_prime.publish()
 
     def test_to_from_filesystem_search(self):
+
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
             ('classifier', DecisionTreeClassifier(max_depth=1)),
@@ -139,9 +146,10 @@ class TestRun(TestBase):
 
         task = openml.tasks.get_task(119)
         run = openml.runs.run_model_on_task(
-            model,
-            task,
+            model=model,
+            task=task,
             add_local_measures=False,
+            avoid_duplicate_runs=False,
         )
 
         cache_path = os.path.join(
@@ -156,14 +164,15 @@ class TestRun(TestBase):
         run_prime.publish()
 
     def test_to_from_filesystem_no_model(self):
+
         model = Pipeline([
             ('imputer', Imputer(strategy='mean')),
             ('classifier', DummyClassifier()),
         ])
         task = openml.tasks.get_task(119)
         run = openml.runs.run_model_on_task(
-            task,
-            model,
+            model=model,
+            task=task,
             add_local_measures=False,
         )
 
@@ -178,3 +187,46 @@ class TestRun(TestBase):
         # assert default behaviour is throwing an error
         with self.assertRaises(ValueError, msg='Could not find model.pkl'):
             openml.runs.OpenMLRun.from_filesystem(cache_path)
+
+    def test_publish_with_local_loaded_flow(self):
+        """
+        Publish a run tied to a local flow after it has first been saved to
+         and loaded from disk.
+        """
+        extension = openml.extensions.sklearn.SklearnExtension()
+
+        model = Pipeline([
+            ('imputer', Imputer(strategy='mean')),
+            ('classifier', DummyClassifier()),
+        ])
+        task = openml.tasks.get_task(119)
+
+        # Make sure the flow does not exist on the server yet.
+        flow = extension.model_to_flow(model)
+        self._add_sentinel_to_flow_name(flow)
+        self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
+
+        run = openml.runs.run_flow_on_task(
+            flow=flow,
+            task=task,
+            add_local_measures=False,
+            avoid_duplicate_runs=False,
+            upload_flow=False
+        )
+
+        # Make sure that the flow has not been uploaded as requested.
+        self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
+
+        cache_path = os.path.join(
+            self.workdir,
+            'runs',
+            str(random.getrandbits(128)),
+        )
+        run.to_filesystem(cache_path)
+        # obtain run from filesystem
+        loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
+        loaded_run.publish()
+
+        # make sure the flow is published as part of publishing the run.
+        self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))
+        openml.runs.get_run(loaded_run.run_id)

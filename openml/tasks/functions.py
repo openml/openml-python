@@ -2,8 +2,9 @@ from collections import OrderedDict
 import io
 import re
 import os
+from typing import Union, Dict, Optional
 
-from oslo_concurrency import lockutils
+import pandas as pd
 import xmltodict
 
 from ..exceptions import OpenMLCacheException
@@ -12,13 +13,17 @@ from .task import (
     OpenMLClassificationTask,
     OpenMLClusteringTask,
     OpenMLLearningCurveTask,
+    TaskTypeEnum,
     OpenMLRegressionTask,
-    OpenMLSupervisedTask
+    OpenMLSupervisedTask,
+    OpenMLTask
 )
 import openml.utils
 import openml._api_calls
 
+
 TASKS_CACHE_DIR_NAME = 'tasks'
+
 
 def _get_cached_tasks():
     """Return a dict of all the tasks which are cached locally.
@@ -46,8 +51,7 @@ def _get_cached_tasks():
     return tasks
 
 
-
-def _get_cached_task(tid):
+def _get_cached_task(tid: int) -> OpenMLTask:
     """Return a cached task based on the given id.
 
     Parameters
@@ -65,10 +69,12 @@ def _get_cached_task(tid):
     )
 
     try:
-        with io.open(os.path.join(tid_cache_dir, "task.xml"), encoding='utf8') as fh:
+        with io.open(os.path.join(tid_cache_dir, "task.xml"), encoding='utf8')\
+                as fh:
             return _create_task_from_xml(fh.read())
     except (OSError, IOError):
-        openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
+        openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME,
+                                              tid_cache_dir)
         raise OpenMLCacheException("Task file for tid %d not "
                                    "cached" % tid)
 
@@ -82,8 +88,10 @@ def _get_estimation_procedure_list():
         a dictionary containing the following information: id, task type id,
         name, type, repeats, folds, stratified.
     """
+    url_suffix = "estimationprocedure/list"
+    xml_string = openml._api_calls._perform_api_call(url_suffix,
+                                                     'get')
 
-    xml_string = openml._api_calls._perform_api_call("estimationprocedure/list")
     procs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
     if 'oml:estimationprocedures' not in procs_dict:
@@ -97,10 +105,12 @@ def _get_estimation_procedure_list():
         raise ValueError('Error in return XML, value of '
                          'oml:estimationprocedures/@xmlns:oml is not '
                          'http://openml.org/openml, but %s' %
-                         str(procs_dict['oml:estimationprocedures']['@xmlns:oml']))
+                         str(procs_dict['oml:estimationprocedures'][
+                             '@xmlns:oml']))
 
     procs = []
-    for proc_ in procs_dict['oml:estimationprocedures']['oml:estimationprocedure']:
+    for proc_ in procs_dict['oml:estimationprocedures'][
+            'oml:estimationprocedure']:
         procs.append(
             {
                 'id': int(proc_['oml:id']),
@@ -113,7 +123,14 @@ def _get_estimation_procedure_list():
     return procs
 
 
-def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
+def list_tasks(
+    task_type_id: Optional[int] = None,
+    offset: Optional[int] = None,
+    size: Optional[int] = None,
+    tag: Optional[str] = None,
+    output_format: str = 'dict',
+    **kwargs
+) -> Union[Dict, pd.DataFrame]:
     """
     Return a number of tasks having the given tag and task_type_id
     Parameters
@@ -138,9 +155,15 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
         the maximum number of tasks to show
     tag : str, optional
         the tag to include
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
     kwargs: dict, optional
-        Legal filter operators: data_tag, status, data_id, data_name, number_instances, number_features,
+        Legal filter operators: data_tag, status, data_id, data_name,
+        number_instances, number_features,
         number_classes, number_missing_values.
+
     Returns
     -------
     dict
@@ -148,11 +171,25 @@ def list_tasks(task_type_id=None, offset=None, size=None, tag=None, **kwargs):
         represented by a dictionary containing the following information:
         task id, dataset id, task_type and status. If qualities are calculated
         for the associated dataset, some of these are also returned.
+    dataframe
+        All tasks having the given task_type_id and the give tag. Every task is
+        represented by a row in the data frame containing the following information
+        as columns: task id, dataset id, task_type and status. If qualities are
+        calculated for the associated dataset, some of these are also returned.
     """
-    return openml.utils._list_all(_list_tasks, task_type_id=task_type_id, offset=offset, size=size, tag=tag, **kwargs)
+    if output_format not in ['dataframe', 'dict']:
+        raise ValueError("Invalid output format selected. "
+                         "Only 'dict' or 'dataframe' applicable.")
+    return openml.utils._list_all(output_format=output_format,
+                                  listing_call=_list_tasks,
+                                  task_type_id=task_type_id,
+                                  offset=offset,
+                                  size=size,
+                                  tag=tag,
+                                  **kwargs)
 
 
-def _list_tasks(task_type_id=None, **kwargs):
+def _list_tasks(task_type_id=None, output_format='dict', **kwargs):
     """
     Perform the api call to return a number of tasks having the given filters.
     Parameters
@@ -171,13 +208,18 @@ def _list_tasks(task_type_id=None, **kwargs):
         - Machine Learning Challenge: 6
         - Survival Analysis: 7
         - Subgroup Discovery: 8
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
     kwargs: dict, optional
         Legal filter operators: tag, task_id (list), data_tag, status, limit,
         offset, data_id, data_name, number_instances, number_features,
         number_classes, number_missing_values.
+
     Returns
     -------
-    dict
+    dict or dataframe
     """
     api_call = "task/list"
     if task_type_id is not None:
@@ -187,13 +229,13 @@ def _list_tasks(task_type_id=None, **kwargs):
             if operator == 'task_id':
                 value = ','.join([str(int(i)) for i in value])
             api_call += "/%s/%s" % (operator, value)
-    return __list_tasks(api_call)
+    return __list_tasks(api_call=api_call, output_format=output_format)
 
 
-def __list_tasks(api_call):
-
-    xml_string = openml._api_calls._perform_api_call(api_call)
-    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task', 'oml:input'))
+def __list_tasks(api_call, output_format='dict'):
+    xml_string = openml._api_calls._perform_api_call(api_call, 'get')
+    tasks_dict = xmltodict.parse(xml_string, force_list=('oml:task',
+                                                         'oml:input'))
     # Minimalistic check if the XML is useful
     if 'oml:tasks' not in tasks_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s'
@@ -229,7 +271,8 @@ def __list_tasks(api_call):
             # Other task inputs
             for input in task_.get('oml:input', list()):
                 if input['@name'] == 'estimation_procedure':
-                    task[input['@name']] = proc_dict[int(input['#text'])]['name']
+                    task[input['@name']] = \
+                        proc_dict[int(input['#text'])]['name']
                 else:
                     value = input.get('#text')
                     task[input['@name']] = value
@@ -240,7 +283,8 @@ def __list_tasks(api_call):
                     quality_value = 0.0
                 else:
                     quality['#text'] = float(quality['#text'])
-                    if abs(int(quality['#text']) - quality['#text']) < 0.0000001:
+                    if abs(int(quality['#text']) - quality['#text']) \
+                            < 0.0000001:
                         quality['#text'] = int(quality['#text'])
                     quality_value = quality['#text']
                 task[quality['@name']] = quality_value
@@ -255,59 +299,83 @@ def __list_tasks(api_call):
             else:
                 raise KeyError('Could not find key %s in %s!' % (e, task_))
 
+    if output_format == 'dataframe':
+        tasks = pd.DataFrame.from_dict(tasks, orient='index')
+
     return tasks
 
 
-def get_tasks(task_ids):
+def get_tasks(task_ids, download_data=True):
     """Download tasks.
+
     This function iterates :meth:`openml.tasks.get_task`.
+
     Parameters
     ----------
     task_ids : iterable
-        Integers representing task ids.
+        Integers/Strings representing task ids.
+    download_data : bool
+        Option to trigger download of data along with the meta data.
+
     Returns
     -------
     list
     """
     tasks = []
     for task_id in task_ids:
-        tasks.append(get_task(task_id))
+        tasks.append(get_task(task_id, download_data))
     return tasks
 
 
-def get_task(task_id):
-    """Download the OpenML task for a given task ID.
+@openml.utils.thread_safe_if_oslo_installed
+def get_task(task_id: int, download_data: bool = True) -> OpenMLTask:
+    """Download OpenML task for a given task ID.
+
+    Downloads the task representation, while the data splits can be
+    downloaded optionally based on the additional parameter. Else,
+    splits will either way be downloaded when the task is being used.
+
     Parameters
     ----------
-    task_id : int
+    task_id : int or str
         The OpenML task id.
+    download_data : bool
+        Option to trigger download of data along with the meta data.
+
+    Returns
+    -------
+    task
     """
-    task_id = int(task_id)
+    try:
+        task_id = int(task_id)
+    except (ValueError, TypeError):
+        raise ValueError("Dataset ID is neither an Integer nor can be "
+                         "cast to an Integer.")
 
-    with lockutils.external_lock(
-            name='task.functions.get_task:%d' % task_id,
-            lock_path=openml.utils._create_lockfiles_dir(),
-    ):
-        tid_cache_dir = openml.utils._create_cache_directory_for_id(
-            TASKS_CACHE_DIR_NAME, task_id,
-        )
+    tid_cache_dir = openml.utils._create_cache_directory_for_id(
+        TASKS_CACHE_DIR_NAME, task_id,
+    )
 
-        try:
-            task = _get_task_description(task_id)
-            dataset = get_dataset(task.dataset_id)
-            # Clustering tasks do not have class labels
-            # and do not offer download_split
+    try:
+        task = _get_task_description(task_id)
+        dataset = get_dataset(task.dataset_id, download_data)
+        # List of class labels availaible in dataset description
+        # Including class labels as part of task meta data handles
+        #   the case where data download was initially disabled
+        if isinstance(task, OpenMLClassificationTask):
+            task.class_labels = \
+                dataset.retrieve_class_labels(task.target_name)
+        # Clustering tasks do not have class labels
+        # and do not offer download_split
+        if download_data:
             if isinstance(task, OpenMLSupervisedTask):
                 task.download_split()
-                if isinstance(task, OpenMLClassificationTask):
-                    task.class_labels = \
-                        dataset.retrieve_class_labels(task.target_name)
-        except Exception as e:
-            openml.utils._remove_cache_dir_for_id(
-                TASKS_CACHE_DIR_NAME,
-                tid_cache_dir,
-            )
-            raise e
+    except Exception as e:
+        openml.utils._remove_cache_dir_for_id(
+            TASKS_CACHE_DIR_NAME,
+            tid_cache_dir,
+        )
+        raise e
 
     return task
 
@@ -324,7 +392,8 @@ def _get_task_description(task_id):
             ),
             "task.xml",
         )
-        task_xml = openml._api_calls._perform_api_call("task/%d" % task_id)
+        task_xml = openml._api_calls._perform_api_call("task/%d" % task_id,
+                                                       'get')
 
         with io.open(xml_file, "w", encoding='utf8') as fh:
             fh.write(task_xml)
@@ -365,19 +434,19 @@ def _create_task_from_xml(xml):
         evaluation_measures = inputs["evaluation_measures"][
             "oml:evaluation_measures"]["oml:evaluation_measure"]
 
-    task_type = dic["oml:task_type"]
+    task_type_id = int(dic["oml:task_type_id"])
     common_kwargs = {
         'task_id': dic["oml:task_id"],
-        'task_type': task_type,
+        'task_type': dic["oml:task_type"],
         'task_type_id': dic["oml:task_type_id"],
         'data_set_id': inputs["source_data"][
             "oml:data_set"]["oml:data_set_id"],
         'evaluation_measure': evaluation_measures,
     }
-    if task_type in (
-        "Supervised Classification",
-        "Supervised Regression",
-        "Learning Curve"
+    if task_type_id in (
+        TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+        TaskTypeEnum.SUPERVISED_REGRESSION,
+        TaskTypeEnum.LEARNING_CURVE
     ):
         # Convert some more parameters
         for parameter in \
@@ -392,16 +461,83 @@ def _create_task_from_xml(xml):
             "oml:estimation_procedure"]["oml:type"]
         common_kwargs['estimation_parameters'] = estimation_parameters
         common_kwargs['target_name'] = inputs[
-                "source_data"]["oml:data_set"]["oml:target_feature"]
+            "source_data"]["oml:data_set"]["oml:target_feature"]
         common_kwargs['data_splits_url'] = inputs["estimation_procedure"][
-                "oml:estimation_procedure"]["oml:data_splits_url"]
+            "oml:estimation_procedure"]["oml:data_splits_url"]
 
     cls = {
-        "Supervised Classification": OpenMLClassificationTask,
-        "Supervised Regression": OpenMLRegressionTask,
-        "Clustering": OpenMLClusteringTask,
-        "Learning Curve": OpenMLLearningCurveTask,
-    }.get(task_type)
+        TaskTypeEnum.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
+        TaskTypeEnum.SUPERVISED_REGRESSION: OpenMLRegressionTask,
+        TaskTypeEnum.CLUSTERING: OpenMLClusteringTask,
+        TaskTypeEnum.LEARNING_CURVE: OpenMLLearningCurveTask,
+    }.get(task_type_id)
     if cls is None:
-        raise NotImplementedError('Task type %s not supported.')
+        raise NotImplementedError('Task type %s not supported.' %
+                                  common_kwargs['task_type'])
     return cls(**common_kwargs)
+
+
+def create_task(
+        task_type_id: int,
+        dataset_id: int,
+        estimation_procedure_id: int,
+        target_name: Optional[str] = None,
+        evaluation_measure: Optional[str] = None,
+        **kwargs
+) -> Union[
+    OpenMLClassificationTask, OpenMLRegressionTask,
+    OpenMLLearningCurveTask, OpenMLClusteringTask
+]:
+    """Create a task based on different given attributes.
+
+    Builds a task object with the function arguments as
+    attributes. The type of the task object built is
+    determined from the task type id.
+    More information on how the arguments (task attributes),
+    relate to the different possible tasks can be found in
+    the individual task objects at the openml.tasks.task
+    module.
+
+    Parameters
+    ----------
+    task_type_id : int
+        Id of the task type.
+    dataset_id : int
+        The id of the dataset for the task.
+    target_name : str, optional
+        The name of the feature used as a target.
+        At the moment, only optional for the clustering tasks.
+    estimation_procedure_id : int
+        The id of the estimation procedure.
+    evaluation_measure : str, optional
+        The name of the evaluation measure.
+    kwargs : dict, optional
+        Other task attributes that are not mandatory
+        for task upload.
+
+    Returns
+    -------
+    OpenMLClassificationTask, OpenMLRegressionTask,
+    OpenMLLearningCurveTask, OpenMLClusteringTask
+    """
+    task_cls = {
+        TaskTypeEnum.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
+        TaskTypeEnum.SUPERVISED_REGRESSION: OpenMLRegressionTask,
+        TaskTypeEnum.CLUSTERING: OpenMLClusteringTask,
+        TaskTypeEnum.LEARNING_CURVE: OpenMLLearningCurveTask,
+    }.get(task_type_id)
+
+    if task_cls is None:
+        raise NotImplementedError(
+            'Task type {0:d} not supported.'.format(task_type_id)
+        )
+    else:
+        return task_cls(
+            task_type_id=task_type_id,
+            task_type=None,
+            data_set_id=dataset_id,
+            target_name=target_name,
+            estimation_procedure_id=estimation_procedure_id,
+            evaluation_measure=evaluation_measure,
+            **kwargs
+        )

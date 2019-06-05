@@ -1,14 +1,12 @@
+import collections
 import json
 import os
 import sys
 import unittest
 from distutils.version import LooseVersion
 from collections import OrderedDict
-
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
+from unittest import mock
+import warnings
 
 import numpy as np
 import scipy.optimize
@@ -20,8 +18,10 @@ import sklearn.dummy
 import sklearn.ensemble
 import sklearn.feature_selection
 import sklearn.gaussian_process
+import sklearn.linear_model
 import sklearn.model_selection
 import sklearn.naive_bayes
+import sklearn.neural_network
 import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
@@ -33,12 +33,12 @@ else:
     from sklearn.impute import SimpleImputer as Imputer
 
 import openml
-from openml.testing import TestBase
-from openml.flows import OpenMLFlow, sklearn_to_flow, flow_to_sklearn
-from openml.flows.functions import assert_flows_equal
-from openml.flows.sklearn_converter import _format_external_version, \
-    _check_dependencies, _check_n_jobs
+from openml.extensions.sklearn import SklearnExtension
 from openml.exceptions import PyOpenMLError
+from openml.flows import OpenMLFlow
+from openml.flows.functions import assert_flows_equal
+from openml.runs.trace import OpenMLRunTrace
+from openml.testing import TestBase
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(this_directory)
@@ -57,147 +57,145 @@ class Model(sklearn.base.BaseEstimator):
         pass
 
 
-class TestSklearn(TestBase):
+class TestSklearnExtensionFlowFunctions(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take less
     # than 1 seconds
 
     def setUp(self):
-        super(TestSklearn, self).setUp()
+        super().setUp(n_levels=2)
         iris = sklearn.datasets.load_iris()
         self.X = iris.data
         self.y = iris.target
 
-    @mock.patch('openml.flows.sklearn_converter._check_dependencies')
-    def test_serialize_model(self, check_dependencies_mock):
-        model = sklearn.tree.DecisionTreeClassifier(criterion='entropy',
-                                                    max_features='auto',
-                                                    max_leaf_nodes=2000)
+        self.extension = SklearnExtension()
 
-        fixture_name = 'sklearn.tree.tree.DecisionTreeClassifier'
-        fixture_description = 'Automatically created scikit-learn flow.'
-        version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
-                          % sklearn.__version__
-        # min_impurity_decrease has been introduced in 0.20
-        # min_impurity_split has been deprecated in 0.20
-        if LooseVersion(sklearn.__version__) < "0.19":
-            fixture_parameters = \
-                OrderedDict((('class_weight', 'null'),
-                            ('criterion', '"entropy"'),
-                            ('max_depth', 'null'),
-                            ('max_features', '"auto"'),
-                            ('max_leaf_nodes', '2000'),
-                            ('min_impurity_split', '1e-07'),
-                            ('min_samples_leaf', '1'),
-                            ('min_samples_split', '2'),
-                            ('min_weight_fraction_leaf', '0.0'),
-                            ('presort', 'false'),
-                            ('random_state', 'null'),
-                            ('splitter', '"best"')))
-        else:
-            fixture_parameters = \
-                OrderedDict((('class_weight', 'null'),
-                            ('criterion', '"entropy"'),
-                            ('max_depth', 'null'),
-                            ('max_features', '"auto"'),
-                            ('max_leaf_nodes', '2000'),
-                            ('min_impurity_decrease', '0.0'),
-                            ('min_impurity_split', 'null'),
-                            ('min_samples_leaf', '1'),
-                            ('min_samples_split', '2'),
-                            ('min_weight_fraction_leaf', '0.0'),
-                            ('presort', 'false'),
-                            ('random_state', 'null'),
-                            ('splitter', '"best"')))
-        structure_fixture = {'sklearn.tree.tree.DecisionTreeClassifier': []}
+    def test_serialize_model(self):
+        with mock.patch.object(self.extension, '_check_dependencies') as check_dependencies_mock:
+            model = sklearn.tree.DecisionTreeClassifier(criterion='entropy',
+                                                        max_features='auto',
+                                                        max_leaf_nodes=2000)
 
-        serialization = sklearn_to_flow(model)
-        structure = serialization.get_structure('name')
+            fixture_name = 'sklearn.tree.tree.DecisionTreeClassifier'
+            fixture_description = 'Automatically created scikit-learn flow.'
+            version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
+                              % sklearn.__version__
+            # min_impurity_decrease has been introduced in 0.20
+            # min_impurity_split has been deprecated in 0.20
+            if LooseVersion(sklearn.__version__) < "0.19":
+                fixture_parameters = \
+                    OrderedDict((('class_weight', 'null'),
+                                ('criterion', '"entropy"'),
+                                ('max_depth', 'null'),
+                                ('max_features', '"auto"'),
+                                ('max_leaf_nodes', '2000'),
+                                ('min_impurity_split', '1e-07'),
+                                ('min_samples_leaf', '1'),
+                                ('min_samples_split', '2'),
+                                ('min_weight_fraction_leaf', '0.0'),
+                                ('presort', 'false'),
+                                ('random_state', 'null'),
+                                ('splitter', '"best"')))
+            else:
+                fixture_parameters = \
+                    OrderedDict((('class_weight', 'null'),
+                                ('criterion', '"entropy"'),
+                                ('max_depth', 'null'),
+                                ('max_features', '"auto"'),
+                                ('max_leaf_nodes', '2000'),
+                                ('min_impurity_decrease', '0.0'),
+                                ('min_impurity_split', 'null'),
+                                ('min_samples_leaf', '1'),
+                                ('min_samples_split', '2'),
+                                ('min_weight_fraction_leaf', '0.0'),
+                                ('presort', 'false'),
+                                ('random_state', 'null'),
+                                ('splitter', '"best"')))
+            structure_fixture = {'sklearn.tree.tree.DecisionTreeClassifier': []}
 
-        self.assertEqual(serialization.name, fixture_name)
-        self.assertEqual(serialization.class_name, fixture_name)
-        self.assertEqual(serialization.description, fixture_description)
-        self.assertEqual(serialization.parameters, fixture_parameters)
-        self.assertEqual(serialization.dependencies, version_fixture)
-        self.assertDictEqual(structure, structure_fixture)
+            serialization = self.extension.model_to_flow(model)
+            structure = serialization.get_structure('name')
 
-        new_model = flow_to_sklearn(serialization)
-        # compares string representations of the dict, as it potentially
-        # contains complex objects that can not be compared with == op
-        # Only in Python 3.x, as Python 2 has Unicode issues
-        if sys.version_info[0] >= 3:
-            self.assertEqual(str(model.get_params()),
-                             str(new_model.get_params()))
+            self.assertEqual(serialization.name, fixture_name)
+            self.assertEqual(serialization.class_name, fixture_name)
+            self.assertEqual(serialization.description, fixture_description)
+            self.assertEqual(serialization.parameters, fixture_parameters)
+            self.assertEqual(serialization.dependencies, version_fixture)
+            self.assertDictEqual(structure, structure_fixture)
 
-        self.assertEqual(type(new_model), type(model))
-        self.assertIsNot(new_model, model)
+            new_model = self.extension.flow_to_model(serialization)
+            # compares string representations of the dict, as it potentially
+            # contains complex objects that can not be compared with == op
+            # Only in Python 3.x, as Python 2 has Unicode issues
+            if sys.version_info[0] >= 3:
+                self.assertEqual(str(model.get_params()), str(new_model.get_params()))
 
-        self.assertEqual(new_model.get_params(), model.get_params())
-        new_model.fit(self.X, self.y)
+            self.assertEqual(type(new_model), type(model))
+            self.assertIsNot(new_model, model)
 
-        self.assertEqual(check_dependencies_mock.call_count, 1)
+            self.assertEqual(new_model.get_params(), model.get_params())
+            new_model.fit(self.X, self.y)
 
-    @mock.patch('openml.flows.sklearn_converter._check_dependencies')
-    def test_serialize_model_clustering(self, check_dependencies_mock):
-        model = sklearn.cluster.KMeans()
+            self.assertEqual(check_dependencies_mock.call_count, 1)
 
-        fixture_name = 'sklearn.cluster.k_means_.KMeans'
-        fixture_description = 'Automatically created scikit-learn flow.'
-        version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
-                          % sklearn.__version__
-        # n_jobs default has changed to None in 0.20
-        if LooseVersion(sklearn.__version__) < "0.20":
-            fixture_parameters = \
-                OrderedDict((('algorithm', '"auto"'),
-                             ('copy_x', 'true'),
-                             ('init', '"k-means++"'),
-                             ('max_iter', '300'),
-                             ('n_clusters', '8'),
-                             ('n_init', '10'),
-                             ('n_jobs', '1'),
-                             ('precompute_distances', '"auto"'),
-                             ('random_state', 'null'),
-                             ('tol', '0.0001'),
-                             ('verbose', '0')))
-        else:
-            fixture_parameters = \
-                OrderedDict((('algorithm', '"auto"'),
-                             ('copy_x', 'true'),
-                             ('init', '"k-means++"'),
-                             ('max_iter', '300'),
-                             ('n_clusters', '8'),
-                             ('n_init', '10'),
-                             ('n_jobs', 'null'),
-                             ('precompute_distances', '"auto"'),
-                             ('random_state', 'null'),
-                             ('tol', '0.0001'),
-                             ('verbose', '0')))
-        fixture_structure = {'sklearn.cluster.k_means_.KMeans': []}
+    def test_serialize_model_clustering(self):
+        with mock.patch.object(self.extension, '_check_dependencies') as check_dependencies_mock:
+            model = sklearn.cluster.KMeans()
 
-        serialization = sklearn_to_flow(model)
-        structure = serialization.get_structure('name')
+            fixture_name = 'sklearn.cluster.k_means_.KMeans'
+            fixture_description = 'Automatically created scikit-learn flow.'
+            version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
+                              % sklearn.__version__
+            # n_jobs default has changed to None in 0.20
+            if LooseVersion(sklearn.__version__) < "0.20":
+                fixture_parameters = \
+                    OrderedDict((('algorithm', '"auto"'),
+                                 ('copy_x', 'true'),
+                                 ('init', '"k-means++"'),
+                                 ('max_iter', '300'),
+                                 ('n_clusters', '8'),
+                                 ('n_init', '10'),
+                                 ('n_jobs', '1'),
+                                 ('precompute_distances', '"auto"'),
+                                 ('random_state', 'null'),
+                                 ('tol', '0.0001'),
+                                 ('verbose', '0')))
+            else:
+                fixture_parameters = \
+                    OrderedDict((('algorithm', '"auto"'),
+                                 ('copy_x', 'true'),
+                                 ('init', '"k-means++"'),
+                                 ('max_iter', '300'),
+                                 ('n_clusters', '8'),
+                                 ('n_init', '10'),
+                                 ('n_jobs', 'null'),
+                                 ('precompute_distances', '"auto"'),
+                                 ('random_state', 'null'),
+                                 ('tol', '0.0001'),
+                                 ('verbose', '0')))
+            fixture_structure = {'sklearn.cluster.k_means_.KMeans': []}
 
-        self.assertEqual(serialization.name, fixture_name)
-        self.assertEqual(serialization.class_name, fixture_name)
-        self.assertEqual(serialization.description, fixture_description)
-        self.assertEqual(serialization.parameters, fixture_parameters)
-        self.assertEqual(serialization.dependencies, version_fixture)
-        self.assertDictEqual(structure, fixture_structure)
+            serialization = self.extension.model_to_flow(model)
+            structure = serialization.get_structure('name')
 
-        new_model = flow_to_sklearn(serialization)
-        # compares string representations of the dict, as it potentially
-        # contains complex objects that can not be compared with == op
-        # Only in Python 3.x, as Python 2 has Unicode issues
-        if sys.version_info[0] >= 3:
-            self.assertEqual(str(model.get_params()),
-                             str(new_model.get_params()))
+            self.assertEqual(serialization.name, fixture_name)
+            self.assertEqual(serialization.class_name, fixture_name)
+            self.assertEqual(serialization.description, fixture_description)
+            self.assertEqual(serialization.parameters, fixture_parameters)
+            self.assertEqual(serialization.dependencies, version_fixture)
+            self.assertDictEqual(structure, fixture_structure)
 
-        self.assertEqual(type(new_model), type(model))
-        self.assertIsNot(new_model, model)
+            new_model = self.extension.flow_to_model(serialization)
+            # compares string representations of the dict, as it potentially
+            # contains complex objects that can not be compared with == op
+            self.assertEqual(str(model.get_params()), str(new_model.get_params()))
 
-        self.assertEqual(new_model.get_params(), model.get_params())
-        new_model.fit(self.X)
+            self.assertEqual(type(new_model), type(model))
+            self.assertIsNot(new_model, model)
 
-        self.assertEqual(check_dependencies_mock.call_count, 1)
+            self.assertEqual(new_model.get_params(), model.get_params())
+            new_model.fit(self.X)
+
+            self.assertEqual(check_dependencies_mock.call_count, 1)
 
     def test_serialize_model_with_subcomponent(self):
         model = sklearn.ensemble.AdaBoostClassifier(
@@ -215,7 +213,7 @@ class TestSklearn(TestBase):
             'sklearn.tree.tree.DecisionTreeClassifier': ['base_estimator']
         }
 
-        serialization = sklearn_to_flow(model)
+        serialization = self.extension.model_to_flow(model)
         structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
@@ -233,13 +231,10 @@ class TestSklearn(TestBase):
                          fixture_subcomponent_description)
         self.assertDictEqual(structure, fixture_structure)
 
-        new_model = flow_to_sklearn(serialization)
+        new_model = self.extension.flow_to_model(serialization)
         # compares string representations of the dict, as it potentially
         # contains complex objects that can not be compared with == op
-        # Only in Python 3.x, as Python 2 has Unicode issues
-        if sys.version_info[0] >= 3:
-            self.assertEqual(str(model.get_params()),
-                             str(new_model.get_params()))
+        self.assertEqual(str(model.get_params()), str(new_model.get_params()))
 
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
@@ -271,7 +266,7 @@ class TestSklearn(TestBase):
             'sklearn.dummy.DummyClassifier': ['dummy']
         }
 
-        serialization = sklearn_to_flow(model)
+        serialization = self.extension.model_to_flow(model)
         structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
@@ -288,11 +283,21 @@ class TestSklearn(TestBase):
             self.assertEqual(len(serialization.parameters), 2)
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
-        self.assertEqual(json.loads(serialization.parameters['steps']),
-                         [{'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'scaler', 'step_name': 'scaler'}},
-                          {'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'dummy', 'step_name': 'dummy'}}])
+        self.assertEqual(
+            json.loads(serialization.parameters['steps']),
+            [
+                {
+                    'oml-python:serialized_object':
+                        'component_reference',
+                    'value': {'key': 'scaler', 'step_name': 'scaler'}
+                },
+                {
+                    'oml-python:serialized_object':
+                        'component_reference',
+                    'value': {'key': 'dummy', 'step_name': 'dummy'}
+                }
+            ]
+        )
 
         # Checking the sub-component
         self.assertEqual(len(serialization.components), 2)
@@ -301,8 +306,7 @@ class TestSklearn(TestBase):
         self.assertIsInstance(serialization.components['dummy'],
                               OpenMLFlow)
 
-        #del serialization.model
-        new_model = flow_to_sklearn(serialization)
+        new_model = self.extension.flow_to_model(serialization)
         # compares string representations of the dict, as it potentially
         # contains complex objects that can not be compared with == op
         # Only in Python 3.x, as Python 2 has Unicode issues
@@ -346,7 +350,7 @@ class TestSklearn(TestBase):
             'sklearn.cluster.k_means_.KMeans': ['clusterer']
         }
 
-        serialization = sklearn_to_flow(model)
+        serialization = self.extension.model_to_flow(model)
         structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
@@ -363,11 +367,19 @@ class TestSklearn(TestBase):
             self.assertEqual(len(serialization.parameters), 2)
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
-        self.assertEqual(json.loads(serialization.parameters['steps']),
-                         [{'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'scaler', 'step_name': 'scaler'}},
-                          {'oml-python:serialized_object':
-                               'component_reference', 'value': {'key': 'clusterer', 'step_name': 'clusterer'}}])
+        self.assertEqual(
+            json.loads(serialization.parameters['steps']),
+            [
+                {
+                    'oml-python:serialized_object': 'component_reference',
+                    'value': {'key': 'scaler', 'step_name': 'scaler'}
+                },
+                {
+                    'oml-python:serialized_object': 'component_reference',
+                    'value': {'key': 'clusterer', 'step_name': 'clusterer'}
+                },
+            ]
+        )
 
         # Checking the sub-component
         self.assertEqual(len(serialization.components), 2)
@@ -377,7 +389,7 @@ class TestSklearn(TestBase):
                               OpenMLFlow)
 
         # del serialization.model
-        new_model = flow_to_sklearn(serialization)
+        new_model = self.extension.flow_to_model(serialization)
         # compares string representations of the dict, as it potentially
         # contains complex objects that can not be compared with == op
         # Only in Python 3.x, as Python 2 has Unicode issues
@@ -426,13 +438,13 @@ class TestSklearn(TestBase):
             'sklearn.preprocessing._encoders.OneHotEncoder': ['nominal']
         }
 
-        serialization = sklearn_to_flow(model)
+        serialization = self.extension.model_to_flow(model)
         structure = serialization.get_structure('name')
         self.assertEqual(serialization.name, fixture)
         self.assertEqual(serialization.description, fixture_description)
         self.assertDictEqual(structure, fixture_structure)
         # del serialization.model
-        new_model = flow_to_sklearn(serialization)
+        new_model = self.extension.flow_to_model(serialization)
         # compares string representations of the dict, as it potentially
         # contains complex objects that can not be compared with == op
         # Only in Python 3.x, as Python 2 has Unicode issues
@@ -441,7 +453,7 @@ class TestSklearn(TestBase):
                              str(new_model.get_params()))
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
-        serialization2 = sklearn_to_flow(new_model)
+        serialization2 = self.extension.model_to_flow(new_model)
         assert_flows_equal(serialization, serialization2)
 
     @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
@@ -478,22 +490,19 @@ class TestSklearn(TestBase):
         }
 
         fixture_description = 'Automatically created scikit-learn flow.'
-        serialization = sklearn_to_flow(model)
+        serialization = self.extension.model_to_flow(model)
         structure = serialization.get_structure('name')
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertDictEqual(structure, fixture_structure)
         # del serialization.model
-        new_model = flow_to_sklearn(serialization)
+        new_model = self.extension.flow_to_model(serialization)
         # compares string representations of the dict, as it potentially
         # contains complex objects that can not be compared with == op
-        # Only in Python 3.x, as Python 2 has Unicode issues
-        if sys.version_info[0] >= 3:
-            self.assertEqual(str(model.get_params()),
-                             str(new_model.get_params()))
+        self.assertEqual(str(model.get_params()), str(new_model.get_params()))
         self.assertEqual(type(new_model), type(model))
         self.assertIsNot(new_model, model)
-        serialization2 = sklearn_to_flow(new_model)
+        serialization2 = self.extension.model_to_flow(new_model)
         assert_flows_equal(serialization, serialization2)
 
     def test_serialize_feature_union(self):
@@ -504,8 +513,9 @@ class TestSklearn(TestBase):
         scaler = sklearn.preprocessing.StandardScaler()
 
         fu = sklearn.pipeline.FeatureUnion(
-            transformer_list=[('ohe', ohe), ('scaler', scaler)])
-        serialization = sklearn_to_flow(fu)
+            transformer_list=[('ohe', ohe), ('scaler', scaler)]
+        )
+        serialization = self.extension.model_to_flow(fu)
         structure = serialization.get_structure('name')
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = ('_encoders'
@@ -523,7 +533,7 @@ class TestSklearn(TestBase):
         }
         self.assertEqual(serialization.name, fixture_name)
         self.assertDictEqual(structure, fixture_structure)
-        new_model = flow_to_sklearn(serialization)
+        new_model = self.extension.flow_to_model(serialization)
         # compares string representations of the dict, as it potentially
         # contains complex objects that can not be compared with == op
         # Only in Python 3.x, as Python 2 has Unicode issues
@@ -562,12 +572,12 @@ class TestSklearn(TestBase):
         new_model.fit(self.X, self.y)
 
         fu.set_params(scaler=None)
-        serialization = sklearn_to_flow(fu)
+        serialization = self.extension.model_to_flow(fu)
         self.assertEqual(serialization.name,
                          'sklearn.pipeline.FeatureUnion('
                          'ohe=sklearn.preprocessing.{}.OneHotEncoder)'
                          .format(module_name_encoder))
-        new_model = flow_to_sklearn(serialization)
+        new_model = self.extension.flow_to_model(serialization)
         self.assertEqual(type(new_model), type(fu))
         self.assertIsNot(new_model, fu)
         self.assertIs(new_model.transformer_list[1][1], None)
@@ -581,8 +591,8 @@ class TestSklearn(TestBase):
             transformer_list=[('ohe', ohe), ('scaler', scaler)])
         fu2 = sklearn.pipeline.FeatureUnion(
             transformer_list=[('scaler', ohe), ('ohe', scaler)])
-        fu1_serialization = sklearn_to_flow(fu1)
-        fu2_serialization = sklearn_to_flow(fu2)
+        fu1_serialization = self.extension.model_to_flow(fu1)
+        fu2_serialization = self.extension.model_to_flow(fu2)
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = ('_encoders'
                                if LooseVersion(sklearn.__version__) >= "0.20"
@@ -617,7 +627,7 @@ class TestSklearn(TestBase):
         cv = sklearn.model_selection.StratifiedKFold(n_splits=5, shuffle=True)
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
-        serialized = sklearn_to_flow(rs)
+        serialized = self.extension.model_to_flow(rs)
         structure = serialized.get_structure('name')
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = ('_encoders'
@@ -645,17 +655,14 @@ class TestSklearn(TestBase):
         self.assertEqual(structure, fixture_structure)
 
         # now do deserialization
-        deserialized = flow_to_sklearn(serialized)
+        deserialized = self.extension.flow_to_model(serialized)
         # compares string representations of the dict, as it potentially
         # contains complex objects that can not be compared with == op
         # JvR: compare str length, due to memory address of distribution
-        # Only in Python 3.x, as Python 2 has Unicode issues
-        if sys.version_info[0] >= 3:
-            self.assertEqual(len(str(rs.get_params())),
-                             len(str(deserialized.get_params())))
+        self.assertEqual(len(str(rs.get_params())), len(str(deserialized.get_params())))
 
         # Checks that sklearn_to_flow is idempotent.
-        serialized2 = sklearn_to_flow(deserialized)
+        serialized2 = self.extension.model_to_flow(deserialized)
         self.assertNotEqual(rs, deserialized)
         # Would raise an exception if the flows would be unequal
         assert_flows_equal(serialized, serialized2)
@@ -665,8 +672,8 @@ class TestSklearn(TestBase):
                            int, np.int, np.int32, np.int64]
 
         for supported_type in supported_types:
-            serialized = sklearn_to_flow(supported_type)
-            deserialized = flow_to_sklearn(serialized)
+            serialized = self.extension.model_to_flow(supported_type)
+            deserialized = self.extension.flow_to_model(serialized)
             self.assertEqual(deserialized, supported_type)
 
     def test_serialize_rvs(self):
@@ -675,8 +682,8 @@ class TestSklearn(TestBase):
                          scipy.stats.randint(low=-3, high=15)]
 
         for supported_rv in supported_rvs:
-            serialized = sklearn_to_flow(supported_rv)
-            deserialized = flow_to_sklearn(serialized)
+            serialized = self.extension.model_to_flow(supported_rv)
+            deserialized = self.extension.flow_to_model(serialized)
             self.assertEqual(type(deserialized.dist), type(supported_rv.dist))
             del deserialized.dist
             del supported_rv.dist
@@ -684,26 +691,38 @@ class TestSklearn(TestBase):
                              supported_rv.__dict__)
 
     def test_serialize_function(self):
-        serialized =  sklearn_to_flow(sklearn.feature_selection.chi2)
-        deserialized = flow_to_sklearn(serialized)
+        serialized = self.extension.model_to_flow(sklearn.feature_selection.chi2)
+        deserialized = self.extension.flow_to_model(serialized)
         self.assertEqual(deserialized, sklearn.feature_selection.chi2)
 
     def test_serialize_cvobject(self):
         methods = [sklearn.model_selection.KFold(3),
                    sklearn.model_selection.LeaveOneOut()]
-        fixtures = [OrderedDict([('oml-python:serialized_object', 'cv_object'),
-                                 ('value', OrderedDict([('name', 'sklearn.model_selection._split.KFold'),
-                                                        ('parameters', OrderedDict([('n_splits', '3'),
-                                                                                    ('random_state', 'null'),
-                                                                                    ('shuffle', 'false')]))]))]),
-                    OrderedDict([('oml-python:serialized_object', 'cv_object'),
-                                 ('value', OrderedDict([('name', 'sklearn.model_selection._split.LeaveOneOut'),
-                                                        ('parameters', OrderedDict())]))])]
+        fixtures = [
+            OrderedDict([
+                ('oml-python:serialized_object', 'cv_object'),
+                ('value', OrderedDict([
+                    ('name', 'sklearn.model_selection._split.KFold'),
+                    ('parameters', OrderedDict([
+                        ('n_splits', '3'),
+                        ('random_state', 'null'),
+                        ('shuffle', 'false'),
+                    ]))
+                ]))
+            ]),
+            OrderedDict([
+                ('oml-python:serialized_object', 'cv_object'),
+                ('value', OrderedDict([
+                    ('name', 'sklearn.model_selection._split.LeaveOneOut'),
+                    ('parameters', OrderedDict())
+                ]))
+            ]),
+        ]
         for method, fixture in zip(methods, fixtures):
-            m = sklearn_to_flow(method)
+            m = self.extension.model_to_flow(method)
             self.assertEqual(m, fixture)
 
-            m_new = flow_to_sklearn(m)
+            m_new = self.extension.flow_to_model(m)
             self.assertIsNot(m_new, m)
             self.assertIsInstance(m_new, type(method))
 
@@ -726,8 +745,8 @@ class TestSklearn(TestBase):
               "criterion": ["gini", "entropy"]}]
 
         for grid, model in zip(grids, models):
-            serialized = sklearn_to_flow(grid)
-            deserialized = flow_to_sklearn(serialized)
+            serialized = self.extension.model_to_flow(grid)
+            deserialized = self.extension.flow_to_model(serialized)
 
             self.assertEqual(deserialized, grid)
             self.assertIsNot(deserialized, grid)
@@ -735,8 +754,8 @@ class TestSklearn(TestBase):
             hpo = sklearn.model_selection.GridSearchCV(
                 param_grid=grid, estimator=model)
 
-            serialized = sklearn_to_flow(hpo)
-            deserialized = flow_to_sklearn(serialized)
+            serialized = self.extension.model_to_flow(hpo)
+            deserialized = self.extension.flow_to_model(serialized)
             self.assertEqual(hpo.param_grid, deserialized.param_grid)
             self.assertEqual(hpo.estimator.get_params(),
                              deserialized.estimator.get_params())
@@ -767,8 +786,8 @@ class TestSklearn(TestBase):
                  'reduce_dim__k': N_FEATURES_OPTIONS,
                  'classify__C': C_OPTIONS}]
 
-        serialized = sklearn_to_flow(grid)
-        deserialized = flow_to_sklearn(serialized)
+        serialized = self.extension.model_to_flow(grid)
+        deserialized = self.extension.flow_to_model(serialized)
 
         self.assertEqual(grid[0]['reduce_dim'][0].get_params(),
                          deserialized[0]['reduce_dim'][0].get_params())
@@ -791,11 +810,30 @@ class TestSklearn(TestBase):
         self.assertEqual(grid[1]['classify__C'],
                          deserialized[1]['classify__C'])
 
+    def test_serialize_advanced_grid_fails(self):
+        # This unit test is checking that the test we skip above would actually fail
+
+        param_grid = {
+            "base_estimator": [
+                sklearn.tree.DecisionTreeClassifier(),
+                sklearn.tree.ExtraTreeClassifier()]
+        }
+
+        clf = sklearn.model_selection.GridSearchCV(
+            sklearn.ensemble.BaggingClassifier(),
+            param_grid=param_grid,
+        )
+        with self.assertRaisesRegex(
+            TypeError,
+            ".*OpenMLFlow.*is not JSON serializable",
+        ):
+            self.extension.model_to_flow(clf)
+
     def test_serialize_resampling(self):
         kfold = sklearn.model_selection.StratifiedKFold(
             n_splits=4, shuffle=True)
-        serialized =  sklearn_to_flow(kfold)
-        deserialized = flow_to_sklearn(serialized)
+        serialized = self.extension.model_to_flow(kfold)
+        deserialized = self.extension.flow_to_model(serialized)
         # Best approximation to get_params()
         self.assertEqual(str(deserialized), str(kfold))
         self.assertIsNot(deserialized, kfold)
@@ -807,8 +845,9 @@ class TestSklearn(TestBase):
 
         model = Model('true', '1', '0.1')
 
-        serialized = sklearn_to_flow(model)
-        deserialized = flow_to_sklearn(serialized)
+        serialized = self.extension.model_to_flow(model)
+        serialized.external_version = 'sklearn==test123'
+        deserialized = self.extension.flow_to_model(serialized)
         self.assertEqual(deserialized.get_params(), model.get_params())
         self.assertIsNot(deserialized, model)
 
@@ -817,9 +856,11 @@ class TestSklearn(TestBase):
         kernel = sklearn.gaussian_process.kernels.Matern()
         gp = sklearn.gaussian_process.GaussianProcessClassifier(
             kernel=kernel, optimizer=opt)
-        self.assertRaisesRegexp(TypeError, "Matern\(length_scale=1, nu=1.5\), "
-                                           "<class 'sklearn.gaussian_process.kernels.Matern'>",
-                                sklearn_to_flow, gp)
+        with self.assertRaisesRegex(
+            TypeError,
+            r"Matern\(length_scale=1, nu=1.5\), <class 'sklearn.gaussian_process.kernels.Matern'>",
+        ):
+            self.extension.model_to_flow(gp)
 
     def test_error_on_adding_component_multiple_times_to_flow(self):
         # this function implicitly checks
@@ -827,21 +868,22 @@ class TestSklearn(TestBase):
         pca = sklearn.decomposition.PCA()
         pca2 = sklearn.decomposition.PCA()
         pipeline = sklearn.pipeline.Pipeline((('pca1', pca), ('pca2', pca2)))
-        fixture = "Found a second occurence of component .*.PCA when trying " \
-                  "to serialize Pipeline"
-        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline)
+        fixture = "Found a second occurence of component .*.PCA when trying to serialize Pipeline"
+        with self.assertRaisesRegex(ValueError, fixture):
+            self.extension.model_to_flow(pipeline)
 
         fu = sklearn.pipeline.FeatureUnion((('pca1', pca), ('pca2', pca2)))
         fixture = "Found a second occurence of component .*.PCA when trying " \
                   "to serialize FeatureUnion"
-        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, fu)
+        with self.assertRaisesRegex(ValueError, fixture):
+            self.extension.model_to_flow(fu)
 
         fs = sklearn.feature_selection.SelectKBest()
         fu2 = sklearn.pipeline.FeatureUnion((('pca1', pca), ('fs', fs)))
         pipeline2 = sklearn.pipeline.Pipeline((('fu', fu2), ('pca2', pca2)))
-        fixture = "Found a second occurence of component .*.PCA when trying " \
-                  "to serialize Pipeline"
-        self.assertRaisesRegexp(ValueError, fixture, sklearn_to_flow, pipeline2)
+        fixture = "Found a second occurence of component .*.PCA when trying to serialize Pipeline"
+        with self.assertRaisesRegex(ValueError, fixture):
+            self.extension.model_to_flow(pipeline2)
 
     def test_subflow_version_propagated(self):
         this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -852,22 +894,22 @@ class TestSklearn(TestBase):
         pca = sklearn.decomposition.PCA()
         dummy = tests.test_flows.dummy_learn.dummy_forest.DummyRegressor()
         pipeline = sklearn.pipeline.Pipeline((('pca', pca), ('dummy', dummy)))
-        flow = sklearn_to_flow(pipeline)
+        flow = self.extension.model_to_flow(pipeline)
         # In python2.7, the unit tests work differently on travis-ci; therefore,
         # I put the alternative travis-ci answer here as well. While it has a
         # different value, it is still correct as it is a propagation of the
         # subclasses' module name
         self.assertEqual(flow.external_version, '%s,%s,%s' % (
-            _format_external_version('openml', openml.__version__),
-            _format_external_version('sklearn', sklearn.__version__),
-            _format_external_version('tests', '0.1')))
+            self.extension._format_external_version('openml', openml.__version__),
+            self.extension._format_external_version('sklearn', sklearn.__version__),
+            self.extension._format_external_version('tests', '0.1')))
 
     @mock.patch('warnings.warn')
     def test_check_dependencies(self, warnings_mock):
         dependencies = ['sklearn==0.1', 'sklearn>=99.99.99',
                         'sklearn>99.99.99']
         for dependency in dependencies:
-            self.assertRaises(ValueError, _check_dependencies, dependency)
+            self.assertRaises(ValueError, self.extension._check_dependencies, dependency)
 
     def test_illegal_parameter_names(self):
         # illegal name: estimators
@@ -882,7 +924,7 @@ class TestSklearn(TestBase):
         cases = [clf1, clf2]
 
         for case in cases:
-            self.assertRaises(PyOpenMLError, sklearn_to_flow, case)
+            self.assertRaises(PyOpenMLError, self.extension.model_to_flow, case)
 
     def test_illegal_parameter_names_pipeline(self):
         # illegal name: steps
@@ -932,7 +974,11 @@ class TestSklearn(TestBase):
             sklearn.model_selection.GridSearchCV(singlecore_bagging,
                                                  legal_param_dist),
             sklearn.model_selection.GridSearchCV(multicore_bagging,
-                                                 legal_param_dist)
+                                                 legal_param_dist),
+            sklearn.ensemble.BaggingClassifier(
+                n_jobs=-1,
+                base_estimator=sklearn.ensemble.RandomForestClassifier(n_jobs=5)
+            )
         ]
         illegal_models = [
             sklearn.model_selection.GridSearchCV(singlecore_bagging,
@@ -941,13 +987,18 @@ class TestSklearn(TestBase):
                                                  illegal_param_dist)
         ]
 
-        answers = [True, False, False, True, False, False, True, False]
+        can_measure_cputime_answers = [True, False, False, True, False, False, True, False, False]
+        can_measure_walltime_answers = [True, True, False, True, True, False, True, True, False]
 
-        for model, expected_answer in zip(legal_models, answers):
-            self.assertTrue(_check_n_jobs(model) == expected_answer)
+        for model, allowed_cputime, allowed_walltime in zip(legal_models,
+                                                            can_measure_cputime_answers,
+                                                            can_measure_walltime_answers):
+            self.assertEqual(self.extension._can_measure_cputime(model), allowed_cputime)
+            self.assertEqual(self.extension._can_measure_wallclocktime(model), allowed_walltime)
 
         for model in illegal_models:
-            self.assertRaises(PyOpenMLError, _check_n_jobs, model)
+            with self.assertRaises(PyOpenMLError):
+                self.extension._prevent_optimize_n_jobs(model)
 
     def test__get_fn_arguments_with_defaults(self):
         if LooseVersion(sklearn.__version__) < "0.19":
@@ -964,7 +1015,9 @@ class TestSklearn(TestBase):
             ]
 
         for fn, num_params_with_defaults in fns:
-            defaults, defaultless = openml.flows.sklearn_converter._get_fn_arguments_with_defaults(fn)
+            defaults, defaultless = (
+                self.extension._get_fn_arguments_with_defaults(fn)
+            )
             self.assertIsInstance(defaults, dict)
             self.assertIsInstance(defaultless, set)
             # check whether we have both defaults and defaultless params
@@ -990,14 +1043,15 @@ class TestSklearn(TestBase):
                   'OneHotEncoder__sparse': False,
                   'Estimator__min_samples_leaf': 42}
         pipe_adjusted.set_params(**params)
-        flow = openml.flows.sklearn_to_flow(pipe_adjusted)
-        pipe_deserialized = openml.flows.flow_to_sklearn(
-            flow, initialize_with_defaults=True)
+        flow = self.extension.model_to_flow(pipe_adjusted)
+        pipe_deserialized = self.extension.flow_to_model(flow, initialize_with_defaults=True)
 
         # we want to compare pipe_deserialized and pipe_orig. We use the flow
         # equals function for this
-        assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig),
-                           openml.flows.sklearn_to_flow(pipe_deserialized))
+        assert_flows_equal(
+            self.extension.model_to_flow(pipe_orig),
+            self.extension.model_to_flow(pipe_deserialized),
+        )
 
     def test_deserialize_adaboost_with_defaults(self):
         # used the 'initialize_with_defaults' flag of the deserialization
@@ -1014,25 +1068,34 @@ class TestSklearn(TestBase):
                   'OneHotEncoder__sparse': False,
                   'Estimator__n_estimators': 10}
         pipe_adjusted.set_params(**params)
-        flow = openml.flows.sklearn_to_flow(pipe_adjusted)
-        pipe_deserialized = openml.flows.flow_to_sklearn(
-            flow, initialize_with_defaults=True)
+        flow = self.extension.model_to_flow(pipe_adjusted)
+        pipe_deserialized = self.extension.flow_to_model(flow, initialize_with_defaults=True)
 
         # we want to compare pipe_deserialized and pipe_orig. We use the flow
         # equals function for this
-        assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig),
-                           openml.flows.sklearn_to_flow(pipe_deserialized))
+        assert_flows_equal(
+            self.extension.model_to_flow(pipe_orig),
+            self.extension.model_to_flow(pipe_deserialized),
+        )
 
     def test_deserialize_complex_with_defaults(self):
         # used the 'initialize_with_defaults' flag of the deserialization
         # method to return a flow that contains default hyperparameter
         # settings.
-        steps = [('Imputer', Imputer()),
-                 ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
-                 ('Estimator', sklearn.ensemble.AdaBoostClassifier(
-                     sklearn.ensemble.BaggingClassifier(
+        steps = [
+            ('Imputer', Imputer()),
+            ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
+            (
+                'Estimator',
+                sklearn.ensemble.AdaBoostClassifier(
+                    sklearn.ensemble.BaggingClassifier(
                         sklearn.ensemble.GradientBoostingClassifier(
-                            sklearn.neighbors.KNeighborsClassifier()))))]
+                            sklearn.neighbors.KNeighborsClassifier()
+                        )
+                    )
+                )
+            ),
+        ]
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
 
         pipe_adjusted = sklearn.clone(pipe_orig)
@@ -1043,13 +1106,15 @@ class TestSklearn(TestBase):
                   'Estimator__base_estimator__base_estimator__learning_rate': 0.1,
                   'Estimator__base_estimator__base_estimator__loss__n_neighbors': 13}
         pipe_adjusted.set_params(**params)
-        flow = openml.flows.sklearn_to_flow(pipe_adjusted)
-        pipe_deserialized = openml.flows.flow_to_sklearn(flow, initialize_with_defaults=True)
+        flow = self.extension.model_to_flow(pipe_adjusted)
+        pipe_deserialized = self.extension.flow_to_model(flow, initialize_with_defaults=True)
 
         # we want to compare pipe_deserialized and pipe_orig. We use the flow
         # equals function for this
-        assert_flows_equal(openml.flows.sklearn_to_flow(pipe_orig),
-                           openml.flows.sklearn_to_flow(pipe_deserialized))
+        assert_flows_equal(
+            self.extension.model_to_flow(pipe_orig),
+            self.extension.model_to_flow(pipe_deserialized),
+        )
 
     def test_openml_param_name_to_sklearn(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
@@ -1057,7 +1122,7 @@ class TestSklearn(TestBase):
             base_estimator=sklearn.tree.DecisionTreeClassifier())
         model = sklearn.pipeline.Pipeline(steps=[
             ('scaler', scaler), ('boosting', boosting)])
-        flow = openml.flows.sklearn_to_flow(model)
+        flow = self.extension.model_to_flow(model)
         task = openml.tasks.get_task(115)
         run = openml.runs.run_flow_on_task(flow, task)
         run = run.publish()
@@ -1068,8 +1133,7 @@ class TestSklearn(TestBase):
         self.assertGreater(len(setup.parameters), 15)
 
         for parameter in setup.parameters.values():
-            sklearn_name = openml.flows.openml_param_name_to_sklearn(
-                parameter, flow)
+            sklearn_name = self.extension._openml_param_name_to_sklearn(parameter, flow)
 
             # test the inverse. Currently, OpenML stores the hyperparameter
             # fullName as flow.name + flow.version + parameter.name on the
@@ -1087,21 +1151,23 @@ class TestSklearn(TestBase):
             self.assertEqual(parameter.full_name, openml_name)
 
     def test_obtain_parameter_values_flow_not_from_server(self):
-        model = sklearn.linear_model.LogisticRegression()
-        flow = sklearn_to_flow(model)
+        model = sklearn.linear_model.LogisticRegression(solver='lbfgs')
+        flow = self.extension.model_to_flow(model)
         msg = 'Flow sklearn.linear_model.logistic.LogisticRegression has no ' \
               'flow_id!'
 
-        self.assertRaisesRegexp(ValueError, msg,
-                                openml.flows.obtain_parameter_values, flow)
+        with self.assertRaisesRegex(ValueError, msg):
+            self.extension.obtain_parameter_values(flow)
 
         model = sklearn.ensemble.AdaBoostClassifier(
-            base_estimator=sklearn.linear_model.LogisticRegression()
+            base_estimator=sklearn.linear_model.LogisticRegression(
+                solver='lbfgs',
+            )
         )
-        flow = sklearn_to_flow(model)
+        flow = self.extension.model_to_flow(model)
         flow.flow_id = 1
-        self.assertRaisesRegexp(ValueError, msg,
-                                openml.flows.obtain_parameter_values, flow)
+        with self.assertRaisesRegex(ValueError, msg):
+            self.extension.obtain_parameter_values(flow)
 
     def test_obtain_parameter_values(self):
 
@@ -1116,12 +1182,417 @@ class TestSklearn(TestBase):
             cv=sklearn.model_selection.StratifiedKFold(n_splits=2,
                                                        random_state=1),
             n_iter=5)
-        flow = sklearn_to_flow(model)
+        flow = self.extension.model_to_flow(model)
         flow.flow_id = 1
         flow.components['estimator'].flow_id = 2
-        parameters = openml.flows.obtain_parameter_values(flow)
+        parameters = self.extension.obtain_parameter_values(flow)
         for parameter in parameters:
             self.assertIsNotNone(parameter['oml:component'], msg=parameter)
             if parameter['oml:name'] == 'n_estimators':
                 self.assertEqual(parameter['oml:value'], '5')
                 self.assertEqual(parameter['oml:component'], 2)
+
+    def test_numpy_type_allowed_in_flow(self):
+        """ Simple numpy types should be serializable. """
+        dt = sklearn.tree.DecisionTreeClassifier(
+            max_depth=np.float64(3.0),
+            min_samples_leaf=np.int32(5)
+        )
+        self.extension.model_to_flow(dt)
+
+    def test_numpy_array_not_allowed_in_flow(self):
+        """ Simple numpy arrays should not be serializable. """
+        bin = sklearn.preprocessing.MultiLabelBinarizer(classes=np.asarray([1, 2, 3]))
+        with self.assertRaises(TypeError):
+            self.extension.model_to_flow(bin)
+
+
+class TestSklearnExtensionRunFunctions(TestBase):
+    _multiprocess_can_split_ = True
+
+    def setUp(self):
+        super().setUp(n_levels=2)
+        self.extension = SklearnExtension()
+
+    ################################################################################################
+    # Test methods for performing runs with this extension module
+
+    def test_seed_model(self):
+        # randomized models that are initialized without seeds, can be seeded
+        randomized_clfs = [
+            sklearn.ensemble.BaggingClassifier(),
+            sklearn.model_selection.RandomizedSearchCV(
+                sklearn.ensemble.RandomForestClassifier(),
+                {
+                    "max_depth": [3, None],
+                    "max_features": [1, 2, 3, 4],
+                    "bootstrap": [True, False],
+                    "criterion": ["gini", "entropy"],
+                    "random_state": [-1, 0, 1, 2],
+                },
+                cv=sklearn.model_selection.StratifiedKFold(n_splits=2, shuffle=True),
+            ),
+            sklearn.dummy.DummyClassifier()
+        ]
+
+        for idx, clf in enumerate(randomized_clfs):
+            const_probe = 42
+            all_params = clf.get_params()
+            params = [key for key in all_params if
+                      key.endswith('random_state')]
+            self.assertGreater(len(params), 0)
+
+            # before param value is None
+            for param in params:
+                self.assertIsNone(all_params[param])
+
+            # now seed the params
+            clf_seeded = self.extension.seed_model(clf, const_probe)
+            new_params = clf_seeded.get_params()
+
+            randstate_params = [key for key in new_params if
+                                key.endswith('random_state')]
+
+            # afterwards, param value is set
+            for param in randstate_params:
+                self.assertIsInstance(new_params[param], int)
+                self.assertIsNotNone(new_params[param])
+
+            if idx == 1:
+                self.assertEqual(clf.cv.random_state, 56422)
+
+    def test_seed_model_raises(self):
+        # the _set_model_seed_where_none should raise exception if random_state is
+        # anything else than an int
+        randomized_clfs = [
+            sklearn.ensemble.BaggingClassifier(random_state=np.random.RandomState(42)),
+            sklearn.dummy.DummyClassifier(random_state="OpenMLIsGreat")
+        ]
+
+        for clf in randomized_clfs:
+            with self.assertRaises(ValueError):
+                self.extension.seed_model(model=clf, seed=42)
+
+    def test_run_model_on_fold_classification_1(self):
+        task = openml.tasks.get_task(1)
+
+        X, y = task.get_X_and_y()
+        train_indices, test_indices = task.get_train_test_split_indices(
+            repeat=0, fold=0, sample=0)
+        X_train = X[train_indices]
+        y_train = y[train_indices]
+        X_test = X[test_indices]
+        y_test = y[test_indices]
+
+        pipeline = sklearn.pipeline.Pipeline(steps=[
+            ('imp', sklearn.preprocessing.Imputer()),
+            ('clf', sklearn.tree.DecisionTreeClassifier()),
+        ])
+        # TODO add some mocking here to actually test the innards of this function, too!
+        res = self.extension._run_model_on_fold(
+            model=pipeline,
+            task=task,
+            fold_no=0,
+            rep_no=0,
+            X_train=X_train,
+            y_train=y_train,
+            X_test=X_test,
+        )
+
+        y_hat, y_hat_proba, user_defined_measures, trace = res
+
+        # predictions
+        self.assertIsInstance(y_hat, np.ndarray)
+        self.assertEqual(y_hat.shape, y_test.shape)
+        self.assertIsInstance(y_hat_proba, np.ndarray)
+        self.assertEqual(y_hat_proba.shape, (y_test.shape[0], 6))
+        np.testing.assert_array_almost_equal(np.sum(y_hat_proba, axis=1), np.ones(y_test.shape))
+        # The class '4' (at index 3) is not present in the training data. We check that the
+        # predicted probabilities for that class are zero!
+        np.testing.assert_array_almost_equal(y_hat_proba[:, 3], np.zeros(y_test.shape))
+        for i in (0, 1, 2, 4, 5):
+            self.assertTrue(np.any(y_hat_proba[:, i] != np.zeros(y_test.shape)))
+
+        # check user defined measures
+        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        for measure in user_defined_measures:
+            fold_evaluations[measure][0][0] = user_defined_measures[measure]
+
+        # trace. SGD does not produce any
+        self.assertIsNone(trace)
+
+        self._check_fold_timing_evaluations(
+            fold_evaluations,
+            num_repeats=1,
+            num_folds=1,
+            task_type=task.task_type_id,
+            check_scores=False,
+        )
+
+    def test_run_model_on_fold_classification_2(self):
+        task = openml.tasks.get_task(7)
+
+        X, y = task.get_X_and_y()
+        train_indices, test_indices = task.get_train_test_split_indices(
+            repeat=0, fold=0, sample=0)
+        X_train = X[train_indices]
+        y_train = y[train_indices]
+        X_test = X[test_indices]
+        y_test = y[test_indices]
+
+        pipeline = sklearn.model_selection.GridSearchCV(
+            sklearn.tree.DecisionTreeClassifier(),
+            {
+                "max_depth": [1, 2],
+            },
+        )
+        # TODO add some mocking here to actually test the innards of this function, too!
+        res = self.extension._run_model_on_fold(
+            model=pipeline,
+            task=task,
+            fold_no=0,
+            rep_no=0,
+            X_train=X_train,
+            y_train=y_train,
+            X_test=X_test,
+        )
+
+        y_hat, y_hat_proba, user_defined_measures, trace = res
+
+        # predictions
+        self.assertIsInstance(y_hat, np.ndarray)
+        self.assertEqual(y_hat.shape, y_test.shape)
+        self.assertIsInstance(y_hat_proba, np.ndarray)
+        self.assertEqual(y_hat_proba.shape, (y_test.shape[0], 2))
+        np.testing.assert_array_almost_equal(np.sum(y_hat_proba, axis=1), np.ones(y_test.shape))
+        for i in (0, 1):
+            self.assertTrue(np.any(y_hat_proba[:, i] != np.zeros(y_test.shape)))
+
+        # check user defined measures
+        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        for measure in user_defined_measures:
+            fold_evaluations[measure][0][0] = user_defined_measures[measure]
+
+        # check that it produced and returned a trace object of the correct length
+        self.assertIsInstance(trace, OpenMLRunTrace)
+        self.assertEqual(len(trace.trace_iterations), 2)
+
+        self._check_fold_timing_evaluations(
+            fold_evaluations,
+            num_repeats=1,
+            num_folds=1,
+            task_type=task.task_type_id,
+            check_scores=False,
+        )
+
+    def test_run_model_on_fold_classification_3(self):
+
+        class HardNaiveBayes(sklearn.naive_bayes.GaussianNB):
+            # class for testing a naive bayes classifier that does not allow soft
+            # predictions
+            def __init__(self, priors=None):
+                super(HardNaiveBayes, self).__init__(priors)
+
+            def predict_proba(*args, **kwargs):
+                raise AttributeError('predict_proba is not available when '
+                                     'probability=False')
+
+        # task 1 (test server) is important: it is a task with an unused class
+        tasks = [1, 3, 115]
+        flow = unittest.mock.Mock()
+        flow.name = 'dummy'
+
+        for task_id in tasks:
+            task = openml.tasks.get_task(task_id)
+            X, y = task.get_X_and_y()
+            train_indices, test_indices = task.get_train_test_split_indices(
+                repeat=0, fold=0, sample=0)
+            X_train = X[train_indices]
+            y_train = y[train_indices]
+            X_test = X[test_indices]
+            clf1 = sklearn.pipeline.Pipeline(steps=[
+                ('imputer', sklearn.preprocessing.Imputer()),
+                ('estimator', sklearn.naive_bayes.GaussianNB())
+            ])
+            clf2 = sklearn.pipeline.Pipeline(steps=[
+                ('imputer', sklearn.preprocessing.Imputer()),
+                ('estimator', HardNaiveBayes())
+            ])
+
+            pred_1, proba_1, _, _ = self.extension._run_model_on_fold(
+                model=clf1,
+                task=task,
+                X_train=X_train,
+                y_train=y_train,
+                X_test=X_test,
+                fold_no=0,
+                rep_no=0,
+            )
+            pred_2, proba_2, _, _ = self.extension._run_model_on_fold(
+                model=clf2,
+                task=task,
+                X_train=X_train,
+                y_train=y_train,
+                X_test=X_test,
+                fold_no=0,
+                rep_no=0,
+            )
+
+            # verifies that the predictions are identical
+            np.testing.assert_array_equal(pred_1, pred_2)
+            np.testing.assert_array_almost_equal(np.sum(proba_1, axis=1), np.ones(X_test.shape[0]))
+            # Test that there are predictions other than ones and zeros
+            self.assertLess(
+                np.sum(proba_1 == 0) + np.sum(proba_1 == 1),
+                X_test.shape[0] * len(task.class_labels),
+            )
+
+            np.testing.assert_array_almost_equal(np.sum(proba_2, axis=1), np.ones(X_test.shape[0]))
+            # Test that there are only ones and zeros predicted
+            self.assertEqual(
+                np.sum(proba_2 == 0) + np.sum(proba_2 == 1),
+                X_test.shape[0] * len(task.class_labels),
+            )
+
+    def test_run_model_on_fold_regression(self):
+        # There aren't any regression tasks on the test server
+        openml.config.server = self.production_server
+        task = openml.tasks.get_task(2999)
+
+        X, y = task.get_X_and_y()
+        train_indices, test_indices = task.get_train_test_split_indices(
+            repeat=0, fold=0, sample=0)
+        X_train = X[train_indices]
+        y_train = y[train_indices]
+        X_test = X[test_indices]
+        y_test = y[test_indices]
+
+        pipeline = sklearn.pipeline.Pipeline(steps=[
+            ('imp', sklearn.preprocessing.Imputer()),
+            ('clf', sklearn.tree.DecisionTreeRegressor()),
+        ])
+        # TODO add some mocking here to actually test the innards of this function, too!
+        res = self.extension._run_model_on_fold(
+            model=pipeline,
+            task=task,
+            fold_no=0,
+            rep_no=0,
+            X_train=X_train,
+            y_train=y_train,
+            X_test=X_test,
+        )
+
+        y_hat, y_hat_proba, user_defined_measures, trace = res
+
+        # predictions
+        self.assertIsInstance(y_hat, np.ndarray)
+        self.assertEqual(y_hat.shape, y_test.shape)
+        self.assertIsNone(y_hat_proba)
+
+        # check user defined measures
+        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        for measure in user_defined_measures:
+            fold_evaluations[measure][0][0] = user_defined_measures[measure]
+
+        # trace. SGD does not produce any
+        self.assertIsNone(trace)
+
+        self._check_fold_timing_evaluations(
+            fold_evaluations,
+            num_repeats=1,
+            num_folds=1,
+            task_type=task.task_type_id,
+            check_scores=False,
+        )
+
+    def test_run_model_on_fold_clustering(self):
+        # There aren't any regression tasks on the test server
+        openml.config.server = self.production_server
+        task = openml.tasks.get_task(126033)
+
+        X = task.get_X(dataset_format='array')
+
+        pipeline = sklearn.pipeline.Pipeline(steps=[
+            ('imp', sklearn.preprocessing.Imputer()),
+            ('clf', sklearn.cluster.KMeans()),
+        ])
+        # TODO add some mocking here to actually test the innards of this function, too!
+        res = self.extension._run_model_on_fold(
+            model=pipeline,
+            task=task,
+            fold_no=0,
+            rep_no=0,
+            X_train=X,
+        )
+
+        y_hat, y_hat_proba, user_defined_measures, trace = res
+
+        # predictions
+        self.assertIsInstance(y_hat, np.ndarray)
+        self.assertEqual(y_hat.shape, (X.shape[0], ))
+        self.assertIsNone(y_hat_proba)
+
+        # check user defined measures
+        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        for measure in user_defined_measures:
+            fold_evaluations[measure][0][0] = user_defined_measures[measure]
+
+        # trace. SGD does not produce any
+        self.assertIsNone(trace)
+
+        self._check_fold_timing_evaluations(
+            fold_evaluations,
+            num_repeats=1,
+            num_folds=1,
+            task_type=task.task_type_id,
+            check_scores=False,
+        )
+
+    def test__extract_trace_data(self):
+
+        param_grid = {"hidden_layer_sizes": [[5, 5], [10, 10], [20, 20]],
+                      "activation": ['identity', 'logistic', 'tanh', 'relu'],
+                      "learning_rate_init": [0.1, 0.01, 0.001, 0.0001],
+                      "max_iter": [10, 20, 40, 80]}
+        num_iters = 10
+        task = openml.tasks.get_task(20)
+        clf = sklearn.model_selection.RandomizedSearchCV(
+            sklearn.neural_network.MLPClassifier(),
+            param_grid,
+            num_iters,
+        )
+        # just run the task on the model (without invoking any fancy extension & openml code)
+        train, _ = task.get_train_test_split_indices(0, 0)
+        X, y = task.get_X_and_y()
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            clf.fit(X[train], y[train])
+
+        # check num layers of MLP
+        self.assertIn(clf.best_estimator_.hidden_layer_sizes, param_grid['hidden_layer_sizes'])
+
+        trace_list = self.extension._extract_trace_data(clf, rep_no=0, fold_no=0)
+        trace = self.extension._obtain_arff_trace(clf, trace_list)
+
+        self.assertIsInstance(trace, OpenMLRunTrace)
+        self.assertIsInstance(trace_list, list)
+        self.assertEqual(len(trace_list), num_iters)
+
+        for trace_iteration in iter(trace):
+            self.assertEqual(trace_iteration.repeat, 0)
+            self.assertEqual(trace_iteration.fold, 0)
+            self.assertGreaterEqual(trace_iteration.iteration, 0)
+            self.assertLessEqual(trace_iteration.iteration, num_iters)
+            self.assertIsNone(trace_iteration.setup_string)
+            self.assertIsInstance(trace_iteration.evaluation, float)
+            self.assertTrue(np.isfinite(trace_iteration.evaluation))
+            self.assertIsInstance(trace_iteration.selected, bool)
+
+            self.assertEqual(len(trace_iteration.parameters), len(param_grid))
+            for param in param_grid:
+
+                # Prepend with the "parameter_" prefix
+                param_in_trace = "parameter_%s" % param
+                self.assertIn(param_in_trace, trace_iteration.parameters)
+                param_value = json.loads(trace_iteration.parameters[param_in_trace])
+                self.assertTrue(param_value in param_grid[param])
