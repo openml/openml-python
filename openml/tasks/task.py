@@ -45,29 +45,32 @@ class OpenMLTask(ABC):
     def __str__(self):
         object_dict = self.__dict__
         output_str = ''
-        task_type = '\n%-20s: %s\n' % ("Task Type", object_dict['task_type'])
-        task_id = '%-20s: %s\n' % ("Task ID", object_dict['task_id'])
+        header = "OpenML Task"
+        header = '{}\n{}\n'.format(header, '=' * len(header))
+        task_type = '{:.<20}: {}\n'.format("Task Type", object_dict['task_type'])
+        task_id = '{:.<20}: {}\n'.format("Task ID", object_dict['task_id'])
         url = 'https://www.openml.org/t/' + str(object_dict['task_id'])
-        task_url = '%-20s: %s\n' % ("Task URL", url)
+        task_url = '{:.<20}: {}\n'.format("Task URL", url)
         evaluation_measure = ''
         if object_dict['evaluation_measure'] is not None:
-            evaluation_measure = '%-20s: %s\n' % ("Evaluation Measure",
-                                                  object_dict['evaluation_measure'])
+            evaluation_measure = '{:.<20}: {}\n'.format("Evaluation Measure",
+                                                        object_dict['evaluation_measure'])
         estimation_procedure = ''
         if object_dict['estimation_procedure'] is not None:
-            estimation_procedure = '%-20s: %s\n' % ("Estimation Procedure",
-                                                    object_dict['estimation_procedure']['type'])
+            procedure = object_dict['estimation_procedure']['type']
+            estimation_procedure = '{:.<20}: {}\n'.format("Estimation Procedure", procedure)
         target = ''
         class_labels = ''
         cost_matrix = ''
         if object_dict['target_name'] is not None:
-            target = '%-20s: %s\n' % ("Target Feature", object_dict['target_name'])
+            target = '{:.<20}: {}\n'.format("Target Feature", object_dict['target_name'])
             if 'class_labels' in object_dict:
-                class_labels = '%-20s: %s\n' % ("# of Classes", len(object_dict['class_labels']))
+                class_labels = '{:.<20}: {}\n'.format("# of Classes",
+                                                      len(object_dict['class_labels']))
             if 'cost_matrix' in object_dict:
-                cost_matrix = '%-20s: %s\n' % ("Cost Matrix", "Available")
-        output_str = task_type + task_id + task_url + evaluation_measure + estimation_procedure + \
-            target + class_labels + cost_matrix
+                cost_matrix = '{:.<20}: {}\n'.format("Cost Matrix", "Available")
+        output_str = '\n' + header + task_type + task_id + task_url + estimation_procedure + \
+            evaluation_measure + target + class_labels + cost_matrix + '\n'
         return(output_str)
 
     def get_dataset(self) -> datasets.OpenMLDataset:

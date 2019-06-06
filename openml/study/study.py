@@ -92,32 +92,33 @@ class BaseStudy(object):
     def __str__(self):
         object_dict = self.__dict__
         output_str = ''
-        id = '\n%-16s: %s\n' % ("ID", object_dict['id'])
-        name = '%-16s: %s\n' % ("Name", object_dict['name'])
-        status = '%-16s: %s\n' % ("Status", object_dict['status'])
-        main_entity_type = '%-16s: %s\n' % ("Main Entity Type", object_dict['main_entity_type'])
+        id = '{:.<16}: {}\n'.format("ID", object_dict['id'])
+        name = '{:.<16}: {}\n'.format("Name", object_dict['name'])
+        status = '{:.<16}: {}\n'.format("Status", object_dict['status'])
+        main_entity_type = '{:.<16}: {}\n'.format("Main Entity Type",
+                                                  object_dict['main_entity_type'])
         url = 'https://www.openml.org/s/' + str(object_dict['id'])
-        study_url = '%-16s: %s\n' % ("Study URL", url)
+        study_url = '{:.<16}: {}\n'.format("Study URL", url)
         data = ''
         if object_dict['data'] is not None:
-            data = '%-16s: %s\n' % ("# of Data", len(object_dict['data']))
+            data = '{:.<16}: {}\n'.format("# of Data", len(object_dict['data']))
         tasks = ''
         if object_dict['tasks'] is not None:
-            tasks = '%-16s: %s\n' % ("# of Tasks", len(object_dict['tasks']))
+            tasks = '{:.<16}: {}\n'.format("# of Tasks", len(object_dict['tasks']))
         flows = ''
         if object_dict['flows'] is not None:
-            flows = '%-16s: %s\n' % ("# of Flows", len(object_dict['flows']))
+            flows = '{:.<16}: {}\n'.format("# of Flows", len(object_dict['flows']))
         runs = ''
         if object_dict['runs'] is not None:
-            runs = '%-16s: %s\n' % ("# of Runs", len(object_dict['runs']))
+            runs = '{:.<16}: {}\n'.format("# of Runs", len(object_dict['runs']))
 
         url = 'https://www.openml.org/u/' + str(object_dict['creator'])
-        creator = '\n%-16s: %s\n' % ("Creator", url)
-        upload_time = '%-16s: %s\n' % ("Upload Time",
-                                       object_dict['creation_date'].replace('T', ' '))
+        creator = '{:.<16}: {}\n'.format("Creator", url)
+        upload_time = '{:.<16}: {}\n'.format("Upload Time",
+                                             object_dict['creation_date'].replace('T', ' '))
         output_str = id + name + status + main_entity_type + study_url + data + \
             tasks + flows + runs + creator + upload_time
-        return(output_str)
+        return output_str
 
     def publish(self) -> int:
         """
@@ -263,6 +264,13 @@ class OpenMLStudy(BaseStudy):
             setups=setups,
         )
 
+    def __str__(self):
+        header = "OpenML Study"
+        header = '{}\n{}\n'.format(header, '=' * len(header))
+        body = super(OpenMLStudy, self).__str__()
+        output_str = '\n' + header + body + '\n'
+        return output_str
+
 
 class OpenMLBenchmarkSuite(BaseStudy):
 
@@ -332,3 +340,10 @@ class OpenMLBenchmarkSuite(BaseStudy):
             runs=None,
             setups=None,
         )
+
+    def __str__(self):
+        header = "OpenML Benchmark Suite"
+        header = '{}\n{}\n'.format(header, '=' * len(header))
+        body = super(OpenMLBenchmarkSuite, self).__str__()
+        output_str = '\n' + header + body + '\n'
+        return output_str

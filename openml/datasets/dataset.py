@@ -176,24 +176,27 @@ class OpenMLDataset(object):
     def __str__(self):
         object_dict = self.__dict__
         output_str = ''
-        name = '\n%-14s: %s\n' % ("Name", object_dict['name'])
-        version = '%-14s: %s\n' % ("Version", object_dict['version'])
-        format = '%-14s: %s\n' % ("Format", object_dict['format'])
-        date = '%-14s: %s\n' % ("Upload Date", object_dict['upload_date'].replace('T', ' '))
-        licence = '%-14s: %s\n' % ("Licence", object_dict['licence'])
-        d_url = '%-14s: %s\n' % ("Download URL", object_dict['url'])
+        header = "OpenML Dataset"
+        header = '{}\n{}\n'.format(header, '=' * len(header))
+        name = '{:.<14}: {}\n'.format("Name", object_dict['name'])
+        version = '{:.<14}: {}\n'.format("Version", object_dict['version'])
+        format = '{:.<14}: {}\n'.format("Format", object_dict['format'])
+        date = '{:.<14}: {}\n'.format("Upload Date", object_dict['upload_date'].replace('T', ' '))
+        licence = '{:.<14}: {}\n'.format("Licence", object_dict['licence'])
+        d_url = '{:.<14}: {}\n'.format("Download URL", object_dict['url'])
         base_url = 'https://www.openml.org/d/'
-        w_url = '%-14s: %s\n' % ("OpenML URL", base_url + str(self.dataset_id))
-        local_file = '%-14s: %s\n' % ("Data file", object_dict['data_file'])
-        pickle_file = '%-14s: %s\n' % ("Pickle file", object_dict['data_pickle_file'])
+        w_url = '{:.<14}: {}\n'.format("OpenML URL", base_url + str(self.dataset_id))
+        local_file = '{:.<14}: {}\n'.format("Data file", object_dict['data_file'])
+        pickle_file = '{:.<14}: {}\n'.format("Pickle file", object_dict['data_pickle_file'])
+        num_features = '{:.<14}: {}\n'.format("# of features", len(object_dict['features']))
         num_instances = ''
         if object_dict['qualities']['NumberOfInstances'] is not None:
-            num_instances = '%-14s: %d\n' % ("# of instances",
-                                             object_dict['qualities']['NumberOfInstances'])
-        num_features = '%-14s: %d\n' % ("# of features", len(object_dict['features']))
-        output_str = name + version + format + date + licence + d_url + w_url + local_file + \
-            pickle_file + num_instances + num_features
-        return(output_str)
+            num_instances = '{:.<14}: {}\n'.format("# of instances",
+                                                   object_dict['qualities']['NumberOfInstances'])
+
+        output_str = '\n' + header + name + version + format + date + licence + d_url + w_url + \
+            local_file + pickle_file + num_features + num_instances + '\n'
+        return output_str
 
     def _data_arff_to_pickle(self, data_file):
         data_pickle_file = data_file.replace('.arff', '.pkl.py3')
