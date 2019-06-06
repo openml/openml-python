@@ -368,9 +368,18 @@ class OpenMLDataset(object):
     def _convert_array_format(data, array_format, attribute_names):
         """Convert a dataset to a given array format.
 
-        By default, the data are stored as a sparse matrix or a pandas
-        dataframe. One might be interested to get a pandas SparseDataFrame or a
-        NumPy array instead, respectively.
+        Parameters
+        ----------
+        array_format : str
+            Tag to attach to the dataset to get a pandas SparseDataFrame or a
+            NumPy array instead.
+            - If array_format='array'
+                Converts non-sparse numeric data to numpy-array
+                Enforces numeric encoding of categorical columns
+                Missing values are represented as NaN in the dataframe
+            - If array_format='dataframe'
+                Convers sparse data to sparse dataframe
+
         """
         if array_format == "array" and not scipy.sparse.issparse(data):
             # We encode the categories such that they are integer to be able
