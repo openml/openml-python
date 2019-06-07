@@ -174,29 +174,32 @@ class OpenMLDataset(object):
             self.data_pickle_file = None
 
     def __str__(self):
-        object_dict = self.__dict__
-        output_str = ''
         header = "OpenML Dataset"
         header = '{}\n{}\n'.format(header, '=' * len(header))
-        name = '{:.<14}: {}\n'.format("Name", object_dict['name'])
-        version = '{:.<14}: {}\n'.format("Version", object_dict['version'])
-        format = '{:.<14}: {}\n'.format("Format", object_dict['format'])
-        date = '{:.<14}: {}\n'.format("Upload Date", object_dict['upload_date'].replace('T', ' '))
-        licence = '{:.<14}: {}\n'.format("Licence", object_dict['licence'])
-        d_url = '{:.<14}: {}\n'.format("Download URL", object_dict['url'])
-        base_url = 'https://www.openml.org/d/'
-        w_url = '{:.<14}: {}\n'.format("OpenML URL", base_url + str(self.dataset_id))
-        local_file = '{:.<14}: {}\n'.format("Data file", object_dict['data_file'])
-        pickle_file = '{:.<14}: {}\n'.format("Pickle file", object_dict['data_pickle_file'])
-        num_features = '{:.<14}: {}\n'.format("# of features", len(object_dict['features']))
-        num_instances = ''
-        if object_dict['qualities']['NumberOfInstances'] is not None:
-            num_instances = '{:.<14}: {}\n'.format("# of instances",
-                                                   object_dict['qualities']['NumberOfInstances'])
 
-        output_str = '\n' + header + name + version + format + date + licence + d_url + w_url + \
-            local_file + pickle_file + num_features + num_instances + '\n'
-        return output_str
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = pd.Series({"Name": self.name,
+                            "Version": self.version,
+                            "Format": self.format,
+                            "Upload Date": self.upload_date.replace('T', ' '),
+                            "Licence": self.licence,
+                            "Download URL": self.url,
+                            "OpenML URL": "{}d/{}".format(base_url, self.dataset_id),
+                            "Data file": self.data_file,
+                            "Pickle file": self.data_pickle_file,
+                            "# of features": len(self.features)})
+
+        if self.qualities['NumberOfInstances'] is not None:
+            fields.append(pd.Series({"# of instances": int(self.qualities['NumberOfInstances'])}))
+
+        order = ["Name", "Version", "Format", "Upload Date", "Licence", "Download URL",
+                 "OpenML URL", "Data File", "Pickle File", "# of features"]
+        fields = list(fields.reindex(order).dropna().iteritems())
+
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return header + body
 
     def _data_arff_to_pickle(self, data_file):
         data_pickle_file = data_file.replace('.arff', '.pkl.py3')

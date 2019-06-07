@@ -1,3 +1,6 @@
+import openml.config
+import pandas as pd
+
 
 class OpenMLSetup(object):
     """Setup object (a.k.a. Configuration).
@@ -26,17 +29,21 @@ class OpenMLSetup(object):
         self.parameters = parameters
 
     def __str__(self):
-        object_dict = self.__dict__
-        output_str = ''
-        header = 'OpenML Setup'
+        header = "OpenML Setup"
         header = '{}\n{}\n'.format(header, '=' * len(header))
-        setup = '{:.<15}: {}\n'.format("Setup ID", object_dict['setup_id'])
-        flow = '{:.<15}: {}\n'.format("Flow ID", object_dict['flow_id'])
-        url = 'https://www.openml.org/f/' + str(object_dict['flow_id'])
-        flow = flow + '{:.<15}: {}\n'.format("Flow URL", url)
-        params = '{:.<15}: {}\n'.format("# of Parameters", len(object_dict['parameters']))
-        output_str = '\n' + header + setup + flow + params + '\n'
-        return(output_str)
+
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = pd.Series({"Setup ID": self.setup_id,
+                            "Flow ID": self.flow_id,
+                            "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                            "# of Parameters": len(self.parameters)})
+        order = ["Setup ID", "Flow ID", "Flow URL", "# of Parameters"]
+        fields = list(fields.reindex(order).dropna().iteritems())
+
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return header + body
 
 
 class OpenMLParameter(object):
@@ -75,20 +82,31 @@ class OpenMLParameter(object):
         self.value = value
 
     def __str__(self):
-        object_dict = self.__dict__
-        output_str = ''
-        header = 'OpenML Parameter'
+        header = "OpenML Parameter"
         header = '{}\n{}\n'.format(header, '=' * len(header))
-        id = '{:.<18}: {}\n'.format("ID", object_dict['id'])
-        flow = '{:.<18}: {}\n'.format("Flow ID", object_dict['flow_id'])
-        flow = flow + '{:.<18}: {}\n'.format("Flow Name", object_dict['flow_name'])
-        flow = flow + '{:.<18}: {}\n'.format("Flow Full Name", object_dict['full_name'])
-        url = 'https://www.openml.org/f/' + str(object_dict['flow_id'])
-        flow = flow + '{:.<18}: {}\n'.format("Flow URL", url)
-        filler = " |" + "_" * 2
-        params = '{:.<18}: {}\n'.format("Parameter Name", object_dict['parameter_name'])
-        params = params + filler + '{:.<14}: {}\n'.format("Data_Type", object_dict['data_type'])
-        params = params + filler + '{:.<14}: {}\n'.format("Default", object_dict['default_value'])
-        params = params + filler + '{:.<14}: {}\n'.format("Value", object_dict['value'])
-        output_str = '\n' + header + id + flow + params + '\n'
-        return(output_str)
+
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = pd.Series({"ID": self.id,
+                            "Flow ID": self.flow_id,
+                            # "Flow Name": self.flow_name,
+                            "Flow Name": self.full_name,
+                            "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                            "Parameter Name": self.parameter_name})
+        # indented prints for parameter attributes
+        # indention = 2 spaces + 1 | + 2 underscores
+        indent = "{}|{}".format(" " * 2, "_" * 2)
+        parameter_data_type = "{}Data Type".format(indent)
+        parameter_default = "{}Default".format(indent)
+        parameter_value = "{}Value".format(indent)
+        fields = fields.append(pd.Series({parameter_data_type: self.data_type,
+                                          parameter_default: self.default_value,
+                                          parameter_value: self.value}))
+
+        order = ["ID", "Flow ID", "Flow Name", "Flow URL", "Parameter Name",
+                 parameter_data_type, parameter_default, parameter_value]
+        fields = list(fields.reindex(order).dropna().iteritems())
+        
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return header + body

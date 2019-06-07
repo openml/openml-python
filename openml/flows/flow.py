@@ -7,6 +7,9 @@ import xmltodict
 from ..extensions import get_extension_by_flow
 from ..utils import extract_xml_tags, _tag_entity
 
+import openml.config
+import pandas as pd
+
 
 class OpenMLFlow(object):
     """OpenML Flow. Stores machine learning models.
@@ -133,27 +136,27 @@ class OpenMLFlow(object):
         self.extension = get_extension_by_flow(self)
 
     def __str__(self):
-        object_dict = self.__dict__
-        output_str = ''
         header = "OpenML Flow"
         header = '{}\n{}\n'.format(header, '=' * len(header))
-        id_version = '{:.<16}: {} (Version: {})\n'.format('Flow ID', object_dict['flow_id'],
-                                                          object_dict['version'])
-        url = '{:.<16}: {}\n'.format('Flow URL',
-                                     'https://www.openml.org/f/' + str(object_dict['flow_id']))
-        name = '{:.<16}: {}\n'.format('Flow Name', object_dict['name'])
-        description = '{:.<16}: {}\n'.format('Flow Description', object_dict['description'])
 
-        binary = ''
-        if object_dict['binary_url'] is not None:
-            binary = '{:.<16}: {}\n'.format('Binary URL', object_dict['binary_url'])
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = pd.Series({"Flow ID": "{} (version {})".format(self.flow_id, self.version),
+                            "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                            "Flow Name": self.name,
+                            "Flow Description": self.description,
+                            "Upload Date": self.upload_date.replace('T', ' '),
+                            "Dependencies": self.dependencies})
+        if self.binary_url is not None:
+            fields = fields.append(pd.Series({"Binary URL": self.binary_url}))
 
-        upload = '{:.<16}: {}\n'.format('Upload Date', object_dict['upload_date'].replace('T', ' '))
-        dependencies = '{:.<16}: {}\n'.format('Dependencies', object_dict['dependencies'])
-        # 3740 for example
-        output_str = '\n' + header + id_version + url + name + description + binary + \
-            upload + dependencies + '\n'
-        return output_str
+        order = ["Flow ID", "Flow URL", "Flow Name", "Flow Description", "Binary URL",
+                 "Upload Date", "Dependencies"]
+        fields = list(fields.reindex(order).dropna().iteritems())
+
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return header + body
 
     def _to_xml(self) -> str:
         """Generate xml representation of self for upload to server.

@@ -7,6 +7,7 @@ import os
 import arff
 import numpy as np
 import xmltodict
+import pandas as pd
 
 import openml
 import openml._api_calls
@@ -64,43 +65,38 @@ class OpenMLRun(object):
         self.predictions_url = predictions_url
 
     def __str__(self):
-        object_dict = self.__dict__
-        output_str = ''
-        header = 'OpenML Run'
+        header = "OpenML Run"
         header = '{}\n{}\n'.format(header, '=' * len(header))
-        uploader = '{:.<16}: {}\n'.format('Uploader Name', object_dict['uploader_name'])
-        url = 'https://www.openml.org/u/' + str(object_dict['uploader'])
-        uploader = uploader + '{:.<16}: {}\n'.format('Uploader Profile', url)
 
-        metric = '{:.<16}: {}\n'.format('Metric', object_dict['task_evaluation_measure'])
-        result = ''
-        if object_dict['task_evaluation_measure'] in object_dict['evaluations']:
-            value = object_dict['evaluations'][object_dict['task_evaluation_measure']]
-            result = '{:.<16}: {}\n'.format('Result', value)
-        run = '{:.<16}: {}\n'.format('Run ID', object_dict['run_id'])
-        url = 'https://www.openml.org/r/' + str(object_dict['run_id'])
-        run = run + '{:.<16}: {}\n'.format('Run URL', url)
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = pd.Series({"Uploader Name": self.uploader_name,
+                            "Uploader Profile": "{}u/{}".format(base_url, self.uploader),
+                            "Metric": self.task_evaluation_measure,
+                            "Run ID": self.run_id,
+                            "Run URL": "{}r/{}".format(base_url, self.run_id),
+                            "Task ID": self.task_id,
+                            "Task Type": self.task_type,
+                            "Task URL": "{}t/{}".format(base_url, self.run_id),
+                            "Flow ID": self.flow_id,
+                            "Flow Name": self.flow_name,
+                            "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                            "Setup ID": self.setup_id,
+                            "Setup String": self.setup_string,
+                            "Dataset ID": self.dataset_id,
+                            "Dataset URL": "{}d/{}".format(base_url, self.dataset_id)})
+        if self.task_evaluation_measure in self.evaluations:
+            value = self.evaluations[self.task_evaluation_measure]
+            fields = fields.append(pd.Series({"Result": value}))
 
-        task = '{:.<16}: {}\n'.format('Task ID', object_dict['task_id'])
-        task = task + '{:.<16}: {}\n'.format('Task Type', object_dict['task_type'])
-        url = 'https://www.openml.org/t/' + str(object_dict['task_id'])
-        task = task + '{:.<16}: {}\n'.format('Task URL', url)
+        order = ["Uploader Name", "Uploader Profile", "Metric", "Result", "Run ID", "Run URL",
+                 "Task ID", "Task Type", "Task URL", "Flow ID", "Flow Name", "Flow URL",
+                 "Setup ID", "Setup String", "Dataset ID", "Dataset URL"]
+        fields = list(fields.reindex(order).dropna().iteritems())
 
-        flow = '{:.<16}: {}\n'.format('Flow ID', object_dict['flow_id'])
-        flow = flow + '{:.<16}: {}\n'.format('Flow Name', object_dict['flow_name'])
-        url = 'https://www.openml.org/f/' + str(object_dict['flow_id'])
-        flow = flow + '{:.<16}: {}\n'.format('Flow URL', url)
-
-        setup = '{:.<16}: {}\n'.format('Setup ID', object_dict['setup_id'])
-        setup = setup + '{:.<16}: {}\n'.format('Setup String', object_dict['setup_string'])
-
-        dataset = '{:.<16}: {}\n'.format('Dataset ID', object_dict['dataset_id'])
-        url = 'https://www.openml.org/d/' + str(object_dict['dataset_id'])
-        dataset = dataset + '{:.<16}: {}\n'.format('Dataset URL', url)
-
-        output_str = '\n' + header + uploader + metric + result + run + task + flow + setup + \
-            dataset + '\n'
-        return output_str
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return header + body
 
     def _repr_pretty_(self, pp, cycle):
         pp.text(str(self))

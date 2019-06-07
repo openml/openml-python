@@ -43,35 +43,32 @@ class OpenMLTask(ABC):
         self.split = None  # type: Optional[OpenMLSplit]
 
     def __str__(self):
-        object_dict = self.__dict__
-        output_str = ''
         header = "OpenML Task"
         header = '{}\n{}\n'.format(header, '=' * len(header))
-        task_type = '{:.<20}: {}\n'.format("Task Type", object_dict['task_type'])
-        task_id = '{:.<20}: {}\n'.format("Task ID", object_dict['task_id'])
-        url = 'https://www.openml.org/t/' + str(object_dict['task_id'])
-        task_url = '{:.<20}: {}\n'.format("Task URL", url)
-        evaluation_measure = ''
-        if object_dict['evaluation_measure'] is not None:
-            evaluation_measure = '{:.<20}: {}\n'.format("Evaluation Measure",
-                                                        object_dict['evaluation_measure'])
-        estimation_procedure = ''
-        if object_dict['estimation_procedure'] is not None:
-            procedure = object_dict['estimation_procedure']['type']
-            estimation_procedure = '{:.<20}: {}\n'.format("Estimation Procedure", procedure)
-        target = ''
-        class_labels = ''
-        cost_matrix = ''
-        if object_dict['target_name'] is not None:
-            target = '{:.<20}: {}\n'.format("Target Feature", object_dict['target_name'])
-            if 'class_labels' in object_dict:
-                class_labels = '{:.<20}: {}\n'.format("# of Classes",
-                                                      len(object_dict['class_labels']))
-            if 'cost_matrix' in object_dict:
-                cost_matrix = '{:.<20}: {}\n'.format("Cost Matrix", "Available")
-        output_str = '\n' + header + task_type + task_id + task_url + estimation_procedure + \
-            evaluation_measure + target + class_labels + cost_matrix + '\n'
-        return(output_str)
+
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = pd.Series({"Task Type": self.task_type,
+                            "Task ID": self.task_id,
+                            "Task URL": "{}t/{}".format(base_url, self.task_id)})
+        if self.evaluation_measure is not None:
+            fields = fields.append(pd.Series({"Evaluation Measure": self.evaluation_measure}))
+        if self.estimation_procedure is not None:
+            fields = fields.append(pd.Series({"Estimation Procedure": self.estimation_procedure['type']}))
+        if self.target_name is not None:
+            fields = fields.append(pd.Series({"Target Feature": self.target_name}))
+            if hasattr(self, 'class_labels'):
+                fields = fields.append(pd.Series({"# of Classes": len(self.class_labels)}))
+            if hasattr(self, 'cost_matrix'):
+                fields = fields.append(pd.Series({"Cost Matrix": "Available"}))
+
+        order = ["Task Type", "Task ID", "Task URL", "Estimation Procedure", "Evaluation Measure",
+                 "Target Feature", "# of Classes", "Cost Matrix"]
+        fields = list(fields.reindex(order).dropna().iteritems())
+
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return header + body
 
     def get_dataset(self) -> datasets.OpenMLDataset:
         """Download dataset associated with task"""
