@@ -119,37 +119,6 @@ class BaseStudy(object):
         body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
         return body
 
-    def old_str(self):
-        object_dict = self.__dict__
-        output_str = ''
-        id = '{:.<16}: {}\n'.format("ID", object_dict['id'])
-        name = '{:.<16}: {}\n'.format("Name", object_dict['name'])
-        status = '{:.<16}: {}\n'.format("Status", object_dict['status'])
-        main_entity_type = '{:.<16}: {}\n'.format("Main Entity Type",
-                                                  object_dict['main_entity_type'])
-        url = 'https://www.openml.org/s/' + str(object_dict['id'])
-        study_url = '{:.<16}: {}\n'.format("Study URL", url)
-        data = ''
-        if object_dict['data'] is not None:
-            data = '{:.<16}: {}\n'.format("# of Data", len(object_dict['data']))
-        tasks = ''
-        if object_dict['tasks'] is not None:
-            tasks = '{:.<16}: {}\n'.format("# of Tasks", len(object_dict['tasks']))
-        flows = ''
-        if object_dict['flows'] is not None:
-            flows = '{:.<16}: {}\n'.format("# of Flows", len(object_dict['flows']))
-        runs = ''
-        if object_dict['runs'] is not None:
-            runs = '{:.<16}: {}\n'.format("# of Runs", len(object_dict['runs']))
-
-        url = 'https://www.openml.org/u/' + str(object_dict['creator'])
-        creator = '{:.<16}: {}\n'.format("Creator", url)
-        upload_time = '{:.<16}: {}\n'.format("Upload Time",
-                                             object_dict['creation_date'].replace('T', ' '))
-        output_str = id + name + status + main_entity_type + study_url + data + \
-            tasks + flows + runs + creator + upload_time
-        return output_str
-
     def publish(self) -> int:
         """
         Publish the study on the OpenML server.
