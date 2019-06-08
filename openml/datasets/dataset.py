@@ -368,19 +368,24 @@ class OpenMLDataset(object):
     def _convert_array_format(data, array_format, attribute_names):
         """Convert a dataset to a given array format.
 
-        Converts a non-sparse matrix to numpy array.
-        Converts a sparse matrix to a sparse dataframe.
+        Converts to numpy array if data is non-sparse.
+        Converts to a sparse dataframe if data is sparse.
 
         Parameters
         ----------
         array_format : str {'array', 'dataframe'}
             Desired data type of the output
             - If array_format='array'
-                Converts non-sparse numeric data to numpy-array
-                Enforces numeric encoding of categorical columns
-                Missing values are represented as NaN in the numpy-array
+                If data is non-sparse
+                    Converts to numpy-array
+                    Enforces numeric encoding of categorical columns
+                    Missing values are represented as NaN in the numpy-array
+                else returns data as is
             - If array_format='dataframe'
-                Converts sparse data to sparse dataframe
+                If data is sparse
+                    Works only on sparse data
+                    Converts sparse data to sparse dataframe
+                else returns data as is
 
         """
         if array_format == "array" and not scipy.sparse.issparse(data):
@@ -407,8 +412,10 @@ class OpenMLDataset(object):
                     'PyOpenML cannot handle string when returning numpy'
                     ' arrays. Use dataset_format="dataframe".'
                 )
-        if array_format == "dataframe" and scipy.sparse.issparse(data):
+        elif array_format == "dataframe" and scipy.sparse.issparse(data):
             return pd.SparseDataFrame(data, columns=attribute_names)
+        else:
+            warn("Conversion criteria not satisfied. Returning input data.")
         return data
 
     @staticmethod
