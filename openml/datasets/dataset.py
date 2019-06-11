@@ -415,7 +415,8 @@ class OpenMLDataset(object):
         elif array_format == "dataframe" and scipy.sparse.issparse(data):
             return pd.SparseDataFrame(data, columns=attribute_names)
         else:
-            warn("Conversion criteria not satisfied. Returning input data.")
+            data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
+            warn("Cannot convert {} to '{}'. Returning input data.".format(data_type, array_format))
         return data
 
     @staticmethod
