@@ -33,12 +33,14 @@ class OpenMLSetup(object):
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
         base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
-        fields = pd.Series({"Setup ID": self.setup_id,
-                            "Flow ID": self.flow_id,
-                            "Flow URL": "{}f/{}".format(base_url, self.flow_id),
-                            "# of Parameters": len(self.parameters)})
+        fields = {"Setup ID": self.setup_id,
+                  "Flow ID": self.flow_id,
+                  "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                  "# of Parameters": len(self.parameters)}
+
+        # determines the order in which the information will be printed
         order = ["Setup ID", "Flow ID", "Flow URL", "# of Parameters"]
-        fields = list(fields.reindex(order).dropna().iteritems())
+        fields = [(key, fields[key]) for key in order if key in fields]
 
         longest_field_name_length = max(len(name) for name, value in fields)
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
@@ -86,26 +88,27 @@ class OpenMLParameter(object):
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
         base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
-        fields = pd.Series({"ID": self.id,
-                            "Flow ID": self.flow_id,
-                            # "Flow Name": self.flow_name,
-                            "Flow Name": self.full_name,
-                            "Flow URL": "{}f/{}".format(base_url, self.flow_id),
-                            "Parameter Name": self.parameter_name})
+        fields = {"ID": self.id,
+                  "Flow ID": self.flow_id,
+                  # "Flow Name": self.flow_name,
+                  "Flow Name": self.full_name,
+                  "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                  "Parameter Name": self.parameter_name}
         # indented prints for parameter attributes
         # indention = 2 spaces + 1 | + 2 underscores
         indent = "{}|{}".format(" " * 2, "_" * 2)
         parameter_data_type = "{}Data Type".format(indent)
+        fields[parameter_data_type] = self.data_type
         parameter_default = "{}Default".format(indent)
+        fields[parameter_default] = self.default_value
         parameter_value = "{}Value".format(indent)
-        fields = fields.append(pd.Series({parameter_data_type: self.data_type,
-                                          parameter_default: self.default_value,
-                                          parameter_value: self.value}))
+        fields[parameter_value] = self.value
 
+        # determines the order in which the information will be printed
         order = ["ID", "Flow ID", "Flow Name", "Flow URL", "Parameter Name",
                  parameter_data_type, parameter_default, parameter_value]
-        fields = list(fields.reindex(order).dropna().iteritems())
-        
+        fields = [(key, fields[key]) for key in order if key in fields]
+
         longest_field_name_length = max(len(name) for name, value in fields)
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
         body = '\n'.join(field_line_format.format(name, value) for name, value in fields)

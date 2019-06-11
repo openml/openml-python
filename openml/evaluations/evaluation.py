@@ -56,24 +56,24 @@ class OpenMLEvaluation(object):
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
         base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
-        fields = pd.Series({"Upload Date": self.upload_time,
-                            "Run ID": self.run_id,
-                            "OpenML Run URL": "{}r/{}".format(base_url, self.run_id),
-                            "Task ID": self.task_id,
-                            "OpenML Task URL": "{}t/{}".format(base_url, self.task_id),
-                            "Flow ID": self.flow_id,
-                            "OpenML Flow URL": "{}f/{}".format(base_url, self.flow_id),
-                            "Setup ID": self.setup_id,
-                            "Data ID": self.data_id,
-                            "Data Name": self.data_name,
-                            "OpenML Data URL": "{}d/{}".format(base_url, self.data_id),
-                            "Metric Used": self.function,
-                            "Result": self.value})
+        fields = {"Upload Date": self.upload_time,
+                  "Run ID": self.run_id,
+                  "OpenML Run URL": "{}r/{}".format(base_url, self.run_id),
+                  "Task ID": self.task_id,
+                  "OpenML Task URL": "{}t/{}".format(base_url, self.task_id),
+                  "Flow ID": self.flow_id,
+                  "OpenML Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                  "Setup ID": self.setup_id,
+                  "Data ID": self.data_id,
+                  "Data Name": self.data_name,
+                  "OpenML Data URL": "{}d/{}".format(base_url, self.data_id),
+                  "Metric Used": self.function,
+                  "Result": self.value}
 
         order = ["Uploader Date", "Run ID", "OpenML Run URL", "Task ID", "OpenML Task URL"
                  "Flow ID", "OpenML Flow URL", "Setup ID", "Data ID", "Data Name",
                  "OpenML Data URL", "Metric Used", "Result"]
-        fields = list(fields.reindex(order).dropna().iteritems())
+        fields = [(key, fields[key]) for key in order if key in fields]
 
         longest_field_name_length = max(len(name) for name, value in fields)
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)

@@ -178,23 +178,23 @@ class OpenMLDataset(object):
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
         base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
-        fields = pd.Series({"Name": self.name,
-                            "Version": self.version,
-                            "Format": self.format,
-                            "Upload Date": self.upload_date.replace('T', ' '),
-                            "Licence": self.licence,
-                            "Download URL": self.url,
-                            "OpenML URL": "{}d/{}".format(base_url, self.dataset_id),
-                            "Data file": self.data_file,
-                            "Pickle file": self.data_pickle_file,
-                            "# of features": len(self.features)})
-
+        fields = {"Name": self.name,
+                  "Version": self.version,
+                  "Format": self.format,
+                  "Upload Date": self.upload_date.replace('T', ' '),
+                  "Licence": self.licence,
+                  "Download URL": self.url,
+                  "OpenML URL": "{}d/{}".format(base_url, self.dataset_id),
+                  "Data file": self.data_file,
+                  "Pickle file": self.data_pickle_file,
+                  "# of features": len(self.features)}
         if self.qualities['NumberOfInstances'] is not None:
-            fields.append(pd.Series({"# of instances": int(self.qualities['NumberOfInstances'])}))
+            fields["# of instances"] = int(self.qualities['NumberOfInstances'])
 
+        # determines the order in which the information will be printed
         order = ["Name", "Version", "Format", "Upload Date", "Licence", "Download URL",
-                 "OpenML URL", "Data File", "Pickle File", "# of features"]
-        fields = list(fields.reindex(order).dropna().iteritems())
+                 "OpenML URL", "Data File", "Pickle File", "# of features", "# of instances"]
+        fields = [(key, fields[key]) for key in order if key in fields]
 
         longest_field_name_length = max(len(name) for name, value in fields)
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)

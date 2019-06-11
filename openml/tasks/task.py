@@ -47,23 +47,24 @@ class OpenMLTask(ABC):
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
         base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
-        fields = pd.Series({"Task Type": self.task_type,
-                            "Task ID": self.task_id,
-                            "Task URL": "{}t/{}".format(base_url, self.task_id)})
+        fields = {"Task Type": self.task_type,
+                  "Task ID": self.task_id,
+                  "Task URL": "{}t/{}".format(base_url, self.task_id)}
         if self.evaluation_measure is not None:
-            fields = fields.append(pd.Series({"Evaluation Measure": self.evaluation_measure}))
+            fields["Evaluation Measure"] = self.evaluation_measure
         if self.estimation_procedure is not None:
-            fields = fields.append(pd.Series({"Estimation Procedure": self.estimation_procedure['type']}))
+            fields["Estimation Procedure"] = self.estimation_procedure['type']
         if self.target_name is not None:
-            fields = fields.append(pd.Series({"Target Feature": self.target_name}))
+            fields["Target Feature"] = self.target_name
             if hasattr(self, 'class_labels'):
-                fields = fields.append(pd.Series({"# of Classes": len(self.class_labels)}))
+                fields["# of Classes"] = len(self.class_labels)
             if hasattr(self, 'cost_matrix'):
-                fields = fields.append(pd.Series({"Cost Matrix": "Available"}))
+                fields["Cost Matrix"] = "Available"
 
+        # determines the order in which the information will be printed
         order = ["Task Type", "Task ID", "Task URL", "Estimation Procedure", "Evaluation Measure",
                  "Target Feature", "# of Classes", "Cost Matrix"]
-        fields = list(fields.reindex(order).dropna().iteritems())
+        fields = [(key, fields[key]) for key in order if key in fields]
 
         longest_field_name_length = max(len(name) for name, value in fields)
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)

@@ -140,18 +140,19 @@ class OpenMLFlow(object):
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
         base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
-        fields = pd.Series({"Flow ID": "{} (version {})".format(self.flow_id, self.version),
-                            "Flow URL": "{}f/{}".format(base_url, self.flow_id),
-                            "Flow Name": self.name,
-                            "Flow Description": self.description,
-                            "Upload Date": self.upload_date.replace('T', ' '),
-                            "Dependencies": self.dependencies})
+        fields = {"Flow ID": "{} (version {})".format(self.flow_id, self.version),
+                  "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                  "Flow Name": self.name,
+                  "Flow Description": self.description,
+                  "Upload Date": self.upload_date.replace('T', ' '),
+                  "Dependencies": self.dependencies}
         if self.binary_url is not None:
-            fields = fields.append(pd.Series({"Binary URL": self.binary_url}))
+            fields["Binary URL"] = self.binary_url
 
+        # determines the order in which the information will be printed
         order = ["Flow ID", "Flow URL", "Flow Name", "Flow Description", "Binary URL",
                  "Upload Date", "Dependencies"]
-        fields = list(fields.reindex(order).dropna().iteritems())
+        fields = [(key, fields[key]) for key in order if key in fields]
 
         longest_field_name_length = max(len(name) for name, value in fields)
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
