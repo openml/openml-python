@@ -181,13 +181,15 @@ class OpenMLDataset(object):
         fields = {"Name": self.name,
                   "Version": self.version,
                   "Format": self.format,
-                  "Upload Date": self.upload_date.replace('T', ' '),
                   "Licence": self.licence,
                   "Download URL": self.url,
-                  "OpenML URL": "{}d/{}".format(base_url, self.dataset_id),
                   "Data file": self.data_file,
                   "Pickle file": self.data_pickle_file,
                   "# of features": len(self.features)}
+        if self.upload_date is not None:
+            fields["Upload Date"] = self.upload_date.replace('T', ' ')
+        if self.dataset_id is not None:
+            fields["OpenML URL"] = "{}d/{}".format(base_url, self.dataset_id)
         if self.qualities['NumberOfInstances'] is not None:
             fields["# of instances"] = int(self.qualities['NumberOfInstances'])
 

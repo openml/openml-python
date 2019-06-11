@@ -47,9 +47,10 @@ class OpenMLTask(ABC):
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
         base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
-        fields = {"Task Type": self.task_type,
-                  "Task ID": self.task_id,
-                  "Task URL": "{}t/{}".format(base_url, self.task_id)}
+        fields = {"Task Type": self.task_type}
+        if self.task_id is not None:
+            fields["Task ID"] = self.task_id
+            fields["Task URL"] = "{}t/{}".format(base_url, self.task_id)
         if self.evaluation_measure is not None:
             fields["Evaluation Measure"] = self.evaluation_measure
         if self.estimation_procedure is not None:

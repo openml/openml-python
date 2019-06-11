@@ -4,7 +4,6 @@ from typing import Dict, List, Optional
 import xmltodict
 
 import openml
-import pandas as pd
 
 
 class BaseStudy(object):
@@ -93,13 +92,16 @@ class BaseStudy(object):
     def __str__(self):
         # header is provided by the sub classes
         base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
-        fields = {"ID": self.id,
-                  "Name": self.name,
+        fields = {"Name": self.name,
                   "Status": self.status,
-                  "Main Entity Type": self.main_entity_type,
-                  "Study URL": "{}s/{}".format(base_url, self.id),
-                  "Creator": "{}u/{}".format(base_url, self.creator),
-                  "Upload Time": self.creation_date.replace('T', ' ')}
+                  "Main Entity Type": self.main_entity_type}
+        if self.id is not None:
+            fields["ID"] = self.id
+            fields["Study URL"] = "{}s/{}".format(base_url, self.id)
+        if self.creator is not None:
+            fields["Creator"] = "{}u/{}".format(base_url, self.creator)
+        if self.creation_date is not None:
+            fields["Upload Time"] = self.creation_date.replace('T', ' ')
         if self.data is not None:
             fields["# of Data"] = len(self.data)
         if self.tasks is not None:

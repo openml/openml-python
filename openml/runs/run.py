@@ -7,7 +7,6 @@ import os
 import arff
 import numpy as np
 import xmltodict
-import pandas as pd
 
 import openml
 import openml._api_calls
@@ -70,13 +69,11 @@ class OpenMLRun(object):
 
         base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
         fields = {"Uploader Name": self.uploader_name,
-                  "Uploader Profile": "{}u/{}".format(base_url, self.uploader),
                   "Metric": self.task_evaluation_measure,
                   "Run ID": self.run_id,
-                  "Run URL": "{}r/{}".format(base_url, self.run_id),
                   "Task ID": self.task_id,
                   "Task Type": self.task_type,
-                  "Task URL": "{}t/{}".format(base_url, self.run_id),
+                  "Task URL": "{}t/{}".format(base_url, self.task_id),
                   "Flow ID": self.flow_id,
                   "Flow Name": self.flow_name,
                   "Flow URL": "{}f/{}".format(base_url, self.flow_id),
@@ -84,6 +81,10 @@ class OpenMLRun(object):
                   "Setup String": self.setup_string,
                   "Dataset ID": self.dataset_id,
                   "Dataset URL": "{}d/{}".format(base_url, self.dataset_id)}
+        if self.uploader is not None:
+            fields["Uploader Profile"] = "{}u/{}".format(base_url, self.uploader)
+        if self.run_id is not None:
+            fields["Run URL"] = "{}r/{}".format(base_url, self.run_id)
         if self.task_evaluation_measure in self.evaluations:
             fields["Result"] = self.evaluations[self.task_evaluation_measure]
 

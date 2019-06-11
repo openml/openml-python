@@ -1,5 +1,4 @@
 import openml.config
-import pandas as pd
 
 
 class OpenMLEvaluation(object):

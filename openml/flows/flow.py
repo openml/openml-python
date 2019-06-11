@@ -8,7 +8,6 @@ from ..extensions import get_extension_by_flow
 from ..utils import extract_xml_tags, _tag_entity
 
 import openml.config
-import pandas as pd
 
 
 class OpenMLFlow(object):
@@ -140,12 +139,17 @@ class OpenMLFlow(object):
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
         base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
-        fields = {"Flow ID": "{} (version {})".format(self.flow_id, self.version),
-                  "Flow URL": "{}f/{}".format(base_url, self.flow_id),
-                  "Flow Name": self.name,
+        fields = {"Flow Name": self.name,
                   "Flow Description": self.description,
-                  "Upload Date": self.upload_date.replace('T', ' '),
                   "Dependencies": self.dependencies}
+        if self.flow_id is not None:
+            if self.version is not None:
+                fields["Flow ID"] = "{} (version {})".format(self.flow_id, self.version)
+            else:
+                fields["Flow ID"] = self.flow_id
+            fields["Flow URL"] = "{}f/{}".format(base_url, self.flow_id)
+        if self.upload_date is not None:
+            fields["Upload Date"] = self.upload_date.replace('T', ' ')
         if self.binary_url is not None:
             fields["Binary URL"] = self.binary_url
 
