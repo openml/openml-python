@@ -680,7 +680,7 @@ class OpenMLDataset(object):
         props = ['id', 'name', 'version', 'description', 'format', 'creator',
                  'contributor', 'collection_date', 'upload_date', 'language',
                  'licence', 'url', 'default_target_attribute',
-                 'row_id_attribute', 'ignore_attribute', 'version_label',
+                 'row_id_attribute', 'ignore_attributes', 'version_label',
                  'citation', 'tag', 'visibility', 'original_data_url',
                  'paper_url', 'update_comment', 'md5_checksum']
 
