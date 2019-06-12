@@ -166,7 +166,7 @@ def _get_cache_directory(dataset: OpenMLDataset) -> str:
 
 
 def list_qualities(verbose=False):
-    """ Return list of data qualities available
+    """ Return list of data qualities available.
 
     The function performs an API call to retrieve the entire list of
     data qualities that are available are computed on the datasets uploaded.
