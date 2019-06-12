@@ -72,6 +72,7 @@ Modules
     get_dataset
     get_datasets
     list_datasets
+    list_qualities
     status_update
 
 :mod:`openml.evaluations`: Evaluation Functions
