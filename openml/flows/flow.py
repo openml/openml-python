@@ -7,6 +7,8 @@ import xmltodict
 from ..extensions import get_extension_by_flow
 from ..utils import extract_xml_tags, _tag_entity
 
+import openml.config
+
 
 class OpenMLFlow(object):
     """OpenML Flow. Stores machine learning models.
@@ -131,6 +133,35 @@ class OpenMLFlow(object):
         self.flow_id = flow_id
 
         self.extension = get_extension_by_flow(self)
+
+    def __str__(self):
+        header = "OpenML Flow"
+        header = '{}\n{}\n'.format(header, '=' * len(header))
+
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = {"Flow Name": self.name,
+                  "Flow Description": self.description,
+                  "Dependencies": self.dependencies}
+        if self.flow_id is not None:
+            if self.version is not None:
+                fields["Flow ID"] = "{} (version {})".format(self.flow_id, self.version)
+            else:
+                fields["Flow ID"] = self.flow_id
+            fields["Flow URL"] = "{}f/{}".format(base_url, self.flow_id)
+        if self.upload_date is not None:
+            fields["Upload Date"] = self.upload_date.replace('T', ' ')
+        if self.binary_url is not None:
+            fields["Binary URL"] = self.binary_url
+
+        # determines the order in which the information will be printed
+        order = ["Flow ID", "Flow URL", "Flow Name", "Flow Description", "Binary URL",
+                 "Upload Date", "Dependencies"]
+        fields = [(key, fields[key]) for key in order if key in fields]
+
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return header + body
 
     def _to_xml(self) -> str:
         """Generate xml representation of self for upload to server.
