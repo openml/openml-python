@@ -690,6 +690,8 @@ class OpenMLDataset(object):
 
         for prop in props:
             content = getattr(self, prop, None)
+            if prop == 'ignore_attributes':
+                prop = "ignore_attribute"
             if content is not None:
                 data_dict["oml:" + prop] = content
 
