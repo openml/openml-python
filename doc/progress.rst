@@ -21,10 +21,12 @@ Changelog
 * ADD #659: Lazy loading of task splits.
 * ADD #516: `run_flow_on_task` flow uploading is now optional.
 * ADD #680: Adds `openml.config.start_using_configuration_for_example` (and resp. stop) to easily connect to the test server.
+* ADD #75, #653: Adds a pretty print for objects of the top-level classes.
 * FIX #642: `check_datasets_active` now correctly also returns active status of deactivated datasets.
 * FIX #304, #636: Allow serialization of numpy datatypes and list of lists of more types (e.g. bools, ints) for flows.
 * FIX #651: Fixed a bug that would prevent openml-python from finding the user's config file.
 * FIX #693: OpenML-Python uses liac-arff instead of scipy.io for loading task splits now.
+* DOC #639: More descriptive documention for function to convert array format.
 * DOC #678: Better color scheme for code examples in documentation.
 * DOC #681: Small improvements and removing list of missing functions.
 * DOC #684: Add notice to examples that connect to the test server.
