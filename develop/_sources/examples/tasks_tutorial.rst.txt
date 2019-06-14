@@ -418,13 +418,13 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLClassificationTask object at 0x2b87eb317a90>
+    <openml.tasks.task.OpenMLClassificationTask object at 0x2ba7504a8a90>
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  33.397 seconds)
+   **Total running time of the script:** ( 0 minutes  34.362 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:
