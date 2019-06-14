@@ -83,6 +83,7 @@ Modules
    :template: function.rst
 
     list_evaluations
+    list_evaluation_measures
 
 :mod:`openml.flows`: Flow Functions
 -----------------------------------
