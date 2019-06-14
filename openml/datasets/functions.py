@@ -171,6 +171,10 @@ def list_qualities() -> list:
     The function performs an API call to retrieve the entire list of
     data qualities that are computed on the datasets uploaded.
 
+    Returns
+    -------
+    list
+    
     """
     api_call = "data/qualities/list"
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
