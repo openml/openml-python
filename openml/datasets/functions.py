@@ -174,7 +174,6 @@ def list_qualities() -> list:
     Returns
     -------
     list
-    
     """
     api_call = "data/qualities/list"
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
