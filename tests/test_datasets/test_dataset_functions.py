@@ -1012,7 +1012,7 @@ class TestOpenMLDataset(TestBase):
             original_data_url=original_data_url,
             paper_url=paper_url
         )
-        self.assertEqual(dataset.ignore_attributes, ['outlook'])
+        self.assertEqual(dataset.ignore_attribute, ['outlook'])
 
         # pass a list to ignore_attribute
         dataset = openml.datasets.functions.create_dataset(
@@ -1033,7 +1033,7 @@ class TestOpenMLDataset(TestBase):
             original_data_url=original_data_url,
             paper_url=paper_url
         )
-        self.assertEqual(dataset.ignore_attributes, ['outlook', 'windy'])
+        self.assertEqual(dataset.ignore_attribute, ['outlook', 'windy'])
 
         # raise an error if unknown type
         err_msg = 'Wrong data type for ignore_attribute. Should be list.'

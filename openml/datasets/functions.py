@@ -277,10 +277,10 @@ def __list_datasets(api_call, output_format='dict'):
 
     datasets = dict()
     for dataset_ in datasets_dict['oml:data']['oml:dataset']:
-        ignore_attributes = ['oml:file_id', 'oml:quality']
+        ignore_attribute = ['oml:file_id', 'oml:quality']
         dataset = {k.replace('oml:', ''): v
                    for (k, v) in dataset_.items()
-                   if k not in ignore_attributes}
+                   if k not in ignore_attribute}
         dataset['did'] = int(dataset['did'])
         dataset['version'] = int(dataset['version'])
 
