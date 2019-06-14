@@ -1112,10 +1112,10 @@ class TestOpenMLDataset(TestBase):
         self.assertIsInstance(dataset.dataset_id, int)
 
         trials = 0
-        timeout_limit = 100
+        timeout_limit = 1000
         dataset = None
         # fetching from server
-        # loop till timeout and not successful
+        # loop till timeout or fetch not successful
         while True:
             if trials > timeout_limit:
                 break
@@ -1130,7 +1130,7 @@ class TestOpenMLDataset(TestBase):
                 else:
                     raise RuntimeError(str(e))
         if dataset is None:
-            raise ValueError("Failed to fetch uploaded dataset: {}".format(upload_did))
+            raise ValueError("TIMEOUT: Failed to fetch uploaded dataset - {}".format(upload_did))
         self.assertEqual(dataset.ignore_attribute, ignore_attribute)
 
     def test_create_dataset_row_id_attribute_error(self):
