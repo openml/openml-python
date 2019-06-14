@@ -1015,6 +1015,7 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(dataset.ignore_attribute, ['outlook'])
 
         # pass a list to ignore_attribute
+        ignore_attribute = ['outlook', 'windy']
         dataset = openml.datasets.functions.create_dataset(
             name=name,
             description=description,
@@ -1025,7 +1026,7 @@ class TestOpenMLDataset(TestBase):
             licence=licence,
             default_target_attribute=default_target_attribute,
             row_id_attribute=None,
-            ignore_attribute=['outlook', 'windy'],
+            ignore_attribute=ignore_attribute,
             citation=citation,
             attributes='auto',
             data=df,
@@ -1033,7 +1034,7 @@ class TestOpenMLDataset(TestBase):
             original_data_url=original_data_url,
             paper_url=paper_url
         )
-        self.assertEqual(dataset.ignore_attribute, ['outlook', 'windy'])
+        self.assertEqual(dataset.ignore_attribute, ignore_attribute)
 
         # raise an error if unknown type
         err_msg = 'Wrong data type for ignore_attribute. Should be list.'
@@ -1056,6 +1057,81 @@ class TestOpenMLDataset(TestBase):
                 original_data_url=original_data_url,
                 paper_url=paper_url
             )
+
+    def test_publish_fetch_ignore_attribute(self):
+        data = [
+            ['a', 'sunny', 85.0, 85.0, 'FALSE', 'no'],
+            ['b', 'sunny', 80.0, 90.0, 'TRUE', 'no'],
+            ['c', 'overcast', 83.0, 86.0, 'FALSE', 'yes'],
+            ['d', 'rainy', 70.0, 96.0, 'FALSE', 'yes'],
+            ['e', 'rainy', 68.0, 80.0, 'FALSE', 'yes']
+        ]
+        column_names = ['rnd_str', 'outlook', 'temperature', 'humidity',
+                        'windy', 'play']
+        df = pd.DataFrame(data, columns=column_names)
+        # enforce the type of each column
+        df['outlook'] = df['outlook'].astype('category')
+        df['windy'] = df['windy'].astype('bool')
+        df['play'] = df['play'].astype('category')
+        # meta-information
+        name = '%s-pandas_testing_dataset' % self._get_sentinel()
+        description = 'Synthetic dataset created from a Pandas DataFrame'
+        creator = 'OpenML tester'
+        collection_date = '01-01-2018'
+        language = 'English'
+        licence = 'MIT'
+        default_target_attribute = 'play'
+        citation = 'None'
+        original_data_url = 'http://openml.github.io/openml-python'
+        paper_url = 'http://openml.github.io/openml-python'
+
+        # pass a list to ignore_attribute
+        ignore_attribute = ['outlook', 'windy']
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=None,
+            ignore_attribute=ignore_attribute,
+            citation=citation,
+            attributes='auto',
+            data=df,
+            version_label='test',
+            original_data_url=original_data_url,
+            paper_url=paper_url
+        )
+
+        # publish dataset
+        upload_did = dataset.publish()
+        # test if publish was successful
+        self.assertIsInstance(dataset.dataset_id, int)
+
+        trials = 0
+        timeout_limit = 100
+        dataset = None
+        # fetching from server
+        # loop till timeout and not successful
+        while True:
+            if trials > timeout_limit:
+                break
+            try:
+                dataset = openml.datasets.get_dataset(upload_did)
+                break
+            except Exception as e:
+                trials += 1
+                if str(e).split(':')[-1].strip() == "Dataset not processed yet":
+                    # if returned code 273: Dataset not processed yet
+                    continue
+                else:
+                    raise RuntimeError(str(e))
+        if dataset is None:
+            raise ValueError("Failed to fetch uploaded dataset: {}".format(upload_did))
+        self.assertEqual(dataset.ignore_attribute, ignore_attribute)
 
     def test_create_dataset_row_id_attribute_error(self):
         # meta-information
