@@ -165,33 +165,24 @@ def _get_cache_directory(dataset: OpenMLDataset) -> str:
     return _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset.dataset_id)
 
 
-def list_qualities(verbose=False):
+def list_qualities() -> list:
     """ Return list of data qualities available.
 
     The function performs an API call to retrieve the entire list of
-    data qualities that are available are computed on the datasets uploaded.
-
-    Parameters
-    ----------
-    verbose : bool (default=False)
-        If True, prints out the list with an index
+    data qualities that are computed on the datasets uploaded.
 
     """
     api_call = "data/qualities/list"
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
-    qualities = xmltodict.parse(xml_string)
+    qualities = xmltodict.parse(xml_string, force_list=('oml:quality'))
     # Minimalistic check if the XML is useful
     if 'oml:data_qualities_list' not in qualities:
         raise ValueError('Error in return XML, does not contain '
                          '"oml:data_qualities_list"')
-    assert type(qualities['oml:data_qualities_list']['oml:quality']) == list
+    if not isinstance(qualities['oml:data_qualities_list']['oml:quality'], list):
+        raise TypeError('Error in return XML, does not contain '
+                        '"oml:quality" as a list')
     qualities = qualities['oml:data_qualities_list']['oml:quality']
-    if verbose:
-        header = "List of available data qualities:"
-        print(header)
-        print("=" * len(header))
-        for i, quality in enumerate(qualities):
-            print("{:>3}....{}".format(i + 1, quality))
     return qualities
 
 
