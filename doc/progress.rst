@@ -21,6 +21,7 @@ Changelog
 * ADD #659: Lazy loading of task splits.
 * ADD #516: `run_flow_on_task` flow uploading is now optional.
 * ADD #680: Adds `openml.config.start_using_configuration_for_example` (and resp. stop) to easily connect to the test server.
+* ADD #687: Adds a function to retrieve the list of evaluation measures available.
 * FIX #642: `check_datasets_active` now correctly also returns active status of deactivated datasets.
 * FIX #304, #636: Allow serialization of numpy datatypes and list of lists of more types (e.g. bools, ints) for flows.
 * FIX #651: Fixed a bug that would prevent openml-python from finding the user's config file.

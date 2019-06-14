@@ -203,10 +203,10 @@ def __list_evaluations(api_call, output_format='object'):
 
 
 def list_evaluation_measures() -> list:
-    """ Return list of data qualities available.
+    """ Return list of evaluation measures available.
 
     The function performs an API call to retrieve the entire list of
-    data qualities that are computed on the datasets uploaded.
+    evaluation measures that are available.
 
     Returns
     -------
