@@ -78,21 +78,21 @@ def run_model_on_task(
         Flow generated from the model.
     """
 
+    # TODO: At some point in the future do not allow for arguments in old order (6-2018).
+    # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
+    # When removing this please also remove the method `is_estimator` from the extension
+    # interface as it is only used here (MF, 3-2019)
+    if isinstance(model, OpenMLTask):
+        warnings.warn("The old argument order (task, model) is deprecated and "
+                      "will not be supported in the future. Please use the "
+                      "order (model, task).", DeprecationWarning)
+        task, model = model, task
+
     extension = get_extension_by_model(model, raise_if_no_extension=True)
     if extension is None:
         # This should never happen and is only here to please mypy will be gone soon once the
         # whole function is removed
         raise TypeError(extension)
-
-    # TODO: At some point in the future do not allow for arguments in old order (6-2018).
-    # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
-    # When removing this please also remove the method `is_estimator` from the extension
-    # interface as it is only used here (MF, 3-2019)
-    if isinstance(model, OpenMLTask) and extension.is_estimator(model):
-        warnings.warn("The old argument order (task, model) is deprecated and "
-                      "will not be supported in the future. Please use the "
-                      "order (model, task).", DeprecationWarning)
-        task, model = model, task
 
     flow = extension.model_to_flow(model)
 
