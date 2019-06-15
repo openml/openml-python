@@ -725,7 +725,7 @@ class TestRun(TestBase):
                 self.assertGreaterEqual(alt_scores[idx], 0)
                 self.assertLessEqual(alt_scores[idx], 1)
 
-    def test_local_run_metric_score_swapped_parameter_order_model(self):
+    def test_local_run_swapped_parameter_order_model(self):
 
         # construct sci-kit learn classifier
         clf = Pipeline(steps=[('imputer', Imputer(strategy='median')),
@@ -736,15 +736,14 @@ class TestRun(TestBase):
 
         # invoke OpenML run
         run = openml.runs.run_model_on_task(
-            model=clf,
-            task=task,
+            task, clf,
             avoid_duplicate_runs=False,
             upload_flow=False,
         )
 
         self._test_local_evaluations(run)
 
-    def test_local_run_metric_score_swapped_parameter_order_flow(self):
+    def test_local_run_swapped_parameter_order_flow(self):
 
         # construct sci-kit learn classifier
         clf = Pipeline(steps=[('imputer', Imputer(strategy='median')),
@@ -756,8 +755,7 @@ class TestRun(TestBase):
 
         # invoke OpenML run
         run = openml.runs.run_flow_on_task(
-            flow=flow,
-            task=task,
+            task, flow,
             avoid_duplicate_runs=False,
             upload_flow=False,
         )
