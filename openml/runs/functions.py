@@ -159,9 +159,6 @@ def run_flow_on_task(
     if flow_tags is not None and not isinstance(flow_tags, list):
         raise ValueError("flow_tags should be a list")
 
-    if task.task_id is None:
-        raise ValueError("The task should be published at OpenML")
-
     # TODO: At some point in the future do not allow for arguments in old order (changed 6-2018).
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
     if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
@@ -170,6 +167,9 @@ def run_flow_on_task(
                       "will not be supported in the future. Please use the "
                       "order (model, Flow).", DeprecationWarning)
         task, flow = flow, task
+
+    if task.task_id is None:
+        raise ValueError("The task should be published at OpenML")
 
     flow.model = flow.extension.seed_model(flow.model, seed=seed)
 
