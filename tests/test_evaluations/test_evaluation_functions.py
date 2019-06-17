@@ -116,3 +116,8 @@ class TestEvaluationFunctions(TestBase):
         for run_id in evaluations.keys():
             self.assertIsNotNone(evaluations[run_id].value)
             self.assertIsNone(evaluations[run_id].values)
+
+    def test_list_evaluation_measures(self):
+        measures = openml.evaluations.list_evaluation_measures()
+        self.assertEqual([isinstance(measures), list)
+        self.assertEqual(all([isinstance(s, str) for s in measures]), True)
