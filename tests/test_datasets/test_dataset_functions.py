@@ -1123,12 +1123,10 @@ class TestOpenMLDataset(TestBase):
                 dataset = openml.datasets.get_dataset(upload_did)
                 break
             except Exception as e:
+                # returned code 273: Dataset not processed yet
+                # returned code 362: No qualities found
                 trials += 1
-                if str(e).split(':')[-1].strip() == "Dataset not processed yet":
-                    # if returned code 273: Dataset not processed yet
-                    continue
-                else:
-                    raise RuntimeError(str(e))
+                continue
         if dataset is None:
             raise ValueError("TIMEOUT: Failed to fetch uploaded dataset - {}".format(upload_did))
         self.assertEqual(dataset.ignore_attribute, ignore_attribute)
