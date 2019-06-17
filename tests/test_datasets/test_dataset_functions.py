@@ -1165,11 +1165,7 @@ class TestOpenMLDataset(TestBase):
         creator = 'OpenML tester'
         collection_date = '01-01-2018'
         language = 'English'
-        licence = 'MIT'   def test_list_evaluation_measures(self):
-        measures = openml.evaluations.list_evaluation_measures()
-        self.assertEqual([isinstance(measures), list)
-        self.assertEqual(all([isinstance(s, str) for s in measures]), True)
-
+        licence = 'MIT'
         default_target_attribute = 'col_{}'.format(data.shape[1] - 1)
         citation = 'None'
         original_data_url = 'http://openml.github.io/openml-python'
