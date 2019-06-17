@@ -1111,7 +1111,7 @@ class TestOpenMLDataset(TestBase):
         # test if publish was successful
         self.assertIsInstance(dataset.dataset_id, int)
 
-        trials = 0
+        trials = 1
         timeout_limit = 1000
         dataset = None
         # fetching from server
@@ -1125,7 +1125,7 @@ class TestOpenMLDataset(TestBase):
             except Exception as e:
                 # returned code 273: Dataset not processed yet
                 # returned code 362: No qualities found
-                print("Trial {}/{}: ".format(trials + 1, timeout_limit))
+                print("Trial {}/{}: ".format(trials, timeout_limit))
                 print("\tFailed to fetch dataset:{} with '{}'.".format(upload_did, str(e)))
                 trials += 1
                 continue
