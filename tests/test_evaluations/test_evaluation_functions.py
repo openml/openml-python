@@ -119,5 +119,5 @@ class TestEvaluationFunctions(TestBase):
 
     def test_list_evaluation_measures(self):
         measures = openml.evaluations.list_evaluation_measures()
-        self.assertEqual([isinstance(measures), list)
+        self.assertEqual(isinstance(measures, list), True)
         self.assertEqual(all([isinstance(s, str) for s in measures]), True)
