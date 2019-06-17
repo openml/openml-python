@@ -19,6 +19,7 @@ def list_evaluations(
     uploader: Optional[List] = None,
     tag: Optional[str] = None,
     per_fold: Optional[bool] = None,
+    sort: Optional[str] = None,
     output_format: str = 'object'
 ) -> Union[Dict, pd.DataFrame]:
     """
@@ -47,6 +48,9 @@ def list_evaluations(
     tag : str, optional
 
     per_fold : bool, optional
+
+    sort : str, optional
+       order of sorting evaluations, ascending ("asc") or descending ("desc")
 
     output_format: str, optional (default='object')
         The parameter decides the format of the output.
@@ -77,6 +81,7 @@ def list_evaluations(
                                   flow=flow,
                                   uploader=uploader,
                                   tag=tag,
+                                  sort=sort,
                                   per_fold=per_fold_str)
 
 
@@ -87,6 +92,7 @@ def _list_evaluations(
     setup: Optional[List] = None,
     flow: Optional[List] = None,
     uploader: Optional[List] = None,
+    sort: Optional[str] = None,
     output_format: str = 'object',
     **kwargs
 ) -> Union[Dict, pd.DataFrame]:
@@ -113,6 +119,9 @@ def _list_evaluations(
 
     kwargs: dict, optional
         Legal filter operators: tag, limit, offset.
+
+    sort : str, optional
+        order of sorting evaluations, ascending ("asc") or descending ("desc")
 
     output_format: str, optional (default='dict')
         The parameter decides the format of the output.
@@ -141,6 +150,8 @@ def _list_evaluations(
         api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
     if uploader is not None:
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
+    if sort is not None:
+        api_call += "/sort/%s" % sort
 
     return __list_evaluations(api_call, output_format=output_format)
 
