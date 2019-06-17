@@ -1125,6 +1125,8 @@ class TestOpenMLDataset(TestBase):
             except Exception as e:
                 # returned code 273: Dataset not processed yet
                 # returned code 362: No qualities found
+                print("Trial {}/{}: ".format(trials + 1, timeout_limit))
+                print("\tFailed to fetch dataset:{} with '{}'.".format(upload_did, str(e)))
                 trials += 1
                 continue
         if dataset is None:
