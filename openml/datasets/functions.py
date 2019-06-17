@@ -165,7 +165,7 @@ def _get_cache_directory(dataset: OpenMLDataset) -> str:
     return _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset.dataset_id)
 
 
-def list_qualities() -> list:
+def list_qualities() -> List[str]:
     """ Return list of data qualities available.
 
     The function performs an API call to retrieve the entire list of
