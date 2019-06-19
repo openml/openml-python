@@ -579,7 +579,7 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:
 
     try:
         if not ignore_cache:
-            _get_cached_run(run_id)
+            return _get_cached_run(run_id)
         else:
             raise OpenMLCacheException(message='dummy')
 
