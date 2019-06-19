@@ -2,6 +2,7 @@ import json
 import xmltodict
 import pandas as pd
 from typing import Union, List, Optional, Dict
+import collections
 
 import openml.utils
 import openml._api_calls
@@ -168,7 +169,7 @@ def __list_evaluations(api_call, output_format='object'):
     assert type(evals_dict['oml:evaluations']['oml:evaluation']) == list, \
         type(evals_dict['oml:evaluations'])
 
-    evals = dict()
+    evals = collections.OrderedDict()
     for eval_ in evals_dict['oml:evaluations']['oml:evaluation']:
         run_id = int(eval_['oml:run_id'])
         value = None
