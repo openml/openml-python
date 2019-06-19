@@ -579,7 +579,7 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:
 
     try:
         if not ignore_cache:
-            return _get_cached_run(run_id)
+            _get_cached_run(run_id)
         else:
             raise OpenMLCacheException(message='dummy')
 
@@ -665,8 +665,11 @@ def _create_run_from_xml(xml, from_server=True):
 
     if 'oml:input_data' in run:
         dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
-    elif not from_server:
-        dataset_id = None
+    else:
+        if not from_server:
+            dataset_id = None
+        else:
+            raise ValueError('Uploaded run does not contain input_data.')
 
     files = OrderedDict()
     evaluations = OrderedDict()
