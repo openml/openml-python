@@ -6,6 +6,11 @@
 Changelog
 =========
 
+0.10.0
+~~~~~~
+* FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.
+* DOC #639: More descriptive documention for function to convert array format.
+
 0.9.0
 ~~~~~
 * ADD #560: OpenML-Python can now handle regression tasks as well.
@@ -26,8 +31,6 @@ Changelog
 * FIX #304, #636: Allow serialization of numpy datatypes and list of lists of more types (e.g. bools, ints) for flows.
 * FIX #651: Fixed a bug that would prevent openml-python from finding the user's config file.
 * FIX #693: OpenML-Python uses liac-arff instead of scipy.io for loading task splits now.
-* FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.
-* DOC #639: More descriptive documention for function to convert array format.
 * DOC #678: Better color scheme for code examples in documentation.
 * DOC #681: Small improvements and removing list of missing functions.
 * DOC #684: Add notice to examples that connect to the test server.
