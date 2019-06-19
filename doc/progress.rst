@@ -6,6 +6,10 @@
 Changelog
 =========
 
+0.10.0
+~~~~~~
+* FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
+
 0.9.0
 ~~~~~
 * ADD #560: OpenML-Python can now handle regression tasks as well.
