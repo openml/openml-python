@@ -665,11 +665,12 @@ def _create_run_from_xml(xml, from_server=True):
 
     if 'oml:input_data' in run:
         dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
+    elif not from_server:
+        dataset_id = None
     else:
-        if not from_server:
-            dataset_id = None
-        else:
-            raise ValueError('Uploaded run does not contain input_data.')
+        raise ValueError('Uploaded run does not contain input_data for run_id={}.\n'
+                         'Kindly report this server-side issue at: '
+                         'https://github.com/openml/openml-python/issues'.format(run_id))
 
     files = OrderedDict()
     evaluations = OrderedDict()
