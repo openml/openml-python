@@ -78,21 +78,21 @@ def run_model_on_task(
         Flow generated from the model.
     """
 
+    # TODO: At some point in the future do not allow for arguments in old order (6-2018).
+    # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
+    # When removing this please also remove the method `is_estimator` from the extension
+    # interface as it is only used here (MF, 3-2019)
+    if isinstance(model, OpenMLTask):
+        warnings.warn("The old argument order (task, model) is deprecated and "
+                      "will not be supported in the future. Please use the "
+                      "order (model, task).", DeprecationWarning)
+        task, model = model, task
+
     extension = get_extension_by_model(model, raise_if_no_extension=True)
     if extension is None:
         # This should never happen and is only here to please mypy will be gone soon once the
         # whole function is removed
         raise TypeError(extension)
-
-    # TODO: At some point in the future do not allow for arguments in old order (6-2018).
-    # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
-    # When removing this please also remove the method `is_estimator` from the extension
-    # interface as it is only used here (MF, 3-2019)
-    if isinstance(model, OpenMLTask) and extension.is_estimator(model):
-        warnings.warn("The old argument order (task, model) is deprecated and "
-                      "will not be supported in the future. Please use the "
-                      "order (model, task).", DeprecationWarning)
-        task, model = model, task
 
     flow = extension.model_to_flow(model)
 
@@ -159,9 +159,6 @@ def run_flow_on_task(
     if flow_tags is not None and not isinstance(flow_tags, list):
         raise ValueError("flow_tags should be a list")
 
-    if task.task_id is None:
-        raise ValueError("The task should be published at OpenML")
-
     # TODO: At some point in the future do not allow for arguments in old order (changed 6-2018).
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
     if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
@@ -170,6 +167,9 @@ def run_flow_on_task(
                       "will not be supported in the future. Please use the "
                       "order (model, Flow).", DeprecationWarning)
         task, flow = flow, task
+
+    if task.task_id is None:
+        raise ValueError("The task should be published at OpenML")
 
     flow.model = flow.extension.seed_model(flow.model, seed=seed)
 
