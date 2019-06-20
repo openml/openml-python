@@ -8,6 +8,8 @@ Changelog
 
 0.10.0
 ~~~~~~
+
+* ADD #687: Adds a function to retrieve the list of evaluation measures available.
 * ADD #695: A function to retrieve all the data quality measures available.
 
 0.9.0
