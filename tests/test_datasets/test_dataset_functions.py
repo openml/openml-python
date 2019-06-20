@@ -1190,3 +1190,8 @@ class TestOpenMLDataset(TestBase):
                 original_data_url=original_data_url,
                 paper_url=paper_url
             )
+
+    def test_list_qualities(self):
+        qualities = openml.datasets.list_qualities()
+        self.assertEqual(isinstance(qualities, list), True)
+        self.assertEqual(all([isinstance(q, str) for q in qualities]), True)
