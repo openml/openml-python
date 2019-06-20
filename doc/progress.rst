@@ -9,6 +9,8 @@ Changelog
 0.10.0
 ~~~~~~
 * FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
+* ADD #687: Adds a function to retrieve the list of evaluation measures available.
+* ADD #695: A function to retrieve all the data quality measures available.
 
 0.9.0
 ~~~~~
