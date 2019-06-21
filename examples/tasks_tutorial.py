@@ -191,7 +191,3 @@ vars(tasktypes)
 ############################################################################
 # [Complete list of model estimation procedures](https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure).
 # [Complete list of evaluation measures](https://www.openml.org/search?q=measure_type%3Aevaluation_measure&type=measure)
-
-
-
-
