@@ -178,7 +178,7 @@ pprint(tasks[0])
 # #######
 #
 # Let's create a classification task on a new dataset. We first upload the dataset
-# (just a copy of the Iris dataset in this example) and then create a new classification 
+# (just a copy of the Iris dataset in this example) and then create a new classification
 # task on it. We'll use 10-fold cross-validation (ID=1), without a predefined measure.
 
 dataset = openml.OpenMLDataset(
