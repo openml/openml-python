@@ -150,22 +150,26 @@ pprint(tasks[0])
 # You can also create new tasks. Take the following into account:
 #
 # * You can only create tasks on _active_ datasets
-# * For now, only the following tasks are supported: classification, regression, clustering, and learning curve analysis.
+# * For now, only the following tasks are supported: classification, regression,<br>
+# clustering, and learning curve analysis.
 # * For now, tasks can only be created on a single dataset.
 #
 # Creating a task requires the following input:
 #
 # * task_type_id: The task type ID, required (see below). Required.
 # * dataset_id: The dataset ID. Required.
-# * target_name: For supervised tasks, the name of the attribute you aim to predict. Optional. 
-# * estimation_procedure_id : The ID of the estimation procedure used to create train-test splits. Optional.
-# * evaluation_measure: The name of the evaluation measure. Optional. 
+# * target_name: For supervised tasks, the name of the attribute you aim to predict.<br>
+# Optional.
+# * estimation_procedure_id : The ID of the estimation procedure used to create train-test<br>
+# splits. Optional.
+# * evaluation_measure: The name of the evaluation measure. Optional.
 # * Any additional inputs for specific tasks
 #
-# It is best to leave the evaluation measure open if there is no strong prerequisite for a specific measure. 
-# OpenML will always compute all appropriate measures and you can filter or sort results on your favourite 
-# measure afterwards. Only add an evaluation measure if necessary (e.g. when other measure make no sense), 
-# since it will create a new task, which scatters results across tasks.
+# It is best to leave the evaluation measure open if there is no strong prerequisite for a
+# specific measure. OpenML will always compute all appropriate measures and you can filter
+# or sort results on your favourite measure afterwards. Only add an evaluation measure if
+# necessary (e.g. when other measure make no sense), since it will create a new task, which
+# scatters results across tasks.
 
 
 ############################################################################
@@ -189,5 +193,7 @@ vars(tasktypes)
 
 
 ############################################################################
-# [Complete list of model estimation procedures](https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure).
-# [Complete list of evaluation measures](https://www.openml.org/search?q=measure_type%3Aevaluation_measure&type=measure)
+# [Complete list of model estimation procedures](
+# https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure)
+# [Complete list of evaluation measures](
+# https://www.openml.org/search?q=measure_type%3Aevaluation_measure&type=measure)
