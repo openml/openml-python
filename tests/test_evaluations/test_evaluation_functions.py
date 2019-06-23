@@ -116,8 +116,7 @@ class TestEvaluationFunctions(TestBase):
         for run_id in evaluations.keys():
             self.assertIsNotNone(evaluations[run_id].value)
             self.assertIsNone(evaluations[run_id].values)
-
-
+            
     def test_evaluation_list_sort(self):
         openml.config.server = self.test_server
         size = 10
