@@ -153,6 +153,7 @@ pprint(tasks[0])
 # * For now, only the following tasks are supported: classification, regression,<br>
 # clustering, and learning curve analysis.
 # * For now, tasks can only be created on a single dataset.
+# * The exact same task should not already exist.
 #
 # Creating a task requires the following input:
 #
@@ -176,12 +177,22 @@ pprint(tasks[0])
 # Example
 # #######
 #
-# Let's create a classification task on dataset Iris (dataset 128 on the test server).
-# We'll use 10-fold cross-validation (ID=1), without a predefined measure.
+# Let's create a classification task on a new dataset. We first upload the dataset
+# (just a copy of the Iris dataset in this example) and then create a new classification 
+# task on it. We'll use 10-fold cross-validation (ID=1), without a predefined measure.
+
+dataset = openml.OpenMLDataset(
+    "%s-UploadTestWithURL" % self._get_sentinel(),
+    "test",
+    data_format="arff",
+    version=1,
+    url="https://www.openml.org/data/download/61/dataset_61_iris.arff",
+)
+dataset.publish()
 
 tasktypes = openml.tasks.TaskTypeEnum
 my_task = openml.tasks.create_task(task_type_id=tasktypes.SUPERVISED_CLASSIFICATION,
-                                   dataset_id=128,
+                                   dataset_id=dataset.dataset_id,
                                    target_name='class',
                                    estimation_procedure_id=1)
 my_task.publish()
