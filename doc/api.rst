@@ -72,6 +72,7 @@ Modules
     get_dataset
     get_datasets
     list_datasets
+    list_qualities
     status_update
 
 :mod:`openml.evaluations`: Evaluation Functions
@@ -83,6 +84,7 @@ Modules
    :template: function.rst
 
     list_evaluations
+    list_evaluation_measures
 
 :mod:`openml.flows`: Flow Functions
 -----------------------------------

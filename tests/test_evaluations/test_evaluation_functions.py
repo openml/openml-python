@@ -117,6 +117,7 @@ class TestEvaluationFunctions(TestBase):
             self.assertIsNotNone(evaluations[run_id].value)
             self.assertIsNone(evaluations[run_id].values)
 
+
     def test_evaluation_list_sort(self):
         openml.config.server = self.test_server
         size = 10
@@ -141,3 +142,8 @@ class TestEvaluationFunctions(TestBase):
         # Compare manual sorting against sorted output
         test_output = sorted(unsorted_output, reverse=True)
         self.assertTrue(test_output[:size] == sorted_output)
+
+    def test_list_evaluation_measures(self):
+        measures = openml.evaluations.list_evaluation_measures()
+        self.assertEqual(isinstance(measures, list), True)
+        self.assertEqual(all([isinstance(s, str) for s in measures]), True)
