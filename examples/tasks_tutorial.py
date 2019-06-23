@@ -182,10 +182,9 @@ pprint(tasks[0])
 # task on it. We'll use 10-fold cross-validation (ID=1), without a predefined measure.
 
 dataset = openml.OpenMLDataset(
-    "%s-UploadTestWithURL" % self._get_sentinel(),
+    "TaskCreationTestDataset",
     "test",
     data_format="arff",
-    version=1,
     url="https://www.openml.org/data/download/61/dataset_61_iris.arff",
 )
 dataset.publish()
