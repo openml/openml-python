@@ -176,12 +176,12 @@ pprint(tasks[0])
 # Example
 # #######
 #
-# Let's create a classification task on dataset Iris (dataset ID=61).
+# Let's create a classification task on dataset Iris (dataset 128 on the test server).
 # We'll use 10-fold cross-validation (ID=1), without a predefined measure.
 
 tasktypes = openml.tasks.TaskTypeEnum
 my_task = openml.tasks.create_task(task_type_id=tasktypes.SUPERVISED_CLASSIFICATION,
-                                   dataset_id=1,
+                                   dataset_id=128,
                                    target_name='class',
                                    estimation_procedure_id=1)
 my_task.publish()
