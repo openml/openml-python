@@ -34,13 +34,30 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         # to benchmark the clustering algorithm.
         super(OpenMLClusteringTaskTest, self).test_upload_task()
 
-        dataset_id = self._get_compatible_rand_dataset()
         # Upload a clustering task without a ground truth.
-        task = openml.tasks.create_task(
-            task_type_id=self.task_type_id,
-            dataset_id=dataset_id,
-            estimation_procedure_id=self.estimation_procedure
-        )
+        # As in the base class, we need to try different datasets
+        # because the task may already exist.
+        for i in range(100):
+            try:
+                dataset_id = self._get_compatible_rand_dataset()
+                task = openml.tasks.create_task(
+                  task_type_id=self.task_type_id,
+                  dataset_id=dataset_id,
+                  estimation_procedure_id=self.estimation_procedure
+                )
+                task_id = task.publish()
+                
+                # success
+                break
+            except OpenMLServerException as e:
+                # Error code for 'task already exists'
+                if e.code == 614:
+                    continue
+                else:
+                    raise e
+        else:
+            raise ValueError(
+                'Could not create a valid task for task type ID {}'.format(self.task_type_id)
+            )
 
-        task_id = task.publish()
         openml.utils._delete_entity('task', task_id)
