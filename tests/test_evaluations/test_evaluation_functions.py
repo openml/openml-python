@@ -118,7 +118,7 @@ class TestEvaluationFunctions(TestBase):
             self.assertIsNone(evaluations[run_id].values)
 
     def test_evaluation_list_sort(self):
-        openml.config.server = self.production_server
+        openml.config.server = self.test_server
         size = 10
         task_id = 1769
         # Get all evaluations of the task
@@ -126,7 +126,7 @@ class TestEvaluationFunctions(TestBase):
             "predictive_accuracy", offset=0, task=[task_id])
         # Get top 10 evaluations of the same task
         sorted_eval = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=size, offset=0, task=[task_id], sort="desc")
+            "predictive_accuracy", size=size, offset=0, task=[task_id], sort_order="desc")
 
         sorted_output = []
         unsorted_output = []
