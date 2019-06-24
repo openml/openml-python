@@ -2,6 +2,7 @@ import openml
 from .test_task import OpenMLTaskTest
 from openml.exceptions import OpenMLServerException
 
+
 class OpenMLClusteringTaskTest(OpenMLTaskTest):
 
     __test__ = True
@@ -41,12 +42,12 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
             try:
                 dataset_id = self._get_compatible_rand_dataset()
                 task = openml.tasks.create_task(
-                  task_type_id=self.task_type_id,
-                  dataset_id=dataset_id,
-                  estimation_procedure_id=self.estimation_procedure
+                    task_type_id=self.task_type_id,
+                    dataset_id=dataset_id,
+                    estimation_procedure_id=self.estimation_procedure
                 )
                 task_id = task.publish()
-                
+
                 # success
                 break
             except OpenMLServerException as e:
