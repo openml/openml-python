@@ -1061,6 +1061,7 @@ class TestOpenMLDataset(TestBase):
     def test___publish_fetch_ignore_attribute(self):
         """(Part 1) Test to upload and retrieve dataset and check ignore_attributes
 
+        DEPENDS on test_publish_fetch_ignore_attribute() to be executed after this
         This test is split into two parts:
         1) test___publish_fetch_ignore_attribute()
             This will be executed earlier, owing to alphabetical sorting.
@@ -1131,6 +1132,7 @@ class TestOpenMLDataset(TestBase):
     def test_publish_fetch_ignore_attribute(self):
         """(Part 2) Test to upload and retrieve dataset and check ignore_attributes
 
+        DEPENDS on test___publish_fetch_ignore_attribute() to be executed first
         This will be executed after test___publish_fetch_ignore_attribute(),
         owing to alphabetical sorting. The time gap is to allow the server
         more time time to compute data qualities.
