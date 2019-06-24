@@ -1058,7 +1058,21 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url
             )
 
-    def test_publish_fetch_ignore_attribute(self):
+    def test___publish_fetch_ignore_attribute(self):
+        """(Part 1) Test to upload and retrieve dataset and check ignore_attributes
+
+        This test is split into two parts:
+        1) test___publish_fetch_ignore_attribute()
+            This will be executed earlier, owing to alphabetical sorting.
+            This test creates and publish() a dataset and checks for a valid ID.
+        2) test_publish_fetch_ignore_attribute()
+            This will be executed after test___publish_fetch_ignore_attribute(),
+            owing to alphabetical sorting. The time gap is to allow the server
+            more time time to compute data qualities.
+            The dataset ID obtained previously is used to fetch the dataset.
+            The retrieved dataset is checked for valid ignore_attributes.
+        """
+        # the returned fixt
         data = [
             ['a', 'sunny', 85.0, 85.0, 'FALSE', 'no'],
             ['b', 'sunny', 80.0, 90.0, 'TRUE', 'no'],
@@ -1109,10 +1123,25 @@ class TestOpenMLDataset(TestBase):
         # publish dataset
         upload_did = dataset.publish()
         # test if publish was successful
-        self.assertIsInstance(dataset.dataset_id, int)
+        self.assertIsInstance(upload_did, int)
+        # variables to carry forward for test_publish_fetch_ignore_attribute()
+        self.__class__.test_publish_fetch_ignore_attribute_did = upload_did
+        self.__class__.test_publish_fetch_ignore_attribute_list = ignore_attribute
 
+    def test_publish_fetch_ignore_attribute(self):
+        """(Part 2) Test to upload and retrieve dataset and check ignore_attributes
+
+        This will be executed after test___publish_fetch_ignore_attribute(),
+        owing to alphabetical sorting. The time gap is to allow the server
+        more time time to compute data qualities.
+        The dataset ID obtained previously is used to fetch the dataset.
+        The retrieved dataset is checked for valid ignore_attributes.
+        """
+        # Retrieving variables from test___publish_fetch_ignore_attribute()
+        upload_did = self.__class__.test_publish_fetch_ignore_attribute_did
+        ignore_attribute = self.__class__.test_publish_fetch_ignore_attribute_list
         trials = 1
-        timeout_limit = 1000
+        timeout_limit = 200
         dataset = None
         # fetching from server
         # loop till timeout or fetch not successful
