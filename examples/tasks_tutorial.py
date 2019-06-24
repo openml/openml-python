@@ -188,11 +188,12 @@ dataset = openml.OpenMLDataset(
     url="https://www.openml.org/data/download/61/dataset_61_iris.arff",
 )
 dataset.publish()
+openml.datasets.status_update(dataset.dataset_id, "active")
 
 tasktypes = openml.tasks.TaskTypeEnum
 my_task = openml.tasks.create_task(task_type_id=tasktypes.SUPERVISED_CLASSIFICATION,
                                    dataset_id=dataset.dataset_id,
-                                   target_name='class',
+                                   target_name="class",
                                    estimation_procedure_id=1)
 my_task.publish()
 
