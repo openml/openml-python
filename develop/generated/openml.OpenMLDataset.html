@@ -191,7 +191,7 @@ which maps a quality name to a quality value.</p>
 </dl>
 <dl class="method">
 <dt id="openml.OpenMLDataset.get_data">
-<code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param">self, target: Union[List[str], str, NoneType] = None, include_row_id: bool = False, include_ignore_attributes: bool = False, dataset_format: str = 'dataframe'</em><span class="sig-paren">)</span> &#x2192; Tuple[Union[numpy.ndarray, pandas.core.frame.DataFrame, scipy.sparse.csr.csr_matrix], Union[numpy.ndarray, pandas.core.frame.DataFrame, NoneType], List[bool], List[str]]<a class="headerlink" href="#openml.OpenMLDataset.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param">self, target: Union[List[str], str, NoneType] = None, include_row_id: bool = False, include_ignore_attribute: bool = False, dataset_format: str = 'dataframe'</em><span class="sig-paren">)</span> &#x2192; Tuple[Union[numpy.ndarray, pandas.core.frame.DataFrame, scipy.sparse.csr.csr_matrix], Union[numpy.ndarray, pandas.core.frame.DataFrame, NoneType], List[bool], List[str]]<a class="headerlink" href="#openml.OpenMLDataset.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns dataset content as dataframes or sparse matrices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -201,7 +201,7 @@ Splitting multiple columns is currently not supported.</p>
 </dd>
 <dt><strong>include_row_id</strong><span class="classifier">boolean (default=False)</span></dt><dd><p>Whether to include row ids in the returned dataset.</p>
 </dd>
-<dt><strong>include_ignore_attributes</strong><span class="classifier">boolean (default=False)</span></dt><dd><p>Whether to include columns that are marked as “ignore”
+<dt><strong>include_ignore_attribute</strong><span class="classifier">boolean (default=False)</span></dt><dd><p>Whether to include columns that are marked as “ignore”
 on the server in the dataset.</p>
 </dd>
 <dt><strong>dataset_format</strong><span class="classifier">string (default=’dataframe’)</span></dt><dd><p>The format of returned dataset.
@@ -227,7 +227,7 @@ If <code class="docutils literal notranslate"><span class="pre">dataframe</span>
 
 <dl class="method">
 <dt id="openml.OpenMLDataset.get_features_by_type">
-<code class="sig-name descname">get_features_by_type</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">data_type</em>, <em class="sig-param">exclude=None</em>, <em class="sig-param">exclude_ignore_attributes=True</em>, <em class="sig-param">exclude_row_id_attribute=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_features_by_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_features_by_type</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">data_type</em>, <em class="sig-param">exclude=None</em>, <em class="sig-param">exclude_ignore_attribute=True</em>, <em class="sig-param">exclude_row_id_attribute=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_features_by_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return indices of features of a given type, e.g. all nominal features.
 Optional parameters to exclude various features by index or ontology.</p>
 <dl class="field-list simple">
@@ -240,7 +240,7 @@ Optional parameters to exclude various features by index or ontology.</p>
 </dd>
 </dl>
 </dd>
-<dt><strong>exclude_ignore_attributes</strong><span class="classifier">bool</span></dt><dd><p>Whether to exclude the defined ignore attributes (and adapt the
+<dt><strong>exclude_ignore_attribute</strong><span class="classifier">bool</span></dt><dd><p>Whether to exclude the defined ignore attributes (and adapt the
 return values as if these indices are not present)</p>
 </dd>
 <dt><strong>exclude_row_id_attribute</strong><span class="classifier">bool</span></dt><dd><p>Whether to exclude the defined row id attributes (and adapt the
