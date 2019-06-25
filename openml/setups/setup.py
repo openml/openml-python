@@ -1,3 +1,5 @@
+import openml.config
+
 
 class OpenMLSetup(object):
     """Setup object (a.k.a. Configuration).
@@ -24,6 +26,25 @@ class OpenMLSetup(object):
         self.setup_id = setup_id
         self.flow_id = flow_id
         self.parameters = parameters
+
+    def __str__(self):
+        header = "OpenML Setup"
+        header = '{}\n{}\n'.format(header, '=' * len(header))
+
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = {"Setup ID": self.setup_id,
+                  "Flow ID": self.flow_id,
+                  "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                  "# of Parameters": len(self.parameters)}
+
+        # determines the order in which the information will be printed
+        order = ["Setup ID", "Flow ID", "Flow URL", "# of Parameters"]
+        fields = [(key, fields[key]) for key in order if key in fields]
+
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return header + body
 
 
 class OpenMLParameter(object):
@@ -60,3 +81,34 @@ class OpenMLParameter(object):
         self.data_type = data_type
         self.default_value = default_value
         self.value = value
+
+    def __str__(self):
+        header = "OpenML Parameter"
+        header = '{}\n{}\n'.format(header, '=' * len(header))
+
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = {"ID": self.id,
+                  "Flow ID": self.flow_id,
+                  # "Flow Name": self.flow_name,
+                  "Flow Name": self.full_name,
+                  "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                  "Parameter Name": self.parameter_name}
+        # indented prints for parameter attributes
+        # indention = 2 spaces + 1 | + 2 underscores
+        indent = "{}|{}".format(" " * 2, "_" * 2)
+        parameter_data_type = "{}Data Type".format(indent)
+        fields[parameter_data_type] = self.data_type
+        parameter_default = "{}Default".format(indent)
+        fields[parameter_default] = self.default_value
+        parameter_value = "{}Value".format(indent)
+        fields[parameter_value] = self.value
+
+        # determines the order in which the information will be printed
+        order = ["ID", "Flow ID", "Flow Name", "Flow URL", "Parameter Name",
+                 parameter_data_type, parameter_default, parameter_value]
+        fields = [(key, fields[key]) for key in order if key in fields]
+
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return header + body

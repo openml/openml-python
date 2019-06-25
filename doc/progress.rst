@@ -10,6 +10,8 @@ Changelog
 ~~~~~~
 * FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.
 * DOC #639: More descriptive documention for function to convert array format.
+* ADD #687: Adds a function to retrieve the list of evaluation measures available.
+* ADD #695: A function to retrieve all the data quality measures available.
 
 0.9.0
 ~~~~~

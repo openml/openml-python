@@ -173,6 +173,36 @@ class OpenMLDataset(object):
         else:
             self.data_pickle_file = None
 
+    def __str__(self):
+        header = "OpenML Dataset"
+        header = '{}\n{}\n'.format(header, '=' * len(header))
+
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = {"Name": self.name,
+                  "Version": self.version,
+                  "Format": self.format,
+                  "Licence": self.licence,
+                  "Download URL": self.url,
+                  "Data file": self.data_file,
+                  "Pickle file": self.data_pickle_file,
+                  "# of features": len(self.features)}
+        if self.upload_date is not None:
+            fields["Upload Date"] = self.upload_date.replace('T', ' ')
+        if self.dataset_id is not None:
+            fields["OpenML URL"] = "{}d/{}".format(base_url, self.dataset_id)
+        if self.qualities['NumberOfInstances'] is not None:
+            fields["# of instances"] = int(self.qualities['NumberOfInstances'])
+
+        # determines the order in which the information will be printed
+        order = ["Name", "Version", "Format", "Upload Date", "Licence", "Download URL",
+                 "OpenML URL", "Data File", "Pickle File", "# of features", "# of instances"]
+        fields = [(key, fields[key]) for key in order if key in fields]
+
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return header + body
+
     def _data_arff_to_pickle(self, data_file):
         data_pickle_file = data_file.replace('.arff', '.pkl.py3')
         if os.path.exists(data_pickle_file):
@@ -368,9 +398,25 @@ class OpenMLDataset(object):
     def _convert_array_format(data, array_format, attribute_names):
         """Convert a dataset to a given array format.
 
-        By default, the data are stored as a sparse matrix or a pandas
-        dataframe. One might be interested to get a pandas SparseDataFrame or a
-        NumPy array instead, respectively.
+        Converts to numpy array if data is non-sparse.
+        Converts to a sparse dataframe if data is sparse.
+
+        Parameters
+        ----------
+        array_format : str {'array', 'dataframe'}
+            Desired data type of the output
+            - If array_format='array'
+                If data is non-sparse
+                    Converts to numpy-array
+                    Enforces numeric encoding of categorical columns
+                    Missing values are represented as NaN in the numpy-array
+                else returns data as is
+            - If array_format='dataframe'
+                If data is sparse
+                    Works only on sparse data
+                    Converts sparse data to sparse dataframe
+                else returns data as is
+
         """
         if array_format == "array" and not scipy.sparse.issparse(data):
             # We encode the categories such that they are integer to be able
@@ -396,8 +442,11 @@ class OpenMLDataset(object):
                     'PyOpenML cannot handle string when returning numpy'
                     ' arrays. Use dataset_format="dataframe".'
                 )
-        if array_format == "dataframe" and scipy.sparse.issparse(data):
+        elif array_format == "dataframe" and scipy.sparse.issparse(data):
             return pd.SparseDataFrame(data, columns=attribute_names)
+        else:
+            data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
+            warn("Cannot convert {} to '{}'. Returning input data.".format(data_type, array_format))
         return data
 
     @staticmethod

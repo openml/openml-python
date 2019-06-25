@@ -68,12 +68,40 @@ class OpenMLRun(object):
         self.predictions_url = predictions_url
 
     def __str__(self):
-        flow_name = self.flow_name
-        if flow_name is not None and len(flow_name) > 26:
-            # long enough to show sklearn.pipeline.Pipeline
-            flow_name = flow_name[:26] + "..."
-        return "[run id: {}, task id: {}, flow id: {}, flow name: {}]".format(
-            self.run_id, self.task_id, self.flow_id, flow_name)
+        header = "OpenML Run"
+        header = '{}\n{}\n'.format(header, '=' * len(header))
+
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = {"Uploader Name": self.uploader_name,
+                  "Metric": self.task_evaluation_measure,
+                  "Run ID": self.run_id,
+                  "Task ID": self.task_id,
+                  "Task Type": self.task_type,
+                  "Task URL": "{}t/{}".format(base_url, self.task_id),
+                  "Flow ID": self.flow_id,
+                  "Flow Name": self.flow_name,
+                  "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                  "Setup ID": self.setup_id,
+                  "Setup String": self.setup_string,
+                  "Dataset ID": self.dataset_id,
+                  "Dataset URL": "{}d/{}".format(base_url, self.dataset_id)}
+        if self.uploader is not None:
+            fields["Uploader Profile"] = "{}u/{}".format(base_url, self.uploader)
+        if self.run_id is not None:
+            fields["Run URL"] = "{}r/{}".format(base_url, self.run_id)
+        if self.task_evaluation_measure in self.evaluations:
+            fields["Result"] = self.evaluations[self.task_evaluation_measure]
+
+        # determines the order in which the information will be printed
+        order = ["Uploader Name", "Uploader Profile", "Metric", "Result", "Run ID", "Run URL",
+                 "Task ID", "Task Type", "Task URL", "Flow ID", "Flow Name", "Flow URL",
+                 "Setup ID", "Setup String", "Dataset ID", "Dataset URL"]
+        fields = [(key, fields[key]) for key in order if key in fields]
+
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return header + body
 
     def _repr_pretty_(self, pp, cycle):
         pp.text(str(self))
