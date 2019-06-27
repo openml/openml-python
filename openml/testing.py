@@ -103,6 +103,25 @@ class TestBase(unittest.TestCase):
         openml.config.server = self.production_server
         openml.config.connection_n_retries = self.connection_n_retries
 
+    def _track_old_files(self):
+        files = os.walk(self.static_cache_dir)
+        self.old_file_list = []
+        for root, _, filenames in files:
+            for filename in filenames:
+                self.old_file_list.append(os.path.join(root, filename))
+
+    def _remove_new_files(self):
+        files = os.walk(self.static_cache_dir)
+        self.new_file_list = []
+        for root, _, filenames in files:
+            for filename in filenames:
+                self.new_file_list.append(os.path.join(root, filename))
+        # filtering the files generated during this run
+        self.new_file_list = list(set(self.new_file_list) -
+                                  set(self.old_file_list))
+        for file in self.new_file_list:
+            os.remove(file)
+
     def _get_sentinel(self, sentinel=None):
         if sentinel is None:
             # Create a unique prefix for the flow. Necessary because the flow

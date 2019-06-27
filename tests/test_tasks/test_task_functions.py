@@ -12,6 +12,14 @@ import pandas as pd
 class TestTask(TestBase):
     _multiprocess_can_split_ = True
 
+    def setUp(self):
+        super(TestTask, self).setUp()
+        self._track_old_files()
+
+    def tearDown(self):
+        self._remove_new_files()
+        super(TestTask, self).tearDown()
+
     def test__get_cached_tasks(self):
         openml.config.cache_directory = self.static_cache_dir
         tasks = openml.tasks.functions._get_cached_tasks()

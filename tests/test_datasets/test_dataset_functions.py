@@ -1,4 +1,5 @@
 import os
+import sys
 import random
 from itertools import product
 from unittest import mock
@@ -6,6 +7,7 @@ from unittest import mock
 import arff
 
 import pytest
+import shutil
 import numpy as np
 import pandas as pd
 import scipy.sparse
@@ -44,18 +46,24 @@ class TestOpenMLDataset(TestBase):
 
     def _remove_pickle_files(self):
         cache_dir = self.static_cache_dir
+        self.lock_path = os.path.join(openml.config.get_cache_directory(), 'locks')
         for did in ['-1', '2']:
             with lockutils.external_lock(
                     name='datasets.functions.get_dataset:%s' % did,
-                    lock_path=os.path.join(openml.config.get_cache_directory(), 'locks'),
+                    lock_path=self.lock_path,
             ):
-                pickle_path = os.path.join(cache_dir, 'datasets', did,
-                                           'dataset.pkl')
+                if sys.version[0] is '3':
+                    pickle_path = os.path.join(openml.config.get_cache_directory(), 'datasets',
+                                               did, 'dataset.pkl.py3')
+                else:
+                    pickle_path = os.path.join(openml.config.get_cache_directory(), 'datasets',
+                                               did, 'dataset.pkl')
                 try:
                     os.remove(pickle_path)
                 except (OSError, FileNotFoundError):
                     #  Replaced a bare except. Not sure why either of these would be acceptable.
                     pass
+        shutil.rmtree(self.lock_path, ignore_errors=True)
 
     def _get_empty_param_for_dataset(self):
 
