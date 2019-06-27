@@ -9,6 +9,8 @@ Changelog
 0.10.0
 ~~~~~~
 * FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
+* FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.
+* DOC #639: More descriptive documention for function to convert array format.
 * ADD #687: Adds a function to retrieve the list of evaluation measures available.
 * ADD #695: A function to retrieve all the data quality measures available.
 
@@ -27,6 +29,7 @@ Changelog
 * ADD #659: Lazy loading of task splits.
 * ADD #516: `run_flow_on_task` flow uploading is now optional.
 * ADD #680: Adds `openml.config.start_using_configuration_for_example` (and resp. stop) to easily connect to the test server.
+* ADD #75, #653: Adds a pretty print for objects of the top-level classes.
 * FIX #642: `check_datasets_active` now correctly also returns active status of deactivated datasets.
 * FIX #304, #636: Allow serialization of numpy datatypes and list of lists of more types (e.g. bools, ints) for flows.
 * FIX #651: Fixed a bug that would prevent openml-python from finding the user's config file.
