@@ -668,9 +668,12 @@ def _create_run_from_xml(xml, from_server=True):
     elif not from_server:
         dataset_id = None
     else:
-        raise ValueError('Uploaded run does not contain input_data for run_id={}.\n'
-                         'Kindly report this server-side issue at: '
-                         'https://github.com/openml/openml-python/issues'.format(run_id))
+        # fetching the task to obtain dataset_id
+        t = openml.tasks.get_task(task_id, download_data=False)
+        if not hasattr(t, 'dataset_id'):
+            raise ValueError("Unable to fetch dataset_id from the task({}) "
+                             "linked to run({})".format(task_id, run_id))
+        dataset_id = t.dataset_id
 
     files = OrderedDict()
     evaluations = OrderedDict()
