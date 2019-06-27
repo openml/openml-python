@@ -118,22 +118,22 @@ class TestEvaluationFunctions(TestBase):
             self.assertIsNone(evaluations[run_id].values)
 
     def test_evaluation_list_sort(self):
-        openml.config.server = self.test_server
         size = 10
-        task_id = 1769
+        task_id = 115
         # Get all evaluations of the task
         unsorted_eval = openml.evaluations.list_evaluations(
             "predictive_accuracy", offset=0, task=[task_id])
         # Get top 10 evaluations of the same task
         sorted_eval = openml.evaluations.list_evaluations(
             "predictive_accuracy", size=size, offset=0, task=[task_id], sort_order="desc")
-
+        self.assertEqual(len(sorted_eval), size)
+        self.assertGreater(len(unsorted_eval),0)
         sorted_output = []
         unsorted_output = []
-        for run_id in sorted_eval.keys():
-            sorted_output.append(sorted_eval[run_id].value)
-        for run_id in unsorted_eval.keys():
-            unsorted_output.append(unsorted_eval[run_id].value)
+        for eval in sorted_eval.values():
+            sorted_output.append(eval.value)
+        for eval in unsorted_eval.values():
+            unsorted_output.append(eval.value)
 
         # Check if output from sort is sorted in the right order
         self.assertTrue(sorted(sorted_output, reverse=True) == sorted_output)
