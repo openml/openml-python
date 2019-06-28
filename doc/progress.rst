@@ -8,6 +8,7 @@ Changelog
 
 0.10.0
 ~~~~~~
+* FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
 * ADD #715: `list_evaluations` now has an option to sort evaluations by score (value).
 * FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.
 * DOC #639: More descriptive documention for function to convert array format.

@@ -667,6 +667,13 @@ def _create_run_from_xml(xml, from_server=True):
         dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
     elif not from_server:
         dataset_id = None
+    else:
+        # fetching the task to obtain dataset_id
+        t = openml.tasks.get_task(task_id, download_data=False)
+        if not hasattr(t, 'dataset_id'):
+            raise ValueError("Unable to fetch dataset_id from the task({}) "
+                             "linked to run({})".format(task_id, run_id))
+        dataset_id = t.dataset_id
 
     files = OrderedDict()
     evaluations = OrderedDict()
