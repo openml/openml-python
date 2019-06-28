@@ -128,12 +128,8 @@ class TestEvaluationFunctions(TestBase):
             "predictive_accuracy", size=size, offset=0, task=[task_id], sort_order="desc")
         self.assertEqual(len(sorted_eval), size)
         self.assertGreater(len(unsorted_eval), 0)
-        sorted_output = []
-        unsorted_output = []
-        for eval in sorted_eval.values():
-            sorted_output.append(eval.value)
-        for eval in unsorted_eval.values():
-            unsorted_output.append(eval.value)
+        sorted_output = [evaluation.value for evaluation in sorted_eval.values()]
+        unsorted_output = [evaluation.value for evaluation in unsorted_eval.values()]
 
         # Check if output from sort is sorted in the right order
         self.assertTrue(sorted(sorted_output, reverse=True) == sorted_output)
