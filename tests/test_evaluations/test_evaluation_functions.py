@@ -127,7 +127,7 @@ class TestEvaluationFunctions(TestBase):
         sorted_eval = openml.evaluations.list_evaluations(
             "predictive_accuracy", size=size, offset=0, task=[task_id], sort_order="desc")
         self.assertEqual(len(sorted_eval), size)
-        self.assertGreater(len(unsorted_eval),0)
+        self.assertGreater(len(unsorted_eval), 0)
         sorted_output = []
         unsorted_output = []
         for eval in sorted_eval.values():
