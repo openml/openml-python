@@ -117,6 +117,27 @@ class TestEvaluationFunctions(TestBase):
             self.assertIsNotNone(evaluations[run_id].value)
             self.assertIsNone(evaluations[run_id].values)
 
+    def test_evaluation_list_sort(self):
+        size = 10
+        task_id = 115
+        # Get all evaluations of the task
+        unsorted_eval = openml.evaluations.list_evaluations(
+            "predictive_accuracy", offset=0, task=[task_id])
+        # Get top 10 evaluations of the same task
+        sorted_eval = openml.evaluations.list_evaluations(
+            "predictive_accuracy", size=size, offset=0, task=[task_id], sort_order="desc")
+        self.assertEqual(len(sorted_eval), size)
+        self.assertGreater(len(unsorted_eval), 0)
+        sorted_output = [evaluation.value for evaluation in sorted_eval.values()]
+        unsorted_output = [evaluation.value for evaluation in unsorted_eval.values()]
+
+        # Check if output from sort is sorted in the right order
+        self.assertTrue(sorted(sorted_output, reverse=True) == sorted_output)
+
+        # Compare manual sorting against sorted output
+        test_output = sorted(unsorted_output, reverse=True)
+        self.assertTrue(test_output[:size] == sorted_output)
+
     def test_list_evaluation_measures(self):
         measures = openml.evaluations.list_evaluation_measures()
         self.assertEqual(isinstance(measures, list), True)
