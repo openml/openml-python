@@ -5,6 +5,7 @@ import shutil
 import warnings
 import pandas as pd
 from functools import wraps
+import collections
 
 import openml._api_calls
 import openml.exceptions
@@ -182,7 +183,7 @@ def _list_all(listing_call, output_format='dict', *args, **filters):
     active_filters = {key: value for key, value in filters.items()
                       if value is not None}
     page = 0
-    result = {}
+    result = collections.OrderedDict()
     if output_format == 'dataframe':
         result = pd.DataFrame()
 
