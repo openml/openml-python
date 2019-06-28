@@ -8,6 +8,7 @@ Changelog
 
 0.10.0
 ~~~~~~
+* ADD #722: Automatic reinstantiation of flow in `run_model_on_task`. Clearer errors if that's not possible.
 * FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.
 * DOC #639: More descriptive documention for function to convert array format.
 * ADD #687: Adds a function to retrieve the list of evaluation measures available.
