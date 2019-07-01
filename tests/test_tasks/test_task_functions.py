@@ -1,7 +1,7 @@
 import os
 from unittest import mock
 
-from openml.testing import TestBase
+from openml.testing import TestBase, cleanup_fixture
 from openml import OpenMLSplit, OpenMLTask
 from openml.exceptions import OpenMLCacheException
 import openml
@@ -14,10 +14,8 @@ class TestTask(TestBase):
 
     def setUp(self):
         super(TestTask, self).setUp()
-        self._track_old_files()
 
     def tearDown(self):
-        self._remove_new_files()
         super(TestTask, self).tearDown()
 
     def test__get_cached_tasks(self):

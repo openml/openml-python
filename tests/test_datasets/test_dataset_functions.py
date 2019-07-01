@@ -7,7 +7,6 @@ from unittest import mock
 import arff
 
 import pytest
-import shutil
 import numpy as np
 import pandas as pd
 import scipy.sparse
@@ -17,7 +16,7 @@ import openml
 from openml import OpenMLDataset
 from openml.exceptions import OpenMLCacheException, OpenMLHashException, \
     OpenMLPrivateDatasetError
-from openml.testing import TestBase
+from openml.testing import TestBase, cleanup_fixture
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (create_dataset,
                                        attributes_arff_from_df,
@@ -45,14 +44,13 @@ class TestOpenMLDataset(TestBase):
         super(TestOpenMLDataset, self).tearDown()
 
     def _remove_pickle_files(self):
-        cache_dir = self.static_cache_dir
         self.lock_path = os.path.join(openml.config.get_cache_directory(), 'locks')
         for did in ['-1', '2']:
             with lockutils.external_lock(
                     name='datasets.functions.get_dataset:%s' % did,
                     lock_path=self.lock_path,
             ):
-                if sys.version[0] is '3':
+                if sys.version[0] == '3':
                     pickle_path = os.path.join(openml.config.get_cache_directory(), 'datasets',
                                                did, 'dataset.pkl.py3')
                 else:
@@ -63,7 +61,6 @@ class TestOpenMLDataset(TestBase):
                 except (OSError, FileNotFoundError):
                     #  Replaced a bare except. Not sure why either of these would be acceptable.
                     pass
-        shutil.rmtree(self.lock_path, ignore_errors=True)
 
     def _get_empty_param_for_dataset(self):
 

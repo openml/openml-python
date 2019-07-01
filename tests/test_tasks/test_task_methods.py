@@ -1,8 +1,7 @@
-import os
 from time import time
 
 import openml
-from openml.testing import TestBase
+from openml.testing import TestBase, cleanup_fixture
 
 
 # Common methods between tasks
@@ -10,10 +9,8 @@ class OpenMLTaskMethodsTest(TestBase):
 
     def setUp(self):
         super(OpenMLTaskMethodsTest, self).setUp()
-        self._track_old_files()
 
     def tearDown(self):
-        self._remove_new_files()
         super(OpenMLTaskMethodsTest, self).tearDown()
 
     def test_tagging(self):

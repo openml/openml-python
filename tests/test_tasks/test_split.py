@@ -5,7 +5,7 @@ import os
 import numpy as np
 
 from openml import OpenMLSplit
-from openml.testing import TestBase
+from openml.testing import TestBase, cleanup_fixture
 
 
 class OpenMLSplitTest(TestBase):
@@ -21,7 +21,7 @@ class OpenMLSplitTest(TestBase):
             "tasks", "1882", "datasplits.arff"
         )
         # TODO Needs to be adapted regarding the python version
-        if sys.version[0] is '3':
+        if sys.version[0] == '3':
             self.pd_filename = self.arff_filename.replace(".arff", ".pkl.py3")
         else:
             self.pd_filename = self.arff_filename.replace(".arff", ".pkl")
