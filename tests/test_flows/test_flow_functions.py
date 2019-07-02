@@ -259,7 +259,8 @@ class TestFlowFunctions(TestBase):
 
     def test_get_flow_reinstantiate_model(self):
         model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
-        flow = self.extension.model_to_flow(model)
+        extension = openml.extensions.get_extension_by_model(model)
+        flow = extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
@@ -269,7 +270,7 @@ class TestFlowFunctions(TestBase):
         # Flow 10 is a WEKA flow
         self.assertRaises(RuntimeError, openml.flows.get_flow, flow_id=10, reinstantiate=True)
 
-    @unittest.skipIf(LooseVersion(sklearn.__version__) == "0.20",
+    @unittest.skipIf(LooseVersion(sklearn.__version__) == "0.20.0",
                      reason="No non-0.20 scikit-learn flow known.")
     def test_get_flow_reinstantiate_model_wrong_version(self):
         # 20 is scikit-learn ==0.20.0
