@@ -1623,17 +1623,18 @@ class TestSklearnExtensionRunFunctions(TestBase):
                     svc=sklearn.svm.classes.SVC)"""
         short = "sklearn.Pipeline(ColumnTransformer,VarianceThreshold,SVC)"
         shorter = "sklearn.Pipeline(...,SVC)"
-        long_stripped, _ = re.subn('\s', '', long)
+        long_stripped, _ = re.subn(r'\s', '', long)
         self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
-        self.assertEqual(shorter, SklearnExtension.trim_flow_name(long_stripped, extra_trim_length=50))
+        self.assertEqual(shorter,
+                         SklearnExtension.trim_flow_name(long_stripped, extra_trim_length=50))
 
         long = """sklearn.pipeline.Pipeline(
                     imputation=openmlstudy14.preprocessing.ConditionalImputer,
                     hotencoding=sklearn.preprocessing.data.OneHotEncoder,
                     variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,
                     classifier=sklearn.ensemble.forest.RandomForestClassifier)"""
-        short = "sklearn.Pipeline(ConditionalImputer,OneHotEncoder,VarianceThreshold,RandomForestClassifier)"
-        long_stripped, _ = re.subn('\s', '', long)
+        short = "sklearn.Pipeline(ConditionalImputer,OneHotEncoder,VarianceThreshold,RandomForestClassifier)"  # noqa: E501
+        long_stripped, _ = re.subn(r'\s', '', long)
         self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
 
         self.assertRaises(ValueError, SklearnExtension.trim_flow_name, "weka.IsolationForest")

@@ -88,7 +88,7 @@ class SklearnExtension(Extension):
         return isinstance(model, sklearn.base.BaseEstimator)
 
     @classmethod
-    def trim_flow_name(cls, long_name: str, extra_trim_length: int=100) -> str:
+    def trim_flow_name(cls, long_name: str, extra_trim_length: int = 100) -> str:
         """ Shorten generated sklearn flow name to at most `max_length` characters.
 
         Flows are assumed to have the following naming structure:
@@ -123,17 +123,18 @@ class SklearnExtension(Extension):
 
         """
         def remove_all_in_parentheses(string: str) -> str:
-            string, removals = re.subn("\([^()]*\)", "", string)
+            string, removals = re.subn(r"\([^()]*\)", "", string)
             while removals > 0:
-                string, removals = re.subn("\([^()]*\)", "", string)
+                string, removals = re.subn(r"\([^()]*\)", "", string)
             return string
 
         name = long_name
         if not name.startswith('sklearn'):
-            raise ValueError("Expected 'sklearn' in as start of flow name. Make sure a sklearn-flow is provided.")
+            raise ValueError("Expected 'sklearn' in as start of flow name. "
+                             "Make sure a sklearn-flow is provided.")
         if 'sklearn.model_selection' in name and not name.startswith('sklearn.model_selection'):
-            raise ValueError(
-                "Model Selection is not outer scope. This is unexpected, create a new issue with the flow id.")
+            raise ValueError("Model Selection is not outer scope. "
+                             "This is unexpected, create a new issue with the flow id.")
         short_name = 'sklearn.{}'
 
         if name.startswith('sklearn.model_selection'):
