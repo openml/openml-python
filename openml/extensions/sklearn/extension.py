@@ -88,7 +88,7 @@ class SklearnExtension(Extension):
         return isinstance(model, sklearn.base.BaseEstimator)
 
     @classmethod
-    def trim_flow_name(cls, long_name: str, max_length: int=100) -> str:
+    def trim_flow_name(cls, long_name: str, extra_trim_length: int=100) -> str:
         """ Shorten generated sklearn flow name to at most `max_length` characters.
 
         Flows are assumed to have the following naming structure:
@@ -112,7 +112,10 @@ class SklearnExtension(Extension):
         Parameters
         ----------
         long_name : str
-        max_length: int (default=100)
+        extra_trim_length: int (default=100)
+            If the trimmed name would exceed `extra_trim_length` characters, additional trimming
+            of the long name is performed. This reduces the produced short name length.
+            There is no guarantee the end result will not exceed `extra_trim_length`.
 
         Returns
         -------
@@ -148,7 +151,7 @@ class SklearnExtension(Extension):
             # stepname=sklearn.submodule.ClassName,step2name=...
             components = [component.split('.')[-1] for component in pipeline.split(',')]
             pipeline = "Pipeline({})".format(','.join(components))
-            if len(short_name.format(pipeline)) > max_length:
+            if len(short_name.format(pipeline)) > extra_trim_length:
                 pipeline = "Pipeline(...,{})".format(components[-1])
         else:
             # Just a simple component: e.g. sklearn.tree.DecisionTreeClassifier

@@ -1625,7 +1625,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         shorter = "sklearn.Pipeline(...,SVC)"
         long_stripped, _ = re.subn('\s', '', long)
         self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
-        self.assertEqual(shorter, SklearnExtension.trim_flow_name(long_stripped, max_length=50))
+        self.assertEqual(shorter, SklearnExtension.trim_flow_name(long_stripped, extra_trim_length=50))
 
         long = """sklearn.pipeline.Pipeline(
                     imputation=openmlstudy14.preprocessing.ConditionalImputer,
