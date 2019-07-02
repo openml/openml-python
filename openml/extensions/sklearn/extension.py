@@ -87,6 +87,75 @@ class SklearnExtension(Extension):
         """
         return isinstance(model, sklearn.base.BaseEstimator)
 
+    @classmethod
+    def trim_flow_name(cls, long_name: str, max_length: int=100) -> str:
+        """ Shorten generated sklearn flow name to at most `max_length` characters.
+
+        Flows are assumed to have the following naming structure:
+        (model_selection)? (pipeline)? (steps)+
+        and will be shortened to:
+        sklearn.(selection.)?(pipeline.)?(steps)+
+        e.g. (white spaces and newlines added for readability)
+        sklearn.pipeline.Pipeline(
+            columntransformer=sklearn.compose._column_transformer.ColumnTransformer(
+                numeric=sklearn.pipeline.Pipeline(
+                    imputer=sklearn.preprocessing.imputation.Imputer,
+                    standardscaler=sklearn.preprocessing.data.StandardScaler),
+                nominal=sklearn.pipeline.Pipeline(
+                    simpleimputer=sklearn.impute.SimpleImputer,
+                    onehotencoder=sklearn.preprocessing._encoders.OneHotEncoder)),
+            variancethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,
+            svc=sklearn.svm.classes.SVC)
+        ->
+        sklearn.Pipeline(ColumnTransformer,VarianceThreshold,SVC)
+
+        Parameters
+        ----------
+        long_name : str
+        max_length: int (default=100)
+
+        Returns
+        -------
+        str
+
+        """
+        def remove_all_in_parentheses(string: str) -> str:
+            string, removals = re.subn("\([^()]*\)", "", string)
+            while removals > 0:
+                string, removals = re.subn("\([^()]*\)", "", string)
+            return string
+
+        name = long_name
+        if not name.startswith('sklearn'):
+            raise ValueError("Expected 'sklearn' in as start of flow name. Make sure a sklearn-flow is provided.")
+        if 'sklearn.model_selection' in name and not name.startswith('sklearn.model_selection'):
+            raise ValueError(
+                "Model Selection is not outer scope. This is unexpected, create a new issue with the flow id.")
+        short_name = 'sklearn.{}'
+
+        if name.startswith('sklearn.model_selection'):
+            model_selection = name.split('(')[0].split('.')[-1]
+            name = name[:-1].split('estimator=', maxsplit=1)[-1]
+            short_name = short_name.format("{}({{}})".format(model_selection))
+
+        if name.startswith('sklearn.pipeline'):
+            _, pipeline = name[:-1].split('(', maxsplit=1)
+            # We don't want nested pipelines in the short name, so we trim all complicated
+            # subcomponents, i.e. those with parentheses:
+            pipeline = remove_all_in_parentheses(pipeline)
+
+            # then the pipeline steps are formatted e.g.:
+            # stepname=sklearn.submodule.ClassName,step2name=...
+            components = [component.split('.')[-1] for component in pipeline.split(',')]
+            pipeline = "Pipeline({})".format(','.join(components))
+            if len(short_name.format(pipeline)) > max_length:
+                pipeline = "Pipeline(...,{})".format(components[-1])
+        else:
+            # Just a simple component: e.g. sklearn.tree.DecisionTreeClassifier
+            pipeline = remove_all_in_parentheses(name).split('.')[-1]
+
+        return short_name.format(pipeline)
+
     ################################################################################################
     # Methods for flow serialization and de-serialization
 
@@ -402,6 +471,7 @@ class SklearnExtension(Extension):
             name = '%s(%s)' % (class_name, sub_components_names[1:])
         else:
             name = class_name
+        short_name = SklearnExtension.trim_flow_name(name)
 
         # Get the external versions of all sub-components
         external_version = self._get_external_version_string(model, subcomponents)
@@ -419,6 +489,7 @@ class SklearnExtension(Extension):
         sklearn_version_formatted = sklearn_version.replace('==', '_')
         flow = OpenMLFlow(name=name,
                           class_name=class_name,
+                          custom_name=short_name,
                           description='Automatically created scikit-learn flow.',
                           model=model,
                           components=subcomponents,

@@ -14,6 +14,7 @@ Changelog
 * DOC #639: More descriptive documention for function to convert array format.
 * ADD #687: Adds a function to retrieve the list of evaluation measures available.
 * ADD #695: A function to retrieve all the data quality measures available.
+* ADD #412: Add a function to trim flow names for scikit-learn flows.
 
 0.9.0
 ~~~~~
