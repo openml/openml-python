@@ -1,6 +1,6 @@
 import openml
 import openml.study
-from openml.testing import TestBase
+from openml.testing import TestBase, cleanup_fixture
 import pandas as pd
 
 
@@ -77,6 +77,9 @@ class TestStudyFunctions(TestBase):
             task_ids=fixture_task_ids
         )
         study_id = study.publish()
+        self._track_test_server_dumps('study', study_id)
+        print("\ntest_study_functions: {}".format(study_id))
+
         self.assertGreater(study_id, 0)
 
         # verify main meta data

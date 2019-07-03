@@ -7,7 +7,7 @@ import sklearn
 import pandas as pd
 
 import openml
-from openml.testing import TestBase
+from openml.testing import TestBase, cleanup_fixture
 import openml.extensions.sklearn
 
 
@@ -251,6 +251,8 @@ class TestFlowFunctions(TestBase):
         # Test flow is accepted by server
         self._add_sentinel_to_flow_name(flow)
         flow.publish()
+        TestBase._track_test_server_dumps('flow', flow.flow_id)
+        print("\ntest_flow_functions: {}".format(flow.flow_id))
 
         # Test deserialization works
         server_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)

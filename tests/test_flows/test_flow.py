@@ -30,7 +30,7 @@ import openml
 from openml._api_calls import _perform_api_call
 import openml.exceptions
 import openml.extensions.sklearn
-from openml.testing import TestBase
+from openml.testing import TestBase #, cleanup_fixture
 import openml.utils
 
 
@@ -40,6 +40,10 @@ class TestFlow(TestBase):
     def setUp(self):
         super().setUp()
         self.extension = openml.extensions.sklearn.SklearnExtension()
+
+    def tearDown(self):
+        # TestBase.tracker.append(TestFlow.tracker)
+        super().tearDown()
 
     def test_get_flow(self):
         # We need to use the production server here because 4024 is not the
@@ -176,7 +180,9 @@ class TestFlow(TestBase):
 
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
 
-        flow.publish()
+        temp = flow.publish()
+        self._track_test_server_dumps('flow', flow.flow_id)
+        print("\ntest_flow: {}".format(flow.flow_id))
         self.assertIsInstance(flow.flow_id, int)
 
     @mock.patch('openml.flows.functions.flow_exists')
@@ -186,7 +192,10 @@ class TestFlow(TestBase):
         flow_exists_mock.return_value = 1
 
         with self.assertRaises(openml.exceptions.PyOpenMLError) as context_manager:
-            flow.publish(raise_error_if_exists=True)
+            temp = flow.publish(raise_error_if_exists=True)
+            self._track_test_server_dumps('flow', flow.flow_id)
+            print("\ntest_flow: {}".format(flow.flow_id))
+        print(TestFlow.tracker)
 
         self.assertTrue('OpenMLFlow already exists' in context_manager.exception.message)
 
@@ -196,7 +205,9 @@ class TestFlow(TestBase):
         ])
         flow = self.extension.model_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
-        flow.publish()
+        temp = flow.publish()
+        self._track_test_server_dumps('flow', flow.flow_id)
+        print("\ntest_flow: {}".format(flow.flow_id))
         # For a flow where both components are published together, the upload
         # date should be equal
         self.assertEqual(
@@ -212,7 +223,10 @@ class TestFlow(TestBase):
         clf1 = sklearn.tree.DecisionTreeClassifier(max_depth=2)
         flow1 = self.extension.model_to_flow(clf1)
         flow1, sentinel = self._add_sentinel_to_flow_name(flow1, None)
-        flow1.publish()
+        temp = flow1.publish()
+        self._track_test_server_dumps('flow', flow1.flow_id)
+        print("\ntest_flow: {}".format(flow.flow_id))
+        print(TestFlow.tracker)
 
         # In order to assign different upload times to the flows!
         time.sleep(1)
