@@ -11,6 +11,7 @@ Changelog
 
 * ADD #687: Adds a function to retrieve the list of evaluation measures available.
 * ADD #695: A function to retrieve all the data quality measures available.
+* FIX #447: All files created by unit tests no longer persist.
 
 0.9.0
 ~~~~~
