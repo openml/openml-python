@@ -5,7 +5,7 @@ import os
 import numpy as np
 
 from openml import OpenMLSplit
-from openml.testing import TestBase, cleanup_fixture
+from openml.testing import TestBase
 
 
 class OpenMLSplitTest(TestBase):

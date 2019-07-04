@@ -1,7 +1,7 @@
 import os
 from unittest import mock
 
-from openml.testing import TestBase, cleanup_fixture
+from openml.testing import TestBase
 from openml import OpenMLSplit, OpenMLTask
 from openml.exceptions import OpenMLCacheException
 import openml

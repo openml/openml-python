@@ -1,7 +1,7 @@
 from time import time
 
 import openml
-from openml.testing import TestBase, cleanup_fixture
+from openml.testing import TestBase
 
 
 # Common methods between tasks
