@@ -1,6 +1,6 @@
 import openml
 import openml.study
-from openml.testing import TestBase, cleanup_fixture
+from openml.testing import TestBase
 import pandas as pd
 
 
@@ -78,7 +78,7 @@ class TestStudyFunctions(TestBase):
         )
         study_id = study.publish()
         self._track_test_server_dumps('study', study_id)
-        print("\ntest_study_functions: {}".format(study_id))
+        print("\ncollected from {}: {}".format( __file__.split('/')[-1], study_id))
 
         self.assertGreater(study_id, 0)
 
@@ -135,6 +135,8 @@ class TestStudyFunctions(TestBase):
             run_ids=list(run_list.keys())
         )
         study_id = study.publish()
+        self._track_test_server_dumps('study', study_id)
+        print("\ncollected from {}: {}".format( __file__.split('/')[-1], study_id))
         self.assertGreater(study_id, 0)
         study_downloaded = openml.study.get_study(study_id)
         self.assertEqual(study_downloaded.alias, fixt_alias)
@@ -184,6 +186,8 @@ class TestStudyFunctions(TestBase):
             run_ids=list(run_list.keys())
         )
         study_id = study.publish()
+        self._track_test_server_dumps('study', study_id)
+        print("\ncollected from {}: {}".format( __file__.split('/')[-1], study_id))
         study_original = openml.study.get_study(study_id)
 
         with self.assertRaisesRegex(openml.exceptions.OpenMLServerException,

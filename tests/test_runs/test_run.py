@@ -129,6 +129,8 @@ class TestRun(TestBase):
         self.assertTrue(run_prime.flow is None)
         self._test_run_obj_equals(run, run_prime)
         run_prime.publish()
+        TestBase._track_test_server_dumps('run', run_prime.run_id)
+        print("\ncollected from {}: {}".format(__file__.split('/')[-1], run_prime.run_id))
 
     def test_to_from_filesystem_search(self):
 
@@ -162,6 +164,8 @@ class TestRun(TestBase):
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
         self._test_run_obj_equals(run, run_prime)
         run_prime.publish()
+        TestBase._track_test_server_dumps('run', run_prime.run_id)
+        print("\ncollected from {}: {}".format(__file__.split('/')[-1], run_prime.run_id))
 
     def test_to_from_filesystem_no_model(self):
 
@@ -226,6 +230,8 @@ class TestRun(TestBase):
         # obtain run from filesystem
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
         loaded_run.publish()
+        TestBase._track_test_server_dumps('run', loaded_run.run_id)
+        print("\ncollected from {}: {}".format( __file__.split('/')[-1], loaded_run.run_id))
 
         # make sure the flow is published as part of publishing the run.
         self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))

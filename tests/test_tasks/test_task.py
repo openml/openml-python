@@ -59,6 +59,8 @@ class OpenMLTaskTest(TestBase):
                 )
 
                 task_id = task.publish()
+                TestBase._track_test_server_dumps('task', task_id)
+                print("\ncollected from {}: {}".format( __file__.split('/')[-1], task_id))
                 # success
                 break
             except OpenMLServerException as e:
