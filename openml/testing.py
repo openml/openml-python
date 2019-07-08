@@ -39,7 +39,6 @@ class TestBase(unittest.TestCase):
         the unit tests of the sub class. When all the tests end, execution
         resumes from the checkpoint.
         """
-        # TODO: generalize this path better akin to static_cache_dir
         directory = "{}/tests/files/".format(os.getcwd())
         files = os.walk(directory)
         old_file_list = []
