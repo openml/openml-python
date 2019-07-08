@@ -268,7 +268,11 @@ class TestFlowFunctions(TestBase):
 
     def test_get_flow_reinstantiate_model_no_extension(self):
         # Flow 10 is a WEKA flow
-        self.assertRaises(RuntimeError, openml.flows.get_flow, flow_id=10, reinstantiate=True)
+        self.assertRaisesRegex(RuntimeError,
+                               "No extension could be found for flow 10: weka.SMO",
+                               openml.flows.get_flow,
+                               flow_id=10,
+                               reinstantiate=True)
 
     @unittest.skipIf(LooseVersion(sklearn.__version__) == "0.20.0",
                      reason="No non-0.20 scikit-learn flow known.")
