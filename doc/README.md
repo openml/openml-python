@@ -19,8 +19,8 @@ $ sphinx-build -b html doc YOUR_PREFERRED_OUTPUT_DIRECTORY
 Below is a list of currently available pages or sections that need to be updated:
 
 * Contributing - page: `contributing.rst`
-* Front page - page: `index.rst`
-* API - Page: papi.rst`
+* Front Page - page: `index.rst`
+* API - page: `api.rst`
 * Progress - page: `progress.rst`
 * Usage	- page: `usage.rst` 
 
