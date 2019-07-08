@@ -14,6 +14,7 @@ Changelog
 * DOC #639: More descriptive documention for function to convert array format.
 * ADD #687: Adds a function to retrieve the list of evaluation measures available.
 * ADD #695: A function to retrieve all the data quality measures available.
+* MAINT #726: Update examples to remove deprecation warnings from scikit-learn
 
 0.9.0
 ~~~~~
