@@ -39,16 +39,9 @@ X, y, categorical_indicator, attribute_names = dataset.get_data(
     target=dataset.default_target_attribute
 )
 print("Categorical features: {}".format(categorical_indicator))
-#enc = preprocessing.OneHotEncoder(categorical_features=categorical_indicator)
-#X = enc.fit_transform(X)
-#print(enc.get_feature_names())
-#print(str(len(enc.get_feature_names())))
 transformer = compose.ColumnTransformer(
-    [('one_hot_encoder', preprocessing.OneHotEncoder(categories='auto'), categorical_indicator)])#,
-    #remainder='passthrough')
+    [('one_hot_encoder', preprocessing.OneHotEncoder(categories='auto'), categorical_indicator)])
 X = transformer.fit_transform(X)
-print(transformer.get_feature_names())
-print(str(len(transformer.get_feature_names())))
 clf.fit(X, y)
 
 ############################################################################
