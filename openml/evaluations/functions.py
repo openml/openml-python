@@ -2,6 +2,7 @@ import json
 import xmltodict
 import pandas as pd
 from typing import Union, List, Optional, Dict
+import collections
 
 import openml.utils
 import openml._api_calls
@@ -19,6 +20,7 @@ def list_evaluations(
     uploader: Optional[List] = None,
     tag: Optional[str] = None,
     per_fold: Optional[bool] = None,
+    sort_order: Optional[str] = None,
     output_format: str = 'object'
 ) -> Union[Dict, pd.DataFrame]:
     """
@@ -47,6 +49,9 @@ def list_evaluations(
     tag : str, optional
 
     per_fold : bool, optional
+
+    sort_order : str, optional
+       order of sorting evaluations, ascending ("asc") or descending ("desc")
 
     output_format: str, optional (default='object')
         The parameter decides the format of the output.
@@ -77,6 +82,7 @@ def list_evaluations(
                                   flow=flow,
                                   uploader=uploader,
                                   tag=tag,
+                                  sort_order=sort_order,
                                   per_fold=per_fold_str)
 
 
@@ -87,6 +93,7 @@ def _list_evaluations(
     setup: Optional[List] = None,
     flow: Optional[List] = None,
     uploader: Optional[List] = None,
+    sort_order: Optional[str] = None,
     output_format: str = 'object',
     **kwargs
 ) -> Union[Dict, pd.DataFrame]:
@@ -113,6 +120,9 @@ def _list_evaluations(
 
     kwargs: dict, optional
         Legal filter operators: tag, limit, offset.
+
+    sort_order : str, optional
+        order of sorting evaluations, ascending ("asc") or descending ("desc")
 
     output_format: str, optional (default='dict')
         The parameter decides the format of the output.
@@ -141,6 +151,8 @@ def _list_evaluations(
         api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
     if uploader is not None:
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
+    if sort_order is not None:
+        api_call += "/sort_order/%s" % sort_order
 
     return __list_evaluations(api_call, output_format=output_format)
 
@@ -157,7 +169,7 @@ def __list_evaluations(api_call, output_format='object'):
     assert type(evals_dict['oml:evaluations']['oml:evaluation']) == list, \
         type(evals_dict['oml:evaluations'])
 
-    evals = dict()
+    evals = collections.OrderedDict()
     for eval_ in evals_dict['oml:evaluations']['oml:evaluation']:
         run_id = int(eval_['oml:run_id'])
         value = None
