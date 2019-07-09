@@ -1,5 +1,6 @@
 set -e
 
+# check status and branch before running the unit tests
 before="`git status --porcelain -b`"
 before="$before"
 
@@ -36,6 +37,8 @@ if [[ "$SKIP_TESTS" != "true" ]]; then
     run_tests
 fi
 
+# check status and branch after running the unit tests
+# compares with $before to check for remaining files
 after="`git status --porcelain -b`"
 if [[ "$before" != "$after" ]]; then
     echo "All generated files have not been deleted!"
