@@ -10,7 +10,8 @@ with open("openml/__version__.py") as fh:
 # very time consuming anyway.
 if len(sys.argv) > 1 and sys.argv[1] == 'install':
     import pip
-    if pip.__version__ < '10.0.':
+    pip_version = int(pip.__version__.split('.')[0])
+    if pip_version < 10:
         print('Please install this package with pip: `pip install -e .` '
               'Installation requires pip>=10.0.')
         sys.exit(1)
