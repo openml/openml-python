@@ -1,5 +1,4 @@
 import inspect
-import sys
 import os
 
 import numpy as np
@@ -20,11 +19,7 @@ class OpenMLSplitTest(TestBase):
             self.directory, "..", "files", "org", "openml", "test",
             "tasks", "1882", "datasplits.arff"
         )
-        # TODO Needs to be adapted regarding the python version
-        if sys.version[0] == '3':
-            self.pd_filename = self.arff_filename.replace(".arff", ".pkl.py3")
-        else:
-            self.pd_filename = self.arff_filename.replace(".arff", ".pkl")
+        self.pd_filename = self.arff_filename.replace(".arff", ".pkl.py3")
 
     def tearDown(self):
         try:

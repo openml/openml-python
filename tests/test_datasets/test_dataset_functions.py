@@ -1,5 +1,4 @@
 import os
-import sys
 import random
 from itertools import product
 from unittest import mock
@@ -50,12 +49,8 @@ class TestOpenMLDataset(TestBase):
                     name='datasets.functions.get_dataset:%s' % did,
                     lock_path=self.lock_path,
             ):
-                if sys.version[0] == '3':
-                    pickle_path = os.path.join(openml.config.get_cache_directory(), 'datasets',
-                                               did, 'dataset.pkl.py3')
-                else:
-                    pickle_path = os.path.join(openml.config.get_cache_directory(), 'datasets',
-                                               did, 'dataset.pkl')
+                pickle_path = os.path.join(openml.config.get_cache_directory(), 'datasets',
+                                           did, 'dataset.pkl.py3')
                 try:
                     os.remove(pickle_path)
                 except (OSError, FileNotFoundError):
