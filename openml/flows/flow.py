@@ -132,7 +132,15 @@ class OpenMLFlow(object):
         self.dependencies = dependencies
         self.flow_id = flow_id
 
-        self.extension = get_extension_by_flow(self)
+        self._extension = get_extension_by_flow(self)
+
+    @property
+    def extension(self):
+        if self._extension is not None:
+            return self._extension
+        else:
+            raise RuntimeError("No extension could be found for flow {}: {}"
+                               .format(self.flow_id, self.name))
 
     def __str__(self):
         header = "OpenML Flow"

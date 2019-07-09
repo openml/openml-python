@@ -8,6 +8,7 @@ Changelog
 
 0.10.0
 ~~~~~~
+* ADD #722: Automatic reinstantiation of flow in `run_model_on_task`. Clearer errors if that's not possible.
 * FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
 * ADD #715: `list_evaluations` now has an option to sort evaluations by score (value).
 * FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.
