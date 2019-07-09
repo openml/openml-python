@@ -9,9 +9,11 @@ with open("openml/__version__.py") as fh:
 # Using Python setup.py install will try to build numpy which is prone to failure and
 # very time consuming anyway.
 if len(sys.argv) > 1 and sys.argv[1] == 'install':
-    print('Please install this package with pip: `pip install -e .` '
-          'Installation requires pip>=10.0.')
-    sys.exit(1)
+    import pip
+    if pip.__version__ < '10.0.':
+        print('Please install this package with pip: `pip install -e .` '
+              'Installation requires pip>=10.0.')
+        sys.exit(1)
 
 if sys.version_info < (3, 5):
     raise ValueError(
