@@ -1277,14 +1277,14 @@ class TestRun(TestBase):
         with self.assertRaises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)
 
-    def test_run_model_on_task_downloaded_flow(self):
+    def test_run_flow_on_task_downloaded_flow(self):
         model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
         flow = self.extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
         TestBase._track_test_server_dumps('flow', flow.flow_id)
         print("\ncollected from test_run_functions: {}".format(flow.flow_id))
 
-        downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
+        downloaded_flow = openml.flows.get_flow(flow.flow_id)
         task = openml.tasks.get_task(119)  # diabetes
         run = openml.runs.run_flow_on_task(
             flow=downloaded_flow,

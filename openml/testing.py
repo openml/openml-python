@@ -129,8 +129,17 @@ class TestBase(unittest.TestCase):
         the unit tests of the sub class. When all the tests end, execution
         resumes from the checkpoint.
         """
-        # TODO: generalize this path better akin to static_cache_dir
-        directory = "{}/tests/files/".format(os.getcwd())
+
+        abspath_this_file = os.path.abspath(inspect.getfile(self.__class__))
+        static_cache_dir = os.path.dirname(abspath_this_file)
+        # Could be a risky while condition, however, going up a directory
+        # n-times will eventually end at main directory
+        while True:
+            if 'openml' in os.listdir(static_cache_dir):
+                break
+            else:
+                static_cache_dir = os.path.join(static_cache_dir, '../')
+        directory = os.path.join(static_cache_dir, 'tests/files/')
         files = os.walk(directory)
         old_file_list = []
         for root, _, filenames in files:
@@ -147,7 +156,7 @@ class TestBase(unittest.TestCase):
                 new_file_list.append(os.path.join(root, filename))
         # filtering the files generated during this run
         new_file_list = list(set(new_file_list) - set(old_file_list))
-        print("Deleting local files generated...")
+        print("Files to delete in local: {}".format(new_file_list))
         for file in new_file_list:
             os.remove(file)
 
@@ -162,6 +171,17 @@ class TestBase(unittest.TestCase):
             index = entity_types.index('run')
             # putting 'run' in the start of the list
             entity_types[0], entity_types[index] = entity_types[index], entity_types[0]
+
+        # reordering to delete sub flows later
+        if 'flow' in entity_types:
+            flows = {}
+            for entity in TestBase.tracker['flow']:
+                flows[openml.flows.get_flow(entity).name] = entity
+            # reordering flow names in descending order of their flow name lengths
+            flow_deletion_order = [flows[name] for name in sorted(list(flows.keys()),
+                                                                  key=lambda x:len(x),
+                                                                  reverse=True)]
+            TestBase.tracker['flow'] = flow_deletion_order
 
         for entity_type in entity_types:
             for i, entity in enumerate(TestBase.tracker[entity_type]):

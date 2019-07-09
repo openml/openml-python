@@ -11,10 +11,12 @@ Changelog
 * FIX #261: Test server is cleared of all files uploaded during unit testing.
 * FIX #447: All files created by unit tests no longer persist in local.
 * FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.
+* FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
 * DOC #639: More descriptive documention for function to convert array format.
 * ADD #687: Adds a function to retrieve the list of evaluation measures available.
 * ADD #695: A function to retrieve all the data quality measures available.
-
+* ADD #715: `list_evaluations` now has an option to sort evaluations by score (value).
+* ADD #722: Automatic reinstantiation of flow in `run_model_on_task`. Clearer errors if that's not possible.
 
 0.9.0
 ~~~~~

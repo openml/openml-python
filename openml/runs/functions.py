@@ -171,6 +171,8 @@ def run_flow_on_task(
     if task.task_id is None:
         raise ValueError("The task should be published at OpenML")
 
+    if flow.model is None:
+        flow.model = flow.extension.flow_to_model(flow)
     flow.model = flow.extension.seed_model(flow.model, seed=seed)
 
     # We only need to sync with the server right now if we want to upload the flow,
@@ -667,6 +669,13 @@ def _create_run_from_xml(xml, from_server=True):
         dataset_id = int(run['oml:input_data']['oml:dataset']['oml:did'])
     elif not from_server:
         dataset_id = None
+    else:
+        # fetching the task to obtain dataset_id
+        t = openml.tasks.get_task(task_id, download_data=False)
+        if not hasattr(t, 'dataset_id'):
+            raise ValueError("Unable to fetch dataset_id from the task({}) "
+                             "linked to run({})".format(task_id, run_id))
+        dataset_id = t.dataset_id
 
     files = OrderedDict()
     evaluations = OrderedDict()

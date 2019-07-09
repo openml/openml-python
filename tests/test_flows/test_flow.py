@@ -42,7 +42,6 @@ class TestFlow(TestBase):
         self.extension = openml.extensions.sklearn.SklearnExtension()
 
     def tearDown(self):
-        # TestBase.tracker.append(TestFlow.tracker)
         super().tearDown()
 
     def test_get_flow(self):
@@ -280,8 +279,8 @@ class TestFlow(TestBase):
         get_flow_mock.return_value = flow
 
         flow.publish()
-        self._track_test_server_dumps('flow', flow.flow_id)
-        print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
+        # Not collecting flow_id for deletion since this is a test for failed upload
+
         self.assertEqual(api_call_mock.call_count, 1)
         self.assertEqual(get_flow_mock.call_count, 1)
         self.assertEqual(flow_exists_mock.call_count, 1)

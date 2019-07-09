@@ -92,7 +92,6 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
 
     if reinstantiate:
         flow.model = flow.extension.flow_to_model(flow)
-
     return flow
 
 
@@ -360,7 +359,7 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                 assert_flows_equal(attr1[name], attr2[name],
                                    ignore_parameter_values_on_older_children,
                                    ignore_parameter_values)
-        elif key == 'extension':
+        elif key == '_extension':
             continue
         else:
             if key == 'parameters':
