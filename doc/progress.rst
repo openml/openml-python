@@ -15,6 +15,7 @@ Changelog
 * DOC #639: More descriptive documention for function to convert array format.
 * ADD #687: Adds a function to retrieve the list of evaluation measures available.
 * ADD #695: A function to retrieve all the data quality measures available.
+* FIX #447: All files created by unit tests are deleted after the completion of all unit tests.
 
 0.9.0
 ~~~~~
