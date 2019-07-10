@@ -145,23 +145,23 @@ pprint(tasks[0])
 
 ############################################################################
 # Creating tasks
-# ^^^^^^^^^^^^^^^^^
+# ^^^^^^^^^^^^^^
 #
 # You can also create new tasks. Take the following into account:
 #
 # * You can only create tasks on _active_ datasets
-# * For now, only the following tasks are supported: classification, regression,<br>
+# * For now, only the following tasks are supported: classification, regression,
 # clustering, and learning curve analysis.
 # * For now, tasks can only be created on a single dataset.
-# * The exact same task should not already exist.
+# * The exact same task must not already exist.
 #
 # Creating a task requires the following input:
 #
 # * task_type_id: The task type ID, required (see below). Required.
 # * dataset_id: The dataset ID. Required.
-# * target_name: For supervised tasks, the name of the attribute you aim to predict.<br>
+# * target_name: The name of the attribute you aim to predict.
 # Optional.
-# * estimation_procedure_id : The ID of the estimation procedure used to create train-test<br>
+# * estimation_procedure_id : The ID of the estimation procedure used to create train-test
 # splits. Optional.
 # * evaluation_measure: The name of the evaluation measure. Optional.
 # * Any additional inputs for specific tasks
@@ -177,34 +177,35 @@ pprint(tasks[0])
 # Example
 # #######
 #
-# Let's create a classification task on a new dataset. We first upload the dataset
-# (just a copy of the Iris dataset in this example) and then create a new classification
-# task on it. We'll use 10-fold cross-validation (ID=1), without a predefined measure.
+# Let's create a classification task on a dataset. In this example we will do this on the 
+# Iris dataset (ID=61). We'll use 10-fold cross-validation (ID=1), and predicive accuracy
+# as the predefined measure (as explained above, this can also be left open). 
+# Note that, since it already has this task, this will return an exception, but if 
+# the task is new it will be created.
 
-dataset = openml.OpenMLDataset(
-    "TaskCreationTestDataset",
-    "test",
-    data_format="arff",
-    url="https://www.openml.org/data/download/61/dataset_61_iris.arff",
-)
-dataset.publish()
-openml.datasets.status_update(dataset.dataset_id, "active")
-
-tasktypes = openml.tasks.TaskTypeEnum
-my_task = openml.tasks.create_task(task_type_id=tasktypes.SUPERVISED_CLASSIFICATION,
-                                   dataset_id=dataset.dataset_id,
-                                   target_name="class",
-                                   estimation_procedure_id=1)
-my_task.publish()
+try:
+    tasktypes = openml.tasks.TaskTypeEnum
+    my_task = openml.tasks.create_task(
+        task_type_id=tasktypes.SUPERVISED_CLASSIFICATION,
+        dataset_id=61,
+        target_name="class",
+        evaluation_measure="predictive_accuracy",
+        estimation_procedure_id=1)
+    my_task.publish()
+except openml.exceptions.OpenMLServerException as e:
+    # Error code for 'task already exists'
+    if e.code == 614:
+        # Lookup task
+        tasks = openml.tasks.list_tasks(data_id=61, output_format='dataframe')
+        tasks = tasks.query("task_type == 'Supervised Classification' " \
+                            "and estimation_procedure == '10-fold Crossvalidation' " \
+                            "and evaluation_measures == 'predictive_accuracy'")
+        task_id = tasks["tid"].values[0]
+        print("Task already exists. Task ID is", task_id)
 
 ############################################################################
-# Complete list of task types:
-
-vars(tasktypes)
-
-
-############################################################################
+# [Complete list of task types](https://www.openml.org/search?type=task_type)  
 # [Complete list of model estimation procedures](
-# https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure)
+# https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure)  
 # [Complete list of evaluation measures](
 # https://www.openml.org/search?q=measure_type%3Aevaluation_measure&type=measure)
