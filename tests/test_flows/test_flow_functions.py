@@ -4,8 +4,10 @@ import unittest
 
 from distutils.version import LooseVersion
 import sklearn
+from sklearn import ensemble
 import pandas as pd
 
+import os
 import openml
 from openml.testing import TestBase
 import openml.extensions.sklearn
@@ -15,10 +17,10 @@ class TestFlowFunctions(TestBase):
     _multiprocess_can_split_ = True
 
     def setUp(self):
-        super().setUp()
+        super(TestFlowFunctions, self).setUp()
 
     def tearDown(self):
-        super().tearDown()
+        super(TestFlowFunctions, self).tearDown()
 
     def _check_flow(self, flow):
         self.assertEqual(type(flow), dict)
@@ -248,7 +250,6 @@ class TestFlowFunctions(TestBase):
     def test_sklearn_to_flow_list_of_lists(self):
         from sklearn.preprocessing import OrdinalEncoder
         ordinal_encoder = OrdinalEncoder(categories=[[0, 1], [0, 1]])
-
         extension = openml.extensions.sklearn.SklearnExtension()
 
         # Test serialization works
@@ -257,20 +258,19 @@ class TestFlowFunctions(TestBase):
         # Test flow is accepted by server
         self._add_sentinel_to_flow_name(flow)
         flow.publish()
-        TestBase._track_test_server_dumps('flow', flow.flow_id)
+        TestBase._track_test_server_dumps('flow', (flow.flow_id, flow.name))
         print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
-
         # Test deserialization works
         server_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
         self.assertEqual(server_flow.parameters['categories'], '[[0, 1], [0, 1]]')
         self.assertEqual(server_flow.model.categories, flow.model.categories)
 
     def test_get_flow_reinstantiate_model(self):
-        model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
+        model = ensemble.RandomForestClassifier(n_estimators=33)
         extension = openml.extensions.get_extension_by_model(model)
         flow = extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
-        TestBase._track_test_server_dumps('flow', flow.flow_id)
+        TestBase._track_test_server_dumps('flow', (flow.flow_id, flow.name))
         print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)

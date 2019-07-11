@@ -1,5 +1,5 @@
 import openml
-from openml.testing import import TestBase
+from openml.testing import TestBase
 from .test_task import OpenMLTaskTest
 
 

@@ -95,7 +95,7 @@ class TestBase(unittest.TestCase):
                 with open(openml.config.config_file, 'w') as fh:
                     fh.write('apikey = %s' % openml.config.apikey)
 
-        # Increase the number of retries to avoid spurios server failures
+        # Increase the number of retries to avoid spurious server failures
         self.connection_n_retries = openml.config.connection_n_retries
         openml.config.connection_n_retries = 10
 
@@ -149,6 +149,7 @@ class TestBase(unittest.TestCase):
         # pauses the code execution here till all tests in the 'session' is over
         yield
         # resumes from here after all collected tests are completed
+        # local file deletion
         files = os.walk(directory)
         new_file_list = []
         for root, _, filenames in files:
@@ -156,15 +157,12 @@ class TestBase(unittest.TestCase):
                 new_file_list.append(os.path.join(root, filename))
         # filtering the files generated during this run
         new_file_list = list(set(new_file_list) - set(old_file_list))
-        print("Files to delete in local: {}".format(new_file_list))
         for file in new_file_list:
             os.remove(file)
 
         # Test server deletion
-        print("Deleting files uploaded to test server...")
         openml.config.server = TestBase.test_server
         openml.config.apikey = TestBase.apikey
-
         entity_types = list(TestBase.tracker.keys())
         # deleting 'run' first to allow other dependent entities to be deleted
         if 'run' in entity_types:
@@ -175,14 +173,15 @@ class TestBase(unittest.TestCase):
         # reordering to delete sub flows later
         if 'flow' in entity_types:
             flows = {}
-            for entity in TestBase.tracker['flow']:
-                flows[openml.flows.get_flow(entity).name] = entity
+            for entity_id, entity_name in TestBase.tracker['flow']:
+                flows[entity_name] = entity_id
             # reordering flow names in descending order of their flow name lengths
             flow_deletion_order = [flows[name] for name in sorted(list(flows.keys()),
-                                                                  key=lambda x:len(x),
+                                                                  key=lambda x: len(x),
                                                                   reverse=True)]
             TestBase.tracker['flow'] = flow_deletion_order
 
+        # deleting all collected entities published to test server
         for entity_type in entity_types:
             for i, entity in enumerate(TestBase.tracker[entity_type]):
                 try:
