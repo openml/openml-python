@@ -201,7 +201,7 @@ class TestBase(unittest.TestCase):
             flows = {}
             for entity_id, entity_name in tracker['flow']:
                 flows[entity_name] = entity_id
-            # reordering flow names in descending order of their flow name lengths
+            # reordering flows in descending order of their flow name lengths
             flow_deletion_order = [flows[name] for name in sorted(list(flows.keys()),
                                                                   key=lambda x: len(x),
                                                                   reverse=True)]
