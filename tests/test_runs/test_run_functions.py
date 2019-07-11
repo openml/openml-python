@@ -184,7 +184,7 @@ class TestRun(TestBase):
         flow, _ = self._add_sentinel_to_flow_name(flow, sentinel)
         if not openml.flows.flow_exists(flow.name, flow.external_version):
             flow.publish()
-            TestBase._track_test_server_dumps('flow', flow.flow_id)
+            TestBase._track_test_server_dumps('flow', (flow.flow_id, flow.name))
             print("\ncollected from test_run_functions: {}".format(flow.flow_id))
 
         task = openml.tasks.get_task(task_id)
@@ -980,7 +980,7 @@ class TestRun(TestBase):
         flow_orig = self.extension.model_to_flow(clf)
         try:
             flow_orig.publish()  # ensures flow exist on server
-            TestBase._track_test_server_dumps('flow', flow_orig.flow_id)
+            TestBase._track_test_server_dumps('flow', (flow_orig.flow_id, flow_orig.name))
             print("\ncollected from test_run_functions: {}".format(flow_orig.flow_id))
         except openml.exceptions.OpenMLServerException:
             # flow already exists
@@ -1007,7 +1007,7 @@ class TestRun(TestBase):
         flow_orig = self.extension.model_to_flow(clf)
         try:
             flow_orig.publish()  # ensures flow exist on server
-            TestBase._track_test_server_dumps('flow', flow_orig.flow_id)
+            TestBase._track_test_server_dumps('flow', (flow_orig.flow_id, flow_orig.name))
             print("\ncollected from test_run_functions: {}".format(flow_orig.flow_id))
         except openml.exceptions.OpenMLServerException:
             # flow already exists
@@ -1281,7 +1281,7 @@ class TestRun(TestBase):
         model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
         flow = self.extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
-        TestBase._track_test_server_dumps('flow', flow.flow_id)
+        TestBase._track_test_server_dumps('flow', (flow.flow_id, flow.name))
         print("\ncollected from test_run_functions: {}".format(flow.flow_id))
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id)

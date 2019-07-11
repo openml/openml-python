@@ -40,7 +40,7 @@ class TestSetupFunctions(TestBase):
         flow = self.extension.model_to_flow(dectree)
         flow.name = 'TEST%s%s' % (sentinel, flow.name)
         flow.publish()
-        self._track_test_server_dumps('flow', flow.flow_id)
+        self._track_test_server_dumps('flow', (flow.flow_id, flow.name))
         print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
 
         # although the flow exists (created as of previous statement),
@@ -54,7 +54,7 @@ class TestSetupFunctions(TestBase):
         flow = self.extension.model_to_flow(classif)
         flow.name = 'TEST%s%s' % (get_sentinel(), flow.name)
         flow.publish()
-        self._track_test_server_dumps('flow', flow.flow_id)
+        self._track_test_server_dumps('flow', (flow.flow_id, flow.name))
         print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
 
         # although the flow exists, we can be sure there are no

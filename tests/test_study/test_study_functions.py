@@ -135,8 +135,9 @@ class TestStudyFunctions(TestBase):
             run_ids=list(run_list.keys())
         )
         study_id = study.publish()
-        self._track_test_server_dumps('study', study_id)
-        print("\ncollected from {}: {}".format( __file__.split('/')[-1], study_id))
+        # not tracking upload for delete since _delete_entity called end of function
+        # self._track_test_server_dumps('study', study_id)
+        # print("\ncollected from {}: {}".format( __file__.split('/')[-1], study_id))
         self.assertGreater(study_id, 0)
         study_downloaded = openml.study.get_study(study_id)
         self.assertEqual(study_downloaded.alias, fixt_alias)

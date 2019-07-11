@@ -180,7 +180,7 @@ class TestFlow(TestBase):
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
 
         flow.publish()
-        self._track_test_server_dumps('flow', flow.flow_id)
+        self._track_test_server_dumps('flow', (flow.flow_id, flow.name))
         print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
         self.assertIsInstance(flow.flow_id, int)
 
@@ -192,9 +192,8 @@ class TestFlow(TestBase):
 
         with self.assertRaises(openml.exceptions.PyOpenMLError) as context_manager:
             flow.publish(raise_error_if_exists=True)
-            self._track_test_server_dumps('flow', flow.flow_id)
+            self._track_test_server_dumps('flow', (flow.flow_id, flow.name))
             print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
-        print(TestFlow.tracker)
 
         self.assertTrue('OpenMLFlow already exists' in context_manager.exception.message)
 
@@ -205,7 +204,7 @@ class TestFlow(TestBase):
         flow = self.extension.model_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.publish()
-        self._track_test_server_dumps('flow', flow.flow_id)
+        self._track_test_server_dumps('flow', (flow.flow_id, flow.name))
         print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
         # For a flow where both components are published together, the upload
         # date should be equal
@@ -223,9 +222,8 @@ class TestFlow(TestBase):
         flow1 = self.extension.model_to_flow(clf1)
         flow1, sentinel = self._add_sentinel_to_flow_name(flow1, None)
         flow1.publish()
-        self._track_test_server_dumps('flow', flow1.flow_id)
+        self._track_test_server_dumps('flow', (flow.flow_id, flow.name))
         print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow1.flow_id))
-        print(TestFlow.tracker)
 
         # In order to assign different upload times to the flows!
         time.sleep(1)
@@ -235,7 +233,7 @@ class TestFlow(TestBase):
         flow2 = self.extension.model_to_flow(clf2)
         flow2, _ = self._add_sentinel_to_flow_name(flow2, sentinel)
         flow2.publish()
-        self._track_test_server_dumps('flow', flow2.flow_id)
+        self._track_test_server_dumps('flow', (flow2.flow_id, flow2.name))
         print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow2.flow_id))
         # If one component was published before the other, the components in
         # the flow should have different upload dates
@@ -249,7 +247,7 @@ class TestFlow(TestBase):
         # Child flow has different parameter. Check for storing the flow
         # correctly on the server should thus not check the child's parameters!
         flow3.publish()
-        self._track_test_server_dumps('flow', flow3.flow_id)
+        self._track_test_server_dumps('flow', (flow3.flow_id, flow3.name))
         print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow3.flow_id))
 
     def test_semi_legal_flow(self):
@@ -263,7 +261,7 @@ class TestFlow(TestBase):
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
 
         flow.publish()
-        self._track_test_server_dumps('flow', flow.flow_id)
+        self._track_test_server_dumps('flow', (flow.flow_id, flow.name))
         print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
 
     @mock.patch('openml.flows.functions.get_flow')
@@ -292,7 +290,7 @@ class TestFlow(TestBase):
 
         with self.assertRaises(ValueError) as context_manager:
             flow.publish()
-            self._track_test_server_dumps('flow', flow.flow_id)
+            self._track_test_server_dumps('flow', (flow.flow_id, flow.name))
             print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
 
         fixture = (
@@ -359,7 +357,7 @@ class TestFlow(TestBase):
             flow, _ = self._add_sentinel_to_flow_name(flow, None)
             # publish the flow
             flow = flow.publish()
-            self._track_test_server_dumps('flow', flow.flow_id)
+            self._track_test_server_dumps('flow', (flow.flow_id, flow.name))
             print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
             # redownload the flow
             flow = openml.flows.get_flow(flow.flow_id)
@@ -419,7 +417,7 @@ class TestFlow(TestBase):
         flow, sentinel = self._add_sentinel_to_flow_name(flow, None)
 
         flow.publish()
-        self._track_test_server_dumps('flow', flow.flow_id)
+        self._track_test_server_dumps('flow', (flow.flow_id, flow.name))
         print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
         self.assertIsInstance(flow.flow_id, int)
 
