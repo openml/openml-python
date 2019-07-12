@@ -16,7 +16,7 @@ An example of an automated machine learning experiment.
 .. code-block:: default
 
     import openml
-    from sklearn import tree, preprocessing, pipeline
+    from sklearn import impute, tree, pipeline
 
 
 
@@ -49,22 +49,13 @@ An example of an automated machine learning experiment.
     # Define a scikit-learn pipeline
     clf = pipeline.Pipeline(
         steps=[
-            ('imputer', preprocessing.Imputer()),
+            ('imputer', impute.SimpleImputer()),
             ('estimator', tree.DecisionTreeClassifier())
         ]
     )
 
 
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
 
 
 
@@ -101,27 +92,7 @@ Run the scikit-learn model on the task (requires an API key).
 
  .. code-block:: none
 
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    URL for run: https://test.openml.org/api/v1/xml/run/3583
+    URL for run: https://test.openml.org/api/v1/xml/run/3891
 
 
 
@@ -138,7 +109,7 @@ Run the scikit-learn model on the task (requires an API key).
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.026 seconds)
+   **Total running time of the script:** ( 0 minutes  5.073 seconds)
 
 
 .. _sphx_glr_download_examples_sklearn_openml_run_example.py:

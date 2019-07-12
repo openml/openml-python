@@ -16,6 +16,7 @@ Changelog
 * ADD #687: Adds a function to retrieve the list of evaluation measures available.
 * ADD #695: A function to retrieve all the data quality measures available.
 * FIX #447: All files created by unit tests are deleted after the completion of all unit tests.
+* MAINT #726: Update examples to remove deprecation warnings from scikit-learn
 
 0.9.0
 ~~~~~

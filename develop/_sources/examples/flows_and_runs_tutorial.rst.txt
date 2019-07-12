@@ -18,7 +18,7 @@ How to train/run a model and how to upload the results.
 
     import openml
     from pprint import pprint
-    from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
+    from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
 
 
 
@@ -68,8 +68,9 @@ You can also ask for meta-data to automatically preprocess the data.
         target=dataset.default_target_attribute
     )
     print("Categorical features: {}".format(categorical_indicator))
-    enc = preprocessing.OneHotEncoder(categorical_features=categorical_indicator)
-    X = enc.fit_transform(X)
+    transformer = compose.ColumnTransformer(
+        [('one_hot_encoder', preprocessing.OneHotEncoder(categories='auto'), categorical_indicator)])
+    X = transformer.fit_transform(X)
     clf.fit(X, y)
 
 
@@ -83,12 +84,6 @@ You can also ask for meta-data to automatically preprocess the data.
  .. code-block:: none
 
     Categorical features: [True, False, True, True, False, True, True, False, True, True, False, True, False, True, True, False, True, False, True, True]
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/preprocessing/_encoders.py:363: FutureWarning: The handling of integer data will change in version 0.22. Currently, the categories are determined based on the range [0, max(values)], while in the future they will be determined based on the unique values.
-    If you want the future behaviour and silence this warning, you can specify "categories='auto'".
-    In case you used a LabelEncoder before this OneHotEncoder to convert the categories to integers, then you can now use the OneHotEncoder directly.
-      warnings.warn(msg, FutureWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/preprocessing/_encoders.py:385: DeprecationWarning: The 'categorical_features' keyword is deprecated in version 0.20 and will be removed in 0.22. You can use the ColumnTransformer instead.
-      "use the ColumnTransformer instead.", DeprecationWarning)
 
 
 
@@ -141,7 +136,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/3573
+    Uploaded to http://test.openml.org/r/3887
 
 
 
@@ -164,7 +159,7 @@ We can now also inspect the flow object which was automatically created:
 
  .. code-block:: none
 
-    {'_extension': <openml.extensions.sklearn.extension.SklearnExtension object at 0x2b2de2fac710>,
+    {'_extension': <openml.extensions.sklearn.extension.SklearnExtension object at 0x2b19a2b88dd8>,
      'binary_format': None,
      'binary_md5': None,
      'binary_url': None,
@@ -197,9 +192,9 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
     task = openml.tasks.get_task(115)
     pipe = pipeline.Pipeline(steps=[
-        ('Imputer', preprocessing.Imputer(strategy='median')),
+        ('Imputer', impute.SimpleImputer(strategy='median')),
         ('OneHotEncoder', preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore')),
-        ('Classifier', ensemble.RandomForestClassifier())
+        ('Classifier', ensemble.RandomForestClassifier(n_estimators=10))
     ])
 
     run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
@@ -216,49 +211,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/ensemble/forest.py:248: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.
-      "10 in version 0.20 to 100 in 0.22.", FutureWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/ensemble/forest.py:248: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.
-      "10 in version 0.20 to 100 in 0.22.", FutureWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/ensemble/forest.py:248: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.
-      "10 in version 0.20 to 100 in 0.22.", FutureWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/ensemble/forest.py:248: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.
-      "10 in version 0.20 to 100 in 0.22.", FutureWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/ensemble/forest.py:248: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.
-      "10 in version 0.20 to 100 in 0.22.", FutureWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/ensemble/forest.py:248: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.
-      "10 in version 0.20 to 100 in 0.22.", FutureWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/ensemble/forest.py:248: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.
-      "10 in version 0.20 to 100 in 0.22.", FutureWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/ensemble/forest.py:248: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.
-      "10 in version 0.20 to 100 in 0.22.", FutureWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/ensemble/forest.py:248: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.
-      "10 in version 0.20 to 100 in 0.22.", FutureWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/ensemble/forest.py:248: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.
-      "10 in version 0.20 to 100 in 0.22.", FutureWarning)
-    Uploaded to http://test.openml.org/r/3574
+    Uploaded to http://test.openml.org/r/3888
 
 
 
@@ -295,17 +248,6 @@ a model on a task without uploading results or flows to the server immediately.
 
 
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/utils/deprecation.py:58: DeprecationWarning: Class Imputer is deprecated; Imputer was deprecated in version 0.20 and will be removed in 0.22. Import impute.SimpleImputer from sklearn instead.
-      warnings.warn(msg, category=DeprecationWarning)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/ensemble/forest.py:248: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.
-      "10 in version 0.20 to 100 in 0.22.", FutureWarning)
 
 
 
@@ -377,7 +319,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/3578
+    kNN on diabetes: http://test.openml.org/r/3890
 
 
 
@@ -394,7 +336,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  19.426 seconds)
+   **Total running time of the script:** ( 0 minutes  19.952 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:
