@@ -10,6 +10,8 @@ Changelog
 ~~~~~~
 * FIX #261: Test server is cleared of all files uploaded during unit testing.
 * FIX #447: All files created by unit tests no longer persist in local.
+* FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
+* FIX #447: All files created by unit tests are deleted after the completion of all unit tests.
 * FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.
 * FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
 * DOC #639: More descriptive documention for function to convert array format.
