@@ -141,7 +141,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/41484
+    Uploaded to http://test.openml.org/r/3573
 
 
 
@@ -164,7 +164,8 @@ We can now also inspect the flow object which was automatically created:
 
  .. code-block:: none
 
-    {'binary_format': None,
+    {'_extension': <openml.extensions.sklearn.extension.SklearnExtension object at 0x2b2de2fac710>,
+     'binary_format': None,
      'binary_md5': None,
      'binary_url': None,
      'class_name': 'sklearn.tree.tree.ExtraTreeClassifier',
@@ -172,18 +173,17 @@ We can now also inspect the flow object which was automatically created:
      'custom_name': None,
      'dependencies': 'sklearn==0.20.0\nnumpy>=1.6.1\nscipy>=0.9',
      'description': 'Automatically created scikit-learn flow.',
-     'extension': <openml.extensions.sklearn.extension.SklearnExtension object at 0x2b4be30badd8>,
      'external_version': 'openml==0.9.0,sklearn==0.20.0',
-     'flow_id': 35744,
+     'flow_id': 2117,
      'language': 'English',
      'model': None,
      'name': 'sklearn.tree.tree.ExtraTreeClassifier',
      'parameters': OrderedDict([...]),
      'parameters_meta_info': OrderedDict([...]),
      'tags': [...],
-     'upload_date': '2019-06-04T09:52:15',
+     'upload_date': '2019-07-09T17:36:20',
      'uploader': '3229',
-     'version': '4'}
+     'version': '1'}
 
 
 
@@ -258,7 +258,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
       warnings.warn(msg, category=DeprecationWarning)
     /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/ensemble/forest.py:248: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.
       "10 in version 0.20 to 100 in 0.22.", FutureWarning)
-    Uploaded to http://test.openml.org/r/41485
+    Uploaded to http://test.openml.org/r/3574
 
 
 
@@ -377,7 +377,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/41487
+    kNN on diabetes: http://test.openml.org/r/3578
 
 
 
@@ -394,7 +394,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  21.130 seconds)
+   **Total running time of the script:** ( 0 minutes  19.426 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:
