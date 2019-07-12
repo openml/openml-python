@@ -5,7 +5,7 @@ OpenML Run Example
 An example of an automated machine learning experiment.
 """
 import openml
-from sklearn import tree, preprocessing, pipeline
+from sklearn import impute, tree, pipeline
 
 ############################################################################
 # .. warning:: This example uploads data. For that reason, this example
@@ -21,7 +21,7 @@ openml.config.start_using_configuration_for_example()
 # Define a scikit-learn pipeline
 clf = pipeline.Pipeline(
     steps=[
-        ('imputer', preprocessing.Imputer()),
+        ('imputer', impute.SimpleImputer()),
         ('estimator', tree.DecisionTreeClassifier())
     ]
 )
