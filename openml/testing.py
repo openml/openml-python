@@ -28,7 +28,7 @@ class TestBase(unittest.TestCase):
     Currently hard-codes a read-write key.
     Hopefully soon allows using a test server, not the production server.
     """
-    tracker: Dict[str, int] = {}
+    tracker = {}  # type: dict
     test_server = None
     apikey = None
 
