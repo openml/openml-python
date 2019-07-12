@@ -231,7 +231,7 @@ class TestRun(TestBase):
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
         loaded_run.publish()
         TestBase._track_test_server_dumps('run', loaded_run.run_id)
-        print("\ncollected from {}: {}".format( __file__.split('/')[-1], loaded_run.run_id))
+        print("\ncollected from {}: {}".format(__file__.split('/')[-1], loaded_run.run_id))
 
         # make sure the flow is published as part of publishing the run.
         self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))

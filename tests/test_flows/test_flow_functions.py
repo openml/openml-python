@@ -7,7 +7,6 @@ import sklearn
 from sklearn import ensemble
 import pandas as pd
 
-import os
 import openml
 from openml.testing import TestBase
 import openml.extensions.sklearn
@@ -259,7 +258,7 @@ class TestFlowFunctions(TestBase):
         self._add_sentinel_to_flow_name(flow)
         flow.publish()
         TestBase._track_test_server_dumps('flow', (flow.flow_id, flow.name))
-        print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
+        print("\ncollected from {}: {}".format(__file__.split('/')[-1], flow.flow_id))
         # Test deserialization works
         server_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
         self.assertEqual(server_flow.parameters['categories'], '[[0, 1], [0, 1]]')
@@ -271,7 +270,7 @@ class TestFlowFunctions(TestBase):
         flow = extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
         TestBase._track_test_server_dumps('flow', (flow.flow_id, flow.name))
-        print("\ncollected from {}: {}".format( __file__.split('/')[-1], flow.flow_id))
+        print("\ncollected from {}: {}".format(__file__.split('/')[-1], flow.flow_id))
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
         self.assertIsInstance(downloaded_flow.model, sklearn.ensemble.RandomForestClassifier)
