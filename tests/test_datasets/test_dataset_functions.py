@@ -43,14 +43,14 @@ class TestOpenMLDataset(TestBase):
         super(TestOpenMLDataset, self).tearDown()
 
     def _remove_pickle_files(self):
-        cache_dir = self.static_cache_dir
+        self.lock_path = os.path.join(openml.config.get_cache_directory(), 'locks')
         for did in ['-1', '2']:
             with lockutils.external_lock(
                     name='datasets.functions.get_dataset:%s' % did,
-                    lock_path=os.path.join(openml.config.get_cache_directory(), 'locks'),
+                    lock_path=self.lock_path,
             ):
-                pickle_path = os.path.join(cache_dir, 'datasets', did,
-                                           'dataset.pkl')
+                pickle_path = os.path.join(openml.config.get_cache_directory(), 'datasets',
+                                           did, 'dataset.pkl.py3')
                 try:
                     os.remove(pickle_path)
                 except (OSError, FileNotFoundError):

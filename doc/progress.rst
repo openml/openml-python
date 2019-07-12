@@ -8,12 +8,14 @@ Changelog
 
 0.10.0
 ~~~~~~
+* ADD #722: Automatic reinstantiation of flow in `run_model_on_task`. Clearer errors if that's not possible.
 * FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
 * ADD #715: `list_evaluations` now has an option to sort evaluations by score (value).
 * FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.
 * DOC #639: More descriptive documention for function to convert array format.
 * ADD #687: Adds a function to retrieve the list of evaluation measures available.
 * ADD #695: A function to retrieve all the data quality measures available.
+* FIX #447: All files created by unit tests are deleted after the completion of all unit tests.
 * MAINT #726: Update examples to remove deprecation warnings from scikit-learn
 
 0.9.0
