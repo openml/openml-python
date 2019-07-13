@@ -1,0 +1,222 @@
+
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>12211</oml:id>
+<oml:uploader>1159</oml:uploader>
+<oml:name>sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,randomforestclassifier=sklearn.ensemble.forest.RandomForestClassifier)</oml:name>
+<oml:class_name>sklearn.pipeline.Pipeline</oml:class_name>
+<oml:version>1</oml:version>
+<oml:external_version>openml==0.9.0,sklearn==0.21.2</oml:external_version>
+<oml:description>Automatically created scikit-learn flow.</oml:description>
+<oml:upload_date>2019-07-13T20:56:25</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==0.21.2
+numpy&gt;=1.6.1
+scipy&gt;=0.9</oml:dependencies>
+<oml:parameter>
+	<oml:name>memory</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>steps</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>[{&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;simpleimputer&quot;, &quot;step_name&quot;: &quot;simpleimputer&quot;}}, {&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;randomforestclassifier&quot;, &quot;step_name&quot;: &quot;randomforestclassifier&quot;}}]</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>verbose</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:component>
+  <oml:identifier>simpleimputer</oml:identifier>
+	
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>12212</oml:id>
+<oml:uploader>1159</oml:uploader>
+<oml:name>sklearn.impute._base.SimpleImputer</oml:name>
+<oml:class_name>sklearn.impute._base.SimpleImputer</oml:class_name>
+<oml:version>1</oml:version>
+<oml:external_version>openml==0.9.0,sklearn==0.21.2</oml:external_version>
+<oml:description>Automatically created scikit-learn flow.</oml:description>
+<oml:upload_date>2019-07-13T20:56:25</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==0.21.2
+numpy&gt;=1.6.1
+scipy&gt;=0.9</oml:dependencies>
+<oml:parameter>
+	<oml:name>add_indicator</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>copy</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>true</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>fill_value</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>missing_values</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>NaN</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>strategy</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;median&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>verbose</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>0</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_0.21.2</oml:tag>
+</oml:flow>
+</oml:component>
+<oml:component>
+  <oml:identifier>randomforestclassifier</oml:identifier>
+	
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>12213</oml:id>
+<oml:uploader>1159</oml:uploader>
+<oml:name>sklearn.ensemble.forest.RandomForestClassifier</oml:name>
+<oml:class_name>sklearn.ensemble.forest.RandomForestClassifier</oml:class_name>
+<oml:version>5</oml:version>
+<oml:external_version>openml==0.9.0,sklearn==0.21.2</oml:external_version>
+<oml:description>Automatically created scikit-learn flow.</oml:description>
+<oml:upload_date>2019-07-13T20:56:25</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==0.21.2
+numpy&gt;=1.6.1
+scipy&gt;=0.9</oml:dependencies>
+<oml:parameter>
+	<oml:name>bootstrap</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>true</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>class_weight</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>criterion</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;entropy&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>max_depth</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>max_features</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>0.2</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>max_leaf_nodes</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_impurity_decrease</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>0.0</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_impurity_split</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_samples_leaf</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>1</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_samples_split</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>2</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_weight_fraction_leaf</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>0.0</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>n_estimators</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>16</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>n_jobs</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>oob_score</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>random_state</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>42</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>verbose</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>0</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>warm_start</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_0.21.2</oml:tag>
+</oml:flow>
+</oml:component>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_0.21.2</oml:tag>
+</oml:flow>

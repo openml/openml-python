@@ -55,7 +55,7 @@ List datasets
 
  .. code-block:: none
 
-    First 10 of 16821 datasets...
+    First 10 of 1568 datasets...
 
 
 Exercise 1
@@ -165,7 +165,7 @@ and manually create a dataframe.
         exec(self.code, self.globals)
       File "/Users/michaelmmeskhi/Documents/GitHub/openml-python/examples/datasets_tutorial.py", line 67, in <module>
         return_attribute_names=True,
-    TypeError: get_data() got an unexpected keyword argument 'dataset_format'
+    TypeError: get_data() got an unexpected keyword argument 'return_attribute_names'
 
 
 
@@ -216,7 +216,7 @@ Exercise 2
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.223 seconds)
+   **Total running time of the script:** ( 0 minutes  1.833 seconds)
 
 
 .. _sphx_glr_download_examples_datasets_tutorial.py:

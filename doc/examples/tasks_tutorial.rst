@@ -86,13 +86,13 @@ to have better visualization and easier access:
            'NumberOfInstancesWithMissingValues', 'NumberOfMissingValues',
            'NumberOfNumericFeatures', 'NumberOfSymbolicFeatures'],
           dtype='object')
-    First 5 of 932 tasks:
-       tid  ttid  did    name                  task_type  status              estimation_procedure  ... NumberOfClasses NumberOfFeatures  NumberOfInstances  NumberOfInstancesWithMissingValues  NumberOfMissingValues  NumberOfNumericFeatures  NumberOfSymbolicFeatures
-    1    1     1    1  anneal  Supervised Classification  active           10-fold Crossvalidation  ...             5.0             39.0              898.0                               898.0                22175.0                      6.0                      33.0
-    2    2     1    1  anneal  Supervised Classification  active    5 times 2-fold Crossvalidation  ...             5.0             39.0              898.0                               898.0                22175.0                      6.0                      33.0
-    3    3     1    1  anneal  Supervised Classification  active  10 times 10-fold Crossvalidation  ...             5.0             39.0              898.0                               898.0                22175.0                      6.0                      33.0
-    4    4     1    1  anneal  Supervised Classification  active                     Leave one out  ...             5.0             39.0              898.0                               898.0                22175.0                      6.0                      33.0
-    5    5     1    1  anneal  Supervised Classification  active                   10% Holdout set  ...             5.0             39.0              898.0                               898.0                22175.0                      6.0                      33.0
+    First 5 of 818 tasks:
+       tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
+    1    1     1  ...                      6.0                     33.0
+    2    2     1  ...                      6.0                     33.0
+    3    3     1  ...                      6.0                     33.0
+    4    4     1  ...                      6.0                     33.0
+    5    5     1  ...                      6.0                     33.0
 
     [5 rows x 19 columns]
 
@@ -117,7 +117,7 @@ We can filter the list of tasks to only contain datasets with more than
 
  .. code-block:: none
 
-    [1, 2, 3, 4, 5, 6, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 41, 42, 91, 92, 93, 94, 95, 96, 115, 116, 117, 118, 119, 120, 127, 128, 129, 130, 131, 132, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 181, 182, 183, 184, 185, 186, 193, 194, 195, 196, 197, 198, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 229, 230, 231, 232, 233, 234, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 307, 308, 309, 310, 311, 312, 379, 380, 381, 382, 383, 384, 391, 392, 393, 394, 395, 396, 433, 434, 435, 436, 437, 438, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 565, 566, 567, 568, 569, 570, 595, 596, 597, 598, 599, 600, 607, 608, 609, 610, 611, 612, 1069, 1072, 1075, 1084, 1088, 1090, 1093, 1094, 1099, 1101, 1103, 1104, 1105, 1107, 1109, 1110, 1111, 1120, 1132, 1134, 1141, 1154, 1155, 1163, 1168, 1232, 1234, 1239, 1240, 1242, 1244, 1245, 1248, 1250, 1251, 1252, 1253, 1257, 1258, 1260, 1261, 1263, 1264, 1265, 1268, 1269, 1270, 1273, 1276, 1279, 1280, 1283, 1288, 1289, 1297, 1304, 1307, 1309, 1310, 1314, 1317, 1320, 1321, 1323, 1327, 1329, 1330, 1334, 1337, 1339, 1341, 1342, 1343, 1346, 1347, 1349, 1353, 1354, 1355, 1358, 1359, 1366, 1367, 1369, 1376, 1377, 1378, 1380, 1382, 1383, 1384, 1387, 1396, 1399, 1402, 1405, 1406, 1410, 1412, 1413, 1419, 1423, 1426, 1428, 1430, 1433, 1437, 1438, 1439, 1440, 1442, 1443, 1447, 1448, 1453, 1456, 1459, 1460, 1462, 1466, 1469, 1471, 1473, 1476, 1477, 1478, 1479, 1484, 1485, 1487, 1490, 1494, 1496, 1497, 1498, 1502, 1503, 1507, 1508, 1509, 1512, 1515, 1518, 1519, 1520, 1523, 1524, 1531, 1535, 1537, 1539, 1541, 1543]
+    [1, 2, 3, 4, 5, 6, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 41, 42, 91, 92, 93, 94, 95, 96, 115, 116, 117, 118, 119, 120, 127, 128, 129, 130, 131, 132, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 181, 182, 183, 184, 185, 186, 193, 194, 195, 196, 197, 198, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 229, 230, 231, 232, 233, 234, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 307, 308, 309, 310, 311, 312, 379, 380, 381, 382, 383, 384, 391, 392, 393, 394, 395, 396, 433, 434, 435, 436, 437, 438, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 565, 566, 567, 568, 569, 570, 595, 596, 597, 598, 599, 600, 607, 608, 609, 610, 611, 612, 1069, 1072, 1075, 1084, 1088, 1090, 1093, 1094, 1099, 1101, 1103, 1104, 1105, 1107, 1109, 1110, 1111, 1120, 1132, 1134, 1141, 1154, 1155, 1163, 1168, 1206, 1209, 1212, 1221, 1225, 1227, 1230, 1231, 1236, 1238, 1240, 1241, 1242, 1244, 1246, 1247, 1248, 1257, 1267, 1269, 1276, 1289, 1290, 1298, 1303]
 
 
 
@@ -137,7 +137,7 @@ We can filter the list of tasks to only contain datasets with more than
 
  .. code-block:: none
 
-    309
+    206
 
 
 Then, we can further restrict the tasks to all have the same resampling strategy:
@@ -207,12 +207,12 @@ Similar to listing tasks by task type, we can list tasks by tags:
  .. code-block:: none
 
     First 5 of 100 tasks:
-        tid  ttid  did           name                  task_type  status     estimation_procedure  ... NumberOfClasses NumberOfFeatures  NumberOfInstances  NumberOfInstancesWithMissingValues  NumberOfMissingValues  NumberOfNumericFeatures  NumberOfSymbolicFeatures
-    1     1     1    1         anneal  Supervised Classification  active  10-fold Crossvalidation  ...             5.0             39.0              898.0                               898.0                22175.0                      6.0                      33.0
-    7     7     1    2       kr-vs-kp  Supervised Classification  active  10-fold Crossvalidation  ...             2.0             37.0             3196.0                                 0.0                    0.0                      0.0                      37.0
-    13   13     1    3         letter  Supervised Classification  active  10-fold Crossvalidation  ...            26.0             17.0            20000.0                                 0.0                    0.0                     16.0                       1.0
-    19   19     1    4  balance-scale  Supervised Classification  active  10-fold Crossvalidation  ...             3.0              5.0              625.0                                 0.0                    0.0                      4.0                       1.0
-    25   25     1    5  mfeat-factors  Supervised Classification  active  10-fold Crossvalidation  ...            10.0            217.0             2000.0                                 0.0                    0.0                    216.0                       1.0
+        tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
+    1     1     1  ...                      6.0                     33.0
+    7     7     1  ...                      0.0                     37.0
+    13   13     1  ...                     16.0                      1.0
+    19   19     1  ...                      4.0                      1.0
+    25   25     1  ...                    216.0                      1.0
 
     [5 rows x 19 columns]
 
@@ -231,18 +231,22 @@ Furthermore, we can list tasks based on the dataset id:
 
 
 
-.. code-block:: pytb
 
-    Traceback (most recent call last):
-      File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/sphinx_gallery/gen_rst.py", line 394, in _memory_usage
-        out = func()
-      File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/sphinx_gallery/gen_rst.py", line 382, in __call__
-        exec(self.code, self.globals)
-      File "/Users/michaelmmeskhi/Documents/GitHub/openml-python/examples/tasks_tutorial.py", line 82, in <module>
-        tasks = openml.tasks.list_tasks(data_id=61)
-    TypeError: list_tasks() got an unexpected keyword argument 'data_id'
+.. rst-class:: sphx-glr-script-out
 
+ Out:
 
+ .. code-block:: none
+
+    First 5 of 11 tasks:
+         tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
+    361  361     1  ...                        7                        1
+    362  362     1  ...                        7                        1
+    363  363     1  ...                        7                        1
+    364  364     1  ...                        7                        1
+    365  365     1  ...                        7                        1
+
+    [5 rows x 19 columns]
 
 
 In addition, a size limit and an offset can be applied both separately and simultaneously:
@@ -254,6 +258,30 @@ In addition, a size limit and an offset can be applied both separately and simul
     tasks = openml.tasks.list_tasks(size=10, offset=50)
     tasks = pd.DataFrame.from_dict(tasks, orient='index')
     pprint(tasks)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
+    51   51     1  ...                        6                        1
+    52   52     1  ...                        6                        1
+    53   53     1  ...                        6                        1
+    54   54     1  ...                        6                        1
+    55   55     1  ...                        0                      241
+    56   56     1  ...                        0                      241
+    57   57     1  ...                        0                      241
+    58   58     1  ...                        0                      241
+    59   59     1  ...                        0                      241
+    60   60     1  ...                        0                      241
+
+    [10 rows x 19 columns]
 
 
 **OpenML 100**
@@ -274,6 +302,18 @@ Finally, it is also possible to list all tasks on OpenML with:
     print(len(tasks))
 
 
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    1305
+
+
 Exercise
 ########
 
@@ -284,6 +324,11 @@ Search for the tasks on the 'eeg-eye-state' dataset.
 
 
     tasks.query('name=="eeg-eye-state"')
+
+
+
+
+
 
 
 Downloading tasks
@@ -301,6 +346,11 @@ all of these tasks:
     task = openml.tasks.get_task(task_id)
 
 
+
+
+
+
+
 Properties of the task are stored as member variables:
 
 
@@ -308,6 +358,33 @@ Properties of the task are stored as member variables:
 
 
     pprint(vars(task))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    {'class_labels': ['1', '2', '3', '4', '5', 'U'],
+     'cost_matrix': None,
+     'dataset_id': 1,
+     'estimation_procedure': {'data_splits_url': 'https://test.openml.org/api_splits/get/1/Task_1_splits.arff',
+                              'parameters': {'number_folds': '10',
+                                             'number_repeats': '1',
+                                             'percentage': '',
+                                             'stratified_sampling': 'true'},
+                              'type': 'crossvalidation'},
+     'estimation_procedure_id': 1,
+     'evaluation_measure': None,
+     'split': None,
+     'target_name': 'class',
+     'task_id': 1,
+     'task_type': 'Supervised Classification',
+     'task_type_id': 1}
 
 
 And:
@@ -321,9 +398,21 @@ And:
     pprint(tasks[0])
 
 
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    <openml.tasks.task.OpenMLClassificationTask object at 0x116936198>
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.633 seconds)
+   **Total running time of the script:** ( 0 minutes  23.174 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:

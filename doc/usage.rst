@@ -131,6 +131,12 @@ Advanced topics
 We are working on tutorials for the following topics:
 
 * Querying datasets (TODO)
-* Creating tasks (TODO)
+
+--------------
+Creating tasks (TODO)
+--------------
+
+
+
 * Working offline (TODO)
 * Analyzing large amounts of results (TODO)

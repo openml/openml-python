@@ -143,21 +143,21 @@ You can also check for common programming errors with the following tools:
 
 .. code:: bash
 
-    $ pip install pytest pytest-cov
+    $ pip3 install pytest pytest-cov
     $ pytest --cov=. path/to/tests_for_package
 
 *  No style warnings, check with:
 
 .. code:: bash
 
-    $ pip install flake8
+    $ pip3 install flake8
     $ flake8 --ignore E402,W503 --show-source --max-line-length 100
 
 *  No mypy (typing) issues, check with:
 
 .. code:: bash
 
-    $ pip install mypy
+    $ pip3 install mypy
     $ mypy openml --ignore-missing-imports --follow-imports skip
 
 
@@ -180,7 +180,7 @@ libraries written in Python.
 We aim to keep the package as light-weight as possible and we will try to
 keep the number of potential installation dependencies as low as possible.
 Therefore, the connection to other machine learning libraries such as
-*pytorch*, *keras* or *tensorflow* should not be done directly inside this
+``pytorch``, ``keras`` or ``tensorflow`` should not be done directly inside this
 package, but in a separate package using the OpenML python connector.
 
 
@@ -191,8 +191,17 @@ package, but in a separate package using the OpenML python connector.
 Installation
 ============
 
-Installation from github
-~~~~~~~~~~~~~~~~~~~~~~~~
+Installing from ``pip3``
+~~~~~~~~~~~~~~~~~~~~~~
+
+To install OpenML stable releases, you can use *pip3* as follows:
+
+.. code:: bash
+    
+    $ pip3 install openml
+
+Installing from Github (``source``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The package source code is available from
 `github <https://github.com/openml/openml-python>`_ and can be obtained with:
@@ -207,20 +216,30 @@ If you are a regular user, install with
 
 .. code:: bash
 
-    $ pip install -e .
+    $ pip3 install -e .
 
 If you are a contributor, you will also need to install test dependencies
 
 .. code:: bash
 
-    $ pip install -e ".[test]"
+    $ pip3 install -e ".[test]"
 
+Updating the OpenML Package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Due to ongoing development and frequent changes made, updating OpenML can be done via aforementioned options. 
+
+.. code:: bash
+
+    $ pip3 install -U openml
+
+For from source installation, you can simply pull the changes and reinstall.
 
 .. _testing:
 
-
+=======
 Testing
-~~~~~~~
+=======
 
 From within the directory of the cloned package, execute:
 
@@ -272,9 +291,11 @@ Happy testing!
 
 .. _newmllib:
 
-
+=========================================
 Connecting new machine learning libraries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=========================================
 
-Coming soon - please stay tuned!
+Currently OpenML 0.9.0 support the following libraries:
 
+* ``scikit-learn``
+* ``mlr``

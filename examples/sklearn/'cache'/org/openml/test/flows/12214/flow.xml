@@ -1,0 +1,192 @@
+
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>12214</oml:id>
+<oml:uploader>1159</oml:uploader>
+<oml:name>sklearn.pipeline.Pipeline(imputer=sklearn.preprocessing.imputation.Imputer,estimator=sklearn.tree.tree.DecisionTreeClassifier)</oml:name>
+<oml:class_name>sklearn.pipeline.Pipeline</oml:class_name>
+<oml:version>5</oml:version>
+<oml:external_version>openml==0.9.0,sklearn==0.21.2</oml:external_version>
+<oml:description>Automatically created scikit-learn flow.</oml:description>
+<oml:upload_date>2019-07-13T20:56:42</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==0.21.2
+numpy&gt;=1.6.1
+scipy&gt;=0.9</oml:dependencies>
+<oml:parameter>
+	<oml:name>memory</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>steps</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>[{&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;imputer&quot;, &quot;step_name&quot;: &quot;imputer&quot;}}, {&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;estimator&quot;, &quot;step_name&quot;: &quot;estimator&quot;}}]</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>verbose</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:component>
+  <oml:identifier>imputer</oml:identifier>
+	
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>12215</oml:id>
+<oml:uploader>1159</oml:uploader>
+<oml:name>sklearn.preprocessing.imputation.Imputer</oml:name>
+<oml:class_name>sklearn.preprocessing.imputation.Imputer</oml:class_name>
+<oml:version>5</oml:version>
+<oml:external_version>openml==0.9.0,sklearn==0.21.2</oml:external_version>
+<oml:description>Automatically created scikit-learn flow.</oml:description>
+<oml:upload_date>2019-07-13T20:56:42</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==0.21.2
+numpy&gt;=1.6.1
+scipy&gt;=0.9</oml:dependencies>
+<oml:parameter>
+	<oml:name>axis</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>0</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>copy</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>true</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>missing_values</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;NaN&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>strategy</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;mean&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>verbose</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>0</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_0.21.2</oml:tag>
+</oml:flow>
+</oml:component>
+<oml:component>
+  <oml:identifier>estimator</oml:identifier>
+	
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>12216</oml:id>
+<oml:uploader>1159</oml:uploader>
+<oml:name>sklearn.tree.tree.DecisionTreeClassifier</oml:name>
+<oml:class_name>sklearn.tree.tree.DecisionTreeClassifier</oml:class_name>
+<oml:version>5</oml:version>
+<oml:external_version>openml==0.9.0,sklearn==0.21.2</oml:external_version>
+<oml:description>Automatically created scikit-learn flow.</oml:description>
+<oml:upload_date>2019-07-13T20:56:42</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==0.21.2
+numpy&gt;=1.6.1
+scipy&gt;=0.9</oml:dependencies>
+<oml:parameter>
+	<oml:name>class_weight</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>criterion</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;gini&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>max_depth</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>max_features</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>max_leaf_nodes</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_impurity_decrease</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>0.0</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_impurity_split</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_samples_leaf</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>1</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_samples_split</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>2</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_weight_fraction_leaf</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>0.0</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>presort</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>random_state</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>splitter</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;best&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_0.21.2</oml:tag>
+</oml:flow>
+</oml:component>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_0.21.2</oml:tag>
+</oml:flow>

@@ -26,17 +26,6 @@ A tutorial on how to create and upload a dataset to OpenML.
 
 
 
-.. code-block:: pytb
-
-    Traceback (most recent call last):
-      File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/sphinx_gallery/gen_rst.py", line 394, in _memory_usage
-        out = func()
-      File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/sphinx_gallery/gen_rst.py", line 382, in __call__
-        exec(self.code, self.globals)
-      File "/Users/michaelmmeskhi/Documents/GitHub/openml-python/examples/create_upload_tutorial.py", line 13, in <module>
-        from openml.datasets.functions import create_dataset
-    ImportError: cannot import name 'create_dataset'
-
 
 
 
@@ -47,6 +36,11 @@ server with countless copies of the same dataset.
 .. code-block:: default
 
     openml.config.server = 'https://test.openml.org/api/v1/xml'
+
+
+
+
+
 
 
 Below we will cover the following cases of the dataset object:
@@ -79,6 +73,11 @@ via the API.
     description = diabetes.DESCR
 
 
+
+
+
+
+
 OpenML does not distinguish between the attributes and targets on the data
 level and stores all data in a single matrix.
 
@@ -103,6 +102,11 @@ that data).
         'http://web.stanford.edu/~hastie/Papers/'
         'LARS/LeastAngle_2002.pdf'
     )
+
+
+
+
+
 
 
 Create the dataset object
@@ -158,11 +162,28 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
 
 
+
+
+
+
+
 .. code-block:: default
 
 
     upload_did = diabetes_dataset.publish()
     print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    URL for dataset: https://test.openml.org/api/v1/xml/data/2937
 
 
 Dataset is a list
@@ -238,11 +259,28 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
 
 
+
+
+
+
+
 .. code-block:: default
 
 
     upload_did = weather_dataset.publish()
     print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    URL for dataset: https://test.openml.org/api/v1/xml/data/2938
 
 
 Dataset is a pandas DataFrame
@@ -265,6 +303,28 @@ function :func:`create_dataset`. In this regard, you only need to pass
     df['windy'] = df['windy'].astype('bool')
     df['play'] = df['play'].astype('category')
     print(df.info())
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    <class 'pandas.core.frame.DataFrame'>
+    RangeIndex: 14 entries, 0 to 13
+    Data columns (total 5 columns):
+    outlook        14 non-null category
+    temperature    14 non-null int64
+    humidity       14 non-null int64
+    windy          14 non-null bool
+    play           14 non-null category
+    dtypes: bool(1), category(2), int64(2)
+    memory usage: 546.0 bytes
+    None
 
 
 We enforce the column 'outlook', 'windy', and 'play' to be a categorical
@@ -295,11 +355,28 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
 
 
+
+
+
+
+
 .. code-block:: default
 
 
     upload_did = weather_dataset.publish()
     print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    URL for dataset: https://test.openml.org/api/v1/xml/data/2939
 
 
 Dataset is a sparse matrix
@@ -339,12 +416,29 @@ Dataset is a sparse matrix
 
 
 
+
+
+
+
+
 .. code-block:: default
 
 
     upload_did = xor_dataset.publish()
     print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    URL for dataset: https://test.openml.org/api/v1/xml/data/2940
 
 
 Dataset is a pandas sparse dataframe
@@ -381,6 +475,26 @@ Dataset is a pandas sparse dataframe
 
 
 
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    <class 'pandas.core.sparse.frame.SparseDataFrame'>
+    RangeIndex: 4 entries, 0 to 3
+    Data columns (total 3 columns):
+    input1    3 non-null Sparse[float64, nan]
+    input2    2 non-null Sparse[float64, nan]
+    y         2 non-null Sparse[float64, nan]
+    dtypes: Sparse[float64, nan](3)
+    memory usage: 176.0 bytes
+    None
+
+
+
 .. code-block:: default
 
 
@@ -388,9 +502,21 @@ Dataset is a pandas sparse dataframe
     print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
 
 
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    URL for dataset: https://test.openml.org/api/v1/xml/data/2941
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.153 seconds)
+   **Total running time of the script:** ( 0 minutes  5.806 seconds)
 
 
 .. _sphx_glr_download_examples_create_upload_tutorial.py:

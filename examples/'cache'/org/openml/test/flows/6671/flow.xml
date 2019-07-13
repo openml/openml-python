@@ -1,0 +1,68 @@
+
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>6671</oml:id>
+<oml:uploader>3229</oml:uploader>
+<oml:name>sklearn.neighbors.classification.KNeighborsClassifier</oml:name>
+<oml:class_name>sklearn.neighbors.classification.KNeighborsClassifier</oml:class_name>
+<oml:version>2</oml:version>
+<oml:external_version>openml==0.9.0,sklearn==0.21.2</oml:external_version>
+<oml:description>Automatically created scikit-learn flow.</oml:description>
+<oml:upload_date>2019-07-11T20:06:10</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==0.21.2
+numpy&gt;=1.6.1
+scipy&gt;=0.9</oml:dependencies>
+<oml:parameter>
+	<oml:name>algorithm</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;auto&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>leaf_size</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>30</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>metric</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;minkowski&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>metric_params</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>n_jobs</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>n_neighbors</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>5</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>p</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>2</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>weights</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;uniform&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_0.21.2</oml:tag>
+</oml:flow>

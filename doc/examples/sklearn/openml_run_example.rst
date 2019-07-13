@@ -59,28 +59,20 @@ Run the scikit-learn model on the task (requires an API key).
 
 
 
-.. code-block:: pytb
 
-    Traceback (most recent call last):
-      File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/sphinx_gallery/gen_rst.py", line 394, in _memory_usage
-        out = func()
-      File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/sphinx_gallery/gen_rst.py", line 382, in __call__
-        exec(self.code, self.globals)
-      File "/Users/michaelmmeskhi/Documents/GitHub/openml-python/examples/sklearn/openml_run_example.py", line 25, in <module>
-        run = openml.runs.run_model_on_task(clf, task)
-      File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/openml-0.6.0-py3.6.egg/openml/runs/functions.py", line 36, in run_model_on_task
-        flow = sklearn_to_flow(model)
-      File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/openml-0.6.0-py3.6.egg/openml/flows/sklearn_converter.py", line 81, in sklearn_to_flow
-        raise TypeError(o, type(o))
-    TypeError: (<openml.tasks.task.OpenMLTask object at 0x1156240b8>, <class 'openml.tasks.task.OpenMLTask'>)
+.. rst-class:: sphx-glr-script-out
 
+ Out:
 
+ .. code-block:: none
+
+    URL for run: https://test.openml.org/api/v1/xml/run/4054
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.125 seconds)
+   **Total running time of the script:** ( 0 minutes  10.099 seconds)
 
 
 .. _sphx_glr_download_examples_sklearn_openml_run_example.py:

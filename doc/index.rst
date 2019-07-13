@@ -14,9 +14,9 @@ collaborative machine learning platform `OpenML.org <https://www.openml.org>`_.
 The OpenML Python package allows to use datasets and tasks from OpenML together
 with scikit-learn and share the results online.
 
--------
-Example
--------
+-------------
+First Example
+-------------
 
 .. code:: python
 
@@ -34,17 +34,20 @@ Example
             ('estimator', tree.DecisionTreeClassifier())
         ]
     )
+
     # Download the OpenML task for the german credit card dataset with 10-fold
     # cross-validation.
     task = openml.tasks.get_task(31)
+
     # Run the scikit-learn model on the task.
     run = openml.runs.run_model_on_task(clf, task)
+
     # Publish the experiment on OpenML (optional, requires an API key).
     run.publish()
     print('View the run online: %s/run/%d' % (openml.config.server, run.run_id))
 
 ----------------------------
-How to get OpenML for python
+How to get OpenML for Python
 ----------------------------
 You can install the OpenML package via `pip`:
 
@@ -66,16 +69,25 @@ Content
 * :ref:`progress`
 
 -------------------
-Further information
+Further Information
 -------------------
 
-* `OpenML documentation <https://docs.openml.org/>`_
-* `OpenML client APIs <https://docs.openml.org/APIs/>`_
-* `OpenML developer guide <https://docs.openml.org/developers/>`_
-* `Contact information <https://www.openml.org/contact>`_
-* `Citation request <https://www.openml.org/cite>`_
-* `OpenML blog <https://medium.com/open-machine-learning>`_
-* `OpenML twitter account <https://twitter.com/open_ml>`_
+For more information on what you can do with OpenML and how to engage in collaborative machine learning, check out the tutorials below. To reach out to us for more informaiton regarding events, citations and updates from the OpenML team, visit our Twitter or Blog.
+
+Get Started with OpenML
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* `OpenML Documentation <https://docs.openml.org/>`_
+* `OpenML Client APIs <https://docs.openml.org/APIs/>`_
+* `OpenML Developer Guide <https://docs.openml.org/developers/>`_
+* `OpenML Tutorials <https://openml.github.io/openml-tutorial/>`_
+
+Contact Us
+~~~~~~~~~~~~~~~~~
+* `Contact Information <https://www.openml.org/contact>`_
+* `Citation Request <https://www.openml.org/cite>`_
+* `OpenML Blog <htt ps://medium.com/open-machine-learning>`_
+* `OpenML Twitter Account <https://twitter.com/open_ml>`_
 
 ------------
 Contributing

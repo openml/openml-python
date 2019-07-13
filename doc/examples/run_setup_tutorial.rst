@@ -51,17 +51,6 @@ In this tutorial we will
 
 
 
-.. code-block:: pytb
-
-    Traceback (most recent call last):
-      File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/sphinx_gallery/gen_rst.py", line 394, in _memory_usage
-        out = func()
-      File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/sphinx_gallery/gen_rst.py", line 382, in __call__
-        exec(self.code, self.globals)
-      File "/Users/michaelmmeskhi/Documents/GitHub/openml-python/examples/run_setup_tutorial.py", line 33, in <module>
-        import sklearn.impute
-    ModuleNotFoundError: No module named 'sklearn.impute'
-
 
 
 
@@ -107,6 +96,11 @@ In this tutorial we will
     run_original = run.publish()  # this implicitly uploads the flow
 
 
+
+
+
+
+
 2) Download the flow and solve the same task again.
 ##############################################################################
 
@@ -129,6 +123,11 @@ In this tutorial we will
 
 
 
+
+
+
+
+
 3) We will verify that the obtained results are exactly the same.
 ##############################################################################
 
@@ -141,9 +140,14 @@ In this tutorial we will
                                   run_duplicate.data_content)
 
 
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.172 seconds)
+   **Total running time of the script:** ( 0 minutes  6.747 seconds)
 
 
 .. _sphx_glr_download_examples_run_setup_tutorial.py:
