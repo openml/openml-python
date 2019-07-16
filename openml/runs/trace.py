@@ -386,6 +386,9 @@ class OpenMLRunTrace(object):
             len(self.trace_iterations),
         )
 
+    def __repr__(self):
+        return self.__str__()
+
     def __iter__(self):
         for val in self.trace_iterations.values():
             yield val

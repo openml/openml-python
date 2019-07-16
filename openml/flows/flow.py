@@ -171,6 +171,9 @@ class OpenMLFlow(object):
         body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
         return header + body
 
+    def __repr__(self):
+        return self.__str__()
+
     def _to_xml(self) -> str:
         """Generate xml representation of self for upload to server.
 

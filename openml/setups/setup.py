@@ -46,6 +46,9 @@ class OpenMLSetup(object):
         body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
         return header + body
 
+    def __repr__(self):
+        return self.__str__()
+
 
 class OpenMLParameter(object):
     """Parameter object (used in setup).
@@ -112,3 +115,6 @@ class OpenMLParameter(object):
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
         body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
         return header + body
+
+    def __repr__(self):
+        return self.__str__()

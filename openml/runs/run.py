@@ -103,6 +103,9 @@ class OpenMLRun(object):
         body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
         return header + body
 
+    def __repr__(self):
+        return self.__str__()
+
     def _repr_pretty_(self, pp, cycle):
         pp.text(str(self))
 

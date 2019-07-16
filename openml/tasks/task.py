@@ -85,6 +85,9 @@ class OpenMLTask(ABC):
         body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
         return header + body
 
+    def __repr__(self):
+        return self.__str__()
+
     def get_dataset(self) -> datasets.OpenMLDataset:
         """Download dataset associated with task"""
         return datasets.get_dataset(self.dataset_id)

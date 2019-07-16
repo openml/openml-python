@@ -274,6 +274,9 @@ class OpenMLStudy(BaseStudy):
         body = super(OpenMLStudy, self).__str__()
         return header + body
 
+    def __repr__(self):
+        return self.__str__()
+
 
 class OpenMLBenchmarkSuite(BaseStudy):
     """
@@ -351,3 +354,6 @@ class OpenMLBenchmarkSuite(BaseStudy):
         header = '{}\n{}\n'.format(header, '=' * len(header))
         body = super(OpenMLBenchmarkSuite, self).__str__()
         return header + body
+
+    def __repr__(self):
+        return self.__str__()

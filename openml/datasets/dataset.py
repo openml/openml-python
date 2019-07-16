@@ -203,6 +203,9 @@ class OpenMLDataset(object):
         body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
         return header + body
 
+    def __repr__(self):
+        return self.__str__()
+
     def _data_arff_to_pickle(self, data_file):
         data_pickle_file = data_file.replace('.arff', '.pkl.py3')
         if os.path.exists(data_pickle_file):
