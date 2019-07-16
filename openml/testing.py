@@ -139,10 +139,12 @@ class TestBase(unittest.TestCase):
             # removes duplicate entries
             TestBase.publish_tracker[entity_type] = list(set(TestBase.publish_tracker[entity_type]))
             if entity_type == 'flow':
-                delete_index = [i for i, (id_, _) in enumerate(TestBase.publish_tracker[entity_type])
+                delete_index = [i for i, (id_, _) in
+                                enumerate(TestBase.publish_tracker[entity_type])
                                 if id_ == entity][0]
             else:
-                delete_index = [i for i, id_ in enumerate(TestBase.publish_tracker[entity_type])
+                delete_index = [i for i, id_ in
+                                enumerate(TestBase.publish_tracker[entity_type])
                                 if id_ == entity][0]
             TestBase.publish_tracker[entity_type].pop(delete_index)
 
@@ -196,9 +198,8 @@ class TestBase(unittest.TestCase):
         openml.config.server = TestBase.test_server
         openml.config.apikey = TestBase.apikey
 
-
-        # legal_entities defined in openml.utils._delete_entity
-        entity_types = {'run', 'data', 'flow', 'task', 'study', 'user'}
+        # legal_entities defined in openml.utils._delete_entity - {'user'}
+        entity_types = {'run', 'data', 'flow', 'task', 'study'}
         # 'run' needs to be first entity to allow other dependent entities to be deleted
         # cloning file tracker to allow deletion of entries of deleted files
         tracker = TestBase.publish_tracker.copy()
@@ -219,7 +220,7 @@ class TestBase(unittest.TestCase):
                     # deleting actual entry from tracker
                     TestBase._delete_entity_from_tracker(entity_type, entity)
                 except Exception as e:
-                    TestBase.logger.warn("Cannot delete ({}, {}): {}".format(entity_type, entity, e))
+                    TestBase.logger.warn("Cannot delete ({},{}): {}".format(entity_type, entity, e))
         TestBase.logger.info("End of cleanup_fixture from {}".format(self.__class__))
 
     def _get_sentinel(self, sentinel=None):

@@ -479,7 +479,8 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._track_test_server_dumps('data', dataset.dataset_id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], dataset.dataset_id))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            dataset.dataset_id))
         self.assertIsInstance(dataset.dataset_id, int)
 
     def test__retrieve_class_labels(self):
@@ -501,7 +502,8 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._track_test_server_dumps('data', dataset.dataset_id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], dataset.dataset_id))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            dataset.dataset_id))
         self.assertIsInstance(dataset.dataset_id, int)
 
     def test_data_status(self):
@@ -512,7 +514,8 @@ class TestOpenMLDataset(TestBase):
             url="https://www.openml.org/data/download/61/dataset_61_iris.arff")
         dataset.publish()
         TestBase._track_test_server_dumps('data', dataset.dataset_id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], dataset.dataset_id))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            dataset.dataset_id))
         did = dataset.dataset_id
 
         # admin key for test server (only adminds can activate datasets.
@@ -627,7 +630,8 @@ class TestOpenMLDataset(TestBase):
 
         upload_did = dataset.publish()
         TestBase._track_test_server_dumps('data', upload_did)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], upload_did))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            upload_did))
 
         self.assertEqual(
             _get_online_dataset_arff(upload_did),
@@ -691,7 +695,8 @@ class TestOpenMLDataset(TestBase):
 
         upload_did = dataset.publish()
         TestBase._track_test_server_dumps('data', upload_did)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], upload_did))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            upload_did))
         self.assertEqual(
             _get_online_dataset_arff(upload_did),
             dataset._dataset,
@@ -736,7 +741,8 @@ class TestOpenMLDataset(TestBase):
 
         upload_did = xor_dataset.publish()
         TestBase._track_test_server_dumps('data', upload_did)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], upload_did))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            upload_did))
         self.assertEqual(
             _get_online_dataset_arff(upload_did),
             xor_dataset._dataset,
@@ -775,7 +781,8 @@ class TestOpenMLDataset(TestBase):
 
         upload_did = xor_dataset.publish()
         TestBase._track_test_server_dumps('data', upload_did)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], upload_did))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            upload_did))
         self.assertEqual(
             _get_online_dataset_arff(upload_did),
             xor_dataset._dataset,
@@ -900,7 +907,8 @@ class TestOpenMLDataset(TestBase):
         )
         upload_did = dataset.publish()
         TestBase._track_test_server_dumps('data', upload_did)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], upload_did))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            upload_did))
         self.assertEqual(
             _get_online_dataset_arff(upload_did),
             dataset._dataset,
@@ -936,7 +944,8 @@ class TestOpenMLDataset(TestBase):
         )
         upload_did = dataset.publish()
         TestBase._track_test_server_dumps('data', upload_did)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], upload_did))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            upload_did))
         self.assertEqual(
             _get_online_dataset_arff(upload_did),
             dataset._dataset,
@@ -974,7 +983,8 @@ class TestOpenMLDataset(TestBase):
         )
         upload_did = dataset.publish()
         TestBase._track_test_server_dumps('data', upload_did)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], upload_did))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            upload_did))
         downloaded_data = _get_online_dataset_arff(upload_did)
         self.assertEqual(
             downloaded_data,
@@ -1144,7 +1154,8 @@ class TestOpenMLDataset(TestBase):
         # publish dataset
         upload_did = dataset.publish()
         TestBase._track_test_server_dumps('data', upload_did)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], upload_did))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            upload_did))
         # test if publish was successful
         self.assertIsInstance(upload_did, int)
         # variables to carry forward for test_publish_fetch_ignore_attribute()
@@ -1276,7 +1287,8 @@ class TestOpenMLDataset(TestBase):
             self.assertEqual(dataset.row_id_attribute, output_row_id)
             upload_did = dataset.publish()
             TestBase._track_test_server_dumps('data', upload_did)
-            TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], upload_did))
+            TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                                upload_did))
             arff_dataset = arff.loads(_get_online_dataset_arff(upload_did))
             arff_data = np.array(arff_dataset['data'], dtype=object)
             # if we set the name of the index then the index will be added to
