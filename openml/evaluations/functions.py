@@ -1,12 +1,14 @@
 import json
 import xmltodict
 import pandas as pd
+import numpy as np
 from typing import Union, List, Optional, Dict
 import collections
 
 import openml.utils
 import openml._api_calls
 from ..evaluations import OpenMLEvaluation
+import openml
 
 
 def list_evaluations(
@@ -209,8 +211,8 @@ def __list_evaluations(api_call, output_format='object'):
                              'array_data': array_data}
 
     if output_format == 'dataframe':
-        evals = pd.DataFrame.from_dict(evals, orient='index')
-
+        data, index = list(evals.values()), list(evals.keys())
+        evals = pd.DataFrame(data, index=index)
     return evals
 
 
@@ -238,3 +240,87 @@ def list_evaluation_measures() -> List[str]:
                         '"oml:measure" as a list')
     qualities = qualities['oml:evaluation_measures']['oml:measures'][0]['oml:measure']
     return qualities
+
+
+def list_evaluations_setups(
+        function: str,
+        offset: Optional[int] = None,
+        size: Optional[int] = None,
+        id: Optional[List] = None,
+        task: Optional[List] = None,
+        setup: Optional[List] = None,
+        flow: Optional[List] = None,
+        uploader: Optional[List] = None,
+        tag: Optional[str] = None,
+        per_fold: Optional[bool] = None,
+        sort_order: Optional[str] = None,
+        output_format: str = 'dataframe'
+) -> Union[Dict, pd.DataFrame]:
+    """
+    List all run-evaluation pairs matching all of the given filters.
+    (Supports large amount of results)
+
+    Parameters
+    ----------
+    function : str
+        the evaluation function. e.g., predictive_accuracy
+    offset : int, optional
+        the number of runs to skip, starting from the first
+    size : int, optional
+        the maximum number of runs to show
+
+    id : list, optional
+
+    task : list, optional
+
+    setup: list, optional
+
+    flow : list, optional
+
+    uploader : list, optional
+
+    tag : str, optional
+
+    per_fold : bool, optional
+
+    sort_order : str, optional
+       order of sorting evaluations, ascending ("asc") or descending ("desc")
+
+    output_format: str, optional (default='object')
+        The parameter decides the format of the output.
+        - If 'object' the output is a dict of OpenMLEvaluation objects
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
+
+
+    Returns
+    -------
+    dict or dataframe
+    """
+    # List evaluations
+    evals = list_evaluations(function=function, offset=offset, size=size, id=id, task=task, setup=setup, flow=flow,
+                             uploader=uploader, tag=tag, per_fold=per_fold, sort_order=sort_order,
+                             output_format='dataframe')
+
+    # List setups
+    # Split setups in evals into chunks of N setups as list_setups does not support long lists
+    N = 100
+    setup_chunks = np.split(evals['setup_id'].unique(), ((len(evals['setup_id'].unique()) - 1) // N) + 1)
+    setups = pd.DataFrame()
+    for setup in setup_chunks:
+        result = openml.setups.list_setups(setup=list(setup), output_format='dataframe')
+        result.drop('flow_id', axis=1, inplace=True)
+        setups = pd.concat([setups, result], ignore_index=True)
+    parameters = []
+    for parameter_dict in setups['parameters']:
+        if parameter_dict is not None:
+            parameters.append([tuple([param['parameter_name'], param['value']]) for param in parameter_dict.values()])
+        else:
+            parameters.append([])
+    setups['parameters'] = parameters
+    # Merge setups with evaluations
+    df = evals.merge(setups, on='setup_id', how='left')
+    if output_format == 'dataframe':
+        return df
+    else:
+        return df.to_dict()
