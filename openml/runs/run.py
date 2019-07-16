@@ -89,7 +89,7 @@ class OpenMLRun(object):
             fields["Uploader Profile"] = "{}u/{}".format(base_url, self.uploader)
         if self.run_id is not None:
             fields["Run URL"] = "{}r/{}".format(base_url, self.run_id)
-        if self.task_evaluation_measure in self.evaluations:
+        if self.evaluations is not None and self.task_evaluation_measure in self.evaluations:
             fields["Result"] = self.evaluations[self.task_evaluation_measure]
 
         # determines the order in which the information will be printed
