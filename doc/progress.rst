@@ -19,6 +19,7 @@ Changelog
 * ADD #695: A function to retrieve all the data quality measures available.
 * ADD #715: `list_evaluations` now has an option to sort evaluations by score (value).
 * ADD #722: Automatic reinstantiation of flow in `run_model_on_task`. Clearer errors if that's not possible.
+* MAINT #726: Update examples to remove deprecation warnings from scikit-learn
 
 0.9.0
 ~~~~~
