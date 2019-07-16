@@ -1,4 +1,5 @@
 import openml
+from openml.testing import TestBase
 from .test_task import OpenMLTaskTest
 
 
@@ -43,5 +44,5 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         )
 
         task_id = task.publish()
-        # not tracking upload for delete since _delete_entity called end of function
-        openml.utils._delete_entity('task', task_id)
+        TestBase._track_test_server_dumps('task', task_id)
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], task_id))

@@ -11,9 +11,6 @@ from openml.tasks import (
     create_task,
     get_task
 )
-from openml.utils import (
-    _delete_entity,
-)
 
 
 class OpenMLTaskTest(TestBase):
@@ -59,7 +56,8 @@ class OpenMLTaskTest(TestBase):
                 )
 
                 task_id = task.publish()
-                # not tracking upload for delete since _delete_entity called end of function
+                TestBase._track_test_server_dumps('task', task_id)
+                TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], task_id))
                 # success
                 break
             except OpenMLServerException as e:
@@ -74,8 +72,6 @@ class OpenMLTaskTest(TestBase):
             raise ValueError(
                 'Could not create a valid task for task type ID {}'.format(self.task_type_id)
             )
-
-        _delete_entity('task', task_id)
 
     def _get_compatible_rand_dataset(self) -> int:
 

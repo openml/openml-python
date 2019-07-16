@@ -41,7 +41,7 @@ class TestSetupFunctions(TestBase):
         flow.name = 'TEST%s%s' % (sentinel, flow.name)
         flow.publish()
         self._track_test_server_dumps('flow', (flow.flow_id, flow.name))
-        print("\ncollected from {}: {}".format(__file__.split('/')[-1], flow.flow_id))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], flow.flow_id))
 
         # although the flow exists (created as of previous statement),
         # we can be sure there are no setups (yet) as it was just created
@@ -55,7 +55,7 @@ class TestSetupFunctions(TestBase):
         flow.name = 'TEST%s%s' % (get_sentinel(), flow.name)
         flow.publish()
         self._track_test_server_dumps('flow', (flow.flow_id, flow.name))
-        print("\ncollected from {}: {}".format(__file__.split('/')[-1], flow.flow_id))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], flow.flow_id))
 
         # although the flow exists, we can be sure there are no
         # setups (yet) as it hasn't been ran
@@ -71,7 +71,7 @@ class TestSetupFunctions(TestBase):
         run.flow_id = flow.flow_id
         run.publish()
         self._track_test_server_dumps('run', run.run_id)
-        print("\ncollected from {}: {}".format(__file__.split('/')[-1], run.run_id))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], run.run_id))
         # download the run, as it contains the right setup id
         run = openml.runs.get_run(run.run_id)
 

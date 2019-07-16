@@ -18,6 +18,7 @@ import openml
 from openml.tasks import TaskTypeEnum
 
 import pytest
+import logging
 
 
 class TestBase(unittest.TestCase):
@@ -28,9 +29,17 @@ class TestBase(unittest.TestCase):
     Currently hard-codes a read-write key.
     Hopefully soon allows using a test server, not the production server.
     """
-    tracker = {}  # type: dict
-    test_server = None
-    apikey = None
+    publish_tracker = {}  # type: dict
+    test_server = "https://test.openml.org/api/v1/xml"
+    # amueller's read/write key that he will throw away later
+    apikey = "610344db6388d9ba34f6db45a3cf71de"
+
+    # creating logger for unit test file deletion status
+    logger = logging.getLogger("unit_tests")
+    logger.setLevel(logging.INFO)
+    fh = logging.FileHandler('TestBase.log')
+    fh.setLevel(logging.INFO)
+    logger.addHandler(fh)
 
     def setUp(self, n_levels: int = 1):
         """Setup variables and temporary directories.
@@ -75,16 +84,9 @@ class TestBase(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-        # amueller's read/write key that he will throw away later
-        openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
+        openml.config.apikey = TestBase.apikey
         self.production_server = "https://openml.org/api/v1/xml"
-        self.test_server = "https://test.openml.org/api/v1/xml"
-
-        # For global file deletion on test server
-        TestBase.test_server = self.test_server
-        TestBase.apikey = openml.config.apikey
-
-        openml.config.server = self.test_server
+        openml.config.server = TestBase.test_server
         openml.config.avoid_duplicate_runs = False
         openml.config.cache_directory = self.workdir
 
@@ -121,26 +123,28 @@ class TestBase(unittest.TestCase):
         For entity_type='flow', each list element is a tuple
         of the form (Flow ID, Flow Name).
         """
-        if entity_type not in TestBase.tracker:
-            TestBase.tracker[entity_type] = [entity_id]
+        if entity_type not in TestBase.publish_tracker:
+            TestBase.publish_tracker[entity_type] = [entity_id]
         else:
-            TestBase.tracker[entity_type].append(entity_id)
+            TestBase.publish_tracker[entity_type].append(entity_id)
 
     @classmethod
     def _delete_entity_from_tracker(self, entity_type, entity):
-        if entity_type in TestBase.tracker:
-            # delete_index handles duplicate entries
-            delete_index = []
-            for i, element in enumerate(TestBase.tracker[entity_type]):
-                if entity_type == 'flow':
-                    id, name = element
-                else:
-                    id = element
-                if id == entity:
-                    delete_index.append(i)
-            TestBase.tracker[entity_type] = [TestBase.tracker[entity_type][index]
-                                             for index in range(len(TestBase.tracker[entity_type]))
-                                             if index not in delete_index]
+        """ Deletes entity records from the static file_tracker
+
+        Given an entity type and corresponding ID, deletes all entries, including
+        duplicate entries of the ID for the entity type.
+        """
+        if entity_type in TestBase.publish_tracker:
+            # removes duplicate entries
+            TestBase.publish_tracker[entity_type] = list(set(TestBase.publish_tracker[entity_type]))
+            if entity_type == 'flow':
+                delete_index = [i for i, (id_, _) in enumerate(TestBase.publish_tracker[entity_type])
+                                if id_ == entity][0]
+            else:
+                delete_index = [i for i, id_ in enumerate(TestBase.publish_tracker[entity_type])
+                                if id_ == entity][0]
+            TestBase.publish_tracker[entity_type].pop(delete_index)
 
     @pytest.fixture(scope="session", autouse=True)
     def _cleanup_fixture(self):
@@ -173,7 +177,9 @@ class TestBase(unittest.TestCase):
         yield
         # resumes from here after all collected tests are completed
 
+        #
         # Local file deletion
+        #
         files = os.walk(directory)
         new_file_list = []
         for root, _, filenames in files:
@@ -184,27 +190,24 @@ class TestBase(unittest.TestCase):
         for file in new_file_list:
             os.remove(file)
 
+        #
         # Test server deletion
+        #
         openml.config.server = TestBase.test_server
         openml.config.apikey = TestBase.apikey
-        entity_types = list(TestBase.tracker.keys())
-        # deleting 'run' first to allow other dependent entities to be deleted
-        if 'run' in entity_types:
-            index = entity_types.index('run')
-            # putting 'run' in the start of the list
-            entity_types[0], entity_types[index] = entity_types[index], entity_types[0]
 
+
+        # legal_entities defined in openml.utils._delete_entity
+        entity_types = {'run', 'data', 'flow', 'task', 'study', 'user'}
+        # 'run' needs to be first entity to allow other dependent entities to be deleted
         # cloning file tracker to allow deletion of entries of deleted files
-        tracker = TestBase.tracker.copy()
-        # reordering to delete sub flows later
+        tracker = TestBase.publish_tracker.copy()
+
+        # reordering to delete sub flows at the end of flows
+        # sub-flows have shorter names, hence, sorting by descending order of flow name length
         if 'flow' in entity_types:
-            flows = {}
-            for entity_id, entity_name in tracker['flow']:
-                flows[entity_name] = entity_id
-            # reordering flows in descending order of their flow name lengths
-            flow_deletion_order = [flows[name] for name in sorted(list(flows.keys()),
-                                                                  key=lambda x: len(x),
-                                                                  reverse=True)]
+            flow_deletion_order = [entity_id for entity_id, _ in
+                                   sorted(tracker['flow'], key=lambda x: len(x[1]), reverse=True)]
             tracker['flow'] = flow_deletion_order
 
         # deleting all collected entities published to test server
@@ -212,12 +215,12 @@ class TestBase(unittest.TestCase):
             for i, entity in enumerate(tracker[entity_type]):
                 try:
                     openml.utils._delete_entity(entity_type, entity)
-                    print("Deleted ({}, {})".format(entity_type, entity))
+                    TestBase.logger.info("Deleted ({}, {})".format(entity_type, entity))
                     # deleting actual entry from tracker
                     TestBase._delete_entity_from_tracker(entity_type, entity)
                 except Exception as e:
-                    print("Cannot delete ({}, {}): {}".format(entity_type, entity, e))
-        print("End of cleanup_fixture from {}\n".format(self.__class__))
+                    TestBase.logger.warn("Cannot delete ({}, {}): {}".format(entity_type, entity, e))
+        TestBase.logger.info("End of cleanup_fixture from {}".format(self.__class__))
 
     def _get_sentinel(self, sentinel=None):
         if sentinel is None:

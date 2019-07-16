@@ -185,7 +185,7 @@ class TestRun(TestBase):
         if not openml.flows.flow_exists(flow.name, flow.external_version):
             flow.publish()
             TestBase._track_test_server_dumps('flow', (flow.flow_id, flow.name))
-            print("\ncollected from test_run_functions: {}".format(flow.flow_id))
+            TestBase.logger.info("collected from test_run_functions: {}".format(flow.flow_id))
 
         task = openml.tasks.get_task(task_id)
 
@@ -199,7 +199,7 @@ class TestRun(TestBase):
         )
         run_ = run.publish()
         TestBase._track_test_server_dumps('run', run.run_id)
-        print("\ncollected from test_run_functions: {}".format(run.run_id))
+        TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
 
@@ -692,7 +692,7 @@ class TestRun(TestBase):
         )
         run_ = run.publish()
         TestBase._track_test_server_dumps('run', run.run_id)
-        print("\ncollected from test_run_functions: {}".format(run.run_id))
+        TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
         run = openml.runs.get_run(run_.run_id)
 
         modelR = openml.runs.initialize_model_from_run(run_id=run.run_id)
@@ -809,7 +809,7 @@ class TestRun(TestBase):
         )
         run_ = run.publish()
         TestBase._track_test_server_dumps('run', run_.run_id)
-        print("\ncollected from test_run_functions: {}".format(run_.run_id))
+        TestBase.logger.info("collected from test_run_functions: {}".format(run_.run_id))
         run = openml.runs.get_run(run_.run_id)
 
         modelR = openml.runs.initialize_model_from_run(run_id=run.run_id)
@@ -862,7 +862,7 @@ class TestRun(TestBase):
             )
             run = run.publish()
             TestBase._track_test_server_dumps('run', run.run_id)
-            print("\ncollected from test_run_functions: {}".format(run.run_id))
+            TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
             self._wait_for_processed_run(run.run_id, 200)
             run_id = run.run_id
         except openml.exceptions.OpenMLRunsExistError as e:
@@ -908,7 +908,7 @@ class TestRun(TestBase):
                 )
                 run.publish()
                 TestBase._track_test_server_dumps('run', run.run_id)
-                print("\ncollected from test_run_functions: {}".format(run.run_id))
+                TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
             except openml.exceptions.PyOpenMLError:
                 # run already existed. Great.
                 pass
@@ -970,7 +970,7 @@ class TestRun(TestBase):
         with self.assertRaisesRegex(openml.exceptions.PyOpenMLError, expected_message_regex):
             loaded_run.publish()
             TestBase._track_test_server_dumps('run', loaded_run.run_id)
-            print("\ncollected from test_run_functions: {}".format(loaded_run.run_id))
+            TestBase.logger.info("collected from test_run_functions: {}".format(loaded_run.run_id))
 
     def test_run_with_illegal_flow_id_1(self):
         # Check the case where the user adds an illegal flow id to an existing
@@ -981,7 +981,7 @@ class TestRun(TestBase):
         try:
             flow_orig.publish()  # ensures flow exist on server
             TestBase._track_test_server_dumps('flow', (flow_orig.flow_id, flow_orig.name))
-            print("\ncollected from test_run_functions: {}".format(flow_orig.flow_id))
+            TestBase.logger.info("collected from test_run_functions: {}".format(flow_orig.flow_id))
         except openml.exceptions.OpenMLServerException:
             # flow already exists
             pass
@@ -1008,7 +1008,7 @@ class TestRun(TestBase):
         try:
             flow_orig.publish()  # ensures flow exist on server
             TestBase._track_test_server_dumps('flow', (flow_orig.flow_id, flow_orig.name))
-            print("\ncollected from test_run_functions: {}".format(flow_orig.flow_id))
+            TestBase.logger.info("collected from test_run_functions: {}".format(flow_orig.flow_id))
         except openml.exceptions.OpenMLServerException:
             # flow already exists
             pass
@@ -1282,7 +1282,7 @@ class TestRun(TestBase):
         flow = self.extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
         TestBase._track_test_server_dumps('flow', (flow.flow_id, flow.name))
-        print("\ncollected from test_run_functions: {}".format(flow.flow_id))
+        TestBase.logger.info("collected from test_run_functions: {}".format(flow.flow_id))
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id)
         task = openml.tasks.get_task(119)  # diabetes
@@ -1295,4 +1295,4 @@ class TestRun(TestBase):
 
         run.publish()
         TestBase._track_test_server_dumps('run', run.run_id)
-        print("\ncollected from {}: {}".format(__file__.split('/')[-1], run.run_id))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], run.run_id))

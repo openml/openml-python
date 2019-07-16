@@ -52,5 +52,5 @@ class TestStudyFunctions(TestBase):
             print('Data set: %s; Accuracy: %0.2f' % (task.get_dataset().name, score.mean()))
             run.publish()  # publish the experiment on OpenML (optional)
             self._track_test_server_dumps('run', run.run_id)
-            print("\ncollected from {}: {}".format(__file__.split('/')[-1], run.run_id))
+            TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], run.run_id))
             print('URL for run: %s/run/%d' % (openml.config.server, run.run_id))
