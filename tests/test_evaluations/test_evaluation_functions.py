@@ -148,11 +148,13 @@ class TestEvaluationFunctions(TestBase):
         flow_id = 405
         size = 10
         evals_setups = openml.evaluations.list_evaluations_setups("predictive_accuracy",
-                                                          flow=[flow_id], size=size,
-                                                          sort_order='desc', output_format='dataframe')
+                                                                  flow=[flow_id], size=size,
+                                                                  sort_order='desc',
+                                                                  output_format='dataframe')
         evals = openml.evaluations.list_evaluations("predictive_accuracy",
-                                                          flow=[flow_id], size=size,
-                                                          sort_order='desc', output_format='dataframe')
+                                                    flow=[flow_id], size=size,
+                                                    sort_order='desc',
+                                                    output_format='dataframe')
 
         # Check if list is non-empty
         self.assertGreater(len(evals_setups), 0)
@@ -170,11 +172,13 @@ class TestEvaluationFunctions(TestBase):
         task_id = 6
         size = 20
         evals_setups = openml.evaluations.list_evaluations_setups("predictive_accuracy",
-                                                          task=[task_id], size=size,
-                                                          sort_order='desc', output_format='dataframe')
+                                                                  task=[task_id], size=size,
+                                                                  sort_order='desc',
+                                                                  output_format='dataframe')
         evals = openml.evaluations.list_evaluations("predictive_accuracy",
-                                                          task=[task_id], size=size,
-                                                          sort_order='desc', output_format='dataframe')
+                                                    task=[task_id], size=size,
+                                                    sort_order='desc',
+                                                    output_format='dataframe')
 
         # Check if list is non-empty
         self.assertGreater(len(evals_setups), 0)
@@ -186,6 +190,3 @@ class TestEvaluationFunctions(TestBase):
             hyper_params = [tuple([param['oml:name'], param['oml:value']]) for param in params]
             self.assertTrue((row['parameters'] == hyper_params))
             self.assertEqual(row['task_id'], task_id)
-
-
-

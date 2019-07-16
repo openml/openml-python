@@ -298,28 +298,30 @@ def list_evaluations_setups(
     dict or dataframe
     """
     # List evaluations
-    evals = list_evaluations(function=function, offset=offset, size=size, id=id, task=task, setup=setup, flow=flow,
-                             uploader=uploader, tag=tag, per_fold=per_fold, sort_order=sort_order,
-                             output_format='dataframe')
+    evals = list_evaluations(function=function, offset=offset, size=size, id=id, task=task,
+                             setup=setup, flow=flow, uploader=uploader, tag=tag,
+                             per_fold=per_fold, sort_order=sort_order, output_format='dataframe')
 
     # List setups
     # Split setups in evals into chunks of N setups as list_setups does not support long lists
     N = 100
-    setup_chunks = np.split(evals['setup_id'].unique(), ((len(evals['setup_id'].unique()) - 1) // N) + 1)
+    setup_chunks = np.split(evals['setup_id'].unique(),
+                            ((len(evals['setup_id'].unique()) - 1) // N) + 1)
     setups = pd.DataFrame()
     for setup in setup_chunks:
-        result = openml.setups.list_setups(setup=list(setup), output_format='dataframe')
+        result = pd.DataFrame(openml.setups.list_setups(setup=setup, output_format='dataframe'))
         result.drop('flow_id', axis=1, inplace=True)
         setups = pd.concat([setups, result], ignore_index=True)
     parameters = []
     for parameter_dict in setups['parameters']:
         if parameter_dict is not None:
-            parameters.append([tuple([param['parameter_name'], param['value']]) for param in parameter_dict.values()])
+            parameters.append([tuple([param['parameter_name'], param['value']])
+                               for param in parameter_dict.values()])
         else:
             parameters.append([])
     setups['parameters'] = parameters
     # Merge setups with evaluations
-    df = evals.merge(setups, on='setup_id', how='left')
+    df = pd.DataFrame(evals.merge(setups, on='setup_id', how='left'))
     if output_format == 'dataframe':
         return df
     else:
