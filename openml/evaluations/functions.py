@@ -321,7 +321,7 @@ def list_evaluations_setups(
             parameters.append([])
     setups['parameters'] = parameters
     # Merge setups with evaluations
-    df = pd.DataFrame(evals.merge(setups, on='setup_id', how='left'))
+    df = pd.merge(evals, setups, on='setup_id', how='left')
     if output_format == 'dataframe':
         return df
     else:
