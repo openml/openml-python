@@ -478,7 +478,7 @@ class TestOpenMLDataset(TestBase):
             data_file=file_path,
         )
         dataset.publish()
-        TestBase._track_test_server_dumps('data', dataset.dataset_id)
+        TestBase._mark_entity_for_removal('data', dataset.dataset_id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             dataset.dataset_id))
         self.assertIsInstance(dataset.dataset_id, int)
@@ -501,7 +501,7 @@ class TestOpenMLDataset(TestBase):
             url="https://www.openml.org/data/download/61/dataset_61_iris.arff",
         )
         dataset.publish()
-        TestBase._track_test_server_dumps('data', dataset.dataset_id)
+        TestBase._mark_entity_for_removal('data', dataset.dataset_id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             dataset.dataset_id))
         self.assertIsInstance(dataset.dataset_id, int)
@@ -513,7 +513,7 @@ class TestOpenMLDataset(TestBase):
             version=1,
             url="https://www.openml.org/data/download/61/dataset_61_iris.arff")
         dataset.publish()
-        TestBase._track_test_server_dumps('data', dataset.dataset_id)
+        TestBase._mark_entity_for_removal('data', dataset.dataset_id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             dataset.dataset_id))
         did = dataset.dataset_id
@@ -629,7 +629,7 @@ class TestOpenMLDataset(TestBase):
         )
 
         upload_did = dataset.publish()
-        TestBase._track_test_server_dumps('data', upload_did)
+        TestBase._mark_entity_for_removal('data', upload_did)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             upload_did))
 
@@ -694,7 +694,7 @@ class TestOpenMLDataset(TestBase):
         )
 
         upload_did = dataset.publish()
-        TestBase._track_test_server_dumps('data', upload_did)
+        TestBase._mark_entity_for_removal('data', upload_did)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             upload_did))
         self.assertEqual(
@@ -740,7 +740,7 @@ class TestOpenMLDataset(TestBase):
         )
 
         upload_did = xor_dataset.publish()
-        TestBase._track_test_server_dumps('data', upload_did)
+        TestBase._mark_entity_for_removal('data', upload_did)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             upload_did))
         self.assertEqual(
@@ -780,7 +780,7 @@ class TestOpenMLDataset(TestBase):
         )
 
         upload_did = xor_dataset.publish()
-        TestBase._track_test_server_dumps('data', upload_did)
+        TestBase._mark_entity_for_removal('data', upload_did)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             upload_did))
         self.assertEqual(
@@ -906,7 +906,7 @@ class TestOpenMLDataset(TestBase):
             paper_url=paper_url
         )
         upload_did = dataset.publish()
-        TestBase._track_test_server_dumps('data', upload_did)
+        TestBase._mark_entity_for_removal('data', upload_did)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             upload_did))
         self.assertEqual(
@@ -943,7 +943,7 @@ class TestOpenMLDataset(TestBase):
             paper_url=paper_url
         )
         upload_did = dataset.publish()
-        TestBase._track_test_server_dumps('data', upload_did)
+        TestBase._mark_entity_for_removal('data', upload_did)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             upload_did))
         self.assertEqual(
@@ -982,7 +982,7 @@ class TestOpenMLDataset(TestBase):
             paper_url=paper_url
         )
         upload_did = dataset.publish()
-        TestBase._track_test_server_dumps('data', upload_did)
+        TestBase._mark_entity_for_removal('data', upload_did)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             upload_did))
         downloaded_data = _get_online_dataset_arff(upload_did)
@@ -1153,7 +1153,7 @@ class TestOpenMLDataset(TestBase):
 
         # publish dataset
         upload_did = dataset.publish()
-        TestBase._track_test_server_dumps('data', upload_did)
+        TestBase._mark_entity_for_removal('data', upload_did)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             upload_did))
         # test if publish was successful
@@ -1286,7 +1286,7 @@ class TestOpenMLDataset(TestBase):
             )
             self.assertEqual(dataset.row_id_attribute, output_row_id)
             upload_did = dataset.publish()
-            TestBase._track_test_server_dumps('data', upload_did)
+            TestBase._mark_entity_for_removal('data', upload_did)
             TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                                 upload_did))
             arff_dataset = arff.loads(_get_online_dataset_arff(upload_did))

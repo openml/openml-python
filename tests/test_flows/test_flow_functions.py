@@ -257,7 +257,7 @@ class TestFlowFunctions(TestBase):
         # Test flow is accepted by server
         self._add_sentinel_to_flow_name(flow)
         flow.publish()
-        TestBase._track_test_server_dumps('flow', (flow.flow_id, flow.name))
+        TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], flow.flow_id))
         # Test deserialization works
         server_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
@@ -269,7 +269,7 @@ class TestFlowFunctions(TestBase):
         extension = openml.extensions.get_extension_by_model(model)
         flow = extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
-        TestBase._track_test_server_dumps('flow', (flow.flow_id, flow.name))
+        TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], flow.flow_id))
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)

@@ -129,7 +129,7 @@ class TestRun(TestBase):
         self.assertTrue(run_prime.flow is None)
         self._test_run_obj_equals(run, run_prime)
         run_prime.publish()
-        TestBase._track_test_server_dumps('run', run_prime.run_id)
+        TestBase._mark_entity_for_removal('run', run_prime.run_id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             run_prime.run_id))
 
@@ -165,7 +165,7 @@ class TestRun(TestBase):
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
         self._test_run_obj_equals(run, run_prime)
         run_prime.publish()
-        TestBase._track_test_server_dumps('run', run_prime.run_id)
+        TestBase._mark_entity_for_removal('run', run_prime.run_id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             run_prime.run_id))
 
@@ -232,7 +232,7 @@ class TestRun(TestBase):
         # obtain run from filesystem
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
         loaded_run.publish()
-        TestBase._track_test_server_dumps('run', loaded_run.run_id)
+        TestBase._mark_entity_for_removal('run', loaded_run.run_id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             loaded_run.run_id))
 

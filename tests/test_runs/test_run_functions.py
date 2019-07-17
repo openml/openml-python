@@ -184,7 +184,7 @@ class TestRun(TestBase):
         flow, _ = self._add_sentinel_to_flow_name(flow, sentinel)
         if not openml.flows.flow_exists(flow.name, flow.external_version):
             flow.publish()
-            TestBase._track_test_server_dumps('flow', (flow.flow_id, flow.name))
+            TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
             TestBase.logger.info("collected from test_run_functions: {}".format(flow.flow_id))
 
         task = openml.tasks.get_task(task_id)
@@ -198,7 +198,7 @@ class TestRun(TestBase):
             avoid_duplicate_runs=openml.config.avoid_duplicate_runs,
         )
         run_ = run.publish()
-        TestBase._track_test_server_dumps('run', run.run_id)
+        TestBase._mark_entity_for_removal('run', run.run_id)
         TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
@@ -691,7 +691,7 @@ class TestRun(TestBase):
             seed=1,
         )
         run_ = run.publish()
-        TestBase._track_test_server_dumps('run', run.run_id)
+        TestBase._mark_entity_for_removal('run', run.run_id)
         TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
         run = openml.runs.get_run(run_.run_id)
 
@@ -808,7 +808,7 @@ class TestRun(TestBase):
             avoid_duplicate_runs=False,
         )
         run_ = run.publish()
-        TestBase._track_test_server_dumps('run', run_.run_id)
+        TestBase._mark_entity_for_removal('run', run_.run_id)
         TestBase.logger.info("collected from test_run_functions: {}".format(run_.run_id))
         run = openml.runs.get_run(run_.run_id)
 
@@ -861,7 +861,7 @@ class TestRun(TestBase):
                 num_iterations * num_folds,
             )
             run = run.publish()
-            TestBase._track_test_server_dumps('run', run.run_id)
+            TestBase._mark_entity_for_removal('run', run.run_id)
             TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
             self._wait_for_processed_run(run.run_id, 200)
             run_id = run.run_id
@@ -907,7 +907,7 @@ class TestRun(TestBase):
                     upload_flow=True
                 )
                 run.publish()
-                TestBase._track_test_server_dumps('run', run.run_id)
+                TestBase._mark_entity_for_removal('run', run.run_id)
                 TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
             except openml.exceptions.PyOpenMLError:
                 # run already existed. Great.
@@ -969,7 +969,7 @@ class TestRun(TestBase):
                                   "but 'flow.flow_id' is not None.")
         with self.assertRaisesRegex(openml.exceptions.PyOpenMLError, expected_message_regex):
             loaded_run.publish()
-            TestBase._track_test_server_dumps('run', loaded_run.run_id)
+            TestBase._mark_entity_for_removal('run', loaded_run.run_id)
             TestBase.logger.info("collected from test_run_functions: {}".format(loaded_run.run_id))
 
     def test_run_with_illegal_flow_id_1(self):
@@ -980,7 +980,7 @@ class TestRun(TestBase):
         flow_orig = self.extension.model_to_flow(clf)
         try:
             flow_orig.publish()  # ensures flow exist on server
-            TestBase._track_test_server_dumps('flow', (flow_orig.flow_id, flow_orig.name))
+            TestBase._mark_entity_for_removal('flow', (flow_orig.flow_id, flow_orig.name))
             TestBase.logger.info("collected from test_run_functions: {}".format(flow_orig.flow_id))
         except openml.exceptions.OpenMLServerException:
             # flow already exists
@@ -1007,7 +1007,7 @@ class TestRun(TestBase):
         flow_orig = self.extension.model_to_flow(clf)
         try:
             flow_orig.publish()  # ensures flow exist on server
-            TestBase._track_test_server_dumps('flow', (flow_orig.flow_id, flow_orig.name))
+            TestBase._mark_entity_for_removal('flow', (flow_orig.flow_id, flow_orig.name))
             TestBase.logger.info("collected from test_run_functions: {}".format(flow_orig.flow_id))
         except openml.exceptions.OpenMLServerException:
             # flow already exists
@@ -1281,7 +1281,7 @@ class TestRun(TestBase):
         model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
         flow = self.extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
-        TestBase._track_test_server_dumps('flow', (flow.flow_id, flow.name))
+        TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
         TestBase.logger.info("collected from test_run_functions: {}".format(flow.flow_id))
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id)
@@ -1294,5 +1294,5 @@ class TestRun(TestBase):
         )
 
         run.publish()
-        TestBase._track_test_server_dumps('run', run.run_id)
+        TestBase._mark_entity_for_removal('run', run.run_id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], run.run_id))

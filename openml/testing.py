@@ -29,7 +29,10 @@ class TestBase(unittest.TestCase):
     Currently hard-codes a read-write key.
     Hopefully soon allows using a test server, not the production server.
     """
-    publish_tracker = {}  # type: dict
+    publish_tracker = {'run': [], 'data': [], 'flow': [], 'task': [],
+                       'study': [], 'user': []}  # type: dict
+    # legal_entities defined in openml.utils._delete_entity - {'user'}
+    entity_types = {'run', 'data', 'flow', 'task', 'study'}
     test_server = "https://test.openml.org/api/v1/xml"
     # amueller's read/write key that he will throw away later
     apikey = "610344db6388d9ba34f6db45a3cf71de"
@@ -115,7 +118,7 @@ class TestBase(unittest.TestCase):
         openml.config.connection_n_retries = self.connection_n_retries
 
     @classmethod
-    def _track_test_server_dumps(self, entity_type, entity_id):
+    def _mark_entity_for_removal(self, entity_type, entity_id):
         """ Static record of entities uploaded to test server
 
         Dictionary of lists where the keys are 'entity_type'.

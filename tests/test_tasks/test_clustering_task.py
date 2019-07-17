@@ -1,6 +1,7 @@
 import openml
 from openml.testing import TestBase
 from .test_task import OpenMLTaskTest
+from openml.exceptions import OpenMLServerException
 
 
 class OpenMLClusteringTaskTest(OpenMLTaskTest):
@@ -29,20 +30,31 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         self.assertEqual(task.dataset_id, 36)
 
     def test_upload_task(self):
+        for i in range(100):
+            try:
+                dataset_id = self._get_compatible_rand_dataset()
+                # Upload a clustering task without a ground truth.
+                task = openml.tasks.create_task(
+                    task_type_id=self.task_type_id,
+                    dataset_id=dataset_id,
+                    estimation_procedure_id=self.estimation_procedure
+                )
 
-        # The base class uploads a clustering task with a target
-        # feature. A situation where a ground truth is available
-        # to benchmark the clustering algorithm.
-        super(OpenMLClusteringTaskTest, self).test_upload_task()
-
-        dataset_id = self._get_compatible_rand_dataset()
-        # Upload a clustering task without a ground truth.
-        task = openml.tasks.create_task(
-            task_type_id=self.task_type_id,
-            dataset_id=dataset_id,
-            estimation_procedure_id=self.estimation_procedure
-        )
-
-        task_id = task.publish()
-        TestBase._track_test_server_dumps('task', task_id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], task_id))
+                task_id = task.publish()
+                TestBase._mark_entity_for_removal('task', task_id)
+                TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                                    task_id))
+                # success
+                break
+            except OpenMLServerException as e:
+                # Error code for 'task already exists'
+                # Should be 533 according to the docs
+                # (# https://www.openml.org/api_docs#!/task/post_task)
+                if e.code == 614:
+                    continue
+                else:
+                    raise e
+        else:
+            raise ValueError(
+                'Could not create a valid task for task type ID {}'.format(self.task_type_id)
+            )
