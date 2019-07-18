@@ -164,7 +164,7 @@ class TestEvaluationFunctions(TestBase):
         for index, row in evals_setups.iterrows():
             params = openml.runs.get_run(row['run_id']).parameter_settings
             hyper_params = [tuple([param['oml:name'], param['oml:value']]) for param in params]
-            self.assertTrue((row['parameters'] == hyper_params))
+            self.assertTrue(sorted(row['parameters']) == sorted(hyper_params))
             self.assertEqual(row['flow_id'], flow_id)
 
     def test_list_evaluations_setups_filter_task(self):
@@ -188,5 +188,5 @@ class TestEvaluationFunctions(TestBase):
         for index, row in evals_setups.iterrows():
             params = openml.runs.get_run(row['run_id']).parameter_settings
             hyper_params = [tuple([param['oml:name'], param['oml:value']]) for param in params]
-            self.assertTrue((row['parameters'] == hyper_params))
+            self.assertTrue(sorted(row['parameters']) == sorted(hyper_params))
             self.assertEqual(row['task_id'], task_id)
