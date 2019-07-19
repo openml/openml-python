@@ -277,6 +277,7 @@ class TestFlowFunctions(TestBase):
     @unittest.skipIf(LooseVersion(sklearn.__version__) == "0.20.0",
                      reason="No non-0.20 scikit-learn flow known.")
     def test_get_flow_reinstantiate_model_wrong_version(self):
+        openml.config.server = self.production_server
         # 20 is scikit-learn ==0.20.0
         # I can't find a != 0.20 permanent flow on the test server.
-        self.assertRaises(ValueError, openml.flows.get_flow, flow_id=20, reinstantiate=True)
+        self.assertRaises(ValueError, openml.flows.get_flow, flow_id=7238, reinstantiate=True)
