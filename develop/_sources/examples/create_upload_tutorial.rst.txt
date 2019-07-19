@@ -184,7 +184,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/5288
+    URL for dataset: https://test.openml.org/api/v1/xml/data/5838
 
 
 
@@ -282,7 +282,7 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/5289
+    URL for dataset: https://test.openml.org/api/v1/xml/data/5839
 
 
 
@@ -326,7 +326,7 @@ function :func:`create_dataset`. In this regard, you only need to pass
     windy          14 non-null bool
     play           14 non-null category
     dtypes: bool(1), category(2), int64(2)
-    memory usage: 546.0 bytes
+    memory usage: 594.0 bytes
     None
 
 
@@ -389,7 +389,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/5290
+    URL for dataset: https://test.openml.org/api/v1/xml/data/5840
 
 
 
@@ -452,7 +452,7 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/5291
+    URL for dataset: https://test.openml.org/api/v1/xml/data/5841
 
 
 
@@ -498,6 +498,36 @@ Dataset is a pandas sparse dataframe
 
  .. code-block:: none
 
+    /home/travis/build/openml/openml-python/examples/create_upload_tutorial.py:291: FutureWarning: SparseDataFrame is deprecated and will be removed in a future version.
+    Use a regular DataFrame whose columns are SparseArrays instead.
+
+    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
+
+      df = pd.SparseDataFrame(sparse_data, columns=column_names)
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/sparse/frame.py:257: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
+    Use a Series with sparse values instead.
+
+        >>> series = pd.Series(pd.SparseArray(...))
+
+    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
+
+      sparse_index=BlockIndex(N, blocs, blens),
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/frame.py:3451: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
+    Use a Series with sparse values instead.
+
+        >>> series = pd.Series(pd.SparseArray(...))
+
+    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
+
+      return klass(values, index=self.index, name=items, fastpath=True)
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/apply.py:345: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
+    Use a Series with sparse values instead.
+
+        >>> series = pd.Series(pd.SparseArray(...))
+
+    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
+
+      result = self.obj._constructor_sliced(results)
     <class 'pandas.core.sparse.frame.SparseDataFrame'>
     RangeIndex: 4 entries, 0 to 3
     Data columns (total 3 columns):
@@ -505,7 +535,7 @@ Dataset is a pandas sparse dataframe
     input2    2 non-null Sparse[float64, nan]
     y         2 non-null Sparse[float64, nan]
     dtypes: Sparse[float64, nan](3)
-    memory usage: 176.0 bytes
+    memory usage: 224.0 bytes
     None
 
 
@@ -528,7 +558,7 @@ Dataset is a pandas sparse dataframe
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/5292
+    URL for dataset: https://test.openml.org/api/v1/xml/data/5842
 
 
 
@@ -545,7 +575,7 @@ Dataset is a pandas sparse dataframe
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.678 seconds)
+   **Total running time of the script:** ( 0 minutes  4.821 seconds)
 
 
 .. _sphx_glr_download_examples_create_upload_tutorial.py:

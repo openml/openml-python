@@ -150,16 +150,16 @@ Note that we now filter the evaluations based on another parameter 'task'.
  .. code-block:: none
 
               run_id  task_id  setup_id  ...     value values array_data
-    9060101  9060101   167140   6993238  ...  0.956685   None       None
-    9060109  9060109   167140   6993245  ...  0.519146   None       None
-    9060112  9060112   167140   6993248  ...  0.964218   None       None
-    9060116  9060116   167140   6993252  ...  0.623666   None       None
-    9060117  9060117   167140   6993253  ...  0.610483   None       None
-    9060119  9060119   167140   6993255  ...  0.610483   None       None
-    9060120  9060120   167140   6993256  ...  0.610483   None       None
-    9060122  9060122   167140   6993258  ...  0.872567   None       None
-    9060127  9060127   167140   6993263  ...  0.960138   None       None
-    9060131  9060131   167140   6993267  ...  0.634338   None       None
+    9199772  9199772   167140   7130140  ...  0.938481   None       None
+    9199845  9199845   167140   7130139  ...  0.623352   None       None
+    9202086  9202086   167140   7131884  ...  0.918393   None       None
+    9202092  9202092   167140   7131890  ...  0.962335   None       None
+    9202096  9202096   167140   7131894  ...  0.961707   None       None
+    9202099  9202099   167140   7131897  ...  0.519146   None       None
+    9202125  9202125   167140   7131923  ...  0.957313   None       None
+    9202139  9202139   167140   7131937  ...  0.519146   None       None
+    9202159  9202159   167140   7131957  ...  0.628060   None       None
+    9202254  9202254   167140   7132052  ...  0.610483   None       None
 
     [10 rows x 12 columns]
 
@@ -168,7 +168,7 @@ Note that we now filter the evaluations based on another parameter 'task'.
     10229415  10229415   167140   8154437  ...  0.966729   None       None
     10231506  10231506   167140   8156528  ...  0.966102   None       None
     10229295  10229295   167140   8154317  ...  0.966102   None       None
-    10231157  10231157   167140   8156179  ...  0.965160   None       None
+    10228369  10228369   167140   8153634  ...  0.965160   None       None
     9193963    9193963   167140   7124554  ...  0.965160   None       None
 
     [5 rows x 12 columns]
@@ -287,10 +287,10 @@ For this, we shall compare the top performing flows.
 
     (12736,
      'sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)')
-    (8399,
-     'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)')
     (12127,
      'sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)')
+    (8399,
+     'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)')
     (8353,
      'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
     (8317,
@@ -311,7 +311,7 @@ For this, we shall compare the top performing flows.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.688 seconds)
+   **Total running time of the script:** ( 0 minutes  6.830 seconds)
 
 
 .. _sphx_glr_download_examples_fetch_evaluations_tutorial.py:

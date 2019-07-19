@@ -290,16 +290,16 @@ In addition, a size limit and an offset can be applied both separately and simul
  .. code-block:: none
 
         tid  ttid  ...  NumberOfSymbolicFeatures number_samples
-    59   59     1  ...                       1.0            NaN
-    60   60     1  ...                      16.0            NaN
-    62   62     3  ...                      33.0              9
-    63   63     3  ...                      37.0             12
-    64   64     3  ...                       9.0              1
-    65   65     3  ...                      74.0              7
-    66   66     3  ...                      70.0              5
-    67   67     3  ...                       NaN              6
-    68   68     3  ...                      11.0              5
-    69   69     3  ...                      16.0              4
+    59   59     1  ...                         1            NaN
+    60   60     1  ...                        16            NaN
+    62   62     3  ...                        33              9
+    63   63     3  ...                        37             12
+    64   64     3  ...                         9              1
+    65   65     3  ...                        74              7
+    66   66     3  ...                        70              5
+    67   67     3  ...                         0              6
+    68   68     3  ...                        11              5
+    69   69     3  ...                        16              4
 
     [10 rows x 21 columns]
 
@@ -332,7 +332,7 @@ Finally, it is also possible to list all tasks on OpenML with:
 
  .. code-block:: none
 
-    19406
+    19415
 
 
 
@@ -429,14 +429,14 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLClassificationTask object at 0x2b6be2e00630>
+    <openml.tasks.task.OpenMLClassificationTask object at 0x2aab30cce400>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  34.700 seconds)
+   **Total running time of the script:** ( 0 minutes  33.517 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:
