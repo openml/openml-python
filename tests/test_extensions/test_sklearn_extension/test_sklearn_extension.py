@@ -1126,6 +1126,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         task = openml.tasks.get_task(115)
         run = openml.runs.run_flow_on_task(flow, task)
         run = run.publish()
+        TestBase._mark_entity_for_removal('run', run.run_id)
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], run.run_id))
         run = openml.runs.get_run(run.run_id)
         setup = openml.setups.get_setup(run.setup_id)
 
