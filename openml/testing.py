@@ -31,8 +31,6 @@ class TestBase(unittest.TestCase):
     """
     publish_tracker = {'run': [], 'data': [], 'flow': [], 'task': [],
                        'study': [], 'user': []}  # type: dict
-    # legal_entities defined in openml.utils._delete_entity - {'user'}
-    entity_types = {'run', 'data', 'flow', 'task', 'study'}
     test_server = "https://test.openml.org/api/v1/xml"
     # amueller's read/write key that he will throw away later
     apikey = "610344db6388d9ba34f6db45a3cf71de"
