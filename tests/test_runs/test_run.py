@@ -13,6 +13,8 @@ from openml.testing import TestBase
 import openml
 import openml.extensions.sklearn
 
+import pytest
+
 
 class TestRun(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take
@@ -133,6 +135,7 @@ class TestRun(TestBase):
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             run_prime.run_id))
 
+    @pytest.mark.flaky(reruns=3)
     def test_to_from_filesystem_search(self):
 
         model = Pipeline([

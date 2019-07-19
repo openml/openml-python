@@ -77,7 +77,7 @@ class TestStudyFunctions(TestBase):
             task_ids=fixture_task_ids
         )
         study_id = study.publish()
-        self._mark_entity_for_removal('study', study_id)
+        TestBase._mark_entity_for_removal('study', study_id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], study_id))
 
         self.assertGreater(study_id, 0)
@@ -186,7 +186,7 @@ class TestStudyFunctions(TestBase):
             run_ids=list(run_list.keys())
         )
         study_id = study.publish()
-        self._mark_entity_for_removal('study', study_id)
+        TestBase._mark_entity_for_removal('study', study_id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], study_id))
         study_original = openml.study.get_study(study_id)
 

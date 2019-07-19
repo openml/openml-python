@@ -51,7 +51,7 @@ class TestStudyFunctions(TestBase):
             )  # print accuracy score
             print('Data set: %s; Accuracy: %0.2f' % (task.get_dataset().name, score.mean()))
             run.publish()  # publish the experiment on OpenML (optional)
-            self._mark_entity_for_removal('run', run.run_id)
+            TestBase._mark_entity_for_removal('run', run.run_id)
             TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                                 run.run_id))
             print('URL for run: %s/run/%d' % (openml.config.server, run.run_id))
