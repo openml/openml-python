@@ -4,6 +4,7 @@ import unittest
 
 from distutils.version import LooseVersion
 import sklearn
+from sklearn import ensemble
 import pandas as pd
 
 import openml
@@ -13,6 +14,12 @@ import openml.extensions.sklearn
 
 class TestFlowFunctions(TestBase):
     _multiprocess_can_split_ = True
+
+    def setUp(self):
+        super(TestFlowFunctions, self).setUp()
+
+    def tearDown(self):
+        super(TestFlowFunctions, self).tearDown()
 
     def _check_flow(self, flow):
         self.assertEqual(type(flow), dict)
@@ -242,7 +249,6 @@ class TestFlowFunctions(TestBase):
     def test_sklearn_to_flow_list_of_lists(self):
         from sklearn.preprocessing import OrdinalEncoder
         ordinal_encoder = OrdinalEncoder(categories=[[0, 1], [0, 1]])
-
         extension = openml.extensions.sklearn.SklearnExtension()
 
         # Test serialization works
@@ -251,8 +257,35 @@ class TestFlowFunctions(TestBase):
         # Test flow is accepted by server
         self._add_sentinel_to_flow_name(flow)
         flow.publish()
-
+        TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], flow.flow_id))
         # Test deserialization works
         server_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
         self.assertEqual(server_flow.parameters['categories'], '[[0, 1], [0, 1]]')
         self.assertEqual(server_flow.model.categories, flow.model.categories)
+
+    def test_get_flow_reinstantiate_model(self):
+        model = ensemble.RandomForestClassifier(n_estimators=33)
+        extension = openml.extensions.get_extension_by_model(model)
+        flow = extension.model_to_flow(model)
+        flow.publish(raise_error_if_exists=False)
+        TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], flow.flow_id))
+
+        downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
+        self.assertIsInstance(downloaded_flow.model, sklearn.ensemble.RandomForestClassifier)
+
+    def test_get_flow_reinstantiate_model_no_extension(self):
+        # Flow 10 is a WEKA flow
+        self.assertRaisesRegex(RuntimeError,
+                               "No extension could be found for flow 10: weka.SMO",
+                               openml.flows.get_flow,
+                               flow_id=10,
+                               reinstantiate=True)
+
+    @unittest.skipIf(LooseVersion(sklearn.__version__) == "0.20.0",
+                     reason="No non-0.20 scikit-learn flow known.")
+    def test_get_flow_reinstantiate_model_wrong_version(self):
+        # 20 is scikit-learn ==0.20.0
+        # I can't find a != 0.20 permanent flow on the test server.
+        self.assertRaises(ValueError, openml.flows.get_flow, flow_id=20, reinstantiate=True)

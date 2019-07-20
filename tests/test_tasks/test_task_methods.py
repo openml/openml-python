@@ -7,6 +7,12 @@ from openml.testing import TestBase
 # Common methods between tasks
 class OpenMLTaskMethodsTest(TestBase):
 
+    def setUp(self):
+        super(OpenMLTaskMethodsTest, self).setUp()
+
+    def tearDown(self):
+        super(OpenMLTaskMethodsTest, self).tearDown()
+
     def test_tagging(self):
         task = openml.tasks.get_task(1)
         tag = "testing_tag_{}_{}".format(self.id(), time())

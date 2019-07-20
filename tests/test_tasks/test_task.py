@@ -1,5 +1,6 @@
 import unittest
-from random import randint
+from typing import List
+from random import randint, shuffle
 
 from openml.exceptions import OpenMLServerException
 from openml.testing import TestBase
@@ -10,9 +11,6 @@ from openml.datasets import (
 from openml.tasks import (
     create_task,
     get_task
-)
-from openml.utils import (
-    _delete_entity,
 )
 
 
@@ -47,9 +45,10 @@ class OpenMLTaskTest(TestBase):
         # beforehand would not be an option because a concurrent unit test could potentially
         # create the same task and make this unit test fail (i.e. getting a dataset and creating
         # a task for it is not atomic).
+        compatible_datasets = self._get_compatible_rand_dataset()
         for i in range(100):
             try:
-                dataset_id = self._get_compatible_rand_dataset()
+                dataset_id = compatible_datasets[i % len(compatible_datasets)]
                 # TODO consider implementing on the diff task types.
                 task = create_task(
                     task_type_id=self.task_type_id,
@@ -59,6 +58,9 @@ class OpenMLTaskTest(TestBase):
                 )
 
                 task_id = task.publish()
+                TestBase._mark_entity_for_removal('task', task_id)
+                TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                                    task_id))
                 # success
                 break
             except OpenMLServerException as e:
@@ -74,9 +76,7 @@ class OpenMLTaskTest(TestBase):
                 'Could not create a valid task for task type ID {}'.format(self.task_type_id)
             )
 
-        _delete_entity('task', task_id)
-
-    def _get_compatible_rand_dataset(self) -> int:
+    def _get_compatible_rand_dataset(self) -> List:
 
         compatible_datasets = []
         active_datasets = list_datasets(status='active')
@@ -84,22 +84,30 @@ class OpenMLTaskTest(TestBase):
         # depending on the task type, find either datasets
         # with only symbolic features or datasets with only
         # numerical features.
-        if self.task_type_id != 2:
+        if self.task_type_id == 2:
+            # regression task
+            for dataset_id, dataset_info in active_datasets.items():
+                if 'NumberOfSymbolicFeatures' in dataset_info:
+                    if dataset_info['NumberOfSymbolicFeatures'] == 0:
+                        compatible_datasets.append(dataset_id)
+        elif self.task_type_id == 5:
+            # clustering task
+            compatible_datasets = list(active_datasets.keys())
+        else:
             for dataset_id, dataset_info in active_datasets.items():
                 # extra checks because of:
                 # https://github.com/openml/OpenML/issues/959
                 if 'NumberOfNumericFeatures' in dataset_info:
                     if dataset_info['NumberOfNumericFeatures'] == 0:
                         compatible_datasets.append(dataset_id)
-        else:
-            for dataset_id, dataset_info in active_datasets.items():
-                if 'NumberOfSymbolicFeatures' in dataset_info:
-                    if dataset_info['NumberOfSymbolicFeatures'] == 0:
-                        compatible_datasets.append(dataset_id)
 
-        random_dataset_pos = randint(0, len(compatible_datasets) - 1)
+        # in-place shuffling
+        shuffle(compatible_datasets)
+        return compatible_datasets
 
-        return compatible_datasets[random_dataset_pos]
+        # random_dataset_pos = randint(0, len(compatible_datasets) - 1)
+        #
+        # return compatible_datasets[random_dataset_pos]
 
     def _get_random_feature(self, dataset_id: int) -> str:
 
