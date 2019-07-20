@@ -77,6 +77,9 @@ class TestStudyFunctions(TestBase):
             task_ids=fixture_task_ids
         )
         study_id = study.publish()
+        TestBase._mark_entity_for_removal('study', study_id)
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], study_id))
+
         self.assertGreater(study_id, 0)
 
         # verify main meta data
@@ -132,6 +135,8 @@ class TestStudyFunctions(TestBase):
             run_ids=list(run_list.keys())
         )
         study_id = study.publish()
+        # not tracking upload for delete since _delete_entity called end of function
+        # asserting return status from openml.study.delete_study()
         self.assertGreater(study_id, 0)
         study_downloaded = openml.study.get_study(study_id)
         self.assertEqual(study_downloaded.alias, fixt_alias)
@@ -181,6 +186,8 @@ class TestStudyFunctions(TestBase):
             run_ids=list(run_list.keys())
         )
         study_id = study.publish()
+        TestBase._mark_entity_for_removal('study', study_id)
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], study_id))
         study_original = openml.study.get_study(study_id)
 
         with self.assertRaisesRegex(openml.exceptions.OpenMLServerException,

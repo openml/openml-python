@@ -171,6 +171,8 @@ def run_flow_on_task(
     if task.task_id is None:
         raise ValueError("The task should be published at OpenML")
 
+    if flow.model is None:
+        flow.model = flow.extension.flow_to_model(flow)
     flow.model = flow.extension.seed_model(flow.model, seed=seed)
 
     # We only need to sync with the server right now if we want to upload the flow,
