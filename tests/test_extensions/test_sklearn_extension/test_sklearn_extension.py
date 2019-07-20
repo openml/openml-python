@@ -1638,4 +1638,5 @@ class TestSklearnExtensionRunFunctions(TestBase):
         short = "sklearn.Pipeline(ConditionalImputer,OneHotEncoder,VarianceThreshold,RandomForestClassifier)"  # noqa: E501
         long_stripped, _ = re.subn(r'\s', '', long)
         self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
-        self.assertEqual("weka.IsolationForest", SklearnExtension.trim_flow_name("weka.IsolationForest"))
+        self.assertEqual("weka.IsolationForest",
+                         SklearnExtension.trim_flow_name("weka.IsolationForest"))
