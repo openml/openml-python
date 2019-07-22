@@ -142,7 +142,7 @@ class OpenMLFlow(object):
             raise RuntimeError("No extension could be found for flow {}: {}"
                                .format(self.flow_id, self.name))
 
-    def __str__(self):
+    def __repr__(self):
         header = "OpenML Flow"
         header = '{}\n{}\n'.format(header, '=' * len(header))
 

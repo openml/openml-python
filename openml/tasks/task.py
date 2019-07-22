@@ -55,7 +55,7 @@ class OpenMLTask(ABC):
         self.estimation_procedure_id = estimation_procedure_id
         self.split = None  # type: Optional[OpenMLSplit]
 
-    def __str__(self):
+    def __repr__(self):
         header = "OpenML Task"
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
