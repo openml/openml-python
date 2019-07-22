@@ -229,11 +229,11 @@ Note that we now filter the evaluations based on another parameter ‘task’.</
 
 Displaying head of sorted dataframe:
             run_id  task_id  setup_id  ...     value values array_data
+10232158  10232158   167140   8157180  ...  0.967671   None       None
 10229415  10229415   167140   8154437  ...  0.966729   None       None
+10232835  10232835   167140   8157857  ...  0.966729   None       None
 10229295  10229295   167140   8154317  ...  0.966102   None       None
 10231506  10231506   167140   8156528  ...  0.966102   None       None
-10231764  10231764   167140   8156786  ...  0.965474   None       None
-10230705  10230705   167140   8155727  ...  0.965160   None       None
 
 [5 rows x 12 columns]
 </pre></div>
@@ -327,12 +327,12 @@ For this, we shall compare the top performing flows.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(12736,
  &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)&#39;)
-(8399,
- &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)&#39;)
-(12127,
- &#39;sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)&#39;)
 (8353,
  &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
+(12127,
+ &#39;sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)&#39;)
+(8399,
+ &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)&#39;)
 (8317,
  &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
 (8330,
@@ -347,7 +347,7 @@ For this, we shall compare the top performing flows.</p>
  &#39;sklearn.pipeline.Pipeline(imputation=preprocessing.ConditionalImputer2,catencoding=preprocessing.MultiLabelEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.610 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.552 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-fetch-evaluations-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/8ebde0963923552ec6438c2732e14fec/fetch_evaluations_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_evaluations_tutorial.py</span></code></a></p>
