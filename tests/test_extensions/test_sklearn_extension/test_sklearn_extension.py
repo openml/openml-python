@@ -1219,6 +1219,12 @@ class TestSklearnExtensionRunFunctions(TestBase):
     ################################################################################################
     # Test methods for performing runs with this extension module
 
+    def test_run_model_on_task(self):
+        class MyLR(sklearn.linear_model.LogisticRegression):
+            pass
+        task = openml.tasks.get_task(1)
+        run = openml.runs.run_model_on_task(MyLR(), task)
+
     def test_seed_model(self):
         # randomized models that are initialized without seeds, can be seeded
         randomized_clfs = [

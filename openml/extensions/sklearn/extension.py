@@ -432,6 +432,7 @@ class SklearnExtension(Extension):
                                 # annotate a class of sklearn.svm.SVC() with the
                                 # tag svm?
                                 ],
+                          extension=self,
                           language='English',
                           # TODO fill in dependencies!
                           dependencies=dependencies)
@@ -455,9 +456,12 @@ class SklearnExtension(Extension):
             model_package_name, model_package_version_number,
         )
         openml_version = self._format_external_version('openml', openml.__version__)
+        sklearn_version = self._format_external_version('sklearn', sklearn.__version__)
+
         external_versions = set()
         external_versions.add(external_version)
         external_versions.add(openml_version)
+        external_versions.add(sklearn_version)
         for visitee in sub_components.values():
             for external_version in visitee.external_version.split(','):
                 external_versions.add(external_version)
