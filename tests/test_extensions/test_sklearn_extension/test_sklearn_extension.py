@@ -1638,5 +1638,23 @@ class TestSklearnExtensionRunFunctions(TestBase):
         short = "sklearn.Pipeline(ConditionalImputer,OneHotEncoder,VarianceThreshold,RandomForestClassifier)"  # noqa: E501
         long_stripped, _ = re.subn(r'\s', '', long)
         self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
+
+        long = """sklearn.pipeline.Pipeline(
+                    Imputer=sklearn.preprocessing.imputation.Imputer,
+                    VarianceThreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold, # noqa: E501
+                    Estimator=sklearn.model_selection._search.RandomizedSearchCV(
+                        estimator=sklearn.tree.tree.DecisionTreeClassifier))"""
+        short = "sklearn.Pipeline(Imputer,VarianceThreshold,RandomizedSearchCV(DecisionTreeClassifier))"
+        long_stripped, _ = re.subn(r'\s', '', long)
+        self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
+
+        long = """sklearn.model_selection._search.RandomizedSearchCV(
+                    estimator=sklearn.pipeline.Pipeline(
+                        Imputer=sklearn.preprocessing.imputation.Imputer,
+                        classifier=sklearn.ensemble.forest.RandomForestClassifier))"""
+        short = "sklearn.RandomizedSearchCV(Pipeline(Imputer,RandomForestClassifier))"
+        long_stripped, _ = re.subn(r'\s', '', long)
+        self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
+
         self.assertEqual("weka.IsolationForest",
                          SklearnExtension.trim_flow_name("weka.IsolationForest"))

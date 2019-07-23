@@ -88,7 +88,12 @@ class SklearnExtension(Extension):
         return isinstance(model, sklearn.base.BaseEstimator)
 
     @classmethod
-    def trim_flow_name(cls, long_name: str, extra_trim_length: int = 100) -> str:
+    def trim_flow_name(
+            cls,
+            long_name: str,
+            extra_trim_length: int = 100,
+            _outer: bool = True
+    ) -> str:
         """ Shorten generated sklearn flow name to at most `max_length` characters.
 
         Flows are assumed to have the following naming structure:
@@ -117,6 +122,8 @@ class SklearnExtension(Extension):
             If the trimmed name would exceed `extra_trim_length` characters, additional trimming
             of the short name is performed. This reduces the produced short name length.
             There is no guarantee the end result will not exceed `extra_trim_length`.
+        _outer : bool (default=True)
+            For internal use only. Specifies if the function is called recursively.
 
         Returns
         -------
@@ -129,18 +136,49 @@ class SklearnExtension(Extension):
                 string, removals = re.subn(r"\([^()]*\)", "", string)
             return string
 
-        name = long_name
-        if 'sklearn.model_selection' in name and not name.startswith('sklearn.model_selection'):
-            raise ValueError("Model Selection is not outer scope. "
-                             "This is unexpected, create a new issue with the flow id.")
+        # Generally, we want to trim all hyperparameters, the exception to that is for model
+        # selection, as the `estimator` hyperparameter is very indicative of what is in the flow.
+        # So we first trim pipeline names of the `estimator` parameter. For reference:
+        # sklearn.pipeline.Pipeline(Imputer=sklearn.preprocessing.imputation.Imputer,
+        # VarianceThreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,
+        # Estimator=sklearn.model_selection._search.RandomizedSearchCV(estimator=
+        # sklearn.tree.tree.DecisionTreeClassifier))
+        if 'sklearn.model_selection' in long_name:
+            start_index = long_name.index('sklearn.model_selection')
+            estimator_start = (start_index
+                               + long_name[start_index:].index('estimator=')
+                               + len('estimator='))
+
+            model_select_boilerplate = long_name[start_index:estimator_start]
+            # above is .g. "sklearn.model_selection._search.RandomizedSearchCV(estimator="
+            model_selection_class = model_select_boilerplate.split('(')[0].split('.')[-1]
+
+            # Now we want to also find and parse the `estimator`, for this we find the closing
+            # parenthesis to the model selection technique:
+            closing_parenthesis_expected = 1
+            for i, char in enumerate(long_name[estimator_start:], start=estimator_start):
+                if char == '(':
+                    closing_parenthesis_expected += 1
+                if char == ')':
+                    closing_parenthesis_expected -= 1
+                if closing_parenthesis_expected == 0:
+                    break
+
+            model_select_pipeline = long_name[estimator_start:i]
+            trimmed_pipeline = cls.trim_flow_name(model_select_pipeline, _outer=False)
+            _, trimmed_pipeline = trimmed_pipeline.split('.', maxsplit=1)  # trim module prefix
+            model_select_short = "sklearn.{}[{}]".format(model_selection_class, trimmed_pipeline)
+            name = long_name[:start_index] + model_select_short + long_name[i+1:]
+        else:
+            name = long_name
 
         module_name = long_name.split('.')[0]
         short_name = module_name + '.{}'
 
-        if name.startswith('sklearn.model_selection'):
-            model_selection = name.split('(')[0].split('.')[-1]
-            name = name[:-1].split('estimator=', maxsplit=1)[-1]
-            short_name = short_name.format("{}({{}})".format(model_selection))
+        # if name.startswith('sklearn.model_selection'):
+        #    model_selection = name.split('(')[0].split('.')[-1]
+        #    name = name[:-1].split('estimator=', maxsplit=1)[-1]
+        #     short_name = short_name.format("{}({{}})".format(model_selection))
 
         if name.startswith('sklearn.pipeline'):
             _, pipeline = name[:-1].split('(', maxsplit=1)
@@ -149,7 +187,7 @@ class SklearnExtension(Extension):
             pipeline = remove_all_in_parentheses(pipeline)
 
             # then the pipeline steps are formatted e.g.:
-            # stepname=sklearn.submodule.ClassName,step2name=...
+            # step1=sklearn.submodule.ClassName,...
             components = [component.split('.')[-1] for component in pipeline.split(',')]
             pipeline = "Pipeline({})".format(','.join(components))
             if len(short_name.format(pipeline)) > extra_trim_length:
@@ -157,6 +195,13 @@ class SklearnExtension(Extension):
         else:
             # Just a simple component: e.g. sklearn.tree.DecisionTreeClassifier
             pipeline = remove_all_in_parentheses(name).split('.')[-1]
+
+        if not _outer:
+            # Anything from parenthesis in inner calls should not be culled, so we use brackets
+            pipeline = pipeline.replace('(', '[').replace(')', ']')
+        else:
+            # Square brackets may be introduced with nested model_selection
+            pipeline = pipeline.replace('[', '(').replace(']', ')')
 
         return short_name.format(pipeline)
 
