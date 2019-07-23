@@ -1220,7 +1220,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
     # Test methods for performing runs with this extension module
 
     def test_run_model_on_task(self):
-        class MyDummy(sklearn.dummy.DummyClassifier()):
+        class MyDummy(sklearn.dummy.DummyClassifier):
             pass
         task = openml.tasks.get_task(1)
         openml.runs.run_model_on_task(MyDummy(), task)
