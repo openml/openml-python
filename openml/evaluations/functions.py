@@ -288,7 +288,7 @@ def list_evaluations_setups(
 
     output_format: str, optional (default='object')
         The parameter decides the format of the output.
-        - If 'object' the output is a dict of OpenMLEvaluation objects
+
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
 
@@ -325,4 +325,4 @@ def list_evaluations_setups(
     if output_format == 'dataframe':
         return df
     else:
-        return df.to_dict()
+        return df.to_dict(orient='index')
