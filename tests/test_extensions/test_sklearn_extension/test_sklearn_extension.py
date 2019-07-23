@@ -1223,7 +1223,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         class MyDummy(sklearn.dummy.DummyClassifier()):
             pass
         task = openml.tasks.get_task(1)
-        run = openml.runs.run_model_on_task(MyLR(), task)
+        openml.runs.run_model_on_task(MyDymmy(), task)
 
     def test_seed_model(self):
         # randomized models that are initialized without seeds, can be seeded
