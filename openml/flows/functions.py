@@ -362,7 +362,8 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                                      'argument2, but not in argument1.' % name)
                 assert_flows_equal(attr1[name], attr2[name],
                                    ignore_parameter_values_on_older_children,
-                                   ignore_parameter_values)
+                                   ignore_parameter_values,
+                                   ignore_custom_name_if_none)
         elif key == '_extension':
             continue
         else:
