@@ -211,8 +211,8 @@ def __list_evaluations(api_call, output_format='object'):
                              'array_data': array_data}
 
     if output_format == 'dataframe':
-        data, index = list(evals.values()), list(evals.keys())
-        evals = pd.DataFrame(data, index=index)
+       rows = [value for key, value in evals.items()]
+    evals = (pd.DataFrame.from_records(rows, columns=rows[0].keys()))
     return evals
 
 

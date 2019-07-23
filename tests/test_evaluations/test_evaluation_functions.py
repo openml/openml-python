@@ -146,7 +146,7 @@ class TestEvaluationFunctions(TestBase):
     def test_list_evaluations_setups_filter_flow(self):
         openml.config.server = self.production_server
         flow_id = 405
-        size = 10
+        size = 100
         evals_setups = openml.evaluations.list_evaluations_setups("predictive_accuracy",
                                                                   flow=[flow_id], size=size,
                                                                   sort_order='desc',
@@ -158,6 +158,9 @@ class TestEvaluationFunctions(TestBase):
 
         # Check if list is non-empty
         self.assertGreater(len(evals_setups), 0)
+        # Check if output from sort is sorted in the right order
+        self.assertTrue(sorted(list(evals_setups['value'].values), reverse=True)
+                        == list(evals_setups['value'].values))
         # Check if output and order of list_evaluations is preserved
         self.assertTrue((evals_setups['run_id'].values == evals['run_id'].values).all())
         # Check if the hyper-parameter column is as accurate and flow_id
@@ -170,7 +173,7 @@ class TestEvaluationFunctions(TestBase):
     def test_list_evaluations_setups_filter_task(self):
         openml.config.server = self.production_server
         task_id = 6
-        size = 20
+        size = 100
         evals_setups = openml.evaluations.list_evaluations_setups("predictive_accuracy",
                                                                   task=[task_id], size=size,
                                                                   sort_order='desc',
@@ -182,6 +185,9 @@ class TestEvaluationFunctions(TestBase):
 
         # Check if list is non-empty
         self.assertGreater(len(evals_setups), 0)
+        # Check if output from sort is sorted in the right order
+        self.assertTrue(sorted(list(evals_setups['value'].values), reverse=True)
+                        == list(evals_setups['value'].values))
         # Check if output and order of list_evaluations is preserved
         self.assertTrue((evals_setups['run_id'].values == evals['run_id'].values).all())
         # Check if the hyper-parameter column is as accurate and task_id
