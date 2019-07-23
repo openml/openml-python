@@ -212,7 +212,7 @@ def __list_evaluations(api_call, output_format='object'):
 
     if output_format == 'dataframe':
         rows = [value for key, value in evals.items()]
-    evals = (pd.DataFrame.from_records(rows, columns=rows[0].keys()))
+        evals = (pd.DataFrame.from_records(rows, columns=rows[0].keys()))
     return evals
 
 
