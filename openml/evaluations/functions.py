@@ -305,7 +305,7 @@ def list_evaluations_setups(
     # List setups
     # Split setups in evals into chunks of N setups as list_setups does not support large size
     df = pd.DataFrame()
-    if not evals.empty:
+    if len(evals) != 0:
         N = 100
         setup_chunks = np.split(evals['setup_id'].unique(),
                                 ((len(evals['setup_id'].unique()) - 1) // N) + 1)
