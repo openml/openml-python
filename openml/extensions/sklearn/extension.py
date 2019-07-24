@@ -175,11 +175,6 @@ class SklearnExtension(Extension):
         module_name = long_name.split('.')[0]
         short_name = module_name + '.{}'
 
-        # if name.startswith('sklearn.model_selection'):
-        #    model_selection = name.split('(')[0].split('.')[-1]
-        #    name = name[:-1].split('estimator=', maxsplit=1)[-1]
-        #     short_name = short_name.format("{}({{}})".format(model_selection))
-
         if name.startswith('sklearn.pipeline'):
             _, pipeline = name[:-1].split('(', maxsplit=1)
             # We don't want nested pipelines in the short name, so we trim all complicated
@@ -187,7 +182,7 @@ class SklearnExtension(Extension):
             pipeline = remove_all_in_parentheses(pipeline)
 
             # then the pipeline steps are formatted e.g.:
-            # step1=sklearn.submodule.ClassName,...
+            # step1name=sklearn.submodule.ClassName,step2name...
             components = [component.split('.')[-1] for component in pipeline.split(',')]
             pipeline = "Pipeline({})".format(','.join(components))
             if len(short_name.format(pipeline)) > extra_trim_length:
