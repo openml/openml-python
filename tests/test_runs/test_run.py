@@ -7,8 +7,8 @@ from sklearn.dummy import DummyClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import Imputer
 
+from openml._backport import SimpleImputer
 from openml.testing import TestBase
 import openml
 import openml.extensions.sklearn
@@ -106,7 +106,7 @@ class TestRun(TestBase):
     def test_to_from_filesystem_vanilla(self):
 
         model = Pipeline([
-            ('imputer', Imputer(strategy='mean')),
+            ('imputer', SimpleImputer(strategy='mean')),
             ('classifier', DecisionTreeClassifier(max_depth=1)),
         ])
         task = openml.tasks.get_task(119)
@@ -139,7 +139,7 @@ class TestRun(TestBase):
     def test_to_from_filesystem_search(self):
 
         model = Pipeline([
-            ('imputer', Imputer(strategy='mean')),
+            ('imputer', SimpleImputer(strategy='mean')),
             ('classifier', DecisionTreeClassifier(max_depth=1)),
         ])
         model = GridSearchCV(
@@ -175,7 +175,7 @@ class TestRun(TestBase):
     def test_to_from_filesystem_no_model(self):
 
         model = Pipeline([
-            ('imputer', Imputer(strategy='mean')),
+            ('imputer', SimpleImputer(strategy='mean')),
             ('classifier', DummyClassifier()),
         ])
         task = openml.tasks.get_task(119)
@@ -205,7 +205,7 @@ class TestRun(TestBase):
         extension = openml.extensions.sklearn.SklearnExtension()
 
         model = Pipeline([
-            ('imputer', Imputer(strategy='mean')),
+            ('imputer', SimpleImputer(strategy='mean')),
             ('classifier', DummyClassifier()),
         ])
         task = openml.tasks.get_task(119)

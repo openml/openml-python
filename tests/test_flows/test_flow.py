@@ -19,10 +19,7 @@ import sklearn.preprocessing
 import sklearn.naive_bayes
 import sklearn.tree
 
-if LooseVersion(sklearn.__version__) < "0.20":
-    from sklearn.preprocessing import Imputer
-else:
-    from sklearn.impute import SimpleImputer as Imputer
+from openml._backport import SimpleImputer
 
 import xmltodict
 
@@ -75,6 +72,8 @@ class TestFlow(TestBase):
         self.assertEqual(len(subflow_3.parameters), 11)
         self.assertEqual(subflow_3.parameters['L'], '-1')
         self.assertEqual(len(subflow_3.components), 0)
+
+
 
     def test_get_structure(self):
         # also responsible for testing: flow.get_subflow
@@ -302,8 +301,8 @@ class TestFlow(TestBase):
                                                                 flow.flow_id))
 
         fixture = (
-            "The flow on the server is inconsistent with the local flow. "
-            "The server flow ID is 1. Please check manually and remove "
+            "Flow was not stored correctly on the server. "
+            "New flow ID is 1. Please check manually and remove "
             "the flow if necessary! Error is:\n"
             "'Flow sklearn.ensemble.forest.RandomForestClassifier: "
             "values for attribute 'name' differ: "

@@ -24,11 +24,12 @@ from openml.runs.functions import (
 )
 from openml.runs.trace import OpenMLRunTrace
 from openml.tasks import TaskTypeEnum
+from openml._backport import SimpleImputer
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing.imputation import Imputer
+
 from sklearn.dummy import DummyClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import VarianceThreshold
@@ -550,7 +551,7 @@ class TestRun(TestBase):
             '62501', sentinel=sentinel)
 
     def test_run_and_upload_decision_tree_pipeline(self):
-        pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+        pipeline2 = Pipeline(steps=[('Imputer', SimpleImputer(strategy='median')),
                                     ('VarianceThreshold', VarianceThreshold()),
                                     ('Estimator', RandomizedSearchCV(
                                         DecisionTreeClassifier(),
@@ -657,7 +658,7 @@ class TestRun(TestBase):
         num_folds = 10
         num_samples = 8
 
-        pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+        pipeline2 = Pipeline(steps=[('Imputer', SimpleImputer(strategy='median')),
                                     ('VarianceThreshold', VarianceThreshold()),
                                     ('Estimator', RandomizedSearchCV(
                                         DecisionTreeClassifier(),
@@ -734,7 +735,7 @@ class TestRun(TestBase):
     def test_local_run_swapped_parameter_order_model(self):
 
         # construct sci-kit learn classifier
-        clf = Pipeline(steps=[('imputer', Imputer(strategy='median')),
+        clf = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
                               ('estimator', RandomForestClassifier())])
 
         # download task
@@ -752,7 +753,7 @@ class TestRun(TestBase):
     def test_local_run_swapped_parameter_order_flow(self):
 
         # construct sci-kit learn classifier
-        clf = Pipeline(steps=[('imputer', Imputer(strategy='median')),
+        clf = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
                               ('estimator', RandomForestClassifier())])
 
         flow = self.extension.model_to_flow(clf)
@@ -771,7 +772,7 @@ class TestRun(TestBase):
     def test_local_run_metric_score(self):
 
         # construct sci-kit learn classifier
-        clf = Pipeline(steps=[('imputer', Imputer(strategy='median')),
+        clf = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
                               ('estimator', RandomForestClassifier())])
 
         # download task
@@ -798,7 +799,7 @@ class TestRun(TestBase):
 
     def test_initialize_model_from_run(self):
         clf = sklearn.pipeline.Pipeline(steps=[
-            ('Imputer', Imputer(strategy='median')),
+            ('Imputer', SimpleImputer(strategy='median')),
             ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
             ('Estimator', GaussianNB())])
         task = openml.tasks.get_task(11)
@@ -882,12 +883,12 @@ class TestRun(TestBase):
         rs = 1
         clfs = [
             sklearn.pipeline.Pipeline(steps=[
-                ('Imputer', Imputer(strategy='mean')),
+                ('Imputer', SimpleImputer(strategy='mean')),
                 ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
                 ('Estimator', DecisionTreeClassifier(max_depth=4))
             ]),
             sklearn.pipeline.Pipeline(steps=[
-                ('Imputer', Imputer(strategy='most_frequent')),
+                ('Imputer', SimpleImputer(strategy='most_frequent')),
                 ('VarianceThreshold', VarianceThreshold(threshold=0.1)),
                 ('Estimator', DecisionTreeClassifier(max_depth=4))]
             )
@@ -1251,7 +1252,7 @@ class TestRun(TestBase):
         flow.name = 'dummy'
         task = openml.tasks.get_task(2)
 
-        model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+        model = Pipeline(steps=[('Imputer', SimpleImputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
         data_content, _, _, _ = _run_task_get_arffcontent(

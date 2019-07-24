@@ -27,10 +27,6 @@ import sklearn.preprocessing
 import sklearn.tree
 import sklearn.cluster
 
-if LooseVersion(sklearn.__version__) < "0.20":
-    from sklearn.preprocessing import Imputer
-else:
-    from sklearn.impute import SimpleImputer as Imputer
 
 import openml
 from openml.extensions.sklearn import SklearnExtension
@@ -39,6 +35,7 @@ from openml.flows import OpenMLFlow
 from openml.flows.functions import assert_flows_equal
 from openml.runs.trace import OpenMLRunTrace
 from openml.testing import TestBase
+from openml._backport import SimpleImputer
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(this_directory)
@@ -941,7 +938,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
     def test_illegal_parameter_names_pipeline(self):
         # illegal name: steps
         steps = [
-            ('Imputer', Imputer(strategy='median')),
+            ('Imputer', SimpleImputer(strategy='median')),
             ('OneHotEncoder',
              sklearn.preprocessing.OneHotEncoder(sparse=False,
                                                  handle_unknown='ignore')),
@@ -954,7 +951,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # illegal name: transformer_list
         transformer_list = [
             ('transformer_list',
-             Imputer(strategy='median')),
+             SimpleImputer(strategy='median')),
             ('OneHotEncoder',
              sklearn.preprocessing.OneHotEncoder(sparse=False,
                                                  handle_unknown='ignore'))
@@ -1045,7 +1042,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # used the 'initialize_with_defaults' flag of the deserialization
         # method to return a flow that contains default hyperparameter
         # settings.
-        steps = [('Imputer', Imputer()),
+        steps = [('Imputer', SimpleImputer()),
                  ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
                  ('Estimator', sklearn.tree.DecisionTreeClassifier())]
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
@@ -1069,7 +1066,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # used the 'initialize_with_defaults' flag of the deserialization
         # method to return a flow that contains default hyperparameter
         # settings.
-        steps = [('Imputer', Imputer()),
+        steps = [('Imputer', SimpleImputer()),
                  ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
                  ('Estimator', sklearn.ensemble.AdaBoostClassifier(
                      sklearn.tree.DecisionTreeClassifier()))]
@@ -1095,7 +1092,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # method to return a flow that contains default hyperparameter
         # settings.
         steps = [
-            ('Imputer', Imputer()),
+            ('Imputer', SimpleImputer()),
             ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
             (
                 'Estimator',
@@ -1299,7 +1296,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y[test_indices]
 
         pipeline = sklearn.pipeline.Pipeline(steps=[
-            ('imp', sklearn.preprocessing.Imputer()),
+            ('imp',  SimpleImputer()),
             ('clf', sklearn.tree.DecisionTreeClassifier()),
         ])
         # TODO add some mocking here to actually test the innards of this function, too!
@@ -1425,11 +1422,11 @@ class TestSklearnExtensionRunFunctions(TestBase):
             y_train = y[train_indices]
             X_test = X[test_indices]
             clf1 = sklearn.pipeline.Pipeline(steps=[
-                ('imputer', sklearn.preprocessing.Imputer()),
+                ('imputer',  SimpleImputer()),
                 ('estimator', sklearn.naive_bayes.GaussianNB())
             ])
             clf2 = sklearn.pipeline.Pipeline(steps=[
-                ('imputer', sklearn.preprocessing.Imputer()),
+                ('imputer',  SimpleImputer()),
                 ('estimator', HardNaiveBayes())
             ])
 
@@ -1482,7 +1479,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y[test_indices]
 
         pipeline = sklearn.pipeline.Pipeline(steps=[
-            ('imp', sklearn.preprocessing.Imputer()),
+            ('imp',  SimpleImputer()),
             ('clf', sklearn.tree.DecisionTreeRegressor()),
         ])
         # TODO add some mocking here to actually test the innards of this function, too!
@@ -1527,7 +1524,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         X = task.get_X(dataset_format='array')
 
         pipeline = sklearn.pipeline.Pipeline(steps=[
-            ('imp', sklearn.preprocessing.Imputer()),
+            ('imp',  SimpleImputer()),
             ('clf', sklearn.cluster.KMeans()),
         ])
         # TODO add some mocking here to actually test the innards of this function, too!
@@ -1616,7 +1613,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         long = """sklearn.pipeline.Pipeline(
                     columntransformer=sklearn.compose._column_transformer.ColumnTransformer(
                         numeric=sklearn.pipeline.Pipeline(
-                            imputer=sklearn.preprocessing.imputation.Imputer,
+                            SimpleImputer=sklearn.preprocessing.imputation.Imputer,
                             standardscaler=sklearn.preprocessing.data.StandardScaler),
                         nominal=sklearn.pipeline.Pipeline(
                             simpleimputer=sklearn.impute.SimpleImputer,
@@ -1640,7 +1637,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
 
         long = """sklearn.pipeline.Pipeline(
-                    Imputer=sklearn.preprocessing.imputation.Imputer,
+                    SimpleImputer=sklearn.preprocessing.imputation.Imputer,
                     VarianceThreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold, # noqa: E501
                     Estimator=sklearn.model_selection._search.RandomizedSearchCV(
                         estimator=sklearn.tree.tree.DecisionTreeClassifier))"""
@@ -1650,7 +1647,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
         long = """sklearn.model_selection._search.RandomizedSearchCV(
                     estimator=sklearn.pipeline.Pipeline(
-                        Imputer=sklearn.preprocessing.imputation.Imputer,
+                        SimpleImputer=sklearn.preprocessing.imputation.Imputer,
                         classifier=sklearn.ensemble.forest.RandomForestClassifier))"""
         short = "sklearn.RandomizedSearchCV(Pipeline(Imputer,RandomForestClassifier))"
         long_stripped, _ = re.subn(r'\s', '', long)
