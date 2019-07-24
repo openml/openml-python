@@ -113,19 +113,25 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>.assert_flows_equal<a class="headerlink" href="#openml-flows-assert-flows-equal" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.flows.assert_flows_equal">
-<code class="sig-prename descclassname">openml.flows.</code><code class="sig-name descname">assert_flows_equal</code><span class="sig-paren">(</span><em class="sig-param">flow1: openml.flows.flow.OpenMLFlow</em>, <em class="sig-param">flow2: openml.flows.flow.OpenMLFlow</em>, <em class="sig-param">ignore_parameter_values_on_older_children: str = None</em>, <em class="sig-param">ignore_parameter_values: bool = False</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#openml.flows.assert_flows_equal" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openml.flows.</code><code class="sig-name descname">assert_flows_equal</code><span class="sig-paren">(</span><em class="sig-param">flow1: openml.flows.flow.OpenMLFlow</em>, <em class="sig-param">flow2: openml.flows.flow.OpenMLFlow</em>, <em class="sig-param">ignore_parameter_values_on_older_children: str = None</em>, <em class="sig-param">ignore_parameter_values: bool = False</em>, <em class="sig-param">ignore_custom_name_if_none: bool = False</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#openml.flows.assert_flows_equal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check equality of two flows.</p>
-<p>Two flows are equal if their all keys which are not set by the server
+<blockquote>
+<div><p>Two flows are equal if their all keys which are not set by the server
 are equal, as well as all their parameters and components.</p>
-<dl class="field-list simple">
+</div></blockquote>
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>flow1</strong><span class="classifier">OpenMLFlow</span></dt><dd></dd>
-<dt><strong>flow2</strong><span class="classifier">OpenMLFlow</span></dt><dd></dd>
-<dt><strong>ignore_parameter_values_on_older_children</strong><span class="classifier">str (optional)</span></dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">OpenMLFlow.upload_date</span></code>, ignores parameters in a child
+<dd class="field-odd"><dl>
+<dt><strong>flow1</strong><span class="classifier">OpenMLFlow</span></dt><dd><p>flow2 : OpenMLFlow</p>
+<dl class="simple">
+<dt>ignore_parameter_values_on_older_children<span class="classifier">str (optional)</span></dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">OpenMLFlow.upload_date</span></code>, ignores parameters in a child
 flow if it’s upload date predates the upload date of the parent flow.</p>
 </dd>
-<dt><strong>ignore_parameter_values</strong><span class="classifier">bool</span></dt><dd><p>Whether to ignore parameter values when comparing flows.</p>
+<dt>ignore_parameter_values<span class="classifier">bool</span></dt><dd><p>Whether to ignore parameter values when comparing flows.</p>
+</dd>
+</dl>
+</dd>
+<dt><strong>ignore_custom_name_if_none</strong><span class="classifier">bool</span></dt><dd><p>Whether to ignore the custom name field if either flow has <cite>custom_name</cite> equal to <cite>None</cite>.</p>
 </dd>
 </dl>
 </dd>
