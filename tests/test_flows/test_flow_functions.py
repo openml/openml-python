@@ -283,8 +283,11 @@ class TestFlowFunctions(TestBase):
                                flow_id=10,
                                reinstantiate=True)
 
-    def test_get_flow_reinstantiate_model_wrong_version_0_20(self):
+    @unittest.skipIf(LooseVersion(sklearn.__version__) == "0.19.2",
+                     reason="Can't retrieve desired 0.20 run, "
+                            "see https://github.com/openml/OpenML/issues/992")
+    def test_get_flow_reinstantiate_model_wrong_version(self):
         openml.config.server = self.production_server
         _, sklearn_major, _ = LooseVersion(sklearn.__version__).version
-        flow = 8784 if sklearn_major != 20 else 8175
+        flow = 8175 if sklearn_major != 19 else 8784
         self.assertRaises(ValueError, openml.flows.get_flow, flow_id=flow, reinstantiate=True)
