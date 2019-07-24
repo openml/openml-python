@@ -1656,5 +1656,16 @@ class TestSklearnExtensionRunFunctions(TestBase):
         long_stripped, _ = re.subn(r'\s', '', long)
         self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
 
+        long = """sklearn.pipeline.FeatureUnion(
+                    pca=sklearn.decomposition.pca.PCA,
+                    svd=sklearn.decomposition.truncated_svd.TruncatedSVD)"""
+        short = "sklearn.FeatureUnion(PCA,TruncatedSVD)"
+        long_stripped, _ = re.subn(r'\s', '', long)
+        self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
+
+        long = "sklearn.ensemble.forest.RandomForestClassifier"
+        short = "sklearn.RandomForestClassifier"
+        self.assertEqual(short, SklearnExtension.trim_flow_name(long))
+
         self.assertEqual("weka.IsolationForest",
                          SklearnExtension.trim_flow_name("weka.IsolationForest"))

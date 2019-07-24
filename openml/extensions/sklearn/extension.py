@@ -138,7 +138,9 @@ class SklearnExtension(Extension):
 
         # Generally, we want to trim all hyperparameters, the exception to that is for model
         # selection, as the `estimator` hyperparameter is very indicative of what is in the flow.
-        # So we first trim pipeline names of the `estimator` parameter. For reference:
+        # So we first trim name of the `estimator` specified in mode selection. For reference, in
+        # the example below, we want to trim `sklearn.tree.tree.DecisionTreeClassifier`, and
+        # keep it in the final trimmed flow name:
         # sklearn.pipeline.Pipeline(Imputer=sklearn.preprocessing.imputation.Imputer,
         # VarianceThreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,
         # Estimator=sklearn.model_selection._search.RandomizedSearchCV(estimator=
@@ -176,7 +178,8 @@ class SklearnExtension(Extension):
         short_name = module_name + '.{}'
 
         if name.startswith('sklearn.pipeline'):
-            _, pipeline = name[:-1].split('(', maxsplit=1)
+            full_pipeline_class, pipeline = name[:-1].split('(', maxsplit=1)
+            pipeline_class = full_pipeline_class.split('.')[-1]
             # We don't want nested pipelines in the short name, so we trim all complicated
             # subcomponents, i.e. those with parentheses:
             pipeline = remove_all_in_parentheses(pipeline)
@@ -184,9 +187,9 @@ class SklearnExtension(Extension):
             # then the pipeline steps are formatted e.g.:
             # step1name=sklearn.submodule.ClassName,step2name...
             components = [component.split('.')[-1] for component in pipeline.split(',')]
-            pipeline = "Pipeline({})".format(','.join(components))
+            pipeline = "{}({})".format(pipeline_class, ','.join(components))
             if len(short_name.format(pipeline)) > extra_trim_length:
-                pipeline = "Pipeline(...,{})".format(components[-1])
+                pipeline = "{}(...,{})".format(pipeline_class, components[-1])
         else:
             # Just a simple component: e.g. sklearn.tree.DecisionTreeClassifier
             pipeline = remove_all_in_parentheses(name).split('.')[-1]

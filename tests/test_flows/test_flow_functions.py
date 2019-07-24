@@ -283,11 +283,16 @@ class TestFlowFunctions(TestBase):
                                flow_id=10,
                                reinstantiate=True)
 
-    @unittest.skipIf(LooseVersion(sklearn.__version__) == "0.19.2",
-                     reason="Can't retrieve desired 0.20 run, "
-                            "see https://github.com/openml/OpenML/issues/992")
+    @unittest.skipIf(LooseVersion(sklearn.__version__) == "0.19.1",
+                     reason="Target flow is from sklearn 0.19.1")
     def test_get_flow_reinstantiate_model_wrong_version(self):
+        # Note that CI does not test against 0.19.1.
         openml.config.server = self.production_server
         _, sklearn_major, _ = LooseVersion(sklearn.__version__).version
-        flow = 8175 if sklearn_major != 19 else 8784
-        self.assertRaises(ValueError, openml.flows.get_flow, flow_id=flow, reinstantiate=True)
+        flow = 8175
+        expected = 'Trying to deserialize a model with dependency sklearn==0.19.1 not satisfied.'
+        self.assertRaisesRegex(ValueError,
+                               expected,
+                               openml.flows.get_flow,
+                               flow_id=flow,
+                               reinstantiate=True)
