@@ -1,5 +1,6 @@
 import collections
 import json
+import re
 import os
 import sys
 import unittest
@@ -825,7 +826,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         with self.assertRaisesRegex(
             TypeError,
-            r".*OpenMLFlow.*is not JSON serializable",
+                re.compile(r".*OpenMLFlow.*is not JSON serializable",
+                           flags=re.DOTALL)
         ):
             self.extension.model_to_flow(clf)
 
