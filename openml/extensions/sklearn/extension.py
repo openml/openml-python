@@ -323,7 +323,8 @@ class SklearnExtension(Extension):
                         rval = (step_name, component, value['argument_1'])
                 elif serialized_type == 'cv_object':
                     rval = self._deserialize_cross_validator(
-                        value, recursion_depth=recursion_depth
+                        value, recursion_depth=recursion_depth,
+                        strict_version=strict_version
                     )
                 else:
                     raise ValueError('Cannot flow_to_sklearn %s' % serialized_type)
@@ -1013,6 +1014,7 @@ class SklearnExtension(Extension):
         self,
         value: 'OrderedDict[str, Any]',
         recursion_depth: int,
+        strict_version: Optional[bool] = True
     ) -> Any:
         model_name = value['name']
         parameters = value['parameters']
@@ -1024,6 +1026,7 @@ class SklearnExtension(Extension):
             parameters[parameter] = self._deserialize_sklearn(
                 parameters[parameter],
                 recursion_depth=recursion_depth + 1,
+                strict_version=strict_version
             )
         return model_class(**parameters)
 
