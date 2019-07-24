@@ -90,7 +90,9 @@ class SklearnExtension(Extension):
     ################################################################################################
     # Methods for flow serialization and de-serialization
 
-    def flow_to_model(self, flow: 'OpenMLFlow', initialize_with_defaults: bool = False) -> Any:
+    def flow_to_model(self, flow: 'OpenMLFlow',
+                      initialize_with_defaults: bool = False,
+                      strict_version: Optional[bool] = True) -> Any:
         """Initializes a sklearn model based on a flow.
 
         Parameters
@@ -103,11 +105,16 @@ class SklearnExtension(Extension):
             If this flag is set, the hyperparameter values of flows will be
             ignored and a flow with its defaults is returned.
 
+        strict_version : bool, default=True
+            Whether to fail if version requirements are not fulfilled.
+
         Returns
         -------
         mixed
         """
-        return self._deserialize_sklearn(flow, initialize_with_defaults=initialize_with_defaults)
+        return self._deserialize_sklearn(
+            flow, initialize_with_defaults=initialize_with_defaults,
+            strict_version=strict_version)
 
     def _deserialize_sklearn(
         self,
@@ -115,6 +122,7 @@ class SklearnExtension(Extension):
         components: Optional[Dict] = None,
         initialize_with_defaults: bool = False,
         recursion_depth: int = 0,
+        strict_version: Optional[bool] = True
     ) -> Any:
         """Recursive function to deserialize a scikit-learn flow.
 
@@ -137,6 +145,9 @@ class SklearnExtension(Extension):
         recursion_depth : int
             The depth at which this flow is called, mostly for debugging
             purposes
+
+        strict_version : bool, default=True
+            Whether to fail if version requirements are not fulfilled.
 
         Returns
         -------
@@ -238,6 +249,7 @@ class SklearnExtension(Extension):
                 flow=o,
                 keep_defaults=initialize_with_defaults,
                 recursion_depth=recursion_depth,
+                strict_version=strict_version
             )
         else:
             raise TypeError(o)
@@ -657,10 +669,12 @@ class SklearnExtension(Extension):
         flow: OpenMLFlow,
         keep_defaults: bool,
         recursion_depth: int,
+        strict_version: Optional[bool] = True
     ) -> Any:
         logging.info('-%s deserialize %s' % ('-' * recursion_depth, flow.name))
         model_name = flow.class_name
-        self._check_dependencies(flow.dependencies)
+        self._check_dependencies(flow.dependencies,
+                                 strict_version=strict_version)
 
         parameters = flow.parameters
         components = flow.components
@@ -721,7 +735,8 @@ class SklearnExtension(Extension):
                     del parameter_dict[param]
         return model_class(**parameter_dict)
 
-    def _check_dependencies(self, dependencies: str) -> None:
+    def _check_dependencies(self, dependencies: str,
+                            strict_version: Optional[bool] = True) -> None:
         if not dependencies:
             return
 
@@ -749,9 +764,13 @@ class SklearnExtension(Extension):
             else:
                 raise NotImplementedError(
                     'operation \'%s\' is not supported' % operation)
+            message = ('Trying to deserialize a model with dependency '
+                       '%s not satisfied.' % dependency_string)
             if not check:
-                warnings.warn('Trying to deserialize a model with dependency '
-                              '%s not satisfied.' % dependency_string)
+                if strict_version:
+                    raise ValueError(message)
+                else:
+                    warnings.warn(message)
 
     def _serialize_type(self, o: Any) -> 'OrderedDict[str, str]':
         mapping = {float: 'float',

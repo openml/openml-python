@@ -289,3 +289,5 @@ class TestFlowFunctions(TestBase):
         # 20 is scikit-learn ==0.20.0
         # I can't find a != 0.20 permanent flow on the test server.
         self.assertRaises(ValueError, openml.flows.get_flow, flow_id=20, reinstantiate=True)
+        openml.flows.get_flow(flow_id=20, reinstantiate=True,
+                              strict_version=False)
