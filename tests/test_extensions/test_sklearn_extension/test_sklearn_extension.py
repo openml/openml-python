@@ -1644,7 +1644,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
                     VarianceThreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold, # noqa: E501
                     Estimator=sklearn.model_selection._search.RandomizedSearchCV(
                         estimator=sklearn.tree.tree.DecisionTreeClassifier))"""
-        short = "sklearn.Pipeline(Imputer,VarianceThreshold,RandomizedSearchCV(DecisionTreeClassifier))"
+        short = "sklearn.Pipeline(Imputer,VarianceThreshold,RandomizedSearchCV(DecisionTreeClassifier))"  # noqa: E501
         long_stripped, _ = re.subn(r'\s', '', long)
         self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
 

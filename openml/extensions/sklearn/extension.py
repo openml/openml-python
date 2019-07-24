@@ -168,7 +168,7 @@ class SklearnExtension(Extension):
             trimmed_pipeline = cls.trim_flow_name(model_select_pipeline, _outer=False)
             _, trimmed_pipeline = trimmed_pipeline.split('.', maxsplit=1)  # trim module prefix
             model_select_short = "sklearn.{}[{}]".format(model_selection_class, trimmed_pipeline)
-            name = long_name[:start_index] + model_select_short + long_name[i+1:]
+            name = long_name[:start_index] + model_select_short + long_name[i + 1:]
         else:
             name = long_name
 
