@@ -301,13 +301,15 @@ class SklearnExtension(Extension):
                     rval = self._deserialize_function(value)
                 elif serialized_type == 'component_reference':
                     assert components is not None  # Necessary for mypy
-                    value = self._deserialize_sklearn(value, recursion_depth=depth_pp)
+                    value = self._deserialize_sklearn(value, recursion_depth=depth_pp,
+                                                      strict_version=strict_version)
                     step_name = value['step_name']
                     key = value['key']
                     component = self._deserialize_sklearn(
                         components[key],
                         initialize_with_defaults=initialize_with_defaults,
-                        recursion_depth=depth_pp
+                        recursion_depth=depth_pp,
+                        strict_version=strict_version
                     )
                     # The component is now added to where it should be used
                     # later. It should not be passed to the constructor of the
@@ -334,12 +336,14 @@ class SklearnExtension(Extension):
                             components=components,
                             initialize_with_defaults=initialize_with_defaults,
                             recursion_depth=depth_pp,
+                            strict_version=strict_version
                         ),
                         self._deserialize_sklearn(
                             o=value,
                             components=components,
                             initialize_with_defaults=initialize_with_defaults,
                             recursion_depth=depth_pp,
+                            strict_version=strict_version
                         )
                     )
                     for key, value in sorted(o.items())
@@ -351,6 +355,7 @@ class SklearnExtension(Extension):
                     components=components,
                     initialize_with_defaults=initialize_with_defaults,
                     recursion_depth=depth_pp,
+                    strict_version=strict_version
                 )
                 for element in o
             ]
@@ -814,6 +819,7 @@ class SklearnExtension(Extension):
                 components=components_,
                 initialize_with_defaults=keep_defaults,
                 recursion_depth=recursion_depth + 1,
+                strict_version=strict_version,
             )
             parameter_dict[name] = rval
 
@@ -828,6 +834,7 @@ class SklearnExtension(Extension):
             rval = self._deserialize_sklearn(
                 value,
                 recursion_depth=recursion_depth + 1,
+                strict_version=strict_version
             )
             parameter_dict[name] = rval
 
