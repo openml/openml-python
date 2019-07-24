@@ -76,6 +76,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                                                         max_leaf_nodes=2000)
 
             fixture_name = 'sklearn.tree.tree.DecisionTreeClassifier'
+            fixture_short_name = 'sklearn.DecisionTreeClassifier'
             fixture_description = 'Automatically created scikit-learn flow.'
             version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
                               % sklearn.__version__
@@ -117,6 +118,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
             self.assertEqual(serialization.name, fixture_name)
             self.assertEqual(serialization.class_name, fixture_name)
+            self.assertEqual(serialization.custom_name, fixture_short_name)
             self.assertEqual(serialization.description, fixture_description)
             self.assertEqual(serialization.parameters, fixture_parameters)
             self.assertEqual(serialization.dependencies, version_fixture)
@@ -142,6 +144,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             model = sklearn.cluster.KMeans()
 
             fixture_name = 'sklearn.cluster.k_means_.KMeans'
+            fixture_short_name = 'sklearn.KMeans'
             fixture_description = 'Automatically created scikit-learn flow.'
             version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
                               % sklearn.__version__
@@ -179,6 +182,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
             self.assertEqual(serialization.name, fixture_name)
             self.assertEqual(serialization.class_name, fixture_name)
+            self.assertEqual(serialization.custom_name, fixture_short_name)
             self.assertEqual(serialization.description, fixture_description)
             self.assertEqual(serialization.parameters, fixture_parameters)
             self.assertEqual(serialization.dependencies, version_fixture)
@@ -204,6 +208,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture_name = 'sklearn.ensemble.weight_boosting.AdaBoostClassifier' \
                        '(base_estimator=sklearn.tree.tree.DecisionTreeClassifier)'
         fixture_class_name = 'sklearn.ensemble.weight_boosting.AdaBoostClassifier'
+        fixture_short_name = 'sklearn.AdaBoostClassifier'
         fixture_description = 'Automatically created scikit-learn flow.'
         fixture_subcomponent_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_subcomponent_class_name = 'sklearn.tree.tree.DecisionTreeClassifier'
@@ -218,6 +223,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.class_name, fixture_class_name)
+        self.assertEqual(serialization.custom_name, fixture_short_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertEqual(serialization.parameters['algorithm'], '"SAMME.R"')
         self.assertIsInstance(serialization.parameters['base_estimator'], str)
@@ -259,6 +265,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture_name = 'sklearn.pipeline.Pipeline(' \
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
                        'dummy=sklearn.dummy.DummyClassifier)'
+        fixture_short_name = 'sklearn.Pipeline(StandardScaler,DummyClassifier)'
         fixture_description = 'Automatically created scikit-learn flow.'
         fixture_structure = {
             fixture_name: [],
@@ -270,6 +277,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
+        self.assertEqual(serialization.custom_name, fixture_short_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertDictEqual(structure, fixture_structure)
 
@@ -343,6 +351,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture_name = 'sklearn.pipeline.Pipeline(' \
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
                        'clusterer=sklearn.cluster.k_means_.KMeans)'
+        fixture_short_name = 'sklearn.Pipeline(StandardScaler,KMeans)'
         fixture_description = 'Automatically created scikit-learn flow.'
         fixture_structure = {
             fixture_name: [],
@@ -354,6 +363,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         structure = serialization.get_structure('name')
 
         self.assertEqual(serialization.name, fixture_name)
+        self.assertEqual(serialization.custom_name, fixture_short_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertDictEqual(structure, fixture_structure)
 
@@ -431,6 +441,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture = 'sklearn.compose._column_transformer.ColumnTransformer(' \
                   'numeric=sklearn.preprocessing.data.StandardScaler,' \
                   'nominal=sklearn.preprocessing._encoders.OneHotEncoder)'
+        fixture_short_name = 'sklearn.ColumnTransformer'
         fixture_description = 'Automatically created scikit-learn flow.'
         fixture_structure = {
             fixture: [],
@@ -441,6 +452,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         serialization = self.extension.model_to_flow(model)
         structure = serialization.get_structure('name')
         self.assertEqual(serialization.name, fixture)
+        self.assertEqual(serialization.custom_name, fixture_short_name)
         self.assertEqual(serialization.description, fixture_description)
         self.assertDictEqual(structure, fixture_structure)
         # del serialization.model
@@ -1598,3 +1610,62 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 self.assertIn(param_in_trace, trace_iteration.parameters)
                 param_value = json.loads(trace_iteration.parameters[param_in_trace])
                 self.assertTrue(param_value in param_grid[param])
+
+    def test_trim_flow_name(self):
+        import re
+        long = """sklearn.pipeline.Pipeline(
+                    columntransformer=sklearn.compose._column_transformer.ColumnTransformer(
+                        numeric=sklearn.pipeline.Pipeline(
+                            imputer=sklearn.preprocessing.imputation.Imputer,
+                            standardscaler=sklearn.preprocessing.data.StandardScaler),
+                        nominal=sklearn.pipeline.Pipeline(
+                            simpleimputer=sklearn.impute.SimpleImputer,
+                            onehotencoder=sklearn.preprocessing._encoders.OneHotEncoder)),
+                    variancethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,
+                    svc=sklearn.svm.classes.SVC)"""
+        short = "sklearn.Pipeline(ColumnTransformer,VarianceThreshold,SVC)"
+        shorter = "sklearn.Pipeline(...,SVC)"
+        long_stripped, _ = re.subn(r'\s', '', long)
+        self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
+        self.assertEqual(shorter,
+                         SklearnExtension.trim_flow_name(long_stripped, extra_trim_length=50))
+
+        long = """sklearn.pipeline.Pipeline(
+                    imputation=openmlstudy14.preprocessing.ConditionalImputer,
+                    hotencoding=sklearn.preprocessing.data.OneHotEncoder,
+                    variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,
+                    classifier=sklearn.ensemble.forest.RandomForestClassifier)"""
+        short = "sklearn.Pipeline(ConditionalImputer,OneHotEncoder,VarianceThreshold,RandomForestClassifier)"  # noqa: E501
+        long_stripped, _ = re.subn(r'\s', '', long)
+        self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
+
+        long = """sklearn.pipeline.Pipeline(
+                    Imputer=sklearn.preprocessing.imputation.Imputer,
+                    VarianceThreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold, # noqa: E501
+                    Estimator=sklearn.model_selection._search.RandomizedSearchCV(
+                        estimator=sklearn.tree.tree.DecisionTreeClassifier))"""
+        short = "sklearn.Pipeline(Imputer,VarianceThreshold,RandomizedSearchCV(DecisionTreeClassifier))"  # noqa: E501
+        long_stripped, _ = re.subn(r'\s', '', long)
+        self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
+
+        long = """sklearn.model_selection._search.RandomizedSearchCV(
+                    estimator=sklearn.pipeline.Pipeline(
+                        Imputer=sklearn.preprocessing.imputation.Imputer,
+                        classifier=sklearn.ensemble.forest.RandomForestClassifier))"""
+        short = "sklearn.RandomizedSearchCV(Pipeline(Imputer,RandomForestClassifier))"
+        long_stripped, _ = re.subn(r'\s', '', long)
+        self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
+
+        long = """sklearn.pipeline.FeatureUnion(
+                    pca=sklearn.decomposition.pca.PCA,
+                    svd=sklearn.decomposition.truncated_svd.TruncatedSVD)"""
+        short = "sklearn.FeatureUnion(PCA,TruncatedSVD)"
+        long_stripped, _ = re.subn(r'\s', '', long)
+        self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
+
+        long = "sklearn.ensemble.forest.RandomForestClassifier"
+        short = "sklearn.RandomForestClassifier"
+        self.assertEqual(short, SklearnExtension.trim_flow_name(long))
+
+        self.assertEqual("weka.IsolationForest",
+                         SklearnExtension.trim_flow_name("weka.IsolationForest"))
