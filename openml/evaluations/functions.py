@@ -212,7 +212,7 @@ def __list_evaluations(api_call, output_format='object'):
 
     if output_format == 'dataframe':
         rows = [value for key, value in evals.items()]
-        evals = (pd.DataFrame.from_records(rows, columns=rows[0].keys()))
+        evals = pd.DataFrame.from_records(rows, columns=rows[0].keys())
     return evals
 
 
@@ -257,8 +257,8 @@ def list_evaluations_setups(
         output_format: str = 'dataframe'
 ) -> Union[Dict, pd.DataFrame]:
     """
-    List all run-evaluation pairs matching all of the given filters.
-    (Supports large amount of results)
+    List all run-evaluation pairs matching all of the given filters
+    and their hyperparameter settings.
 
     Parameters
     ----------
@@ -295,7 +295,7 @@ def list_evaluations_setups(
 
     Returns
     -------
-    dict or dataframe
+    dict or dataframe with hyperparameter settings as a list of tuples.
     """
     # List evaluations
     evals = list_evaluations(function=function, offset=offset, size=size, id=id, task=task,
@@ -303,25 +303,30 @@ def list_evaluations_setups(
                              per_fold=per_fold, sort_order=sort_order, output_format='dataframe')
 
     # List setups
-    # Split setups in evals into chunks of N setups as list_setups does not support long lists
-    N = 100
-    setup_chunks = np.split(evals['setup_id'].unique(),
-                            ((len(evals['setup_id'].unique()) - 1) // N) + 1)
-    setups = pd.DataFrame()
-    for setup in setup_chunks:
-        result = pd.DataFrame(openml.setups.list_setups(setup=setup, output_format='dataframe'))
-        result.drop('flow_id', axis=1, inplace=True)
-        setups = pd.concat([setups, result], ignore_index=True)
-    parameters = []
-    for parameter_dict in setups['parameters']:
-        if parameter_dict is not None:
-            parameters.append([tuple([param['parameter_name'], param['value']])
-                               for param in parameter_dict.values()])
-        else:
-            parameters.append([])
-    setups['parameters'] = parameters
-    # Merge setups with evaluations
-    df = pd.merge(evals, setups, on='setup_id', how='left')
+    # Split setups in evals into chunks of N setups as list_setups does not support large size
+    df = pd.DataFrame()
+    if not evals.empty:
+        N = 100
+        setup_chunks = np.split(evals['setup_id'].unique(),
+                                ((len(evals['setup_id'].unique()) - 1) // N) + 1)
+        setups = pd.DataFrame()
+        for setup in setup_chunks:
+            result = pd.DataFrame(openml.setups.list_setups(setup=setup, output_format='dataframe'))
+            result.drop('flow_id', axis=1, inplace=True)
+            # concat resulting setup chunks into single datframe
+            setups = pd.concat([setups, result], ignore_index=True)
+        parameters = []
+        # Convert parameters of setup into list of tuples of (hyperparameter, value)
+        for parameter_dict in setups['parameters']:
+            if parameter_dict is not None:
+                parameters.append([tuple([param['parameter_name'], param['value']])
+                                   for param in parameter_dict.values()])
+            else:
+                parameters.append([])
+        setups['parameters'] = parameters
+        # Merge setups with evaluations
+        df = pd.merge(evals, setups, on='setup_id', how='left')
+
     if output_format == 'dataframe':
         return df
     else:
