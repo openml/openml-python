@@ -7,7 +7,7 @@ How to train/run a model and how to upload the results.
 
 import openml
 from pprint import pprint
-from sklearn import ensemble, neighbors, preprocessing, pipeline, tree
+from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
 
 ############################################################################
 # Train machine learning models
@@ -39,8 +39,9 @@ X, y, categorical_indicator, attribute_names = dataset.get_data(
     target=dataset.default_target_attribute
 )
 print("Categorical features: {}".format(categorical_indicator))
-enc = preprocessing.OneHotEncoder(categorical_features=categorical_indicator)
-X = enc.fit_transform(X)
+transformer = compose.ColumnTransformer(
+    [('one_hot_encoder', preprocessing.OneHotEncoder(categories='auto'), categorical_indicator)])
+X = transformer.fit_transform(X)
 clf.fit(X, y)
 
 ############################################################################
@@ -83,9 +84,9 @@ pprint(vars(flow), depth=1)
 # When you need to handle 'dirty' data, build pipelines to model then automatically.
 task = openml.tasks.get_task(115)
 pipe = pipeline.Pipeline(steps=[
-    ('Imputer', preprocessing.Imputer(strategy='median')),
+    ('Imputer', impute.SimpleImputer(strategy='median')),
     ('OneHotEncoder', preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore')),
-    ('Classifier', ensemble.RandomForestClassifier())
+    ('Classifier', ensemble.RandomForestClassifier(n_estimators=10))
 ])
 
 run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)

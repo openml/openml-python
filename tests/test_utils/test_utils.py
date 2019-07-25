@@ -48,7 +48,10 @@ class OpenMLTaskTest(TestBase):
 
         # note that in the meantime the number of datasets could have increased
         # due to tests that run in parallel.
-        self.assertGreaterEqual(len(datasets_b), len(datasets_a))
+        # instead of equality of size of list, checking if a valid subset
+        a = set(datasets_a.keys())
+        b = set(datasets_b.keys())
+        self.assertTrue(b.issubset(a))
 
     def test_list_all_for_tasks(self):
         required_size = 1068  # default test server reset value

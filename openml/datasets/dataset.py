@@ -132,9 +132,9 @@ class OpenMLDataset(object):
         self.default_target_attribute = default_target_attribute
         self.row_id_attribute = row_id_attribute
         if isinstance(ignore_attribute, str):
-            self.ignore_attributes = [ignore_attribute]
+            self.ignore_attribute = [ignore_attribute]
         elif isinstance(ignore_attribute, list) or ignore_attribute is None:
-            self.ignore_attributes = ignore_attribute
+            self.ignore_attribute = ignore_attribute
         else:
             raise ValueError('Wrong data type for ignore_attribute. '
                              'Should be list.')
@@ -472,7 +472,7 @@ class OpenMLDataset(object):
             self,
             target: Optional[Union[List[str], str]] = None,
             include_row_id: bool = False,
-            include_ignore_attributes: bool = False,
+            include_ignore_attribute: bool = False,
             dataset_format: str = "dataframe",
     ) -> Tuple[
             Union[np.ndarray, pd.DataFrame, scipy.sparse.csr_matrix],
@@ -489,7 +489,7 @@ class OpenMLDataset(object):
             Splitting multiple columns is currently not supported.
         include_row_id : boolean (default=False)
             Whether to include row ids in the returned dataset.
-        include_ignore_attributes : boolean (default=False)
+        include_ignore_attribute : boolean (default=False)
             Whether to include columns that are marked as "ignore"
             on the server in the dataset.
         dataset_format : string (default='dataframe')
@@ -528,11 +528,11 @@ class OpenMLDataset(object):
             elif isinstance(self.row_id_attribute, Iterable):
                 to_exclude.extend(self.row_id_attribute)
 
-        if not include_ignore_attributes and self.ignore_attributes is not None:
-            if isinstance(self.ignore_attributes, str):
-                to_exclude.append(self.ignore_attributes)
-            elif isinstance(self.ignore_attributes, Iterable):
-                to_exclude.extend(self.ignore_attributes)
+        if not include_ignore_attribute and self.ignore_attribute is not None:
+            if isinstance(self.ignore_attribute, str):
+                to_exclude.append(self.ignore_attribute)
+            elif isinstance(self.ignore_attribute, Iterable):
+                to_exclude.extend(self.ignore_attribute)
 
         if len(to_exclude) > 0:
             logger.info("Going to remove the following attributes:"
@@ -615,7 +615,7 @@ class OpenMLDataset(object):
         return None
 
     def get_features_by_type(self, data_type, exclude=None,
-                             exclude_ignore_attributes=True,
+                             exclude_ignore_attribute=True,
                              exclude_row_id_attribute=True):
         """
         Return indices of features of a given type, e.g. all nominal features.
@@ -628,7 +628,7 @@ class OpenMLDataset(object):
         exclude : list(int)
             Indices to exclude (and adapt the return values as if these indices
                         are not present)
-        exclude_ignore_attributes : bool
+        exclude_ignore_attribute : bool
             Whether to exclude the defined ignore attributes (and adapt the
             return values as if these indices are not present)
         exclude_row_id_attribute : bool
@@ -642,9 +642,9 @@ class OpenMLDataset(object):
         """
         if data_type not in OpenMLDataFeature.LEGAL_DATA_TYPES:
             raise TypeError("Illegal feature type requested")
-        if self.ignore_attributes is not None:
-            if not isinstance(self.ignore_attributes, list):
-                raise TypeError("ignore_attributes should be a list")
+        if self.ignore_attribute is not None:
+            if not isinstance(self.ignore_attribute, list):
+                raise TypeError("ignore_attribute should be a list")
         if self.row_id_attribute is not None:
             if not isinstance(self.row_id_attribute, str):
                 raise TypeError("row id attribute should be a str")
@@ -656,8 +656,8 @@ class OpenMLDataset(object):
         to_exclude = []
         if exclude is not None:
             to_exclude.extend(exclude)
-        if exclude_ignore_attributes and self.ignore_attributes is not None:
-            to_exclude.extend(self.ignore_attributes)
+        if exclude_ignore_attribute and self.ignore_attribute is not None:
+            to_exclude.extend(self.ignore_attribute)
         if exclude_row_id_attribute and self.row_id_attribute is not None:
             to_exclude.append(self.row_id_attribute)
 

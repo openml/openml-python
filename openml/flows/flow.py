@@ -132,7 +132,15 @@ class OpenMLFlow(object):
         self.dependencies = dependencies
         self.flow_id = flow_id
 
-        self.extension = get_extension_by_flow(self)
+        self._extension = get_extension_by_flow(self)
+
+    @property
+    def extension(self):
+        if self._extension is not None:
+            return self._extension
+        else:
+            raise RuntimeError("No extension could be found for flow {}: {}"
+                               .format(self.flow_id, self.name))
 
     def __str__(self):
         header = "OpenML Flow"
@@ -409,14 +417,15 @@ class OpenMLFlow(object):
         _copy_server_fields(flow, self)
         try:
             openml.flows.functions.assert_flows_equal(
-                self, flow, flow.upload_date, ignore_parameter_values=True
+                self, flow, flow.upload_date,
+                ignore_parameter_values=True,
+                ignore_custom_name_if_none=True
             )
         except ValueError as e:
             message = e.args[0]
-            raise ValueError("Flow was not stored correctly on the server. "
-                             "New flow ID is %d. Please check manually and "
-                             "remove the flow if necessary! Error is:\n'%s'" %
-                             (flow_id, message))
+            raise ValueError("The flow on the server is inconsistent with the local flow. "
+                             "The server flow ID is {}. Please check manually and remove "
+                             "the flow if necessary! Error is:\n'{}'".format(flow_id, message))
         return self
 
     def get_structure(self, key_item: str) -> Dict[str, List[str]]:

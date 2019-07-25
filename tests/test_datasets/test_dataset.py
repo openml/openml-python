@@ -141,7 +141,7 @@ class OpenMLDatasetTest(TestBase):
         self.assertNotIn("class", attribute_names)
 
     def test_get_data_rowid_and_ignore_and_target(self):
-        self.dataset.ignore_attributes = ["condition"]
+        self.dataset.ignore_attribute = ["condition"]
         self.dataset.row_id_attribute = ["hardness"]
         X, y, categorical, names = self.dataset.get_data(target="class")
         self.assertEqual(X.shape, (898, 36))
@@ -151,15 +151,15 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual(y.shape, (898, ))
 
     def test_get_data_with_ignore_attributes(self):
-        self.dataset.ignore_attributes = ["condition"]
-        rval, _, categorical, _ = self.dataset.get_data(include_ignore_attributes=True)
+        self.dataset.ignore_attribute = ["condition"]
+        rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=True)
         for (dtype, is_cat) in zip(rval.dtypes, categorical):
             expected_type = 'category' if is_cat else 'float64'
             self.assertEqual(dtype.name, expected_type)
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
 
-        rval, _, categorical, _ = self.dataset.get_data(include_ignore_attributes=False)
+        rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=False)
         for (dtype, is_cat) in zip(rval.dtypes, categorical):
             expected_type = 'category' if is_cat else 'float64'
             self.assertEqual(dtype.name, expected_type)
@@ -271,9 +271,9 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertEqual(len(categorical), 20000)
 
     def test_get_sparse_dataset_with_ignore_attributes(self):
-        self.sparse_dataset.ignore_attributes = ["V256"]
+        self.sparse_dataset.ignore_attribute = ["V256"]
         rval, _, categorical, _ = self.sparse_dataset.get_data(
-            dataset_format='array', include_ignore_attributes=True
+            dataset_format='array', include_ignore_attribute=True
         )
         self.assertTrue(sparse.issparse(rval))
         self.assertEqual(rval.dtype, np.float32)
@@ -281,7 +281,7 @@ class OpenMLDatasetTestSparse(TestBase):
 
         self.assertEqual(len(categorical), 20001)
         rval, _, categorical, _ = self.sparse_dataset.get_data(
-            dataset_format='array', include_ignore_attributes=False
+            dataset_format='array', include_ignore_attribute=False
         )
         self.assertTrue(sparse.issparse(rval))
         self.assertEqual(rval.dtype, np.float32)
@@ -290,13 +290,13 @@ class OpenMLDatasetTestSparse(TestBase):
 
     def test_get_sparse_dataset_rowid_and_ignore_and_target(self):
         # TODO: re-add row_id and ignore attributes
-        self.sparse_dataset.ignore_attributes = ["V256"]
+        self.sparse_dataset.ignore_attribute = ["V256"]
         self.sparse_dataset.row_id_attribute = ["V512"]
         X, y, categorical, _ = self.sparse_dataset.get_data(
             dataset_format='array',
             target="class",
             include_row_id=False,
-            include_ignore_attributes=False,
+            include_ignore_attribute=False,
         )
         self.assertTrue(sparse.issparse(X))
         self.assertEqual(X.dtype, np.float32)
