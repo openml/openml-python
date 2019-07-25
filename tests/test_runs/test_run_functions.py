@@ -717,7 +717,7 @@ class TestRun(TestBase):
 
         # also check if we can obtain some other scores:
         tests = [(sklearn.metrics.cohen_kappa_score, {'weights': None}),
-                 (sklearn.metrics.roc_auc, {}),
+                 (sklearn.metrics.roc_auc_score, {}),
                  (sklearn.metrics.average_precision_score, {}),
                  (sklearn.metrics.jaccard_similarity_score, {}),
                  (sklearn.metrics.precision_score, {'average': 'macro'}),
