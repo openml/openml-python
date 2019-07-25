@@ -43,7 +43,7 @@ class OpenMLTaskTest(TestBase):
         for did in datasets:
             self._check_dataset(datasets[did])
 
-    # owing to concurrent runs and deletion files on test completion, need to re-run to pass
+    # with concurrent runs and file deletions on test completion, need to re-run to pass
     @pytest.mark.flaky(reruns=20)
     def test_list_datasets_with_high_size_parameter(self):
         datasets_a = openml.datasets.list_datasets()
@@ -54,6 +54,8 @@ class OpenMLTaskTest(TestBase):
         # instead of equality of size of list, checking if a valid subset
         a = set(datasets_a.keys())
         b = set(datasets_b.keys())
+        TestBase.logger.debug("In test_list_datasets_with_high_size_parameter() -- "
+                              "len(a): {}; len(b):{}".format(len(a), len(b)))
         self.assertTrue(a.issubset(b))
 
     def test_list_all_for_tasks(self):

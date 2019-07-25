@@ -37,9 +37,9 @@ class TestBase(unittest.TestCase):
 
     # creating logger for unit test file deletion status
     logger = logging.getLogger("unit_tests")
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     fh = logging.FileHandler('TestBase.log')
-    fh.setLevel(logging.INFO)
+    # fh.setLevel(logging.DEBUG)
     logger.addHandler(fh)
 
     def setUp(self, n_levels: int = 1):
