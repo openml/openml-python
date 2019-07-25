@@ -1311,7 +1311,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y[test_indices]
 
         pipeline = sklearn.pipeline.Pipeline(steps=[
-            ('imp',  SimpleImputer()),
+            ('imp', SimpleImputer()),
             ('clf', sklearn.tree.DecisionTreeClassifier()),
         ])
         # TODO add some mocking here to actually test the innards of this function, too!
@@ -1437,11 +1437,11 @@ class TestSklearnExtensionRunFunctions(TestBase):
             y_train = y[train_indices]
             X_test = X[test_indices]
             clf1 = sklearn.pipeline.Pipeline(steps=[
-                ('imputer',  SimpleImputer()),
+                ('imputer', SimpleImputer()),
                 ('estimator', sklearn.naive_bayes.GaussianNB())
             ])
             clf2 = sklearn.pipeline.Pipeline(steps=[
-                ('imputer',  SimpleImputer()),
+                ('imputer', SimpleImputer()),
                 ('estimator', HardNaiveBayes())
             ])
 
@@ -1494,7 +1494,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y[test_indices]
 
         pipeline = sklearn.pipeline.Pipeline(steps=[
-            ('imp',  SimpleImputer()),
+            ('imp', SimpleImputer()),
             ('clf', sklearn.tree.DecisionTreeRegressor()),
         ])
         # TODO add some mocking here to actually test the innards of this function, too!
@@ -1539,7 +1539,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         X = task.get_X(dataset_format='array')
 
         pipeline = sklearn.pipeline.Pipeline(steps=[
-            ('imp',  SimpleImputer()),
+            ('imp', SimpleImputer()),
             ('clf', sklearn.cluster.KMeans()),
         ])
         # TODO add some mocking here to actually test the innards of this function, too!
