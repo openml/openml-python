@@ -33,7 +33,7 @@ class OpenMLDataFeature(object):
         self.nominal_values = nominal_values
         self.number_missing_values = number_missing_values
 
-    def __str__(self):
+    def __repr__(self):
         return "[%d - %s (%s)]" % (self.index, self.name, self.data_type)
 
     def _repr_pretty_(self, pp, cycle):

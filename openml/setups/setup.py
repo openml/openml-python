@@ -27,7 +27,7 @@ class OpenMLSetup(object):
         self.flow_id = flow_id
         self.parameters = parameters
 
-    def __str__(self):
+    def __repr__(self):
         header = "OpenML Setup"
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
@@ -82,7 +82,7 @@ class OpenMLParameter(object):
         self.default_value = default_value
         self.value = value
 
-    def __str__(self):
+    def __repr__(self):
         header = "OpenML Parameter"
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
