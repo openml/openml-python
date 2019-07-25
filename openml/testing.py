@@ -221,7 +221,8 @@ class TestBase(unittest.TestCase):
                     # deleting actual entry from tracker
                     TestBase._delete_entity_from_tracker(entity_type, entity)
                 except Exception as e:
-                    TestBase.logger.warn("Cannot delete ({},{}): {}".format(entity_type, entity, e))
+                    TestBase.logger.warning("Cannot delete ({},{}): {}".format(
+                        entity_type, entity, e))
         TestBase.logger.info("End of cleanup_fixture from {}".format(self.__class__))
 
     def _get_sentinel(self, sentinel=None):

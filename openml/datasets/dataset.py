@@ -173,7 +173,7 @@ class OpenMLDataset(object):
         else:
             self.data_pickle_file = None
 
-    def __str__(self):
+    def __repr__(self):
         header = "OpenML Dataset"
         header = '{}\n{}\n'.format(header, '=' * len(header))
 

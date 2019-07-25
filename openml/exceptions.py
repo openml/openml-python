@@ -25,7 +25,7 @@ class OpenMLServerException(OpenMLServerError):
         self.url = url
         super().__init__(message)
 
-    def __str__(self):
+    def __repr__(self):
         return '%s returned code %s: %s' % (
             self.url, self.code, self.message,
         )
