@@ -1163,7 +1163,7 @@ class TestOpenMLDataset(TestBase):
         self.__class__.test_publish_fetch_ignore_attribute_list = ignore_attribute
 
     # owing to concurrent runs this function maybe called before test__publish_fetch_ignore_attribute
-    @pytest.mark.flaky(reruns=3)
+    @pytest.mark.flaky(reruns=5)
     def test_publish_fetch_ignore_attribute(self):
         """(Part 2) Test to upload and retrieve dataset and check ignore_attributes
 
