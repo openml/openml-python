@@ -289,10 +289,10 @@ For this, we shall compare the top performing flows.
      'sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)')
     (8399,
      'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)')
-    (12127,
-     'sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)')
     (8353,
      'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
+    (12127,
+     'sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)')
     (8317,
      'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
     (8330,
@@ -311,7 +311,7 @@ For this, we shall compare the top performing flows.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.478 seconds)
+   **Total running time of the script:** ( 0 minutes  6.527 seconds)
 
 
 .. _sphx_glr_download_examples_fetch_evaluations_tutorial.py:

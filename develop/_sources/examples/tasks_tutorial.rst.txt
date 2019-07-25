@@ -429,14 +429,23 @@ And:
 
  .. code-block:: none
 
-    <openml.tasks.task.OpenMLClassificationTask object at 0x2b6891ea25f8>
+    OpenML Task
+    ===========
+    Task Type...........: Supervised Classification
+    Task ID.............: 2
+    Task URL............: https://www.openml.org/t/2
+    Estimation Procedure: crossvalidation
+    Evaluation Measure..: predictive_accuracy
+    Target Feature......: class
+    # of Classes........: 6
+    Cost Matrix.........: Available
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  32.348 seconds)
+   **Total running time of the script:** ( 0 minutes  32.373 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:
