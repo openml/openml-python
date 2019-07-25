@@ -73,7 +73,6 @@ class TestFlow(TestBase):
         self.assertEqual(subflow_3.parameters['L'], '-1')
         self.assertEqual(len(subflow_3.components), 0)
 
-
     def test_get_structure(self):
         # also responsible for testing: flow.get_subflow
         # We need to use the production server here because 4024 is not the
