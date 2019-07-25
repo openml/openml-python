@@ -74,7 +74,6 @@ class TestFlow(TestBase):
         self.assertEqual(len(subflow_3.components), 0)
 
 
-
     def test_get_structure(self):
         # also responsible for testing: flow.get_subflow
         # We need to use the production server here because 4024 is not the
@@ -317,8 +316,8 @@ class TestFlow(TestBase):
         # should throw error as it contains two imputers
         illegal = sklearn.pipeline.Pipeline(
             steps=[
-                ('imputer1', Imputer()),
-                ('imputer2', Imputer()),
+                ('imputer1', SimpleImputer()),
+                ('imputer2', SimpleImputer()),
                 ('classif', sklearn.tree.DecisionTreeClassifier())
             ]
         )
@@ -349,7 +348,7 @@ class TestFlow(TestBase):
         if LooseVersion(sklearn.__version__) >= '0.20':
             ohe_params['categories'] = 'auto'
         steps = [
-            ('imputation', Imputer(strategy='median')),
+            ('imputation', SimpleImputer(strategy='median')),
             ('hotencoding', sklearn.preprocessing.OneHotEncoder(**ohe_params)),
             (
                 'variencethreshold',
