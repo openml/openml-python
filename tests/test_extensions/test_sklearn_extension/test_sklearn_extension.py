@@ -621,7 +621,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             .format(module_name_encoder))
 
     def test_serialize_complex_flow(self):
-        ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[0])
+        ohe = sklearn.preprocessing.OneHotEncoder()
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         boosting = sklearn.ensemble.AdaBoostClassifier(
             base_estimator=sklearn.tree.DecisionTreeClassifier())
