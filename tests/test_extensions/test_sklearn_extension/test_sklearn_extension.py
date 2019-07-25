@@ -749,15 +749,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # Examples from the scikit-learn documentation
         models = [sklearn.svm.SVC(), sklearn.ensemble.RandomForestClassifier()]
         grids = \
-            [[{'C': [1, 10, 100, 1000], 'kernel': ['linear']},
-              {'C': [1, 10, 100, 1000], 'gamma': [0.001, 0.0001],
-               'kernel': ['rbf']}],
-             {"max_depth": [3, None],
-              "max_features": [1, 3, 10],
-              "min_samples_split": [1, 3, 10],
-              "min_samples_leaf": [1, 3, 10],
-              "bootstrap": [True, False],
-              "criterion": ["gini", "entropy"]}]
+            [[OrderedDict({'C': [1, 10, 100, 1000], 'kernel': ['linear']}),
+              OrderedDict({'C': [1, 10, 100, 1000], 'gamma': [0.001, 0.0001],
+                           'kernel': ['rbf']})],
+             OrderedDict({"bootstrap": [True, False],
+                          "criterion": ["gini", "entropy"],
+                          "max_depth": [3, None],
+                          "max_features": [1, 3, 10],
+                          "min_samples_leaf": [1, 3, 10],
+                          "min_samples_split": [1, 3, 10]
+                          })]
 
         for grid, model in zip(grids, models):
             serialized = self.extension.model_to_flow(grid)
@@ -765,9 +766,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
             self.assertEqual(deserialized, grid)
             self.assertIsNot(deserialized, grid)
-
+            # providing error_score because nan != nan
             hpo = sklearn.model_selection.GridSearchCV(
-                param_grid=grid, estimator=model)
+                param_grid=grid, estimator=model, error_score=-1000)
 
             serialized = self.extension.model_to_flow(hpo)
             deserialized = self.extension.flow_to_model(serialized)
