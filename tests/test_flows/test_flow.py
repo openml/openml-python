@@ -300,8 +300,8 @@ class TestFlow(TestBase):
                                                                 flow.flow_id))
 
         fixture = (
-            "Flow was not stored correctly on the server. "
-            "New flow ID is 1. Please check manually and remove "
+            "The flow on the server is inconsistent with the local flow. "
+            "The server flow ID is 1. Please check manually and remove "
             "the flow if necessary! Error is:\n"
             "'Flow sklearn.ensemble.forest.RandomForestClassifier: "
             "values for attribute 'name' differ: "
