@@ -1012,17 +1012,24 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 self.extension._prevent_optimize_n_jobs(model)
 
     def test__get_fn_arguments_with_defaults(self):
-        if LooseVersion(sklearn.__version__) < "0.19":
+        sklearn_version = LooseVersion(sklearn.__version__)
+        if sklearn_version < "0.19":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 15),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 12),
                 (sklearn.pipeline.Pipeline.__init__, 0)
             ]
-        else:
+        elif sklearn_version < "0.21":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 16),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 1)
+            ]
+        else:
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 16),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 13),
+                (sklearn.pipeline.Pipeline.__init__, 2)
             ]
 
         for fn, num_params_with_defaults in fns:
