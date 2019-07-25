@@ -282,11 +282,14 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # Comparing the pipeline
         # The parameters only have the name of base objects(not the whole flow)
         # as value
-        # memory parameter has been added in 0.19
+        # memory parameter has been added in 0.19, verbose in 0.21
         if LooseVersion(sklearn.__version__) < "0.19":
             self.assertEqual(len(serialization.parameters), 1)
-        else:
+        elif LooseVersion(sklearn.__version__) < "0.21":
             self.assertEqual(len(serialization.parameters), 2)
+        else:
+            self.assertEqual(len(serialization.parameters), 3)
+
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
         self.assertEqual(
@@ -371,8 +374,10 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # memory parameter has been added in 0.19
         if LooseVersion(sklearn.__version__) < "0.19":
             self.assertEqual(len(serialization.parameters), 1)
-        else:
+        elif LooseVersion(sklearn.__version__) < "0.21":
             self.assertEqual(len(serialization.parameters), 2)
+        else:
+            self.assertEqual(len(serialization.parameters), 3)
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
         self.assertEqual(
