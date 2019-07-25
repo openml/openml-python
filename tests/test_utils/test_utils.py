@@ -44,7 +44,7 @@ class OpenMLTaskTest(TestBase):
             self._check_dataset(datasets[did])
 
     # with concurrent runs and file deletions on test completion, need to re-run to pass
-    @pytest.mark.flaky(reruns=20)
+    @pytest.mark.flaky(reruns=30)
     def test_list_datasets_with_high_size_parameter(self):
         datasets_a = openml.datasets.list_datasets()
         datasets_b = openml.datasets.list_datasets(size=np.inf)
