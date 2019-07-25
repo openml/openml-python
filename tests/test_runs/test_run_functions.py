@@ -715,9 +715,9 @@ class TestRun(TestBase):
         np.testing.assert_array_almost_equal(accuracy_scores_provided,
                                              accuracy_scores)
 
-        # also check if we can obtain some other scores: # TODO: how to do AUC?
+        # also check if we can obtain some other scores:
         tests = [(sklearn.metrics.cohen_kappa_score, {'weights': None}),
-                 (sklearn.metrics.auc, {'reorder': True}),
+                 (sklearn.metrics.roc_auc, {}),
                  (sklearn.metrics.average_precision_score, {}),
                  (sklearn.metrics.jaccard_similarity_score, {}),
                  (sklearn.metrics.precision_score, {'average': 'macro'}),
