@@ -184,7 +184,7 @@ print(tasks[0])
 # will be returned.
 
 
-# using only test server for example uploads
+# using test server for example uploads
 openml.config.start_using_configuration_for_example()
 
 try:
@@ -206,6 +206,10 @@ except openml.exceptions.OpenMLServerException as e:
         tasks = tasks[tasks[:, 19] == "predictive_accuracy"]
         task_id = tasks[0][0]
         print("Task already exists. Task ID is", task_id)
+
+# reverting to prod server
+openml.config.stop_using_configuration_for_example()
+
 
 ############################################################################
 # [Complete list of task types](https://www.openml.org/search?type=task_type)
