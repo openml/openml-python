@@ -89,7 +89,7 @@ class BaseStudy(object):
         self.runs = runs
         pass
 
-    def __str__(self):
+    def __repr__(self):
         # header is provided by the sub classes
         base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
         fields = {"Name": self.name,
@@ -268,10 +268,10 @@ class OpenMLStudy(BaseStudy):
             setups=setups,
         )
 
-    def __str__(self):
+    def __repr__(self):
         header = "OpenML Study"
         header = '{}\n{}\n'.format(header, '=' * len(header))
-        body = super(OpenMLStudy, self).__str__()
+        body = super(OpenMLStudy, self).__repr__()
         return header + body
 
 
@@ -346,8 +346,8 @@ class OpenMLBenchmarkSuite(BaseStudy):
             setups=None,
         )
 
-    def __str__(self):
+    def __repr__(self):
         header = "OpenML Benchmark Suite"
         header = '{}\n{}\n'.format(header, '=' * len(header))
-        body = super(OpenMLBenchmarkSuite, self).__str__()
+        body = super(OpenMLBenchmarkSuite, self).__repr__()
         return header + body

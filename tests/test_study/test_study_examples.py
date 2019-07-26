@@ -1,4 +1,4 @@
-from openml.testing import TestBase
+from openml.testing import TestBase, SimpleImputer
 
 
 class TestStudyFunctions(TestBase):
@@ -30,12 +30,13 @@ class TestStudyFunctions(TestBase):
         import sklearn.pipeline
         import sklearn.preprocessing
         import sklearn.tree
+
         benchmark_suite = openml.study.get_study(
             'OpenML100', 'tasks'
         )  # obtain the benchmark suite
         clf = sklearn.pipeline.Pipeline(
             steps=[
-                ('imputer', sklearn.preprocessing.Imputer()),
+                ('imputer', SimpleImputer()),
                 ('estimator', sklearn.tree.DecisionTreeClassifier())
             ]
         )  # build a sklearn classifier

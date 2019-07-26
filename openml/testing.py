@@ -73,7 +73,9 @@ class TestBase(unittest.TestCase):
             self.static_cache_dir = os.path.join(static_cache_dir, 'files')
 
         if self.static_cache_dir is None:
-            raise ValueError('Cannot find test cache dir!')
+            raise ValueError(
+                'Cannot find test cache dir, expected it to be {}!'.format(static_cache_dir)
+            )
 
         self.cwd = os.getcwd()
         workdir = os.path.dirname(os.path.abspath(__file__))
@@ -221,7 +223,8 @@ class TestBase(unittest.TestCase):
                     # deleting actual entry from tracker
                     TestBase._delete_entity_from_tracker(entity_type, entity)
                 except Exception as e:
-                    TestBase.logger.warn("Cannot delete ({},{}): {}".format(entity_type, entity, e))
+                    TestBase.logger.warning("Cannot delete ({},{}): {}".format(
+                        entity_type, entity, e))
         TestBase.logger.info("End of cleanup_fixture from {}".format(self.__class__))
 
     def _get_sentinel(self, sentinel=None):
@@ -318,4 +321,10 @@ class TestBase(unittest.TestCase):
                         self.assertLessEqual(evaluation, max_val)
 
 
-__all__ = ['TestBase']
+try:
+    from sklearn.impute import SimpleImputer
+except ImportError:
+    from sklearn.preprocessing import Imputer as SimpleImputer
+
+
+__all__ = ['TestBase', 'SimpleImputer']

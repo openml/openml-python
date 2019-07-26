@@ -67,7 +67,7 @@ class OpenMLRun(object):
         self.tags = tags
         self.predictions_url = predictions_url
 
-    def __str__(self):
+    def __repr__(self):
         header = "OpenML Run"
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
