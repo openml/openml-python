@@ -153,7 +153,6 @@ class OpenMLDataset(object):
 
         if features is not None:
             self.features = {}
-            # todo add nominal values (currently not in database)
             for idx, xmlfeature in enumerate(features['oml:feature']):
                 nr_missing = xmlfeature.get('oml:number_of_missing_values', 0)
                 feature = OpenMLDataFeature(int(xmlfeature['oml:index']),

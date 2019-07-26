@@ -182,8 +182,8 @@ def create_study(
     where the runs are the main entity (collection consists of runs and all
     entities (flows, tasks, etc) that are related to these runs)
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     alias : str (optional)
         a string ID, unique on server (url-friendly)
     benchmark_suite : int (optional)
@@ -195,8 +195,8 @@ def create_study(
     run_ids : list
         a list of run ids associated with this study
 
-    Returns:
-    --------
+    Returns
+    -------
     OpenMLStudy
         A local OpenML study object (call publish method to upload to server)
     """
@@ -228,8 +228,8 @@ def create_benchmark_suite(
     Creates an OpenML benchmark suite (collection of entity types, where
     the tasks are the linked entity)
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     alias : str (optional)
         a string ID, unique on server (url-friendly)
     name : str
@@ -239,8 +239,8 @@ def create_benchmark_suite(
     task_ids : list
         a list of task ids associated with this study
 
-    Returns:
-    --------
+    Returns
+    -------
     OpenMLStudy
         A local OpenML study object (call publish method to upload to server)
     """

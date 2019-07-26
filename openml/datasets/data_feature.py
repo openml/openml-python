@@ -1,18 +1,19 @@
 class OpenMLDataFeature(object):
-    """Data Feature (a.k.a. Attribute) object.
+    """
+    Data Feature (a.k.a. Attribute) object.
 
-       Parameters
-       ----------
-       index : int
-            The index of this feature
-        name : str
-            Name of the feature
-        data_type : str
-            can be nominal, numeric, string, date (corresponds to arff)
-        nominal_values : list(str)
-            list of the possible values, in case of nominal attribute
-        number_missing_values : int
-       """
+    Parameters
+    ----------
+    index : int
+        The index of this feature
+    name : str
+        Name of the feature
+    data_type : str
+        can be nominal, numeric, string, date (corresponds to arff)
+    nominal_values : list(str)
+        list of the possible values, in case of nominal attribute
+    number_missing_values : int
+    """
     LEGAL_DATA_TYPES = ['nominal', 'numeric', 'string', 'date']
 
     def __init__(self, index, name, data_type, nominal_values,
@@ -22,8 +23,16 @@ class OpenMLDataFeature(object):
         if data_type not in self.LEGAL_DATA_TYPES:
             raise ValueError('data type should be in %s, found: %s' %
                              (str(self.LEGAL_DATA_TYPES), data_type))
-        if nominal_values is not None and type(nominal_values) != list:
-            raise ValueError('Nominal_values is of wrong datatype')
+        if data_type == 'nominal':
+            if nominal_values is None:
+                raise TypeError('Dataset features require attribute `nominal_values` for nominal '
+                                'feature type.')
+            elif not isinstance(nominal_values, list):
+                raise TypeError('Argument `nominal_values` is of wrong datatype, should be list, '
+                                'but is {}'.format(type(nominal_values)))
+        else:
+            if nominal_values is not None:
+                raise TypeError('Argument `nominal_values` must be None for non-nominal feature.')
         if type(number_missing_values) != int:
             raise ValueError('number_missing_values is of wrong datatype')
 

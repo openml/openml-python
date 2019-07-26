@@ -4,14 +4,14 @@ import openml.config
 class OpenMLSetup(object):
     """Setup object (a.k.a. Configuration).
 
-       Parameters
-       ----------
-       setup_id : int
-            The OpenML setup id
-       flow_id : int
-            The flow that it is build upon
-        parameters : dict
-            The setting of the parameters
+    Parameters
+    ----------
+    setup_id : int
+        The OpenML setup id
+    flow_id : int
+        The flow that it is build upon
+    parameters : dict
+        The setting of the parameters
     """
 
     def __init__(self, setup_id, flow_id, parameters):

@@ -73,7 +73,9 @@ class TestBase(unittest.TestCase):
             self.static_cache_dir = os.path.join(static_cache_dir, 'files')
 
         if self.static_cache_dir is None:
-            raise ValueError('Cannot find test cache dir!')
+            raise ValueError(
+                'Cannot find test cache dir, expected it to be {}!'.format(static_cache_dir)
+            )
 
         self.cwd = os.getcwd()
         workdir = os.path.dirname(os.path.abspath(__file__))
