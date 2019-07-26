@@ -749,16 +749,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # Examples from the scikit-learn documentation
         models = [sklearn.svm.SVC(), sklearn.ensemble.RandomForestClassifier()]
         grids = \
-            [[OrderedDict({'C': [1, 10, 100, 1000], 'kernel': ['linear']}),
-              OrderedDict({'C': [1, 10, 100, 1000], 'gamma': [0.001, 0.0001],
-                           'kernel': ['rbf']})],
-             OrderedDict({"bootstrap": [True, False],
-                          "criterion": ["gini", "entropy"],
-                          "max_depth": [3, None],
-                          "max_features": [1, 3, 10],
-                          "min_samples_leaf": [1, 3, 10],
-                          "min_samples_split": [1, 3, 10]
-                          })]
+            [[OrderedDict([('C', [1, 10, 100, 1000]), ('kernel', ['linear'])]),
+              OrderedDict([('C', [1, 10, 100, 1000]), ('gamma', [0.001, 0.0001]),
+                           ('kernel', ['rbf'])])],
+             OrderedDict([("bootstrap", [True, False]),
+                          ("criterion", ["gini", "entropy"]),
+                          ("max_depth", [3, None]),
+                          ("max_features", [1, 3, 10]),
+                          ("min_samples_leaf", [1, 3, 10]),
+                          ("min_samples_split", [1, 3, 10])
+                          ])]
 
         for grid, model in zip(grids, models):
             serialized = self.extension.model_to_flow(grid)
