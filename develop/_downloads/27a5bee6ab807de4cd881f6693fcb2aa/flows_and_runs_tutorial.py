@@ -6,7 +6,6 @@ How to train/run a model and how to upload the results.
 """
 
 import openml
-from pprint import pprint
 from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
 
 ############################################################################
@@ -58,7 +57,7 @@ clf = tree.ExtraTreeClassifier()
 # Run the flow
 run = openml.runs.run_model_on_task(clf, task)
 
-# pprint(vars(run), depth=2)
+print(run)
 
 ############################################################################
 # Share the run on the OpenML server
@@ -75,17 +74,37 @@ print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 # We can now also inspect the flow object which was automatically created:
 
 flow = openml.flows.get_flow(run.flow_id)
-pprint(vars(flow), depth=1)
+print(flow)
 
 ############################################################################
 # It also works with pipelines
 # ############################
 #
 # When you need to handle 'dirty' data, build pipelines to model then automatically.
-task = openml.tasks.get_task(115)
+task = openml.tasks.get_task(1)
+features = task.get_dataset().features
+nominal_feature_indices = [
+    i for i in range(len(features))
+    if features[i].name != task.target_name and features[i].data_type == 'nominal'
+]
 pipe = pipeline.Pipeline(steps=[
-    ('Imputer', impute.SimpleImputer(strategy='median')),
-    ('OneHotEncoder', preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore')),
+    (
+        'Preprocessing',
+        compose.ColumnTransformer([
+            ('Nominal', pipeline.Pipeline(
+                [
+                    ('Imputer', impute.SimpleImputer(strategy='most_frequent')),
+                    (
+                        'Encoder',
+                        preprocessing.OneHotEncoder(
+                            sparse=False, handle_unknown='ignore',
+                        )
+                    ),
+                ]),
+                nominal_feature_indices,
+             ),
+        ]),
+    ),
     ('Classifier', ensemble.RandomForestClassifier(n_estimators=10))
 ])
 

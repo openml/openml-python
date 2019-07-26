@@ -116,6 +116,26 @@
 <code class="sig-prename descclassname">openml.study.</code><code class="sig-name descname">create_benchmark_suite</code><span class="sig-paren">(</span><em class="sig-param">name: str, description: str, task_ids: List[int], alias: Union[str, NoneType]</em><span class="sig-paren">)</span> &#x2192; openml.study.study.OpenMLBenchmarkSuite<a class="headerlink" href="#openml.study.create_benchmark_suite" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenML benchmark suite (collection of entity types, where
 the tasks are the linked entity)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>alias</strong><span class="classifier">str (optional)</span></dt><dd><p>a string ID, unique on server (url-friendly)</p>
+</dd>
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>the name of the study (meta-info)</p>
+</dd>
+<dt><strong>description</strong><span class="classifier">str</span></dt><dd><p>brief description (meta-info)</p>
+</dd>
+<dt><strong>task_ids</strong><span class="classifier">list</span></dt><dd><p>a list of task ids associated with this study</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>OpenMLStudy</dt><dd><p>A local OpenML study object (call publish method to upload to server)</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <div class="clearer"></div></div>

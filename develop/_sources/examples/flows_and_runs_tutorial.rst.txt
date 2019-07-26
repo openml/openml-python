@@ -17,7 +17,6 @@ How to train/run a model and how to upload the results.
 
 
     import openml
-    from pprint import pprint
     from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
 
 
@@ -104,11 +103,38 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     # Run the flow
     run = openml.runs.run_model_on_task(clf, task)
 
-    # pprint(vars(run), depth=2)
+    print(run)
 
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    OpenML Run
+    ==========
+    Uploader Name: None
+    Metric.......: None
+    Run ID.......: None
+    Task ID......: 403
+    Task Type....: None
+    Task URL.....: https://test.openml.org/t/403
+    Flow ID......: 2117
+    Flow Name....: sklearn.tree.tree.ExtraTreeClassifier
+    Flow URL.....: https://test.openml.org/f/2117
+    Setup ID.....: None
+    Setup String.: Python_3.7.3. Sklearn_0.20.0. NumPy_1.16.4. SciPy_1.3.0. ExtraTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
+              max_features='auto', max_leaf_nodes=None,
+              min_impurity_decrease=0.0, min_impurity_split=None,
+              min_samples_leaf=1, min_samples_split=2,
+              min_weight_fraction_leaf=0.0, random_state=29188,
+              splitter='random')
+    Dataset ID...: 68
+    Dataset URL..: https://test.openml.org/d/68
 
 
 
@@ -136,7 +162,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/22746
+    Uploaded to http://test.openml.org/r/23115
 
 
 
@@ -147,7 +173,7 @@ We can now also inspect the flow object which was automatically created:
 
 
     flow = openml.flows.get_flow(run.flow_id)
-    pprint(vars(flow), depth=1)
+    print(flow)
 
 
 
@@ -159,26 +185,16 @@ We can now also inspect the flow object which was automatically created:
 
  .. code-block:: none
 
-    {'_extension': <openml.extensions.sklearn.extension.SklearnExtension object at 0x2b04a5e11eb8>,
-     'binary_format': None,
-     'binary_md5': None,
-     'binary_url': None,
-     'class_name': 'sklearn.tree.tree.ExtraTreeClassifier',
-     'components': OrderedDict(),
-     'custom_name': None,
-     'dependencies': 'sklearn==0.20.0\nnumpy>=1.6.1\nscipy>=0.9',
-     'description': 'Automatically created scikit-learn flow.',
-     'external_version': 'openml==0.9.0,sklearn==0.20.0',
-     'flow_id': 2117,
-     'language': 'English',
-     'model': None,
-     'name': 'sklearn.tree.tree.ExtraTreeClassifier',
-     'parameters': OrderedDict([...]),
-     'parameters_meta_info': OrderedDict([...]),
-     'tags': [...],
-     'upload_date': '2019-07-09T17:36:20',
-     'uploader': '3229',
-     'version': '1'}
+    OpenML Flow
+    ===========
+    Flow ID.........: 2117 (version 1)
+    Flow URL........: https://test.openml.org/f/2117
+    Flow Name.......: sklearn.tree.tree.ExtraTreeClassifier
+    Flow Description: Automatically created scikit-learn flow.
+    Upload Date.....: 2019-07-09 17:36:20
+    Dependencies....: sklearn==0.20.0
+    numpy>=1.6.1
+    scipy>=0.9
 
 
 
@@ -190,10 +206,30 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
 .. code-block:: default
 
-    task = openml.tasks.get_task(115)
+    task = openml.tasks.get_task(1)
+    features = task.get_dataset().features
+    nominal_feature_indices = [
+        i for i in range(len(features))
+        if features[i].name != task.target_name and features[i].data_type == 'nominal'
+    ]
     pipe = pipeline.Pipeline(steps=[
-        ('Imputer', impute.SimpleImputer(strategy='median')),
-        ('OneHotEncoder', preprocessing.OneHotEncoder(sparse=False, handle_unknown='ignore')),
+        (
+            'Preprocessing',
+            compose.ColumnTransformer([
+                ('Nominal', pipeline.Pipeline(
+                    [
+                        ('Imputer', impute.SimpleImputer(strategy='most_frequent')),
+                        (
+                            'Encoder',
+                            preprocessing.OneHotEncoder(
+                                sparse=False, handle_unknown='ignore',
+                            )
+                        ),
+                    ]),
+                    nominal_feature_indices,
+                 ),
+            ]),
+        ),
         ('Classifier', ensemble.RandomForestClassifier(n_estimators=10))
     ])
 
@@ -211,7 +247,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/22747
+    Uploaded to http://test.openml.org/r/23117
 
 
 
@@ -319,7 +355,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/22749
+    kNN on diabetes: http://test.openml.org/r/23119
 
 
 
@@ -336,7 +372,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  20.707 seconds)
+   **Total running time of the script:** ( 0 minutes  22.751 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:

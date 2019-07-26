@@ -133,7 +133,7 @@ task = openml.tasks.get_task(task_id)
 ############################################################################
 # Properties of the task are stored as member variables:
 
-print(vars(task))
+print(task)
 
 ############################################################################
 # And:

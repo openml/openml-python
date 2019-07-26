@@ -29,7 +29,6 @@ In this example, we shall do the following:
 .. code-block:: default
 
     import openml
-    from pprint import pprint
 
 
 
@@ -55,7 +54,7 @@ Required filters can be applied to retrieve results from runs as required.
                                                 output_format='dataframe')
 
     # Querying the returned results for precision above 0.98
-    pprint(evals[evals.value > 0.98])
+    print(evals[evals.value > 0.98])
 
 
 
@@ -88,7 +87,7 @@ Over here we shall briefly take a look at the details of the task.
     # We will start by displaying a simple *supervised classification* task:
     task_id = 167140        # https://www.openml.org/t/167140
     task = openml.tasks.get_task(task_id)
-    pprint(vars(task))
+    print(task)
 
 
 
@@ -100,22 +99,15 @@ Over here we shall briefly take a look at the details of the task.
 
  .. code-block:: none
 
-    {'class_labels': ['1', '2', '3'],
-     'cost_matrix': None,
-     'dataset_id': 40670,
-     'estimation_procedure': {'data_splits_url': 'https://www.openml.org/api_splits/get/167140/Task_167140_splits.arff',
-                              'parameters': {'number_folds': '10',
-                                             'number_repeats': '1',
-                                             'percentage': '',
-                                             'stratified_sampling': 'true'},
-                              'type': 'crossvalidation'},
-     'estimation_procedure_id': 1,
-     'evaluation_measure': None,
-     'split': None,
-     'target_name': 'class',
-     'task_id': 167140,
-     'task_type': 'Supervised Classification',
-     'task_type_id': 1}
+    OpenML Task
+    ===========
+    Task Type...........: Supervised Classification
+    Task ID.............: 167140
+    Task URL............: https://www.openml.org/t/167140
+    Estimation Procedure: crossvalidation
+    Target Feature......: class
+    # of Classes........: 3
+    Cost Matrix.........: Available
 
 
 
@@ -133,11 +125,11 @@ Note that we now filter the evaluations based on another parameter 'task'.
     evals = openml.evaluations.list_evaluations(function=metric, task=[task_id],
                                                 output_format='dataframe')
     # Displaying the first 10 rows
-    pprint(evals.head(n=10))
+    print(evals.head(n=10))
     # Sorting the evaluations in decreasing order of the metric chosen
     evals = evals.sort_values(by='value', ascending=False)
     print("\nDisplaying head of sorted dataframe: ")
-    pprint(evals.head())
+    print(evals.head())
 
 
 
@@ -271,7 +263,7 @@ For this, we shall compare the top performing flows.
     flow_ids = evals.flow_id.unique()[:top_n]
     flow_names = evals.flow_name.unique()[:top_n]
     for i in range(top_n):
-        pprint((flow_ids[i], flow_names[i]))
+        print((flow_ids[i], flow_names[i]))
 
 
 
@@ -285,33 +277,23 @@ For this, we shall compare the top performing flows.
 
  .. code-block:: none
 
-    (12736,
-     'sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)')
-    (8399,
-     'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)')
-    (12127,
-     'sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)')
-    (8353,
-     'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
-    (8317,
-     'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
-    (8330,
-     'sklearn.pipeline.Pipeline(imputation=openmlstudy14.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,classifier=sklearn.svm.classes.SVC)(2)')
-    (8351,
-     'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)')
-    (8365,
-     'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier))(1)')
-    (8315,
-     'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)')
-    (8885,
-     'sklearn.pipeline.Pipeline(imputation=preprocessing.ConditionalImputer2,catencoding=preprocessing.MultiLabelEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)')
+    (12736, 'sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)')
+    (8399, 'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)')
+    (12127, 'sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)')
+    (8353, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
+    (8317, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
+    (8330, 'sklearn.pipeline.Pipeline(imputation=openmlstudy14.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,classifier=sklearn.svm.classes.SVC)(2)')
+    (8351, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)')
+    (8365, 'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier))(1)')
+    (8315, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)')
+    (8885, 'sklearn.pipeline.Pipeline(imputation=preprocessing.ConditionalImputer2,catencoding=preprocessing.MultiLabelEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)')
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.592 seconds)
+   **Total running time of the script:** ( 0 minutes  6.607 seconds)
 
 
 .. _sphx_glr_download_examples_fetch_evaluations_tutorial.py:

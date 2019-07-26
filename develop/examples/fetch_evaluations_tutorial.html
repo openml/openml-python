@@ -138,7 +138,6 @@ reuse of results from previous experiments on similar parameters.</p>
 <li><p>Compare the top 10 performing flows based on the evaluation performance</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
-<span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pprint</span>
 </pre></div>
 </div>
 <div class="section" id="listing-evaluations">
@@ -154,7 +153,7 @@ Required filters can be applied to retrieve results from runs as required.</p>
                                             <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span>
 
 <span class="c1"># Querying the returned results for precision above 0.98</span>
-<span class="n">pprint</span><span class="p">(</span><span class="n">evals</span><span class="p">[</span><span class="n">evals</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mf">0.98</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">evals</span><span class="p">[</span><span class="n">evals</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mf">0.98</span><span class="p">])</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -173,26 +172,19 @@ Required filters can be applied to retrieve results from runs as required.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># We will start by displaying a simple *supervised classification* task:</span>
 <span class="n">task_id</span> <span class="o">=</span> <span class="mi">167140</span>        <span class="c1"># https://www.openml.org/t/167140</span>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-<span class="n">pprint</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">task</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;class_labels&#39;: [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;],
- &#39;cost_matrix&#39;: None,
- &#39;dataset_id&#39;: 40670,
- &#39;estimation_procedure&#39;: {&#39;data_splits_url&#39;: &#39;https://www.openml.org/api_splits/get/167140/Task_167140_splits.arff&#39;,
-                          &#39;parameters&#39;: {&#39;number_folds&#39;: &#39;10&#39;,
-                                         &#39;number_repeats&#39;: &#39;1&#39;,
-                                         &#39;percentage&#39;: &#39;&#39;,
-                                         &#39;stratified_sampling&#39;: &#39;true&#39;},
-                          &#39;type&#39;: &#39;crossvalidation&#39;},
- &#39;estimation_procedure_id&#39;: 1,
- &#39;evaluation_measure&#39;: None,
- &#39;split&#39;: None,
- &#39;target_name&#39;: &#39;class&#39;,
- &#39;task_id&#39;: 167140,
- &#39;task_type&#39;: &#39;Supervised Classification&#39;,
- &#39;task_type_id&#39;: 1}
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Task
+===========
+Task Type...........: Supervised Classification
+Task ID.............: 167140
+Task URL............: https://www.openml.org/t/167140
+Estimation Procedure: crossvalidation
+Target Feature......: class
+# of Classes........: 3
+Cost Matrix.........: Available
 </pre></div>
 </div>
 </div>
@@ -205,11 +197,11 @@ Note that we now filter the evaluations based on another parameter ‘task’.</
 <span class="n">evals</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="p">[</span><span class="n">task_id</span><span class="p">],</span>
                                             <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span>
 <span class="c1"># Displaying the first 10 rows</span>
-<span class="n">pprint</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 <span class="c1"># Sorting the evaluations in decreasing order of the metric chosen</span>
 <span class="n">evals</span> <span class="o">=</span> <span class="n">evals</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Displaying head of sorted dataframe: &quot;</span><span class="p">)</span>
-<span class="n">pprint</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -320,34 +312,24 @@ For this, we shall compare the top performing flows.</p>
 <span class="n">flow_ids</span> <span class="o">=</span> <span class="n">evals</span><span class="o">.</span><span class="n">flow_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()[:</span><span class="n">top_n</span><span class="p">]</span>
 <span class="n">flow_names</span> <span class="o">=</span> <span class="n">evals</span><span class="o">.</span><span class="n">flow_name</span><span class="o">.</span><span class="n">unique</span><span class="p">()[:</span><span class="n">top_n</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">top_n</span><span class="p">):</span>
-    <span class="n">pprint</span><span class="p">((</span><span class="n">flow_ids</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">flow_names</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+    <span class="nb">print</span><span class="p">((</span><span class="n">flow_ids</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">flow_names</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_fetch_evaluations_tutorial_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_fetch_evaluations_tutorial_002.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(12736,
- &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)&#39;)
-(8399,
- &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)&#39;)
-(12127,
- &#39;sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)&#39;)
-(8353,
- &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
-(8317,
- &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
-(8330,
- &#39;sklearn.pipeline.Pipeline(imputation=openmlstudy14.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,classifier=sklearn.svm.classes.SVC)(2)&#39;)
-(8351,
- &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)&#39;)
-(8365,
- &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier))(1)&#39;)
-(8315,
- &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)&#39;)
-(8885,
- &#39;sklearn.pipeline.Pipeline(imputation=preprocessing.ConditionalImputer2,catencoding=preprocessing.MultiLabelEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(12736, &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)&#39;)
+(8399, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)&#39;)
+(12127, &#39;sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)&#39;)
+(8353, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
+(8317, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
+(8330, &#39;sklearn.pipeline.Pipeline(imputation=openmlstudy14.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,classifier=sklearn.svm.classes.SVC)(2)&#39;)
+(8351, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)&#39;)
+(8365, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier))(1)&#39;)
+(8315, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)&#39;)
+(8885, &#39;sklearn.pipeline.Pipeline(imputation=preprocessing.ConditionalImputer2,catencoding=preprocessing.MultiLabelEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.592 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.607 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-fetch-evaluations-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/8ebde0963923552ec6438c2732e14fec/fetch_evaluations_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_evaluations_tutorial.py</span></code></a></p>

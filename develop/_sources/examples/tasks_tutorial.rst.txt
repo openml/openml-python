@@ -378,7 +378,7 @@ Properties of the task are stored as member variables:
 .. code-block:: default
 
 
-    print(vars(task))
+    print(task)
 
 
 
@@ -390,7 +390,15 @@ Properties of the task are stored as member variables:
 
  .. code-block:: none
 
-    {'task_id': 31, 'task_type_id': 1, 'task_type': 'Supervised Classification', 'dataset_id': 31, 'evaluation_measure': None, 'estimation_procedure': {'type': 'crossvalidation', 'parameters': {'number_repeats': '1', 'number_folds': '10', 'percentage': '', 'stratified_sampling': 'true'}, 'data_splits_url': 'https://www.openml.org/api_splits/get/31/Task_31_splits.arff'}, 'estimation_procedure_id': 1, 'split': None, 'target_name': 'class', 'class_labels': ['good', 'bad'], 'cost_matrix': None}
+    OpenML Task
+    ===========
+    Task Type...........: Supervised Classification
+    Task ID.............: 31
+    Task URL............: https://www.openml.org/t/31
+    Estimation Procedure: crossvalidation
+    Target Feature......: class
+    # of Classes........: 2
+    Cost Matrix.........: Available
 
 
 
@@ -520,7 +528,7 @@ https://www.openml.org/search?q=measure_type%3Aevaluation_measure&type=measure)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  32.026 seconds)
+   **Total running time of the script:** ( 0 minutes  32.181 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:

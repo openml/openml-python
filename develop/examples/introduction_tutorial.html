@@ -103,6 +103,8 @@
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
 <li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#authentication">Authentication</a></li>
 <li><a class="reference internal" href="#caching">Caching</a></li>
 <li><a class="reference internal" href="#simple-example">Simple Example</a></li>
 </ul>
@@ -120,8 +122,8 @@
 <div class="sphx-glr-example-title section" id="introduction">
 <span id="sphx-glr-examples-introduction-tutorial-py"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <p>An introduction to OpenML, followed up by a simple example.</p>
-<dl>
-<dt>OpenML is an online collaboration platform for machine learning which allows</dt><dd><p>you to:</p>
+<p>OpenML is an online collaboration platform for machine learning which allows
+you to:</p>
 <ul class="simple">
 <li><p>Find or share interesting, well-documented datasets</p></li>
 <li><p>Define research / modelling goals (tasks)</p></li>
@@ -130,12 +132,17 @@
 <li><p>Works seamlessly with scikit-learn and other libraries</p></li>
 <li><p>Large scale benchmarking, compare to state of the art</p></li>
 </ul>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>Installation is done via <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install openml
 </pre></div>
 </div>
 <p>For further information, please check out the installation guide at
 <a class="reference external" href="https://openml.github.io/openml-python/master/contributing.html#installation">https://openml.github.io/openml-python/master/contributing.html#installation</a></p>
+</div>
+<div class="section" id="authentication">
+<h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
 <p>The OpenML server can only be accessed by users who have signed up on the
 OpenML platform. If you don’t have an account yet, sign up now.
 You will receive an API key, which will authenticate you to the server
@@ -159,9 +166,6 @@ importing the openml module.</p></li>
 connects to the test server instead. This prevents the live server from
 crowding with example datasets, tasks, studies, and so on.</p>
 </div>
-</dd>
-</dl>
-<hr class="docutils" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="k">import</span> <span class="n">neighbors</span>
 
@@ -173,6 +177,7 @@ This can be done with the following line of code (uncomment it!).
 Never share your apikey with others.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># openml.config.apikey = &#39;YOURKEY&#39;</span>
 </pre></div>
+</div>
 </div>
 <div class="section" id="caching">
 <h2>Caching<a class="headerlink" href="#caching" title="Permalink to this headline">¶</a></h2>
@@ -207,13 +212,13 @@ will use <strong>~/.openml/cache</strong> as the cache directory.</p></li>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: http://test.openml.org/r/22744
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: http://test.openml.org/r/23113
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.105 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  15.582 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-introduction-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/401c39eb686323be5e9bb1b8948e4e0e/introduction_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">introduction_tutorial.py</span></code></a></p>

@@ -126,16 +126,12 @@ with scikit-learn and share the results online.</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
-<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">preprocessing</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">pipeline</span>
-
-<span class="c1"># Set the OpenML API Key which is required to upload your runs.</span>
-<span class="c1"># You can get your own API by signing up to OpenML.org.</span>
-<span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">apikey</span> <span class="o">=</span> <span class="s1">&#39;ABC&#39;</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">impute</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">pipeline</span>
 
 <span class="c1"># Define a scikit-learn classifier or pipeline</span>
 <span class="n">clf</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
     <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;imputer&#39;</span><span class="p">,</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">Imputer</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s1">&#39;imputer&#39;</span><span class="p">,</span> <span class="n">impute</span><span class="o">.</span><span class="n">SimpleImputer</span><span class="p">()),</span>
         <span class="p">(</span><span class="s1">&#39;estimator&#39;</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">())</span>
     <span class="p">]</span>
 <span class="p">)</span>
@@ -144,11 +140,13 @@ with scikit-learn and share the results online.</p>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">31</span><span class="p">)</span>
 <span class="c1"># Run the scikit-learn model on the task.</span>
 <span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
-<span class="c1"># Publish the experiment on OpenML (optional, requires an API key).</span>
+<span class="c1"># Publish the experiment on OpenML (optional, requires an API key.</span>
+<span class="c1"># You can get your own API key by signing up to OpenML.org)</span>
 <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
 <span class="k">print</span><span class="p">(</span><span class="s1">&#39;View the run online: </span><span class="si">%s</span><span class="s1">/run/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">run</span><span class="o">.</span><span class="n">run_id</span><span class="p">))</span>
 </pre></div>
 </div>
+<p>You can find more examples in our <a class="reference external" href="examples/index.html">examples gallery</a>.</p>
 </div>
 <div class="section" id="how-to-get-openml-for-python">
 <h2>How to get OpenML for python<a class="headerlink" href="#how-to-get-openml-for-python" title="Permalink to this headline">¶</a></h2>
