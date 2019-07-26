@@ -17,14 +17,13 @@ import warnings
 import pandas as pd
 
 import openml.extensions.sklearn
-from openml.testing import TestBase
+from openml.testing import TestBase, SimpleImputer
 from openml.runs.functions import (
     _run_task_get_arffcontent,
     run_exists,
 )
 from openml.runs.trace import OpenMLRunTrace
 from openml.tasks import TaskTypeEnum
-from openml._backport import SimpleImputer
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV

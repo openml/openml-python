@@ -19,15 +19,13 @@ import sklearn.preprocessing
 import sklearn.naive_bayes
 import sklearn.tree
 
-from openml._backport import SimpleImputer
-
 import xmltodict
 
 import openml
 from openml._api_calls import _perform_api_call
 import openml.exceptions
 import openml.extensions.sklearn
-from openml.testing import TestBase
+from openml.testing import TestBase, SimpleImputer
 import openml.utils
 
 
