@@ -28,10 +28,6 @@ import sklearn.preprocessing
 import sklearn.tree
 import sklearn.cluster
 
-if LooseVersion(sklearn.__version__) < "0.20":
-    from sklearn.preprocessing import Imputer
-else:
-    from sklearn.impute import SimpleImputer as Imputer
 
 import openml
 from openml.extensions.sklearn import SklearnExtension
@@ -39,7 +35,8 @@ from openml.exceptions import PyOpenMLError
 from openml.flows import OpenMLFlow
 from openml.flows.functions import assert_flows_equal
 from openml.runs.trace import OpenMLRunTrace
-from openml.testing import TestBase
+from openml.testing import TestBase, SimpleImputer
+
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(this_directory)
@@ -285,11 +282,14 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # Comparing the pipeline
         # The parameters only have the name of base objects(not the whole flow)
         # as value
-        # memory parameter has been added in 0.19
+        # memory parameter has been added in 0.19, verbose in 0.21
         if LooseVersion(sklearn.__version__) < "0.19":
             self.assertEqual(len(serialization.parameters), 1)
-        else:
+        elif LooseVersion(sklearn.__version__) < "0.21":
             self.assertEqual(len(serialization.parameters), 2)
+        else:
+            self.assertEqual(len(serialization.parameters), 3)
+
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
         self.assertEqual(
@@ -374,8 +374,10 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # memory parameter has been added in 0.19
         if LooseVersion(sklearn.__version__) < "0.19":
             self.assertEqual(len(serialization.parameters), 1)
-        else:
+        elif LooseVersion(sklearn.__version__) < "0.21":
             self.assertEqual(len(serialization.parameters), 2)
+        else:
+            self.assertEqual(len(serialization.parameters), 3)
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
         self.assertEqual(
@@ -624,7 +626,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             .format(module_name_encoder))
 
     def test_serialize_complex_flow(self):
-        ohe = sklearn.preprocessing.OneHotEncoder(categorical_features=[0])
+        ohe = sklearn.preprocessing.OneHotEncoder()
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         boosting = sklearn.ensemble.AdaBoostClassifier(
             base_estimator=sklearn.tree.DecisionTreeClassifier())
@@ -747,15 +749,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # Examples from the scikit-learn documentation
         models = [sklearn.svm.SVC(), sklearn.ensemble.RandomForestClassifier()]
         grids = \
-            [[{'C': [1, 10, 100, 1000], 'kernel': ['linear']},
-              {'C': [1, 10, 100, 1000], 'gamma': [0.001, 0.0001],
-               'kernel': ['rbf']}],
-             {"max_depth": [3, None],
-              "max_features": [1, 3, 10],
-              "min_samples_split": [1, 3, 10],
-              "min_samples_leaf": [1, 3, 10],
-              "bootstrap": [True, False],
-              "criterion": ["gini", "entropy"]}]
+            [[OrderedDict([('C', [1, 10, 100, 1000]), ('kernel', ['linear'])]),
+              OrderedDict([('C', [1, 10, 100, 1000]), ('gamma', [0.001, 0.0001]),
+                           ('kernel', ['rbf'])])],
+             OrderedDict([("bootstrap", [True, False]),
+                          ("criterion", ["gini", "entropy"]),
+                          ("max_depth", [3, None]),
+                          ("max_features", [1, 3, 10]),
+                          ("min_samples_leaf", [1, 3, 10]),
+                          ("min_samples_split", [1, 3, 10])
+                          ])]
 
         for grid, model in zip(grids, models):
             serialized = self.extension.model_to_flow(grid)
@@ -763,9 +766,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
             self.assertEqual(deserialized, grid)
             self.assertIsNot(deserialized, grid)
-
+            # providing error_score because nan != nan
             hpo = sklearn.model_selection.GridSearchCV(
-                param_grid=grid, estimator=model)
+                param_grid=grid, estimator=model, error_score=-1000)
 
             serialized = self.extension.model_to_flow(hpo)
             deserialized = self.extension.flow_to_model(serialized)
@@ -943,7 +946,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
     def test_illegal_parameter_names_pipeline(self):
         # illegal name: steps
         steps = [
-            ('Imputer', Imputer(strategy='median')),
+            ('Imputer', SimpleImputer(strategy='median')),
             ('OneHotEncoder',
              sklearn.preprocessing.OneHotEncoder(sparse=False,
                                                  handle_unknown='ignore')),
@@ -956,7 +959,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # illegal name: transformer_list
         transformer_list = [
             ('transformer_list',
-             Imputer(strategy='median')),
+             SimpleImputer(strategy='median')),
             ('OneHotEncoder',
              sklearn.preprocessing.OneHotEncoder(sparse=False,
                                                  handle_unknown='ignore'))
@@ -1015,17 +1018,24 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 self.extension._prevent_optimize_n_jobs(model)
 
     def test__get_fn_arguments_with_defaults(self):
-        if LooseVersion(sklearn.__version__) < "0.19":
+        sklearn_version = LooseVersion(sklearn.__version__)
+        if sklearn_version < "0.19":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 15),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 12),
                 (sklearn.pipeline.Pipeline.__init__, 0)
             ]
-        else:
+        elif sklearn_version < "0.21":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 16),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 1)
+            ]
+        else:
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 16),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 13),
+                (sklearn.pipeline.Pipeline.__init__, 2)
             ]
 
         for fn, num_params_with_defaults in fns:
@@ -1047,7 +1057,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # used the 'initialize_with_defaults' flag of the deserialization
         # method to return a flow that contains default hyperparameter
         # settings.
-        steps = [('Imputer', Imputer()),
+        steps = [('Imputer', SimpleImputer()),
                  ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
                  ('Estimator', sklearn.tree.DecisionTreeClassifier())]
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
@@ -1071,7 +1081,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # used the 'initialize_with_defaults' flag of the deserialization
         # method to return a flow that contains default hyperparameter
         # settings.
-        steps = [('Imputer', Imputer()),
+        steps = [('Imputer', SimpleImputer()),
                  ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
                  ('Estimator', sklearn.ensemble.AdaBoostClassifier(
                      sklearn.tree.DecisionTreeClassifier()))]
@@ -1097,7 +1107,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # method to return a flow that contains default hyperparameter
         # settings.
         steps = [
-            ('Imputer', Imputer()),
+            ('Imputer', SimpleImputer()),
             ('OneHotEncoder', sklearn.preprocessing.OneHotEncoder()),
             (
                 'Estimator',
@@ -1237,7 +1247,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         class MyPipe(sklearn.pipeline.Pipeline):
             pass
         task = openml.tasks.get_task(1)
-        pipe = MyPipe([('imp', Imputer()),
+        pipe = MyPipe([('imp', SimpleImputer()),
                        ('dummy', sklearn.dummy.DummyClassifier())])
         openml.runs.run_model_on_task(pipe, task)
 
@@ -1309,7 +1319,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y[test_indices]
 
         pipeline = sklearn.pipeline.Pipeline(steps=[
-            ('imp', sklearn.preprocessing.Imputer()),
+            ('imp', SimpleImputer()),
             ('clf', sklearn.tree.DecisionTreeClassifier()),
         ])
         # TODO add some mocking here to actually test the innards of this function, too!
@@ -1435,11 +1445,11 @@ class TestSklearnExtensionRunFunctions(TestBase):
             y_train = y[train_indices]
             X_test = X[test_indices]
             clf1 = sklearn.pipeline.Pipeline(steps=[
-                ('imputer', sklearn.preprocessing.Imputer()),
+                ('imputer', SimpleImputer()),
                 ('estimator', sklearn.naive_bayes.GaussianNB())
             ])
             clf2 = sklearn.pipeline.Pipeline(steps=[
-                ('imputer', sklearn.preprocessing.Imputer()),
+                ('imputer', SimpleImputer()),
                 ('estimator', HardNaiveBayes())
             ])
 
@@ -1492,7 +1502,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y[test_indices]
 
         pipeline = sklearn.pipeline.Pipeline(steps=[
-            ('imp', sklearn.preprocessing.Imputer()),
+            ('imp', SimpleImputer()),
             ('clf', sklearn.tree.DecisionTreeRegressor()),
         ])
         # TODO add some mocking here to actually test the innards of this function, too!
@@ -1537,7 +1547,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         X = task.get_X(dataset_format='array')
 
         pipeline = sklearn.pipeline.Pipeline(steps=[
-            ('imp', sklearn.preprocessing.Imputer()),
+            ('imp', SimpleImputer()),
             ('clf', sklearn.cluster.KMeans()),
         ])
         # TODO add some mocking here to actually test the innards of this function, too!
@@ -1626,7 +1636,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         long = """sklearn.pipeline.Pipeline(
                     columntransformer=sklearn.compose._column_transformer.ColumnTransformer(
                         numeric=sklearn.pipeline.Pipeline(
-                            imputer=sklearn.preprocessing.imputation.Imputer,
+                            SimpleImputer=sklearn.preprocessing.imputation.Imputer,
                             standardscaler=sklearn.preprocessing.data.StandardScaler),
                         nominal=sklearn.pipeline.Pipeline(
                             simpleimputer=sklearn.impute.SimpleImputer,
@@ -1650,7 +1660,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         self.assertEqual(short, SklearnExtension.trim_flow_name(long_stripped))
 
         long = """sklearn.pipeline.Pipeline(
-                    Imputer=sklearn.preprocessing.imputation.Imputer,
+                    SimpleImputer=sklearn.preprocessing.imputation.Imputer,
                     VarianceThreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold, # noqa: E501
                     Estimator=sklearn.model_selection._search.RandomizedSearchCV(
                         estimator=sklearn.tree.tree.DecisionTreeClassifier))"""
@@ -1660,7 +1670,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
         long = """sklearn.model_selection._search.RandomizedSearchCV(
                     estimator=sklearn.pipeline.Pipeline(
-                        Imputer=sklearn.preprocessing.imputation.Imputer,
+                        SimpleImputer=sklearn.preprocessing.imputation.Imputer,
                         classifier=sklearn.ensemble.forest.RandomForestClassifier))"""
         short = "sklearn.RandomizedSearchCV(Pipeline(Imputer,RandomForestClassifier))"
         long_stripped, _ = re.subn(r'\s', '', long)

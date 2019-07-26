@@ -321,4 +321,10 @@ class TestBase(unittest.TestCase):
                         self.assertLessEqual(evaluation, max_val)
 
 
-__all__ = ['TestBase']
+try:
+    from sklearn.impute import SimpleImputer
+except ImportError:
+    from sklearn.preprocessing import Imputer as SimpleImputer
+
+
+__all__ = ['TestBase', 'SimpleImputer']

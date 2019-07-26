@@ -19,18 +19,13 @@ import sklearn.preprocessing
 import sklearn.naive_bayes
 import sklearn.tree
 
-if LooseVersion(sklearn.__version__) < "0.20":
-    from sklearn.preprocessing import Imputer
-else:
-    from sklearn.impute import SimpleImputer as Imputer
-
 import xmltodict
 
 import openml
 from openml._api_calls import _perform_api_call
 import openml.exceptions
 import openml.extensions.sklearn
-from openml.testing import TestBase
+from openml.testing import TestBase, SimpleImputer
 import openml.utils
 
 
@@ -318,8 +313,8 @@ class TestFlow(TestBase):
         # should throw error as it contains two imputers
         illegal = sklearn.pipeline.Pipeline(
             steps=[
-                ('imputer1', Imputer()),
-                ('imputer2', Imputer()),
+                ('imputer1', SimpleImputer()),
+                ('imputer2', SimpleImputer()),
                 ('classif', sklearn.tree.DecisionTreeClassifier())
             ]
         )
@@ -350,7 +345,7 @@ class TestFlow(TestBase):
         if LooseVersion(sklearn.__version__) >= '0.20':
             ohe_params['categories'] = 'auto'
         steps = [
-            ('imputation', Imputer(strategy='median')),
+            ('imputation', SimpleImputer(strategy='median')),
             ('hotencoding', sklearn.preprocessing.OneHotEncoder(**ohe_params)),
             (
                 'variencethreshold',
