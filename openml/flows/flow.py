@@ -87,7 +87,7 @@ class OpenMLFlow(object):
                  dependencies, class_name=None, custom_name=None,
                  binary_url=None, binary_format=None,
                  binary_md5=None, uploader=None, upload_date=None,
-                 flow_id=None, version=None):
+                 flow_id=None, extension=None, version=None):
         self.name = name
         self.description = description
         self.model = model
@@ -131,8 +131,10 @@ class OpenMLFlow(object):
         self.language = language
         self.dependencies = dependencies
         self.flow_id = flow_id
-
-        self._extension = get_extension_by_flow(self)
+        if extension is None:
+            self._extension = get_extension_by_flow(self)
+        else:
+            self._extension = extension
 
     @property
     def extension(self):

@@ -1,6 +1,6 @@
 """
 Introduction
-===================
+============
 
 An introduction to OpenML, followed up by a simple example.
 """
@@ -15,6 +15,8 @@ An introduction to OpenML, followed up by a simple example.
 # * Works seamlessly with scikit-learn and other libraries
 # * Large scale benchmarking, compare to state of the art
 #
+
+############################################################################
 # Installation
 # ^^^^^^^^^^^^
 # Installation is done via ``pip``:
@@ -26,6 +28,8 @@ An introduction to OpenML, followed up by a simple example.
 # For further information, please check out the installation guide at
 # https://openml.github.io/openml-python/master/contributing.html#installation
 #
+
+############################################################################
 # Authentication
 # ^^^^^^^^^^^^^^
 #
@@ -49,6 +53,7 @@ An introduction to OpenML, followed up by a simple example.
 # .. warning:: This example uploads data. For that reason, this example
 #   connects to the test server instead. This prevents the live server from
 #   crowding with example datasets, tasks, studies, and so on.
+
 ############################################################################
 import openml
 from sklearn import neighbors
