@@ -40,7 +40,6 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
                     dataset_id=dataset_id,
                     estimation_procedure_id=self.estimation_procedure
                 )
-
                 task_id = task.publish()
                 TestBase._mark_entity_for_removal('task', task_id)
                 TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],

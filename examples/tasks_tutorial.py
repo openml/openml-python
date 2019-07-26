@@ -7,7 +7,6 @@ A tutorial on how to list and download tasks.
 
 import openml
 import pandas as pd
-from pprint import pprint
 
 ############################################################################
 #
@@ -40,11 +39,11 @@ tasks = openml.tasks.list_tasks(task_type_id=1)
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
 print(tasks.columns)
 print("First 5 of %s tasks:" % len(tasks))
-pprint(tasks.head())
+print(tasks.head())
 
 # The same can be obtained through lesser lines of code
 tasks_df = openml.tasks.list_tasks(task_type_id=1, output_format='dataframe')
-pprint(tasks_df.head())
+print(tasks_df.head())
 
 ############################################################################
 # We can filter the list of tasks to only contain datasets with more than
@@ -78,7 +77,7 @@ print(len(filtered_tasks))
 tasks = openml.tasks.list_tasks(tag='OpenML100')
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
 print("First 5 of %s tasks:" % len(tasks))
-pprint(tasks.head())
+print(tasks.head())
 
 ############################################################################
 # Furthermore, we can list tasks based on the dataset id:
@@ -86,14 +85,14 @@ pprint(tasks.head())
 tasks = openml.tasks.list_tasks(data_id=1471)
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
 print("First 5 of %s tasks:" % len(tasks))
-pprint(tasks.head())
+print(tasks.head())
 
 ############################################################################
 # In addition, a size limit and an offset can be applied both separately and simultaneously:
 
 tasks = openml.tasks.list_tasks(size=10, offset=50)
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
-pprint(tasks)
+print(tasks)
 
 ############################################################################
 #
@@ -134,11 +133,87 @@ task = openml.tasks.get_task(task_id)
 ############################################################################
 # Properties of the task are stored as member variables:
 
-pprint(vars(task))
+print(vars(task))
 
 ############################################################################
 # And:
 
 ids = [2, 1891, 31, 9983]
 tasks = openml.tasks.get_tasks(ids)
-pprint(tasks[0])
+print(tasks[0])
+
+############################################################################
+# Creating tasks
+# ^^^^^^^^^^^^^^
+#
+# You can also create new tasks. Take the following into account:
+#
+# * You can only create tasks on _active_ datasets
+# * For now, only the following tasks are supported: classification, regression,
+# clustering, and learning curve analysis.
+# * For now, tasks can only be created on a single dataset.
+# * The exact same task must not already exist.
+#
+# Creating a task requires the following input:
+#
+# * task_type_id: The task type ID, required (see below). Required.
+# * dataset_id: The dataset ID. Required.
+# * target_name: The name of the attribute you aim to predict.
+# Optional.
+# * estimation_procedure_id : The ID of the estimation procedure used to create train-test
+# splits. Optional.
+# * evaluation_measure: The name of the evaluation measure. Optional.
+# * Any additional inputs for specific tasks
+#
+# It is best to leave the evaluation measure open if there is no strong prerequisite for a
+# specific measure. OpenML will always compute all appropriate measures and you can filter
+# or sort results on your favourite measure afterwards. Only add an evaluation measure if
+# necessary (e.g. when other measure make no sense), since it will create a new task, which
+# scatters results across tasks.
+
+
+############################################################################
+# Example
+# #######
+#
+# Let's create a classification task on a dataset. In this example we will do this on the
+# Iris dataset (ID=128 (on test server)). We'll use 10-fold cross-validation (ID=1),
+# and _predictive accuracy_ as the predefined measure (this can also be left open).
+# If a task with these parameters exist, we will get an appropriate exception.
+# If such a task doesn't exist, a task will be created and the corresponding task_id
+# will be returned.
+
+
+# using test server for example uploads
+openml.config.start_using_configuration_for_example()
+
+try:
+    tasktypes = openml.tasks.TaskTypeEnum
+    my_task = openml.tasks.create_task(
+        task_type_id=tasktypes.SUPERVISED_CLASSIFICATION,
+        dataset_id=128,
+        target_name="class",
+        evaluation_measure="predictive_accuracy",
+        estimation_procedure_id=1)
+    my_task.publish()
+except openml.exceptions.OpenMLServerException as e:
+    # Error code for 'task already exists'
+    if e.code == 614:
+        # Lookup task
+        tasks = openml.tasks.list_tasks(data_id=128, output_format='dataframe').to_numpy()
+        tasks = tasks[tasks[:, 4] == "Supervised Classification"]
+        tasks = tasks[tasks[:, 6] == "10-fold Crossvalidation"]
+        tasks = tasks[tasks[:, 19] == "predictive_accuracy"]
+        task_id = tasks[0][0]
+        print("Task already exists. Task ID is", task_id)
+
+# reverting to prod server
+openml.config.stop_using_configuration_for_example()
+
+
+############################################################################
+# [Complete list of task types](https://www.openml.org/search?type=task_type)
+# [Complete list of model estimation procedures](
+# https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure)
+# [Complete list of evaluation measures](
+# https://www.openml.org/search?q=measure_type%3Aevaluation_measure&type=measure)
