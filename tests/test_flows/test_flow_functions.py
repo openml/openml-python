@@ -296,5 +296,7 @@ class TestFlowFunctions(TestBase):
                                openml.flows.get_flow,
                                flow_id=flow,
                                reinstantiate=True)
-        openml.flows.get_flow(flow_id=flow, reinstantiate=True,
-                              strict_version=False)
+        if LooseVersion(sklearn.__version__) > "0.19.1":
+            # 0.18 actually can't deserialize this because of incompatible changes
+            openml.flows.get_flow(flow_id=flow, reinstantiate=True,
+                                  strict_version=False)
