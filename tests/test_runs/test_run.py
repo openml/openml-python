@@ -8,8 +8,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 
-from openml._backport import SimpleImputer
-from openml.testing import TestBase
+from openml.testing import TestBase, SimpleImputer
 import openml
 import openml.extensions.sklearn
 

@@ -1247,7 +1247,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         class MyPipe(sklearn.pipeline.Pipeline):
             pass
         task = openml.tasks.get_task(1)
-        pipe = MyPipe([('imp', Imputer()),
+        pipe = MyPipe([('imp', SimpleImputer()),
                        ('dummy', sklearn.dummy.DummyClassifier())])
         openml.runs.run_model_on_task(pipe, task)
 
