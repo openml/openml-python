@@ -288,7 +288,7 @@ class TestFlowFunctions(TestBase):
     def test_get_flow_reinstantiate_model_wrong_version(self):
         # Note that CI does not test against 0.19.1.
         openml.config.server = self.production_server
-        _, sklearn_major, _ = LooseVersion(sklearn.__version__).version
+        _, sklearn_major, _ = LooseVersion(sklearn.__version__).version[:3]
         flow = 8175
         expected = 'Trying to deserialize a model with dependency sklearn==0.19.1 not satisfied.'
         self.assertRaisesRegex(ValueError,
