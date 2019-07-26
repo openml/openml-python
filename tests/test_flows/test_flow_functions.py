@@ -290,13 +290,17 @@ class TestFlowFunctions(TestBase):
         openml.config.server = self.production_server
         _, sklearn_major, _ = LooseVersion(sklearn.__version__).version[:3]
         flow = 8175
-        expected = 'Trying to deserialize a model with dependency sklearn==0.19.1 not satisfied.'
+        expected = ('Trying to deserialize a model with dependency'
+                    ' sklearn==0.19.1 not satisfied.')
         self.assertRaisesRegex(ValueError,
                                expected,
                                openml.flows.get_flow,
                                flow_id=flow,
                                reinstantiate=True)
         if LooseVersion(sklearn.__version__) > "0.19.1":
-            # 0.18 actually can't deserialize this because of incompatible changes
-            openml.flows.get_flow(flow_id=flow, reinstantiate=True,
-                                  strict_version=False)
+            # 0.18 actually can't deserialize this because of incompatibility
+            flow = openml.flows.get_flow(flow_id=flow, reinstantiate=True,
+                                         strict_version=False)
+            # ensure that a new flow was created
+            assert flow.flow_id is None
+            assert "0.19.1" not in flow.dependencies

@@ -97,6 +97,11 @@ def get_flow(flow_id: int, reinstantiate: bool = False,
     if reinstantiate:
         flow.model = flow.extension.flow_to_model(
             flow, strict_version=strict_version)
+        if not strict_version:
+            # check if we need to return a new flow b/c of version mismatch
+            new_flow = flow.extension.model_to_flow(flow.model)
+            if new_flow.dependencies != flow.dependencies:
+                return new_flow
     return flow
 
 
