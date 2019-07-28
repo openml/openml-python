@@ -92,7 +92,7 @@ Run the scikit-learn model on the task (requires an API key).
 
  .. code-block:: none
 
-    URL for run: https://test.openml.org/api/v1/xml/run/24917
+    URL for run: https://test.openml.org/api/v1/xml/run/25196
 
 
 
@@ -109,7 +109,7 @@ Run the scikit-learn model on the task (requires an API key).
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.103 seconds)
+   **Total running time of the script:** ( 0 minutes  5.015 seconds)
 
 
 .. _sphx_glr_download_examples_sklearn_openml_run_example.py:

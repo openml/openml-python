@@ -159,8 +159,8 @@ Note that we now filter the evaluations based on another parameter 'task'.
                 run_id  task_id  setup_id  ...     value values array_data
     10232158  10232158   167140   8157180  ...  0.967671   None       None
     10232987  10232987   167140   8157961  ...  0.967671   None       None
-    10229415  10229415   167140   8154437  ...  0.966729   None       None
     10232835  10232835   167140   8157857  ...  0.966729   None       None
+    10229415  10229415   167140   8154437  ...  0.966729   None       None
     10233290  10233290   167140   8158181  ...  0.966416   None       None
 
     [5 rows x 12 columns]
@@ -293,7 +293,7 @@ For this, we shall compare the top performing flows.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.771 seconds)
+   **Total running time of the script:** ( 0 minutes  6.547 seconds)
 
 
 .. _sphx_glr_download_examples_fetch_evaluations_tutorial.py:
