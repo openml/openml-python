@@ -7,11 +7,12 @@ from sklearn.dummy import DummyClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import Imputer
 
-from openml.testing import TestBase
+from openml.testing import TestBase, SimpleImputer
 import openml
 import openml.extensions.sklearn
+
+import pytest
 
 
 class TestRun(TestBase):
@@ -104,7 +105,7 @@ class TestRun(TestBase):
     def test_to_from_filesystem_vanilla(self):
 
         model = Pipeline([
-            ('imputer', Imputer(strategy='mean')),
+            ('imputer', SimpleImputer(strategy='mean')),
             ('classifier', DecisionTreeClassifier(max_depth=1)),
         ])
         task = openml.tasks.get_task(119)
@@ -129,11 +130,15 @@ class TestRun(TestBase):
         self.assertTrue(run_prime.flow is None)
         self._test_run_obj_equals(run, run_prime)
         run_prime.publish()
+        TestBase._mark_entity_for_removal('run', run_prime.run_id)
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            run_prime.run_id))
 
+    @pytest.mark.flaky(reruns=3)
     def test_to_from_filesystem_search(self):
 
         model = Pipeline([
-            ('imputer', Imputer(strategy='mean')),
+            ('imputer', SimpleImputer(strategy='mean')),
             ('classifier', DecisionTreeClassifier(max_depth=1)),
         ])
         model = GridSearchCV(
@@ -162,11 +167,14 @@ class TestRun(TestBase):
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
         self._test_run_obj_equals(run, run_prime)
         run_prime.publish()
+        TestBase._mark_entity_for_removal('run', run_prime.run_id)
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            run_prime.run_id))
 
     def test_to_from_filesystem_no_model(self):
 
         model = Pipeline([
-            ('imputer', Imputer(strategy='mean')),
+            ('imputer', SimpleImputer(strategy='mean')),
             ('classifier', DummyClassifier()),
         ])
         task = openml.tasks.get_task(119)
@@ -196,7 +204,7 @@ class TestRun(TestBase):
         extension = openml.extensions.sklearn.SklearnExtension()
 
         model = Pipeline([
-            ('imputer', Imputer(strategy='mean')),
+            ('imputer', SimpleImputer(strategy='mean')),
             ('classifier', DummyClassifier()),
         ])
         task = openml.tasks.get_task(119)
@@ -226,6 +234,9 @@ class TestRun(TestBase):
         # obtain run from filesystem
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
         loaded_run.publish()
+        TestBase._mark_entity_for_removal('run', loaded_run.run_id)
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            loaded_run.run_id))
 
         # make sure the flow is published as part of publishing the run.
         self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))

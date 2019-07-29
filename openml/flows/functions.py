@@ -307,7 +307,8 @@ def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
 
 def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                        ignore_parameter_values_on_older_children: str = None,
-                       ignore_parameter_values: bool = False) -> None:
+                       ignore_parameter_values: bool = False,
+                       ignore_custom_name_if_none: bool = False) -> None:
     """Check equality of two flows.
 
     Two flows are equal if their all keys which are not set by the server
@@ -325,6 +326,9 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
 
     ignore_parameter_values : bool
         Whether to ignore parameter values when comparing flows.
+
+   ignore_custom_name_if_none : bool
+        Whether to ignore the custom name field if either flow has `custom_name` equal to `None`.
     """
     if not isinstance(flow1, OpenMLFlow):
         raise TypeError('Argument 1 must be of type OpenMLFlow, but is %s' %
@@ -358,7 +362,8 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                                      'argument2, but not in argument1.' % name)
                 assert_flows_equal(attr1[name], attr2[name],
                                    ignore_parameter_values_on_older_children,
-                                   ignore_parameter_values)
+                                   ignore_parameter_values,
+                                   ignore_custom_name_if_none)
         elif key == '_extension':
             continue
         else:
@@ -385,6 +390,13 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                     # Continue needs to be done here as the first if
                     # statement triggers in both special cases
                     continue
+            elif (key == 'custom_name'
+                  and ignore_custom_name_if_none
+                  and (attr1 is None or attr2 is None)):
+                # If specified, we allow `custom_name` inequality if one flow's name is None.
+                # Helps with backwards compatibility as `custom_name` is now auto-generated, but
+                # before it used to be `None`.
+                continue
 
             if attr1 != attr2:
                 raise ValueError("Flow %s: values for attribute '%s' differ: "

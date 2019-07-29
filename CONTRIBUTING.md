@@ -81,6 +81,10 @@ following rules before you submit a pull request:
    Drafts often benefit from the inclusion of a
    [task list](https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments)
    in the PR description.
+   
+- Add [unit tests](https://github.com/openml/openml-python/tree/develop/tests) and [examples](https://github.com/openml/openml-python/tree/develop/examples) for any new functionality being introduced. 
+    - If an unit test contains an upload to the test server, please ensure that it is followed by a file collection for deletion, to prevent the test server from bulking up. For example, `TestBase._mark_entity_for_removal('data', dataset.dataset_id)`, `TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))`.
+    - Please ensure that the example is run on the test server by beginning with the call to `openml.config.start_using_configuration_for_example()`.      
 
 -  All tests pass when running `pytest`. On
    Unix-like systems, check with (from the toplevel source folder):

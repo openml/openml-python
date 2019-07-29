@@ -17,7 +17,7 @@ import warnings
 import pandas as pd
 
 import openml.extensions.sklearn
-from openml.testing import TestBase
+from openml.testing import TestBase, SimpleImputer
 from openml.runs.functions import (
     _run_task_get_arffcontent,
     run_exists,
@@ -28,7 +28,7 @@ from openml.tasks import TaskTypeEnum
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing.imputation import Imputer
+
 from sklearn.dummy import DummyClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import VarianceThreshold
@@ -184,6 +184,8 @@ class TestRun(TestBase):
         flow, _ = self._add_sentinel_to_flow_name(flow, sentinel)
         if not openml.flows.flow_exists(flow.name, flow.external_version):
             flow.publish()
+            TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
+            TestBase.logger.info("collected from test_run_functions: {}".format(flow.flow_id))
 
         task = openml.tasks.get_task(task_id)
 
@@ -196,6 +198,8 @@ class TestRun(TestBase):
             avoid_duplicate_runs=openml.config.avoid_duplicate_runs,
         )
         run_ = run.publish()
+        TestBase._mark_entity_for_removal('run', run.run_id)
+        TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
         self.assertEqual(run_, run)
         self.assertIsInstance(run.dataset_id, int)
 
@@ -546,7 +550,7 @@ class TestRun(TestBase):
             '62501', sentinel=sentinel)
 
     def test_run_and_upload_decision_tree_pipeline(self):
-        pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+        pipeline2 = Pipeline(steps=[('Imputer', SimpleImputer(strategy='median')),
                                     ('VarianceThreshold', VarianceThreshold()),
                                     ('Estimator', RandomizedSearchCV(
                                         DecisionTreeClassifier(),
@@ -653,7 +657,7 @@ class TestRun(TestBase):
         num_folds = 10
         num_samples = 8
 
-        pipeline2 = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+        pipeline2 = Pipeline(steps=[('Imputer', SimpleImputer(strategy='median')),
                                     ('VarianceThreshold', VarianceThreshold()),
                                     ('Estimator', RandomizedSearchCV(
                                         DecisionTreeClassifier(),
@@ -687,6 +691,8 @@ class TestRun(TestBase):
             seed=1,
         )
         run_ = run.publish()
+        TestBase._mark_entity_for_removal('run', run.run_id)
+        TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
         run = openml.runs.get_run(run_.run_id)
 
         modelR = openml.runs.initialize_model_from_run(run_id=run.run_id)
@@ -708,9 +714,9 @@ class TestRun(TestBase):
         np.testing.assert_array_almost_equal(accuracy_scores_provided,
                                              accuracy_scores)
 
-        # also check if we can obtain some other scores: # TODO: how to do AUC?
+        # also check if we can obtain some other scores:
         tests = [(sklearn.metrics.cohen_kappa_score, {'weights': None}),
-                 (sklearn.metrics.auc, {'reorder': True}),
+                 (sklearn.metrics.roc_auc_score, {}),
                  (sklearn.metrics.average_precision_score, {}),
                  (sklearn.metrics.jaccard_similarity_score, {}),
                  (sklearn.metrics.precision_score, {'average': 'macro'}),
@@ -728,7 +734,7 @@ class TestRun(TestBase):
     def test_local_run_swapped_parameter_order_model(self):
 
         # construct sci-kit learn classifier
-        clf = Pipeline(steps=[('imputer', Imputer(strategy='median')),
+        clf = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
                               ('estimator', RandomForestClassifier())])
 
         # download task
@@ -746,7 +752,7 @@ class TestRun(TestBase):
     def test_local_run_swapped_parameter_order_flow(self):
 
         # construct sci-kit learn classifier
-        clf = Pipeline(steps=[('imputer', Imputer(strategy='median')),
+        clf = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
                               ('estimator', RandomForestClassifier())])
 
         flow = self.extension.model_to_flow(clf)
@@ -765,7 +771,7 @@ class TestRun(TestBase):
     def test_local_run_metric_score(self):
 
         # construct sci-kit learn classifier
-        clf = Pipeline(steps=[('imputer', Imputer(strategy='median')),
+        clf = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
                               ('estimator', RandomForestClassifier())])
 
         # download task
@@ -792,7 +798,7 @@ class TestRun(TestBase):
 
     def test_initialize_model_from_run(self):
         clf = sklearn.pipeline.Pipeline(steps=[
-            ('Imputer', Imputer(strategy='median')),
+            ('Imputer', SimpleImputer(strategy='median')),
             ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
             ('Estimator', GaussianNB())])
         task = openml.tasks.get_task(11)
@@ -802,6 +808,8 @@ class TestRun(TestBase):
             avoid_duplicate_runs=False,
         )
         run_ = run.publish()
+        TestBase._mark_entity_for_removal('run', run_.run_id)
+        TestBase.logger.info("collected from test_run_functions: {}".format(run_.run_id))
         run = openml.runs.get_run(run_.run_id)
 
         modelR = openml.runs.initialize_model_from_run(run_id=run.run_id)
@@ -853,6 +861,8 @@ class TestRun(TestBase):
                 num_iterations * num_folds,
             )
             run = run.publish()
+            TestBase._mark_entity_for_removal('run', run.run_id)
+            TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
             self._wait_for_processed_run(run.run_id, 200)
             run_id = run.run_id
         except openml.exceptions.OpenMLRunsExistError as e:
@@ -872,12 +882,12 @@ class TestRun(TestBase):
         rs = 1
         clfs = [
             sklearn.pipeline.Pipeline(steps=[
-                ('Imputer', Imputer(strategy='mean')),
+                ('Imputer', SimpleImputer(strategy='mean')),
                 ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
                 ('Estimator', DecisionTreeClassifier(max_depth=4))
             ]),
             sklearn.pipeline.Pipeline(steps=[
-                ('Imputer', Imputer(strategy='most_frequent')),
+                ('Imputer', SimpleImputer(strategy='most_frequent')),
                 ('VarianceThreshold', VarianceThreshold(threshold=0.1)),
                 ('Estimator', DecisionTreeClassifier(max_depth=4))]
             )
@@ -897,6 +907,8 @@ class TestRun(TestBase):
                     upload_flow=True
                 )
                 run.publish()
+                TestBase._mark_entity_for_removal('run', run.run_id)
+                TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
             except openml.exceptions.PyOpenMLError:
                 # run already existed. Great.
                 pass
@@ -957,6 +969,8 @@ class TestRun(TestBase):
                                   "but 'flow.flow_id' is not None.")
         with self.assertRaisesRegex(openml.exceptions.PyOpenMLError, expected_message_regex):
             loaded_run.publish()
+            TestBase._mark_entity_for_removal('run', loaded_run.run_id)
+            TestBase.logger.info("collected from test_run_functions: {}".format(loaded_run.run_id))
 
     def test_run_with_illegal_flow_id_1(self):
         # Check the case where the user adds an illegal flow id to an existing
@@ -966,6 +980,8 @@ class TestRun(TestBase):
         flow_orig = self.extension.model_to_flow(clf)
         try:
             flow_orig.publish()  # ensures flow exist on server
+            TestBase._mark_entity_for_removal('flow', (flow_orig.flow_id, flow_orig.name))
+            TestBase.logger.info("collected from test_run_functions: {}".format(flow_orig.flow_id))
         except openml.exceptions.OpenMLServerException:
             # flow already exists
             pass
@@ -991,6 +1007,8 @@ class TestRun(TestBase):
         flow_orig = self.extension.model_to_flow(clf)
         try:
             flow_orig.publish()  # ensures flow exist on server
+            TestBase._mark_entity_for_removal('flow', (flow_orig.flow_id, flow_orig.name))
+            TestBase.logger.info("collected from test_run_functions: {}".format(flow_orig.flow_id))
         except openml.exceptions.OpenMLServerException:
             # flow already exists
             pass
@@ -1233,7 +1251,7 @@ class TestRun(TestBase):
         flow.name = 'dummy'
         task = openml.tasks.get_task(2)
 
-        model = Pipeline(steps=[('Imputer', Imputer(strategy='median')),
+        model = Pipeline(steps=[('Imputer', SimpleImputer(strategy='median')),
                                 ('Estimator', DecisionTreeClassifier())])
 
         data_content, _, _, _ = _run_task_get_arffcontent(
@@ -1263,6 +1281,8 @@ class TestRun(TestBase):
         model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
         flow = self.extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
+        TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
+        TestBase.logger.info("collected from test_run_functions: {}".format(flow.flow_id))
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id)
         task = openml.tasks.get_task(119)  # diabetes
@@ -1274,3 +1294,5 @@ class TestRun(TestBase):
         )
 
         run.publish()
+        TestBase._mark_entity_for_removal('run', run.run_id)
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], run.run_id))

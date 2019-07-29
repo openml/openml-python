@@ -19,18 +19,13 @@ import sklearn.preprocessing
 import sklearn.naive_bayes
 import sklearn.tree
 
-if LooseVersion(sklearn.__version__) < "0.20":
-    from sklearn.preprocessing import Imputer
-else:
-    from sklearn.impute import SimpleImputer as Imputer
-
 import xmltodict
 
 import openml
 from openml._api_calls import _perform_api_call
 import openml.exceptions
 import openml.extensions.sklearn
-from openml.testing import TestBase
+from openml.testing import TestBase, SimpleImputer
 import openml.utils
 
 
@@ -40,6 +35,9 @@ class TestFlow(TestBase):
     def setUp(self):
         super().setUp()
         self.extension = openml.extensions.sklearn.SklearnExtension()
+
+    def tearDown(self):
+        super().tearDown()
 
     def test_get_flow(self):
         # We need to use the production server here because 4024 is not the
@@ -177,6 +175,9 @@ class TestFlow(TestBase):
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
 
         flow.publish()
+        TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            flow.flow_id))
         self.assertIsInstance(flow.flow_id, int)
 
     @mock.patch('openml.flows.functions.flow_exists')
@@ -187,6 +188,9 @@ class TestFlow(TestBase):
 
         with self.assertRaises(openml.exceptions.PyOpenMLError) as context_manager:
             flow.publish(raise_error_if_exists=True)
+            TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
+            TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                                flow.flow_id))
 
         self.assertTrue('OpenMLFlow already exists' in context_manager.exception.message)
 
@@ -197,6 +201,9 @@ class TestFlow(TestBase):
         flow = self.extension.model_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.publish()
+        TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            flow.flow_id))
         # For a flow where both components are published together, the upload
         # date should be equal
         self.assertEqual(
@@ -213,6 +220,9 @@ class TestFlow(TestBase):
         flow1 = self.extension.model_to_flow(clf1)
         flow1, sentinel = self._add_sentinel_to_flow_name(flow1, None)
         flow1.publish()
+        TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            flow1.flow_id))
 
         # In order to assign different upload times to the flows!
         time.sleep(1)
@@ -222,6 +232,9 @@ class TestFlow(TestBase):
         flow2 = self.extension.model_to_flow(clf2)
         flow2, _ = self._add_sentinel_to_flow_name(flow2, sentinel)
         flow2.publish()
+        TestBase._mark_entity_for_removal('flow', (flow2.flow_id, flow2.name))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            flow2.flow_id))
         # If one component was published before the other, the components in
         # the flow should have different upload dates
         self.assertNotEqual(flow2.upload_date,
@@ -234,6 +247,9 @@ class TestFlow(TestBase):
         # Child flow has different parameter. Check for storing the flow
         # correctly on the server should thus not check the child's parameters!
         flow3.publish()
+        TestBase._mark_entity_for_removal('flow', (flow3.flow_id, flow3.name))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            flow3.flow_id))
 
     def test_semi_legal_flow(self):
         # TODO: Test if parameters are set correctly!
@@ -246,6 +262,9 @@ class TestFlow(TestBase):
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
 
         flow.publish()
+        TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            flow.flow_id))
 
     @mock.patch('openml.flows.functions.get_flow')
     @mock.patch('openml.flows.functions.flow_exists')
@@ -260,6 +279,8 @@ class TestFlow(TestBase):
         get_flow_mock.return_value = flow
 
         flow.publish()
+        # Not collecting flow_id for deletion since this is a test for failed upload
+
         self.assertEqual(api_call_mock.call_count, 1)
         self.assertEqual(get_flow_mock.call_count, 1)
         self.assertEqual(flow_exists_mock.call_count, 1)
@@ -271,10 +292,13 @@ class TestFlow(TestBase):
 
         with self.assertRaises(ValueError) as context_manager:
             flow.publish()
+            TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
+            TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                                flow.flow_id))
 
         fixture = (
-            "Flow was not stored correctly on the server. "
-            "New flow ID is 1. Please check manually and remove "
+            "The flow on the server is inconsistent with the local flow. "
+            "The server flow ID is 1. Please check manually and remove "
             "the flow if necessary! Error is:\n"
             "'Flow sklearn.ensemble.forest.RandomForestClassifier: "
             "values for attribute 'name' differ: "
@@ -289,8 +313,8 @@ class TestFlow(TestBase):
         # should throw error as it contains two imputers
         illegal = sklearn.pipeline.Pipeline(
             steps=[
-                ('imputer1', Imputer()),
-                ('imputer2', Imputer()),
+                ('imputer1', SimpleImputer()),
+                ('imputer2', SimpleImputer()),
                 ('classif', sklearn.tree.DecisionTreeClassifier())
             ]
         )
@@ -321,7 +345,7 @@ class TestFlow(TestBase):
         if LooseVersion(sklearn.__version__) >= '0.20':
             ohe_params['categories'] = 'auto'
         steps = [
-            ('imputation', Imputer(strategy='median')),
+            ('imputation', SimpleImputer(strategy='median')),
             ('hotencoding', sklearn.preprocessing.OneHotEncoder(**ohe_params)),
             (
                 'variencethreshold',
@@ -336,6 +360,9 @@ class TestFlow(TestBase):
             flow, _ = self._add_sentinel_to_flow_name(flow, None)
             # publish the flow
             flow = flow.publish()
+            TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
+            TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                                flow.flow_id))
             # redownload the flow
             flow = openml.flows.get_flow(flow.flow_id)
 
@@ -394,6 +421,9 @@ class TestFlow(TestBase):
         flow, sentinel = self._add_sentinel_to_flow_name(flow, None)
 
         flow.publish()
+        TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                            flow.flow_id))
         self.assertIsInstance(flow.flow_id, int)
 
         # Check whether we can load the flow again
