@@ -301,4 +301,3 @@ class TestFlowFunctions(TestBase):
                                openml.flows.get_flow,
                                flow_id=flow,
                                reinstantiate=True)
-
