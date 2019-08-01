@@ -83,6 +83,7 @@ def compare_delete_files(old_list, new_list) -> None:
     file_list = list(set(new_list) - set(old_list))
     for file in file_list:
         os.remove(file)
+        logger.info("Deleted from local: {}".format(file))
 
 
 def delete_remote_files(tracker) -> None:
