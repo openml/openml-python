@@ -153,7 +153,6 @@ class OpenMLDataset(object):
 
         if features is not None:
             self.features = {}
-            # todo add nominal values (currently not in database)
             for idx, xmlfeature in enumerate(features['oml:feature']):
                 nr_missing = xmlfeature.get('oml:number_of_missing_values', 0)
                 feature = OpenMLDataFeature(int(xmlfeature['oml:index']),
@@ -173,7 +172,7 @@ class OpenMLDataset(object):
         else:
             self.data_pickle_file = None
 
-    def __str__(self):
+    def __repr__(self):
         header = "OpenML Dataset"
         header = '{}\n{}\n'.format(header, '=' * len(header))
 

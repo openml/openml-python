@@ -17,6 +17,7 @@ Changelog
 * DOC #639: More descriptive documention for function to convert array format.
 * ADD #687: Adds a function to retrieve the list of evaluation measures available.
 * ADD #695: A function to retrieve all the data quality measures available.
+* ADD #412: Add a function to trim flow names for scikit-learn flows.
 * ADD #715: `list_evaluations` now has an option to sort evaluations by score (value).
 * ADD #722: Automatic reinstantiation of flow in `run_model_on_task`. Clearer errors if that's not possible.
 * MAINT #726: Update examples to remove deprecation warnings from scikit-learn

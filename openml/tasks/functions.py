@@ -133,14 +133,14 @@ def list_tasks(
 ) -> Union[Dict, pd.DataFrame]:
     """
     Return a number of tasks having the given tag and task_type_id
+
     Parameters
     ----------
     Filter task_type_id is separated from the other filters because
     it is used as task_type_id in the task description, but it is named
     type when used as a filter in list tasks call.
     task_type_id : int, optional
-        ID of the task type as detailed
-        `here <https://www.openml.org/search?type=task_type>`_.
+        ID of the task type as detailed `here <https://www.openml.org/search?type=task_type>`_.
         - Supervised classification: 1
         - Supervised regression: 2
         - Learning curve: 3
@@ -362,7 +362,7 @@ def get_task(task_id: int, download_data: bool = True) -> OpenMLTask:
         # List of class labels availaible in dataset description
         # Including class labels as part of task meta data handles
         #   the case where data download was initially disabled
-        if isinstance(task, OpenMLClassificationTask):
+        if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
             task.class_labels = \
                 dataset.retrieve_class_labels(task.target_name)
         # Clustering tasks do not have class labels

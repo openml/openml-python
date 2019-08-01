@@ -4,14 +4,14 @@ import openml.config
 class OpenMLSetup(object):
     """Setup object (a.k.a. Configuration).
 
-       Parameters
-       ----------
-       setup_id : int
-            The OpenML setup id
-       flow_id : int
-            The flow that it is build upon
-        parameters : dict
-            The setting of the parameters
+    Parameters
+    ----------
+    setup_id : int
+        The OpenML setup id
+    flow_id : int
+        The flow that it is build upon
+    parameters : dict
+        The setting of the parameters
     """
 
     def __init__(self, setup_id, flow_id, parameters):
@@ -27,7 +27,7 @@ class OpenMLSetup(object):
         self.flow_id = flow_id
         self.parameters = parameters
 
-    def __str__(self):
+    def __repr__(self):
         header = "OpenML Setup"
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
@@ -82,7 +82,7 @@ class OpenMLParameter(object):
         self.default_value = default_value
         self.value = value
 
-    def __str__(self):
+    def __repr__(self):
         header = "OpenML Parameter"
         header = '{}\n{}\n'.format(header, '=' * len(header))
 

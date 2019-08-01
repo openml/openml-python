@@ -72,7 +72,9 @@ class TestBase(unittest.TestCase):
             self.static_cache_dir = os.path.join(static_cache_dir, 'files')
 
         if self.static_cache_dir is None:
-            raise ValueError('Cannot find test cache dir!')
+            raise ValueError(
+                'Cannot find test cache dir, expected it to be {}!'.format(static_cache_dir)
+            )
 
         self.cwd = os.getcwd()
         workdir = os.path.dirname(os.path.abspath(__file__))
@@ -147,7 +149,7 @@ class TestBase(unittest.TestCase):
                                 enumerate(TestBase.publish_tracker[entity_type])
                                 if id_ == entity][0]
             TestBase.publish_tracker[entity_type].pop(delete_index)
-
+    
     def _get_sentinel(self, sentinel=None):
         if sentinel is None:
             # Create a unique prefix for the flow. Necessary because the flow
@@ -242,4 +244,10 @@ class TestBase(unittest.TestCase):
                         self.assertLessEqual(evaluation, max_val)
 
 
-__all__ = ['TestBase']
+try:
+    from sklearn.impute import SimpleImputer
+except ImportError:
+    from sklearn.preprocessing import Imputer as SimpleImputer
+
+
+__all__ = ['TestBase', 'SimpleImputer']

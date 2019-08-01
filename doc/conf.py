@@ -15,6 +15,7 @@
 import os
 import sys
 import sphinx_bootstrap_theme
+import time
 import openml
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -65,7 +66,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'OpenML'
 copyright = (
-    u'2014-2019, the OpenML-Python team.'
+    u'2014-{}, the OpenML-Python team.'.format(time.strftime("%Y,%m,%d,%H,%M,%S").split(',')[0])
 )
 
 # The version info for the project you're documenting, acts as replacement for
