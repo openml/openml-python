@@ -40,6 +40,14 @@ directory = None
 name = '/test'  # semaphore name
 pkl_file = 'publish_tracker.pkl'  # file tracking uploaded entities
 
+# finding the root directory of conftest.py and going up to OpenML main directory
+# exploiting the fact that conftest.py always resides in the root directory for tests
+static_cache_dir = '/'.join(__file__.split('/')[0:-1])
+while True:
+    if 'openml' in os.listdir(static_cache_dir):
+        break
+    static_cache_dir = os.path.join(static_cache_dir, '../')
+
 
 def worker_id() -> str:
     ''' Returns the name of the worker process owning this function call.
@@ -61,7 +69,7 @@ def read_file_list() -> List[str]:
     :return: List[str]
     '''
     # TODO: better directory extractor
-    static_cache_dir = os.getcwd()
+    # static_cache_dir = os.getcwd()
     directory = os.path.join(static_cache_dir, 'tests/files/')
     if worker_id() == 'master':
         logger.info("Collecting file lists from: {}".format(directory))
