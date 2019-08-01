@@ -268,27 +268,23 @@ def list_evaluations_setups(
         the number of runs to skip, starting from the first
     size : int, optional
         the maximum number of runs to show
-
-    id : list, optional
-
-    task : list, optional
-
-    setup: list, optional
-
-    flow : list, optional
-
-    uploader : list, optional
-
+    id : list[int], optional
+        the list of evaluation ID's
+    task : list[int], optional
+        the list of task ID's
+    setup: list[int], optional
+        the list of setup ID's
+    flow : list[int], optional
+        the list of flow ID's
+    uploader : list[int], optional
+        the list of uploader ID's
     tag : str, optional
-
+        filter evaluation based on given tag
     per_fold : bool, optional
-
     sort_order : str, optional
        order of sorting evaluations, ascending ("asc") or descending ("desc")
-
-    output_format: str, optional (default='object')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
-
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
 
