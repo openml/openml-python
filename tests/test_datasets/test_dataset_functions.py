@@ -1165,9 +1165,9 @@ class TestOpenMLDataset(TestBase):
         self.__class__.test_publish_fetch_ignore_attribute_list = ignore_attribute
 
     # The flaky rerun is to handle the rare case of this function being called before
-    # or in parallel to test__publish_fetch_ignore_attribute() such that there is no
-    # ID or ignore_attribute list to check for
-    @pytest.mark.flaky(reruns=3)
+    # or in parallel to test__publish_fetch_ignore_attribute() resulting in no ID or
+    # ignore_attribute list to check for
+    @pytest.mark.flaky(reruns=5)
     def test_publish_fetch_ignore_attribute(self):
         """(Part 2) Test to upload and retrieve dataset and check ignore_attributes
 
