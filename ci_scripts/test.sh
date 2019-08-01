@@ -45,6 +45,8 @@ cd $curr_dir
 # compares with $before to check for remaining files
 after="`git status --porcelain -b`"
 if [[ "$before" != "$after" ]]; then
+    echo $before
+    echo $after
     echo "All generated files have not been deleted!"
     exit 1
 fi

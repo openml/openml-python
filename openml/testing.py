@@ -149,7 +149,7 @@ class TestBase(unittest.TestCase):
                                 enumerate(TestBase.publish_tracker[entity_type])
                                 if id_ == entity][0]
             TestBase.publish_tracker[entity_type].pop(delete_index)
-    
+
     def _get_sentinel(self, sentinel=None):
         if sentinel is None:
             # Create a unique prefix for the flow. Necessary because the flow
