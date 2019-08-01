@@ -12,15 +12,15 @@ class TestEvaluationFunctions(TestBase):
                                                                   sort_order='desc',
                                                                   output_format='dataframe')
         evals = openml.evaluations.list_evaluations("predictive_accuracy",
-                                                    **kwargs,  size=size,
+                                                    **kwargs, size=size,
                                                     sort_order='desc',
                                                     output_format='dataframe')
 
         # Check if list is non-empty
         self.assertGreater(len(evals_setups), 0)
         # Check if output from sort is sorted in the right order
-        self.assertSequenceEqual(sorted(evals_setups['value'].tolist(), reverse=True)
-                                 , evals_setups['value'].tolist())
+        self.assertSequenceEqual(sorted(evals_setups['value'].tolist(), reverse=True),
+                                 evals_setups['value'].tolist())
 
         # Check if output and order of list_evaluations is preserved
         self.assertSequenceEqual(evals_setups['run_id'].tolist(), evals['run_id'].tolist())
@@ -29,7 +29,6 @@ class TestEvaluationFunctions(TestBase):
             params = openml.runs.get_run(row['run_id']).parameter_settings
             hyper_params = [tuple([param['oml:name'], param['oml:value']]) for param in params]
             self.assertTrue(sorted(row['parameters']) == sorted(hyper_params))
-
 
     def test_evaluation_list_filter_task(self):
         openml.config.server = self.production_server
