@@ -1182,16 +1182,15 @@ class TestOpenMLDataset(TestBase):
                 not hasattr(self.__class__, "test_publish_fetch_ignore_attribute_list"):
             raise RuntimeError("test___publish_fetch_ignore_attribute() has not finished "
                                "or has failed.")
+            # wait before retrying
+            time.sleep(10)
         # Retrieving variables from test___publish_fetch_ignore_attribute()
         upload_did = self.__class__.test_publish_fetch_ignore_attribute_did
         ignore_attribute = self.__class__.test_publish_fetch_ignore_attribute_list
 
-        # trials = 1
-        # timeout_limit = 100
         dataset = None
         # fetching from server
         # loop till timeout or fetch not successful
-
         max_waiting_time_seconds = 200
         # time.time() works in seconds
         start_time = time.time()
