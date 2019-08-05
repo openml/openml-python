@@ -38,7 +38,7 @@ directory = None
 
 # finding the root directory of conftest.py and going up to OpenML main directory
 # exploiting the fact that conftest.py always resides in the root directory for tests
-static_dir =  os.path.dirname(os.path.abspath(__file__))
+static_dir = os.path.dirname(os.path.abspath(__file__))
 logging.info("static directory: {}".format(static_dir))
 print("static directory: {}".format(static_dir))
 while True:
