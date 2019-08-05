@@ -157,11 +157,11 @@ Required filters can be applied to retrieve results from runs as required.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>     run_id  task_id  ...  values                                    array_data
-62       62        1  ...    None  [0.714286,0.98,0.992658,0,0.985294,0.904762]
-237     237        1  ...    None                [1,0.942857,0.991215,0,1,0.95]
-413     413        1  ...    None            [1,0.980198,0.994152,0,1,0.948718]
-500     500        1  ...    None         [1,0.99,0.997059,0,0.985294,0.863636]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>   run_id  task_id  ...  values                                    array_data
+0      62        1  ...    None  [0.714286,0.98,0.992658,0,0.985294,0.904762]
+1     237        1  ...    None                [1,0.942857,0.991215,0,1,0.95]
+3     413        1  ...    None            [1,0.980198,0.994152,0,1,0.948718]
+4     500        1  ...    None         [1,0.99,0.997059,0,0.985294,0.863636]
 
 [4 rows x 12 columns]
 </pre></div>
@@ -205,27 +205,27 @@ Note that we now filter the evaluations based on another parameter ‘task’.</
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>          run_id  task_id  setup_id  ...     value values array_data
-9199772  9199772   167140   7130140  ...  0.938481   None       None
-9199845  9199845   167140   7130139  ...  0.623352   None       None
-9202086  9202086   167140   7131884  ...  0.918393   None       None
-9202092  9202092   167140   7131890  ...  0.962335   None       None
-9202096  9202096   167140   7131894  ...  0.961707   None       None
-9202099  9202099   167140   7131897  ...  0.519146   None       None
-9202125  9202125   167140   7131923  ...  0.957313   None       None
-9202139  9202139   167140   7131937  ...  0.519146   None       None
-9202159  9202159   167140   7131957  ...  0.628060   None       None
-9202254  9202254   167140   7132052  ...  0.610483   None       None
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>    run_id  task_id  setup_id  ...     value values array_data
+0  9199772   167140   7130140  ...  0.938481   None       None
+1  9199845   167140   7130139  ...  0.623352   None       None
+2  9202086   167140   7131884  ...  0.918393   None       None
+3  9202092   167140   7131890  ...  0.962335   None       None
+4  9202096   167140   7131894  ...  0.961707   None       None
+5  9202099   167140   7131897  ...  0.519146   None       None
+6  9202125   167140   7131923  ...  0.957313   None       None
+7  9202139   167140   7131937  ...  0.519146   None       None
+8  9202159   167140   7131957  ...  0.628060   None       None
+9  9202254   167140   7132052  ...  0.610483   None       None
 
 [10 rows x 12 columns]
 
 Displaying head of sorted dataframe:
-            run_id  task_id  setup_id  ...     value values array_data
-10279798  10279798   167140   8166877  ...  0.968613   None       None
-10279797  10279797   167140   8166877  ...  0.968613   None       None
-10232158  10232158   167140   8157180  ...  0.967671   None       None
-10232987  10232987   167140   8157961  ...  0.967671   None       None
-10291679  10291679   167140   8157545  ...  0.967043   None       None
+        run_id  task_id  setup_id  ...     value values array_data
+2759  10279798   167140   8166877  ...  0.968613   None       None
+2758  10279797   167140   8166877  ...  0.968613   None       None
+2216  10232158   167140   8157180  ...  0.967671   None       None
+2233  10232987   167140   8157961  ...  0.967671   None       None
+2823  10291679   167140   8157545  ...  0.967043   None       None
 
 [5 rows x 12 columns]
 </pre></div>
@@ -329,7 +329,7 @@ For this, we shall compare the top performing flows.</p>
 (8885, &#39;sklearn.pipeline.Pipeline(imputation=preprocessing.ConditionalImputer2,catencoding=preprocessing.MultiLabelEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.816 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.757 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-fetch-evaluations-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/8ebde0963923552ec6438c2732e14fec/fetch_evaluations_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_evaluations_tutorial.py</span></code></a></p>
