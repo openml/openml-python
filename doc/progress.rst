@@ -8,6 +8,7 @@ Changelog
 
 0.10.0
 ~~~~~~
+* ADD #737: Add list_evaluations_setups to return hyperparameters along with list of evaluations.
 * FIX #261: Test server is cleared of all files uploaded during unit testing.
 * FIX #447: All files created by unit tests no longer persist in local.
 * FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
