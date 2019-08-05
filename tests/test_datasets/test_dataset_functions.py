@@ -1089,22 +1089,8 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url
             )
 
-    def test___publish_fetch_ignore_attribute(self):
-        """(Part 1) Test to upload and retrieve dataset and check ignore_attributes
-
-        DEPENDS on test_publish_fetch_ignore_attribute() to be executed after this
-        This test is split into two parts:
-        1) test___publish_fetch_ignore_attribute() [this unit test]
-            This will be executed earlier, owing to alphabetical sorting.
-            This test creates and publish() a dataset and checks for a valid ID.
-        2) test_publish_fetch_ignore_attribute()
-            This will be executed after test___publish_fetch_ignore_attribute(),
-            owing to alphabetical sorting. The delayed schedule is expected to allow
-            the server more time time to compute data qualities. The interim time
-            can be used by other unit tests instead of waiting for server to respond.
-            The dataset ID obtained previously is used to fetch the dataset.
-            The retrieved dataset is checked for valid ignore_attributes.
-        """
+    def test_publish_fetch_ignore_attribute(self):
+        """Test to upload and retrieve dataset and check ignore_attributes"""
         data = [
             ['a', 'sunny', 85.0, 85.0, 'FALSE', 'no'],
             ['b', 'sunny', 80.0, 90.0, 'TRUE', 'no'],
@@ -1160,38 +1146,10 @@ class TestOpenMLDataset(TestBase):
         # test if publish was successful
         self.assertIsInstance(upload_did, int)
 
-        # variables to carry forward for test_publish_fetch_ignore_attribute()
-        self.__class__.test_publish_fetch_ignore_attribute_did = upload_did
-        self.__class__.test_publish_fetch_ignore_attribute_list = ignore_attribute
-
-    # The flaky rerun is to handle the rare case of this function being called before
-    # or in parallel to test__publish_fetch_ignore_attribute() resulting in no ID or
-    # ignore_attribute list to check for
-    @pytest.mark.flaky(reruns=5)
-    def test_publish_fetch_ignore_attribute(self):
-        """(Part 2) Test to upload and retrieve dataset and check ignore_attributes
-
-        DEPENDS on test___publish_fetch_ignore_attribute() to be executed first
-        This will be executed after test___publish_fetch_ignore_attribute(),
-        owing to alphabetical sorting. The time gap is to allow the server
-        more time time to compute data qualities.
-        The dataset ID obtained previously is used to fetch the dataset.
-        The retrieved dataset is checked for valid ignore_attributes.
-        """
-        if not hasattr(self.__class__, "test_publish_fetch_ignore_attribute_did") and \
-                not hasattr(self.__class__, "test_publish_fetch_ignore_attribute_list"):
-            # wait before retrying
-            time.sleep(10)
-            raise RuntimeError("test___publish_fetch_ignore_attribute() has not finished "
-                               "or has failed.")
-        # Retrieving variables from test___publish_fetch_ignore_attribute()
-        upload_did = self.__class__.test_publish_fetch_ignore_attribute_did
-        ignore_attribute = self.__class__.test_publish_fetch_ignore_attribute_list
-
         dataset = None
         # fetching from server
         # loop till timeout or fetch not successful
-        max_waiting_time_seconds = 200
+        max_waiting_time_seconds = 400
         # time.time() works in seconds
         start_time = time.time()
         while time.time() - start_time < max_waiting_time_seconds:

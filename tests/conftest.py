@@ -21,9 +21,7 @@ Possible Future: class TestBase from openml/testing.py can be included
 '''
 
 import os
-import pickle
 import logging
-import posix_ipc  # required for semaphore synchronization
 from typing import List
 
 import openml
@@ -37,16 +35,14 @@ logger.addHandler(fh)
 
 file_list = []
 directory = None
-name = '/test'  # semaphore name
-pkl_file = 'publish_tracker.pkl'  # file tracking uploaded entities
 
 # finding the root directory of conftest.py and going up to OpenML main directory
 # exploiting the fact that conftest.py always resides in the root directory for tests
-static_cache_dir = '/'.join(__file__.split('/')[0:-1])
+static_dir = '/'.join(__file__.split('/')[0:-1])
 while True:
-    if 'openml' in os.listdir(static_cache_dir):
+    if 'openml' in os.listdir(static_dir):
         break
-    static_cache_dir = os.path.join(static_cache_dir, '../')
+    static_dir = os.path.join(static_dir, '../')
 
 
 def worker_id() -> str:
@@ -68,9 +64,7 @@ def read_file_list() -> List[str]:
 
     :return: List[str]
     '''
-    # TODO: better directory extractor
-    # static_cache_dir = os.getcwd()
-    directory = os.path.join(static_cache_dir, 'tests/files/')
+    directory = os.path.join(static_dir, 'tests/files/')
     if worker_id() == 'master':
         logger.info("Collecting file lists from: {}".format(directory))
     files = os.walk(directory)
@@ -145,9 +139,8 @@ def pytest_sessionstart() -> None:
     'master' while the worker processes are named as 'gw{i}' where i = 0, 1, ..., n-1.
     The order of process spawning is: 'master' -> random ordering of the 'gw{i}' workers.
 
-    Since, master is always executed first, it is checked if the current process is 'master' and,
-    * A semaphore is created which later will help synchronize the master and workers
-    * Return a list of strings of paths of all files in the directory (pre-unit test snapshot)
+    Since, master is always executed first, it is checked if the current process is 'master' and
+    store a list of strings of paths of all files in the directory (pre-unit test snapshot).
 
     :return: None
     '''
@@ -155,15 +148,7 @@ def pytest_sessionstart() -> None:
     global file_list
     worker = worker_id()
     if worker == 'master':
-        # creates the semaphore which can be accessed using 'name'
-        # initial_value is set to be 0
-        # subsequently, a value of 0 would mean resource is occupied, 1 would mean it is available
-        # for more details: http://semanchuk.com/philip/posix_ipc/#semaphore
-        posix_ipc.Semaphore(name, flags=posix_ipc.O_CREAT, initial_value=0)
         file_list = read_file_list()
-        # sets the semaphore to a value of 1, indicating it is available for other processes
-        posix_ipc.Semaphore(name).release()
-    logger.info("Start session: {}; Semaphore: {}".format(worker, posix_ipc.Semaphore(name).value))
 
 
 def pytest_sessionfinish() -> None:
@@ -178,15 +163,7 @@ def pytest_sessionfinish() -> None:
 
     Since, master is always executed last, it is checked if the current process is 'master' and,
     * Compares file list with pre-unit test snapshot and deletes all local files generated
-    * Reads the list of entities uploaded to test server and iteratively deletes them remotely
-    * The semaphore is unlinked or deleted
-
-    For the 'gw{i}' workers, this function:
-    * Writes/updates a file which stores the dictionary containing the list of entities and their
-      entity types that were uploaded to the test server by the unit tests
-    The semaphore enforces synchronisation such that no parallel file read/write happens.
-    The singular list of collated entity types allow a consistent deletion of all uploaded files,
-    only after all unit tests have finished.
+    * Iterates over the list of entities uploaded to test server and deletes them remotely
 
     :return: None
     '''
@@ -194,52 +171,15 @@ def pytest_sessionfinish() -> None:
     global file_list
     worker = worker_id()
     logger.info("Finishing worker {}".format(worker))
-    # locking - other workers go into 'wait' state, till the current worker calls 'release()'
-    # this sets the semaphore value to 0, and hence, if any other worker has called 'acquire()'
-    # in parallel, they enter a waiting queue, until the current process calls 'release()'
-    posix_ipc.Semaphore(name).acquire()
+
+    # Test file deletion
+    logger.info("Deleting files uploaded to test server for worker {}".format(worker))
+    delete_remote_files(TestBase.publish_tracker)
+
     if worker == 'master':
         # Local file deletion
         new_file_list = read_file_list()
         compare_delete_files(file_list, new_file_list)
         logger.info("Local files deleted")
 
-        # Test server file deletion
-        #
-        # Since master finished last, the file read now contains the collated list
-        # from all the workers that were running in parallel
-        with open(pkl_file, 'rb') as f:
-            tracker = pickle.load(f)
-        f.close()
-        os.remove(pkl_file)
-        delete_remote_files(tracker)
-        logger.info("Remote files deleted")
-        posix_ipc.Semaphore(name).release()
-        logger.info("Master worker released")
-        posix_ipc.unlink_semaphore(name)
-        logger.info("Closed semaphore")
-    else:  # If the process is a worker named 'gw{i}'
-        if not os.path.isfile('publish_tracker.pkl'):
-            # The first worker which has finished its allocated unit test will not find the
-            # pickle file existing, and therefore will first create it
-            with open(pkl_file, 'wb') as f:
-                pickle.dump(TestBase.publish_tracker, f)
-            f.close()
-        # All workers that have finished their unit tests can read the pickle file
-        with open(pkl_file, 'rb') as f:
-            tracker = pickle.load(f)
-        f.close()
-        # 'tracker' collates the entity list from all workers into one
-        for key in TestBase.publish_tracker:
-            if key in tracker:
-                tracker[key].extend(TestBase.publish_tracker[key])
-                tracker[key] = list(set(tracker[key]))
-            else:
-                tracker[key] = TestBase.publish_tracker[key]
-        # All workers finishing up, updates the pickle file
-        with open(pkl_file, 'wb') as f:
-            pickle.dump(tracker, f)
-        f.close()
-        logger.info("Releasing worker {}".format(worker))
-        # The semaphore is made available for the other workers
-        posix_ipc.Semaphore(name).release()
+    logging.info("{} is killed".format(worker))

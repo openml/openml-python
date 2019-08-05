@@ -52,6 +52,3 @@ fi
 # Install scikit-learn last to make sure the openml package installation works
 # from a clean environment without scikit-learn.
 pip install scikit-learn==$SKLEARN_VERSION
-
-# Install posix_ipc to use semaphores for synchornizing file deletions
-pip install posix_ipc
