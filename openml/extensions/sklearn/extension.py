@@ -476,6 +476,35 @@ class SklearnExtension(Extension):
             or ',sklearn==' in flow.external_version
         )
 
+    def _get_sklearn_description(self, model: Any, char_lim: int = 1024) -> str:
+        '''Fetches the sklearn function docstring for the flow description
+
+        Parameters
+        ----------
+        model: The sklearn model object
+        char_lim: int, specifying the max length of the returned string
+            OpenML servers have a constraint of 1024 characters for the 'description' field.
+
+        Returns
+        -------
+        string of length <= char_lim
+        '''
+        def match_format(s):
+            return "{}\n{}\n".format(s, len(s) * '-')
+        s1 = "Parameters"
+        # s2 = "Attributes"
+        # s3 = "See also"
+        # s4 = "Notes"
+        s = inspect.getdoc(model)
+        if len(s) <= char_lim:
+            return s
+        index = s.index(match_format(s1))
+        # captures description till start of 'Parameters\n----------\n', excluding it
+        s = s[:index]
+        if len(s) > char_lim:
+            s = "{}...".format(s[:char_lim - 3])
+        return s
+
     def _serialize_model(self, model: Any) -> OpenMLFlow:
         """Create an OpenMLFlow.
 
@@ -534,10 +563,12 @@ class SklearnExtension(Extension):
 
         sklearn_version = self._format_external_version('sklearn', sklearn.__version__)
         sklearn_version_formatted = sklearn_version.replace('==', '_')
+
+        sklearn_description = self._get_sklearn_description(model)
         flow = OpenMLFlow(name=name,
                           class_name=class_name,
                           custom_name=short_name,
-                          description='Automatically created scikit-learn flow.',
+                          description=sklearn_description,
                           model=model,
                           components=subcomponents,
                           parameters=parameters,
