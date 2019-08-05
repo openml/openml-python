@@ -6,6 +6,7 @@ import inspect
 import json
 import logging
 import re
+from re import IGNORECASE
 import sys
 import time
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
@@ -492,6 +493,8 @@ class SklearnExtension(Extension):
         def match_format(s):
             return "{}\n{}\n".format(s, len(s) * '-')
         s1 = "Parameters"
+        # p = re.compile("[a-z0-9_ ]+ : [a-z0-9_]+[a-z0-9_ ]*", flags=IGNORECASE)
+        # t = p.findall(d)
         # s2 = "Attributes"
         # s3 = "See also"
         # s4 = "Notes"
@@ -633,6 +636,42 @@ class SklearnExtension(Extension):
                 known_sub_components.add(visitee.name)
                 to_visit_stack.extend(visitee.components.values())
 
+    def _extract_sklearn_param_info(self, model):
+        def match_format(s):
+            return "{}\n{}\n".format(s, len(s) * '-')
+        s1 = "Parameters"
+        s2 = "Attributes"
+        s = inspect.getdoc(model)
+        index1 = s.index(match_format(s1))
+        index2 = s.index(match_format(s2))
+        docstring = s[index1:index2]
+        n = re.compile("[.]*\n", flags=IGNORECASE)
+        lines = n.split(docstring)
+        p = re.compile("[a-z0-9_ ]+ : [a-z0-9_]+[a-z0-9_ ]*", flags=IGNORECASE)
+        parameter_docs = OrderedDict()
+        description = []
+
+        # collecting parameters and their descriptions
+        for i, s in enumerate(lines):
+            param = p.findall(s)
+            if param != []:
+                if len(description) > 0:
+                    description[-1] = '\n'.join(description[-1])
+                description.append([])
+            else:
+                if len(description) > 0:
+                    description[-1].append(s)
+        description[-1] = '\n'.join(description[-1])
+
+        # collecting parameters and their types
+        matches = p.findall(docstring)
+        parameter_docs = OrderedDict()
+        for i, param in enumerate(matches):
+            key, value = param.split(':')
+            parameter_docs[key.strip()] = [value.strip(), description[i]]
+
+        return parameter_docs
+
     def _extract_information_from_model(
         self,
         model: Any,
@@ -654,6 +693,7 @@ class SklearnExtension(Extension):
         sub_components_explicit = set()
         parameters = OrderedDict()  # type: OrderedDict[str, Optional[str]]
         parameters_meta_info = OrderedDict()  # type: OrderedDict[str, Optional[Dict]]
+        parameters_docs = self._extract_sklearn_param_info(model)
 
         model_parameters = model.get_params(deep=False)
         for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
@@ -774,7 +814,9 @@ class SklearnExtension(Extension):
                 else:
                     parameters[k] = None
 
-            parameters_meta_info[k] = OrderedDict((('description', None), ('data_type', None)))
+            data_type, description = parameters_docs[k]
+            parameters_meta_info[k] = OrderedDict((('description', description),
+                                                   ('data_type', data_type)))
 
         return parameters, parameters_meta_info, sub_components, sub_components_explicit
 
