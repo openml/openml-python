@@ -28,7 +28,7 @@ setuptools.setup(name="openml",
                  version=version,
                  packages=setuptools.find_packages(),
                  package_data={'': ['*.txt', '*.md']},
-                 python_requires=">= 3.5",
+                 python_requires=">=3.5",
                  install_requires=[
                      'liac-arff>=2.4.0',
                      'xmltodict',
