@@ -38,11 +38,12 @@ directory = None
 
 # finding the root directory of conftest.py and going up to OpenML main directory
 # exploiting the fact that conftest.py always resides in the root directory for tests
-static_dir = '/'.join(__file__.split('/')[0:-1])
+static_dir =  os.path.dirname(os.path.abspath(__file__))
+logging.info("static directory: {}".format(static_dir))
 while True:
     if 'openml' in os.listdir(static_dir):
         break
-    static_dir = os.path.join(static_dir, '../')
+    static_dir = os.path.join(static_dir, '..')
 
 
 def worker_id() -> str:
