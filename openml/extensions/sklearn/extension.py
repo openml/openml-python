@@ -492,17 +492,15 @@ class SklearnExtension(Extension):
         '''
         def match_format(s):
             return "{}\n{}\n".format(s, len(s) * '-')
-        s1 = "Parameters"
-        # p = re.compile("[a-z0-9_ ]+ : [a-z0-9_]+[a-z0-9_ ]*", flags=IGNORECASE)
-        # t = p.findall(d)
-        # s2 = "Attributes"
-        # s3 = "See also"
-        # s4 = "Notes"
         s = inspect.getdoc(model)
         if len(s) <= char_lim:
             return s
-        index = s.index(match_format(s1))
-        # captures description till start of 'Parameters\n----------\n', excluding it
+        try:
+            pattern = "Read more in the :ref:"  # "Parameters"
+            index = s.index(pattern)
+        except ValueError:
+            pattern = "Parameters"
+            index = s.index(match_format(pattern))
         s = s[:index]
         if len(s) > char_lim:
             s = "{}...".format(s[:char_lim - 3])
@@ -636,15 +634,33 @@ class SklearnExtension(Extension):
                 known_sub_components.add(visitee.name)
                 to_visit_stack.extend(visitee.components.values())
 
-    def _extract_sklearn_param_info(self, model):
+    def _extract_sklearn_parameter_docstring(self, model):
         def match_format(s):
             return "{}\n{}\n".format(s, len(s) * '-')
-        s1 = "Parameters"
-        s2 = "Attributes"
         s = inspect.getdoc(model)
-        index1 = s.index(match_format(s1))
-        index2 = s.index(match_format(s2))
-        docstring = s[index1:index2]
+        s1 = "Parameters"
+        s2 = ["Attributes", "See also", "Note", "References"]
+        try:
+            index1 = s.index(match_format(s1))
+        except ValueError as e:
+            print("Parameter {}".format(e))
+            # returns the whole sklearn docstring available
+            return s
+        for h in s2:
+            try:
+                index2 = s.index(match_format(h))
+                break
+            except ValueError:
+                print("{} not available in docstring".format(h))
+                continue
+        else:
+            # in the case only 'Parameters' exist
+            index2 = len(s)
+        s = s[index1:index2]
+        return s
+
+    def _extract_sklearn_param_info(self, model):
+        docstring = self._extract_sklearn_parameter_docstring(model)
         n = re.compile("[.]*\n", flags=IGNORECASE)
         lines = n.split(docstring)
         p = re.compile("[a-z0-9_ ]+ : [a-z0-9_]+[a-z0-9_ ]*", flags=IGNORECASE)
@@ -656,12 +672,12 @@ class SklearnExtension(Extension):
             param = p.findall(s)
             if param != []:
                 if len(description) > 0:
-                    description[-1] = '\n'.join(description[-1])
+                    description[-1] = '\n'.join(description[-1]).strip()
                 description.append([])
             else:
                 if len(description) > 0:
                     description[-1].append(s)
-        description[-1] = '\n'.join(description[-1])
+        description[-1] = '\n'.join(description[-1]).strip()
 
         # collecting parameters and their types
         matches = p.findall(docstring)
