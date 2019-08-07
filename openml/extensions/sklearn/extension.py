@@ -480,31 +480,48 @@ class SklearnExtension(Extension):
     def _get_sklearn_description(self, model: Any, char_lim: int = 1024) -> str:
         '''Fetches the sklearn function docstring for the flow description
 
+        Retrieves the sklearn docstring available and does the following:
+        * If length of docstring <= char_lim, then returns the complete docstring
+        * Else, trims the docstring till it encounters a 'Read more in the :ref:'
+        * Or till it encounters a 'Parameters\n----------\n'
+        The final string returned is at most of length char_lim with leading and
+        trailing whitespaces removed.
+
         Parameters
         ----------
-        model: The sklearn model object
-        char_lim: int, specifying the max length of the returned string
+        model : sklearn model
+        char_lim : int
+            Specifying the max length of the returned string
             OpenML servers have a constraint of 1024 characters for the 'description' field.
 
         Returns
         -------
-        string of length <= char_lim
+        str
         '''
         def match_format(s):
             return "{}\n{}\n".format(s, len(s) * '-')
         s = inspect.getdoc(model)
         if len(s) <= char_lim:
-            return s
+            # if the fetched docstring is smaller than char_lim, no trimming required
+            return s.strip()
         try:
-            pattern = "Read more in the :ref:"  # "Parameters"
+            # trim till 'Read more'
+            pattern = "Read more in the :ref:"
             index = s.index(pattern)
         except ValueError:
+            pass
+        try:
+            # if 'Read more' doesn't exist, trim till 'Parameters'
             pattern = "Parameters"
             index = s.index(match_format(pattern))
+        except ValueError:
+            # returning full docstring
+            index = len(s)
         s = s[:index]
+        # trimming docstring to be within char_lim
         if len(s) > char_lim:
             s = "{}...".format(s[:char_lim - 3])
-        return s
+        return s.strip()
 
     def _serialize_model(self, model: Any) -> OpenMLFlow:
         """Create an OpenMLFlow.
@@ -634,38 +651,69 @@ class SklearnExtension(Extension):
                 known_sub_components.add(visitee.name)
                 to_visit_stack.extend(visitee.components.values())
 
-    def _extract_sklearn_parameter_docstring(self, model):
+    def _extract_sklearn_parameter_docstring(self, model) -> Union[None, str]:
+        '''Extracts the part of sklearn docstring containing parameter information
+
+        Fetches the entire docstring and trims just the Parameter section.
+        The assumption is that 'Parameters' is the first section in sklearn docstrings,
+        followed by other sections titled 'Attributes', 'See also', 'Note', 'References',
+        appearing in that order if defined.
+        Returns a None if no section with 'Parameters' can be found in the docstring.
+
+        Parameters
+        ----------
+        model : sklearn model
+
+        Returns
+        -------
+        str, or None
+        '''
         def match_format(s):
             return "{}\n{}\n".format(s, len(s) * '-')
         s = inspect.getdoc(model)
-        s1 = "Parameters"
-        s2 = ["Attributes", "See also", "Note", "References"]
         try:
-            index1 = s.index(match_format(s1))
+            index1 = s.index(match_format("Parameters"))
         except ValueError as e:
-            print("Parameter {}".format(e))
-            # returns the whole sklearn docstring available
-            return s
-        for h in s2:
+            # when sklearn docstring has no 'Parameters' section
+            print("{} {}".format(match_format("Parameters"), e))
+            return None
+
+        headings = ["Attributes", "See also", "Note", "References"]
+        for h in headings:
             try:
+                # to find end of Parameters section
                 index2 = s.index(match_format(h))
                 break
             except ValueError:
                 print("{} not available in docstring".format(h))
                 continue
         else:
-            # in the case only 'Parameters' exist
+            # in the case only 'Parameters' exist, trim till end of docstring
             index2 = len(s)
         s = s[index1:index2]
-        return s
+        return s.strip()
 
-    def _extract_sklearn_param_info(self, model):
+    def _extract_sklearn_param_info(self, model) -> Union[None, Dict]:
+        '''Parses parameter type and description from sklearn dosctring
+
+        Parameters
+        ----------
+        model : sklearn model
+
+        Returns
+        -------
+        Dict, or None
+        '''
         docstring = self._extract_sklearn_parameter_docstring(model)
+        if docstring is None:
+            # when sklearn docstring has no 'Parameters' section
+            return None
+
         n = re.compile("[.]*\n", flags=IGNORECASE)
         lines = n.split(docstring)
         p = re.compile("[a-z0-9_ ]+ : [a-z0-9_]+[a-z0-9_ ]*", flags=IGNORECASE)
-        parameter_docs = OrderedDict()
-        description = []
+        parameter_docs = OrderedDict()  # type: Dict
+        description = []  # type: List
 
         # collecting parameters and their descriptions
         for i, s in enumerate(lines):
@@ -681,7 +729,6 @@ class SklearnExtension(Extension):
 
         # collecting parameters and their types
         matches = p.findall(docstring)
-        parameter_docs = OrderedDict()
         for i, param in enumerate(matches):
             key, value = param.split(':')
             parameter_docs[key.strip()] = [value.strip(), description[i]]
@@ -830,9 +877,12 @@ class SklearnExtension(Extension):
                 else:
                     parameters[k] = None
 
-            data_type, description = parameters_docs[k]
-            parameters_meta_info[k] = OrderedDict((('description', description),
-                                                   ('data_type', data_type)))
+            if parameters_docs is not None:
+                data_type, description = parameters_docs[k]
+                parameters_meta_info[k] = OrderedDict((('description', description),
+                                                       ('data_type', data_type)))
+            else:
+                parameters_meta_info[k] = OrderedDict((('description', None), ('data_type', None)))
 
         return parameters, parameters_meta_info, sub_components, sub_components_explicit
 
