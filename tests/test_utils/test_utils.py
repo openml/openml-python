@@ -2,7 +2,6 @@ from openml.testing import TestBase
 import numpy as np
 import openml
 import sys
-import pytest
 
 if sys.version_info[0] >= 3:
     from unittest import mock
