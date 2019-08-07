@@ -491,7 +491,7 @@ class SklearnExtension(Extension):
         ----------
         model : sklearn model
         char_lim : int
-            Specifying the max length of the returned string
+            Specifying the max length of the returned string.
             OpenML servers have a constraint of 1024 characters for the 'description' field.
 
         Returns
@@ -508,6 +508,11 @@ class SklearnExtension(Extension):
             # trim till 'Read more'
             pattern = "Read more in the :ref:"
             index = s.index(pattern)
+            s = s[:index]
+            # trimming docstring to be within char_lim
+            if len(s) > char_lim:
+                s = "{}...".format(s[:char_lim - 3])
+            return s.strip()
         except ValueError:
             pass
         try:
@@ -678,7 +683,7 @@ class SklearnExtension(Extension):
             print("{} {}".format(match_format("Parameters"), e))
             return None
 
-        headings = ["Attributes", "See also", "Note", "References"]
+        headings = ["Attributes", "Notes", "See also", "Note", "References"]
         for h in headings:
             try:
                 # to find end of Parameters section
@@ -693,12 +698,15 @@ class SklearnExtension(Extension):
         s = s[index1:index2]
         return s.strip()
 
-    def _extract_sklearn_param_info(self, model) -> Union[None, Dict]:
+    def _extract_sklearn_param_info(self, model, char_lim=1024) -> Union[None, Dict]:
         '''Parses parameter type and description from sklearn dosctring
 
         Parameters
         ----------
         model : sklearn model
+        char_lim : int
+            Specifying the max length of the returned string.
+            OpenML servers have a constraint of 1024 characters string fields.
 
         Returns
         -------
@@ -711,7 +719,7 @@ class SklearnExtension(Extension):
 
         n = re.compile("[.]*\n", flags=IGNORECASE)
         lines = n.split(docstring)
-        p = re.compile("[a-z0-9_ ]+ : [a-z0-9_]+[a-z0-9_ ]*", flags=IGNORECASE)
+        p = re.compile("[a-z0-9_ ]+ : [a-z0-9_']+[a-z0-9_ ]*", flags=IGNORECASE)
         parameter_docs = OrderedDict()  # type: Dict
         description = []  # type: List
 
@@ -721,11 +729,15 @@ class SklearnExtension(Extension):
             if param != []:
                 if len(description) > 0:
                     description[-1] = '\n'.join(description[-1]).strip()
+                    if len(description[-1]) > char_lim:
+                        description[-1] = "{}...".format(description[-1][:char_lim - 3])
                 description.append([])
             else:
                 if len(description) > 0:
                     description[-1].append(s)
         description[-1] = '\n'.join(description[-1]).strip()
+        if len(description[-1]) > char_lim:
+            description[-1] = "{}...".format(description[-1][:char_lim - 3])
 
         # collecting parameters and their types
         matches = p.findall(docstring)
