@@ -30,8 +30,6 @@ from openml.testing import TestBase
 # creating logger for unit test file deletion status
 logger = logging.getLogger("unit_tests")
 logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler('UnitTestDeletion.log')
-logger.addHandler(fh)
 
 file_list = []
 directory = None
@@ -106,10 +104,6 @@ def delete_remote_files(tracker) -> None:
     '''
     openml.config.server = TestBase.test_server
     openml.config.apikey = TestBase.apikey
-
-    # legal_entities defined in openml.utils._delete_entity() - {'user'}
-    # entity_types = {'run', 'data', 'flow', 'task', 'study'}
-    # 'run' needs to be first entity to allow other dependent entities to be deleted
 
     # reordering to delete sub flows at the end of flows
     # sub-flows have shorter names, hence, sorting by descending order of flow name length

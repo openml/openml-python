@@ -35,11 +35,8 @@ class TestBase(unittest.TestCase):
     apikey = "610344db6388d9ba34f6db45a3cf71de"
 
     # creating logger for tracking files uploaded to test server
-    logger = logging.getLogger("unit_tests_publish")
+    logger = logging.getLogger("unit_tests_published_entities")
     logger.setLevel(logging.DEBUG)
-    fh = logging.FileHandler('UploadedFiles.log')
-    # fh.setLevel(logging.DEBUG)
-    logger.addHandler(fh)
 
     def setUp(self, n_levels: int = 1):
         """Setup variables and temporary directories.
