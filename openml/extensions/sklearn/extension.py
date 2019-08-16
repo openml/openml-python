@@ -208,7 +208,7 @@ class SklearnExtension(Extension):
 
     def flow_to_model(self, flow: 'OpenMLFlow',
                       initialize_with_defaults: bool = False,
-                      strict_version: Optional[bool] = True) -> Any:
+                      strict_version: bool = True) -> Any:
         """Initializes a sklearn model based on a flow.
 
         Parameters
@@ -238,7 +238,7 @@ class SklearnExtension(Extension):
         components: Optional[Dict] = None,
         initialize_with_defaults: bool = False,
         recursion_depth: int = 0,
-        strict_version: Optional[bool] = True
+        strict_version: bool = True,
     ) -> Any:
         """Recursive function to deserialize a scikit-learn flow.
 
@@ -309,7 +309,7 @@ class SklearnExtension(Extension):
                         components[key],
                         initialize_with_defaults=initialize_with_defaults,
                         recursion_depth=depth_pp,
-                        strict_version=strict_version
+                        strict_version=strict_version,
                     )
                     # The component is now added to where it should be used
                     # later. It should not be passed to the constructor of the
@@ -797,7 +797,7 @@ class SklearnExtension(Extension):
         flow: OpenMLFlow,
         keep_defaults: bool,
         recursion_depth: int,
-        strict_version: Optional[bool] = True
+        strict_version: bool = True
     ) -> Any:
         logging.info('-%s deserialize %s' % ('-' * recursion_depth, flow.name))
         model_name = flow.class_name
@@ -866,7 +866,7 @@ class SklearnExtension(Extension):
         return model_class(**parameter_dict)
 
     def _check_dependencies(self, dependencies: str,
-                            strict_version: Optional[bool] = True) -> None:
+                            strict_version: bool = True) -> None:
         if not dependencies:
             return
 
@@ -1018,7 +1018,7 @@ class SklearnExtension(Extension):
         self,
         value: 'OrderedDict[str, Any]',
         recursion_depth: int,
-        strict_version: Optional[bool] = True
+        strict_version: bool = True
     ) -> Any:
         model_name = value['name']
         parameters = value['parameters']
