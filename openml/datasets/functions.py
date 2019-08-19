@@ -504,7 +504,7 @@ def attributes_arff_from_df(df):
     for column_name in df:
         # skipna=True does not infer properly the dtype. The NA values are
         # dropped before the inference instead.
-        column_dtype = pd.api.types.infer_dtype(df[column_name].dropna())
+        column_dtype = pd.api.types.infer_dtype(df[column_name].dropna(), skipna=False)
 
         if column_dtype == 'categorical':
             # for categorical feature, arff expects a list string. However, a
