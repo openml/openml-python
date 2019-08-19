@@ -17,6 +17,8 @@ with warnings.catch_warnings():
 import openml
 from openml.tasks import TaskTypeEnum
 
+import logging
+
 
 class TestBase(unittest.TestCase):
     """Base class for tests
@@ -26,6 +28,15 @@ class TestBase(unittest.TestCase):
     Currently hard-codes a read-write key.
     Hopefully soon allows using a test server, not the production server.
     """
+    publish_tracker = {'run': [], 'data': [], 'flow': [], 'task': [],
+                       'study': [], 'user': []}  # type: dict
+    test_server = "https://test.openml.org/api/v1/xml"
+    # amueller's read/write key that he will throw away later
+    apikey = "610344db6388d9ba34f6db45a3cf71de"
+
+    # creating logger for tracking files uploaded to test server
+    logger = logging.getLogger("unit_tests_published_entities")
+    logger.setLevel(logging.DEBUG)
 
     def setUp(self, n_levels: int = 1):
         """Setup variables and temporary directories.
@@ -58,7 +69,9 @@ class TestBase(unittest.TestCase):
             self.static_cache_dir = os.path.join(static_cache_dir, 'files')
 
         if self.static_cache_dir is None:
-            raise ValueError('Cannot find test cache dir!')
+            raise ValueError(
+                'Cannot find test cache dir, expected it to be {}!'.format(static_cache_dir)
+            )
 
         self.cwd = os.getcwd()
         workdir = os.path.dirname(os.path.abspath(__file__))
@@ -70,12 +83,9 @@ class TestBase(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-        # amueller's read/write key that he will throw away later
-        openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
+        openml.config.apikey = TestBase.apikey
         self.production_server = "https://openml.org/api/v1/xml"
-        self.test_server = "https://test.openml.org/api/v1/xml"
-
-        openml.config.server = self.test_server
+        openml.config.server = TestBase.test_server
         openml.config.avoid_duplicate_runs = False
         openml.config.cache_directory = self.workdir
 
@@ -86,7 +96,7 @@ class TestBase(unittest.TestCase):
                 with open(openml.config.config_file, 'w') as fh:
                     fh.write('apikey = %s' % openml.config.apikey)
 
-        # Increase the number of retries to avoid spurios server failures
+        # Increase the number of retries to avoid spurious server failures
         self.connection_n_retries = openml.config.connection_n_retries
         openml.config.connection_n_retries = 10
 
@@ -102,6 +112,40 @@ class TestBase(unittest.TestCase):
                 raise
         openml.config.server = self.production_server
         openml.config.connection_n_retries = self.connection_n_retries
+
+    @classmethod
+    def _mark_entity_for_removal(self, entity_type, entity_id):
+        """ Static record of entities uploaded to test server
+
+        Dictionary of lists where the keys are 'entity_type'.
+        Each such dictionary is a list of integer IDs.
+        For entity_type='flow', each list element is a tuple
+        of the form (Flow ID, Flow Name).
+        """
+        if entity_type not in TestBase.publish_tracker:
+            TestBase.publish_tracker[entity_type] = [entity_id]
+        else:
+            TestBase.publish_tracker[entity_type].append(entity_id)
+
+    @classmethod
+    def _delete_entity_from_tracker(self, entity_type, entity):
+        """ Deletes entity records from the static file_tracker
+
+        Given an entity type and corresponding ID, deletes all entries, including
+        duplicate entries of the ID for the entity type.
+        """
+        if entity_type in TestBase.publish_tracker:
+            # removes duplicate entries
+            TestBase.publish_tracker[entity_type] = list(set(TestBase.publish_tracker[entity_type]))
+            if entity_type == 'flow':
+                delete_index = [i for i, (id_, _) in
+                                enumerate(TestBase.publish_tracker[entity_type])
+                                if id_ == entity][0]
+            else:
+                delete_index = [i for i, id_ in
+                                enumerate(TestBase.publish_tracker[entity_type])
+                                if id_ == entity][0]
+            TestBase.publish_tracker[entity_type].pop(delete_index)
 
     def _get_sentinel(self, sentinel=None):
         if sentinel is None:
@@ -197,4 +241,10 @@ class TestBase(unittest.TestCase):
                         self.assertLessEqual(evaluation, max_val)
 
 
-__all__ = ['TestBase']
+try:
+    from sklearn.impute import SimpleImputer
+except ImportError:
+    from sklearn.preprocessing import Imputer as SimpleImputer
+
+
+__all__ = ['TestBase', 'SimpleImputer']

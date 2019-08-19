@@ -6,6 +6,30 @@ from openml.testing import TestBase
 class TestEvaluationFunctions(TestBase):
     _multiprocess_can_split_ = True
 
+    def _check_list_evaluation_setups(self, size, **kwargs):
+        evals_setups = openml.evaluations.list_evaluations_setups("predictive_accuracy",
+                                                                  **kwargs, size=size,
+                                                                  sort_order='desc',
+                                                                  output_format='dataframe')
+        evals = openml.evaluations.list_evaluations("predictive_accuracy",
+                                                    **kwargs, size=size,
+                                                    sort_order='desc',
+                                                    output_format='dataframe')
+
+        # Check if list is non-empty
+        self.assertGreater(len(evals_setups), 0)
+        # Check if output from sort is sorted in the right order
+        self.assertSequenceEqual(sorted(evals_setups['value'].tolist(), reverse=True),
+                                 evals_setups['value'].tolist())
+
+        # Check if output and order of list_evaluations is preserved
+        self.assertSequenceEqual(evals_setups['run_id'].tolist(), evals['run_id'].tolist())
+        # Check if the hyper-parameter column is as accurate and flow_id
+        for index, row in evals_setups.iterrows():
+            params = openml.runs.get_run(row['run_id']).parameter_settings
+            hyper_params = [tuple([param['oml:name'], param['oml:value']]) for param in params]
+            self.assertTrue(sorted(row['parameters']) == sorted(hyper_params))
+
     def test_evaluation_list_filter_task(self):
         openml.config.server = self.production_server
 
@@ -116,3 +140,41 @@ class TestEvaluationFunctions(TestBase):
         for run_id in evaluations.keys():
             self.assertIsNotNone(evaluations[run_id].value)
             self.assertIsNone(evaluations[run_id].values)
+
+    def test_evaluation_list_sort(self):
+        size = 10
+        task_id = 115
+        # Get all evaluations of the task
+        unsorted_eval = openml.evaluations.list_evaluations(
+            "predictive_accuracy", offset=0, task=[task_id])
+        # Get top 10 evaluations of the same task
+        sorted_eval = openml.evaluations.list_evaluations(
+            "predictive_accuracy", size=size, offset=0, task=[task_id], sort_order="desc")
+        self.assertEqual(len(sorted_eval), size)
+        self.assertGreater(len(unsorted_eval), 0)
+        sorted_output = [evaluation.value for evaluation in sorted_eval.values()]
+        unsorted_output = [evaluation.value for evaluation in unsorted_eval.values()]
+
+        # Check if output from sort is sorted in the right order
+        self.assertTrue(sorted(sorted_output, reverse=True) == sorted_output)
+
+        # Compare manual sorting against sorted output
+        test_output = sorted(unsorted_output, reverse=True)
+        self.assertTrue(test_output[:size] == sorted_output)
+
+    def test_list_evaluation_measures(self):
+        measures = openml.evaluations.list_evaluation_measures()
+        self.assertEqual(isinstance(measures, list), True)
+        self.assertEqual(all([isinstance(s, str) for s in measures]), True)
+
+    def test_list_evaluations_setups_filter_flow(self):
+        openml.config.server = self.production_server
+        flow_id = [405]
+        size = 100
+        self._check_list_evaluation_setups(size, flow=flow_id)
+
+    def test_list_evaluations_setups_filter_task(self):
+        openml.config.server = self.production_server
+        task_id = [6]
+        size = 100
+        self._check_list_evaluation_setups(size, task=task_id)

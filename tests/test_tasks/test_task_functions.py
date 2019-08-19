@@ -12,6 +12,12 @@ import pandas as pd
 class TestTask(TestBase):
     _multiprocess_can_split_ = True
 
+    def setUp(self):
+        super(TestTask, self).setUp()
+
+    def tearDown(self):
+        super(TestTask, self).tearDown()
+
     def test__get_cached_tasks(self):
         openml.config.cache_directory = self.static_cache_dir
         tasks = openml.tasks.functions._get_cached_tasks()
@@ -78,6 +84,8 @@ class TestTask(TestBase):
 
         self.assertIsInstance(tasks, dict)
 
+    @unittest.skip("Server will currently incorrectly return only 99 tasks."
+                   "See https://github.com/openml/OpenML/issues/980")
     def test_list_tasks_by_tag(self):
         num_basic_tasks = 100  # number is flexible, check server if fails
         tasks = openml.tasks.list_tasks(tag='OpenML100')

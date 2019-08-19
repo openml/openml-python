@@ -132,9 +132,9 @@ class OpenMLDataset(object):
         self.default_target_attribute = default_target_attribute
         self.row_id_attribute = row_id_attribute
         if isinstance(ignore_attribute, str):
-            self.ignore_attributes = [ignore_attribute]
+            self.ignore_attribute = [ignore_attribute]
         elif isinstance(ignore_attribute, list) or ignore_attribute is None:
-            self.ignore_attributes = ignore_attribute
+            self.ignore_attribute = ignore_attribute
         else:
             raise ValueError('Wrong data type for ignore_attribute. '
                              'Should be list.')
@@ -153,7 +153,6 @@ class OpenMLDataset(object):
 
         if features is not None:
             self.features = {}
-            # todo add nominal values (currently not in database)
             for idx, xmlfeature in enumerate(features['oml:feature']):
                 nr_missing = xmlfeature.get('oml:number_of_missing_values', 0)
                 feature = OpenMLDataFeature(int(xmlfeature['oml:index']),
@@ -172,6 +171,36 @@ class OpenMLDataset(object):
             self.data_pickle_file = self._data_arff_to_pickle(data_file)
         else:
             self.data_pickle_file = None
+
+    def __repr__(self):
+        header = "OpenML Dataset"
+        header = '{}\n{}\n'.format(header, '=' * len(header))
+
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = {"Name": self.name,
+                  "Version": self.version,
+                  "Format": self.format,
+                  "Licence": self.licence,
+                  "Download URL": self.url,
+                  "Data file": self.data_file,
+                  "Pickle file": self.data_pickle_file,
+                  "# of features": len(self.features)}
+        if self.upload_date is not None:
+            fields["Upload Date"] = self.upload_date.replace('T', ' ')
+        if self.dataset_id is not None:
+            fields["OpenML URL"] = "{}d/{}".format(base_url, self.dataset_id)
+        if self.qualities['NumberOfInstances'] is not None:
+            fields["# of instances"] = int(self.qualities['NumberOfInstances'])
+
+        # determines the order in which the information will be printed
+        order = ["Name", "Version", "Format", "Upload Date", "Licence", "Download URL",
+                 "OpenML URL", "Data File", "Pickle File", "# of features", "# of instances"]
+        fields = [(key, fields[key]) for key in order if key in fields]
+
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return header + body
 
     def _data_arff_to_pickle(self, data_file):
         data_pickle_file = data_file.replace('.arff', '.pkl.py3')
@@ -368,9 +397,25 @@ class OpenMLDataset(object):
     def _convert_array_format(data, array_format, attribute_names):
         """Convert a dataset to a given array format.
 
-        By default, the data are stored as a sparse matrix or a pandas
-        dataframe. One might be interested to get a pandas SparseDataFrame or a
-        NumPy array instead, respectively.
+        Converts to numpy array if data is non-sparse.
+        Converts to a sparse dataframe if data is sparse.
+
+        Parameters
+        ----------
+        array_format : str {'array', 'dataframe'}
+            Desired data type of the output
+            - If array_format='array'
+                If data is non-sparse
+                    Converts to numpy-array
+                    Enforces numeric encoding of categorical columns
+                    Missing values are represented as NaN in the numpy-array
+                else returns data as is
+            - If array_format='dataframe'
+                If data is sparse
+                    Works only on sparse data
+                    Converts sparse data to sparse dataframe
+                else returns data as is
+
         """
         if array_format == "array" and not scipy.sparse.issparse(data):
             # We encode the categories such that they are integer to be able
@@ -396,8 +441,11 @@ class OpenMLDataset(object):
                     'PyOpenML cannot handle string when returning numpy'
                     ' arrays. Use dataset_format="dataframe".'
                 )
-        if array_format == "dataframe" and scipy.sparse.issparse(data):
+        elif array_format == "dataframe" and scipy.sparse.issparse(data):
             return pd.SparseDataFrame(data, columns=attribute_names)
+        else:
+            data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
+            warn("Cannot convert {} to '{}'. Returning input data.".format(data_type, array_format))
         return data
 
     @staticmethod
@@ -423,7 +471,7 @@ class OpenMLDataset(object):
             self,
             target: Optional[Union[List[str], str]] = None,
             include_row_id: bool = False,
-            include_ignore_attributes: bool = False,
+            include_ignore_attribute: bool = False,
             dataset_format: str = "dataframe",
     ) -> Tuple[
             Union[np.ndarray, pd.DataFrame, scipy.sparse.csr_matrix],
@@ -440,7 +488,7 @@ class OpenMLDataset(object):
             Splitting multiple columns is currently not supported.
         include_row_id : boolean (default=False)
             Whether to include row ids in the returned dataset.
-        include_ignore_attributes : boolean (default=False)
+        include_ignore_attribute : boolean (default=False)
             Whether to include columns that are marked as "ignore"
             on the server in the dataset.
         dataset_format : string (default='dataframe')
@@ -479,11 +527,11 @@ class OpenMLDataset(object):
             elif isinstance(self.row_id_attribute, Iterable):
                 to_exclude.extend(self.row_id_attribute)
 
-        if not include_ignore_attributes and self.ignore_attributes is not None:
-            if isinstance(self.ignore_attributes, str):
-                to_exclude.append(self.ignore_attributes)
-            elif isinstance(self.ignore_attributes, Iterable):
-                to_exclude.extend(self.ignore_attributes)
+        if not include_ignore_attribute and self.ignore_attribute is not None:
+            if isinstance(self.ignore_attribute, str):
+                to_exclude.append(self.ignore_attribute)
+            elif isinstance(self.ignore_attribute, Iterable):
+                to_exclude.extend(self.ignore_attribute)
 
         if len(to_exclude) > 0:
             logger.info("Going to remove the following attributes:"
@@ -566,7 +614,7 @@ class OpenMLDataset(object):
         return None
 
     def get_features_by_type(self, data_type, exclude=None,
-                             exclude_ignore_attributes=True,
+                             exclude_ignore_attribute=True,
                              exclude_row_id_attribute=True):
         """
         Return indices of features of a given type, e.g. all nominal features.
@@ -579,7 +627,7 @@ class OpenMLDataset(object):
         exclude : list(int)
             Indices to exclude (and adapt the return values as if these indices
                         are not present)
-        exclude_ignore_attributes : bool
+        exclude_ignore_attribute : bool
             Whether to exclude the defined ignore attributes (and adapt the
             return values as if these indices are not present)
         exclude_row_id_attribute : bool
@@ -593,9 +641,9 @@ class OpenMLDataset(object):
         """
         if data_type not in OpenMLDataFeature.LEGAL_DATA_TYPES:
             raise TypeError("Illegal feature type requested")
-        if self.ignore_attributes is not None:
-            if not isinstance(self.ignore_attributes, list):
-                raise TypeError("ignore_attributes should be a list")
+        if self.ignore_attribute is not None:
+            if not isinstance(self.ignore_attribute, list):
+                raise TypeError("ignore_attribute should be a list")
         if self.row_id_attribute is not None:
             if not isinstance(self.row_id_attribute, str):
                 raise TypeError("row id attribute should be a str")
@@ -607,8 +655,8 @@ class OpenMLDataset(object):
         to_exclude = []
         if exclude is not None:
             to_exclude.extend(exclude)
-        if exclude_ignore_attributes and self.ignore_attributes is not None:
-            to_exclude.extend(self.ignore_attributes)
+        if exclude_ignore_attribute and self.ignore_attribute is not None:
+            to_exclude.extend(self.ignore_attribute)
         if exclude_row_id_attribute and self.row_id_attribute is not None:
             to_exclude.append(self.row_id_attribute)
 

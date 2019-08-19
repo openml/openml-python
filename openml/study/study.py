@@ -89,6 +89,39 @@ class BaseStudy(object):
         self.runs = runs
         pass
 
+    def __repr__(self):
+        # header is provided by the sub classes
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = {"Name": self.name,
+                  "Status": self.status,
+                  "Main Entity Type": self.main_entity_type}
+        if self.id is not None:
+            fields["ID"] = self.id
+            fields["Study URL"] = "{}s/{}".format(base_url, self.id)
+        if self.creator is not None:
+            fields["Creator"] = "{}u/{}".format(base_url, self.creator)
+        if self.creation_date is not None:
+            fields["Upload Time"] = self.creation_date.replace('T', ' ')
+        if self.data is not None:
+            fields["# of Data"] = len(self.data)
+        if self.tasks is not None:
+            fields["# of Tasks"] = len(self.tasks)
+        if self.flows is not None:
+            fields["# of Flows"] = len(self.flows)
+        if self.runs is not None:
+            fields["# of Runs"] = len(self.runs)
+
+        # determines the order in which the information will be printed
+        order = ["ID", "Name", "Status", "Main Entity Type", "Study URL",
+                 "# of Data", "# of Tasks", "# of Flows", "# of Runs",
+                 "Creator", "Upload Time"]
+        fields = [(key, fields[key]) for key in order if key in fields]
+
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return body
+
     def publish(self) -> int:
         """
         Publish the study on the OpenML server.
@@ -235,6 +268,12 @@ class OpenMLStudy(BaseStudy):
             setups=setups,
         )
 
+    def __repr__(self):
+        header = "OpenML Study"
+        header = '{}\n{}\n'.format(header, '=' * len(header))
+        body = super(OpenMLStudy, self).__repr__()
+        return header + body
+
 
 class OpenMLBenchmarkSuite(BaseStudy):
     """
@@ -306,3 +345,9 @@ class OpenMLBenchmarkSuite(BaseStudy):
             runs=None,
             setups=None,
         )
+
+    def __repr__(self):
+        header = "OpenML Benchmark Suite"
+        header = '{}\n{}\n'.format(header, '=' * len(header))
+        body = super(OpenMLBenchmarkSuite, self).__repr__()
+        return header + body

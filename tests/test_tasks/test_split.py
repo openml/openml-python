@@ -19,8 +19,7 @@ class OpenMLSplitTest(TestBase):
             self.directory, "..", "files", "org", "openml", "test",
             "tasks", "1882", "datasplits.arff"
         )
-        # TODO Needs to be adapted regarding the python version
-        self.pd_filename = self.arff_filename.replace(".arff", ".pkl")
+        self.pd_filename = self.arff_filename.replace(".arff", ".pkl.py3")
 
     def tearDown(self):
         try:

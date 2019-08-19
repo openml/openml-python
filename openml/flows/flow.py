@@ -7,6 +7,8 @@ import xmltodict
 from ..extensions import get_extension_by_flow
 from ..utils import extract_xml_tags, _tag_entity
 
+import openml.config
+
 
 class OpenMLFlow(object):
     """OpenML Flow. Stores machine learning models.
@@ -85,7 +87,7 @@ class OpenMLFlow(object):
                  dependencies, class_name=None, custom_name=None,
                  binary_url=None, binary_format=None,
                  binary_md5=None, uploader=None, upload_date=None,
-                 flow_id=None, version=None):
+                 flow_id=None, extension=None, version=None):
         self.name = name
         self.description = description
         self.model = model
@@ -129,8 +131,47 @@ class OpenMLFlow(object):
         self.language = language
         self.dependencies = dependencies
         self.flow_id = flow_id
+        if extension is None:
+            self._extension = get_extension_by_flow(self)
+        else:
+            self._extension = extension
 
-        self.extension = get_extension_by_flow(self)
+    @property
+    def extension(self):
+        if self._extension is not None:
+            return self._extension
+        else:
+            raise RuntimeError("No extension could be found for flow {}: {}"
+                               .format(self.flow_id, self.name))
+
+    def __repr__(self):
+        header = "OpenML Flow"
+        header = '{}\n{}\n'.format(header, '=' * len(header))
+
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = {"Flow Name": self.name,
+                  "Flow Description": self.description,
+                  "Dependencies": self.dependencies}
+        if self.flow_id is not None:
+            if self.version is not None:
+                fields["Flow ID"] = "{} (version {})".format(self.flow_id, self.version)
+            else:
+                fields["Flow ID"] = self.flow_id
+            fields["Flow URL"] = "{}f/{}".format(base_url, self.flow_id)
+        if self.upload_date is not None:
+            fields["Upload Date"] = self.upload_date.replace('T', ' ')
+        if self.binary_url is not None:
+            fields["Binary URL"] = self.binary_url
+
+        # determines the order in which the information will be printed
+        order = ["Flow ID", "Flow URL", "Flow Name", "Flow Description", "Binary URL",
+                 "Upload Date", "Dependencies"]
+        fields = [(key, fields[key]) for key in order if key in fields]
+
+        longest_field_name_length = max(len(name) for name, value in fields)
+        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        return header + body
 
     def _to_xml(self) -> str:
         """Generate xml representation of self for upload to server.
@@ -378,14 +419,15 @@ class OpenMLFlow(object):
         _copy_server_fields(flow, self)
         try:
             openml.flows.functions.assert_flows_equal(
-                self, flow, flow.upload_date, ignore_parameter_values=True
+                self, flow, flow.upload_date,
+                ignore_parameter_values=True,
+                ignore_custom_name_if_none=True
             )
         except ValueError as e:
             message = e.args[0]
-            raise ValueError("Flow was not stored correctly on the server. "
-                             "New flow ID is %d. Please check manually and "
-                             "remove the flow if necessary! Error is:\n'%s'" %
-                             (flow_id, message))
+            raise ValueError("The flow on the server is inconsistent with the local flow. "
+                             "The server flow ID is {}. Please check manually and remove "
+                             "the flow if necessary! Error is:\n'{}'".format(flow_id, message))
         return self
 
     def get_structure(self, key_item: str) -> Dict[str, List[str]]:

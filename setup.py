@@ -6,13 +6,6 @@ import sys
 with open("openml/__version__.py") as fh:
     version = fh.readlines()[-1].split()[-1].strip("\"'")
 
-# Using Python setup.py install will try to build numpy which is prone to failure and
-# very time consuming anyway.
-if len(sys.argv) > 1 and sys.argv[1] == 'install':
-    print('Please install this package with pip: `pip install -e .` '
-          'Installation requires pip>=10.0.')
-    sys.exit(1)
-
 if sys.version_info < (3, 5):
     raise ValueError(
         'Unsupported Python version {}.{}.{} found. OpenML requires Python 3.5 or higher.'
@@ -35,6 +28,7 @@ setuptools.setup(name="openml",
                  version=version,
                  packages=setuptools.find_packages(),
                  package_data={'': ['*.txt', '*.md']},
+                 python_requires=">=3.5",
                  install_requires=[
                      'liac-arff>=2.4.0',
                      'xmltodict',
@@ -79,7 +73,6 @@ setuptools.setup(name="openml",
                               'Operating System :: Unix',
                               'Operating System :: MacOS',
                               'Programming Language :: Python :: 3',
-                              'Programming Language :: Python :: 3.4',
                               'Programming Language :: Python :: 3.5',
                               'Programming Language :: Python :: 3.6',
                               'Programming Language :: Python :: 3.7'])

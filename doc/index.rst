@@ -21,16 +21,12 @@ Example
 .. code:: python
 
     import openml
-    from sklearn import preprocessing, tree, pipeline
-
-    # Set the OpenML API Key which is required to upload your runs.
-    # You can get your own API by signing up to OpenML.org.
-    openml.config.apikey = 'ABC'
+    from sklearn import impute, tree, pipeline
 
     # Define a scikit-learn classifier or pipeline
     clf = pipeline.Pipeline(
         steps=[
-            ('imputer', preprocessing.Imputer()),
+            ('imputer', impute.SimpleImputer()),
             ('estimator', tree.DecisionTreeClassifier())
         ]
     )
@@ -39,9 +35,12 @@ Example
     task = openml.tasks.get_task(31)
     # Run the scikit-learn model on the task.
     run = openml.runs.run_model_on_task(clf, task)
-    # Publish the experiment on OpenML (optional, requires an API key).
+    # Publish the experiment on OpenML (optional, requires an API key.
+    # You can get your own API key by signing up to OpenML.org)
     run.publish()
     print('View the run online: %s/run/%d' % (openml.config.server, run.run_id))
+
+You can find more examples in our `examples gallery <examples/index.html>`_.
 
 ----------------------------
 How to get OpenML for python

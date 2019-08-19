@@ -20,7 +20,6 @@ In this example, we shall do the following:
 
 ############################################################################
 import openml
-from pprint import pprint
 
 ############################################################################
 # Listing evaluations
@@ -37,7 +36,7 @@ evals = openml.evaluations.list_evaluations(function='precision', size=10,
                                             output_format='dataframe')
 
 # Querying the returned results for precision above 0.98
-pprint(evals[evals.value > 0.98])
+print(evals[evals.value > 0.98])
 
 #############################################################################
 # Viewing a sample task
@@ -47,7 +46,7 @@ pprint(evals[evals.value > 0.98])
 # We will start by displaying a simple *supervised classification* task:
 task_id = 167140        # https://www.openml.org/t/167140
 task = openml.tasks.get_task(task_id)
-pprint(vars(task))
+print(task)
 
 #############################################################################
 # Obtaining all the evaluations for the task
@@ -60,11 +59,11 @@ metric = 'predictive_accuracy'
 evals = openml.evaluations.list_evaluations(function=metric, task=[task_id],
                                             output_format='dataframe')
 # Displaying the first 10 rows
-pprint(evals.head(n=10))
+print(evals.head(n=10))
 # Sorting the evaluations in decreasing order of the metric chosen
 evals = evals.sort_values(by='value', ascending=False)
 print("\nDisplaying head of sorted dataframe: ")
-pprint(evals.head())
+print(evals.head())
 
 #############################################################################
 # Obtaining CDF of metric for chosen task
@@ -147,4 +146,4 @@ top_n = 10
 flow_ids = evals.flow_id.unique()[:top_n]
 flow_names = evals.flow_name.unique()[:top_n]
 for i in range(top_n):
-    pprint((flow_ids[i], flow_names[i]))
+    print((flow_ids[i], flow_names[i]))

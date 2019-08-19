@@ -1,4 +1,4 @@
-from openml.testing import TestBase
+from openml.testing import TestBase, SimpleImputer
 
 
 class TestStudyFunctions(TestBase):
@@ -30,12 +30,13 @@ class TestStudyFunctions(TestBase):
         import sklearn.pipeline
         import sklearn.preprocessing
         import sklearn.tree
+
         benchmark_suite = openml.study.get_study(
             'OpenML100', 'tasks'
         )  # obtain the benchmark suite
         clf = sklearn.pipeline.Pipeline(
             steps=[
-                ('imputer', sklearn.preprocessing.Imputer()),
+                ('imputer', SimpleImputer()),
                 ('estimator', sklearn.tree.DecisionTreeClassifier())
             ]
         )  # build a sklearn classifier
@@ -51,4 +52,7 @@ class TestStudyFunctions(TestBase):
             )  # print accuracy score
             print('Data set: %s; Accuracy: %0.2f' % (task.get_dataset().name, score.mean()))
             run.publish()  # publish the experiment on OpenML (optional)
+            TestBase._mark_entity_for_removal('run', run.run_id)
+            TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
+                                                                run.run_id))
             print('URL for run: %s/run/%d' % (openml.config.server, run.run_id))

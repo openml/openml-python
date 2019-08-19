@@ -6,6 +6,27 @@
 Changelog
 =========
 
+0.10.0
+~~~~~~
+* ADD #737: Add list_evaluations_setups to return hyperparameters along with list of evaluations.
+* FIX #261: Test server is cleared of all files uploaded during unit testing.
+* FIX #447: All files created by unit tests no longer persist in local.
+* FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
+* FIX #447: All files created by unit tests are deleted after the completion of all unit tests.
+* FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.
+* FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
+* DOC #639: More descriptive documention for function to convert array format.
+* DOC #719: Add documentation on uploading tasks.
+* ADD #687: Adds a function to retrieve the list of evaluation measures available.
+* ADD #695: A function to retrieve all the data quality measures available.
+* ADD #412: Add a function to trim flow names for scikit-learn flows.
+* ADD #715: `list_evaluations` now has an option to sort evaluations by score (value).
+* ADD #722: Automatic reinstantiation of flow in `run_model_on_task`. Clearer errors if that's not possible.
+* ADD #412: The scikit-learn extension populates the short name field for flows.
+* MAINT #726: Update examples to remove deprecation warnings from scikit-learn
+* MAINT #752: Update OpenML-Python to be compatible with sklearn 0.21
+
+
 0.9.0
 ~~~~~
 * ADD #560: OpenML-Python can now handle regression tasks as well.
@@ -21,6 +42,7 @@ Changelog
 * ADD #659: Lazy loading of task splits.
 * ADD #516: `run_flow_on_task` flow uploading is now optional.
 * ADD #680: Adds `openml.config.start_using_configuration_for_example` (and resp. stop) to easily connect to the test server.
+* ADD #75, #653: Adds a pretty print for objects of the top-level classes.
 * FIX #642: `check_datasets_active` now correctly also returns active status of deactivated datasets.
 * FIX #304, #636: Allow serialization of numpy datatypes and list of lists of more types (e.g. bools, ints) for flows.
 * FIX #651: Fixed a bug that would prevent openml-python from finding the user's config file.

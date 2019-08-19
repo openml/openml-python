@@ -380,7 +380,7 @@ class OpenMLRunTrace(object):
 
         return cls(None, merged_trace)
 
-    def __str__(self):
+    def __repr__(self):
         return '[Run id: %d, %d trace iterations]'.format(
             -1 if self.run_id is None else self.run_id,
             len(self.trace_iterations),
@@ -471,7 +471,7 @@ class OpenMLTraceIteration(object):
                 result[param[len(PREFIX):]] = value
         return result
 
-    def __str__(self):
+    def __repr__(self):
         """
         tmp string representation, will be changed in the near future
         """
