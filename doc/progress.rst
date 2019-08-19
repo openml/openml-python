@@ -16,12 +16,16 @@ Changelog
 * FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.
 * FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
 * DOC #639: More descriptive documention for function to convert array format.
+* DOC #719: Add documentation on uploading tasks.
 * ADD #687: Adds a function to retrieve the list of evaluation measures available.
 * ADD #695: A function to retrieve all the data quality measures available.
 * ADD #412: Add a function to trim flow names for scikit-learn flows.
 * ADD #715: `list_evaluations` now has an option to sort evaluations by score (value).
 * ADD #722: Automatic reinstantiation of flow in `run_model_on_task`. Clearer errors if that's not possible.
+* ADD #412: The scikit-learn extension populates the short name field for flows.
 * MAINT #726: Update examples to remove deprecation warnings from scikit-learn
+* MAINT #752: Update OpenML-Python to be compatible with sklearn 0.21
+
 
 0.9.0
 ~~~~~
