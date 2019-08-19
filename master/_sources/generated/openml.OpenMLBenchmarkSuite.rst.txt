@@ -1,0 +1,6 @@
+:mod:`openml`.OpenMLBenchmarkSuite
+=========================================
+
+.. currentmodule:: openml
+
+.. autoclass:: OpenMLBenchmarkSuite

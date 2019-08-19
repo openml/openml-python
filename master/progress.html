@@ -2,27 +2,27 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Progress &#8212; OpenML 0.8.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>Changelog &#8212; OpenML 0.10.0 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/language_data.js"></script>
-    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
-    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
 
   </head><body>
   
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.8.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -102,425 +102,141 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#">Progress</a><ul>
-<li><a class="reference internal" href="#changelog">Changelog</a><ul>
-<li><a class="reference internal" href="#id2">0.8.0</a></li>
-<li><a class="reference internal" href="#id4">0.4.-0.7</a></li>
-<li><a class="reference internal" href="#id5">0.3.0</a></li>
+<li><a class="reference internal" href="#">Changelog</a><ul>
+<li><a class="reference internal" href="#id1">0.10.0</a></li>
+<li><a class="reference internal" href="#id2">0.9.0</a></li>
+<li><a class="reference internal" href="#id3">0.8.0</a></li>
+<li><a class="reference internal" href="#id5">0.4.-0.7</a></li>
+<li><a class="reference internal" href="#id6">0.3.0</a></li>
 <li><a class="reference internal" href="#prior">Prior</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#api-calls">API calls</a></li>
 </ul>
 </li>
 </ul>
 
         </div>
       </div>
-    <div class="col-md-9 content">
+    <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="progress">
-<span id="id1"></span><h1>Progress<a class="headerlink" href="#progress" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id2">
-<h3>0.8.0<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+  <div class="section" id="changelog">
+<span id="progress"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2>0.10.0<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>ADD #440: Improved dataset upload.</li>
-<li>ADD #545, #583: Allow uploading a dataset from a pandas DataFrame.</li>
-<li>ADD #528: New functions to update the status of a dataset.</li>
-<li>ADD #523: Support for scikit-learn 0.20’s new ColumnTransformer.</li>
-<li>ADD #459: Enhanced support to store runs on disk prior to uploading them to
-OpenML.</li>
-<li>ADD #564: New helpers to access the structure of a flow (and find its
-subflows).</li>
-<li>ADD #618: The software will from now on retry to connect to the server if a
-connection failed. The number of retries can be configured.</li>
-<li>FIX #538: Support loading clustering tasks.</li>
-<li>FIX #464: Fixes a bug related to listing functions (returns correct listing
-size).</li>
-<li>FIX #580: Listing function now works properly when there are less results
-than requested.</li>
-<li>FIX #571: Fixes an issue where tasks could not be downloaded in parallel.</li>
-<li>FIX #536: Flows can now be printed when the flow name is None.</li>
-<li>FIX #504: Better support for hierarchical hyperparameters when uploading
-scikit-learn’s grid and random search.</li>
-<li>FIX #569: Less strict checking of flow dependencies when loading flows.</li>
-<li>FIX #431: Pickle of task splits are no longer cached.</li>
-<li>DOC #540: More examples for dataset uploading.</li>
-<li>DOC #554: Remove the doubled progress entry from the docs.</li>
-<li>MAINT #613: Utilize the latest updates in OpenML evaluation listings.</li>
-<li>MAINT #482: Cleaner interface for handling search traces.</li>
-<li>MAINT #557: Continuous integration works for scikit-learn 0.18-0.20.</li>
-<li>MAINT #542: Continuous integration now runs python3.7 as well.</li>
-<li>MAINT #535: Continuous integration now enforces PEP8 compliance for new code.</li>
-<li>MAINT #527: Replace deprecated nose by pytest.</li>
-<li>MAINT #510: Documentation is now built by travis-ci instead of circle-ci.</li>
-<li>MAINT: Completely re-designed documentation built on sphinx gallery.</li>
-<li>MAINT #462: Appveyor CI support.</li>
-<li>MAINT #477: Improve error handling for issue
-<a class="reference external" href="https://github.com/openml/openml-python/pull/479">#479</a>:
-the OpenML connector fails earlier and with a better error message when
-failing to create a flow from the OpenML description.</li>
-<li>MAINT #561: Improve documentation on running specific unit tests.</li>
+<li><p>ADD #737: Add list_evaluations_setups to return hyperparameters along with list of evaluations.</p></li>
+<li><p>FIX #261: Test server is cleared of all files uploaded during unit testing.</p></li>
+<li><p>FIX #447: All files created by unit tests no longer persist in local.</p></li>
+<li><p>FIX #608: Fixing dataset_id referenced before assignment error in get_run function.</p></li>
+<li><p>FIX #447: All files created by unit tests are deleted after the completion of all unit tests.</p></li>
+<li><p>FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.</p></li>
+<li><p>FIX #608: Fixing dataset_id referenced before assignment error in get_run function.</p></li>
+<li><p>DOC #639: More descriptive documention for function to convert array format.</p></li>
+<li><p>DOC #719: Add documentation on uploading tasks.</p></li>
+<li><p>ADD #687: Adds a function to retrieve the list of evaluation measures available.</p></li>
+<li><p>ADD #695: A function to retrieve all the data quality measures available.</p></li>
+<li><p>ADD #412: Add a function to trim flow names for scikit-learn flows.</p></li>
+<li><p>ADD #715: <cite>list_evaluations</cite> now has an option to sort evaluations by score (value).</p></li>
+<li><p>ADD #722: Automatic reinstantiation of flow in <cite>run_model_on_task</cite>. Clearer errors if that’s not possible.</p></li>
+<li><p>ADD #412: The scikit-learn extension populates the short name field for flows.</p></li>
+<li><p>MAINT #726: Update examples to remove deprecation warnings from scikit-learn</p></li>
+<li><p>MAINT #752: Update OpenML-Python to be compatible with sklearn 0.21</p></li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h3>0.4.-0.7<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-<p>There is no changelog for these versions.</p>
+<div class="section" id="id2">
+<h2>0.9.0<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>ADD #560: OpenML-Python can now handle regression tasks as well.</p></li>
+<li><p>ADD #620, #628, #632, #649, #682: Full support for studies and distinguishes suites from studies.</p></li>
+<li><p>ADD #607: Tasks can now be created and uploaded.</p></li>
+<li><p>ADD #647, #673: Introduced the extension interface. This provides an easy way to create a hook for machine learning packages to perform e.g. automated runs.</p></li>
+<li><p>ADD #548, #646, #676: Support for Pandas DataFrame and SparseDataFrame</p></li>
+<li><p>ADD #662: Results of listing functions can now be returned as pandas.DataFrame.</p></li>
+<li><p>ADD #59: Datasets can now also be retrieved by name.</p></li>
+<li><p>ADD #672: Add timing measurements for runs, when possible.</p></li>
+<li><p>ADD #661: Upload time and error messages now displayed with <cite>list_runs</cite>.</p></li>
+<li><p>ADD #644: Datasets can now be downloaded ‘lazily’, retrieving only metadata at first, and the full dataset only when necessary.</p></li>
+<li><p>ADD #659: Lazy loading of task splits.</p></li>
+<li><p>ADD #516: <cite>run_flow_on_task</cite> flow uploading is now optional.</p></li>
+<li><p>ADD #680: Adds <cite>openml.config.start_using_configuration_for_example</cite> (and resp. stop) to easily connect to the test server.</p></li>
+<li><p>ADD #75, #653: Adds a pretty print for objects of the top-level classes.</p></li>
+<li><p>FIX #642: <cite>check_datasets_active</cite> now correctly also returns active status of deactivated datasets.</p></li>
+<li><p>FIX #304, #636: Allow serialization of numpy datatypes and list of lists of more types (e.g. bools, ints) for flows.</p></li>
+<li><p>FIX #651: Fixed a bug that would prevent openml-python from finding the user’s config file.</p></li>
+<li><p>FIX #693: OpenML-Python uses liac-arff instead of scipy.io for loading task splits now.</p></li>
+<li><p>DOC #678: Better color scheme for code examples in documentation.</p></li>
+<li><p>DOC #681: Small improvements and removing list of missing functions.</p></li>
+<li><p>DOC #684: Add notice to examples that connect to the test server.</p></li>
+<li><p>DOC #688: Add new example on retrieving evaluations.</p></li>
+<li><p>DOC #691: Update contributing guidelines to use Github draft feature instead of tags in title.</p></li>
+<li><p>DOC #692: All functions are documented now.</p></li>
+<li><p>MAINT #184: Dropping Python2 support.</p></li>
+<li><p>MAINT #596: Fewer dependencies for regular pip install.</p></li>
+<li><p>MAINT #652: Numpy and Scipy are no longer required before installation.</p></li>
+<li><p>MAINT #655: Lazy loading is now preferred in unit tests.</p></li>
+<li><p>MAINT #667: Different tag functions now share code.</p></li>
+<li><p>MAINT #666: More descriptive error message for <cite>TypeError</cite> in <cite>list_runs</cite>.</p></li>
+<li><p>MAINT #668: Fix some type hints.</p></li>
+<li><p>MAINT #677: <cite>dataset.get_data</cite> now has consistent behavior in its return type.</p></li>
+<li><p>MAINT #686: Adds ignore directives for several <cite>mypy</cite> folders.</p></li>
+<li><p>MAINT #629, #630: Code now adheres to single PEP8 standard.</p></li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h2>0.8.0<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>ADD #440: Improved dataset upload.</p></li>
+<li><p>ADD #545, #583: Allow uploading a dataset from a pandas DataFrame.</p></li>
+<li><p>ADD #528: New functions to update the status of a dataset.</p></li>
+<li><p>ADD #523: Support for scikit-learn 0.20’s new ColumnTransformer.</p></li>
+<li><p>ADD #459: Enhanced support to store runs on disk prior to uploading them to
+OpenML.</p></li>
+<li><p>ADD #564: New helpers to access the structure of a flow (and find its
+subflows).</p></li>
+<li><p>ADD #618: The software will from now on retry to connect to the server if a
+connection failed. The number of retries can be configured.</p></li>
+<li><p>FIX #538: Support loading clustering tasks.</p></li>
+<li><p>FIX #464: Fixes a bug related to listing functions (returns correct listing
+size).</p></li>
+<li><p>FIX #580: Listing function now works properly when there are less results
+than requested.</p></li>
+<li><p>FIX #571: Fixes an issue where tasks could not be downloaded in parallel.</p></li>
+<li><p>FIX #536: Flows can now be printed when the flow name is None.</p></li>
+<li><p>FIX #504: Better support for hierarchical hyperparameters when uploading
+scikit-learn’s grid and random search.</p></li>
+<li><p>FIX #569: Less strict checking of flow dependencies when loading flows.</p></li>
+<li><p>FIX #431: Pickle of task splits are no longer cached.</p></li>
+<li><p>DOC #540: More examples for dataset uploading.</p></li>
+<li><p>DOC #554: Remove the doubled progress entry from the docs.</p></li>
+<li><p>MAINT #613: Utilize the latest updates in OpenML evaluation listings.</p></li>
+<li><p>MAINT #482: Cleaner interface for handling search traces.</p></li>
+<li><p>MAINT #557: Continuous integration works for scikit-learn 0.18-0.20.</p></li>
+<li><p>MAINT #542: Continuous integration now runs python3.7 as well.</p></li>
+<li><p>MAINT #535: Continuous integration now enforces PEP8 compliance for new code.</p></li>
+<li><p>MAINT #527: Replace deprecated nose by pytest.</p></li>
+<li><p>MAINT #510: Documentation is now built by travis-ci instead of circle-ci.</p></li>
+<li><p>MAINT: Completely re-designed documentation built on sphinx gallery.</p></li>
+<li><p>MAINT #462: Appveyor CI support.</p></li>
+<li><p>MAINT #477: Improve error handling for issue
+<a class="reference external" href="https://github.com/openml/openml-python/pull/479">#479</a>:
+the OpenML connector fails earlier and with a better error message when
+failing to create a flow from the OpenML description.</p></li>
+<li><p>MAINT #561: Improve documentation on running specific unit tests.</p></li>
+</ul>
 </div>
 <div class="section" id="id5">
-<h3>0.3.0<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<h2>0.4.-0.7<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<p>There is no changelog for these versions.</p>
+</div>
+<div class="section" id="id6">
+<h2>0.3.0<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Add this changelog (Matthias Feurer)</li>
-<li>2nd example notebook PyOpenML.ipynb (Joaquin Vanschoren)</li>
-<li>Pagination support for list datasets and list tasks</li>
+<li><p>Add this changelog</p></li>
+<li><p>2nd example notebook PyOpenML.ipynb</p></li>
+<li><p>Pagination support for list datasets and list tasks</p></li>
 </ul>
 </div>
 <div class="section" id="prior">
-<h3>Prior<a class="headerlink" href="#prior" title="Permalink to this headline">¶</a></h3>
+<h2>Prior<a class="headerlink" href="#prior" title="Permalink to this headline">¶</a></h2>
 <p>There is no changelog for prior versions.</p>
-</div>
-</div>
-<div class="section" id="api-calls">
-<h2>API calls<a class="headerlink" href="#api-calls" title="Permalink to this headline">¶</a></h2>
-<table border="1" class="docutils">
-<colgroup>
-<col width="43%" />
-<col width="10%" />
-<col width="5%" />
-<col width="14%" />
-<col width="9%" />
-<col width="19%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">API call</th>
-<th class="head">implemented</th>
-<th class="head">tested</th>
-<th class="head">properly tested</th>
-<th class="head">loads json</th>
-<th class="head">proper error handling</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>/data/{id}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/data/features/{id}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/data/qualities/{id}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/data/list/</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/data/list/tag/{tag}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/data/upload/</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/data/tag</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/data/untag</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/data/delete/</td>
-<td>X</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/task/{task}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/task/list</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/task/list/type/{id}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/task/list/tag/{tag}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/task {POST}</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/task/tag</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/task/untag</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/task/delete</td>
-<td>X</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/tasktype/{id}</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/tasktype/list</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/flow/{id}</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/flow/exists/{name}/{ext_version}</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/flow/list</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/flow/list/tag/{tag}</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/flow/owned</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/flow/ {POST}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/flow/tag</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/flow/untag</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/flow/{id} {DELETE}</td>
-<td>X</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/run/list/task/{ids}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/run/list/run/{ids}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/run/list/tag/{tag}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/run/{id}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/run/list/uploader/{ids}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/run/list/flow/{ids}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/run/list/{filters}</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/run/untag</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/run (POST)</td>
-<td>yes</td>
-<td>yes</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/run/tag</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/run/{id} (DELETE)</td>
-<td>X</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/evaluation/list/run/{ids}</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/evaluation/list/tag/{tag}</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/evaluation/list/task/{ids}</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/evaluation/list/uploader/{ids}</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>/evaluation/list/flow/{ids}</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>/evaluation/list/{filters}</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-</tbody>
-</table>
-<p>We do not plan to implement API calls marked with an <strong>X</strong>!</p>
 </div>
 </div>
 
@@ -536,8 +252,8 @@ failing to create a flow from the OpenML description.</li>
       
     </p>
     <p>
-        &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.<br/>
+        &copy; Copyright 2014-2019, the OpenML-Python team..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.0.<br/>
     </p>
   </div>
 </footer>

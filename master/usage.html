@@ -2,27 +2,27 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Basic Usage &#8212; OpenML 0.8.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>User Guide &#8212; OpenML 0.10.0 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/language_data.js"></script>
-    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
-    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
 
   </head><body>
   
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.8.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -102,12 +102,13 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#">Basic Usage</a><ul>
+<li><a class="reference internal" href="#">User Guide</a><ul>
 <li><a class="reference internal" href="#installation-set-up">Installation &amp; Set up</a></li>
 <li><a class="reference internal" href="#key-concepts">Key concepts</a></li>
 <li><a class="reference internal" href="#working-with-tasks">Working with tasks</a></li>
 <li><a class="reference internal" href="#running-machine-learning-algorithms-and-uploading-results">Running machine learning algorithms and uploading results</a></li>
 <li><a class="reference internal" href="#datasets">Datasets</a></li>
+<li><a class="reference internal" href="#extending-openml-python">Extending OpenML-Python</a></li>
 <li><a class="reference internal" href="#advanced-topics">Advanced topics</a></li>
 </ul>
 </li>
@@ -115,10 +116,10 @@
 
         </div>
       </div>
-    <div class="col-md-9 content">
+    <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="basic-usage">
-<span id="usage"></span><h1>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="user-guide">
+<span id="usage"></span><h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
 <p>This document will guide you through the most important use cases, functions
 and classes in the OpenML Python API. Throughout this document, we will use
 <a class="reference external" href="http://pandas.pydata.org/">pandas</a> to format and filter tables.</p>
@@ -130,7 +131,7 @@ machine learning algorithms on them and then share the results online.</p>
 <p>The following tutorial gives a short introduction on how to install and set up
 the OpenML python connector, followed up by a simple example.</p>
 <ul class="simple">
-<li><a class="reference external" href="examples/introduction_tutorial.html">Introduction</a></li>
+<li><p><a class="reference external" href="examples/introduction_tutorial.html">Introduction</a></p></li>
 </ul>
 </div>
 <div class="section" id="key-concepts">
@@ -161,7 +162,7 @@ for which a flow should be optimized.</p>
 <p>Below you can find our tutorial regarding tasks and if you want to know more
 you can read the <a class="reference external" href="https://docs.openml.org/#tasks">OpenML guide</a>:</p>
 <ul class="simple">
-<li><a class="reference external" href="examples/tasks_tutorial.html">Tasks</a></li>
+<li><p><a class="reference external" href="examples/tasks_tutorial.html">Tasks</a></p></li>
 </ul>
 </div>
 <div class="section" id="running-machine-learning-algorithms-and-uploading-results">
@@ -186,7 +187,7 @@ downloaded from the server if it already exists.</p>
 <p>The next tutorial covers how to train different machine learning models,
 how to run machine learning models on OpenML data and how to share the results:</p>
 <ul class="simple">
-<li><a class="reference external" href="examples/flows_and_runs_tutorial.html">Flows and Runs</a></li>
+<li><p><a class="reference external" href="examples/flows_and_runs_tutorial.html">Flows and Runs</a></p></li>
 </ul>
 </div>
 <div class="section" id="datasets">
@@ -199,22 +200,28 @@ available metadata. The tutorial which follows explains how to get a list of
 datasets, how to filter the list to find the dataset that suits your
 requirements and how to download a dataset:</p>
 <ul class="simple">
-<li><a class="reference external" href="examples/datasets_tutorial.html">Filter and explore datasets</a></li>
+<li><p><a class="reference external" href="examples/datasets_tutorial.html">Filter and explore datasets</a></p></li>
 </ul>
 <p>OpenML is about sharing machine learning results and the datasets they were
 obtained on. Learn how to share your datasets in the following tutorial:</p>
 <ul class="simple">
-<li><a class="reference external" href="examples/create_upload_tutorial.html">Upload a dataset</a></li>
+<li><p><a class="reference external" href="examples/create_upload_tutorial.html">Upload a dataset</a></p></li>
 </ul>
+</div>
+<div class="section" id="extending-openml-python">
+<h2>Extending OpenML-Python<a class="headerlink" href="#extending-openml-python" title="Permalink to this headline">¶</a></h2>
+<p>OpenML-Python provides an extension interface to connect other machine learning libraries than
+scikit-learn to OpenML. Please check the <a class="reference internal" href="api.html#api-extensions"><span class="std std-ref">Extensions</span></a> and use the
+scikit-learn extension in <a class="reference internal" href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension" title="openml.extensions.sklearn.SklearnExtension"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.extensions.sklearn.SklearnExtension</span></code></a> as a starting point.</p>
 </div>
 <div class="section" id="advanced-topics">
 <h2>Advanced topics<a class="headerlink" href="#advanced-topics" title="Permalink to this headline">¶</a></h2>
 <p>We are working on tutorials for the following topics:</p>
 <ul class="simple">
-<li>Querying datasets (TODO)</li>
-<li>Creating tasks (TODO)</li>
-<li>Working offline (TODO)</li>
-<li>Analyzing large amounts of results (TODO)</li>
+<li><p>Querying datasets (TODO)</p></li>
+<li><p>Creating tasks (TODO)</p></li>
+<li><p>Working offline (TODO)</p></li>
+<li><p>Analyzing large amounts of results (TODO)</p></li>
 </ul>
 </div>
 </div>
@@ -231,8 +238,8 @@ obtained on. Learn how to share your datasets in the following tutorial:</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.<br/>
+        &copy; Copyright 2014-2019, the OpenML-Python team..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.0.<br/>
     </p>
   </div>
 </footer>

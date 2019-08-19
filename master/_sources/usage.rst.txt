@@ -8,9 +8,9 @@
 .. role:: python(code)
    :language: python
 
-***********
-Basic Usage
-***********
+**********
+User Guide
+**********
 
 This document will guide you through the most important use cases, functions
 and classes in the OpenML Python API. Throughout this document, we will use
@@ -116,6 +116,13 @@ obtained on. Learn how to share your datasets in the following tutorial:
 
 * `Upload a dataset <examples/create_upload_tutorial.html>`_
 
+~~~~~~~~~~~~~~~~~~~~~~~
+Extending OpenML-Python
+~~~~~~~~~~~~~~~~~~~~~~~
+
+OpenML-Python provides an extension interface to connect other machine learning libraries than
+scikit-learn to OpenML. Please check the :ref:`api_extensions` and use the
+scikit-learn extension in :class:`openml.extensions.sklearn.SklearnExtension` as a starting point.
 
 ~~~~~~~~~~~~~~~
 Advanced topics

@@ -13,8 +13,7 @@ Dataset upload tutorial
 A tutorial on how to create and upload a dataset to OpenML.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
     import numpy as np
     import pandas as pd
@@ -30,15 +29,15 @@ A tutorial on how to create and upload a dataset to OpenML.
 
 
 
-For this tutorial we will upload to the test server to not pollute the live
-server with countless copies of the same dataset.
+.. warning:: This example uploads data. For that reason, this example
+  connects to the test server at test.openml.org. This prevents the main
+  server from crowding with example datasets, tasks, runs, and so on.
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-    openml.config.server = 'https://test.openml.org/api/v1/xml'
-
+    openml.config.start_using_configuration_for_example()
 
 
 
@@ -53,7 +52,6 @@ Below we will cover the following cases of the dataset object:
 * A sparse matrix
 * A pandas sparse dataframe
 
-
 Dataset is a numpy array
 ========================
 A numpy array can contain lists in the case of dense data or it can contain
@@ -65,8 +63,7 @@ Load an example dataset from scikit-learn which we will upload to OpenML.org
 via the API.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     diabetes = sklearn.datasets.load_diabetes()
@@ -89,8 +86,7 @@ The target feature is indicated as meta-data of the dataset (and tasks on
 that data).
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
@@ -122,8 +118,7 @@ expected format:
 https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     diabetes_dataset = create_dataset(
@@ -173,7 +168,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
 
 
-.. code-block:: python
+.. code-block:: default
 
 
     upload_did = diabetes_dataset.publish()
@@ -189,7 +184,8 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/29235
+    URL for dataset: https://test.openml.org/api/v1/xml/data/28990
+
 
 
 Dataset is a list
@@ -201,8 +197,7 @@ Weather dataset:
 http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     data = [
@@ -271,7 +266,7 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
 
 
-.. code-block:: python
+.. code-block:: default
 
 
     upload_did = weather_dataset.publish()
@@ -287,7 +282,8 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/29236
+    URL for dataset: https://test.openml.org/api/v1/xml/data/28991
+
 
 
 Dataset is a pandas DataFrame
@@ -301,8 +297,7 @@ function :func:`create_dataset`. In this regard, you only need to pass
 ``'auto'`` to the ``attributes`` parameter.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     df = pd.DataFrame(data, columns=[col_name for col_name, _ in attribute_names])
@@ -331,8 +326,9 @@ function :func:`create_dataset`. In this regard, you only need to pass
     windy          14 non-null bool
     play           14 non-null category
     dtypes: bool(1), category(2), int64(2)
-    memory usage: 546.0 bytes
+    memory usage: 594.0 bytes
     None
+
 
 
 We enforce the column 'outlook', 'windy', and 'play' to be a categorical
@@ -341,8 +337,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 ``attributes`` to ``'auto'``.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     weather_dataset = create_dataset(
@@ -366,10 +361,19 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/travis/build/openml/openml-python/openml/datasets/functions.py:651: FutureWarning: A future version of pandas will default to `skipna=True`. To silence this warning, pass `skipna=True|False` explicitly.
+      attributes_ = attributes_arff_from_df(data)
 
 
 
-.. code-block:: python
+
+.. code-block:: default
 
 
     upload_did = weather_dataset.publish()
@@ -385,15 +389,15 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/29237
+    URL for dataset: https://test.openml.org/api/v1/xml/data/28992
+
 
 
 Dataset is a sparse matrix
 ==========================
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     sparse_data = coo_matrix((
@@ -431,7 +435,7 @@ Dataset is a sparse matrix
 
 
 
-.. code-block:: python
+.. code-block:: default
 
 
     upload_did = xor_dataset.publish()
@@ -448,15 +452,15 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/29238
+    URL for dataset: https://test.openml.org/api/v1/xml/data/28993
+
 
 
 Dataset is a pandas sparse dataframe
 ====================================
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     sparse_data = coo_matrix((
@@ -494,6 +498,36 @@ Dataset is a pandas sparse dataframe
 
  .. code-block:: none
 
+    /home/travis/build/openml/openml-python/examples/create_upload_tutorial.py:291: FutureWarning: SparseDataFrame is deprecated and will be removed in a future version.
+    Use a regular DataFrame whose columns are SparseArrays instead.
+
+    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
+
+      df = pd.SparseDataFrame(sparse_data, columns=column_names)
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/sparse/frame.py:257: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
+    Use a Series with sparse values instead.
+
+        >>> series = pd.Series(pd.SparseArray(...))
+
+    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
+
+      sparse_index=BlockIndex(N, blocs, blens),
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/frame.py:3451: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
+    Use a Series with sparse values instead.
+
+        >>> series = pd.Series(pd.SparseArray(...))
+
+    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
+
+      return klass(values, index=self.index, name=items, fastpath=True)
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/apply.py:345: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
+    Use a Series with sparse values instead.
+
+        >>> series = pd.Series(pd.SparseArray(...))
+
+    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
+
+      result = self.obj._constructor_sliced(results)
     <class 'pandas.core.sparse.frame.SparseDataFrame'>
     RangeIndex: 4 entries, 0 to 3
     Data columns (total 3 columns):
@@ -501,16 +535,19 @@ Dataset is a pandas sparse dataframe
     input2    2 non-null Sparse[float64, nan]
     y         2 non-null Sparse[float64, nan]
     dtypes: Sparse[float64, nan](3)
-    memory usage: 176.0 bytes
+    memory usage: 224.0 bytes
     None
 
 
 
-.. code-block:: python
+
+.. code-block:: default
 
 
     upload_did = xor_dataset.publish()
     print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+
+
 
 
 
@@ -521,10 +558,24 @@ Dataset is a pandas sparse dataframe
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/29239
+    URL for dataset: https://test.openml.org/api/v1/xml/data/28994
 
 
-**Total running time of the script:** ( 0 minutes  4.970 seconds)
+
+
+.. code-block:: default
+
+    openml.config.stop_using_configuration_for_example()
+
+
+
+
+
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  5.832 seconds)
 
 
 .. _sphx_glr_download_examples_create_upload_tutorial.py:
@@ -552,4 +603,4 @@ Dataset is a pandas sparse dataframe
 
  .. rst-class:: sphx-glr-signature
 
-    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.readthedocs.io>`_
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

@@ -2,12 +2,67 @@
 
 .. _progress:
 
-========
-Progress
-========
-
+=========
 Changelog
 =========
+
+0.10.0
+~~~~~~
+* ADD #737: Add list_evaluations_setups to return hyperparameters along with list of evaluations.
+* FIX #261: Test server is cleared of all files uploaded during unit testing.
+* FIX #447: All files created by unit tests no longer persist in local.
+* FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
+* FIX #447: All files created by unit tests are deleted after the completion of all unit tests.
+* FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.
+* FIX #608: Fixing dataset_id referenced before assignment error in get_run function.
+* DOC #639: More descriptive documention for function to convert array format.
+* DOC #719: Add documentation on uploading tasks.
+* ADD #687: Adds a function to retrieve the list of evaluation measures available.
+* ADD #695: A function to retrieve all the data quality measures available.
+* ADD #412: Add a function to trim flow names for scikit-learn flows.
+* ADD #715: `list_evaluations` now has an option to sort evaluations by score (value).
+* ADD #722: Automatic reinstantiation of flow in `run_model_on_task`. Clearer errors if that's not possible.
+* ADD #412: The scikit-learn extension populates the short name field for flows.
+* MAINT #726: Update examples to remove deprecation warnings from scikit-learn
+* MAINT #752: Update OpenML-Python to be compatible with sklearn 0.21
+
+
+0.9.0
+~~~~~
+* ADD #560: OpenML-Python can now handle regression tasks as well.
+* ADD #620, #628, #632, #649, #682: Full support for studies and distinguishes suites from studies.
+* ADD #607: Tasks can now be created and uploaded.
+* ADD #647, #673: Introduced the extension interface. This provides an easy way to create a hook for machine learning packages to perform e.g. automated runs.
+* ADD #548, #646, #676: Support for Pandas DataFrame and SparseDataFrame
+* ADD #662: Results of listing functions can now be returned as pandas.DataFrame.
+* ADD #59: Datasets can now also be retrieved by name.
+* ADD #672: Add timing measurements for runs, when possible.
+* ADD #661: Upload time and error messages now displayed with `list_runs`.
+* ADD #644: Datasets can now be downloaded 'lazily', retrieving only metadata at first, and the full dataset only when necessary.
+* ADD #659: Lazy loading of task splits.
+* ADD #516: `run_flow_on_task` flow uploading is now optional.
+* ADD #680: Adds `openml.config.start_using_configuration_for_example` (and resp. stop) to easily connect to the test server.
+* ADD #75, #653: Adds a pretty print for objects of the top-level classes.
+* FIX #642: `check_datasets_active` now correctly also returns active status of deactivated datasets.
+* FIX #304, #636: Allow serialization of numpy datatypes and list of lists of more types (e.g. bools, ints) for flows.
+* FIX #651: Fixed a bug that would prevent openml-python from finding the user's config file.
+* FIX #693: OpenML-Python uses liac-arff instead of scipy.io for loading task splits now.
+* DOC #678: Better color scheme for code examples in documentation.
+* DOC #681: Small improvements and removing list of missing functions.
+* DOC #684: Add notice to examples that connect to the test server.
+* DOC #688: Add new example on retrieving evaluations.
+* DOC #691: Update contributing guidelines to use Github draft feature instead of tags in title.
+* DOC #692: All functions are documented now.
+* MAINT #184: Dropping Python2 support.
+* MAINT #596: Fewer dependencies for regular pip install.
+* MAINT #652: Numpy and Scipy are no longer required before installation.
+* MAINT #655: Lazy loading is now preferred in unit tests.
+* MAINT #667: Different tag functions now share code.
+* MAINT #666: More descriptive error message for `TypeError` in `list_runs`.
+* MAINT #668: Fix some type hints.
+* MAINT #677: `dataset.get_data` now has consistent behavior in its return type.
+* MAINT #686: Adds ignore directives for several `mypy` folders.
+* MAINT #629, #630: Code now adheres to single PEP8 standard.
 
 0.8.0
 ~~~~~
@@ -58,72 +113,11 @@ There is no changelog for these versions.
 0.3.0
 ~~~~~
 
-* Add this changelog (Matthias Feurer)
-* 2nd example notebook PyOpenML.ipynb (Joaquin Vanschoren)
+* Add this changelog
+* 2nd example notebook PyOpenML.ipynb
 * Pagination support for list datasets and list tasks
 
 Prior
 ~~~~~
 
 There is no changelog for prior versions.
-
-API calls
-=========
-
-=============================================== =========== ====== =============== ========== =====================
-API call                                        implemented tested properly tested loads json proper error handling
-=============================================== =========== ====== =============== ========== =====================
-/data/{id}                                      yes         yes
-/data/features/{id}                             yes         yes
-/data/qualities/{id}                            yes         yes
-/data/list/                                     yes         yes
-/data/list/tag/{tag}                            yes         yes
-/data/upload/                                   yes         yes
-/data/tag
-/data/untag
-/data/delete/                                   X
-
-/task/{task}                                    yes         yes
-/task/list                                      yes         yes
-/task/list/type/{id}                            yes         yes
-/task/list/tag/{tag}                            yes         yes
-/task {POST}
-/task/tag
-/task/untag
-/task/delete                                    X
-
-/tasktype/{id}
-/tasktype/list
-
-/flow/{id}
-/flow/exists/{name}/{ext_version}               yes
-/flow/list                                      yes
-/flow/list/tag/{tag}
-/flow/owned
-/flow/ {POST}                                   yes         yes
-/flow/tag
-/flow/untag
-/flow/{id} {DELETE}                             X
-
-/run/list/task/{ids}                            yes         yes
-/run/list/run/{ids}                             yes         yes
-/run/list/tag/{tag}                             yes         yes
-/run/{id}                                       yes         yes
-/run/list/uploader/{ids}                        yes         yes
-/run/list/flow/{ids}                            yes         yes
-/run/list/{filters}                             yes         yes
-/run/untag
-/run (POST)                                     yes         yes
-/run/tag
-/run/{id} (DELETE)                              X
-
-/evaluation/list/run/{ids}
-/evaluation/list/tag/{tag}
-/evaluation/list/task/{ids}
-/evaluation/list/uploader/{ids}
-/evaluation/list/flow/{ids}
-/evaluation/list/{filters}
-
-=============================================== =========== ====== =============== ========== =====================
-
-We do not plan to implement API calls marked with an **X**!

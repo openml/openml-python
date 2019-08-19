@@ -1,0 +1,6 @@
+:mod:`openml`.OpenMLSetup
+================================
+
+.. currentmodule:: openml
+
+.. autoclass:: OpenMLSetup

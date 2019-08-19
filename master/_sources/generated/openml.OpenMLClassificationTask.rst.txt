@@ -1,0 +1,6 @@
+:mod:`openml`.OpenMLClassificationTask
+=============================================
+
+.. currentmodule:: openml
+
+.. autoclass:: OpenMLClassificationTask

@@ -2,27 +2,27 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>openml.runs.run_model_on_task &#8212; OpenML 0.8.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>openml.runs.run_model_on_task &#8212; OpenML 0.10.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
-    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
   
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.8.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -102,19 +102,54 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">openml.runs</span></code>.run_model_on_task</a></li>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>.run_model_on_task</a></li>
 </ul>
 
         </div>
       </div>
-    <div class="col-md-9 content">
+    <div class="body col-md-9 content" role="main">
       
   <div class="section" id="openml-runs-run-model-on-task">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>.run_model_on_task<a class="headerlink" href="#openml-runs-run-model-on-task" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.runs.run_model_on_task">
-<code class="descclassname">openml.runs.</code><code class="descname">run_model_on_task</code><span class="sig-paren">(</span><em>model</em>, <em>task</em>, <em>avoid_duplicate_runs=True</em>, <em>flow_tags=None</em>, <em>seed=None</em>, <em>add_local_measures=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.run_model_on_task" title="Permalink to this definition">¶</a></dt>
-<dd><p>See <code class="docutils literal notranslate"><span class="pre">run_flow_on_task</span> <span class="pre">for</span> <span class="pre">a</span> <span class="pre">documentation</span></code>.</p>
+<code class="sig-prename descclassname">openml.runs.</code><code class="sig-name descname">run_model_on_task</code><span class="sig-paren">(</span><em class="sig-param">model: Any</em>, <em class="sig-param">task: openml.tasks.task.OpenMLTask</em>, <em class="sig-param">avoid_duplicate_runs: bool = True</em>, <em class="sig-param">flow_tags: List[str] = None</em>, <em class="sig-param">seed: int = None</em>, <em class="sig-param">add_local_measures: bool = True</em>, <em class="sig-param">upload_flow: bool = False</em>, <em class="sig-param">return_flow: bool = False</em><span class="sig-paren">)</span> &#x2192; Union[openml.runs.run.OpenMLRun, Tuple[openml.runs.run.OpenMLRun, openml.flows.flow.OpenMLFlow]]<a class="headerlink" href="#openml.runs.run_model_on_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the model on the dataset defined by the task.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model</strong><span class="classifier">sklearn model</span></dt><dd><p>A model which has a function fit(X,Y) and predict(X),
+all supervised estimators of scikit learn follow this definition of a model [1]
+[1](<a class="reference external" href="http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html">http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html</a>)</p>
+</dd>
+<dt><strong>task</strong><span class="classifier">OpenMLTask</span></dt><dd><p>Task to perform. This may be a model instead if the first argument is an OpenMLTask.</p>
+</dd>
+<dt><strong>avoid_duplicate_runs</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, the run will throw an error if the setup/task combination is already present on
+the server. This feature requires an internet connection.</p>
+</dd>
+<dt><strong>flow_tags</strong><span class="classifier">List[str], optional (default=None)</span></dt><dd><p>A list of tags that the flow should have at creation.</p>
+</dd>
+<dt><strong>seed: int, optional (default=None)</strong></dt><dd><p>Models that are not seeded will get this seed.</p>
+</dd>
+<dt><strong>add_local_measures</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>Determines whether to calculate a set of evaluation measures locally,
+to later verify server behaviour.</p>
+</dd>
+<dt><strong>upload_flow</strong><span class="classifier">bool (default=False)</span></dt><dd><p>If True, upload the flow to OpenML if it does not exist yet.
+If False, do not upload the flow to OpenML.</p>
+</dd>
+<dt><strong>return_flow</strong><span class="classifier">bool (default=False)</span></dt><dd><p>If True, returns the OpenMLFlow generated from the model in addition to the OpenMLRun.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>run</strong><span class="classifier">OpenMLRun</span></dt><dd><p>Result of the run.</p>
+</dd>
+<dt><strong>flow</strong><span class="classifier">OpenMLFlow (optional, only if <cite>return_flow</cite> is True).</span></dt><dd><p>Flow generated from the model.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <div class="clearer"></div></div>
@@ -131,8 +166,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2014-2018, Matthias Feurer, Andreas Müller, Farzan Majdani, Joaquin Vanschoren, Jan van Rijn, Arlind Kadra and Pieter Gijsbers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.<br/>
+        &copy; Copyright 2014-2019, the OpenML-Python team..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.0.<br/>
     </p>
   </div>
 </footer>
