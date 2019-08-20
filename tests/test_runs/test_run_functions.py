@@ -827,7 +827,7 @@ class TestRun(TestBase):
         self.assertEqual(flowS.components['VarianceThreshold'].
                          parameters['threshold'], '0.05')
 
-    @pytest.mark.flaky(reruns=3)
+    @pytest.mark.flaky()
     def test_get_run_trace(self):
         # get_run_trace is already tested implicitly in test_run_and_publish
         # this test is a bit additional.
