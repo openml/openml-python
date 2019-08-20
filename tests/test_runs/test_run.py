@@ -134,7 +134,7 @@ class TestRun(TestBase):
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             run_prime.run_id))
 
-    @pytest.mark.flaky(reruns=3)
+    @pytest.mark.flaky()
     def test_to_from_filesystem_search(self):
 
         model = Pipeline([
