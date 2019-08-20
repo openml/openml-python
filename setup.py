@@ -48,7 +48,8 @@ setuptools.setup(name="openml",
                          'pytest-xdist',
                          'pytest-timeout',
                          'nbformat',
-                         'oslo.concurrency'
+                         'oslo.concurrency',
+                         'flaky',
                      ],
                      'examples': [
                          'matplotlib',
