@@ -172,16 +172,16 @@ class TestEvaluationFunctions(TestBase):
         openml.config.server = self.production_server
         flow_id = [405]
         size = 100
-        evals_setups = self._check_list_evaluation_setups(size, flow=flow_id)
+        evals = self._check_list_evaluation_setups(size, flow=flow_id)
         # check if parameters in separate columns works
-        evals_setups_cols = openml.evaluations.list_evaluations_setups("predictive_accuracy",
-                                                                       flow=flow_id, size=size,
-                                                                       sort_order='desc',
-                                                                       output_format='dataframe',
-                                                                       parameters_in_separate_columns=True
-                                                                       )
-        columns = (list(evals_setups_cols.columns))
-        keys = (list(evals_setups['parameters'].values[0].keys()))
+        evals_cols = openml.evaluations.list_evaluations_setups("predictive_accuracy",
+                                                                flow=flow_id, size=size,
+                                                                sort_order='desc',
+                                                                output_format='dataframe',
+                                                                parameters_in_separate_columns=True
+                                                                )
+        columns = (list(evals_cols.columns))
+        keys = (list(evals['parameters'].values[0].keys()))
         self.assertTrue(all(elem in columns for elem in keys))
 
     def test_list_evaluations_setups_filter_task(self):
