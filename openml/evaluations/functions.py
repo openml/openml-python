@@ -255,7 +255,7 @@ def list_evaluations_setups(
         per_fold: Optional[bool] = None,
         sort_order: Optional[str] = None,
         output_format: str = 'dataframe',
-        parameters_in_separate_columns: Optional[bool]= False
+        parameters_in_separate_columns: Optional[bool] = False
 ) -> Union[Dict, pd.DataFrame]:
     """
     List all run-evaluation pairs matching all of the given filters
@@ -328,10 +328,10 @@ def list_evaluations_setups(
         df = pd.merge(evals, setups, on='setup_id', how='left')
 
     if parameters_in_separate_columns:
-    	if flow and len(flow) == 1:
-    		df = pd.concat([df.drop('parameters', axis=1), df['parameters'].apply(pd.Series)], axis=1)
-    	else:
-    		raise ValueError("Can set parameters_in_separate_columns to true only for single flow_id")
+        if flow and len(flow) == 1:
+            df = pd.concat([df.drop('parameters', axis=1), df['parameters'].apply(pd.Series)], axis=1)
+        else:
+            raise ValueError("Can set parameters_in_separate_columns to true only for single flow_id")
 
     if output_format == 'dataframe':
         return df

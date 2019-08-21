@@ -152,23 +152,24 @@ for i in range(top_n):
 ###############################################################################
 # Obtaining evaluations with hyperparameter settings
 # ==========================================
-# We'll now obtain the evaluations of a task and a flow along with the hyperparameter settings
+# We'll now obtain the evaluations of a task and a flow with the hyperparameters
 
-# Return evaluations for given task_id in descending order based on predictive_accuracy and with hyperparameter settings
-evals_setups = openml.evaluations.list_evaluations_setups(function='predictive_accuracy', task=[31], size=100, sort_order='desc',
-                                                          parameters_in_separate_columns=False)
+# List evaluations in desc order based on predictive_accuracy with hyperparameters
+evals_setups = openml.evaluations.list_evaluations_setups(function='predictive_accuracy', task=[31],
+                                                          size=100, sort_order='desc')
 
 ""
 print(evals_setups.head())
 
 ""
-# Return evaluations for given flow_id in descending order based on predictive_accuracy and with hyperparameter settings
-# parameters_in_separate_columns returns parameters in separate columns (works only when single flow_id is given)
-evals_setups = openml.evaluations.list_evaluations_setups(function='predictive_accuracy', flow=[6767], size=100,
-                                                         parameters_in_separate_columns=True)
+# Return evaluations for flow_id in desc order based on predictive_accuracy with hyperparameters
+# parameters_in_separate_columns returns parameters in separate columns
+evals_setups = openml.evaluations.list_evaluations_setups(function='predictive_accuracy',
+                                                          flow=[6767],
+                                                          size=100,
+                                                          parameters_in_separate_columns=True)
 
 ""
 print(evals_setups.head(10))
 
 ""
-
