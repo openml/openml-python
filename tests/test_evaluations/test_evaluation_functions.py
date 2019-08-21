@@ -28,7 +28,9 @@ class TestEvaluationFunctions(TestBase):
         for index, row in evals_setups.iterrows():
             params = openml.runs.get_run(row['run_id']).parameter_settings
             hyper_params = {param['oml:name']: param['oml:value'] for param in params}
-            self.assertTrue(sorted(row['parameters'].values()) == sorted(hyper_params.values()))
+            list1 = list(hyper_params.values())
+            list2 = list(row['parameters'].values())
+            self.assertTrue(all(elem in list2 for elem in list1))
         return evals_setups
 
     def test_evaluation_list_filter_task(self):
