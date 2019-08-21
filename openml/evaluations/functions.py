@@ -329,9 +329,11 @@ def list_evaluations_setups(
 
     if parameters_in_separate_columns:
         if flow and len(flow) == 1:
-            df = pd.concat([df.drop('parameters', axis=1), df['parameters'].apply(pd.Series)], axis=1)
+            df = pd.concat([df.drop('parameters', axis=1), df['parameters'].apply(pd.Series)],
+                           axis=1)
         else:
-            raise ValueError("Can set parameters_in_separate_columns to true only for single flow_id")
+            raise ValueError("Can set parameters_in_separate_columns to true only "
+                             "for single flow_id")
 
     if output_format == 'dataframe':
         return df
