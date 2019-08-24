@@ -75,7 +75,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
             fixture_name = 'sklearn.tree.tree.DecisionTreeClassifier'
             fixture_short_name = 'sklearn.DecisionTreeClassifier'
-            fixture_description = 'Automatically created scikit-learn flow.'
+            fixture_description = self.extension._get_sklearn_description(model)
             version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
                               % sklearn.__version__
             # min_impurity_decrease has been introduced in 0.20
@@ -143,7 +143,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
             fixture_name = 'sklearn.cluster.k_means_.KMeans'
             fixture_short_name = 'sklearn.KMeans'
-            fixture_description = 'Automatically created scikit-learn flow.'
+            fixture_description = self.extension._get_sklearn_description(model)
             version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
                               % sklearn.__version__
             # n_jobs default has changed to None in 0.20
@@ -207,10 +207,10 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                        '(base_estimator=sklearn.tree.tree.DecisionTreeClassifier)'
         fixture_class_name = 'sklearn.ensemble.weight_boosting.AdaBoostClassifier'
         fixture_short_name = 'sklearn.AdaBoostClassifier'
-        fixture_description = 'Automatically created scikit-learn flow.'
+        fixture_description = self.extension._get_sklearn_description(model)
         fixture_subcomponent_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_subcomponent_class_name = 'sklearn.tree.tree.DecisionTreeClassifier'
-        fixture_subcomponent_description = 'Automatically created scikit-learn flow.'
+        fixture_subcomponent_description = self.extension._get_sklearn_description(model.base_estimator)
         fixture_structure = {
             fixture_name: [],
             'sklearn.tree.tree.DecisionTreeClassifier': ['base_estimator']
@@ -264,7 +264,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
                        'dummy=sklearn.dummy.DummyClassifier)'
         fixture_short_name = 'sklearn.Pipeline(StandardScaler,DummyClassifier)'
-        fixture_description = 'Automatically created scikit-learn flow.'
+        fixture_description = self.extension._get_sklearn_description(model)
         fixture_structure = {
             fixture_name: [],
             'sklearn.preprocessing.data.StandardScaler': ['scaler'],
@@ -353,7 +353,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
                        'clusterer=sklearn.cluster.k_means_.KMeans)'
         fixture_short_name = 'sklearn.Pipeline(StandardScaler,KMeans)'
-        fixture_description = 'Automatically created scikit-learn flow.'
+        fixture_description = self.extension._get_sklearn_description(model)
         fixture_structure = {
             fixture_name: [],
             'sklearn.preprocessing.data.StandardScaler': ['scaler'],
@@ -445,7 +445,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                   'numeric=sklearn.preprocessing.data.StandardScaler,' \
                   'nominal=sklearn.preprocessing._encoders.OneHotEncoder)'
         fixture_short_name = 'sklearn.ColumnTransformer'
-        fixture_description = 'Automatically created scikit-learn flow.'
+        fixture_description = self.extension._get_sklearn_description(model)
         fixture_structure = {
             fixture: [],
             'sklearn.preprocessing.data.StandardScaler': ['numeric'],
@@ -504,7 +504,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             fixture_name: [],
         }
 
-        fixture_description = 'Automatically created scikit-learn flow.'
+        fixture_description = self.extension._get_sklearn_description(model)
         serialization = self.extension.model_to_flow(model)
         structure = serialization.get_structure('name')
         self.assertEqual(serialization.name, fixture_name)

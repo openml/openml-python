@@ -501,6 +501,8 @@ class SklearnExtension(Extension):
         def match_format(s):
             return "{}\n{}\n".format(s, len(s) * '-')
         s = inspect.getdoc(model)
+        if s is None:
+            return ''
         if len(s) <= char_lim:
             # if the fetched docstring is smaller than char_lim, no trimming required
             return s.strip()
@@ -527,6 +529,105 @@ class SklearnExtension(Extension):
         if len(s) > char_lim:
             s = "{}...".format(s[:char_lim - 3])
         return s.strip()
+
+    def _extract_sklearn_parameter_docstring(self, model) -> Union[None, str]:
+        '''Extracts the part of sklearn docstring containing parameter information
+
+        Fetches the entire docstring and trims just the Parameter section.
+        The assumption is that 'Parameters' is the first section in sklearn docstrings,
+        followed by other sections titled 'Attributes', 'See also', 'Note', 'References',
+        appearing in that order if defined.
+        Returns a None if no section with 'Parameters' can be found in the docstring.
+
+        Parameters
+        ----------
+        model : sklearn model
+
+        Returns
+        -------
+        str, or None
+        '''
+        def match_format(s):
+            return "{}\n{}\n".format(s, len(s) * '-')
+        s = inspect.getdoc(model)
+        if s is None:
+            return None
+        try:
+            index1 = s.index(match_format("Parameters"))
+        except ValueError as e:
+            # when sklearn docstring has no 'Parameters' section
+            print("{} {}".format(match_format("Parameters"), e))
+            return None
+
+        headings = ["Attributes", "Notes", "See also", "Note", "References"]
+        for h in headings:
+            try:
+                # to find end of Parameters section
+                index2 = s.index(match_format(h))
+                break
+            except ValueError:
+                print("{} not available in docstring".format(h))
+                continue
+        else:
+            # in the case only 'Parameters' exist, trim till end of docstring
+            index2 = len(s)
+        s = s[index1:index2]
+        return s.strip()
+
+    def _extract_sklearn_param_info(self, model, char_lim=1024) -> Union[None, Dict]:
+        '''Parses parameter type and description from sklearn dosctring
+
+        Parameters
+        ----------
+        model : sklearn model
+        char_lim : int
+            Specifying the max length of the returned string.
+            OpenML servers have a constraint of 1024 characters string fields.
+
+        Returns
+        -------
+        Dict, or None
+        '''
+        docstring = self._extract_sklearn_parameter_docstring(model)
+        if docstring is None:
+            # when sklearn docstring has no 'Parameters' section
+            return None
+
+        n = re.compile("[.]*\n", flags=IGNORECASE)
+        lines = n.split(docstring)
+        p = re.compile("[a-z0-9_ ]+ : [a-z0-9_']+[a-z0-9_ ]*", flags=IGNORECASE)
+        parameter_docs = OrderedDict()  # type: Dict
+        description = []  # type: List
+
+        # collecting parameters and their descriptions
+        for i, s in enumerate(lines):
+            param = p.findall(s)
+            if param != []:
+                if len(description) > 0:
+                    description[-1] = '\n'.join(description[-1]).strip()
+                    if len(description[-1]) > char_lim:
+                        description[-1] = "{}...".format(description[-1][:char_lim - 3])
+                description.append([])
+            else:
+                if len(description) > 0:
+                    description[-1].append(s)
+        description[-1] = '\n'.join(description[-1]).strip()
+        if len(description[-1]) > char_lim:
+            description[-1] = "{}...".format(description[-1][:char_lim - 3])
+
+        # collecting parameters and their types
+        matches = p.findall(docstring)
+        for i, param in enumerate(matches):
+            key, value = param.split(':')
+            parameter_docs[key.strip()] = [value.strip(), description[i]]
+
+        # to avoid KeyError for missing parameters
+        param_list_true = list(model.get_params().keys())
+        param_list_found = list(parameter_docs.keys())
+        for param in list(set(param_list_true) - set(param_list_found)):
+            parameter_docs[param] = [None, None]
+
+        return parameter_docs
 
     def _serialize_model(self, model: Any) -> OpenMLFlow:
         """Create an OpenMLFlow.
@@ -655,97 +756,6 @@ class SklearnExtension(Extension):
             else:
                 known_sub_components.add(visitee.name)
                 to_visit_stack.extend(visitee.components.values())
-
-    def _extract_sklearn_parameter_docstring(self, model) -> Union[None, str]:
-        '''Extracts the part of sklearn docstring containing parameter information
-
-        Fetches the entire docstring and trims just the Parameter section.
-        The assumption is that 'Parameters' is the first section in sklearn docstrings,
-        followed by other sections titled 'Attributes', 'See also', 'Note', 'References',
-        appearing in that order if defined.
-        Returns a None if no section with 'Parameters' can be found in the docstring.
-
-        Parameters
-        ----------
-        model : sklearn model
-
-        Returns
-        -------
-        str, or None
-        '''
-        def match_format(s):
-            return "{}\n{}\n".format(s, len(s) * '-')
-        s = inspect.getdoc(model)
-        try:
-            index1 = s.index(match_format("Parameters"))
-        except ValueError as e:
-            # when sklearn docstring has no 'Parameters' section
-            print("{} {}".format(match_format("Parameters"), e))
-            return None
-
-        headings = ["Attributes", "Notes", "See also", "Note", "References"]
-        for h in headings:
-            try:
-                # to find end of Parameters section
-                index2 = s.index(match_format(h))
-                break
-            except ValueError:
-                print("{} not available in docstring".format(h))
-                continue
-        else:
-            # in the case only 'Parameters' exist, trim till end of docstring
-            index2 = len(s)
-        s = s[index1:index2]
-        return s.strip()
-
-    def _extract_sklearn_param_info(self, model, char_lim=1024) -> Union[None, Dict]:
-        '''Parses parameter type and description from sklearn dosctring
-
-        Parameters
-        ----------
-        model : sklearn model
-        char_lim : int
-            Specifying the max length of the returned string.
-            OpenML servers have a constraint of 1024 characters string fields.
-
-        Returns
-        -------
-        Dict, or None
-        '''
-        docstring = self._extract_sklearn_parameter_docstring(model)
-        if docstring is None:
-            # when sklearn docstring has no 'Parameters' section
-            return None
-
-        n = re.compile("[.]*\n", flags=IGNORECASE)
-        lines = n.split(docstring)
-        p = re.compile("[a-z0-9_ ]+ : [a-z0-9_']+[a-z0-9_ ]*", flags=IGNORECASE)
-        parameter_docs = OrderedDict()  # type: Dict
-        description = []  # type: List
-
-        # collecting parameters and their descriptions
-        for i, s in enumerate(lines):
-            param = p.findall(s)
-            if param != []:
-                if len(description) > 0:
-                    description[-1] = '\n'.join(description[-1]).strip()
-                    if len(description[-1]) > char_lim:
-                        description[-1] = "{}...".format(description[-1][:char_lim - 3])
-                description.append([])
-            else:
-                if len(description) > 0:
-                    description[-1].append(s)
-        description[-1] = '\n'.join(description[-1]).strip()
-        if len(description[-1]) > char_lim:
-            description[-1] = "{}...".format(description[-1][:char_lim - 3])
-
-        # collecting parameters and their types
-        matches = p.findall(docstring)
-        for i, param in enumerate(matches):
-            key, value = param.split(':')
-            parameter_docs[key.strip()] = [value.strip(), description[i]]
-
-        return parameter_docs
 
     def _extract_information_from_model(
         self,
@@ -890,6 +900,10 @@ class SklearnExtension(Extension):
                     parameters[k] = None
 
             if parameters_docs is not None:
+                # print(type(model))
+                # print(sorted(parameters_docs.keys()))
+                # print(sorted(model_parameters.keys()))
+                # print()
                 data_type, description = parameters_docs[k]
                 parameters_meta_info[k] = OrderedDict((('description', description),
                                                        ('data_type', data_type)))
