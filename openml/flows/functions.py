@@ -409,7 +409,8 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                 params1 = set(flow1.parameters_meta_info.keys())
                 params2 = set(flow2.parameters_meta_info.keys())
                 if params1 != params2:
-                    raise ValueError('Parameter list in meta info for parameters differ in the two flows.')
+                    raise ValueError('Parameter list in meta info for parameters differ '
+                                     'in the two flows.')
                 # iterating over the parameter's meta info list
                 for param in params1:
                     if isinstance(flow1.parameters_meta_info[param], Dict) and \
@@ -424,8 +425,9 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                     if value1 is None or value2 is None:
                         continue
                     elif value1 != value2:
-                        raise ValueError("Flow {}: data type for parameter {} in parameters_meta_info differ as "
-                                         "{}\nvs\n{}".format(flow1.name, key, value1, value2))
+                        raise ValueError("Flow {}: data type for parameter {} in {} differ "
+                                         "as {}\nvs\n{}".format(flow1.name, param, key,
+                                                                value1, value2))
                 # the continue is to avoid the 'attr != attr2' check at end of function
                 continue
 

@@ -210,7 +210,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture_description = self.extension._get_sklearn_description(model)
         fixture_subcomponent_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_subcomponent_class_name = 'sklearn.tree.tree.DecisionTreeClassifier'
-        fixture_subcomponent_description = self.extension._get_sklearn_description(model.base_estimator)
+        fixture_subcomponent_description = \
+            self.extension._get_sklearn_description(model.base_estimator)
         fixture_structure = {
             fixture_name: [],
             'sklearn.tree.tree.DecisionTreeClassifier': ['base_estimator']
