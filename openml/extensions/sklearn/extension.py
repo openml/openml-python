@@ -596,29 +596,38 @@ class SklearnExtension(Extension):
         n = re.compile("[.]*\n", flags=IGNORECASE)
         lines = n.split(docstring)
         p = re.compile("[a-z0-9_ ]+ : [a-z0-9_']+[a-z0-9_ ]*", flags=IGNORECASE)
-        parameter_docs = OrderedDict()  # type: Dict
-        description = []  # type: List
+        # The above regular expression is designed to detect sklearn parameter names and type
+        # in the format of [variable_name][space]:[space][type]
+        # The expectation is that the parameter description for this detected parameter will
+        # be all the lines in the docstring till the regex finds another parameter match
 
         # collecting parameters and their descriptions
+        description = []  # type: List
         for i, s in enumerate(lines):
             param = p.findall(s)
             if param != []:
-                if len(description) > 0:
-                    description[-1] = '\n'.join(description[-1]).strip()
-                    if len(description[-1]) > char_lim:
-                        description[-1] = "{}...".format(description[-1][:char_lim - 3])
-                description.append([])
+                # a parameter definition is found by regex
+                # creating placeholder when parameter found which will be a list of strings
+                # string descriptions will be appended in subsequent iterations
+                # till another parameter is found and a new placeholder is created
+                placeholder = ['']  # type: List[str]
+                description.append(placeholder)
             else:
-                if len(description) > 0:
+                if len(description) > 0:  # description=[] means no parameters found yet
+                    # appending strings to the placeholder created when parameter found
                     description[-1].append(s)
-        description[-1] = '\n'.join(description[-1]).strip()
-        if len(description[-1]) > char_lim:
-            description[-1] = "{}...".format(description[-1][:char_lim - 3])
+        for i in range(len(description)):
+            # concatenating parameter description strings
+            description[i] = '\n'.join(description[i]).strip()
+            # limiting all parameter descriptions to accepted OpenML string length
+            if len(description[i]) > char_lim:
+                description[i] = "{}...".format(description[i][:char_lim - 3])
 
         # collecting parameters and their types
+        parameter_docs = OrderedDict()  # type: Dict
         matches = p.findall(docstring)
         for i, param in enumerate(matches):
-            key, value = param.split(':')
+            key, value = str(param).split(':')
             parameter_docs[key.strip()] = [value.strip(), description[i]]
 
         # to avoid KeyError for missing parameters
