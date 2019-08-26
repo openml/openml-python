@@ -157,11 +157,11 @@ Note that we now filter the evaluations based on another parameter 'task'.
 
     Displaying head of sorted dataframe: 
             run_id  task_id  setup_id  ...     value values array_data
-    2758  10279797   167140   8166877  ...  0.968613   None       None
     2759  10279798   167140   8166877  ...  0.968613   None       None
-    2216  10232158   167140   8157180  ...  0.967671   None       None
+    2758  10279797   167140   8166877  ...  0.968613   None       None
     2233  10232987   167140   8157961  ...  0.967671   None       None
-    2823  10291679   167140   8157545  ...  0.967043   None       None
+    2216  10232158   167140   8157180  ...  0.967671   None       None
+    2284  10271558   167140   8154506  ...  0.967043   None       None
 
     [5 rows x 12 columns]
 
@@ -278,22 +278,22 @@ For this, we shall compare the top performing flows.
  .. code-block:: none
 
     (12736, 'sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)')
-    (12127, 'sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)')
     (8399, 'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)')
+    (12127, 'sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)')
     (8353, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
+    (16347, 'sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,onehotencoder=sklearn.preprocessing._encoders.OneHotEncoder,svc=sklearn.svm.classes.SVC)(1)')
     (8317, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
     (8330, 'sklearn.pipeline.Pipeline(imputation=openmlstudy14.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,classifier=sklearn.svm.classes.SVC)(2)')
     (8351, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)')
     (8365, 'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier))(1)')
     (8315, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)')
-    (8885, 'sklearn.pipeline.Pipeline(imputation=preprocessing.ConditionalImputer2,catencoding=preprocessing.MultiLabelEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)')
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.833 seconds)
+   **Total running time of the script:** ( 0 minutes  6.842 seconds)
 
 
 .. _sphx_glr_download_examples_fetch_evaluations_tutorial.py:
