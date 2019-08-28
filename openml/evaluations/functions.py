@@ -332,8 +332,8 @@ def list_evaluations_setups(
         df = pd.merge(evals, setups, on='setup_id', how='left')
 
     if parameters_in_separate_columns:
-        df = pd.concat([df.drop('parameters', axis=1), df['parameters'].apply(pd.Series)],
-                           axis=1)
+        df = pd.concat([df.drop('parameters', axis=1),
+                        df['parameters'].apply(pd.Series)], axis=1)
 
     if output_format == 'dataframe':
         return df

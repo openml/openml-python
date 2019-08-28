@@ -30,7 +30,7 @@ class TestEvaluationFunctions(TestBase):
             list1 = [param['oml:value'] for param in params]
             list2 = list(row['parameters'].values())
             # check if all values are equal
-            self.assertSequenceEqual(list1, list2)
+            self.assertSequenceEqual(sorted(list1), sorted(list2))
         return evals_setups
 
     def test_evaluation_list_filter_task(self):
