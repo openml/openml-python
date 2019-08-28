@@ -27,10 +27,10 @@ class TestEvaluationFunctions(TestBase):
         # Check if the hyper-parameter column is as accurate and flow_id
         for index, row in evals_setups.iterrows():
             params = openml.runs.get_run(row['run_id']).parameter_settings
-            hyper_params = {param['oml:name']: param['oml:value'] for param in params}
-            list1 = list(hyper_params.values())
+            list1 = [param['oml:value'] for param in params]
             list2 = list(row['parameters'].values())
-            self.assertTrue(all(elem in list2 for elem in list1))
+            # check if all values are equal
+            self.assertSequenceEqual(list1, list2)
         return evals_setups
 
     def test_evaluation_list_filter_task(self):
