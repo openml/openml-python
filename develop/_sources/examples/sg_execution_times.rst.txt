@@ -5,12 +5,12 @@
 
 Computation times
 =================
-**01:37.132** total execution time for **examples** files:
+**01:37.292** total execution time for **examples** files:
 
-- **00:33.277**: :ref:`sphx_glr_examples_tasks_tutorial.py` (``tasks_tutorial.py``)
-- **00:21.938**: :ref:`sphx_glr_examples_flows_and_runs_tutorial.py` (``flows_and_runs_tutorial.py``)
-- **00:13.910**: :ref:`sphx_glr_examples_introduction_tutorial.py` (``introduction_tutorial.py``)
-- **00:07.473**: :ref:`sphx_glr_examples_run_setup_tutorial.py` (``run_setup_tutorial.py``)
-- **00:07.422**: :ref:`sphx_glr_examples_datasets_tutorial.py` (``datasets_tutorial.py``)
-- **00:07.166**: :ref:`sphx_glr_examples_fetch_evaluations_tutorial.py` (``fetch_evaluations_tutorial.py``)
-- **00:05.947**: :ref:`sphx_glr_examples_create_upload_tutorial.py` (``create_upload_tutorial.py``)
+- **00:34.144**: :ref:`sphx_glr_examples_tasks_tutorial.py` (``tasks_tutorial.py``)
+- **00:22.291**: :ref:`sphx_glr_examples_flows_and_runs_tutorial.py` (``flows_and_runs_tutorial.py``)
+- **00:12.977**: :ref:`sphx_glr_examples_introduction_tutorial.py` (``introduction_tutorial.py``)
+- **00:07.581**: :ref:`sphx_glr_examples_run_setup_tutorial.py` (``run_setup_tutorial.py``)
+- **00:07.396**: :ref:`sphx_glr_examples_datasets_tutorial.py` (``datasets_tutorial.py``)
+- **00:06.997**: :ref:`sphx_glr_examples_fetch_evaluations_tutorial.py` (``fetch_evaluations_tutorial.py``)
+- **00:05.906**: :ref:`sphx_glr_examples_create_upload_tutorial.py` (``create_upload_tutorial.py``)
