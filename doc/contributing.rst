@@ -158,5 +158,25 @@ Happy testing!
 Connecting new machine learning libraries
 =========================================
 
-Coming soon - please stay tuned!
+Each extension created should be a stand-alone repository, compatible with the
+`OpenML repository <https://github.com/openml/openml-python>`_.
+The extension repository should work off-the-shelf with openml-python installed.
+It should follow the structure:
 
+::
+
+| openml
+|   |-- extensions
+|   |    |-- [extension name]
+|   |    |    |-- __init__.py
+|   |    |    |-- extension.py
+|   |    |    |-- config.py (optionally)
+|   |    |-- sklearn
+|   |    |    |-- __init__.py
+|   |    |    |-- extension.py
+|   |    |-- keras
+|   |    |    |-- __init__.py
+|   |    |    |-- extension.py
+
+The `sklearn extension <https://github.com/openml/openml-python/tree/develop/openml/extensions>`_ packaged with the OpenML repository can be used as a template/benchmark
+to build the extension.
