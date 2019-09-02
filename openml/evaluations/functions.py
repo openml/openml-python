@@ -254,7 +254,8 @@ def list_evaluations_setups(
         tag: Optional[str] = None,
         per_fold: Optional[bool] = None,
         sort_order: Optional[str] = None,
-        output_format: str = 'dataframe'
+        output_format: str = 'dataframe',
+        parameters_in_separate_columns: bool = False
 ) -> Union[Dict, pd.DataFrame]:
     """
     List all run-evaluation pairs matching all of the given filters
@@ -287,12 +288,19 @@ def list_evaluations_setups(
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
+    parameters_in_separate_columns: bool, optional (default= False)
+        Returns hyperparameters in separate columns if set to True.
+        Valid only for a single flow
 
 
     Returns
     -------
     dict or dataframe with hyperparameter settings as a list of tuples.
     """
+    if parameters_in_separate_columns and (flow is None or len(flow) != 1):
+        raise ValueError("Can set parameters_in_separate_columns to true "
+                         "only for single flow_id")
+
     # List evaluations
     evals = list_evaluations(function=function, offset=offset, size=size, id=id, task=task,
                              setup=setup, flow=flow, uploader=uploader, tag=tag,
@@ -315,13 +323,17 @@ def list_evaluations_setups(
         # Convert parameters of setup into list of tuples of (hyperparameter, value)
         for parameter_dict in setups['parameters']:
             if parameter_dict is not None:
-                parameters.append([tuple([param['parameter_name'], param['value']])
-                                   for param in parameter_dict.values()])
+                parameters.append({param['full_name']: param['value']
+                                   for param in parameter_dict.values()})
             else:
-                parameters.append([])
+                parameters.append({})
         setups['parameters'] = parameters
         # Merge setups with evaluations
         df = pd.merge(evals, setups, on='setup_id', how='left')
+
+    if parameters_in_separate_columns:
+        df = pd.concat([df.drop('parameters', axis=1),
+                        df['parameters'].apply(pd.Series)], axis=1)
 
     if output_format == 'dataframe':
         return df

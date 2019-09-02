@@ -27,8 +27,11 @@ class TestEvaluationFunctions(TestBase):
         # Check if the hyper-parameter column is as accurate and flow_id
         for index, row in evals_setups.iterrows():
             params = openml.runs.get_run(row['run_id']).parameter_settings
-            hyper_params = [tuple([param['oml:name'], param['oml:value']]) for param in params]
-            self.assertTrue(sorted(row['parameters']) == sorted(hyper_params))
+            list1 = [param['oml:value'] for param in params]
+            list2 = list(row['parameters'].values())
+            # check if all values are equal
+            self.assertSequenceEqual(sorted(list1), sorted(list2))
+        return evals_setups
 
     def test_evaluation_list_filter_task(self):
         openml.config.server = self.production_server
@@ -171,7 +174,17 @@ class TestEvaluationFunctions(TestBase):
         openml.config.server = self.production_server
         flow_id = [405]
         size = 100
-        self._check_list_evaluation_setups(size, flow=flow_id)
+        evals = self._check_list_evaluation_setups(size, flow=flow_id)
+        # check if parameters in separate columns works
+        evals_cols = openml.evaluations.list_evaluations_setups("predictive_accuracy",
+                                                                flow=flow_id, size=size,
+                                                                sort_order='desc',
+                                                                output_format='dataframe',
+                                                                parameters_in_separate_columns=True
+                                                                )
+        columns = (list(evals_cols.columns))
+        keys = (list(evals['parameters'].values[0].keys()))
+        self.assertTrue(all(elem in columns for elem in keys))
 
     def test_list_evaluations_setups_filter_task(self):
         openml.config.server = self.production_server

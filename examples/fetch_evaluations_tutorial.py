@@ -16,6 +16,7 @@ In this example, we shall do the following:
 * Sort the obtained results in descending order of the metric
 * Plot a cumulative distribution function for the evaluations
 * Compare the top 10 performing flows based on the evaluation performance
+* Retrieve evaluations with hyperparameter settings
 """
 
 ############################################################################
@@ -147,3 +148,30 @@ flow_ids = evals.flow_id.unique()[:top_n]
 flow_names = evals.flow_name.unique()[:top_n]
 for i in range(top_n):
     print((flow_ids[i], flow_names[i]))
+
+#############################################################################
+# Obtaining evaluations with hyperparameter settings
+# ==================================================
+# We'll now obtain the evaluations of a task and a flow with the hyperparameters
+
+# List evaluations in descending order based on predictive_accuracy with
+# hyperparameters
+evals_setups = openml.evaluations.list_evaluations_setups(function='predictive_accuracy', task=[31],
+                                                          size=100, sort_order='desc')
+
+""
+print(evals_setups.head())
+
+""
+# Return evaluations for flow_id in descending order based on predictive_accuracy
+# with hyperparameters. parameters_in_separate_columns returns parameters in
+# separate columns
+evals_setups = openml.evaluations.list_evaluations_setups(function='predictive_accuracy',
+                                                          flow=[6767],
+                                                          size=100,
+                                                          parameters_in_separate_columns=True)
+
+""
+print(evals_setups.head(10))
+
+""
