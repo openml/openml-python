@@ -24,6 +24,7 @@ In this example, we shall do the following:
 * Sort the obtained results in descending order of the metric
 * Plot a cumulative distribution function for the evaluations
 * Compare the top 10 performing flows based on the evaluation performance
+* Retrieve evaluations with hyperparameter settings
 
 
 .. code-block:: default
@@ -267,6 +268,7 @@ For this, we shall compare the top performing flows.
 
 
 
+
 .. image:: /examples/images/sphx_glr_fetch_evaluations_tutorial_002.png
     :class: sphx-glr-single-img
 
@@ -290,10 +292,73 @@ For this, we shall compare the top performing flows.
 
 
 
+Obtaining evaluations with hyperparameter settings
+==================================================
+We'll now obtain the evaluations of a task and a flow with the hyperparameters
+
+
+.. code-block:: default
+
+
+    # List evaluations in descending order based on predictive_accuracy with
+    # hyperparameters
+    evals_setups = openml.evaluations.list_evaluations_setups(function='predictive_accuracy', task=[31],
+                                                              size=100, sort_order='desc')
+
+    ""
+    print(evals_setups.head())
+
+    ""
+    # Return evaluations for flow_id in descending order based on predictive_accuracy
+    # with hyperparameters. parameters_in_separate_columns returns parameters in
+    # separate columns
+    evals_setups = openml.evaluations.list_evaluations_setups(function='predictive_accuracy',
+                                                              flow=[6767],
+                                                              size=100,
+                                                              parameters_in_separate_columns=True)
+
+    ""
+    print(evals_setups.head(10))
+
+    ""
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+        run_id  ...                                         parameters
+    0  6725054  ...  {'mlr.classif.ranger(13)_num.trees': '48', 'ml...
+    1  2083190  ...  {'sklearn.ensemble.forest.RandomForestClassifi...
+    2  3962979  ...  {'mlr.classif.ranger(13)_num.trees': '42', 'ml...
+    3  2083596  ...  {'sklearn.ensemble.forest.RandomForestClassifi...
+    4  6162649  ...  {'mlr.classif.ranger(13)_num.trees': '715', 'm...
+
+    [5 rows x 13 columns]
+        run_id  ...  mlr.classif.xgboost(9)_nthread
+    0  2420531  ...                             NaN
+    1  2420532  ...                             NaN
+    2  2420533  ...                             NaN
+    3  2420534  ...                             NaN
+    4  2420535  ...                             NaN
+    5  2420536  ...                             NaN
+    6  2420537  ...                             NaN
+    7  2431903  ...                             NaN
+    8  2432142  ...                             NaN
+    9  2432377  ...                             NaN
+
+    [10 rows x 27 columns]
+
+
+
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.927 seconds)
+   **Total running time of the script:** ( 0 minutes  13.002 seconds)
 
 
 .. _sphx_glr_download_examples_fetch_evaluations_tutorial.py:

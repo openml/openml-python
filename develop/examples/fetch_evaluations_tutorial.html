@@ -109,7 +109,10 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#obtaining-cdf-of-metric-for-chosen-task">Obtaining CDF of metric for chosen task</a></li>
-<li><a class="reference internal" href="#comparing-top-10-performing-flows">Comparing top 10 performing flows</a></li>
+<li><a class="reference internal" href="#comparing-top-10-performing-flows">Comparing top 10 performing flows</a><ul>
+<li><a class="reference internal" href="#obtaining-evaluations-with-hyperparameter-settings">Obtaining evaluations with hyperparameter settings</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -136,6 +139,7 @@ reuse of results from previous experiments on similar parameters.</p>
 <li><p>Sort the obtained results in descending order of the metric</p></li>
 <li><p>Plot a cumulative distribution function for the evaluations</p></li>
 <li><p>Compare the top 10 performing flows based on the evaluation performance</p></li>
+<li><p>Retrieve evaluations with hyperparameter settings</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
 </pre></div>
@@ -329,7 +333,57 @@ For this, we shall compare the top performing flows.</p>
 (8315, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.927 seconds)</p>
+<div class="section" id="obtaining-evaluations-with-hyperparameter-settings">
+<h3>Obtaining evaluations with hyperparameter settings<a class="headerlink" href="#obtaining-evaluations-with-hyperparameter-settings" title="Permalink to this headline">¶</a></h3>
+<p>We’ll now obtain the evaluations of a task and a flow with the hyperparameters</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># List evaluations in descending order based on predictive_accuracy with</span>
+<span class="c1"># hyperparameters</span>
+<span class="n">evals_setups</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations_setups</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="s1">&#39;predictive_accuracy&#39;</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="p">[</span><span class="mi">31</span><span class="p">],</span>
+                                                          <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">)</span>
+
+<span class="s2">&quot;&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">evals_setups</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="s2">&quot;&quot;</span>
+<span class="c1"># Return evaluations for flow_id in descending order based on predictive_accuracy</span>
+<span class="c1"># with hyperparameters. parameters_in_separate_columns returns parameters in</span>
+<span class="c1"># separate columns</span>
+<span class="n">evals_setups</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations_setups</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="s1">&#39;predictive_accuracy&#39;</span><span class="p">,</span>
+                                                          <span class="n">flow</span><span class="o">=</span><span class="p">[</span><span class="mi">6767</span><span class="p">],</span>
+                                                          <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                                                          <span class="n">parameters_in_separate_columns</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="s2">&quot;&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">evals_setups</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="s2">&quot;&quot;</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>    run_id  ...                                         parameters
+0  6725054  ...  {&#39;mlr.classif.ranger(13)_num.trees&#39;: &#39;48&#39;, &#39;ml...
+1  2083190  ...  {&#39;sklearn.ensemble.forest.RandomForestClassifi...
+2  3962979  ...  {&#39;mlr.classif.ranger(13)_num.trees&#39;: &#39;42&#39;, &#39;ml...
+3  2083596  ...  {&#39;sklearn.ensemble.forest.RandomForestClassifi...
+4  6162649  ...  {&#39;mlr.classif.ranger(13)_num.trees&#39;: &#39;715&#39;, &#39;m...
+
+[5 rows x 13 columns]
+    run_id  ...  mlr.classif.xgboost(9)_nthread
+0  2420531  ...                             NaN
+1  2420532  ...                             NaN
+2  2420533  ...                             NaN
+3  2420534  ...                             NaN
+4  2420535  ...                             NaN
+5  2420536  ...                             NaN
+6  2420537  ...                             NaN
+7  2431903  ...                             NaN
+8  2432142  ...                             NaN
+9  2432377  ...                             NaN
+
+[10 rows x 27 columns]
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.002 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-fetch-evaluations-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/98e45252eea6ada8491ffe4fb42d5b8b/fetch_evaluations_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_evaluations_tutorial.py</span></code></a></p>
@@ -339,6 +393,7 @@ For this, we shall compare the top performing flows.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
 </div>
 </div>
 
