@@ -127,11 +127,11 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     Flow Name....: sklearn.tree.tree.ExtraTreeClassifier
     Flow URL.....: https://test.openml.org/f/103649
     Setup ID.....: None
-    Setup String.: Python_3.7.4. Sklearn_0.21.2. NumPy_1.17.0. SciPy_1.3.1. ExtraTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
+    Setup String.: Python_3.7.4. Sklearn_0.21.2. NumPy_1.17.1. SciPy_1.3.1. ExtraTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
                         max_features='auto', max_leaf_nodes=None,
                         min_impurity_decrease=0.0, min_impurity_split=None,
                         min_samples_leaf=1, min_samples_split=2,
-                        min_weight_fraction_leaf=0.0, random_state=20956,
+                        min_weight_fraction_leaf=0.0, random_state=50413,
                         splitter='random')
     Dataset ID...: 68
     Dataset URL..: https://test.openml.org/d/68
@@ -162,7 +162,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/43393
+    Uploaded to http://test.openml.org/r/47030
 
 
 
@@ -247,7 +247,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/43394
+    Uploaded to http://test.openml.org/r/47031
 
 
 
@@ -355,7 +355,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/43396
+    kNN on diabetes: http://test.openml.org/r/47036
 
 
 
@@ -372,7 +372,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  21.332 seconds)
+   **Total running time of the script:** ( 0 minutes  21.648 seconds)
 
 
 .. _sphx_glr_download_examples_flows_and_runs_tutorial.py:
