@@ -75,7 +75,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
             fixture_name = 'sklearn.tree.tree.DecisionTreeClassifier'
             fixture_short_name = 'sklearn.DecisionTreeClassifier'
-            fixture_description = self.extension._get_sklearn_description(model)
+            # str obtained from self.extension._get_sklearn_description(model)
+            fixture_description = 'A decision tree classifier.'
             version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
                               % sklearn.__version__
             # min_impurity_decrease has been introduced in 0.20
@@ -143,7 +144,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
             fixture_name = 'sklearn.cluster.k_means_.KMeans'
             fixture_short_name = 'sklearn.KMeans'
-            fixture_description = self.extension._get_sklearn_description(model)
+            # str obtained from self.extension._get_sklearn_description(model)
+            fixture_description = 'K-Means clustering'
             version_fixture = 'sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9' \
                               % sklearn.__version__
             # n_jobs default has changed to None in 0.20
@@ -207,11 +209,18 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                        '(base_estimator=sklearn.tree.tree.DecisionTreeClassifier)'
         fixture_class_name = 'sklearn.ensemble.weight_boosting.AdaBoostClassifier'
         fixture_short_name = 'sklearn.AdaBoostClassifier'
-        fixture_description = self.extension._get_sklearn_description(model)
+        # str obtained from self.extension._get_sklearn_description(model)
+        fixture_description = 'An AdaBoost classifier.\n\nAn AdaBoost [1] classifier is a '\
+                              'meta-estimator that begins by fitting a\nclassifier on the original'\
+                              ' dataset and then fits additional copies of the\nclassifier on the '\
+                              'same dataset but where the weights of incorrectly\nclassified '\
+                              'instances are adjusted such that subsequent classifiers focus\nmore'\
+                              ' on difficult cases.\n\nThis class implements the algorithm known '\
+                              'as AdaBoost-SAMME [2].'
         fixture_subcomponent_name = 'sklearn.tree.tree.DecisionTreeClassifier'
         fixture_subcomponent_class_name = 'sklearn.tree.tree.DecisionTreeClassifier'
-        fixture_subcomponent_description = \
-            self.extension._get_sklearn_description(model.base_estimator)
+        # str obtained from self.extension._get_sklearn_description(model.base_estimator)
+        fixture_subcomponent_description = 'A decision tree classifier.'
         fixture_structure = {
             fixture_name: [],
             'sklearn.tree.tree.DecisionTreeClassifier': ['base_estimator']
@@ -265,7 +274,20 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
                        'dummy=sklearn.dummy.DummyClassifier)'
         fixture_short_name = 'sklearn.Pipeline(StandardScaler,DummyClassifier)'
-        fixture_description = self.extension._get_sklearn_description(model)
+        # str obtained from self.extension._get_sklearn_description(model)
+        fixture_description = "Pipeline of transforms with a final estimator.\n\nSequentially " \
+                              "apply a list of transforms and a final estimator.\nIntermediate "\
+                              "steps of the pipeline must be 'transforms', that is, they\nmust "\
+                              "implement fit and transform methods.\nThe final estimator only "\
+                              "needs to implement fit.\nThe transformers in the pipeline can be "\
+                              "cached using ``memory`` argument.\n\nThe purpose of the pipeline is"\
+                              " to assemble several steps that can be\ncross-validated together "\
+                              "while setting different parameters.\nFor this, it enables setting "\
+                              "parameters of the various steps using their\nnames and the "\
+                              "parameter name separated by a '__', as in the example below.\nA "\
+                              "step's estimator may be replaced entirely by setting the "\
+                              "parameter\nwith its name to another estimator, or a transformer "\
+                              "removed by setting\nit to 'passthrough' or ``None``."
         fixture_structure = {
             fixture_name: [],
             'sklearn.preprocessing.data.StandardScaler': ['scaler'],
@@ -354,7 +376,20 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                        'scaler=sklearn.preprocessing.data.StandardScaler,' \
                        'clusterer=sklearn.cluster.k_means_.KMeans)'
         fixture_short_name = 'sklearn.Pipeline(StandardScaler,KMeans)'
-        fixture_description = self.extension._get_sklearn_description(model)
+        # str obtained from self.extension._get_sklearn_description(model)
+        fixture_description = "Pipeline of transforms with a final estimator.\n\nSequentially "\
+                              "apply a list of transforms and a final estimator.\nIntermediate "\
+                              "steps of the pipeline must be 'transforms', that is, they\nmust "\
+                              "implement fit and transform methods.\nThe final estimator only "\
+                              "needs to implement fit.\nThe transformers in the pipeline can be "\
+                              "cached using ``memory`` argument.\n\nThe purpose of the pipeline is"\
+                              " to assemble several steps that can be\ncross-validated together "\
+                              "while setting different parameters.\nFor this, it enables setting "\
+                              "parameters of the various steps using their\nnames and the "\
+                              "parameter name separated by a '__', as in the example below.\nA "\
+                              "step's estimator may be replaced entirely by setting the parameter"\
+                              "\nwith its name to another estimator, or a transformer removed "\
+                              "by setting\nit to 'passthrough' or ``None``."
         fixture_structure = {
             fixture_name: [],
             'sklearn.preprocessing.data.StandardScaler': ['scaler'],
@@ -446,7 +481,14 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                   'numeric=sklearn.preprocessing.data.StandardScaler,' \
                   'nominal=sklearn.preprocessing._encoders.OneHotEncoder)'
         fixture_short_name = 'sklearn.ColumnTransformer'
-        fixture_description = self.extension._get_sklearn_description(model)
+        # str obtained from self.extension._get_sklearn_description(model)
+        fixture_description = 'Applies transformers to columns of an array or pandas DataFrame.\n' \
+                              '\nThis estimator allows different columns or column subsets of the '\
+                              'input\nto be transformed separately and the features generated by '\
+                              'each transformer\nwill be concatenated to form a single feature '\
+                              'space.\nThis is useful for heterogeneous or columnar data, to '\
+                              'combine several\nfeature extraction mechanisms or transformations '\
+                              'into a single transformer.'
         fixture_structure = {
             fixture: [],
             'sklearn.preprocessing.data.StandardScaler': ['numeric'],
@@ -505,7 +547,20 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             fixture_name: [],
         }
 
-        fixture_description = self.extension._get_sklearn_description(model)
+        # str obtained from self.extension._get_sklearn_description(model)
+        fixture_description = "Pipeline of transforms with a final estimator.\n\nSequentially "\
+                              "apply a list of transforms and a final estimator.\nIntermediate "\
+                              "steps of the pipeline must be 'transforms', that is, they\nmust "\
+                              "implement fit and transform methods.\nThe final estimator only "\
+                              "needs to implement fit.\nThe transformers in the pipeline can be "\
+                              "cached using ``memory`` argument.\n\nThe purpose of the pipeline "\
+                              "is to assemble several steps that can be\ncross-validated together "\
+                              "while setting different parameters.\nFor this, it enables setting "\
+                              "parameters of the various steps using their\nnames and the "\
+                              "parameter name separated by a '__', as in the example below.\nA "\
+                              "step's estimator may be replaced entirely by setting the parameter"\
+                              "\nwith its name to another estimator, or a transformer removed by "\
+                              "setting\nit to 'passthrough' or ``None``."
         serialization = self.extension.model_to_flow(model)
         structure = serialization.get_structure('name')
         self.assertEqual(serialization.name, fixture_name)

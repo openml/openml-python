@@ -308,7 +308,8 @@ def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
 def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                        ignore_parameter_values_on_older_children: str = None,
                        ignore_parameter_values: bool = False,
-                       ignore_custom_name_if_none: bool = False) -> None:
+                       ignore_custom_name_if_none: bool = False,
+                       check_description: bool = True) -> None:
     """Check equality of two flows.
 
     Two flows are equal if their all keys which are not set by the server
@@ -327,8 +328,11 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
     ignore_parameter_values : bool
         Whether to ignore parameter values when comparing flows.
 
-   ignore_custom_name_if_none : bool
+    ignore_custom_name_if_none : bool
         Whether to ignore the custom name field if either flow has `custom_name` equal to `None`.
+
+    check_description : bool
+        Whether to ignore matching of flow descriptions.
     """
     if not isinstance(flow1, OpenMLFlow):
         raise TypeError('Argument 1 must be of type OpenMLFlow, but is %s' %
@@ -366,7 +370,7 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                                    ignore_custom_name_if_none)
         elif key == '_extension':
             continue
-        elif key == 'description':
+        elif check_description and key == 'description':
             # to ignore matching of descriptions since sklearn based flows may have
             # altering docstrings and is not guaranteed to be consistent
             continue
@@ -404,8 +408,8 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
             elif key == 'parameters_meta_info':
                 # this value is a dictionary where each key is a parameter name, containing another
                 # dictionary with keys specifying the parameter's 'description' and 'data_type'
-                # check of descriptions can be ignored since that might change
-                # data type check can be ignored if one of them is not defined, i.e., None
+                # checking parameter descriptions can be ignored since that might change
+                # data type check can also be ignored if one of them is not defined, i.e., None
                 params1 = set(flow1.parameters_meta_info.keys())
                 params2 = set(flow2.parameters_meta_info.keys())
                 if params1 != params2:

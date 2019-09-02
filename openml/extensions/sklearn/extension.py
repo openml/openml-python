@@ -503,9 +503,6 @@ class SklearnExtension(Extension):
         s = inspect.getdoc(model)
         if s is None:
             return ''
-        if len(s) <= char_lim:
-            # if the fetched docstring is smaller than char_lim, no trimming required
-            return s.strip()
         try:
             # trim till 'Read more'
             pattern = "Read more in the :ref:"
@@ -516,6 +513,8 @@ class SklearnExtension(Extension):
                 s = "{}...".format(s[:char_lim - 3])
             return s.strip()
         except ValueError:
+            logging.info("'Read more' not found in descriptions. "
+                         "Trying to trim till 'Parameters' if available in docstring.")
             pass
         try:
             # if 'Read more' doesn't exist, trim till 'Parameters'
@@ -523,6 +522,7 @@ class SklearnExtension(Extension):
             index = s.index(match_format(pattern))
         except ValueError:
             # returning full docstring
+            logging.info("'Parameters' not found in docstring. Omitting docstring trimming.")
             index = len(s)
         s = s[:index]
         # trimming docstring to be within char_lim
@@ -556,7 +556,7 @@ class SklearnExtension(Extension):
             index1 = s.index(match_format("Parameters"))
         except ValueError as e:
             # when sklearn docstring has no 'Parameters' section
-            print("{} {}".format(match_format("Parameters"), e))
+            logging.info("{} {}".format(match_format("Parameters"), e))
             return None
 
         headings = ["Attributes", "Notes", "See also", "Note", "References"]
@@ -566,7 +566,7 @@ class SklearnExtension(Extension):
                 index2 = s.index(match_format(h))
                 break
             except ValueError:
-                print("{} not available in docstring".format(h))
+                logging.info("{} not available in docstring".format(h))
                 continue
         else:
             # in the case only 'Parameters' exist, trim till end of docstring
@@ -909,10 +909,6 @@ class SklearnExtension(Extension):
                     parameters[k] = None
 
             if parameters_docs is not None:
-                # print(type(model))
-                # print(sorted(parameters_docs.keys()))
-                # print(sorted(model_parameters.keys()))
-                # print()
                 data_type, description = parameters_docs[k]
                 parameters_meta_info[k] = OrderedDict((('description', description),
                                                        ('data_type', data_type)))
