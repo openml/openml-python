@@ -423,14 +423,14 @@ def _run_task_get_arffcontent(
         train_indices, test_indices = task.get_train_test_split_indices(
             repeat=rep_no, fold=fold_no, sample=sample_no)
         if isinstance(task, OpenMLSupervisedTask):
-            x, y = task.get_X_and_y(dataset_format='array')
-            train_x = x[train_indices]
-            train_y = y[train_indices]
-            test_x = x[test_indices]
-            test_y = y[test_indices]
+            x, y = task.get_X_and_y(dataset_format='dataframe')
+            train_x = x.iloc[train_indices]
+            train_y = y.iloc[train_indices]
+            test_x = x.iloc[test_indices]
+            test_y = y.iloc[test_indices]
         elif isinstance(task, OpenMLClusteringTask):
-            x = task.get_X(dataset_format='array')
-            train_x = x[train_indices]
+            x = task.get_X()
+            train_x = x.iloc[train_indices]
             train_y = None
             test_x = None
             test_y = None
@@ -473,8 +473,8 @@ def _run_task_get_arffcontent(
                     for j, class_label in enumerate(task.class_labels):
                         arff_line.append(proba_y[i][j])
 
-                    arff_line.append(task.class_labels[pred_y[i]])
-                    arff_line.append(task.class_labels[test_y[i]])
+                    arff_line.append(pred_y[i])
+                    arff_line.append(test_y.iloc[i])
                 else:
                     raise ValueError('The task has no class labels')
 
