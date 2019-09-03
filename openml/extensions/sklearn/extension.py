@@ -862,10 +862,10 @@ class SklearnExtension(Extension):
                 parameter_value = list()  # type: List
                 reserved_keywords = set(model.get_params(deep=False).keys())
 
-                for i, sub_component_tuple in enumerate(rval):
+                for sub_component_tuple in rval:
                     identifier = sub_component_tuple[0]
                     sub_component = sub_component_tuple[1]
-                    # sub_component_type = type(sub_component_tuple)
+                    sub_component_type = type(sub_component_tuple)
                     if not 2 <= len(sub_component_tuple) <= 3:
                         # length 2 is for {VotingClassifier.estimators,
                         # Pipeline.steps, FeatureUnion.transformer_list}
@@ -1765,7 +1765,7 @@ class SklearnExtension(Extension):
                         if len(subcomponent) == 3:
                             if not isinstance(subcomponent[2], list):
                                 raise TypeError('Subcomponent argument should be'
-                                                ' list')
+                                                'list')
                             current['value']['argument_1'] = subcomponent[2]
                         parsed_values.append(current)
                     parsed_values = json.dumps(parsed_values)
