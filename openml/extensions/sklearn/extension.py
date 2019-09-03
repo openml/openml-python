@@ -1549,7 +1549,7 @@ class SklearnExtension(Extension):
                         if len(subcomponent) == 3:
                             if not isinstance(subcomponent[2], list):
                                 raise TypeError('Subcomponent argument should be'
-                                                'list')
+                                                ' list')
                             current['value']['argument_1'] = subcomponent[2]
                         parsed_values.append(current)
                     parsed_values = json.dumps(parsed_values)
