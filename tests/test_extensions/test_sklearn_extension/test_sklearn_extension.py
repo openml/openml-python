@@ -315,6 +315,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.custom_name, fixture_short_name)
+        TestBase.logger.info("\n\ntest_serialize_pipeline\n---------------------\n"
+                             "{}\n\n{}\n\n".format(serialization.description, fixture_description))
         self.assertEqual(serialization.description, fixture_description)
         self.assertDictEqual(structure, fixture_structure)
 
@@ -417,6 +419,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.custom_name, fixture_short_name)
+        TestBase.logger.info("\n\ntest_serialize_pipeline_clustering\n---------------------\n"
+                             "{}\n\n{}\n\n".format(serialization.description, fixture_description))
         self.assertEqual(serialization.description, fixture_description)
         self.assertDictEqual(structure, fixture_structure)
 
