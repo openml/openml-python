@@ -513,7 +513,7 @@ class SklearnExtension(Extension):
                 s = "{}...".format(s[:char_lim - 3])
             return s.strip()
         except ValueError:
-            logging.info("'Read more' not found in descriptions. "
+            logging.warning("'Read more' not found in descriptions. "
                          "Trying to trim till 'Parameters' if available in docstring.")
             pass
         try:
@@ -522,7 +522,7 @@ class SklearnExtension(Extension):
             index = s.index(match_format(pattern))
         except ValueError:
             # returning full docstring
-            logging.info("'Parameters' not found in docstring. Omitting docstring trimming.")
+            logging.warning("'Parameters' not found in docstring. Omitting docstring trimming.")
             index = len(s)
         s = s[:index]
         # trimming docstring to be within char_lim
