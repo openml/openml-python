@@ -158,14 +158,19 @@ Happy testing!
 Connecting new machine learning libraries
 =========================================
 
+Hosting the library
+~~~~~~~~~~~~~~~~~~~
+
 Each extension created should be a stand-alone repository, compatible with the
 `OpenML repository <https://github.com/openml/openml-python>`_.
 The extension repository should work off-the-shelf with openml-python installed.
-It should follow the structure:
+
+Create a `public Github repo <https://help.github.com/en/articles/create-a-repo>`_ with
+the following directory structure:
 
 ::
 
-| openml
+| [repo name]
 |   |-- extensions
 |   |    |-- [extension name]
 |   |    |    |-- __init__.py
@@ -178,5 +183,56 @@ It should follow the structure:
 |   |    |    |-- __init__.py
 |   |    |    |-- extension.py
 
-The `sklearn extension <https://github.com/openml/openml-python/tree/develop/openml/extensions>`_ packaged with the OpenML repository can be used as a template/benchmark
-to build the extension.
+
+
+Content of the Library
+~~~~~~~~~~~~~~~~~~~~~~
+
+To get an understanding of what OpenML does and why support of the latest
+machine learning libraries can be beneficial for the community, please refer
+`here <https://openml.github.io/OpenML/>`_.
+
+Various `examples <https://openml.github.io/openml-python/develop/examples/index.html>`_
+can show how OpenML works in
+practice.
+Moreover `this example <https://openml.github.io/openml-python/develop/examples/
+flows_and_runs_tutorial.html>`_
+shows how scikit-learn currently works with OpenMl as an extension. The
+`sklearn extension <https://github.com/openml/openml-python/tree/develop/openml/extensions>`_
+packaged with the `openml-python <https://github.com/openml/openml-python/issues/730>`_
+repository can be used as a template/benchmark to build the extension.
+
+
+API
++++
+* The extension scripts should be importing `openml` and be able to execute any
+  function from the OpenML `API <https://openml.github.io/openml-python/develop/api.html#>`_.
+* The extension class defined here should inherit the `openml extension
+  class <https://openml.github.io/openml-python/develop/generated/openml.extensions.
+  Extension.html#openml.extensions.Extension>`_.
+* The class should have the functions from `class Extension` overloaded as required.
+  The `Sklearn Extension API <https://openml.github.io/openml-python/develop/generated/
+  openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension>`_
+  is a good checklist to follow.
+
+
+Interfacing with OpenML
++++++++++++++++++++++++
+Once the new extension class has been defined, the openml module to `register extensions
+<https://openml.github.io/openml-python/develop/generated/openml.extensions.register_
+extension.html#openml.extensions.register_extension>`_ can be called to allow OpenML
+interface the new extension. For example, the `sklearn extension registering
+<https://github.com/openml/openml-python/blob/develop/openml/extensions/sklearn/
+extension.py#L1744>`_.
+
+
+Recommended
+~~~~~~~~~~~
+* Test cases to keep the extension up to date with the `openml-python` upstream changes.
+* Documentation of the extension API, especially if any new functionality added to OpenML's
+  extension design.
+* Examples to show the interfacing with OpenML.
+* Create a PR to add the new extension to the OpenML API documentation.
+
+
+Happy contributing!
