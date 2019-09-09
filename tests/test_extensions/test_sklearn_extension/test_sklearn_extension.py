@@ -292,18 +292,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                                   "estimator, or a transformer removed by setting\nit to "\
                                   "'passthrough' or ``None``."
         else:
-            fixture_description = "Pipeline of transforms with a final estimator.\n\nSequentially"\
-                                  " apply a list of transforms and a final estimator.\n"\
-                                  "Intermediate steps of the pipeline must be 'transforms', that "\
-                                  "is, they\nmust implement fit and transform methods.\nThe final"\
-                                  " estimator only needs to implement fit.\n\nThe purpose of the "\
-                                  "pipeline is to assemble several steps that can be\n"\
-                                  "cross-validated together while setting different parameters."\
-                                  "\nFor this, it enables setting parameters of the various steps"\
-                                  " using their\nnames and the parameter name separated by a '__',"\
-                                  " as in the example below.\nA step's estimator may be replaced "\
-                                  "entirely by setting the parameter\nwith its name to another "\
-                                  "estimator, or a transformer removed by setting\nto None."
+            fixture_description = self.extension._get_sklearn_description(model)
+
         fixture_structure = {
             fixture_name: [],
             'sklearn.preprocessing.data.StandardScaler': ['scaler'],
@@ -315,9 +305,6 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.custom_name, fixture_short_name)
-        TestBase.logger.info("\n\ntest_serialize_pipeline\n---------------------\n{}\n"
-                             "{}\n\n{}\n\n".format(sklearn.__version__, serialization.description,
-                                                   fixture_description))
         self.assertEqual(serialization.description, fixture_description)
         self.assertDictEqual(structure, fixture_structure)
 
@@ -412,18 +399,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                                   "estimator, or a transformer removed by setting\nit to "\
                                   "'passthrough' or ``None``."
         else:
-            fixture_description = "Pipeline of transforms with a final estimator.\n\nSequentially"\
-                                  " apply a list of transforms and a final estimator.\n"\
-                                  "Intermediate steps of the pipeline must be 'transforms', that "\
-                                  "is, they\nmust implement fit and transform methods.\nThe final"\
-                                  " estimator only needs to implement fit.\n\nThe purpose of the "\
-                                  "pipeline is to assemble several steps that can be\n"\
-                                  "cross-validated together while setting different parameters."\
-                                  "\nFor this, it enables setting parameters of the various steps"\
-                                  " using their\nnames and the parameter name separated by a '__',"\
-                                  " as in the example below.\nA step's estimator may be replaced "\
-                                  "entirely by setting the parameter\nwith its name to another "\
-                                  "estimator, or a transformer removed by setting\nto None."
+            fixture_description = self.extension._get_sklearn_description(model)
         fixture_structure = {
             fixture_name: [],
             'sklearn.preprocessing.data.StandardScaler': ['scaler'],
@@ -435,9 +411,6 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.custom_name, fixture_short_name)
-        TestBase.logger.info("\n\ntest_serialize_pipeline_clustering\n---------------------\n{}\n"
-                             "{}\n\n{}\n\n".format(sklearn.__version__, serialization.description,
-                                                   fixture_description))
         self.assertEqual(serialization.description, fixture_description)
         self.assertDictEqual(structure, fixture_structure)
 
@@ -518,14 +491,20 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                   'numeric=sklearn.preprocessing.data.StandardScaler,' \
                   'nominal=sklearn.preprocessing._encoders.OneHotEncoder)'
         fixture_short_name = 'sklearn.ColumnTransformer'
-        # str obtained from self.extension._get_sklearn_description(model)
-        fixture_description = 'Applies transformers to columns of an array or pandas DataFrame.\n' \
-                              '\nThis estimator allows different columns or column subsets of the '\
-                              'input\nto be transformed separately and the features generated by '\
-                              'each transformer\nwill be concatenated to form a single feature '\
-                              'space.\nThis is useful for heterogeneous or columnar data, to '\
-                              'combine several\nfeature extraction mechanisms or transformations '\
-                              'into a single transformer.'
+
+        if version.parse(sklearn.__version__) >= version.parse("0.21.0"):
+            # str obtained from self.extension._get_sklearn_description(model)
+            fixture_description = 'Applies transformers to columns of an array or pandas '\
+                                  'DataFrame.\n\nThis estimator allows different columns or '\
+                                  'column subsets of the input\nto be transformed separately and '\
+                                  'the features generated by each transformer\nwill be '\
+                                  'concatenated to form a single feature space.\nThis is useful '\
+                                  'for heterogeneous or columnar data, to combine several\nfeature'\
+                                  ' extraction mechanisms or transformations into a single '\
+                                  'transformer.'
+        else:
+            fixture_description = self.extension._get_sklearn_description(model)
+
         fixture_structure = {
             fixture: [],
             'sklearn.preprocessing.data.StandardScaler': ['numeric'],
@@ -584,20 +563,25 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             fixture_name: [],
         }
 
-        # str obtained from self.extension._get_sklearn_description(model)
-        fixture_description = "Pipeline of transforms with a final estimator.\n\nSequentially "\
-                              "apply a list of transforms and a final estimator.\nIntermediate "\
-                              "steps of the pipeline must be 'transforms', that is, they\nmust "\
-                              "implement fit and transform methods.\nThe final estimator only "\
-                              "needs to implement fit.\nThe transformers in the pipeline can be "\
-                              "cached using ``memory`` argument.\n\nThe purpose of the pipeline "\
-                              "is to assemble several steps that can be\ncross-validated together "\
-                              "while setting different parameters.\nFor this, it enables setting "\
-                              "parameters of the various steps using their\nnames and the "\
-                              "parameter name separated by a '__', as in the example below.\nA "\
-                              "step's estimator may be replaced entirely by setting the parameter"\
-                              "\nwith its name to another estimator, or a transformer removed by "\
-                              "setting\nit to 'passthrough' or ``None``."
+        if version.parse(sklearn.__version__) >= version.parse("0.21.0"):
+            # str obtained from self.extension._get_sklearn_description(model)
+            fixture_description = "Pipeline of transforms with a final estimator.\n\nSequentially"\
+                                  " apply a list of transforms and a final estimator.\n"\
+                                  "Intermediate steps of the pipeline must be 'transforms', that "\
+                                  "is, they\nmust implement fit and transform methods.\nThe final"\
+                                  " estimator only needs to implement fit.\nThe transformers in "\
+                                  "the pipeline can be cached using ``memory`` argument.\n\nThe "\
+                                  "purpose of the pipeline is to assemble several steps that can "\
+                                  "be\ncross-validated together while setting different "\
+                                  "parameters.\nFor this, it enables setting parameters of the "\
+                                  "various steps using their\nnames and the parameter name "\
+                                  "separated by a '__', as in the example below.\nA step's "\
+                                  "estimator may be replaced entirely by setting the parameter\n"\
+                                  "with its name to another estimator, or a transformer removed by"\
+                                  " setting\nit to 'passthrough' or ``None``."
+        else:
+            fixture_description = self.extension._get_sklearn_description(model)
+
         serialization = self.extension.model_to_flow(model)
         structure = serialization.get_structure('name')
         self.assertEqual(serialization.name, fixture_name)
