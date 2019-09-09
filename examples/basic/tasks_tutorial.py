@@ -17,5 +17,5 @@ tasks_df.head()
 # Downloading tasks
 
 first_task_id = int(tasks_df['tid'].iloc[0])
-task = openml.tasks.get_task(tasks_df)
+task = openml.tasks.get_task(first_task_id)
 print(task)
