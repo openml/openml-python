@@ -514,7 +514,7 @@ class SklearnExtension(Extension):
             return s.strip()
         except ValueError:
             logging.warning("'Read more' not found in descriptions. "
-                         "Trying to trim till 'Parameters' if available in docstring.")
+                            "Trying to trim till 'Parameters' if available in docstring.")
             pass
         try:
             # if 'Read more' doesn't exist, trim till 'Parameters'

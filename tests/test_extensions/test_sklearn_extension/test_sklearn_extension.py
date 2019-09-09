@@ -277,26 +277,26 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture_short_name = 'sklearn.Pipeline(StandardScaler,DummyClassifier)'
 
         if version.parse(sklearn.__version__) >= version.parse("0.21.0"):
-            fixture_description = "Pipeline of transforms with a final estimator.\n\nSequentially " \
-                                  "apply a list of transforms and a final estimator.\nIntermediate " \
-                                  "steps of the pipeline must be 'transforms', that is, they\nmust " \
-                                  "implement fit and transform methods.\nThe final estimator only " \
-                                  "needs to implement fit.\nThe transformers in the pipeline can be " \
-                                  "cached using ``memory`` argument.\n\nThe purpose of the pipeline is" \
-                                  " to assemble several steps that can be\ncross-validated together " \
-                                  "while setting different parameters.\nFor this, it enables setting " \
-                                  "parameters of the various steps using their\nnames and the " \
-                                  "parameter name separated by a '__', as in the example below.\nA " \
-                                  "step's estimator may be replaced entirely by setting the " \
-                                  "parameter\nwith its name to another estimator, or a transformer " \
-                                  "removed by setting\nit to 'passthrough' or ``None``."
+            fixture_description = "Pipeline of transforms with a final estimator.\n\nSequentially"\
+                                  " apply a list of transforms and a final estimator.\n"\
+                                  "Intermediate steps of the pipeline must be 'transforms', that "\
+                                  "is, they\nmust implement fit and transform methods.\nThe final "\
+                                  "estimator only needs to implement fit.\nThe transformers in "\
+                                  "the pipeline can be cached using ``memory`` argument.\n\nThe "\
+                                  "purpose of the pipeline is to assemble several steps that can "\
+                                  "be\ncross-validated together while setting different parameters"\
+                                  ".\nFor this, it enables setting parameters of the various steps"\
+                                  " using their\nnames and the parameter name separated by a '__',"\
+                                  " as in the example below.\nA step's estimator may be replaced "\
+                                  "entirely by setting the parameter\nwith its name to another "\
+                                  "estimator, or a transformer removed by setting\nit to "\
+                                  "'passthrough' or ``None``."
         else:
             fixture_description = "Pipeline of transforms with a final estimator.\n\nSequentially"\
-                                  " apply a list of transforms and a final estimator.\nIntermediate"\
-                                  " steps of the pipeline must be 'transforms', that is, they\nmust "\
-                                  "implement fit and transform methods.\nThe final estimator only "\
-                                  "needs to implement fit.\nThe transformers in the pipeline can "\
-                                  "be cached using ``memory`` argument.\n\nThe purpose of the "\
+                                  " apply a list of transforms and a final estimator.\n"\
+                                  "Intermediate steps of the pipeline must be 'transforms', that "\
+                                  "is, they\nmust implement fit and transform methods.\nThe final"\
+                                  " estimator only needs to implement fit.\n\nThe purpose of the "\
                                   "pipeline is to assemble several steps that can be\n"\
                                   "cross-validated together while setting different parameters."\
                                   "\nFor this, it enables setting parameters of the various steps"\
@@ -397,26 +397,26 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture_short_name = 'sklearn.Pipeline(StandardScaler,KMeans)'
 
         if version.parse(sklearn.__version__) >= version.parse("0.21.0"):
-            fixture_description = "Pipeline of transforms with a final estimator.\n\nSequentially " \
-                                  "apply a list of transforms and a final estimator.\nIntermediate " \
-                                  "steps of the pipeline must be 'transforms', that is, they\nmust " \
-                                  "implement fit and transform methods.\nThe final estimator only " \
-                                  "needs to implement fit.\nThe transformers in the pipeline can be " \
-                                  "cached using ``memory`` argument.\n\nThe purpose of the pipeline is" \
-                                  " to assemble several steps that can be\ncross-validated together " \
-                                  "while setting different parameters.\nFor this, it enables setting " \
-                                  "parameters of the various steps using their\nnames and the " \
-                                  "parameter name separated by a '__', as in the example below.\nA " \
-                                  "step's estimator may be replaced entirely by setting the " \
-                                  "parameter\nwith its name to another estimator, or a transformer " \
-                                  "removed by setting\nit to 'passthrough' or ``None``."
+            fixture_description = "Pipeline of transforms with a final estimator.\n\nSequentially"\
+                                  " apply a list of transforms and a final estimator.\n"\
+                                  "Intermediate steps of the pipeline must be 'transforms', that "\
+                                  "is, they\nmust implement fit and transform methods.\nThe final "\
+                                  "estimator only needs to implement fit.\nThe transformers in "\
+                                  "the pipeline can be cached using ``memory`` argument.\n\nThe "\
+                                  "purpose of the pipeline is to assemble several steps that can "\
+                                  "be\ncross-validated together while setting different parameters"\
+                                  ".\nFor this, it enables setting parameters of the various steps"\
+                                  " using their\nnames and the parameter name separated by a '__',"\
+                                  " as in the example below.\nA step's estimator may be replaced "\
+                                  "entirely by setting the parameter\nwith its name to another "\
+                                  "estimator, or a transformer removed by setting\nit to "\
+                                  "'passthrough' or ``None``."
         else:
             fixture_description = "Pipeline of transforms with a final estimator.\n\nSequentially"\
-                                  " apply a list of transforms and a final estimator.\nIntermediate"\
-                                  " steps of the pipeline must be 'transforms', that is, they\nmust "\
-                                  "implement fit and transform methods.\nThe final estimator only "\
-                                  "needs to implement fit.\nThe transformers in the pipeline can "\
-                                  "be cached using ``memory`` argument.\n\nThe purpose of the "\
+                                  " apply a list of transforms and a final estimator.\n"\
+                                  "Intermediate steps of the pipeline must be 'transforms', that "\
+                                  "is, they\nmust implement fit and transform methods.\nThe final"\
+                                  " estimator only needs to implement fit.\n\nThe purpose of the "\
                                   "pipeline is to assemble several steps that can be\n"\
                                   "cross-validated together while setting different parameters."\
                                   "\nFor this, it enables setting parameters of the various steps"\
