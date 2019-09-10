@@ -3,19 +3,21 @@
 Datasets
 ========
 
-How to list and download datasets.
+A basic tutorial on how to list and download datasets.
 """
 ############################################################################
 import openml
 
 ############################################################################
 # List datasets
+# =============
 
 datasets_df = openml.datasets.list_datasets(output_format='dataframe')
-datasets_df.head(n=10)
+print(datasets_df.head(n=10))
 
 ############################################################################
-# Download datasets
+# Download a dataset
+# ==================
 
 first_dataset_id = int(datasets_df['did'].iloc[0])
 dataset = openml.datasets.get_dataset(first_dataset_id)
