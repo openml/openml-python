@@ -95,7 +95,6 @@ class TestFlowFunctions(TestBase):
         # Test most important values that can be set by a user
         openml.flows.functions.assert_flows_equal(flow, flow)
         for attribute, new_value in [('name', 'Tes'),
-                                     ('description', 'Test flo'),
                                      ('external_version', '2'),
                                      ('language', 'english'),
                                      ('dependencies', 'ab'),

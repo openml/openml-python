@@ -308,7 +308,8 @@ def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
 def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                        ignore_parameter_values_on_older_children: str = None,
                        ignore_parameter_values: bool = False,
-                       ignore_custom_name_if_none: bool = False) -> None:
+                       ignore_custom_name_if_none: bool = False,
+                       check_description: bool = True) -> None:
     """Check equality of two flows.
 
     Two flows are equal if their all keys which are not set by the server
@@ -327,8 +328,11 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
     ignore_parameter_values : bool
         Whether to ignore parameter values when comparing flows.
 
-   ignore_custom_name_if_none : bool
+    ignore_custom_name_if_none : bool
         Whether to ignore the custom name field if either flow has `custom_name` equal to `None`.
+
+    check_description : bool
+        Whether to ignore matching of flow descriptions.
     """
     if not isinstance(flow1, OpenMLFlow):
         raise TypeError('Argument 1 must be of type OpenMLFlow, but is %s' %
@@ -366,6 +370,10 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                                    ignore_custom_name_if_none)
         elif key == '_extension':
             continue
+        elif check_description and key == 'description':
+            # to ignore matching of descriptions since sklearn based flows may have
+            # altering docstrings and is not guaranteed to be consistent
+            continue
         else:
             if key == 'parameters':
                 if ignore_parameter_values or \
@@ -396,6 +404,35 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                 # If specified, we allow `custom_name` inequality if one flow's name is None.
                 # Helps with backwards compatibility as `custom_name` is now auto-generated, but
                 # before it used to be `None`.
+                continue
+            elif key == 'parameters_meta_info':
+                # this value is a dictionary where each key is a parameter name, containing another
+                # dictionary with keys specifying the parameter's 'description' and 'data_type'
+                # checking parameter descriptions can be ignored since that might change
+                # data type check can also be ignored if one of them is not defined, i.e., None
+                params1 = set(flow1.parameters_meta_info.keys())
+                params2 = set(flow2.parameters_meta_info.keys())
+                if params1 != params2:
+                    raise ValueError('Parameter list in meta info for parameters differ '
+                                     'in the two flows.')
+                # iterating over the parameter's meta info list
+                for param in params1:
+                    if isinstance(flow1.parameters_meta_info[param], Dict) and \
+                       isinstance(flow2.parameters_meta_info[param], Dict) and \
+                       'data_type' in flow1.parameters_meta_info[param] and \
+                       'data_type' in flow2.parameters_meta_info[param]:
+                        value1 = flow1.parameters_meta_info[param]['data_type']
+                        value2 = flow2.parameters_meta_info[param]['data_type']
+                    else:
+                        value1 = flow1.parameters_meta_info[param]
+                        value2 = flow2.parameters_meta_info[param]
+                    if value1 is None or value2 is None:
+                        continue
+                    elif value1 != value2:
+                        raise ValueError("Flow {}: data type for parameter {} in {} differ "
+                                         "as {}\nvs\n{}".format(flow1.name, param, key,
+                                                                value1, value2))
+                # the continue is to avoid the 'attr != attr2' check at end of function
                 continue
 
             if attr1 != attr2:
