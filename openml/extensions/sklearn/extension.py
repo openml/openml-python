@@ -556,7 +556,7 @@ class SklearnExtension(Extension):
             index1 = s.index(match_format("Parameters"))
         except ValueError as e:
             # when sklearn docstring has no 'Parameters' section
-            logging.info("{} {}".format(match_format("Parameters"), e))
+            logging.warning("{} {}".format(match_format("Parameters"), e))
             return None
 
         headings = ["Attributes", "Notes", "See also", "Note", "References"]
@@ -566,7 +566,7 @@ class SklearnExtension(Extension):
                 index2 = s.index(match_format(h))
                 break
             except ValueError:
-                logging.info("{} not available in docstring".format(h))
+                logging.warning("{} not available in docstring".format(h))
                 continue
         else:
             # in the case only 'Parameters' exist, trim till end of docstring
