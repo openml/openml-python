@@ -331,7 +331,7 @@ Finally, it is also possible to list all tasks on OpenML with:
 
  .. code-block:: none
 
-    19542
+    19543
 
 
 
@@ -528,7 +528,7 @@ https://www.openml.org/search?q=measure_type%3Aevaluation_measure&type=measure)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  32.316 seconds)
+   **Total running time of the script:** ( 0 minutes  33.670 seconds)
 
 
 .. _sphx_glr_download_examples_tasks_tutorial.py:
