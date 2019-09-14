@@ -172,6 +172,21 @@ def __list_evaluations(api_call, output_format='object'):
         type(evals_dict['oml:evaluations'])
 
     evals = collections.OrderedDict()
+    uploader_ids = []
+    for eval_ in evals_dict['oml:evaluations']['oml:evaluation']:
+        uploader_ids.append(eval_['oml:uploader'])
+
+    api_users = "user/list/user_id/"+ ', '.join(uploader_ids)
+    print(api_users)
+    xml_string_user = openml._api_calls._perform_api_call(api_users, 'get')
+    users_dic = xmltodict.parse(xml_string_user, force_list=('oml:user',))
+    dic = dict()
+    for user in users_dic['oml:users']['oml:user']:
+        user_id = user['oml:id']
+        name = user['oml:username']
+        dic[user_id] =  name
+    print (dic)
+
     for eval_ in evals_dict['oml:evaluations']['oml:evaluation']:
         run_id = int(eval_['oml:run_id'])
         value = None
@@ -194,6 +209,8 @@ def __list_evaluations(api_call, output_format='object'):
                                              eval_['oml:data_name'],
                                              eval_['oml:function'],
                                              eval_['oml:upload_time'],
+                                             eval_['oml:uploader'],
+                                             dic[eval_['oml:uploader']],
                                              value, values, array_data)
         else:
             # for output_format in ['dict', 'dataframe']
@@ -206,6 +223,8 @@ def __list_evaluations(api_call, output_format='object'):
                              'data_name': eval_['oml:data_name'],
                              'function': eval_['oml:function'],
                              'upload_time': eval_['oml:upload_time'],
+                             'uploader': eval_['oml:uploader'],
+                             'uploader_name': dic[eval_['oml:uploader']],
                              'value': value,
                              'values': values,
                              'array_data': array_data}
