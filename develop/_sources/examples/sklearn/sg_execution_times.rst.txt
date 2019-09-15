@@ -5,6 +5,6 @@
 
 Computation times
 =================
-**00:05.231** total execution time for **examples_sklearn** files:
+**00:05.116** total execution time for **examples_sklearn** files:
 
-- **00:05.231**: :ref:`sphx_glr_examples_sklearn_openml_run_example.py` (``openml_run_example.py``)
+- **00:05.116**: :ref:`sphx_glr_examples_sklearn_openml_run_example.py` (``openml_run_example.py``)
