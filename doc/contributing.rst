@@ -183,20 +183,19 @@ API
 * The extension class defined here in the extension script should inherit the `openml extension
   class <https://openml.github.io/openml-python/develop/generated/openml.extensions.
   Extension.html#openml.extensions.Extension>`_.
-* The class should have the functions from `class Extension` overloaded as required.
-  The `Sklearn Extension API <https://openml.github.io/openml-python/develop/generated/
+* The class should have all the functions from `class Extension` overloaded as required.
+* The redefined functions should have adequate and appropriate docstrings. The
+  `Sklearn Extension API <https://openml.github.io/openml-python/develop/generated/
   openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension>`_
-  is a good checklist to follow for a list of functions to define.
+  is a good benchmark to follow.
 
 
 Interfacing with OpenML
 +++++++++++++++++++++++
 Once the new extension class has been defined, the openml module to `register extensions
 <https://openml.github.io/openml-python/develop/generated/openml.extensions.register_
-extension.html#openml.extensions.register_extension>`_ can be called to allow OpenML to
-interface the new extension. For example, the `sklearn extension registering
-<https://github.com/openml/openml-python/blob/develop/openml/extensions/sklearn/
-extension.py#L1744>`_.
+extension.html#openml.extensions.register_extension>`_ must be called to allow OpenML to
+interface the new extension.
 
 
 Hosting the library
@@ -204,7 +203,7 @@ Hosting the library
 
 Each extension created should be a stand-alone repository, compatible with the
 `OpenML-Python repository <https://github.com/openml/openml-python>`_.
-The extension repository should work off-the-shelf with ``openml-python`` installed.
+The extension repository should work off-the-shelf with ``OpenML-Python`` installed.
 
 Create a `public Github repo <https://help.github.com/en/articles/create-a-repo>`_ with
 the following directory structure:
@@ -216,12 +215,6 @@ the following directory structure:
 |    |    |-- __init__.py
 |    |    |-- extension.py
 |    |    |-- config.py (optionally)
-|    |-- sklearn (example other extension)
-|    |    |-- __init__.py
-|    |    |-- extension.py
-|    |-- keras (example other extension)
-|    |    |-- __init__.py
-|    |    |-- extension.py
 
 
 
