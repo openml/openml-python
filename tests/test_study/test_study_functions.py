@@ -34,7 +34,7 @@ class TestStudyFunctions(TestBase):
         self.assertIsInstance(study, openml.study.OpenMLBenchmarkSuite)
         study_2 = openml.study.get_suite('OpenML100')
         self.assertIsInstance(study_2, openml.study.OpenMLBenchmarkSuite)
-        self.assertEqual(study.id, study_2.id)
+        self.assertEqual(study.study_id, study_2.study_id)
 
     def test_get_study_error(self):
         openml.config.server = self.production_server

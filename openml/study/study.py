@@ -72,7 +72,7 @@ class BaseStudy(object):
         setups: Optional[List[int]],
     ):
 
-        self.id = study_id
+        self.study_id = study_id
         self.alias = alias
         self.main_entity_type = main_entity_type
         self.benchmark_suite = benchmark_suite
@@ -95,9 +95,9 @@ class BaseStudy(object):
         fields = {"Name": self.name,
                   "Status": self.status,
                   "Main Entity Type": self.main_entity_type}
-        if self.id is not None:
-            fields["ID"] = self.id
-            fields["Study URL"] = "{}s/{}".format(base_url, self.id)
+        if self.study_id is not None:
+            fields["ID"] = self.study_id
+            fields["Study URL"] = "{}s/{}".format(base_url, self.study_id)
         if self.creator is not None:
             fields["Creator"] = "{}u/{}".format(base_url, self.creator)
         if self.creation_date is not None:
