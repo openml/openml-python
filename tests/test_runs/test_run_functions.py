@@ -259,6 +259,8 @@ class TestRun(TestBase):
 
         downloaded = openml.runs.get_run(run_.run_id)
         assert ('openml-python' in downloaded.tags)
+        assert run_.predictions_url == downloaded.predictions_url
+        assert run_.uploader_name == downloaded.uploader_name
 
         # TODO make sure that these attributes are instantiated when
         # downloading a run? Or make sure that the trace object is created when
@@ -1112,6 +1114,9 @@ class TestRun(TestBase):
             self.assertEqual(run.fold_evaluations['f_measure'][0][i], value)
         assert ('weka' in run.tags)
         assert ('weka_3.7.12' in run.tags)
+        assert (run.predictions_url ==
+                "https://www.openml.org/data/download/1667125/"
+                "weka_generated_predictions4575715871712251329.arff")
 
     def _check_run(self, run):
         self.assertIsInstance(run, dict)
