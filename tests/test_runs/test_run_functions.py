@@ -259,8 +259,6 @@ class TestRun(TestBase):
 
         downloaded = openml.runs.get_run(run_.run_id)
         assert ('openml-python' in downloaded.tags)
-        assert run_.predictions_url == downloaded.predictions_url
-        assert run_.uploader_name == downloaded.uploader_name
 
         # TODO make sure that these attributes are instantiated when
         # downloading a run? Or make sure that the trace object is created when
