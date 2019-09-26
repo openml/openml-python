@@ -207,7 +207,9 @@ class SklearnExtension(Extension):
     ################################################################################################
     # Methods for flow serialization and de-serialization
 
-    def flow_to_model(self, flow: 'OpenMLFlow', initialize_with_defaults: bool = False) -> Any:
+    def flow_to_model(self, flow: 'OpenMLFlow',
+                      initialize_with_defaults: bool = False,
+                      strict_version: bool = True) -> Any:
         """Initializes a sklearn model based on a flow.
 
         Parameters
@@ -220,11 +222,16 @@ class SklearnExtension(Extension):
             If this flag is set, the hyperparameter values of flows will be
             ignored and a flow with its defaults is returned.
 
+        strict_version : bool, default=True
+            Whether to fail if version requirements are not fulfilled.
+
         Returns
         -------
         mixed
         """
-        return self._deserialize_sklearn(flow, initialize_with_defaults=initialize_with_defaults)
+        return self._deserialize_sklearn(
+            flow, initialize_with_defaults=initialize_with_defaults,
+            strict_version=strict_version)
 
     def _deserialize_sklearn(
         self,
@@ -232,6 +239,7 @@ class SklearnExtension(Extension):
         components: Optional[Dict] = None,
         initialize_with_defaults: bool = False,
         recursion_depth: int = 0,
+        strict_version: bool = True,
     ) -> Any:
         """Recursive function to deserialize a scikit-learn flow.
 
@@ -254,6 +262,9 @@ class SklearnExtension(Extension):
         recursion_depth : int
             The depth at which this flow is called, mostly for debugging
             purposes
+
+        strict_version : bool, default=True
+            Whether to fail if version requirements are not fulfilled.
 
         Returns
         -------
@@ -291,13 +302,15 @@ class SklearnExtension(Extension):
                     rval = self._deserialize_function(value)
                 elif serialized_type == 'component_reference':
                     assert components is not None  # Necessary for mypy
-                    value = self._deserialize_sklearn(value, recursion_depth=depth_pp)
+                    value = self._deserialize_sklearn(value, recursion_depth=depth_pp,
+                                                      strict_version=strict_version)
                     step_name = value['step_name']
                     key = value['key']
                     component = self._deserialize_sklearn(
                         components[key],
                         initialize_with_defaults=initialize_with_defaults,
-                        recursion_depth=depth_pp
+                        recursion_depth=depth_pp,
+                        strict_version=strict_version,
                     )
                     # The component is now added to where it should be used
                     # later. It should not be passed to the constructor of the
@@ -311,7 +324,8 @@ class SklearnExtension(Extension):
                         rval = (step_name, component, value['argument_1'])
                 elif serialized_type == 'cv_object':
                     rval = self._deserialize_cross_validator(
-                        value, recursion_depth=recursion_depth
+                        value, recursion_depth=recursion_depth,
+                        strict_version=strict_version
                     )
                 else:
                     raise ValueError('Cannot flow_to_sklearn %s' % serialized_type)
@@ -324,12 +338,14 @@ class SklearnExtension(Extension):
                             components=components,
                             initialize_with_defaults=initialize_with_defaults,
                             recursion_depth=depth_pp,
+                            strict_version=strict_version
                         ),
                         self._deserialize_sklearn(
                             o=value,
                             components=components,
                             initialize_with_defaults=initialize_with_defaults,
                             recursion_depth=depth_pp,
+                            strict_version=strict_version
                         )
                     )
                     for key, value in sorted(o.items())
@@ -341,6 +357,7 @@ class SklearnExtension(Extension):
                     components=components,
                     initialize_with_defaults=initialize_with_defaults,
                     recursion_depth=depth_pp,
+                    strict_version=strict_version
                 )
                 for element in o
             ]
@@ -355,6 +372,7 @@ class SklearnExtension(Extension):
                 flow=o,
                 keep_defaults=initialize_with_defaults,
                 recursion_depth=recursion_depth,
+                strict_version=strict_version
             )
         else:
             raise TypeError(o)
@@ -949,10 +967,12 @@ class SklearnExtension(Extension):
         flow: OpenMLFlow,
         keep_defaults: bool,
         recursion_depth: int,
+        strict_version: bool = True
     ) -> Any:
         logging.info('-%s deserialize %s' % ('-' * recursion_depth, flow.name))
         model_name = flow.class_name
-        self._check_dependencies(flow.dependencies)
+        self._check_dependencies(flow.dependencies,
+                                 strict_version=strict_version)
 
         parameters = flow.parameters
         components = flow.components
@@ -974,6 +994,7 @@ class SklearnExtension(Extension):
                 components=components_,
                 initialize_with_defaults=keep_defaults,
                 recursion_depth=recursion_depth + 1,
+                strict_version=strict_version,
             )
             parameter_dict[name] = rval
 
@@ -988,6 +1009,7 @@ class SklearnExtension(Extension):
             rval = self._deserialize_sklearn(
                 value,
                 recursion_depth=recursion_depth + 1,
+                strict_version=strict_version
             )
             parameter_dict[name] = rval
 
@@ -1013,7 +1035,8 @@ class SklearnExtension(Extension):
                     del parameter_dict[param]
         return model_class(**parameter_dict)
 
-    def _check_dependencies(self, dependencies: str) -> None:
+    def _check_dependencies(self, dependencies: str,
+                            strict_version: bool = True) -> None:
         if not dependencies:
             return
 
@@ -1041,9 +1064,13 @@ class SklearnExtension(Extension):
             else:
                 raise NotImplementedError(
                     'operation \'%s\' is not supported' % operation)
+            message = ('Trying to deserialize a model with dependency '
+                       '%s not satisfied.' % dependency_string)
             if not check:
-                raise ValueError('Trying to deserialize a model with dependency '
-                                 '%s not satisfied.' % dependency_string)
+                if strict_version:
+                    raise ValueError(message)
+                else:
+                    warnings.warn(message)
 
     def _serialize_type(self, o: Any) -> 'OrderedDict[str, str]':
         mapping = {float: 'float',
@@ -1161,6 +1188,7 @@ class SklearnExtension(Extension):
         self,
         value: 'OrderedDict[str, Any]',
         recursion_depth: int,
+        strict_version: bool = True
     ) -> Any:
         model_name = value['name']
         parameters = value['parameters']
@@ -1172,6 +1200,7 @@ class SklearnExtension(Extension):
             parameters[parameter] = self._deserialize_sklearn(
                 parameters[parameter],
                 recursion_depth=recursion_depth + 1,
+                strict_version=strict_version
             )
         return model_class(**parameters)
 

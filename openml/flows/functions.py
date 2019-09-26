@@ -71,7 +71,8 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
+def get_flow(flow_id: int, reinstantiate: bool = False,
+             strict_version: bool = True) -> OpenMLFlow:
     """Download the OpenML flow for a given flow ID.
 
     Parameters
@@ -82,6 +83,9 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
     reinstantiate: bool
         Whether to reinstantiate the flow to a model instance.
 
+    strict_version : bool, default=True
+        Whether to fail if version requirements are not fulfilled.
+
     Returns
     -------
     flow : OpenMLFlow
@@ -91,7 +95,13 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
     flow = _get_flow_description(flow_id)
 
     if reinstantiate:
-        flow.model = flow.extension.flow_to_model(flow)
+        flow.model = flow.extension.flow_to_model(
+            flow, strict_version=strict_version)
+        if not strict_version:
+            # check if we need to return a new flow b/c of version mismatch
+            new_flow = flow.extension.model_to_flow(flow.model)
+            if new_flow.dependencies != flow.dependencies:
+                return new_flow
     return flow
 
 
