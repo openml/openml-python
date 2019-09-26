@@ -687,10 +687,13 @@ def _create_run_from_xml(xml, from_server=True):
                              '(OpenML server error?)')
     else:
         output_data = run['oml:output_data']
+        predictions_url = None
         if 'oml:file' in output_data:
             # multiple files, the normal case
             for file_dict in output_data['oml:file']:
                 files[file_dict['oml:name']] = int(file_dict['oml:file_id'])
+                if file_dict['oml:name'] == 'predictions':
+                    predictions_url = file_dict['oml:url']
         if 'oml:evaluation' in output_data:
             # in normal cases there should be evaluations, but in case there
             # was an error these could be absent
@@ -757,8 +760,8 @@ def _create_run_from_xml(xml, from_server=True):
                      dataset_id=dataset_id, output_files=files,
                      evaluations=evaluations,
                      fold_evaluations=fold_evaluations,
-                     sample_evaluations=sample_evaluations,
-                     tags=tags)
+                     sample_evaluations=sample_evaluations, tags=tags,
+                     predictions_url=predictions_url)
 
 
 def _get_cached_run(run_id):
