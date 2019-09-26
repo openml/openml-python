@@ -1112,9 +1112,12 @@ class TestRun(TestBase):
             self.assertEqual(run.fold_evaluations['f_measure'][0][i], value)
         assert ('weka' in run.tags)
         assert ('weka_3.7.12' in run.tags)
-        assert (run.predictions_url ==
+        assert (
+            run.predictions_url == (
                 "https://www.openml.org/data/download/1667125/"
-                "weka_generated_predictions4575715871712251329.arff")
+                "weka_generated_predictions4575715871712251329.arff"
+            )
+        )
 
     def _check_run(self, run):
         self.assertIsInstance(run, dict)
