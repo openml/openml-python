@@ -174,7 +174,7 @@
 
 <dl class="method">
 <dt id="openml.extensions.Extension.flow_to_model">
-<em class="property">abstract </em><code class="sig-name descname">flow_to_model</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">flow: 'OpenMLFlow'</em>, <em class="sig-param">initialize_with_defaults: bool = False</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#openml.extensions.Extension.flow_to_model" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">flow_to_model</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">flow: 'OpenMLFlow'</em>, <em class="sig-param">initialize_with_defaults: bool = False</em>, <em class="sig-param">strict_version: bool = True</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#openml.extensions.Extension.flow_to_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiate a model from the flow representation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -182,6 +182,8 @@
 <dt><strong>flow</strong><span class="classifier">OpenMLFlow</span></dt><dd></dd>
 <dt><strong>initialize_with_defaults</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If this flag is set, the hyperparameter values of flows will be
 ignored and a flow with its defaults is returned.</p>
+</dd>
+<dt><strong>strict_version</strong><span class="classifier">bool, default=True</span></dt><dd><p>Whether to fail if version requirements are not fulfilled.</p>
 </dd>
 </dl>
 </dd>
