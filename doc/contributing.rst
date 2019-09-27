@@ -161,28 +161,21 @@ Connecting new machine learning libraries
 Content of the Library
 ~~~~~~~~~~~~~~~~~~~~~~
 
-To get an understanding of what OpenML does and why support of the latest
-machine learning libraries can be beneficial for the community, please refer
-`here <https://openml.github.io/OpenML/>`_.
+To leverage support from the community and to tap in the potential of OpenML, interfacing
+popular machine learning libraries is essential. Building a suitable extension for the same
+therefore requires an understanding of the current OpenML-Python support.
 
-Various `examples <https://openml.github.io/openml-python/develop/examples/index.html>`_
-can show how OpenML-Python works in
-practice.
-Moreover `this example <https://openml.github.io/openml-python/develop/examples/
-flows_and_runs_tutorial.html>`_
-shows how scikit-learn currently works with OpenML-Python as an extension. The
-`sklearn extension <https://github.com/openml/openml-python/tree/develop/openml/extensions>`_
-packaged with the `openml-python <https://github.com/openml/openml-python>`_
-repository can be used as a template/benchmark to build the extension.
+`This example <examples/flows_and_runs_tutorial.html>`_
+shows how scikit-learn currently works with OpenML-Python as an extension. The *sklearn*
+extension packaged with the `openml-python <https://github.com/openml/openml-python>`_
+repository can be used as a template/benchmark to build the new extension.
 
 
 API
 +++
 * The extension scripts should be importing `openml` and be able to execute any
-  function from the OpenML-Python `API <https://openml.github.io/openml-python/develop/api.html#>`_.
-* The extension class defined here in the extension script should inherit the `openml extension
-  class <https://openml.github.io/openml-python/develop/generated/openml.extensions.
-  Extension.html#openml.extensions.Extension>`_.
+  function from the OpenML-Python `API <api.html>`_.
+* The extension class defined here in the extension script should inherit the class :class:`openml.extensions.Extension`.
 * The class should have all the functions from `class Extension` overloaded as required.
 * The redefined functions should have adequate and appropriate docstrings. The
   `Sklearn Extension API <https://openml.github.io/openml-python/develop/generated/
