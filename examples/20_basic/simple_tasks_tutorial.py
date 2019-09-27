@@ -3,7 +3,7 @@
 Tasks
 =====
 
-A 20_basic tutorial on how to list and download tasks.
+A basic tutorial on how to list and download tasks.
 """
 import openml
 from pprint import pprint
