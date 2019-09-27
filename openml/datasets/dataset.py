@@ -482,6 +482,11 @@ class OpenMLDataset(object):
                 else returns data as is
 
         """
+        if ((array_format == "dataframe" and isinstance(data, pd.DataFrame))
+                or (array_format == "array" and isinstance(data, np.ndarray))):
+            # No conversion or warning required.
+            return data
+
         if array_format == "array" and not scipy.sparse.issparse(data):
             # We encode the categories such that they are integer to be able
             # to make a conversion to numeric for backward compatibility
