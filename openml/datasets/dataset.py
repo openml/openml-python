@@ -414,7 +414,7 @@ class OpenMLDataset(object):
         return data_pickle_file
 
     def _load_data(self):
-        """ Load data from pickle or, if needed, arff. Download data first if not present on disk. """
+        """ Load data from pickle or arff. Download data first if not present on disk. """
         if self.data_pickle_file is None:
             if self.data_file is None:
                 self._download_data()
