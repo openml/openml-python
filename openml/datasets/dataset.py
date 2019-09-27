@@ -490,10 +490,6 @@ class OpenMLDataset(object):
                 else returns data as is
 
         """
-        if ((array_format == "dataframe" and isinstance(data, pd.DataFrame))
-                or (array_format == "array" and isinstance(data, np.ndarray))):
-            # No conversion or warning required.
-            return data
 
         if array_format == "array" and not scipy.sparse.issparse(data):
             # We encode the categories such that they are integer to be able
@@ -523,7 +519,10 @@ class OpenMLDataset(object):
             return pd.SparseDataFrame(data, columns=attribute_names)
         else:
             data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
-            warn("Cannot convert {} to '{}'. Returning input data.".format(data_type, array_format))
+            logging.warning(
+                "Cannot convert %s (%s) to '%s'. Returning input data."
+                % (data_type, type(data), array_format)
+            )
         return data
 
     @staticmethod
