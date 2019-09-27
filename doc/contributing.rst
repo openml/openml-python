@@ -175,19 +175,18 @@ API
 +++
 * The extension scripts should be importing `openml` and be able to execute any
   function from the OpenML-Python `API <api.html>`_.
-* The extension class defined here in the extension script should inherit the class :class:`openml.extensions.Extension`.
-* The class should have all the functions from `class Extension` overloaded as required.
+* The extension class defined here in the extension script should inherit the
+  class :class:`openml.extensions.Extension`.
+* This class should have all the functions from `class Extension` overloaded as required.
 * The redefined functions should have adequate and appropriate docstrings. The
-  `Sklearn Extension API <https://openml.github.io/openml-python/develop/generated/
-  openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension>`_
+  `Sklearn Extension API <generated/openml.extensions.sklearn.SklearnExtension.html>`_
   is a good benchmark to follow.
 
 
 Interfacing with OpenML-Python
 ++++++++++++++++++++++++++++++
 Once the new extension class has been defined, the openml-python module to `register extensions
-<https://openml.github.io/openml-python/develop/generated/openml.extensions.register_
-extension.html#openml.extensions.register_extension>`_ must be called to allow OpenML-Python to
+<generated/openml.extensions.register_extension.html>`_ must be called to allow OpenML-Python to
 interface the new extension.
 
 
@@ -196,7 +195,7 @@ Hosting the library
 
 Each extension created should be a stand-alone repository, compatible with the
 `OpenML-Python repository <https://github.com/openml/openml-python>`_.
-The extension repository should work off-the-shelf with ``OpenML-Python`` installed.
+The extension repository should work off-the-shelf with *OpenML-Python* installed.
 
 Create a `public Github repo <https://help.github.com/en/articles/create-a-repo>`_ with
 the following directory structure:
@@ -216,7 +215,7 @@ Recommended
 * Test cases to keep the extension up to date with the `openml-python` upstream changes.
 * Documentation of the extension API, especially if any new functionality added to OpenML-Python's
   extension design.
-* Examples to show the interfacing with OpenML-Python.
+* Examples to show how the new extension interfaces and works with OpenML-Python.
 * Create a PR to add the new extension to the OpenML-Python API documentation.
 
 
