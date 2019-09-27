@@ -260,7 +260,8 @@ class OpenMLDataset(object):
         # if it exceeds 120mb (slightly more than covtype dataset size)
         # This number is somewhat arbitrary.
         if bits != 64 and os.path.getsize(filename) > 120000000:
-            return NotImplementedError("File too big")
+            raise NotImplementedError("File {} too big for {}-bit system ({} bytes)."
+                                      .format(filename, os.path.getsize(filename), bits))
 
         if format.lower() == 'arff':
             return_type = arff.DENSE
