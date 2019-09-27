@@ -12,7 +12,7 @@ import pandas as pd
 #
 # Tasks are identified by IDs and can be accessed in two different ways:
 #
-# 1. In a list providing basic information on all tasks available on OpenML.
+# 1. In a list providing 20_basic information on all tasks available on OpenML.
 # This function will not download the actual tasks, but will instead download
 # meta data that can be used to filter the tasks and retrieve a set of IDs.
 # We can filter this list, for example, we can only list tasks having a
