@@ -166,11 +166,11 @@ machine learning libraries can be beneficial for the community, please refer
 `here <https://openml.github.io/OpenML/>`_.
 
 Various `examples <https://openml.github.io/openml-python/develop/examples/index.html>`_
-can show how OpenML works in
+can show how OpenML-Python works in
 practice.
 Moreover `this example <https://openml.github.io/openml-python/develop/examples/
 flows_and_runs_tutorial.html>`_
-shows how scikit-learn currently works with OpenMl as an extension. The
+shows how scikit-learn currently works with OpenML-Python as an extension. The
 `sklearn extension <https://github.com/openml/openml-python/tree/develop/openml/extensions>`_
 packaged with the `openml-python <https://github.com/openml/openml-python>`_
 repository can be used as a template/benchmark to build the extension.
@@ -179,7 +179,7 @@ repository can be used as a template/benchmark to build the extension.
 API
 +++
 * The extension scripts should be importing `openml` and be able to execute any
-  function from the OpenML `API <https://openml.github.io/openml-python/develop/api.html#>`_.
+  function from the OpenML-Python `API <https://openml.github.io/openml-python/develop/api.html#>`_.
 * The extension class defined here in the extension script should inherit the `openml extension
   class <https://openml.github.io/openml-python/develop/generated/openml.extensions.
   Extension.html#openml.extensions.Extension>`_.
@@ -190,11 +190,11 @@ API
   is a good benchmark to follow.
 
 
-Interfacing with OpenML
-+++++++++++++++++++++++
-Once the new extension class has been defined, the openml module to `register extensions
+Interfacing with OpenML-Python
+++++++++++++++++++++++++++++++
+Once the new extension class has been defined, the openml-python module to `register extensions
 <https://openml.github.io/openml-python/develop/generated/openml.extensions.register_
-extension.html#openml.extensions.register_extension>`_ must be called to allow OpenML to
+extension.html#openml.extensions.register_extension>`_ must be called to allow OpenML-Python to
 interface the new extension.
 
 
@@ -221,10 +221,10 @@ the following directory structure:
 Recommended
 ~~~~~~~~~~~
 * Test cases to keep the extension up to date with the `openml-python` upstream changes.
-* Documentation of the extension API, especially if any new functionality added to OpenML's
+* Documentation of the extension API, especially if any new functionality added to OpenML-Python's
   extension design.
-* Examples to show the interfacing with OpenML.
-* Create a PR to add the new extension to the OpenML API documentation.
+* Examples to show the interfacing with OpenML-Python.
+* Create a PR to add the new extension to the OpenML-Python API documentation.
 
 
 Happy contributing!
