@@ -192,18 +192,16 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual(np.sum(y == 3), 0)
 
     def test_get_data_corrupt_pickle(self):
-        # lazy loaded dataset, populate cache
+        # Lazy loaded dataset, populate cache.
         self.iris.get_data()
-        # corrupt pickle file, overwrite as empty.
+        # Corrupt pickle file, overwrite as empty.
         with open(self.iris.data_pickle_file, "w") as fh:
             fh.write("")
-
-        with catch_warnings():
-            filterwarnings('error')
-            self.assertRaises(
-                UserWarning,
-                self.iris.get_data
-            )
+        # Despite the corrupt file, the data should be loaded from the ARFF file.
+        # A warning message is written to the python logger.
+        xy, _, _, _ = self.iris.get_data()
+        self.assertIsInstance(xy, pd.DataFrame)
+        self.assertEqual(xy.shape, (150, 5))
 
 
 class OpenMLDatasetTestOnTestServer(TestBase):

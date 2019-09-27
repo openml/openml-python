@@ -237,7 +237,9 @@ class OpenMLDataset(object):
 
         Reads the file referenced in self.data_file.
 
-        :param format: str
+        Parameters
+        ----------
+        format : str
             Format of the ARFF file.
             Must be one of 'arff' or 'sparse_arff' or a string that will be either of those
             when converted to lower case.
@@ -288,9 +290,14 @@ class OpenMLDataset(object):
     ) -> Tuple[Union[pd.DataFrame, scipy.sparse.csr_matrix], List[bool], List[str]]:
         """ Parse all required data from arff file.
 
-        :param arff_file_path: str
+        Parameters
+        ----------
+        arff_file_path : str
             Path to the file on disk.
-        :return: Tuple[Union[pd.DataFrame, scipy.sparse.csr_matrix], List[bool], List[str]]
+
+        Returns
+        -------
+        Tuple[Union[pd.DataFrame, scipy.sparse.csr_matrix], List[bool], List[str]]
             DataFrame or csr_matrix: dataset
             List[bool]: List indicating which columns contain categorical variables.
             List[str]: List of column names.
@@ -387,7 +394,7 @@ class OpenMLDataset(object):
                     data, categorical, attribute_names = pickle.load(fh)
                 except EOFError:
                     # The file is likely corrupt, see #780.
-                    # We deal with this when loading the data in `_load_data_from_disk`.
+                    # We deal with this when loading the data in `_load_data`.
                     return data_pickle_file
 
             # Between v0.8 and v0.9 the format of pickled data changed from
@@ -424,13 +431,13 @@ class OpenMLDataset(object):
             with open(self.data_pickle_file, "rb") as fh:
                 data, categorical, attribute_names = pickle.load(fh)
         except EOFError:
-            warn(
-                "Detected a corrupt cache file loading dataset {did}: '{path}'. "
+            logging.warning(
+                "Detected a corrupt cache file loading dataset %d: '%s'. "
                 "We will continue loading data from the arff-file, "
                 "but this will be much slower for big datasets. "
                 "Please manually delete the cache file if you want openml-python "
                 "to attempt to reconstruct it."
-                "".format(did=self.dataset_id, path=self.data_pickle_file)
+                "" % (self.dataset_id, self.data_pickle_file)
             )
             data, categorical, attribute_names = self._parse_data_from_arff(self.data_file)
         except FileNotFoundError:
