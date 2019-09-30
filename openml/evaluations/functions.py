@@ -176,7 +176,7 @@ def __list_evaluations(api_call, output_format='object'):
     api_users = "user/list/user_id/" + ', '.join(uploader_ids)
     xml_string_user = openml._api_calls._perform_api_call(api_users, 'get')
     users = xmltodict.parse(xml_string_user, force_list=('oml:user',))
-    user_dict = {user['oml:id']:user['oml:username'] for user in users['oml:users']['oml:user']}
+    user_dict = {user['oml:id']: user['oml:username'] for user in users['oml:users']['oml:user']}
     for eval_ in evals_dict['oml:evaluations']['oml:evaluation']:
         run_id = int(eval_['oml:run_id'])
         value = None

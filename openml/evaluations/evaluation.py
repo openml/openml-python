@@ -57,7 +57,6 @@ class OpenMLEvaluation(object):
         self.values = values
         self.array_data = array_data
 
-
     def __repr__(self):
         header = "OpenML Evaluation"
         header = '{}\n{}\n'.format(header, '=' * len(header))
