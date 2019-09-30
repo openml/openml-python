@@ -162,10 +162,12 @@ Content of the Library
 ~~~~~~~~~~~~~~~~~~~~~~
 
 To leverage support from the community and to tap in the potential of OpenML, interfacing
-popular machine learning libraries is essential. Building a suitable extension for the same
-therefore requires an understanding of the current OpenML-Python support.
+with popular machine learning libraries is essential. However, the OpenML-Python team does
+not have the capacity to develop and maintain such interfaces on its own. For this, we
+have built an extension interface to allows others to contribute back. Building a suitable 
+extension for therefore requires an understanding of the current OpenML-Python support.
 
-`This example <examples/flows_and_runs_tutorial.html>`_
+`This example <examples/flows_and_runs_tutorial.html>`_ 
 shows how scikit-learn currently works with OpenML-Python as an extension. The *sklearn*
 extension packaged with the `openml-python <https://github.com/openml/openml-python>`_
 repository can be used as a template/benchmark to build the new extension.
@@ -173,20 +175,20 @@ repository can be used as a template/benchmark to build the new extension.
 
 API
 +++
-* The extension scripts should be importing `openml` and be able to execute any
-  function from the OpenML-Python `API <api.html>`_.
-* The extension class defined here in the extension script should inherit the
-  class :class:`openml.extensions.Extension`.
-* This class should have all the functions from `class Extension` overloaded as required.
+* The extension scripts must import the `openml` package and be able to interface with
+  any function from the OpenML-Python `API <api.html>`_.
+* The extension has to be defined as a Python class and must inherit from
+  :class:`openml.extensions.Extension`.
+* This class needs to have all the functions from `class Extension` overloaded as required.
 * The redefined functions should have adequate and appropriate docstrings. The
-  `Sklearn Extension API <generated/openml.extensions.sklearn.SklearnExtension.html>`_
+  `Sklearn Extension API :class:`openml.extensions.sklearn.SklearnExtension.html`
   is a good benchmark to follow.
 
 
 Interfacing with OpenML-Python
 ++++++++++++++++++++++++++++++
-Once the new extension class has been defined, the openml-python module to `register extensions
-<generated/openml.extensions.register_extension.html>`_ must be called to allow OpenML-Python to
+Once the new extension class has been defined, the openml-python module to 
+:meth:`openml.extensions.register_extension.html` must be called to allow OpenML-Python to
 interface the new extension.
 
 
