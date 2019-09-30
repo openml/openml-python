@@ -1,8 +1,8 @@
 """
-Introduction
-============
+Setup
+=====
 
-An introduction to OpenML, followed up by a simple example.
+An example how to set up OpenML-Python followed up by a simple example.
 """
 ############################################################################
 # OpenML is an online collaboration platform for machine learning which allows
