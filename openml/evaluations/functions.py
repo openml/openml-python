@@ -172,7 +172,8 @@ def __list_evaluations(api_call, output_format='object'):
         type(evals_dict['oml:evaluations'])
 
     evals = collections.OrderedDict()
-    uploader_ids = list(set([eval_['oml:uploader'] for eval_ in evals_dict['oml:evaluations']['oml:evaluation']]))
+    uploader_ids = list(set([eval_['oml:uploader'] for eval_ in
+                             evals_dict['oml:evaluations']['oml:evaluation']]))
     api_users = "user/list/user_id/" + ', '.join(uploader_ids)
     xml_string_user = openml._api_calls._perform_api_call(api_users, 'get')
     users = xmltodict.parse(xml_string_user, force_list=('oml:user',))
