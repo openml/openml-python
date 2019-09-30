@@ -20,6 +20,7 @@ def list_evaluations(
     setup: Optional[List] = None,
     flow: Optional[List] = None,
     uploader: Optional[List] = None,
+    run: Optional[List] = None,
     tag: Optional[str] = None,
     per_fold: Optional[bool] = None,
     sort_order: Optional[str] = None,
@@ -47,6 +48,8 @@ def list_evaluations(
     flow : list, optional
 
     uploader : list, optional
+
+    run : list, optional
 
     tag : str, optional
 
@@ -83,6 +86,7 @@ def list_evaluations(
                                   setup=setup,
                                   flow=flow,
                                   uploader=uploader,
+                                  run=run,
                                   tag=tag,
                                   sort_order=sort_order,
                                   per_fold=per_fold_str)
@@ -95,6 +99,7 @@ def _list_evaluations(
     setup: Optional[List] = None,
     flow: Optional[List] = None,
     uploader: Optional[List] = None,
+    run: Optional[List] = None,
     sort_order: Optional[str] = None,
     output_format: str = 'object',
     **kwargs
@@ -119,6 +124,8 @@ def _list_evaluations(
     flow : list, optional
 
     uploader : list, optional
+
+    run : list, optional
 
     kwargs: dict, optional
         Legal filter operators: tag, limit, offset.
@@ -153,6 +160,8 @@ def _list_evaluations(
         api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
     if uploader is not None:
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
+    if run is not None:
+        api_call += "/run/%s" % ','.join([str(int(i)) for i in run])
     if sort_order is not None:
         api_call += "/sort_order/%s" % sort_order
 
