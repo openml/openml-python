@@ -210,8 +210,6 @@ dataframe with the correct dtypes.
 
  .. code-block:: none
 
-    /home/travis/build/openml/openml-python/openml/datasets/dataset.py:448: UserWarning: Cannot convert non-sparse data to 'dataframe'. Returning input data.
-      warn("Cannot convert {} to '{}'. Returning input data.".format(data_type, array_format))
             V1       V2       V3       V4  ...      V11      V12      V13      V14
     0  4329.23  4009.23  4289.23  4148.21  ...  4211.28  4280.51  4635.90  4393.85
     1  4324.62  4004.62  4293.85  4148.72  ...  4207.69  4279.49  4632.82  4384.10
@@ -289,7 +287,7 @@ Exercise 2
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.501 seconds)
+   **Total running time of the script:** ( 0 minutes  7.302 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:
