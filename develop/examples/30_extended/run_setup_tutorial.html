@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Run Setup &#8212; OpenML 0.10.1dev documentation</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.10.1dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../index.html">Start</a></li>
+                <li><a href="../../usage.html">User Guide</a></li>
+                <li><a href="../../api.html">API</a></li>
+                <li><a href="../index.html">Examples</a></li>
+                <li><a href="../../contributing.html">Contributing</a></li>
+                <li><a href="../../progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">Run Setup</a><ul>
+<li><a class="reference internal" href="#create-a-flow-and-use-it-to-solve-a-task">1) Create a flow and use it to solve a task</a></li>
+<li><a class="reference internal" href="#download-the-flow-and-solve-the-same-task-again">2) Download the flow and solve the same task again.</a></li>
+<li><a class="reference internal" href="#we-will-verify-that-the-obtained-results-are-exactly-the-same">3) We will verify that the obtained results are exactly the same.</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-run-setup-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="run-setup">
+<span id="sphx-glr-examples-30-extended-run-setup-tutorial-py"></span><h1>Run Setup<a class="headerlink" href="#run-setup" title="Permalink to this headline">¶</a></h1>
+<p>By: Jan N. van Rijn</p>
+<p>One of the key features of the openml-python library is that is allows to
+reinstantiate flows with hyperparameter settings that were uploaded before.
+This tutorial uses the concept of setups. Although setups are not extensively
+described in the OpenML documentation (because most users will not directly
+use them), they form a important concept within OpenML distinguishing between
+hyperparameter configurations.
+A setup is the combination of a flow with all its hyperparameters set.</p>
+<p>A key requirement for reinstantiating a flow is to have the same scikit-learn
+version as the flow that was uploaded. However, this tutorial will upload the
+flow (that will later be reinstantiated) itself, so it can be ran with any
+scikit-learn version that is supported by this library. In this case, the
+requirement of the corresponding scikit-learn versions is automatically met.</p>
+<dl class="simple">
+<dt>In this tutorial we will</dt><dd><ol class="arabic simple">
+<li><p>Create a flow and use it to solve a task;</p></li>
+<li><p>Download the flow, reinstantiate the model with same hyperparameters,
+and solve the same task again;</p></li>
+<li><p>We will verify that the obtained results are exactly the same.</p></li>
+</ol>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This example uploads data. For that reason, this example
+connects to the test server at test.openml.org. This prevents the main
+server from crowding with example datasets, tasks, runs, and so on.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">openml</span>
+<span class="kn">import</span> <span class="nn">sklearn.ensemble</span>
+<span class="kn">import</span> <span class="nn">sklearn.impute</span>
+<span class="kn">import</span> <span class="nn">sklearn.preprocessing</span>
+
+
+<span class="n">root</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="n">root</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="section" id="create-a-flow-and-use-it-to-solve-a-task">
+<h2>1) Create a flow and use it to solve a task<a class="headerlink" href="#create-a-flow-and-use-it-to-solve-a-task" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># first, let&#39;s download the task that we are interested in</span>
+<span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+
+
+<span class="c1"># we will create a fairly complex model, with many preprocessing components and</span>
+<span class="c1"># many potential hyperparameters. Of course, the model can be as complex and as</span>
+<span class="c1"># easy as you want it to be</span>
+<span class="n">model_original</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">make_pipeline</span><span class="p">(</span>
+    <span class="n">sklearn</span><span class="o">.</span><span class="n">impute</span><span class="o">.</span><span class="n">SimpleImputer</span><span class="p">(),</span>
+    <span class="n">sklearn</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">RandomForestClassifier</span><span class="p">()</span>
+<span class="p">)</span>
+
+
+<span class="c1"># Let&#39;s change some hyperparameters. Of course, in any good application we</span>
+<span class="c1"># would tune them using, e.g., Random Search or Bayesian Optimization, but for</span>
+<span class="c1"># the purpose of this tutorial we set them to some specific values that might</span>
+<span class="c1"># or might not be optimal</span>
+<span class="n">hyperparameters_original</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;simpleimputer__strategy&#39;</span><span class="p">:</span> <span class="s1">&#39;median&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;randomforestclassifier__criterion&#39;</span><span class="p">:</span> <span class="s1">&#39;entropy&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;randomforestclassifier__max_features&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+    <span class="s1">&#39;randomforestclassifier__min_samples_leaf&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;randomforestclassifier__n_estimators&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="s1">&#39;randomforestclassifier__random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">model_original</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="o">**</span><span class="n">hyperparameters_original</span><span class="p">)</span>
+
+<span class="c1"># solve the task and upload the result (this implicitly creates the flow)</span>
+<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
+    <span class="n">model_original</span><span class="p">,</span>
+    <span class="n">task</span><span class="p">,</span>
+    <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">run_original</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>  <span class="c1"># this implicitly uploads the flow</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="download-the-flow-and-solve-the-same-task-again">
+<h2>2) Download the flow and solve the same task again.<a class="headerlink" href="#download-the-flow-and-solve-the-same-task-again" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># obtain setup id (note that the setup id is assigned by the OpenML server -</span>
+<span class="c1"># therefore it was not yet available in our local copy of the run)</span>
+<span class="n">run_downloaded</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_original</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>
+<span class="n">setup_id</span> <span class="o">=</span> <span class="n">run_downloaded</span><span class="o">.</span><span class="n">setup_id</span>
+
+<span class="c1"># after this, we can easily reinstantiate the model</span>
+<span class="n">model_duplicate</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">setups</span><span class="o">.</span><span class="n">initialize_model</span><span class="p">(</span><span class="n">setup_id</span><span class="p">)</span>
+<span class="c1"># it will automatically have all the hyperparameters set</span>
+
+<span class="c1"># and run the task again</span>
+<span class="n">run_duplicate</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
+    <span class="n">model_duplicate</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="we-will-verify-that-the-obtained-results-are-exactly-the-same">
+<h2>3) We will verify that the obtained results are exactly the same.<a class="headerlink" href="#we-will-verify-that-the-obtained-results-are-exactly-the-same" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># the run has stored all predictions in the field data content</span>
+<span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">run_original</span><span class="o">.</span><span class="n">data_content</span><span class="p">,</span>
+                              <span class="n">run_duplicate</span><span class="o">.</span><span class="n">data_content</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.113 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-run-setup-tutorial-py">
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/6b1e091fbd3ac8d106b6552c91cf05cc/run_setup_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">run_setup_tutorial.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/e981986e86f01c0fbdffc604d78a6bf3/run_setup_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">run_setup_tutorial.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2019, the OpenML-Python team..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.0.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

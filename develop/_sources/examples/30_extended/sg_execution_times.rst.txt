@@ -1,0 +1,15 @@
+
+:orphan:
+
+.. _sphx_glr_examples_30_extended_sg_execution_times:
+
+Computation times
+=================
+**01:29.179** total execution time for **examples_30_extended** files:
+
+- **00:33.118**: :ref:`sphx_glr_examples_30_extended_tasks_tutorial.py` (``tasks_tutorial.py``)
+- **00:20.265**: :ref:`sphx_glr_examples_30_extended_flows_and_runs_tutorial.py` (``flows_and_runs_tutorial.py``)
+- **00:13.588**: :ref:`sphx_glr_examples_30_extended_fetch_evaluations_tutorial.py` (``fetch_evaluations_tutorial.py``)
+- **00:08.113**: :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py` (``run_setup_tutorial.py``)
+- **00:07.501**: :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py` (``datasets_tutorial.py``)
+- **00:06.594**: :ref:`sphx_glr_examples_30_extended_create_upload_tutorial.py` (``create_upload_tutorial.py``)

@@ -1,0 +1,13 @@
+
+:orphan:
+
+.. _sphx_glr_examples_20_basic_sg_execution_times:
+
+Computation times
+=================
+**00:24.926** total execution time for **examples_20_basic** files:
+
+- **00:13.444**: :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py` (``introduction_tutorial.py``)
+- **00:07.261**: :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py` (``simple_flows_and_runs_tutorial.py``)
+- **00:04.134**: :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py` (``simple_datasets_tutorial.py``)
+- **00:00.088**: :ref:`sphx_glr_examples_20_basic_simple_studies_tutorial.py` (``simple_studies_tutorial.py``)
