@@ -39,8 +39,8 @@ class OpenMLEvaluation(object):
         (e.g., in case of precision, auroc, recall)
     """
     def __init__(self, run_id, task_id, setup_id, flow_id, flow_name,
-                 data_id, data_name, function, upload_time, uploader,
-                 uploader_name, value, values,
+                 data_id, data_name, function, upload_time, uploader: int,
+                 uploader_name: str, value, values,
                  array_data=None):
         self.run_id = run_id
         self.task_id = task_id
