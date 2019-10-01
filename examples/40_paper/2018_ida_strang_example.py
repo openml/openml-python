@@ -17,28 +17,56 @@ import matplotlib.pyplot as plt
 import openml
 import pandas as pd
 
+##############################################################################
+# A basic step for each data-mining or machine learning task is to determine
+# which model to choose based on the problem and the data at hand. In this
+# work we investigate when non-linear classifiers outperform linear
+# classifiers by means of a large scale experiment.
+#
+# The paper is accompanied with a study object, containing all relevant tasks
+# and runs (study id = 123). The paper features three experiment classes:
+# Support Vector Machines (SVM), Neural Networks (NN) and Decision Trees (DT).
+# This example demonstrates how to reproduce the plots, comparing two
+# classifiers given the OpenML flow ids. Note that this allows us to reproduce
+# the SVM and NN experiment, but not the DT experiment, as this requires a bit
+# more effort to distinguish the same flow with different hyperparameter
+# values.
+##############################################################################
+
 study_id = 123
 # for comparing svms: flow_ids = [7754, 7756]
 # for comparing nns: flow_ids = [7722, 7729]
-# for comparing dts: flow_ids = [7725], differentiate on hyper-parameter value instead
+# for comparing dts: flow_ids = [7725], differentiate on hyper-parameter value
 classifier_family = 'SVM'
 flow_ids = [7754, 7756]
 measure = 'predictive_accuracy'
 meta_features = ['NumberOfInstances', 'NumberOfFeatures']
+class_values = ['non-linear better', 'linear better', 'equal']
 
-
-evaluations = openml.evaluations.list_evaluations(measure, flow=flow_ids, study=study_id, output_format='dataframe')
+# Downloads all evaluation records related to this study
+evaluations = openml.evaluations.list_evaluations(
+    measure, flow=flow_ids, study=study_id, output_format='dataframe')
+# cast to integer (required to do a join to meta-features)
 evaluations['data_id'] = evaluations['data_id'].apply(pd.to_numeric)
-evaluations = evaluations.pivot(index='data_id', columns='flow_id', values='value').dropna()
-data_qualities = openml.datasets.list_datasets(data_id=list(evaluations.index.values), output_format='dataframe')
+# gives us a table with columns data_id, flow1_value, flow2_value
+evaluations = evaluations.pivot(
+    index='data_id', columns='flow_id', values='value').dropna()
+# downloads all data qualities (for scatter plot)
+data_qualities = openml.datasets.list_datasets(
+    data_id=list(evaluations.index.values), output_format='dataframe')
+# removes irrelevant data qualities
 data_qualities = data_qualities[meta_features]
+# makes a join between evaluation table and data qualities table,
+# now we have columns data_id, flow1_value, flow2_value, meta_feature_1,
+# meta_feature_2
 evaluations = evaluations.join(data_qualities, how='inner')
 
 # adds column that indicates the difference between the two classifiers
-evaluations['difference'] = evaluations[flow_ids[0]] - evaluations[flow_ids[1]]
+evaluations['diff'] = evaluations[flow_ids[0]] - evaluations[flow_ids[1]]
 
+# makes the s-plot
 fig_splot, ax_splot = plt.subplots()
-ax_splot.plot(range(len(evaluations)), sorted(evaluations['difference']))
+ax_splot.plot(range(len(evaluations)), sorted(evaluations['diff']))
 ax_splot.set_title(classifier_family)
 ax_splot.set_xlabel('Dataset (sorted)')
 ax_splot.set_ylabel('difference between linear and non-linear classifier')
@@ -47,7 +75,6 @@ plt.show()
 
 
 # adds column that indicates the difference between the two classifiers
-class_values = ['non-linear better', 'linear better', 'equal']
 def determine_class(val_lin, val_nonlin):
     if val_lin < val_nonlin:
         return class_values[0]
@@ -57,12 +84,16 @@ def determine_class(val_lin, val_nonlin):
         return class_values[2]
 
 
-evaluations['class'] = evaluations.apply(lambda row: determine_class(row[flow_ids[0]], row[flow_ids[1]]), axis=1)
+evaluations['class'] = evaluations.apply(
+    lambda row: determine_class(row[flow_ids[0]], row[flow_ids[1]]), axis=1)
 
+# makes the scatter plot
 fig_scatter, ax_scatter = plt.subplots()
 for class_val in class_values:
     df_class = evaluations[evaluations['class'] == class_val]
-    plt.scatter(df_class[meta_features[0]], df_class[meta_features[1]], label=class_val)
+    plt.scatter(df_class[meta_features[0]],
+                df_class[meta_features[1]],
+                label=class_val)
 ax_scatter.set_title(classifier_family)
 ax_scatter.set_xlabel(meta_features[0])
 ax_scatter.set_ylabel(meta_features[1])
