@@ -5,7 +5,7 @@ import io
 import re
 import xmltodict
 import pandas as pd
-from typing import Union, Dict, Optional
+from typing import Any, Union, Dict, Optional, List
 
 from ..exceptions import OpenMLCacheException
 import openml._api_calls
@@ -266,6 +266,67 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
         return flow_id
     else:
         return False
+
+
+def get_flow_id(
+    model: Optional[Any] = None,
+    name: Optional[str] = None,
+    exact_version=True,
+) -> Union[int, bool, List[int]]:
+    """Retrieves the flow id for a model or a flow name.
+
+    Provide either a model or a name to this function. Depending on the input, it does
+
+    * ``model`` and ``exact_version == True``: This helper function first queries for the necessary
+      extension. Second, it uses that extension to convert the model into a flow. Third, it
+      executes ``flow_exists`` to potentially obtain the flow id the flow is published to the
+      server.
+    * ``model`` and ``exact_version == False``: This helper function first queries for the
+      necessary extension. Second, it uses that extension to convert the model into a flow. Third
+      it calls ``list_flows`` and filters the returned values based on the flow name.
+    * ``name``: Ignores ``exact_version`` and calls ``list_flows``, then filters the returned
+      values based on the flow name.
+
+    Parameters
+    ----------
+    model : object
+        Any model. Must provide either ``model`` or ``name``.
+    name : str
+        Name of the flow. Must provide either ``model`` or ``name``.
+    exact_version : bool
+        Whether to return the ``flow_id`` of the exact version or all ``flow_id``s where the name
+        of the flow matches. This is only taken into account for a model where a version number
+        is available.
+
+    Returns
+    -------
+    int or bool, List
+        flow id iff exists, ``False`` otherwise, List if exact_version is ``False``
+    """
+    if model is None and name is None:
+        raise ValueError(
+            'Need to provide either argument `model` or argument `name`, but both are `None`.'
+        )
+    elif model is not None and name is not None:
+        raise ValueError(
+            'Must provide either argument `model` or argument `name`, but both both.'
+        )
+
+    if model is not None:
+        extension = openml.extensions.get_extension_by_model(model, raise_if_no_extension=True)
+        flow = extension.model_to_flow(model)
+        flow_name = flow.name
+        external_version = flow.external_version
+    else:
+        flow_name = name
+        exact_version = False
+
+    if exact_version:
+        return flow_exists(name=flow_name, external_version=external_version)
+    else:
+        flows = list_flows(output_format='dataframe')
+        flows = flows.query('name == "{}"'.format(flow_name))
+        return flows['id'].to_list()
 
 
 def __list_flows(
