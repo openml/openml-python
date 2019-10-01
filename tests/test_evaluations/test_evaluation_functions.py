@@ -54,7 +54,9 @@ class TestEvaluationFunctions(TestBase):
 
         uploader_id = 16
         evaluations = openml.evaluations.list_evaluations("predictive_accuracy",
-                                                          uploader=[uploader_id])
+                                                          uploader=[uploader_id],
+                                                          output_format='dataframe')
+        self.assertEqual(evaluations['uploader'].unique(), [uploader_id])
 
         self.assertGreater(len(evaluations), 50)
 
