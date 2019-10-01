@@ -22,7 +22,7 @@ import sklearn.pipeline
 
 import openml
 from openml.exceptions import PyOpenMLError
-from openml.extensions import Extension, register_extension
+from openml.extensions import Extension
 from openml.flows import OpenMLFlow
 from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration, PREFIX
 from openml.tasks import (
@@ -1938,6 +1938,3 @@ class SklearnExtension(Extension):
             trace_attributes,
             trace_content,
         )
-
-
-register_extension(SklearnExtension)

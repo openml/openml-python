@@ -26,6 +26,7 @@ class OpenMLDatasetTest(TestBase):
         # these datasets have some boolean features
         self.pc4 = openml.datasets.get_dataset(1049, download_data=False)
         self.jm1 = openml.datasets.get_dataset(1053, download_data=False)
+        self.iris = openml.datasets.get_dataset(61, download_data=False)
 
     def test_get_data_array(self):
         # Basic usage
@@ -189,6 +190,18 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual(np.max(y), 5)
         # Check that no label is mapped to 3, since it is reserved for label '4'.
         self.assertEqual(np.sum(y == 3), 0)
+
+    def test_get_data_corrupt_pickle(self):
+        # Lazy loaded dataset, populate cache.
+        self.iris.get_data()
+        # Corrupt pickle file, overwrite as empty.
+        with open(self.iris.data_pickle_file, "w") as fh:
+            fh.write("")
+        # Despite the corrupt file, the data should be loaded from the ARFF file.
+        # A warning message is written to the python logger.
+        xy, _, _, _ = self.iris.get_data()
+        self.assertIsInstance(xy, pd.DataFrame)
+        self.assertEqual(xy.shape, (150, 5))
 
 
 class OpenMLDatasetTestOnTestServer(TestBase):
