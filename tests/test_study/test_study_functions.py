@@ -117,15 +117,15 @@ class TestStudyFunctions(TestBase):
 
     def test_publish_study(self):
         # get some random runs to attach
-        run_list = openml.runs.list_runs(size=10)
+        run_list = openml.evaluations.list_evaluations('predictive_accuracy', size=10)
         self.assertEqual(len(run_list), 10)
 
         fixt_alias = None
         fixt_name = 'unit tested study'
         fixt_descr = 'bla'
-        fixt_flow_ids = set([run['flow_id'] for run in run_list.values()])
-        fixt_task_ids = set([run['task_id'] for run in run_list.values()])
-        fixt_setup_ids = set([run['setup_id']for run in run_list.values()])
+        fixt_flow_ids = set([evaluation.flow_id for evaluation in run_list.values()])
+        fixt_task_ids = set([evaluation.task_id for evaluation in run_list.values()])
+        fixt_setup_ids = set([evaluation.setup_id for evaluation in run_list.values()])
 
         study = openml.study.create_study(
             alias=fixt_alias,
@@ -148,6 +148,14 @@ class TestStudyFunctions(TestBase):
         self.assertSetEqual(set(study_downloaded.setups), set(fixt_setup_ids))
         self.assertSetEqual(set(study_downloaded.flows), set(fixt_flow_ids))
         self.assertSetEqual(set(study_downloaded.tasks), set(fixt_task_ids))
+
+        # test whether the list run function also handles study data fine
+        run_ids = openml.runs.list_runs(study=study_id)
+        self.assertSetEqual(set(run_ids), set(study_downloaded.runs))
+
+        # test whether the list evaluation function also handles study data fine
+        run_ids = openml.evaluations.list_evaluations('predictive_accuracy', study=study_id)
+        self.assertSetEqual(set(run_ids), set(study_downloaded.runs))
 
         # attach more runs
         run_list_additional = openml.runs.list_runs(size=10, offset=10)

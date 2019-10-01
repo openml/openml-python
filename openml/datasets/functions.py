@@ -260,12 +260,19 @@ def list_datasets(
                                   **kwargs)
 
 
-def _list_datasets(output_format='dict', **kwargs):
+def _list_datasets(data_id: Optional[List] = None, output_format='dict', **kwargs):
     """
     Perform api call to return a list of all datasets.
 
     Parameters
     ----------
+    The arguments that are lists are separated from the single value
+    ones which are put into the kwargs.
+    display_errors is also separated from the kwargs since it has a
+    default value.
+
+    data_id : list, optional
+
     output_format: str, optional (default='dict')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
@@ -285,6 +292,8 @@ def _list_datasets(output_format='dict', **kwargs):
     if kwargs is not None:
         for operator, value in kwargs.items():
             api_call += "/%s/%s" % (operator, value)
+    if data_id is not None:
+        api_call += "/data_id/%s" % ','.join([str(int(i)) for i in data_id])
     return __list_datasets(api_call=api_call, output_format=output_format)
 
 
