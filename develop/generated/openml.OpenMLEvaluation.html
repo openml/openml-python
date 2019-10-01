@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLEvaluation<a class="headerlink" href="#openml-openmlevaluation" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="openml.OpenMLEvaluation">
-<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLEvaluation</code><span class="sig-paren">(</span><em class="sig-param">run_id</em>, <em class="sig-param">task_id</em>, <em class="sig-param">setup_id</em>, <em class="sig-param">flow_id</em>, <em class="sig-param">flow_name</em>, <em class="sig-param">data_id</em>, <em class="sig-param">data_name</em>, <em class="sig-param">function</em>, <em class="sig-param">upload_time</em>, <em class="sig-param">value</em>, <em class="sig-param">values</em>, <em class="sig-param">array_data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLEvaluation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLEvaluation</code><span class="sig-paren">(</span><em class="sig-param">run_id</em>, <em class="sig-param">task_id</em>, <em class="sig-param">setup_id</em>, <em class="sig-param">flow_id</em>, <em class="sig-param">flow_name</em>, <em class="sig-param">data_id</em>, <em class="sig-param">data_name</em>, <em class="sig-param">function</em>, <em class="sig-param">upload_time</em>, <em class="sig-param">uploader: int</em>, <em class="sig-param">uploader_name: str</em>, <em class="sig-param">value</em>, <em class="sig-param">values</em>, <em class="sig-param">array_data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLEvaluation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contains all meta-information about a run / evaluation combination,
 according to the evaluation/list function</p>
 <dl class="field-list simple">
@@ -136,6 +136,10 @@ according to the evaluation/list function</p>
 <dt><strong>function</strong><span class="classifier">str</span></dt><dd><p>The evaluation metric of this item (e.g., accuracy).</p>
 </dd>
 <dt><strong>upload_time</strong><span class="classifier">str</span></dt><dd><p>The time of evaluation.</p>
+</dd>
+<dt><strong>uploader: int</strong></dt><dd><p>Uploader ID (user ID)</p>
+</dd>
+<dt><strong>upload_name</strong><span class="classifier">str</span></dt><dd><p>Name of the uploader of this evaluation</p>
 </dd>
 <dt><strong>value</strong><span class="classifier">float</span></dt><dd><p>The value (score) of this evaluation.</p>
 </dd>
