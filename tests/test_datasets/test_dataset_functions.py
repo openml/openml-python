@@ -525,23 +525,23 @@ class TestOpenMLDataset(TestBase):
 
         openml.datasets.status_update(did, 'active')
         # need to use listing fn, as this is immune to cache
-        result = openml.datasets.list_datasets(data_id=did, status='all')
+        result = openml.datasets.list_datasets(data_id=[did], status='all')
         self.assertEqual(len(result), 1)
         self.assertEqual(result[did]['status'], 'active')
         openml.datasets.status_update(did, 'deactivated')
         # need to use listing fn, as this is immune to cache
-        result = openml.datasets.list_datasets(data_id=did, status='all')
+        result = openml.datasets.list_datasets(data_id=[did], status='all')
         self.assertEqual(len(result), 1)
         self.assertEqual(result[did]['status'], 'deactivated')
         openml.datasets.status_update(did, 'active')
         # need to use listing fn, as this is immune to cache
-        result = openml.datasets.list_datasets(data_id=did, status='all')
+        result = openml.datasets.list_datasets(data_id=[did], status='all')
         self.assertEqual(len(result), 1)
         self.assertEqual(result[did]['status'], 'active')
         with self.assertRaises(ValueError):
             openml.datasets.status_update(did, 'in_preparation')
         # need to use listing fn, as this is immune to cache
-        result = openml.datasets.list_datasets(data_id=did, status='all')
+        result = openml.datasets.list_datasets(data_id=[did], status='all')
         self.assertEqual(len(result), 1)
         self.assertEqual(result[did]['status'], 'active')
 

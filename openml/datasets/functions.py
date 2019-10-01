@@ -190,6 +190,7 @@ def list_qualities() -> List[str]:
 
 
 def list_datasets(
+    data_id: Optional[List[int]] = None,
     offset: Optional[int] = None,
     size: Optional[int] = None,
     status: Optional[str] = None,
@@ -204,6 +205,9 @@ def list_datasets(
 
     Parameters
     ----------
+    data_id : list, optional
+        A list of data ids, to specify which datasets should be
+        listed
     offset : int, optional
         The number of datasets to skip, starting from the first.
     size : int, optional
@@ -251,7 +255,8 @@ def list_datasets(
         raise ValueError("Invalid output format selected. "
                          "Only 'dict' or 'dataframe' applicable.")
 
-    return openml.utils._list_all(output_format=output_format,
+    return openml.utils._list_all(data_id=data_id,
+                                  output_format=output_format,
                                   listing_call=_list_datasets,
                                   offset=offset,
                                   size=size,
