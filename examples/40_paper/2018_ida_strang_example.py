@@ -24,7 +24,7 @@ import pandas as pd
 # classifiers by means of a large scale experiment.
 #
 # The paper is accompanied with a study object, containing all relevant tasks
-# and runs (study id = 123). The paper features three experiment classes:
+# and runs (``study_id=123``). The paper features three experiment classes:
 # Support Vector Machines (SVM), Neural Networks (NN) and Decision Trees (DT).
 # This example demonstrates how to reproduce the plots, comparing two
 # classifiers given the OpenML flow ids. Note that this allows us to reproduce
