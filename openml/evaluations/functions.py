@@ -95,7 +95,6 @@ def _list_evaluations(
     setup: Optional[List] = None,
     flow: Optional[List] = None,
     uploader: Optional[List] = None,
-    run: Optional[List] = None,
     sort_order: Optional[str] = None,
     output_format: str = 'object',
     **kwargs
