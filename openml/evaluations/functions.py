@@ -15,10 +15,10 @@ def list_evaluations(
     function: str,
     offset: Optional[int] = None,
     size: Optional[int] = None,
-    id: Optional[List] = None,
     task: Optional[List] = None,
     setup: Optional[List] = None,
     flow: Optional[List] = None,
+    run: Optional[List] = None,
     uploader: Optional[List] = None,
     tag: Optional[str] = None,
     per_fold: Optional[bool] = None,
@@ -38,13 +38,14 @@ def list_evaluations(
     size : int, optional
         the maximum number of runs to show
 
-    id : list, optional
-
     task : list, optional
 
     setup: list, optional
 
     flow : list, optional
+
+    run : list, optional
+
 
     uploader : list, optional
 
@@ -78,10 +79,10 @@ def list_evaluations(
                                   function=function,
                                   offset=offset,
                                   size=size,
-                                  id=id,
                                   task=task,
                                   setup=setup,
                                   flow=flow,
+                                  run=run,
                                   uploader=uploader,
                                   tag=tag,
                                   sort_order=sort_order,
@@ -90,10 +91,10 @@ def list_evaluations(
 
 def _list_evaluations(
     function: str,
-    id: Optional[List] = None,
     task: Optional[List] = None,
     setup: Optional[List] = None,
     flow: Optional[List] = None,
+run: Optional[List] = None,
     uploader: Optional[List] = None,
     sort_order: Optional[str] = None,
     output_format: str = 'object',
@@ -110,13 +111,14 @@ def _list_evaluations(
     function : str
         the evaluation function. e.g., predictive_accuracy
 
-    id : list, optional
-
     task : list, optional
 
     setup: list, optional
 
     flow : list, optional
+
+    run : list, optional
+
 
     uploader : list, optional
 
@@ -143,14 +145,14 @@ def _list_evaluations(
     if kwargs is not None:
         for operator, value in kwargs.items():
             api_call += "/%s/%s" % (operator, value)
-    if id is not None:
-        api_call += "/run/%s" % ','.join([str(int(i)) for i in id])
     if task is not None:
         api_call += "/task/%s" % ','.join([str(int(i)) for i in task])
     if setup is not None:
         api_call += "/setup/%s" % ','.join([str(int(i)) for i in setup])
     if flow is not None:
         api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
+    if run is not None:
+        api_call += "/run/%s" % ','.join([str(int(i)) for i in run])
     if uploader is not None:
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
     if sort_order is not None:
