@@ -274,26 +274,6 @@ its use in recent publications.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to get the datasets used in the paper introducing *Probabilistic Matrix Facto...">
-
-.. only:: html
-
-    .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_neurips_fusi_example_thumb.png
-
-        :ref:`sphx_glr_examples_40_paper_2018_neurips_fusi_example.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /examples/40_paper/2018_neurips_fusi_example
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to reproduce the paper *Hyperparameter Importance Across Datasets*.">
 
 .. only:: html
