@@ -321,4 +321,3 @@ class TestFlowFunctions(TestBase):
         self.assertEqual(flow_ids_exact_version_True, flow_ids_exact_version_False)
         self.assertIn(flow.flow_id, flow_ids_exact_version_True)
         self.assertGreater(len(flow_ids_exact_version_True), 2)
-
