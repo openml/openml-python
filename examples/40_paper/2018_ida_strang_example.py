@@ -31,7 +31,6 @@ import pandas as pd
 # the SVM and NN experiment, but not the DT experiment, as this requires a bit
 # more effort to distinguish the same flow with different hyperparameter
 # values.
-##############################################################################
 
 study_id = 123
 # for comparing svms: flow_ids = [7754, 7756]
@@ -46,8 +45,6 @@ class_values = ['non-linear better', 'linear better', 'equal']
 # Downloads all evaluation records related to this study
 evaluations = openml.evaluations.list_evaluations(
     measure, flow=flow_ids, study=study_id, output_format='dataframe')
-# cast to integer (required to do a join to meta-features)
-evaluations['data_id'] = evaluations['data_id'].apply(pd.to_numeric)
 # gives us a table with columns data_id, flow1_value, flow2_value
 evaluations = evaluations.pivot(
     index='data_id', columns='flow_id', values='value').dropna()
