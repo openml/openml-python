@@ -41,27 +41,22 @@ dataset_ids = [
 # OpenML, which define both the target feature and the train/test split.
 #
 # .. note::
-#    Please do not use datasets but the respective tasks as basis for a paper.
+#    It is discouraged to work directly on datasets and only provide dataset IDs in a paper as
+#    this does not allow reproducibility (unclear splitting). Please do not use datasets but the
+#    respective tasks as basis for a paper and publish task IDS. This example is only given to
+#    showcase the use OpenML-Python for a published paper and as a warning on how not to do it.
+#    Please check the `OpenML documentation of tasks <https://docs.openml.org/#tasks>`_ if you
+#    want to learn more about them.
 
 # active tasks
-tasks_a = openml.tasks.list_tasks(
-    task_type_id=1,
-    status='active',
+tasks = openml.tasks.list_tasks(
+    task_type_id=openml.tasks.TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+    status='all',
     output_format='dataframe',
 )
 
 # query only those with holdout as the resampling startegy.
-tasks_a = tasks_a[(tasks_a.estimation_procedure == "33% Holdout set")]
-
-# deactivated tasks
-tasks_d = openml.tasks.list_tasks(
-    task_type_id=1,
-    status='deactivated',
-    output_format='dataframe',
-)
-tasks_d = tasks_d[(tasks_d.estimation_procedure == "33% Holdout set")]
-
-tasks = pd.concat([tasks_a, tasks_d], sort=True)
+tasks = tasks[(tasks.estimation_procedure == "33% Holdout set")]
 
 task_ids = []
 for did in dataset_ids:
