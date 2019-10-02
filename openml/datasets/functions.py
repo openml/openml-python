@@ -190,6 +190,7 @@ def list_qualities() -> List[str]:
 
 
 def list_datasets(
+    data_id: Optional[List[int]] = None,
     offset: Optional[int] = None,
     size: Optional[int] = None,
     status: Optional[str] = None,
@@ -204,6 +205,9 @@ def list_datasets(
 
     Parameters
     ----------
+    data_id : list, optional
+        A list of data ids, to specify which datasets should be
+        listed
     offset : int, optional
         The number of datasets to skip, starting from the first.
     size : int, optional
@@ -251,7 +255,8 @@ def list_datasets(
         raise ValueError("Invalid output format selected. "
                          "Only 'dict' or 'dataframe' applicable.")
 
-    return openml.utils._list_all(output_format=output_format,
+    return openml.utils._list_all(data_id=data_id,
+                                  output_format=output_format,
                                   listing_call=_list_datasets,
                                   offset=offset,
                                   size=size,
@@ -260,12 +265,19 @@ def list_datasets(
                                   **kwargs)
 
 
-def _list_datasets(output_format='dict', **kwargs):
+def _list_datasets(data_id: Optional[List] = None, output_format='dict', **kwargs):
     """
     Perform api call to return a list of all datasets.
 
     Parameters
     ----------
+    The arguments that are lists are separated from the single value
+    ones which are put into the kwargs.
+    display_errors is also separated from the kwargs since it has a
+    default value.
+
+    data_id : list, optional
+
     output_format: str, optional (default='dict')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
@@ -285,6 +297,8 @@ def _list_datasets(output_format='dict', **kwargs):
     if kwargs is not None:
         for operator, value in kwargs.items():
             api_call += "/%s/%s" % (operator, value)
+    if data_id is not None:
+        api_call += "/data_id/%s" % ','.join([str(int(i)) for i in data_id])
     return __list_datasets(api_call=api_call, output_format=output_format)
 
 

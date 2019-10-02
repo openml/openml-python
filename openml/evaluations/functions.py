@@ -21,6 +21,7 @@ def list_evaluations(
     flow: Optional[List] = None,
     uploader: Optional[List] = None,
     tag: Optional[str] = None,
+    study: Optional[int] = None,
     per_fold: Optional[bool] = None,
     sort_order: Optional[str] = None,
     output_format: str = 'object'
@@ -49,6 +50,8 @@ def list_evaluations(
     uploader : list, optional
 
     tag : str, optional
+
+    study : int, optional
 
     per_fold : bool, optional
 
@@ -84,6 +87,7 @@ def list_evaluations(
                                   flow=flow,
                                   uploader=uploader,
                                   tag=tag,
+                                  study=study,
                                   sort_order=sort_order,
                                   per_fold=per_fold_str)
 
@@ -95,6 +99,7 @@ def _list_evaluations(
     setup: Optional[List] = None,
     flow: Optional[List] = None,
     uploader: Optional[List] = None,
+    study: Optional[int] = None,
     sort_order: Optional[str] = None,
     output_format: str = 'object',
     **kwargs
@@ -119,6 +124,8 @@ def _list_evaluations(
     flow : list, optional
 
     uploader : list, optional
+
+    study : int, optional
 
     kwargs: dict, optional
         Legal filter operators: tag, limit, offset.
@@ -153,6 +160,8 @@ def _list_evaluations(
         api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
     if uploader is not None:
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
+    if study is not None:
+        api_call += "/study/%d" % study
     if sort_order is not None:
         api_call += "/sort_order/%s" % sort_order
 
@@ -196,7 +205,7 @@ def __list_evaluations(api_call, output_format='object'):
                                              int(eval_['oml:setup_id']),
                                              int(eval_['oml:flow_id']),
                                              eval_['oml:flow_name'],
-                                             eval_['oml:data_id'],
+                                             int(eval_['oml:data_id']),
                                              eval_['oml:data_name'],
                                              eval_['oml:function'],
                                              eval_['oml:upload_time'],
@@ -210,7 +219,7 @@ def __list_evaluations(api_call, output_format='object'):
                              'setup_id': int(eval_['oml:setup_id']),
                              'flow_id': int(eval_['oml:flow_id']),
                              'flow_name': eval_['oml:flow_name'],
-                             'data_id': eval_['oml:data_id'],
+                             'data_id': int(eval_['oml:data_id']),
                              'data_name': eval_['oml:data_name'],
                              'function': eval_['oml:function'],
                              'upload_time': eval_['oml:upload_time'],
