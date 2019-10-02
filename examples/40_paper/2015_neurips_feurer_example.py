@@ -48,20 +48,24 @@ dataset_ids = [
 #    Please check the `OpenML documentation of tasks <https://docs.openml.org/#tasks>`_ if you
 #    want to learn more about them.
 
-# active tasks
+####################################################################################################
+# This lists both active and inactive tasks (because of ``status='all'``). Unfortunately,
+# this is necessary as some of the datasets contain issues found after the publication and became
+# deactivated, which also deactivated the tasks on them. More information on active or inactive
+# datasets can be found in the `online docs <https://docs.openml.org/#dataset-status>`_.
 tasks = openml.tasks.list_tasks(
     task_type_id=openml.tasks.TaskTypeEnum.SUPERVISED_CLASSIFICATION,
     status='all',
     output_format='dataframe',
 )
 
-# query only those with holdout as the resampling startegy.
-tasks = tasks[(tasks.estimation_procedure == "33% Holdout set")]
+# Query only those with holdout as the resampling startegy.
+tasks = tasks.query('estimation_procedure == "33% Holdout set"')
 
 task_ids = []
 for did in dataset_ids:
     tasks_ = list(tasks.query("did == {}".format(did)).tid)
-    if len(tasks_) >= 1:  # if there are more than one task, take the lowest one.
+    if len(tasks_) >= 1:  # if there are multiple task, take the one with lowest ID (oldest).
         task_id = min(tasks_)
     else:
         raise ValueError(did)
