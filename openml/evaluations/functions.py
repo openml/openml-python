@@ -1,4 +1,5 @@
 import json
+import logging
 import xmltodict
 import pandas as pd
 import numpy as np
@@ -315,7 +316,6 @@ def list_evaluations_setups(
     evals = list_evaluations(function=function, offset=offset, size=size, id=id, task=task,
                              setup=setup, flow=flow, uploader=uploader, tag=tag,
                              per_fold=per_fold, sort_order=sort_order, output_format='dataframe')
-
     # List setups
     # Split setups in evals into chunks of N setups as list_setups does not support large size
     df = pd.DataFrame()
@@ -331,10 +331,15 @@ def list_evaluations_setups(
             setups = pd.concat([setups, result], ignore_index=True)
         parameters = []
         # Convert parameters of setup into list of tuples of (hyperparameter, value)
-        for parameter_dict in setups['parameters']:
+        for idx, parameter_dict in enumerate(setups['parameters']):
             if parameter_dict is not None:
-                parameters.append({param['full_name']: param['value']
-                                   for param in parameter_dict.values()})
+                try:
+                    parameters.append({param['full_name']: json.loads(param['value'])
+                                       for param in parameter_dict.values()})
+                except json.decoder.JSONDecodeError as e:
+                    logging.error('Can not properly parse all parameter values for '
+                                  'setup %d' % setups.iloc[idx]['setup_id'])
+                    raise e
             else:
                 parameters.append({})
         setups['parameters'] = parameters
