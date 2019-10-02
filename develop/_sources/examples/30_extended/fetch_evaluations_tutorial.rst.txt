@@ -142,27 +142,27 @@ Note that we now filter the evaluations based on another parameter 'task'.
 
  .. code-block:: none
 
-        run_id  task_id  setup_id  ...     value values array_data
-    0  9199772   167140   7130140  ...  0.938481   None       None
-    1  9199845   167140   7130139  ...  0.623352   None       None
-    2  9202086   167140   7131884  ...  0.918393   None       None
-    3  9202092   167140   7131890  ...  0.962335   None       None
-    4  9202096   167140   7131894  ...  0.961707   None       None
-    5  9202099   167140   7131897  ...  0.519146   None       None
-    6  9202125   167140   7131923  ...  0.957313   None       None
-    7  9202139   167140   7131937  ...  0.519146   None       None
-    8  9202159   167140   7131957  ...  0.628060   None       None
-    9  9202254   167140   7132052  ...  0.610483   None       None
+        run_id  task_id  setup_id  ...     value values  array_data
+    0  9199772   167140   7130140  ...  0.938481   None        None
+    1  9199845   167140   7130139  ...  0.623352   None        None
+    2  9202086   167140   7131884  ...  0.918393   None        None
+    3  9202092   167140   7131890  ...  0.962335   None        None
+    4  9202096   167140   7131894  ...  0.961707   None        None
+    5  9202099   167140   7131897  ...  0.519146   None        None
+    6  9202125   167140   7131923  ...  0.957313   None        None
+    7  9202139   167140   7131937  ...  0.519146   None        None
+    8  9202159   167140   7131957  ...  0.628060   None        None
+    9  9202254   167140   7132052  ...  0.610483   None        None
 
     [10 rows x 14 columns]
 
     Displaying head of sorted dataframe: 
-            run_id  task_id  setup_id  ...     value values array_data
-    2759  10279798   167140   8166877  ...  0.968613   None       None
-    2758  10279797   167140   8166877  ...  0.968613   None       None
-    2233  10232987   167140   8157961  ...  0.967671   None       None
-    2216  10232158   167140   8157180  ...  0.967671   None       None
-    2284  10271558   167140   8154506  ...  0.967043   None       None
+            run_id  task_id  setup_id  ...     value values  array_data
+    2759  10279798   167140   8166877  ...  0.968613   None        None
+    2758  10279797   167140   8166877  ...  0.968613   None        None
+    2233  10232987   167140   8157961  ...  0.967671   None        None
+    2216  10232158   167140   8157180  ...  0.967671   None        None
+    2284  10271558   167140   8154506  ...  0.967043   None        None
 
     [5 rows x 14 columns]
 
@@ -358,7 +358,7 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  15.593 seconds)
+   **Total running time of the script:** ( 0 minutes  14.535 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_fetch_evaluations_tutorial.py:

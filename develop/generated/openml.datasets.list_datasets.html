@@ -113,12 +113,15 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.list_datasets<a class="headerlink" href="#openml-datasets-list-datasets" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.datasets.list_datasets">
-<code class="sig-prename descclassname">openml.datasets.</code><code class="sig-name descname">list_datasets</code><span class="sig-paren">(</span><em class="sig-param">offset: Union[int</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">size: Union[int</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">status: Union[str</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">tag: Union[str</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">output_format: str = 'dict'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Union[Dict, pandas.core.frame.DataFrame]<a class="headerlink" href="#openml.datasets.list_datasets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openml.datasets.</code><code class="sig-name descname">list_datasets</code><span class="sig-paren">(</span><em class="sig-param">data_id: Union[List[int], NoneType] = None, offset: Union[int, NoneType] = None, size: Union[int, NoneType] = None, status: Union[str, NoneType] = None, tag: Union[str, NoneType] = None, output_format: str = 'dict', **kwargs</em><span class="sig-paren">)</span> &#x2192; Union[Dict, pandas.core.frame.DataFrame]<a class="headerlink" href="#openml.datasets.list_datasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of all dataset which are on OpenML.
 Supports large amount of results.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
+<dt><strong>data_id</strong><span class="classifier">list, optional</span></dt><dd><p>A list of data ids, to specify which datasets should be
+listed</p>
+</dd>
 <dt><strong>offset</strong><span class="classifier">int, optional</span></dt><dd><p>The number of datasets to skip, starting from the first.</p>
 </dd>
 <dt><strong>size</strong><span class="classifier">int, optional</span></dt><dd><p>The maximum number of datasets to show.</p>
