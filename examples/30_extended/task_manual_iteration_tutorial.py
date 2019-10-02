@@ -15,7 +15,8 @@ import openml
 ####################################################################################################
 # For this tutorial we will use the famous King+Rook versus King+Pawn on a A7 datasets, which has
 # the dataset ID 3 (`dataset on OpenML <https://www.openml.org/d/3>`_), and for there exist
-# tasks with all important estimation procedures.
+# tasks with all important estimation procedures. It is small enough (less than 5000 samples) to
+# efficiently use it in an example.
 #
 # We will first start with (`task 233 <https://www.openml.org/t/233>`_), which is a task with a
 # holdout estimation procedure.
