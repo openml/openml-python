@@ -5,9 +5,9 @@
 
 Computation times
 =================
-**00:24.598** total execution time for **examples_20_basic** files:
+**00:24.331** total execution time for **examples_20_basic** files:
 
-- **00:13.118**: :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py` (``introduction_tutorial.py``)
-- **00:07.334**: :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py` (``simple_flows_and_runs_tutorial.py``)
-- **00:04.040**: :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py` (``simple_datasets_tutorial.py``)
-- **00:00.106**: :ref:`sphx_glr_examples_20_basic_simple_studies_tutorial.py` (``simple_studies_tutorial.py``)
+- **00:13.305**: :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py` (``introduction_tutorial.py``)
+- **00:07.125**: :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py` (``simple_flows_and_runs_tutorial.py``)
+- **00:03.805**: :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py` (``simple_datasets_tutorial.py``)
+- **00:00.097**: :ref:`sphx_glr_examples_20_basic_simple_studies_tutorial.py` (``simple_studies_tutorial.py``)
