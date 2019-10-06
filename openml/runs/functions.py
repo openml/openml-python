@@ -789,6 +789,7 @@ def list_runs(
     flow: Optional[List] = None,
     uploader: Optional[List] = None,
     tag: Optional[str] = None,
+    study: Optional[int] = None,
     display_errors: bool = False,
     output_format: str = 'dict',
     **kwargs
@@ -815,6 +816,8 @@ def list_runs(
     uploader : list, optional
 
     tag : str, optional
+
+    study : int, optional
 
     display_errors : bool, optional (default=None)
         Whether to list runs which have an error (for example a missing
@@ -857,6 +860,7 @@ def list_runs(
                                   flow=flow,
                                   uploader=uploader,
                                   tag=tag,
+                                  study=study,
                                   display_errors=display_errors,
                                   **kwargs)
 
@@ -867,6 +871,7 @@ def _list_runs(
     setup: Optional[List] = None,
     flow: Optional[List] = None,
     uploader: Optional[List] = None,
+    study: Optional[int] = None,
     display_errors: bool = False,
     output_format: str = 'dict',
     **kwargs
@@ -891,6 +896,8 @@ def _list_runs(
     flow : list, optional
 
     uploader : list, optional
+
+    study : int, optional
 
     display_errors : bool, optional (default=None)
         Whether to list runs which have an error (for example a missing
@@ -924,6 +931,8 @@ def _list_runs(
         api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
     if uploader is not None:
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
+    if study is not None:
+        api_call += "/study/%d" % study
     if display_errors:
         api_call += "/show_errors/true"
     return __list_runs(api_call=api_call, output_format=output_format)
