@@ -27,7 +27,7 @@ datalist = datalist[[
     'NumberOfFeatures', 'NumberOfClasses'
 ]]
 
-print("First 10 of %s datasets..." % len(datalist))
+print(f"First 10 of {len(datalist)} datasets...")
 datalist.head(n=10)
 
 # The same can be done with lesser lines of code
@@ -56,9 +56,9 @@ datalist.query('NumberOfClasses > 50')
 dataset = openml.datasets.get_dataset(1471)
 
 # Print a summary
-print("This is dataset '%s', the target feature is '%s'" %
-      (dataset.name, dataset.default_target_attribute))
-print("URL: %s" % dataset.url)
+print(f"This is dataset '{dataset.name}', the target feature is "
+      f"'{dataset.default_target_attribute}'")
+print(f"URL: {dataset.url}")
 print(dataset.description[:500])
 
 ############################################################################

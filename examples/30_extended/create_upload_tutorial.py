@@ -120,7 +120,7 @@ diabetes_dataset = create_dataset(
 ############################################################################
 
 upload_did = diabetes_dataset.publish()
-print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+print(f"URL for dataset: {openml.config.server}/data/{upload_did}")
 
 ############################################################################
 # Dataset is a list
@@ -193,7 +193,7 @@ weather_dataset = create_dataset(
 ############################################################################
 
 upload_did = weather_dataset.publish()
-print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+print(f"URL for dataset: {openml.config.server}/data/{upload_did}")
 
 ############################################################################
 # Dataset is a pandas DataFrame
@@ -239,7 +239,7 @@ weather_dataset = create_dataset(
 ############################################################################
 
 upload_did = weather_dataset.publish()
-print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+print(f"URL for dataset: {openml.config.server}/data/{upload_did}")
 
 ############################################################################
 # Dataset is a sparse matrix
@@ -276,7 +276,7 @@ xor_dataset = create_dataset(
 ############################################################################
 
 upload_did = xor_dataset.publish()
-print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+print(f"URL for dataset: {openml.config.server}/data/{upload_did}")
 
 
 ############################################################################
@@ -311,7 +311,7 @@ xor_dataset = create_dataset(
 ############################################################################
 
 upload_did = xor_dataset.publish()
-print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+print(f"URL for dataset: {openml.config.server}/data/{upload_did}")
 
 
 ############################################################################
