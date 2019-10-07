@@ -93,7 +93,7 @@ def _list_evaluations(
     task: Optional[List] = None,
     setup: Optional[List] = None,
     flow: Optional[List] = None,
-run: Optional[List] = None,
+    run: Optional[List] = None,
     uploader: Optional[List] = None,
     sort_order: Optional[str] = None,
     output_format: str = 'object',
@@ -256,10 +256,10 @@ def list_evaluations_setups(
         function: str,
         offset: Optional[int] = None,
         size: Optional[int] = None,
-        id: Optional[List] = None,
         task: Optional[List] = None,
         setup: Optional[List] = None,
         flow: Optional[List] = None,
+        run: Optional[List] = None,
         uploader: Optional[List] = None,
         tag: Optional[str] = None,
         per_fold: Optional[bool] = None,
@@ -279,16 +279,16 @@ def list_evaluations_setups(
         the number of runs to skip, starting from the first
     size : int, optional
         the maximum number of runs to show
-    id : list[int], optional
-        the list of evaluation ID's
     task : list[int], optional
-        the list of task ID's
+        the list of task IDs
     setup: list[int], optional
-        the list of setup ID's
+        the list of setup IDs
     flow : list[int], optional
-        the list of flow ID's
+        the list of flow IDs
+    run : list[int], optional
+        the list of run IDs
     uploader : list[int], optional
-        the list of uploader ID's
+        the list of uploader IDs
     tag : str, optional
         filter evaluation based on given tag
     per_fold : bool, optional
@@ -312,7 +312,7 @@ def list_evaluations_setups(
                          "only for single flow_id")
 
     # List evaluations
-    evals = list_evaluations(function=function, offset=offset, size=size, id=id, task=task,
+    evals = list_evaluations(function=function, offset=offset, size=size, run=run, task=task,
                              setup=setup, flow=flow, uploader=uploader, tag=tag,
                              per_fold=per_fold, sort_order=sort_order, output_format='dataframe')
 
