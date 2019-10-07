@@ -343,7 +343,7 @@ def list_evaluations_setups(
         for idx, parameter_dict in enumerate(setups['parameters']):
             if parameter_dict is not None:
                 try:
-                    parameters.append({param['full_name']: json.loads(param['value'])
+                    parameters.append({param['full_name']: param['value']
                                        for param in parameter_dict.values()})
                 except json.decoder.JSONDecodeError as e:
                     logging.error('Can not properly parse all parameter values for '
