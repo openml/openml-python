@@ -313,6 +313,8 @@ class TestFlowFunctions(TestBase):
         self.assertIn(flow.flow_id, flow_ids)
         self.assertGreater(len(flow_ids), 2)
 
+        # Check that the output of get_flow_id is identical if only the name is given, no matter
+        # whether exact_version is set to True or False.
         flow_ids_exact_version_True = openml.flows.get_flow_id(name=flow.name, exact_version=True)
         flow_ids_exact_version_False = openml.flows.get_flow_id(
             name=flow.name,

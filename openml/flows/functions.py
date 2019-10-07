@@ -309,11 +309,15 @@ def get_flow_id(
         )
     elif model is not None and name is not None:
         raise ValueError(
-            'Must provide either argument `model` or argument `name`, but both both.'
+            'Must provide either argument `model` or argument `name`, but not both.'
         )
 
     if model is not None:
         extension = openml.extensions.get_extension_by_model(model, raise_if_no_extension=True)
+        if extension is None:
+            # This should never happen and is only here to please mypy will be gone soon once the
+            # whole function is removed
+            raise TypeError(extension)
         flow = extension.model_to_flow(model)
         flow_name = flow.name
         external_version = flow.external_version
@@ -325,6 +329,7 @@ def get_flow_id(
         return flow_exists(name=flow_name, external_version=external_version)
     else:
         flows = list_flows(output_format='dataframe')
+        assert isinstance(flows, pd.DataFrame)  # Make mypy happy
         flows = flows.query('name == "{}"'.format(flow_name))
         return flows['id'].to_list()
 

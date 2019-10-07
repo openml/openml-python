@@ -48,7 +48,6 @@ print(flow_id)
 # flows with the same name for different versions of a software. This might be necessary if an
 # algorithm or implementation introduces, renames or drop hyperparameters over time.
 
-flow = openml.extensions.get_extension_by_model(clf).model_to_flow(clf)
 print(flow.name, flow.external_version)
 
 ####################################################################################################
