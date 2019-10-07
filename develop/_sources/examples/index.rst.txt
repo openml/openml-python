@@ -119,6 +119,26 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This tutorial discusses different ways to obtain the ID of a flow in order to perform further a...">
+
+.. only:: html
+
+    .. figure:: /examples/30_extended/images/thumb/sphx_glr_flow_id_tutorial_thumb.png
+
+        :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/30_extended/flow_id_tutorial
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="How to list and download datasets.">
 
 .. only:: html
