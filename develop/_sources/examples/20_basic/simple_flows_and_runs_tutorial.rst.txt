@@ -94,7 +94,7 @@ Running a model on a task
                            min_impurity_decrease=0.0, min_impurity_split=None,
                            min_samples_leaf=1, min_samples_split=2,
                            min_weight_fraction_leaf=0.0, n_estimators='warn',
-                           n_jobs=None, oob_score=False, random_state=54315,
+                           n_jobs=None, oob_score=False, random_state=46432,
                            verbose=0, warm_start=False)
     Dataset ID...: 20
     Dataset URL..: https://test.openml.org/d/20
@@ -122,7 +122,7 @@ Publishing the run
 
  .. code-block:: none
 
-    Run was uploaded to http://test.openml.org/r/76018
+    Run was uploaded to http://test.openml.org/r/76418
     The flow can be found at http://test.openml.org/f/106943
 
 
