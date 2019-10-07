@@ -324,6 +324,7 @@ def list_evaluations_setups(
     evals = list_evaluations(function=function, offset=offset, size=size, id=id, task=task,
                              setup=setup, flow=flow, uploader=uploader, tag=tag,
                              per_fold=per_fold, sort_order=sort_order, output_format='dataframe')
+
     # List setups
     # Split setups in evals into chunks of N setups as list_setups does not support large size
     df = pd.DataFrame()
