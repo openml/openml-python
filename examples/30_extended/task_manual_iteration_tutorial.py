@@ -13,8 +13,8 @@ but not OpenML's functionality to conduct runs.
 import openml
 
 ####################################################################################################
-# For this tutorial we will use the famous King+Rook versus King+Pawn on a A7 datasets, which has
-# the dataset ID 3 (`dataset on OpenML <https://www.openml.org/d/3>`_), and for there exist
+# For this tutorial we will use the famous King+Rook versus King+Pawn on A7 dataset, which has
+# the dataset ID 3 (`dataset on OpenML <https://www.openml.org/d/3>`_), and for which there exist
 # tasks with all important estimation procedures. It is small enough (less than 5000 samples) to
 # efficiently use it in an example.
 #
@@ -93,9 +93,9 @@ for repeat_idx in range(n_repeats):
     for fold_idx in range(n_folds):
         for sample_idx in range(n_samples):
             train_indices, test_indices = task.get_train_test_split_indices(
-                repeat=0,
-                fold=0,
-                sample=0,
+                repeat=repeat_idx,
+                fold=fold_idx,
+                sample=sample_idx,
             )
             X_train = X.loc[train_indices]
             y_train = y[train_indices]
@@ -128,9 +128,9 @@ for repeat_idx in range(n_repeats):
     for fold_idx in range(n_folds):
         for sample_idx in range(n_samples):
             train_indices, test_indices = task.get_train_test_split_indices(
-                repeat=0,
-                fold=0,
-                sample=0,
+                repeat=repeat_idx,
+                fold=fold_idx,
+                sample=sample_idx,
             )
             X_train = X.loc[train_indices]
             y_train = y[train_indices]
@@ -163,9 +163,9 @@ for repeat_idx in range(n_repeats):
     for fold_idx in range(n_folds):
         for sample_idx in range(n_samples):
             train_indices, test_indices = task.get_train_test_split_indices(
-                repeat=0,
-                fold=0,
-                sample=0,
+                repeat=repeat_idx,
+                fold=fold_idx,
+                sample=sample_idx,
             )
             X_train = X.loc[train_indices]
             y_train = y[train_indices]
