@@ -75,7 +75,7 @@ print(len(filtered_tasks))
 
 tasks = openml.tasks.list_tasks(tag='OpenML100')
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
-print("First 5 of {len(tasks)} tasks:")
+print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
 ############################################################################
@@ -83,7 +83,7 @@ print(tasks.head())
 
 tasks = openml.tasks.list_tasks(data_id=1471)
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
-print("First 5 of {len(tasks)} tasks:")
+print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
 ############################################################################
