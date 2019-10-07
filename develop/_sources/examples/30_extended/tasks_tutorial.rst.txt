@@ -54,9 +54,10 @@ We will start by simply listing only *supervised classification* tasks:
 
 
 
-**openml.tasks.list_tasks()** returns a dictionary of dictionaries, we convert it into a
+**openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, which we convert
+into a
 `pandas dataframe <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
-to have better visualization and easier access:
+to have better visualization capabilities and easier access:
 
 
 .. code-block:: default
@@ -67,7 +68,8 @@ to have better visualization and easier access:
     print("First 5 of %s tasks:" % len(tasks))
     print(tasks.head())
 
-    # The same can be obtained through lesser lines of code
+    # As conversion to a pandas dataframe is a common task, we have added this functionality to the
+    # OpenML-Python library which can be used by passing ``output_format='dataframe'``:
     tasks_df = openml.tasks.list_tasks(task_type_id=1, output_format='dataframe')
     print(tasks_df.head())
 
@@ -89,7 +91,7 @@ to have better visualization and easier access:
            'NumberOfMissingValues', 'NumberOfNumericFeatures',
            'NumberOfSymbolicFeatures', 'cost_matrix'],
           dtype='object')
-    First 5 of 3292 tasks:
+    First 5 of 3295 tasks:
        tid  ttid  ...  NumberOfSymbolicFeatures cost_matrix
     2    2     1  ...                      33.0         NaN
     3    3     1  ...                      37.0         NaN
@@ -207,8 +209,7 @@ Similar to listing tasks by task type, we can list tasks by tags:
 .. code-block:: default
 
 
-    tasks = openml.tasks.list_tasks(tag='OpenML100')
-    tasks = pd.DataFrame.from_dict(tasks, orient='index')
+    tasks = openml.tasks.list_tasks(tag='OpenML100', output_format='dataframe')
     print("First 5 of %s tasks:" % len(tasks))
     print(tasks.head())
 
@@ -240,8 +241,7 @@ Furthermore, we can list tasks based on the dataset id:
 .. code-block:: default
 
 
-    tasks = openml.tasks.list_tasks(data_id=1471)
-    tasks = pd.DataFrame.from_dict(tasks, orient='index')
+    tasks = openml.tasks.list_tasks(data_id=1471, output_format='dataframe')
     print("First 5 of %s tasks:" % len(tasks))
     print(tasks.head())
 
@@ -273,8 +273,7 @@ In addition, a size limit and an offset can be applied both separately and simul
 .. code-block:: default
 
 
-    tasks = openml.tasks.list_tasks(size=10, offset=50)
-    tasks = pd.DataFrame.from_dict(tasks, orient='index')
+    tasks = openml.tasks.list_tasks(size=10, offset=50, output_format='dataframe')
     print(tasks)
 
 
@@ -316,8 +315,7 @@ Finally, it is also possible to list all tasks on OpenML with:
 
 .. code-block:: default
 
-    tasks = openml.tasks.list_tasks()
-    tasks = pd.DataFrame.from_dict(tasks, orient='index')
+    tasks = openml.tasks.list_tasks(output_format='dataframe')
     print(len(tasks))
 
 
@@ -330,7 +328,15 @@ Finally, it is also possible to list all tasks on OpenML with:
 
  .. code-block:: none
 
-    19544
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/frame.py:7123: FutureWarning: Sorting because non-concatenation axis is not aligned. A future version
+    of pandas will change to not sort by default.
+
+    To accept the future behavior, pass 'sort=False'.
+
+    To retain the current behavior and silence the warning, pass 'sort=True'.
+
+      sort=sort,
+    19547
 
 
 
@@ -525,7 +531,7 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  30.197 seconds)
+   **Total running time of the script:** ( 0 minutes  30.436 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:

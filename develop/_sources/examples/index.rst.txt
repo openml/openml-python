@@ -199,6 +199,26 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Tasks define a target and a train/test split. Normally, they are the input to the function open...">
+
+.. only:: html
+
+    .. figure:: /examples/30_extended/images/thumb/sphx_glr_task_manual_iteration_tutorial_thumb.png
+
+        :ref:`sphx_glr_examples_30_extended_task_manual_iteration_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/30_extended/task_manual_iteration_tutorial
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Evalutions contain a concise summary of the results of all runs made. Each evaluation provides ...">
 
 .. only:: html
