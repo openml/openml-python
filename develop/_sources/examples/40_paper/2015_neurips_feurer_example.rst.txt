@@ -18,7 +18,7 @@ Publication
 ~~~~~~~~~~~
 
 | Efficient and Robust Automated Machine Learning
-| Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Springenberg, Manuel Blum and Frank Hutter  # noqa F401
+| Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Springenberg, Manuel Blum and Frank Hutter
 | In *Advances in Neural Information Processing Systems 28*, 2015
 | Available at http://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning.pdf
 
@@ -61,7 +61,7 @@ https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learnin
 
 
 
-The dataset IDs could be used directly to load the dataset and split the data into a training
+The dataset IDs could be used directly to load the dataset and split the data into a training set
 and a test set. However, to be reproducible, we will first obtain the respective tasks from
 OpenML, which define both the target feature and the train/test split.
 
@@ -69,7 +69,7 @@ OpenML, which define both the target feature and the train/test split.
    It is discouraged to work directly on datasets and only provide dataset IDs in a paper as
    this does not allow reproducibility (unclear splitting). Please do not use datasets but the
    respective tasks as basis for a paper and publish task IDS. This example is only given to
-   showcase the use OpenML-Python for a published paper and as a warning on how not to do it.
+   showcase the use of OpenML-Python for a published paper and as a warning on how not to do it.
    Please check the `OpenML documentation of tasks <https://docs.openml.org/#tasks>`_ if you
    want to learn more about them.
 
@@ -132,7 +132,7 @@ datasets can be found in the `online docs <https://docs.openml.org/#dataset-stat
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.623 seconds)
+   **Total running time of the script:** ( 0 minutes  2.636 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2015_neurips_feurer_example.py:
