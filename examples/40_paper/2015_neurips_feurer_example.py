@@ -10,10 +10,10 @@ Publication
 ~~~~~~~~~~~
 
 | Efficient and Robust Automated Machine Learning
-| Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Springenberg, Manuel Blum and Frank Hutter  # noqa F401
+| Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Springenberg, Manuel Blum and Frank Hutter
 | In *Advances in Neural Information Processing Systems 28*, 2015
 | Available at http://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning.pdf
-"""
+"""  # noqa F401
 
 import pandas as pd
 
@@ -36,7 +36,7 @@ dataset_ids = [
 ]
 
 ####################################################################################################
-# The dataset IDs could be used directly to load the dataset and split the data into a training
+# The dataset IDs could be used directly to load the dataset and split the data into a training set
 # and a test set. However, to be reproducible, we will first obtain the respective tasks from
 # OpenML, which define both the target feature and the train/test split.
 #
@@ -44,7 +44,7 @@ dataset_ids = [
 #    It is discouraged to work directly on datasets and only provide dataset IDs in a paper as
 #    this does not allow reproducibility (unclear splitting). Please do not use datasets but the
 #    respective tasks as basis for a paper and publish task IDS. This example is only given to
-#    showcase the use OpenML-Python for a published paper and as a warning on how not to do it.
+#    showcase the use of OpenML-Python for a published paper and as a warning on how not to do it.
 #    Please check the `OpenML documentation of tasks <https://docs.openml.org/#tasks>`_ if you
 #    want to learn more about them.
 
