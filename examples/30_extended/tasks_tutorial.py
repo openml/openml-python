@@ -31,16 +31,18 @@ import pandas as pd
 tasks = openml.tasks.list_tasks(task_type_id=1)
 
 ############################################################################
-# **openml.tasks.list_tasks()** returns a dictionary of dictionaries, we convert it into a
+# **openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, which we convert
+# into a
 # `pandas dataframe <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
-# to have better visualization and easier access:
+# to have better visualization capabilities and easier access:
 
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
 print(tasks.columns)
 print("First 5 of %s tasks:" % len(tasks))
 print(tasks.head())
 
-# The same can be obtained through lesser lines of code
+# As conversion to a pandas dataframe is a common task, we have added this functionality to the
+# OpenML-Python library which can be used by passing ``output_format='dataframe'``:
 tasks_df = openml.tasks.list_tasks(task_type_id=1, output_format='dataframe')
 print(tasks_df.head())
 
@@ -73,24 +75,21 @@ print(len(filtered_tasks))
 #
 # Similar to listing tasks by task type, we can list tasks by tags:
 
-tasks = openml.tasks.list_tasks(tag='OpenML100')
-tasks = pd.DataFrame.from_dict(tasks, orient='index')
+tasks = openml.tasks.list_tasks(tag='OpenML100', output_format='dataframe')
 print("First 5 of %s tasks:" % len(tasks))
 print(tasks.head())
 
 ############################################################################
 # Furthermore, we can list tasks based on the dataset id:
 
-tasks = openml.tasks.list_tasks(data_id=1471)
-tasks = pd.DataFrame.from_dict(tasks, orient='index')
+tasks = openml.tasks.list_tasks(data_id=1471, output_format='dataframe')
 print("First 5 of %s tasks:" % len(tasks))
 print(tasks.head())
 
 ############################################################################
 # In addition, a size limit and an offset can be applied both separately and simultaneously:
 
-tasks = openml.tasks.list_tasks(size=10, offset=50)
-tasks = pd.DataFrame.from_dict(tasks, orient='index')
+tasks = openml.tasks.list_tasks(size=10, offset=50, output_format='dataframe')
 print(tasks)
 
 ############################################################################
@@ -106,8 +105,7 @@ print(tasks)
 # Finally, it is also possible to list all tasks on OpenML with:
 
 ############################################################################
-tasks = openml.tasks.list_tasks()
-tasks = pd.DataFrame.from_dict(tasks, orient='index')
+tasks = openml.tasks.list_tasks(output_format='dataframe')
 print(len(tasks))
 
 ############################################################################

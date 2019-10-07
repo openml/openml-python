@@ -16,7 +16,7 @@ import pandas as pd
 # * List datasets
 #
 #   * Use the output_format parameter to select output type
-#   * Default gives 'dict' (other option: 'dataframe')
+#   * Default gives 'dict' (other option: 'dataframe', see below)
 
 openml_list = openml.datasets.list_datasets()  # returns a dict
 
