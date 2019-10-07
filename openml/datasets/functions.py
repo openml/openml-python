@@ -458,7 +458,8 @@ def get_dataset(
     If dataset is retrieved by name, a version may be specified.
     If no version is specified and multiple versions of the dataset exist,
     the earliest version of the dataset that is still active will be returned.
-    This scenario will raise an error instead if `exception_if_multiple` is `True`.
+    If no version is specified, multiple versions of the dataset exist and
+    ``exception_if_multiple`` is set to ``True``, this function will raise an exception.
 
     Parameters
     ----------
@@ -473,7 +474,7 @@ def get_dataset(
         Specifies the version if `dataset_id` is specified by name.
         If no version is specified, retrieve the least recent still active version.
     error_if_multiple : bool, optional (default=False)
-        If `True` raise an error if multiple datasets are found with matching criteria.
+        If ``True`` raise an error if multiple datasets are found with matching criteria.
 
     Returns
     -------
