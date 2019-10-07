@@ -59,7 +59,7 @@ print(flow_id)
 
 ####################################################################################################
 # We can also retrieve all flows for a given name:
-flow_ids = openml.flows.get_flow_id(name=flow.name, exact_version=False)
+flow_ids = openml.flows.get_flow_id(name=flow.name)
 print(flow_ids)
 
 ####################################################################################################
