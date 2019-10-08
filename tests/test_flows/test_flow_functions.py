@@ -303,3 +303,23 @@ class TestFlowFunctions(TestBase):
             # ensure that a new flow was created
             assert flow.flow_id is None
             assert "0.19.1" not in flow.dependencies
+
+    def test_get_flow_id(self):
+        clf = sklearn.tree.DecisionTreeClassifier()
+        flow = openml.extensions.get_extension_by_model(clf).model_to_flow(clf).publish()
+
+        self.assertEqual(openml.flows.get_flow_id(model=clf, exact_version=True), flow.flow_id)
+        flow_ids = openml.flows.get_flow_id(model=clf, exact_version=False)
+        self.assertIn(flow.flow_id, flow_ids)
+        self.assertGreater(len(flow_ids), 2)
+
+        # Check that the output of get_flow_id is identical if only the name is given, no matter
+        # whether exact_version is set to True or False.
+        flow_ids_exact_version_True = openml.flows.get_flow_id(name=flow.name, exact_version=True)
+        flow_ids_exact_version_False = openml.flows.get_flow_id(
+            name=flow.name,
+            exact_version=False,
+        )
+        self.assertEqual(flow_ids_exact_version_True, flow_ids_exact_version_False)
+        self.assertIn(flow.flow_id, flow_ids_exact_version_True)
+        self.assertGreater(len(flow_ids_exact_version_True), 2)
