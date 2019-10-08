@@ -37,6 +37,7 @@ python -c "import numpy; print('numpy %s' % numpy.__version__)"
 python -c "import scipy; print('scipy %s' % scipy.__version__)"
 
 if [[ "$EXAMPLES" == "true" ]]; then
+    conda install gxx_linux-64 gcc_linux-64 swig
     pip install -e '.[examples]'
 fi
 if [[ "$DOCTEST" == "true" ]]; then

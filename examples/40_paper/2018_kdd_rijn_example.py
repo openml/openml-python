@@ -12,13 +12,15 @@ Publication
 | In *Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining*, 2018
 | Available at https://dl.acm.org/citation.cfm?id=3220058
 """
-import fanova
 import json
 import logging
+
+import fanova
 import matplotlib.pyplot as plt
-import openml
 import pandas as pd
 import seaborn as sns
+
+import openml
 
 root = logging.getLogger()
 root.setLevel(logging.INFO)
@@ -32,8 +34,8 @@ root.setLevel(logging.INFO)
 # algorithm, what are generally its most important hyperparameters?
 #
 # This work is carried out on the OpenML-100 benchmark suite, which can be
-# obtained by `openml.study.get_suite('OpenML100')`. In this example, we
-# conduct the experiment on the Support Vector Machine (`flow_id=7707`)
+# obtained by ``openml.study.get_suite('OpenML100')``. In this example, we
+# conduct the experiment on the Support Vector Machine (``flow_id=7707``)
 # with specific kernel (we will perform a post-process filter operation for
 # this). We should set some other experimental parameters (number of results
 # per task, evaluation measure and the number of trees of the internal
@@ -42,8 +44,8 @@ root.setLevel(logging.INFO)
 # Note that we simplify the example in several ways
 # 1) We only consider numerical hyperparameters
 # 2) We consider all hyperparameters that are numerical (in reality, some
-#    hyperparameters might be inactive (e.g., `degree`) or irrelevant (e.g.,
-#    `random_state`)
+#    hyperparameters might be inactive (e.g., ``degree``) or irrelevant
+#    (e.g., ``random_state``)
 # 3) We assume all hyperparameters to be on uniform scale
 #
 # Any difference in conclusion between the actual paper and the presented
@@ -61,13 +63,17 @@ parameter_filters = {
 }
 evaluation_measure = 'predictive_accuracy'
 limit_per_task = 500
+limit_nr_tasks = 15
 n_trees = 16
 
 fanova_results = []
 # we will obtain all results from OpenML per task. Practice has shown that this places the bottleneck on the
 # communication with OpenML, and for iterated experimenting it is better to cache the results in a local file.
 for idx, task_id in enumerate(suite.tasks):
-    logging.info('Starting with task %d (%d/%d)' % (task_id, idx+1, len(suite.tasks)))
+    if limit_nr_tasks is not None and idx >= limit_nr_tasks:
+        continue
+    logging.info('Starting with task %d (%d/%d)' % (task_id, idx+1,
+                                                    len(suite.tasks) if limit_nr_tasks is None else limit_nr_tasks))
     evals = openml.evaluations.list_evaluations_setups(
         evaluation_measure, flow=[flow_id], task=[task_id], size=limit_per_task, output_format='dataframe')
 
@@ -75,7 +81,9 @@ for idx, task_id in enumerate(suite.tasks):
     # make a DataFrame consisting of all hyperparameters (which is a dict in setup['parameters']) and the performance
     # value (in setup['value']). The following line looks a bit complicated, but combines 2 tasks: a) combine
     # hyperparameters and performance data in a single dict, b) cast hyperparameter values to the appropriate format
-    # Note that
+    # Note that the ``json.loads(...)`` requires the content to be in JSON format, which is only the case for
+    # scikit-learn setups (and even there some legacy setups might violate this requirement). It will work for the
+    # setups that belong to the flows embedded in this example though.
     try:
         setups_evals = pd.DataFrame([dict(**{name: json.loads(value) for name, value in setup['parameters'].items()},
                                           **{performance_column: setup[performance_column]})
@@ -89,13 +97,18 @@ for idx, task_id in enumerate(suite.tasks):
     # in this simplified example, we only display numerical and float hyperparameters. For categorical hyperparameters,
     # the fanova library needs to be informed by using a configspace object.
     setups_evals = setups_evals.select_dtypes(include=['int64', 'float64'])
-    # drop rows with unique values. These are by definition not an interesting hyperparameter, e.g., `axis`, `verbose`
+    # drop rows with unique values. These are by definition not an interesting hyperparameter, e.g., ``axis``,
+    # ``verbose``.
     setups_evals = setups_evals[[c for c in list(setups_evals)
                                  if len(setups_evals[c].unique()) > 1 or c == performance_column]]
+    # We are done with processing ``setups_evals``. Note that we still might have some irrelevant hyperparameters, e.g.,
+    # ``random_state``. We have dropped some relevant hyperparameters, i.e., several categoricals. Let's check it out:
+    print(setups_evals.dtypes)
+
     # determine x values to pass to fanova library
-    parameter_names = [pname for pname in setups_evals.columns.values if pname != performance_column]
+    parameter_names = [pname for pname in setups_evals.columns.to_numpy() if pname != performance_column]
     evaluator = fanova.fanova.fANOVA(
-        X=setups_evals[parameter_names].values, Y=setups_evals[performance_column].values, n_trees=n_trees)
+        X=setups_evals[parameter_names].to_numpy(), Y=setups_evals[performance_column].to_numpy(), n_trees=n_trees)
     for idx, pname in enumerate(parameter_names):
         try:
             fanova_results.append({
@@ -104,16 +117,19 @@ for idx, task_id in enumerate(suite.tasks):
             })
         except RuntimeError as e:
             # functional ANOVA sometimes crashes with a RuntimeError, e.g., on tasks where the performance is constant
-            # for all configurations (there is no variance)
+            # for all configurations (there is no variance). We will skip these tasks (like the authors did in the
+            # paper).
             logging.warning('Task %d error: %s' % (task_id, e))
+            continue
 
-# transform fanova_results from a list of dicts into a DataFrame
+# transform ``fanova_results`` from a list of dicts into a DataFrame
 fanova_results = pd.DataFrame(fanova_results)
 
 ##############################################################################
-# make the boxplot of the variance contribution. Obviously, we can also use this data to make the Nemenyi plot, but this
-# relies on the rather complex `Orange` dependency (`pip install Orange3`). For the complete example, the reader is
-# referred to the more elaborate script (referred to earlier)
+# make the boxplot of the variance contribution. Obviously, we can also use
+# this data to make the Nemenyi plot, but this relies on the rather complex
+# ``Orange`` dependency (``pip install Orange3``). For the complete example,
+# the reader is referred to the more elaborate script (referred to earlier)
 fig, ax = plt.subplots()
 sns.boxplot(x='hyperparameter', y='fanova', data=fanova_results, ax=ax)
 ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')

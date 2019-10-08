@@ -52,6 +52,7 @@ setuptools.setup(name="openml",
                          'flaky',
                      ],
                      'examples': [
+                         'fanova',
                          'matplotlib',
                          'jupyter',
                          'notebook',
