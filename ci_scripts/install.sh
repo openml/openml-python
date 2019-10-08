@@ -44,7 +44,7 @@ if [[ "$DOCTEST" == "true" ]]; then
     pip install sphinx_bootstrap_theme
 fi
 if [[ "$DOCPUSH" == "true" ]]; then
-    conda install gxx_linux-64 gcc_linux-64 swig
+    conda install --yes gxx_linux-64 gcc_linux-64 swig
 fi
 if [[ "$COVERAGE" == "true" ]]; then
     pip install codecov pytest-cov
