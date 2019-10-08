@@ -236,11 +236,11 @@ expected format:</p>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">upload_did</span> <span class="o">=</span> <span class="n">diabetes_dataset</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;URL for dataset: </span><span class="si">%s</span><span class="s1">/data/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">upload_did</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{openml.config.server}</span><span class="s2">/data/</span><span class="si">{upload_did}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/54391
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/55102
 </pre></div>
 </div>
 </div>
@@ -312,11 +312,11 @@ OrderedDicts in the case of sparse data.</p>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">upload_did</span> <span class="o">=</span> <span class="n">weather_dataset</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;URL for dataset: </span><span class="si">%s</span><span class="s1">/data/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">upload_did</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{openml.config.server}</span><span class="s2">/data/</span><span class="si">{upload_did}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/54392
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/55103
 </pre></div>
 </div>
 </div>
@@ -379,11 +379,11 @@ call <code class="xref py py-func docutils literal notranslate"><span class="pre
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">upload_did</span> <span class="o">=</span> <span class="n">weather_dataset</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;URL for dataset: </span><span class="si">%s</span><span class="s1">/data/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">upload_did</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{openml.config.server}</span><span class="s2">/data/</span><span class="si">{upload_did}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/54393
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/55104
 </pre></div>
 </div>
 </div>
@@ -419,11 +419,11 @@ call <code class="xref py py-func docutils literal notranslate"><span class="pre
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">upload_did</span> <span class="o">=</span> <span class="n">xor_dataset</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;URL for dataset: </span><span class="si">%s</span><span class="s1">/data/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">upload_did</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{openml.config.server}</span><span class="s2">/data/</span><span class="si">{upload_did}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/54394
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/55105
 </pre></div>
 </div>
 </div>
@@ -498,17 +498,17 @@ None
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">upload_did</span> <span class="o">=</span> <span class="n">xor_dataset</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;URL for dataset: </span><span class="si">%s</span><span class="s1">/data/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">upload_did</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{openml.config.server}</span><span class="s2">/data/</span><span class="si">{upload_did}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/54395
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/55106
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.763 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.169 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-create-upload-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/0d1d1c06933bd6d32bda534cb0aa0e53/create_upload_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">create_upload_tutorial.py</span></code></a></p>

@@ -143,7 +143,7 @@ with scikit-learn and share the results online.</p>
 <span class="c1"># Publish the experiment on OpenML (optional, requires an API key.</span>
 <span class="c1"># You can get your own API key by signing up to OpenML.org)</span>
 <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;View the run online: </span><span class="si">%s</span><span class="s1">/run/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="n">run</span><span class="o">.</span><span class="n">run_id</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;View the run online: {openml.config.server}/run/{run.run_id}&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You can find more examples in our <a class="reference external" href="examples/index.html">examples gallery</a>.</p>

@@ -130,7 +130,7 @@ Download the OpenML task for the eeg-eye-state.
     # For this tutorial, our configuration publishes to the test server
     # as to not crowd the main server with runs created by examples.
     myrun = run.publish()
-    print("kNN on %s: http://test.openml.org/r/%d" % (data.name, myrun.run_id))
+    print(f"kNN on {data.name}: http://test.openml.org/r/{myrun.run_id}")
 
 
 
@@ -142,7 +142,7 @@ Download the OpenML task for the eeg-eye-state.
 
  .. code-block:: none
 
-    kNN on eeg-eye-state: http://test.openml.org/r/76726
+    kNN on eeg-eye-state: http://test.openml.org/r/77786
 
 
 
@@ -159,7 +159,7 @@ Download the OpenML task for the eeg-eye-state.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  12.759 seconds)
+   **Total running time of the script:** ( 0 minutes  12.657 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_introduction_tutorial.py:

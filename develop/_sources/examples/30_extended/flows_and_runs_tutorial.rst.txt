@@ -66,7 +66,7 @@ You can also ask for meta-data to automatically preprocess the data.
         dataset_format='array',
         target=dataset.default_target_attribute
     )
-    print("Categorical features: {}".format(categorical_indicator))
+    print(f"Categorical features: {categorical_indicator}")
     transformer = compose.ColumnTransformer(
         [('one_hot_encoder', preprocessing.OneHotEncoder(categories='auto'), categorical_indicator)])
     X = transformer.fit_transform(X)
@@ -131,7 +131,7 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
                         max_features='auto', max_leaf_nodes=None,
                         min_impurity_decrease=0.0, min_impurity_split=None,
                         min_samples_leaf=1, min_samples_split=2,
-                        min_weight_fraction_leaf=0.0, random_state=27152,
+                        min_weight_fraction_leaf=0.0, random_state=51840,
                         splitter='random')
     Dataset ID...: 68
     Dataset URL..: https://test.openml.org/d/68
@@ -162,7 +162,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/76728
+    Uploaded to http://test.openml.org/r/77793
 
 
 
@@ -247,7 +247,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/76729
+    Uploaded to http://test.openml.org/r/77794
 
 
 
@@ -342,7 +342,7 @@ them. Some tasks you could try (or browse openml.org):
 
         run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
         myrun = run.publish()
-        print("kNN on %s: http://test.openml.org/r/%d" % (data.name, myrun.run_id))
+        print(f"kNN on {data.name}: http://test.openml.org/r/{myrun.run_id}")
 
 
 
@@ -355,7 +355,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/76732
+    kNN on diabetes: http://test.openml.org/r/77796
 
 
 
@@ -372,7 +372,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  19.996 seconds)
+   **Total running time of the script:** ( 0 minutes  19.755 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:

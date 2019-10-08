@@ -65,7 +65,7 @@ to have better visualization capabilities and easier access:
 
     tasks = pd.DataFrame.from_dict(tasks, orient='index')
     print(tasks.columns)
-    print("First 5 of %s tasks:" % len(tasks))
+    print(f"First 5 of {len(tasks)} tasks:")
     print(tasks.head())
 
     # As conversion to a pandas dataframe is a common task, we have added this functionality to the
@@ -210,7 +210,7 @@ Similar to listing tasks by task type, we can list tasks by tags:
 
 
     tasks = openml.tasks.list_tasks(tag='OpenML100', output_format='dataframe')
-    print("First 5 of %s tasks:" % len(tasks))
+    print(f"First 5 of {len(tasks)} tasks:")
     print(tasks.head())
 
 
@@ -242,7 +242,7 @@ Furthermore, we can list tasks based on the dataset id:
 
 
     tasks = openml.tasks.list_tasks(data_id=1471, output_format='dataframe')
-    print("First 5 of %s tasks:" % len(tasks))
+    print(f"First 5 of {len(tasks)} tasks:")
     print(tasks.head())
 
 
@@ -531,7 +531,7 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  30.065 seconds)
+   **Total running time of the script:** ( 0 minutes  29.693 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:

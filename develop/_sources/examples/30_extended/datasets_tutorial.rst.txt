@@ -46,7 +46,7 @@ Exercise 0
         'NumberOfFeatures', 'NumberOfClasses'
     ]]
 
-    print("First 10 of %s datasets..." % len(datalist))
+    print(f"First 10 of {len(datalist)} datasets...")
     datalist.head(n=10)
 
     # The same can be done with lesser lines of code
@@ -117,9 +117,9 @@ Download datasets
     dataset = openml.datasets.get_dataset(1471)
 
     # Print a summary
-    print("This is dataset '%s', the target feature is '%s'" %
-          (dataset.name, dataset.default_target_attribute))
-    print("URL: %s" % dataset.url)
+    print(f"This is dataset '{dataset.name}', the target feature is "
+          f"'{dataset.default_target_attribute}'")
+    print(f"URL: {dataset.url}")
     print(dataset.description[:500])
 
 
@@ -287,7 +287,7 @@ Exercise 2
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.167 seconds)
+   **Total running time of the script:** ( 0 minutes  6.990 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:

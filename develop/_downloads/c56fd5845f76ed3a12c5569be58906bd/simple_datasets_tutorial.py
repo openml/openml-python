@@ -23,7 +23,7 @@ first_dataset_id = int(datasets_df['did'].iloc[0])
 dataset = openml.datasets.get_dataset(first_dataset_id)
 
 # Print a summary
-print("This is dataset '%s', the target feature is '%s'" %
-      (dataset.name, dataset.default_target_attribute))
-print("URL: %s" % dataset.url)
+print(f"This is dataset '{dataset.name}', the target feature is "
+      f"'{dataset.default_target_attribute}'")
+print(f"URL: {dataset.url}")
 print(dataset.description[:500])
