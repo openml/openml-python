@@ -41,7 +41,8 @@ root.setLevel(logging.INFO)
 # per task, evaluation measure and the number of trees of the internal
 # functional Anova) before the fun can begin.
 #
-# Note that we simplify the example in several ways
+# Note that we simplify the example in several ways:
+#
 # 1) We only consider numerical hyperparameters
 # 2) We consider all hyperparameters that are numerical (in reality, some
 #    hyperparameters might be inactive (e.g., ``degree``) or irrelevant
@@ -50,7 +51,7 @@ root.setLevel(logging.INFO)
 #
 # Any difference in conclusion between the actual paper and the presented
 # results is most likely due to one of these simplifications. For example,
-# # the hyperparameter C looks rather insignificant, whereas it is quite
+# the hyperparameter C looks rather insignificant, whereas it is quite
 # important when it is put on a log-scale. All these simplifications can be
 # addressed by defining a ConfigSpace. For a more elaborated example that uses
 # this, please see:
@@ -74,6 +75,7 @@ for idx, task_id in enumerate(suite.tasks):
         continue
     logging.info('Starting with task %d (%d/%d)' % (task_id, idx+1,
                                                     len(suite.tasks) if limit_nr_tasks is None else limit_nr_tasks))
+    # note that we explicitly only include tasks from the benchmark suite that was specified (as per the for-loop)
     evals = openml.evaluations.list_evaluations_setups(
         evaluation_measure, flow=[flow_id], task=[task_id], size=limit_per_task, output_format='dataframe')
 
