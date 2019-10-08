@@ -186,7 +186,7 @@ This also work with the actual model (generalizing the first part of this exampl
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.993 seconds)
+   **Total running time of the script:** ( 0 minutes  7.025 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flow_id_tutorial.py:
