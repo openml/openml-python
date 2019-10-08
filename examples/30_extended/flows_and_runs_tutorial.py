@@ -37,7 +37,7 @@ X, y, categorical_indicator, attribute_names = dataset.get_data(
     dataset_format='array',
     target=dataset.default_target_attribute
 )
-print("Categorical features: {}".format(categorical_indicator))
+print(f"Categorical features: {categorical_indicator}")
 transformer = compose.ColumnTransformer(
     [('one_hot_encoder', preprocessing.OneHotEncoder(categories='auto'), categorical_indicator)])
 X = transformer.fit_transform(X)
@@ -182,7 +182,7 @@ for task_id in [115, ]:  # Add further tasks. Disclaimer: they might take some t
 
     run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
     myrun = run.publish()
-    print("kNN on %s: http://test.openml.org/r/%d" % (data.name, myrun.run_id))
+    print(f"kNN on {data.name}: http://test.openml.org/r/{myrun.run_id}")
 
 
 ############################################################################

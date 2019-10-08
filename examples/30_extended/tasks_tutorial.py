@@ -38,7 +38,7 @@ tasks = openml.tasks.list_tasks(task_type_id=1)
 
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
 print(tasks.columns)
-print("First 5 of %s tasks:" % len(tasks))
+print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
 # As conversion to a pandas dataframe is a common task, we have added this functionality to the
@@ -76,14 +76,14 @@ print(len(filtered_tasks))
 # Similar to listing tasks by task type, we can list tasks by tags:
 
 tasks = openml.tasks.list_tasks(tag='OpenML100', output_format='dataframe')
-print("First 5 of %s tasks:" % len(tasks))
+print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
 ############################################################################
 # Furthermore, we can list tasks based on the dataset id:
 
 tasks = openml.tasks.list_tasks(data_id=1471, output_format='dataframe')
-print("First 5 of %s tasks:" % len(tasks))
+print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
 ############################################################################

@@ -38,7 +38,7 @@ Example
     # Publish the experiment on OpenML (optional, requires an API key.
     # You can get your own API key by signing up to OpenML.org)
     run.publish()
-    print('View the run online: %s/run/%d' % (openml.config.server, run.run_id))
+    print(f'View the run online: {openml.config.server}/run/{run.run_id}')
 
 You can find more examples in our `examples gallery <examples/index.html>`_.
 
