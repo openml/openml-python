@@ -36,12 +36,6 @@ pip install -e '.[test]'
 python -c "import numpy; print('numpy %s' % numpy.__version__)"
 python -c "import scipy; print('scipy %s' % scipy.__version__)"
 
-if [[ "$EXAMPLES" == "true" ]]; then
-    pip install -e '.[examples]'
-fi
-if [[ "$DOCTEST" == "true" ]]; then
-    pip install sphinx_bootstrap_theme
-fi
 if [[ "$COVERAGE" == "true" ]]; then
     pip install codecov pytest-cov
 fi
