@@ -39,6 +39,7 @@ python -c "import scipy; print('scipy %s' % scipy.__version__)"
 if [[ "$EXAMPLES" == "true" ]]; then
     conda install --yes gxx_linux-64 gcc_linux-64 swig
     pip install -e '.[examples]'
+    pip install -e '.[examples_unix]'
 fi
 if [[ "$DOCTEST" == "true" ]]; then
     pip install sphinx_bootstrap_theme
@@ -46,6 +47,7 @@ fi
 if [[ "$DOCPUSH" == "true" ]]; then
     conda install --yes gxx_linux-64 gcc_linux-64 swig
     pip install -e '.[examples]'
+    pip install -e '.[examples_unix]'
 fi
 if [[ "$COVERAGE" == "true" ]]; then
     pip install codecov pytest-cov

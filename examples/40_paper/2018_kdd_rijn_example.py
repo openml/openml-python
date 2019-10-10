@@ -4,6 +4,9 @@ van Rijn and Hutter (2018)
 
 A tutorial on how to reproduce the paper *Hyperparameter Importance Across Datasets*.
 
+This is a Unix-only tutorial, as the requirements can not be satisfied on a Windows machine (Untested on other
+systems).
+
 Publication
 ~~~~~~~~~~~
 
@@ -14,7 +17,11 @@ Publication
 """
 import json
 import logging
+import sys
 
+if sys.platform == 'win32':  # noqa
+    logging.warning('The pyrfr library (requirement of fanova) can currently not be installed on Windows systems')
+    exit()
 import fanova
 import matplotlib.pyplot as plt
 import pandas as pd
