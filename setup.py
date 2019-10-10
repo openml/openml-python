@@ -63,7 +63,7 @@ setuptools.setup(name="openml",
                          'seaborn'
                      ],
                      'examples_unix': [
-                        'fanova',
+                         'fanova',
                      ]
                  },
                  test_suite="pytest",
