@@ -56,7 +56,7 @@ import matplotlib.pyplot as plt
 sns.set_style("darkgrid")
 
 
-def hide_current_axis():
+def hide_current_axis(*args, **kwds):
     plt.gca().set_visible(False)
 
 
