@@ -60,6 +60,6 @@ for task_id in tasks[:3]:
 # ================
 #
 # * `Advanced benchmarking suites tutorial <../30_extended/suites_tutorial.html>`_
-# * `Benchmarking studies tutorial <../30_extended/suites_tutorial.html>`_
+# * `Benchmarking studies tutorial <../30_extended/studies_tutorial.html>`_
 # * `Using studies to compare linear and non-linear classifiers
 #   <../40_paper/2018_ida_strang_example.html>`_
