@@ -105,6 +105,8 @@
 <li><a class="reference internal" href="#">Datasets</a><ul>
 <li><a class="reference internal" href="#list-datasets">List datasets</a></li>
 <li><a class="reference internal" href="#download-a-dataset">Download a dataset</a></li>
+<li><a class="reference internal" href="#load-a-dataset">Load a dataset</a></li>
+<li><a class="reference internal" href="#visualize-the-dataset">Visualize the dataset</a></li>
 </ul>
 </li>
 </ul>
@@ -119,7 +121,11 @@
 </div>
 <div class="sphx-glr-example-title section" id="datasets">
 <span id="sphx-glr-examples-20-basic-simple-datasets-tutorial-py"></span><h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h1>
-<p>A basic tutorial on how to list and download datasets.</p>
+<p>A basic tutorial on how to list, load and visualize datasets.</p>
+<p>In general, we recommend working with tasks, so that the results can
+be easily reproduced. Furthermore, the results can be compared to existing results
+at OpenML. However, for the purposes of this tutorial, we are going to work with
+the datasets directly.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
 </pre></div>
 </div>
@@ -148,8 +154,8 @@
 </div>
 <div class="section" id="download-a-dataset">
 <h2>Download a dataset<a class="headerlink" href="#download-a-dataset" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">first_dataset_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">datasets_df</span><span class="p">[</span><span class="s1">&#39;did&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">first_dataset_id</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Iris dataset https://www.openml.org/d/61</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">61</span><span class="p">)</span>
 
 <span class="c1"># Print a summary</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;This is dataset &#39;</span><span class="si">{dataset.name}</span><span class="s2">&#39;, the target feature is &quot;</span>
@@ -159,16 +165,54 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>This is dataset &#39;anneal&#39;, the target feature is &#39;class&#39;
-URL: https://www.openml.org/data/v1/download/1666876/anneal.arff
-**Author**: Unknown. Donated by David Sterling and Wray Buntine
-**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/Annealing) - 1990
-**Please cite**: [UCI](https://archive.ics.uci.edu/ml/citation_policy.html)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>This is dataset &#39;iris&#39;, the target feature is &#39;class&#39;
+URL: https://www.openml.org/data/v1/download/61/iris.arff
+**Author**: R.A. Fisher
+**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/Iris) - 1936 - Donated by Michael Marshall
+**Please cite**:
 
-The original Annealing dataset from UCI. The exact meaning of the features and classes is largely unknown. Annealing, in metallurgy and materials science, is a heat treatment that alters the physical and sometimes chemical properties of a material to increase its ductility and
+**Iris Plants Database**
+This is perhaps the best known database to be found in the pattern recognition literature.  Fisher&#39;s paper is a classic in the field and is referenced frequently to this day.  (See Duda &amp; Hart, for example.)  The data set contains 3 classes of 50 instances each, where each class refers to a type of iris plant.  One class
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.734 seconds)</p>
+</div>
+<div class="section" id="load-a-dataset">
+<h2>Load a dataset<a class="headerlink" href="#load-a-dataset" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># X - An array/dataframe where each row represents one example with</span>
+<span class="c1"># the corresponding feature values.</span>
+<span class="c1"># y - the classes for each example</span>
+<span class="c1"># categorical_indicator - an array that indicates which feature is categorical</span>
+<span class="c1"># attribute_names - the names of the features for the examples (X) and</span>
+<span class="c1"># target feature (y)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_indicator</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+    <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">,</span>
+    <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="visualize-the-dataset">
+<h2>Visualize the dataset<a class="headerlink" href="#visualize-the-dataset" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s2">&quot;darkgrid&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">hide_current_axis</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+
+<span class="c1"># We combine all the data so that we can map the different</span>
+<span class="c1"># examples to different colors according to the classes.</span>
+<span class="n">combined_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">iris_plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">combined_data</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;class&quot;</span><span class="p">)</span>
+<span class="n">iris_plot</span><span class="o">.</span><span class="n">map_upper</span><span class="p">(</span><span class="n">hide_current_axis</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../_images/sphx_glr_simple_datasets_tutorial_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_simple_datasets_tutorial_001.png" />
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.155 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-20-basic-simple-datasets-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c56fd5845f76ed3a12c5569be58906bd/simple_datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">simple_datasets_tutorial.py</span></code></a></p>

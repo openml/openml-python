@@ -46,26 +46,6 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A basic tutorial on how to list and download datasets.">
-
-.. only:: html
-
-    .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_datasets_tutorial_thumb.png
-
-        :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /examples/20_basic/simple_datasets_tutorial
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="A simple tutorial on how to train/run a model and how to upload the results.">
 
 .. only:: html
@@ -103,6 +83,26 @@ Introductory examples to the usage of the OpenML python connector.
    :hidden:
 
    /examples/20_basic/introduction_tutorial
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A basic tutorial on how to list, load and visualize datasets.">
+
+.. only:: html
+
+    .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_datasets_tutorial_thumb.png
+
+        :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/20_basic/simple_datasets_tutorial
 .. raw:: html
 
     <div style='clear:both'></div>
@@ -314,26 +314,6 @@ its use in recent publications.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to reproduce the paper *Hyperparameter Importance Across Datasets*.">
-
-.. only:: html
-
-    .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_kdd_rijn_example_thumb.png
-
-        :ref:`sphx_glr_examples_40_paper_2018_kdd_rijn_example.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /examples/40_paper/2018_kdd_rijn_example
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to get the datasets used in the paper introducing *Auto-sklearn* by Feurer et...">
 
 .. only:: html
@@ -371,6 +351,26 @@ its use in recent publications.
    :hidden:
 
    /examples/40_paper/2018_ida_strang_example
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to reproduce the paper *Hyperparameter Importance Across Datasets*.">
+
+.. only:: html
+
+    .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_kdd_rijn_example_thumb.png
+
+        :ref:`sphx_glr_examples_40_paper_2018_kdd_rijn_example.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/40_paper/2018_kdd_rijn_example
 .. raw:: html
 
     <div style='clear:both'></div>

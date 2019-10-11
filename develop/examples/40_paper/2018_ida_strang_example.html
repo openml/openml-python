@@ -173,19 +173,22 @@ values.</p>
 
 <span class="c1"># adds column that indicates the difference between the two classifiers</span>
 <span class="n">evaluations</span><span class="p">[</span><span class="s1">&#39;diff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">evaluations</span><span class="p">[</span><span class="n">flow_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">-</span> <span class="n">evaluations</span><span class="p">[</span><span class="n">flow_ids</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
-
-<span class="c1"># makes the s-plot</span>
-<span class="n">fig_splot</span><span class="p">,</span> <span class="n">ax_splot</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>makes the s-plot</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig_splot</span><span class="p">,</span> <span class="n">ax_splot</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">ax_splot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">evaluations</span><span class="p">)),</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">evaluations</span><span class="p">[</span><span class="s1">&#39;diff&#39;</span><span class="p">]))</span>
 <span class="n">ax_splot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">classifier_family</span><span class="p">)</span>
 <span class="n">ax_splot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Dataset (sorted)&#39;</span><span class="p">)</span>
 <span class="n">ax_splot</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;difference between linear and non-linear classifier&#39;</span><span class="p">)</span>
 <span class="n">ax_splot</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-
-<span class="c1"># adds column that indicates the difference between the two classifiers</span>
-<span class="k">def</span> <span class="nf">determine_class</span><span class="p">(</span><span class="n">val_lin</span><span class="p">,</span> <span class="n">val_nonlin</span><span class="p">):</span>
+</pre></div>
+</div>
+<img alt="../../_images/sphx_glr_2018_ida_strang_example_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_2018_ida_strang_example_001.png" />
+<p>adds column that indicates the difference between the two classifiers,
+needed for the scatter plot</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">determine_class</span><span class="p">(</span><span class="n">val_lin</span><span class="p">,</span> <span class="n">val_nonlin</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">val_lin</span> <span class="o">&lt;</span> <span class="n">val_nonlin</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">class_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">elif</span> <span class="n">val_nonlin</span> <span class="o">&lt;</span> <span class="n">val_lin</span><span class="p">:</span>
@@ -197,7 +200,7 @@ values.</p>
 <span class="n">evaluations</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">evaluations</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
     <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">determine_class</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">flow_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">row</span><span class="p">[</span><span class="n">flow_ids</span><span class="p">[</span><span class="mi">1</span><span class="p">]]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="c1"># makes the scatter plot</span>
+<span class="c1"># does the plotting and formatting</span>
 <span class="n">fig_scatter</span><span class="p">,</span> <span class="n">ax_scatter</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">class_val</span> <span class="ow">in</span> <span class="n">class_values</span><span class="p">:</span>
     <span class="n">df_class</span> <span class="o">=</span> <span class="n">evaluations</span><span class="p">[</span><span class="n">evaluations</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">class_val</span><span class="p">]</span>
@@ -213,13 +216,22 @@ values.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<ul class="sphx-glr-horizontal">
-<li><img alt="../../_images/sphx_glr_2018_ida_strang_example_001.png" class="sphx-glr-multi-img" src="../../_images/sphx_glr_2018_ida_strang_example_001.png" />
-</li>
-<li><img alt="../../_images/sphx_glr_2018_ida_strang_example_002.png" class="sphx-glr-multi-img" src="../../_images/sphx_glr_2018_ida_strang_example_002.png" />
-</li>
-</ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.222 seconds)</p>
+<img alt="../../_images/sphx_glr_2018_ida_strang_example_002.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_2018_ida_strang_example_002.png" />
+<p>makes a scatter plot where each data point represents the performance of the
+two algorithms on various axis (not in the paper)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig_diagplot</span><span class="p">,</span> <span class="n">ax_diagplot</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax_diagplot</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+<span class="n">ax_diagplot</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="n">ax_diagplot</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">],</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="n">ax_diagplot</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="n">ax_diagplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">evaluations</span><span class="p">[</span><span class="n">flow_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">evaluations</span><span class="p">[</span><span class="n">flow_ids</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">ax_diagplot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">measure</span><span class="p">)</span>
+<span class="n">ax_diagplot</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">measure</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../_images/sphx_glr_2018_ida_strang_example_003.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_2018_ida_strang_example_003.png" />
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.457 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-ida-strang-example-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ae217469b5304eb1a9415c36e1db590f/2018_ida_strang_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_ida_strang_example.py</span></code></a></p>

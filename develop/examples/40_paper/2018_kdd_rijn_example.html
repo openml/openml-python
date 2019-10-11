@@ -119,16 +119,271 @@
 <div class="sphx-glr-example-title section" id="van-rijn-and-hutter-2018">
 <span id="sphx-glr-examples-40-paper-2018-kdd-rijn-example-py"></span><h1>van Rijn and Hutter (2018)<a class="headerlink" href="#van-rijn-and-hutter-2018" title="Permalink to this headline">¶</a></h1>
 <p>A tutorial on how to reproduce the paper <em>Hyperparameter Importance Across Datasets</em>.</p>
+<p>This is a Unix-only tutorial, as the requirements can not be satisfied on a Windows machine (Untested on other
+systems).</p>
 <div class="section" id="publication">
 <h2>Publication<a class="headerlink" href="#publication" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line">Hyperparameter importance across datasets</div>
-<div class="line">Jan van Rijn and Frank Hutter</div>
+<div class="line">Jan N. van Rijn and Frank Hutter</div>
 <div class="line">In <em>Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery &amp; Data Mining</em>, 2018</div>
 <div class="line">Available at <a class="reference external" href="https://dl.acm.org/citation.cfm?id=3220058">https://dl.acm.org/citation.cfm?id=3220058</a></div>
 </div>
-<p>This is currently a placeholder.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.047 seconds)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s1">&#39;win32&#39;</span><span class="p">:</span>  <span class="c1"># noqa</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;The pyrfr library (requirement of fanova) can currently not be installed on Windows systems&#39;</span><span class="p">)</span>
+    <span class="n">exit</span><span class="p">()</span>
+<span class="kn">import</span> <span class="nn">fanova</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="kn">import</span> <span class="nn">openml</span>
+
+<span class="n">root</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="n">root</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With the advent of automated machine learning, automated hyperparameter
+optimization methods are by now routinely used in data mining. However, this
+progress is not yet matched by equal progress on automatic analyses that
+yield information beyond performance-optimizing hyperparameter settings.
+In this example, we aim to answer the following two questions: Given an
+algorithm, what are generally its most important hyperparameters?</p>
+<p>This work is carried out on the OpenML-100 benchmark suite, which can be
+obtained by <code class="docutils literal notranslate"><span class="pre">openml.study.get_suite('OpenML100')</span></code>. In this example, we
+conduct the experiment on the Support Vector Machine (<code class="docutils literal notranslate"><span class="pre">flow_id=7707</span></code>)
+with specific kernel (we will perform a post-process filter operation for
+this). We should set some other experimental parameters (number of results
+per task, evaluation measure and the number of trees of the internal
+functional Anova) before the fun can begin.</p>
+<p>Note that we simplify the example in several ways:</p>
+<ol class="arabic simple">
+<li><p>We only consider numerical hyperparameters</p></li>
+<li><p>We consider all hyperparameters that are numerical (in reality, some
+hyperparameters might be inactive (e.g., <code class="docutils literal notranslate"><span class="pre">degree</span></code>) or irrelevant
+(e.g., <code class="docutils literal notranslate"><span class="pre">random_state</span></code>)</p></li>
+<li><p>We assume all hyperparameters to be on uniform scale</p></li>
+</ol>
+<p>Any difference in conclusion between the actual paper and the presented
+results is most likely due to one of these simplifications. For example,
+the hyperparameter C looks rather insignificant, whereas it is quite
+important when it is put on a log-scale. All these simplifications can be
+addressed by defining a ConfigSpace. For a more elaborated example that uses
+this, please see:
+<a class="reference external" href="https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdccc7b9265/examples/plot/plot_fanova_aggregates.py">https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdccc7b9265/examples/plot/plot_fanova_aggregates.py</a> # noqa F401</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">suite</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">get_suite</span><span class="p">(</span><span class="s1">&#39;OpenML100&#39;</span><span class="p">)</span>
+<span class="n">flow_id</span> <span class="o">=</span> <span class="mi">7707</span>
+<span class="n">parameter_filters</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;sklearn.svm.classes.SVC(17)_kernel&#39;</span><span class="p">:</span> <span class="s1">&#39;sigmoid&#39;</span>
+<span class="p">}</span>
+<span class="n">evaluation_measure</span> <span class="o">=</span> <span class="s1">&#39;predictive_accuracy&#39;</span>
+<span class="n">limit_per_task</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">limit_nr_tasks</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">n_trees</span> <span class="o">=</span> <span class="mi">16</span>
+
+<span class="n">fanova_results</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1"># we will obtain all results from OpenML per task. Practice has shown that this places the bottleneck on the</span>
+<span class="c1"># communication with OpenML, and for iterated experimenting it is better to cache the results in a local file.</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">suite</span><span class="o">.</span><span class="n">tasks</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">limit_nr_tasks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="n">limit_nr_tasks</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Starting with task </span><span class="si">%d</span><span class="s1"> (</span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                                    <span class="nb">len</span><span class="p">(</span><span class="n">suite</span><span class="o">.</span><span class="n">tasks</span><span class="p">)</span> <span class="k">if</span> <span class="n">limit_nr_tasks</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">limit_nr_tasks</span><span class="p">))</span>
+    <span class="c1"># note that we explicitly only include tasks from the benchmark suite that was specified (as per the for-loop)</span>
+    <span class="n">evals</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations_setups</span><span class="p">(</span>
+        <span class="n">evaluation_measure</span><span class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="p">[</span><span class="n">flow_id</span><span class="p">],</span> <span class="n">task</span><span class="o">=</span><span class="p">[</span><span class="n">task_id</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">limit_per_task</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span>
+
+    <span class="n">performance_column</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span>
+    <span class="c1"># make a DataFrame consisting of all hyperparameters (which is a dict in setup[&#39;parameters&#39;]) and the performance</span>
+    <span class="c1"># value (in setup[&#39;value&#39;]). The following line looks a bit complicated, but combines 2 tasks: a) combine</span>
+    <span class="c1"># hyperparameters and performance data in a single dict, b) cast hyperparameter values to the appropriate format</span>
+    <span class="c1"># Note that the ``json.loads(...)`` requires the content to be in JSON format, which is only the case for</span>
+    <span class="c1"># scikit-learn setups (and even there some legacy setups might violate this requirement). It will work for the</span>
+    <span class="c1"># setups that belong to the flows embedded in this example though.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">setups_evals</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="nb">dict</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">setup</span><span class="p">[</span><span class="s1">&#39;parameters&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+                                          <span class="o">**</span><span class="p">{</span><span class="n">performance_column</span><span class="p">:</span> <span class="n">setup</span><span class="p">[</span><span class="n">performance_column</span><span class="p">]})</span>
+                                     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">setup</span> <span class="ow">in</span> <span class="n">evals</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()])</span>
+    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Task </span><span class="si">%d</span><span class="s1"> error: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">continue</span>
+    <span class="c1"># apply our filters, to have only the setups that comply to the hyperparameters we want</span>
+    <span class="k">for</span> <span class="n">filter_key</span><span class="p">,</span> <span class="n">filter_value</span> <span class="ow">in</span> <span class="n">parameter_filters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">setups_evals</span> <span class="o">=</span> <span class="n">setups_evals</span><span class="p">[</span><span class="n">setups_evals</span><span class="p">[</span><span class="n">filter_key</span><span class="p">]</span> <span class="o">==</span> <span class="n">filter_value</span><span class="p">]</span>
+    <span class="c1"># in this simplified example, we only display numerical and float hyperparameters. For categorical hyperparameters,</span>
+    <span class="c1"># the fanova library needs to be informed by using a configspace object.</span>
+    <span class="n">setups_evals</span> <span class="o">=</span> <span class="n">setups_evals</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;int64&#39;</span><span class="p">,</span> <span class="s1">&#39;float64&#39;</span><span class="p">])</span>
+    <span class="c1"># drop rows with unique values. These are by definition not an interesting hyperparameter, e.g., ``axis``,</span>
+    <span class="c1"># ``verbose``.</span>
+    <span class="n">setups_evals</span> <span class="o">=</span> <span class="n">setups_evals</span><span class="p">[[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">setups_evals</span><span class="p">)</span>
+                                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">setups_evals</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">c</span> <span class="o">==</span> <span class="n">performance_column</span><span class="p">]]</span>
+    <span class="c1"># We are done with processing ``setups_evals``. Note that we still might have some irrelevant hyperparameters, e.g.,</span>
+    <span class="c1"># ``random_state``. We have dropped some relevant hyperparameters, i.e., several categoricals. Let&#39;s check it out:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">setups_evals</span><span class="o">.</span><span class="n">dtypes</span><span class="p">)</span>
+
+    <span class="c1"># determine x values to pass to fanova library</span>
+    <span class="n">parameter_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">pname</span> <span class="k">for</span> <span class="n">pname</span> <span class="ow">in</span> <span class="n">setups_evals</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="k">if</span> <span class="n">pname</span> <span class="o">!=</span> <span class="n">performance_column</span><span class="p">]</span>
+    <span class="n">evaluator</span> <span class="o">=</span> <span class="n">fanova</span><span class="o">.</span><span class="n">fanova</span><span class="o">.</span><span class="n">fANOVA</span><span class="p">(</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">setups_evals</span><span class="p">[</span><span class="n">parameter_names</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">Y</span><span class="o">=</span><span class="n">setups_evals</span><span class="p">[</span><span class="n">performance_column</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">n_trees</span><span class="o">=</span><span class="n">n_trees</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">pname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parameter_names</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fanova_results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s1">&#39;hyperparameter&#39;</span><span class="p">:</span> <span class="n">pname</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pname</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">35</span> <span class="k">else</span> <span class="s1">&#39;[...] </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pname</span><span class="p">[</span><span class="o">-</span><span class="mi">30</span><span class="p">:],</span>
+                <span class="s1">&#39;fanova&#39;</span><span class="p">:</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">quantify_importance</span><span class="p">([</span><span class="n">idx</span><span class="p">])[(</span><span class="n">idx</span><span class="p">,)][</span><span class="s1">&#39;individual importance&#39;</span><span class="p">]</span>
+            <span class="p">})</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># functional ANOVA sometimes crashes with a RuntimeError, e.g., on tasks where the performance is constant</span>
+            <span class="c1"># for all configurations (there is no variance). We will skip these tasks (like the authors did in the</span>
+            <span class="c1"># paper).</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Task </span><span class="si">%d</span><span class="s1"> error: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+            <span class="k">continue</span>
+
+<span class="c1"># transform ``fanova_results`` from a list of dicts into a DataFrame</span>
+<span class="n">fanova_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">fanova_results</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+sklearn.svm.classes.SVC(17)_C               float64
+sklearn.svm.classes.SVC(17)_coef0           float64
+sklearn.svm.classes.SVC(17)_degree            int64
+sklearn.svm.classes.SVC(17)_gamma           float64
+sklearn.svm.classes.SVC(17)_random_state      int64
+sklearn.svm.classes.SVC(17)_tol             float64
+value                                       float64
+dtype: object
+</pre></div>
+</div>
+<p>make the boxplot of the variance contribution. Obviously, we can also use
+this data to make the Nemenyi plot, but this relies on the rather complex
+<code class="docutils literal notranslate"><span class="pre">Orange</span></code> dependency (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">Orange3</span></code>). For the complete example,
+the reader is referred to the more elaborate script (referred to earlier)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;hyperparameter&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;fanova&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">fanova_results</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Variance Contribution&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../_images/sphx_glr_2018_kdd_rijn_example_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_2018_kdd_rijn_example_001.png" />
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  21.033 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-kdd-rijn-example-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/fb4c80b20c8429a4165b670554f3d313/2018_kdd_rijn_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_kdd_rijn_example.py</span></code></a></p>

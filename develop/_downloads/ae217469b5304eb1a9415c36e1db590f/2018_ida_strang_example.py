@@ -61,7 +61,10 @@ evaluations = evaluations.join(data_qualities, how='inner')
 # adds column that indicates the difference between the two classifiers
 evaluations['diff'] = evaluations[flow_ids[0]] - evaluations[flow_ids[1]]
 
+
+##############################################################################
 # makes the s-plot
+
 fig_splot, ax_splot = plt.subplots()
 ax_splot.plot(range(len(evaluations)), sorted(evaluations['diff']))
 ax_splot.set_title(classifier_family)
@@ -71,7 +74,10 @@ ax_splot.grid(linestyle='--', axis='y')
 plt.show()
 
 
-# adds column that indicates the difference between the two classifiers
+##############################################################################
+# adds column that indicates the difference between the two classifiers,
+# needed for the scatter plot
+
 def determine_class(val_lin, val_nonlin):
     if val_lin < val_nonlin:
         return class_values[0]
@@ -84,7 +90,7 @@ def determine_class(val_lin, val_nonlin):
 evaluations['class'] = evaluations.apply(
     lambda row: determine_class(row[flow_ids[0]], row[flow_ids[1]]), axis=1)
 
-# makes the scatter plot
+# does the plotting and formatting
 fig_scatter, ax_scatter = plt.subplots()
 for class_val in class_values:
     df_class = evaluations[evaluations['class'] == class_val]
@@ -97,4 +103,18 @@ ax_scatter.set_ylabel(meta_features[1])
 ax_scatter.legend()
 ax_scatter.set_xscale('log')
 ax_scatter.set_yscale('log')
+plt.show()
+
+##############################################################################
+# makes a scatter plot where each data point represents the performance of the
+# two algorithms on various axis (not in the paper)
+
+fig_diagplot, ax_diagplot = plt.subplots()
+ax_diagplot.grid(linestyle='--')
+ax_diagplot.plot([0, 1], ls="-", color="black")
+ax_diagplot.plot([0.2, 1.2], ls="--", color="black")
+ax_diagplot.plot([-0.2, 0.8], ls="--", color="black")
+ax_diagplot.scatter(evaluations[flow_ids[0]], evaluations[flow_ids[1]])
+ax_diagplot.set_xlabel(measure)
+ax_diagplot.set_ylabel(measure)
 plt.show()

@@ -11,13 +11,18 @@
 Datasets
 ========
 
-A basic tutorial on how to list and download datasets.
+A basic tutorial on how to list, load and visualize datasets.
+
+In general, we recommend working with tasks, so that the results can
+be easily reproduced. Furthermore, the results can be compared to existing results
+at OpenML. However, for the purposes of this tutorial, we are going to work with
+the datasets directly.
 
 
 .. code-block:: default
 
-    import openml
 
+    import openml
 
 
 
@@ -67,8 +72,8 @@ Download a dataset
 .. code-block:: default
 
 
-    first_dataset_id = int(datasets_df['did'].iloc[0])
-    dataset = openml.datasets.get_dataset(first_dataset_id)
+    # Iris dataset https://www.openml.org/d/61
+    dataset = openml.datasets.get_dataset(61)
 
     # Print a summary
     print(f"This is dataset '{dataset.name}', the target feature is "
@@ -79,26 +84,83 @@ Download a dataset
 
 
 
+
 .. rst-class:: sphx-glr-script-out
 
  Out:
 
  .. code-block:: none
 
-    This is dataset 'anneal', the target feature is 'class'
-    URL: https://www.openml.org/data/v1/download/1666876/anneal.arff
-    **Author**: Unknown. Donated by David Sterling and Wray Buntine  
-    **Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/Annealing) - 1990  
-    **Please cite**: [UCI](https://archive.ics.uci.edu/ml/citation_policy.html)  
+    This is dataset 'iris', the target feature is 'class'
+    URL: https://www.openml.org/data/v1/download/61/iris.arff
+    **Author**: R.A. Fisher  
+    **Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/Iris) - 1936 - Donated by Michael Marshall  
+    **Please cite**:   
 
-    The original Annealing dataset from UCI. The exact meaning of the features and classes is largely unknown. Annealing, in metallurgy and materials science, is a heat treatment that alters the physical and sometimes chemical properties of a material to increase its ductility and
+    **Iris Plants Database**  
+    This is perhaps the best known database to be found in the pattern recognition literature.  Fisher's paper is a classic in the field and is referenced frequently to this day.  (See Duda & Hart, for example.)  The data set contains 3 classes of 50 instances each, where each class refers to a type of iris plant.  One class 
+
+
+
+Load a dataset
+==============
+
+
+.. code-block:: default
+
+
+    # X - An array/dataframe where each row represents one example with
+    # the corresponding feature values.
+    # y - the classes for each example
+    # categorical_indicator - an array that indicates which feature is categorical
+    # attribute_names - the names of the features for the examples (X) and
+    # target feature (y)
+    X, y, categorical_indicator, attribute_names = dataset.get_data(
+        dataset_format='dataframe',
+        target=dataset.default_target_attribute
+    )
+
+
+
+
+
+
+Visualize the dataset
+=====================
+
+
+.. code-block:: default
+
+
+    import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    sns.set_style("darkgrid")
+
+
+    def hide_current_axis(*args, **kwds):
+        plt.gca().set_visible(False)
+
+
+    # We combine all the data so that we can map the different
+    # examples to different colors according to the classes.
+    combined_data = pd.concat([X, y], axis=1)
+    iris_plot = sns.pairplot(combined_data, hue="class")
+    iris_plot.map_upper(hide_current_axis)
+    plt.show()
+
+
+
+.. image:: /examples/20_basic/images/sphx_glr_simple_datasets_tutorial_001.png
+    :class: sphx-glr-single-img
+
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.734 seconds)
+   **Total running time of the script:** ( 0 minutes  8.155 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_datasets_tutorial.py:
