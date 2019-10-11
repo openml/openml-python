@@ -18,10 +18,9 @@ import openml
 
 ############################################################################
 # .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server at test.openml.org. This prevents the main
-#   server from crowding with example datasets, tasks, runs, and so on.
-
-openml.config.start_using_configuration_for_example()
+#   connects to the test server at test.openml.org before doing so.
+#   This prevents the main server from crowding with example datasets,
+#   tasks, runs, and so on.
 ############################################################################
 
 
@@ -42,7 +41,7 @@ print(suites.head(n=10))
 
 ############################################################################
 # This is done based on the dataset ID.
-suite = openml.study.get_suite(1)
+suite = openml.study.get_suite(99)
 print(suite)
 
 ############################################################################
@@ -67,6 +66,8 @@ print(tasks.describe().transpose())
 # entity - the only reason why we need so much code in this example is
 # because we upload some random data.
 
+openml.config.start_using_configuration_for_example()
+
 # We'll take a random subset of at least ten tasks of all available tasks on
 # the test server:
 all_tasks = list(openml.tasks.list_tasks().keys())
@@ -74,7 +75,7 @@ num_tasks_in_suite = np.random.randint(10, len(all_tasks))
 task_ids_for_suite = sorted(np.random.choice(all_tasks, replace=False, size=num_tasks_in_suite))
 
 # The study needs a machine-readable and unique alias. To obtain this,
-# we simply append all task ID to each other and hash them.
+# we simply append all task IDs to each other and hash them.
 alias = '-'.join([str(task_id) for task_id in task_ids_for_suite])
 md5 = hashlib.md5()
 md5.update(alias.encode('utf8'))
