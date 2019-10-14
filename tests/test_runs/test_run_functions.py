@@ -1243,10 +1243,9 @@ class TestRun(TestBase):
 
         runs = openml.runs.list_runs(id=ids, task=tasks, uploader=uploaders_1)
 
-    
     def test_get_runs_list_by_tag(self):
         # TODO: comes from live, no such lists on test
-        #unit test works on production server only
+        # Unit test works on production server only
         openml.config.server = self.production_server
         runs = openml.runs.list_runs(tag='curves')
         self.assertGreaterEqual(len(runs), 1)
