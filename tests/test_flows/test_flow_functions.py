@@ -263,6 +263,11 @@ class TestFlowFunctions(TestBase):
         self.assertEqual(server_flow.parameters['categories'], '[[0, 1], [0, 1]]')
         self.assertEqual(server_flow.model.categories, flow.model.categories)
 
+    def test_get_flow1(self):
+        # Make sure that issue #305 doesn't pop up any more
+        openml.config.server = self.production_server
+        openml.flows.get_flow(1)
+
     def test_get_flow_reinstantiate_model(self):
         model = ensemble.RandomForestClassifier(n_estimators=33)
         extension = openml.extensions.get_extension_by_model(model)
