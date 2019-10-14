@@ -28,6 +28,14 @@ class OpenMLDatasetTest(TestBase):
         self.jm1 = openml.datasets.get_dataset(1053, download_data=False)
         self.iris = openml.datasets.get_dataset(61, download_data=False)
 
+    def test_repr(self):
+        # create a bare-bones dataset as would be returned by
+        # create_dataset
+        data = openml.datasets.OpenMLDataset(name="some name",
+                                             description="a description")
+        str(data)
+
+
     def test_get_data_array(self):
         # Basic usage
         rval, _, categorical, attribute_names = self.dataset.get_data(dataset_format='array')
