@@ -420,7 +420,7 @@ class TestRun(TestBase):
                     fold=0,
                 )
             except openml.exceptions.OpenMLServerException as e:
-                e.additional = "%s; run_id %d" % (e.additional, run.run_id)
+                e.message = "%s; run_id %d" % (e.message, run.run_id)
                 raise e
 
             self._rerun_model_and_compare_predictions(run.run_id, model_prime,
@@ -1243,9 +1243,9 @@ class TestRun(TestBase):
 
         runs = openml.runs.list_runs(id=ids, task=tasks, uploader=uploaders_1)
 
-    @unittest.skip("API currently broken: https://github.com/openml/OpenML/issues/948")
     def test_get_runs_list_by_tag(self):
         # TODO: comes from live, no such lists on test
+        # Unit test works on production server only
         openml.config.server = self.production_server
         runs = openml.runs.list_runs(tag='curves')
         self.assertGreaterEqual(len(runs), 1)

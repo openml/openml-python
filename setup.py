@@ -61,6 +61,9 @@ setuptools.setup(name="openml",
                          'ipython',
                          'ipykernel',
                          'seaborn'
+                     ],
+                     'examples_unix': [
+                         'fanova',
                      ]
                  },
                  test_suite="pytest",
