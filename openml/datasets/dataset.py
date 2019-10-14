@@ -109,10 +109,10 @@ class OpenMLDataset(object):
                  paper_url=None, update_comment=None,
                  md5_checksum=None, data_file=None, features=None,
                  qualities=None, dataset=None):
-        if not re.match("^[\x00-\x7F]*$", description):
+        if description and not re.match("^[\x00-\x7F]*$", description):
             raise ValueError("Invalid symbols in description: {}".format(
                 description))
-        if not re.match("^[\x00-\x7F]*$", citation):
+        if citation and not re.match("^[\x00-\x7F]*$", citation):
             raise ValueError("Invalid symbols in citation: {}".format(
                 citation))
         if not re.match("^[a-zA-Z0-9_\\-\\.\\(\\),]+$", name):

@@ -31,9 +31,23 @@ class OpenMLDatasetTest(TestBase):
     def test_repr(self):
         # create a bare-bones dataset as would be returned by
         # create_dataset
-        data = openml.datasets.OpenMLDataset(name="some name",
+        data = openml.datasets.OpenMLDataset(name="somename",
                                              description="a description")
         str(data)
+
+    def test_init_string_validation(self):
+        with pytest.raises(ValueError, match="Invalid symbols in name"):
+            openml.datasets.OpenMLDataset(name="some name",
+                                          description="a description")
+
+        with pytest.raises(ValueError, match="Invalid symbols in description"):
+            openml.datasets.OpenMLDataset(name="somename",
+                                          description="a descriptïon")
+
+        with pytest.raises(ValueError, match="Invalid symbols in citation"):
+            openml.datasets.OpenMLDataset(name="somename",
+                                          description="a description",
+                                          citation="Something by Müller")
 
     def test_get_data_array(self):
         # Basic usage
