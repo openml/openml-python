@@ -26,13 +26,13 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This is only a placeholder so far.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This is a brief showcase of OpenML benchmark suites, which were introduced by `Bischl et al. (2...">
 
 .. only:: html
 
-    .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_studies_tutorial_thumb.png
+    .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_suites_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_20_basic_simple_studies_tutorial.py`
+        :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py`
 
 .. raw:: html
 
@@ -42,7 +42,7 @@ Introductory examples to the usage of the OpenML python connector.
 .. toctree::
    :hidden:
 
-   /examples/20_basic/simple_studies_tutorial
+   /examples/20_basic/simple_suites_tutorial
 
 .. raw:: html
 
@@ -136,6 +136,46 @@ Extended examples for the usage of the OpenML python connector.
    :hidden:
 
    /examples/30_extended/flow_id_tutorial
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="How to list, download and upload benchmark suites.">
+
+.. only:: html
+
+    .. figure:: /examples/30_extended/images/thumb/sphx_glr_suites_tutorial_thumb.png
+
+        :ref:`sphx_glr_examples_30_extended_suites_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/30_extended/suites_tutorial
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="How to list, download and upload benchmark studies.">
+
+.. only:: html
+
+    .. figure:: /examples/30_extended/images/thumb/sphx_glr_study_tutorial_thumb.png
+
+        :ref:`sphx_glr_examples_30_extended_study_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/30_extended/study_tutorial
 
 .. raw:: html
 
