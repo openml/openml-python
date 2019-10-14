@@ -490,10 +490,13 @@ class SklearnExtension(Extension):
 
     @classmethod
     def _is_sklearn_flow(cls, flow: OpenMLFlow) -> bool:
-        return (
-            flow.external_version.startswith('sklearn==')
-            or ',sklearn==' in flow.external_version
-        )
+        if flow.external_version is None:
+            return False
+        else:
+            return (
+                flow.external_version.startswith('sklearn==')
+                or ',sklearn==' in flow.external_version
+            )
 
     def _get_sklearn_description(self, model: Any, char_lim: int = 1024) -> str:
         '''Fetches the sklearn function docstring for the flow description
