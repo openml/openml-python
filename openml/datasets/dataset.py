@@ -245,6 +245,7 @@ class OpenMLDataset(object):
             when converted to lower case.
 
 
+
         Returns
         -------
         dict
@@ -319,13 +320,15 @@ class OpenMLDataset(object):
         attribute_names = []
         categories_names = {}
         categorical = []
-        for name, type_ in data['attributes']:
+        for i, (name, type_) in enumerate(data['attributes']):
             # if the feature is nominal and the a sparse matrix is
             # requested, the categories need to be numeric
             if (isinstance(type_, list)
                     and self.format.lower() == 'sparse_arff'):
                 try:
-                    np.array(type_, dtype=np.float32)
+                    # checks if the strings which should be the class labels
+                    # can be encoded into integers
+                    pd.factorize(type_)[0]
                 except ValueError:
                     raise ValueError(
                         "Categorical data needs to be numeric when "

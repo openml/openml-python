@@ -320,6 +320,14 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertListEqual(categorical, [False] * 19998)
         self.assertEqual(y.shape, (600, ))
 
+    def test_get_sparse_categorical_data_id_395(self):
+        dataset = openml.datasets.get_dataset(395, download_data=False)
+        feature = dataset.features[3758]
+        self.assertEqual(dataset.name, 're1.wc')
+        self.assertEqual(feature.name, 'CLASS_LABEL')
+        self.assertEqual(feature.data_type, 'nominal')
+        self.assertEqual(len(feature.nominal_values), 25)
+
 
 class OpenMLDatasetQualityTest(TestBase):
     def test__check_qualities(self):
