@@ -295,13 +295,24 @@ class OpenMLFlow(object):
         dic = xml_dict["oml:flow"]
 
         # Mandatory parts in the xml file
-        for key in ['name', 'external_version']:
+        for key in ['name']:
             arguments[key] = dic["oml:" + key]
 
         # non-mandatory parts in the xml file
-        for key in ['uploader', 'description', 'upload_date', 'language',
-                    'dependencies', 'version', 'binary_url', 'binary_format',
-                    'binary_md5', 'class_name', 'custom_name']:
+        for key in [
+            'external_version',
+            'uploader',
+            'description',
+            'upload_date',
+            'language',
+            'dependencies',
+            'version',
+            'binary_url',
+            'binary_format',
+            'binary_md5',
+            'class_name',
+            'custom_name',
+        ]:
             arguments[key] = dic.get("oml:" + key)
 
         # has to be converted to an int if present and cannot parsed in the
