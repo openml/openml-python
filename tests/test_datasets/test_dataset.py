@@ -9,6 +9,7 @@ from scipy import sparse
 import openml
 from openml.testing import TestBase
 from openml.exceptions import PyOpenMLError
+from openml.datasets import OpenMLDataset, OpenMLDataFeature
 
 
 class OpenMLDatasetTest(TestBase):
@@ -323,6 +324,8 @@ class OpenMLDatasetTestSparse(TestBase):
     def test_get_sparse_categorical_data_id_395(self):
         dataset = openml.datasets.get_dataset(395, download_data=False)
         feature = dataset.features[3758]
+        self.assertTrue(isinstance(dataset, OpenMLDataset))
+        self.assertTrue(isinstance(feature, OpenMLDataFeature))
         self.assertEqual(dataset.name, 're1.wc')
         self.assertEqual(feature.name, 'CLASS_LABEL')
         self.assertEqual(feature.data_type, 'nominal')
