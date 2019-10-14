@@ -35,7 +35,6 @@ class OpenMLDatasetTest(TestBase):
                                              description="a description")
         str(data)
 
-
     def test_get_data_array(self):
         # Basic usage
         rval, _, categorical, attribute_names = self.dataset.get_data(dataset_format='array')
