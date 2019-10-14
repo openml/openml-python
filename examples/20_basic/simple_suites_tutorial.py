@@ -20,8 +20,8 @@ import openml
 # datasets commonly used in machine learning research. These are all datasets from mid-2018 that
 # satisfy a large set of clear requirements for thorough yet practical benchmarking:
 #
-# 1. the number ofobservations are between 500 and 100000 to focus on medium-sized datasets,
-# 2. the numberof features does not exceed 5000 features to keep the runtime of algorithms low
+# 1. the number of observations are between 500 and 100,000 to focus on medium-sized datasets,
+# 2. the numberof features does not exceed 5,000 features to keep the runtime of algorithms low
 # 3. the target attribute has at least two classes with no class less than 20 observations
 # 4. the ratio of the minority class and the majority class is above 0.05(to eliminate highly
 #    imbalanced datasets which require special treatment for both algorithms and evaluation

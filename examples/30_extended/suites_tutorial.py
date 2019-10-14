@@ -10,7 +10,8 @@ If you want to learn more about benchmark suites, check out our
 `OpenML benchmark docs <https://docs.openml.org/benchmark/#benchmarking-suites>`_.
 """
 ############################################################################
-import hashlib
+import uuid
+
 import numpy as np
 
 import openml
@@ -45,7 +46,7 @@ suite = openml.study.get_suite(99)
 print(suite)
 
 ############################################################################
-# Suites also features a description:
+# Suites also feature a description:
 print(suite.description)
 
 ############################################################################
@@ -55,6 +56,10 @@ print(suite.tasks)
 ############################################################################
 # And we can use the task listing functionality to learn more about them:
 tasks = openml.tasks.list_tasks(output_format='dataframe')
+
+# Using ``@`` in `pd.DataFrame.query <
+# https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html>`_
+# accesses variables outside of the current dataframe.
 tasks = tasks.query('tid in @suite.tasks')
 print(tasks.describe().transpose())
 
@@ -71,15 +76,12 @@ openml.config.start_using_configuration_for_example()
 # We'll take a random subset of at least ten tasks of all available tasks on
 # the test server:
 all_tasks = list(openml.tasks.list_tasks().keys())
-num_tasks_in_suite = np.random.randint(10, len(all_tasks))
-task_ids_for_suite = sorted(np.random.choice(all_tasks, replace=False, size=num_tasks_in_suite))
+task_ids_for_suite = sorted(np.random.choice(all_tasks, replace=False, size=20))
 
 # The study needs a machine-readable and unique alias. To obtain this,
-# we simply append all task IDs to each other and hash them.
-alias = '-'.join([str(task_id) for task_id in task_ids_for_suite])
-md5 = hashlib.md5()
-md5.update(alias.encode('utf8'))
-alias = md5.hexdigest()
+# we simply generate a random uuid.
+
+alias = uuid.uuid4().hex
 
 new_suite = openml.study.create_benchmark_suite(
     name='Test-Suite',

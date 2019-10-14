@@ -10,7 +10,8 @@ hold a list of tasks, studies hold a list of runs. As runs contain all informati
 tasks, all required information about a study can be retrieved.
 """
 ############################################################################
-import hashlib
+import uuid
+
 import numpy as np
 import sklearn.tree
 import sklearn.pipeline
@@ -44,7 +45,7 @@ print(studies.head(n=10))
 # ===================
 
 ############################################################################
-# This is done based on the dataset ID.
+# This is done based on the study ID.
 study = openml.study.get_study(123)
 print(study)
 
@@ -76,7 +77,7 @@ print(evaluations.head())
 
 openml.config.start_using_configuration_for_example()
 
-# Very simple classifier which ignores categorical features
+# Very simple classifier which ignores the feature type
 clf = sklearn.pipeline.Pipeline(steps=[
     ('imputer', sklearn.impute.SimpleImputer()),
     ('estimator', sklearn.tree.DecisionTreeClassifier(max_depth=5)),
@@ -93,11 +94,8 @@ for task_id in tasks:
     run_ids.append(run.run_id)
 
 # The study needs a machine-readable and unique alias. To obtain this,
-# we simply append all run IDs to each other and hash them.
-alias = '-'.join([str(run_id) for run_id in run_ids])
-md5 = hashlib.md5()
-md5.update(alias.encode('utf8'))
-alias = md5.hexdigest()
+# we simply generate a random uuid.
+alias = uuid.uuid4().hex
 
 new_study = openml.study.create_study(
     name='Test-Study',
