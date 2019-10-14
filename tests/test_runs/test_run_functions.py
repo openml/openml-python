@@ -420,7 +420,7 @@ class TestRun(TestBase):
                     fold=0,
                 )
             except openml.exceptions.OpenMLServerException as e:
-                e.additional = "%s; run_id %d" % (e.additional, run.run_id)
+                e.message = "%s; run_id %d" % (e.message, run.run_id)
                 raise e
 
             self._rerun_model_and_compare_predictions(run.run_id, model_prime,
