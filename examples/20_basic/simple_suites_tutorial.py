@@ -15,7 +15,7 @@ import openml
 # OpenML-CC18
 # ===========
 #
-# As an example we have a look the OpenML-CC18, which is a suite of 72 classification datasets
+# As an example we have a look at the OpenML-CC18, which is a suite of 72 classification datasets
 # from OpenML which were carefully selected to be usable by many algorithms and also represent
 # datasets commonly used in machine learning research. These are all datasets from mid-2018 that
 # satisfy a large set of clear requirements for thorough yet practical benchmarking:
