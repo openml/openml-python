@@ -110,12 +110,15 @@ class OpenMLDataset(object):
                  md5_checksum=None, data_file=None, features=None,
                  qualities=None, dataset=None):
         if description and not re.match("^[\x00-\x7F]*$", description):
+            # not basiclatin (XSD complains)
             raise ValueError("Invalid symbols in description: {}".format(
                 description))
         if citation and not re.match("^[\x00-\x7F]*$", citation):
+            # not basiclatin (XSD complains)
             raise ValueError("Invalid symbols in citation: {}".format(
                 citation))
         if not re.match("^[a-zA-Z0-9_\\-\\.\\(\\),]+$", name):
+            # regex given by server in error message
             raise ValueError("Invalid symbols in name: {}".format(name))
         # TODO add function to check if the name is casual_string128
         # Attributes received by querying the RESTful API
