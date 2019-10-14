@@ -23,7 +23,7 @@ import openml
 ############################################################################
 # .. warning:: This example uploads data. For that reason, this example
 #   connects to the test server at test.openml.org before doing so.
-#   This prevents the main server from crowding with example datasets,
+#   This prevents the crowding of the main server with example datasets,
 #   tasks, runs, and so on.
 ############################################################################
 
@@ -50,11 +50,11 @@ study = openml.study.get_study(123)
 print(study)
 
 ############################################################################
-# Suites also features a description:
+# Studies also features a description:
 print(study.description)
 
 ############################################################################
-# Suites are a container for runs:
+# Studies are a container for runs:
 print(study.runs)
 
 ############################################################################
