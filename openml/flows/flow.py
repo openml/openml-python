@@ -280,6 +280,9 @@ class OpenMLFlow(object):
 
         Calls itself recursively to create :class:`OpenMLFlow` objects of
         subflows (components).
+        
+        XML definition of a flow is available at
+        https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.implementation.upload.xsd
 
         Parameters
         ----------
@@ -290,7 +293,7 @@ class OpenMLFlow(object):
         -------
             OpenMLFlow
 
-        """
+        """  # noqa E501
         arguments = OrderedDict()
         dic = xml_dict["oml:flow"]
 
