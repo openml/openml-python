@@ -155,9 +155,9 @@ def _parse_server_exception(response, url):
         # 512 for runs, 372 for datasets, 500 for flows
         # 482 for tasks, 542 for evaluations, 674 for setups
         return OpenMLServerNoResult(code, message, additional_information)
+    full_message = '{} - {}'.format(message, additional_information)
     return OpenMLServerException(
         code=code,
-        message=message,
-        additional=additional_information,
+        message=full_message,
         url=url
     )

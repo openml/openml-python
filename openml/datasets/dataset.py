@@ -192,12 +192,13 @@ class OpenMLDataset(object):
                   "Download URL": self.url,
                   "Data file": self.data_file,
                   "Pickle file": self.data_pickle_file,
-                  "# of features": len(self.features)}
+                  "# of features": len(self.features)
+                  if self.features is not None else None}
         if self.upload_date is not None:
             fields["Upload Date"] = self.upload_date.replace('T', ' ')
         if self.dataset_id is not None:
             fields["OpenML URL"] = "{}d/{}".format(base_url, self.dataset_id)
-        if self.qualities['NumberOfInstances'] is not None:
+        if self.qualities is not None and self.qualities['NumberOfInstances'] is not None:
             fields["# of instances"] = int(self.qualities['NumberOfInstances'])
 
         # determines the order in which the information will be printed
