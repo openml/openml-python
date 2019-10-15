@@ -532,10 +532,7 @@ class OpenMLDataset(object):
             if scipy.sparse.issparse(data):
                 return pd.SparseDataFrame(data, columns=attribute_names)
             else:
-                if data.ndim == 2:
-                    return pd.DataFrame(data, columns=attribute_names)
-                else:
-                    return pd.Series(data)
+                return data
         else:
             data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
             logging.warning(
