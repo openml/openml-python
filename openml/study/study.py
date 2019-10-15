@@ -4,9 +4,10 @@ from typing import Dict, List, Optional
 import xmltodict
 
 import openml
+from openml.base import OpenMLBase
 
 
-class BaseStudy(object):
+class BaseStudy(OpenMLBase):
     """
     An OpenMLStudy represents the OpenML concept of a study. It contains
     the following information: name, id, description, creation date,
@@ -89,16 +90,16 @@ class BaseStudy(object):
         self.runs = runs
         pass
 
-    def __repr__(self):
+    def _get_repr_body_fields(self):
         # header is provided by the sub classes
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
         fields = {"Name": self.name,
                   "Status": self.status,
                   "Main Entity Type": self.main_entity_type}
         if self.study_id is not None:
             fields["ID"] = self.study_id
-            fields["Study URL"] = "{}s/{}".format(base_url, self.study_id)
+            fields["Study URL"] = self.openml_url
         if self.creator is not None:
+            base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
             fields["Creator"] = "{}u/{}".format(base_url, self.creator)
         if self.creation_date is not None:
             fields["Upload Time"] = self.creation_date.replace('T', ' ')
@@ -115,12 +116,7 @@ class BaseStudy(object):
         order = ["ID", "Name", "Status", "Main Entity Type", "Study URL",
                  "# of Data", "# of Tasks", "# of Flows", "# of Runs",
                  "Creator", "Upload Time"]
-        fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
-        return body
+        return [(key, fields[key]) for key in order if key in fields]
 
     def publish(self) -> int:
         """
@@ -186,6 +182,12 @@ class BaseStudy(object):
         # <?xml version="1.0" encoding="utf-8"?>
         xml_string = xml_string.split('\n', 1)[-1]
         return xml_string
+
+    def push_tag(self, tag: str):
+        raise NotImplementedError("Tags for studies is not (yet) supported.")
+
+    def remove_tag(self, tag: str):
+        raise NotImplementedError("Tags for studies is not (yet) supported.")
 
 
 class OpenMLStudy(BaseStudy):
@@ -268,12 +270,6 @@ class OpenMLStudy(BaseStudy):
             setups=setups,
         )
 
-    def __repr__(self):
-        header = "OpenML Study"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
-        body = super(OpenMLStudy, self).__repr__()
-        return header + body
-
 
 class OpenMLBenchmarkSuite(BaseStudy):
     """
@@ -345,9 +341,3 @@ class OpenMLBenchmarkSuite(BaseStudy):
             runs=None,
             setups=None,
         )
-
-    def __repr__(self):
-        header = "OpenML Benchmark Suite"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
-        body = super(OpenMLBenchmarkSuite, self).__repr__()
-        return header + body

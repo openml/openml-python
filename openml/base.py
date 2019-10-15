@@ -96,7 +96,7 @@ class OpenMLBase(ABC):
         """ Opens the OpenML web page corresponding to this object in your default browser. """
         webbrowser.open(self.openml_url)
 
-    def push_tag(self, tag):
+    def push_tag(self, tag: str):
         """Annotates this entity with a tag on the server.
 
         Parameters
@@ -106,7 +106,7 @@ class OpenMLBase(ABC):
         """
         _tag_entity('flow', self.id, tag)
 
-    def remove_tag(self, tag):
+    def remove_tag(self, tag: str):
         """Removes a tag from this entity on the server.
 
         Parameters
