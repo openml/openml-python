@@ -139,6 +139,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
             self.assertEqual(check_dependencies_mock.call_count, 1)
 
+    def test_can_handle_flow(self):
+        openml.config.server = self.production_server
+
+        R_flow = openml.flows.get_flow(6794)
+        assert not self.extension.can_handle_flow(R_flow)
+        old_3rd_party_flow = openml.flows.get_flow(7660)
+        assert self.extension.can_handle_flow(old_3rd_party_flow)
+
+        openml.config.server = self.test_server
+
     def test_serialize_model_clustering(self):
         with mock.patch.object(self.extension, '_check_dependencies') as check_dependencies_mock:
             model = sklearn.cluster.KMeans()
