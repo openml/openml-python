@@ -531,8 +531,11 @@ class OpenMLDataset(object):
                     'PyOpenML cannot handle string when returning numpy'
                     ' arrays. Use dataset_format="dataframe".'
                 )
-        elif array_format == "dataframe" and scipy.sparse.issparse(data):
-            return pd.SparseDataFrame(data, columns=attribute_names)
+        elif array_format == "dataframe":
+            if scipy.sparse.issparse(data):
+                return pd.SparseDataFrame(data, columns=attribute_names)
+            else:
+                return data
         else:
             data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
             logging.warning(
