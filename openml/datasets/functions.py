@@ -824,8 +824,20 @@ def _get_dataset_description(did_cache_dir, dataset_id):
         with io.open(description_file, "w", encoding='utf8') as fh:
             fh.write(dataset_xml)
 
-    description = xmltodict.parse(dataset_xml)[
-        "oml:data_set_description"]
+    description = xmltodict.parse(dataset_xml)["oml:data_set_description"]
+    # Very simple code to convert elements of the first level to an integer if
+    # this is encountered in the xml
+    for key in description:
+        if isinstance(description[key], OrderedDict):
+            value = description[key]
+            if len(value) == 2 and '@type' in value and '#text' in value:
+                type_ = value['@type']
+                text = value['#text']
+                if type_ == 'xs:integer':
+                    text = int(text)
+                else:
+                    raise ValueError(type_)
+                description[key] = text
 
     return description
 
@@ -979,8 +991,8 @@ def _create_dataset_from_description(
         Dataset object from dict and ARFF.
     """
     return OpenMLDataset(
-        description["oml:name"],
-        description.get("oml:description"),
+        name=description["oml:name"],
+        description=description.get("oml:description"),
         data_format=description["oml:format"],
         dataset_id=description["oml:id"],
         version=description["oml:version"],

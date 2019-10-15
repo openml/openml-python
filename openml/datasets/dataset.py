@@ -123,7 +123,7 @@ class OpenMLDataset(object):
                 raise ValueError("Invalid symbols in name: {}".format(name))
         # TODO add function to check if the name is casual_string128
         # Attributes received by querying the RESTful API
-        self.dataset_id = int(dataset_id) if dataset_id is not None else None
+        self.dataset_id = dataset_id
         self.name = name
         self.version = int(version) if version is not None else None
         self.description = description
