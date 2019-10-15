@@ -1,4 +1,5 @@
 from typing import Optional, List, Tuple
+import webbrowser
 
 import openml.config
 from .utils import _tag_entity
@@ -83,6 +84,10 @@ class OpenMLBase:
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
         body = '\n'.join(field_line_format.format(name, value) for name, value in body_fields)
         return header + body
+
+    def open_in_browser(self):
+        """ Opens the OpenML web page corresponding to this object in your default browser. """
+        webbrowser.open(self.openml_url)
 
     def push_tag(self, tag):
         """Annotates this entity with a tag on the server.
