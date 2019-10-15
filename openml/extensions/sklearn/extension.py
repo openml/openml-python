@@ -490,6 +490,8 @@ class SklearnExtension(Extension):
 
     @classmethod
     def _is_sklearn_flow(cls, flow: OpenMLFlow) -> bool:
+        if "sklearn" in flow.dependencies:
+            return True
         if flow.external_version is None:
             return False
         else:
