@@ -10,6 +10,7 @@ import xmltodict
 
 import openml
 import openml._api_calls
+from openml.base import OpenMLBase
 from ..exceptions import PyOpenMLError
 from ..flows import get_flow
 from ..tasks import (get_task,
@@ -22,7 +23,7 @@ from ..tasks import (get_task,
 from ..utils import _tag_entity
 
 
-class OpenMLRun(object):
+class OpenMLRun(OpenMLBase):
     """OpenML Run: result of running a model on an openml dataset.
 
        Parameters
@@ -67,28 +68,25 @@ class OpenMLRun(object):
         self.tags = tags
         self.predictions_url = predictions_url
 
-    def __repr__(self):
-        header = "OpenML Run"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
-
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+    def _get_repr_body_fields(self):
         fields = {"Uploader Name": self.uploader_name,
                   "Metric": self.task_evaluation_measure,
                   "Run ID": self.run_id,
                   "Task ID": self.task_id,
                   "Task Type": self.task_type,
-                  "Task URL": "{}t/{}".format(base_url, self.task_id),
+                  "Task URL": openml.tasks.OpenMLTask.url_for_id(self.task_id),
                   "Flow ID": self.flow_id,
                   "Flow Name": self.flow_name,
-                  "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                  "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
                   "Setup ID": self.setup_id,
                   "Setup String": self.setup_string,
                   "Dataset ID": self.dataset_id,
-                  "Dataset URL": "{}d/{}".format(base_url, self.dataset_id)}
+                  "Dataset URL": openml.datasets.OpenMLDataset.url_for_id(self.dataset_id)}
         if self.uploader is not None:
-            fields["Uploader Profile"] = "{}u/{}".format(base_url, self.uploader)
+            base_url = "{}".format(openml.config.server[:-len('/api/v1/xml')])
+            fields["Uploader Profile"] = "{}/u/{}".format(base_url, self.uploader)
         if self.run_id is not None:
-            fields["Run URL"] = "{}r/{}".format(base_url, self.run_id)
+            fields["Run URL"] = self.openml_url
         if self.evaluations is not None and self.task_evaluation_measure in self.evaluations:
             fields["Result"] = self.evaluations[self.task_evaluation_measure]
 
@@ -96,12 +94,7 @@ class OpenMLRun(object):
         order = ["Uploader Name", "Uploader Profile", "Metric", "Result", "Run ID", "Run URL",
                  "Task ID", "Task Type", "Task URL", "Flow ID", "Flow Name", "Flow URL",
                  "Setup ID", "Setup String", "Dataset ID", "Dataset URL"]
-        fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
-        return header + body
+        return [(key, fields[key]) for key in order if key in fields]
 
     def _repr_pretty_(self, pp, cycle):
         pp.text(str(self))
@@ -511,26 +504,6 @@ class OpenMLRun(object):
                                tags=self.tags)
         description_xml = xmltodict.unparse(description, pretty=True)
         return description_xml
-
-    def push_tag(self, tag: str) -> None:
-        """Annotates this run with a tag on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the run.
-        """
-        _tag_entity('run', self.run_id, tag)
-
-    def remove_tag(self, tag: str) -> None:
-        """Removes a tag from this run on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the run.
-        """
-        _tag_entity('run', self.run_id, tag, untag=True)
 
 
 ###############################################################################

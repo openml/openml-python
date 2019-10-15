@@ -11,12 +11,13 @@ import scipy.sparse
 import xmltodict
 
 import openml._api_calls
+from openml.base import OpenMLBase
 from .. import datasets
 from .split import OpenMLSplit
-from ..utils import _create_cache_directory_for_id, _tag_entity
+from ..utils import _create_cache_directory_for_id
 
 
-class OpenMLTask(ABC):
+class OpenMLTask(OpenMLBase):
     """OpenML Task object.
 
        Parameters
@@ -55,15 +56,11 @@ class OpenMLTask(ABC):
         self.estimation_procedure_id = estimation_procedure_id
         self.split = None  # type: Optional[OpenMLSplit]
 
-    def __repr__(self):
-        header = "OpenML Task"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
-
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+    def _get_repr_body_fields(self):
         fields = {"Task Type": self.task_type}
         if self.task_id is not None:
             fields["Task ID"] = self.task_id
-            fields["Task URL"] = "{}t/{}".format(base_url, self.task_id)
+            fields["Task URL"] = self.openml_url
         if self.evaluation_measure is not None:
             fields["Evaluation Measure"] = self.evaluation_measure
         if self.estimation_procedure is not None:
@@ -78,12 +75,7 @@ class OpenMLTask(ABC):
         # determines the order in which the information will be printed
         order = ["Task Type", "Task ID", "Task URL", "Estimation Procedure", "Evaluation Measure",
                  "Target Feature", "# of Classes", "Cost Matrix"]
-        fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
-        return header + body
+        return [(key, fields[key]) for key in order if key in fields]
 
     def get_dataset(self) -> datasets.OpenMLDataset:
         """Download dataset associated with task"""
@@ -143,26 +135,6 @@ class OpenMLTask(ABC):
             self.split = self.download_split()
 
         return self.split.repeats, self.split.folds, self.split.samples
-
-    def push_tag(self, tag: str):
-        """Annotates this task with a tag on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the task.
-        """
-        _tag_entity('task', self.task_id, tag)
-
-    def remove_tag(self, tag: str):
-        """Removes a tag from this task on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the task.
-        """
-        _tag_entity('task', self.task_id, tag, untag=True)
 
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
 

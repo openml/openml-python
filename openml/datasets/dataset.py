@@ -15,6 +15,7 @@ import xmltodict
 from warnings import warn
 
 import openml._api_calls
+from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
 from ..utils import _tag_entity
@@ -23,7 +24,7 @@ from ..utils import _tag_entity
 logger = logging.getLogger(__name__)
 
 
-class OpenMLDataset(object):
+class OpenMLDataset(OpenMLBase):
     """Dataset object.
 
     Allows fetching and uploading datasets to OpenML.
@@ -184,11 +185,7 @@ class OpenMLDataset(object):
         else:
             self.data_pickle_file = None
 
-    def __repr__(self):
-        header = "OpenML Dataset"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
-
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+    def _get_repr_body_fields(self):
         fields = {"Name": self.name,
                   "Version": self.version,
                   "Format": self.format,
@@ -201,19 +198,14 @@ class OpenMLDataset(object):
         if self.upload_date is not None:
             fields["Upload Date"] = self.upload_date.replace('T', ' ')
         if self.dataset_id is not None:
-            fields["OpenML URL"] = "{}d/{}".format(base_url, self.dataset_id)
+            fields["OpenML URL"] = self.openml_url
         if self.qualities is not None and self.qualities['NumberOfInstances'] is not None:
             fields["# of instances"] = int(self.qualities['NumberOfInstances'])
 
         # determines the order in which the information will be printed
         order = ["Name", "Version", "Format", "Upload Date", "Licence", "Download URL",
                  "OpenML URL", "Data File", "Pickle File", "# of features", "# of instances"]
-        fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
-        return header + body
+        return [(key, fields[key]) for key in order if key in fields]
 
     def __eq__(self, other):
 
@@ -458,26 +450,6 @@ class OpenMLDataset(object):
                              "location {} ".format(self.name, self.data_pickle_file))
 
         return data, categorical, attribute_names
-
-    def push_tag(self, tag):
-        """Annotates this data set with a tag on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the dataset.
-        """
-        _tag_entity('data', self.dataset_id, tag)
-
-    def remove_tag(self, tag):
-        """Removes a tag from this dataset on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the dataset.
-        """
-        _tag_entity('data', self.dataset_id, tag, untag=True)
 
     @staticmethod
     def _convert_array_format(data, array_format, attribute_names):

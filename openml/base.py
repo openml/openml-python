@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+import re
 from typing import Optional, List, Tuple
 import webbrowser
 
@@ -5,7 +7,7 @@ import openml.config
 from .utils import _tag_entity
 
 
-class OpenMLBase:
+class OpenMLBase(ABC):
     """ Base object for functionality that is shared across entities. """
 
     def __repr__(self):
@@ -36,10 +38,10 @@ class OpenMLBase:
         """ The URL of the object on the server, if it was uploaded, else None. """
         if self.id is None:
             return None
-        return self.__class__._url_for_id(self.id)
+        return self.__class__.url_for_id(self.id)
 
     @classmethod
-    def _url_for_id(cls, id_: int) -> str:
+    def url_for_id(cls, id_: int) -> str:
         """ Return the OpenML URL for the object of the class entity with the given id. """
         # Sample url for a flow: openml.org/f/123
         base_url = "{}".format(openml.config.server[:-len('/api/v1/xml')])
@@ -51,10 +53,14 @@ class OpenMLBase:
         # We take advantage of the class naming convention (OpenMLX),
         # which holds for all entities except studies.
         from openml.study.study import BaseStudy
+        from openml.tasks.task import OpenMLTask
         if issubclass(cls, BaseStudy):
             return 's'
+        if issubclass(cls, OpenMLTask):
+            return 't'
         return cls.__name__.lower()[len('OpenML'):][0]
 
+    @abstractmethod
     def _get_repr_body_fields(self) -> List[Tuple[str, str]]:
         """ Collect all information to display in the __repr__ body.
 
@@ -65,7 +71,7 @@ class OpenMLBase:
             E.g.: [('metric', 'accuracy'), ('dataset', 'iris')]
         """
         # Should be implemented in the base class.
-        return []
+        pass
 
     def _apply_repr_template(self, body_fields: List[Tuple[str, str]]) -> str:
         """ Generates the header and formats the body for string representation of the object.
@@ -75,10 +81,11 @@ class OpenMLBase:
          body_fields: List[Tuple[str, str]]
             A list of (name, value) pairs to display in the body of the __repr__.
          """
-        # Add a space in the class name, e.g. OpenMLFlow -> OpenML Flow
-        entity_name = '{} {}'.format(self.__class__.__name__[:len('OpenML')],
-                                     self.__class__.__name__[len('OpenML'):])
-        header = '{}\n{}\n'.format(entity_name, '=' * len(entity_name))
+        # We add spaces between capitals, e.g. ClassificationTask -> Classification Task
+        name_with_spaces = re.sub(r"(\w)([A-Z])", r"\1 \2",
+                                  self.__class__.__name__[len('OpenML'):])
+        header_text = 'OpenML {}'.format(name_with_spaces)
+        header = '{}\n{}\n'.format(header_text, '=' * len(header_text))
 
         longest_field_name_length = max(len(name) for name, value in body_fields)
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
