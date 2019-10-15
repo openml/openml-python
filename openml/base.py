@@ -6,10 +6,6 @@ from .utils import _tag_entity
 
 class OpenMLBase:
     """ Base object for functionality that is shared across entities. """
-    entity_letter: str = None
-
-    def __init__(self, entity_id: Optional[int] = None):
-        self._entity_id = entity_id
 
     def __repr__(self):
         body_fields = self._get_repr_body_fields()
@@ -18,21 +14,45 @@ class OpenMLBase:
     @property
     def id(self) -> Optional[int]:
         """ The id of the entity, it is unique for its entity type. """
-        return self._entity_id
+        from openml.datasets.dataset import OpenMLDataset
+        from openml.flows.flow import OpenMLFlow
+        from openml.runs.run import OpenMLRun
+        from openml.study.study import BaseStudy
+        from openml.tasks.task import OpenMLTask
+        if isinstance(self, OpenMLDataset):
+            return self.dataset_id
+        if isinstance(self, OpenMLFlow):
+            return self.flow_id
+        if isinstance(self, OpenMLRun):
+            return self.run_id
+        if isinstance(self, BaseStudy):
+            return self.study_id
+        if isinstance(self, OpenMLTask):
+            return self.task_id
 
     @property
     def openml_url(self) -> Optional[str]:
         """ The URL of the object on the server, if it was uploaded, else None. """
-        if self._entity_id is None:
+        if self.id is None:
             return None
-        return self.__class__._url_for_id(self._entity_id)
+        return self.__class__._url_for_id(self.id)
 
     @classmethod
     def _url_for_id(cls, id_: int) -> str:
         """ Return the OpenML URL for the object of the class entity with the given id. """
         # Sample url for a flow: openml.org/f/123
         base_url = "{}".format(openml.config.server[:-len('/api/v1/xml')])
-        return "{}/{}/{}".format(base_url, cls.entity_letter, id_)
+        return "{}/{}/{}".format(base_url, cls._entity_letter(), id_)
+
+    @classmethod
+    def _entity_letter(cls):
+        """ Return the letter which represents the entity type in urls, e.g. 'f' for flow."""
+        # We take advantage of the class naming convention (OpenMLX),
+        # which holds for all entities except studies.
+        from openml.study.study import BaseStudy
+        if issubclass(cls, BaseStudy):
+            return 's'
+        return cls.__name__.lower()[len('OpenML'):][0]
 
     def _get_repr_body_fields(self) -> List[Tuple[str, str]]:
         """ Collect all information to display in the __repr__ body.
@@ -72,7 +92,7 @@ class OpenMLBase:
         tag : str
             Tag to attach to the flow.
         """
-        _tag_entity('flow', self._entity_id, tag)
+        _tag_entity('flow', self.id, tag)
 
     def remove_tag(self, tag):
         """Removes a tag from this entity on the server.
@@ -82,4 +102,4 @@ class OpenMLBase:
         tag : str
             Tag to attach to the flow.
         """
-        _tag_entity('flow', self._entity_id, tag, untag=True)
+        _tag_entity('flow', self.id, tag, untag=True)

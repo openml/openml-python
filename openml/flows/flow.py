@@ -87,7 +87,6 @@ class OpenMLFlow(OpenMLBase):
                  binary_url=None, binary_format=None,
                  binary_md5=None, uploader=None, upload_date=None,
                  flow_id=None, extension=None, version=None):
-        super().__init__(entity_id=flow_id)
         self.name = name
         self.description = description
         self.model = model
