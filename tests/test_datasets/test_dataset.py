@@ -322,7 +322,7 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertEqual(y.shape, (600, ))
 
     def test_get_sparse_categorical_data_id_395(self):
-        dataset = openml.datasets.get_dataset(395, download_data=False)
+        dataset = openml.datasets.get_dataset(395, download_data=True)
         feature = dataset.features[3758]
         self.assertTrue(isinstance(dataset, OpenMLDataset))
         self.assertTrue(isinstance(feature, OpenMLDataFeature))
