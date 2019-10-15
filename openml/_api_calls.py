@@ -1,4 +1,5 @@
 import time
+import logging
 import requests
 import warnings
 
@@ -42,7 +43,7 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
     url += call
 
     url = url.replace('=', '%3d')
-
+    logging.info('[%s] %s' % (request_method, url))
     if file_elements is not None:
         if request_method != 'post':
             raise ValueError('request method must be post when file elements '
