@@ -26,7 +26,7 @@ This is currently a placeholder.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.108 seconds)
+   **Total running time of the script:** ( 0 minutes  0.077 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_neurips_perrone_example.py:
