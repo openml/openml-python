@@ -61,7 +61,7 @@ from sklearn import neighbors
 openml.config.start_using_configuration_for_example()
 
 ############################################################################
-# When using the main server, instead make sure your apikey is configured.
+# When using the main server instead, make sure your apikey is configured.
 # This can be done with the following line of code (uncomment it!).
 # Never share your apikey with others.
 
