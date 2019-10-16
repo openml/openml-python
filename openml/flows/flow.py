@@ -1,6 +1,6 @@
 from collections import OrderedDict
 import os
-from typing import Dict, List, Union  # noqa: F401
+from typing import Dict, List, Union, Tuple, Optional  # noqa: F401
 
 import xmltodict
 
@@ -136,7 +136,7 @@ class OpenMLFlow(OpenMLBase):
             self._extension = extension
 
     @property
-    def id(self):
+    def id(self) -> Optional[int]:
         return self.flow_id
 
     @property
@@ -147,7 +147,8 @@ class OpenMLFlow(OpenMLBase):
             raise RuntimeError("No extension could be found for flow {}: {}"
                                .format(self.flow_id, self.name))
 
-    def _get_repr_body_fields(self):
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+        """ Collect all information to display in the __repr__ body. """
         fields = {"Flow Name": self.name,
                   "Flow Description": self.description,
                   "Dependencies": self.dependencies}
@@ -167,24 +168,7 @@ class OpenMLFlow(OpenMLBase):
         return [(key, fields[key]) for key in order if key in fields]
 
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
-        """ Helper function used by _to_xml and itself.
-
-        Creates a dictionary representation of self which can be serialized
-        to xml by the function _to_xml. Since a flow can contain subflows
-        (components) this helper function calls itself recursively to also
-        serialize these flows to dictionaries.
-
-        Uses OrderedDict to ensure consistent ordering when converting to xml.
-        The return value (OrderedDict) will be used to create the upload xml
-        file. The xml file must have the tags in exactly the order given in the
-        xsd schema of a flow (see class docstring).
-
-        Returns
-        -------
-        OrderedDict
-            Flow represented as OrderedDict.
-
-        """
+        """ Creates a dictionary representation of self. """
         flow_container = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
         flow_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])  # type: 'OrderedDict[str, Union[List, str]]'  # noqa E501
         flow_container['oml:flow'] = flow_dict

@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import pickle
 import time
-from typing import Any, IO, TextIO  # noqa F401
+from typing import Any, IO, TextIO, List, Union, Tuple, Optional  # noqa F401
 import os
 
 import arff
@@ -69,10 +69,11 @@ class OpenMLRun(OpenMLBase):
         self.predictions_url = predictions_url
 
     @property
-    def id(self):
+    def id(self) -> Optional[int]:
         return self.run_id
 
-    def _get_repr_body_fields(self):
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+        """ Collect all information to display in the __repr__ body. """
         fields = {"Uploader Name": self.uploader_name,
                   "Metric": self.task_evaluation_measure,
                   "Run ID": self.run_id,
@@ -482,31 +483,7 @@ class OpenMLRun(OpenMLBase):
         return self
 
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
-        """ Creates a dictionary corresponding to the desired xml desired by openML
-
-        Parameters
-        ----------
-        taskid : int
-            the identifier of the task
-        setup_string : string
-            a CLI string which can invoke the learning with the correct parameter
-            settings
-        parameter_settings : array of dicts
-            each dict containing keys name, value and component, one per parameter
-            setting
-        tags : array of strings
-            information that give a description of the run, must conform to
-            regex ``([a-zA-Z0-9_\-\.])+``
-        fold_evaluations : dict mapping from evaluation measure to a dict mapping
-            repeat_nr to a dict mapping from fold nr to a value (double)
-        sample_evaluations : dict mapping from evaluation measure to a dict
-            mapping repeat_nr to a dict mapping from fold nr to a dict mapping to
-            a sample nr to a value (double)
-        sample_evaluations :
-        Returns
-        -------
-        result : an array with version information of the above packages
-        """  # noqa: W605
+        """ Creates a dictionary representation of self. """
         description = OrderedDict()  # type: 'OrderedDict'
         description['oml:run'] = OrderedDict()
         description['oml:run']['@xmlns:oml'] = 'http://openml.org/openml'

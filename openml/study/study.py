@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple, Union, Any
 
 import xmltodict
 
@@ -90,18 +90,18 @@ class BaseStudy(OpenMLBase):
         self.runs = runs
 
     @classmethod
-    def _entity_letter(cls):
+    def _entity_letter(cls) -> str:
         return 's'
 
     @property
-    def id(self):
+    def id(self) -> Optional[int]:
         return self.study_id
 
-    def _get_repr_body_fields(self):
-        # header is provided by the sub classes
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+        """ Collect all information to display in the __repr__ body. """
         fields = {"Name": self.name,
                   "Status": self.status,
-                  "Main Entity Type": self.main_entity_type}
+                  "Main Entity Type": self.main_entity_type}  # type: Dict[str, Any]
         if self.study_id is not None:
             fields["ID"] = self.study_id
             fields["Study URL"] = self.openml_url
@@ -146,13 +146,7 @@ class BaseStudy(OpenMLBase):
         return self.study_id
 
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
-        """ Creates a dictionary representation of self.
-
-        Returns
-        -------
-        data_container : OrderedDict[str, OrderedDict]
-            Dataset represented as OrderedDict.
-        """
+        """ Creates a dictionary representation of self. """
         # some can not be uploaded, e.g., id, creator, creation_date
         simple_props = ['alias', 'main_entity_type', 'name', 'description']
         # maps from attribute name (which is used as outer tag name) to immer

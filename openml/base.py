@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from collections import OrderedDict
 import re
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Union
 import webbrowser
 
 import xmltodict
@@ -37,21 +37,22 @@ class OpenMLBase(ABC):
         return "{}/{}/{}".format(openml.config.server_base_url, cls._entity_letter(), id_)
 
     @classmethod
-    def _entity_letter(cls):
+    def _entity_letter(cls) -> str:
         """ Return the letter which represents the entity type in urls, e.g. 'f' for flow."""
         # We take advantage of the class naming convention (OpenMLX),
         # which holds for all entities except studies and tasks, which overwrite this method.
         return cls.__name__.lower()[len('OpenML'):][0]
 
     @abstractmethod
-    def _get_repr_body_fields(self) -> List[Tuple[str, str]]:
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
         """ Collect all information to display in the __repr__ body.
 
         Returns
         ------
-        body_fields: List[Tuple[str, str]]
+        body_fields : List[Tuple[str, Union[str, int, List[str]]]]
             A list of (name, value) pairs to display in the body of the __repr__.
             E.g.: [('metric', 'accuracy'), ('dataset', 'iris')]
+            If value is a List of str, then each item of the list will appear in a separate row.
         """
         # Should be implemented in the base class.
         pass
@@ -77,18 +78,24 @@ class OpenMLBase(ABC):
 
     @abstractmethod
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
-        """ Generate a dict representation of self. """
+        """ Creates a dictionary representation of self.
+
+        Uses OrderedDict to ensure consistent ordering when converting to xml.
+        The return value (OrderedDict) will be used to create the upload xml file.
+        The xml file must have the tags in exactly the order of the object's xsd.
+        (see https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/).
+
+        Returns
+        -------
+        OrderedDict
+            Flow represented as OrderedDict.
+
+        """
         # Should be implemented in the base class.
         pass
 
     def _to_xml(self) -> str:
-        """Generate xml representation of self for upload to server.
-
-        Returns
-        -------
-        str
-            Task represented as XML string.
-        """
+        """ Generate xml representation of self for upload to server. """
         dict_representation = self._to_dict()
         xml_representation = xmltodict.unparse(dict_representation, pretty=True)
 

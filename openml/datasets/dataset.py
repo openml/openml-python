@@ -185,10 +185,11 @@ class OpenMLDataset(OpenMLBase):
             self.data_pickle_file = None
 
     @property
-    def id(self):
+    def id(self) -> Optional[int]:
         return self.dataset_id
 
-    def _get_repr_body_fields(self):
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+        """ Collect all information to display in the __repr__ body. """
         fields = {"Name": self.name,
                   "Version": self.version,
                   "Format": self.format,
@@ -766,13 +767,7 @@ class OpenMLDataset(OpenMLBase):
         return self.dataset_id
 
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
-        """ Creates a dictionary representation of self.
-
-        Returns
-        -------
-        data_container : OrderedDict[str, OrderedDict]
-            Dataset represented as OrderedDict.
-        """
+        """ Creates a dictionary representation of self. """
         props = ['id', 'name', 'version', 'description', 'format', 'creator',
                  'contributor', 'collection_date', 'upload_date', 'language',
                  'licence', 'url', 'default_target_attribute',
