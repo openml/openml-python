@@ -1,4 +1,5 @@
 import time
+from typing import Dict
 import requests
 import warnings
 
@@ -137,7 +138,11 @@ def send_request(
     return response
 
 
-def _parse_server_exception(response, url, file_elements):
+def _parse_server_exception(
+    response: requests.Response,
+    url: str,
+    file_elements: Dict,
+) -> OpenMLServerError:
     # OpenML has a sophisticated error system
     # where information about failures is provided. try to parse this
     try:
@@ -157,6 +162,7 @@ def _parse_server_exception(response, url, file_elements):
         return OpenMLServerNoResult(code, message, additional_information)
     # 163: failure to validate flow XML (https://www.openml.org/api_docs#!/flow/post_flow)
     if code in [163] and file_elements is not None and 'description' in file_elements:
+        # file_elements['description'] is the XML file description of the flow
         full_message = '\n{}\n{} - {}'.format(
             file_elements['description'],
             message,
