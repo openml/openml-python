@@ -39,7 +39,9 @@ The subsequent functions are defined to fetch tasks, flows, evaluations and prep
 a tabular format that can be used to build models.
 """
 
-def fetch_evaluations(run_full=False, flow_type='svm', metric = 'area_under_roc_curve'):
+def fetch_evaluations(run_full=False,
+                      flow_type='svm',
+                      metric='area_under_roc_curve'):
     '''
     Fetch a list of evaluations based on the flows and tasks used in the experiments.
 
@@ -77,13 +79,19 @@ def fetch_evaluations(run_full=False, flow_type='svm', metric = 'area_under_roc_
     flow_id = 5891 if flow_type == 'svm' else 6767
 
     # Fetching evaluations
-    eval_df = openml.evaluations.list_evaluations(function=metric, task=task_ids, flow=[flow_id],
-                                                  uploader=[2702], output_format='dataframe')
+    eval_df = openml.evaluations.list_evaluations(function=metric,
+                                                  task=task_ids,
+                                                  flow=[flow_id],
+                                                  uploader=[2702],
+                                                  output_format='dataframe')
     return eval_df, task_ids, flow_id
 
 
-def create_table_from_evaluations(eval_df, flow_type='svm', run_count=np.iinfo(np.int64).max,
-                                  metric = 'area_under_roc_curve', task_ids=None):
+def create_table_from_evaluations(eval_df,
+                                  flow_type='svm',
+                                  run_count=np.iinfo(np.int64).max,
+                                  metric = 'area_under_roc_curve',
+                                  task_ids=None):
     '''
     Create a tabular data with its ground truth from a dataframe of evaluations.
     Optionally, can filter out records based on task ids.
@@ -108,7 +116,6 @@ def create_table_from_evaluations(eval_df, flow_type='svm', run_count=np.iinfo(n
     '''
     if task_ids is not None:
         eval_df = eval_df.loc[eval_df.task_id.isin(task_ids)]
-    ncols = 4 if flow_type == 'svm' else 10  # ncols determine the number of hyperparameters
     if flow_type == 'svm':
         ncols = 4
         colnames = ['cost', 'degree', 'gamma', 'kernel']
@@ -165,6 +172,8 @@ def preprocess(eval_table, flow_type='svm'):
 eval_df, task_ids, flow_id = fetch_evaluations(run_full=False)
 X, y = create_table_from_evaluations(eval_df, run_count=1000)
 X = preprocess(X)
+print("Type: {}; Shape: {}".format(type(X), X.shape))
+print(X[:5])
 
 
 #############################################################################
