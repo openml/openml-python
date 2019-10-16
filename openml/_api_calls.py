@@ -43,13 +43,17 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
     url += call
 
     url = url.replace('=', '%3d')
-    logging.info('[%s] %s'.format(request_method, url))
+    logging.info('Starting [%s] request for the URL %s', request_method, url)
+    start = time.time()
     if file_elements is not None:
         if request_method != 'post':
             raise ValueError('request method must be post when file elements '
                              'are present')
-        return _read_url_files(url, data=data, file_elements=file_elements)
-    return _read_url(url, request_method, data)
+        response = _read_url_files(url, data=data, file_elements=file_elements)
+    else:
+        response = _read_url(url, request_method, data)
+    logging.info('%.7fs taken for [%s] request for the URL %s', time.time() - start, request_method, url)
+    return response
 
 
 def _file_id_to_url(file_id, filename=None):
@@ -74,14 +78,12 @@ def _read_url_files(url, data=None, file_elements=None):
         file_elements = {}
     # Using requests.post sets header 'Accept-encoding' automatically to
     # 'gzip,deflate'
-    start = time.time()
     response = send_request(
         request_method='post',
         url=url,
         data=data,
         files=file_elements,
     )
-    logging.info("Time for POST request: {:.7f}s".format(time.time() - start))
     if response.status_code != 200:
         raise _parse_server_exception(response, url)
     if 'Content-Encoding' not in response.headers or \
@@ -96,9 +98,7 @@ def _read_url(url, request_method, data=None):
     if config.apikey is not None:
         data['api_key'] = config.apikey
 
-    start = time.time()
     response = send_request(request_method=request_method, url=url, data=data)
-    logging.info("Time for {} request: {:.7f}s".format(request_method, time.time() - start))
     if response.status_code != 200:
         raise _parse_server_exception(response, url)
     if 'Content-Encoding' not in response.headers or \
