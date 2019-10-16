@@ -68,6 +68,10 @@ class OpenMLRun(OpenMLBase):
         self.tags = tags
         self.predictions_url = predictions_url
 
+    @property
+    def id(self):
+        return self.run_id
+
     def _get_repr_body_fields(self):
         fields = {"Uploader Name": self.uploader_name,
                   "Metric": self.task_evaluation_measure,

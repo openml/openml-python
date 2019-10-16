@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import re
-from typing import Optional, List, Tuple, OrderedDict
+from typing import Optional, List, Tuple
 import webbrowser
 
 import xmltodict
@@ -17,23 +17,10 @@ class OpenMLBase(ABC):
         return self._apply_repr_template(body_fields)
 
     @property
+    @abstractmethod
     def id(self) -> Optional[int]:
         """ The id of the entity, it is unique for its entity type. """
-        from openml.datasets.dataset import OpenMLDataset
-        from openml.flows.flow import OpenMLFlow
-        from openml.runs.run import OpenMLRun
-        from openml.study.study import BaseStudy
-        from openml.tasks.task import OpenMLTask
-        if isinstance(self, OpenMLDataset):
-            return self.dataset_id
-        if isinstance(self, OpenMLFlow):
-            return self.flow_id
-        if isinstance(self, OpenMLRun):
-            return self.run_id
-        if isinstance(self, BaseStudy):
-            return self.study_id
-        if isinstance(self, OpenMLTask):
-            return self.task_id
+        pass
 
     @property
     def openml_url(self) -> Optional[str]:
@@ -95,7 +82,7 @@ class OpenMLBase(ABC):
         return header + body
 
     @abstractmethod
-    def _to_dict(self) -> OrderedDict[str, OrderedDict]:
+    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
         """ Generate a dict representation of self. """
         # Should be implemented in the base class.
         pass

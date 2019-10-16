@@ -56,6 +56,10 @@ class OpenMLTask(OpenMLBase):
         self.estimation_procedure_id = estimation_procedure_id
         self.split = None  # type: Optional[OpenMLSplit]
 
+    @property
+    def id(self):
+        return self.task_id
+
     def _get_repr_body_fields(self):
         base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
         fields = {"Task Type Description": '{}tt/{}'.format(base_url, self.task_type_id)}

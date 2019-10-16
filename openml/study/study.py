@@ -89,6 +89,10 @@ class BaseStudy(OpenMLBase):
         self.setups = setups
         self.runs = runs
 
+    @property
+    def id(self):
+        return self.study_id
+
     def _get_repr_body_fields(self):
         # header is provided by the sub classes
         fields = {"Name": self.name,

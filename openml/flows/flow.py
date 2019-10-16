@@ -1,6 +1,6 @@
 from collections import OrderedDict
 import os
-from typing import Dict, List  # noqa: F401
+from typing import Dict, List, Union  # noqa: F401
 
 import xmltodict
 
@@ -134,6 +134,10 @@ class OpenMLFlow(OpenMLBase):
             self._extension = get_extension_by_flow(self)
         else:
             self._extension = extension
+
+    @property
+    def id(self):
+        return self.flow_id
 
     @property
     def extension(self):

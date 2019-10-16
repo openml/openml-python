@@ -184,6 +184,10 @@ class OpenMLDataset(OpenMLBase):
         else:
             self.data_pickle_file = None
 
+    @property
+    def id(self):
+        return self.dataset_id
+
     def _get_repr_body_fields(self):
         fields = {"Name": self.name,
                   "Version": self.version,
@@ -776,7 +780,7 @@ class OpenMLDataset(OpenMLBase):
                  'citation', 'tag', 'visibility', 'original_data_url',
                  'paper_url', 'update_comment', 'md5_checksum']
 
-        data_container = OrderedDict()
+        data_container = OrderedDict()  # type: 'OrderedDict[str, Union[Dict, str]]'
         data_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])
         data_container['oml:data_set_description'] = data_dict
 
