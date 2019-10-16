@@ -96,9 +96,6 @@ class OpenMLRun(OpenMLBase):
                  "Setup ID", "Setup String", "Dataset ID", "Dataset URL"]
         return [(key, fields[key]) for key in order if key in fields]
 
-    def _repr_pretty_(self, pp, cycle):
-        pp.text(str(self))
-
     @classmethod
     def from_filesystem(cls, directory: str, expect_model: bool = True) -> 'OpenMLRun':
         """
