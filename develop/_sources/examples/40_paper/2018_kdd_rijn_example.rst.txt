@@ -132,7 +132,6 @@ https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdcc
                                      if len(setups_evals[c].unique()) > 1 or c == performance_column]]
         # We are done with processing ``setups_evals``. Note that we still might have some irrelevant hyperparameters, e.g.,
         # ``random_state``. We have dropped some relevant hyperparameters, i.e., several categoricals. Let's check it out:
-        print(setups_evals.dtypes)
 
         # determine x values to pass to fanova library
         parameter_names = [pname for pname in setups_evals.columns.to_numpy() if pname != performance_column]
@@ -141,7 +140,7 @@ https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdcc
         for idx, pname in enumerate(parameter_names):
             try:
                 fanova_results.append({
-                    'hyperparameter': pname if len(pname) < 35 else '[...] %s' % pname[-30:],
+                    'hyperparameter': pname.split(".")[-1],
                     'fanova': evaluator.quantify_importance([idx])[(idx,)]['individual importance']
                 })
             except RuntimeError as e:
@@ -157,133 +156,6 @@ https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdcc
 
 
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
-    sklearn.svm.classes.SVC(17)_C               float64
-    sklearn.svm.classes.SVC(17)_coef0           float64
-    sklearn.svm.classes.SVC(17)_degree            int64
-    sklearn.svm.classes.SVC(17)_gamma           float64
-    sklearn.svm.classes.SVC(17)_random_state      int64
-    sklearn.svm.classes.SVC(17)_tol             float64
-    value                                       float64
-    dtype: object
 
 
 
@@ -314,7 +186,7 @@ the reader is referred to the more elaborate script (referred to earlier)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  19.585 seconds)
+   **Total running time of the script:** ( 1 minutes  19.307 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_kdd_rijn_example.py:

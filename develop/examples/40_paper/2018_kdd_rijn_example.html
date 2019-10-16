@@ -223,7 +223,6 @@ this, please see:
                                  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">setups_evals</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">c</span> <span class="o">==</span> <span class="n">performance_column</span><span class="p">]]</span>
     <span class="c1"># We are done with processing ``setups_evals``. Note that we still might have some irrelevant hyperparameters, e.g.,</span>
     <span class="c1"># ``random_state``. We have dropped some relevant hyperparameters, i.e., several categoricals. Let&#39;s check it out:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">setups_evals</span><span class="o">.</span><span class="n">dtypes</span><span class="p">)</span>
 
     <span class="c1"># determine x values to pass to fanova library</span>
     <span class="n">parameter_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">pname</span> <span class="k">for</span> <span class="n">pname</span> <span class="ow">in</span> <span class="n">setups_evals</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="k">if</span> <span class="n">pname</span> <span class="o">!=</span> <span class="n">performance_column</span><span class="p">]</span>
@@ -232,7 +231,7 @@ this, please see:
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">pname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parameter_names</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">fanova_results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-                <span class="s1">&#39;hyperparameter&#39;</span><span class="p">:</span> <span class="n">pname</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pname</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">35</span> <span class="k">else</span> <span class="s1">&#39;[...] </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pname</span><span class="p">[</span><span class="o">-</span><span class="mi">30</span><span class="p">:],</span>
+                <span class="s1">&#39;hyperparameter&#39;</span><span class="p">:</span> <span class="n">pname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
                 <span class="s1">&#39;fanova&#39;</span><span class="p">:</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">quantify_importance</span><span class="p">([</span><span class="n">idx</span><span class="p">])[(</span><span class="n">idx</span><span class="p">,)][</span><span class="s1">&#39;individual importance&#39;</span><span class="p">]</span>
             <span class="p">})</span>
         <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -244,129 +243,6 @@ this, please see:
 
 <span class="c1"># transform ``fanova_results`` from a list of dicts into a DataFrame</span>
 <span class="n">fanova_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">fanova_results</span><span class="p">)</span>
-</pre></div>
-</div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
-sklearn.svm.classes.SVC(17)_C               float64
-sklearn.svm.classes.SVC(17)_coef0           float64
-sklearn.svm.classes.SVC(17)_degree            int64
-sklearn.svm.classes.SVC(17)_gamma           float64
-sklearn.svm.classes.SVC(17)_random_state      int64
-sklearn.svm.classes.SVC(17)_tol             float64
-value                                       float64
-dtype: object
 </pre></div>
 </div>
 <p>make the boxplot of the variance contribution. Obviously, we can also use
@@ -383,7 +259,7 @@ the reader is referred to the more elaborate script (referred to earlier)</p>
 </pre></div>
 </div>
 <img alt="../../_images/sphx_glr_2018_kdd_rijn_example_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_2018_kdd_rijn_example_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  19.585 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  19.307 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-kdd-rijn-example-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/fb4c80b20c8429a4165b670554f3d313/2018_kdd_rijn_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_kdd_rijn_example.py</span></code></a></p>
