@@ -761,13 +761,13 @@ class OpenMLDataset(OpenMLBase):
         self.dataset_id = int(response['oml:upload_data_set']['oml:id'])
         return self.dataset_id
 
-    def _to_xml(self):
-        """ Serialize object to xml for upload
+    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
+        """ Creates a dictionary representation of self.
 
         Returns
         -------
-        xml_dataset : str
-            XML description of the data.
+        data_container : OrderedDict[str, OrderedDict]
+            Dataset represented as OrderedDict.
         """
         props = ['id', 'name', 'version', 'description', 'format', 'creator',
                  'contributor', 'collection_date', 'upload_date', 'language',
@@ -785,14 +785,7 @@ class OpenMLDataset(OpenMLBase):
             if content is not None:
                 data_dict["oml:" + prop] = content
 
-        xml_string = xmltodict.unparse(
-            input_dict=data_container,
-            pretty=True,
-        )
-        # A flow may not be uploaded with the xml encoding specification:
-        # <?xml version="1.0" encoding="utf-8"?>
-        xml_string = xml_string.split('\n', 1)[-1]
-        return xml_string
+        return data_container
 
 
 def _check_qualities(qualities):

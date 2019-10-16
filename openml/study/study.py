@@ -1,4 +1,4 @@
-import collections
+from collections import OrderedDict
 from typing import Dict, List, Optional
 
 import xmltodict
@@ -88,7 +88,6 @@ class BaseStudy(OpenMLBase):
         self.flows = flows
         self.setups = setups
         self.runs = runs
-        pass
 
     def _get_repr_body_fields(self):
         # header is provided by the sub classes
@@ -139,13 +138,13 @@ class BaseStudy(OpenMLBase):
         self.study_id = int(study_res['oml:study_upload']['oml:id'])
         return self.study_id
 
-    def _to_xml(self) -> str:
-        """Serialize object to xml for upload
+    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
+        """ Creates a dictionary representation of self.
 
         Returns
         -------
-        xml_study : str
-            XML description of the data.
+        data_container : OrderedDict[str, OrderedDict]
+            Dataset represented as OrderedDict.
         """
         # some can not be uploaded, e.g., id, creator, creation_date
         simple_props = ['alias', 'main_entity_type', 'name', 'description']
@@ -157,9 +156,9 @@ class BaseStudy(OpenMLBase):
             'runs': 'run_id',
         }
 
-        study_container = collections.OrderedDict()  # type: 'collections.OrderedDict'
+        study_container = OrderedDict()  # type: 'collections.OrderedDict'
         namespace_list = [('@xmlns:oml', 'http://openml.org/openml')]
-        study_dict = collections.OrderedDict(namespace_list)  # type: 'collections.OrderedDict'
+        study_dict = OrderedDict(namespace_list)  # type: 'collections.OrderedDict'
         study_container['oml:study'] = study_dict
 
         for prop_name in simple_props:
@@ -173,15 +172,7 @@ class BaseStudy(OpenMLBase):
                     'oml:' + inner_name: content
                 }
                 study_dict["oml:" + prop_name] = sub_dict
-
-        xml_string = xmltodict.unparse(
-            input_dict=study_container,
-            pretty=True,
-        )
-        # A flow may not be uploaded with the xml encoding specification:
-        # <?xml version="1.0" encoding="utf-8"?>
-        xml_string = xml_string.split('\n', 1)[-1]
-        return xml_string
+        return study_container
 
     def push_tag(self, tag: str):
         raise NotImplementedError("Tags for studies is not (yet) supported.")

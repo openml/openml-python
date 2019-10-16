@@ -171,23 +171,6 @@ class OpenMLTask(OpenMLBase):
 
         return task_container
 
-    def _to_xml(self) -> str:
-        """Generate xml representation of self for upload to server.
-
-        Returns
-        -------
-        str
-            Task represented as XML string.
-        """
-        task_dict = self._to_dict()
-        task_xml = xmltodict.unparse(task_dict, pretty=True)
-
-        # A task may not be uploaded with the xml encoding specification:
-        # <?xml version="1.0" encoding="utf-8"?>
-        task_xml = task_xml.split('\n', 1)[-1]
-
-        return task_xml
-
     def publish(self) -> int:
         """Publish task to OpenML server.
 

@@ -162,23 +162,7 @@ class OpenMLFlow(OpenMLBase):
                  "Upload Date", "Dependencies"]
         return [(key, fields[key]) for key in order if key in fields]
 
-    def _to_xml(self) -> str:
-        """Generate xml representation of self for upload to server.
-
-        Returns
-        -------
-        str
-            Flow represented as XML string.
-        """
-        flow_dict = self._to_dict()
-        flow_xml = xmltodict.unparse(flow_dict, pretty=True)
-
-        # A flow may not be uploaded with the xml encoding specification:
-        # <?xml version="1.0" encoding="utf-8"?>
-        flow_xml = flow_xml.split('\n', 1)[-1]
-        return flow_xml
-
-    def _to_dict(self) -> dict:
+    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
         """ Helper function used by _to_xml and itself.
 
         Creates a dictionary representation of self which can be serialized

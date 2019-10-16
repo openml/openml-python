@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 import re
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, OrderedDict
 import webbrowser
+
+import xmltodict
 
 import openml.config
 from .utils import _tag_openml_base
@@ -91,6 +93,28 @@ class OpenMLBase(ABC):
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
         body = '\n'.join(field_line_format.format(name, value) for name, value in body_fields)
         return header + body
+
+    @abstractmethod
+    def _to_dict(self) -> OrderedDict[str, OrderedDict]:
+        """ Generate a dict representation of self. """
+        # Should be implemented in the base class.
+        pass
+
+    def _to_xml(self) -> str:
+        """Generate xml representation of self for upload to server.
+
+        Returns
+        -------
+        str
+            Task represented as XML string.
+        """
+        dict_representation = self._to_dict()
+        xml_representation = xmltodict.unparse(dict_representation, pretty=True)
+
+        # A task may not be uploaded with the xml encoding specification:
+        # <?xml version="1.0" encoding="utf-8"?>
+        encoding_specification, xml_body = xml_representation.split('\n', 1)
+        return xml_body
 
     def open_in_browser(self):
         """ Opens the OpenML web page corresponding to this object in your default browser. """

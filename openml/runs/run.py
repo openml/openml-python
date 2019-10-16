@@ -191,7 +191,7 @@ class OpenMLRun(OpenMLBase):
                 'Output directory {} should be empty'.format(os.path.abspath(directory))
             )
 
-        run_xml = self._create_description_xml()
+        run_xml = self._to_xml()
         predictions_arff = arff.dumps(self._generate_arff_dict())
 
         # It seems like typing does not allow to define the same variable multiple times
@@ -459,7 +459,7 @@ class OpenMLRun(OpenMLBase):
                 self.model,
             )
 
-        description_xml = self._create_description_xml()
+        description_xml = self._to_xml()
         file_elements = {'description': ("description.xml", description_xml)}
 
         if self.error_message is None:
@@ -477,95 +477,65 @@ class OpenMLRun(OpenMLBase):
         self.run_id = int(result['oml:upload_run']['oml:run_id'])
         return self
 
-    def _create_description_xml(self):
-        """Create xml representation of run for upload.
+    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
+        """ Creates a dictionary corresponding to the desired xml desired by openML
 
+        Parameters
+        ----------
+        taskid : int
+            the identifier of the task
+        setup_string : string
+            a CLI string which can invoke the learning with the correct parameter
+            settings
+        parameter_settings : array of dicts
+            each dict containing keys name, value and component, one per parameter
+            setting
+        tags : array of strings
+            information that give a description of the run, must conform to
+            regex ``([a-zA-Z0-9_\-\.])+``
+        fold_evaluations : dict mapping from evaluation measure to a dict mapping
+            repeat_nr to a dict mapping from fold nr to a value (double)
+        sample_evaluations : dict mapping from evaluation measure to a dict
+            mapping repeat_nr to a dict mapping from fold nr to a dict mapping to
+            a sample nr to a value (double)
+        sample_evaluations :
         Returns
         -------
-        xml_string : string
-            XML description of run.
-        """
-
-        # as a tag, it must be of the form ([a-zA-Z0-9_\-\.])+
-        # so we format time from 'mm/dd/yy hh:mm:ss' to 'mm-dd-yy_hh.mm.ss'
-        # well_formatted_time = time.strftime("%c").replace(
-        #     ' ', '_').replace('/', '-').replace(':', '.')
-        # tags = run_environment + [well_formatted_time] + ['run_task'] + \
-        #     [self.model.__module__ + "." + self.model.__class__.__name__]
-        description = _to_dict(taskid=self.task_id, flow_id=self.flow_id,
-                               setup_string=self.setup_string,
-                               parameter_settings=self.parameter_settings,
-                               error_message=self.error_message,
-                               fold_evaluations=self.fold_evaluations,
-                               sample_evaluations=self.sample_evaluations,
-                               tags=self.tags)
-        description_xml = xmltodict.unparse(description, pretty=True)
-        return description_xml
-
-
-###############################################################################
-# Functions which cannot be in runs/functions due to circular imports
-
-def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
-             tags=None, fold_evaluations=None, sample_evaluations=None):
-    """ Creates a dictionary corresponding to the desired xml desired by openML
-
-    Parameters
-    ----------
-    taskid : int
-        the identifier of the task
-    setup_string : string
-        a CLI string which can invoke the learning with the correct parameter
-        settings
-    parameter_settings : array of dicts
-        each dict containing keys name, value and component, one per parameter
-        setting
-    tags : array of strings
-        information that give a description of the run, must conform to
-        regex ``([a-zA-Z0-9_\-\.])+``
-    fold_evaluations : dict mapping from evaluation measure to a dict mapping
-        repeat_nr to a dict mapping from fold nr to a value (double)
-    sample_evaluations : dict mapping from evaluation measure to a dict
-        mapping repeat_nr to a dict mapping from fold nr to a dict mapping to
-        a sample nr to a value (double)
-    sample_evaluations :
-    Returns
-    -------
-    result : an array with version information of the above packages
-    """  # noqa: W605
-    description = OrderedDict()
-    description['oml:run'] = OrderedDict()
-    description['oml:run']['@xmlns:oml'] = 'http://openml.org/openml'
-    description['oml:run']['oml:task_id'] = taskid
-    description['oml:run']['oml:flow_id'] = flow_id
-    if error_message is not None:
-        description['oml:run']['oml:error_message'] = error_message
-    description['oml:run']['oml:parameter_setting'] = parameter_settings
-    if tags is not None:
-        description['oml:run']['oml:tag'] = tags  # Tags describing the run
-    if (fold_evaluations is not None and len(fold_evaluations) > 0) or \
-            (sample_evaluations is not None and len(sample_evaluations) > 0):
-        description['oml:run']['oml:output_data'] = OrderedDict()
-        description['oml:run']['oml:output_data']['oml:evaluation'] = list()
-    if fold_evaluations is not None:
-        for measure in fold_evaluations:
-            for repeat in fold_evaluations[measure]:
-                for fold, value in fold_evaluations[measure][repeat].items():
-                    current = OrderedDict([
-                        ('@repeat', str(repeat)), ('@fold', str(fold)),
-                        ('oml:name', measure), ('oml:value', str(value))])
-                    description['oml:run']['oml:output_data'][
-                        'oml:evaluation'].append(current)
-    if sample_evaluations is not None:
-        for measure in sample_evaluations:
-            for repeat in sample_evaluations[measure]:
-                for fold in sample_evaluations[measure][repeat]:
-                    for sample, value in sample_evaluations[measure][repeat][
-                            fold].items():
+        result : an array with version information of the above packages
+        """  # noqa: W605
+        description = OrderedDict()
+        description['oml:run'] = OrderedDict()
+        description['oml:run']['@xmlns:oml'] = 'http://openml.org/openml'
+        description['oml:run']['oml:task_id'] = self.task_id
+        description['oml:run']['oml:flow_id'] = self.flow_id
+        if self.error_message is not None:
+            description['oml:run']['oml:error_message'] = self.error_message
+        description['oml:run']['oml:parameter_setting'] = self.parameter_settings
+        if self.tags is not None:
+            description['oml:run']['oml:tag'] = self.tags  # Tags describing the run
+        if (self.fold_evaluations is not None and len(self.fold_evaluations) > 0) or \
+                (self.sample_evaluations is not None and len(self.sample_evaluations) > 0):
+            description['oml:run']['oml:output_data'] = OrderedDict()
+            description['oml:run']['oml:output_data']['oml:evaluation'] = list()
+        if self.fold_evaluations is not None:
+            for measure in self.fold_evaluations:
+                for repeat in self.fold_evaluations[measure]:
+                    for fold, value in self.fold_evaluations[measure][repeat].items():
                         current = OrderedDict([
                             ('@repeat', str(repeat)), ('@fold', str(fold)),
-                            ('@sample', str(sample)), ('oml:name', measure),
-                            ('oml:value', str(value))])
+                            ('oml:name', measure), ('oml:value', str(value))])
                         description['oml:run']['oml:output_data'][
                             'oml:evaluation'].append(current)
-    return description
+        if self.sample_evaluations is not None:
+            for measure in self.sample_evaluations:
+                for repeat in self.sample_evaluations[measure]:
+                    for fold in self.sample_evaluations[measure][repeat]:
+                        for sample, value in \
+                                self.sample_evaluations[measure][repeat][fold].items():
+                            current = OrderedDict([
+                                ('@repeat', str(repeat)), ('@fold', str(fold)),
+                                ('@sample', str(sample)), ('oml:name', measure),
+                                ('oml:value', str(value))])
+                            description['oml:run']['oml:output_data'][
+                                'oml:evaluation'].append(current)
+        return description
