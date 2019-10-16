@@ -20,7 +20,6 @@ from ..tasks import (get_task,
                      OpenMLClusteringTask,
                      OpenMLRegressionTask
                      )
-from ..utils import _tag_entity
 
 
 class OpenMLRun(OpenMLBase):
