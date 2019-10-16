@@ -1,4 +1,5 @@
 import time
+from typing import Dict
 import requests
 import warnings
 
@@ -80,7 +81,7 @@ def _read_url_files(url, data=None, file_elements=None):
         files=file_elements,
     )
     if response.status_code != 200:
-        raise _parse_server_exception(response, url)
+        raise _parse_server_exception(response, url, file_elements=file_elements)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for {}.'
@@ -95,7 +96,7 @@ def _read_url(url, request_method, data=None):
 
     response = send_request(request_method=request_method, url=url, data=data)
     if response.status_code != 200:
-        raise _parse_server_exception(response, url)
+        raise _parse_server_exception(response, url, file_elements=None)
     if 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         warnings.warn('Received uncompressed content from OpenML for {}.'
@@ -137,7 +138,11 @@ def send_request(
     return response
 
 
-def _parse_server_exception(response, url):
+def _parse_server_exception(
+    response: requests.Response,
+    url: str,
+    file_elements: Dict,
+) -> OpenMLServerError:
     # OpenML has a sophisticated error system
     # where information about failures is provided. try to parse this
     try:
@@ -152,10 +157,27 @@ def _parse_server_exception(response, url):
     message = server_error['oml:message']
     additional_information = server_error.get('oml:additional_information')
     if code in [372, 512, 500, 482, 542, 674]:
+        if additional_information:
+            full_message = '{} - {}'.format(message, additional_information)
+        else:
+            full_message = message
+
         # 512 for runs, 372 for datasets, 500 for flows
         # 482 for tasks, 542 for evaluations, 674 for setups
-        return OpenMLServerNoResult(code, message, additional_information)
-    full_message = '{} - {}'.format(message, additional_information)
+        return OpenMLServerNoResult(
+            code=code,
+            message=full_message,
+        )
+    # 163: failure to validate flow XML (https://www.openml.org/api_docs#!/flow/post_flow)
+    if code in [163] and file_elements is not None and 'description' in file_elements:
+        # file_elements['description'] is the XML file description of the flow
+        full_message = '\n{}\n{} - {}'.format(
+            file_elements['description'],
+            message,
+            additional_information,
+        )
+    else:
+        full_message = '{} - {}'.format(message, additional_information)
     return OpenMLServerException(
         code=code,
         message=full_message,
