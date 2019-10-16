@@ -6,14 +6,34 @@ Plotting hyperparameter surfaces
 import openml
 import numpy as np
 
-# Choose an SVM flow, for example 8353, and a task.
+####################################################################################################
+# First step - obtaining the data
+# ===============================
+# First, we nood to choose an SVM flow, for example 8353, and a task. Finding the IDs of them are
+# not part of this tutorial, this could for example be done via the website.
+#
+# For this we use the function ``list_evaluations_setup`` which can automatically join
+# evaluations conducted by the server with the hyperparameter settings extracted from the
+# uploaded runs (called *setup*).
 df = openml.evaluations.list_evaluations_setups(
     function='predictive_accuracy',
     flow=[8353],
     task=[6],
     output_format='dataframe',
+    # Using this flag incorporates the hyperparameters into the returned dataframe. Otherwise,
+    # the dataframe would contain a field ``paramaters`` containing an unparsed dictionary.
     parameters_in_separate_columns=True,
 )
+print(df.head(n=10))
+
+####################################################################################################
+# We can see all the hyperparameter names in the columns of the dataframe:
+for name in df.columns:
+    print(name)
+
+####################################################################################################
+# Next, we cast and transform the hyperparameters of interest (``C`` and ``gamma``) so that we
+# can nicely plot them.
 hyperparameters = ['sklearn.svm.classes.SVC(16)_C', 'sklearn.svm.classes.SVC(16)_gamma']
 df[hyperparameters] = df[hyperparameters].astype(float).apply(np.log)
 
@@ -52,23 +72,3 @@ ax.set(
     xlabel="C (log10)",
     ylabel="gamma (log10)",
 )
-
-####################################################################################################
-# Option 3 - exact code example from the OpenML-Python paper
-# ==========================================================
-#
-
-import openml
-import numpy as np
-import matplotlib.pyplot as plt
-df = openml.evaluations.list_evaluations_setups(
-    'predictive_accuracy', flow=[8353], task=[6],
-    output_format='dataframe', parameters_in_separate_columns=True,
-) # Choose an SVM flow, for example 8353, and a task.
-hp_names = ['sklearn.svm.classes.SVC(16)_C','sklearn.svm.classes.SVC(16)_gamma']
-df[hp_names] = df[hp_names].astype(float).apply(np.log)
-C, gamma, score = df[hp_names[0]], df[hp_names[1]], df['value']
-cntr = plt.tricontourf(C, gamma, score, levels=12, cmap="RdBu_r")
-plt.colorbar(cntr, label="accuracy")
-plt.xlim((min(C), max(C))); plt.ylim((min(gamma), max(gamma)))
-plt.xlabel("C (log10)"); plt.ylabel("gamma (log10)")
