@@ -13,15 +13,14 @@ import pandas as pd
 # Tasks are identified by IDs and can be accessed in two different ways:
 #
 # 1. In a list providing basic information on all tasks available on OpenML.
-# This function will not download the actual tasks, but will instead download
-# meta data that can be used to filter the tasks and retrieve a set of IDs.
-# We can filter this list, for example, we can only list tasks having a
-# special tag or only tasks for a specific target such as
-# *supervised classification*.
-#
+#    This function will not download the actual tasks, but will instead download
+#    meta data that can be used to filter the tasks and retrieve a set of IDs.
+#    We can filter this list, for example, we can only list tasks having a
+#    special tag or only tasks for a specific target such as
+#    *supervised classification*.
 # 2. A single task by its ID. It contains all meta information, the target
-# metric, the splits and an iterator which can be used to access the
-# splits in a useful manner.
+#    metric, the splits and an iterator which can be used to access the
+#    splits in a useful manner.
 
 ############################################################################
 # Listing tasks
@@ -32,16 +31,18 @@ import pandas as pd
 tasks = openml.tasks.list_tasks(task_type_id=1)
 
 ############################################################################
-# **openml.tasks.list_tasks()** returns a dictionary of dictionaries, we convert it into a
+# **openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, which we convert
+# into a
 # `pandas dataframe <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
-# to have better visualization and easier access:
+# to have better visualization capabilities and easier access:
 
 tasks = pd.DataFrame.from_dict(tasks, orient='index')
 print(tasks.columns)
-print("First 5 of %s tasks:" % len(tasks))
+print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
-# The same can be obtained through lesser lines of code
+# As conversion to a pandas dataframe is a common task, we have added this functionality to the
+# OpenML-Python library which can be used by passing ``output_format='dataframe'``:
 tasks_df = openml.tasks.list_tasks(task_type_id=1, output_format='dataframe')
 print(tasks_df.head())
 
@@ -74,24 +75,21 @@ print(len(filtered_tasks))
 #
 # Similar to listing tasks by task type, we can list tasks by tags:
 
-tasks = openml.tasks.list_tasks(tag='OpenML100')
-tasks = pd.DataFrame.from_dict(tasks, orient='index')
-print("First 5 of %s tasks:" % len(tasks))
+tasks = openml.tasks.list_tasks(tag='OpenML100', output_format='dataframe')
+print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
 ############################################################################
 # Furthermore, we can list tasks based on the dataset id:
 
-tasks = openml.tasks.list_tasks(data_id=1471)
-tasks = pd.DataFrame.from_dict(tasks, orient='index')
-print("First 5 of %s tasks:" % len(tasks))
+tasks = openml.tasks.list_tasks(data_id=1471, output_format='dataframe')
+print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
 ############################################################################
 # In addition, a size limit and an offset can be applied both separately and simultaneously:
 
-tasks = openml.tasks.list_tasks(size=10, offset=50)
-tasks = pd.DataFrame.from_dict(tasks, orient='index')
+tasks = openml.tasks.list_tasks(size=10, offset=50, output_format='dataframe')
 print(tasks)
 
 ############################################################################
@@ -107,8 +105,7 @@ print(tasks)
 # Finally, it is also possible to list all tasks on OpenML with:
 
 ############################################################################
-tasks = openml.tasks.list_tasks()
-tasks = pd.DataFrame.from_dict(tasks, orient='index')
+tasks = openml.tasks.list_tasks(output_format='dataframe')
 print(len(tasks))
 
 ############################################################################
@@ -148,9 +145,9 @@ print(tasks[0])
 #
 # You can also create new tasks. Take the following into account:
 #
-# * You can only create tasks on _active_ datasets
+# * You can only create tasks on *active* datasets
 # * For now, only the following tasks are supported: classification, regression,
-# clustering, and learning curve analysis.
+#   clustering, and learning curve analysis.
 # * For now, tasks can only be created on a single dataset.
 # * The exact same task must not already exist.
 #
@@ -158,10 +155,9 @@ print(tasks[0])
 #
 # * task_type_id: The task type ID, required (see below). Required.
 # * dataset_id: The dataset ID. Required.
-# * target_name: The name of the attribute you aim to predict.
-# Optional.
+# * target_name: The name of the attribute you aim to predict. Optional.
 # * estimation_procedure_id : The ID of the estimation procedure used to create train-test
-# splits. Optional.
+#   splits. Optional.
 # * evaluation_measure: The name of the evaluation measure. Optional.
 # * Any additional inputs for specific tasks
 #
@@ -178,7 +174,7 @@ print(tasks[0])
 #
 # Let's create a classification task on a dataset. In this example we will do this on the
 # Iris dataset (ID=128 (on test server)). We'll use 10-fold cross-validation (ID=1),
-# and _predictive accuracy_ as the predefined measure (this can also be left open).
+# and *predictive accuracy* as the predefined measure (this can also be left open).
 # If a task with these parameters exist, we will get an appropriate exception.
 # If such a task doesn't exist, a task will be created and the corresponding task_id
 # will be returned.
@@ -212,8 +208,7 @@ openml.config.stop_using_configuration_for_example()
 
 
 ############################################################################
-# [Complete list of task types](https://www.openml.org/search?type=task_type)
-# [Complete list of model estimation procedures](
-# https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure)
-# [Complete list of evaluation measures](
-# https://www.openml.org/search?q=measure_type%3Aevaluation_measure&type=measure)
+# * `Complete list of task types <https://www.openml.org/search?type=task_type>`_.
+# * `Complete list of model estimation procedures <https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure>`_.
+# * `Complete list of evaluation measures <https://www.openml.org/search?q=measure_type%3Aevaluation_measure&type=measure>`_.
+#

@@ -1,6 +1,7 @@
 from collections import OrderedDict
 import os
 from typing import Dict, List, Union  # noqa: F401
+import logging
 
 import xmltodict
 
@@ -223,6 +224,10 @@ class OpenMLFlow(object):
             _add_if_nonempty(flow_dict, 'oml:{}'.format(attribute),
                              getattr(self, attribute))
 
+        if not self.description:
+            logger = logging.getLogger(__name__)
+            logger.warn("Flow % has empty description", self.name)
+
         flow_parameters = []
         for key in self.parameters:
             param_dict = OrderedDict()  # type: 'OrderedDict[str, str]'
@@ -280,6 +285,9 @@ class OpenMLFlow(object):
 
         Calls itself recursively to create :class:`OpenMLFlow` objects of
         subflows (components).
+        
+        XML definition of a flow is available at
+        https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.implementation.upload.xsd
 
         Parameters
         ----------
@@ -290,18 +298,29 @@ class OpenMLFlow(object):
         -------
             OpenMLFlow
 
-        """
+        """  # noqa E501
         arguments = OrderedDict()
         dic = xml_dict["oml:flow"]
 
         # Mandatory parts in the xml file
-        for key in ['name', 'external_version']:
+        for key in ['name']:
             arguments[key] = dic["oml:" + key]
 
         # non-mandatory parts in the xml file
-        for key in ['uploader', 'description', 'upload_date', 'language',
-                    'dependencies', 'version', 'binary_url', 'binary_format',
-                    'binary_md5', 'class_name', 'custom_name']:
+        for key in [
+            'external_version',
+            'uploader',
+            'description',
+            'upload_date',
+            'language',
+            'dependencies',
+            'version',
+            'binary_url',
+            'binary_format',
+            'binary_md5',
+            'class_name',
+            'custom_name',
+        ]:
             arguments[key] = dic.get("oml:" + key)
 
         # has to be converted to an int if present and cannot parsed in the

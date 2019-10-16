@@ -25,6 +25,7 @@ Changelog
 * ADD #412: The scikit-learn extension populates the short name field for flows.
 * MAINT #726: Update examples to remove deprecation warnings from scikit-learn
 * MAINT #752: Update OpenML-Python to be compatible with sklearn 0.21
+* ADD #790: Add user ID and name to list_evaluations
 
 
 0.9.0

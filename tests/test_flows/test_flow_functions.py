@@ -95,7 +95,6 @@ class TestFlowFunctions(TestBase):
         # Test most important values that can be set by a user
         openml.flows.functions.assert_flows_equal(flow, flow)
         for attribute, new_value in [('name', 'Tes'),
-                                     ('description', 'Test flo'),
                                      ('external_version', '2'),
                                      ('language', 'english'),
                                      ('dependencies', 'ab'),
@@ -264,6 +263,13 @@ class TestFlowFunctions(TestBase):
         self.assertEqual(server_flow.parameters['categories'], '[[0, 1], [0, 1]]')
         self.assertEqual(server_flow.model.categories, flow.model.categories)
 
+    def test_get_flow1(self):
+        # Regression test for issue #305
+        # Basically, this checks that a flow without an external version can be loaded
+        openml.config.server = self.production_server
+        flow = openml.flows.get_flow(1)
+        self.assertIsNone(flow.external_version)
+
     def test_get_flow_reinstantiate_model(self):
         model = ensemble.RandomForestClassifier(n_estimators=33)
         extension = openml.extensions.get_extension_by_model(model)
@@ -290,9 +296,37 @@ class TestFlowFunctions(TestBase):
         openml.config.server = self.production_server
         _, sklearn_major, _ = LooseVersion(sklearn.__version__).version[:3]
         flow = 8175
-        expected = 'Trying to deserialize a model with dependency sklearn==0.19.1 not satisfied.'
+        expected = ('Trying to deserialize a model with dependency'
+                    ' sklearn==0.19.1 not satisfied.')
         self.assertRaisesRegex(ValueError,
                                expected,
                                openml.flows.get_flow,
                                flow_id=flow,
                                reinstantiate=True)
+        if LooseVersion(sklearn.__version__) > "0.19.1":
+            # 0.18 actually can't deserialize this because of incompatibility
+            flow = openml.flows.get_flow(flow_id=flow, reinstantiate=True,
+                                         strict_version=False)
+            # ensure that a new flow was created
+            assert flow.flow_id is None
+            assert "0.19.1" not in flow.dependencies
+
+    def test_get_flow_id(self):
+        clf = sklearn.tree.DecisionTreeClassifier()
+        flow = openml.extensions.get_extension_by_model(clf).model_to_flow(clf).publish()
+
+        self.assertEqual(openml.flows.get_flow_id(model=clf, exact_version=True), flow.flow_id)
+        flow_ids = openml.flows.get_flow_id(model=clf, exact_version=False)
+        self.assertIn(flow.flow_id, flow_ids)
+        self.assertGreater(len(flow_ids), 2)
+
+        # Check that the output of get_flow_id is identical if only the name is given, no matter
+        # whether exact_version is set to True or False.
+        flow_ids_exact_version_True = openml.flows.get_flow_id(name=flow.name, exact_version=True)
+        flow_ids_exact_version_False = openml.flows.get_flow_id(
+            name=flow.name,
+            exact_version=False,
+        )
+        self.assertEqual(flow_ids_exact_version_True, flow_ids_exact_version_False)
+        self.assertIn(flow.flow_id, flow_ids_exact_version_True)
+        self.assertGreater(len(flow_ids_exact_version_True), 2)

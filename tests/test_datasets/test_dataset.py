@@ -9,6 +9,7 @@ from scipy import sparse
 import openml
 from openml.testing import TestBase
 from openml.exceptions import PyOpenMLError
+from openml.datasets import OpenMLDataset, OpenMLDataFeature
 
 
 class OpenMLDatasetTest(TestBase):
@@ -26,6 +27,28 @@ class OpenMLDatasetTest(TestBase):
         # these datasets have some boolean features
         self.pc4 = openml.datasets.get_dataset(1049, download_data=False)
         self.jm1 = openml.datasets.get_dataset(1053, download_data=False)
+        self.iris = openml.datasets.get_dataset(61, download_data=False)
+
+    def test_repr(self):
+        # create a bare-bones dataset as would be returned by
+        # create_dataset
+        data = openml.datasets.OpenMLDataset(name="somename",
+                                             description="a description")
+        str(data)
+
+    def test_init_string_validation(self):
+        with pytest.raises(ValueError, match="Invalid symbols in name"):
+            openml.datasets.OpenMLDataset(name="some name",
+                                          description="a description")
+
+        with pytest.raises(ValueError, match="Invalid symbols in description"):
+            openml.datasets.OpenMLDataset(name="somename",
+                                          description="a descriptïon")
+
+        with pytest.raises(ValueError, match="Invalid symbols in citation"):
+            openml.datasets.OpenMLDataset(name="somename",
+                                          description="a description",
+                                          citation="Something by Müller")
 
     def test_get_data_array(self):
         # Basic usage
@@ -190,6 +213,18 @@ class OpenMLDatasetTest(TestBase):
         # Check that no label is mapped to 3, since it is reserved for label '4'.
         self.assertEqual(np.sum(y == 3), 0)
 
+    def test_get_data_corrupt_pickle(self):
+        # Lazy loaded dataset, populate cache.
+        self.iris.get_data()
+        # Corrupt pickle file, overwrite as empty.
+        with open(self.iris.data_pickle_file, "w") as fh:
+            fh.write("")
+        # Despite the corrupt file, the data should be loaded from the ARFF file.
+        # A warning message is written to the python logger.
+        xy, _, _, _ = self.iris.get_data()
+        self.assertIsInstance(xy, pd.DataFrame)
+        self.assertEqual(xy.shape, (150, 5))
+
 
 class OpenMLDatasetTestOnTestServer(TestBase):
     def setUp(self):
@@ -306,6 +341,16 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertEqual(len(categorical), 19998)
         self.assertListEqual(categorical, [False] * 19998)
         self.assertEqual(y.shape, (600, ))
+
+    def test_get_sparse_categorical_data_id_395(self):
+        dataset = openml.datasets.get_dataset(395, download_data=True)
+        feature = dataset.features[3758]
+        self.assertTrue(isinstance(dataset, OpenMLDataset))
+        self.assertTrue(isinstance(feature, OpenMLDataFeature))
+        self.assertEqual(dataset.name, 're1.wc')
+        self.assertEqual(feature.name, 'CLASS_LABEL')
+        self.assertEqual(feature.data_type, 'nominal')
+        self.assertEqual(len(feature.nominal_values), 25)
 
 
 class OpenMLDatasetQualityTest(TestBase):

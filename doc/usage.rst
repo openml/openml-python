@@ -114,7 +114,7 @@ requirements and how to download a dataset:
 OpenML is about sharing machine learning results and the datasets they were
 obtained on. Learn how to share your datasets in the following tutorial:
 
-* `Upload a dataset <examples/create_upload_tutorial.html>`_
+* `Upload a dataset <examples/30_extended/create_upload_tutorial.html>`_
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Extending OpenML-Python

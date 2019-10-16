@@ -54,7 +54,9 @@ class TestEvaluationFunctions(TestBase):
 
         uploader_id = 16
         evaluations = openml.evaluations.list_evaluations("predictive_accuracy",
-                                                          uploader=[uploader_id])
+                                                          uploader=[uploader_id],
+                                                          output_format='dataframe')
+        self.assertEqual(evaluations['uploader'].unique(), [uploader_id])
 
         self.assertGreater(len(evaluations), 50)
 
@@ -95,7 +97,7 @@ class TestEvaluationFunctions(TestBase):
         run_id = 12
 
         evaluations = openml.evaluations.list_evaluations("predictive_accuracy",
-                                                          id=[run_id])
+                                                          run=[run_id])
 
         self.assertEqual(len(evaluations), 1)
         for run_id in evaluations.keys():

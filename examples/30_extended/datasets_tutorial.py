@@ -14,8 +14,9 @@ import pandas as pd
 # **********
 #
 # * List datasets
+#
 #   * Use the output_format parameter to select output type
-#   * Default gives 'dict' (other option: 'dataframe')
+#   * Default gives 'dict' (other option: 'dataframe', see below)
 
 openml_list = openml.datasets.list_datasets()  # returns a dict
 
@@ -26,7 +27,7 @@ datalist = datalist[[
     'NumberOfFeatures', 'NumberOfClasses'
 ]]
 
-print("First 10 of %s datasets..." % len(datalist))
+print(f"First 10 of {len(datalist)} datasets...")
 datalist.head(n=10)
 
 # The same can be done with lesser lines of code
@@ -55,9 +56,9 @@ datalist.query('NumberOfClasses > 50')
 dataset = openml.datasets.get_dataset(1471)
 
 # Print a summary
-print("This is dataset '%s', the target feature is '%s'" %
-      (dataset.name, dataset.default_target_attribute))
-print("URL: %s" % dataset.url)
+print(f"This is dataset '{dataset.name}', the target feature is "
+      f"'{dataset.default_target_attribute}'")
+print(f"URL: {dataset.url}")
 print(dataset.description[:500])
 
 ############################################################################

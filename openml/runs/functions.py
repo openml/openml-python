@@ -687,10 +687,13 @@ def _create_run_from_xml(xml, from_server=True):
                              '(OpenML server error?)')
     else:
         output_data = run['oml:output_data']
+        predictions_url = None
         if 'oml:file' in output_data:
             # multiple files, the normal case
             for file_dict in output_data['oml:file']:
                 files[file_dict['oml:name']] = int(file_dict['oml:file_id'])
+                if file_dict['oml:name'] == 'predictions':
+                    predictions_url = file_dict['oml:url']
         if 'oml:evaluation' in output_data:
             # in normal cases there should be evaluations, but in case there
             # was an error these could be absent
@@ -757,8 +760,8 @@ def _create_run_from_xml(xml, from_server=True):
                      dataset_id=dataset_id, output_files=files,
                      evaluations=evaluations,
                      fold_evaluations=fold_evaluations,
-                     sample_evaluations=sample_evaluations,
-                     tags=tags)
+                     sample_evaluations=sample_evaluations, tags=tags,
+                     predictions_url=predictions_url)
 
 
 def _get_cached_run(run_id):
@@ -786,6 +789,7 @@ def list_runs(
     flow: Optional[List] = None,
     uploader: Optional[List] = None,
     tag: Optional[str] = None,
+    study: Optional[int] = None,
     display_errors: bool = False,
     output_format: str = 'dict',
     **kwargs
@@ -812,6 +816,8 @@ def list_runs(
     uploader : list, optional
 
     tag : str, optional
+
+    study : int, optional
 
     display_errors : bool, optional (default=None)
         Whether to list runs which have an error (for example a missing
@@ -854,6 +860,7 @@ def list_runs(
                                   flow=flow,
                                   uploader=uploader,
                                   tag=tag,
+                                  study=study,
                                   display_errors=display_errors,
                                   **kwargs)
 
@@ -864,6 +871,7 @@ def _list_runs(
     setup: Optional[List] = None,
     flow: Optional[List] = None,
     uploader: Optional[List] = None,
+    study: Optional[int] = None,
     display_errors: bool = False,
     output_format: str = 'dict',
     **kwargs
@@ -888,6 +896,8 @@ def _list_runs(
     flow : list, optional
 
     uploader : list, optional
+
+    study : int, optional
 
     display_errors : bool, optional (default=None)
         Whether to list runs which have an error (for example a missing
@@ -921,6 +931,8 @@ def _list_runs(
         api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
     if uploader is not None:
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
+    if study is not None:
+        api_call += "/study/%d" % study
     if display_errors:
         api_call += "/show_errors/true"
     return __list_runs(api_call=api_call, output_format=output_format)

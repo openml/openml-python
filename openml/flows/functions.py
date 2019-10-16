@@ -5,7 +5,7 @@ import io
 import re
 import xmltodict
 import pandas as pd
-from typing import Union, Dict, Optional
+from typing import Any, Union, Dict, Optional, List
 
 from ..exceptions import OpenMLCacheException
 import openml._api_calls
@@ -71,7 +71,8 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
+def get_flow(flow_id: int, reinstantiate: bool = False,
+             strict_version: bool = True) -> OpenMLFlow:
     """Download the OpenML flow for a given flow ID.
 
     Parameters
@@ -82,6 +83,9 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
     reinstantiate: bool
         Whether to reinstantiate the flow to a model instance.
 
+    strict_version : bool, default=True
+        Whether to fail if version requirements are not fulfilled.
+
     Returns
     -------
     flow : OpenMLFlow
@@ -91,7 +95,13 @@ def get_flow(flow_id: int, reinstantiate: bool = False) -> OpenMLFlow:
     flow = _get_flow_description(flow_id)
 
     if reinstantiate:
-        flow.model = flow.extension.flow_to_model(flow)
+        flow.model = flow.extension.flow_to_model(
+            flow, strict_version=strict_version)
+        if not strict_version:
+            # check if we need to return a new flow b/c of version mismatch
+            new_flow = flow.extension.model_to_flow(flow.model)
+            if new_flow.dependencies != flow.dependencies:
+                return new_flow
     return flow
 
 
@@ -258,6 +268,72 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
         return False
 
 
+def get_flow_id(
+    model: Optional[Any] = None,
+    name: Optional[str] = None,
+    exact_version=True,
+) -> Union[int, bool, List[int]]:
+    """Retrieves the flow id for a model or a flow name.
+
+    Provide either a model or a name to this function. Depending on the input, it does
+
+    * ``model`` and ``exact_version == True``: This helper function first queries for the necessary
+      extension. Second, it uses that extension to convert the model into a flow. Third, it
+      executes ``flow_exists`` to potentially obtain the flow id the flow is published to the
+      server.
+    * ``model`` and ``exact_version == False``: This helper function first queries for the
+      necessary extension. Second, it uses that extension to convert the model into a flow. Third
+      it calls ``list_flows`` and filters the returned values based on the flow name.
+    * ``name``: Ignores ``exact_version`` and calls ``list_flows``, then filters the returned
+      values based on the flow name.
+
+    Parameters
+    ----------
+    model : object
+        Any model. Must provide either ``model`` or ``name``.
+    name : str
+        Name of the flow. Must provide either ``model`` or ``name``.
+    exact_version : bool
+        Whether to return the ``flow_id`` of the exact version or all ``flow_id``s where the name
+        of the flow matches. This is only taken into account for a model where a version number
+        is available.
+
+    Returns
+    -------
+    int or bool, List
+        flow id iff exists, ``False`` otherwise, List if exact_version is ``False``
+    """
+    if model is None and name is None:
+        raise ValueError(
+            'Need to provide either argument `model` or argument `name`, but both are `None`.'
+        )
+    elif model is not None and name is not None:
+        raise ValueError(
+            'Must provide either argument `model` or argument `name`, but not both.'
+        )
+
+    if model is not None:
+        extension = openml.extensions.get_extension_by_model(model, raise_if_no_extension=True)
+        if extension is None:
+            # This should never happen and is only here to please mypy will be gone soon once the
+            # whole function is removed
+            raise TypeError(extension)
+        flow = extension.model_to_flow(model)
+        flow_name = flow.name
+        external_version = flow.external_version
+    else:
+        flow_name = name
+        exact_version = False
+
+    if exact_version:
+        return flow_exists(name=flow_name, external_version=external_version)
+    else:
+        flows = list_flows(output_format='dataframe')
+        assert isinstance(flows, pd.DataFrame)  # Make mypy happy
+        flows = flows.query('name == "{}"'.format(flow_name))
+        return flows['id'].to_list()
+
+
 def __list_flows(
     api_call: str,
     output_format: str = 'dict'
@@ -308,7 +384,8 @@ def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
 def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                        ignore_parameter_values_on_older_children: str = None,
                        ignore_parameter_values: bool = False,
-                       ignore_custom_name_if_none: bool = False) -> None:
+                       ignore_custom_name_if_none: bool = False,
+                       check_description: bool = True) -> None:
     """Check equality of two flows.
 
     Two flows are equal if their all keys which are not set by the server
@@ -327,8 +404,11 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
     ignore_parameter_values : bool
         Whether to ignore parameter values when comparing flows.
 
-   ignore_custom_name_if_none : bool
+    ignore_custom_name_if_none : bool
         Whether to ignore the custom name field if either flow has `custom_name` equal to `None`.
+
+    check_description : bool
+        Whether to ignore matching of flow descriptions.
     """
     if not isinstance(flow1, OpenMLFlow):
         raise TypeError('Argument 1 must be of type OpenMLFlow, but is %s' %
@@ -366,6 +446,10 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                                    ignore_custom_name_if_none)
         elif key == '_extension':
             continue
+        elif check_description and key == 'description':
+            # to ignore matching of descriptions since sklearn based flows may have
+            # altering docstrings and is not guaranteed to be consistent
+            continue
         else:
             if key == 'parameters':
                 if ignore_parameter_values or \
@@ -396,6 +480,35 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                 # If specified, we allow `custom_name` inequality if one flow's name is None.
                 # Helps with backwards compatibility as `custom_name` is now auto-generated, but
                 # before it used to be `None`.
+                continue
+            elif key == 'parameters_meta_info':
+                # this value is a dictionary where each key is a parameter name, containing another
+                # dictionary with keys specifying the parameter's 'description' and 'data_type'
+                # checking parameter descriptions can be ignored since that might change
+                # data type check can also be ignored if one of them is not defined, i.e., None
+                params1 = set(flow1.parameters_meta_info.keys())
+                params2 = set(flow2.parameters_meta_info.keys())
+                if params1 != params2:
+                    raise ValueError('Parameter list in meta info for parameters differ '
+                                     'in the two flows.')
+                # iterating over the parameter's meta info list
+                for param in params1:
+                    if isinstance(flow1.parameters_meta_info[param], Dict) and \
+                       isinstance(flow2.parameters_meta_info[param], Dict) and \
+                       'data_type' in flow1.parameters_meta_info[param] and \
+                       'data_type' in flow2.parameters_meta_info[param]:
+                        value1 = flow1.parameters_meta_info[param]['data_type']
+                        value2 = flow2.parameters_meta_info[param]['data_type']
+                    else:
+                        value1 = flow1.parameters_meta_info[param]
+                        value2 = flow2.parameters_meta_info[param]
+                    if value1 is None or value2 is None:
+                        continue
+                    elif value1 != value2:
+                        raise ValueError("Flow {}: data type for parameter {} in {} differ "
+                                         "as {}\nvs\n{}".format(flow1.name, param, key,
+                                                                value1, value2))
+                # the continue is to avoid the 'attr != attr2' check at end of function
                 continue
 
             if attr1 != attr2:
