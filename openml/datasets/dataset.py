@@ -780,7 +780,7 @@ class OpenMLDataset(OpenMLBase):
                  'citation', 'tag', 'visibility', 'original_data_url',
                  'paper_url', 'update_comment', 'md5_checksum']
 
-        data_container = OrderedDict()  # type: 'OrderedDict[str, Union[Dict, str]]'
+        data_container = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
         data_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])
         data_container['oml:data_set_description'] = data_dict
 

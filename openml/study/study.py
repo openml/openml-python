@@ -102,8 +102,7 @@ class BaseStudy(OpenMLBase):
             fields["ID"] = self.study_id
             fields["Study URL"] = self.openml_url
         if self.creator is not None:
-            base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
-            fields["Creator"] = "{}u/{}".format(base_url, self.creator)
+            fields["Creator"] = "{}/u/{}".format(openml.config.server_base_url, self.creator)
         if self.creation_date is not None:
             fields["Upload Time"] = self.creation_date.replace('T', ' ')
         if self.data is not None:
@@ -160,9 +159,9 @@ class BaseStudy(OpenMLBase):
             'runs': 'run_id',
         }
 
-        study_container = OrderedDict()  # type: 'collections.OrderedDict'
+        study_container = OrderedDict()  # type: 'OrderedDict'
         namespace_list = [('@xmlns:oml', 'http://openml.org/openml')]
-        study_dict = OrderedDict(namespace_list)  # type: 'collections.OrderedDict'
+        study_dict = OrderedDict(namespace_list)  # type: 'OrderedDict'
         study_container['oml:study'] = study_dict
 
         for prop_name in simple_props:

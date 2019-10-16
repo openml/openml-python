@@ -61,8 +61,8 @@ class OpenMLTask(OpenMLBase):
         return self.task_id
 
     def _get_repr_body_fields(self):
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
-        fields = {"Task Type Description": '{}tt/{}'.format(base_url, self.task_type_id)}
+        fields = {"Task Type Description": '{}/tt/{}'.format(openml.config.server_base_url,
+                                                             self.task_type_id)}
         if self.task_id is not None:
             fields["Task ID"] = self.task_id
             fields["Task URL"] = self.openml_url

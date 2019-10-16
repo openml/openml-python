@@ -87,8 +87,8 @@ class OpenMLRun(OpenMLBase):
                   "Dataset ID": self.dataset_id,
                   "Dataset URL": openml.datasets.OpenMLDataset.url_for_id(self.dataset_id)}
         if self.uploader is not None:
-            base_url = "{}".format(openml.config.server[:-len('/api/v1/xml')])
-            fields["Uploader Profile"] = "{}/u/{}".format(base_url, self.uploader)
+            fields["Uploader Profile"] = "{}/u/{}".format(openml.config.server_base_url,
+                                                          self.uploader)
         if self.run_id is not None:
             fields["Run URL"] = self.openml_url
         if self.evaluations is not None and self.task_evaluation_measure in self.evaluations:
@@ -507,7 +507,7 @@ class OpenMLRun(OpenMLBase):
         -------
         result : an array with version information of the above packages
         """  # noqa: W605
-        description = OrderedDict()
+        description = OrderedDict()  # type: 'OrderedDict'
         description['oml:run'] = OrderedDict()
         description['oml:run']['@xmlns:oml'] = 'http://openml.org/openml'
         description['oml:run']['oml:task_id'] = self.task_id
