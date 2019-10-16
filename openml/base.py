@@ -4,7 +4,7 @@ from typing import Optional, List, Tuple
 import webbrowser
 
 import openml.config
-from .utils import _tag_entity
+from .utils import _tag_openml_base
 
 
 class OpenMLBase(ABC):
@@ -104,7 +104,7 @@ class OpenMLBase(ABC):
         tag : str
             Tag to attach to the flow.
         """
-        _tag_entity('flow', self.id, tag)
+        _tag_openml_base(self, tag)
 
     def remove_tag(self, tag: str):
         """Removes a tag from this entity on the server.
@@ -114,4 +114,4 @@ class OpenMLBase(ABC):
         tag : str
             Tag to attach to the flow.
         """
-        _tag_entity('flow', self.id, tag, untag=True)
+        _tag_openml_base(self, tag, untag=True)

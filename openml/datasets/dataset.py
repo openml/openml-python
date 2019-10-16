@@ -18,7 +18,6 @@ import openml._api_calls
 from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
-from ..utils import _tag_entity
 
 
 logger = logging.getLogger(__name__)
