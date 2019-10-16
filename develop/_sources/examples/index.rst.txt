@@ -159,6 +159,26 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Plotting hyperparameter surfaces">
+
+.. only:: html
+
+    .. figure:: /examples/30_extended/images/thumb/sphx_glr_plot_svm_hyperparameters_tutorial_thumb.png
+
+        :ref:`sphx_glr_examples_30_extended_plot_svm_hyperparameters_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/30_extended/plot_svm_hyperparameters_tutorial
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="How to list, download and upload benchmark studies.">
 
 .. only:: html
