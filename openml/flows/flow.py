@@ -226,7 +226,7 @@ class OpenMLFlow(object):
 
         if not self.description:
             logger = logging.getLogger(__name__)
-            logger.warn("Flow {} has empty description".format(self.name))
+            logger.warn("Flow % has empty description", self.name)
 
         flow_parameters = []
         for key in self.parameters:
