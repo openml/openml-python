@@ -89,6 +89,10 @@ class BaseStudy(OpenMLBase):
         self.setups = setups
         self.runs = runs
 
+    @classmethod
+    def _entity_letter(cls):
+        return 's'
+
     @property
     def id(self):
         return self.study_id

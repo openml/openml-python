@@ -40,13 +40,7 @@ class OpenMLBase(ABC):
     def _entity_letter(cls):
         """ Return the letter which represents the entity type in urls, e.g. 'f' for flow."""
         # We take advantage of the class naming convention (OpenMLX),
-        # which holds for all entities except studies.
-        from openml.study.study import BaseStudy
-        from openml.tasks.task import OpenMLTask
-        if issubclass(cls, BaseStudy):
-            return 's'
-        if issubclass(cls, OpenMLTask):
-            return 't'
+        # which holds for all entities except studies and tasks, which overwrite this method.
         return cls.__name__.lower()[len('OpenML'):][0]
 
     @abstractmethod

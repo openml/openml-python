@@ -56,6 +56,10 @@ class OpenMLTask(OpenMLBase):
         self.estimation_procedure_id = estimation_procedure_id
         self.split = None  # type: Optional[OpenMLSplit]
 
+    @classmethod
+    def _entity_letter(cls):
+        return 't'
+
     @property
     def id(self):
         return self.task_id
