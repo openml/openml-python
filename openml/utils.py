@@ -68,7 +68,7 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
                              (xml_tag_name, str(node)))
 
 
-def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool=False):
+def _tag_openml_base(oml_object: 'OpenMLBase', tag: str, untag: bool=False):
     rest_api_mapping = [
         (openml.datasets.OpenMLDataset, 'data'),
         (openml.flows.OpenMLFlow, 'flow'),
