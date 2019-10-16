@@ -258,6 +258,7 @@ class OpenMLDataset(object):
             when converted to lower case.
 
 
+
         Returns
         -------
         dict
@@ -332,13 +333,15 @@ class OpenMLDataset(object):
         attribute_names = []
         categories_names = {}
         categorical = []
-        for name, type_ in data['attributes']:
+        for i, (name, type_) in enumerate(data['attributes']):
             # if the feature is nominal and the a sparse matrix is
             # requested, the categories need to be numeric
             if (isinstance(type_, list)
                     and self.format.lower() == 'sparse_arff'):
                 try:
-                    np.array(type_, dtype=np.float32)
+                    # checks if the strings which should be the class labels
+                    # can be encoded into integers
+                    pd.factorize(type_)[0]
                 except ValueError:
                     raise ValueError(
                         "Categorical data needs to be numeric when "
@@ -528,8 +531,11 @@ class OpenMLDataset(object):
                     'PyOpenML cannot handle string when returning numpy'
                     ' arrays. Use dataset_format="dataframe".'
                 )
-        elif array_format == "dataframe" and scipy.sparse.issparse(data):
-            return pd.SparseDataFrame(data, columns=attribute_names)
+        elif array_format == "dataframe":
+            if scipy.sparse.issparse(data):
+                return pd.SparseDataFrame(data, columns=attribute_names)
+            else:
+                return data
         else:
             data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
             logging.warning(
