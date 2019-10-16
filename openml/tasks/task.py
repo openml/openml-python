@@ -57,7 +57,8 @@ class OpenMLTask(OpenMLBase):
         self.split = None  # type: Optional[OpenMLSplit]
 
     def _get_repr_body_fields(self):
-        fields = {"Task Type": self.task_type}
+        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+        fields = {"Task Type Description": '{}tt/{}'.format(base_url, self.task_type_id)}
         if self.task_id is not None:
             fields["Task ID"] = self.task_id
             fields["Task URL"] = self.openml_url
@@ -73,8 +74,8 @@ class OpenMLTask(OpenMLBase):
                 fields["Cost Matrix"] = "Available"
 
         # determines the order in which the information will be printed
-        order = ["Task Type", "Task ID", "Task URL", "Estimation Procedure", "Evaluation Measure",
-                 "Target Feature", "# of Classes", "Cost Matrix"]
+        order = ["Task Type Description", "Task ID", "Task URL", "Estimation Procedure",
+                 "Evaluation Measure", "Target Feature", "# of Classes", "Cost Matrix"]
         return [(key, fields[key]) for key in order if key in fields]
 
     def get_dataset(self) -> datasets.OpenMLDataset:
