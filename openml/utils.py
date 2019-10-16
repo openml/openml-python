@@ -76,7 +76,8 @@ def _tag_openml_base(oml_object: 'OpenMLBase', tag: str, untag: bool=False):
         (openml.runs.OpenMLRun, 'run')
     ]
     _, api_type_alias = [(python_type, api_alias)
-                         for (python_type, api_alias) in rest_api_mapping][0]
+                         for (python_type, api_alias) in rest_api_mapping
+                         if isinstance(oml_object, python_type)][0]
     _tag_entity(api_type_alias, oml_object.id, tag, untag)
 
 
