@@ -44,7 +44,10 @@ df[hyperparameters] = df[hyperparameters].astype(float).apply(np.log)
 df.plot.hexbin(
     x='sklearn.svm.classes.SVC(16)_C',
     y='sklearn.svm.classes.SVC(16)_gamma',
-    C='value', reduce_C_function=np.mean, gridsize=25,
+    C='value',
+    reduce_C_function=np.mean,
+    gridsize=25,
+    title='SVM performance landscape',
 )
 
 ####################################################################################################
@@ -67,8 +70,9 @@ cntr = ax.tricontourf(C, gamma, score, levels=12, cmap="RdBu_r")
 fig.colorbar(cntr, ax=ax, label="accuracy")
 # Adjusting the axis limits
 ax.set(
-    xlim=[min(C),max(C)],
-    ylim=[min(gamma),max(gamma)],
+    xlim=(min(C), max(C)),
+    ylim=(min(gamma), max(gamma)),
     xlabel="C (log10)",
     ylabel="gamma (log10)",
 )
+ax.set_title('SVM performance landscape')

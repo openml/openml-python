@@ -22,7 +22,7 @@ class TestEvaluationsExample(unittest.TestCase):
         hp_names = ['sklearn.svm.classes.SVC(16)_C', 'sklearn.svm.classes.SVC(16)_gamma']
         df[hp_names] = df[hp_names].astype(float).apply(np.log)
         C, gamma, score = df[hp_names[0]], df[hp_names[1]], df['value']
-        
+
         cntr = plt.tricontourf(C, gamma, score, levels=12, cmap="RdBu_r")
         plt.colorbar(cntr, label="accuracy")
         plt.xlim((min(C), max(C)))
