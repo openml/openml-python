@@ -8,7 +8,6 @@ from warnings import warn
 import numpy as np
 import pandas as pd
 import scipy.sparse
-import xmltodict
 
 import openml._api_calls
 from openml.base import OpenMLBase
@@ -181,30 +180,18 @@ class OpenMLTask(OpenMLBase):
 
         return task_container
 
-    def publish(self) -> int:
-        """Publish task to OpenML server.
+    def publish(self) -> 'OpenMLTask':
+        """ Publish task to OpenML server.
 
         Returns
         -------
-        task_id: int
-            Returns the id of the uploaded task
-            if successful.
-
+        self : OpenMLTask
+            The OpenMLTask with the dataset_id set.
         """
 
-        xml_description = self._to_xml()
-
-        file_elements = {'description': xml_description}
-
-        return_value = openml._api_calls._perform_api_call(
-            "task/",
-            'post',
-            file_elements=file_elements,
-        )
-
-        task_id = int(xmltodict.parse(return_value)['oml:upload_task']['oml:id'])
-
-        return task_id
+        xml_response = self._add_description_and_publish(file_elements={})
+        self.task_id = int(xml_response['oml:upload_task']['oml:id'])
+        return self
 
 
 class OpenMLSupervisedTask(OpenMLTask, ABC):

@@ -11,10 +11,8 @@ import arff
 import numpy as np
 import pandas as pd
 import scipy.sparse
-import xmltodict
 from warnings import warn
 
-import openml._api_calls
 from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
@@ -728,49 +726,35 @@ class OpenMLDataset(OpenMLBase):
                     result.append(idx - offset)
         return result
 
-    def publish(self):
-        """Publish the dataset on the OpenML server.
+    def publish(self) -> 'OpenMLDataset':
+        """ Publish the dataset on the OpenML server.
 
-        Upload the dataset description and dataset content to openml.
+        Upload the dataset description and dataset content to OpenML.
 
         Returns
         -------
-        dataset_id: int
-            Id of the dataset uploaded to the server.
+        self : OpenMLDataset
+            The OpenMLDataset with the dataset_id set.
         """
-        file_elements = {'description': self._to_xml()}
+        file_elements = {}
+        path = None if self.data_file is None else os.path.abspath(self.data_file)
 
-        # the arff dataset string is available
         if self._dataset is not None:
             file_elements['dataset'] = self._dataset
-        else:
-            # the path to the arff dataset is given
-            if self.data_file is not None:
-                path = os.path.abspath(self.data_file)
-                if os.path.exists(path):
-                    try:
+        elif path is not None and os.path.exists(path):
+            with open(path, 'rb') as fp:
+                file_elements['dataset'] = fp.read()
+            try:
+                dataset_utf8 = str(file_elements['dataset'], 'utf8')
+                arff.ArffDecoder().decode(dataset_utf8, encode_nominal=True)
+            except arff.ArffException:
+                raise ValueError("The file you have provided is not a valid arff file.")
+        elif self.url is None:
+            raise ValueError("No valid url/path to the data file was given.")
 
-                        with io.open(path, encoding='utf8') as fh:
-                            # check if arff is valid
-                            decoder = arff.ArffDecoder()
-                            decoder.decode(fh, encode_nominal=True)
-                    except arff.ArffException:
-                        raise ValueError("The file you have provided is not "
-                                         "a valid arff file.")
-
-                    with open(path, 'rb') as fp:
-                        file_elements['dataset'] = fp.read()
-            else:
-                if self.url is None:
-                    raise ValueError("No url/path to the data file was given")
-
-        return_value = openml._api_calls._perform_api_call(
-            "data/", 'post',
-            file_elements=file_elements,
-        )
-        response = xmltodict.parse(return_value)
-        self.dataset_id = int(response['oml:upload_data_set']['oml:id'])
-        return self.dataset_id
+        xml_response = self._add_description_and_publish(file_elements)
+        self.dataset_id = int(xml_response['oml:upload_data_set']['oml:id'])
+        return self
 
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
         """ Creates a dictionary representation of self. """
