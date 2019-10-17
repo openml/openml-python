@@ -495,19 +495,18 @@ def get_dataset(
     )
 
     try:
-        qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
-    except OpenMLServerException as e:
-        if not (e.code == 362 and str(e) == 'No qualities found - None'):
-            raise
-        qualities = None
-
-    try:
         remove_dataset_cache = True
         description = _get_dataset_description(did_cache_dir, dataset_id)
         features = _get_dataset_features(did_cache_dir, dataset_id)
 
-        arff_file = _get_dataset_arff(description) if download_data else None
+        try:
+            qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
+        except OpenMLServerException as e:
+            if not (e.code == 362 and str(e) == 'No qualities found - None'):
+                raise
+            qualities = None
 
+        arff_file = _get_dataset_arff(description) if download_data else None
         remove_dataset_cache = False
     except OpenMLServerException as e:
         # if there was an exception,
