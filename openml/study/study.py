@@ -1,8 +1,6 @@
 from collections import OrderedDict
 from typing import Dict, List, Optional, Tuple, Union, Any
 
-import xmltodict
-
 import openml
 from openml.base import OpenMLBase
 

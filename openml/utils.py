@@ -74,7 +74,8 @@ def _get_rest_api_type_alias(oml_object: 'OpenMLBase') -> str:
         (openml.datasets.OpenMLDataset, 'data'),
         (openml.flows.OpenMLFlow, 'flow'),
         (openml.tasks.OpenMLTask, 'task'),
-        (openml.runs.OpenMLRun, 'run')
+        (openml.runs.OpenMLRun, 'run'),
+        (openml.study.BaseStudy, 'study')
     ]
     _, api_type_alias = [(python_type, api_alias)
                          for (python_type, api_alias) in rest_api_mapping
