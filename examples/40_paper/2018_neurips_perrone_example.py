@@ -241,6 +241,9 @@ def random_sample_configurations(num_samples=100):
     return X
 
 configs = random_sample_configurations(num_samples=1000)
+print(configs)
+
+#############################################################################
 preds = model.predict(configs)
 
 # tracking the maximum AUC obtained over the functions evaluations
