@@ -31,7 +31,7 @@ class OpenMLRunTrace(object):
     """
 
     def __init__(self, run_id, trace_iterations):
-        self.run_id: Optional[int] = run_id
+        self.run_id = run_id
         self.trace_iterations = trace_iterations
 
     def get_selected_iteration(self, fold: int, repeat: int) -> int:
@@ -382,7 +382,7 @@ class OpenMLRunTrace(object):
 
     def __repr__(self):
         return '[Run id: %d, %d trace iterations]'.format(
-            -1 if self.run_id is None else self.run_id,
+            -1 if self.run_id is None else int(self.run_id),
             len(self.trace_iterations),
         )
 
