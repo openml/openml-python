@@ -8,11 +8,11 @@ http://nvie.com/posts/a-successful-git-branching-model/
 Master branch:
 
 [![Build Status](https://travis-ci.org/openml/openml-python.svg?branch=master)](https://travis-ci.org/openml/openml-python)
-[![Code Health](https://landscape.io/github/openml/openml-python/master/landscape.svg)](https://landscape.io/github/openml/openml-python/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/blna1eip00kdyr25?svg=true)](https://ci.appveyor.com/project/OpenML/openml-python)
 [![Coverage Status](https://coveralls.io/repos/github/openml/openml-python/badge.svg?branch=master)](https://coveralls.io/github/openml/openml-python?branch=master)
 
 Development branch:
 
 [![Build Status](https://travis-ci.org/openml/openml-python.svg?branch=develop)](https://travis-ci.org/openml/openml-python)
-[![Code Health](https://landscape.io/github/openml/openml-python/master/landscape.svg)](https://landscape.io/github/openml/openml-python/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/blna1eip00kdyr25/branch/develop?svg=true)](https://ci.appveyor.com/project/OpenML/openml-python/branch/develop)
 [![Coverage Status](https://coveralls.io/repos/github/openml/openml-python/badge.svg?branch=develop)](https://coveralls.io/github/openml/openml-python?branch=develop)

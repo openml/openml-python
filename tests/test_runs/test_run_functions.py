@@ -206,7 +206,7 @@ class TestRun(TestBase):
 
         # This is only a smoke check right now
         # TODO add a few asserts here
-        run._create_description_xml()
+        run._to_xml()
         if run.trace is not None:
             # This is only a smoke check right now
             # TODO add a few asserts here

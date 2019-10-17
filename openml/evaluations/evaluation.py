@@ -61,18 +61,17 @@ class OpenMLEvaluation(object):
         header = "OpenML Evaluation"
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
         fields = {"Upload Date": self.upload_time,
                   "Run ID": self.run_id,
-                  "OpenML Run URL": "{}r/{}".format(base_url, self.run_id),
+                  "OpenML Run URL": openml.runs.OpenMLRun.url_for_id(self.run_id),
                   "Task ID": self.task_id,
-                  "OpenML Task URL": "{}t/{}".format(base_url, self.task_id),
+                  "OpenML Task URL": openml.tasks.OpenMLTask.url_for_id(self.task_id),
                   "Flow ID": self.flow_id,
-                  "OpenML Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                  "OpenML Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
                   "Setup ID": self.setup_id,
                   "Data ID": self.data_id,
                   "Data Name": self.data_name,
-                  "OpenML Data URL": "{}d/{}".format(base_url, self.data_id),
+                  "OpenML Data URL": openml.datasets.OpenMLDataset.url_for_id(self.data_id),
                   "Metric Used": self.function,
                   "Result": self.value}
 

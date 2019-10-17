@@ -3,7 +3,7 @@
 Fetching Evaluations
 ====================
 
-Evalutions contain a concise summary of the results of all runs made. Each evaluation
+Evaluations contain a concise summary of the results of all runs made. Each evaluation
 provides information on the dataset used, the flow applied, the setup used, the metric
 evaluated, and the result obtained on the metric, for each such run made. These collection
 of results can be used for efficient benchmarking of an algorithm and also allow transparent
