@@ -129,33 +129,33 @@ and iterated for benchmarking. For speed reasons we'll only iterate over the fir
 
  .. code-block:: none
 
-    OpenML Task
-    ===========
-    Task Type...........: Supervised Classification
-    Task ID.............: 3
-    Task URL............: https://www.openml.org/t/3
-    Estimation Procedure: crossvalidation
-    Target Feature......: class
-    # of Classes........: 2
-    Cost Matrix.........: Available
-    OpenML Task
-    ===========
-    Task Type...........: Supervised Classification
-    Task ID.............: 6
-    Task URL............: https://www.openml.org/t/6
-    Estimation Procedure: crossvalidation
-    Target Feature......: class
-    # of Classes........: 26
-    Cost Matrix.........: Available
-    OpenML Task
-    ===========
-    Task Type...........: Supervised Classification
-    Task ID.............: 11
-    Task URL............: https://www.openml.org/t/11
-    Estimation Procedure: crossvalidation
-    Target Feature......: class
-    # of Classes........: 3
-    Cost Matrix.........: Available
+    OpenML Classification Task
+    ==========================
+    Task Type Description: https://www.openml.org/tt/1
+    Task ID..............: 3
+    Task URL.............: https://www.openml.org/t/3
+    Estimation Procedure.: crossvalidation
+    Target Feature.......: class
+    # of Classes.........: 2
+    Cost Matrix..........: Available
+    OpenML Classification Task
+    ==========================
+    Task Type Description: https://www.openml.org/tt/1
+    Task ID..............: 6
+    Task URL.............: https://www.openml.org/t/6
+    Estimation Procedure.: crossvalidation
+    Target Feature.......: class
+    # of Classes.........: 26
+    Cost Matrix..........: Available
+    OpenML Classification Task
+    ==========================
+    Task Type Description: https://www.openml.org/tt/1
+    Task ID..............: 11
+    Task URL.............: https://www.openml.org/t/11
+    Estimation Procedure.: crossvalidation
+    Target Feature.......: class
+    # of Classes.........: 3
+    Cost Matrix..........: Available
 
 
 
@@ -170,7 +170,7 @@ Further examples
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.802 seconds)
+   **Total running time of the script:** ( 0 minutes  11.857 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_suites_tutorial.py:
