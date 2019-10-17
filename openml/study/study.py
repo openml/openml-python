@@ -124,26 +124,17 @@ class BaseStudy(OpenMLBase):
                  "Creator", "Upload Time"]
         return [(key, fields[key]) for key in order if key in fields]
 
-    def publish(self) -> int:
-        """
-        Publish the study on the OpenML server.
+    def publish(self) -> 'BaseStudy':
+        """ Publish the study on the OpenML server.
 
         Returns
         -------
-        study_id: int
-            Id of the study uploaded to the server.
+        self : BaseStudy
+            The BaseStudy with the study_id set.
         """
-        file_elements = {
-            'description': self._to_xml()
-        }
-        return_value = openml._api_calls._perform_api_call(
-            "study/",
-            'post',
-            file_elements=file_elements,
-        )
-        study_res = xmltodict.parse(return_value)
-        self.study_id = int(study_res['oml:study_upload']['oml:id'])
-        return self.study_id
+        xml_response = self._add_description_and_publish(file_elements={})
+        self.study_id = int(xml_response['oml:study_upload']['oml:id'])
+        return self
 
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
         """ Creates a dictionary representation of self. """
