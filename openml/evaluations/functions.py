@@ -324,14 +324,15 @@ def list_evaluations_setups(
     evals = list_evaluations(function=function, offset=offset, size=size, run=run, task=task,
                              setup=setup, flow=flow, uploader=uploader, tag=tag,
                              per_fold=per_fold, sort_order=sort_order, output_format='dataframe')
-
+    print("evals done")
     # List setups
     # Split setups in evals into chunks of N setups as list_setups does not support large size
     df = pd.DataFrame()
     if len(evals) != 0:
         N = 100
-        setup_chunks = np.split(evals['setup_id'].unique(),
+        setup_chunks = np.array_split(evals['setup_id'].unique(),
                                 ((len(evals['setup_id'].unique()) - 1) // N) + 1)
+        print( len(evals['setup_id'].unique()),((len(evals['setup_id'].unique()) - 1) // N) + 1)
         setups = pd.DataFrame()
         for setup in setup_chunks:
             result = pd.DataFrame(openml.setups.list_setups(setup=setup, output_format='dataframe'))
@@ -353,6 +354,7 @@ def list_evaluations_setups(
     if parameters_in_separate_columns:
         df = pd.concat([df.drop('parameters', axis=1),
                         df['parameters'].apply(pd.Series)], axis=1)
+    print("done")
 
     if output_format == 'dataframe':
         return df
