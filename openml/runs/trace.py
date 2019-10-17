@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import json
 import os
-from typing import List, Tuple  # noqa F401
+from typing import List, Tuple, Optional  # noqa F401
 
 import arff
 import xmltodict
@@ -31,7 +31,7 @@ class OpenMLRunTrace(object):
     """
 
     def __init__(self, run_id, trace_iterations):
-        self.run_id = run_id
+        self.run_id: Optional[int] = run_id
         self.trace_iterations = trace_iterations
 
     def get_selected_iteration(self, fold: int, repeat: int) -> int:
