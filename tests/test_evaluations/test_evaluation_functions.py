@@ -195,4 +195,3 @@ class TestEvaluationFunctions(TestBase):
         task_id = [6]
         size = 121
         self._check_list_evaluation_setups(task=task_id, size=size)
-
