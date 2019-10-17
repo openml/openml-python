@@ -193,11 +193,6 @@ class TestEvaluationFunctions(TestBase):
     def test_list_evaluations_setups_filter_task(self):
         openml.config.server = self.production_server
         task_id = [6]
-        size = 100
+        size = 121
         self._check_list_evaluation_setups(task=task_id, size=size)
 
-    def test_list_evaluations_setups_not_100_multiple(self):
-        openml.config.server = self.production_server
-        task_id = [37]
-        flow_id = [5891]
-        self._check_list_evaluation_setups(task=task_id, flow=flow_id)
