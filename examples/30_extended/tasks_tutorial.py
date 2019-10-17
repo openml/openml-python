@@ -175,7 +175,7 @@ print(tasks[0])
 # Let's create a classification task on a dataset. In this example we will do this on the
 # Iris dataset (ID=128 (on test server)). We'll use 10-fold cross-validation (ID=1),
 # and *predictive accuracy* as the predefined measure (this can also be left open).
-# If a task with these parameters exist, we will get an appropriate exception.
+# If a task with these parameters exists, we will get an appropriate exception.
 # If such a task doesn't exist, a task will be created and the corresponding task_id
 # will be returned.
 

@@ -21,12 +21,12 @@ you can use github's assign feature, otherwise you can just leave a comment.
 Scope of the package
 ====================
 
-The scope of the OpenML python package is to provide a python interface to
-the OpenML platform which integrates well with pythons scientific stack, most
+The scope of the OpenML Python package is to provide a Python interface to
+the OpenML platform which integrates well with Python's scientific stack, most
 notably `numpy <http://www.numpy.org/>`_ and `scipy <https://www.scipy.org/>`_.
 To reduce opportunity costs and demonstrate the usage of the package, it also
 implements an interface to the most popular machine learning package written
-in python, `scikit-learn <http://scikit-learn.org/stable/index.html>`_.
+in Python, `scikit-learn <http://scikit-learn.org/stable/index.html>`_.
 Thereby it will automatically be compatible with many machine learning
 libraries written in Python.
 
@@ -34,7 +34,7 @@ We aim to keep the package as light-weight as possible and we will try to
 keep the number of potential installation dependencies as low as possible.
 Therefore, the connection to other machine learning libraries such as
 *pytorch*, *keras* or *tensorflow* should not be done directly inside this
-package, but in a separate package using the OpenML python connector.
+package, but in a separate package using the OpenML Python connector.
 
 .. _issues:
 
@@ -52,7 +52,7 @@ contains longer-term goals.
 How to contribute
 =================
 
-There are many ways to contribute to the development of the OpenML python
+There are many ways to contribute to the development of the OpenML Python
 connector and OpenML in general. We welcome all kinds of contributions,
 especially:
 
