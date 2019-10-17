@@ -29,6 +29,6 @@ class TestEvaluationsExample(unittest.TestCase):
         plt.ylim((min(gamma), max(gamma)))
         plt.xlabel('C (log10)', size=16)
         plt.ylabel('gamma (log10)', size=16)
-        plt.title('SVM performance ladscape', size=20)
+        plt.title('SVM performance landscape', size=20)
 
         plt.tight_layout()
