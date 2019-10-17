@@ -71,7 +71,7 @@ Running machine learning algorithms and uploading results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to upload and share results of running a machine learning algorithm
-on a task, we need to create a :class:`~openml.OpenMLRun`. A run object can
+on a task, we need to create an :class:`~openml.OpenMLRun`. A run object can
 be created by running a :class:`~openml.OpenMLFlow` or a scikit-learn compatible
 model on a task. We will focus on the simpler example of running a
 scikit-learn model.
