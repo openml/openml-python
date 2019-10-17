@@ -121,7 +121,7 @@ def create_table_from_evaluations(eval_df,
     values : list
     '''
     if task_ids is not None:
-        eval_df = eval_df.loc[eval_df.task_id.isin(task_ids)]
+        eval_df = eval_df[eval_df['task_id'].isin(task_ids)]
     if flow_type == 'svm':
         ncols = 4
         colnames = ['cost', 'degree', 'gamma', 'kernel']
@@ -130,7 +130,7 @@ def create_table_from_evaluations(eval_df,
         colnames = ['alpha', 'booster', 'colsample_bylevel', 'colsample_bytree', 'eta', 'lambda',
                     'max_depth', 'min_child_weight', 'nrounds', 'subsample']
     eval_df = eval_df.sample(frac=1)  # shuffling rows
-    run_ids = eval_df.run_id[:run_count]
+    run_ids = eval_df.loc[:,"run_id"][:run_count]
     eval_table = pd.DataFrame(np.nan, index=run_ids, columns=colnames)
     values = []
     for run_id in run_ids:
@@ -148,31 +148,6 @@ def list_categorical_attributes(flow_type='svm'):
     if flow_type == 'svm':
         return ['kernel']
     return ['booster']
-
-
-def impute_missing_values(eval_table, flow_type='svm'):
-    # Replacing NaNs with fixed values outside the range of the parameters
-    # given in the supplement material of the paper
-    if flow_type == 'svm':
-        eval_table.kernel.fillna("None", inplace=True)
-        eval_table.fillna(-1, inplace=True)
-    else:
-        eval_table.booster.fillna("None", inplace=True)
-        eval_table.fillna(-1, inplace=True)
-    return eval_table
-
-
-def preprocess(eval_table, flow_type='svm'):
-    eval_table = impute_missing_values(eval_table, flow_type)
-    # Encode categorical variables as one-hot vectors
-    enc = OneHotEncoder(handle_unknown='ignore')
-    enc.fit(eval_table.kernel.to_numpy().reshape(-1, 1))
-    one_hots = enc.transform(eval_table.kernel.to_numpy().reshape(-1, 1)).toarray()
-    if flow_type == 'svm':
-        eval_table = np.hstack((eval_table.drop('kernel', 1), one_hots)).astype(float)
-    else:
-        eval_table = np.hstack((eval_table.drop('booster', 1), one_hots)).astype(float)
-    return eval_table
 
 
 #############################################################################
