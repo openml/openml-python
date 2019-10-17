@@ -184,7 +184,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/72751
+    URL for dataset: https://test.openml.org/api/v1/xml/data/73041
 
 
 
@@ -282,17 +282,17 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/72752
+    URL for dataset: https://test.openml.org/api/v1/xml/data/73042
 
 
 
 Dataset is a pandas DataFrame
 =============================
-It might happen that your dataset is made of heterogeneous data which can be
-usually stored as a Pandas DataFrame. DataFrame offers the adavantages to
-store the type of data for each column as well as the attribute names.
-Therefore, when providing a Pandas DataFrame, OpenML can infer those
-information without the need to specifically provide them when calling the
+It might happen that your dataset is made of heterogeneous data which can usually
+be stored as a Pandas DataFrame. DataFrames offer the advantage of
+storing the type of data for each column as well as the attribute names.
+Therefore, when providing a Pandas DataFrame, OpenML can infer this
+information without needing to explicitly provide it when calling the
 function :func:`create_dataset`. In this regard, you only need to pass
 ``'auto'`` to the ``attributes`` parameter.
 
@@ -389,7 +389,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/72753
+    URL for dataset: https://test.openml.org/api/v1/xml/data/73043
 
 
 
@@ -452,7 +452,7 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/72754
+    URL for dataset: https://test.openml.org/api/v1/xml/data/73044
 
 
 
@@ -558,7 +558,7 @@ Dataset is a pandas sparse dataframe
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/api/v1/xml/data/72755
+    URL for dataset: https://test.openml.org/api/v1/xml/data/73045
 
 
 
@@ -575,7 +575,7 @@ Dataset is a pandas sparse dataframe
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.743 seconds)
+   **Total running time of the script:** ( 0 minutes  7.731 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:

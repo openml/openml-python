@@ -240,7 +240,7 @@ expected format:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/72751
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/73041
 </pre></div>
 </div>
 </div>
@@ -316,17 +316,17 @@ OrderedDicts in the case of sparse data.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/72752
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/73042
 </pre></div>
 </div>
 </div>
 <div class="section" id="dataset-is-a-pandas-dataframe">
 <h1>Dataset is a pandas DataFrame<a class="headerlink" href="#dataset-is-a-pandas-dataframe" title="Permalink to this headline">¶</a></h1>
-<p>It might happen that your dataset is made of heterogeneous data which can be
-usually stored as a Pandas DataFrame. DataFrame offers the adavantages to
-store the type of data for each column as well as the attribute names.
-Therefore, when providing a Pandas DataFrame, OpenML can infer those
-information without the need to specifically provide them when calling the
+<p>It might happen that your dataset is made of heterogeneous data which can usually
+be stored as a Pandas DataFrame. DataFrames offer the advantage of
+storing the type of data for each column as well as the attribute names.
+Therefore, when providing a Pandas DataFrame, OpenML can infer this
+information without needing to explicitly provide it when calling the
 function <code class="xref py py-func docutils literal notranslate"><span class="pre">create_dataset()</span></code>. In this regard, you only need to pass
 <code class="docutils literal notranslate"><span class="pre">'auto'</span></code> to the <code class="docutils literal notranslate"><span class="pre">attributes</span></code> parameter.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">col_name</span> <span class="k">for</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">attribute_names</span><span class="p">])</span>
@@ -383,7 +383,7 @@ call <code class="xref py py-func docutils literal notranslate"><span class="pre
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/72753
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/73043
 </pre></div>
 </div>
 </div>
@@ -423,7 +423,7 @@ call <code class="xref py py-func docutils literal notranslate"><span class="pre
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/72754
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/73044
 </pre></div>
 </div>
 </div>
@@ -502,13 +502,13 @@ None
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/72755
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/api/v1/xml/data/73045
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.743 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.731 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-create-upload-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/0d1d1c06933bd6d32bda534cb0aa0e53/create_upload_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">create_upload_tutorial.py</span></code></a></p>

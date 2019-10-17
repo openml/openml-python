@@ -55,7 +55,7 @@ analysis.
 
 
 
-This piece of code is rather involved. First, it retrieves an
+This piece of code is rather involved. First, it retrieves a
 :class:`~openml.extensions.Extension` which is registered and can handle the given model,
 in our case it is :class:`openml.extensions.sklearn.SklearnExtension`. Second, the extension
 converts the classifier into an instance of :class:`openml.flow.OpenMLFlow`. Third and finally,
@@ -162,7 +162,7 @@ We can also retrieve all flows for a given name:
 
 
 
-This also work with the actual model (generalizing the first part of this example):
+This also works with the actual model (generalizing the first part of this example):
 
 
 .. code-block:: default
@@ -186,7 +186,7 @@ This also work with the actual model (generalizing the first part of this exampl
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.102 seconds)
+   **Total running time of the script:** ( 0 minutes  7.112 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flow_id_tutorial.py:

@@ -50,7 +50,7 @@ tasks = suite.tasks
 print(tasks)
 
 ####################################################################################################
-# and iterated for benchmarking. For speed reasons we'll only iterate over the first three tasks:
+# and iterated over for benchmarking. For speed reasons we'll only iterate over the first three tasks:
 
 for task_id in tasks[:3]:
     task = openml.tasks.get_task(task_id)
