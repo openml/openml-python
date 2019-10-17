@@ -8,6 +8,7 @@ Changelog
 
 0.10.0
 ~~~~~~
+* FIX #838: Fix list_evaluations_setups to work when evaluations are not a 100 multiple.
 * ADD #737: Add list_evaluations_setups to return hyperparameters along with list of evaluations.
 * FIX #261: Test server is cleared of all files uploaded during unit testing.
 * FIX #447: All files created by unit tests no longer persist in local.
