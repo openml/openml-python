@@ -28,7 +28,8 @@ config_file = os.path.expanduser(os.path.join('~', '.openml', 'config'))
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
-server = _defaults['server']
+server = str(_defaults['server'])  # so mypy knows it is a string
+server_base_url = server[:-len('/api/v1/xml')]
 apikey = _defaults['apikey']
 # The current cache directory (without the server name)
 cache_directory = _defaults['cachedir']

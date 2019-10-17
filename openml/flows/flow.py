@@ -1,17 +1,16 @@
 from collections import OrderedDict
 import os
-from typing import Dict, List, Union  # noqa: F401
+from typing import Dict, List, Union, Tuple, Optional  # noqa: F401
 import logging
 
 import xmltodict
 
+from openml.base import OpenMLBase
 from ..extensions import get_extension_by_flow
-from ..utils import extract_xml_tags, _tag_entity
-
-import openml.config
+from ..utils import extract_xml_tags
 
 
-class OpenMLFlow(object):
+class OpenMLFlow(OpenMLBase):
     """OpenML Flow. Stores machine learning models.
 
     Flows should not be generated manually, but by the function
@@ -138,6 +137,10 @@ class OpenMLFlow(object):
             self._extension = extension
 
     @property
+    def id(self) -> Optional[int]:
+        return self.flow_id
+
+    @property
     def extension(self):
         if self._extension is not None:
             return self._extension
@@ -145,20 +148,16 @@ class OpenMLFlow(object):
             raise RuntimeError("No extension could be found for flow {}: {}"
                                .format(self.flow_id, self.name))
 
-    def __repr__(self):
-        header = "OpenML Flow"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
-
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+        """ Collect all information to display in the __repr__ body. """
         fields = {"Flow Name": self.name,
                   "Flow Description": self.description,
                   "Dependencies": self.dependencies}
         if self.flow_id is not None:
+            fields["Flow URL"] = self.openml_url
+            fields["Flow ID"] = str(self.flow_id)
             if self.version is not None:
-                fields["Flow ID"] = "{} (version {})".format(self.flow_id, self.version)
-            else:
-                fields["Flow ID"] = self.flow_id
-            fields["Flow URL"] = "{}f/{}".format(base_url, self.flow_id)
+                fields["Flow ID"] += " (version {})".format(self.version)
         if self.upload_date is not None:
             fields["Upload Date"] = self.upload_date.replace('T', ' ')
         if self.binary_url is not None:
@@ -167,48 +166,10 @@ class OpenMLFlow(object):
         # determines the order in which the information will be printed
         order = ["Flow ID", "Flow URL", "Flow Name", "Flow Description", "Binary URL",
                  "Upload Date", "Dependencies"]
-        fields = [(key, fields[key]) for key in order if key in fields]
+        return [(key, fields[key]) for key in order if key in fields]
 
-        longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
-        return header + body
-
-    def _to_xml(self) -> str:
-        """Generate xml representation of self for upload to server.
-
-        Returns
-        -------
-        str
-            Flow represented as XML string.
-        """
-        flow_dict = self._to_dict()
-        flow_xml = xmltodict.unparse(flow_dict, pretty=True)
-
-        # A flow may not be uploaded with the xml encoding specification:
-        # <?xml version="1.0" encoding="utf-8"?>
-        flow_xml = flow_xml.split('\n', 1)[-1]
-        return flow_xml
-
-    def _to_dict(self) -> dict:
-        """ Helper function used by _to_xml and itself.
-
-        Creates a dictionary representation of self which can be serialized
-        to xml by the function _to_xml. Since a flow can contain subflows
-        (components) this helper function calls itself recursively to also
-        serialize these flows to dictionaries.
-
-        Uses OrderedDict to ensure consistent ordering when converting to xml.
-        The return value (OrderedDict) will be used to create the upload xml
-        file. The xml file must have the tags in exactly the order given in the
-        xsd schema of a flow (see class docstring).
-
-        Returns
-        -------
-        OrderedDict
-            Flow represented as OrderedDict.
-
-        """
+    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
+        """ Creates a dictionary representation of self. """
         flow_container = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
         flow_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])  # type: 'OrderedDict[str, Union[List, str]]'  # noqa E501
         flow_container['oml:flow'] = flow_dict
@@ -505,26 +466,6 @@ class OpenMLFlow(object):
         else:
             structure.pop(0)
             return self.components[sub_identifier].get_subflow(structure)
-
-    def push_tag(self, tag):
-        """Annotates this flow with a tag on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the flow.
-        """
-        _tag_entity('flow', self.flow_id, tag)
-
-    def remove_tag(self, tag):
-        """Removes a tag from this flow on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the flow.
-        """
-        _tag_entity('flow', self.flow_id, tag, untag=True)
 
 
 def _copy_server_fields(source_flow, target_flow):

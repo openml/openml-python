@@ -425,7 +425,7 @@ def assert_flows_equal(flow1: OpenMLFlow, flow2: OpenMLFlow,
                                # but the uploader has no control over them!
                                'tags']
     ignored_by_python_api = ['binary_url', 'binary_format', 'binary_md5',
-                             'model']
+                             'model', '_entity_id']
 
     for key in set(flow1.__dict__.keys()).union(flow2.__dict__.keys()):
         if key in generated_by_the_server + ignored_by_python_api:

@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import pickle
 import time
-from typing import Any, IO, TextIO  # noqa F401
+from typing import Any, IO, TextIO, List, Union, Tuple, Optional  # noqa F401
 import os
 
 import arff
@@ -10,6 +10,7 @@ import xmltodict
 
 import openml
 import openml._api_calls
+from openml.base import OpenMLBase
 from ..exceptions import PyOpenMLError
 from ..flows import get_flow
 from ..tasks import (get_task,
@@ -19,10 +20,9 @@ from ..tasks import (get_task,
                      OpenMLClusteringTask,
                      OpenMLRegressionTask
                      )
-from ..utils import _tag_entity
 
 
-class OpenMLRun(object):
+class OpenMLRun(OpenMLBase):
     """OpenML Run: result of running a model on an openml dataset.
 
        Parameters
@@ -67,28 +67,30 @@ class OpenMLRun(object):
         self.tags = tags
         self.predictions_url = predictions_url
 
-    def __repr__(self):
-        header = "OpenML Run"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
+    @property
+    def id(self) -> Optional[int]:
+        return self.run_id
 
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+        """ Collect all information to display in the __repr__ body. """
         fields = {"Uploader Name": self.uploader_name,
                   "Metric": self.task_evaluation_measure,
                   "Run ID": self.run_id,
                   "Task ID": self.task_id,
                   "Task Type": self.task_type,
-                  "Task URL": "{}t/{}".format(base_url, self.task_id),
+                  "Task URL": openml.tasks.OpenMLTask.url_for_id(self.task_id),
                   "Flow ID": self.flow_id,
                   "Flow Name": self.flow_name,
-                  "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                  "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
                   "Setup ID": self.setup_id,
                   "Setup String": self.setup_string,
                   "Dataset ID": self.dataset_id,
-                  "Dataset URL": "{}d/{}".format(base_url, self.dataset_id)}
+                  "Dataset URL": openml.datasets.OpenMLDataset.url_for_id(self.dataset_id)}
         if self.uploader is not None:
-            fields["Uploader Profile"] = "{}u/{}".format(base_url, self.uploader)
+            fields["Uploader Profile"] = "{}/u/{}".format(openml.config.server_base_url,
+                                                          self.uploader)
         if self.run_id is not None:
-            fields["Run URL"] = "{}r/{}".format(base_url, self.run_id)
+            fields["Run URL"] = self.openml_url
         if self.evaluations is not None and self.task_evaluation_measure in self.evaluations:
             fields["Result"] = self.evaluations[self.task_evaluation_measure]
 
@@ -96,15 +98,7 @@ class OpenMLRun(object):
         order = ["Uploader Name", "Uploader Profile", "Metric", "Result", "Run ID", "Run URL",
                  "Task ID", "Task Type", "Task URL", "Flow ID", "Flow Name", "Flow URL",
                  "Setup ID", "Setup String", "Dataset ID", "Dataset URL"]
-        fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
-        return header + body
-
-    def _repr_pretty_(self, pp, cycle):
-        pp.text(str(self))
+        return [(key, fields[key]) for key in order if key in fields]
 
     @classmethod
     def from_filesystem(cls, directory: str, expect_model: bool = True) -> 'OpenMLRun':
@@ -201,7 +195,7 @@ class OpenMLRun(object):
                 'Output directory {} should be empty'.format(os.path.abspath(directory))
             )
 
-        run_xml = self._create_description_xml()
+        run_xml = self._to_xml()
         predictions_arff = arff.dumps(self._generate_arff_dict())
 
         # It seems like typing does not allow to define the same variable multiple times
@@ -469,7 +463,7 @@ class OpenMLRun(object):
                 self.model,
             )
 
-        description_xml = self._create_description_xml()
+        description_xml = self._to_xml()
         file_elements = {'description': ("description.xml", description_xml)}
 
         if self.error_message is None:
@@ -487,115 +481,41 @@ class OpenMLRun(object):
         self.run_id = int(result['oml:upload_run']['oml:run_id'])
         return self
 
-    def _create_description_xml(self):
-        """Create xml representation of run for upload.
-
-        Returns
-        -------
-        xml_string : string
-            XML description of run.
-        """
-
-        # as a tag, it must be of the form ([a-zA-Z0-9_\-\.])+
-        # so we format time from 'mm/dd/yy hh:mm:ss' to 'mm-dd-yy_hh.mm.ss'
-        # well_formatted_time = time.strftime("%c").replace(
-        #     ' ', '_').replace('/', '-').replace(':', '.')
-        # tags = run_environment + [well_formatted_time] + ['run_task'] + \
-        #     [self.model.__module__ + "." + self.model.__class__.__name__]
-        description = _to_dict(taskid=self.task_id, flow_id=self.flow_id,
-                               setup_string=self.setup_string,
-                               parameter_settings=self.parameter_settings,
-                               error_message=self.error_message,
-                               fold_evaluations=self.fold_evaluations,
-                               sample_evaluations=self.sample_evaluations,
-                               tags=self.tags)
-        description_xml = xmltodict.unparse(description, pretty=True)
-        return description_xml
-
-    def push_tag(self, tag: str) -> None:
-        """Annotates this run with a tag on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the run.
-        """
-        _tag_entity('run', self.run_id, tag)
-
-    def remove_tag(self, tag: str) -> None:
-        """Removes a tag from this run on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the run.
-        """
-        _tag_entity('run', self.run_id, tag, untag=True)
-
-
-###############################################################################
-# Functions which cannot be in runs/functions due to circular imports
-
-def _to_dict(taskid, flow_id, setup_string, error_message, parameter_settings,
-             tags=None, fold_evaluations=None, sample_evaluations=None):
-    """ Creates a dictionary corresponding to the desired xml desired by openML
-
-    Parameters
-    ----------
-    taskid : int
-        the identifier of the task
-    setup_string : string
-        a CLI string which can invoke the learning with the correct parameter
-        settings
-    parameter_settings : array of dicts
-        each dict containing keys name, value and component, one per parameter
-        setting
-    tags : array of strings
-        information that give a description of the run, must conform to
-        regex ``([a-zA-Z0-9_\-\.])+``
-    fold_evaluations : dict mapping from evaluation measure to a dict mapping
-        repeat_nr to a dict mapping from fold nr to a value (double)
-    sample_evaluations : dict mapping from evaluation measure to a dict
-        mapping repeat_nr to a dict mapping from fold nr to a dict mapping to
-        a sample nr to a value (double)
-    sample_evaluations :
-    Returns
-    -------
-    result : an array with version information of the above packages
-    """  # noqa: W605
-    description = OrderedDict()
-    description['oml:run'] = OrderedDict()
-    description['oml:run']['@xmlns:oml'] = 'http://openml.org/openml'
-    description['oml:run']['oml:task_id'] = taskid
-    description['oml:run']['oml:flow_id'] = flow_id
-    if error_message is not None:
-        description['oml:run']['oml:error_message'] = error_message
-    description['oml:run']['oml:parameter_setting'] = parameter_settings
-    if tags is not None:
-        description['oml:run']['oml:tag'] = tags  # Tags describing the run
-    if (fold_evaluations is not None and len(fold_evaluations) > 0) or \
-            (sample_evaluations is not None and len(sample_evaluations) > 0):
-        description['oml:run']['oml:output_data'] = OrderedDict()
-        description['oml:run']['oml:output_data']['oml:evaluation'] = list()
-    if fold_evaluations is not None:
-        for measure in fold_evaluations:
-            for repeat in fold_evaluations[measure]:
-                for fold, value in fold_evaluations[measure][repeat].items():
-                    current = OrderedDict([
-                        ('@repeat', str(repeat)), ('@fold', str(fold)),
-                        ('oml:name', measure), ('oml:value', str(value))])
-                    description['oml:run']['oml:output_data'][
-                        'oml:evaluation'].append(current)
-    if sample_evaluations is not None:
-        for measure in sample_evaluations:
-            for repeat in sample_evaluations[measure]:
-                for fold in sample_evaluations[measure][repeat]:
-                    for sample, value in sample_evaluations[measure][repeat][
-                            fold].items():
+    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
+        """ Creates a dictionary representation of self. """
+        description = OrderedDict()  # type: 'OrderedDict'
+        description['oml:run'] = OrderedDict()
+        description['oml:run']['@xmlns:oml'] = 'http://openml.org/openml'
+        description['oml:run']['oml:task_id'] = self.task_id
+        description['oml:run']['oml:flow_id'] = self.flow_id
+        if self.error_message is not None:
+            description['oml:run']['oml:error_message'] = self.error_message
+        description['oml:run']['oml:parameter_setting'] = self.parameter_settings
+        if self.tags is not None:
+            description['oml:run']['oml:tag'] = self.tags  # Tags describing the run
+        if (self.fold_evaluations is not None and len(self.fold_evaluations) > 0) or \
+                (self.sample_evaluations is not None and len(self.sample_evaluations) > 0):
+            description['oml:run']['oml:output_data'] = OrderedDict()
+            description['oml:run']['oml:output_data']['oml:evaluation'] = list()
+        if self.fold_evaluations is not None:
+            for measure in self.fold_evaluations:
+                for repeat in self.fold_evaluations[measure]:
+                    for fold, value in self.fold_evaluations[measure][repeat].items():
                         current = OrderedDict([
                             ('@repeat', str(repeat)), ('@fold', str(fold)),
-                            ('@sample', str(sample)), ('oml:name', measure),
-                            ('oml:value', str(value))])
+                            ('oml:name', measure), ('oml:value', str(value))])
                         description['oml:run']['oml:output_data'][
                             'oml:evaluation'].append(current)
-    return description
+        if self.sample_evaluations is not None:
+            for measure in self.sample_evaluations:
+                for repeat in self.sample_evaluations[measure]:
+                    for fold in self.sample_evaluations[measure][repeat]:
+                        for sample, value in \
+                                self.sample_evaluations[measure][repeat][fold].items():
+                            current = OrderedDict([
+                                ('@repeat', str(repeat)), ('@fold', str(fold)),
+                                ('@sample', str(sample)), ('oml:name', measure),
+                                ('oml:value', str(value))])
+                            description['oml:run']['oml:output_data'][
+                                'oml:evaluation'].append(current)
+        return description
