@@ -17,10 +17,10 @@ This example demonstrates how OpenML runs can be used to construct a surrogate m
 
 In the following section, we shall do the following:
 
-* Retrieve tasks and flows as used in the experiments by Perrone et al.
-* Build a tabular data by fetching the evaluations uploaded to OpenML
+* Retrieve tasks and flows as used in the experiments by Perrone et al. (2018).
+* Build a tabular data by fetching the evaluations uploaded to OpenML.
 * Impute missing values and handle categorical data before building a Random Forest model that
-  maps hyperparameter values to the area under curve score
+  maps hyperparameter values to the area under curve score.
 """
 
 ############################################################################
@@ -35,15 +35,11 @@ from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestRegressor
 
-
-user_id = 2702
 flow_type = 'svm'  # this example will use the smaller svm flow evaluations
 ############################################################################
-
-"""
-The subsequent functions are defined to fetch tasks, flows, evaluations and preprocess them into
-a tabular format that can be used to build models.
-"""
+# The subsequent functions are defined to fetch tasks, flows, evaluations and preprocess them into
+# a tabular format that can be used to build models.
+#
 
 def fetch_evaluations(run_full=False,
                       flow_type='svm',
@@ -69,15 +65,20 @@ def fetch_evaluations(run_full=False,
     '''
     # Collecting task IDs as used by the experiments from the paper
     if flow_type == 'svm' and run_full:
-        task_ids = [10101, 145878, 146064, 14951, 34537, 3485, 3492, 3493, 3494, 37, 3889, 3891,
-                    3899, 3902, 3903, 3913, 3918, 3950, 9889, 9914, 9946, 9952, 9967, 9971, 9976,
-                    9978, 9980, 9983]
+        task_ids = [
+            10101, 145878, 146064, 14951, 34537, 3485, 3492, 3493, 3494,
+            37, 3889, 3891, 3899, 3902, 3903, 3913, 3918, 3950, 9889,
+            9914, 9946, 9952, 9967, 9971, 9976, 9978, 9980, 9983,
+        ]
     elif flow_type == 'svm' and not run_full:
         task_ids = [9983, 3485, 3902, 3903, 145878]
     elif flow_type == 'xgboost' and run_full:
-        task_ids = [10093, 10101, 125923, 145847, 145857, 145862, 145872, 145878, 145953, 145972,
-                    145976, 145979, 146064, 14951, 31, 3485, 3492, 3493, 37, 3896, 3903, 3913,
-                    3917, 3918, 3, 49, 9914, 9946, 9952, 9967]
+        task_ids = [
+            10093, 10101, 125923, 145847, 145857, 145862, 145872, 145878,
+            145953, 145972, 145976, 145979, 146064, 14951, 31, 3485,
+            3492, 3493, 37, 3896, 3903, 3913, 3917, 3918, 3, 49, 9914,
+            9946, 9952, 9967,
+        ]
     else:  #flow_type == 'xgboost' and not run_full:
         task_ids = [3903, 37, 3485, 49, 3913]
 
@@ -123,23 +124,24 @@ def create_table_from_evaluations(eval_df,
     if task_ids is not None:
         eval_df = eval_df[eval_df['task_id'].isin(task_ids)]
     if flow_type == 'svm':
-        ncols = 4
         colnames = ['cost', 'degree', 'gamma', 'kernel']
     else:
-        ncols = 10
-        colnames = ['alpha', 'booster', 'colsample_bylevel', 'colsample_bytree', 'eta', 'lambda',
-                    'max_depth', 'min_child_weight', 'nrounds', 'subsample']
+        colnames = [
+            'alpha', 'booster', 'colsample_bylevel', 'colsample_bytree',
+            'eta', 'lambda', 'max_depth', 'min_child_weight', 'nrounds',
+            'subsample',
+        ]
     eval_df = eval_df.sample(frac=1)  # shuffling rows
-    run_ids = eval_df.loc[:,"run_id"][:run_count]
+    run_ids = eval_df["run_id"][:run_count]
     eval_table = pd.DataFrame(np.nan, index=run_ids, columns=colnames)
     values = []
-    for run_id in run_ids:
-        r = openml.runs.get_run(run_id)
+    runs = openml.runs.get_runs(run_ids)
+    for r in runs:
         params = r.parameter_settings
         for p in params:
             name, value = p['oml:name'], p['oml:value']
             if name in colnames:
-                eval_table.loc[run_id, name] = value
+                eval_table.loc[r.run_id, name] = value
         values.append(r.evaluations[metric])
     return eval_table, values
 
@@ -153,13 +155,14 @@ def list_categorical_attributes(flow_type='svm'):
 #############################################################################
 # Fetching the data from OpenML
 # *****************************
-# To read all the tasks and evaluations for them and collate into a table. Here, we are reading
-# all the tasks and evaluations for the SVM flow and pre-processing all retrieved evaluations.
+# Now, we read all the tasks and evaluations for them and collate into a table.
+# Here, we are reading all the tasks and evaluations for the SVM flow and
+# pre-processing all retrieved evaluations.
 
 eval_df, task_ids, flow_id = fetch_evaluations(run_full=False, flow_type=flow_type)
 # run_count can not be passed if all the results are required
-# it is set to 1000 here arbitrarily to get results quickly
-X, y = create_table_from_evaluations(eval_df, run_count=1000, flow_type=flow_type)
+# it is set to 500 here arbitrarily to get results quickly
+X, y = create_table_from_evaluations(eval_df, run_count=500, flow_type=flow_type)
 print(X.head())
 print("Y : ", y[:5])
 
@@ -218,6 +221,7 @@ print("Training RMSE : {:.5}".format(mean_squared_error(y, y_pred)))
 # The surrogate model built from a task's evaluations fetched from OpenML will be put into
 # trivial action here, where we shall randomly sample configurations and observe the trajectory
 # of the area under curve (auc) we can obtain from the surrogate we've built.
+#
 # NOTE: This section is written exclusively for the SVM flow
 
 # Sampling random configurations
@@ -246,8 +250,6 @@ regret = 1 - preds
 
 # plotting the regret curve
 plt.plot(regret)
-# plt.yscale('log')
 plt.title('AUC regret for Random Search on surrogate')
 plt.xlabel('Numbe of function evaluations')
 plt.ylabel('Regret')
-plt.show()
