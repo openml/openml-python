@@ -27,11 +27,17 @@ In the following section, we shall do the following:
 import openml
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
+from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
+from sklearn.compose import ColumnTransformer
+from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestRegressor
 
+
 user_id = 2702
+flow_type = 'svm'  # this example will use the smaller svm flow evaluations
 ############################################################################
 
 """
@@ -138,6 +144,12 @@ def create_table_from_evaluations(eval_df,
     return eval_table, values
 
 
+def list_categorical_attributes(flow_type='svm'):
+    if flow_type == 'svm':
+        return ['kernel']
+    return ['booster']
+
+
 def impute_missing_values(eval_table, flow_type='svm'):
     # Replacing NaNs with fixed values outside the range of the parameters
     # given in the supplement material of the paper
@@ -164,30 +176,103 @@ def preprocess(eval_table, flow_type='svm'):
 
 
 #############################################################################
-# Fetching the tasks and evaluations
-# ==================================
+# Fetching the data from OpenML
+# *****************************
 # To read all the tasks and evaluations for them and collate into a table. Here, we are reading
-# all the tasks and evaluations for the SVM flow and preprocessing all retrieved evaluations.
+# all the tasks and evaluations for the SVM flow and pre-processing all retrieved evaluations.
 
-eval_df, task_ids, flow_id = fetch_evaluations(run_full=False)
-X, y = create_table_from_evaluations(eval_df, run_count=1000)
-X = preprocess(X)
-print("Type: {}; Shape: {}".format(type(X), X.shape))
-print(X[:5])
+eval_df, task_ids, flow_id = fetch_evaluations(run_full=False, flow_type=flow_type)
+# run_count can not be passed if all the results are required
+# it is set to 1000 here arbitrarily to get results quickly
+X, y = create_table_from_evaluations(eval_df, run_count=1000, flow_type=flow_type)
+print(X.head())
+print("Y : ", y[:5])
+
+#############################################################################
+# Creating pre-processing and modelling pipelines
+# ***********************************************
+# The two primary tasks are to impute the missing values, that is, account for the hyperparameters
+# that are not available with the runs from OpenML. And secondly, to handle categorical variables
+# using One-hot encoding prior to modelling.
+
+# Separating data into categorical and non-categorical (numeric for this example) columns
+cat_cols = list_categorical_attributes(flow_type=flow_type)
+num_cols = list(set(X.columns) - set(cat_cols))
+X_cat = X.loc[:, cat_cols]
+X_num = X.loc[:, num_cols]
+
+# Missing value imputers
+cat_imputer = SimpleImputer(missing_values=np.nan, strategy='constant', fill_value='None')
+num_imputer = SimpleImputer(missing_values=np.nan, strategy='constant', fill_value=-1)
+
+# Creating the one-hot encoder
+enc = OneHotEncoder(handle_unknown='ignore')
+
+# Pipeline to handle categorical column transformations
+cat_transforms = Pipeline([('impute', cat_imputer), ('encode', enc)])
+
+# Combining column transformers
+ct = ColumnTransformer([('cat', cat_transforms, cat_cols), ('num', num_imputer, num_cols)])
+
+# Creating the full pipeline with the surrogate model
+clf = RandomForestRegressor(n_estimators=50)
+model = Pipeline(steps=[('preprocess', ct), ('surrogate', clf)])
 
 
 #############################################################################
 # Building a surrogate model on a task's evaluation
-# =================================================
+# *************************************************
 # The same set of functions can be used for a single task to retrieve a singular table which can
 # be used for the surrogate model construction. We shall use the SVM flow here to keep execution
 # time simple and quick.
 
-# Selecting a task
+# Selecting a task for the surrogate
 task_id = task_ids[-1]
+print("Task ID : ", task_id)
 X, y = create_table_from_evaluations(eval_df, run_count=1000, task_ids=[task_id], flow_type='svm')
-X = preprocess(X, flow_type='svm')
 
-# Surrogate model
-clf = RandomForestRegressor(n_estimators=50, max_depth=3)
-clf.fit(X, y)
+model.fit(X, y)
+y_pred = model.predict(X)
+
+print("Training RMSE : {:.5}".format(mean_squared_error(y, y_pred)))
+
+
+#############################################################################
+# Evaluating the surrogate model
+# ******************************
+# The surrogate model built from a task's evaluations fetched from OpenML will be put into
+# trivial action here, where we shall randomly sample configurations and observe the trajectory
+# of the area under curve (auc) we can obtain from the surrogate we've built.
+# NOTE: This section is written exclusively for the SVM flow
+
+# Sampling random configurations
+def random_sample_configurations(num_samples=100):
+    colnames = ['cost', 'degree', 'gamma', 'kernel']
+    ranges = [(0.000986, 998.492437),
+              (2.0, 5.0),
+              (0.000988, 913.373845),
+              (['linear', 'polynomial', 'radial', 'sigmoid'])]
+    X = pd.DataFrame(np.nan, index=range(num_samples), columns=colnames)
+    for i in range(len(colnames)):
+        if len(ranges[i]) == 2:
+            col_val = np.random.uniform(low=ranges[i][0], high=ranges[i][1], size=num_samples)
+        else:
+            col_val = np.random.choice(ranges[i], size=num_samples)
+        X.iloc[:, i] = col_val
+    return X
+
+configs = random_sample_configurations(num_samples=1000)
+preds = model.predict(configs)
+
+# tracking the maximum AUC obtained over the functions evaluations
+preds = np.maximum.accumulate(preds)
+# computing regret (1 - predicted_auc)
+regret = 1 - preds
+
+# plotting the regret curve
+plt.plot(regret)
+# plt.yscale('log')
+plt.title('AUC regret for Random Search on surrogate')
+plt.xlabel('Numbe of function evaluations')
+plt.ylabel('Regret')
+plt.show()
