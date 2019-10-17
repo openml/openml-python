@@ -1,6 +1,7 @@
 from collections import OrderedDict
 import os
 from typing import Dict, List, Union, Tuple, Optional  # noqa: F401
+import logging
 
 import xmltodict
 
@@ -183,6 +184,10 @@ class OpenMLFlow(OpenMLBase):
                           "upload_date", "language", "dependencies"]:
             _add_if_nonempty(flow_dict, 'oml:{}'.format(attribute),
                              getattr(self, attribute))
+
+        if not self.description:
+            logger = logging.getLogger(__name__)
+            logger.warn("Flow % has empty description", self.name)
 
         flow_parameters = []
         for key in self.parameters:

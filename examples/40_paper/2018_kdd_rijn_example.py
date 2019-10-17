@@ -112,7 +112,6 @@ for idx, task_id in enumerate(suite.tasks):
                                  if len(setups_evals[c].unique()) > 1 or c == performance_column]]
     # We are done with processing ``setups_evals``. Note that we still might have some irrelevant hyperparameters, e.g.,
     # ``random_state``. We have dropped some relevant hyperparameters, i.e., several categoricals. Let's check it out:
-    print(setups_evals.dtypes)
 
     # determine x values to pass to fanova library
     parameter_names = [pname for pname in setups_evals.columns.to_numpy() if pname != performance_column]
@@ -121,7 +120,7 @@ for idx, task_id in enumerate(suite.tasks):
     for idx, pname in enumerate(parameter_names):
         try:
             fanova_results.append({
-                'hyperparameter': pname if len(pname) < 35 else '[...] %s' % pname[-30:],
+                'hyperparameter': pname.split(".")[-1],
                 'fanova': evaluator.quantify_importance([idx])[(idx,)]['individual importance']
             })
         except RuntimeError as e:
