@@ -329,7 +329,7 @@ def list_evaluations_setups(
     # Hence we split the list of unique setup ids returned by list_evaluations into chunks of size N
     df = pd.DataFrame()
     if len(evals) != 0:
-        N = 100 # size of section
+        N = 100  # size of section
         length = len(evals['setup_id'].unique())  # length of the array we want to split
         # array_split - allows indices_or_sections to not equally divide the array
         # array_split -length % N sub-arrays of size length//N + 1 and the rest of size length//N.
