@@ -1,8 +1,6 @@
 from collections import OrderedDict
 from typing import Dict, List, Optional, Tuple, Union, Any
 
-import xmltodict
-
 import openml
 from openml.base import OpenMLBase
 
@@ -124,26 +122,9 @@ class BaseStudy(OpenMLBase):
                  "Creator", "Upload Time"]
         return [(key, fields[key]) for key in order if key in fields]
 
-    def publish(self) -> int:
-        """
-        Publish the study on the OpenML server.
-
-        Returns
-        -------
-        study_id: int
-            Id of the study uploaded to the server.
-        """
-        file_elements = {
-            'description': self._to_xml()
-        }
-        return_value = openml._api_calls._perform_api_call(
-            "study/",
-            'post',
-            file_elements=file_elements,
-        )
-        study_res = xmltodict.parse(return_value)
-        self.study_id = int(study_res['oml:study_upload']['oml:id'])
-        return self.study_id
+    def _parse_publish_response(self, xml_response: Dict):
+        """ Parse the id from the xml_response and assign it to self. """
+        self.study_id = int(xml_response['oml:study_upload']['oml:id'])
 
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
         """ Creates a dictionary representation of self. """

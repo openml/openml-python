@@ -2,7 +2,7 @@ import os
 import hashlib
 import xmltodict
 import shutil
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Tuple, Union, Type
 import warnings
 import pandas as pd
 from functools import wraps
@@ -68,16 +68,23 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
                              (xml_tag_name, str(node)))
 
 
-def _tag_openml_base(oml_object: 'OpenMLBase', tag: str, untag: bool = False):
+def _get_rest_api_type_alias(oml_object: 'OpenMLBase') -> str:
+    """ Return the alias of the openml entity as it is defined for the REST API. """
     rest_api_mapping = [
         (openml.datasets.OpenMLDataset, 'data'),
         (openml.flows.OpenMLFlow, 'flow'),
         (openml.tasks.OpenMLTask, 'task'),
-        (openml.runs.OpenMLRun, 'run')
-    ]
+        (openml.runs.OpenMLRun, 'run'),
+        ((openml.study.OpenMLStudy, openml.study.OpenMLBenchmarkSuite), 'study')
+    ]  # type: List[Tuple[Union[Type, Tuple], str]]
     _, api_type_alias = [(python_type, api_alias)
                          for (python_type, api_alias) in rest_api_mapping
                          if isinstance(oml_object, python_type)][0]
+    return api_type_alias
+
+
+def _tag_openml_base(oml_object: 'OpenMLBase', tag: str, untag: bool = False):
+    api_type_alias = _get_rest_api_type_alias(oml_object)
     _tag_entity(api_type_alias, oml_object.id, tag, untag)
 
 

@@ -514,10 +514,10 @@ class TestOpenMLDataset(TestBase):
             version=1,
             url="https://www.openml.org/data/download/61/dataset_61_iris.arff")
         dataset.publish()
-        TestBase._mark_entity_for_removal('data', dataset.dataset_id)
+        TestBase._mark_entity_for_removal('data', dataset.id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                            dataset.dataset_id))
-        did = dataset.dataset_id
+                                                            dataset.id))
+        did = dataset.id
 
         # admin key for test server (only adminds can activate datasets.
         # all users can deactivate their own datasets)
@@ -629,18 +629,18 @@ class TestOpenMLDataset(TestBase):
             paper_url='http://openml.github.io/openml-python'
         )
 
-        upload_did = dataset.publish()
-        TestBase._mark_entity_for_removal('data', upload_did)
+        dataset.publish()
+        TestBase._mark_entity_for_removal('data', dataset.id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                            upload_did))
+                                                            dataset.id))
 
         self.assertEqual(
-            _get_online_dataset_arff(upload_did),
+            _get_online_dataset_arff(dataset.id),
             dataset._dataset,
             "Uploaded arff does not match original one"
         )
         self.assertEqual(
-            _get_online_dataset_format(upload_did),
+            _get_online_dataset_format(dataset.id),
             'arff',
             "Wrong format for dataset"
         )
@@ -694,17 +694,17 @@ class TestOpenMLDataset(TestBase):
             paper_url='http://openml.github.io/openml-python'
         )
 
-        upload_did = dataset.publish()
-        TestBase._mark_entity_for_removal('data', upload_did)
+        dataset.publish()
+        TestBase._mark_entity_for_removal('data', dataset.id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                            upload_did))
+                                                            dataset.id))
         self.assertEqual(
-            _get_online_dataset_arff(upload_did),
+            _get_online_dataset_arff(dataset.id),
             dataset._dataset,
             "Uploaded ARFF does not match original one"
         )
         self.assertEqual(
-            _get_online_dataset_format(upload_did),
+            _get_online_dataset_format(dataset.id),
             'arff',
             "Wrong format for dataset"
         )
@@ -740,17 +740,17 @@ class TestOpenMLDataset(TestBase):
             version_label='test',
         )
 
-        upload_did = xor_dataset.publish()
-        TestBase._mark_entity_for_removal('data', upload_did)
+        xor_dataset.publish()
+        TestBase._mark_entity_for_removal('data', xor_dataset.id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                            upload_did))
+                                                            xor_dataset.id))
         self.assertEqual(
-            _get_online_dataset_arff(upload_did),
+            _get_online_dataset_arff(xor_dataset.id),
             xor_dataset._dataset,
             "Uploaded ARFF does not match original one"
         )
         self.assertEqual(
-            _get_online_dataset_format(upload_did),
+            _get_online_dataset_format(xor_dataset.id),
             'sparse_arff',
             "Wrong format for dataset"
         )
@@ -780,17 +780,17 @@ class TestOpenMLDataset(TestBase):
             version_label='test',
         )
 
-        upload_did = xor_dataset.publish()
-        TestBase._mark_entity_for_removal('data', upload_did)
+        xor_dataset.publish()
+        TestBase._mark_entity_for_removal('data', xor_dataset.id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                            upload_did))
+                                                            xor_dataset.id))
         self.assertEqual(
-            _get_online_dataset_arff(upload_did),
+            _get_online_dataset_arff(xor_dataset.id),
             xor_dataset._dataset,
             "Uploaded ARFF does not match original one"
         )
         self.assertEqual(
-            _get_online_dataset_format(upload_did),
+            _get_online_dataset_format(xor_dataset.id),
             'sparse_arff',
             "Wrong format for dataset"
         )
@@ -906,12 +906,12 @@ class TestOpenMLDataset(TestBase):
             original_data_url=original_data_url,
             paper_url=paper_url
         )
-        upload_did = dataset.publish()
-        TestBase._mark_entity_for_removal('data', upload_did)
+        dataset.publish()
+        TestBase._mark_entity_for_removal('data', dataset.id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                            upload_did))
+                                                            dataset.id))
         self.assertEqual(
-            _get_online_dataset_arff(upload_did),
+            _get_online_dataset_arff(dataset.id),
             dataset._dataset,
             "Uploaded ARFF does not match original one"
         )
@@ -943,17 +943,17 @@ class TestOpenMLDataset(TestBase):
             original_data_url=original_data_url,
             paper_url=paper_url
         )
-        upload_did = dataset.publish()
-        TestBase._mark_entity_for_removal('data', upload_did)
+        dataset.publish()
+        TestBase._mark_entity_for_removal('data', dataset.id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                            upload_did))
+                                                            dataset.id))
         self.assertEqual(
-            _get_online_dataset_arff(upload_did),
+            _get_online_dataset_arff(dataset.id),
             dataset._dataset,
             "Uploaded ARFF does not match original one"
         )
         self.assertEqual(
-            _get_online_dataset_format(upload_did),
+            _get_online_dataset_format(dataset.id),
             'sparse_arff',
             "Wrong format for dataset"
         )
@@ -982,11 +982,11 @@ class TestOpenMLDataset(TestBase):
             original_data_url=original_data_url,
             paper_url=paper_url
         )
-        upload_did = dataset.publish()
-        TestBase._mark_entity_for_removal('data', upload_did)
+        dataset.publish()
+        TestBase._mark_entity_for_removal('data', dataset.id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                            upload_did))
-        downloaded_data = _get_online_dataset_arff(upload_did)
+                                                            dataset.id))
+        downloaded_data = _get_online_dataset_arff(dataset.id)
         self.assertEqual(
             downloaded_data,
             dataset._dataset,
@@ -1139,14 +1139,14 @@ class TestOpenMLDataset(TestBase):
         )
 
         # publish dataset
-        upload_did = dataset.publish()
-        TestBase._mark_entity_for_removal('data', upload_did)
+        dataset.publish()
+        TestBase._mark_entity_for_removal('data', dataset.id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                            upload_did))
+                                                            dataset.id))
         # test if publish was successful
-        self.assertIsInstance(upload_did, int)
+        self.assertIsInstance(dataset.id, int)
 
-        dataset = None
+        downloaded_dataset = None
         # fetching from server
         # loop till timeout or fetch not successful
         max_waiting_time_seconds = 400
@@ -1154,17 +1154,17 @@ class TestOpenMLDataset(TestBase):
         start_time = time.time()
         while time.time() - start_time < max_waiting_time_seconds:
             try:
-                dataset = openml.datasets.get_dataset(upload_did)
+                downloaded_dataset = openml.datasets.get_dataset(dataset.id)
                 break
             except Exception as e:
                 # returned code 273: Dataset not processed yet
                 # returned code 362: No qualities found
-                print("Failed to fetch dataset:{} with '{}'.".format(upload_did, str(e)))
+                print("Failed to fetch dataset:{} with '{}'.".format(dataset.id, str(e)))
                 time.sleep(10)
                 continue
-        if dataset is None:
-            raise ValueError("TIMEOUT: Failed to fetch uploaded dataset - {}".format(upload_did))
-        self.assertEqual(dataset.ignore_attribute, ignore_attribute)
+        if downloaded_dataset is None:
+            raise ValueError("TIMEOUT: Failed to fetch uploaded dataset - {}".format(dataset.id))
+        self.assertEqual(downloaded_dataset.ignore_attribute, ignore_attribute)
 
     def test_create_dataset_row_id_attribute_error(self):
         # meta-information
@@ -1254,11 +1254,11 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url
             )
             self.assertEqual(dataset.row_id_attribute, output_row_id)
-            upload_did = dataset.publish()
-            TestBase._mark_entity_for_removal('data', upload_did)
+            dataset.publish()
+            TestBase._mark_entity_for_removal('data', dataset.id)
             TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                                upload_did))
-            arff_dataset = arff.loads(_get_online_dataset_arff(upload_did))
+                                                                dataset.id))
+            arff_dataset = arff.loads(_get_online_dataset_arff(dataset.id))
             arff_data = np.array(arff_dataset['data'], dtype=object)
             # if we set the name of the index then the index will be added to
             # the data

@@ -1,12 +1,11 @@
 from collections import OrderedDict
 import pickle
 import time
-from typing import Any, IO, TextIO, List, Union, Tuple, Optional  # noqa F401
+from typing import Any, IO, TextIO, List, Union, Tuple, Optional, Dict  # noqa F401
 import os
 
 import arff
 import numpy as np
-import xmltodict
 
 import openml
 import openml._api_calls
@@ -428,16 +427,15 @@ class OpenMLRun(OpenMLBase):
                 scores.append(sklearn_fn(y_true, y_pred, **kwargs))
         return np.array(scores)
 
-    def publish(self) -> 'OpenMLRun':
-        """ Publish a run (and if necessary, its flow) to the OpenML server.
+    def _parse_publish_response(self, xml_response: Dict):
+        """ Parse the id from the xml_response and assign it to self. """
+        self.run_id = int(xml_response['oml:upload_run']['oml:run_id'])
 
-        Uploads the results of a run to OpenML.
-        If the run is of an unpublished OpenMLFlow, the flow will be uploaded too.
-        Sets the run_id on self.
+    def _get_file_elements(self) -> Dict:
+        """ Get file_elements to upload to the server.
 
-        Returns
-        -------
-        self : OpenMLRun
+        Derived child classes should overwrite this method as necessary.
+        The description field will be populated automatically if not provided.
         """
         if self.model is None:
             raise PyOpenMLError(
@@ -463,8 +461,7 @@ class OpenMLRun(OpenMLBase):
                 self.model,
             )
 
-        description_xml = self._to_xml()
-        file_elements = {'description': ("description.xml", description_xml)}
+        file_elements = {'description': ("description.xml", self._to_xml())}
 
         if self.error_message is None:
             predictions = arff.dumps(self._generate_arff_dict())
@@ -473,13 +470,7 @@ class OpenMLRun(OpenMLBase):
         if self.trace is not None:
             trace_arff = arff.dumps(self.trace.trace_to_arff())
             file_elements['trace'] = ("trace.arff", trace_arff)
-
-        return_value = openml._api_calls._perform_api_call(
-            "/run/", 'post', file_elements=file_elements
-        )
-        result = xmltodict.parse(return_value)
-        self.run_id = int(result['oml:upload_run']['oml:run_id'])
-        return self
+        return file_elements
 
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
         """ Creates a dictionary representation of self. """

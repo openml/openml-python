@@ -351,6 +351,10 @@ class OpenMLFlow(OpenMLBase):
             xml_string = f.read()
         return OpenMLFlow._from_dict(xmltodict.parse(xml_string))
 
+    def _parse_publish_response(self, xml_response: Dict):
+        """ Parse the id from the xml_response and assign it to self. """
+        self.flow_id = int(xml_response['oml:upload_flow']['oml:id'])
+
     def publish(self, raise_error_if_exists: bool = False) -> 'OpenMLFlow':
         """ Publish this flow to OpenML server.
 
@@ -379,15 +383,8 @@ class OpenMLFlow(OpenMLBase):
             if self.flow_id:
                 raise openml.exceptions.PyOpenMLError("Flow does not exist on the server, "
                                                       "but 'flow.flow_id' is not None.")
-            xml_description = self._to_xml()
-            file_elements = {'description': xml_description}
-            return_value = openml._api_calls._perform_api_call(
-                "flow/",
-                'post',
-                file_elements=file_elements,
-            )
-            server_response = xmltodict.parse(return_value)
-            flow_id = int(server_response['oml:upload_flow']['oml:id'])
+            super().publish()
+            flow_id = self.flow_id
         elif raise_error_if_exists:
             error_message = "This OpenMLFlow already exists with id: {}.".format(flow_id)
             raise openml.exceptions.PyOpenMLError(error_message)
