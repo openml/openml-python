@@ -180,18 +180,9 @@ class OpenMLTask(OpenMLBase):
 
         return task_container
 
-    def publish(self) -> 'OpenMLTask':
-        """ Publish task to OpenML server.
-
-        Returns
-        -------
-        self : OpenMLTask
-            The OpenMLTask with the dataset_id set.
-        """
-
-        xml_response = self._add_description_and_publish(file_elements={})
+    def _parse_publish_response(self, xml_response: Dict):
+        """ Parse the id from the xml_response and assign it to self. """
         self.task_id = int(xml_response['oml:upload_task']['oml:id'])
-        return self
 
 
 class OpenMLSupervisedTask(OpenMLTask, ABC):

@@ -104,18 +104,33 @@ class OpenMLBase(ABC):
         encoding_specification, xml_body = xml_representation.split('\n', 1)
         return xml_body
 
-    def _add_description_and_publish(self, file_elements: Dict) -> Dict:
-        file_elements['description'] = self._to_xml()
-        call = '{}/'.format(_get_rest_api_type_alias(self))
+    def _get_file_elements(self) -> Dict:
+        """ Get file_elements to upload to the server, called during Publish.
 
+        Derived child classes should overwrite this method as necessary.
+        The description field will be populated automatically if not provided.
+        """
+        return {}
+
+    @abstractmethod
+    def _parse_publish_response(self, xml_response: Dict):
+        """ Parse the id from the xml_response and assign it to self. """
+        pass
+
+    def publish(self) -> 'OpenMLBase':
+        file_elements = self._get_file_elements()
+
+        if 'description' not in file_elements:
+            file_elements['description'] = self._to_xml()
+
+        call = '{}/'.format(_get_rest_api_type_alias(self))
         response_text = openml._api_calls._perform_api_call(
             call, 'post', file_elements=file_elements
         )
-        return xmltodict.parse(response_text)
+        xml_response = xmltodict.parse(response_text)
 
-    @abstractmethod
-    def publish(self) -> 'OpenMLBase':
-        pass
+        self._parse_publish_response(xml_response)
+        return self
 
     def open_in_browser(self):
         """ Opens the OpenML web page corresponding to this object in your default browser. """

@@ -726,16 +726,8 @@ class OpenMLDataset(OpenMLBase):
                     result.append(idx - offset)
         return result
 
-    def publish(self) -> 'OpenMLDataset':
-        """ Publish the dataset on the OpenML server.
-
-        Upload the dataset description and dataset content to OpenML.
-
-        Returns
-        -------
-        self : OpenMLDataset
-            The OpenMLDataset with the dataset_id set.
-        """
+    def _get_file_elements(self) -> Dict:
+        """ Adds the 'dataset' to file elements. """
         file_elements = {}
         path = None if self.data_file is None else os.path.abspath(self.data_file)
 
@@ -751,10 +743,11 @@ class OpenMLDataset(OpenMLBase):
                 raise ValueError("The file you have provided is not a valid arff file.")
         elif self.url is None:
             raise ValueError("No valid url/path to the data file was given.")
+        return file_elements
 
-        xml_response = self._add_description_and_publish(file_elements)
+    def _parse_publish_response(self, xml_response: Dict):
+        """ Parse the id from the xml_response and assign it to self. """
         self.dataset_id = int(xml_response['oml:upload_data_set']['oml:id'])
-        return self
 
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
         """ Creates a dictionary representation of self. """
