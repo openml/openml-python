@@ -6,7 +6,6 @@ import os
 
 import arff
 import numpy as np
-import xmltodict
 
 import openml
 import openml._api_calls
