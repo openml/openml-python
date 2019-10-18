@@ -1,4 +1,5 @@
 import io
+import logging
 import os
 import re
 from typing import List, Dict, Union, Optional
@@ -28,6 +29,7 @@ from ..utils import (
 
 
 DATASETS_CACHE_DIR_NAME = 'datasets'
+logger = logging.getLogger(__name__)
 
 ############################################################################
 # Local getters/accessors to the cache directory
@@ -498,10 +500,17 @@ def get_dataset(
         remove_dataset_cache = True
         description = _get_dataset_description(did_cache_dir, dataset_id)
         features = _get_dataset_features(did_cache_dir, dataset_id)
-        qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
+
+        try:
+            qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
+        except OpenMLServerException as e:
+            if e.code == 362 and str(e) == 'No qualities found - None':
+                logger.warning("No qualities found for dataset {}".format(dataset_id))
+                qualities = None
+            else:
+                raise
 
         arff_file = _get_dataset_arff(description) if download_data else None
-
         remove_dataset_cache = False
     except OpenMLServerException as e:
         # if there was an exception,

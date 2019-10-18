@@ -23,9 +23,12 @@ class TestEvaluationsExample(unittest.TestCase):
         df[hp_names] = df[hp_names].astype(float).apply(np.log)
         C, gamma, score = df[hp_names[0]], df[hp_names[1]], df['value']
 
-        cntr = plt.tricontourf(C, gamma, score, levels=12, cmap="RdBu_r")
-        plt.colorbar(cntr, label="accuracy")
+        cntr = plt.tricontourf(C, gamma, score, levels=12, cmap='RdBu_r')
+        plt.colorbar(cntr, label='accuracy')
         plt.xlim((min(C), max(C)))
         plt.ylim((min(gamma), max(gamma)))
-        plt.xlabel("C (log10)")
-        plt.ylabel("gamma (log10)")
+        plt.xlabel('C (log10)', size=16)
+        plt.ylabel('gamma (log10)', size=16)
+        plt.title('SVM performance landscape', size=20)
+
+        plt.tight_layout()
