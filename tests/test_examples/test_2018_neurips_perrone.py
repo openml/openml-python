@@ -1,12 +1,15 @@
 import openml
 from openml.testing import TestBase
 
+import unittest
+from distutils.version import LooseVersion
+
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+
+import sklearn
 from sklearn.pipeline import Pipeline
-from sklearn.impute import SimpleImputer
-from sklearn.compose import ColumnTransformer
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestRegressor
@@ -14,6 +17,9 @@ from sklearn.ensemble import RandomForestRegressor
 
 class TestPerroneExample(TestBase):
 
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20", reason="SimpleImputer and "
+                                                                        "ColumnTransformer doesn't"
+                                                                        "exist in older versions.")
     def test_perrone_example(self):
         openml.config.server = self.production_server
 
@@ -41,6 +47,7 @@ class TestPerroneExample(TestBase):
         cat_cols = ['kernel']
         num_cols = ['cost', 'degree', 'gamma']
         # Missing value imputers
+        from sklearn.impute import SimpleImputer
         cat_imputer = SimpleImputer(missing_values=np.nan, strategy='constant', fill_value='None')
         num_imputer = SimpleImputer(missing_values=np.nan, strategy='constant', fill_value=-1)
         # Creating the one-hot encoder
@@ -48,6 +55,7 @@ class TestPerroneExample(TestBase):
         # Pipeline to handle categorical column transformations
         cat_transforms = Pipeline(steps=[('impute', cat_imputer), ('encode', enc)])
         # Combining column transformers
+        from sklearn.compose import ColumnTransformer
         ct = ColumnTransformer([('cat', cat_transforms, cat_cols), ('num', num_imputer, num_cols)])
         # Creating the full pipeline with the surrogate model
         clf = RandomForestRegressor(n_estimators=50)
