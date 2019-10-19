@@ -39,7 +39,7 @@ flow_type = 'svm'  # this example will use the smaller svm flow evaluations
 ############################################################################
 # The subsequent functions are defined to fetch tasks, flows, evaluations and preprocess them into
 # a tabular format that can be used to build models.
-#
+
 
 def fetch_evaluations(run_full=False,
                       flow_type='svm',
@@ -79,25 +79,25 @@ def fetch_evaluations(run_full=False,
             3492, 3493, 37, 3896, 3903, 3913, 3917, 3918, 3, 49, 9914,
             9946, 9952, 9967,
         ]
-    else:  #flow_type == 'xgboost' and not run_full:
+    else:  # flow_type == 'xgboost' and not run_full:
         task_ids = [3903, 37, 3485, 49, 3913]
 
     # Fetching the relevant flow
     flow_id = 5891 if flow_type == 'svm' else 6767
 
     # Fetching evaluations
-    eval_df = openml.evaluations.list_evaluations(function=metric,
-                                                  task=task_ids,
-                                                  flow=[flow_id],
-                                                  uploader=[2702],
-                                                  output_format='dataframe')
+    eval_df = openml.evaluations.list_evaluations_setups(function=metric,
+                                                         task=task_ids,
+                                                         flow=[flow_id],
+                                                         uploader=[2702],
+                                                         output_format='dataframe',
+                                                         parameters_in_separate_columns=True)
     return eval_df, task_ids, flow_id
 
 
 def create_table_from_evaluations(eval_df,
                                   flow_type='svm',
                                   run_count=np.iinfo(np.int64).max,
-                                  metric = 'area_under_roc_curve',
                                   task_ids=None):
     '''
     Create a tabular data with its ground truth from a dataframe of evaluations.
@@ -111,8 +111,6 @@ def create_table_from_evaluations(eval_df,
         To select whether svm or xgboost experiments are to be run
     run_count : int
         Maximum size of the table created, or number of runs included in the table
-    metric : str
-        The evaluation measure that is passed to openml.evaluations.list_evaluations
     task_ids : list, (optional)
         List of integers specifying the tasks to be retained from the evaluations dataframe
 
@@ -132,18 +130,11 @@ def create_table_from_evaluations(eval_df,
             'subsample',
         ]
     eval_df = eval_df.sample(frac=1)  # shuffling rows
-    run_ids = eval_df["run_id"][:run_count]
-    eval_table = pd.DataFrame(np.nan, index=run_ids, columns=colnames)
-    values = []
-    runs = openml.runs.get_runs(run_ids)
-    for r in runs:
-        params = r.parameter_settings
-        for p in params:
-            name, value = p['oml:name'], p['oml:value']
-            if name in colnames:
-                eval_table.loc[r.run_id, name] = value
-        values.append(r.evaluations[metric])
-    return eval_table, values
+    eval_df = eval_df.iloc[:run_count, :]
+    eval_df.columns = [column.split('_')[-1] for column in eval_df.columns]
+    eval_table = eval_df.loc[:, colnames]
+    value = eval_df.loc[:, 'value']
+    return eval_table, value
 
 
 def list_categorical_attributes(flow_type='svm'):
@@ -160,9 +151,7 @@ def list_categorical_attributes(flow_type='svm'):
 # pre-processing all retrieved evaluations.
 
 eval_df, task_ids, flow_id = fetch_evaluations(run_full=False, flow_type=flow_type)
-# run_count can not be passed if all the results are required
-# it is set to 500 here arbitrarily to get results quickly
-X, y = create_table_from_evaluations(eval_df, run_count=500, flow_type=flow_type)
+X, y = create_table_from_evaluations(eval_df, flow_type=flow_type)
 print(X.head())
 print("Y : ", y[:5])
 
@@ -176,8 +165,6 @@ print("Y : ", y[:5])
 # Separating data into categorical and non-categorical (numeric for this example) columns
 cat_cols = list_categorical_attributes(flow_type=flow_type)
 num_cols = list(set(X.columns) - set(cat_cols))
-X_cat = X.loc[:, cat_cols]
-X_num = X.loc[:, num_cols]
 
 # Missing value imputers
 cat_imputer = SimpleImputer(missing_values=np.nan, strategy='constant', fill_value='None')
@@ -187,7 +174,7 @@ num_imputer = SimpleImputer(missing_values=np.nan, strategy='constant', fill_val
 enc = OneHotEncoder(handle_unknown='ignore')
 
 # Pipeline to handle categorical column transformations
-cat_transforms = Pipeline([('impute', cat_imputer), ('encode', enc)])
+cat_transforms = Pipeline(steps=[('impute', cat_imputer), ('encode', enc)])
 
 # Combining column transformers
 ct = ColumnTransformer([('cat', cat_transforms, cat_cols), ('num', num_imputer, num_cols)])
@@ -207,7 +194,7 @@ model = Pipeline(steps=[('preprocess', ct), ('surrogate', clf)])
 # Selecting a task for the surrogate
 task_id = task_ids[-1]
 print("Task ID : ", task_id)
-X, y = create_table_from_evaluations(eval_df, run_count=1000, task_ids=[task_id], flow_type='svm')
+X, y = create_table_from_evaluations(eval_df, task_ids=[task_id], flow_type='svm')
 
 model.fit(X, y)
 y_pred = model.predict(X)
@@ -224,6 +211,7 @@ print("Training RMSE : {:.5}".format(mean_squared_error(y, y_pred)))
 #
 # NOTE: This section is written exclusively for the SVM flow
 
+
 # Sampling random configurations
 def random_sample_configurations(num_samples=100):
     colnames = ['cost', 'degree', 'gamma', 'kernel']
@@ -239,6 +227,7 @@ def random_sample_configurations(num_samples=100):
             col_val = np.random.choice(ranges[i], size=num_samples)
         X.iloc[:, i] = col_val
     return X
+
 
 configs = random_sample_configurations(num_samples=1000)
 print(configs)
