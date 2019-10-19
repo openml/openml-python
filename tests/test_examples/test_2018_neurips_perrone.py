@@ -15,6 +15,8 @@ from sklearn.ensemble import RandomForestRegressor
 class TestPerroneExample(TestBase):
 
     def test_perrone_example(self):
+        openml.config.server = self.production_server
+
         metric = 'area_under_roc_curve'
         task_ids = [9983, 3485, 3902, 3903, 145878]
         flow_id = 5891
@@ -25,12 +27,12 @@ class TestPerroneExample(TestBase):
                                                              uploader=[2702],
                                                              output_format='dataframe',
                                                              parameters_in_separate_columns=True)
+        self.assertTrue(all(np.isin(task_ids, eval_df['task_id'])))
         self.assertEqual(eval_df.shape[1], 21)
         self.assertGreaterEqual(eval_df.shape[0], 5000)
 
         eval_df.columns = [column.split('_')[-1] for column in eval_df.columns]
         self.assertTrue(all(np.isin(colnames, eval_df.columns)))
-        self.assertTrue(all(np.isin(task_ids, eval_df['task_id'])))
 
         eval_df = eval_df.sample(frac=1)  # shuffling rows
         eval_df.columns = [column.split('_')[-1] for column in eval_df.columns]
@@ -80,3 +82,5 @@ class TestPerroneExample(TestBase):
         plt.title('AUC regret for Random Search on surrogate')
         plt.xlabel('Numbe of function evaluations')
         plt.ylabel('Regret')
+
+        openml.config.server = self.test_server
