@@ -569,6 +569,12 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(attributes, [('integer', 'INTEGER'),
                                       ('floating', 'REAL')])
 
+    def test_attributes_arff_from_df_numeric_column(self):
+        # Test column names are automatically converted to str if needed (#819)
+        df = pd.DataFrame({0: [1, 2, 3], 0.5: [4, 5, 6], 'target': [0, 1, 1]})
+        attributes = attributes_arff_from_df(df)
+        self.assertEqual(attributes, [('0', 'INTEGER'), ('0.5', 'INTEGER'), ('target', 'INTEGER')])
+
     def test_attributes_arff_from_df_mixed_dtype_categories(self):
         # liac-arff imposed categorical attributes to be of sting dtype. We
         # raise an error if this is not the case.
