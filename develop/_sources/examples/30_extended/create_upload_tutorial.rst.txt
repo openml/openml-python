@@ -184,7 +184,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/79529
+    URL for dataset: https://www.openml.org/d/80004
 
 
 
@@ -282,7 +282,7 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/79530
+    URL for dataset: https://www.openml.org/d/80005
 
 
 
@@ -367,7 +367,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    /home/travis/build/openml/openml-python/openml/datasets/functions.py:675: FutureWarning: A future version of pandas will default to `skipna=True`. To silence this warning, pass `skipna=True|False` explicitly.
+    /home/travis/build/openml/openml-python/openml/datasets/functions.py:680: FutureWarning: A future version of pandas will default to `skipna=True`. To silence this warning, pass `skipna=True|False` explicitly.
       attributes_ = attributes_arff_from_df(data)
 
 
@@ -389,7 +389,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/79531
+    URL for dataset: https://www.openml.org/d/80006
 
 
 
@@ -452,7 +452,7 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/79532
+    URL for dataset: https://www.openml.org/d/80007
 
 
 
@@ -558,7 +558,7 @@ Dataset is a pandas sparse dataframe
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/79533
+    URL for dataset: https://www.openml.org/d/80008
 
 
 
@@ -575,7 +575,7 @@ Dataset is a pandas sparse dataframe
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  8.161 seconds)
+   **Total running time of the script:** ( 0 minutes  8.390 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:
