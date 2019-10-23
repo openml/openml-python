@@ -103,7 +103,13 @@
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
 <li><a class="reference internal" href="#">Perrone et al. (2018)</a><ul>
-<li><a class="reference internal" href="#publication">Publication</a></li>
+<li><a class="reference internal" href="#publication">Publication</a><ul>
+<li><a class="reference internal" href="#fetching-the-data-from-openml">Fetching the data from OpenML</a></li>
+<li><a class="reference internal" href="#creating-pre-processing-and-modelling-pipelines">Creating pre-processing and modelling pipelines</a></li>
+<li><a class="reference internal" href="#building-a-surrogate-model-on-a-task-s-evaluation">Building a surrogate model on a task’s evaluation</a></li>
+<li><a class="reference internal" href="#evaluating-the-surrogate-model">Evaluating the surrogate model</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -128,8 +134,269 @@ Hyperparameter Transfer Learning</em> by Perrone et al..</p>
 <div class="line">In <em>Advances in Neural Information Processing Systems 31</em>, 2018</div>
 <div class="line">Available at <a class="reference external" href="http://papers.nips.cc/paper/7917-scalable-hyperparameter-transfer-learning.pdf">http://papers.nips.cc/paper/7917-scalable-hyperparameter-transfer-learning.pdf</a></div>
 </div>
-<p>This is currently a placeholder.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.100 seconds)</p>
+<p>This example demonstrates how OpenML runs can be used to construct a surrogate model.</p>
+<p>In the following section, we shall do the following:</p>
+<ul class="simple">
+<li><p>Retrieve tasks and flows as used in the experiments by Perrone et al. (2018).</p></li>
+<li><p>Build a tabular data by fetching the evaluations uploaded to OpenML.</p></li>
+<li><p>Impute missing values and handle categorical data before building a Random Forest model that
+maps hyperparameter values to the area under curve score.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="k">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="k">import</span> <span class="n">SimpleImputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="k">import</span> <span class="n">ColumnTransformer</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">RandomForestRegressor</span>
+
+<span class="n">flow_type</span> <span class="o">=</span> <span class="s1">&#39;svm&#39;</span>  <span class="c1"># this example will use the smaller svm flow evaluations</span>
+</pre></div>
+</div>
+<p>The subsequent functions are defined to fetch tasks, flows, evaluations and preprocess them into
+a tabular format that can be used to build models.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fetch_evaluations</span><span class="p">(</span><span class="n">run_full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">flow_type</span><span class="o">=</span><span class="s1">&#39;svm&#39;</span><span class="p">,</span>
+                      <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;area_under_roc_curve&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Fetch a list of evaluations based on the flows and tasks used in the experiments.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    run_full : boolean</span>
+<span class="sd">        If True, use the full list of tasks used in the paper</span>
+<span class="sd">        If False, use 5 tasks with the smallest number of evaluations available</span>
+<span class="sd">    flow_type : str, {&#39;svm&#39;, &#39;xgboost&#39;}</span>
+<span class="sd">        To select whether svm or xgboost experiments are to be run</span>
+<span class="sd">    metric : str</span>
+<span class="sd">        The evaluation measure that is passed to openml.evaluations.list_evaluations</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    eval_df : dataframe</span>
+<span class="sd">    task_ids : list</span>
+<span class="sd">    flow_id : int</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># Collecting task IDs as used by the experiments from the paper</span>
+    <span class="k">if</span> <span class="n">flow_type</span> <span class="o">==</span> <span class="s1">&#39;svm&#39;</span> <span class="ow">and</span> <span class="n">run_full</span><span class="p">:</span>
+        <span class="n">task_ids</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="mi">10101</span><span class="p">,</span> <span class="mi">145878</span><span class="p">,</span> <span class="mi">146064</span><span class="p">,</span> <span class="mi">14951</span><span class="p">,</span> <span class="mi">34537</span><span class="p">,</span> <span class="mi">3485</span><span class="p">,</span> <span class="mi">3492</span><span class="p">,</span> <span class="mi">3493</span><span class="p">,</span> <span class="mi">3494</span><span class="p">,</span>
+            <span class="mi">37</span><span class="p">,</span> <span class="mi">3889</span><span class="p">,</span> <span class="mi">3891</span><span class="p">,</span> <span class="mi">3899</span><span class="p">,</span> <span class="mi">3902</span><span class="p">,</span> <span class="mi">3903</span><span class="p">,</span> <span class="mi">3913</span><span class="p">,</span> <span class="mi">3918</span><span class="p">,</span> <span class="mi">3950</span><span class="p">,</span> <span class="mi">9889</span><span class="p">,</span>
+            <span class="mi">9914</span><span class="p">,</span> <span class="mi">9946</span><span class="p">,</span> <span class="mi">9952</span><span class="p">,</span> <span class="mi">9967</span><span class="p">,</span> <span class="mi">9971</span><span class="p">,</span> <span class="mi">9976</span><span class="p">,</span> <span class="mi">9978</span><span class="p">,</span> <span class="mi">9980</span><span class="p">,</span> <span class="mi">9983</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="k">elif</span> <span class="n">flow_type</span> <span class="o">==</span> <span class="s1">&#39;svm&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">run_full</span><span class="p">:</span>
+        <span class="n">task_ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">9983</span><span class="p">,</span> <span class="mi">3485</span><span class="p">,</span> <span class="mi">3902</span><span class="p">,</span> <span class="mi">3903</span><span class="p">,</span> <span class="mi">145878</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">flow_type</span> <span class="o">==</span> <span class="s1">&#39;xgboost&#39;</span> <span class="ow">and</span> <span class="n">run_full</span><span class="p">:</span>
+        <span class="n">task_ids</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="mi">10093</span><span class="p">,</span> <span class="mi">10101</span><span class="p">,</span> <span class="mi">125923</span><span class="p">,</span> <span class="mi">145847</span><span class="p">,</span> <span class="mi">145857</span><span class="p">,</span> <span class="mi">145862</span><span class="p">,</span> <span class="mi">145872</span><span class="p">,</span> <span class="mi">145878</span><span class="p">,</span>
+            <span class="mi">145953</span><span class="p">,</span> <span class="mi">145972</span><span class="p">,</span> <span class="mi">145976</span><span class="p">,</span> <span class="mi">145979</span><span class="p">,</span> <span class="mi">146064</span><span class="p">,</span> <span class="mi">14951</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">3485</span><span class="p">,</span>
+            <span class="mi">3492</span><span class="p">,</span> <span class="mi">3493</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">3896</span><span class="p">,</span> <span class="mi">3903</span><span class="p">,</span> <span class="mi">3913</span><span class="p">,</span> <span class="mi">3917</span><span class="p">,</span> <span class="mi">3918</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">9914</span><span class="p">,</span>
+            <span class="mi">9946</span><span class="p">,</span> <span class="mi">9952</span><span class="p">,</span> <span class="mi">9967</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># flow_type == &#39;xgboost&#39; and not run_full:</span>
+        <span class="n">task_ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3903</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">3485</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">3913</span><span class="p">]</span>
+
+    <span class="c1"># Fetching the relevant flow</span>
+    <span class="n">flow_id</span> <span class="o">=</span> <span class="mi">5891</span> <span class="k">if</span> <span class="n">flow_type</span> <span class="o">==</span> <span class="s1">&#39;svm&#39;</span> <span class="k">else</span> <span class="mi">6767</span>
+
+    <span class="c1"># Fetching evaluations</span>
+    <span class="n">eval_df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations_setups</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+                                                         <span class="n">task</span><span class="o">=</span><span class="n">task_ids</span><span class="p">,</span>
+                                                         <span class="n">flow</span><span class="o">=</span><span class="p">[</span><span class="n">flow_id</span><span class="p">],</span>
+                                                         <span class="n">uploader</span><span class="o">=</span><span class="p">[</span><span class="mi">2702</span><span class="p">],</span>
+                                                         <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">,</span>
+                                                         <span class="n">parameters_in_separate_columns</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">eval_df</span><span class="p">,</span> <span class="n">task_ids</span><span class="p">,</span> <span class="n">flow_id</span>
+
+
+<span class="k">def</span> <span class="nf">create_table_from_evaluations</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span>
+                                  <span class="n">flow_type</span><span class="o">=</span><span class="s1">&#39;svm&#39;</span><span class="p">,</span>
+                                  <span class="n">run_count</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">,</span>
+                                  <span class="n">task_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Create a tabular data with its ground truth from a dataframe of evaluations.</span>
+<span class="sd">    Optionally, can filter out records based on task ids.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    eval_df : dataframe</span>
+<span class="sd">        Containing list of runs as obtained from list_evaluations()</span>
+<span class="sd">    flow_type : str, {&#39;svm&#39;, &#39;xgboost&#39;}</span>
+<span class="sd">        To select whether svm or xgboost experiments are to be run</span>
+<span class="sd">    run_count : int</span>
+<span class="sd">        Maximum size of the table created, or number of runs included in the table</span>
+<span class="sd">    task_ids : list, (optional)</span>
+<span class="sd">        List of integers specifying the tasks to be retained from the evaluations dataframe</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    eval_table : dataframe</span>
+<span class="sd">    values : list</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">task_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">eval_df</span> <span class="o">=</span> <span class="n">eval_df</span><span class="p">[</span><span class="n">eval_df</span><span class="p">[</span><span class="s1">&#39;task_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">task_ids</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">flow_type</span> <span class="o">==</span> <span class="s1">&#39;svm&#39;</span><span class="p">:</span>
+        <span class="n">colnames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cost&#39;</span><span class="p">,</span> <span class="s1">&#39;degree&#39;</span><span class="p">,</span> <span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="s1">&#39;kernel&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">colnames</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="s1">&#39;booster&#39;</span><span class="p">,</span> <span class="s1">&#39;colsample_bylevel&#39;</span><span class="p">,</span> <span class="s1">&#39;colsample_bytree&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;eta&#39;</span><span class="p">,</span> <span class="s1">&#39;lambda&#39;</span><span class="p">,</span> <span class="s1">&#39;max_depth&#39;</span><span class="p">,</span> <span class="s1">&#39;min_child_weight&#39;</span><span class="p">,</span> <span class="s1">&#39;nrounds&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;subsample&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="n">eval_df</span> <span class="o">=</span> <span class="n">eval_df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># shuffling rows</span>
+    <span class="n">eval_df</span> <span class="o">=</span> <span class="n">eval_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">run_count</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">eval_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">column</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">eval_df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="n">eval_table</span> <span class="o">=</span> <span class="n">eval_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">colnames</span><span class="p">]</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">eval_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;value&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">eval_table</span><span class="p">,</span> <span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">list_categorical_attributes</span><span class="p">(</span><span class="n">flow_type</span><span class="o">=</span><span class="s1">&#39;svm&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">flow_type</span> <span class="o">==</span> <span class="s1">&#39;svm&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;kernel&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;booster&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="fetching-the-data-from-openml">
+<h3>Fetching the data from OpenML<a class="headerlink" href="#fetching-the-data-from-openml" title="Permalink to this headline">¶</a></h3>
+<p>Now, we read all the tasks and evaluations for them and collate into a table.
+Here, we are reading all the tasks and evaluations for the SVM flow and
+pre-processing all retrieved evaluations.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eval_df</span><span class="p">,</span> <span class="n">task_ids</span><span class="p">,</span> <span class="n">flow_id</span> <span class="o">=</span> <span class="n">fetch_evaluations</span><span class="p">(</span><span class="n">run_full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">flow_type</span><span class="o">=</span><span class="n">flow_type</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">create_table_from_evaluations</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">flow_type</span><span class="o">=</span><span class="n">flow_type</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Y : &quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                   cost degree             gamma      kernel
+2978  0.298995933567111      5               NaN  polynomial
+400    21.2267347807971    NaN  562.330769712904         NaN
+2595    653.08555802624    NaN               NaN      linear
+2318  0.439217506663726    NaN               NaN      linear
+927     45.912553638607      2               NaN  polynomial
+Y :  2978    0.491500
+400     0.501098
+2595    0.575058
+2318    0.662580
+927     0.910423
+Name: value, dtype: float64
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-pre-processing-and-modelling-pipelines">
+<h3>Creating pre-processing and modelling pipelines<a class="headerlink" href="#creating-pre-processing-and-modelling-pipelines" title="Permalink to this headline">¶</a></h3>
+<p>The two primary tasks are to impute the missing values, that is, account for the hyperparameters
+that are not available with the runs from OpenML. And secondly, to handle categorical variables
+using One-hot encoding prior to modelling.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Separating data into categorical and non-categorical (numeric for this example) columns</span>
+<span class="n">cat_cols</span> <span class="o">=</span> <span class="n">list_categorical_attributes</span><span class="p">(</span><span class="n">flow_type</span><span class="o">=</span><span class="n">flow_type</span><span class="p">)</span>
+<span class="n">num_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">cat_cols</span><span class="p">))</span>
+
+<span class="c1"># Missing value imputers</span>
+<span class="n">cat_imputer</span> <span class="o">=</span> <span class="n">SimpleImputer</span><span class="p">(</span><span class="n">missing_values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;None&#39;</span><span class="p">)</span>
+<span class="n">num_imputer</span> <span class="o">=</span> <span class="n">SimpleImputer</span><span class="p">(</span><span class="n">missing_values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Creating the one-hot encoder</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+<span class="c1"># Pipeline to handle categorical column transformations</span>
+<span class="n">cat_transforms</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;impute&#39;</span><span class="p">,</span> <span class="n">cat_imputer</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;encode&#39;</span><span class="p">,</span> <span class="n">enc</span><span class="p">)])</span>
+
+<span class="c1"># Combining column transformers</span>
+<span class="n">ct</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">([(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">cat_transforms</span><span class="p">,</span> <span class="n">cat_cols</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">,</span> <span class="n">num_imputer</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">)])</span>
+
+<span class="c1"># Creating the full pipeline with the surrogate model</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;preprocess&#39;</span><span class="p">,</span> <span class="n">ct</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;surrogate&#39;</span><span class="p">,</span> <span class="n">clf</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="building-a-surrogate-model-on-a-task-s-evaluation">
+<h3>Building a surrogate model on a task’s evaluation<a class="headerlink" href="#building-a-surrogate-model-on-a-task-s-evaluation" title="Permalink to this headline">¶</a></h3>
+<p>The same set of functions can be used for a single task to retrieve a singular table which can
+be used for the surrogate model construction. We shall use the SVM flow here to keep execution
+time simple and quick.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Selecting a task for the surrogate</span>
+<span class="n">task_id</span> <span class="o">=</span> <span class="n">task_ids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Task ID : &quot;</span><span class="p">,</span> <span class="n">task_id</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">create_table_from_evaluations</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">task_ids</span><span class="o">=</span><span class="p">[</span><span class="n">task_id</span><span class="p">],</span> <span class="n">flow_type</span><span class="o">=</span><span class="s1">&#39;svm&#39;</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training RMSE : </span><span class="si">{:.5}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
+Training RMSE : 1.8908e-05
+</pre></div>
+</div>
+</div>
+<div class="section" id="evaluating-the-surrogate-model">
+<h3>Evaluating the surrogate model<a class="headerlink" href="#evaluating-the-surrogate-model" title="Permalink to this headline">¶</a></h3>
+<p>The surrogate model built from a task’s evaluations fetched from OpenML will be put into
+trivial action here, where we shall randomly sample configurations and observe the trajectory
+of the area under curve (auc) we can obtain from the surrogate we’ve built.</p>
+<p>NOTE: This section is written exclusively for the SVM flow</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sampling random configurations</span>
+<span class="k">def</span> <span class="nf">random_sample_configurations</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">colnames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cost&#39;</span><span class="p">,</span> <span class="s1">&#39;degree&#39;</span><span class="p">,</span> <span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="s1">&#39;kernel&#39;</span><span class="p">]</span>
+    <span class="n">ranges</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">0.000986</span><span class="p">,</span> <span class="mf">998.492437</span><span class="p">),</span>
+              <span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
+              <span class="p">(</span><span class="mf">0.000988</span><span class="p">,</span> <span class="mf">913.373845</span><span class="p">),</span>
+              <span class="p">([</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="s1">&#39;polynomial&#39;</span><span class="p">,</span> <span class="s1">&#39;radial&#39;</span><span class="p">,</span> <span class="s1">&#39;sigmoid&#39;</span><span class="p">])]</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="n">num_samples</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="n">colnames</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">colnames</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ranges</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">col_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="n">ranges</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">high</span><span class="o">=</span><span class="n">ranges</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">num_samples</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">col_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">ranges</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">num_samples</span><span class="p">)</span>
+        <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">col_val</span>
+    <span class="k">return</span> <span class="n">X</span>
+
+
+<span class="n">configs</span> <span class="o">=</span> <span class="n">random_sample_configurations</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">configs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
+0    449.048617  2.876961   80.028387     sigmoid
+1    453.531746  3.928831  616.023027      linear
+2    438.184419  3.589853  309.036344     sigmoid
+3    185.312222  4.140401  583.878973      radial
+4    781.768452  2.940926  669.741871     sigmoid
+..          ...       ...         ...         ...
+995  650.408060  2.821319  821.402121      linear
+996  589.765706  4.838155  360.277478      radial
+997  257.232815  3.752401  900.223676      linear
+998  564.914812  3.222108  306.122421     sigmoid
+999    7.907866  2.157036  281.976909  polynomial
+
+[1000 rows x 4 columns]
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">configs</span><span class="p">)</span>
+
+<span class="c1"># tracking the maximum AUC obtained over the functions evaluations</span>
+<span class="n">preds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="o">.</span><span class="n">accumulate</span><span class="p">(</span><span class="n">preds</span><span class="p">)</span>
+<span class="c1"># computing regret (1 - predicted_auc)</span>
+<span class="n">regret</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">preds</span>
+
+<span class="c1"># plotting the regret curve</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">regret</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;AUC regret for Random Search on surrogate&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Numbe of function evaluations&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Regret&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" />
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  33.695 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
@@ -139,6 +406,7 @@ Hyperparameter Transfer Learning</em> by Perrone et al..</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
 </div>
 </div>
 

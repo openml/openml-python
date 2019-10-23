@@ -354,26 +354,6 @@ its use in recent publications.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to build a surrogate model based on OpenML data as done for *Scalable Hyperpa...">
-
-.. only:: html
-
-    .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_neurips_perrone_example_thumb.png
-
-        :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /examples/40_paper/2018_neurips_perrone_example
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to get the datasets used in the paper introducing *Auto-sklearn* by Feurer et...">
 
 .. only:: html
@@ -431,6 +411,26 @@ its use in recent publications.
    :hidden:
 
    /examples/40_paper/2018_kdd_rijn_example
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to build a surrogate model based on OpenML data as done for *Scalable Hyperpa...">
+
+.. only:: html
+
+    .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_neurips_perrone_example_thumb.png
+
+        :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/40_paper/2018_neurips_perrone_example
 .. raw:: html
 
     <div style='clear:both'></div>
