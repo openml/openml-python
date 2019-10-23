@@ -549,6 +549,11 @@ def attributes_arff_from_df(df):
         'string': 'STRING'
     }
     attributes_arff = []
+
+    if not all([isinstance(column_name, str) for column_name in df.columns]):
+        logger.warning("Converting non-str column names to str.")
+        df.columns = [str(column_name) for column_name in df.columns]
+
     for column_name in df:
         # skipna=True does not infer properly the dtype. The NA values are
         # dropped before the inference instead.
