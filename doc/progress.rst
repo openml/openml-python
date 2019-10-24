@@ -6,7 +6,7 @@
 Changelog
 =========
 
-0.11.0
+0.10.1
 ~~~~~~
 * ADD #175: Automatically adds the docstring of scikit-learn objects to flow and its parameters.
 * ADD #737: New evaluation listing call that includes the hyperparameter settings.
@@ -38,6 +38,7 @@ Changelog
   categorical variables.
 * FIX #779: Do not fail on corrupt pickle
 * FIX #782: Assign the study id to the correct class attribute.
+* FIX #819: Automatically convert column names to type string when uploading a dataset.
 * FIX #820: Make ``__repr__`` work for datasets which do not have an id.
 * MAINT #796: Rename an argument to make the function ``list_evaluations`` more consistent.
 * MAINT #811: Print the full error message given by the server.
