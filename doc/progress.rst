@@ -6,9 +6,55 @@
 Changelog
 =========
 
+0.10.1
+~~~~~~
+* ADD #175: Automatically adds the docstring of scikit-learn objects to flow and its parameters.
+* ADD #737: New evaluation listing call that includes the hyperparameter settings.
+* ADD #744: It is now possible to only issue a warning and not raise an exception if the package
+  versions for a flow are not met when deserializing it.
+* ADD #783: The URL to download the predictions for a run is now stored in the run object.
+* ADD #790: Adds the uploader name and id as new filtering options for ``list_evaluations``.
+* ADD #792: New convenience function ``openml.flow.get_flow_id``.
+* DOC #778: Introduces instructions on how to publish an extension to support other libraries
+  than scikit-learn.
+* DOC #785: The examples section is completely restructured into simple simple examples, advanced
+  examples and examples showcasing the use of OpenML-Python to reproduce papers which were done
+  with OpenML-Python.
+* DOC #788: New example on manually iterating through the split of a task.
+* DOC #789: Improve the usage of dataframes in the examples.
+* DOC #791: New example for the paper *Efficient and Robust Automated Machine Learning* by Feurer
+  et al. (2015).
+* DOC #803: New example for the paper *Don’t  Rule  Out  Simple  Models Prematurely:
+  A Large Scale  Benchmark Comparing Linear and Non-linear Classifiers in OpenML* by Benjamin
+  Strang et al. (2018).
+* DOC #808: New example demonstrating basic use cases of a dataset.
+* DOC #810: New example demonstrating the use of benchmarking studies and suites.
+* DOC #832: New example for the paper *Scalable Hyperparameter Transfer Learning* by
+  Valerio Perrone et al. (2019)
+* DOC #834: New example showing how to plot the loss surface for a support vector machine.
+* FIX #305: Do not require the external version in the flow XML when loading an object.
+* FIX #734: Better handling of *"old"* flows.
+* FIX #758: Fixes an error which made the client API crash when loading a sparse data with
+  categorical variables.
+* FIX #779: Do not fail on corrupt pickle
+* FIX #782: Assign the study id to the correct class attribute.
+* FIX #819: Automatically convert column names to type string when uploading a dataset.
+* FIX #820: Make ``__repr__`` work for datasets which do not have an id.
+* MAINT #796: Rename an argument to make the function ``list_evaluations`` more consistent.
+* MAINT #811: Print the full error message given by the server.
+* MAINT #828: Create base class for OpenML entity classes.
+* MAINT #829: Reduce the number of data conversion warnings.
+* MAINT #831: Warn if there's an empty flow description when publishing a flow.
+* MAINT #837: Also print the flow XML if a flow fails to validate.
+* FIX #838: Fix list_evaluations_setups to work when evaluations are not a 100 multiple.
+* FIX #847: Fixes an issue where the client API would crash when trying to download a dataset
+  when there are no qualities available on the server.
+* MAINT #849: Move logic of most different ``publish`` functions into the base class.
+* MAINt #850: Remove outdated test code.
+
 0.10.0
 ~~~~~~
-* FIX #838: Fix list_evaluations_setups to work when evaluations are not a 100 multiple.
+
 * ADD #737: Add list_evaluations_setups to return hyperparameters along with list of evaluations.
 * FIX #261: Test server is cleared of all files uploaded during unit testing.
 * FIX #447: All files created by unit tests no longer persist in local.
