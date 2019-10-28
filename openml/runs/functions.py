@@ -967,6 +967,7 @@ def __list_runs(api_call, output_format='dict'):
                'setup_id': int(run_['oml:setup_id']),
                'flow_id': int(run_['oml:flow_id']),
                'uploader': int(run_['oml:uploader']),
+               'task_type': int(run_['oml:task_type_id']),
                'upload_time': str(run_['oml:upload_time']),
                'error_message': str((run_['oml:error_message']) or '')}
 
