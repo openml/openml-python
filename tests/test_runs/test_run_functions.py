@@ -1121,7 +1121,7 @@ class TestRun(TestBase):
 
     def _check_run(self, run):
         self.assertIsInstance(run, dict)
-        self.assertEqual(len(run), 7)
+        self.assertEqual(len(run), 7, msg=str(run))
 
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
