@@ -123,15 +123,15 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     Task ID......: 403
     Task Type....: None
     Task URL.....: https://www.openml.org/t/403
-    Flow ID......: 107914
+    Flow ID......: 1704
     Flow Name....: sklearn.tree.tree.ExtraTreeClassifier
-    Flow URL.....: https://www.openml.org/f/107914
+    Flow URL.....: https://www.openml.org/f/1704
     Setup ID.....: None
     Setup String.: Python_3.7.4. Sklearn_0.21.2. NumPy_1.17.3. SciPy_1.3.1. ExtraTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
                         max_features='auto', max_leaf_nodes=None,
                         min_impurity_decrease=0.0, min_impurity_split=None,
                         min_samples_leaf=1, min_samples_split=2,
-                        min_weight_fraction_leaf=0.0, random_state=30524,
+                        min_weight_fraction_leaf=0.0, random_state=2874,
                         splitter='random')
     Dataset ID...: 68
     Dataset URL..: https://www.openml.org/d/68
@@ -162,7 +162,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/113166
+    Uploaded to http://test.openml.org/r/1187
 
 
 
@@ -187,11 +187,20 @@ We can now also inspect the flow object which was automatically created:
 
     OpenML Flow
     ===========
-    Flow ID.........: 107914 (version 5)
-    Flow URL........: https://www.openml.org/f/107914
+    Flow ID.........: 1704 (version 1)
+    Flow URL........: https://www.openml.org/f/1704
     Flow Name.......: sklearn.tree.tree.ExtraTreeClassifier
-    Flow Description: Automatically created scikit-learn flow.
-    Upload Date.....: 2019-08-19 17:16:42
+    Flow Description: An extremely randomized tree classifier.
+
+    Extra-trees differ from classic decision trees in the way they are built.
+    When looking for the best split to separate the samples of a node into two
+    groups, random splits are drawn for each of the `max_features` randomly
+    selected features and the best split among those is chosen. When
+    `max_features` is set 1, this amounts to building a totally random
+    decision tree.
+
+    Warning: Extra-trees should only be used within ensemble methods.
+    Upload Date.....: 2019-10-29 17:04:51
     Dependencies....: sklearn==0.21.2
     numpy>=1.6.1
     scipy>=0.9
@@ -247,7 +256,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/113167
+    Uploaded to http://test.openml.org/r/1188
 
 
 
@@ -355,7 +364,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/113169
+    kNN on diabetes: http://test.openml.org/r/1191
 
 
 
@@ -372,7 +381,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  20.785 seconds)
+   **Total running time of the script:** ( 0 minutes  18.697 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:

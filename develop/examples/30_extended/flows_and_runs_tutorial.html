@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Flows and Runs &#8212; OpenML 0.10.1dev documentation</title>
+    <title>Flows and Runs &#8212; OpenML 0.10.1 documentation</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10.1dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -194,15 +194,15 @@ Run ID.......: None
 Task ID......: 403
 Task Type....: None
 Task URL.....: https://www.openml.org/t/403
-Flow ID......: 107914
+Flow ID......: 1704
 Flow Name....: sklearn.tree.tree.ExtraTreeClassifier
-Flow URL.....: https://www.openml.org/f/107914
+Flow URL.....: https://www.openml.org/f/1704
 Setup ID.....: None
 Setup String.: Python_3.7.4. Sklearn_0.21.2. NumPy_1.17.3. SciPy_1.3.1. ExtraTreeClassifier(class_weight=None, criterion=&#39;gini&#39;, max_depth=None,
                     max_features=&#39;auto&#39;, max_leaf_nodes=None,
                     min_impurity_decrease=0.0, min_impurity_split=None,
                     min_samples_leaf=1, min_samples_split=2,
-                    min_weight_fraction_leaf=0.0, random_state=30524,
+                    min_weight_fraction_leaf=0.0, random_state=2874,
                     splitter=&#39;random&#39;)
 Dataset ID...: 68
 Dataset URL..: https://www.openml.org/d/68
@@ -218,7 +218,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/113166
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/1187
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -229,11 +229,20 @@ the run is sent to the OpenML server:</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Flow
 ===========
-Flow ID.........: 107914 (version 5)
-Flow URL........: https://www.openml.org/f/107914
+Flow ID.........: 1704 (version 1)
+Flow URL........: https://www.openml.org/f/1704
 Flow Name.......: sklearn.tree.tree.ExtraTreeClassifier
-Flow Description: Automatically created scikit-learn flow.
-Upload Date.....: 2019-08-19 17:16:42
+Flow Description: An extremely randomized tree classifier.
+
+Extra-trees differ from classic decision trees in the way they are built.
+When looking for the best split to separate the samples of a node into two
+groups, random splits are drawn for each of the `max_features` randomly
+selected features and the best split among those is chosen. When
+`max_features` is set 1, this amounts to building a totally random
+decision tree.
+
+Warning: Extra-trees should only be used within ensemble methods.
+Upload Date.....: 2019-10-29 17:04:51
 Dependencies....: sklearn==0.21.2
 numpy&gt;=1.6.1
 scipy&gt;=0.9
@@ -275,7 +284,7 @@ scipy&gt;=0.9
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/113167
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/1188
 </pre></div>
 </div>
 </div>
@@ -351,13 +360,13 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/113169
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/1191
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  20.785 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  18.697 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9e0617073c8209f15abf91f273871776/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></p>
@@ -383,7 +392,7 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
     </p>
     <p>
         &copy; Copyright 2014-2019, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.<br/>
     </p>
   </div>
 </footer>
