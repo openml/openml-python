@@ -1120,6 +1120,11 @@ class TestRun(TestBase):
         )
 
     def _check_run(self, run):
+        # This tests that the API returns seven entries for each run
+        # Check out https://openml.org/api/v1/xml/run/list/flow/1154
+        # They are run_id, task_id, task_type_id, setup_id, flow_id, uploader, upload_time
+        # error_message and run_details exist, too, but are not used so far. We need to update
+        # this check once they are used!
         self.assertIsInstance(run, dict)
         assert len(run) == 7, str(run)
 
