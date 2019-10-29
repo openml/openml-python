@@ -265,6 +265,7 @@ class TestOpenMLDataset(TestBase):
 
     def test__name_to_id_with_multiple_active_error(self):
         """ With multiple active datasets, retrieve the least recent active. """
+        openml.config.server = self.production_server
         self.assertRaisesRegex(
             ValueError,
             "Multiple active datasets exist with name iris",
