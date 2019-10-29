@@ -75,14 +75,14 @@ class OpenMLTaskTest(TestBase):
         self.assertEqual(len(setups), required_size)
 
     def test_list_all_for_runs(self):
-        required_size = 48
+        required_size = 21
         runs = openml.runs.list_runs(batch_size=self._batch_size, size=required_size)
 
         # might not be on test server after reset, please rerun test at least once if fails
         self.assertEqual(len(runs), required_size)
 
     def test_list_all_for_evaluations(self):
-        required_size = 57
+        required_size = 22
         # TODO apparently list_evaluations function does not support kwargs
         evaluations = openml.evaluations.list_evaluations(function='predictive_accuracy',
                                                           size=required_size)

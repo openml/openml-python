@@ -79,7 +79,7 @@ class TestRun(TestBase):
             if len(run.evaluations) > 0:
                 return
             else:
-                time.sleep(10)
+                time.sleep(3)
         raise RuntimeError('Could not find any evaluations! Please check whether run {} was '
                            'evaluated correctly on the server'.format(run_id))
 
@@ -1121,7 +1121,7 @@ class TestRun(TestBase):
 
     def _check_run(self, run):
         self.assertIsInstance(run, dict)
-        self.assertEqual(len(run), 7, msg=str(run))
+        assert len(run) == 7, str(run)
 
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
