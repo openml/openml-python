@@ -273,9 +273,8 @@ class SklearnExtension(Extension):
         mixed
         """
 
-        logger.info('-%s flow_to_sklearn START o=%s, components=%s, '
-                     'init_defaults=%s' % ('-' * recursion_depth, o, components,
-                                           initialize_with_defaults))
+        logger.info('-%s flow_to_sklearn START o=%s, components=%s, init_defaults=%s'
+                    % ('-' * recursion_depth, o, components, initialize_with_defaults))
         depth_pp = recursion_depth + 1  # shortcut var, depth plus plus
 
         # First, we need to check whether the presented object is a json string.
@@ -378,8 +377,7 @@ class SklearnExtension(Extension):
             )
         else:
             raise TypeError(o)
-        logger.info('-%s flow_to_sklearn END   o=%s, rval=%s'
-                     % ('-' * recursion_depth, o, rval))
+        logger.info('-%s flow_to_sklearn END   o=%s, rval=%s' % ('-' * recursion_depth, o, rval))
         return rval
 
     def model_to_flow(self, model: Any) -> 'OpenMLFlow':
@@ -540,7 +538,7 @@ class SklearnExtension(Extension):
             return s.strip()
         except ValueError:
             logger.warning("'Read more' not found in descriptions. "
-                            "Trying to trim till 'Parameters' if available in docstring.")
+                           "Trying to trim till 'Parameters' if available in docstring.")
             pass
         try:
             # if 'Read more' doesn't exist, trim till 'Parameters'
@@ -995,8 +993,7 @@ class SklearnExtension(Extension):
 
         for name in parameters:
             value = parameters.get(name)
-            logger.info('--%s flow_parameter=%s, value=%s' %
-                         ('-' * recursion_depth, name, value))
+            logger.info('--%s flow_parameter=%s, value=%s' % ('-' * recursion_depth, name, value))
             rval = self._deserialize_sklearn(
                 value,
                 components=components_,
@@ -1012,8 +1009,7 @@ class SklearnExtension(Extension):
             if name not in components_:
                 continue
             value = components[name]
-            logger.info('--%s flow_component=%s, value=%s'
-                         % ('-' * recursion_depth, name, value))
+            logger.info('--%s flow_component=%s, value=%s' % ('-' * recursion_depth, name, value))
             rval = self._deserialize_sklearn(
                 value,
                 recursion_depth=recursion_depth + 1,

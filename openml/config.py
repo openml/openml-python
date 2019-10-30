@@ -4,6 +4,7 @@ Store module level information like the API key, cache directory and the server
 import logging
 import logging.handlers
 import os
+from typing import cast
 
 from io import StringIO
 import configparser
@@ -52,13 +53,13 @@ server = str(_defaults['server'])  # so mypy knows it is a string
 server_base_url = server[:-len('/api/v1/xml')]
 apikey = _defaults['apikey']
 # The current cache directory (without the server name)
-cache_directory = _defaults['cachedir']
+cache_directory = str(_defaults['cachedir'])  # so mypy knows it is a string
 avoid_duplicate_runs = True if _defaults['avoid_duplicate_runs'] == 'True' else False
 
 # Number of retries if the connection breaks
 connection_n_retries = _defaults['connection_n_retries']
 
-configure_logging(_defaults['verbosity'], _defaults['file_verbosity'])
+configure_logging(cast(int, _defaults['verbosity']), cast(int, _defaults['file_verbosity']))
 
 
 class ConfigurationForExamples:
