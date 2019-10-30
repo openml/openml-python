@@ -196,11 +196,11 @@ except openml.exceptions.OpenMLServerException as e:
     # Error code for 'task already exists'
     if e.code == 614:
         # Lookup task
-        tasks = openml.tasks.list_tasks(data_id=128, output_format='dataframe').to_numpy()
-        tasks = tasks[tasks[:, 4] == "Supervised Classification"]
-        tasks = tasks[tasks[:, 6] == "10-fold Crossvalidation"]
-        tasks = tasks[tasks[:, 19] == "predictive_accuracy"]
-        task_id = tasks[0][0]
+        tasks = openml.tasks.list_tasks(data_id=128, output_format='dataframe') #.to_numpy()
+        tasks = tasks[tasks.loc[:, "task_type"] == "Supervised Classification"]
+        tasks = tasks[tasks.loc[:, "estimation_procedure"] == "10-fold Crossvalidation"]
+        tasks = tasks[tasks.loc[:, "evaluation_measures"] == "predictive_accuracy"]
+        task_id = tasks.loc[:, "tid"].values[0]
         print("Task already exists. Task ID is", task_id)
 
 # reverting to prod server
