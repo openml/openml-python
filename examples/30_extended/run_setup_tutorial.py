@@ -37,8 +37,6 @@ import sklearn.impute
 import sklearn.preprocessing
 
 
-root = logging.getLogger()
-root.setLevel(logging.INFO)
 openml.config.start_using_configuration_for_example()
 
 ###############################################################################

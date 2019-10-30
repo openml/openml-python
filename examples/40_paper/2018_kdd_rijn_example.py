@@ -15,13 +15,19 @@ Publication
 | In *Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining*, 2018
 | Available at https://dl.acm.org/citation.cfm?id=3220058
 """
-import json
 import logging
 import sys
 
+logger = logging.getLogger(__name__)
+console_output = logging.StreamHandler()
+console_output.setLevel(logging.INFO)
+logger.addHandler(console_output)
+
 if sys.platform == 'win32':  # noqa
-    logging.warning('The pyrfr library (requirement of fanova) can currently not be installed on Windows systems')
+    logger.warning('The pyrfr library (requirement of fanova) can currently not be installed on Windows systems')
     exit()
+
+import json
 import fanova
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -29,8 +35,6 @@ import seaborn as sns
 
 import openml
 
-root = logging.getLogger()
-root.setLevel(logging.INFO)
 
 ##############################################################################
 # With the advent of automated machine learning, automated hyperparameter
@@ -80,7 +84,7 @@ fanova_results = []
 for idx, task_id in enumerate(suite.tasks):
     if limit_nr_tasks is not None and idx >= limit_nr_tasks:
         continue
-    logging.info('Starting with task %d (%d/%d)' % (task_id, idx+1,
+    logger.info('Starting with task %d (%d/%d)' % (task_id, idx+1,
                                                     len(suite.tasks) if limit_nr_tasks is None else limit_nr_tasks))
     # note that we explicitly only include tasks from the benchmark suite that was specified (as per the for-loop)
     evals = openml.evaluations.list_evaluations_setups(
@@ -98,7 +102,7 @@ for idx, task_id in enumerate(suite.tasks):
                                           **{performance_column: setup[performance_column]})
                                      for _, setup in evals.iterrows()])
     except json.decoder.JSONDecodeError as e:
-        logging.warning('Task %d error: %s' % (task_id, e))
+        logger.warning('Task %d error: %s' % (task_id, e))
         continue
     # apply our filters, to have only the setups that comply to the hyperparameters we want
     for filter_key, filter_value in parameter_filters.items():
@@ -127,7 +131,7 @@ for idx, task_id in enumerate(suite.tasks):
             # functional ANOVA sometimes crashes with a RuntimeError, e.g., on tasks where the performance is constant
             # for all configurations (there is no variance). We will skip these tasks (like the authors did in the
             # paper).
-            logging.warning('Task %d error: %s' % (task_id, e))
+            logger.warning('Task %d error: %s' % (task_id, e))
             continue
 
 # transform ``fanova_results`` from a list of dicts into a DataFrame
