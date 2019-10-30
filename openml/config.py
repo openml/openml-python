@@ -2,23 +2,43 @@
 Store module level information like the API key, cache directory and the server
 """
 import logging
+import logging.handlers
 import os
 
 from io import StringIO
 import configparser
 from urllib.parse import urlparse
 
-
 logger = logging.getLogger(__name__)
-logging.basicConfig(
-    format='[%(levelname)s] [%(asctime)s:%(name)s] %('
-           'message)s', datefmt='%H:%M:%S')
+
+
+def configure_logging(console_output_level: int, file_output_level: int):
+    """ Sets the OpenML logger to DEBUG, with attached Stream- and FileHandler. """
+    openml_logger = logging.getLogger('openml')
+    openml_logger.setLevel(logging.DEBUG)
+    message_format = '[%(levelname)s] [%(asctime)s:%(name)s] %(message)s'
+    output_formatter = logging.Formatter(message_format, datefmt='%H:%M:%S')
+
+    console_stream = logging.StreamHandler()
+    console_stream.setFormatter(output_formatter)
+    console_stream.setLevel(console_output_level)
+
+    one_mb = 2**20
+    log_path = os.path.join(cache_directory, 'openml_python.log')
+    file_stream = logging.handlers.RotatingFileHandler(log_path, maxBytes=one_mb, backupCount=1)
+    file_stream.setLevel(file_output_level)
+    file_stream.setFormatter(output_formatter)
+
+    openml_logger.addHandler(console_stream)
+    openml_logger.addHandler(file_stream)
+
 
 # Default values!
 _defaults = {
     'apikey': None,
     'server': "https://www.openml.org/api/v1/xml",
-    'verbosity': 0,
+    'verbosity': logging.WARNING,
+    'file_verbosity': logging.DEBUG,
     'cachedir': os.path.expanduser(os.path.join('~', '.openml', 'cache')),
     'avoid_duplicate_runs': 'True',
     'connection_n_retries': 2,
@@ -37,6 +57,8 @@ avoid_duplicate_runs = True if _defaults['avoid_duplicate_runs'] == 'True' else 
 
 # Number of retries if the connection breaks
 connection_n_retries = _defaults['connection_n_retries']
+
+configure_logging(_defaults['verbosity'], _defaults['file_verbosity'])
 
 
 class ConfigurationForExamples:
@@ -147,7 +169,7 @@ def _parse_config():
         config_file_.seek(0)
         config.read_file(config_file_)
     except OSError as e:
-        logging.info("Error opening file %s: %s", config_file, e.message)
+        logger.info("Error opening file %s: %s", config_file, e.message)
     return config
 
 
