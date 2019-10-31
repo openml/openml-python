@@ -123,6 +123,13 @@ def _setup():
     global avoid_duplicate_runs
     global connection_n_retries
 
+    # read config file, create cache directory
+    try:
+        os.mkdir(os.path.expanduser(os.path.join('~', '.openml')))
+    except (IOError, OSError):
+        # TODO add debug information
+        pass
+
     config = _parse_config()
     apikey = config.get('FAKE_SECTION', 'apikey')
     server = config.get('FAKE_SECTION', 'server')
@@ -130,7 +137,7 @@ def _setup():
     short_cache_dir = config.get('FAKE_SECTION', 'cachedir')
     cache_directory = os.path.expanduser(short_cache_dir)
 
-    # read config file, create cache directory
+    # create the cache subdirectory
     try:
         os.mkdir(cache_directory)
     except (IOError, OSError):
