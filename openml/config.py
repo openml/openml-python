@@ -59,8 +59,6 @@ avoid_duplicate_runs = True if _defaults['avoid_duplicate_runs'] == 'True' else 
 # Number of retries if the connection breaks
 connection_n_retries = _defaults['connection_n_retries']
 
-configure_logging(cast(int, _defaults['verbosity']), cast(int, _defaults['file_verbosity']))
-
 
 class ConfigurationForExamples:
     """ Allows easy switching to and from a test configuration, used for examples. """
@@ -145,6 +143,8 @@ def _setup():
             'A higher number of retries than 20 is not allowed to keep the '
             'server load reasonable'
         )
+
+    configure_logging(cast(int, _defaults['verbosity']), cast(int, _defaults['file_verbosity']))
 
 
 def _parse_config():
