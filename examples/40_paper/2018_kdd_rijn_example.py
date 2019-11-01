@@ -24,7 +24,7 @@ console_output.setLevel(logging.INFO)
 logger.addHandler(console_output)
 
 if sys.platform == 'win32':  # noqa
-    logger.warning('The pyrfr library (requirement of fanova) can currently not be installed on Windows systems')
+    logger.critical('The pyrfr library (requirement of fanova) can currently not be installed on Windows systems')
     exit()
 
 import json

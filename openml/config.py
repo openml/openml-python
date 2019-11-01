@@ -126,8 +126,8 @@ def _setup():
     # read config file, create cache directory
     try:
         os.mkdir(os.path.expanduser(os.path.join('~', '.openml')))
-    except (IOError, OSError):
-        # TODO add debug information
+    except FileExistsError:
+        # For other errors, we want to propagate the error as openml does not work without cache
         pass
 
     config = _parse_config()
@@ -140,8 +140,8 @@ def _setup():
     # create the cache subdirectory
     try:
         os.mkdir(cache_directory)
-    except (IOError, OSError):
-        # TODO add debug information
+    except FileExistsError:
+        # For other errors, we want to propagate the error as openml does not work without cache
         pass
 
     avoid_duplicate_runs = config.getboolean('FAKE_SECTION',
@@ -153,7 +153,12 @@ def _setup():
             'server load reasonable'
         )
 
-    configure_logging(cast(int, _defaults['verbosity']), cast(int, _defaults['file_verbosity']))
+    # Verbosity levels as defined (https://github.com/openml/OpenML/wiki/Client-API-Standards)
+    # don't match Python values directly:
+    verbosity_map = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
+    console_log_level = verbosity_map[_defaults['verbosity']]
+    file_log_level = verbosity_map[_defaults['file_verbosity']]
+    configure_logging(console_log_level, file_log_level)
 
 
 def _parse_config():
