@@ -412,11 +412,11 @@ will be returned.</p>
     <span class="c1"># Error code for &#39;task already exists&#39;</span>
     <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="mi">614</span><span class="p">:</span>
         <span class="c1"># Lookup task</span>
-        <span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-        <span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="p">[</span><span class="n">tasks</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Supervised Classification&quot;</span><span class="p">]</span>
-        <span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="p">[</span><span class="n">tasks</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;10-fold Crossvalidation&quot;</span><span class="p">]</span>
-        <span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="p">[</span><span class="n">tasks</span><span class="p">[:,</span> <span class="mi">19</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">]</span>
-        <span class="n">task_id</span> <span class="o">=</span> <span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span>
+        <span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;task_type == &quot;Supervised Classification&quot; &#39;</span>
+                            <span class="s1">&#39;and estimation_procedure == &quot;10-fold Crossvalidation&quot; &#39;</span>
+                            <span class="s1">&#39;and evaluation_measures == &quot;predictive_accuracy&quot;&#39;</span><span class="p">)</span>
+        <span class="n">task_id</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;tid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Task already exists. Task ID is&quot;</span><span class="p">,</span> <span class="n">task_id</span><span class="p">)</span>
 
 <span class="c1"># reverting to prod server</span>
@@ -432,7 +432,7 @@ will be returned.</p>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&amp;type=measure">Complete list of model estimation procedures</a>.</p></li>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=measure_type%3Aevaluation_measure&amp;type=measure">Complete list of evaluation measures</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  31.474 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  33.145 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-tasks-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e6648ddbb54e75b09dd01d69be33f340/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></p>
