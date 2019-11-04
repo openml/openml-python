@@ -79,7 +79,7 @@ class TestRun(TestBase):
             if len(run.evaluations) > 0:
                 return
             else:
-                time.sleep(10)
+                time.sleep(3)
         raise RuntimeError('Could not find any evaluations! Please check whether run {} was '
                            'evaluated correctly on the server'.format(run_id))
 
@@ -1120,8 +1120,13 @@ class TestRun(TestBase):
         )
 
     def _check_run(self, run):
+        # This tests that the API returns seven entries for each run
+        # Check out https://openml.org/api/v1/xml/run/list/flow/1154
+        # They are run_id, task_id, task_type_id, setup_id, flow_id, uploader, upload_time
+        # error_message and run_details exist, too, but are not used so far. We need to update
+        # this check once they are used!
         self.assertIsInstance(run, dict)
-        self.assertEqual(len(run), 7)
+        assert len(run) == 7, str(run)
 
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
