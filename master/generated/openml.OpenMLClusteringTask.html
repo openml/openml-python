@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>openml.OpenMLClusteringTask &#8212; OpenML 0.10.0 documentation</title>
+    <title>openml.OpenMLClusteringTask &#8212; OpenML 0.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -158,28 +158,31 @@ for possible options.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="openml.OpenMLClusteringTask.publish">
-<code class="sig-name descname">publish</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#openml.OpenMLClusteringTask.publish" title="Permalink to this definition">¶</a></dt>
-<dd><p>Publish task to OpenML server.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><dl class="simple">
-<dt>task_id: int</dt><dd><p>Returns the id of the uploaded task
-if successful.</p>
-</dd>
-</dl>
-</dd>
-</dl>
+<dt id="openml.OpenMLClusteringTask.id">
+<em class="property">property </em><code class="sig-name descname">id</code><a class="headerlink" href="#openml.OpenMLClusteringTask.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The id of the entity, it is unique for its entity type.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLClusteringTask.open_in_browser">
+<code class="sig-name descname">open_in_browser</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLClusteringTask.open_in_browser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the OpenML web page corresponding to this object in your default browser.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLClusteringTask.openml_url">
+<em class="property">property </em><code class="sig-name descname">openml_url</code><a class="headerlink" href="#openml.OpenMLClusteringTask.openml_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>The URL of the object on the server, if it was uploaded, else None.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="openml.OpenMLClusteringTask.push_tag">
 <code class="sig-name descname">push_tag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tag: str</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLClusteringTask.push_tag" title="Permalink to this definition">¶</a></dt>
-<dd><p>Annotates this task with a tag on the server.</p>
+<dd><p>Annotates this entity with a tag on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the task.</p>
+<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
 </dd>
 </dl>
 </dd>
@@ -189,15 +192,21 @@ if successful.</p>
 <dl class="method">
 <dt id="openml.OpenMLClusteringTask.remove_tag">
 <code class="sig-name descname">remove_tag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tag: str</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLClusteringTask.remove_tag" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes a tag from this task on the server.</p>
+<dd><p>Removes a tag from this entity on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the task.</p>
+<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="openml.OpenMLClusteringTask.url_for_id">
+<em class="property">classmethod </em><code class="sig-name descname">url_for_id</code><span class="sig-paren">(</span><em class="sig-param">id_: int</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#openml.OpenMLClusteringTask.url_for_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the OpenML URL for the object of the class entity with the given id.</p>
 </dd></dl>
 
 </dd></dl>

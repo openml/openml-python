@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>APIs &#8212; OpenML 0.10.0 documentation</title>
+    <title>APIs &#8212; OpenML 0.10.1 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -244,7 +244,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.datasets.get_datasets.html#openml.datasets.get_datasets" title="openml.datasets.get_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_datasets</span></code></a>(dataset_ids, int]], download_data)</p></td>
 <td><p>Download datasets.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.datasets.list_datasets.html#openml.datasets.list_datasets" title="openml.datasets.list_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_datasets</span></code></a>(offset, NoneType] = None, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.datasets.list_datasets.html#openml.datasets.list_datasets" title="openml.datasets.list_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_datasets</span></code></a>(data_id, NoneType] = None, …)</p></td>
 <td><p>Return a list of all dataset which are on OpenML.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.datasets.list_qualities.html#openml.datasets.list_qualities" title="openml.datasets.list_qualities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_qualities</span></code></a>()</p></td>
@@ -270,6 +270,9 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.evaluations.list_evaluation_measures.html#openml.evaluations.list_evaluation_measures" title="openml.evaluations.list_evaluation_measures"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_evaluation_measures</span></code></a>()</p></td>
 <td><p>Return list of evaluation measures available.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.evaluations.list_evaluations_setups.html#openml.evaluations.list_evaluations_setups" title="openml.evaluations.list_evaluations_setups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_evaluations_setups</span></code></a>(function, offset, …)</p></td>
+<td><p>List all run-evaluation pairs matching all of the given filters and their hyperparameter settings.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -287,7 +290,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.flows.flow_exists.html#openml.flows.flow_exists" title="openml.flows.flow_exists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flow_exists</span></code></a>(name, external_version)</p></td>
 <td><p>Retrieves the flow id.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.flows.get_flow.html#openml.flows.get_flow" title="openml.flows.get_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_flow</span></code></a>(flow_id, reinstantiate)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.flows.get_flow.html#openml.flows.get_flow" title="openml.flows.get_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_flow</span></code></a>(flow_id, reinstantiate, strict_version)</p></td>
 <td><p>Download the OpenML flow for a given flow ID.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.flows.list_flows.html#openml.flows.list_flows" title="openml.flows.list_flows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_flows</span></code></a>(offset, NoneType] = None, size, …)</p></td>

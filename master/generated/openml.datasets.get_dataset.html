@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>openml.datasets.get_dataset &#8212; OpenML 0.10.0 documentation</title>
+    <title>openml.datasets.get_dataset &#8212; OpenML 0.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -121,7 +121,8 @@ previously been downloaded, and if so be loaded from disk instead of retrieved f
 <p>If dataset is retrieved by name, a version may be specified.
 If no version is specified and multiple versions of the dataset exist,
 the earliest version of the dataset that is still active will be returned.
-This scenario will raise an error instead if <cite>exception_if_multiple</cite> is <cite>True</cite>.</p>
+If no version is specified, multiple versions of the dataset exist and
+<code class="docutils literal notranslate"><span class="pre">exception_if_multiple</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function will raise an exception.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -135,7 +136,7 @@ The data may later be retrieved through the <cite>OpenMLDataset.get_data</cite> 
 <dt><strong>version</strong><span class="classifier">int, optional (default=None)</span></dt><dd><p>Specifies the version if <cite>dataset_id</cite> is specified by name.
 If no version is specified, retrieve the least recent still active version.</p>
 </dd>
-<dt><strong>error_if_multiple</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <cite>True</cite> raise an error if multiple datasets are found with matching criteria.</p>
+<dt><strong>error_if_multiple</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> raise an error if multiple datasets are found with matching criteria.</p>
 </dd>
 </dl>
 </dd>

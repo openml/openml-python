@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>User Guide &#8212; OpenML 0.10.0 documentation</title>
+    <title>User Guide &#8212; OpenML 0.10.1 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -126,10 +126,10 @@ and classes in the OpenML Python API. Throughout this document, we will use
 <div class="section" id="installation-set-up">
 <h2>Installation &amp; Set up<a class="headerlink" href="#installation-set-up" title="Permalink to this headline">¶</a></h2>
 <p>The OpenML Python package is a connector to <a class="reference external" href="https://www.openml.org/">OpenML</a>.
-It allows to use and share datasets and tasks, run
+It allows you to use and share datasets and tasks, run
 machine learning algorithms on them and then share the results online.</p>
 <p>The following tutorial gives a short introduction on how to install and set up
-the OpenML python connector, followed up by a simple example.</p>
+the OpenML Python connector, followed up by a simple example.</p>
 <ul class="simple">
 <li><p><a class="reference external" href="examples/introduction_tutorial.html">Introduction</a></p></li>
 </ul>
@@ -151,7 +151,7 @@ a list of <strong>tasks</strong>.</p>
 <div class="section" id="working-with-tasks">
 <h2>Working with tasks<a class="headerlink" href="#working-with-tasks" title="Permalink to this headline">¶</a></h2>
 <p>You can think of a task as an experimentation protocol, describing how to apply
-a machine learning model to a dataset in a way that it is comparable with the
+a machine learning model to a dataset in a way that is comparable with the
 results of others (more on how to do that further down). Tasks are containers,
 defining which dataset to use, what kind of task we’re solving (regression,
 classification, clustering, etc…) and which column to predict. Furthermore,
@@ -180,7 +180,7 @@ settings for the flow, a setup string (most likely a command line call) and all
 predictions of that run. When a run is uploaded to the server, the server
 automatically calculates several metrics which can be used to compare the
 performance of different flows to each other.</p>
-<p>So far, the OpenML python connector works only with estimator objects following
+<p>So far, the OpenML Python connector works only with estimator objects following
 the <a class="reference external" href="http://scikit-learn.org/dev/developers/contributing.html#apis-of-scikit-learn-objects">scikit-learn estimator API</a>.
 Those can be directly run on a task, and a flow will automatically be created or
 downloaded from the server if it already exists.</p>
@@ -205,7 +205,7 @@ requirements and how to download a dataset:</p>
 <p>OpenML is about sharing machine learning results and the datasets they were
 obtained on. Learn how to share your datasets in the following tutorial:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="examples/create_upload_tutorial.html">Upload a dataset</a></p></li>
+<li><p><a class="reference external" href="examples/30_extended/create_upload_tutorial.html">Upload a dataset</a></p></li>
 </ul>
 </div>
 <div class="section" id="extending-openml-python">

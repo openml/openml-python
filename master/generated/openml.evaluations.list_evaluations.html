@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>openml.evaluations.list_evaluations &#8212; OpenML 0.10.0 documentation</title>
+    <title>openml.evaluations.list_evaluations &#8212; OpenML 0.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.evaluations</span></code>.list_evaluations<a class="headerlink" href="#openml-evaluations-list-evaluations" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.evaluations.list_evaluations">
-<code class="sig-prename descclassname">openml.evaluations.</code><code class="sig-name descname">list_evaluations</code><span class="sig-paren">(</span><em class="sig-param">function: str</em>, <em class="sig-param">offset: Union[int</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">size: Union[int</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">id: Union[List</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">task: Union[List</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">setup: Union[List</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">flow: Union[List</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">uploader: Union[List</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">tag: Union[str</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">per_fold: Union[bool</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">sort_order: Union[str</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">output_format: str = 'object'</em><span class="sig-paren">)</span> &#x2192; Union[Dict, pandas.core.frame.DataFrame]<a class="headerlink" href="#openml.evaluations.list_evaluations" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openml.evaluations.</code><code class="sig-name descname">list_evaluations</code><span class="sig-paren">(</span><em class="sig-param">function: str</em>, <em class="sig-param">offset: Union[int</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">size: Union[int</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">task: Union[List</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">setup: Union[List</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">flow: Union[List</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">run: Union[List</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">uploader: Union[List</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">tag: Union[str</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">study: Union[int</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">per_fold: Union[bool</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">sort_order: Union[str</em>, <em class="sig-param">NoneType] = None</em>, <em class="sig-param">output_format: str = 'object'</em><span class="sig-paren">)</span> &#x2192; Union[Dict, pandas.core.frame.DataFrame]<a class="headerlink" href="#openml.evaluations.list_evaluations" title="Permalink to this definition">¶</a></dt>
 <dd><p>List all run-evaluation pairs matching all of the given filters.
 (Supports large amount of results)</p>
 <dl class="field-list simple">
@@ -125,12 +125,13 @@
 </dd>
 <dt><strong>size</strong><span class="classifier">int, optional</span></dt><dd><p>the maximum number of runs to show</p>
 </dd>
-<dt><strong>id</strong><span class="classifier">list, optional</span></dt><dd></dd>
 <dt><strong>task</strong><span class="classifier">list, optional</span></dt><dd></dd>
 <dt><strong>setup: list, optional</strong></dt><dd></dd>
 <dt><strong>flow</strong><span class="classifier">list, optional</span></dt><dd></dd>
+<dt><strong>run</strong><span class="classifier">list, optional</span></dt><dd></dd>
 <dt><strong>uploader</strong><span class="classifier">list, optional</span></dt><dd></dd>
 <dt><strong>tag</strong><span class="classifier">str, optional</span></dt><dd></dd>
+<dt><strong>study</strong><span class="classifier">int, optional</span></dt><dd></dd>
 <dt><strong>per_fold</strong><span class="classifier">bool, optional</span></dt><dd></dd>
 <dt><strong>sort_order</strong><span class="classifier">str, optional</span></dt><dd><p>order of sorting evaluations, ascending (“asc”) or descending (“desc”)</p>
 </dd>

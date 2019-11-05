@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>openml.flows.get_flow &#8212; OpenML 0.10.0 documentation</title>
+    <title>openml.flows.get_flow &#8212; OpenML 0.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>.get_flow<a class="headerlink" href="#openml-flows-get-flow" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.flows.get_flow">
-<code class="sig-prename descclassname">openml.flows.</code><code class="sig-name descname">get_flow</code><span class="sig-paren">(</span><em class="sig-param">flow_id: int</em>, <em class="sig-param">reinstantiate: bool = False</em><span class="sig-paren">)</span> &#x2192; openml.flows.flow.OpenMLFlow<a class="headerlink" href="#openml.flows.get_flow" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openml.flows.</code><code class="sig-name descname">get_flow</code><span class="sig-paren">(</span><em class="sig-param">flow_id: int</em>, <em class="sig-param">reinstantiate: bool = False</em>, <em class="sig-param">strict_version: bool = True</em><span class="sig-paren">)</span> &#x2192; openml.flows.flow.OpenMLFlow<a class="headerlink" href="#openml.flows.get_flow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download the OpenML flow for a given flow ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -121,6 +121,8 @@
 <dt><strong>flow_id</strong><span class="classifier">int</span></dt><dd><p>The OpenML flow id.</p>
 </dd>
 <dt><strong>reinstantiate: bool</strong></dt><dd><p>Whether to reinstantiate the flow to a model instance.</p>
+</dd>
+<dt><strong>strict_version</strong><span class="classifier">bool, default=True</span></dt><dd><p>Whether to fail if version requirements are not fulfilled.</p>
 </dd>
 </dl>
 </dd>
