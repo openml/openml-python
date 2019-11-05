@@ -6,6 +6,7 @@ import inspect
 import json
 import logging
 import re
+from re import IGNORECASE
 import sys
 import time
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
@@ -21,7 +22,7 @@ import sklearn.pipeline
 
 import openml
 from openml.exceptions import PyOpenMLError
-from openml.extensions import Extension, register_extension
+from openml.extensions import Extension
 from openml.flows import OpenMLFlow
 from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration, PREFIX
 from openml.tasks import (
@@ -32,6 +33,8 @@ from openml.tasks import (
     OpenMLClusteringTask,
     OpenMLRegressionTask,
 )
+
+logger = logging.getLogger(__name__)
 
 
 if sys.version_info >= (3, 5):
@@ -206,7 +209,9 @@ class SklearnExtension(Extension):
     ################################################################################################
     # Methods for flow serialization and de-serialization
 
-    def flow_to_model(self, flow: 'OpenMLFlow', initialize_with_defaults: bool = False) -> Any:
+    def flow_to_model(self, flow: 'OpenMLFlow',
+                      initialize_with_defaults: bool = False,
+                      strict_version: bool = True) -> Any:
         """Initializes a sklearn model based on a flow.
 
         Parameters
@@ -219,11 +224,16 @@ class SklearnExtension(Extension):
             If this flag is set, the hyperparameter values of flows will be
             ignored and a flow with its defaults is returned.
 
+        strict_version : bool, default=True
+            Whether to fail if version requirements are not fulfilled.
+
         Returns
         -------
         mixed
         """
-        return self._deserialize_sklearn(flow, initialize_with_defaults=initialize_with_defaults)
+        return self._deserialize_sklearn(
+            flow, initialize_with_defaults=initialize_with_defaults,
+            strict_version=strict_version)
 
     def _deserialize_sklearn(
         self,
@@ -231,6 +241,7 @@ class SklearnExtension(Extension):
         components: Optional[Dict] = None,
         initialize_with_defaults: bool = False,
         recursion_depth: int = 0,
+        strict_version: bool = True,
     ) -> Any:
         """Recursive function to deserialize a scikit-learn flow.
 
@@ -254,14 +265,16 @@ class SklearnExtension(Extension):
             The depth at which this flow is called, mostly for debugging
             purposes
 
+        strict_version : bool, default=True
+            Whether to fail if version requirements are not fulfilled.
+
         Returns
         -------
         mixed
         """
 
-        logging.info('-%s flow_to_sklearn START o=%s, components=%s, '
-                     'init_defaults=%s' % ('-' * recursion_depth, o, components,
-                                           initialize_with_defaults))
+        logger.info('-%s flow_to_sklearn START o=%s, components=%s, init_defaults=%s'
+                    % ('-' * recursion_depth, o, components, initialize_with_defaults))
         depth_pp = recursion_depth + 1  # shortcut var, depth plus plus
 
         # First, we need to check whether the presented object is a json string.
@@ -290,13 +303,15 @@ class SklearnExtension(Extension):
                     rval = self._deserialize_function(value)
                 elif serialized_type == 'component_reference':
                     assert components is not None  # Necessary for mypy
-                    value = self._deserialize_sklearn(value, recursion_depth=depth_pp)
+                    value = self._deserialize_sklearn(value, recursion_depth=depth_pp,
+                                                      strict_version=strict_version)
                     step_name = value['step_name']
                     key = value['key']
                     component = self._deserialize_sklearn(
                         components[key],
                         initialize_with_defaults=initialize_with_defaults,
-                        recursion_depth=depth_pp
+                        recursion_depth=depth_pp,
+                        strict_version=strict_version,
                     )
                     # The component is now added to where it should be used
                     # later. It should not be passed to the constructor of the
@@ -310,7 +325,8 @@ class SklearnExtension(Extension):
                         rval = (step_name, component, value['argument_1'])
                 elif serialized_type == 'cv_object':
                     rval = self._deserialize_cross_validator(
-                        value, recursion_depth=recursion_depth
+                        value, recursion_depth=recursion_depth,
+                        strict_version=strict_version
                     )
                 else:
                     raise ValueError('Cannot flow_to_sklearn %s' % serialized_type)
@@ -323,12 +339,14 @@ class SklearnExtension(Extension):
                             components=components,
                             initialize_with_defaults=initialize_with_defaults,
                             recursion_depth=depth_pp,
+                            strict_version=strict_version
                         ),
                         self._deserialize_sklearn(
                             o=value,
                             components=components,
                             initialize_with_defaults=initialize_with_defaults,
                             recursion_depth=depth_pp,
+                            strict_version=strict_version
                         )
                     )
                     for key, value in sorted(o.items())
@@ -340,6 +358,7 @@ class SklearnExtension(Extension):
                     components=components,
                     initialize_with_defaults=initialize_with_defaults,
                     recursion_depth=depth_pp,
+                    strict_version=strict_version
                 )
                 for element in o
             ]
@@ -354,11 +373,11 @@ class SklearnExtension(Extension):
                 flow=o,
                 keep_defaults=initialize_with_defaults,
                 recursion_depth=recursion_depth,
+                strict_version=strict_version
             )
         else:
             raise TypeError(o)
-        logging.info('-%s flow_to_sklearn END   o=%s, rval=%s'
-                     % ('-' * recursion_depth, o, rval))
+        logger.info('-%s flow_to_sklearn END   o=%s, rval=%s' % ('-' * recursion_depth, o, rval))
         return rval
 
     def model_to_flow(self, model: Any) -> 'OpenMLFlow':
@@ -471,10 +490,177 @@ class SklearnExtension(Extension):
 
     @classmethod
     def _is_sklearn_flow(cls, flow: OpenMLFlow) -> bool:
-        return (
-            flow.external_version.startswith('sklearn==')
-            or ',sklearn==' in flow.external_version
-        )
+        if (getattr(flow, 'dependencies', None) is not None
+                and "sklearn" in flow.dependencies):
+            return True
+        if flow.external_version is None:
+            return False
+        else:
+            return (
+                flow.external_version.startswith('sklearn==')
+                or ',sklearn==' in flow.external_version
+            )
+
+    def _get_sklearn_description(self, model: Any, char_lim: int = 1024) -> str:
+        '''Fetches the sklearn function docstring for the flow description
+
+        Retrieves the sklearn docstring available and does the following:
+        * If length of docstring <= char_lim, then returns the complete docstring
+        * Else, trims the docstring till it encounters a 'Read more in the :ref:'
+        * Or till it encounters a 'Parameters\n----------\n'
+        The final string returned is at most of length char_lim with leading and
+        trailing whitespaces removed.
+
+        Parameters
+        ----------
+        model : sklearn model
+        char_lim : int
+            Specifying the max length of the returned string.
+            OpenML servers have a constraint of 1024 characters for the 'description' field.
+
+        Returns
+        -------
+        str
+        '''
+        def match_format(s):
+            return "{}\n{}\n".format(s, len(s) * '-')
+        s = inspect.getdoc(model)
+        if s is None:
+            return ''
+        try:
+            # trim till 'Read more'
+            pattern = "Read more in the :ref:"
+            index = s.index(pattern)
+            s = s[:index]
+            # trimming docstring to be within char_lim
+            if len(s) > char_lim:
+                s = "{}...".format(s[:char_lim - 3])
+            return s.strip()
+        except ValueError:
+            logger.warning("'Read more' not found in descriptions. "
+                           "Trying to trim till 'Parameters' if available in docstring.")
+            pass
+        try:
+            # if 'Read more' doesn't exist, trim till 'Parameters'
+            pattern = "Parameters"
+            index = s.index(match_format(pattern))
+        except ValueError:
+            # returning full docstring
+            logger.warning("'Parameters' not found in docstring. Omitting docstring trimming.")
+            index = len(s)
+        s = s[:index]
+        # trimming docstring to be within char_lim
+        if len(s) > char_lim:
+            s = "{}...".format(s[:char_lim - 3])
+        return s.strip()
+
+    def _extract_sklearn_parameter_docstring(self, model) -> Union[None, str]:
+        '''Extracts the part of sklearn docstring containing parameter information
+
+        Fetches the entire docstring and trims just the Parameter section.
+        The assumption is that 'Parameters' is the first section in sklearn docstrings,
+        followed by other sections titled 'Attributes', 'See also', 'Note', 'References',
+        appearing in that order if defined.
+        Returns a None if no section with 'Parameters' can be found in the docstring.
+
+        Parameters
+        ----------
+        model : sklearn model
+
+        Returns
+        -------
+        str, or None
+        '''
+        def match_format(s):
+            return "{}\n{}\n".format(s, len(s) * '-')
+        s = inspect.getdoc(model)
+        if s is None:
+            return None
+        try:
+            index1 = s.index(match_format("Parameters"))
+        except ValueError as e:
+            # when sklearn docstring has no 'Parameters' section
+            logger.warning("{} {}".format(match_format("Parameters"), e))
+            return None
+
+        headings = ["Attributes", "Notes", "See also", "Note", "References"]
+        for h in headings:
+            try:
+                # to find end of Parameters section
+                index2 = s.index(match_format(h))
+                break
+            except ValueError:
+                logger.warning("{} not available in docstring".format(h))
+                continue
+        else:
+            # in the case only 'Parameters' exist, trim till end of docstring
+            index2 = len(s)
+        s = s[index1:index2]
+        return s.strip()
+
+    def _extract_sklearn_param_info(self, model, char_lim=1024) -> Union[None, Dict]:
+        '''Parses parameter type and description from sklearn dosctring
+
+        Parameters
+        ----------
+        model : sklearn model
+        char_lim : int
+            Specifying the max length of the returned string.
+            OpenML servers have a constraint of 1024 characters string fields.
+
+        Returns
+        -------
+        Dict, or None
+        '''
+        docstring = self._extract_sklearn_parameter_docstring(model)
+        if docstring is None:
+            # when sklearn docstring has no 'Parameters' section
+            return None
+
+        n = re.compile("[.]*\n", flags=IGNORECASE)
+        lines = n.split(docstring)
+        p = re.compile("[a-z0-9_ ]+ : [a-z0-9_']+[a-z0-9_ ]*", flags=IGNORECASE)
+        # The above regular expression is designed to detect sklearn parameter names and type
+        # in the format of [variable_name][space]:[space][type]
+        # The expectation is that the parameter description for this detected parameter will
+        # be all the lines in the docstring till the regex finds another parameter match
+
+        # collecting parameters and their descriptions
+        description = []  # type: List
+        for i, s in enumerate(lines):
+            param = p.findall(s)
+            if param != []:
+                # a parameter definition is found by regex
+                # creating placeholder when parameter found which will be a list of strings
+                # string descriptions will be appended in subsequent iterations
+                # till another parameter is found and a new placeholder is created
+                placeholder = ['']  # type: List[str]
+                description.append(placeholder)
+            else:
+                if len(description) > 0:  # description=[] means no parameters found yet
+                    # appending strings to the placeholder created when parameter found
+                    description[-1].append(s)
+        for i in range(len(description)):
+            # concatenating parameter description strings
+            description[i] = '\n'.join(description[i]).strip()
+            # limiting all parameter descriptions to accepted OpenML string length
+            if len(description[i]) > char_lim:
+                description[i] = "{}...".format(description[i][:char_lim - 3])
+
+        # collecting parameters and their types
+        parameter_docs = OrderedDict()  # type: Dict
+        matches = p.findall(docstring)
+        for i, param in enumerate(matches):
+            key, value = str(param).split(':')
+            parameter_docs[key.strip()] = [value.strip(), description[i]]
+
+        # to avoid KeyError for missing parameters
+        param_list_true = list(model.get_params().keys())
+        param_list_found = list(parameter_docs.keys())
+        for param in list(set(param_list_true) - set(param_list_found)):
+            parameter_docs[param] = [None, None]
+
+        return parameter_docs
 
     def _serialize_model(self, model: Any) -> OpenMLFlow:
         """Create an OpenMLFlow.
@@ -534,10 +720,12 @@ class SklearnExtension(Extension):
 
         sklearn_version = self._format_external_version('sklearn', sklearn.__version__)
         sklearn_version_formatted = sklearn_version.replace('==', '_')
+
+        sklearn_description = self._get_sklearn_description(model)
         flow = OpenMLFlow(name=name,
                           class_name=class_name,
                           custom_name=short_name,
-                          description='Automatically created scikit-learn flow.',
+                          description=sklearn_description,
                           model=model,
                           components=subcomponents,
                           parameters=parameters,
@@ -623,6 +811,7 @@ class SklearnExtension(Extension):
         sub_components_explicit = set()
         parameters = OrderedDict()  # type: OrderedDict[str, Optional[str]]
         parameters_meta_info = OrderedDict()  # type: OrderedDict[str, Optional[Dict]]
+        parameters_docs = self._extract_sklearn_param_info(model)
 
         model_parameters = model.get_params(deep=False)
         for k, v in sorted(model_parameters.items(), key=lambda t: t[0]):
@@ -743,7 +932,12 @@ class SklearnExtension(Extension):
                 else:
                     parameters[k] = None
 
-            parameters_meta_info[k] = OrderedDict((('description', None), ('data_type', None)))
+            if parameters_docs is not None:
+                data_type, description = parameters_docs[k]
+                parameters_meta_info[k] = OrderedDict((('description', description),
+                                                       ('data_type', data_type)))
+            else:
+                parameters_meta_info[k] = OrderedDict((('description', None), ('data_type', None)))
 
         return parameters, parameters_meta_info, sub_components, sub_components_explicit
 
@@ -779,10 +973,12 @@ class SklearnExtension(Extension):
         flow: OpenMLFlow,
         keep_defaults: bool,
         recursion_depth: int,
+        strict_version: bool = True
     ) -> Any:
-        logging.info('-%s deserialize %s' % ('-' * recursion_depth, flow.name))
+        logger.info('-%s deserialize %s' % ('-' * recursion_depth, flow.name))
         model_name = flow.class_name
-        self._check_dependencies(flow.dependencies)
+        self._check_dependencies(flow.dependencies,
+                                 strict_version=strict_version)
 
         parameters = flow.parameters
         components = flow.components
@@ -797,13 +993,13 @@ class SklearnExtension(Extension):
 
         for name in parameters:
             value = parameters.get(name)
-            logging.info('--%s flow_parameter=%s, value=%s' %
-                         ('-' * recursion_depth, name, value))
+            logger.info('--%s flow_parameter=%s, value=%s' % ('-' * recursion_depth, name, value))
             rval = self._deserialize_sklearn(
                 value,
                 components=components_,
                 initialize_with_defaults=keep_defaults,
                 recursion_depth=recursion_depth + 1,
+                strict_version=strict_version,
             )
             parameter_dict[name] = rval
 
@@ -813,11 +1009,11 @@ class SklearnExtension(Extension):
             if name not in components_:
                 continue
             value = components[name]
-            logging.info('--%s flow_component=%s, value=%s'
-                         % ('-' * recursion_depth, name, value))
+            logger.info('--%s flow_component=%s, value=%s' % ('-' * recursion_depth, name, value))
             rval = self._deserialize_sklearn(
                 value,
                 recursion_depth=recursion_depth + 1,
+                strict_version=strict_version
             )
             parameter_dict[name] = rval
 
@@ -843,7 +1039,8 @@ class SklearnExtension(Extension):
                     del parameter_dict[param]
         return model_class(**parameter_dict)
 
-    def _check_dependencies(self, dependencies: str) -> None:
+    def _check_dependencies(self, dependencies: str,
+                            strict_version: bool = True) -> None:
         if not dependencies:
             return
 
@@ -871,9 +1068,13 @@ class SklearnExtension(Extension):
             else:
                 raise NotImplementedError(
                     'operation \'%s\' is not supported' % operation)
+            message = ('Trying to deserialize a model with dependency '
+                       '%s not satisfied.' % dependency_string)
             if not check:
-                raise ValueError('Trying to deserialize a model with dependency '
-                                 '%s not satisfied.' % dependency_string)
+                if strict_version:
+                    raise ValueError(message)
+                else:
+                    warnings.warn(message)
 
     def _serialize_type(self, o: Any) -> 'OrderedDict[str, str]':
         mapping = {float: 'float',
@@ -991,6 +1192,7 @@ class SklearnExtension(Extension):
         self,
         value: 'OrderedDict[str, Any]',
         recursion_depth: int,
+        strict_version: bool = True
     ) -> Any:
         model_name = value['name']
         parameters = value['parameters']
@@ -1002,6 +1204,7 @@ class SklearnExtension(Extension):
             parameters[parameter] = self._deserialize_sklearn(
                 parameters[parameter],
                 recursion_depth=recursion_depth + 1,
+                strict_version=strict_version
             )
         return model_class(**parameters)
 
@@ -1549,7 +1752,7 @@ class SklearnExtension(Extension):
                         if len(subcomponent) == 3:
                             if not isinstance(subcomponent[2], list):
                                 raise TypeError('Subcomponent argument should be'
-                                                'list')
+                                                ' list')
                             current['value']['argument_1'] = subcomponent[2]
                         parsed_values.append(current)
                     parsed_values = json.dumps(parsed_values)
@@ -1739,6 +1942,3 @@ class SklearnExtension(Extension):
             trace_attributes,
             trace_content,
         )
-
-
-register_extension(SklearnExtension)

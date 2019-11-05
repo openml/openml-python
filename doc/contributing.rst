@@ -21,12 +21,12 @@ you can use github's assign feature, otherwise you can just leave a comment.
 Scope of the package
 ====================
 
-The scope of the OpenML python package is to provide a python interface to
-the OpenML platform which integrates well with pythons scientific stack, most
+The scope of the OpenML Python package is to provide a Python interface to
+the OpenML platform which integrates well with Python's scientific stack, most
 notably `numpy <http://www.numpy.org/>`_ and `scipy <https://www.scipy.org/>`_.
 To reduce opportunity costs and demonstrate the usage of the package, it also
 implements an interface to the most popular machine learning package written
-in python, `scikit-learn <http://scikit-learn.org/stable/index.html>`_.
+in Python, `scikit-learn <http://scikit-learn.org/stable/index.html>`_.
 Thereby it will automatically be compatible with many machine learning
 libraries written in Python.
 
@@ -34,7 +34,7 @@ We aim to keep the package as light-weight as possible and we will try to
 keep the number of potential installation dependencies as low as possible.
 Therefore, the connection to other machine learning libraries such as
 *pytorch*, *keras* or *tensorflow* should not be done directly inside this
-package, but in a separate package using the OpenML python connector.
+package, but in a separate package using the OpenML Python connector.
 
 .. _issues:
 
@@ -52,7 +52,7 @@ contains longer-term goals.
 How to contribute
 =================
 
-There are many ways to contribute to the development of the OpenML python
+There are many ways to contribute to the development of the OpenML Python
 connector and OpenML in general. We welcome all kinds of contributions,
 especially:
 
@@ -158,5 +158,67 @@ Happy testing!
 Connecting new machine learning libraries
 =========================================
 
-Coming soon - please stay tuned!
+Content of the Library
+~~~~~~~~~~~~~~~~~~~~~~
 
+To leverage support from the community and to tap in the potential of OpenML, interfacing
+with popular machine learning libraries is essential. However, the OpenML-Python team does
+not have the capacity to develop and maintain such interfaces on its own. For this, we
+have built an extension interface to allows others to contribute back. Building a suitable 
+extension for therefore requires an understanding of the current OpenML-Python support.
+
+`This example <examples/flows_and_runs_tutorial.html>`_ 
+shows how scikit-learn currently works with OpenML-Python as an extension. The *sklearn*
+extension packaged with the `openml-python <https://github.com/openml/openml-python>`_
+repository can be used as a template/benchmark to build the new extension.
+
+
+API
++++
+* The extension scripts must import the `openml` package and be able to interface with
+  any function from the OpenML-Python `API <api.html>`_.
+* The extension has to be defined as a Python class and must inherit from
+  :class:`openml.extensions.Extension`.
+* This class needs to have all the functions from `class Extension` overloaded as required.
+* The redefined functions should have adequate and appropriate docstrings. The
+  `Sklearn Extension API :class:`openml.extensions.sklearn.SklearnExtension.html`
+  is a good benchmark to follow.
+
+
+Interfacing with OpenML-Python
+++++++++++++++++++++++++++++++
+Once the new extension class has been defined, the openml-python module to 
+:meth:`openml.extensions.register_extension.html` must be called to allow OpenML-Python to
+interface the new extension.
+
+
+Hosting the library
+~~~~~~~~~~~~~~~~~~~
+
+Each extension created should be a stand-alone repository, compatible with the
+`OpenML-Python repository <https://github.com/openml/openml-python>`_.
+The extension repository should work off-the-shelf with *OpenML-Python* installed.
+
+Create a `public Github repo <https://help.github.com/en/articles/create-a-repo>`_ with
+the following directory structure:
+
+::
+
+| [repo name]
+|    |-- [extension name]
+|    |    |-- __init__.py
+|    |    |-- extension.py
+|    |    |-- config.py (optionally)
+
+
+
+Recommended
+~~~~~~~~~~~
+* Test cases to keep the extension up to date with the `openml-python` upstream changes.
+* Documentation of the extension API, especially if any new functionality added to OpenML-Python's
+  extension design.
+* Examples to show how the new extension interfaces and works with OpenML-Python.
+* Create a PR to add the new extension to the OpenML-Python API documentation.
+
+
+Happy contributing!

@@ -1,28 +1,27 @@
 from collections import OrderedDict
+import re
 import gzip
 import io
 import logging
 import os
 import pickle
-from typing import List, Optional, Union, Tuple, Iterable
+from typing import List, Optional, Union, Tuple, Iterable, Dict
 
 import arff
 import numpy as np
 import pandas as pd
 import scipy.sparse
-import xmltodict
 from warnings import warn
 
-import openml._api_calls
+from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
-from ..utils import _tag_entity
 
 
 logger = logging.getLogger(__name__)
 
 
-class OpenMLDataset(object):
+class OpenMLDataset(OpenMLBase):
     """Dataset object.
 
     Allows fetching and uploading datasets to OpenML.
@@ -108,7 +107,18 @@ class OpenMLDataset(object):
                  paper_url=None, update_comment=None,
                  md5_checksum=None, data_file=None, features=None,
                  qualities=None, dataset=None):
-
+        if dataset_id is None:
+            if description and not re.match("^[\x00-\x7F]*$", description):
+                # not basiclatin (XSD complains)
+                raise ValueError("Invalid symbols in description: {}".format(
+                    description))
+            if citation and not re.match("^[\x00-\x7F]*$", citation):
+                # not basiclatin (XSD complains)
+                raise ValueError("Invalid symbols in citation: {}".format(
+                    citation))
+            if not re.match("^[a-zA-Z0-9_\\-\\.\\(\\),]+$", name):
+                # regex given by server in error message
+                raise ValueError("Invalid symbols in name: {}".format(name))
         # TODO add function to check if the name is casual_string128
         # Attributes received by querying the RESTful API
         self.dataset_id = int(dataset_id) if dataset_id is not None else None
@@ -168,15 +178,16 @@ class OpenMLDataset(object):
         self.qualities = _check_qualities(qualities)
 
         if data_file is not None:
-            self.data_pickle_file = self._data_arff_to_pickle(data_file)
+            self.data_pickle_file = self._create_pickle_in_cache(data_file)
         else:
             self.data_pickle_file = None
 
-    def __repr__(self):
-        header = "OpenML Dataset"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
+    @property
+    def id(self) -> Optional[int]:
+        return self.dataset_id
 
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+        """ Collect all information to display in the __repr__ body. """
         fields = {"Name": self.name,
                   "Version": self.version,
                   "Format": self.format,
@@ -184,44 +195,126 @@ class OpenMLDataset(object):
                   "Download URL": self.url,
                   "Data file": self.data_file,
                   "Pickle file": self.data_pickle_file,
-                  "# of features": len(self.features)}
+                  "# of features": len(self.features)
+                  if self.features is not None else None}
         if self.upload_date is not None:
             fields["Upload Date"] = self.upload_date.replace('T', ' ')
         if self.dataset_id is not None:
-            fields["OpenML URL"] = "{}d/{}".format(base_url, self.dataset_id)
-        if self.qualities['NumberOfInstances'] is not None:
+            fields["OpenML URL"] = self.openml_url
+        if self.qualities is not None and self.qualities['NumberOfInstances'] is not None:
             fields["# of instances"] = int(self.qualities['NumberOfInstances'])
 
         # determines the order in which the information will be printed
         order = ["Name", "Version", "Format", "Upload Date", "Licence", "Download URL",
                  "OpenML URL", "Data File", "Pickle File", "# of features", "# of instances"]
-        fields = [(key, fields[key]) for key in order if key in fields]
+        return [(key, fields[key]) for key in order if key in fields]
 
-        longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
-        return header + body
+    def __eq__(self, other):
 
-    def _data_arff_to_pickle(self, data_file):
-        data_pickle_file = data_file.replace('.arff', '.pkl.py3')
-        if os.path.exists(data_pickle_file):
-            with open(data_pickle_file, "rb") as fh:
-                data, categorical, attribute_names = pickle.load(fh)
+        if type(other) != OpenMLDataset:
+            return False
 
-            # Between v0.8 and v0.9 the format of pickled data changed from
-            # np.ndarray to pd.DataFrame. This breaks some backwards compatibility,
-            # e.g. for `run_model_on_task`. If a local file still exists with
-            # np.ndarray data, we reprocess the data file to store a pickled
-            # pd.DataFrame blob. See also #646.
-            if isinstance(data, pd.DataFrame) or scipy.sparse.issparse(data):
-                logger.debug("Data pickle file already exists.")
-                return data_pickle_file
+        server_fields = {
+            'dataset_id',
+            'version',
+            'upload_date',
+            'url',
+            'dataset',
+            'data_file',
+        }
 
+        # check that the keys are identical
+        self_keys = set(self.__dict__.keys()) - server_fields
+        other_keys = set(other.__dict__.keys()) - server_fields
+        if self_keys != other_keys:
+            return False
+
+        # check that values of the common keys are identical
+        return all(self.__dict__[key] == other.__dict__[key]
+                   for key in self_keys)
+
+    def _download_data(self) -> None:
+        """ Download ARFF data file to standard cache directory. Set `self.data_file`. """
+        # import required here to avoid circular import.
+        from .functions import _get_dataset_arff
+        self.data_file = _get_dataset_arff(self)
+
+    def _get_arff(self, format: str) -> Dict:
+        """Read ARFF file and return decoded arff.
+
+        Reads the file referenced in self.data_file.
+
+        Parameters
+        ----------
+        format : str
+            Format of the ARFF file.
+            Must be one of 'arff' or 'sparse_arff' or a string that will be either of those
+            when converted to lower case.
+
+
+
+        Returns
+        -------
+        dict
+            Decoded arff.
+
+        """
+
+        # TODO: add a partial read method which only returns the attribute
+        # headers of the corresponding .arff file!
+        import struct
+
+        filename = self.data_file
+        bits = (8 * struct.calcsize("P"))
+        # Files can be considered too large on a 32-bit system,
+        # if it exceeds 120mb (slightly more than covtype dataset size)
+        # This number is somewhat arbitrary.
+        if bits != 64 and os.path.getsize(filename) > 120000000:
+            raise NotImplementedError("File {} too big for {}-bit system ({} bytes)."
+                                      .format(filename, os.path.getsize(filename), bits))
+
+        if format.lower() == 'arff':
+            return_type = arff.DENSE
+        elif format.lower() == 'sparse_arff':
+            return_type = arff.COO
+        else:
+            raise ValueError('Unknown data format {}'.format(format))
+
+        def decode_arff(fh):
+            decoder = arff.ArffDecoder()
+            return decoder.decode(fh, encode_nominal=True,
+                                  return_type=return_type)
+
+        if filename[-3:] == ".gz":
+            with gzip.open(filename) as fh:
+                return decode_arff(fh)
+        else:
+            with io.open(filename, encoding='utf8') as fh:
+                return decode_arff(fh)
+
+    def _parse_data_from_arff(
+            self,
+            arff_file_path: str
+    ) -> Tuple[Union[pd.DataFrame, scipy.sparse.csr_matrix], List[bool], List[str]]:
+        """ Parse all required data from arff file.
+
+        Parameters
+        ----------
+        arff_file_path : str
+            Path to the file on disk.
+
+        Returns
+        -------
+        Tuple[Union[pd.DataFrame, scipy.sparse.csr_matrix], List[bool], List[str]]
+            DataFrame or csr_matrix: dataset
+            List[bool]: List indicating which columns contain categorical variables.
+            List[str]: List of column names.
+        """
         try:
             data = self._get_arff(self.format)
         except OSError as e:
-            logger.critical("Please check that the data file %s is "
-                            "there and can be read.", data_file)
+            logger.critical("Please check that the data file {} is "
+                            "there and can be read.".format(arff_file_path))
             raise e
 
         ARFF_DTYPES_TO_PD_DTYPE = {
@@ -234,13 +327,15 @@ class OpenMLDataset(object):
         attribute_names = []
         categories_names = {}
         categorical = []
-        for name, type_ in data['attributes']:
+        for i, (name, type_) in enumerate(data['attributes']):
             # if the feature is nominal and the a sparse matrix is
             # requested, the categories need to be numeric
             if (isinstance(type_, list)
                     and self.format.lower() == 'sparse_arff'):
                 try:
-                    np.array(type_, dtype=np.float32)
+                    # checks if the strings which should be the class labels
+                    # can be encoded into integers
+                    pd.factorize(type_)[0]
                 except ValueError:
                     raise ValueError(
                         "Categorical data needs to be numeric when "
@@ -282,7 +377,6 @@ class OpenMLDataset(object):
             X = scipy.sparse.coo_matrix(
                 (X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
             X = X.tocsr()
-
         elif self.format.lower() == 'arff':
             X = pd.DataFrame(data['data'], columns=attribute_names)
 
@@ -295,103 +389,72 @@ class OpenMLDataset(object):
                 else:
                     col.append(X[column_name])
             X = pd.concat(col, axis=1)
+        else:
+            raise ValueError("Dataset format '{}' is not a valid format.".format(self.format))
 
-        # Pickle the dataframe or the sparse matrix.
+        return X, categorical, attribute_names
+
+    def _create_pickle_in_cache(self, data_file: str) -> str:
+        """ Parse the arff and pickle the result. Update any old pickle objects. """
+        data_pickle_file = data_file.replace('.arff', '.pkl.py3')
+        if os.path.exists(data_pickle_file):
+            # Load the data to check if the pickle file is outdated (i.e. contains numpy array)
+            with open(data_pickle_file, "rb") as fh:
+                try:
+                    data, categorical, attribute_names = pickle.load(fh)
+                except EOFError:
+                    # The file is likely corrupt, see #780.
+                    # We deal with this when loading the data in `_load_data`.
+                    return data_pickle_file
+
+            # Between v0.8 and v0.9 the format of pickled data changed from
+            # np.ndarray to pd.DataFrame. This breaks some backwards compatibility,
+            # e.g. for `run_model_on_task`. If a local file still exists with
+            # np.ndarray data, we reprocess the data file to store a pickled
+            # pd.DataFrame blob. See also #646.
+            if isinstance(data, pd.DataFrame) or scipy.sparse.issparse(data):
+                logger.debug("Data pickle file already exists and is up to date.")
+                return data_pickle_file
+
+        # At this point either the pickle file does not exist, or it had outdated formatting.
+        # We parse the data from arff again and populate the cache with a recent pickle file.
+        X, categorical, attribute_names = self._parse_data_from_arff(data_file)
+
         with open(data_pickle_file, "wb") as fh:
-            pickle.dump((X, categorical, attribute_names), fh, -1)
+            pickle.dump((X, categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
         logger.debug("Saved dataset {did}: {name} to file {path}"
                      .format(did=int(self.dataset_id or -1),
                              name=self.name,
                              path=data_pickle_file)
                      )
+
         return data_pickle_file
 
-    def push_tag(self, tag):
-        """Annotates this data set with a tag on the server.
+    def _load_data(self):
+        """ Load data from pickle or arff. Download data first if not present on disk. """
+        if self.data_pickle_file is None:
+            if self.data_file is None:
+                self._download_data()
+            self.data_pickle_file = self._create_pickle_in_cache(self.data_file)
 
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the dataset.
-        """
-        _tag_entity('data', self.dataset_id, tag)
+        try:
+            with open(self.data_pickle_file, "rb") as fh:
+                data, categorical, attribute_names = pickle.load(fh)
+        except EOFError:
+            logger.warning(
+                "Detected a corrupt cache file loading dataset %d: '%s'. "
+                "We will continue loading data from the arff-file, "
+                "but this will be much slower for big datasets. "
+                "Please manually delete the cache file if you want openml-python "
+                "to attempt to reconstruct it."
+                "" % (self.dataset_id, self.data_pickle_file)
+            )
+            data, categorical, attribute_names = self._parse_data_from_arff(self.data_file)
+        except FileNotFoundError:
+            raise ValueError("Cannot find a pickle file for dataset {} at "
+                             "location {} ".format(self.name, self.data_pickle_file))
 
-    def remove_tag(self, tag):
-        """Removes a tag from this dataset on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the dataset.
-        """
-        _tag_entity('data', self.dataset_id, tag, untag=True)
-
-    def __eq__(self, other):
-
-        if type(other) != OpenMLDataset:
-            return False
-
-        server_fields = {
-            'dataset_id',
-            'version',
-            'upload_date',
-            'url',
-            'dataset',
-            'data_file',
-        }
-
-        # check that the keys are identical
-        self_keys = set(self.__dict__.keys()) - server_fields
-        other_keys = set(other.__dict__.keys()) - server_fields
-        if self_keys != other_keys:
-            return False
-
-        # check that values of the common keys are identical
-        return all(self.__dict__[key] == other.__dict__[key]
-                   for key in self_keys)
-
-    def _get_arff(self, format):
-        """Read ARFF file and return decoded arff.
-
-        Reads the file referenced in self.data_file.
-
-        Returns
-        -------
-        dict
-            Decoded arff.
-
-        """
-
-        # TODO: add a partial read method which only returns the attribute
-        # headers of the corresponding .arff file!
-        import struct
-
-        filename = self.data_file
-        bits = (8 * struct.calcsize("P"))
-        # Files can be considered too large on a 32-bit system,
-        # if it exceeds 120mb (slightly more than covtype dataset size)
-        # This number is somewhat arbitrary.
-        if bits != 64 and os.path.getsize(filename) > 120000000:
-            return NotImplementedError("File too big")
-
-        if format.lower() == 'arff':
-            return_type = arff.DENSE
-        elif format.lower() == 'sparse_arff':
-            return_type = arff.COO
-        else:
-            raise ValueError('Unknown data format %s' % format)
-
-        def decode_arff(fh):
-            decoder = arff.ArffDecoder()
-            return decoder.decode(fh, encode_nominal=True,
-                                  return_type=return_type)
-
-        if filename[-3:] == ".gz":
-            with gzip.open(filename) as fh:
-                return decode_arff(fh)
-        else:
-            with io.open(filename, encoding='utf8') as fh:
-                return decode_arff(fh)
+        return data, categorical, attribute_names
 
     @staticmethod
     def _convert_array_format(data, array_format, attribute_names):
@@ -417,6 +480,7 @@ class OpenMLDataset(object):
                 else returns data as is
 
         """
+
         if array_format == "array" and not scipy.sparse.issparse(data):
             # We encode the categories such that they are integer to be able
             # to make a conversion to numeric for backward compatibility
@@ -441,11 +505,17 @@ class OpenMLDataset(object):
                     'PyOpenML cannot handle string when returning numpy'
                     ' arrays. Use dataset_format="dataframe".'
                 )
-        elif array_format == "dataframe" and scipy.sparse.issparse(data):
-            return pd.SparseDataFrame(data, columns=attribute_names)
+        elif array_format == "dataframe":
+            if scipy.sparse.issparse(data):
+                return pd.SparseDataFrame(data, columns=attribute_names)
+            else:
+                return data
         else:
             data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
-            warn("Cannot convert {} to '{}'. Returning input data.".format(data_type, array_format))
+            logger.warning(
+                "Cannot convert %s (%s) to '%s'. Returning input data."
+                % (data_type, type(data), array_format)
+            )
         return data
 
     @staticmethod
@@ -460,12 +530,6 @@ class OpenMLDataset(object):
         # https://pandas.pydata.org/pandas-docs/version/0.24/user_guide/categorical.html#series-creation  # noqa E501
         raw_cat = pd.Categorical(col, ordered=True, categories=categories)
         return pd.Series(raw_cat, index=series.index, name=series.name)
-
-    def _download_data(self) -> None:
-        """ Download ARFF data file to standard cache directory. Set `self.data_file`. """
-        # import required here to avoid circular import.
-        from .functions import _get_dataset_arff
-        self.data_file = _get_dataset_arff(self)
 
     def get_data(
             self,
@@ -507,18 +571,7 @@ class OpenMLDataset(object):
         attribute_names : List[str]
             List of attribute names.
         """
-        if self.data_pickle_file is None:
-            if self.data_file is None:
-                self._download_data()
-            self.data_pickle_file = self._data_arff_to_pickle(self.data_file)
-
-        path = self.data_pickle_file
-        if not os.path.exists(path):
-            raise ValueError("Cannot find a pickle file for dataset %s at "
-                             "location %s " % (self.name, path))
-        else:
-            with open(path, "rb") as fh:
-                data, categorical, attribute_names = pickle.load(fh)
+        data, categorical, attribute_names = self._load_data()
 
         to_exclude = []
         if not include_row_id and self.row_id_attribute is not None:
@@ -673,58 +726,31 @@ class OpenMLDataset(object):
                     result.append(idx - offset)
         return result
 
-    def publish(self):
-        """Publish the dataset on the OpenML server.
+    def _get_file_elements(self) -> Dict:
+        """ Adds the 'dataset' to file elements. """
+        file_elements = {}
+        path = None if self.data_file is None else os.path.abspath(self.data_file)
 
-        Upload the dataset description and dataset content to openml.
-
-        Returns
-        -------
-        dataset_id: int
-            Id of the dataset uploaded to the server.
-        """
-        file_elements = {'description': self._to_xml()}
-
-        # the arff dataset string is available
         if self._dataset is not None:
             file_elements['dataset'] = self._dataset
-        else:
-            # the path to the arff dataset is given
-            if self.data_file is not None:
-                path = os.path.abspath(self.data_file)
-                if os.path.exists(path):
-                    try:
+        elif path is not None and os.path.exists(path):
+            with open(path, 'rb') as fp:
+                file_elements['dataset'] = fp.read()
+            try:
+                dataset_utf8 = str(file_elements['dataset'], 'utf8')
+                arff.ArffDecoder().decode(dataset_utf8, encode_nominal=True)
+            except arff.ArffException:
+                raise ValueError("The file you have provided is not a valid arff file.")
+        elif self.url is None:
+            raise ValueError("No valid url/path to the data file was given.")
+        return file_elements
 
-                        with io.open(path, encoding='utf8') as fh:
-                            # check if arff is valid
-                            decoder = arff.ArffDecoder()
-                            decoder.decode(fh, encode_nominal=True)
-                    except arff.ArffException:
-                        raise ValueError("The file you have provided is not "
-                                         "a valid arff file.")
+    def _parse_publish_response(self, xml_response: Dict):
+        """ Parse the id from the xml_response and assign it to self. """
+        self.dataset_id = int(xml_response['oml:upload_data_set']['oml:id'])
 
-                    with open(path, 'rb') as fp:
-                        file_elements['dataset'] = fp.read()
-            else:
-                if self.url is None:
-                    raise ValueError("No url/path to the data file was given")
-
-        return_value = openml._api_calls._perform_api_call(
-            "data/", 'post',
-            file_elements=file_elements,
-        )
-        response = xmltodict.parse(return_value)
-        self.dataset_id = int(response['oml:upload_data_set']['oml:id'])
-        return self.dataset_id
-
-    def _to_xml(self):
-        """ Serialize object to xml for upload
-
-        Returns
-        -------
-        xml_dataset : str
-            XML description of the data.
-        """
+    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
+        """ Creates a dictionary representation of self. """
         props = ['id', 'name', 'version', 'description', 'format', 'creator',
                  'contributor', 'collection_date', 'upload_date', 'language',
                  'licence', 'url', 'default_target_attribute',
@@ -732,7 +758,7 @@ class OpenMLDataset(object):
                  'citation', 'tag', 'visibility', 'original_data_url',
                  'paper_url', 'update_comment', 'md5_checksum']
 
-        data_container = OrderedDict()
+        data_container = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
         data_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])
         data_container['oml:data_set_description'] = data_dict
 
@@ -741,14 +767,7 @@ class OpenMLDataset(object):
             if content is not None:
                 data_dict["oml:" + prop] = content
 
-        xml_string = xmltodict.unparse(
-            input_dict=data_container,
-            pretty=True,
-        )
-        # A flow may not be uploaded with the xml encoding specification:
-        # <?xml version="1.0" encoding="utf-8"?>
-        xml_string = xml_string.split('\n', 1)[-1]
-        return xml_string
+        return data_container
 
 
 def _check_qualities(qualities):

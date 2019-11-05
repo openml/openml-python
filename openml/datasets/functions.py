@@ -1,4 +1,5 @@
 import io
+import logging
 import os
 import re
 from typing import List, Dict, Union, Optional
@@ -28,6 +29,7 @@ from ..utils import (
 
 
 DATASETS_CACHE_DIR_NAME = 'datasets'
+logger = logging.getLogger(__name__)
 
 ############################################################################
 # Local getters/accessors to the cache directory
@@ -190,6 +192,7 @@ def list_qualities() -> List[str]:
 
 
 def list_datasets(
+    data_id: Optional[List[int]] = None,
     offset: Optional[int] = None,
     size: Optional[int] = None,
     status: Optional[str] = None,
@@ -204,6 +207,9 @@ def list_datasets(
 
     Parameters
     ----------
+    data_id : list, optional
+        A list of data ids, to specify which datasets should be
+        listed
     offset : int, optional
         The number of datasets to skip, starting from the first.
     size : int, optional
@@ -251,7 +257,8 @@ def list_datasets(
         raise ValueError("Invalid output format selected. "
                          "Only 'dict' or 'dataframe' applicable.")
 
-    return openml.utils._list_all(output_format=output_format,
+    return openml.utils._list_all(data_id=data_id,
+                                  output_format=output_format,
                                   listing_call=_list_datasets,
                                   offset=offset,
                                   size=size,
@@ -260,12 +267,19 @@ def list_datasets(
                                   **kwargs)
 
 
-def _list_datasets(output_format='dict', **kwargs):
+def _list_datasets(data_id: Optional[List] = None, output_format='dict', **kwargs):
     """
     Perform api call to return a list of all datasets.
 
     Parameters
     ----------
+    The arguments that are lists are separated from the single value
+    ones which are put into the kwargs.
+    display_errors is also separated from the kwargs since it has a
+    default value.
+
+    data_id : list, optional
+
     output_format: str, optional (default='dict')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
@@ -285,6 +299,8 @@ def _list_datasets(output_format='dict', **kwargs):
     if kwargs is not None:
         for operator, value in kwargs.items():
             api_call += "/%s/%s" % (operator, value)
+    if data_id is not None:
+        api_call += "/data_id/%s" % ','.join([str(int(i)) for i in data_id])
     return __list_datasets(api_call=api_call, output_format=output_format)
 
 
@@ -444,7 +460,8 @@ def get_dataset(
     If dataset is retrieved by name, a version may be specified.
     If no version is specified and multiple versions of the dataset exist,
     the earliest version of the dataset that is still active will be returned.
-    This scenario will raise an error instead if `exception_if_multiple` is `True`.
+    If no version is specified, multiple versions of the dataset exist and
+    ``exception_if_multiple`` is set to ``True``, this function will raise an exception.
 
     Parameters
     ----------
@@ -459,7 +476,7 @@ def get_dataset(
         Specifies the version if `dataset_id` is specified by name.
         If no version is specified, retrieve the least recent still active version.
     error_if_multiple : bool, optional (default=False)
-        If `True` raise an error if multiple datasets are found with matching criteria.
+        If ``True`` raise an error if multiple datasets are found with matching criteria.
 
     Returns
     -------
@@ -483,10 +500,17 @@ def get_dataset(
         remove_dataset_cache = True
         description = _get_dataset_description(did_cache_dir, dataset_id)
         features = _get_dataset_features(did_cache_dir, dataset_id)
-        qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
+
+        try:
+            qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
+        except OpenMLServerException as e:
+            if e.code == 362 and str(e) == 'No qualities found - None':
+                logger.warning("No qualities found for dataset {}".format(dataset_id))
+                qualities = None
+            else:
+                raise
 
         arff_file = _get_dataset_arff(description) if download_data else None
-
         remove_dataset_cache = False
     except OpenMLServerException as e:
         # if there was an exception,
@@ -525,10 +549,15 @@ def attributes_arff_from_df(df):
         'string': 'STRING'
     }
     attributes_arff = []
+
+    if not all([isinstance(column_name, str) for column_name in df.columns]):
+        logger.warning("Converting non-str column names to str.")
+        df.columns = [str(column_name) for column_name in df.columns]
+
     for column_name in df:
         # skipna=True does not infer properly the dtype. The NA values are
         # dropped before the inference instead.
-        column_dtype = pd.api.types.infer_dtype(df[column_name].dropna())
+        column_dtype = pd.api.types.infer_dtype(df[column_name].dropna(), skipna=False)
 
         if column_dtype == 'categorical':
             # for categorical feature, arff expects a list string. However, a

@@ -2,23 +2,49 @@
 Store module level information like the API key, cache directory and the server
 """
 import logging
+import logging.handlers
 import os
+from typing import cast
 
 from io import StringIO
 import configparser
 from urllib.parse import urlparse
 
-
 logger = logging.getLogger(__name__)
-logging.basicConfig(
-    format='[%(levelname)s] [%(asctime)s:%(name)s] %('
-           'message)s', datefmt='%H:%M:%S')
 
-# Default values!
+
+def configure_logging(console_output_level: int, file_output_level: int):
+    """ Sets the OpenML logger to DEBUG, with attached Stream- and FileHandler. """
+    # Verbosity levels as defined (https://github.com/openml/OpenML/wiki/Client-API-Standards)
+    # don't match Python values directly:
+    verbosity_map = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
+
+    openml_logger = logging.getLogger('openml')
+    openml_logger.setLevel(logging.DEBUG)
+    message_format = '[%(levelname)s] [%(asctime)s:%(name)s] %(message)s'
+    output_formatter = logging.Formatter(message_format, datefmt='%H:%M:%S')
+
+    console_stream = logging.StreamHandler()
+    console_stream.setFormatter(output_formatter)
+    console_stream.setLevel(verbosity_map[console_output_level])
+
+    one_mb = 2**20
+    log_path = os.path.join(cache_directory, 'openml_python.log')
+    file_stream = logging.handlers.RotatingFileHandler(log_path, maxBytes=one_mb, backupCount=1)
+    file_stream.setLevel(verbosity_map[file_output_level])
+    file_stream.setFormatter(output_formatter)
+
+    openml_logger.addHandler(console_stream)
+    openml_logger.addHandler(file_stream)
+    return console_stream, file_stream
+
+
+# Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
 _defaults = {
     'apikey': None,
     'server': "https://www.openml.org/api/v1/xml",
-    'verbosity': 0,
+    'verbosity': 0,  # WARNING
+    'file_verbosity': 2,  # DEBUG
     'cachedir': os.path.expanduser(os.path.join('~', '.openml', 'cache')),
     'avoid_duplicate_runs': 'True',
     'connection_n_retries': 2,
@@ -28,10 +54,11 @@ config_file = os.path.expanduser(os.path.join('~', '.openml', 'config'))
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
-server = _defaults['server']
+server = str(_defaults['server'])  # so mypy knows it is a string
+server_base_url = server[:-len('/api/v1/xml')]
 apikey = _defaults['apikey']
 # The current cache directory (without the server name)
-cache_directory = _defaults['cachedir']
+cache_directory = str(_defaults['cachedir'])  # so mypy knows it is a string
 avoid_duplicate_runs = True if _defaults['avoid_duplicate_runs'] == 'True' else False
 
 # Number of retries if the connection breaks
@@ -100,18 +127,27 @@ def _setup():
     global cache_directory
     global avoid_duplicate_runs
     global connection_n_retries
+
     # read config file, create cache directory
     try:
         os.mkdir(os.path.expanduser(os.path.join('~', '.openml')))
-    except (IOError, OSError):
-        # TODO add debug information
+    except FileExistsError:
+        # For other errors, we want to propagate the error as openml does not work without cache
         pass
+
     config = _parse_config()
     apikey = config.get('FAKE_SECTION', 'apikey')
     server = config.get('FAKE_SECTION', 'server')
 
     short_cache_dir = config.get('FAKE_SECTION', 'cachedir')
     cache_directory = os.path.expanduser(short_cache_dir)
+
+    # create the cache subdirectory
+    try:
+        os.mkdir(cache_directory)
+    except FileExistsError:
+        # For other errors, we want to propagate the error as openml does not work without cache
+        pass
 
     avoid_duplicate_runs = config.getboolean('FAKE_SECTION',
                                              'avoid_duplicate_runs')
@@ -146,7 +182,7 @@ def _parse_config():
         config_file_.seek(0)
         config.read_file(config_file_)
     except OSError as e:
-        logging.info("Error opening file %s: %s", config_file, e.message)
+        logger.info("Error opening file %s: %s", config_file, e.message)
     return config
 
 
@@ -203,3 +239,7 @@ __all__ = [
 ]
 
 _setup()
+
+_console_log_level = cast(int, _defaults['verbosity'])
+_file_log_level = cast(int, _defaults['file_verbosity'])
+console_log, file_log = configure_logging(_console_log_level, _file_log_level)

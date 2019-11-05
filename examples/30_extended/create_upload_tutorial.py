@@ -119,8 +119,8 @@ diabetes_dataset = create_dataset(
 
 ############################################################################
 
-upload_did = diabetes_dataset.publish()
-print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+diabetes_dataset.publish()
+print(f"URL for dataset: {diabetes_dataset.openml_url}")
 
 ############################################################################
 # Dataset is a list
@@ -192,17 +192,17 @@ weather_dataset = create_dataset(
 
 ############################################################################
 
-upload_did = weather_dataset.publish()
-print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+weather_dataset.publish()
+print(f"URL for dataset: {weather_dataset.openml_url}")
 
 ############################################################################
 # Dataset is a pandas DataFrame
 # =============================
-# It might happen that your dataset is made of heterogeneous data which can be
-# usually stored as a Pandas DataFrame. DataFrame offers the adavantages to
-# store the type of data for each column as well as the attribute names.
-# Therefore, when providing a Pandas DataFrame, OpenML can infer those
-# information without the need to specifically provide them when calling the
+# It might happen that your dataset is made of heterogeneous data which can usually
+# be stored as a Pandas DataFrame. DataFrames offer the advantage of
+# storing the type of data for each column as well as the attribute names.
+# Therefore, when providing a Pandas DataFrame, OpenML can infer this
+# information without needing to explicitly provide it when calling the
 # function :func:`create_dataset`. In this regard, you only need to pass
 # ``'auto'`` to the ``attributes`` parameter.
 
@@ -238,8 +238,8 @@ weather_dataset = create_dataset(
 
 ############################################################################
 
-upload_did = weather_dataset.publish()
-print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+weather_dataset.publish()
+print(f"URL for dataset: {weather_dataset.openml_url}")
 
 ############################################################################
 # Dataset is a sparse matrix
@@ -275,8 +275,8 @@ xor_dataset = create_dataset(
 
 ############################################################################
 
-upload_did = xor_dataset.publish()
-print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+xor_dataset.publish()
+print(f"URL for dataset: {xor_dataset.openml_url}")
 
 
 ############################################################################
@@ -310,8 +310,8 @@ xor_dataset = create_dataset(
 
 ############################################################################
 
-upload_did = xor_dataset.publish()
-print('URL for dataset: %s/data/%d' % (openml.config.server, upload_did))
+xor_dataset.publish()
+print(f"URL for dataset: {xor_dataset.openml_url}")
 
 
 ############################################################################

@@ -36,11 +36,12 @@ pip install -e '.[test]'
 python -c "import numpy; print('numpy %s' % numpy.__version__)"
 python -c "import scipy; print('scipy %s' % scipy.__version__)"
 
-if [[ "$EXAMPLES" == "true" ]]; then
-    pip install -e '.[examples]'
-fi
 if [[ "$DOCTEST" == "true" ]]; then
     pip install sphinx_bootstrap_theme
+fi
+if [[ "$DOCPUSH" == "true" ]]; then
+    conda install --yes gxx_linux-64 gcc_linux-64 swig
+    pip install -e '.[examples,examples_unix]'
 fi
 if [[ "$COVERAGE" == "true" ]]; then
     pip install codecov pytest-cov
@@ -52,3 +53,5 @@ fi
 # Install scikit-learn last to make sure the openml package installation works
 # from a clean environment without scikit-learn.
 pip install scikit-learn==$SKLEARN_VERSION
+
+conda list

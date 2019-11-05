@@ -2,21 +2,21 @@ from abc import ABC
 from collections import OrderedDict
 import io
 import os
-from typing import Union, Tuple, Dict, List, Optional
+from typing import Union, Tuple, Dict, List, Optional, Any
 from warnings import warn
 
 import numpy as np
 import pandas as pd
 import scipy.sparse
-import xmltodict
 
 import openml._api_calls
+from openml.base import OpenMLBase
 from .. import datasets
 from .split import OpenMLSplit
-from ..utils import _create_cache_directory_for_id, _tag_entity
+from ..utils import _create_cache_directory_for_id
 
 
-class OpenMLTask(ABC):
+class OpenMLTask(OpenMLBase):
     """OpenML Task object.
 
        Parameters
@@ -55,35 +55,36 @@ class OpenMLTask(ABC):
         self.estimation_procedure_id = estimation_procedure_id
         self.split = None  # type: Optional[OpenMLSplit]
 
-    def __repr__(self):
-        header = "OpenML Task"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
+    @classmethod
+    def _entity_letter(cls) -> str:
+        return 't'
 
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
-        fields = {"Task Type": self.task_type}
+    @property
+    def id(self) -> Optional[int]:
+        return self.task_id
+
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+        """ Collect all information to display in the __repr__ body. """
+        fields = {"Task Type Description": '{}/tt/{}'.format(
+            openml.config.server_base_url, self.task_type_id)}  # type: Dict[str, Any]
         if self.task_id is not None:
             fields["Task ID"] = self.task_id
-            fields["Task URL"] = "{}t/{}".format(base_url, self.task_id)
+            fields["Task URL"] = self.openml_url
         if self.evaluation_measure is not None:
             fields["Evaluation Measure"] = self.evaluation_measure
         if self.estimation_procedure is not None:
             fields["Estimation Procedure"] = self.estimation_procedure['type']
-        if self.target_name is not None:
-            fields["Target Feature"] = self.target_name
+        if getattr(self, 'target_name', None) is not None:
+            fields["Target Feature"] = getattr(self, 'target_name')
             if hasattr(self, 'class_labels'):
-                fields["# of Classes"] = len(self.class_labels)
+                fields["# of Classes"] = len(getattr(self, 'class_labels'))
             if hasattr(self, 'cost_matrix'):
                 fields["Cost Matrix"] = "Available"
 
         # determines the order in which the information will be printed
-        order = ["Task Type", "Task ID", "Task URL", "Estimation Procedure", "Evaluation Measure",
-                 "Target Feature", "# of Classes", "Cost Matrix"]
-        fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
-        return header + body
+        order = ["Task Type Description", "Task ID", "Task URL", "Estimation Procedure",
+                 "Evaluation Measure", "Target Feature", "# of Classes", "Cost Matrix"]
+        return [(key, fields[key]) for key in order if key in fields]
 
     def get_dataset(self) -> datasets.OpenMLDataset:
         """Download dataset associated with task"""
@@ -144,28 +145,8 @@ class OpenMLTask(ABC):
 
         return self.split.repeats, self.split.folds, self.split.samples
 
-    def push_tag(self, tag: str):
-        """Annotates this task with a tag on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the task.
-        """
-        _tag_entity('task', self.task_id, tag)
-
-    def remove_tag(self, tag: str):
-        """Removes a tag from this task on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the task.
-        """
-        _tag_entity('task', self.task_id, tag, untag=True)
-
     def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
-
+        """ Creates a dictionary representation of self. """
         task_container = OrderedDict()  # type: OrderedDict[str, OrderedDict]
         task_dict = OrderedDict([
             ('@xmlns:oml', 'http://openml.org/openml')
@@ -199,47 +180,9 @@ class OpenMLTask(ABC):
 
         return task_container
 
-    def _to_xml(self) -> str:
-        """Generate xml representation of self for upload to server.
-
-        Returns
-        -------
-        str
-            Task represented as XML string.
-        """
-        task_dict = self._to_dict()
-        task_xml = xmltodict.unparse(task_dict, pretty=True)
-
-        # A task may not be uploaded with the xml encoding specification:
-        # <?xml version="1.0" encoding="utf-8"?>
-        task_xml = task_xml.split('\n', 1)[-1]
-
-        return task_xml
-
-    def publish(self) -> int:
-        """Publish task to OpenML server.
-
-        Returns
-        -------
-        task_id: int
-            Returns the id of the uploaded task
-            if successful.
-
-        """
-
-        xml_description = self._to_xml()
-
-        file_elements = {'description': xml_description}
-
-        return_value = openml._api_calls._perform_api_call(
-            "task/",
-            'post',
-            file_elements=file_elements,
-        )
-
-        task_id = int(xmltodict.parse(return_value)['oml:upload_task']['oml:id'])
-
-        return task_id
+    def _parse_publish_response(self, xml_response: Dict):
+        """ Parse the id from the xml_response and assign it to self. """
+        self.task_id = int(xml_response['oml:upload_task']['oml:id'])
 
 
 class OpenMLSupervisedTask(OpenMLTask, ABC):

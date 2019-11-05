@@ -46,8 +46,8 @@ class TestRun(TestBase):
                 other = getattr(run_prime, dictionary)
                 if other is not None:
                     self.assertDictEqual(other, dict())
-        self.assertEqual(run._create_description_xml(),
-                         run_prime._create_description_xml())
+        self.assertEqual(run._to_xml(),
+                         run_prime._to_xml())
 
         numeric_part = \
             np.array(np.array(run.data_content)[:, 0:-2], dtype=float)
@@ -134,7 +134,7 @@ class TestRun(TestBase):
         TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
                                                             run_prime.run_id))
 
-    @pytest.mark.flaky(reruns=3)
+    @pytest.mark.flaky()
     def test_to_from_filesystem_search(self):
 
         model = Pipeline([

@@ -7,6 +7,7 @@ import sys
 import unittest.mock
 
 import numpy as np
+import pytest
 
 import openml
 import openml.exceptions
@@ -78,7 +79,7 @@ class TestRun(TestBase):
             if len(run.evaluations) > 0:
                 return
             else:
-                time.sleep(10)
+                time.sleep(3)
         raise RuntimeError('Could not find any evaluations! Please check whether run {} was '
                            'evaluated correctly on the server'.format(run_id))
 
@@ -205,7 +206,7 @@ class TestRun(TestBase):
 
         # This is only a smoke check right now
         # TODO add a few asserts here
-        run._create_description_xml()
+        run._to_xml()
         if run.trace is not None:
             # This is only a smoke check right now
             # TODO add a few asserts here
@@ -419,7 +420,7 @@ class TestRun(TestBase):
                     fold=0,
                 )
             except openml.exceptions.OpenMLServerException as e:
-                e.additional = "%s; run_id %d" % (e.additional, run.run_id)
+                e.message = "%s; run_id %d" % (e.message, run.run_id)
                 raise e
 
             self._rerun_model_and_compare_predictions(run.run_id, model_prime,
@@ -826,6 +827,7 @@ class TestRun(TestBase):
         self.assertEqual(flowS.components['VarianceThreshold'].
                          parameters['threshold'], '0.05')
 
+    @pytest.mark.flaky()
     def test_get_run_trace(self):
         # get_run_trace is already tested implicitly in test_run_and_publish
         # this test is a bit additional.
@@ -1110,10 +1112,21 @@ class TestRun(TestBase):
             self.assertEqual(run.fold_evaluations['f_measure'][0][i], value)
         assert ('weka' in run.tags)
         assert ('weka_3.7.12' in run.tags)
+        assert (
+            run.predictions_url == (
+                "https://www.openml.org/data/download/1667125/"
+                "weka_generated_predictions4575715871712251329.arff"
+            )
+        )
 
     def _check_run(self, run):
+        # This tests that the API returns seven entries for each run
+        # Check out https://openml.org/api/v1/xml/run/list/flow/1154
+        # They are run_id, task_id, task_type_id, setup_id, flow_id, uploader, upload_time
+        # error_message and run_details exist, too, but are not used so far. We need to update
+        # this check once they are used!
         self.assertIsInstance(run, dict)
-        self.assertEqual(len(run), 7)
+        assert len(run) == 7, str(run)
 
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
@@ -1235,9 +1248,9 @@ class TestRun(TestBase):
 
         runs = openml.runs.list_runs(id=ids, task=tasks, uploader=uploaders_1)
 
-    @unittest.skip("API currently broken: https://github.com/openml/OpenML/issues/948")
     def test_get_runs_list_by_tag(self):
         # TODO: comes from live, no such lists on test
+        # Unit test works on production server only
         openml.config.server = self.production_server
         runs = openml.runs.list_runs(tag='curves')
         self.assertGreaterEqual(len(runs), 1)

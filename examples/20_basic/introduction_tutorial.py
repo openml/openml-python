@@ -1,8 +1,8 @@
 """
-Introduction
-============
+Setup
+=====
 
-An introduction to OpenML, followed up by a simple example.
+An example how to set up OpenML-Python followed up by a simple example.
 """
 ############################################################################
 # OpenML is an online collaboration platform for machine learning which allows
@@ -61,7 +61,7 @@ from sklearn import neighbors
 openml.config.start_using_configuration_for_example()
 
 ############################################################################
-# When using the main server, instead make sure your apikey is configured.
+# When using the main server instead, make sure your apikey is configured.
 # This can be done with the following line of code (uncomment it!).
 # Never share your apikey with others.
 
@@ -96,7 +96,7 @@ run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
 # For this tutorial, our configuration publishes to the test server
 # as to not crowd the main server with runs created by examples.
 myrun = run.publish()
-print("kNN on %s: http://test.openml.org/r/%d" % (data.name, myrun.run_id))
+print(f"kNN on {data.name}: http://test.openml.org/r/{myrun.run_id}")
 
 ############################################################################
 openml.config.stop_using_configuration_for_example()

@@ -26,6 +26,10 @@ class OpenMLEvaluation(object):
         The evaluation metric of this item (e.g., accuracy).
     upload_time : str
         The time of evaluation.
+    uploader: int
+        Uploader ID (user ID)
+    upload_name : str
+        Name of the uploader of this evaluation
     value : float
         The value (score) of this evaluation.
     values : List[float]
@@ -35,7 +39,8 @@ class OpenMLEvaluation(object):
         (e.g., in case of precision, auroc, recall)
     """
     def __init__(self, run_id, task_id, setup_id, flow_id, flow_name,
-                 data_id, data_name, function, upload_time, value, values,
+                 data_id, data_name, function, upload_time, uploader: int,
+                 uploader_name: str, value, values,
                  array_data=None):
         self.run_id = run_id
         self.task_id = task_id
@@ -46,6 +51,8 @@ class OpenMLEvaluation(object):
         self.data_name = data_name
         self.function = function
         self.upload_time = upload_time
+        self.uploader = uploader
+        self.uploader_name = uploader_name
         self.value = value
         self.values = values
         self.array_data = array_data
@@ -54,18 +61,17 @@ class OpenMLEvaluation(object):
         header = "OpenML Evaluation"
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
         fields = {"Upload Date": self.upload_time,
                   "Run ID": self.run_id,
-                  "OpenML Run URL": "{}r/{}".format(base_url, self.run_id),
+                  "OpenML Run URL": openml.runs.OpenMLRun.url_for_id(self.run_id),
                   "Task ID": self.task_id,
-                  "OpenML Task URL": "{}t/{}".format(base_url, self.task_id),
+                  "OpenML Task URL": openml.tasks.OpenMLTask.url_for_id(self.task_id),
                   "Flow ID": self.flow_id,
-                  "OpenML Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                  "OpenML Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
                   "Setup ID": self.setup_id,
                   "Data ID": self.data_id,
                   "Data Name": self.data_name,
-                  "OpenML Data URL": "{}d/{}".format(base_url, self.data_id),
+                  "OpenML Data URL": openml.datasets.OpenMLDataset.url_for_id(self.data_id),
                   "Metric Used": self.function,
                   "Result": self.value}
 

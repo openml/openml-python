@@ -21,11 +21,11 @@ Installation & Set up
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The OpenML Python package is a connector to `OpenML <https://www.openml.org/>`_.
-It allows to use and share datasets and tasks, run
+It allows you to use and share datasets and tasks, run
 machine learning algorithms on them and then share the results online.
 
 The following tutorial gives a short introduction on how to install and set up
-the OpenML python connector, followed up by a simple example.
+the OpenML Python connector, followed up by a simple example.
 
 * `Introduction <examples/introduction_tutorial.html>`_
 
@@ -52,7 +52,7 @@ Working with tasks
 ~~~~~~~~~~~~~~~~~~
 
 You can think of a task as an experimentation protocol, describing how to apply
-a machine learning model to a dataset in a way that it is comparable with the
+a machine learning model to a dataset in a way that is comparable with the
 results of others (more on how to do that further down). Tasks are containers,
 defining which dataset to use, what kind of task we're solving (regression,
 classification, clustering, etc...) and which column to predict. Furthermore,
@@ -86,7 +86,7 @@ predictions of that run. When a run is uploaded to the server, the server
 automatically calculates several metrics which can be used to compare the
 performance of different flows to each other.
 
-So far, the OpenML python connector works only with estimator objects following
+So far, the OpenML Python connector works only with estimator objects following
 the `scikit-learn estimator API <http://scikit-learn.org/dev/developers/contributing.html#apis-of-scikit-learn-objects>`_.
 Those can be directly run on a task, and a flow will automatically be created or
 downloaded from the server if it already exists.
@@ -114,7 +114,7 @@ requirements and how to download a dataset:
 OpenML is about sharing machine learning results and the datasets they were
 obtained on. Learn how to share your datasets in the following tutorial:
 
-* `Upload a dataset <examples/create_upload_tutorial.html>`_
+* `Upload a dataset <examples/30_extended/create_upload_tutorial.html>`_
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Extending OpenML-Python
