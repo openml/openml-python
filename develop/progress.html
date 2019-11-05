@@ -130,6 +130,7 @@ versions for a flow are not met when deserializing it.</p></li>
 <li><p>ADD #783: The URL to download the predictions for a run is now stored in the run object.</p></li>
 <li><p>ADD #790: Adds the uploader name and id as new filtering options for <code class="docutils literal notranslate"><span class="pre">list_evaluations</span></code>.</p></li>
 <li><p>ADD #792: New convenience function <code class="docutils literal notranslate"><span class="pre">openml.flow.get_flow_id</span></code>.</p></li>
+<li><p>ADD #861: Debug-level log information now being written to a file in the cache directory (at most 2 MB).</p></li>
 <li><p>DOC #778: Introduces instructions on how to publish an extension to support other libraries
 than scikit-learn.</p></li>
 <li><p>DOC #785: The examples section is completely restructured into simple simple examples, advanced
@@ -149,6 +150,7 @@ Valerio Perrone et al. (2019)</p></li>
 <li><p>DOC #834: New example showing how to plot the loss surface for a support vector machine.</p></li>
 <li><p>FIX #305: Do not require the external version in the flow XML when loading an object.</p></li>
 <li><p>FIX #734: Better handling of <em>“old”</em> flows.</p></li>
+<li><p>FIX #736: Attach a StreamHandler to the openml logger instead of the root logger.</p></li>
 <li><p>FIX #758: Fixes an error which made the client API crash when loading a sparse data with
 categorical variables.</p></li>
 <li><p>FIX #779: Do not fail on corrupt pickle</p></li>

@@ -129,22 +129,19 @@ systems).</p>
 <div class="line">In <em>Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery &amp; Data Mining</em>, 2018</div>
 <div class="line">Available at <a class="reference external" href="https://dl.acm.org/citation.cfm?id=3220058">https://dl.acm.org/citation.cfm?id=3220058</a></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s1">&#39;win32&#39;</span><span class="p">:</span>  <span class="c1"># noqa</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;The pyrfr library (requirement of fanova) can currently not be installed on Windows systems&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The pyrfr library (requirement of fanova) can currently not be installed on Windows systems&#39;</span><span class="p">)</span>
     <span class="n">exit</span><span class="p">()</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">fanova</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 
 <span class="kn">import</span> <span class="nn">openml</span>
-
-<span class="n">root</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
-<span class="n">root</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>With the advent of automated machine learning, automated hyperparameter
@@ -191,8 +188,8 @@ this, please see:
 <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">suite</span><span class="o">.</span><span class="n">tasks</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">limit_nr_tasks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="n">limit_nr_tasks</span><span class="p">:</span>
         <span class="k">continue</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Starting with task </span><span class="si">%d</span><span class="s1"> (</span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
-                                                    <span class="nb">len</span><span class="p">(</span><span class="n">suite</span><span class="o">.</span><span class="n">tasks</span><span class="p">)</span> <span class="k">if</span> <span class="n">limit_nr_tasks</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">limit_nr_tasks</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting with task </span><span class="si">%d</span><span class="s1"> (</span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">)&#39;</span>
+          <span class="o">%</span> <span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">suite</span><span class="o">.</span><span class="n">tasks</span><span class="p">)</span> <span class="k">if</span> <span class="n">limit_nr_tasks</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">limit_nr_tasks</span><span class="p">))</span>
     <span class="c1"># note that we explicitly only include tasks from the benchmark suite that was specified (as per the for-loop)</span>
     <span class="n">evals</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations_setups</span><span class="p">(</span>
         <span class="n">evaluation_measure</span><span class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="p">[</span><span class="n">flow_id</span><span class="p">],</span> <span class="n">task</span><span class="o">=</span><span class="p">[</span><span class="n">task_id</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">limit_per_task</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span>
@@ -209,7 +206,7 @@ this, please see:
                                           <span class="o">**</span><span class="p">{</span><span class="n">performance_column</span><span class="p">:</span> <span class="n">setup</span><span class="p">[</span><span class="n">performance_column</span><span class="p">]})</span>
                                      <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">setup</span> <span class="ow">in</span> <span class="n">evals</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()])</span>
     <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Task </span><span class="si">%d</span><span class="s1"> error: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Task </span><span class="si">%d</span><span class="s1"> error: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
         <span class="k">continue</span>
     <span class="c1"># apply our filters, to have only the setups that comply to the hyperparameters we want</span>
     <span class="k">for</span> <span class="n">filter_key</span><span class="p">,</span> <span class="n">filter_value</span> <span class="ow">in</span> <span class="n">parameter_filters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -238,11 +235,29 @@ this, please see:
             <span class="c1"># functional ANOVA sometimes crashes with a RuntimeError, e.g., on tasks where the performance is constant</span>
             <span class="c1"># for all configurations (there is no variance). We will skip these tasks (like the authors did in the</span>
             <span class="c1"># paper).</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Task </span><span class="si">%d</span><span class="s1"> error: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Task </span><span class="si">%d</span><span class="s1"> error: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
             <span class="k">continue</span>
 
 <span class="c1"># transform ``fanova_results`` from a list of dicts into a DataFrame</span>
 <span class="n">fanova_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">fanova_results</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Starting with task 3 (1/15)
+Starting with task 6 (2/15)
+Starting with task 11 (3/15)
+Starting with task 12 (4/15)
+Starting with task 14 (5/15)
+Starting with task 15 (6/15)
+Starting with task 16 (7/15)
+Starting with task 18 (8/15)
+Starting with task 20 (9/15)
+Starting with task 21 (10/15)
+Starting with task 22 (11/15)
+Starting with task 23 (12/15)
+Starting with task 24 (13/15)
+Starting with task 28 (14/15)
+Starting with task 29 (15/15)
 </pre></div>
 </div>
 <p>make the boxplot of the variance contribution. Obviously, we can also use
@@ -259,7 +274,7 @@ the reader is referred to the more elaborate script (referred to earlier)</p>
 </pre></div>
 </div>
 <img alt="../../_images/sphx_glr_2018_kdd_rijn_example_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_2018_kdd_rijn_example_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  20.471 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  19.010 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-kdd-rijn-example-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/fb4c80b20c8429a4165b670554f3d313/2018_kdd_rijn_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_kdd_rijn_example.py</span></code></a></p>
