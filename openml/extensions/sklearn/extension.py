@@ -34,6 +34,8 @@ from openml.tasks import (
     OpenMLRegressionTask,
 )
 
+logger = logging.getLogger(__name__)
+
 
 if sys.version_info >= (3, 5):
     from json.decoder import JSONDecodeError
@@ -271,9 +273,8 @@ class SklearnExtension(Extension):
         mixed
         """
 
-        logging.info('-%s flow_to_sklearn START o=%s, components=%s, '
-                     'init_defaults=%s' % ('-' * recursion_depth, o, components,
-                                           initialize_with_defaults))
+        logger.info('-%s flow_to_sklearn START o=%s, components=%s, init_defaults=%s'
+                    % ('-' * recursion_depth, o, components, initialize_with_defaults))
         depth_pp = recursion_depth + 1  # shortcut var, depth plus plus
 
         # First, we need to check whether the presented object is a json string.
@@ -376,8 +377,7 @@ class SklearnExtension(Extension):
             )
         else:
             raise TypeError(o)
-        logging.info('-%s flow_to_sklearn END   o=%s, rval=%s'
-                     % ('-' * recursion_depth, o, rval))
+        logger.info('-%s flow_to_sklearn END   o=%s, rval=%s' % ('-' * recursion_depth, o, rval))
         return rval
 
     def model_to_flow(self, model: Any) -> 'OpenMLFlow':
@@ -537,8 +537,8 @@ class SklearnExtension(Extension):
                 s = "{}...".format(s[:char_lim - 3])
             return s.strip()
         except ValueError:
-            logging.warning("'Read more' not found in descriptions. "
-                            "Trying to trim till 'Parameters' if available in docstring.")
+            logger.warning("'Read more' not found in descriptions. "
+                           "Trying to trim till 'Parameters' if available in docstring.")
             pass
         try:
             # if 'Read more' doesn't exist, trim till 'Parameters'
@@ -546,7 +546,7 @@ class SklearnExtension(Extension):
             index = s.index(match_format(pattern))
         except ValueError:
             # returning full docstring
-            logging.warning("'Parameters' not found in docstring. Omitting docstring trimming.")
+            logger.warning("'Parameters' not found in docstring. Omitting docstring trimming.")
             index = len(s)
         s = s[:index]
         # trimming docstring to be within char_lim
@@ -580,7 +580,7 @@ class SklearnExtension(Extension):
             index1 = s.index(match_format("Parameters"))
         except ValueError as e:
             # when sklearn docstring has no 'Parameters' section
-            logging.warning("{} {}".format(match_format("Parameters"), e))
+            logger.warning("{} {}".format(match_format("Parameters"), e))
             return None
 
         headings = ["Attributes", "Notes", "See also", "Note", "References"]
@@ -590,7 +590,7 @@ class SklearnExtension(Extension):
                 index2 = s.index(match_format(h))
                 break
             except ValueError:
-                logging.warning("{} not available in docstring".format(h))
+                logger.warning("{} not available in docstring".format(h))
                 continue
         else:
             # in the case only 'Parameters' exist, trim till end of docstring
@@ -975,7 +975,7 @@ class SklearnExtension(Extension):
         recursion_depth: int,
         strict_version: bool = True
     ) -> Any:
-        logging.info('-%s deserialize %s' % ('-' * recursion_depth, flow.name))
+        logger.info('-%s deserialize %s' % ('-' * recursion_depth, flow.name))
         model_name = flow.class_name
         self._check_dependencies(flow.dependencies,
                                  strict_version=strict_version)
@@ -993,8 +993,7 @@ class SklearnExtension(Extension):
 
         for name in parameters:
             value = parameters.get(name)
-            logging.info('--%s flow_parameter=%s, value=%s' %
-                         ('-' * recursion_depth, name, value))
+            logger.info('--%s flow_parameter=%s, value=%s' % ('-' * recursion_depth, name, value))
             rval = self._deserialize_sklearn(
                 value,
                 components=components_,
@@ -1010,8 +1009,7 @@ class SklearnExtension(Extension):
             if name not in components_:
                 continue
             value = components[name]
-            logging.info('--%s flow_component=%s, value=%s'
-                         % ('-' * recursion_depth, name, value))
+            logger.info('--%s flow_component=%s, value=%s' % ('-' * recursion_depth, name, value))
             rval = self._deserialize_sklearn(
                 value,
                 recursion_depth=recursion_depth + 1,
