@@ -4,6 +4,7 @@ Store module level information like the API key, cache directory and the server
 import logging
 import logging.handlers
 import os
+from typing import cast
 
 from io import StringIO
 import configparser
@@ -14,6 +15,10 @@ logger = logging.getLogger(__name__)
 
 def configure_logging(console_output_level: int, file_output_level: int):
     """ Sets the OpenML logger to DEBUG, with attached Stream- and FileHandler. """
+    # Verbosity levels as defined (https://github.com/openml/OpenML/wiki/Client-API-Standards)
+    # don't match Python values directly:
+    verbosity_map = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
+
     openml_logger = logging.getLogger('openml')
     openml_logger.setLevel(logging.DEBUG)
     message_format = '[%(levelname)s] [%(asctime)s:%(name)s] %(message)s'
@@ -21,16 +26,17 @@ def configure_logging(console_output_level: int, file_output_level: int):
 
     console_stream = logging.StreamHandler()
     console_stream.setFormatter(output_formatter)
-    console_stream.setLevel(console_output_level)
+    console_stream.setLevel(verbosity_map[console_output_level])
 
     one_mb = 2**20
     log_path = os.path.join(cache_directory, 'openml_python.log')
     file_stream = logging.handlers.RotatingFileHandler(log_path, maxBytes=one_mb, backupCount=1)
-    file_stream.setLevel(file_output_level)
+    file_stream.setLevel(verbosity_map[file_output_level])
     file_stream.setFormatter(output_formatter)
 
     openml_logger.addHandler(console_stream)
     openml_logger.addHandler(file_stream)
+    return console_stream, file_stream
 
 
 # Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
@@ -152,13 +158,6 @@ def _setup():
             'server load reasonable'
         )
 
-    # Verbosity levels as defined (https://github.com/openml/OpenML/wiki/Client-API-Standards)
-    # don't match Python values directly:
-    verbosity_map = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
-    console_log_level = verbosity_map[_defaults['verbosity']]
-    file_log_level = verbosity_map[_defaults['file_verbosity']]
-    configure_logging(console_log_level, file_log_level)
-
 
 def _parse_config():
     """Parse the config file, set up defaults.
@@ -240,3 +239,7 @@ __all__ = [
 ]
 
 _setup()
+
+_console_log_level = cast(int, _defaults['verbosity'])
+_file_log_level = cast(int, _defaults['file_verbosity'])
+console_log, file_log = configure_logging(_console_log_level, _file_log_level)
