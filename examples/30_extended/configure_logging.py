@@ -1,3 +1,10 @@
+"""
+========
+Logging
+========
+
+Explains openml-python logging, and shows how to configure it.
+"""
 ##################################################################################
 # Logging
 # ^^^^^^^
