@@ -37,7 +37,7 @@ directory = None
 # finding the root directory of conftest.py and going up to OpenML main directory
 # exploiting the fact that conftest.py always resides in the root directory for tests
 static_dir = os.path.dirname(os.path.abspath(__file__))
-logging.info("static directory: {}".format(static_dir))
+logger.info("static directory: {}".format(static_dir))
 print("static directory: {}".format(static_dir))
 while True:
     if 'openml' in os.listdir(static_dir):
@@ -178,4 +178,4 @@ def pytest_sessionfinish() -> None:
         compare_delete_files(file_list, new_file_list)
         logger.info("Local files deleted")
 
-    logging.info("{} is killed".format(worker))
+    logger.info("{} is killed".format(worker))

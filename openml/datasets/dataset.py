@@ -441,7 +441,7 @@ class OpenMLDataset(OpenMLBase):
             with open(self.data_pickle_file, "rb") as fh:
                 data, categorical, attribute_names = pickle.load(fh)
         except EOFError:
-            logging.warning(
+            logger.warning(
                 "Detected a corrupt cache file loading dataset %d: '%s'. "
                 "We will continue loading data from the arff-file, "
                 "but this will be much slower for big datasets. "
@@ -512,7 +512,7 @@ class OpenMLDataset(OpenMLBase):
                 return data
         else:
             data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
-            logging.warning(
+            logger.warning(
                 "Cannot convert %s (%s) to '%s'. Returning input data."
                 % (data_type, type(data), array_format)
             )
