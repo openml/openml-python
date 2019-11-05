@@ -4,7 +4,6 @@ Store module level information like the API key, cache directory and the server
 import logging
 import logging.handlers
 import os
-from typing import cast
 
 from io import StringIO
 import configparser
@@ -34,12 +33,12 @@ def configure_logging(console_output_level: int, file_output_level: int):
     openml_logger.addHandler(file_stream)
 
 
-# Default values!
+# Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
 _defaults = {
     'apikey': None,
     'server': "https://www.openml.org/api/v1/xml",
-    'verbosity': logging.WARNING,
-    'file_verbosity': logging.DEBUG,
+    'verbosity': 0,  # WARNING
+    'file_verbosity': 2,  # DEBUG
     'cachedir': os.path.expanduser(os.path.join('~', '.openml', 'cache')),
     'avoid_duplicate_runs': 'True',
     'connection_n_retries': 2,

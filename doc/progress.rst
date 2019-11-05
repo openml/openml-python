@@ -15,6 +15,7 @@ Changelog
 * ADD #783: The URL to download the predictions for a run is now stored in the run object.
 * ADD #790: Adds the uploader name and id as new filtering options for ``list_evaluations``.
 * ADD #792: New convenience function ``openml.flow.get_flow_id``.
+* ADD #861: Debug-level log information now being written to a file in the cache directory (at most 2 MB).
 * DOC #778: Introduces instructions on how to publish an extension to support other libraries
   than scikit-learn.
 * DOC #785: The examples section is completely restructured into simple simple examples, advanced
@@ -34,6 +35,7 @@ Changelog
 * DOC #834: New example showing how to plot the loss surface for a support vector machine.
 * FIX #305: Do not require the external version in the flow XML when loading an object.
 * FIX #734: Better handling of *"old"* flows.
+* FIX #736: Attach a StreamHandler to the openml logger instead of the root logger.
 * FIX #758: Fixes an error which made the client API crash when loading a sparse data with
   categorical variables.
 * FIX #779: Do not fail on corrupt pickle
