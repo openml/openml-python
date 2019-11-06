@@ -5,6 +5,7 @@ import io
 import logging
 import os
 import pickle
+import pyarrow.feather as feather
 from typing import List, Optional, Union, Tuple, Iterable, Dict
 
 import arff
@@ -178,9 +179,10 @@ class OpenMLDataset(OpenMLBase):
         self.qualities = _check_qualities(qualities)
 
         if data_file is not None:
-            self.data_pickle_file = self._create_pickle_in_cache(data_file)
+            self.data_pickle_file, self.data_feather_file = self._create_pickle_in_cache(data_file)
         else:
             self.data_pickle_file = None
+            self.data_feather_file = None
 
     @property
     def id(self) -> Optional[int]:
@@ -397,15 +399,27 @@ class OpenMLDataset(OpenMLBase):
     def _create_pickle_in_cache(self, data_file: str) -> str:
         """ Parse the arff and pickle the result. Update any old pickle objects. """
         data_pickle_file = data_file.replace('.arff', '.pkl.py3')
+        data_feather_file = data_file.replace('.arff', '.feather')
         if os.path.exists(data_pickle_file):
-            # Load the data to check if the pickle file is outdated (i.e. contains numpy array)
-            with open(data_pickle_file, "rb") as fh:
-                try:
-                    data, categorical, attribute_names = pickle.load(fh)
-                except EOFError:
-                    # The file is likely corrupt, see #780.
-                    # We deal with this when loading the data in `_load_data`.
-                    return data_pickle_file
+            if os.path.exists(data_feather_file):
+                data = feather.read_feather(data_feather_file)
+                with open(data_pickle_file, "rb") as fh:
+                    try:
+                        categorical, attribute_names = pickle.load(fh)
+                    except EOFError:
+                        # The file is likely corrupt, see #780.
+                        # We deal with this when loading the data in `_load_data`.
+                        return data_pickle_file, data_feather_file
+
+            else:
+                # Load the data to check if the pickle file is outdated (i.e. contains numpy array)
+                with open(data_pickle_file, "rb") as fh:
+                    try:
+                        data, categorical, attribute_names = pickle.load(fh)
+                    except EOFError:
+                        # The file is likely corrupt, see #780.
+                        # We deal with this when loading the data in `_load_data`.
+                        return data_pickle_file, data_feather_file
 
             # Between v0.8 and v0.9 the format of pickled data changed from
             # np.ndarray to pd.DataFrame. This breaks some backwards compatibility,
@@ -414,32 +428,50 @@ class OpenMLDataset(OpenMLBase):
             # pd.DataFrame blob. See also #646.
             if isinstance(data, pd.DataFrame) or scipy.sparse.issparse(data):
                 logger.debug("Data pickle file already exists and is up to date.")
-                return data_pickle_file
+                return data_pickle_file, data_feather_file
 
         # At this point either the pickle file does not exist, or it had outdated formatting.
         # We parse the data from arff again and populate the cache with a recent pickle file.
         X, categorical, attribute_names = self._parse_data_from_arff(data_file)
+        f = 0
+        try:
+            print("feather")
+            f = 1
+            feather.write_feather(X, data_feather_file)
+        except:
+            print("pickle")
+            with open(data_pickle_file, "wb") as fh:
+                pickle.dump((X, categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
+        if f:
+            with open(data_pickle_file, "wb") as fh:
+                pickle.dump((categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
 
-        with open(data_pickle_file, "wb") as fh:
-            pickle.dump((X, categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
+
         logger.debug("Saved dataset {did}: {name} to file {path}"
                      .format(did=int(self.dataset_id or -1),
                              name=self.name,
                              path=data_pickle_file)
                      )
 
-        return data_pickle_file
+        return data_pickle_file, data_feather_file
 
     def _load_data(self):
         """ Load data from pickle or arff. Download data first if not present on disk. """
         if self.data_pickle_file is None:
             if self.data_file is None:
                 self._download_data()
-            self.data_pickle_file = self._create_pickle_in_cache(self.data_file)
+            self.data_pickle_file, self.data_feather_file = self._create_pickle_in_cache(self.data_file)
 
         try:
-            with open(self.data_pickle_file, "rb") as fh:
-                data, categorical, attribute_names = pickle.load(fh)
+            if os.path.exists(self.data_feather_file):
+                print("feather")
+                data = feather.read_feather(self.data_feather_file)
+                with open(self.data_pickle_file, "rb") as fh:
+                    categorical, attribute_names = pickle.load(fh)
+            else:
+                print("pickle")
+                with open(self.data_pickle_file, "rb") as fh:
+                    data, categorical, attribute_names = pickle.load(fh)
         except EOFError:
             logger.warning(
                 "Detected a corrupt cache file loading dataset %d: '%s'. "
