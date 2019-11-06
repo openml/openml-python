@@ -22,6 +22,8 @@ Explains openml-python logging, and shows how to configure it.
 # It is possible to configure what log levels to send to console and file.
 # When downloading a dataset from OpenML, a `DEBUG`-level message is written:
 
+# License: BSD 3-Clause
+
 import openml
 openml.datasets.get_dataset('iris')
 

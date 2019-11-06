@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+# License: BSD 3-Clause
+
 import os
 import setuptools
 import sys

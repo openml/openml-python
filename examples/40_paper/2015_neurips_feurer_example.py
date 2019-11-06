@@ -15,6 +15,8 @@ Publication
 | Available at http://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning.pdf
 """  # noqa F401
 
+# License: BSD 3-Clause
+
 import pandas as pd
 
 import openml

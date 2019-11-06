@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import dateutil.parser
 from collections import OrderedDict
 import os

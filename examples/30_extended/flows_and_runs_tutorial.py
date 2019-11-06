@@ -5,6 +5,8 @@ Flows and Runs
 How to train/run a model and how to upload the results.
 """
 
+# License: BSD 3-Clause
+
 import openml
 from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
 

@@ -5,12 +5,13 @@ the contribution guidelines: https://github.com/openml/openml-python/blob/master
 Please make sure that:
 
 * this pull requests is against the `develop` branch
-* you updated all docs, this includes the changelog!
+* you updated all docs, this includes the changelog (doc/progress.rst)
 * for any new function or class added, please add it to doc/api.rst
     * the list of classes and functions should be alphabetical 
 * for any new functionality, consider adding a relevant example
 * add unit tests for new functionalities
     * collect files uploaded to test server using _mark_entity_for_removal()
+* add the BSD 3-Clause license to any new file created
 -->
 
 #### Reference Issue
