@@ -1,6 +1,9 @@
 """
 Store module level information like the API key, cache directory and the server
 """
+
+# License: BSD 3-Clause
+
 import logging
 import logging.handlers
 import os

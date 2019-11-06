@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from openml.runs import OpenMLRunTrace, OpenMLTraceIteration
 from openml.testing import TestBase
 

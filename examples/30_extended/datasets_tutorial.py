@@ -6,6 +6,9 @@ Datasets
 How to list and download datasets.
 """
 ############################################################################
+
+# License: BSD 3-Clauses
+
 import openml
 import pandas as pd
 

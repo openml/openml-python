@@ -55,6 +55,9 @@ An example how to set up OpenML-Python followed up by a simple example.
 #   crowding with example datasets, tasks, studies, and so on.
 
 ############################################################################
+
+# License: BSD 3-Clause
+
 import openml
 from sklearn import neighbors
 

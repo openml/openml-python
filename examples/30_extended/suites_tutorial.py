@@ -10,12 +10,14 @@ If you want to learn more about benchmark suites, check out our
 `OpenML benchmark docs <https://docs.openml.org/benchmark/#benchmarking-suites>`_.
 """
 ############################################################################
+
+# License: BSD 3-Clause
+
 import uuid
 
 import numpy as np
 
 import openml
-
 
 ############################################################################
 # .. warning:: This example uploads data. For that reason, this example

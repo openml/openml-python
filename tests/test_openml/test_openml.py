@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from unittest import mock
 
 from openml.testing import TestBase

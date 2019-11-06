@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import time
 from typing import Dict
 import requests

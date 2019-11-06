@@ -1,3 +1,6 @@
+# License: BSD 3-Clause
+
+
 class DummyRegressor(object):
     def fit(self, X, y):
         return self

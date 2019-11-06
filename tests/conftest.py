@@ -20,6 +20,8 @@ Possible Future: class TestBase from openml/testing.py can be included
     testing.py in each of the unit test modules.
 '''
 
+# License: BSD 3-Clause
+
 import os
 import logging
 from typing import List
