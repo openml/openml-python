@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from abc import ABC, abstractmethod
 from collections import OrderedDict
 import re

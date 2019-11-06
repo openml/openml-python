@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import numpy as np
 
 from openml.tasks import get_task

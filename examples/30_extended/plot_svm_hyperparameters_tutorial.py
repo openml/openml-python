@@ -3,6 +3,9 @@
 Plotting hyperparameter surfaces
 ================================
 """
+
+# License: BSD 3-Clause
+
 import openml
 import numpy as np
 

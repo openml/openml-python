@@ -15,6 +15,8 @@ In particular, this module implements a python interface for the
 <http://en.wikipedia.org/wiki/Representational_state_transfer>`_).
 """
 
+# License: BSD 3-Clause
+
 from . import _api_calls
 from . import config
 from .datasets import OpenMLDataset, OpenMLDataFeature

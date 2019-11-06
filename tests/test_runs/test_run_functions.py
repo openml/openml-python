@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import arff
 from distutils.version import LooseVersion
 import os

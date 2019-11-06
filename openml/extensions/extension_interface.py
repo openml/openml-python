@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from abc import ABC, abstractmethod
 from collections import OrderedDict  # noqa: F401
 from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union

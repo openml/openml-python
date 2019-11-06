@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import json
 import xmltodict
 import pandas as pd

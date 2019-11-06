@@ -13,6 +13,9 @@ Publication
 | In *Advances in Intelligent Data Analysis XVII 17th International Symposium*, 2018
 | Available at https://link.springer.com/chapter/10.1007%2F978-3-030-01768-2_25
 """
+
+# License: BSD 3-Clause
+
 import matplotlib.pyplot as plt
 import openml
 import pandas as pd

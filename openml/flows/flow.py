@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from collections import OrderedDict
 import os
 from typing import Dict, List, Union, Tuple, Optional  # noqa: F401
