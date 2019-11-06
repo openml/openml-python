@@ -694,10 +694,14 @@ class SklearnExtension(Extension):
         # will be part of the name (in brackets)
         sub_components_names = ""
         for key in subcomponents:
-            if key in subcomponents_explicit:
-                sub_components_names += "," + key + "=" + subcomponents[key].name
+            if isinstance(subcomponents[key], str):
+                name = subcomponents[key]
             else:
-                sub_components_names += "," + subcomponents[key].name
+                name = subcomponents[key].name
+            if key in subcomponents_explicit:
+                sub_components_names += "," + key + "=" + name
+            else:
+                sub_components_names += "," + name
 
         if sub_components_names:
             # slice operation on string in order to get rid of leading comma
@@ -769,6 +773,8 @@ class SklearnExtension(Extension):
         external_versions.add(openml_version)
         external_versions.add(sklearn_version)
         for visitee in sub_components.values():
+            if isinstance(visitee, str):
+                continue
             for external_version in visitee.external_version.split(','):
                 external_versions.add(external_version)
         return ','.join(list(sorted(external_versions)))
@@ -776,14 +782,16 @@ class SklearnExtension(Extension):
     def _check_multiple_occurence_of_component_in_flow(
         self,
         model: Any,
-        sub_components: Dict[str, OpenMLFlow],
+        sub_components: Dict[str, Any],
     ) -> None:
         to_visit_stack = []  # type: List[OpenMLFlow]
         to_visit_stack.extend(sub_components.values())
         known_sub_components = set()  # type: Set[str]
         while len(to_visit_stack) > 0:
             visitee = to_visit_stack.pop()
-            if visitee.name in known_sub_components:
+            if isinstance(visitee, str):
+                known_sub_components.add(visitee)
+            elif visitee.name in known_sub_components:
                 raise ValueError('Found a second occurence of component %s when '
                                  'trying to serialize %s.' % (visitee.name, model))
             else:
@@ -796,7 +804,7 @@ class SklearnExtension(Extension):
     ) -> Tuple[
         'OrderedDict[str, Optional[str]]',
         'OrderedDict[str, Optional[Dict]]',
-        'OrderedDict[str, OpenMLFlow]',
+        'OrderedDict[str, Any]',
         Set,
     ]:
         # This function contains four "global" states and is quite long and
@@ -820,7 +828,7 @@ class SklearnExtension(Extension):
             def flatten_all(list_):
                 """ Flattens arbitrary depth lists of lists (e.g. [[1,2],[3,[1]]] -> [1,2,3,1]). """
                 for el in list_:
-                    if isinstance(el, (list, tuple)):
+                    if isinstance(el, (list, tuple)) and len(el) > 0:
                         yield from flatten_all(el)
                     else:
                         yield el
@@ -860,7 +868,16 @@ class SklearnExtension(Extension):
                         # length 3 is for ColumnTransformer
                         msg = 'Length of tuple does not match assumptions'
                         raise ValueError(msg)
-                    if not isinstance(sub_component, (OpenMLFlow, type(None))):
+
+                    if isinstance(sub_component, str):
+                        if sub_component != 'drop' and sub_component != 'passthrough':
+                            msg = 'Second item of tuple does not match assumptions. ' \
+                                  'If string, can be only \'drop\' or \'passthrough\' but' \
+                                  'got %s' % sub_component
+                            raise ValueError(msg)
+                        else:
+                            pass
+                    elif not isinstance(sub_component, (OpenMLFlow, type(None))):
                         msg = 'Second item of tuple does not match assumptions. ' \
                               'Expected OpenMLFlow, got %s' % type(sub_component)
                         raise TypeError(msg)
