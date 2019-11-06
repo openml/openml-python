@@ -5,17 +5,17 @@
 
 Computation times
 =================
-**02:31.382** total execution time for **examples_30_extended** files:
+**02:35.462** total execution time for **examples_30_extended** files:
 
-- **00:31.357**: :ref:`sphx_glr_examples_30_extended_tasks_tutorial.py` (``tasks_tutorial.py``)
-- **00:26.932**: :ref:`sphx_glr_examples_30_extended_study_tutorial.py` (``study_tutorial.py``)
-- **00:18.231**: :ref:`sphx_glr_examples_30_extended_flows_and_runs_tutorial.py` (``flows_and_runs_tutorial.py``)
-- **00:16.363**: :ref:`sphx_glr_examples_30_extended_fetch_evaluations_tutorial.py` (``fetch_evaluations_tutorial.py``)
-- **00:15.588**: :ref:`sphx_glr_examples_30_extended_suites_tutorial.py` (``suites_tutorial.py``)
-- **00:10.376**: :ref:`sphx_glr_examples_30_extended_plot_svm_hyperparameters_tutorial.py` (``plot_svm_hyperparameters_tutorial.py``)
-- **00:07.272**: :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py` (``datasets_tutorial.py``)
-- **00:07.056**: :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py` (``run_setup_tutorial.py``)
-- **00:07.017**: :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py` (``flow_id_tutorial.py``)
-- **00:06.221**: :ref:`sphx_glr_examples_30_extended_task_manual_iteration_tutorial.py` (``task_manual_iteration_tutorial.py``)
-- **00:04.970**: :ref:`sphx_glr_examples_30_extended_create_upload_tutorial.py` (``create_upload_tutorial.py``)
+- **00:32.350**: :ref:`sphx_glr_examples_30_extended_study_tutorial.py` (``study_tutorial.py``)
+- **00:30.989**: :ref:`sphx_glr_examples_30_extended_tasks_tutorial.py` (``tasks_tutorial.py``)
+- **00:18.215**: :ref:`sphx_glr_examples_30_extended_flows_and_runs_tutorial.py` (``flows_and_runs_tutorial.py``)
+- **00:16.194**: :ref:`sphx_glr_examples_30_extended_fetch_evaluations_tutorial.py` (``fetch_evaluations_tutorial.py``)
+- **00:15.895**: :ref:`sphx_glr_examples_30_extended_suites_tutorial.py` (``suites_tutorial.py``)
+- **00:09.977**: :ref:`sphx_glr_examples_30_extended_plot_svm_hyperparameters_tutorial.py` (``plot_svm_hyperparameters_tutorial.py``)
+- **00:07.193**: :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py` (``datasets_tutorial.py``)
+- **00:06.953**: :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py` (``run_setup_tutorial.py``)
+- **00:06.909**: :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py` (``flow_id_tutorial.py``)
+- **00:05.929**: :ref:`sphx_glr_examples_30_extended_task_manual_iteration_tutorial.py` (``task_manual_iteration_tutorial.py``)
+- **00:04.859**: :ref:`sphx_glr_examples_30_extended_create_upload_tutorial.py` (``create_upload_tutorial.py``)
 - **00:00.000**: :ref:`sphx_glr_examples_30_extended_configure_logging.py` (``configure_logging.py``)
