@@ -16,6 +16,8 @@ A simple tutorial on how to train/run a model and how to upload the results.
 .. code-block:: default
 
 
+    # License: BSD 3-Clause
+
     import openml
     from sklearn import ensemble, neighbors
 
@@ -94,7 +96,7 @@ Running a model on a task
                            min_impurity_decrease=0.0, min_impurity_split=None,
                            min_samples_leaf=1, min_samples_split=2,
                            min_weight_fraction_leaf=0.0, n_estimators='warn',
-                           n_jobs=None, oob_score=False, random_state=15035,
+                           n_jobs=None, oob_score=False, random_state=39534,
                            verbose=0, warm_start=False)
     Dataset ID...: 20
     Dataset URL..: https://www.openml.org/d/20
@@ -122,7 +124,7 @@ Publishing the run
 
  .. code-block:: none
 
-    Run was uploaded to http://test.openml.org/r/6582
+    Run was uploaded to http://test.openml.org/r/8244
     The flow can be found at http://test.openml.org/f/69
 
 
@@ -140,7 +142,7 @@ Publishing the run
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.734 seconds)
+   **Total running time of the script:** ( 0 minutes  6.814 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_flows_and_runs_tutorial.py:

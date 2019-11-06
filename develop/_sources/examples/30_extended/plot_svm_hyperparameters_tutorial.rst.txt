@@ -14,6 +14,9 @@ Plotting hyperparameter surfaces
 
 .. code-block:: default
 
+
+    # License: BSD 3-Clause
+
     import openml
     import numpy as np
 
@@ -220,7 +223,7 @@ Option 2 - plotting via matplotlib
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.085 seconds)
+   **Total running time of the script:** ( 0 minutes  10.376 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_plot_svm_hyperparameters_tutorial.py:

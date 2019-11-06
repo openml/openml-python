@@ -6,6 +6,10 @@
 Changelog
 =========
 
+0.10.2
+~~~~~~
+* DOC #862: Added license BSD 3-Clause to each of the source files.
+
 0.10.1
 ~~~~~~
 * ADD #175: Automatically adds the docstring of scikit-learn objects to flow and its parameters.

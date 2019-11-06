@@ -132,7 +132,9 @@ found in your cache directory (see also the
 These file logs are automatically deleted if needed, and use at most 2MB of space.</p>
 <p>It is possible to configure what log levels to send to console and file.
 When downloading a dataset from OpenML, a <cite>DEBUG</cite>-level message is written:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
+
+<span class="kn">import</span> <span class="nn">openml</span>
 <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
 
 <span class="c1"># With default configuration, the above example will show no output to console.</span>

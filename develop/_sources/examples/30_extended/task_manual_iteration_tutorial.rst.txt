@@ -21,6 +21,8 @@ but not OpenML's functionality to conduct runs.
 .. code-block:: default
 
 
+    # License: BSD 3-Clause
+
     import openml
 
 
@@ -508,7 +510,7 @@ And then again perform the aforementioned iteration over all splits:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.119 seconds)
+   **Total running time of the script:** ( 0 minutes  6.221 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_task_manual_iteration_tutorial.py:

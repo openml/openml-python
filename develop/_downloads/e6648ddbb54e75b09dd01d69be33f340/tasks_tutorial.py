@@ -5,6 +5,8 @@ Tasks
 A tutorial on how to list and download tasks.
 """
 
+# License: BSD 3-Clause
+
 import openml
 import pandas as pd
 

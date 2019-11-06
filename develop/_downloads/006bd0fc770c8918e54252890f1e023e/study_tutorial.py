@@ -10,6 +10,9 @@ hold a list of tasks, studies hold a list of runs. As runs contain all informati
 tasks, all required information about a study can be retrieved.
 """
 ############################################################################
+
+# License: BSD 3-Clause
+
 import uuid
 
 import numpy as np

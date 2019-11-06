@@ -15,6 +15,9 @@ Publication
 | In *Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining*, 2018
 | Available at https://dl.acm.org/citation.cfm?id=3220058
 """
+
+# License: BSD 3-Clause
+
 import sys
 
 if sys.platform == 'win32':  # noqa
