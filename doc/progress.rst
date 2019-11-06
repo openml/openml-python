@@ -8,6 +8,7 @@ Changelog
 
 0.10.1
 ~~~~~~
+* ADD #857: Adds task type ID to list_runs
 * ADD #175: Automatically adds the docstring of scikit-learn objects to flow and its parameters.
 * ADD #737: New evaluation listing call that includes the hyperparameter settings.
 * ADD #744: It is now possible to only issue a warning and not raise an exception if the package
