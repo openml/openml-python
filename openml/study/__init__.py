@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from .study import OpenMLStudy, OpenMLBenchmarkSuite
 from .functions import (
     get_study,

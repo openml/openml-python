@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 set -e
 
 # check status and branch before running the unit tests

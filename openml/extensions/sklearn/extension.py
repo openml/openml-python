@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from collections import OrderedDict  # noqa: F401
 import copy
 from distutils.version import LooseVersion

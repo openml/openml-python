@@ -9,6 +9,8 @@ datasets and splits to be used in an experiment or paper. They are fully integra
 and simplify both the sharing of the setup and the results.
 """
 
+# License: BSD 3-Clause
+
 import openml
 
 ####################################################################################################

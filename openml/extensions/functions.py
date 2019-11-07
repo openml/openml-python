@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from typing import Any, Optional, Type, TYPE_CHECKING
 from . import Extension
 # Need to implement the following by its full path because otherwise it won't be possible to

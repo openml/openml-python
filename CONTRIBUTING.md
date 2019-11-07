@@ -106,6 +106,8 @@ following rules before you submit a pull request:
 
  - Add your changes to the changelog in the file doc/progress.rst.
 
+ - If any source file is being added to the repository, please add the BSD 3-Clause license to it.
+
 
 You can also check for common programming errors with the following
 tools:

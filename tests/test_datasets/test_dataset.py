@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from time import time
 from warnings import filterwarnings, catch_warnings
 

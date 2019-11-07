@@ -10,6 +10,8 @@ the functions provided by OpenML. One such example is in the benchmark library
 but not OpenML's functionality to conduct runs.
 """
 
+# License: BSD 3-Clause
+
 import openml
 
 ####################################################################################################

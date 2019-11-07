@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from time import time
 
 import openml

@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import numpy as np
 
 from .test_supervised_task import OpenMLSupervisedTaskTest
