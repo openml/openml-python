@@ -33,6 +33,8 @@ When downloading a dataset from OpenML, a `DEBUG`-level message is written:
 .. code-block:: default
 
 
+    # License: BSD 3-Clause
+
     import openml
     openml.datasets.get_dataset('iris')
 

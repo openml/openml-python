@@ -29,6 +29,9 @@ In this tutorial we will
    connects to the test server at test.openml.org. This prevents the main
    server from crowding with example datasets, tasks, runs, and so on.
 """
+
+# License: BSD 3-Clause
+
 import numpy as np
 import openml
 import sklearn.ensemble

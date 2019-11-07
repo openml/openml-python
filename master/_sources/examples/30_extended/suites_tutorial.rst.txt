@@ -20,12 +20,14 @@ If you want to learn more about benchmark suites, check out our
 
 .. code-block:: default
 
+
+    # License: BSD 3-Clause
+
     import uuid
 
     import numpy as np
 
     import openml
-
 
 
 
@@ -250,11 +252,11 @@ because we upload some random data.
 
     OpenML Benchmark Suite
     ======================
-    ID..............: 798
+    ID..............: 1325
     Name............: Test-Suite
     Status..........: None
     Main Entity Type: task
-    Study URL.......: https://www.openml.org/s/798
+    Study URL.......: https://www.openml.org/s/1325
     # of Tasks......: 20
 
 
@@ -272,7 +274,7 @@ because we upload some random data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  16.124 seconds)
+   **Total running time of the script:** ( 0 minutes  15.747 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_suites_tutorial.py:

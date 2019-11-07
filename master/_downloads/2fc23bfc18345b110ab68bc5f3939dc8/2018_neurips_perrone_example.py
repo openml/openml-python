@@ -24,6 +24,9 @@ In the following section, we shall do the following:
 """
 
 ############################################################################
+
+# License: BSD 3-Clause
+
 import openml
 import numpy as np
 import pandas as pd

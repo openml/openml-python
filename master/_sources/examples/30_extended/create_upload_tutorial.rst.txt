@@ -15,6 +15,9 @@ A tutorial on how to create and upload a dataset to OpenML.
 
 .. code-block:: default
 
+
+    # License: BSD 3-Clause
+
     import numpy as np
     import pandas as pd
     import sklearn.datasets
@@ -184,7 +187,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/4113
+    URL for dataset: https://www.openml.org/d/6635
 
 
 
@@ -282,7 +285,7 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/4114
+    URL for dataset: https://www.openml.org/d/6636
 
 
 
@@ -367,7 +370,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    /home/travis/build/openml/openml-python/openml/datasets/functions.py:680: FutureWarning: A future version of pandas will default to `skipna=True`. To silence this warning, pass `skipna=True|False` explicitly.
+    /home/travis/build/openml/openml-python/openml/datasets/functions.py:682: FutureWarning: A future version of pandas will default to `skipna=True`. To silence this warning, pass `skipna=True|False` explicitly.
       attributes_ = attributes_arff_from_df(data)
 
 
@@ -389,7 +392,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/4115
+    URL for dataset: https://www.openml.org/d/6637
 
 
 
@@ -452,7 +455,7 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/4116
+    URL for dataset: https://www.openml.org/d/6638
 
 
 
@@ -498,7 +501,7 @@ Dataset is a pandas sparse dataframe
 
  .. code-block:: none
 
-    /home/travis/build/openml/openml-python/examples/30_extended/create_upload_tutorial.py:291: FutureWarning: SparseDataFrame is deprecated and will be removed in a future version.
+    /home/travis/build/openml/openml-python/examples/30_extended/create_upload_tutorial.py:294: FutureWarning: SparseDataFrame is deprecated and will be removed in a future version.
     Use a regular DataFrame whose columns are SparseArrays instead.
 
     See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
@@ -558,7 +561,7 @@ Dataset is a pandas sparse dataframe
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/4117
+    URL for dataset: https://www.openml.org/d/6639
 
 
 
@@ -575,7 +578,7 @@ Dataset is a pandas sparse dataframe
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.958 seconds)
+   **Total running time of the script:** ( 0 minutes  4.954 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:

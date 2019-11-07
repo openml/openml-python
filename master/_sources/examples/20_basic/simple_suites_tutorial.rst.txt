@@ -20,6 +20,8 @@ and simplify both the sharing of the setup and the results.
 .. code-block:: default
 
 
+    # License: BSD 3-Clause
+
     import openml
 
 
@@ -170,7 +172,7 @@ Further examples
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.945 seconds)
+   **Total running time of the script:** ( 0 minutes  11.892 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_suites_tutorial.py:
