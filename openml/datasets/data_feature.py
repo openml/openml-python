@@ -1,3 +1,6 @@
+# License: BSD 3-Clause
+
+
 class OpenMLDataFeature(object):
     """
     Data Feature (a.k.a. Attribute) object.

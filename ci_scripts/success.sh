@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 set -e
 
 if [[ "$COVERAGE" == "true" ]]; then

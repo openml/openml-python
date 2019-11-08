@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import io
 import logging
 import os

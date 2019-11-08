@@ -6,6 +6,14 @@
 Changelog
 =========
 
+0.11.0
+~~~~~~
+
+0.10.2
+~~~~~~
+* ADD #857: Adds task type ID to list_runs
+* DOC #862: Added license BSD 3-Clause to each of the source files.
+
 0.10.1
 ~~~~~~
 * ADD #175: Automatically adds the docstring of scikit-learn objects to flow and its parameters.

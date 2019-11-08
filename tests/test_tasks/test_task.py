@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import unittest
 from typing import List
 from random import randint, shuffle

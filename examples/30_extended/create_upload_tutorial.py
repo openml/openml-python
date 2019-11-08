@@ -4,6 +4,9 @@ Dataset upload tutorial
 
 A tutorial on how to create and upload a dataset to OpenML.
 """
+
+# License: BSD 3-Clause
+
 import numpy as np
 import pandas as pd
 import sklearn.datasets

@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from typing import List, Type  # noqa: F401
 
 from .extension_interface import Extension

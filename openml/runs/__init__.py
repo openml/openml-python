@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from .run import OpenMLRun
 from .trace import OpenMLRunTrace, OpenMLTraceIteration
 from .functions import (

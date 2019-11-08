@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# License: BSD 3-Clause
+
 # Update /CONTRIBUTING.md if these commands change.
 # The reason for not advocating using this script directly is that it
 # might not work out of the box on Windows.

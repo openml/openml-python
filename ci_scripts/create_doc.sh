@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 set -euo pipefail
 
 # Check if DOCPUSH is set

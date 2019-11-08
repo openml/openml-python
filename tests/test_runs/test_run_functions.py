@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import arff
 from distutils.version import LooseVersion
 import os
@@ -1126,7 +1128,7 @@ class TestRun(TestBase):
         # error_message and run_details exist, too, but are not used so far. We need to update
         # this check once they are used!
         self.assertIsInstance(run, dict)
-        assert len(run) == 7, str(run)
+        assert len(run) == 8, str(run)
 
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test

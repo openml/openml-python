@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import hashlib
 import time
 import unittest.mock

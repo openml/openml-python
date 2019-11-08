@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import openml
 import openml.study
 from openml.testing import TestBase
