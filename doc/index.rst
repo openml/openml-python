@@ -102,10 +102,7 @@ reference to the following paper:
      @article{feurer-arxiv19a,
          author    = {Matthias Feurer and Jan N. van Rijn and Arlind Kadra and Pieter Gijsbers and Neeratyoy Mallik and Sahithya Ravi and Andreas Müller and Joaquin Vanschoren and Frank Hutter},
          title     = {OpenML-Python: an extensible Python API for OpenML},
-         journal   = {arXiv},
-         volume    = {1911.02490},
+         journal   = {arXiv:1911.02490},
          year      = {2019},
-         month     = nov,
-         pages     = {1-5}
      }
 
