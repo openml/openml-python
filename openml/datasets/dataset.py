@@ -9,7 +9,7 @@ import os
 import pickle
 import pyarrow.feather as feather
 from typing import List, Optional, Union, Tuple, Iterable, Dict
-
+import shutil
 import arff
 import numpy as np
 import pandas as pd
@@ -436,18 +436,16 @@ class OpenMLDataset(OpenMLBase):
         # We parse the data from arff again and populate the cache with a recent pickle file.
         X, categorical, attribute_names = self._parse_data_from_arff(data_file)
         f = 0
-        try:
-            print("feather")
-            f = 1
+
+        if type(X) != scipy.sparse.csr.csr_matrix:
+            print("feather write")
             feather.write_feather(X, data_feather_file)
-        except:
-            print("pickle")
-            with open(data_pickle_file, "wb") as fh:
-                pickle.dump((X, categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
-        if f:
             with open(data_pickle_file, "wb") as fh:
                 pickle.dump((categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
-
+        else:
+            print("pickle write")
+            with open(data_pickle_file, "wb") as fh:
+                pickle.dump((X, categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
 
         logger.debug("Saved dataset {did}: {name} to file {path}"
                      .format(did=int(self.dataset_id or -1),
@@ -459,6 +457,7 @@ class OpenMLDataset(OpenMLBase):
 
     def _load_data(self):
         """ Load data from pickle or arff. Download data first if not present on disk. """
+        print("load data")
         if self.data_pickle_file is None:
             if self.data_file is None:
                 self._download_data()
@@ -466,12 +465,13 @@ class OpenMLDataset(OpenMLBase):
 
         try:
             if os.path.exists(self.data_feather_file):
-                print("feather")
+                print("feather load data")
                 data = feather.read_feather(self.data_feather_file)
+
                 with open(self.data_pickle_file, "rb") as fh:
                     categorical, attribute_names = pickle.load(fh)
             else:
-                print("pickle")
+                print("pickle load data")
                 with open(self.data_pickle_file, "rb") as fh:
                     data, categorical, attribute_names = pickle.load(fh)
         except EOFError:
