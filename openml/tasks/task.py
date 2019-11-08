@@ -68,7 +68,7 @@ class OpenMLTask(OpenMLBase):
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
         """ Collect all information to display in the __repr__ body. """
         fields = {"Task Type Description": '{}/tt/{}'.format(
-            openml.config.server_base_url, self.task_type_id)}  # type: Dict[str, Any]
+            openml.config.get_server_base_url(), self.task_type_id)}  # type: Dict[str, Any]
         if self.task_id is not None:
             fields["Task ID"] = self.task_id
             fields["Task URL"] = self.openml_url

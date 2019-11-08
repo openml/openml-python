@@ -106,7 +106,7 @@ class BaseStudy(OpenMLBase):
             fields["ID"] = self.study_id
             fields["Study URL"] = self.openml_url
         if self.creator is not None:
-            fields["Creator"] = "{}/u/{}".format(openml.config.server_base_url, self.creator)
+            fields["Creator"] = "{}/u/{}".format(openml.config.get_server_base_url(), self.creator)
         if self.creation_date is not None:
             fields["Upload Time"] = self.creation_date.replace('T', ' ')
         if self.data is not None:
