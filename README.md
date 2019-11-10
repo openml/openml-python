@@ -35,7 +35,7 @@ Bibtex entry:
 ```bibtex
 @article{feurer-arxiv19a,
   author    = {Matthias Feurer and Jan N. van Rijn and Arlind Kadra and Pieter Gijsbers and Neeratyoy Mallik and Sahithya Ravi and Andreas Müller and Joaquin Vanschoren and Frank Hutter},
-  title     = {OpenML-Python: an extensible Python API for OpenML},<br/>
+  title     = {OpenML-Python: an extensible Python API for OpenML},
   journal   = {arXiv:1911.02490},
   year      = {2019},
 }
