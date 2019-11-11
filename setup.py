@@ -38,7 +38,7 @@ setuptools.setup(name="openml",
                  # Make sure to remove stale files such as the egg-info before updating this:
                  # https://stackoverflow.com/a/26547314
                  packages=setuptools.find_packages(
-                     include=['openml.*'],
+                     include=['openml.*', 'openml'],
                      exclude=["*.tests", "*.tests.*", "tests.*", "tests"],
                  ),
                  package_data={'': ['*.txt', '*.md']},
