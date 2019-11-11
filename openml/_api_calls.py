@@ -52,7 +52,12 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
         response = _read_url_files(url, data=data, file_elements=file_elements)
     else:
         response = _read_url(url, request_method, data)
-    logging.info('%.7fs taken for [%s] request for the URL %s', time.time() - start, request_method, url)
+    logging.info(
+        '%.7fs taken for [%s] request for the URL %s', 
+        time.time() - start, 
+        request_method, 
+        url,
+    )
     return response
 
 
