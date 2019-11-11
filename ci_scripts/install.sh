@@ -40,7 +40,7 @@ if [[ "$TEST_DIST" == "true" ]]; then
     # Find file which was modified last as done in https://stackoverflow.com/a/4561987
     dist=`find dist -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" "`
     echo "Installing $dist"
-    pip install "$dist"
+    pip install "$dist"'.[test]'
     twine check "$dist"
 else
     pip install -e '.[test]'
