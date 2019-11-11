@@ -9,6 +9,9 @@ Changelog
 0.11.0
 ~~~~~~
 
+* FIX #873: Fixes an issue which resulted in incorrect URLs when printing OpenML objects after
+  switching the server
+
 0.10.2
 ~~~~~~
 * ADD #857: Adds task type ID to list_runs

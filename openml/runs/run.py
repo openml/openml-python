@@ -88,7 +88,7 @@ class OpenMLRun(OpenMLBase):
                   "Dataset ID": self.dataset_id,
                   "Dataset URL": openml.datasets.OpenMLDataset.url_for_id(self.dataset_id)}
         if self.uploader is not None:
-            fields["Uploader Profile"] = "{}/u/{}".format(openml.config.server_base_url,
+            fields["Uploader Profile"] = "{}/u/{}".format(openml.config.get_server_base_url(),
                                                           self.uploader)
         if self.run_id is not None:
             fields["Run URL"] = self.openml_url

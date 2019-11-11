@@ -36,7 +36,7 @@ class OpenMLBase(ABC):
     def url_for_id(cls, id_: int) -> str:
         """ Return the OpenML URL for the object of the class entity with the given id. """
         # Sample url for a flow: openml.org/f/123
-        return "{}/{}/{}".format(openml.config.server_base_url, cls._entity_letter(), id_)
+        return "{}/{}/{}".format(openml.config.get_server_base_url(), cls._entity_letter(), id_)
 
     @classmethod
     def _entity_letter(cls) -> str:
