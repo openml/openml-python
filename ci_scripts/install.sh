@@ -35,12 +35,13 @@ fi
 python --version
 
 if [[ "$TEST_DIST" == "true" ]]; then
-    pip install twine
+    pip install twine nbconvert jupyter_client matplotlib pytest pytest-xdist pytest-timeout \
+        nbformat oslo.concurrency flaky
     python setup.py sdist
     # Find file which was modified last as done in https://stackoverflow.com/a/4561987
     dist=`find dist -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" "`
     echo "Installing $dist"
-    pip install "$dist"'.[test]'
+    pip install "$dist"
     twine check "$dist"
 else
     pip install -e '.[test]'
