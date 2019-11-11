@@ -1,11 +1,11 @@
 # License: BSD 3-Clause
 
 import time
-from typing import Dict
+import logging
 import requests
 import warnings
-
 import xmltodict
+from typing import Dict
 
 from . import config
 from .exceptions import (OpenMLServerError, OpenMLServerException,
@@ -45,13 +45,22 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
     url += call
 
     url = url.replace('=', '%3d')
-
+    logging.info('Starting [%s] request for the URL %s', request_method, url)
+    start = time.time()
     if file_elements is not None:
         if request_method != 'post':
             raise ValueError('request method must be post when file elements '
                              'are present')
-        return _read_url_files(url, data=data, file_elements=file_elements)
-    return _read_url(url, request_method, data)
+        response = _read_url_files(url, data=data, file_elements=file_elements)
+    else:
+        response = _read_url(url, request_method, data)
+    logging.info(
+        '%.7fs taken for [%s] request for the URL %s',
+        time.time() - start,
+        request_method,
+        url,
+    )
+    return response
 
 
 def _file_id_to_url(file_id, filename=None):
