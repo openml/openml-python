@@ -8,8 +8,8 @@ import logging
 import os
 import pickle
 import pyarrow.feather as feather
+
 from typing import List, Optional, Union, Tuple, Iterable, Dict
-import shutil
 import arff
 import numpy as np
 import pandas as pd
@@ -435,9 +435,8 @@ class OpenMLDataset(OpenMLBase):
         # At this point either the pickle file does not exist, or it had outdated formatting.
         # We parse the data from arff again and populate the cache with a recent pickle file.
         X, categorical, attribute_names = self._parse_data_from_arff(data_file)
-        f = 0
 
-        if type(X) != scipy.sparse.csr.csr_matrix:
+        if type(X) != scipy.sparse.csr.csr_matrix and X.shape[1] <= 1000:
             print("feather write")
             feather.write_feather(X, data_feather_file)
             with open(data_pickle_file, "wb") as fh:
