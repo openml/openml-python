@@ -35,7 +35,12 @@ setuptools.setup(name="openml",
                      "Source Code": "https://github.com/openml/openml-python"
                  },
                  version=version,
-                 packages=setuptools.find_packages(),
+                 # Make sure to remove stale files such as the egg-info before updating this:
+                 # https://stackoverflow.com/a/26547314
+                 packages=setuptools.find_packages(
+                     include=['openml.*'],
+                     exclude=["*.tests", "*.tests.*", "tests.*", "tests"],
+                 ),
                  package_data={'': ['*.txt', '*.md']},
                  python_requires=">=3.5",
                  install_requires=[

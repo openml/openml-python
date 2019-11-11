@@ -16,6 +16,9 @@ Changelog
 ~~~~~~
 * ADD #857: Adds task type ID to list_runs
 * DOC #862: Added license BSD 3-Clause to each of the source files.
+* MAINT #767: Source distribution installation is now unit-tested.
+* MAINT #865: OpenML no longer bundles test files in the source distribution.
+
 
 0.10.1
 ~~~~~~
