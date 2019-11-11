@@ -53,9 +53,9 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
     else:
         response = _read_url(url, request_method, data)
     logging.info(
-        '%.7fs taken for [%s] request for the URL %s', 
-        time.time() - start, 
-        request_method, 
+        '%.7fs taken for [%s] request for the URL %s',
+        time.time() - start,
+        request_method,
         url,
     )
     return response
