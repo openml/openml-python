@@ -117,7 +117,7 @@ class OpenMLTask(OpenMLBase):
         except (OSError, IOError):
             split_url = self.estimation_procedure["data_splits_url"]
             openml._api_calls._download_text_file(
-                source=split_url,
+                source=str(split_url),
                 output_path=cache_file,
             )
 

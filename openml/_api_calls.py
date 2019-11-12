@@ -51,11 +51,11 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
     if file_elements is not None:
         if request_method != 'post':
             raise ValueError('request method must be post when file elements are present')
-        response = _read_url_files(url, data=data, file_elements=file_elements)
+        response = __read_url_files(url, data=data, file_elements=file_elements)
     else:
-        response = _read_url(url, request_method, data)
+        response = __read_url(url, request_method, data)
 
-    _check_response(response, url, file_elements)
+    __check_response(response, url, file_elements)
 
     logging.info(
         '%.7fs taken for [%s] request for the URL %s',
@@ -95,7 +95,7 @@ def _download_text_file(source: str,
         try:
             with open(output_path, encoding=encoding):
                 if exists_ok:
-                    return
+                    return None
                 else:
                     raise FileExistsError
         except FileNotFoundError:
@@ -103,8 +103,8 @@ def _download_text_file(source: str,
 
     logging.info('Starting [%s] request for the URL %s', 'get', source)
     start = time.time()
-    response = _read_url(source, request_method='get')
-    _check_response(response, source, None)
+    response = __read_url(source, request_method='get')
+    __check_response(response, source, None)
     downloaded_file = response.text
 
     if md5_checksum is not None:
@@ -137,11 +137,12 @@ def _download_text_file(source: str,
         )
 
         del downloaded_file
+        return None
 
 
-def _check_response(response, url, file_elements):
+def __check_response(response, url, file_elements):
     if response.status_code != 200:
-        raise _parse_server_exception(response, url, file_elements=file_elements)
+        raise __parse_server_exception(response, url, file_elements=file_elements)
     elif 'Content-Encoding' not in response.headers or \
             response.headers['Content-Encoding'] != 'gzip':
         logging.warning('Received uncompressed content from OpenML for {}.'.format(url))
@@ -159,7 +160,7 @@ def _file_id_to_url(file_id, filename=None):
     return url
 
 
-def _read_url_files(url, data=None, file_elements=None):
+def __read_url_files(url, data=None, file_elements=None):
     """do a post request to url with data
     and sending file_elements as files"""
 
@@ -169,7 +170,7 @@ def _read_url_files(url, data=None, file_elements=None):
         file_elements = {}
     # Using requests.post sets header 'Accept-encoding' automatically to
     # 'gzip,deflate'
-    response = send_request(
+    response = __send_request(
         request_method='post',
         url=url,
         data=data,
@@ -178,15 +179,15 @@ def _read_url_files(url, data=None, file_elements=None):
     return response
 
 
-def _read_url(url, request_method, data=None):
+def __read_url(url, request_method, data=None):
     data = {} if data is None else data
     if config.apikey is not None:
         data['api_key'] = config.apikey
 
-    return send_request(request_method=request_method, url=url, data=data)
+    return __send_request(request_method=request_method, url=url, data=data)
 
 
-def send_request(
+def __send_request(
     request_method,
     url,
     data,
@@ -220,7 +221,7 @@ def send_request(
     return response
 
 
-def _parse_server_exception(
+def __parse_server_exception(
     response: requests.Response,
     url: str,
     file_elements: Dict,

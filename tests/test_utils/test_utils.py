@@ -16,7 +16,7 @@ class OpenMLTaskTest(TestBase):
     def mocked_perform_api_call(call, request_method):
         # TODO: JvR: Why is this not a staticmethod?
         url = openml.config.server + '/' + call
-        return openml._api_calls._read_url(url, request_method=request_method)
+        return openml._api_calls._download_text_file(url)
 
     def test_list_all(self):
         openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
