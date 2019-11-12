@@ -11,6 +11,8 @@ Changelog
 
 * FIX #873: Fixes an issue which resulted in incorrect URLs when printing OpenML objects after
   switching the server
+* MAINT #767: Source distribution installation is now unit-tested.
+* MAINT #865: OpenML no longer bundles test files in the source distribution.
 
 0.10.2
 ~~~~~~
