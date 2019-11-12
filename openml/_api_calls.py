@@ -3,7 +3,6 @@
 import time
 import logging
 import requests
-import warnings
 import xmltodict
 from typing import Dict
 
@@ -47,20 +46,27 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
     url = url.replace('=', '%3d')
     logging.info('Starting [%s] request for the URL %s', request_method, url)
     start = time.time()
+
     if file_elements is not None:
         if request_method != 'post':
-            raise ValueError('request method must be post when file elements '
-                             'are present')
+            raise ValueError('request method must be post when file elements are present')
         response = _read_url_files(url, data=data, file_elements=file_elements)
     else:
         response = _read_url(url, request_method, data)
+
+    if response.status_code != 200:
+        raise _parse_server_exception(response, url, file_elements=file_elements)
+    elif 'Content-Encoding' not in response.headers or \
+            response.headers['Content-Encoding'] != 'gzip':
+        logging.warning('Received uncompressed content from OpenML for {}.'.format(url))
+
     logging.info(
         '%.7fs taken for [%s] request for the URL %s',
         time.time() - start,
         request_method,
         url,
     )
-    return response
+    return response.text
 
 
 def _file_id_to_url(file_id, filename=None):
@@ -91,13 +97,7 @@ def _read_url_files(url, data=None, file_elements=None):
         data=data,
         files=file_elements,
     )
-    if response.status_code != 200:
-        raise _parse_server_exception(response, url, file_elements=file_elements)
-    if 'Content-Encoding' not in response.headers or \
-            response.headers['Content-Encoding'] != 'gzip':
-        warnings.warn('Received uncompressed content from OpenML for {}.'
-                      .format(url))
-    return response.text
+    return response
 
 
 def _read_url(url, request_method, data=None):
@@ -105,14 +105,7 @@ def _read_url(url, request_method, data=None):
     if config.apikey is not None:
         data['api_key'] = config.apikey
 
-    response = send_request(request_method=request_method, url=url, data=data)
-    if response.status_code != 200:
-        raise _parse_server_exception(response, url, file_elements=None)
-    if 'Content-Encoding' not in response.headers or \
-            response.headers['Content-Encoding'] != 'gzip':
-        warnings.warn('Received uncompressed content from OpenML for {}.'
-                      .format(url))
-    return response.text
+    return send_request(request_method=request_method, url=url, data=data)
 
 
 def send_request(
@@ -159,9 +152,12 @@ def _parse_server_exception(
     try:
         server_exception = xmltodict.parse(response.text)
     except Exception:
-        raise OpenMLServerError(
-            'Unexpected server error when calling {}. Please contact the developers!\n'
-            'Status code: {}\n{}'.format(url, response.status_code, response.text))
+        if response.status_code == 414:
+            raise OpenMLServerError('URI too long! ({})'.format(url))
+        else:
+            raise OpenMLServerError(
+                'Unexpected server error when calling {}. Please contact the developers!\n'
+                'Status code: {}\n{}'.format(url, response.status_code, response.text))
 
     server_error = server_exception['oml:error']
     code = int(server_error['oml:code'])
