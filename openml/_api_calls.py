@@ -5,7 +5,7 @@ import hashlib
 import logging
 import requests
 import xmltodict
-from typing import Dict
+from typing import Dict, Optional
 
 from . import config
 from .exceptions import (OpenMLServerError, OpenMLServerException,
@@ -67,11 +67,11 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
 
 
 def _download_text_file(source: str,
-                        output_path: str,
+                        output_path: Optional[str] = None,
                         md5_checksum: str = None,
                         exists_ok: bool = True,
                         encoding: str = 'utf8',
-                        ) -> None:
+                        ) -> Optional[str]:
     """ Download the text file at `source` and store it in `output_path`.
 
     By default, do nothing if a file already exists in `output_path`.
@@ -81,8 +81,9 @@ def _download_text_file(source: str,
     ----------
     source : str
         url of the file to be downloaded
-    output_path : str
-        full path, including filename, of where the file should be stored.
+    output_path : str, (optional)
+        full path, including filename, of where the file should be stored. If ``None``,
+        this function returns the downloaded file as string.
     md5_checksum : str, optional (default=None)
         If not None, should be a string of hexidecimal digits of the expected digest value.
     exists_ok : bool, optional (default=True)
@@ -90,14 +91,15 @@ def _download_text_file(source: str,
     encoding : str, optional (default='utf8')
         The encoding with which the file should be stored.
     """
-    try:
-        with open(output_path, encoding=encoding):
-            if exists_ok:
-                return
-            else:
-                raise FileExistsError
-    except FileNotFoundError:
-        pass
+    if output_path is not None:
+        try:
+            with open(output_path, encoding=encoding):
+                if exists_ok:
+                    return
+                else:
+                    raise FileExistsError
+        except FileNotFoundError:
+            pass
 
     logging.info('Starting [%s] request for the URL %s', 'get', source)
     start = time.time()
@@ -114,17 +116,27 @@ def _download_text_file(source: str,
                 'Checksum {} of downloaded file is unequal to the expected checksum {}.'
                 .format(md5_checksum_download, md5_checksum))
 
-    with open(output_path, "w", encoding=encoding) as fh:
-        fh.write(downloaded_file)
+    if output_path is None:
+        logging.info(
+            '%.7fs taken for [%s] request for the URL %s',
+            time.time() - start,
+            'get',
+            source,
+        )
+        return downloaded_file
 
-    logging.info(
-        '%.7fs taken for [%s] request for the URL %s',
-        time.time() - start,
-        'get',
-        source,
-    )
+    else:
+        with open(output_path, "w", encoding=encoding) as fh:
+            fh.write(downloaded_file)
 
-    del downloaded_file
+        logging.info(
+            '%.7fs taken for [%s] request for the URL %s',
+            time.time() - start,
+            'get',
+            source,
+        )
+
+        del downloaded_file
 
 
 def _check_response(response, url, file_elements):

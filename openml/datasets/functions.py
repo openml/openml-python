@@ -1038,13 +1038,11 @@ def _get_online_dataset_arff(dataset_id):
     str
         A string representation of an ARFF file.
     """
-    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id,
-                                                      'get')
+    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id, 'get')
     # build a dict from the xml.
     # use the url from the dataset description and return the ARFF string
-    return openml._api_calls._read_url(
+    return openml._api_calls._download_text_file(
         xmltodict.parse(dataset_xml)['oml:data_set_description']['oml:url'],
-        request_method='get'
     )
 
 
