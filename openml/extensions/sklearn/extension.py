@@ -1927,9 +1927,10 @@ class SklearnExtension(Extension):
                             param_value is None or param_value is np.ma.masked:
                         # basic string values
                         type = 'STRING'
-                    elif isinstance(param_value, list) and \
+                    elif isinstance(param_value, (list, tuple)) and \
                             all(isinstance(i, int) for i in param_value):
-                        # list of integers
+                        # list of integers (usually for selecting features)
+                        # hyperparameter layer_sizes of MLPClassifier
                         type = 'STRING'
                     else:
                         raise TypeError('Unsupported param type in param grid: %s' % key)
