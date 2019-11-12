@@ -76,8 +76,8 @@ class OpenMLSplit(object):
         pkl_filename = filename.replace(".arff", ".pkl.py3")
 
         if os.path.exists(pkl_filename):
-            with open(pkl_filename, "rb") as fh:
-                _ = pickle.load(fh)
+            with open(pkl_filename, "rb") as fh_binary:
+                _ = pickle.load(fh_binary)
             repetitions = _["repetitions"]
             name = _["name"]
 
@@ -88,8 +88,8 @@ class OpenMLSplit(object):
                 raise FileNotFoundError(
                     'Split arff %s does not exist!' % filename
                 )
-            with open(filename) as fh:
-                file_data = arff.load(fh, return_type=arff.DENSE_GEN)
+            with open(filename) as fh_text:
+                file_data = arff.load(fh_text, return_type=arff.DENSE_GEN)
                 splits = file_data['data']
                 name = file_data['relation']
                 attrnames = [attr[0] for attr in file_data['attributes']]
@@ -139,9 +139,9 @@ class OpenMLSplit(object):
                                 np.array(repetitions[repetition][fold][sample][1],
                                          dtype=np.int32))
 
-            with tempfile.NamedTemporaryFile(delete=False) as fh:
-                pickle.dump({"name": name, "repetitions": repetitions}, fh, protocol=-1)
-                os.rename(fh.name, pkl_filename)
+            with tempfile.NamedTemporaryFile(delete=False) as fh_other:
+                pickle.dump({"name": name, "repetitions": repetitions}, fh_other, protocol=-1)
+                os.rename(fh_other.name, pkl_filename)
 
         return cls(name, '', repetitions)
 
