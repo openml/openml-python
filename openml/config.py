@@ -7,7 +7,7 @@ Store module level information like the API key, cache directory and the server
 import logging
 import logging.handlers
 import os
-from typing import cast
+from typing import Any, cast, Dict
 
 from io import StringIO
 import configparser
@@ -58,6 +58,12 @@ config_file = os.path.expanduser(os.path.join('~', '.openml', 'config'))
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
 server = str(_defaults['server'])  # so mypy knows it is a string
+apikey = _defaults['apikey']
+# The current cache directory (without the server name)
+cache_directory = str(_defaults['cachedir'])  # so mypy knows it is a string
+avoid_duplicate_runs = True if _defaults['avoid_duplicate_runs'] == 'True' else False
+# Number of retries if the connection breaks
+connection_n_retries = _defaults['connection_n_retries']
 
 
 def get_server_base_url() -> str:
@@ -70,15 +76,6 @@ def get_server_base_url() -> str:
     str
     """
     return server[:-len('/api/v1/xml')]
-
-
-apikey = _defaults['apikey']
-# The current cache directory (without the server name)
-cache_directory = str(_defaults['cachedir'])  # so mypy knows it is a string
-avoid_duplicate_runs = True if _defaults['avoid_duplicate_runs'] == 'True' else False
-
-# Number of retries if the connection breaks
-connection_n_retries = _defaults['connection_n_retries']
 
 
 class ConfigurationForExamples:
@@ -129,7 +126,7 @@ class ConfigurationForExamples:
         cls._start_last_called = False
 
 
-def _setup():
+def _setup(config=None):
     """Setup openml package. Called on first import.
 
     Reads the config file and sets up apikey, server, cache appropriately.
@@ -151,11 +148,20 @@ def _setup():
         # For other errors, we want to propagate the error as openml does not work without cache
         pass
 
-    config = _parse_config()
-    apikey = config.get('FAKE_SECTION', 'apikey')
-    server = config.get('FAKE_SECTION', 'server')
+    if config is None:
+        config = _parse_config()
+        apikey = config.get('FAKE_SECTION', 'apikey')
+        server = config.get('FAKE_SECTION', 'server')
+        short_cache_dir = config.get('FAKE_SECTION', 'cachedir')
+        avoid_duplicate_runs = config.getboolean('FAKE_SECTION', 'avoid_duplicate_runs')
+        connection_n_retries = config.getint('FAKE_SECTION', 'connection_n_retries')
+    else:
+        apikey = config.get('apikey')
+        server = config.get('server')
+        short_cache_dir = config.get('cachedir')
+        avoid_duplicate_runs = config.get('avoid_duplicate_runs')
+        connection_n_retries = config.get('connection_n_retries')
 
-    short_cache_dir = config.get('FAKE_SECTION', 'cachedir')
     cache_directory = os.path.expanduser(short_cache_dir)
 
     # create the cache subdirectory
@@ -165,9 +171,7 @@ def _setup():
         # For other errors, we want to propagate the error as openml does not work without cache
         pass
 
-    avoid_duplicate_runs = config.getboolean('FAKE_SECTION',
-                                             'avoid_duplicate_runs')
-    connection_n_retries = config.get('FAKE_SECTION', 'connection_n_retries')
+
     if connection_n_retries > 20:
         raise ValueError(
             'A higher number of retries than 20 is not allowed to keep the '
@@ -200,6 +204,16 @@ def _parse_config():
     except OSError as e:
         logger.info("Error opening file %s: %s", config_file, e.message)
     return config
+
+
+def _get_setup() -> Dict[str, Any]:
+    setup = dict()
+    setup['apikey'] = apikey
+    setup['server'] = server
+    setup['cachedir'] = cache_directory
+    setup['avoid_duplicate_runs'] = avoid_duplicate_runs
+    setup['connection_n_retries'] = connection_n_retries
+    return setup
 
 
 def get_cache_directory():

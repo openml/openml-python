@@ -3,6 +3,7 @@
 from collections import OrderedDict
 import io
 import itertools
+import logging
 import os
 from typing import Any, List, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
 import warnings
@@ -16,7 +17,6 @@ import openml.utils
 import openml._api_calls
 from openml.exceptions import PyOpenMLError
 from openml.extensions import get_extension_by_model
-from openml import config
 from openml.flows.flow import _copy_server_fields
 from ..flows import get_flow, flow_exists, OpenMLFlow
 from ..setups import setup_exists, initialize_model
@@ -255,7 +255,8 @@ def run_flow_on_task(
         message = 'Executed Task {} with Flow id:{}'.format(task.task_id, run.flow_id)
     else:
         message = 'Executed Task {} on local Flow with name {}.'.format(task.task_id, flow.name)
-    config.logger.info(message)
+    logger = logging.getLogger(__name__)
+    logger.info(message)
 
     return run
 
@@ -405,48 +406,40 @@ def _run_task_get_arffcontent(
     # methods, less maintenance, less confusion)
     num_reps, num_folds, num_samples = task.get_split_dimensions()
 
+    from joblib.parallel import Parallel, delayed
+
+    jobs = []
     for n_fit, (rep_no, fold_no, sample_no) in enumerate(itertools.product(
         range(num_reps),
         range(num_folds),
         range(num_samples),
     ), start=1):
+        jobs.append((n_fit, rep_no, fold_no, sample_no))
 
-        train_indices, test_indices = task.get_train_test_split_indices(
-            repeat=rep_no, fold=fold_no, sample=sample_no)
-        if isinstance(task, OpenMLSupervisedTask):
-            x, y = task.get_X_and_y(dataset_format='array')
-            train_x = x[train_indices]
-            train_y = y[train_indices]
-            test_x = x[test_indices]
-            test_y = y[test_indices]
-        elif isinstance(task, OpenMLClusteringTask):
-            x = task.get_X(dataset_format='array')
-            train_x = x[train_indices]
-            train_y = None
-            test_x = None
-            test_y = None
-        else:
-            raise NotImplementedError(task.task_type)
-
-        config.logger.info(
-            "Going to execute flow '%s' on task %d for repeat %d fold %d sample %d.",
-            flow.name, task.task_id, rep_no, fold_no, sample_no,
-        )
-
-        (
-            pred_y,
-            proba_y,
-            user_defined_measures_fold,
-            trace,
-        ) = extension._run_model_on_fold(
-            model=model,
-            task=task,
-            X_train=train_x,
-            y_train=train_y,
-            rep_no=rep_no,
+    config = openml.config._get_setup()
+    job_rvals = Parallel(verbose=0, n_jobs=4)(
+        delayed(_run_task_get_arffcontent_parallel_helper)(
+            extension=extension,
+            flow=flow,
             fold_no=fold_no,
-            X_test=test_x,
+            model=model,
+            rep_no=rep_no,
+            sample_no=sample_no,
+            task=task,
+            config=config,
+        ) for n_fit, rep_no, fold_no, sample_no in jobs
+    )
+
+    for n_fit, (rep_no, fold_no, sample_no) in enumerate(itertools.product(
+            range(num_reps),
+            range(num_folds),
+            range(num_samples),
+        ), start=1):
+
+        pred_y, proba_y, test_indices, test_y, trace, user_defined_measures_fold = (
+            job_rvals[n_fit - 1]
         )
+
         if trace is not None:
             traces.append(trace)
 
@@ -534,6 +527,47 @@ def _run_task_get_arffcontent(
         user_defined_measures_per_fold,
         user_defined_measures_per_sample,
     )
+
+
+def _run_task_get_arffcontent_parallel_helper(extension, flow, fold_no, model, rep_no, sample_no,
+                                              task, config):
+    openml.config._setup(config)
+    train_indices, test_indices = task.get_train_test_split_indices(
+        repeat=rep_no, fold=fold_no, sample=sample_no)
+    if isinstance(task, OpenMLSupervisedTask):
+        x, y = task.get_X_and_y(dataset_format='array')
+        train_x = x[train_indices]
+        train_y = y[train_indices]
+        test_x = x[test_indices]
+        test_y = y[test_indices]
+    elif isinstance(task, OpenMLClusteringTask):
+        x = task.get_X(dataset_format='array')
+        train_x = x[train_indices]
+        train_y = None
+        test_x = None
+        test_y = None
+    else:
+        raise NotImplementedError(task.task_type)
+    logger = logging.getLogger(__name__)
+    logger.info(
+        "Going to execute flow '%s' on task %d for repeat %d fold %d sample %d.",
+        flow.name, task.task_id, rep_no, fold_no, sample_no,
+    )
+    (
+        pred_y,
+        proba_y,
+        user_defined_measures_fold,
+        trace,
+    ) = extension._run_model_on_fold(
+        model=model,
+        task=task,
+        X_train=train_x,
+        y_train=train_y,
+        rep_no=rep_no,
+        fold_no=fold_no,
+        X_test=test_x,
+    )
+    return pred_y, proba_y, test_indices, test_y, trace, user_defined_measures_fold
 
 
 def get_runs(run_ids):
