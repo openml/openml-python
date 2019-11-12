@@ -1101,7 +1101,7 @@ class TestRun(TestBase):
                 np.array([1, 2]),
                 np.array([1, 1]),
                 None,
-               {},
+                {},
             )
         mock.side_effect = side_effect
 

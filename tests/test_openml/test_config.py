@@ -23,8 +23,7 @@ class TestConfigurationForExamples(openml.testing.TestBase):
             'cachedir': self.workdir,
             'avoid_duplicate_runs': False,
             'connection_n_retries': 10,
-        }, \
-        config
+        }, config
 
     def test_set_config(self):
         fixture = {
