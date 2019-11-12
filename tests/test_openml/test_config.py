@@ -18,13 +18,13 @@ class TestConfigurationForExamples(openml.testing.TestBase):
     def test_get_config(self):
         config = openml.config._get_setup()
         assert config == {
-                'apikey': '610344db6388d9ba34f6db45a3cf71de',
-                'server': 'https://test.openml.org/api/v1/xml',
-                'cachedir': self.workdir,
-                'avoid_duplicate_runs': False,
-                'connection_n_retries': 10,
-            }, \
-            config
+            'apikey': '610344db6388d9ba34f6db45a3cf71de',
+            'server': 'https://test.openml.org/api/v1/xml',
+            'cachedir': self.workdir,
+            'avoid_duplicate_runs': False,
+            'connection_n_retries': 10,
+        }, \
+        config
 
     def test_set_config(self):
         fixture = {

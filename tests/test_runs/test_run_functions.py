@@ -1155,13 +1155,13 @@ class TestRun(TestBase):
                 add_local_measures=True,
             )
         # If we wouldn't pass the config and change it, there would be an
-        # `IndexError: index 1300 is out of bounds for axis 0 with size 898` because the 
+        # `IndexError: index 1300 is out of bounds for axis 0 with size 898` because the
         # dataset on the test server is larger than the dataset on the live server. This function
-        # passes the task from the test server to a new process, the new process would load 
-        # the task from the live server, which is more than ten times smaller. Thus, the indices 
-        # of the training and test data are now larger than the dataset. Because we change the 
-        # server in the new process to be the same server as used in this function (by calling 
-        # `openml.config._setup(config)` we make this work! 
+        # passes the task from the test server to a new process, the new process would load
+        # the task from the live server, which is more than ten times smaller. Thus, the indices
+        # of the training and test data are now larger than the dataset. Because we change the
+        # server in the new process to be the same server as used in this function (by calling
+        # `openml.config._setup(config)` we make this work!
         assert len(res[0]) == num_instances, len(res[0])
 
     def test__create_trace_from_arff(self):
