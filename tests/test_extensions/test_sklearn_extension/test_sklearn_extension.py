@@ -28,7 +28,10 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
 import sklearn.cluster
-
+from sklearn.pipeline import make_pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.impute import SimpleImputer
 
 import openml
 from openml.extensions.sklearn import SklearnExtension
@@ -36,7 +39,7 @@ from openml.exceptions import PyOpenMLError
 from openml.flows import OpenMLFlow
 from openml.flows.functions import assert_flows_equal
 from openml.runs.trace import OpenMLRunTrace
-from openml.testing import TestBase, SimpleImputer
+from openml.testing import TestBase
 
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -678,6 +681,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(serialization.name,
                          'sklearn.pipeline.FeatureUnion('
                          'ohe=sklearn.preprocessing.{}.OneHotEncoder)'
+                         'scaler=None'
                          .format(module_name_encoder))
         new_model = self.extension.flow_to_model(serialization)
         self.assertEqual(type(new_model), type(fu))
@@ -1776,3 +1780,48 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
         self.assertEqual("weka.IsolationForest",
                          SklearnExtension.trim_flow_name("weka.IsolationForest"))
+
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
+                     reason="SimpleImputer available only after 0.19")
+    def test_run_on_model_with_empty_steps(self):
+        # testing 'drop', 'passthrough', None as non-actionable sklearn estimators
+        dataset = openml.datasets.get_dataset(128)
+        task = openml.tasks.get_task(59)
+
+        X, y, categorical_ind, feature_names = dataset.get_data(
+            target=dataset.default_target_attribute, dataset_format='array')
+        categorical_ind = np.array(categorical_ind)
+        cat_idx, = np.where(categorical_ind)
+        cont_idx, = np.where(~categorical_ind)
+
+        clf = make_pipeline(
+            ColumnTransformer([('cat', make_pipeline(SimpleImputer(strategy='most_frequent'),
+                                                     OneHotEncoder()), cat_idx.tolist()),
+                               ('cont', make_pipeline(SimpleImputer(strategy='median'),
+                                                      StandardScaler()), cont_idx.tolist())])
+        )
+
+        clf = sklearn.pipeline.Pipeline([
+            ('dummystep', 'passthrough'),  # adding 'passthrough' as an estimator
+            ('prep', clf),
+            ('variancethreshold', None),  # adding 'None' as an estimator
+            ('classifier', sklearn.svm.SVC(gamma='auto'))
+        ])
+
+        # adding 'drop' to a ColumnTransformer
+        if not categorical_ind.any():
+            clf[1][0].set_params(cat='drop')
+        if not (~categorical_ind).any():
+            clf[1][0].set_params(cont='drop')
+
+        run, flow = openml.runs.run_model_on_task(model=clf, task=task, return_flow=True)
+
+        self.assertEqual(len(flow.components), 4)
+        self.assertEqual(flow.components['dummystep'], 'passthrough')
+        self.assertTrue(isinstance(flow.components['classifier'], OpenMLFlow))
+        self.assertEqual(flow.components['variancethreshold'], None)
+        self.assertTrue(isinstance(flow.components['prep'], OpenMLFlow))
+        self.assertTrue(isinstance(flow.components['prep'].components['columntransformer'],
+                        OpenMLFlow))
+        self.assertEqual(flow.components['prep'].components['columntransformer'].components['cat'],
+                         'drop')

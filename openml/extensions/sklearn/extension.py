@@ -694,10 +694,12 @@ class SklearnExtension(Extension):
         # will be part of the name (in brackets)
         sub_components_names = ""
         for key in subcomponents:
-            if isinstance(subcomponents[key], str):
-                name = subcomponents[key]
-            else:
+            if isinstance(subcomponents[key], OpenMLFlow):
                 name = subcomponents[key].name
+            elif isinstance(subcomponents[key], str):  # 'drop', 'passthrough' can be passed
+                name = subcomponents[key]
+            elif subcomponents[key] is None:
+                name = "None"
             if key in subcomponents_explicit:
                 sub_components_names += "," + key + "=" + name
             else:
@@ -752,7 +754,7 @@ class SklearnExtension(Extension):
     def _get_external_version_string(
         self,
         model: Any,
-        sub_components: Dict[str, OpenMLFlow],
+        sub_components: Dict[str, Union[OpenMLFlow, str, None]],
     ) -> str:
         # Create external version string for a flow, given the model and the
         # already parsed dictionary of sub_components. Retrieves the external
@@ -773,7 +775,8 @@ class SklearnExtension(Extension):
         external_versions.add(openml_version)
         external_versions.add(sklearn_version)
         for visitee in sub_components.values():
-            if isinstance(visitee, str):
+            # 'drop', 'passthrough', None can be passed as estimators
+            if isinstance(visitee, str) or visitee is None:
                 continue
             for external_version in visitee.external_version.split(','):
                 external_versions.add(external_version)
@@ -782,15 +785,18 @@ class SklearnExtension(Extension):
     def _check_multiple_occurence_of_component_in_flow(
         self,
         model: Any,
-        sub_components: Dict[str, Any],
+        sub_components: Dict[str, Union[OpenMLFlow, str, None]],
     ) -> None:
-        to_visit_stack = []  # type: List[OpenMLFlow]
+        to_visit_stack = []  # type: List[Union[OpenMLFlow, str, None]]
         to_visit_stack.extend(sub_components.values())
         known_sub_components = set()  # type: Set[str]
+
         while len(to_visit_stack) > 0:
             visitee = to_visit_stack.pop()
-            if isinstance(visitee, str):
+            if isinstance(visitee, str):  # 'drop', 'passthrough' can be passed as estimators
                 known_sub_components.add(visitee)
+            elif visitee is None:  # a None step can be included in a Pipeline
+                known_sub_components.add(str(visitee))
             elif visitee.name in known_sub_components:
                 raise ValueError('Found a second occurence of component %s when '
                                  'trying to serialize %s.' % (visitee.name, model))
@@ -804,7 +810,7 @@ class SklearnExtension(Extension):
     ) -> Tuple[
         'OrderedDict[str, Optional[str]]',
         'OrderedDict[str, Optional[Dict]]',
-        'OrderedDict[str, Any]',
+        'OrderedDict[str, Union[OpenMLFlow, str, None]]',
         Set,
     ]:
         # This function contains four "global" states and is quite long and
@@ -814,7 +820,7 @@ class SklearnExtension(Extension):
         # separate class methods
 
         # stores all entities that should become subcomponents
-        sub_components = OrderedDict()  # type: OrderedDict[str, OpenMLFlow]
+        sub_components = OrderedDict()  # type: OrderedDict[str, Union[OpenMLFlow, str, None]]
         # stores the keys of all subcomponents that should become
         sub_components_explicit = set()
         parameters = OrderedDict()  # type: OrderedDict[str, Optional[str]]
@@ -858,7 +864,7 @@ class SklearnExtension(Extension):
                 parameter_value = list()  # type: List
                 reserved_keywords = set(model.get_params(deep=False).keys())
 
-                for sub_component_tuple in rval:
+                for i, sub_component_tuple in enumerate(rval):
                     identifier = sub_component_tuple[0]
                     sub_component = sub_component_tuple[1]
                     sub_component_type = type(sub_component_tuple)
@@ -891,13 +897,15 @@ class SklearnExtension(Extension):
                         raise PyOpenMLError(msg)
 
                     if sub_component is None:
-                        # In a FeatureUnion it is legal to have a None step
+                        # In a FeatureUnion, Pipeline it is legal to have a None step
 
                         pv = [identifier, None]
                         if sub_component_type is tuple:
                             parameter_value.append(tuple(pv))
                         else:
                             parameter_value.append(pv)
+                        sub_components_explicit.add(identifier)
+                        sub_components[identifier] = sub_component
 
                     else:
                         # Add the component to the list of components, add a
