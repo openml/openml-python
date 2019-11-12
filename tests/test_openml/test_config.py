@@ -15,6 +15,29 @@ class TestConfig(openml.testing.TestBase):
 
 class TestConfigurationForExamples(openml.testing.TestBase):
 
+    def test_get_config(self):
+        config = openml.config._get_setup()
+        assert config == {
+                'apikey': '610344db6388d9ba34f6db45a3cf71de',
+                'server': 'https://test.openml.org/api/v1/xml',
+                'cachedir': self.workdir,
+                'avoid_duplicate_runs': False,
+                'connection_n_retries': 10,
+            }, \
+            config
+
+    def test_set_config(self):
+        fixture = {
+            'apikey': '610344db6388d9ba34f6db45a3cf71de',
+            'server': 'https://test.openml.org/api/v1/xml',
+            'cachedir': self.workdir,
+            'avoid_duplicate_runs': False,
+            'connection_n_retries': 10,
+        }
+        openml.config._setup(fixture)
+        config = openml.config._get_setup()
+        assert fixture == config
+
     def test_switch_to_example_configuration(self):
         """ Verifies the test configuration is loaded properly. """
         # Below is the default test key which would be used anyway, but just for clarity:

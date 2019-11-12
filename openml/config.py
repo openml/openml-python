@@ -171,7 +171,6 @@ def _setup(config=None):
         # For other errors, we want to propagate the error as openml does not work without cache
         pass
 
-
     if connection_n_retries > 20:
         raise ValueError(
             'A higher number of retries than 20 is not allowed to keep the '

@@ -8,6 +8,7 @@ import time
 import sys
 import unittest.mock
 
+from joblib import parallel_backend
 import numpy as np
 import pytest
 
@@ -1045,6 +1046,7 @@ class TestRun(TestBase):
         )
 
     def test__run_task_get_arffcontent(self):
+        # Integration style test
         task = openml.tasks.get_task(7)
         num_instances = 3196
         num_folds = 10
@@ -1088,6 +1090,79 @@ class TestRun(TestBase):
             self.assertAlmostEqual(sum(arff_line[4:6]), 1.0)
             self.assertIn(arff_line[6], ['won', 'nowin'])
             self.assertIn(arff_line[7], ['won', 'nowin'])
+
+    @unittest.mock.patch('openml.runs.functions._run_task_get_arffcontent_parallel_helper')
+    def test__run_task_get_arffcontent_2(self, mock):
+        # Unit test style test
+        def side_effect(*args, **kwargs):
+            return (
+                np.array([0, 1]),
+                np.array([[0.8, 0.2], [0.2, 0.8]]),
+                np.array([1, 2]),
+                np.array([1, 1]),
+                None,
+               {},
+            )
+        mock.side_effect = side_effect
+
+        task = openml.tasks.get_task(7)
+
+        flow = unittest.mock.Mock()
+        flow.name = 'dummy'
+        clf = SGDClassifier(loss='log', random_state=1)
+
+        # Unit test doesn't work with loky and multiprocessing backend
+        for n_jobs, backend, call_count in (
+            (1, 'sequential', 10),
+            (1, 'threading', 20),
+            (-1, 'threading', 30),
+            (2, 'threading', 40),
+            (None, 'threading', 50),
+        ):
+            with parallel_backend(backend, n_jobs=n_jobs):
+                res = openml.runs.functions._run_task_get_arffcontent(
+                    flow=flow,
+                    extension=self.extension,
+                    model=clf,
+                    task=task,
+                    add_local_measures=True,
+                )
+            assert len(res) == 4, len(res)  # General function interface
+            assert len(res[0]) == 20  # 10 folds x 2 predictions returned
+            assert res[1] is None  # No trace
+            assert len(res[2]) == 1
+            assert len(res[2]['predictive_accuracy']) == 1
+            assert len(res[2]['predictive_accuracy'][0]) == 10
+            assert len(res[3]) == 1
+            assert len(res[3]['predictive_accuracy']) == 1
+            assert len(res[3]['predictive_accuracy'][0]) == 10
+            assert mock.call_count == call_count, (mock.call_count, call_count)
+
+    def test__run_task_get_arffcontent_3(self):
+        # Integration style test
+        task = openml.tasks.get_task(7)
+        num_instances = 3196
+
+        flow = unittest.mock.Mock()
+        flow.name = 'dummy'
+        clf = SGDClassifier(loss='log', random_state=1)
+        with parallel_backend('loky', n_jobs=2):
+            res = openml.runs.functions._run_task_get_arffcontent(
+                flow=flow,
+                extension=self.extension,
+                model=clf,
+                task=task,
+                add_local_measures=True,
+            )
+        # If we wouldn't pass the config and change it, there would be an
+        # `IndexError: index 1300 is out of bounds for axis 0 with size 898` because the 
+        # dataset on the test server is larger than the dataset on the live server. This function
+        # passes the task from the test server to a new process, the new process would load 
+        # the task from the live server, which is more than ten times smaller. Thus, the indices 
+        # of the training and test data are now larger than the dataset. Because we change the 
+        # server in the new process to be the same server as used in this function (by calling 
+        # `openml.config._setup(config)` we make this work! 
+        assert len(res[0]) == num_instances, len(res[0])
 
     def test__create_trace_from_arff(self):
         with open(self.static_cache_dir + '/misc/trace.arff',

@@ -430,11 +430,14 @@ def _run_task_get_arffcontent(
         ) for n_fit, rep_no, fold_no, sample_no in jobs
     )
 
-    for n_fit, (rep_no, fold_no, sample_no) in enumerate(itertools.product(
+    for n_fit, (rep_no, fold_no, sample_no) in enumerate(
+        itertools.product(
             range(num_reps),
             range(num_folds),
             range(num_samples),
-        ), start=1):
+        ),
+        start=1,
+    ):
 
         pred_y, proba_y, test_indices, test_y, trace, user_defined_measures_fold = (
             job_rvals[n_fit - 1]

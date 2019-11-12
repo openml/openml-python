@@ -3,6 +3,7 @@
 from collections import namedtuple, OrderedDict
 import os
 import pickle
+import tempfile
 
 import numpy as np
 import arff
@@ -87,59 +88,60 @@ class OpenMLSplit(object):
                 raise FileNotFoundError(
                     'Split arff %s does not exist!' % filename
                 )
-            file_data = arff.load(open(filename), return_type=arff.DENSE_GEN)
-            splits = file_data['data']
-            name = file_data['relation']
-            attrnames = [attr[0] for attr in file_data['attributes']]
+            with open(filename) as fh:
+                file_data = arff.load(fh, return_type=arff.DENSE_GEN)
+                splits = file_data['data']
+                name = file_data['relation']
+                attrnames = [attr[0] for attr in file_data['attributes']]
 
-            repetitions = OrderedDict()
+                repetitions = OrderedDict()
 
-            type_idx = attrnames.index('type')
-            rowid_idx = attrnames.index('rowid')
-            repeat_idx = attrnames.index('repeat')
-            fold_idx = attrnames.index('fold')
-            sample_idx = (
-                attrnames.index('sample')
-                if 'sample' in attrnames
-                else None
-            )
+                type_idx = attrnames.index('type')
+                rowid_idx = attrnames.index('rowid')
+                repeat_idx = attrnames.index('repeat')
+                fold_idx = attrnames.index('fold')
+                sample_idx = (
+                    attrnames.index('sample')
+                    if 'sample' in attrnames
+                    else None
+                )
 
-            for line in splits:
-                # A line looks like type, rowid, repeat, fold
-                repetition = int(line[repeat_idx])
-                fold = int(line[fold_idx])
-                sample = 0
-                if sample_idx is not None:
-                    sample = int(line[sample_idx])
+                for line in splits:
+                    # A line looks like type, rowid, repeat, fold
+                    repetition = int(line[repeat_idx])
+                    fold = int(line[fold_idx])
+                    sample = 0
+                    if sample_idx is not None:
+                        sample = int(line[sample_idx])
 
-                if repetition not in repetitions:
-                    repetitions[repetition] = OrderedDict()
-                if fold not in repetitions[repetition]:
-                    repetitions[repetition][fold] = OrderedDict()
-                if sample not in repetitions[repetition][fold]:
-                    repetitions[repetition][fold][sample] = ([], [])
-                split = repetitions[repetition][fold][sample]
+                    if repetition not in repetitions:
+                        repetitions[repetition] = OrderedDict()
+                    if fold not in repetitions[repetition]:
+                        repetitions[repetition][fold] = OrderedDict()
+                    if sample not in repetitions[repetition][fold]:
+                        repetitions[repetition][fold][sample] = ([], [])
+                    split = repetitions[repetition][fold][sample]
 
-                type_ = line[type_idx]
-                if type_ == 'TRAIN':
-                    split[0].append(line[rowid_idx])
-                elif type_ == 'TEST':
-                    split[1].append(line[rowid_idx])
-                else:
-                    raise ValueError(type_)
+                    type_ = line[type_idx]
+                    if type_ == 'TRAIN':
+                        split[0].append(line[rowid_idx])
+                    elif type_ == 'TEST':
+                        split[1].append(line[rowid_idx])
+                    else:
+                        raise ValueError(type_)
 
-            for repetition in repetitions:
-                for fold in repetitions[repetition]:
-                    for sample in repetitions[repetition][fold]:
-                        repetitions[repetition][fold][sample] = Split(
-                            np.array(repetitions[repetition][fold][sample][0],
-                                     dtype=np.int32),
-                            np.array(repetitions[repetition][fold][sample][1],
-                                     dtype=np.int32))
+                for repetition in repetitions:
+                    for fold in repetitions[repetition]:
+                        for sample in repetitions[repetition][fold]:
+                            repetitions[repetition][fold][sample] = Split(
+                                np.array(repetitions[repetition][fold][sample][0],
+                                         dtype=np.int32),
+                                np.array(repetitions[repetition][fold][sample][1],
+                                         dtype=np.int32))
 
-            with open(pkl_filename, "wb") as fh:
-                pickle.dump({"name": name, "repetitions": repetitions}, fh,
-                            protocol=2)
+            with tempfile.NamedTemporaryFile(delete=False) as fh:
+                pickle.dump({"name": name, "repetitions": repetitions}, fh, protocol=-1)
+                os.rename(fh.name, pkl_filename)
 
         return cls(name, '', repetitions)
 
