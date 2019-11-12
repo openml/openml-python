@@ -680,8 +680,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         serialization = self.extension.model_to_flow(fu)
         self.assertEqual(serialization.name,
                          'sklearn.pipeline.FeatureUnion('
-                         'ohe=sklearn.preprocessing.{}.OneHotEncoder)'
-                         'scaler=None'
+                         'ohe=sklearn.preprocessing.{}.OneHotEncoder,'
+                         'scaler=None)'
                          .format(module_name_encoder))
         new_model = self.extension.flow_to_model(serialization)
         self.assertEqual(type(new_model), type(fu))
@@ -1814,6 +1814,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         if not (~categorical_ind).any():
             clf[1][0].set_params(cont='drop')
 
+        # serializing model with non-actionable step
         run, flow = openml.runs.run_model_on_task(model=clf, task=task, return_flow=True)
 
         self.assertEqual(len(flow.components), 4)
@@ -1825,3 +1826,11 @@ class TestSklearnExtensionRunFunctions(TestBase):
                         OpenMLFlow))
         self.assertEqual(flow.components['prep'].components['columntransformer'].components['cat'],
                          'drop')
+
+        # de-serializing flow to a model with non-actionable step
+        model = self.extension.flow_to_model(flow)
+
+        self.assertEqual(type(model), type(clf))
+        self.assertNotEqual(model, clf)
+        self.assertEqual(len(model.named_steps), 4)
+        self.assertEqual(model.named_steps['variancethreshold'], None)

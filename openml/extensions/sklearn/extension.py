@@ -867,7 +867,7 @@ class SklearnExtension(Extension):
                 for i, sub_component_tuple in enumerate(rval):
                     identifier = sub_component_tuple[0]
                     sub_component = sub_component_tuple[1]
-                    sub_component_type = type(sub_component_tuple)
+                    # sub_component_type = type(sub_component_tuple)
                     if not 2 <= len(sub_component_tuple) <= 3:
                         # length 2 is for {VotingClassifier.estimators,
                         # Pipeline.steps, FeatureUnion.transformer_list}
@@ -896,33 +896,18 @@ class SklearnExtension(Extension):
                                                         identifier)
                         raise PyOpenMLError(msg)
 
-                    if sub_component is None:
-                        # In a FeatureUnion, Pipeline it is legal to have a None step
-
-                        pv = [identifier, None]
-                        if sub_component_type is tuple:
-                            parameter_value.append(tuple(pv))
-                        else:
-                            parameter_value.append(pv)
-                        sub_components_explicit.add(identifier)
-                        sub_components[identifier] = sub_component
-
-                    else:
-                        # Add the component to the list of components, add a
-                        # component reference as a placeholder to the list of
-                        # parameters, which will be replaced by the real component
-                        # when deserializing the parameter
-                        sub_components_explicit.add(identifier)
-                        sub_components[identifier] = sub_component
-                        component_reference = OrderedDict()  # type: Dict[str, Union[str, Dict]]
-                        component_reference['oml-python:serialized_object'] = 'component_reference'
-                        cr_value = OrderedDict()  # type: Dict[str, Any]
-                        cr_value['key'] = identifier
-                        cr_value['step_name'] = identifier
-                        if len(sub_component_tuple) == 3:
-                            cr_value['argument_1'] = sub_component_tuple[2]
-                        component_reference['value'] = cr_value
-                        parameter_value.append(component_reference)
+                    # when deserializing the parameter
+                    sub_components_explicit.add(identifier)
+                    sub_components[identifier] = sub_component
+                    component_reference = OrderedDict()  # type: Dict[str, Union[str, Dict]]
+                    component_reference['oml-python:serialized_object'] = 'component_reference'
+                    cr_value = OrderedDict()  # type: Dict[str, Any]
+                    cr_value['key'] = identifier
+                    cr_value['step_name'] = identifier
+                    if len(sub_component_tuple) == 3:
+                        cr_value['argument_1'] = sub_component_tuple[2]
+                    component_reference['value'] = cr_value
+                    parameter_value.append(component_reference)
 
                 # Here (and in the elif and else branch below) are the only
                 # places where we encode a value as json to make sure that all
