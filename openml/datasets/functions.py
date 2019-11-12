@@ -886,7 +886,7 @@ def _get_dataset_arff(description: Union[Dict, OpenMLDataset],
     output_file_path = os.path.join(cache_directory, "dataset.arff")
 
     try:
-        openml.utils._download_text_file(
+        openml._api_calls._download_text_file(
             source=url,
             output_path=output_file_path,
             md5_checksum=md5_checksum_fixture
