@@ -28,10 +28,9 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
 import sklearn.cluster
-from sklearn.pipeline import make_pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 import openml
 from openml.extensions.sklearn import SklearnExtension
@@ -1782,8 +1781,9 @@ class TestSklearnExtensionRunFunctions(TestBase):
                          SklearnExtension.trim_flow_name("weka.IsolationForest"))
 
     @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
-                     reason="SimpleImputer available only after 0.19")
+                     reason="SimpleImputer, ColumnTransformer available only after 0.19")
     def test_run_on_model_with_empty_steps(self):
+        from sklearn.compose import ColumnTransformer
         # testing 'drop', 'passthrough', None as non-actionable sklearn estimators
         dataset = openml.datasets.get_dataset(128)
         task = openml.tasks.get_task(59)
@@ -1829,7 +1829,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
         # de-serializing flow to a model with non-actionable step
         model = self.extension.flow_to_model(flow)
-
+        model.fit(X, y)
         self.assertEqual(type(model), type(clf))
         self.assertNotEqual(model, clf)
         self.assertEqual(len(model.named_steps), 4)

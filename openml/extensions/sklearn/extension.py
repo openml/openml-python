@@ -754,7 +754,7 @@ class SklearnExtension(Extension):
     def _get_external_version_string(
         self,
         model: Any,
-        sub_components: Dict[str, Union[OpenMLFlow, str, None]],
+        sub_components: Dict[str, OpenMLFlow],
     ) -> str:
         # Create external version string for a flow, given the model and the
         # already parsed dictionary of sub_components. Retrieves the external
@@ -785,9 +785,9 @@ class SklearnExtension(Extension):
     def _check_multiple_occurence_of_component_in_flow(
         self,
         model: Any,
-        sub_components: Dict[str, Union[OpenMLFlow, str, None]],
+        sub_components: Dict[str, OpenMLFlow],
     ) -> None:
-        to_visit_stack = []  # type: List[Union[OpenMLFlow, str, None]]
+        to_visit_stack = []  # type: List[OpenMLFlow]
         to_visit_stack.extend(sub_components.values())
         known_sub_components = set()  # type: Set[str]
 
@@ -810,7 +810,7 @@ class SklearnExtension(Extension):
     ) -> Tuple[
         'OrderedDict[str, Optional[str]]',
         'OrderedDict[str, Optional[Dict]]',
-        'OrderedDict[str, Union[OpenMLFlow, str, None]]',
+        'OrderedDict[str, OpenMLFlow]',
         Set,
     ]:
         # This function contains four "global" states and is quite long and
@@ -820,7 +820,7 @@ class SklearnExtension(Extension):
         # separate class methods
 
         # stores all entities that should become subcomponents
-        sub_components = OrderedDict()  # type: OrderedDict[str, Union[OpenMLFlow, str, None]]
+        sub_components = OrderedDict()  # type: OrderedDict[str, OpenMLFlow]
         # stores the keys of all subcomponents that should become
         sub_components_explicit = set()
         parameters = OrderedDict()  # type: OrderedDict[str, Optional[str]]
