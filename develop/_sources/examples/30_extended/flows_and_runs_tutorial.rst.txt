@@ -133,7 +133,7 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
                         max_features='auto', max_leaf_nodes=None,
                         min_impurity_decrease=0.0, min_impurity_split=None,
                         min_samples_leaf=1, min_samples_split=2,
-                        min_weight_fraction_leaf=0.0, random_state=19682,
+                        min_weight_fraction_leaf=0.0, random_state=31551,
                         splitter='random')
     Dataset ID...: 68
     Dataset URL..: https://test.openml.org/d/68
@@ -164,7 +164,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/16061
+    Uploaded to http://test.openml.org/r/19856
 
 
 
@@ -258,7 +258,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/16062
+    Uploaded to http://test.openml.org/r/19857
 
 
 
@@ -366,7 +366,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/16064
+    kNN on diabetes: http://test.openml.org/r/19859
 
 
 
@@ -383,7 +383,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  18.751 seconds)
+   **Total running time of the script:** ( 0 minutes  18.864 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:
