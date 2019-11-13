@@ -28,7 +28,6 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
 import sklearn.cluster
-from sklearn.impute import SimpleImputer
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
@@ -38,7 +37,7 @@ from openml.exceptions import PyOpenMLError
 from openml.flows import OpenMLFlow
 from openml.flows.functions import assert_flows_equal
 from openml.runs.trace import OpenMLRunTrace
-from openml.testing import TestBase
+from openml.testing import TestBase, SimpleImputer
 
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -1780,8 +1779,9 @@ class TestSklearnExtensionRunFunctions(TestBase):
         self.assertEqual("weka.IsolationForest",
                          SklearnExtension.trim_flow_name("weka.IsolationForest"))
 
-    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
-                     reason="SimpleImputer, ColumnTransformer available only after 0.19")
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.21",
+                     reason="SimpleImputer, ColumnTransformer available only after 0.19 and "
+                            "Pipeline till 0.20 doesn't support indexing and 'passthrough'")
     def test_run_on_model_with_empty_steps(self):
         from sklearn.compose import ColumnTransformer
         # testing 'drop', 'passthrough', None as non-actionable sklearn estimators
