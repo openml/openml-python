@@ -226,17 +226,17 @@ def __parse_server_exception(
     url: str,
     file_elements: Dict,
 ) -> OpenMLServerError:
-    # OpenML has a sophisticated error system
-    # where information about failures is provided. try to parse this
+
+    if response.status_code == 414:
+        raise OpenMLServerError('URI too long! ({})'.format(url))
     try:
         server_exception = xmltodict.parse(response.text)
     except Exception:
-        if response.status_code == 414:
-            raise OpenMLServerError('URI too long! ({})'.format(url))
-        else:
-            raise OpenMLServerError(
-                'Unexpected server error when calling {}. Please contact the developers!\n'
-                'Status code: {}\n{}'.format(url, response.status_code, response.text))
+        # OpenML has a sophisticated error system
+        # where information about failures is provided. try to parse this
+        raise OpenMLServerError(
+            'Unexpected server error when calling {}. Please contact the developers!\n'
+            'Status code: {}\n{}'.format(url, response.status_code, response.text))
 
     server_error = server_exception['oml:error']
     code = int(server_error['oml:code'])
