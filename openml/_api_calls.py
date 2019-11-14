@@ -1,15 +1,15 @@
 # License: BSD 3-Clause
 
 import time
+import hashlib
 import logging
 import requests
-import warnings
 import xmltodict
-from typing import Dict
+from typing import Dict, Optional
 
 from . import config
 from .exceptions import (OpenMLServerError, OpenMLServerException,
-                         OpenMLServerNoResult)
+                         OpenMLServerNoResult, OpenMLHashException)
 
 
 def _perform_api_call(call, request_method, data=None, file_elements=None):
@@ -47,20 +47,105 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
     url = url.replace('=', '%3d')
     logging.info('Starting [%s] request for the URL %s', request_method, url)
     start = time.time()
+
     if file_elements is not None:
         if request_method != 'post':
-            raise ValueError('request method must be post when file elements '
-                             'are present')
-        response = _read_url_files(url, data=data, file_elements=file_elements)
+            raise ValueError('request method must be post when file elements are present')
+        response = __read_url_files(url, data=data, file_elements=file_elements)
     else:
-        response = _read_url(url, request_method, data)
+        response = __read_url(url, request_method, data)
+
+    __check_response(response, url, file_elements)
+
     logging.info(
         '%.7fs taken for [%s] request for the URL %s',
         time.time() - start,
         request_method,
         url,
     )
-    return response
+    return response.text
+
+
+def _download_text_file(source: str,
+                        output_path: Optional[str] = None,
+                        md5_checksum: str = None,
+                        exists_ok: bool = True,
+                        encoding: str = 'utf8',
+                        ) -> Optional[str]:
+    """ Download the text file at `source` and store it in `output_path`.
+
+    By default, do nothing if a file already exists in `output_path`.
+    The downloaded file can be checked against an expected md5 checksum.
+
+    Parameters
+    ----------
+    source : str
+        url of the file to be downloaded
+    output_path : str, (optional)
+        full path, including filename, of where the file should be stored. If ``None``,
+        this function returns the downloaded file as string.
+    md5_checksum : str, optional (default=None)
+        If not None, should be a string of hexidecimal digits of the expected digest value.
+    exists_ok : bool, optional (default=True)
+        If False, raise an FileExistsError if there already exists a file at `output_path`.
+    encoding : str, optional (default='utf8')
+        The encoding with which the file should be stored.
+    """
+    if output_path is not None:
+        try:
+            with open(output_path, encoding=encoding):
+                if exists_ok:
+                    return None
+                else:
+                    raise FileExistsError
+        except FileNotFoundError:
+            pass
+
+    logging.info('Starting [%s] request for the URL %s', 'get', source)
+    start = time.time()
+    response = __read_url(source, request_method='get')
+    __check_response(response, source, None)
+    downloaded_file = response.text
+
+    if md5_checksum is not None:
+        md5 = hashlib.md5()
+        md5.update(downloaded_file.encode('utf-8'))
+        md5_checksum_download = md5.hexdigest()
+        if md5_checksum != md5_checksum_download:
+            raise OpenMLHashException(
+                'Checksum {} of downloaded file is unequal to the expected checksum {}.'
+                .format(md5_checksum_download, md5_checksum))
+
+    if output_path is None:
+        logging.info(
+            '%.7fs taken for [%s] request for the URL %s',
+            time.time() - start,
+            'get',
+            source,
+        )
+        return downloaded_file
+
+    else:
+        with open(output_path, "w", encoding=encoding) as fh:
+            fh.write(downloaded_file)
+
+        logging.info(
+            '%.7fs taken for [%s] request for the URL %s',
+            time.time() - start,
+            'get',
+            source,
+        )
+
+        del downloaded_file
+        return None
+
+
+def __check_response(response, url, file_elements):
+    if response.status_code != 200:
+        raise __parse_server_exception(response, url, file_elements=file_elements)
+    elif 'Content-Encoding' not in response.headers or \
+            response.headers['Content-Encoding'] != 'gzip':
+        logging.warning('Received uncompressed content from OpenML for {}.'.format(url))
 
 
 def _file_id_to_url(file_id, filename=None):
@@ -75,7 +160,7 @@ def _file_id_to_url(file_id, filename=None):
     return url
 
 
-def _read_url_files(url, data=None, file_elements=None):
+def __read_url_files(url, data=None, file_elements=None):
     """do a post request to url with data
     and sending file_elements as files"""
 
@@ -85,37 +170,24 @@ def _read_url_files(url, data=None, file_elements=None):
         file_elements = {}
     # Using requests.post sets header 'Accept-encoding' automatically to
     # 'gzip,deflate'
-    response = send_request(
+    response = __send_request(
         request_method='post',
         url=url,
         data=data,
         files=file_elements,
     )
-    if response.status_code != 200:
-        raise _parse_server_exception(response, url, file_elements=file_elements)
-    if 'Content-Encoding' not in response.headers or \
-            response.headers['Content-Encoding'] != 'gzip':
-        warnings.warn('Received uncompressed content from OpenML for {}.'
-                      .format(url))
-    return response.text
+    return response
 
 
-def _read_url(url, request_method, data=None):
+def __read_url(url, request_method, data=None):
     data = {} if data is None else data
     if config.apikey is not None:
         data['api_key'] = config.apikey
 
-    response = send_request(request_method=request_method, url=url, data=data)
-    if response.status_code != 200:
-        raise _parse_server_exception(response, url, file_elements=None)
-    if 'Content-Encoding' not in response.headers or \
-            response.headers['Content-Encoding'] != 'gzip':
-        warnings.warn('Received uncompressed content from OpenML for {}.'
-                      .format(url))
-    return response.text
+    return __send_request(request_method=request_method, url=url, data=data)
 
 
-def send_request(
+def __send_request(
     request_method,
     url,
     data,
@@ -149,16 +221,19 @@ def send_request(
     return response
 
 
-def _parse_server_exception(
+def __parse_server_exception(
     response: requests.Response,
     url: str,
     file_elements: Dict,
 ) -> OpenMLServerError:
-    # OpenML has a sophisticated error system
-    # where information about failures is provided. try to parse this
+
+    if response.status_code == 414:
+        raise OpenMLServerError('URI too long! ({})'.format(url))
     try:
         server_exception = xmltodict.parse(response.text)
     except Exception:
+        # OpenML has a sophisticated error system
+        # where information about failures is provided. try to parse this
         raise OpenMLServerError(
             'Unexpected server error when calling {}. Please contact the developers!\n'
             'Status code: {}\n{}'.format(url, response.status_code, response.text))

@@ -327,8 +327,7 @@ class OpenMLRun(OpenMLBase):
             predictions_file_url = openml._api_calls._file_id_to_url(
                 self.output_files['predictions'], 'predictions.arff',
             )
-            response = openml._api_calls._read_url(predictions_file_url,
-                                                   request_method='get')
+            response = openml._api_calls._download_text_file(predictions_file_url)
             predictions_arff = arff.loads(response)
             # TODO: make this a stream reader
         else:
