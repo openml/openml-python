@@ -674,17 +674,17 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(new_model_params, fu_params)
         new_model.fit(self.X, self.y)
 
-        fu.set_params(scaler=None)
+        fu.set_params(scaler='drop')
         serialization = self.extension.model_to_flow(fu)
         self.assertEqual(serialization.name,
                          'sklearn.pipeline.FeatureUnion('
                          'ohe=sklearn.preprocessing.{}.OneHotEncoder,'
-                         'scaler=None)'
+                         'scaler=drop)'
                          .format(module_name_encoder))
         new_model = self.extension.flow_to_model(serialization)
         self.assertEqual(type(new_model), type(fu))
         self.assertIsNot(new_model, fu)
-        self.assertIs(new_model.transformer_list[1][1], None)
+        self.assertIs(new_model.transformer_list[1][1], 'drop')
 
     def test_serialize_feature_union_switched_names(self):
         ohe_params = ({'categories': 'auto'}
@@ -1804,7 +1804,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
         clf = sklearn.pipeline.Pipeline([
             ('dummystep', 'passthrough'),  # adding 'passthrough' as an estimator
             ('prep', clf),
-            ('variancethreshold', None),  # adding 'None' as an estimator
             ('classifier', sklearn.svm.SVC(gamma='auto'))
         ])
 
@@ -1817,10 +1816,9 @@ class TestSklearnExtensionRunFunctions(TestBase):
         # serializing model with non-actionable step
         run, flow = openml.runs.run_model_on_task(model=clf, task=task, return_flow=True)
 
-        self.assertEqual(len(flow.components), 4)
+        self.assertEqual(len(flow.components), 3)
         self.assertEqual(flow.components['dummystep'], 'passthrough')
         self.assertTrue(isinstance(flow.components['classifier'], OpenMLFlow))
-        self.assertEqual(flow.components['variancethreshold'], None)
         self.assertTrue(isinstance(flow.components['prep'], OpenMLFlow))
         self.assertTrue(isinstance(flow.components['prep'].components['columntransformer'],
                         OpenMLFlow))
@@ -1832,5 +1830,5 @@ class TestSklearnExtensionRunFunctions(TestBase):
         model.fit(X, y)
         self.assertEqual(type(model), type(clf))
         self.assertNotEqual(model, clf)
-        self.assertEqual(len(model.named_steps), 4)
-        self.assertEqual(model.named_steps['variancethreshold'], None)
+        self.assertEqual(len(model.named_steps), 3)
+        self.assertEqual(model.named_steps['dummystep'], 'passthrough')

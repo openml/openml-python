@@ -698,8 +698,6 @@ class SklearnExtension(Extension):
                 name = subcomponents[key].name
             elif isinstance(subcomponents[key], str):  # 'drop', 'passthrough' can be passed
                 name = subcomponents[key]
-            elif subcomponents[key] is None:
-                name = "None"
             if key in subcomponents_explicit:
                 sub_components_names += "," + key + "=" + name
             else:
@@ -776,7 +774,7 @@ class SklearnExtension(Extension):
         external_versions.add(sklearn_version)
         for visitee in sub_components.values():
             # 'drop', 'passthrough', None can be passed as estimators
-            if isinstance(visitee, str) or visitee is None:
+            if isinstance(visitee, str):
                 continue
             for external_version in visitee.external_version.split(','):
                 external_versions.add(external_version)
@@ -795,8 +793,6 @@ class SklearnExtension(Extension):
             visitee = to_visit_stack.pop()
             if isinstance(visitee, str):  # 'drop', 'passthrough' can be passed as estimators
                 known_sub_components.add(visitee)
-            elif visitee is None:  # a None step can be included in a Pipeline
-                known_sub_components.add(str(visitee))
             elif visitee.name in known_sub_components:
                 raise ValueError('Found a second occurence of component %s when '
                                  'trying to serialize %s.' % (visitee.name, model))
@@ -883,7 +879,12 @@ class SklearnExtension(Extension):
                             raise ValueError(msg)
                         else:
                             pass
-                    elif not isinstance(sub_component, (OpenMLFlow, type(None))):
+                    elif isinstance(sub_component, type(None)):
+                        msg = 'Cannot serialize objects of None type. Please replace with a '\
+                              'relevant placeholder. Note that empty sklearn estimators can be '\
+                              'replaced with \'drop\' or \'passthrough\'.'
+                        raise ValueError(msg)
+                    elif not isinstance(sub_component, OpenMLFlow):
                         msg = 'Second item of tuple does not match assumptions. ' \
                               'Expected OpenMLFlow, got %s' % type(sub_component)
                         raise TypeError(msg)
