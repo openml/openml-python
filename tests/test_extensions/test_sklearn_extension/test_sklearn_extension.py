@@ -608,6 +608,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         serialization2 = self.extension.model_to_flow(new_model)
         assert_flows_equal(serialization, serialization2)
 
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
+                     reason="Pipeline processing behaviour updated")
     def test_serialize_feature_union(self):
         ohe_params = {'sparse': False}
         if LooseVersion(sklearn.__version__) >= "0.20":
@@ -1832,3 +1834,12 @@ class TestSklearnExtensionRunFunctions(TestBase):
         self.assertNotEqual(model, clf)
         self.assertEqual(len(model.named_steps), 3)
         self.assertEqual(model.named_steps['dummystep'], 'passthrough')
+
+    def test_sklearn_serialization_with_none_step(self):
+        msg = 'Cannot serialize objects of None type. Please use a valid ' \
+              'placeholder for None. Note that empty sklearn estimators can be ' \
+              'replaced with \'drop\' or \'passthrough\'.'
+        clf = sklearn.pipeline.Pipeline([('dummystep', None),
+                                         ('classifier', sklearn.svm.SVC(gamma='auto'))])
+        with self.assertRaisesRegex(ValueError, msg):
+            self.extension.model_to_flow(clf)

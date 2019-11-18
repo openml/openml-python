@@ -880,8 +880,8 @@ class SklearnExtension(Extension):
                         else:
                             pass
                     elif isinstance(sub_component, type(None)):
-                        msg = 'Cannot serialize objects of None type. Please replace with a '\
-                              'relevant placeholder. Note that empty sklearn estimators can be '\
+                        msg = 'Cannot serialize objects of None type. Please use a valid ' \
+                              'placeholder for None. Note that empty sklearn estimators can be '\
                               'replaced with \'drop\' or \'passthrough\'.'
                         raise ValueError(msg)
                     elif not isinstance(sub_component, OpenMLFlow):
