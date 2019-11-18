@@ -40,6 +40,7 @@ In this example, we shall do the following:
 
 
 
+
 Listing evaluations
 *******************
 Evaluations can be retrieved from the database in the chosen output format.
@@ -80,6 +81,7 @@ Required filters can be applied to retrieve results from runs as required.
 
 
 
+
 Viewing a sample task
 =====================
 Over here we shall briefly take a look at the details of the task.
@@ -112,6 +114,7 @@ Over here we shall briefly take a look at the details of the task.
     Target Feature.......: class
     # of Classes.........: 3
     Cost Matrix..........: Available
+
 
 
 
@@ -171,6 +174,7 @@ Note that we now filter the evaluations based on another parameter 'task'.
 
 
 
+
 Obtaining CDF of metric for chosen task
 ***************************************
 We shall now analyse how the performance of various flows have been on this task,
@@ -211,6 +215,7 @@ We shall now plot a cumulative distributive function (CDF) for the accuracies ob
 
 .. image:: /examples/30_extended/images/sphx_glr_fetch_evaluations_tutorial_001.png
     :class: sphx-glr-single-img
+
 
 
 
@@ -295,6 +300,7 @@ For this, we shall compare the top performing flows.
 
 
 
+
 Obtaining evaluations with hyperparameter settings
 ==================================================
 We'll now obtain the evaluations of a task and a flow with the hyperparameters
@@ -356,12 +362,14 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
 
     [10 rows x 29 columns]
 
+    ''
+
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  16.681 seconds)
+   **Total running time of the script:** ( 0 minutes  16.301 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_fetch_evaluations_tutorial.py:

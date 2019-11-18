@@ -11,7 +11,7 @@ Examples
 
 .. raw:: html
 
-    <div style='clear:both'></div>
+    <div class="sphx-glr-clear"></div>
 
 
 
@@ -30,9 +30,9 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_suites_tutorial_thumb.png
+ .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_suites_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py`
+     :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py`
 
 .. raw:: html
 
@@ -50,9 +50,9 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_flows_and_runs_tutorial_thumb.png
+ .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_flows_and_runs_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py`
+     :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py`
 
 .. raw:: html
 
@@ -70,9 +70,9 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/20_basic/images/thumb/sphx_glr_introduction_tutorial_thumb.png
+ .. figure:: /examples/20_basic/images/thumb/sphx_glr_introduction_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`
+     :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`
 
 .. raw:: html
 
@@ -90,9 +90,9 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_datasets_tutorial_thumb.png
+ .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_datasets_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py`
+     :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py`
 
 .. raw:: html
 
@@ -105,7 +105,7 @@ Introductory examples to the usage of the OpenML python connector.
    /examples/20_basic/simple_datasets_tutorial
 .. raw:: html
 
-    <div style='clear:both'></div>
+    <div class="sphx-glr-clear"></div>
 
 
 
@@ -123,9 +123,9 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/30_extended/images/thumb/sphx_glr_flow_id_tutorial_thumb.png
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_flow_id_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py`
+     :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py`
 
 .. raw:: html
 
@@ -143,9 +143,9 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/30_extended/images/thumb/sphx_glr_suites_tutorial_thumb.png
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_suites_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_30_extended_suites_tutorial.py`
+     :ref:`sphx_glr_examples_30_extended_suites_tutorial.py`
 
 .. raw:: html
 
@@ -163,9 +163,9 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/30_extended/images/thumb/sphx_glr_configure_logging_thumb.png
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_configure_logging_thumb.png
 
-        :ref:`sphx_glr_examples_30_extended_configure_logging.py`
+     :ref:`sphx_glr_examples_30_extended_configure_logging.py`
 
 .. raw:: html
 
@@ -183,9 +183,9 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/30_extended/images/thumb/sphx_glr_plot_svm_hyperparameters_tutorial_thumb.png
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_plot_svm_hyperparameters_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_30_extended_plot_svm_hyperparameters_tutorial.py`
+     :ref:`sphx_glr_examples_30_extended_plot_svm_hyperparameters_tutorial.py`
 
 .. raw:: html
 
@@ -203,9 +203,9 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/30_extended/images/thumb/sphx_glr_study_tutorial_thumb.png
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_study_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_30_extended_study_tutorial.py`
+     :ref:`sphx_glr_examples_30_extended_study_tutorial.py`
 
 .. raw:: html
 
@@ -223,9 +223,9 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/30_extended/images/thumb/sphx_glr_datasets_tutorial_thumb.png
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_datasets_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py`
+     :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py`
 
 .. raw:: html
 
@@ -243,9 +243,9 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/30_extended/images/thumb/sphx_glr_run_setup_tutorial_thumb.png
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_run_setup_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py`
+     :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py`
 
 .. raw:: html
 
@@ -263,9 +263,9 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/30_extended/images/thumb/sphx_glr_tasks_tutorial_thumb.png
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_tasks_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_30_extended_tasks_tutorial.py`
+     :ref:`sphx_glr_examples_30_extended_tasks_tutorial.py`
 
 .. raw:: html
 
@@ -283,9 +283,9 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/30_extended/images/thumb/sphx_glr_flows_and_runs_tutorial_thumb.png
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_flows_and_runs_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_30_extended_flows_and_runs_tutorial.py`
+     :ref:`sphx_glr_examples_30_extended_flows_and_runs_tutorial.py`
 
 .. raw:: html
 
@@ -303,9 +303,9 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/30_extended/images/thumb/sphx_glr_task_manual_iteration_tutorial_thumb.png
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_task_manual_iteration_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_30_extended_task_manual_iteration_tutorial.py`
+     :ref:`sphx_glr_examples_30_extended_task_manual_iteration_tutorial.py`
 
 .. raw:: html
 
@@ -323,9 +323,9 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/30_extended/images/thumb/sphx_glr_fetch_evaluations_tutorial_thumb.png
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_fetch_evaluations_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_30_extended_fetch_evaluations_tutorial.py`
+     :ref:`sphx_glr_examples_30_extended_fetch_evaluations_tutorial.py`
 
 .. raw:: html
 
@@ -343,9 +343,9 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
-    .. figure:: /examples/30_extended/images/thumb/sphx_glr_create_upload_tutorial_thumb.png
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_create_upload_tutorial_thumb.png
 
-        :ref:`sphx_glr_examples_30_extended_create_upload_tutorial.py`
+     :ref:`sphx_glr_examples_30_extended_create_upload_tutorial.py`
 
 .. raw:: html
 
@@ -358,7 +358,7 @@ Extended examples for the usage of the OpenML python connector.
    /examples/30_extended/create_upload_tutorial
 .. raw:: html
 
-    <div style='clear:both'></div>
+    <div class="sphx-glr-clear"></div>
 
 
 
@@ -378,9 +378,9 @@ its use in recent publications.
 
 .. only:: html
 
-    .. figure:: /examples/40_paper/images/thumb/sphx_glr_2015_neurips_feurer_example_thumb.png
+ .. figure:: /examples/40_paper/images/thumb/sphx_glr_2015_neurips_feurer_example_thumb.png
 
-        :ref:`sphx_glr_examples_40_paper_2015_neurips_feurer_example.py`
+     :ref:`sphx_glr_examples_40_paper_2015_neurips_feurer_example.py`
 
 .. raw:: html
 
@@ -398,9 +398,9 @@ its use in recent publications.
 
 .. only:: html
 
-    .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_ida_strang_example_thumb.png
+ .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_ida_strang_example_thumb.png
 
-        :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py`
+     :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py`
 
 .. raw:: html
 
@@ -418,9 +418,9 @@ its use in recent publications.
 
 .. only:: html
 
-    .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_kdd_rijn_example_thumb.png
+ .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_kdd_rijn_example_thumb.png
 
-        :ref:`sphx_glr_examples_40_paper_2018_kdd_rijn_example.py`
+     :ref:`sphx_glr_examples_40_paper_2018_kdd_rijn_example.py`
 
 .. raw:: html
 
@@ -438,9 +438,9 @@ its use in recent publications.
 
 .. only:: html
 
-    .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_neurips_perrone_example_thumb.png
+ .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_neurips_perrone_example_thumb.png
 
-        :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py`
+     :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py`
 
 .. raw:: html
 
@@ -453,7 +453,7 @@ its use in recent publications.
    /examples/40_paper/2018_neurips_perrone_example
 .. raw:: html
 
-    <div style='clear:both'></div>
+    <div class="sphx-glr-clear"></div>
 
 
 

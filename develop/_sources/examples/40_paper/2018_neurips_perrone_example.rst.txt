@@ -54,6 +54,7 @@ In the following section, we shall do the following:
 
 
 
+
 The subsequent functions are defined to fetch tasks, flows, evaluations and preprocess them into
 a tabular format that can be used to build models.
 
@@ -170,6 +171,7 @@ a tabular format that can be used to build models.
 
 
 
+
 Fetching the data from OpenML
 *****************************
 Now, we read all the tasks and evaluations for them and collate into a table.
@@ -195,18 +197,19 @@ pre-processing all retrieved evaluations.
 
  .. code-block:: none
 
-                         cost degree            gamma      kernel
-    2401  0.00223141689517568      5              NaN  polynomial
-    3988    0.122151474625084    NaN              NaN  polynomial
-    3690     1.33419364140706      4              NaN  polynomial
-    940     0.866885199435372    NaN  150.09731761567         NaN
-    237      1.81984300327009    NaN              NaN  polynomial
-    Y :  2401    0.480292
-    3988    0.518984
-    3690    0.514084
-    940     0.499272
-    237     0.904236
+                       cost degree            gamma      kernel
+    3981   1.31850489352823    NaN              NaN      linear
+    2204  0.879992478903583    NaN  677.02730799692         NaN
+    4654  0.104438912660752      5              NaN  polynomial
+    2964  0.552759104017109    NaN              NaN      linear
+    4523   223.240178071129    NaN              NaN      linear
+    Y :  3981    0.618578
+    2204    0.572686
+    4654    0.978265
+    2964    0.663774
+    4523    0.984660
     Name: value, dtype: float64
+
 
 
 
@@ -248,6 +251,7 @@ using One-hot encoding prior to modelling.
 
 
 
+
 Building a surrogate model on a task's evaluation
 *************************************************
 The same set of functions can be used for a single task to retrieve a singular table which can
@@ -280,7 +284,8 @@ time simple and quick.
  .. code-block:: none
 
     Task ID :  145878
-    Training RMSE : 1.4231e-05
+    Training RMSE : 1.2366e-05
+
 
 
 
@@ -328,19 +333,20 @@ NOTE: This section is written exclusively for the SVM flow
  .. code-block:: none
 
                cost    degree       gamma      kernel
-    0    947.013575  3.825341  866.229678      linear
-    1    506.557591  2.420370  381.681399      linear
-    2     88.922370  2.919230  514.374354      linear
-    3    673.390891  2.347999  167.003493  polynomial
-    4    539.903137  3.256770  123.198780     sigmoid
+    0    903.221534  4.797079   23.381054  polynomial
+    1    824.726411  2.669889  829.044079      linear
+    2    907.436642  4.526759  666.406180      radial
+    3    748.057742  2.066723  207.113439      radial
+    4    461.048761  3.231039  649.916253     sigmoid
     ..          ...       ...         ...         ...
-    995  753.767443  3.167544  902.933606      linear
-    996  883.010616  4.407911  252.996728      linear
-    997  352.617982  4.329903  841.962918      linear
-    998  355.860867  3.522732  175.110450  polynomial
-    999  120.247916  3.894622  282.995637      radial
+    995  195.057094  2.669719  634.877153  polynomial
+    996  451.931414  2.362913  887.553194  polynomial
+    997  559.348000  4.970631  288.983860      radial
+    998  399.242967  2.409647  868.891217  polynomial
+    999  966.292174  4.015028   71.023344  polynomial
 
     [1000 rows x 4 columns]
+
 
 
 
@@ -366,12 +372,21 @@ NOTE: This section is written exclusively for the SVM flow
     :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    Text(0, 0.5, 'Regret')
+
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  31.882 seconds)
+   **Total running time of the script:** ( 0 minutes  32.226 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_neurips_perrone_example.py:

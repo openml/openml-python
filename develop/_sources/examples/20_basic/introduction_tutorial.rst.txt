@@ -76,6 +76,7 @@ There are two ways to authenticate:
 
 
 
+
 When using the main server instead, make sure your apikey is configured.
 This can be done with the following line of code (uncomment it!).
 Never share your apikey with others.
@@ -85,6 +86,7 @@ Never share your apikey with others.
 
 
     # openml.config.apikey = 'YOURKEY'
+
 
 
 
@@ -111,6 +113,7 @@ through the API:
     # Uncomment and set your OpenML cache directory
     # import os
     # openml.config.cache_directory = os.path.expanduser('YOURDIR')
+
 
 
 
@@ -145,7 +148,8 @@ Download the OpenML task for the eeg-eye-state.
 
  .. code-block:: none
 
-    kNN on eeg-eye-state: http://test.openml.org/r/22826
+    kNN on eeg-eye-state: http://test.openml.org/r/23179
+
 
 
 
@@ -160,9 +164,10 @@ Download the OpenML task for the eeg-eye-state.
 
 
 
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  12.486 seconds)
+   **Total running time of the script:** ( 0 minutes  12.519 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_introduction_tutorial.py:

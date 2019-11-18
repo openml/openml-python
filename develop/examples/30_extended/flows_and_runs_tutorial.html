@@ -151,6 +151,12 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
 <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>KNeighborsClassifier(algorithm=&#39;auto&#39;, leaf_size=30, metric=&#39;minkowski&#39;,
+                     metric_params=None, n_jobs=None, n_neighbors=1, p=2,
+                     weights=&#39;uniform&#39;)
+</pre></div>
+</div>
 <p>You can also ask for meta-data to automatically preprocess the data.</p>
 <ul class="simple">
 <li><p>e.g. categorical features -&gt; do feature encoding</p></li>
@@ -169,6 +175,10 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Categorical features: [True, False, True, True, False, True, True, False, True, True, False, True, False, True, True, False, True, False, True, True]
+
+KNeighborsClassifier(algorithm=&#39;auto&#39;, leaf_size=30, metric=&#39;minkowski&#39;,
+                     metric_params=None, n_jobs=None, n_neighbors=1, p=2,
+                     weights=&#39;uniform&#39;)
 </pre></div>
 </div>
 </div>
@@ -204,7 +214,7 @@ Setup String.: Python_3.7.5. Sklearn_0.21.2. NumPy_1.17.4. SciPy_1.3.2. ExtraTre
                     max_features=&#39;auto&#39;, max_leaf_nodes=None,
                     min_impurity_decrease=0.0, min_impurity_split=None,
                     min_samples_leaf=1, min_samples_split=2,
-                    min_weight_fraction_leaf=0.0, random_state=1258,
+                    min_weight_fraction_leaf=0.0, random_state=1887,
                     splitter=&#39;random&#39;)
 Dataset ID...: 68
 Dataset URL..: https://test.openml.org/d/68
@@ -220,7 +230,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/22843
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/23202
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -286,7 +296,7 @@ scipy&gt;=0.9
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/22847
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/23203
 </pre></div>
 </div>
 </div>
@@ -315,6 +325,25 @@ a model on a task without uploading results or flows to the server immediately.<
 
 <span class="c1"># Publishing the run will automatically upload the related flow if</span>
 <span class="c1"># it does not yet exist on the server.</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Run
+==========
+Uploader Name: None
+Metric.......: None
+Run ID.......: 23204
+Run URL......: https://test.openml.org/r/23204
+Task ID......: 6
+Task Type....: None
+Task URL.....: https://test.openml.org/t/6
+Flow ID......: 26988
+Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(Nominal=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder)),Classifier=sklearn.ensemble.forest.RandomForestClassifier)
+Flow URL.....: https://test.openml.org/f/26988
+Setup ID.....: None
+Setup String.: None
+Dataset ID...: None
+Dataset URL..: https://test.openml.org/d/None
 </pre></div>
 </div>
 <p>Alternatively, one can also directly run flows.</p>
@@ -362,13 +391,13 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/22851
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/23207
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  18.658 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  18.355 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9e0617073c8209f15abf91f273871776/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></p>

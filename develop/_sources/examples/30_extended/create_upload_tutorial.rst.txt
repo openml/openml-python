@@ -32,6 +32,7 @@ A tutorial on how to create and upload a dataset to OpenML.
 
 
 
+
 .. warning:: This example uploads data. For that reason, this example
   connects to the test server at test.openml.org. This prevents the main
   server from crowding with example datasets, tasks, runs, and so on.
@@ -41,6 +42,7 @@ A tutorial on how to create and upload a dataset to OpenML.
 
 
     openml.config.start_using_configuration_for_example()
+
 
 
 
@@ -82,6 +84,7 @@ via the API.
 
 
 
+
 OpenML does not distinguish between the attributes and targets on the data
 level and stores all data in a single matrix.
 
@@ -106,6 +109,7 @@ that data).
         'http://web.stanford.edu/~hastie/Papers/'
         'LARS/LeastAngle_2002.pdf'
     )
+
 
 
 
@@ -171,6 +175,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
 
 
+
 .. code-block:: default
 
 
@@ -187,7 +192,8 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/14720
+    URL for dataset: https://test.openml.org/d/14925
+
 
 
 
@@ -269,6 +275,7 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
 
 
+
 .. code-block:: default
 
 
@@ -285,7 +292,8 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/14721
+    URL for dataset: https://test.openml.org/d/14926
+
 
 
 
@@ -334,6 +342,7 @@ function :func:`create_dataset`. In this regard, you only need to pass
 
 
 
+
 We enforce the column 'outlook', 'windy', and 'play' to be a categorical
 dtype while the column 'rnd_str' is kept as a string column. Then, we can
 call :func:`create_dataset` by passing the dataframe and fixing the parameter
@@ -376,6 +385,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
 
 
+
 .. code-block:: default
 
 
@@ -392,7 +402,8 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/14722
+    URL for dataset: https://test.openml.org/d/14927
+
 
 
 
@@ -438,6 +449,7 @@ Dataset is a sparse matrix
 
 
 
+
 .. code-block:: default
 
 
@@ -455,7 +467,8 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/14723
+    URL for dataset: https://test.openml.org/d/14928
+
 
 
 
@@ -544,6 +557,7 @@ Dataset is a pandas sparse dataframe
 
 
 
+
 .. code-block:: default
 
 
@@ -561,7 +575,8 @@ Dataset is a pandas sparse dataframe
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/14724
+    URL for dataset: https://test.openml.org/d/14929
+
 
 
 
@@ -576,9 +591,10 @@ Dataset is a pandas sparse dataframe
 
 
 
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.289 seconds)
+   **Total running time of the script:** ( 0 minutes  5.248 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:
