@@ -99,8 +99,13 @@ def run_model_on_task(
 
     flow = extension.model_to_flow(model)
 
-    if isinstance(task, (int, str)):
-        task = get_task(int(task))
+    def get_task_and_type_conversion(task: Union[int, str, OpenMLTask]) -> OpenMLTask:
+        if isinstance(task, (int, str)):
+            return get_task(int(task))
+        else:
+            return task
+
+    task = get_task_and_type_conversion(task)
 
     run = run_flow_on_task(
         task=task,
