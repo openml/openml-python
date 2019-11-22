@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>.run_model_on_task<a class="headerlink" href="#openml-runs-run-model-on-task" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.runs.run_model_on_task">
-<code class="sig-prename descclassname">openml.runs.</code><code class="sig-name descname">run_model_on_task</code><span class="sig-paren">(</span><em class="sig-param">model: Any</em>, <em class="sig-param">task: openml.tasks.task.OpenMLTask</em>, <em class="sig-param">avoid_duplicate_runs: bool = True</em>, <em class="sig-param">flow_tags: List[str] = None</em>, <em class="sig-param">seed: int = None</em>, <em class="sig-param">add_local_measures: bool = True</em>, <em class="sig-param">upload_flow: bool = False</em>, <em class="sig-param">return_flow: bool = False</em><span class="sig-paren">)</span> &#x2192; Union[openml.runs.run.OpenMLRun, Tuple[openml.runs.run.OpenMLRun, openml.flows.flow.OpenMLFlow]]<a class="headerlink" href="#openml.runs.run_model_on_task" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openml.runs.</code><code class="sig-name descname">run_model_on_task</code><span class="sig-paren">(</span><em class="sig-param">model: Any, task: Union[int, str, openml.tasks.task.OpenMLTask], avoid_duplicate_runs: bool = True, flow_tags: List[str] = None, seed: int = None, add_local_measures: bool = True, upload_flow: bool = False, return_flow: bool = False</em><span class="sig-paren">)</span> &#x2192; Union[openml.runs.run.OpenMLRun, Tuple[openml.runs.run.OpenMLRun, openml.flows.flow.OpenMLFlow]]<a class="headerlink" href="#openml.runs.run_model_on_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the model on the dataset defined by the task.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -122,7 +122,8 @@
 all supervised estimators of scikit learn follow this definition of a model [1]
 [1](<a class="reference external" href="http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html">http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html</a>)</p>
 </dd>
-<dt><strong>task</strong><span class="classifier">OpenMLTask</span></dt><dd><p>Task to perform. This may be a model instead if the first argument is an OpenMLTask.</p>
+<dt><strong>task</strong><span class="classifier">OpenMLTask or int or str</span></dt><dd><p>Task to perform or Task id.
+This may be a model instead if the first argument is an OpenMLTask.</p>
 </dd>
 <dt><strong>avoid_duplicate_runs</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, the run will throw an error if the setup/task combination is already present on
 the server. This feature requires an internet connection.</p>

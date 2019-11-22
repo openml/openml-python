@@ -227,11 +227,11 @@ Note that we now filter the evaluations based on another parameter ‘task’.</
 
 Displaying head of sorted dataframe:
         run_id  task_id  setup_id  ...     value values  array_data
-2765  10279797   167140   8166877  ...  0.968613   None        None
-2766  10279798   167140   8166877  ...  0.968613   None        None
-2223  10232158   167140   8157180  ...  0.967671   None        None
-2240  10232987   167140   8157961  ...  0.967671   None        None
-2830  10291679   167140   8157545  ...  0.967043   None        None
+2780  10279798   167140   8166877  ...  0.968613   None        None
+2779  10279797   167140   8166877  ...  0.968613   None        None
+2237  10232158   167140   8157180  ...  0.967671   None        None
+2254  10232987   167140   8157961  ...  0.967671   None        None
+2844  10291679   167140   8157545  ...  0.967043   None        None
 
 [5 rows x 14 columns]
 </pre></div>
@@ -324,15 +324,15 @@ For this, we shall compare the top performing flows.</p>
 <img alt="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(12736, &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)&#39;)
-(8353, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
-(8399, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)&#39;)
 (12127, &#39;sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)&#39;)
+(8399, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)&#39;)
+(8353, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
 (16347, &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,onehotencoder=sklearn.preprocessing._encoders.OneHotEncoder,svc=sklearn.svm.classes.SVC)(1)&#39;)
 (8317, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
+(17436, &#39;sklearn.pipeline.Pipeline(columntransformer=sklearn.compose._column_transformer.ColumnTransformer(numeric=sklearn.pipeline.Pipeline(imputer=sklearn.preprocessing.imputation.Imputer,standardscaler=sklearn.preprocessing.data.StandardScaler),nominal=sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,onehotencoder=sklearn.preprocessing._encoders.OneHotEncoder)),variancethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,gradientboostingclassifier=sklearn.ensemble.gradient_boosting.GradientBoostingClassifier)(2)&#39;)
 (8330, &#39;sklearn.pipeline.Pipeline(imputation=openmlstudy14.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,classifier=sklearn.svm.classes.SVC)(2)&#39;)
 (8666, &#39;weka.classifiers.meta.MultiSearch(weka.classifiers.meta.multisearch.RandomSearch,weka.classifiers.meta.FilteredClassifier(weka.filters.MultiFilter(weka.filters.unsupervised.attribute.ReplaceMissingValues,weka.filters.unsupervised.attribute.RemoveUseless,weka.filters.unsupervised.attribute.Normalize),weka.classifiers.functions.SMO(weka.classifiers.functions.supportVector.RBFKernel,weka.classifiers.functions.Logistic)))(1)&#39;)
 (8351, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier)(1)&#39;)
-(8365, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.ensemble.forest.RandomForestClassifier))(1)&#39;)
 </pre></div>
 </div>
 <div class="section" id="obtaining-evaluations-with-hyperparameter-settings">
@@ -387,7 +387,7 @@ For this, we shall compare the top performing flows.</p>
 &#39;&#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  15.843 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  15.431 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-fetch-evaluations-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ae7e73aff29ef9ace1e17781346a204b/fetch_evaluations_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_evaluations_tutorial.py</span></code></a></p>
