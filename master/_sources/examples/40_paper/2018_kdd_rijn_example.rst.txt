@@ -50,6 +50,7 @@ Publication
 
 
 
+
 With the advent of automated machine learning, automated hyperparameter
 optimization methods are by now routinely used in data mining. However, this
 progress is not yet matched by equal progress on automatic analyses that
@@ -182,6 +183,7 @@ https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdcc
 
 
 
+
 make the boxplot of the variance contribution. Obviously, we can also use
 this data to make the Nemenyi plot, but this relies on the rather complex
 ``Orange`` dependency (``pip install Orange3``). For the complete example,
@@ -207,9 +209,10 @@ the reader is referred to the more elaborate script (referred to earlier)
 
 
 
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  20.433 seconds)
+   **Total running time of the script:** ( 1 minutes  19.957 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_kdd_rijn_example.py:

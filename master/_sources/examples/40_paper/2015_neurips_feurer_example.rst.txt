@@ -38,6 +38,7 @@ Publication
 
 
 
+
 List of dataset IDs given in the supplementary material of Feurer et al.:
 https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning-supplemental.zip
 
@@ -56,6 +57,7 @@ https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learnin
         1056, 1067, 1068, 1069, 1111, 1112, 1114, 1116, 1119, 1120, 1128, 1130,
         1134, 1138, 1139, 1142, 1146, 1161, 1166,
     ]
+
 
 
 
@@ -132,9 +134,10 @@ datasets can be found in the `online docs <https://docs.openml.org/#dataset-stat
 
 
 
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.620 seconds)
+   **Total running time of the script:** ( 0 minutes  2.501 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2015_neurips_feurer_example.py:

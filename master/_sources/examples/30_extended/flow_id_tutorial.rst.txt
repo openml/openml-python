@@ -32,6 +32,7 @@ analysis.
 
 
 
+
 1. Obtaining a flow given a classifier
 ======================================
 
@@ -55,6 +56,7 @@ analysis.
  .. code-block:: none
 
     17347
+
 
 
 
@@ -89,6 +91,7 @@ To simplify the usage we have created a helper function which automates all thes
 
 
 
+
 2. Obtaining a flow given its name
 ==================================
 The schema of a flow is given in XSD (`here
@@ -119,6 +122,7 @@ algorithm or implementation introduces, renames or drop hyperparameters over tim
 
 
 
+
 The name and external version are automatically added to a flow when constructing it from a
 model. We can then use them to retrieve the flow id as follows:
 
@@ -140,6 +144,7 @@ model. We can then use them to retrieve the flow id as follows:
  .. code-block:: none
 
     17347
+
 
 
 
@@ -165,6 +170,7 @@ We can also retrieve all flows for a given name:
 
 
 
+
 This also works with the actual model (generalizing the first part of this example):
 
 
@@ -187,9 +193,10 @@ This also works with the actual model (generalizing the first part of this examp
 
 
 
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.168 seconds)
+   **Total running time of the script:** ( 0 minutes  6.904 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flow_id_tutorial.py:

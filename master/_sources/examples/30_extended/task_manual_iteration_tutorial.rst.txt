@@ -31,6 +31,7 @@ but not OpenML's functionality to conduct runs.
 
 
 
+
 For this tutorial we will use the famous King+Rook versus King+Pawn on A7 dataset, which has
 the dataset ID 3 (`dataset on OpenML <https://www.openml.org/d/3>`_), and for which there exist
 tasks with all important estimation procedures. It is small enough (less than 5000 samples) to
@@ -51,6 +52,7 @@ holdout estimation procedure.
 
 
 
+
 Now that we have a task object we can obtain the number of repetitions, folds and samples as
 defined by the task:
 
@@ -59,6 +61,7 @@ defined by the task:
 
 
     n_repeats, n_folds, n_samples = task.get_split_dimensions()
+
 
 
 
@@ -100,6 +103,7 @@ single repeat, a single fold and a single sample size:
 
 
 
+
 We can now retrieve the train/test split for this combination of repeats, folds and number of
 samples (indexing is zero-based). Usually, one would loop over all repeats, folds and sample
 sizes, but we can neglect this here as there is only a single repetition.
@@ -129,6 +133,7 @@ sizes, but we can neglect this here as there is only a single repetition.
 
     (2142,) int32
     (1054,) int32
+
 
 
 
@@ -164,6 +169,7 @@ And then split the data based on this:
 
 
 
+
 Obviously, we can also retrieve cross-validation versions of the dataset used in task ``233``:
 
 
@@ -190,6 +196,7 @@ Obviously, we can also retrieve cross-validation versions of the dataset used in
  .. code-block:: none
 
     Task 3: number of repeats: 1, number of folds: 10, number of samples 1.
+
 
 
 
@@ -242,6 +249,7 @@ And then perform the aforementioned iteration over all splits:
 
 
 
+
 And also versions with multiple repeats:
 
 
@@ -268,6 +276,7 @@ And also versions with multiple repeats:
  .. code-block:: none
 
     Task 1767: number of repeats: 5, number of folds: 2, number of samples 1.
+
 
 
 
@@ -320,6 +329,7 @@ And then again perform the aforementioned iteration over all splits:
 
 
 
+
 And finally a task based on learning curves:
 
 
@@ -346,6 +356,7 @@ And finally a task based on learning curves:
  .. code-block:: none
 
     Task 1702: number of repeats: 1, number of folds: 10, number of samples 12.
+
 
 
 
@@ -508,9 +519,10 @@ And then again perform the aforementioned iteration over all splits:
 
 
 
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.276 seconds)
+   **Total running time of the script:** ( 0 minutes  6.091 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_task_manual_iteration_tutorial.py:

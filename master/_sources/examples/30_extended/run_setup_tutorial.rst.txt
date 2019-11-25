@@ -58,6 +58,7 @@ In this tutorial we will
 
 
 
+
 1) Create a flow and use it to solve a task
 ##############################################################################
 
@@ -105,6 +106,7 @@ In this tutorial we will
 
 
 
+
 2) Download the flow and solve the same task again.
 ##############################################################################
 
@@ -132,6 +134,7 @@ In this tutorial we will
 
 
 
+
 3) We will verify that the obtained results are exactly the same.
 ##############################################################################
 
@@ -142,6 +145,7 @@ In this tutorial we will
     # the run has stored all predictions in the field data content
     np.testing.assert_array_equal(run_original.data_content,
                                   run_duplicate.data_content)
+
 
 
 
@@ -161,9 +165,10 @@ In this tutorial we will
 
 
 
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.226 seconds)
+   **Total running time of the script:** ( 0 minutes  6.988 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_run_setup_tutorial.py:

@@ -31,6 +31,7 @@ the datasets directly.
 
 
 
+
 List datasets
 =============
 
@@ -64,6 +65,7 @@ List datasets
     11   11    balance-scale  ...                      4.0                      1.0
 
     [10 rows x 16 columns]
+
 
 
 
@@ -104,6 +106,7 @@ Download a dataset
 
 
 
+
 Load a dataset
 ==============
 
@@ -121,6 +124,7 @@ Load a dataset
         dataset_format='dataframe',
         target=dataset.default_target_attribute
     )
+
 
 
 
@@ -160,9 +164,10 @@ Visualize the dataset
 
 
 
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  8.038 seconds)
+   **Total running time of the script:** ( 0 minutes  7.980 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_datasets_tutorial.py:

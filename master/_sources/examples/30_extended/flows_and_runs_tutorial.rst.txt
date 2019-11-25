@@ -27,6 +27,7 @@ How to train/run a model and how to upload the results.
 
 
 
+
 Train machine learning models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -53,6 +54,17 @@ Train a scikit-learn model on the data manually.
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+                         metric_params=None, n_jobs=None, n_neighbors=1, p=2,
+                         weights='uniform')
 
 
 
@@ -85,6 +97,10 @@ You can also ask for meta-data to automatically preprocess the data.
  .. code-block:: none
 
     Categorical features: [True, False, True, True, False, True, True, False, True, True, False, True, False, True, True, False, True, False, True, True]
+
+    KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+                         metric_params=None, n_jobs=None, n_neighbors=1, p=2,
+                         weights='uniform')
 
 
 
@@ -129,14 +145,15 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     Flow Name....: sklearn.tree.tree.ExtraTreeClassifier
     Flow URL.....: https://www.openml.org/f/24258
     Setup ID.....: None
-    Setup String.: Python_3.7.5. Sklearn_0.21.2. NumPy_1.17.4. SciPy_1.3.2. ExtraTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
+    Setup String.: Python_3.7.5. Sklearn_0.21.2. NumPy_1.17.4. SciPy_1.3.3. ExtraTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
                         max_features='auto', max_leaf_nodes=None,
                         min_impurity_decrease=0.0, min_impurity_split=None,
                         min_samples_leaf=1, min_samples_split=2,
-                        min_weight_fraction_leaf=0.0, random_state=25930,
+                        min_weight_fraction_leaf=0.0, random_state=42518,
                         splitter='random')
     Dataset ID...: 68
     Dataset URL..: https://www.openml.org/d/68
+
 
 
 
@@ -164,7 +181,8 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/23031
+    Uploaded to http://test.openml.org/r/24678
+
 
 
 
@@ -206,6 +224,7 @@ We can now also inspect the flow object which was automatically created:
     Dependencies....: sklearn==0.21.2
     numpy>=1.6.1
     scipy>=0.9
+
 
 
 
@@ -258,7 +277,8 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/23032
+    Uploaded to http://test.openml.org/r/24680
+
 
 
 
@@ -296,6 +316,30 @@ a model on a task without uploading results or flows to the server immediately.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    OpenML Run
+    ==========
+    Uploader Name: None
+    Metric.......: None
+    Run ID.......: 24681
+    Run URL......: https://www.openml.org/r/24681
+    Task ID......: 6
+    Task Type....: None
+    Task URL.....: https://www.openml.org/t/6
+    Flow ID......: 24261
+    Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(Nominal=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder)),Classifier=sklearn.ensemble.forest.RandomForestClassifier)
+    Flow URL.....: https://www.openml.org/f/24261
+    Setup ID.....: None
+    Setup String.: None
+    Dataset ID...: None
+    Dataset URL..: https://www.openml.org/d/None
+
 
 
 Alternatively, one can also directly run flows.
@@ -316,6 +360,7 @@ Alternatively, one can also directly run flows.
     flow = extension.model_to_flow(clf)
 
     run = openml.runs.run_flow_on_task(flow, task)
+
 
 
 
@@ -366,7 +411,8 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/23034
+    kNN on diabetes: http://test.openml.org/r/24682
+
 
 
 
@@ -381,9 +427,10 @@ them. Some tasks you could try (or browse openml.org):
 
 
 
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  18.822 seconds)
+   **Total running time of the script:** ( 0 minutes  18.538 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:

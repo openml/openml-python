@@ -26,6 +26,7 @@ Plotting hyperparameter surfaces
 
 
 
+
 First step - obtaining the data
 ===============================
 First, we nood to choose an SVM flow, for example 8353, and a task. Finding the IDs of them are
@@ -72,6 +73,7 @@ uploaded runs (called *setup*).
     9  9154576  ...                                               null                                                                                                                                                                                                                                                                   
 
     [10 rows x 46 columns]
+
 
 
 
@@ -142,6 +144,7 @@ We can see all the hyperparameter names in the columns of the dataframe:
 
 
 
+
 Next, we cast and transform the hyperparameters of interest (``C`` and ``gamma``) so that we
 can nicely plot them.
 
@@ -150,6 +153,7 @@ can nicely plot them.
 
     hyperparameters = ['sklearn.svm.classes.SVC(16)_C', 'sklearn.svm.classes.SVC(16)_gamma']
     df[hyperparameters] = df[hyperparameters].astype(float).apply(np.log)
+
 
 
 
@@ -179,6 +183,15 @@ Option 1 - plotting via the pandas helper functions
 .. image:: /examples/30_extended/images/sphx_glr_plot_svm_hyperparameters_tutorial_001.png
     :class: sphx-glr-single-img
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    <matplotlib.axes._subplots.AxesSubplot object at 0x7f3e61245710>
 
 
 
@@ -218,12 +231,21 @@ Option 2 - plotting via matplotlib
     :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    Text(0.5, 1.0, 'SVM performance landscape')
+
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.642 seconds)
+   **Total running time of the script:** ( 0 minutes  10.040 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_plot_svm_hyperparameters_tutorial.py:
