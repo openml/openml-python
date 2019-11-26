@@ -157,7 +157,7 @@ into a
 to have better visualization capabilities and easier access:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;First 5 of {len(tasks)} tasks:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First 5 of {len(tasks)} tasks:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 
 <span class="c1"># As conversion to a pandas dataframe is a common task, we have added this functionality to the</span>
@@ -233,7 +233,7 @@ First 5 of 3302 tasks:
 <a class="reference external" href="http://www.openml.org/search?type=measure&amp;q=estimation%20procedure">OpenML Website</a>.</p>
 <p>Similar to listing tasks by task type, we can list tasks by tags:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s1">&#39;OpenML100&#39;</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;First 5 of {len(tasks)} tasks:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First 5 of {len(tasks)} tasks:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -251,7 +251,7 @@ First 5 of 3302 tasks:
 </div>
 <p>Furthermore, we can list tasks based on the dataset id:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="mi">1471</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;First 5 of {len(tasks)} tasks:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First 5 of {len(tasks)} tasks:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -983,7 +983,7 @@ will be returned.</p>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&amp;type=measure">Complete list of model estimation procedures</a>.</p></li>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=measure_type%3Aevaluation_measure&amp;type=measure">Complete list of evaluation measures</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  29.843 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  30.013 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-tasks-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e6648ddbb54e75b09dd01d69be33f340/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></p>

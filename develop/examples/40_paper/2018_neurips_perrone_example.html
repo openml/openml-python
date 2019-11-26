@@ -147,13 +147,13 @@ maps hyperparameter values to the area under curve score.</p></li>
 <span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="k">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="k">import</span> <span class="n">SimpleImputer</span>
-<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="k">import</span> <span class="n">ColumnTransformer</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">mean_squared_error</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">OneHotEncoder</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">SimpleImputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
 
 <span class="n">flow_type</span> <span class="o">=</span> <span class="s1">&#39;svm&#39;</span>  <span class="c1"># this example will use the smaller svm flow evaluations</span>
 </pre></div>
@@ -275,16 +275,16 @@ pre-processing all retrieved evaluations.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                     cost degree               gamma      kernel
-2316     0.23351899127781    NaN                 NaN      linear
-4308     243.025423607266    NaN  0.0195528239987504         NaN
-3744  0.00422377857824577      2                 NaN  polynomial
-858     0.337254011902766    NaN                 NaN      linear
-722   0.00106700063107234      5                 NaN  polynomial
-Y :  2316    0.675713
-4308    0.989456
-3744    0.586266
-858     0.980025
-722     0.591490
+3378  0.00106562598593485    NaN                 NaN      linear
+1489     567.697829380661    NaN                 NaN      linear
+1129      1.6870779621062      2                 NaN  polynomial
+490     0.171733561530676    NaN  0.0874151528177306         NaN
+242     0.207484227886742    NaN    254.003599627294         NaN
+Y :  3378    0.611291
+1489    0.904361
+1129    0.830287
+490     0.663154
+242     0.499272
 Name: value, dtype: float64
 </pre></div>
 </div>
@@ -335,7 +335,7 @@ time simple and quick.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 2.2107e-05
+Training RMSE : 1.9006e-05
 </pre></div>
 </div>
 </div>
@@ -368,17 +368,17 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
-0    362.738417  4.158913  393.270472      radial
-1    219.864324  4.443837  815.745743      linear
-2    838.315499  3.988576  818.446847  polynomial
-3    690.006745  3.634661  171.616544      radial
-4    146.631610  2.122455  906.079449     sigmoid
+0    732.454648  4.803402  114.659480  polynomial
+1    326.305037  4.874292  364.537872     sigmoid
+2      6.177094  3.307355  188.215636  polynomial
+3    989.542310  4.978374  440.918722  polynomial
+4    173.389308  4.670089  472.191585     sigmoid
 ..          ...       ...         ...         ...
-995  691.880848  3.489397  913.281781      linear
-996  583.141386  3.453148  291.223629      linear
-997  147.746429  3.215238  204.788031      radial
-998  766.595479  2.901585  772.227593      linear
-999  864.898782  3.049771  251.128101      radial
+995  921.169382  2.945714  841.627981     sigmoid
+996  133.525780  3.564434  184.524284  polynomial
+997  583.706599  4.098914   98.606209      radial
+998  595.288630  3.913105   34.752361     sigmoid
+999   45.437638  3.188247  510.004320  polynomial
 
 [1000 rows x 4 columns]
 </pre></div>
@@ -402,7 +402,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  31.389 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  31.970 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
