@@ -30,7 +30,9 @@ def _create_log_handlers():
 
     one_mb = 2 ** 20
     log_path = os.path.join(cache_directory, 'openml_python.log')
-    file_handler = logging.handlers.RotatingFileHandler(log_path, maxBytes=one_mb, backupCount=1)
+    file_handler = logging.handlers.RotatingFileHandler(
+        log_path, maxBytes=one_mb, backupCount=1, delay=True
+    )
     file_handler.setFormatter(output_formatter)
 
 
@@ -304,10 +306,11 @@ _setup()
 
 
 _create_log_handlers()
+_config = _parse_config()
 
-if 'verbosity' in _defaults:
-    _console_log_level = cast(int, _defaults['verbosity'])
+if _config['FAKE_SECTION'].get('verbosity', None) is not None:
+    _console_log_level = int(_config.get('FAKE_SECTION', 'verbosity'))
     set_console_log_level(_console_log_level)
-if 'file_verbosity' in _defaults:
-    _file_log_level = cast(int, _defaults['file_verbosity'])
+if _config['FAKE_SECTION'].get('file_verbosity', None) is not None:
+    _file_log_level = int(_config.get('FAKE_SECTION', 'file_verbosity'))
     set_file_log_level(_file_log_level)
