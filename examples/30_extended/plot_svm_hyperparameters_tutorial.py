@@ -12,7 +12,7 @@ import numpy as np
 ####################################################################################################
 # First step - obtaining the data
 # ===============================
-# First, we nood to choose an SVM flow, for example 8353, and a task. Finding the IDs of them are
+# First, we need to choose an SVM flow, for example 8353, and a task. Finding the IDs of them are
 # not part of this tutorial, this could for example be done via the website.
 #
 # For this we use the function ``list_evaluations_setup`` which can automatically join
@@ -38,7 +38,7 @@ for name in df.columns:
 # Next, we cast and transform the hyperparameters of interest (``C`` and ``gamma``) so that we
 # can nicely plot them.
 hyperparameters = ['sklearn.svm.classes.SVC(16)_C', 'sklearn.svm.classes.SVC(16)_gamma']
-df[hyperparameters] = df[hyperparameters].astype(float).apply(np.log)
+df[hyperparameters] = df[hyperparameters].astype(float).apply(np.log10)
 
 ####################################################################################################
 # Option 1 - plotting via the pandas helper functions
