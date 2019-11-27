@@ -29,7 +29,7 @@ Plotting hyperparameter surfaces
 
 First step - obtaining the data
 ===============================
-First, we nood to choose an SVM flow, for example 8353, and a task. Finding the IDs of them are
+First, we need to choose an SVM flow, for example 8353, and a task. Finding the IDs of them are
 not part of this tutorial, this could for example be done via the website.
 
 For this we use the function ``list_evaluations_setup`` which can automatically join
@@ -152,7 +152,7 @@ can nicely plot them.
 .. code-block:: default
 
     hyperparameters = ['sklearn.svm.classes.SVC(16)_C', 'sklearn.svm.classes.SVC(16)_gamma']
-    df[hyperparameters] = df[hyperparameters].astype(float).apply(np.log)
+    df[hyperparameters] = df[hyperparameters].astype(float).apply(np.log10)
 
 
 
@@ -191,7 +191,7 @@ Option 1 - plotting via the pandas helper functions
  .. code-block:: none
 
 
-    <matplotlib.axes._subplots.AxesSubplot object at 0x7f7f63938710>
+    <matplotlib.axes._subplots.AxesSubplot object at 0x7fa553df4a90>
 
 
 
@@ -245,7 +245,7 @@ Option 2 - plotting via matplotlib
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.077 seconds)
+   **Total running time of the script:** ( 0 minutes  9.975 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_plot_svm_hyperparameters_tutorial.py:
