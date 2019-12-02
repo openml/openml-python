@@ -149,7 +149,7 @@
     <span class="s1">&#39;NumberOfFeatures&#39;</span><span class="p">,</span> <span class="s1">&#39;NumberOfClasses&#39;</span>
 <span class="p">]]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;First 10 of {len(datalist)} datasets...&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First 10 of {len(datalist)} datasets...&quot;</span><span class="p">)</span>
 <span class="n">datalist</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 
 <span class="c1"># The same can be done with lesser lines of code</span>
@@ -158,7 +158,7 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 2973 datasets...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 2976 datasets...
 </pre></div>
 </div>
 <div>
@@ -439,20 +439,20 @@
       <td>0.0</td>
     </tr>
     <tr>
-      <th>981</th>
-      <td>981</td>
-      <td>kdd_internet_usage</td>
-      <td>10108.0</td>
-      <td>69.0</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
       <th>372</th>
       <td>372</td>
       <td>internet_usage</td>
       <td>10108.0</td>
       <td>72.0</td>
       <td>46.0</td>
+    </tr>
+    <tr>
+      <th>981</th>
+      <td>981</td>
+      <td>kdd_internet_usage</td>
+      <td>10108.0</td>
+      <td>69.0</td>
+      <td>2.0</td>
     </tr>
     <tr>
       <th>1536</th>
@@ -543,20 +543,20 @@
       <td>3.0</td>
     </tr>
     <tr>
-      <th>32</th>
-      <td>32</td>
-      <td>pendigits</td>
-      <td>10992.0</td>
-      <td>17.0</td>
-      <td>10.0</td>
-    </tr>
-    <tr>
       <th>1019</th>
       <td>1019</td>
       <td>pendigits</td>
       <td>10992.0</td>
       <td>17.0</td>
       <td>2.0</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>32</td>
+      <td>pendigits</td>
+      <td>10992.0</td>
+      <td>17.0</td>
+      <td>10.0</td>
     </tr>
     <tr>
       <th>42199</th>
@@ -770,9 +770,9 @@
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">)</span>
 
 <span class="c1"># Print a summary</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;This is dataset &#39;</span><span class="si">{dataset.name}</span><span class="s2">&#39;, the target feature is &quot;</span>
-      <span class="n">f</span><span class="s2">&quot;&#39;</span><span class="si">{dataset.default_target_attribute}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;URL: </span><span class="si">{dataset.url}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This is dataset &#39;</span><span class="si">{dataset.name}</span><span class="s2">&#39;, the target feature is &quot;</span>
+      <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{dataset.default_target_attribute}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL: </span><span class="si">{dataset.url}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">description</span><span class="p">[:</span><span class="mi">500</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -886,7 +886,7 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 </pre></div>
 </div>
 <img alt="../../_images/sphx_glr_datasets_tutorial_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_datasets_tutorial_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.124 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.719 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-datasets-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/b95c071188526f5ef5d991e382df9fa5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>
@@ -912,7 +912,7 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
     </p>
     <p>
         &copy; Copyright 2014-2019, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

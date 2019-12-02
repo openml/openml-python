@@ -147,13 +147,13 @@ maps hyperparameter values to the area under curve score.</p></li>
 <span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="k">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="k">import</span> <span class="n">SimpleImputer</span>
-<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="k">import</span> <span class="n">ColumnTransformer</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">mean_squared_error</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">OneHotEncoder</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">SimpleImputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
 
 <span class="n">flow_type</span> <span class="o">=</span> <span class="s1">&#39;svm&#39;</span>  <span class="c1"># this example will use the smaller svm flow evaluations</span>
 </pre></div>
@@ -274,17 +274,17 @@ pre-processing all retrieved evaluations.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                    cost degree                gamma  kernel
-4677    12.3394617266211    NaN                  NaN  linear
-2644   0.160914162166068    NaN   0.0104724938480386     NaN
-1304    50.4645284560995    NaN                  NaN  linear
-3900     458.91107394426    NaN  0.00162063628796401     NaN
-466   0.0076128291033646    NaN  0.00282021314132745     NaN
-Y :  4677    0.991636
-2644    0.705542
-1304    0.905133
-3900    0.698083
-466     0.920731
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                    cost degree              gamma  kernel
+1303  0.0189626392890179    NaN  0.868276035344621     NaN
+1149   0.466593332120139    NaN                NaN  linear
+1837   0.291781484589755    NaN   4.52342171312087     NaN
+3668    14.1511325178061    NaN                NaN  linear
+3443  0.0592044136501759    NaN   0.44784899086766     NaN
+Y :  1303    0.849563
+1149    0.899386
+1837    0.724989
+3668    0.634412
+3443    0.761143
 Name: value, dtype: float64
 </pre></div>
 </div>
@@ -335,7 +335,7 @@ time simple and quick.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 1.9372e-05
+Training RMSE : 1.3939e-05
 </pre></div>
 </div>
 </div>
@@ -368,17 +368,17 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
-0     52.092622  4.966423  332.094092     sigmoid
-1    565.572141  4.773653  857.431953     sigmoid
-2    162.853453  4.369701  545.736432      radial
-3    751.406321  4.760634    5.845405      linear
-4    490.689250  3.626489  128.254244     sigmoid
+0     37.832041  3.580717  372.469343      linear
+1    293.069922  3.519581  419.264151  polynomial
+2    744.283237  3.443622  761.636294      linear
+3    902.797531  4.526967  264.618426      radial
+4    246.515420  4.088921  158.313720      radial
 ..          ...       ...         ...         ...
-995   74.662166  4.250481  256.689883      linear
-996  197.633785  4.330900  494.707394     sigmoid
-997  752.254032  3.602485  630.690700  polynomial
-998   99.491647  4.504320   11.221696      radial
-999  370.615166  4.007243  264.030918      linear
+995  742.685162  3.558218  844.736919      radial
+996  621.133922  4.830994  416.304344  polynomial
+997  821.788995  4.017277  270.106558  polynomial
+998  194.045509  4.730850  150.130430      radial
+999  786.484132  3.230497  747.770196     sigmoid
 
 [1000 rows x 4 columns]
 </pre></div>
@@ -402,7 +402,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  31.551 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  30.908 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
@@ -429,7 +429,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
     </p>
     <p>
         &copy; Copyright 2014-2019, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>
