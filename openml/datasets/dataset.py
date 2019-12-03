@@ -391,7 +391,7 @@ class OpenMLDataset(OpenMLBase):
                 elif attribute_dtype[column_name] in ('floating',
                                                       'integer'):
                     X_col = X[column_name]
-                    if X_col.min() == 0 and X_col.max() == 255:
+                    if X_col.min() >= 0 and X_col.max() <= 255:
                         X_col_uint = X_col.astype('uint8')
                         if (X_col == X_col_uint).all():
                             col.append(X_col_uint)
