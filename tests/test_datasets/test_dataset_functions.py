@@ -352,6 +352,13 @@ class TestOpenMLDataset(TestBase):
         openml.config.server = self.production_server
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
 
+    def test_get_dataset_uint8_dtype(self):
+        dataset = openml.datasets.get_dataset(1)
+        self.assertEqual(type(dataset), OpenMLDataset)
+        self.assertEqual(dataset.name, 'anneal')
+        df, _, _, _ = dataset.get_data()
+        self.assertEqual(df['carbon'].dtype, 'uint8')
+
     def test_get_dataset_lazy(self):
         dataset = openml.datasets.get_dataset(1, download_data=False)
         self.assertEqual(type(dataset), OpenMLDataset)
