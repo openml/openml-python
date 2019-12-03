@@ -5,14 +5,14 @@
 
 Computation times
 =================
-**01:56.902** total execution time for **examples_40_paper** files:
+**01:52.456** total execution time for **examples_40_paper** files:
 
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_40_paper_2018_kdd_rijn_example.py` (``2018_kdd_rijn_example.py``)               | 01:19.017 | 0.0 MB |
+| :ref:`sphx_glr_examples_40_paper_2018_kdd_rijn_example.py` (``2018_kdd_rijn_example.py``)               | 01:16.806 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py` (``2018_neurips_perrone_example.py``) | 00:33.098 | 0.0 MB |
+| :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py` (``2018_neurips_perrone_example.py``) | 00:31.091 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_40_paper_2015_neurips_feurer_example.py` (``2015_neurips_feurer_example.py``)   | 00:02.474 | 0.0 MB |
+| :ref:`sphx_glr_examples_40_paper_2015_neurips_feurer_example.py` (``2015_neurips_feurer_example.py``)   | 00:02.393 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py` (``2018_ida_strang_example.py``)           | 00:02.313 | 0.0 MB |
+| :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py` (``2018_ida_strang_example.py``)           | 00:02.165 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
