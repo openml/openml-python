@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from .task import (
     OpenMLTask,
     OpenMLSupervisedTask,

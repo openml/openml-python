@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import numpy as np
 import random
 import os
@@ -46,8 +48,8 @@ class TestRun(TestBase):
                 other = getattr(run_prime, dictionary)
                 if other is not None:
                     self.assertDictEqual(other, dict())
-        self.assertEqual(run._create_description_xml(),
-                         run_prime._create_description_xml())
+        self.assertEqual(run._to_xml(),
+                         run_prime._to_xml())
 
         numeric_part = \
             np.array(np.array(run.data_content)[:, 0:-2], dtype=float)

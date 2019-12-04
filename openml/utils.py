@@ -1,7 +1,9 @@
+# License: BSD 3-Clause
+
 import os
-import hashlib
 import xmltodict
 import shutil
+from typing import TYPE_CHECKING, List, Tuple, Union, Type
 import warnings
 import pandas as pd
 from functools import wraps
@@ -10,6 +12,11 @@ import collections
 import openml._api_calls
 import openml.exceptions
 from . import config
+
+# Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
+if TYPE_CHECKING:
+    from openml.base import OpenMLBase
+
 
 oslo_installed = False
 try:
@@ -60,6 +67,26 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
         else:
             raise ValueError("Could not find tag '%s' in node '%s'" %
                              (xml_tag_name, str(node)))
+
+
+def _get_rest_api_type_alias(oml_object: 'OpenMLBase') -> str:
+    """ Return the alias of the openml entity as it is defined for the REST API. """
+    rest_api_mapping = [
+        (openml.datasets.OpenMLDataset, 'data'),
+        (openml.flows.OpenMLFlow, 'flow'),
+        (openml.tasks.OpenMLTask, 'task'),
+        (openml.runs.OpenMLRun, 'run'),
+        ((openml.study.OpenMLStudy, openml.study.OpenMLBenchmarkSuite), 'study')
+    ]  # type: List[Tuple[Union[Type, Tuple], str]]
+    _, api_type_alias = [(python_type, api_alias)
+                         for (python_type, api_alias) in rest_api_mapping
+                         if isinstance(oml_object, python_type)][0]
+    return api_type_alias
+
+
+def _tag_openml_base(oml_object: 'OpenMLBase', tag: str, untag: bool = False):
+    api_type_alias = _get_rest_api_type_alias(oml_object)
+    _tag_entity(api_type_alias, oml_object.id, tag, untag)
 
 
 def _tag_entity(entity_type, entity_id, tag, untag=False):
@@ -338,53 +365,3 @@ def _create_lockfiles_dir():
     except OSError:
         pass
     return dir
-
-
-def _download_text_file(source: str,
-                        output_path: str,
-                        md5_checksum: str = None,
-                        exists_ok: bool = True,
-                        encoding: str = 'utf8',
-                        ) -> None:
-    """ Download the text file at `source` and store it in `output_path`.
-
-    By default, do nothing if a file already exists in `output_path`.
-    The downloaded file can be checked against an expected md5 checksum.
-
-    Parameters
-    ----------
-    source : str
-        url of the file to be downloaded
-    output_path : str
-        full path, including filename, of where the file should be stored.
-    md5_checksum : str, optional (default=None)
-        If not None, should be a string of hexidecimal digits of the expected digest value.
-    exists_ok : bool, optional (default=True)
-        If False, raise an FileExistsError if there already exists a file at `output_path`.
-    encoding : str, optional (default='utf8')
-        The encoding with which the file should be stored.
-    """
-    try:
-        with open(output_path, encoding=encoding):
-            if exists_ok:
-                return
-            else:
-                raise FileExistsError
-    except FileNotFoundError:
-        pass
-
-    downloaded_file = openml._api_calls._read_url(source, request_method='get')
-
-    if md5_checksum is not None:
-        md5 = hashlib.md5()
-        md5.update(downloaded_file.encode('utf-8'))
-        md5_checksum_download = md5.hexdigest()
-        if md5_checksum != md5_checksum_download:
-            raise openml.exceptions.OpenMLHashException(
-                'Checksum {} of downloaded file is unequal to the expected checksum {}.'
-                .format(md5_checksum_download, md5_checksum))
-
-    with open(output_path, "w", encoding=encoding) as fh:
-        fh.write(downloaded_file)
-
-    del downloaded_file

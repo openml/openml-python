@@ -1,4 +1,7 @@
+# License: BSD 3-Clause
+
 import io
+import logging
 import os
 import re
 from typing import List, Dict, Union, Optional
@@ -28,6 +31,7 @@ from ..utils import (
 
 
 DATASETS_CACHE_DIR_NAME = 'datasets'
+logger = logging.getLogger(__name__)
 
 ############################################################################
 # Local getters/accessors to the cache directory
@@ -498,10 +502,17 @@ def get_dataset(
         remove_dataset_cache = True
         description = _get_dataset_description(did_cache_dir, dataset_id)
         features = _get_dataset_features(did_cache_dir, dataset_id)
-        qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
+
+        try:
+            qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
+        except OpenMLServerException as e:
+            if e.code == 362 and str(e) == 'No qualities found - None':
+                logger.warning("No qualities found for dataset {}".format(dataset_id))
+                qualities = None
+            else:
+                raise
 
         arff_file = _get_dataset_arff(description) if download_data else None
-
         remove_dataset_cache = False
     except OpenMLServerException as e:
         # if there was an exception,
@@ -540,6 +551,11 @@ def attributes_arff_from_df(df):
         'string': 'STRING'
     }
     attributes_arff = []
+
+    if not all([isinstance(column_name, str) for column_name in df.columns]):
+        logger.warning("Converting non-str column names to str.")
+        df.columns = [str(column_name) for column_name in df.columns]
+
     for column_name in df:
         # skipna=True does not infer properly the dtype. The NA values are
         # dropped before the inference instead.
@@ -870,7 +886,7 @@ def _get_dataset_arff(description: Union[Dict, OpenMLDataset],
     output_file_path = os.path.join(cache_directory, "dataset.arff")
 
     try:
-        openml.utils._download_text_file(
+        openml._api_calls._download_text_file(
             source=url,
             output_path=output_file_path,
             md5_checksum=md5_checksum_fixture
@@ -1022,13 +1038,11 @@ def _get_online_dataset_arff(dataset_id):
     str
         A string representation of an ARFF file.
     """
-    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id,
-                                                      'get')
+    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id, 'get')
     # build a dict from the xml.
     # use the url from the dataset description and return the ARFF string
-    return openml._api_calls._read_url(
+    return openml._api_calls._download_text_file(
         xmltodict.parse(dataset_xml)['oml:data_set_description']['oml:url'],
-        request_method='get'
     )
 
 

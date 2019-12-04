@@ -1,12 +1,13 @@
-import collections
-from typing import Dict, List, Optional
+# License: BSD 3-Clause
 
-import xmltodict
+from collections import OrderedDict
+from typing import Dict, List, Optional, Tuple, Union, Any
 
 import openml
+from openml.base import OpenMLBase
 
 
-class BaseStudy(object):
+class BaseStudy(OpenMLBase):
     """
     An OpenMLStudy represents the OpenML concept of a study. It contains
     the following information: name, id, description, creation date,
@@ -87,19 +88,25 @@ class BaseStudy(object):
         self.flows = flows
         self.setups = setups
         self.runs = runs
-        pass
 
-    def __repr__(self):
-        # header is provided by the sub classes
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+    @classmethod
+    def _entity_letter(cls) -> str:
+        return 's'
+
+    @property
+    def id(self) -> Optional[int]:
+        return self.study_id
+
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+        """ Collect all information to display in the __repr__ body. """
         fields = {"Name": self.name,
                   "Status": self.status,
-                  "Main Entity Type": self.main_entity_type}
+                  "Main Entity Type": self.main_entity_type}  # type: Dict[str, Any]
         if self.study_id is not None:
             fields["ID"] = self.study_id
-            fields["Study URL"] = "{}s/{}".format(base_url, self.study_id)
+            fields["Study URL"] = self.openml_url
         if self.creator is not None:
-            fields["Creator"] = "{}u/{}".format(base_url, self.creator)
+            fields["Creator"] = "{}/u/{}".format(openml.config.get_server_base_url(), self.creator)
         if self.creation_date is not None:
             fields["Upload Time"] = self.creation_date.replace('T', ' ')
         if self.data is not None:
@@ -115,42 +122,14 @@ class BaseStudy(object):
         order = ["ID", "Name", "Status", "Main Entity Type", "Study URL",
                  "# of Data", "# of Tasks", "# of Flows", "# of Runs",
                  "Creator", "Upload Time"]
-        fields = [(key, fields[key]) for key in order if key in fields]
+        return [(key, fields[key]) for key in order if key in fields]
 
-        longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
-        return body
+    def _parse_publish_response(self, xml_response: Dict):
+        """ Parse the id from the xml_response and assign it to self. """
+        self.study_id = int(xml_response['oml:study_upload']['oml:id'])
 
-    def publish(self) -> int:
-        """
-        Publish the study on the OpenML server.
-
-        Returns
-        -------
-        study_id: int
-            Id of the study uploaded to the server.
-        """
-        file_elements = {
-            'description': self._to_xml()
-        }
-        return_value = openml._api_calls._perform_api_call(
-            "study/",
-            'post',
-            file_elements=file_elements,
-        )
-        study_res = xmltodict.parse(return_value)
-        self.study_id = int(study_res['oml:study_upload']['oml:id'])
-        return self.study_id
-
-    def _to_xml(self) -> str:
-        """Serialize object to xml for upload
-
-        Returns
-        -------
-        xml_study : str
-            XML description of the data.
-        """
+    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
+        """ Creates a dictionary representation of self. """
         # some can not be uploaded, e.g., id, creator, creation_date
         simple_props = ['alias', 'main_entity_type', 'name', 'description']
         # maps from attribute name (which is used as outer tag name) to immer
@@ -161,9 +140,9 @@ class BaseStudy(object):
             'runs': 'run_id',
         }
 
-        study_container = collections.OrderedDict()  # type: 'collections.OrderedDict'
+        study_container = OrderedDict()  # type: 'OrderedDict'
         namespace_list = [('@xmlns:oml', 'http://openml.org/openml')]
-        study_dict = collections.OrderedDict(namespace_list)  # type: 'collections.OrderedDict'
+        study_dict = OrderedDict(namespace_list)  # type: 'OrderedDict'
         study_container['oml:study'] = study_dict
 
         for prop_name in simple_props:
@@ -177,15 +156,13 @@ class BaseStudy(object):
                     'oml:' + inner_name: content
                 }
                 study_dict["oml:" + prop_name] = sub_dict
+        return study_container
 
-        xml_string = xmltodict.unparse(
-            input_dict=study_container,
-            pretty=True,
-        )
-        # A flow may not be uploaded with the xml encoding specification:
-        # <?xml version="1.0" encoding="utf-8"?>
-        xml_string = xml_string.split('\n', 1)[-1]
-        return xml_string
+    def push_tag(self, tag: str):
+        raise NotImplementedError("Tags for studies is not (yet) supported.")
+
+    def remove_tag(self, tag: str):
+        raise NotImplementedError("Tags for studies is not (yet) supported.")
 
 
 class OpenMLStudy(BaseStudy):
@@ -268,12 +245,6 @@ class OpenMLStudy(BaseStudy):
             setups=setups,
         )
 
-    def __repr__(self):
-        header = "OpenML Study"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
-        body = super(OpenMLStudy, self).__repr__()
-        return header + body
-
 
 class OpenMLBenchmarkSuite(BaseStudy):
     """
@@ -345,9 +316,3 @@ class OpenMLBenchmarkSuite(BaseStudy):
             runs=None,
             setups=None,
         )
-
-    def __repr__(self):
-        header = "OpenML Benchmark Suite"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
-        body = super(OpenMLBenchmarkSuite, self).__repr__()
-        return header + body

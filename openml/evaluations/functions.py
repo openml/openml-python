@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import json
 import xmltodict
 import pandas as pd
@@ -324,14 +326,17 @@ def list_evaluations_setups(
     evals = list_evaluations(function=function, offset=offset, size=size, run=run, task=task,
                              setup=setup, flow=flow, uploader=uploader, tag=tag,
                              per_fold=per_fold, sort_order=sort_order, output_format='dataframe')
-
     # List setups
-    # Split setups in evals into chunks of N setups as list_setups does not support large size
+    # list_setups by setup id does not support large sizes (exceeds URL length limit)
+    # Hence we split the list of unique setup ids returned by list_evaluations into chunks of size N
     df = pd.DataFrame()
     if len(evals) != 0:
-        N = 100
-        setup_chunks = np.split(evals['setup_id'].unique(),
-                                ((len(evals['setup_id'].unique()) - 1) // N) + 1)
+        N = 100  # size of section
+        length = len(evals['setup_id'].unique())  # length of the array we want to split
+        # array_split - allows indices_or_sections to not equally divide the array
+        # array_split -length % N sub-arrays of size length//N + 1 and the rest of size length//N.
+        setup_chunks = np.array_split(ary=evals['setup_id'].unique(),
+                                      indices_or_sections=((length - 1) // N) + 1)
         setups = pd.DataFrame()
         for setup in setup_chunks:
             result = pd.DataFrame(openml.setups.list_setups(setup=setup, output_format='dataframe'))

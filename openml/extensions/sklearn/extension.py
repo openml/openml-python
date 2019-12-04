@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from collections import OrderedDict  # noqa: F401
 import copy
 from distutils.version import LooseVersion
@@ -33,6 +35,8 @@ from openml.tasks import (
     OpenMLClusteringTask,
     OpenMLRegressionTask,
 )
+
+logger = logging.getLogger(__name__)
 
 
 if sys.version_info >= (3, 5):
@@ -271,9 +275,8 @@ class SklearnExtension(Extension):
         mixed
         """
 
-        logging.info('-%s flow_to_sklearn START o=%s, components=%s, '
-                     'init_defaults=%s' % ('-' * recursion_depth, o, components,
-                                           initialize_with_defaults))
+        logger.info('-%s flow_to_sklearn START o=%s, components=%s, init_defaults=%s'
+                    % ('-' * recursion_depth, o, components, initialize_with_defaults))
         depth_pp = recursion_depth + 1  # shortcut var, depth plus plus
 
         # First, we need to check whether the presented object is a json string.
@@ -376,8 +379,7 @@ class SklearnExtension(Extension):
             )
         else:
             raise TypeError(o)
-        logging.info('-%s flow_to_sklearn END   o=%s, rval=%s'
-                     % ('-' * recursion_depth, o, rval))
+        logger.info('-%s flow_to_sklearn END   o=%s, rval=%s' % ('-' * recursion_depth, o, rval))
         return rval
 
     def model_to_flow(self, model: Any) -> 'OpenMLFlow':
@@ -537,8 +539,8 @@ class SklearnExtension(Extension):
                 s = "{}...".format(s[:char_lim - 3])
             return s.strip()
         except ValueError:
-            logging.warning("'Read more' not found in descriptions. "
-                            "Trying to trim till 'Parameters' if available in docstring.")
+            logger.warning("'Read more' not found in descriptions. "
+                           "Trying to trim till 'Parameters' if available in docstring.")
             pass
         try:
             # if 'Read more' doesn't exist, trim till 'Parameters'
@@ -546,7 +548,7 @@ class SklearnExtension(Extension):
             index = s.index(match_format(pattern))
         except ValueError:
             # returning full docstring
-            logging.warning("'Parameters' not found in docstring. Omitting docstring trimming.")
+            logger.warning("'Parameters' not found in docstring. Omitting docstring trimming.")
             index = len(s)
         s = s[:index]
         # trimming docstring to be within char_lim
@@ -580,7 +582,7 @@ class SklearnExtension(Extension):
             index1 = s.index(match_format("Parameters"))
         except ValueError as e:
             # when sklearn docstring has no 'Parameters' section
-            logging.warning("{} {}".format(match_format("Parameters"), e))
+            logger.warning("{} {}".format(match_format("Parameters"), e))
             return None
 
         headings = ["Attributes", "Notes", "See also", "Note", "References"]
@@ -590,7 +592,7 @@ class SklearnExtension(Extension):
                 index2 = s.index(match_format(h))
                 break
             except ValueError:
-                logging.warning("{} not available in docstring".format(h))
+                logger.warning("{} not available in docstring".format(h))
                 continue
         else:
             # in the case only 'Parameters' exist, trim till end of docstring
@@ -694,10 +696,14 @@ class SklearnExtension(Extension):
         # will be part of the name (in brackets)
         sub_components_names = ""
         for key in subcomponents:
+            if isinstance(subcomponents[key], OpenMLFlow):
+                name = subcomponents[key].name
+            elif isinstance(subcomponents[key], str):  # 'drop', 'passthrough' can be passed
+                name = subcomponents[key]
             if key in subcomponents_explicit:
-                sub_components_names += "," + key + "=" + subcomponents[key].name
+                sub_components_names += "," + key + "=" + name
             else:
-                sub_components_names += "," + subcomponents[key].name
+                sub_components_names += "," + name
 
         if sub_components_names:
             # slice operation on string in order to get rid of leading comma
@@ -770,6 +776,9 @@ class SklearnExtension(Extension):
         external_versions.add(openml_version)
         external_versions.add(sklearn_version)
         for visitee in sub_components.values():
+            # 'drop', 'passthrough', None can be passed as estimators
+            if isinstance(visitee, str):
+                continue
             for external_version in visitee.external_version.split(','):
                 external_versions.add(external_version)
         return ','.join(list(sorted(external_versions)))
@@ -782,9 +791,12 @@ class SklearnExtension(Extension):
         to_visit_stack = []  # type: List[OpenMLFlow]
         to_visit_stack.extend(sub_components.values())
         known_sub_components = set()  # type: Set[str]
+
         while len(to_visit_stack) > 0:
             visitee = to_visit_stack.pop()
-            if visitee.name in known_sub_components:
+            if isinstance(visitee, str):  # 'drop', 'passthrough' can be passed as estimators
+                known_sub_components.add(visitee)
+            elif visitee.name in known_sub_components:
                 raise ValueError('Found a second occurence of component %s when '
                                  'trying to serialize %s.' % (visitee.name, model))
             else:
@@ -821,7 +833,7 @@ class SklearnExtension(Extension):
             def flatten_all(list_):
                 """ Flattens arbitrary depth lists of lists (e.g. [[1,2],[3,[1]]] -> [1,2,3,1]). """
                 for el in list_:
-                    if isinstance(el, (list, tuple)):
+                    if isinstance(el, (list, tuple)) and len(el) > 0:
                         yield from flatten_all(el)
                     else:
                         yield el
@@ -851,17 +863,31 @@ class SklearnExtension(Extension):
                 parameter_value = list()  # type: List
                 reserved_keywords = set(model.get_params(deep=False).keys())
 
-                for sub_component_tuple in rval:
+                for i, sub_component_tuple in enumerate(rval):
                     identifier = sub_component_tuple[0]
                     sub_component = sub_component_tuple[1]
-                    sub_component_type = type(sub_component_tuple)
+                    # sub_component_type = type(sub_component_tuple)
                     if not 2 <= len(sub_component_tuple) <= 3:
                         # length 2 is for {VotingClassifier.estimators,
                         # Pipeline.steps, FeatureUnion.transformer_list}
                         # length 3 is for ColumnTransformer
                         msg = 'Length of tuple does not match assumptions'
                         raise ValueError(msg)
-                    if not isinstance(sub_component, (OpenMLFlow, type(None))):
+
+                    if isinstance(sub_component, str):
+                        if sub_component != 'drop' and sub_component != 'passthrough':
+                            msg = 'Second item of tuple does not match assumptions. ' \
+                                  'If string, can be only \'drop\' or \'passthrough\' but' \
+                                  'got %s' % sub_component
+                            raise ValueError(msg)
+                        else:
+                            pass
+                    elif isinstance(sub_component, type(None)):
+                        msg = 'Cannot serialize objects of None type. Please use a valid ' \
+                              'placeholder for None. Note that empty sklearn estimators can be '\
+                              'replaced with \'drop\' or \'passthrough\'.'
+                        raise ValueError(msg)
+                    elif not isinstance(sub_component, OpenMLFlow):
                         msg = 'Second item of tuple does not match assumptions. ' \
                               'Expected OpenMLFlow, got %s' % type(sub_component)
                         raise TypeError(msg)
@@ -874,31 +900,18 @@ class SklearnExtension(Extension):
                                                         identifier)
                         raise PyOpenMLError(msg)
 
-                    if sub_component is None:
-                        # In a FeatureUnion it is legal to have a None step
-
-                        pv = [identifier, None]
-                        if sub_component_type is tuple:
-                            parameter_value.append(tuple(pv))
-                        else:
-                            parameter_value.append(pv)
-
-                    else:
-                        # Add the component to the list of components, add a
-                        # component reference as a placeholder to the list of
-                        # parameters, which will be replaced by the real component
-                        # when deserializing the parameter
-                        sub_components_explicit.add(identifier)
-                        sub_components[identifier] = sub_component
-                        component_reference = OrderedDict()  # type: Dict[str, Union[str, Dict]]
-                        component_reference['oml-python:serialized_object'] = 'component_reference'
-                        cr_value = OrderedDict()  # type: Dict[str, Any]
-                        cr_value['key'] = identifier
-                        cr_value['step_name'] = identifier
-                        if len(sub_component_tuple) == 3:
-                            cr_value['argument_1'] = sub_component_tuple[2]
-                        component_reference['value'] = cr_value
-                        parameter_value.append(component_reference)
+                    # when deserializing the parameter
+                    sub_components_explicit.add(identifier)
+                    sub_components[identifier] = sub_component
+                    component_reference = OrderedDict()  # type: Dict[str, Union[str, Dict]]
+                    component_reference['oml-python:serialized_object'] = 'component_reference'
+                    cr_value = OrderedDict()  # type: Dict[str, Any]
+                    cr_value['key'] = identifier
+                    cr_value['step_name'] = identifier
+                    if len(sub_component_tuple) == 3:
+                        cr_value['argument_1'] = sub_component_tuple[2]
+                    component_reference['value'] = cr_value
+                    parameter_value.append(component_reference)
 
                 # Here (and in the elif and else branch below) are the only
                 # places where we encode a value as json to make sure that all
@@ -976,7 +989,7 @@ class SklearnExtension(Extension):
         recursion_depth: int,
         strict_version: bool = True
     ) -> Any:
-        logging.info('-%s deserialize %s' % ('-' * recursion_depth, flow.name))
+        logger.info('-%s deserialize %s' % ('-' * recursion_depth, flow.name))
         model_name = flow.class_name
         self._check_dependencies(flow.dependencies,
                                  strict_version=strict_version)
@@ -994,8 +1007,7 @@ class SklearnExtension(Extension):
 
         for name in parameters:
             value = parameters.get(name)
-            logging.info('--%s flow_parameter=%s, value=%s' %
-                         ('-' * recursion_depth, name, value))
+            logger.info('--%s flow_parameter=%s, value=%s' % ('-' * recursion_depth, name, value))
             rval = self._deserialize_sklearn(
                 value,
                 components=components_,
@@ -1011,8 +1023,7 @@ class SklearnExtension(Extension):
             if name not in components_:
                 continue
             value = components[name]
-            logging.info('--%s flow_component=%s, value=%s'
-                         % ('-' * recursion_depth, name, value))
+            logger.info('--%s flow_component=%s, value=%s' % ('-' * recursion_depth, name, value))
             rval = self._deserialize_sklearn(
                 value,
                 recursion_depth=recursion_depth + 1,
@@ -1944,9 +1955,10 @@ class SklearnExtension(Extension):
                             param_value is None or param_value is np.ma.masked:
                         # basic string values
                         type = 'STRING'
-                    elif isinstance(param_value, list) and \
+                    elif isinstance(param_value, (list, tuple)) and \
                             all(isinstance(i, int) for i in param_value):
-                        # list of integers
+                        # list of integers (usually for selecting features)
+                        # hyperparameter layer_sizes of MLPClassifier
                         type = 'STRING'
                     else:
                         raise TypeError('Unsupported param type in param grid: %s' % key)

@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 set -e
 
 # check status and branch before running the unit tests
@@ -13,14 +15,8 @@ run_tests() {
 
     cwd=`pwd`
     test_dir=$cwd/tests
-    doctest_dir=$cwd/doc
 
     cd $TEST_DIR
-    if [[ "$EXAMPLES" == "true" ]]; then
-        pytest -sv $test_dir/test_examples/
-    elif [[ "$DOCTEST" == "true" ]]; then
-        python -m doctest $doctest_dir/usage.rst
-    fi
 
     if [[ "$COVERAGE" == "true" ]]; then
         PYTEST_ARGS='--cov=openml'
@@ -28,7 +24,7 @@ run_tests() {
         PYTEST_ARGS=''
     fi
 
-    pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread -sv --ignore='test_OpenMLDemo.py' $PYTEST_ARGS $test_dir
+    pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread -sv $PYTEST_ARGS $test_dir
 }
 
 if [[ "$RUN_FLAKE8" == "true" ]]; then

@@ -9,6 +9,8 @@ datasets and splits to be used in an experiment or paper. They are fully integra
 and simplify both the sharing of the setup and the results.
 """
 
+# License: BSD 3-Clause
+
 import openml
 
 ####################################################################################################
@@ -50,7 +52,7 @@ tasks = suite.tasks
 print(tasks)
 
 ####################################################################################################
-# and iterated for benchmarking. For speed reasons we'll only iterate over the first three tasks:
+# and iterated over for benchmarking. For speed reasons we only iterate over the first three tasks:
 
 for task_id in tasks[:3]:
     task = openml.tasks.get_task(task_id)

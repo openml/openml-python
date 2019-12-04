@@ -5,6 +5,8 @@ Tasks
 A tutorial on how to list and download tasks.
 """
 
+# License: BSD 3-Clause
+
 import openml
 import pandas as pd
 
@@ -175,7 +177,7 @@ print(tasks[0])
 # Let's create a classification task on a dataset. In this example we will do this on the
 # Iris dataset (ID=128 (on test server)). We'll use 10-fold cross-validation (ID=1),
 # and *predictive accuracy* as the predefined measure (this can also be left open).
-# If a task with these parameters exist, we will get an appropriate exception.
+# If a task with these parameters exists, we will get an appropriate exception.
 # If such a task doesn't exist, a task will be created and the corresponding task_id
 # will be returned.
 
@@ -196,11 +198,11 @@ except openml.exceptions.OpenMLServerException as e:
     # Error code for 'task already exists'
     if e.code == 614:
         # Lookup task
-        tasks = openml.tasks.list_tasks(data_id=128, output_format='dataframe').to_numpy()
-        tasks = tasks[tasks[:, 4] == "Supervised Classification"]
-        tasks = tasks[tasks[:, 6] == "10-fold Crossvalidation"]
-        tasks = tasks[tasks[:, 19] == "predictive_accuracy"]
-        task_id = tasks[0][0]
+        tasks = openml.tasks.list_tasks(data_id=128, output_format='dataframe')
+        tasks = tasks.query('task_type == "Supervised Classification" '
+                            'and estimation_procedure == "10-fold Crossvalidation" '
+                            'and evaluation_measures == "predictive_accuracy"')
+        task_id = tasks.loc[:, "tid"].values[0]
         print("Task already exists. Task ID is", task_id)
 
 # reverting to prod server

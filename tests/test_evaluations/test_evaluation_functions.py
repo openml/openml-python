@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import openml
 import openml.evaluations
 from openml.testing import TestBase
@@ -6,18 +8,20 @@ from openml.testing import TestBase
 class TestEvaluationFunctions(TestBase):
     _multiprocess_can_split_ = True
 
-    def _check_list_evaluation_setups(self, size, **kwargs):
+    def _check_list_evaluation_setups(self, **kwargs):
         evals_setups = openml.evaluations.list_evaluations_setups("predictive_accuracy",
-                                                                  **kwargs, size=size,
+                                                                  **kwargs,
                                                                   sort_order='desc',
                                                                   output_format='dataframe')
         evals = openml.evaluations.list_evaluations("predictive_accuracy",
-                                                    **kwargs, size=size,
+                                                    **kwargs,
                                                     sort_order='desc',
                                                     output_format='dataframe')
 
         # Check if list is non-empty
         self.assertGreater(len(evals_setups), 0)
+        # Check if length is accurate
+        self.assertEqual(len(evals_setups), len(evals))
         # Check if output from sort is sorted in the right order
         self.assertSequenceEqual(sorted(evals_setups['value'].tolist(), reverse=True),
                                  evals_setups['value'].tolist())
@@ -147,8 +151,9 @@ class TestEvaluationFunctions(TestBase):
             self.assertIsNone(evaluations[run_id].values)
 
     def test_evaluation_list_sort(self):
+        openml.config.server = self.production_server
         size = 10
-        task_id = 115
+        task_id = 6
         # Get all evaluations of the task
         unsorted_eval = openml.evaluations.list_evaluations(
             "predictive_accuracy", offset=0, task=[task_id])
@@ -176,7 +181,7 @@ class TestEvaluationFunctions(TestBase):
         openml.config.server = self.production_server
         flow_id = [405]
         size = 100
-        evals = self._check_list_evaluation_setups(size, flow=flow_id)
+        evals = self._check_list_evaluation_setups(flow=flow_id, size=size)
         # check if parameters in separate columns works
         evals_cols = openml.evaluations.list_evaluations_setups("predictive_accuracy",
                                                                 flow=flow_id, size=size,
@@ -191,5 +196,5 @@ class TestEvaluationFunctions(TestBase):
     def test_list_evaluations_setups_filter_task(self):
         openml.config.server = self.production_server
         task_id = [6]
-        size = 100
-        self._check_list_evaluation_setups(size, task=task_id)
+        size = 121
+        self._check_list_evaluation_setups(task=task_id, size=size)

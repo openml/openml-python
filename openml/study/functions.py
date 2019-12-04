@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from typing import cast, Dict, List, Optional, Union
 import warnings
 
@@ -120,7 +122,7 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
         if 'oml:setups' in result_dict:
             setups = [int(x) for x in result_dict['oml:setups']['oml:setup_id']]
         else:
-            raise ValueError('No setups attached to study!'.format(id_))
+            raise ValueError('No setups attached to study {}!'.format(id_))
         if 'oml:runs' in result_dict:
             runs = [
                 int(x) for x in result_dict['oml:runs']['oml:run_id']
@@ -130,7 +132,7 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
                 # Legacy studies did not require runs
                 runs = None
             else:
-                raise ValueError('No runs attached to study!'.format(id_))
+                raise ValueError('No runs attached to study {}!'.format(id_))
 
         study = OpenMLStudy(
             study_id=study_id,
