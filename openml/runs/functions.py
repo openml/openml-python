@@ -478,7 +478,7 @@ def _run_task_get_arffcontent(
         elif isinstance(task, OpenMLRegressionTask):
 
             for i in range(0, len(test_indices)):
-                arff_line = [rep_no, fold_no, test_indices[i], pred_y[i], test_y[i]]
+                arff_line = [rep_no, fold_no, test_indices[i], pred_y[i], test_y.iloc[i]]
                 arff_datacontent.append(arff_line)
 
             if add_local_measures:

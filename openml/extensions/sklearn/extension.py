@@ -756,6 +756,7 @@ class SklearnExtension(Extension):
         # requirements for their subcomponents. The external version string is a
         # sorted concatenation of all modules which are present in this run.
         model_package_name = model.__module__.split('.')[0]
+
         module = importlib.import_module(model_package_name)
         model_package_version_number = module.__version__  # type: ignore
         external_version = self._format_external_version(
@@ -1501,10 +1502,11 @@ class SklearnExtension(Extension):
             if not isinstance(classes, list):
                 raise ValueError('please convert model classes to list prior to '
                                  'calling this fn')
-            result = np.zeros((len(y), len(classes)), dtype=np.float32)
-            for obs, prediction_idx in enumerate(y):
-                result[obs][prediction_idx] = 1.0
-            return result
+            # DataFrame allows more accurate mapping of classes as column names
+            result = pd.DataFrame(0, index=np.arange(len(y)), columns=classes, dtype=np.float32)
+            for obs, prediction in enumerate(y):
+                result.loc[obs, prediction] = 1.0
+            return result.to_numpy()
 
         if isinstance(task, OpenMLSupervisedTask):
             if y_train is None:
@@ -1562,6 +1564,11 @@ class SklearnExtension(Extension):
             else:
                 model_classes = used_estimator.classes_
 
+            # to handle the case when dataset is numpy and categories are encoded
+            # however the class labels stored in task are still categories
+            if isinstance(y_train, np.ndarray) and isinstance(task.class_labels[0], str):
+                model_classes = [task.class_labels[i] for i in model_classes]
+
         modelpredict_start_cputime = time.process_time()
         modelpredict_start_walltime = time.time()
 
@@ -1590,9 +1597,16 @@ class SklearnExtension(Extension):
 
             try:
                 proba_y = model_copy.predict_proba(X_test)
-            except AttributeError:
+            except AttributeError:  # predict_proba is not available when probability=False
                 if task.class_labels is not None:
-                    proba_y = _prediction_to_probabilities(pred_y, list(task.class_labels))
+                    if isinstance(y_train, np.ndarray) and isinstance(task.class_labels[0], str):
+                        # mapping (decoding) the predictions to the categories
+                        # creating a separate copy to not change the expected pred_y type
+                        preds = [task.class_labels[pred] for pred in pred_y]
+                        proba_y = _prediction_to_probabilities(preds, model_classes)
+                    else:
+                        proba_y = _prediction_to_probabilities(pred_y, model_classes)
+
                 else:
                     raise ValueError('The task has no class labels')
 
@@ -1608,10 +1622,13 @@ class SklearnExtension(Extension):
                     # then we need to add a column full of zeros into the probabilities
                     # for class 3 because the rest of the library expects that the
                     # probabilities are ordered the same way as the classes are ordered).
-                    proba_y_new = np.zeros((proba_y.shape[0], len(task.class_labels)))
+
+                    # DataFrame allows more accurate mapping of classes as column names
+                    proba_y_new = pd.DataFrame(0, index=np.arange(proba_y.shape[0]),
+                                               columns=task.class_labels, dtype=np.float32)
                     for idx, model_class in enumerate(model_classes):
-                        proba_y_new[:, model_class] = proba_y[:, idx]
-                    proba_y = proba_y_new
+                        proba_y_new.loc[:, model_class] = proba_y[:, idx]
+                    proba_y = proba_y_new.to_numpy()
 
                 if proba_y.shape[1] != len(task.class_labels):
                     message = "Estimator only predicted for {}/{} classes!".format(

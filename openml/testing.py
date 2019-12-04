@@ -247,4 +247,16 @@ except ImportError:
     from sklearn.preprocessing import Imputer as SimpleImputer
 
 
-__all__ = ['TestBase', 'SimpleImputer']
+class CustomImputer(SimpleImputer):
+    pass
+
+
+def cont(X):
+    return X.dtypes != 'category'
+
+
+def cat(X):
+    return X.dtypes == 'category'
+
+
+__all__ = ['TestBase', 'SimpleImputer', 'CustomImputer', 'cat', 'cont']
