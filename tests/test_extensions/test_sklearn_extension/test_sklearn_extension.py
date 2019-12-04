@@ -1340,7 +1340,8 @@ class TestSklearnExtensionRunFunctions(TestBase):
         class MyPipe(sklearn.pipeline.Pipeline):
             pass
         task = openml.tasks.get_task(1)
-        pipe = MyPipe([('imp', SimpleImputer()),
+        # using most_frequent imputer since dataste has mixed types and to keep things simple
+        pipe = MyPipe([('imp', SimpleImputer(strategy='most_frequent')),
                        ('dummy', sklearn.dummy.DummyClassifier())])
         openml.runs.run_model_on_task(pipe, task)
 
