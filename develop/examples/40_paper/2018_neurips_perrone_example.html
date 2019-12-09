@@ -274,17 +274,17 @@ pre-processing all retrieved evaluations.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                    cost degree gamma      kernel
-1913    49.9681324218494    NaN   NaN      linear
-1357    14.4719687220545    NaN   NaN      linear
-2675   0.431083323700233      2   NaN  polynomial
-2607  0.0158432063365588      4   NaN  polynomial
-4196    158.978813334691      5   NaN  polynomial
-Y :  1913    0.905172
-1357    0.906496
-2675    0.645211
-2607    0.473334
-4196    0.991200
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                     cost degree             gamma      kernel
+2330     192.295805157492    NaN  177.314618272536         NaN
+61       54.1905296006498      2               NaN  polynomial
+4407    0.160738674965664    NaN               NaN      linear
+5177  0.00137872592248986    NaN               NaN  polynomial
+1973     192.602009384228      5               NaN  polynomial
+Y :  2330    0.580774
+61      0.910439
+4407    0.994371
+5177    0.977921
+1973    0.619795
 Name: value, dtype: float64
 </pre></div>
 </div>
@@ -335,7 +335,7 @@ time simple and quick.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 1.4283e-05
+Training RMSE : 1.7723e-05
 </pre></div>
 </div>
 </div>
@@ -368,17 +368,17 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
-0    236.358879  4.255495   98.344250      linear
-1    850.996637  4.323650  556.010811      linear
-2    811.533163  4.663669  680.757713      radial
-3    438.401187  2.582998  436.239683  polynomial
-4    393.425694  2.914181  329.040673      radial
+0    366.070928  3.661776   84.080485  polynomial
+1    494.629705  2.525625  629.589786      linear
+2    128.341762  4.029045  336.197111      radial
+3    883.474316  3.525754  645.750091  polynomial
+4    217.782437  3.735597  553.295469      radial
 ..          ...       ...         ...         ...
-995  607.405343  4.241244  909.416299  polynomial
-996  165.604151  3.427075  681.013856      radial
-997  989.261440  2.955568  866.995675  polynomial
-998   53.252541  4.507781  546.012430  polynomial
-999  371.374282  2.546299  857.362929  polynomial
+995  205.459943  3.072227  469.363400      linear
+996  879.285663  2.402492  709.388814     sigmoid
+997   32.517311  2.153940  682.169150      linear
+998  302.754500  4.062110   92.196964     sigmoid
+999  169.049026  3.862827  849.396300     sigmoid
 
 [1000 rows x 4 columns]
 </pre></div>
@@ -402,7 +402,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  31.885 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  31.015 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
