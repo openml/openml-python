@@ -248,6 +248,8 @@ except ImportError:
 
 
 class CustomImputer(SimpleImputer):
+    '''Duplicate class alias for sklearn's SimpleImputer
+    '''
     pass
 
 
