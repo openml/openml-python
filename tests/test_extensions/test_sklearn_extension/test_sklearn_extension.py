@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import collections
 import json
 import re
@@ -28,7 +30,8 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
 import sklearn.cluster
-
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 import openml
 from openml.extensions.sklearn import SklearnExtension
@@ -607,6 +610,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         serialization2 = self.extension.model_to_flow(new_model)
         assert_flows_equal(serialization, serialization2)
 
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
+                     reason="Pipeline processing behaviour updated")
     def test_serialize_feature_union(self):
         ohe_params = {'sparse': False}
         if LooseVersion(sklearn.__version__) >= "0.20":
@@ -673,16 +678,17 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(new_model_params, fu_params)
         new_model.fit(self.X, self.y)
 
-        fu.set_params(scaler=None)
+        fu.set_params(scaler='drop')
         serialization = self.extension.model_to_flow(fu)
         self.assertEqual(serialization.name,
                          'sklearn.pipeline.FeatureUnion('
-                         'ohe=sklearn.preprocessing.{}.OneHotEncoder)'
+                         'ohe=sklearn.preprocessing.{}.OneHotEncoder,'
+                         'scaler=drop)'
                          .format(module_name_encoder))
         new_model = self.extension.flow_to_model(serialization)
         self.assertEqual(type(new_model), type(fu))
         self.assertIsNot(new_model, fu)
-        self.assertIs(new_model.transformer_list[1][1], None)
+        self.assertIs(new_model.transformer_list[1][1], 'drop')
 
     def test_serialize_feature_union_switched_names(self):
         ohe_params = ({'categories': 'auto'}
@@ -1777,3 +1783,66 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
         self.assertEqual("weka.IsolationForest",
                          SklearnExtension.trim_flow_name("weka.IsolationForest"))
+
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.21",
+                     reason="SimpleImputer, ColumnTransformer available only after 0.19 and "
+                            "Pipeline till 0.20 doesn't support indexing and 'passthrough'")
+    def test_run_on_model_with_empty_steps(self):
+        from sklearn.compose import ColumnTransformer
+        # testing 'drop', 'passthrough', None as non-actionable sklearn estimators
+        dataset = openml.datasets.get_dataset(128)
+        task = openml.tasks.get_task(59)
+
+        X, y, categorical_ind, feature_names = dataset.get_data(
+            target=dataset.default_target_attribute, dataset_format='array')
+        categorical_ind = np.array(categorical_ind)
+        cat_idx, = np.where(categorical_ind)
+        cont_idx, = np.where(~categorical_ind)
+
+        clf = make_pipeline(
+            ColumnTransformer([('cat', make_pipeline(SimpleImputer(strategy='most_frequent'),
+                                                     OneHotEncoder()), cat_idx.tolist()),
+                               ('cont', make_pipeline(SimpleImputer(strategy='median'),
+                                                      StandardScaler()), cont_idx.tolist())])
+        )
+
+        clf = sklearn.pipeline.Pipeline([
+            ('dummystep', 'passthrough'),  # adding 'passthrough' as an estimator
+            ('prep', clf),
+            ('classifier', sklearn.svm.SVC(gamma='auto'))
+        ])
+
+        # adding 'drop' to a ColumnTransformer
+        if not categorical_ind.any():
+            clf[1][0].set_params(cat='drop')
+        if not (~categorical_ind).any():
+            clf[1][0].set_params(cont='drop')
+
+        # serializing model with non-actionable step
+        run, flow = openml.runs.run_model_on_task(model=clf, task=task, return_flow=True)
+
+        self.assertEqual(len(flow.components), 3)
+        self.assertEqual(flow.components['dummystep'], 'passthrough')
+        self.assertTrue(isinstance(flow.components['classifier'], OpenMLFlow))
+        self.assertTrue(isinstance(flow.components['prep'], OpenMLFlow))
+        self.assertTrue(isinstance(flow.components['prep'].components['columntransformer'],
+                        OpenMLFlow))
+        self.assertEqual(flow.components['prep'].components['columntransformer'].components['cat'],
+                         'drop')
+
+        # de-serializing flow to a model with non-actionable step
+        model = self.extension.flow_to_model(flow)
+        model.fit(X, y)
+        self.assertEqual(type(model), type(clf))
+        self.assertNotEqual(model, clf)
+        self.assertEqual(len(model.named_steps), 3)
+        self.assertEqual(model.named_steps['dummystep'], 'passthrough')
+
+    def test_sklearn_serialization_with_none_step(self):
+        msg = 'Cannot serialize objects of None type. Please use a valid ' \
+              'placeholder for None. Note that empty sklearn estimators can be ' \
+              'replaced with \'drop\' or \'passthrough\'.'
+        clf = sklearn.pipeline.Pipeline([('dummystep', None),
+                                         ('classifier', sklearn.svm.SVC(gamma='auto'))])
+        with self.assertRaisesRegex(ValueError, msg):
+            self.extension.model_to_flow(clf)

@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import openml.config
 
 
@@ -31,10 +33,9 @@ class OpenMLSetup(object):
         header = "OpenML Setup"
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
         fields = {"Setup ID": self.setup_id,
                   "Flow ID": self.flow_id,
-                  "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                  "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
                   "# of Parameters": len(self.parameters)}
 
         # determines the order in which the information will be printed
@@ -86,12 +87,11 @@ class OpenMLParameter(object):
         header = "OpenML Parameter"
         header = '{}\n{}\n'.format(header, '=' * len(header))
 
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
         fields = {"ID": self.id,
                   "Flow ID": self.flow_id,
                   # "Flow Name": self.flow_name,
                   "Flow Name": self.full_name,
-                  "Flow URL": "{}f/{}".format(base_url, self.flow_id),
+                  "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
                   "Parameter Name": self.parameter_name}
         # indented prints for parameter attributes
         # indention = 2 spaces + 1 | + 2 underscores

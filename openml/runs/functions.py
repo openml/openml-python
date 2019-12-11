@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from collections import OrderedDict
 import io
 import itertools
@@ -23,7 +25,7 @@ from ..tasks import OpenMLTask, OpenMLClassificationTask, OpenMLClusteringTask, 
     OpenMLRegressionTask, OpenMLSupervisedTask, OpenMLLearningCurveTask
 from .run import OpenMLRun
 from .trace import OpenMLRunTrace
-from ..tasks import TaskTypeEnum
+from ..tasks import TaskTypeEnum, get_task
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
@@ -36,7 +38,7 @@ RUNS_CACHE_DIR_NAME = 'runs'
 
 def run_model_on_task(
     model: Any,
-    task: OpenMLTask,
+    task: Union[int, str, OpenMLTask],
     avoid_duplicate_runs: bool = True,
     flow_tags: List[str] = None,
     seed: int = None,
@@ -52,8 +54,9 @@ def run_model_on_task(
         A model which has a function fit(X,Y) and predict(X),
         all supervised estimators of scikit learn follow this definition of a model [1]
         [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
-    task : OpenMLTask
-        Task to perform. This may be a model instead if the first argument is an OpenMLTask.
+    task : OpenMLTask or int or str
+        Task to perform or Task id.
+        This may be a model instead if the first argument is an OpenMLTask.
     avoid_duplicate_runs : bool, optional (default=True)
         If True, the run will throw an error if the setup/task combination is already present on
         the server. This feature requires an internet connection.
@@ -82,7 +85,7 @@ def run_model_on_task(
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
     # When removing this please also remove the method `is_estimator` from the extension
     # interface as it is only used here (MF, 3-2019)
-    if isinstance(model, OpenMLTask):
+    if isinstance(model, (int, str, OpenMLTask)):
         warnings.warn("The old argument order (task, model) is deprecated and "
                       "will not be supported in the future. Please use the "
                       "order (model, task).", DeprecationWarning)
@@ -95,6 +98,14 @@ def run_model_on_task(
         raise TypeError(extension)
 
     flow = extension.model_to_flow(model)
+
+    def get_task_and_type_conversion(task: Union[int, str, OpenMLTask]) -> OpenMLTask:
+        if isinstance(task, (int, str)):
+            return get_task(int(task))
+        else:
+            return task
+
+    task = get_task_and_type_conversion(task)
 
     run = run_flow_on_task(
         task=task,
@@ -967,6 +978,7 @@ def __list_runs(api_call, output_format='dict'):
                'setup_id': int(run_['oml:setup_id']),
                'flow_id': int(run_['oml:flow_id']),
                'uploader': int(run_['oml:uploader']),
+               'task_type': int(run_['oml:task_type_id']),
                'upload_time': str(run_['oml:upload_time']),
                'error_message': str((run_['oml:error_message']) or '')}
 

@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+# License: BSD 3-Clause
+
+import os
 import setuptools
 import sys
 
@@ -12,13 +15,19 @@ if sys.version_info < (3, 5):
         .format(sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
     )
 
+with open(os.path.join("README.md")) as fid:
+    README = fid.read()
+
 setuptools.setup(name="openml",
-                 author="Matthias Feurer, Jan van Rijn, Arlind Kadra, Andreas Müller, "
-                        "Pieter Gijsbers and Joaquin Vanschoren",
+                 author="Matthias Feurer, Jan van Rijn, Arlind Kadra, Pieter Gijsbers, "
+                        "Neeratyoy Mallik, Sahithya Ravi, Andreas Müller, Joaquin Vanschoren "
+                        "and Frank Hutter",
                  author_email="feurerm@informatik.uni-freiburg.de",
                  maintainer="Matthias Feurer",
                  maintainer_email="feurerm@informatik.uni-freiburg.de",
                  description="Python API for OpenML",
+                 long_description=README,
+                 long_description_content_type='text/markdown',
                  license="BSD 3-clause",
                  url="http://openml.org/",
                  project_urls={
@@ -26,7 +35,12 @@ setuptools.setup(name="openml",
                      "Source Code": "https://github.com/openml/openml-python"
                  },
                  version=version,
-                 packages=setuptools.find_packages(),
+                 # Make sure to remove stale files such as the egg-info before updating this:
+                 # https://stackoverflow.com/a/26547314
+                 packages=setuptools.find_packages(
+                     include=['openml.*', 'openml'],
+                     exclude=["*.tests", "*.tests.*", "tests.*", "tests"],
+                 ),
                  package_data={'': ['*.txt', '*.md']},
                  python_requires=">=3.5",
                  install_requires=[

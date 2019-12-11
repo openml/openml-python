@@ -1,7 +1,9 @@
+# License: BSD 3-Clause
+
 from collections import OrderedDict
 import json
 import os
-from typing import List, Tuple  # noqa F401
+from typing import List, Tuple, Optional  # noqa F401
 
 import arff
 import xmltodict
@@ -381,7 +383,7 @@ class OpenMLRunTrace(object):
         return cls(None, merged_trace)
 
     def __repr__(self):
-        return '[Run id: %d, %d trace iterations]'.format(
+        return '[Run id: {}, {} trace iterations]'.format(
             -1 if self.run_id is None else self.run_id,
             len(self.trace_iterations),
         )

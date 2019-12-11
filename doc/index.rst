@@ -84,3 +84,25 @@ Contribution to the OpenML package is highly appreciated. The OpenML package
 currently has a 1/4 position for the development and all help possible is
 needed to extend and maintain the package, create new examples and improve
 the usability. Please see the :ref:`contributing` page for more information.
+
+--------------------
+Citing OpenML-Python
+--------------------
+
+If you use OpenML-Python in a scientific publication, we would appreciate a
+reference to the following paper:
+
+
+ `OpenML-Python: an extensible Python API for OpenML
+ <https://arxiv.org/abs/1911.02490>`_,
+ Feurer *et al.*, arXiv:1911.02490.
+
+ Bibtex entry::
+
+     @article{feurer-arxiv19a,
+         author    = {Matthias Feurer and Jan N. van Rijn and Arlind Kadra and Pieter Gijsbers and Neeratyoy Mallik and Sahithya Ravi and Andreas Müller and Joaquin Vanschoren and Frank Hutter},
+         title     = {OpenML-Python: an extensible Python API for OpenML},
+         journal   = {arXiv:1911.02490},
+         year      = {2019},
+     }
+

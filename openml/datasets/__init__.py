@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from .functions import (
     attributes_arff_from_df,
     check_datasets_active,

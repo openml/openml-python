@@ -85,6 +85,7 @@ Modules
 
     list_evaluations
     list_evaluation_measures
+    list_evaluations_setups
 
 :mod:`openml.flows`: Flow Functions
 -----------------------------------

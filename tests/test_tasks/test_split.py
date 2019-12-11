@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import inspect
 import os
 

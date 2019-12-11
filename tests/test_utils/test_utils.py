@@ -16,7 +16,7 @@ class OpenMLTaskTest(TestBase):
     def mocked_perform_api_call(call, request_method):
         # TODO: JvR: Why is this not a staticmethod?
         url = openml.config.server + '/' + call
-        return openml._api_calls._read_url(url, request_method=request_method)
+        return openml._api_calls._download_text_file(url)
 
     def test_list_all(self):
         openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
@@ -75,14 +75,14 @@ class OpenMLTaskTest(TestBase):
         self.assertEqual(len(setups), required_size)
 
     def test_list_all_for_runs(self):
-        required_size = 48
+        required_size = 21
         runs = openml.runs.list_runs(batch_size=self._batch_size, size=required_size)
 
         # might not be on test server after reset, please rerun test at least once if fails
         self.assertEqual(len(runs), required_size)
 
     def test_list_all_for_evaluations(self):
-        required_size = 57
+        required_size = 22
         # TODO apparently list_evaluations function does not support kwargs
         evaluations = openml.evaluations.list_evaluations(function='predictive_accuracy',
                                                           size=required_size)

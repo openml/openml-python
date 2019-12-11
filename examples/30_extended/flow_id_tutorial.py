@@ -8,6 +8,9 @@ analysis.
 """
 
 ####################################################################################################
+
+# License: BSD 3-Clause
+
 import sklearn.tree
 
 import openml
@@ -24,7 +27,7 @@ flow_id = flow.flow_id
 print(flow_id)
 
 ####################################################################################################
-# This piece of code is rather involved. First, it retrieves an
+# This piece of code is rather involved. First, it retrieves a
 # :class:`~openml.extensions.Extension` which is registered and can handle the given model,
 # in our case it is :class:`openml.extensions.sklearn.SklearnExtension`. Second, the extension
 # converts the classifier into an instance of :class:`openml.flow.OpenMLFlow`. Third and finally,
@@ -63,6 +66,6 @@ flow_ids = openml.flows.get_flow_id(name=flow.name)
 print(flow_ids)
 
 ####################################################################################################
-# This also work with the actual model (generalizing the first part of this example):
+# This also works with the actual model (generalizing the first part of this example):
 flow_ids = openml.flows.get_flow_id(model=clf, exact_version=False)
 print(flow_ids)

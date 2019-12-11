@@ -11,6 +11,8 @@ A basic tutorial on how to list, load and visualize datasets.
 # at OpenML. However, for the purposes of this tutorial, we are going to work with
 # the datasets directly.
 
+# License: BSD 3-Clause
+
 import openml
 ############################################################################
 # List datasets

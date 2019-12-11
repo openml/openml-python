@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 from collections import OrderedDict
 import re
 import gzip
@@ -11,19 +13,17 @@ import arff
 import numpy as np
 import pandas as pd
 import scipy.sparse
-import xmltodict
 from warnings import warn
 
-import openml._api_calls
+from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
-from ..utils import _tag_entity
 
 
 logger = logging.getLogger(__name__)
 
 
-class OpenMLDataset(object):
+class OpenMLDataset(OpenMLBase):
     """Dataset object.
 
     Allows fetching and uploading datasets to OpenML.
@@ -184,11 +184,12 @@ class OpenMLDataset(object):
         else:
             self.data_pickle_file = None
 
-    def __repr__(self):
-        header = "OpenML Dataset"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
+    @property
+    def id(self) -> Optional[int]:
+        return self.dataset_id
 
-        base_url = "{}".format(openml.config.server[:-len('api/v1/xml')])
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+        """ Collect all information to display in the __repr__ body. """
         fields = {"Name": self.name,
                   "Version": self.version,
                   "Format": self.format,
@@ -201,19 +202,14 @@ class OpenMLDataset(object):
         if self.upload_date is not None:
             fields["Upload Date"] = self.upload_date.replace('T', ' ')
         if self.dataset_id is not None:
-            fields["OpenML URL"] = "{}d/{}".format(base_url, self.dataset_id)
+            fields["OpenML URL"] = self.openml_url
         if self.qualities is not None and self.qualities['NumberOfInstances'] is not None:
             fields["# of instances"] = int(self.qualities['NumberOfInstances'])
 
         # determines the order in which the information will be printed
         order = ["Name", "Version", "Format", "Upload Date", "Licence", "Download URL",
                  "OpenML URL", "Data File", "Pickle File", "# of features", "# of instances"]
-        fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
-        return header + body
+        return [(key, fields[key]) for key in order if key in fields]
 
     def __eq__(self, other):
 
@@ -447,7 +443,7 @@ class OpenMLDataset(object):
             with open(self.data_pickle_file, "rb") as fh:
                 data, categorical, attribute_names = pickle.load(fh)
         except EOFError:
-            logging.warning(
+            logger.warning(
                 "Detected a corrupt cache file loading dataset %d: '%s'. "
                 "We will continue loading data from the arff-file, "
                 "but this will be much slower for big datasets. "
@@ -461,26 +457,6 @@ class OpenMLDataset(object):
                              "location {} ".format(self.name, self.data_pickle_file))
 
         return data, categorical, attribute_names
-
-    def push_tag(self, tag):
-        """Annotates this data set with a tag on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the dataset.
-        """
-        _tag_entity('data', self.dataset_id, tag)
-
-    def remove_tag(self, tag):
-        """Removes a tag from this dataset on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the dataset.
-        """
-        _tag_entity('data', self.dataset_id, tag, untag=True)
 
     @staticmethod
     def _convert_array_format(data, array_format, attribute_names):
@@ -538,7 +514,7 @@ class OpenMLDataset(object):
                 return data
         else:
             data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
-            logging.warning(
+            logger.warning(
                 "Cannot convert %s (%s) to '%s'. Returning input data."
                 % (data_type, type(data), array_format)
             )
@@ -752,58 +728,31 @@ class OpenMLDataset(object):
                     result.append(idx - offset)
         return result
 
-    def publish(self):
-        """Publish the dataset on the OpenML server.
+    def _get_file_elements(self) -> Dict:
+        """ Adds the 'dataset' to file elements. """
+        file_elements = {}
+        path = None if self.data_file is None else os.path.abspath(self.data_file)
 
-        Upload the dataset description and dataset content to openml.
-
-        Returns
-        -------
-        dataset_id: int
-            Id of the dataset uploaded to the server.
-        """
-        file_elements = {'description': self._to_xml()}
-
-        # the arff dataset string is available
         if self._dataset is not None:
             file_elements['dataset'] = self._dataset
-        else:
-            # the path to the arff dataset is given
-            if self.data_file is not None:
-                path = os.path.abspath(self.data_file)
-                if os.path.exists(path):
-                    try:
+        elif path is not None and os.path.exists(path):
+            with open(path, 'rb') as fp:
+                file_elements['dataset'] = fp.read()
+            try:
+                dataset_utf8 = str(file_elements['dataset'], 'utf8')
+                arff.ArffDecoder().decode(dataset_utf8, encode_nominal=True)
+            except arff.ArffException:
+                raise ValueError("The file you have provided is not a valid arff file.")
+        elif self.url is None:
+            raise ValueError("No valid url/path to the data file was given.")
+        return file_elements
 
-                        with io.open(path, encoding='utf8') as fh:
-                            # check if arff is valid
-                            decoder = arff.ArffDecoder()
-                            decoder.decode(fh, encode_nominal=True)
-                    except arff.ArffException:
-                        raise ValueError("The file you have provided is not "
-                                         "a valid arff file.")
+    def _parse_publish_response(self, xml_response: Dict):
+        """ Parse the id from the xml_response and assign it to self. """
+        self.dataset_id = int(xml_response['oml:upload_data_set']['oml:id'])
 
-                    with open(path, 'rb') as fp:
-                        file_elements['dataset'] = fp.read()
-            else:
-                if self.url is None:
-                    raise ValueError("No url/path to the data file was given")
-
-        return_value = openml._api_calls._perform_api_call(
-            "data/", 'post',
-            file_elements=file_elements,
-        )
-        response = xmltodict.parse(return_value)
-        self.dataset_id = int(response['oml:upload_data_set']['oml:id'])
-        return self.dataset_id
-
-    def _to_xml(self):
-        """ Serialize object to xml for upload
-
-        Returns
-        -------
-        xml_dataset : str
-            XML description of the data.
-        """
+    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
+        """ Creates a dictionary representation of self. """
         props = ['id', 'name', 'version', 'description', 'format', 'creator',
                  'contributor', 'collection_date', 'upload_date', 'language',
                  'licence', 'url', 'default_target_attribute',
@@ -811,7 +760,7 @@ class OpenMLDataset(object):
                  'citation', 'tag', 'visibility', 'original_data_url',
                  'paper_url', 'update_comment', 'md5_checksum']
 
-        data_container = OrderedDict()
+        data_container = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
         data_dict = OrderedDict([('@xmlns:oml', 'http://openml.org/openml')])
         data_container['oml:data_set_description'] = data_dict
 
@@ -820,14 +769,7 @@ class OpenMLDataset(object):
             if content is not None:
                 data_dict["oml:" + prop] = content
 
-        xml_string = xmltodict.unparse(
-            input_dict=data_container,
-            pretty=True,
-        )
-        # A flow may not be uploaded with the xml encoding specification:
-        # <?xml version="1.0" encoding="utf-8"?>
-        xml_string = xml_string.split('\n', 1)[-1]
-        return xml_string
+        return data_container
 
 
 def _check_qualities(qualities):

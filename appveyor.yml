@@ -43,4 +43,4 @@ build: false
 
 test_script:
   - "cd C:\\projects\\openml-python"
-  - "%CMD_IN_ENV% pytest -n 4 --timeout=600 --timeout-method=thread -sv --ignore='test_OpenMLDemo.py'"
+  - "%CMD_IN_ENV% pytest -n 4 --timeout=600 --timeout-method=thread -sv"

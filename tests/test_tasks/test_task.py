@@ -1,3 +1,5 @@
+# License: BSD 3-Clause
+
 import unittest
 from typing import List
 from random import randint, shuffle
@@ -57,10 +59,10 @@ class OpenMLTaskTest(TestBase):
                     estimation_procedure_id=self.estimation_procedure
                 )
 
-                task_id = task.publish()
-                TestBase._mark_entity_for_removal('task', task_id)
+                task.publish()
+                TestBase._mark_entity_for_removal('task', task.id)
                 TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                                    task_id))
+                                                                    task.id))
                 # success
                 break
             except OpenMLServerException as e:
