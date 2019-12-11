@@ -11,6 +11,7 @@ import re
 from re import IGNORECASE
 import sys
 import time
+import typing
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 import warnings
 
@@ -1577,8 +1578,10 @@ class SklearnExtension(Extension):
 
             # to handle the case when dataset is numpy and categories are encoded
             # however the class labels stored in task are still categories
-            if isinstance(y_train, np.ndarray) and isinstance(task.class_labels[0], str):
-                model_classes = [task.class_labels[i] for i in model_classes]
+            if isinstance(y_train, np.ndarray) and \
+                    isinstance(typing.cast(List[str], task.class_labels)[0], str):
+                model_classes = [typing.cast(List[str], task.class_labels)[i]
+                                 for i in model_classes]
 
         modelpredict_start_cputime = time.process_time()
         modelpredict_start_walltime = time.time()
