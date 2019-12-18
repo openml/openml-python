@@ -22,6 +22,10 @@ file_handler = None
 def _create_log_handlers():
     """ Creates but does not attach the log handlers. """
     global console_handler, file_handler
+    if console_handler is not None or file_handler is not None:
+        logger.debug("Requested to create log handlers, but they are already created.")
+        return
+
     message_format = '[%(levelname)s] [%(asctime)s:%(name)s] %(message)s'
     output_formatter = logging.Formatter(message_format, datefmt='%H:%M:%S')
 
