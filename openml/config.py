@@ -7,7 +7,7 @@ Store module level information like the API key, cache directory and the server
 import logging
 import logging.handlers
 import os
-from typing import cast, Optional, Tuple, Any
+from typing import Optional, Tuple
 
 from io import StringIO
 import configparser
@@ -48,11 +48,7 @@ def _convert_log_levels(log_level: int) -> Tuple[int, int]:
     return openml_level, python_level
 
 
-def _set_level_register_and_store(
-        handler: logging.Handler,
-        log_level: int,
-        store_under_key: Optional[str] = None
-):
+def _set_level_register_and_store(handler: logging.Handler, log_level: int):
     """ Set handler log level, register it if needed, save setting to config file if specified. """
     oml_level, py_level = _convert_log_levels(log_level)
     handler.setLevel(py_level)
@@ -63,32 +59,17 @@ def _set_level_register_and_store(
     if handler not in openml_logger.handlers:
         openml_logger.addHandler(handler)
 
-    if store_under_key is not None:
-        _save_setting_to_configuration(store_under_key, oml_level)
 
-
-def set_console_log_level(
-        console_output_level: Optional[int] = None,
-        save_as_default: bool = False
-):
+def set_console_log_level(console_output_level: Optional[int] = None):
     """ Set console output to the desired level and register it with openml logger if needed. """
     global console_handler
-    store_under_key = 'verbosity' if save_as_default else None
-    _set_level_register_and_store(console_handler, console_output_level, store_under_key)
+    _set_level_register_and_store(console_handler, console_output_level)
 
 
-def set_file_log_level(
-        file_output_level: Optional[int] = None,
-        save_as_default: bool = False
-):
+def set_file_log_level(file_output_level: Optional[int] = None):
     """ Set file output to the desired level and register it with openml logger if needed. """
     global file_handler
-    store_under_key = 'file_verbosity' if save_as_default else None
-    _set_level_register_and_store(file_handler, file_output_level, store_under_key)
-
-
-def _save_setting_to_configuration(key: str, value: Any):
-    raise NotImplementedError("Storing values not yet supported.")
+    _set_level_register_and_store(file_handler, file_output_level)
 
 
 # Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
@@ -223,9 +204,7 @@ def _setup():
 
 
 def _parse_config():
-    """Parse the config file, set up defaults.
-    """
-
+    """ Parse the config file, set up defaults. """
     config = configparser.RawConfigParser(defaults=_defaults)
 
     if not os.path.exists(config_file):
@@ -303,14 +282,4 @@ __all__ = [
 ]
 
 _setup()
-
-
 _create_log_handlers()
-_config = _parse_config()
-
-if _config['FAKE_SECTION'].get('verbosity', None) is not None:
-    _console_log_level = int(_config.get('FAKE_SECTION', 'verbosity'))
-    set_console_log_level(_console_log_level)
-if _config['FAKE_SECTION'].get('file_verbosity', None) is not None:
-    _file_log_level = int(_config.get('FAKE_SECTION', 'file_verbosity'))
-    set_file_log_level(_file_log_level)
