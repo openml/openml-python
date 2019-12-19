@@ -7,7 +7,7 @@ Store module level information like the API key, cache directory and the server
 import logging
 import logging.handlers
 import os
-from typing import Optional, Tuple
+from typing import Tuple, cast
 
 from io import StringIO
 import configparser
@@ -64,16 +64,16 @@ def _set_level_register_and_store(handler: logging.Handler, log_level: int):
         openml_logger.addHandler(handler)
 
 
-def set_console_log_level(console_output_level: Optional[int] = None):
+def set_console_log_level(console_output_level: int):
     """ Set console output to the desired level and register it with openml logger if needed. """
     global console_handler
-    _set_level_register_and_store(console_handler, console_output_level)
+    _set_level_register_and_store(cast(logging.Handler, console_handler), console_output_level)
 
 
-def set_file_log_level(file_output_level: Optional[int] = None):
+def set_file_log_level(file_output_level: int):
     """ Set file output to the desired level and register it with openml logger if needed. """
     global file_handler
-    _set_level_register_and_store(file_handler, file_output_level)
+    _set_level_register_and_store(cast(logging.Handler, file_handler), file_output_level)
 
 
 # Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
