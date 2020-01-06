@@ -696,10 +696,14 @@ class SklearnExtension(Extension):
         # will be part of the name (in brackets)
         sub_components_names = ""
         for key in subcomponents:
+            if isinstance(subcomponents[key], OpenMLFlow):
+                name = subcomponents[key].name
+            elif isinstance(subcomponents[key], str):  # 'drop', 'passthrough' can be passed
+                name = subcomponents[key]
             if key in subcomponents_explicit:
-                sub_components_names += "," + key + "=" + subcomponents[key].name
+                sub_components_names += "," + key + "=" + name
             else:
-                sub_components_names += "," + subcomponents[key].name
+                sub_components_names += "," + name
 
         if sub_components_names:
             # slice operation on string in order to get rid of leading comma
@@ -771,6 +775,9 @@ class SklearnExtension(Extension):
         external_versions.add(openml_version)
         external_versions.add(sklearn_version)
         for visitee in sub_components.values():
+            # 'drop', 'passthrough', None can be passed as estimators
+            if isinstance(visitee, str):
+                continue
             for external_version in visitee.external_version.split(','):
                 external_versions.add(external_version)
         return ','.join(list(sorted(external_versions)))
@@ -783,9 +790,12 @@ class SklearnExtension(Extension):
         to_visit_stack = []  # type: List[OpenMLFlow]
         to_visit_stack.extend(sub_components.values())
         known_sub_components = set()  # type: Set[str]
+
         while len(to_visit_stack) > 0:
             visitee = to_visit_stack.pop()
-            if visitee.name in known_sub_components:
+            if isinstance(visitee, str):  # 'drop', 'passthrough' can be passed as estimators
+                known_sub_components.add(visitee)
+            elif visitee.name in known_sub_components:
                 raise ValueError('Found a second occurence of component %s when '
                                  'trying to serialize %s.' % (visitee.name, model))
             else:
@@ -822,7 +832,7 @@ class SklearnExtension(Extension):
             def flatten_all(list_):
                 """ Flattens arbitrary depth lists of lists (e.g. [[1,2],[3,[1]]] -> [1,2,3,1]). """
                 for el in list_:
-                    if isinstance(el, (list, tuple)):
+                    if isinstance(el, (list, tuple)) and len(el) > 0:
                         yield from flatten_all(el)
                     else:
                         yield el
@@ -852,17 +862,31 @@ class SklearnExtension(Extension):
                 parameter_value = list()  # type: List
                 reserved_keywords = set(model.get_params(deep=False).keys())
 
-                for sub_component_tuple in rval:
+                for i, sub_component_tuple in enumerate(rval):
                     identifier = sub_component_tuple[0]
                     sub_component = sub_component_tuple[1]
-                    sub_component_type = type(sub_component_tuple)
+                    # sub_component_type = type(sub_component_tuple)
                     if not 2 <= len(sub_component_tuple) <= 3:
                         # length 2 is for {VotingClassifier.estimators,
                         # Pipeline.steps, FeatureUnion.transformer_list}
                         # length 3 is for ColumnTransformer
                         msg = 'Length of tuple does not match assumptions'
                         raise ValueError(msg)
-                    if not isinstance(sub_component, (OpenMLFlow, type(None))):
+
+                    if isinstance(sub_component, str):
+                        if sub_component != 'drop' and sub_component != 'passthrough':
+                            msg = 'Second item of tuple does not match assumptions. ' \
+                                  'If string, can be only \'drop\' or \'passthrough\' but' \
+                                  'got %s' % sub_component
+                            raise ValueError(msg)
+                        else:
+                            pass
+                    elif isinstance(sub_component, type(None)):
+                        msg = 'Cannot serialize objects of None type. Please use a valid ' \
+                              'placeholder for None. Note that empty sklearn estimators can be '\
+                              'replaced with \'drop\' or \'passthrough\'.'
+                        raise ValueError(msg)
+                    elif not isinstance(sub_component, OpenMLFlow):
                         msg = 'Second item of tuple does not match assumptions. ' \
                               'Expected OpenMLFlow, got %s' % type(sub_component)
                         raise TypeError(msg)
@@ -875,31 +899,18 @@ class SklearnExtension(Extension):
                                                         identifier)
                         raise PyOpenMLError(msg)
 
-                    if sub_component is None:
-                        # In a FeatureUnion it is legal to have a None step
-
-                        pv = [identifier, None]
-                        if sub_component_type is tuple:
-                            parameter_value.append(tuple(pv))
-                        else:
-                            parameter_value.append(pv)
-
-                    else:
-                        # Add the component to the list of components, add a
-                        # component reference as a placeholder to the list of
-                        # parameters, which will be replaced by the real component
-                        # when deserializing the parameter
-                        sub_components_explicit.add(identifier)
-                        sub_components[identifier] = sub_component
-                        component_reference = OrderedDict()  # type: Dict[str, Union[str, Dict]]
-                        component_reference['oml-python:serialized_object'] = 'component_reference'
-                        cr_value = OrderedDict()  # type: Dict[str, Any]
-                        cr_value['key'] = identifier
-                        cr_value['step_name'] = identifier
-                        if len(sub_component_tuple) == 3:
-                            cr_value['argument_1'] = sub_component_tuple[2]
-                        component_reference['value'] = cr_value
-                        parameter_value.append(component_reference)
+                    # when deserializing the parameter
+                    sub_components_explicit.add(identifier)
+                    sub_components[identifier] = sub_component
+                    component_reference = OrderedDict()  # type: Dict[str, Union[str, Dict]]
+                    component_reference['oml-python:serialized_object'] = 'component_reference'
+                    cr_value = OrderedDict()  # type: Dict[str, Any]
+                    cr_value['key'] = identifier
+                    cr_value['step_name'] = identifier
+                    if len(sub_component_tuple) == 3:
+                        cr_value['argument_1'] = sub_component_tuple[2]
+                    component_reference['value'] = cr_value
+                    parameter_value.append(component_reference)
 
                 # Here (and in the elif and else branch below) are the only
                 # places where we encode a value as json to make sure that all
@@ -1927,9 +1938,10 @@ class SklearnExtension(Extension):
                             param_value is None or param_value is np.ma.masked:
                         # basic string values
                         type = 'STRING'
-                    elif isinstance(param_value, list) and \
+                    elif isinstance(param_value, (list, tuple)) and \
                             all(isinstance(i, int) for i in param_value):
-                        # list of integers
+                        # list of integers (usually for selecting features)
+                        # hyperparameter layer_sizes of MLPClassifier
                         type = 'STRING'
                     else:
                         raise TypeError('Unsupported param type in param grid: %s' % key)

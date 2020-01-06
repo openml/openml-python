@@ -9,7 +9,7 @@ all: clean inplace test
 
 clean:
 	$(PYTHON) setup.py clean
-	rm -rf dist
+	rm -rf dist openml.egg-info
 
 in: inplace # just a shortcut
 inplace:

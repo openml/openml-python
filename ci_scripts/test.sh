@@ -15,14 +15,8 @@ run_tests() {
 
     cwd=`pwd`
     test_dir=$cwd/tests
-    doctest_dir=$cwd/doc
 
     cd $TEST_DIR
-    if [[ "$EXAMPLES" == "true" ]]; then
-        pytest -sv $test_dir/test_examples/
-    elif [[ "$DOCTEST" == "true" ]]; then
-        python -m doctest $doctest_dir/usage.rst
-    fi
 
     if [[ "$COVERAGE" == "true" ]]; then
         PYTEST_ARGS='--cov=openml'

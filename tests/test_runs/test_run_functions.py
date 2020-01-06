@@ -110,24 +110,35 @@ class TestRun(TestBase):
 
         return True
 
-    def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed):
+    def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed,
+                                             create_task_obj):
         run = openml.runs.get_run(run_id)
-        task = openml.tasks.get_task(run.task_id)
 
         # TODO: assert holdout task
 
         # downloads the predictions of the old task
         file_id = run.output_files['predictions']
         predictions_url = openml._api_calls._file_id_to_url(file_id)
-        response = openml._api_calls._read_url(predictions_url,
-                                               request_method='get')
+        response = openml._api_calls._download_text_file(predictions_url)
         predictions = arff.loads(response)
-        run_prime = openml.runs.run_model_on_task(
-            model=model_prime,
-            task=task,
-            avoid_duplicate_runs=False,
-            seed=seed,
-        )
+
+        # if create_task_obj=False, task argument in run_model_on_task is specified task_id
+        if create_task_obj:
+            task = openml.tasks.get_task(run.task_id)
+            run_prime = openml.runs.run_model_on_task(
+                model=model_prime,
+                task=task,
+                avoid_duplicate_runs=False,
+                seed=seed,
+            )
+        else:
+            run_prime = openml.runs.run_model_on_task(
+                model=model_prime,
+                task=run.task_id,
+                avoid_duplicate_runs=False,
+                seed=seed,
+            )
+
         predictions_prime = run_prime._generate_arff_dict()
 
         self._compare_predictions(predictions, predictions_prime)
@@ -426,13 +437,17 @@ class TestRun(TestBase):
                 raise e
 
             self._rerun_model_and_compare_predictions(run.run_id, model_prime,
-                                                      seed)
+                                                      seed, create_task_obj=True)
+            self._rerun_model_and_compare_predictions(run.run_id, model_prime,
+                                                      seed, create_task_obj=False)
         else:
             run_downloaded = openml.runs.get_run(run.run_id)
             sid = run_downloaded.setup_id
             model_prime = openml.setups.initialize_model(sid)
-            self._rerun_model_and_compare_predictions(run.run_id,
-                                                      model_prime, seed)
+            self._rerun_model_and_compare_predictions(run.run_id, model_prime,
+                                                      seed, create_task_obj=True)
+            self._rerun_model_and_compare_predictions(run.run_id, model_prime,
+                                                      seed, create_task_obj=False)
 
         # todo: check if runtime is present
         self._check_fold_timing_evaluations(run.fold_evaluations, 1, num_folds,
