@@ -348,7 +348,7 @@ Finally, it is also possible to list all tasks on OpenML with:
     To retain the current behavior and silence the warning, pass 'sort=True'.
 
       sort=sort,
-    22542
+    22544
 
 
 
@@ -1133,7 +1133,7 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  32.747 seconds)
+   **Total running time of the script:** ( 0 minutes  33.887 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:
