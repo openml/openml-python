@@ -100,7 +100,8 @@ class OpenMLDataset(OpenMLBase):
         Serialized arff dataset string.
     """
     def __init__(self, name, description, format=None,
-                 data_format='arff', dataset_id=None, version=None,
+                 data_format='arff', cache_format='feather',
+                 dataset_id=None, version=None,
                  creator=None, contributor=None, collection_date=None,
                  upload_date=None, language=None, licence=None,
                  url=None, default_target_attribute=None,
@@ -128,6 +129,7 @@ class OpenMLDataset(OpenMLBase):
         self.name = name
         self.version = int(version) if version is not None else None
         self.description = description
+        self.cache_format = cache_format
         if format is None:
             self.format = data_format
         else:
@@ -436,7 +438,7 @@ class OpenMLDataset(OpenMLBase):
         # We parse the data from arff again and populate the cache with a recent pickle file.
         X, categorical, attribute_names = self._parse_data_from_arff(data_file)
 
-        if type(X) != scipy.sparse.csr.csr_matrix and X.shape[1] <= 1000:
+        if self.cache_format == "feather": #type(X) != scipy.sparse.csr.csr_matrix and X.shape[1] <= 1000:
             print("feather write")
             feather.write_feather(X, data_feather_file)
             with open(data_pickle_file, "wb") as fh:

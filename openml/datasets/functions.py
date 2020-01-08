@@ -451,7 +451,8 @@ def get_dataset(
     dataset_id: Union[int, str],
     download_data: bool = True,
     version: int = None,
-    error_if_multiple: bool = False
+    error_if_multiple: bool = False,
+    cache_format: str = 'feather'
 ) -> OpenMLDataset:
     """ Download the OpenML dataset representation, optionally also download actual data file.
 
@@ -527,7 +528,7 @@ def get_dataset(
                                      did_cache_dir)
 
     dataset = _create_dataset_from_description(
-        description, features, qualities, arff_file
+        description, features, qualities, arff_file, cache_format
     )
     return dataset
 
@@ -975,6 +976,7 @@ def _create_dataset_from_description(
         features: Dict,
         qualities: List,
         arff_file: str = None,
+        cache_format: str = 'feather'
 ) -> OpenMLDataset:
     """Create a dataset object from a description dict.
 
@@ -1019,6 +1021,7 @@ def _create_dataset_from_description(
         update_comment=description.get("oml:update_comment"),
         md5_checksum=description.get("oml:md5_checksum"),
         data_file=arff_file,
+        cache_format=cache_format,
         features=features,
         qualities=qualities,
     )
