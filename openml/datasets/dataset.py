@@ -438,7 +438,7 @@ class OpenMLDataset(OpenMLBase):
         # We parse the data from arff again and populate the cache with a recent pickle file.
         X, categorical, attribute_names = self._parse_data_from_arff(data_file)
 
-        if self.cache_format == "feather" and type(X) != scipy.sparse.csr.csr_matrix: # and X.shape[1] <= 1000:
+        if self.cache_format == "feather" and type(X) != scipy.sparse.csr.csr_matrix:
             print("feather write")
             feather.write_feather(X, data_feather_file)
             with open(data_pickle_file, "wb") as fh:
@@ -462,7 +462,8 @@ class OpenMLDataset(OpenMLBase):
         if self.data_pickle_file is None:
             if self.data_file is None:
                 self._download_data()
-            self.data_pickle_file, self.data_feather_file = self._create_pickle_in_cache(self.data_file)
+            self.data_pickle_file, self.data_feather_file = self._create_pickle_in_cache(
+                self.data_file)
 
         try:
             if os.path.exists(self.data_feather_file):
