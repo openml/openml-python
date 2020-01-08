@@ -286,4 +286,4 @@ __all__ = [
 ]
 
 _setup()
-# _create_log_handlers()
+_create_log_handlers()
