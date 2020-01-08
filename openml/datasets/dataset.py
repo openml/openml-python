@@ -400,7 +400,7 @@ class OpenMLDataset(OpenMLBase):
 
         return X, categorical, attribute_names
 
-    def _create_pickle_in_cache(self, data_file: str) -> str:
+    def _create_pickle_in_cache(self, data_file: str) -> (str, str):
         """ Parse the arff and pickle the result. Update any old pickle objects. """
         data_pickle_file = data_file.replace('.arff', '.pkl.py3')
         data_feather_file = data_file.replace('.arff', '.feather')
