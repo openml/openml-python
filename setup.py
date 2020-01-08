@@ -51,7 +51,8 @@ setuptools.setup(name="openml",
                      'python-dateutil',  # Installed through pandas anyway.
                      'pandas>=0.19.2',
                      'scipy>=0.13.3',
-                     'numpy>=1.6.2'
+                     'numpy>=1.6.2',
+                     'pyarrow>=0.15.1'
                  ],
                  extras_require={
                      'test': [
