@@ -35,7 +35,7 @@ install:
   # Install the build and runtime dependencies of the project.
   - "cd C:\\projects\\openml-python"
   - "pip install .[examples,test]"
-  - conda install --quiet --yes scikit-learn=0.22
+  - conda install --quiet --yes scikit-learn=0.21
 
 
 # Not a .NET project, we build scikit-learn in the install step instead
