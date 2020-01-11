@@ -4,7 +4,7 @@ import io
 import logging
 import os
 import re
-from typing import List, Dict, Union, Optional, Tuple
+from typing import List, Dict, Union, Optional
 
 import numpy as np
 import arff
@@ -482,16 +482,15 @@ def get_dataset(
         If ``True`` raise an error if multiple datasets are found with matching criteria.
     cache_format : str, optional (default='feather)
         Format for caching the dataset - may be feather or pickle
-        The default option feather may be slower than pickle when no.of.columns is high.
-        Hence, we have an option to set the caching to pickle in such cases.
-
+        Note that the default 'feather' option may load slower than pickle when
+        no.of.cols is very high.
     Returns
     -------
     dataset : :class:`openml.OpenMLDataset`
         The downloaded dataset.
     """
     if cache_format not in ['feather', 'pickle']:
-        raise ValueError("cache_format can only be 'feather' or 'pickle'")
+        raise ValueError("cache_format must be one of 'feather' or 'pickle'")
 
     if isinstance(dataset_id, str):
         try:

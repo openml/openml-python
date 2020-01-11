@@ -1316,3 +1316,17 @@ class TestOpenMLDataset(TestBase):
         qualities = openml.datasets.list_qualities()
         self.assertEqual(isinstance(qualities, list), True)
         self.assertEqual(all([isinstance(q, str) for q in qualities]), True)
+
+    def test_get_dataset_cache_format(self):
+        # This is the only non-lazy load to ensure default behaviour works.
+        dataset = openml.datasets.get_dataset(1, cache_format='pickle')
+        self.assertEqual(type(dataset), OpenMLDataset)
+        self.assertEqual(dataset.name, 'anneal')
+        self._datasets_retrieved_successfully([1], metadata_only=False)
+
+        self.assertGreater(len(dataset.features), 1)
+        self.assertGreater(len(dataset.qualities), 4)
+
+        # Issue324 Properly handle private datasets when trying to access them
+        openml.config.server = self.production_server
+        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
