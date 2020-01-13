@@ -95,7 +95,7 @@ to have better visualization capabilities and easier access:
            'NumberOfMissingValues', 'NumberOfNumericFeatures',
            'NumberOfSymbolicFeatures', 'cost_matrix'],
           dtype='object')
-    First 5 of 3303 tasks:
+    First 5 of 3307 tasks:
        tid  ttid  ...  NumberOfSymbolicFeatures cost_matrix
     2    2     1  ...                      33.0         NaN
     3    3     1  ...                      37.0         NaN
@@ -265,7 +265,7 @@ Furthermore, we can list tasks based on the dataset id:
 
  .. code-block:: none
 
-    First 5 of 16 tasks:
+    First 5 of 17 tasks:
              tid  ttid   did  ... target_value evaluation_measures number_samples
     9983    9983     1  1471  ...          NaN                 NaN            NaN
     14951  14951     1  1471  ...          NaN                 NaN            NaN
@@ -348,7 +348,7 @@ Finally, it is also possible to list all tasks on OpenML with:
     To retain the current behavior and silence the warning, pass 'sort=True'.
 
       sort=sort,
-    19563
+    22549
 
 
 
@@ -918,6 +918,37 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>170139</td>
               <td>5</td>
             </tr>
+            <tr>
+              <th>20717</th>
+              <td>8257.0</td>
+              <td>2.0</td>
+              <td>6723.0</td>
+              <td>2.0</td>
+              <td>15.0</td>
+              <td>14980.0</td>
+              <td>0.0</td>
+              <td>0.0</td>
+              <td>14.0</td>
+              <td>1.0</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>50 times Clustering</td>
+              <td>NaN</td>
+              <td>eeg-eye-state</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>NaN</td>
+              <td>active</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>Clustering</td>
+              <td>191646</td>
+              <td>5</td>
+            </tr>
           </tbody>
         </table>
         </div>
@@ -1102,7 +1133,7 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  30.586 seconds)
+   **Total running time of the script:** ( 0 minutes  33.148 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:
