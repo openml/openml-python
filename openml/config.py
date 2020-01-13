@@ -7,47 +7,79 @@ Store module level information like the API key, cache directory and the server
 import logging
 import logging.handlers
 import os
-from typing import cast
+from typing import Tuple, cast
 
 from io import StringIO
 import configparser
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
+openml_logger = logging.getLogger('openml')
+console_handler = None
+file_handler = None
 
 
-def configure_logging(console_output_level: int, file_output_level: int):
-    """ Sets the OpenML logger to DEBUG, with attached Stream- and FileHandler. """
-    # Verbosity levels as defined (https://github.com/openml/OpenML/wiki/Client-API-Standards)
-    # don't match Python values directly:
-    verbosity_map = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
+def _create_log_handlers():
+    """ Creates but does not attach the log handlers. """
+    global console_handler, file_handler
+    if console_handler is not None or file_handler is not None:
+        logger.debug("Requested to create log handlers, but they are already created.")
+        return
 
-    openml_logger = logging.getLogger('openml')
-    openml_logger.setLevel(logging.DEBUG)
     message_format = '[%(levelname)s] [%(asctime)s:%(name)s] %(message)s'
     output_formatter = logging.Formatter(message_format, datefmt='%H:%M:%S')
 
-    console_stream = logging.StreamHandler()
-    console_stream.setFormatter(output_formatter)
-    console_stream.setLevel(verbosity_map[console_output_level])
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(output_formatter)
 
-    one_mb = 2**20
+    one_mb = 2 ** 20
     log_path = os.path.join(cache_directory, 'openml_python.log')
-    file_stream = logging.handlers.RotatingFileHandler(log_path, maxBytes=one_mb, backupCount=1)
-    file_stream.setLevel(verbosity_map[file_output_level])
-    file_stream.setFormatter(output_formatter)
+    file_handler = logging.handlers.RotatingFileHandler(
+        log_path, maxBytes=one_mb, backupCount=1, delay=True
+    )
+    file_handler.setFormatter(output_formatter)
 
-    openml_logger.addHandler(console_stream)
-    openml_logger.addHandler(file_stream)
-    return console_stream, file_stream
+
+def _convert_log_levels(log_level: int) -> Tuple[int, int]:
+    """ Converts a log level that's either defined by OpenML/Python to both specifications. """
+    # OpenML verbosity level don't match Python values directly:
+    openml_to_python = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
+    python_to_openml = {logging.DEBUG: 2, logging.INFO: 1, logging.WARNING: 0,
+                        logging.CRITICAL: 0, logging.ERROR: 0}
+    # Because the dictionaries share no keys, we use `get` to convert as necessary:
+    openml_level = python_to_openml.get(log_level, log_level)
+    python_level = openml_to_python.get(log_level, log_level)
+    return openml_level, python_level
+
+
+def _set_level_register_and_store(handler: logging.Handler, log_level: int):
+    """ Set handler log level, register it if needed, save setting to config file if specified. """
+    oml_level, py_level = _convert_log_levels(log_level)
+    handler.setLevel(py_level)
+
+    if openml_logger.level > py_level or openml_logger.level == logging.NOTSET:
+        openml_logger.setLevel(py_level)
+
+    if handler not in openml_logger.handlers:
+        openml_logger.addHandler(handler)
+
+
+def set_console_log_level(console_output_level: int):
+    """ Set console output to the desired level and register it with openml logger if needed. """
+    global console_handler
+    _set_level_register_and_store(cast(logging.Handler, console_handler), console_output_level)
+
+
+def set_file_log_level(file_output_level: int):
+    """ Set file output to the desired level and register it with openml logger if needed. """
+    global file_handler
+    _set_level_register_and_store(cast(logging.Handler, file_handler), file_output_level)
 
 
 # Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
 _defaults = {
     'apikey': None,
     'server': "https://www.openml.org/api/v1/xml",
-    'verbosity': 0,  # WARNING
-    'file_verbosity': 2,  # DEBUG
     'cachedir': os.path.expanduser(os.path.join('~', '.openml', 'cache')),
     'avoid_duplicate_runs': 'True',
     'connection_n_retries': 2,
@@ -176,9 +208,7 @@ def _setup():
 
 
 def _parse_config():
-    """Parse the config file, set up defaults.
-    """
-
+    """ Parse the config file, set up defaults. """
     config = configparser.RawConfigParser(defaults=_defaults)
 
     if not os.path.exists(config_file):
@@ -189,6 +219,7 @@ def _parse_config():
                     "create an empty file there." % config_file)
 
     try:
+        # The ConfigParser requires a [SECTION_HEADER], which we do not expect in our config file.
         # Cheat the ConfigParser module by adding a fake section header
         config_file_ = StringIO()
         config_file_.write("[FAKE_SECTION]\n")
@@ -255,7 +286,4 @@ __all__ = [
 ]
 
 _setup()
-
-_console_log_level = cast(int, _defaults['verbosity'])
-_file_log_level = cast(int, _defaults['file_verbosity'])
-console_log, file_log = configure_logging(_console_log_level, _file_log_level)
+_create_log_handlers()

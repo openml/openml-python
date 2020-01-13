@@ -11,6 +11,8 @@ Changelog
 
 * FIX #873: Fixes an issue which resulted in incorrect URLs when printing OpenML objects after
   switching the server
+* FIX #885: Logger no longer registered by default. Added utility functions to easily register
+  logging to console and file.
 * MAINT #767: Source distribution installation is now unit-tested.
 * MAINT #865: OpenML no longer bundles test files in the source distribution.
 
