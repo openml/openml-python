@@ -410,7 +410,7 @@ class OpenMLDataset(OpenMLBase):
         """ Parse the arff and pickle the result. Update any old pickle objects. """
         data_pickle_file = data_file.replace('.arff', '.pkl.py3')
         data_feather_file = data_file.replace('.arff','.feather')
-        feather_attribute_file = 'attribute_info.pkl.py3'
+        feather_attribute_file = data_file.replace('.arff','_attribute.pkl.py3')
         if os.path.exists(data_pickle_file) and self.cache_format == 'pickle':
             # Load the data to check if the pickle file is outdated (i.e. contains numpy array)
             with open(data_pickle_file, "rb") as fh:
