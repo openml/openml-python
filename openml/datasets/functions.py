@@ -996,6 +996,8 @@ def _create_dataset_from_description(
         Description of a dataset qualities.
     arff_file : string, optional
         Path of dataset ARFF file.
+    cache_format: string, optional
+        Caching option for datasets (feather/pickle)
 
     Returns
     -------
