@@ -1320,7 +1320,7 @@ class TestOpenMLDataset(TestBase):
     def test_get_dataset_cache_format_pickle(self):
         # Feather format is default and tested by all other cases
         # this test case checks if pickle option works
-        dataset = openml.datasets.get_dataset(1, cache_format='feather')
+        dataset = openml.datasets.get_dataset(1, cache_format='pickle')
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, 'anneal')
         self.assertGreater(len(dataset.features), 1)
@@ -1328,5 +1328,6 @@ class TestOpenMLDataset(TestBase):
 
         X, y, categorical, attribute_names = dataset.get_data()
         self.assertIsInstance(X, pd.DataFrame)
+        self.assertEqual(X.shape, (898, 39))
         self.assertEqual(len(categorical), X.shape[1])
         self.assertEqual(len(attribute_names), X.shape[1])

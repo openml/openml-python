@@ -192,8 +192,8 @@ class OpenMLDataset(OpenMLBase):
             self.data_pickle_file, self.data_feather_file,\
                 self.feather_attribute_file = self._create_pickle_in_cache(data_file)
         else:
-            self.data_pickle_file, self.data_feather_file, self.feather_attribute_file = None, None, \
-                                                                                         None
+            self.data_pickle_file, self.data_feather_file, \
+                self.feather_attribute_file = None, None, None
 
     @property
     def id(self) -> Optional[int]:
@@ -439,14 +439,8 @@ class OpenMLDataset(OpenMLBase):
                 # We deal with this when loading the data in `_load_data`.
                 return data_pickle_file, data_feather_file, feather_attribute_file
 
-            # Between v0.8 and v0.9 the format of pickled data changed from
-            # np.ndarray to pd.DataFrame. This breaks some backwards compatibility,
-            # e.g. for `run_model_on_task`. If a local file still exists with
-            # np.ndarray data, we reprocess the data file to store a pickled
-            # pd.DataFrame blob. See also #646.
-            if isinstance(data, pd.DataFrame) or scipy.sparse.issparse(data):
-                logger.debug("Data pickle file already exists and is up to date.")
-                return data_pickle_file, data_feather_file, feather_attribute_file
+            logger.debug("Data feather file already exists and is up to date.")
+            return data_pickle_file, data_feather_file, feather_attribute_file
 
         # At this point either the pickle file does not exist, or it had outdated formatting.
         # We parse the data from arff again and populate the cache with a recent pickle file.
