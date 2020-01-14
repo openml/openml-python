@@ -409,8 +409,8 @@ class OpenMLDataset(OpenMLBase):
     def _create_pickle_in_cache(self, data_file: str) -> Tuple[str, str, str]:
         """ Parse the arff and pickle the result. Update any old pickle objects. """
         data_pickle_file = data_file.replace('.arff', '.pkl.py3')
-        data_feather_file = data_file.replace('.arff','.feather')
-        feather_attribute_file = data_file.replace('.arff','_attribute.pkl.py3')
+        data_feather_file = data_file.replace('.arff', '.feather')
+        feather_attribute_file = data_file.replace('.arff', '_attribute.pkl.py3')
         if os.path.exists(data_pickle_file) and self.cache_format == 'pickle':
             # Load the data to check if the pickle file is outdated (i.e. contains numpy array)
             with open(data_pickle_file, "rb") as fh:
@@ -452,12 +452,12 @@ class OpenMLDataset(OpenMLBase):
         X, categorical, attribute_names = self._parse_data_from_arff(data_file)
 
         if self.cache_format == "feather" and type(X) != scipy.sparse.csr.csr_matrix:
-            print("feather write")
+            logger.info("feather write")
             feather.write_feather(X, data_feather_file)
             with open(feather_attribute_file, "wb") as fh:
                 pickle.dump((categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
         else:
-            print("pickle write")
+            logger.info("pickle write")
             self.cache_format = 'pickle'
             with open(data_pickle_file, "wb") as fh:
                 pickle.dump((X, categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)

@@ -1317,16 +1317,21 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(isinstance(qualities, list), True)
         self.assertEqual(all([isinstance(q, str) for q in qualities]), True)
 
-    def test_get_dataset_cache_format(self):
-        # This is the only non-lazy load to ensure default behaviour works.
-        dataset = openml.datasets.get_dataset(1, cache_format='pickle')
+    def test_get_dataset_cache_format_pickle(self):
+        # Feather format is default and tested by all other cases
+        # this test case checks if pickle option works
+        dataset = openml.datasets.get_dataset(1, cache_format='feather')
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, 'anneal')
-        self._datasets_retrieved_successfully([1], metadata_only=False)
-
         self.assertGreater(len(dataset.features), 1)
         self.assertGreater(len(dataset.qualities), 4)
 
-        # Issue324 Properly handle private datasets when trying to access them
-        openml.config.server = self.production_server
-        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
+        X, y, categorical, attribute_names = dataset.get_data()
+        self.assertIsInstance(X, pd.DataFrame)
+        self.assertEqual(len(categorical), X.shape[1])
+        self.assertEqual(len(attribute_names), X.shape[1])
+
+
+
+
+
