@@ -1330,8 +1330,3 @@ class TestOpenMLDataset(TestBase):
         self.assertIsInstance(X, pd.DataFrame)
         self.assertEqual(len(categorical), X.shape[1])
         self.assertEqual(len(attribute_names), X.shape[1])
-
-
-
-
-

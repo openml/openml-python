@@ -192,7 +192,8 @@ class OpenMLDataset(OpenMLBase):
             self.data_pickle_file, self.data_feather_file,\
                 self.feather_attribute_file = self._create_pickle_in_cache(data_file)
         else:
-            self.data_pickle_file, self.data_feather_file, self.feather_attribute_file = None, None, None
+            self.data_pickle_file, self.data_feather_file, self.feather_attribute_file = None, None, \
+                                                                                         None
 
     @property
     def id(self) -> Optional[int]:
