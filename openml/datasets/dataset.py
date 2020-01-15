@@ -446,7 +446,8 @@ class OpenMLDataset(OpenMLBase):
         # We parse the data from arff again and populate the cache with a recent pickle file.
         X, categorical, attribute_names = self._parse_data_from_arff(data_file)
 
-        if self.cache_format == "feather" and type(X) != scipy.sparse.csr.csr_matrix:
+        # Feather format does not work for sparse datasets, so we use pickle for sparse datasets
+        if self.cache_format == "feather" and type(X) != scipy.sparse.csr_matrix:
             logger.info("feather write")
             feather.write_feather(X, data_feather_file)
             with open(feather_attribute_file, "wb") as fh:
