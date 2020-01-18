@@ -274,17 +274,17 @@ pre-processing all retrieved evaluations.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                   cost degree             gamma  kernel
-3986   11.6457140228441    NaN               NaN  linear
-999    170.370731793267    NaN  2.92277466827233     NaN
-5158  0.172909804329222    NaN               NaN  linear
-1471    108.33169397885    NaN               NaN  linear
-47    0.271963734342017    NaN               NaN  linear
-Y :  3986    0.627096
-999     0.502617
-5158    0.994371
-1471    0.905758
-47      0.980458
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                     cost degree              gamma      kernel
+5161   0.0393129079740665      4                NaN  polynomial
+5075  0.00175702775511577    NaN  0.870568954119789         NaN
+1502     798.977755931069    NaN                NaN      linear
+3482     34.6540401799934    NaN                NaN      linear
+5030   0.0025224061457393      2                NaN  polynomial
+Y :  5161    0.781077
+5075    0.916739
+1502    0.906851
+3482    0.646826
+5030    0.713189
 Name: value, dtype: float64
 </pre></div>
 </div>
@@ -335,7 +335,7 @@ time simple and quick.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 1.8639e-05
+Training RMSE : 1.4035e-05
 </pre></div>
 </div>
 </div>
@@ -368,17 +368,17 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
-0    395.232614  4.037589  823.670957      radial
-1    858.189249  2.740460  427.298919      linear
-2    886.495989  3.040102  728.399204      linear
-3    748.431057  4.794736  497.795494  polynomial
-4    282.748613  4.013702  699.492840  polynomial
+0    854.674748  3.686808  692.892062      radial
+1    213.240365  4.101387    7.044233     sigmoid
+2    571.228483  2.797688  733.259676      linear
+3    264.477689  3.348044  569.362840      radial
+4    221.794326  4.109468  728.320209      radial
 ..          ...       ...         ...         ...
-995   76.238905  3.426888  660.900660      linear
-996  598.739632  4.682057  672.849930      linear
-997  442.885382  2.153000   34.532452      linear
-998  536.674032  2.539064   84.424671  polynomial
-999   77.970682  4.082872  263.468309      linear
+995  953.553425  4.198255  731.991203     sigmoid
+996  388.325691  4.711041  476.782306     sigmoid
+997  548.268297  2.723144  443.521475  polynomial
+998  875.730615  4.184873  134.891577  polynomial
+999  108.814321  3.737431  654.873373     sigmoid
 
 [1000 rows x 4 columns]
 </pre></div>
@@ -402,7 +402,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  29.253 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  29.241 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
