@@ -67,7 +67,7 @@ Exercise 0
 
  .. code-block:: none
 
-    First 10 of 2987 datasets...
+    First 10 of 2989 datasets...
 
 
 .. only:: builder_html
@@ -467,20 +467,20 @@ Exercise 1
               <td>3.0</td>
             </tr>
             <tr>
-              <th>1019</th>
-              <td>1019</td>
-              <td>pendigits</td>
-              <td>10992.0</td>
-              <td>17.0</td>
-              <td>2.0</td>
-            </tr>
-            <tr>
               <th>32</th>
               <td>32</td>
               <td>pendigits</td>
               <td>10992.0</td>
               <td>17.0</td>
               <td>10.0</td>
+            </tr>
+            <tr>
+              <th>1019</th>
+              <td>1019</td>
+              <td>pendigits</td>
+              <td>10992.0</td>
+              <td>17.0</td>
+              <td>2.0</td>
             </tr>
             <tr>
               <th>42199</th>
@@ -917,7 +917,7 @@ Exercise 2
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.778 seconds)
+   **Total running time of the script:** ( 0 minutes  6.798 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:
