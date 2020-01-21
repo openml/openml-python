@@ -864,7 +864,7 @@ class SklearnExtension(Extension):
                 parameter_value = list()  # type: List
                 reserved_keywords = set(model.get_params(deep=False).keys())
 
-                for sub_component_tuple in rval:
+                for i, sub_component_tuple in enumerate(rval):
                     identifier = sub_component_tuple[0]
                     sub_component = sub_component_tuple[1]
                     sub_component_type = type(sub_component_tuple)
