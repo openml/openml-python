@@ -452,7 +452,7 @@ def get_dataset(
     download_data: bool = True,
     version: int = None,
     error_if_multiple: bool = False,
-    cache_format: str = 'feather'
+    cache_format: str = 'pickle'
 ) -> OpenMLDataset:
     """ Download the OpenML dataset representation, optionally also download actual data file.
 
@@ -480,10 +480,10 @@ def get_dataset(
         If no version is specified, retrieve the least recent still active version.
     error_if_multiple : bool, optional (default=False)
         If ``True`` raise an error if multiple datasets are found with matching criteria.
-    cache_format : str, optional (default='feather)
+    cache_format : str, optional (default='pickle')
         Format for caching the dataset - may be feather or pickle
-        Note that the default 'feather' option may load slower than pickle when
-        no.of.cols is very high.
+        Note that the default 'pickle' option may load slower than feather when
+        no.of.rows is very high.
     Returns
     -------
     dataset : :class:`openml.OpenMLDataset`
@@ -982,7 +982,7 @@ def _create_dataset_from_description(
         features: Dict,
         qualities: List,
         arff_file: str = None,
-        cache_format: str = 'feather'
+        cache_format: str = 'pickle'
 ) -> OpenMLDataset:
     """Create a dataset object from a description dict.
 

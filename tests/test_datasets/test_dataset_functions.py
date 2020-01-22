@@ -1318,9 +1318,9 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(all([isinstance(q, str) for q in qualities]), True)
 
     def test_get_dataset_cache_format_pickle(self):
-        # Feather format is default and tested by all other cases
+        # Feather format cant be tested without installing pyarrow
         # this test case checks if pickle option works
-        dataset = openml.datasets.get_dataset(1, cache_format='pickle')
+        dataset = openml.datasets.get_dataset(1)
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, 'anneal')
         self.assertGreater(len(dataset.features), 1)

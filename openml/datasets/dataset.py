@@ -7,8 +7,6 @@ import io
 import logging
 import os
 import pickle
-import pyarrow.feather as feather
-
 from typing import List, Optional, Union, Tuple, Iterable, Dict
 
 import arff
@@ -103,7 +101,7 @@ class OpenMLDataset(OpenMLBase):
         Serialized arff dataset string.
     """
     def __init__(self, name, description, format=None,
-                 data_format='arff', cache_format='feather',
+                 data_format='arff', cache_format='pickle',
                  dataset_id=None, version=None,
                  creator=None, contributor=None, collection_date=None,
                  upload_date=None, language=None, licence=None,
@@ -433,7 +431,7 @@ class OpenMLDataset(OpenMLBase):
         elif os.path.exists(data_feather_file) and self.cache_format == 'feather':
             # Load the data to check if the pickle file is outdated (i.e. contains numpy array)
             try:
-                data = feather.read_feather(data_feather_file)
+                data = pd.read_feather(data_feather_file)
             except EOFError:
                 # The file is likely corrupt, see #780.
                 # We deal with this when loading the data in `_load_data`.
@@ -449,7 +447,7 @@ class OpenMLDataset(OpenMLBase):
         # Feather format does not work for sparse datasets, so we use pickle for sparse datasets
         if self.cache_format == "feather" and type(X) != scipy.sparse.csr_matrix:
             logger.info("feather write")
-            feather.write_feather(X, data_feather_file)
+            X.to_feather(data_feather_file)
             with open(feather_attribute_file, "wb") as fh:
                 pickle.dump((categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
         else:
@@ -476,7 +474,7 @@ class OpenMLDataset(OpenMLBase):
         try:
             if self.cache_format == 'feather':
                 logger.info("feather load data")
-                data = feather.read_feather(self.data_feather_file)
+                data = pd.read_feather(self.data_feather_file)
 
                 with open(self.feather_attribute_file, "rb") as fh:
                     categorical, attribute_names = pickle.load(fh)

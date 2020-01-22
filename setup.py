@@ -52,7 +52,6 @@ setuptools.setup(name="openml",
                      'pandas>=0.19.2',
                      'scipy>=0.13.3',
                      'numpy>=1.6.2',
-                     'pyarrow>=0.15.1'
                  ],
                  extras_require={
                      'test': [
