@@ -17,7 +17,7 @@ matrix:
 install:
   # Miniconda is pre-installed in the worker build
   - "SET PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
-  - "python -m pip install -U pip"
+  - "python -m pip install -U pip==19.3.1"
 
   # Check that we have the expected version and architecture for Python
   - "python --version"
