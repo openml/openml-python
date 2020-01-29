@@ -112,6 +112,7 @@ class OpenMLDataset(OpenMLBase):
                  paper_url=None, update_comment=None,
                  md5_checksum=None, data_file=None, features=None,
                  qualities=None, dataset=None):
+        print(cache_format)
         if dataset_id is None:
             if description and not re.match("^[\x00-\x7F]*$", description):
                 # not basiclatin (XSD complains)
@@ -446,7 +447,8 @@ class OpenMLDataset(OpenMLBase):
         X, categorical, attribute_names = self._parse_data_from_arff(data_file)
 
         # Feather format does not work for sparse datasets, so we use pickle for sparse datasets
-        if self.cache_format == "feather" and scipy.sparse.issparse(X):
+        print(self.cache_format)
+        if self.cache_format == "feather" and not scipy.sparse.issparse(X):
             logger.info("feather write {}".format(self.name))
             X.to_feather(data_feather_file)
             with open(feather_attribute_file, "wb") as fh:
