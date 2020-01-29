@@ -490,7 +490,8 @@ def get_dataset(
         The downloaded dataset.
     """
     if cache_format not in ['feather', 'pickle']:
-        raise ValueError("cache_format must be one of 'feather' or 'pickle'")
+        raise ValueError("cache_format must be one of 'feather' or 'pickle. "
+                         "Invalid format specified: {}".format(cache_format))
 
     if isinstance(dataset_id, str):
         try:

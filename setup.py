@@ -64,6 +64,7 @@ setuptools.setup(name="openml",
                          'nbformat',
                          'oslo.concurrency',
                          'flaky',
+                         'pyarrow'
                      ],
                      'examples': [
                          'matplotlib',

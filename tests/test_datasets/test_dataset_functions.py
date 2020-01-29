@@ -1331,3 +1331,18 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(X.shape, (898, 39))
         self.assertEqual(len(categorical), X.shape[1])
         self.assertEqual(len(attribute_names), X.shape[1])
+
+    def test_get_dataset_cache_format_feather(self):
+        # Feather format cant be tested without installing pyarrow
+        # this test case checks if pickle option works
+        dataset = openml.datasets.get_dataset('iris', cache_format='feather')
+        self.assertEqual(type(dataset), OpenMLDataset)
+        self.assertEqual(dataset.name, 'iris')
+        self.assertGreater(len(dataset.features), 1)
+        self.assertGreater(len(dataset.qualities), 4)
+
+        X, y, categorical, attribute_names = dataset.get_data()
+        self.assertIsInstance(X, pd.DataFrame)
+        self.assertEqual(X.shape, (150, 5))
+        self.assertEqual(len(categorical), X.shape[1])
+        self.assertEqual(len(attribute_names), X.shape[1])
