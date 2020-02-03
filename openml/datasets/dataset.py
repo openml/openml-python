@@ -447,7 +447,7 @@ class OpenMLDataset(OpenMLBase):
         X, categorical, attribute_names = self._parse_data_from_arff(data_file)
 
         # Feather format does not work for sparse datasets, so we use pickle for sparse datasets
-        print(self.cache_format)
+
         if self.cache_format == "feather" and not scipy.sparse.issparse(X):
             logger.info("feather write {}".format(self.name))
             X.to_feather(data_feather_file)
