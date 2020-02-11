@@ -1318,8 +1318,6 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(all([isinstance(q, str) for q in qualities]), True)
 
     def test_get_dataset_cache_format_pickle(self):
-        # Feather format cant be tested without installing pyarrow
-        # this test case checks if pickle option works
         dataset = openml.datasets.get_dataset(1)
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, 'anneal')
@@ -1333,9 +1331,20 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(len(attribute_names), X.shape[1])
 
     def test_get_dataset_cache_format_feather(self):
-        # Feather format cant be tested without installing pyarrow
-        # this test case checks if pickle option works
+
         dataset = openml.datasets.get_dataset('iris', cache_format='feather')
+
+        # Check if dataset is written using feather
+        data_folder = os.path.join(openml.config.get_cache_directory(), 'datasets',
+                                   '128')
+        feather_file = os.path.join(data_folder, 'dataset.feather')
+        pickle_file = os.path.join(data_folder, 'dataset.feather.attributes.pkl.py3')
+        data = pd.read_feather(feather_file)
+        self.assertTrue(os.path.isfile(feather_file), msg='Feather file is missing')
+        self.assertTrue(os.path.isfile(pickle_file), msg='Attributes pickle file is missing')
+        self.assertEqual(data.shape, (150, 5))
+
+        # Check if get_data is able to retrieve feather data
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, 'iris')
         self.assertGreater(len(dataset.features), 1)

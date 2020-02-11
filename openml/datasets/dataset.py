@@ -112,7 +112,6 @@ class OpenMLDataset(OpenMLBase):
                  paper_url=None, update_comment=None,
                  md5_checksum=None, data_file=None, features=None,
                  qualities=None, dataset=None):
-        print(cache_format)
         if dataset_id is None:
             if description and not re.match("^[\x00-\x7F]*$", description):
                 # not basiclatin (XSD complains)

@@ -983,7 +983,7 @@ def _create_dataset_from_description(
         features: Dict,
         qualities: List,
         arff_file: str = None,
-        cache_format: str = 'pickle'
+        cache_format: str = 'pickle',
 ) -> OpenMLDataset:
     """Create a dataset object from a description dict.
 
