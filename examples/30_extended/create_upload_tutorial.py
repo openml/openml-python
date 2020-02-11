@@ -291,7 +291,7 @@ sparse_data = coo_matrix((
     ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
 ))
 column_names = ['input1', 'input2', 'y']
-df = pd.SparseDataFrame(sparse_data, columns=column_names)
+df = pd.DataFrame.sparse.from_spmatrix(sparse_data, columns=column_names)
 print(df.info())
 
 xor_dataset = create_dataset(

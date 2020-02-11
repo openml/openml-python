@@ -664,7 +664,7 @@ def create_dataset(name, description, creator, contributor,
     class:`openml.OpenMLDataset`
         Dataset description."""
 
-    if isinstance(data, (pd.DataFrame, pd.SparseDataFrame)):
+    if isinstance(data, pd.DataFrame):
         # infer the row id from the index of the dataset
         if row_id_attribute is None:
             row_id_attribute = data.index.name
@@ -676,8 +676,7 @@ def create_dataset(name, description, creator, contributor,
     if attributes == 'auto' or isinstance(attributes, dict):
         if not hasattr(data, "columns"):
             raise ValueError("Automatically inferring attributes requires "
-                             "a pandas DataFrame or SparseDataFrame. "
-                             "A {!r} was given instead.".format(data))
+                             "a pandas DataFrame. A {!r} was given instead.".format(data))
         # infer the type of data for each column of the DataFrame
         attributes_ = attributes_arff_from_df(data)
         if isinstance(attributes, dict):

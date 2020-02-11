@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 import scipy.sparse
 from warnings import warn
+from distutils.version import LooseVersion
 
 from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
@@ -509,7 +510,12 @@ class OpenMLDataset(OpenMLBase):
                 )
         elif array_format == "dataframe":
             if scipy.sparse.issparse(data):
-                return pd.SparseDataFrame(data, columns=attribute_names)
+                # SparseDataFrame removed in pandas 1.0.0
+                if LooseVersion(pd.__version__) >= "1.0.0":
+                    return pd.DataFrame.sparse.from_spmatrix(data, columns=attribute_names)
+                else:
+                    raise Exception("Current pandas version found {}. OpenML supports pandas "
+                                    "1.0.0 or higher.".format(LooseVersion(pd.__version__)))
             else:
                 return data
         else:
@@ -560,7 +566,7 @@ class OpenMLDataset(OpenMLBase):
         dataset_format : string (default='dataframe')
             The format of returned dataset.
             If ``array``, the returned dataset will be a NumPy array or a SciPy sparse matrix.
-            If ``dataframe``, the returned dataset will be a Pandas DataFrame or SparseDataFrame.
+            If ``dataframe``, the returned dataset will be a Pandas DataFrame.
 
         Returns
         -------

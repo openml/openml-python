@@ -8,6 +8,9 @@ import pandas as pd
 import pytest
 from scipy import sparse
 
+import unittest
+from distutils.version import LooseVersion
+
 import openml
 from openml.testing import TestBase
 from openml.exceptions import PyOpenMLError
@@ -284,9 +287,14 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertEqual(len(attribute_names), 20001)
         self.assertTrue(all([isinstance(att, str) for att in attribute_names]))
 
+    @unittest.skipIf(LooseVersion(pd.__version__) < "1.0.0",
+                     reason="SparseDataFrame support removed from pandas 1.0.0 and onwards.")
     def test_get_sparse_dataframe(self):
         rval, *_ = self.sparse_dataset.get_data()
-        self.assertTrue(isinstance(rval, pd.SparseDataFrame))
+        dtypes = all([dtype == pd.SparseDtype(np.float32, fill_value=0.0)
+                      for dtype in rval.dtypes])
+        self.assertTrue(isinstance(rval, pd.DataFrame))
+        self.assertTrue(dtypes)
         self.assertEqual((600, 20001), rval.shape)
 
     def test_get_sparse_dataset_with_rowid(self):
