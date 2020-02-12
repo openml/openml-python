@@ -11,6 +11,7 @@ import re
 from re import IGNORECASE
 import sys
 import time
+import typing
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 import warnings
 
@@ -1574,7 +1575,6 @@ class SklearnExtension(Extension):
                 model_classes = used_estimator.best_estimator_.classes_
             else:
                 model_classes = used_estimator.classes_
-
             # to handle the case when dataset is numpy and categories are encoded
             # however the class labels stored in task are still categories
             if isinstance(y_train, np.ndarray) and \
@@ -1616,9 +1616,9 @@ class SklearnExtension(Extension):
                         # mapping (decoding) the predictions to the categories
                         # creating a separate copy to not change the expected pred_y type
                         preds = [task.class_labels[pred] for pred in pred_y]
-                        proba_y = _prediction_to_probabilities(preds, model_classes)
+                        proba_y = _prediction_to_probabilities(preds, model_classes.tolist())
                     else:
-                        proba_y = _prediction_to_probabilities(pred_y, model_classes)
+                        proba_y = _prediction_to_probabilities(pred_y, model_classes.tolist())
 
                 else:
                     raise ValueError('The task has no class labels')

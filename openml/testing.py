@@ -251,6 +251,8 @@ except ImportError:
 
 class CustomImputer(SimpleImputer):
     '''Duplicate class alias for sklearn's SimpleImputer
+
+    Helps bypass the sklearn extension duplicate operation check
     '''
     pass
 
