@@ -540,11 +540,11 @@ class TestRun(TestBase):
             inner = sklearn.compose.ColumnTransformer(
                 transformers=[
                     ('numeric',
-                     make_pipeline(SimpleImputer(strategy='most_frequent'),
+                     make_pipeline(SimpleImputer(strategy='mean'),
                                    sklearn.preprocessing.StandardScaler()),
                      numeric_indices),
                     ('nominal',
-                     make_pipeline(CustomImputer(),
+                     make_pipeline(CustomImputer(strategy='most_frequent'),
                                    sklearn.preprocessing.OneHotEncoder(handle_unknown='ignore')),
                      nominal_indices)],
                 remainder='passthrough')
@@ -843,29 +843,11 @@ class TestRun(TestBase):
     @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
                      reason="SimpleImputer doesn't handle mixed type DataFrame as input")
     def test_initialize_model_from_run(self):
-        class MyGaussianNB(GaussianNB):
-            def fit(self, X, y, **kwargs):
-                if scipy.sparse.issparse(X):
-                    X = X.toarray()
-                return super().fit(X=X, y=y, **kwargs)
-
-            def predict(self, X, **kwargs):
-                if scipy.sparse.issparse(X):
-                    X = X.toarray()
-                return super().predict(X=X, **kwargs)
-
-            def predict_proba(self, X, **kwargs):
-                # if isinstance(X, scipy.sparse.csr.csr_matrix):
-                if scipy.sparse.issparse(X):
-                    X = X.toarray()
-                return super().predict_proba(X=X, **kwargs)
-
         clf = sklearn.pipeline.Pipeline(steps=[
             ('Imputer', SimpleImputer(strategy='most_frequent')),
-            ('Encoder', OneHotEncoder(handle_unknown='ignore')),
             ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
-            ('Estimator', MyGaussianNB())])
-        task = openml.tasks.get_task(11)
+            ('Estimator', GaussianNB())])
+        task = openml.tasks.get_task(1198)
         run = openml.runs.run_model_on_task(
             model=clf,
             task=task,
@@ -886,7 +868,7 @@ class TestRun(TestBase):
         openml.flows.assert_flows_equal(flowS, flowL)
 
         self.assertEqual(flowS.components['Imputer'].
-                         parameters['strategy'], '"median"')
+                         parameters['strategy'], '"most_frequent"')
         self.assertEqual(flowS.components['VarianceThreshold'].
                          parameters['threshold'], '0.05')
 
