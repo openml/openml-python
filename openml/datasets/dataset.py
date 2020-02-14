@@ -513,8 +513,9 @@ class OpenMLDataset(OpenMLBase):
                 if LooseVersion(pd.__version__) >= "1.0.0":
                     return pd.DataFrame.sparse.from_spmatrix(data, columns=attribute_names)
                 else:
-                    raise Exception("Current pandas version found {}. OpenML supports pandas "
-                                    "1.0.0 or higher.".format(LooseVersion(pd.__version__)))
+                    return pd.SparseDataFrame(data, columns=attribute_names)
+                    logger.warning("Current pandas version found {}. OpenML supports pandas "
+                                   "1.0.0 or higher.".format(LooseVersion(pd.__version__)))
             else:
                 return data
         else:

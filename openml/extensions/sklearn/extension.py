@@ -1575,6 +1575,9 @@ class SklearnExtension(Extension):
                 model_classes = used_estimator.best_estimator_.classes_
             else:
                 model_classes = used_estimator.classes_
+            if not isinstance(model_classes, list):
+                model_classes = model_classes.tolist()
+
             # to handle the case when dataset is numpy and categories are encoded
             # however the class labels stored in task are still categories
             if isinstance(y_train, np.ndarray) and \
@@ -1616,9 +1619,9 @@ class SklearnExtension(Extension):
                         # mapping (decoding) the predictions to the categories
                         # creating a separate copy to not change the expected pred_y type
                         preds = [task.class_labels[pred] for pred in pred_y]
-                        proba_y = _prediction_to_probabilities(preds, model_classes.tolist())
+                        proba_y = _prediction_to_probabilities(preds, model_classes)
                     else:
-                        proba_y = _prediction_to_probabilities(pred_y, model_classes.tolist())
+                        proba_y = _prediction_to_probabilities(pred_y, model_classes)
 
                 else:
                     raise ValueError('The task has no class labels')
@@ -1783,8 +1786,12 @@ class SklearnExtension(Extension):
                         }
                         if len(subcomponent) == 3:
                             if not isinstance(subcomponent[2], list):
+                                # print("PARAM NAME: ", _param_name)
+                                # print("SUBCOMPONENT NOT A LIST: ", subcomponent[2])
                                 raise TypeError('Subcomponent argument should be'
                                                 ' list')
+                            # print("PARAM NAME: ", _param_name)
+                            # print("SUBCOMPONENT A LIST: ", subcomponent[2])
                             current['value']['argument_1'] = subcomponent[2]
                         parsed_values.append(current)
                     parsed_values = json.dumps(parsed_values)
