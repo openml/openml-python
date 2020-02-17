@@ -10,11 +10,14 @@ Changelog
 ~~~~~~
 
 * FIX #873: Fixes an issue which resulted in incorrect URLs when printing OpenML objects after
-  switching the server
+  switching the server.
 * FIX #885: Logger no longer registered by default. Added utility functions to easily register
   logging to console and file.
 * MAINT #767: Source distribution installation is now unit-tested.
+* MAINT #836: OpenML supports only pandas version 1.0.0 or above to match the removal
+  of SparseDataFrame support.
 * MAINT #865: OpenML no longer bundles test files in the source distribution.
+* MAINT #897: Dropping support for Python 3.5.
 
 0.10.2
 ~~~~~~

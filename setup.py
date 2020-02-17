@@ -9,9 +9,9 @@ import sys
 with open("openml/__version__.py") as fh:
     version = fh.readlines()[-1].split()[-1].strip("\"'")
 
-if sys.version_info < (3, 5):
+if sys.version_info < (3, 6):
     raise ValueError(
-        'Unsupported Python version {}.{}.{} found. OpenML requires Python 3.5 or higher.'
+        'Unsupported Python version {}.{}.{} found. OpenML requires Python 3.6 or higher.'
         .format(sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
     )
 
@@ -42,14 +42,14 @@ setuptools.setup(name="openml",
                      exclude=["*.tests", "*.tests.*", "tests.*", "tests"],
                  ),
                  package_data={'': ['*.txt', '*.md']},
-                 python_requires=">=3.5",
+                 python_requires=">=3.6",
                  install_requires=[
                      'liac-arff>=2.4.0',
                      'xmltodict',
                      'requests',
                      'scikit-learn>=0.18',
                      'python-dateutil',  # Installed through pandas anyway.
-                     'pandas>=0.19.2',
+                     'pandas>=1.0.0',
                      'scipy>=0.13.3',
                      'numpy>=1.6.2'
                  ],
@@ -90,7 +90,5 @@ setuptools.setup(name="openml",
                               'Operating System :: POSIX',
                               'Operating System :: Unix',
                               'Operating System :: MacOS',
-                              'Programming Language :: Python :: 3',
-                              'Programming Language :: Python :: 3.5',
                               'Programming Language :: Python :: 3.6',
                               'Programming Language :: Python :: 3.7'])
