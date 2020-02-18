@@ -1332,13 +1332,13 @@ class TestOpenMLDataset(TestBase):
 
     def test_get_dataset_cache_format_feather(self):
 
-        dataset = openml.datasets.get_dataset('iris', cache_format='feather')
+        dataset = openml.datasets.get_dataset(128, cache_format='feather')
 
-        # Check if dataset is written using feather
-        data_folder = os.path.join(openml.config.get_cache_directory(), 'datasets',
-                                   '128')
-        feather_file = os.path.join(data_folder, 'dataset.feather')
-        pickle_file = os.path.join(data_folder, 'dataset.feather.attributes.pkl.py3')
+        # Check if dataset is written to cache directory using feather
+        cache_dir = openml.config.get_cache_directory()
+        cache_dir_for_id = os.path.join(cache_dir, 'datasets', '128')
+        feather_file = os.path.join(cache_dir_for_id, 'dataset.feather')
+        pickle_file = os.path.join(cache_dir_for_id, 'dataset.feather.attributes.pkl.py3')
         data = pd.read_feather(feather_file)
         self.assertTrue(os.path.isfile(feather_file), msg='Feather file is missing')
         self.assertTrue(os.path.isfile(pickle_file), msg='Attributes pickle file is missing')
