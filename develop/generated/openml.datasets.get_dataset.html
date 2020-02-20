@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.get_dataset<a class="headerlink" href="#openml-datasets-get-dataset" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="openml.datasets.get_dataset">
-<code class="sig-prename descclassname">openml.datasets.</code><code class="sig-name descname">get_dataset</code><span class="sig-paren">(</span><em class="sig-param">dataset_id: Union[int, str], download_data: bool = True, version: int = None, error_if_multiple: bool = False</em><span class="sig-paren">)</span> &#x2192; openml.datasets.dataset.OpenMLDataset<a class="headerlink" href="#openml.datasets.get_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openml.datasets.</code><code class="sig-name descname">get_dataset</code><span class="sig-paren">(</span><em class="sig-param">dataset_id: Union[int, str], download_data: bool = True, version: int = None, error_if_multiple: bool = False, cache_format: str = 'pickle'</em><span class="sig-paren">)</span> &#x2192; openml.datasets.dataset.OpenMLDataset<a class="headerlink" href="#openml.datasets.get_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download the OpenML dataset representation, optionally also download actual data file.</p>
 <p>This function is thread/multiprocessing safe.
 This function uses caching. A check will be performed to determine if the information has
@@ -125,7 +125,7 @@ If no version is specified, multiple versions of the dataset exist and
 <code class="docutils literal notranslate"><span class="pre">exception_if_multiple</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function will raise an exception.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
+<dd class="field-odd"><dl>
 <dt><strong>dataset_id</strong><span class="classifier">int or str</span></dt><dd><p>Dataset ID of the dataset to download</p>
 </dd>
 <dt><strong>download_data</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, also download the data file. Beware that some datasets are large and it might
@@ -138,10 +138,12 @@ If no version is specified, retrieve the least recent still active version.</p>
 </dd>
 <dt><strong>error_if_multiple</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> raise an error if multiple datasets are found with matching criteria.</p>
 </dd>
-</dl>
+<dt><strong>cache_format</strong><span class="classifier">str, optional (default=’pickle’)</span></dt><dd><p>Format for caching the dataset - may be feather or pickle
+Note that the default ‘pickle’ option may load slower than feather when
+no.of.rows is very high.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl>
+<dt><strong>Returns</strong></dt><dd></dd>
+<dt><strong>——-</strong></dt><dd></dd>
 <dt><strong>dataset</strong><span class="classifier"><a class="reference internal" href="openml.OpenMLDataset.html#openml.OpenMLDataset" title="openml.OpenMLDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.OpenMLDataset</span></code></a></span></dt><dd><p>The downloaded dataset.</p>
 </dd>
 </dl>
@@ -164,7 +166,7 @@ If no version is specified, retrieve the least recent still active version.</p>
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.2.<br/>
     </p>
   </div>
 </footer>

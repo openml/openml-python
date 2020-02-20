@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -113,7 +113,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLDataset<a class="headerlink" href="#openml-openmldataset" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="openml.OpenMLDataset">
-<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLDataset</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">description</em>, <em class="sig-param">format=None</em>, <em class="sig-param">data_format='arff'</em>, <em class="sig-param">dataset_id=None</em>, <em class="sig-param">version=None</em>, <em class="sig-param">creator=None</em>, <em class="sig-param">contributor=None</em>, <em class="sig-param">collection_date=None</em>, <em class="sig-param">upload_date=None</em>, <em class="sig-param">language=None</em>, <em class="sig-param">licence=None</em>, <em class="sig-param">url=None</em>, <em class="sig-param">default_target_attribute=None</em>, <em class="sig-param">row_id_attribute=None</em>, <em class="sig-param">ignore_attribute=None</em>, <em class="sig-param">version_label=None</em>, <em class="sig-param">citation=None</em>, <em class="sig-param">tag=None</em>, <em class="sig-param">visibility=None</em>, <em class="sig-param">original_data_url=None</em>, <em class="sig-param">paper_url=None</em>, <em class="sig-param">update_comment=None</em>, <em class="sig-param">md5_checksum=None</em>, <em class="sig-param">data_file=None</em>, <em class="sig-param">features=None</em>, <em class="sig-param">qualities=None</em>, <em class="sig-param">dataset=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLDataset</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">description</em>, <em class="sig-param">format=None</em>, <em class="sig-param">data_format='arff'</em>, <em class="sig-param">cache_format='pickle'</em>, <em class="sig-param">dataset_id=None</em>, <em class="sig-param">version=None</em>, <em class="sig-param">creator=None</em>, <em class="sig-param">contributor=None</em>, <em class="sig-param">collection_date=None</em>, <em class="sig-param">upload_date=None</em>, <em class="sig-param">language=None</em>, <em class="sig-param">licence=None</em>, <em class="sig-param">url=None</em>, <em class="sig-param">default_target_attribute=None</em>, <em class="sig-param">row_id_attribute=None</em>, <em class="sig-param">ignore_attribute=None</em>, <em class="sig-param">version_label=None</em>, <em class="sig-param">citation=None</em>, <em class="sig-param">tag=None</em>, <em class="sig-param">visibility=None</em>, <em class="sig-param">original_data_url=None</em>, <em class="sig-param">paper_url=None</em>, <em class="sig-param">update_comment=None</em>, <em class="sig-param">md5_checksum=None</em>, <em class="sig-param">data_file=None</em>, <em class="sig-param">features=None</em>, <em class="sig-param">qualities=None</em>, <em class="sig-param">dataset=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dataset object.</p>
 <p>Allows fetching and uploading datasets to OpenML.</p>
 <dl class="field-list simple">
@@ -124,6 +124,8 @@
 <dt><strong>description</strong><span class="classifier">str</span></dt><dd><p>Description of the dataset.</p>
 </dd>
 <dt><strong>format</strong><span class="classifier">str</span></dt><dd><p>Format of the dataset which can be either ‘arff’ or ‘sparse_arff’.</p>
+</dd>
+<dt><strong>cache_format</strong><span class="classifier">str</span></dt><dd><p>Format for caching the dataset which can be either ‘feather’ or ‘pickle’.</p>
 </dd>
 <dt><strong>dataset_id</strong><span class="classifier">int, optional</span></dt><dd><p>Id autogenerated by the server.</p>
 </dd>
@@ -349,7 +351,7 @@ classname when uploading the results of a run.</p>
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.2.<br/>
     </p>
   </div>
 </footer>

@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -324,15 +324,15 @@ For this, we shall compare the top performing flows.</p>
 <img alt="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(12736, &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)&#39;)
+(8399, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)&#39;)
 (8353, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
 (12127, &#39;sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)&#39;)
-(8399, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)&#39;)
 (16347, &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,onehotencoder=sklearn.preprocessing._encoders.OneHotEncoder,svc=sklearn.svm.classes.SVC)(1)&#39;)
-(8317, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
 (17373, &#39;sklearn.model_selection._search_successive_halving.HalvingRandomSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(4)&#39;)
+(8317, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
+(17369, &#39;sklearn.model_selection._search_successive_halving.HalvingRandomSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(3)&#39;)
+(17374, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(4)&#39;)
 (17371, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(3)&#39;)
-(17436, &#39;sklearn.pipeline.Pipeline(columntransformer=sklearn.compose._column_transformer.ColumnTransformer(numeric=sklearn.pipeline.Pipeline(imputer=sklearn.preprocessing.imputation.Imputer,standardscaler=sklearn.preprocessing.data.StandardScaler),nominal=sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,onehotencoder=sklearn.preprocessing._encoders.OneHotEncoder)),variancethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,gradientboostingclassifier=sklearn.ensemble.gradient_boosting.GradientBoostingClassifier)(2)&#39;)
-(8330, &#39;sklearn.pipeline.Pipeline(imputation=openmlstudy14.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,classifier=sklearn.svm.classes.SVC)(2)&#39;)
 </pre></div>
 </div>
 <div class="section" id="obtaining-evaluations-with-hyperparameter-settings">
@@ -387,7 +387,7 @@ For this, we shall compare the top performing flows.</p>
 &#39;&#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  23.503 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  16.335 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-fetch-evaluations-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ae7e73aff29ef9ace1e17781346a204b/fetch_evaluations_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_evaluations_tutorial.py</span></code></a></p>
@@ -414,7 +414,7 @@ For this, we shall compare the top performing flows.</p>
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.2.<br/>
     </p>
   </div>
 </footer>
