@@ -451,7 +451,8 @@ def get_dataset(
     dataset_id: Union[int, str],
     download_data: bool = True,
     version: int = None,
-    error_if_multiple: bool = False
+    error_if_multiple: bool = False,
+    cache_format: str = 'pickle'
 ) -> OpenMLDataset:
     """ Download the OpenML dataset representation, optionally also download actual data file.
 
@@ -479,12 +480,19 @@ def get_dataset(
         If no version is specified, retrieve the least recent still active version.
     error_if_multiple : bool, optional (default=False)
         If ``True`` raise an error if multiple datasets are found with matching criteria.
-
+    cache_format : str, optional (default='pickle')
+        Format for caching the dataset - may be feather or pickle
+        Note that the default 'pickle' option may load slower than feather when
+        no.of.rows is very high.
     Returns
     -------
     dataset : :class:`openml.OpenMLDataset`
         The downloaded dataset.
     """
+    if cache_format not in ['feather', 'pickle']:
+        raise ValueError("cache_format must be one of 'feather' or 'pickle. "
+                         "Invalid format specified: {}".format(cache_format))
+
     if isinstance(dataset_id, str):
         try:
             dataset_id = int(dataset_id)
@@ -527,7 +535,7 @@ def get_dataset(
                                      did_cache_dir)
 
     dataset = _create_dataset_from_description(
-        description, features, qualities, arff_file
+        description, features, qualities, arff_file, cache_format
     )
     return dataset
 
@@ -975,6 +983,7 @@ def _create_dataset_from_description(
         features: Dict,
         qualities: List,
         arff_file: str = None,
+        cache_format: str = 'pickle',
 ) -> OpenMLDataset:
     """Create a dataset object from a description dict.
 
@@ -988,6 +997,8 @@ def _create_dataset_from_description(
         Description of a dataset qualities.
     arff_file : string, optional
         Path of dataset ARFF file.
+    cache_format: string, optional
+        Caching option for datasets (feather/pickle)
 
     Returns
     -------
@@ -1019,6 +1030,7 @@ def _create_dataset_from_description(
         update_comment=description.get("oml:update_comment"),
         md5_checksum=description.get("oml:md5_checksum"),
         data_file=arff_file,
+        cache_format=cache_format,
         features=features,
         qualities=qualities,
     )

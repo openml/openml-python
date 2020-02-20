@@ -35,7 +35,7 @@ fi
 python --version
 
 if [[ "$TEST_DIST" == "true" ]]; then
-    pip install twine nbconvert jupyter_client matplotlib pytest pytest-xdist pytest-timeout \
+    pip install twine nbconvert jupyter_client matplotlib pyarrow pytest pytest-xdist pytest-timeout \
         nbformat oslo.concurrency flaky
     python setup.py sdist
     # Find file which was modified last as done in https://stackoverflow.com/a/4561987

@@ -15,6 +15,7 @@ Changelog
   logging to console and file.
 * MAINT #767: Source distribution installation is now unit-tested.
 * MAINT #865: OpenML no longer bundles test files in the source distribution.
+* ADD #894: Support caching of datasets using feather format as an option.
 
 0.10.2
 ~~~~~~
