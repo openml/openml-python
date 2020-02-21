@@ -510,14 +510,7 @@ class OpenMLDataset(OpenMLBase):
                 )
         elif array_format == "dataframe":
             if scipy.sparse.issparse(data):
-                # SparseDataFrame removed in pandas 1.0.0
-                if LooseVersion(pd.__version__) >= "1.0.0":
-                    return pd.DataFrame.sparse.from_spmatrix(data, columns=attribute_names)
-                else:
-                    raise Exception("Current pandas version found {}. OpenML supports pandas "
-                                    "1.0.0 or higher.".format(LooseVersion(pd.__version__)))
-            else:
-                return data
+                return pd.DataFrame.sparse.from_spmatrix(data, columns=attribute_names)
         else:
             data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
             logger.warning(
