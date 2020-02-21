@@ -1313,3 +1313,42 @@ class TestOpenMLDataset(TestBase):
         qualities = openml.datasets.list_qualities()
         self.assertEqual(isinstance(qualities, list), True)
         self.assertEqual(all([isinstance(q, str) for q in qualities]), True)
+
+    def test_get_dataset_cache_format_pickle(self):
+        dataset = openml.datasets.get_dataset(1)
+        self.assertEqual(type(dataset), OpenMLDataset)
+        self.assertEqual(dataset.name, 'anneal')
+        self.assertGreater(len(dataset.features), 1)
+        self.assertGreater(len(dataset.qualities), 4)
+
+        X, y, categorical, attribute_names = dataset.get_data()
+        self.assertIsInstance(X, pd.DataFrame)
+        self.assertEqual(X.shape, (898, 39))
+        self.assertEqual(len(categorical), X.shape[1])
+        self.assertEqual(len(attribute_names), X.shape[1])
+
+    def test_get_dataset_cache_format_feather(self):
+
+        dataset = openml.datasets.get_dataset(128, cache_format='feather')
+
+        # Check if dataset is written to cache directory using feather
+        cache_dir = openml.config.get_cache_directory()
+        cache_dir_for_id = os.path.join(cache_dir, 'datasets', '128')
+        feather_file = os.path.join(cache_dir_for_id, 'dataset.feather')
+        pickle_file = os.path.join(cache_dir_for_id, 'dataset.feather.attributes.pkl.py3')
+        data = pd.read_feather(feather_file)
+        self.assertTrue(os.path.isfile(feather_file), msg='Feather file is missing')
+        self.assertTrue(os.path.isfile(pickle_file), msg='Attributes pickle file is missing')
+        self.assertEqual(data.shape, (150, 5))
+
+        # Check if get_data is able to retrieve feather data
+        self.assertEqual(type(dataset), OpenMLDataset)
+        self.assertEqual(dataset.name, 'iris')
+        self.assertGreater(len(dataset.features), 1)
+        self.assertGreater(len(dataset.qualities), 4)
+
+        X, y, categorical, attribute_names = dataset.get_data()
+        self.assertIsInstance(X, pd.DataFrame)
+        self.assertEqual(X.shape, (150, 5))
+        self.assertEqual(len(categorical), X.shape[1])
+        self.assertEqual(len(attribute_names), X.shape[1])
