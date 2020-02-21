@@ -51,7 +51,7 @@ setuptools.setup(name="openml",
                      'python-dateutil',  # Installed through pandas anyway.
                      'pandas>=1.0.0',
                      'scipy>=0.13.3',
-                     'numpy>=1.6.2'
+                     'numpy>=1.6.2',
                  ],
                  extras_require={
                      'test': [
@@ -64,6 +64,7 @@ setuptools.setup(name="openml",
                          'nbformat',
                          'oslo.concurrency',
                          'flaky',
+                         'pyarrow'
                      ],
                      'examples': [
                          'matplotlib',

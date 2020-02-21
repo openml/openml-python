@@ -17,6 +17,7 @@ Changelog
 * MAINT #836: OpenML supports only pandas version 1.0.0 or above.
 * MAINT #865: OpenML no longer bundles test files in the source distribution.
 * MAINT #897: Dropping support for Python 3.5.
+* ADD #894: Support caching of datasets using feather format as an option.
 
 0.10.2
 ~~~~~~
