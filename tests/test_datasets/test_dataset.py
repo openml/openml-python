@@ -8,9 +8,6 @@ import pandas as pd
 import pytest
 from scipy import sparse
 
-import unittest
-from distutils.version import LooseVersion
-
 import openml
 from openml.testing import TestBase
 from openml.exceptions import PyOpenMLError

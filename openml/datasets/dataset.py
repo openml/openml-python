@@ -14,7 +14,6 @@ import numpy as np
 import pandas as pd
 import scipy.sparse
 from warnings import warn
-from distutils.version import LooseVersion
 
 from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
