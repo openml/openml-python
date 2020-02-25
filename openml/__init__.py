@@ -114,7 +114,6 @@ __all__ = [
     'study',
     'utils',
     '_api_calls',
-    '__version__',
 ]
 
 # Load the scikit-learn extension by default
