@@ -46,6 +46,8 @@ from . import setups
 from .setups import OpenMLSetup, OpenMLParameter
 
 
+from .__version__ import __version__
+
 
 def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None,
                    run_ids=None):
