@@ -924,7 +924,7 @@ class TestOpenMLDataset(TestBase):
 
         # Check that DataFrame with Sparse columns are supported properly
         sparse_data = scipy.sparse.coo_matrix((
-            [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
             ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
         ))
         column_names = ['input1', 'input2', 'y']
@@ -960,7 +960,7 @@ class TestOpenMLDataset(TestBase):
         )
         self.assertEqual(
             _get_online_dataset_format(dataset.id),
-            'arff',
+            'sparse_arff',
             "Wrong format for dataset"
         )
 
