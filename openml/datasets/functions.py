@@ -707,7 +707,6 @@ def create_dataset(name, description, creator, contributor,
             )
 
     if hasattr(data, "columns"):
-        # if isinstance(data, pd.SparseDataFrame):
         if all(isinstance(dtype, pd.SparseDtype) for dtype in data.dtypes):
             data = data.sparse.to_coo()
             # liac-arff only support COO matrices with sorted rows
