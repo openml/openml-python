@@ -903,13 +903,32 @@ Exercise 2
     :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/plotting/_matplotlib/tools.py:307: MatplotlibDeprecationWarning: 
+    The rowNum attribute was deprecated in Matplotlib 3.2 and will be removed two minor releases later. Use ax.get_subplotspec().rowspan.start instead.
+      layout[ax.rowNum, ax.colNum] = ax.get_visible()
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/plotting/_matplotlib/tools.py:307: MatplotlibDeprecationWarning: 
+    The colNum attribute was deprecated in Matplotlib 3.2 and will be removed two minor releases later. Use ax.get_subplotspec().colspan.start instead.
+      layout[ax.rowNum, ax.colNum] = ax.get_visible()
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/plotting/_matplotlib/tools.py:313: MatplotlibDeprecationWarning: 
+    The rowNum attribute was deprecated in Matplotlib 3.2 and will be removed two minor releases later. Use ax.get_subplotspec().rowspan.start instead.
+      if not layout[ax.rowNum + 1, ax.colNum]:
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/plotting/_matplotlib/tools.py:313: MatplotlibDeprecationWarning: 
+    The colNum attribute was deprecated in Matplotlib 3.2 and will be removed two minor releases later. Use ax.get_subplotspec().colspan.start instead.
+      if not layout[ax.rowNum + 1, ax.colNum]:
+
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.798 seconds)
+   **Total running time of the script:** ( 0 minutes  6.604 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:
