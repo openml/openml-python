@@ -283,13 +283,9 @@ print(f"URL for dataset: {xor_dataset.openml_url}")
 
 
 ############################################################################
-# Dataset is a pandas sparse dataframe
-# ====================================
+# Dataset is a pandas dataframe with sparse columns
+# =================================================
 
-# sparse_data = coo_matrix((
-#     [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-#     ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
-# ))
 sparse_data = coo_matrix((
     [1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0],
     ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
