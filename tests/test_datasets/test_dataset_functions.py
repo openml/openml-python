@@ -561,12 +561,9 @@ class TestOpenMLDataset(TestBase):
                                       ('string', 'STRING'),
                                       ('category', ['A', 'B']),
                                       ('boolean', ['True', 'False'])])
-        # SparseDataFrame case
-        df = pd.SparseDataFrame([[1, 1.0],
-                                 [2, 2.0],
-                                 [0, 0]],
-                                columns=['integer', 'floating'],
-                                default_fill_value=0)
+        # DataFrame with Sparse columns case
+        df = pd.DataFrame({"integer": pd.arrays.SparseArray([1, 2, 0], fill_value=0),
+                           "floating": pd.arrays.SparseArray([1.0, 2.0, 0], fill_value=0.0)})
         df['integer'] = df['integer'].astype(np.int64)
         attributes = attributes_arff_from_df(df)
         self.assertEqual(attributes, [('integer', 'INTEGER'),
@@ -925,15 +922,15 @@ class TestOpenMLDataset(TestBase):
             "Uploaded ARFF does not match original one"
         )
 
-        # Check that SparseDataFrame are supported properly
+        # Check that DataFrame with Sparse columns are supported properly
         sparse_data = scipy.sparse.coo_matrix((
-            [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
             ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
         ))
         column_names = ['input1', 'input2', 'y']
-        df = pd.SparseDataFrame(sparse_data, columns=column_names)
+        df = pd.DataFrame.sparse.from_spmatrix(sparse_data, columns=column_names)
         # meta-information
-        description = 'Synthetic dataset created from a Pandas SparseDataFrame'
+        description = 'Synthetic dataset created from a Pandas DataFrame with Sparse columns'
         dataset = openml.datasets.functions.create_dataset(
             name=name,
             description=description,

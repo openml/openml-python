@@ -286,7 +286,9 @@ class OpenMLDatasetTestSparse(TestBase):
 
     def test_get_sparse_dataframe(self):
         rval, *_ = self.sparse_dataset.get_data()
-        self.assertTrue(isinstance(rval, pd.SparseDataFrame))
+        self.assertIsInstance(rval, pd.DataFrame)
+        np.testing.assert_array_equal(
+            [pd.SparseDtype(np.float32, fill_value=0.0)] * len(rval.dtypes), rval.dtypes)
         self.assertEqual((600, 20001), rval.shape)
 
     def test_get_sparse_dataset_with_rowid(self):

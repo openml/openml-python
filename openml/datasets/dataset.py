@@ -551,9 +551,7 @@ class OpenMLDataset(OpenMLBase):
                 )
         elif array_format == "dataframe":
             if scipy.sparse.issparse(data):
-                return pd.SparseDataFrame(data, columns=attribute_names)
-            else:
-                return data
+                return pd.DataFrame.sparse.from_spmatrix(data, columns=attribute_names)
         else:
             data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
             logger.warning(
@@ -602,7 +600,7 @@ class OpenMLDataset(OpenMLBase):
         dataset_format : string (default='dataframe')
             The format of returned dataset.
             If ``array``, the returned dataset will be a NumPy array or a SciPy sparse matrix.
-            If ``dataframe``, the returned dataset will be a Pandas DataFrame or SparseDataFrame.
+            If ``dataframe``, the returned dataset will be a Pandas DataFrame.
 
         Returns
         -------
