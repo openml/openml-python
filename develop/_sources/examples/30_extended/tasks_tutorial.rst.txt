@@ -340,14 +340,6 @@ Finally, it is also possible to list all tasks on OpenML with:
 
  .. code-block:: none
 
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/frame.py:7138: FutureWarning: Sorting because non-concatenation axis is not aligned. A future version
-    of pandas will change to not sort by default.
-
-    To accept the future behavior, pass 'sort=False'.
-
-    To retain the current behavior and silence the warning, pass 'sort=True'.
-
-      sort=sort,
     22863
 
 
@@ -391,6 +383,16 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <thead>
             <tr style="text-align: right;">
               <th></th>
+              <th>tid</th>
+              <th>ttid</th>
+              <th>did</th>
+              <th>name</th>
+              <th>task_type</th>
+              <th>status</th>
+              <th>estimation_procedure</th>
+              <th>evaluation_measures</th>
+              <th>source_data</th>
+              <th>target_feature</th>
               <th>MajorityClassSize</th>
               <th>MaxNominalAttDistinctValues</th>
               <th>MinorityClassSize</th>
@@ -401,29 +403,29 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <th>NumberOfMissingValues</th>
               <th>NumberOfNumericFeatures</th>
               <th>NumberOfSymbolicFeatures</th>
-              <th>cost_matrix</th>
-              <th>did</th>
-              <th>estimation_procedure</th>
-              <th>evaluation_measures</th>
-              <th>name</th>
               <th>number_samples</th>
-              <th>quality_measure</th>
-              <th>source_data</th>
+              <th>cost_matrix</th>
               <th>source_data_labeled</th>
-              <th>status</th>
-              <th>target_feature</th>
               <th>target_feature_event</th>
               <th>target_feature_left</th>
               <th>target_feature_right</th>
+              <th>quality_measure</th>
               <th>target_value</th>
-              <th>task_type</th>
-              <th>tid</th>
-              <th>ttid</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <th>3509</th>
+              <td>9983</td>
+              <td>1</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Supervised Classification</td>
+              <td>active</td>
+              <td>10-fold Crossvalidation</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>Class</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -435,26 +437,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
-              <td>10-fold Crossvalidation</td>
-              <td>NaN</td>
-              <td>eeg-eye-state</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
-              <td>Class</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>Supervised Classification</td>
-              <td>9983</td>
-              <td>1</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>NaN</td>
             </tr>
             <tr>
               <th>4690</th>
+              <td>14951</td>
+              <td>1</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Supervised Classification</td>
+              <td>active</td>
+              <td>10-fold Crossvalidation</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>Class</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -466,26 +468,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
-              <td>10-fold Crossvalidation</td>
-              <td>NaN</td>
-              <td>eeg-eye-state</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
-              <td>Class</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>Supervised Classification</td>
-              <td>14951</td>
-              <td>1</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>NaN</td>
             </tr>
             <tr>
               <th>8030</th>
+              <td>56483</td>
+              <td>8</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Subgroup Discovery</td>
+              <td>active</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>Class</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -497,26 +499,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>eeg-eye-state</td>
+              <td>NaN</td>
+              <td>NaN</td>
               <td>NaN</td>
               <td>Cortana Quality</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
-              <td>Class</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>NaN</td>
               <td>1</td>
-              <td>Subgroup Discovery</td>
-              <td>56483</td>
-              <td>8</td>
             </tr>
             <tr>
               <th>8031</th>
+              <td>56484</td>
+              <td>8</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Subgroup Discovery</td>
+              <td>active</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>Class</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -528,26 +530,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>eeg-eye-state</td>
+              <td>NaN</td>
+              <td>NaN</td>
               <td>NaN</td>
               <td>Information gain</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
-              <td>Class</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>NaN</td>
               <td>1</td>
-              <td>Subgroup Discovery</td>
-              <td>56484</td>
-              <td>8</td>
             </tr>
             <tr>
               <th>8032</th>
+              <td>56485</td>
+              <td>8</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Subgroup Discovery</td>
+              <td>active</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>Class</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -559,26 +561,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>eeg-eye-state</td>
+              <td>NaN</td>
+              <td>NaN</td>
               <td>NaN</td>
               <td>Binomial test</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
-              <td>Class</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>NaN</td>
               <td>1</td>
-              <td>Subgroup Discovery</td>
-              <td>56485</td>
-              <td>8</td>
             </tr>
             <tr>
               <th>8033</th>
+              <td>56486</td>
+              <td>8</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Subgroup Discovery</td>
+              <td>active</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>Class</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -590,26 +592,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>eeg-eye-state</td>
+              <td>NaN</td>
+              <td>NaN</td>
               <td>NaN</td>
               <td>Jaccard</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
-              <td>Class</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>NaN</td>
               <td>1</td>
-              <td>Subgroup Discovery</td>
-              <td>56486</td>
-              <td>8</td>
             </tr>
             <tr>
               <th>8034</th>
+              <td>56487</td>
+              <td>8</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Subgroup Discovery</td>
+              <td>active</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>Class</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -621,26 +623,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>eeg-eye-state</td>
+              <td>NaN</td>
+              <td>NaN</td>
               <td>NaN</td>
               <td>Cortana Quality</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
-              <td>Class</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>NaN</td>
               <td>2</td>
-              <td>Subgroup Discovery</td>
-              <td>56487</td>
-              <td>8</td>
             </tr>
             <tr>
               <th>8035</th>
+              <td>56488</td>
+              <td>8</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Subgroup Discovery</td>
+              <td>active</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>Class</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -652,26 +654,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>eeg-eye-state</td>
+              <td>NaN</td>
+              <td>NaN</td>
               <td>NaN</td>
               <td>Information gain</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
-              <td>Class</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>NaN</td>
               <td>2</td>
-              <td>Subgroup Discovery</td>
-              <td>56488</td>
-              <td>8</td>
             </tr>
             <tr>
               <th>8036</th>
+              <td>56489</td>
+              <td>8</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Subgroup Discovery</td>
+              <td>active</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>Class</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -683,26 +685,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>eeg-eye-state</td>
+              <td>NaN</td>
+              <td>NaN</td>
               <td>NaN</td>
               <td>Binomial test</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
-              <td>Class</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>NaN</td>
               <td>2</td>
-              <td>Subgroup Discovery</td>
-              <td>56489</td>
-              <td>8</td>
             </tr>
             <tr>
               <th>8037</th>
+              <td>56490</td>
+              <td>8</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Subgroup Discovery</td>
+              <td>active</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>Class</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -714,26 +716,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>eeg-eye-state</td>
+              <td>NaN</td>
+              <td>NaN</td>
               <td>NaN</td>
               <td>Jaccard</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
-              <td>Class</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>NaN</td>
               <td>2</td>
-              <td>Subgroup Discovery</td>
-              <td>56490</td>
-              <td>8</td>
             </tr>
             <tr>
               <th>8579</th>
+              <td>75219</td>
+              <td>1</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Supervised Classification</td>
+              <td>active</td>
+              <td>33% Holdout set</td>
+              <td>predictive_accuracy</td>
+              <td>1471</td>
+              <td>Class</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -745,26 +747,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
-              <td>33% Holdout set</td>
-              <td>predictive_accuracy</td>
-              <td>eeg-eye-state</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
-              <td>Class</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>Supervised Classification</td>
-              <td>75219</td>
-              <td>1</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>NaN</td>
             </tr>
             <tr>
               <th>8661</th>
+              <td>125901</td>
+              <td>3</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Learning Curve</td>
+              <td>active</td>
+              <td>10-fold Learning Curve</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>Class</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -775,27 +777,27 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>0.0</td>
               <td>14.0</td>
               <td>1.0</td>
-              <td>NaN</td>
-              <td>1471</td>
-              <td>10-fold Learning Curve</td>
-              <td>NaN</td>
-              <td>eeg-eye-state</td>
               <td>17</td>
               <td>NaN</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
-              <td>Class</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>Learning Curve</td>
-              <td>125901</td>
-              <td>3</td>
+              <td>NaN</td>
+              <td>NaN</td>
             </tr>
             <tr>
               <th>9858</th>
+              <td>127251</td>
+              <td>5</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Clustering</td>
+              <td>active</td>
+              <td>50 times Clustering</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>NaN</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -807,26 +809,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
-              <td>50 times Clustering</td>
-              <td>NaN</td>
-              <td>eeg-eye-state</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>Clustering</td>
-              <td>127251</td>
-              <td>5</td>
+              <td>NaN</td>
+              <td>NaN</td>
             </tr>
             <tr>
               <th>11910</th>
+              <td>146761</td>
+              <td>5</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Clustering</td>
+              <td>active</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>Class</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -838,26 +840,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>eeg-eye-state</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
-              <td>Class</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>Clustering</td>
-              <td>146761</td>
-              <td>5</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>NaN</td>
             </tr>
             <tr>
               <th>13191</th>
+              <td>148117</td>
+              <td>5</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Clustering</td>
+              <td>active</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>NaN</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -869,26 +871,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>eeg-eye-state</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>Clustering</td>
-              <td>148117</td>
-              <td>5</td>
+              <td>NaN</td>
+              <td>NaN</td>
             </tr>
             <tr>
               <th>17285</th>
+              <td>170139</td>
+              <td>5</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Clustering</td>
+              <td>active</td>
+              <td>50 times Clustering</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>NaN</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -900,26 +902,26 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
-              <td>50 times Clustering</td>
-              <td>NaN</td>
-              <td>eeg-eye-state</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>Clustering</td>
-              <td>170139</td>
-              <td>5</td>
+              <td>NaN</td>
+              <td>NaN</td>
             </tr>
             <tr>
               <th>20718</th>
+              <td>191646</td>
+              <td>5</td>
+              <td>1471</td>
+              <td>eeg-eye-state</td>
+              <td>Clustering</td>
+              <td>active</td>
+              <td>50 times Clustering</td>
+              <td>NaN</td>
+              <td>1471</td>
+              <td>NaN</td>
               <td>8257.0</td>
               <td>2.0</td>
               <td>6723.0</td>
@@ -931,23 +933,13 @@ Search for the tasks on the 'eeg-eye-state' dataset.
               <td>14.0</td>
               <td>1.0</td>
               <td>NaN</td>
-              <td>1471</td>
-              <td>50 times Clustering</td>
-              <td>NaN</td>
-              <td>eeg-eye-state</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>1471</td>
-              <td>NaN</td>
-              <td>active</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
               <td>NaN</td>
-              <td>Clustering</td>
-              <td>191646</td>
-              <td>5</td>
+              <td>NaN</td>
+              <td>NaN</td>
             </tr>
           </tbody>
         </table>
@@ -1133,7 +1125,7 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  31.761 seconds)
+   **Total running time of the script:** ( 0 minutes  32.659 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:

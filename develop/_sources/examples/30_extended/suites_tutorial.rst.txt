@@ -184,15 +184,10 @@ And we can use the task listing functionality to learn more about them:
 
  .. code-block:: none
 
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/frame.py:7138: FutureWarning: Sorting because non-concatenation axis is not aligned. A future version
-    of pandas will change to not sort by default.
-
-    To accept the future behavior, pass 'sort=False'.
-
-    To retain the current behavior and silence the warning, pass 'sort=True'.
-
-      sort=sort,
                                         count          mean  ...       75%       max
+    tid                                  72.0  41849.305556  ...  42707.50  167141.0
+    ttid                                 72.0      1.000000  ...      1.00       1.0
+    did                                  72.0  10472.263889  ...  10594.25   41027.0
     MajorityClassSize                    72.0   4820.166667  ...   2796.00   48658.0
     MaxNominalAttDistinctValues          72.0      8.638889  ...     10.00      71.0
     MinorityClassSize                    72.0   2199.777778  ...   1326.50   47662.0
@@ -203,10 +198,7 @@ And we can use the task listing functionality to learn more about them:
     NumberOfMissingValues                72.0    226.597222  ...      0.00    6465.0
     NumberOfNumericFeatures              72.0    166.875000  ...     64.00    3072.0
     NumberOfSymbolicFeatures             72.0     29.722222  ...      5.25    1556.0
-    did                                  72.0  10472.263889  ...  10594.25   41027.0
     target_feature_left                   0.0           NaN  ...       NaN       NaN
-    tid                                  72.0  41849.305556  ...  42707.50  167141.0
-    ttid                                 72.0      1.000000  ...      1.00       1.0
 
     [14 rows x 8 columns]
 
@@ -258,11 +250,11 @@ because we upload some random data.
 
     OpenML Benchmark Suite
     ======================
-    ID..............: 7040
+    ID..............: 7101
     Name............: Test-Suite
     Status..........: None
     Main Entity Type: task
-    Study URL.......: https://test.openml.org/s/7040
+    Study URL.......: https://test.openml.org/s/7101
     # of Tasks......: 20
 
 
@@ -282,7 +274,7 @@ because we upload some random data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  18.557 seconds)
+   **Total running time of the script:** ( 0 minutes  18.121 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_suites_tutorial.py:

@@ -111,7 +111,7 @@
 <li><a class="reference internal" href="#dataset-is-a-list">Dataset is a list</a></li>
 <li><a class="reference internal" href="#dataset-is-a-pandas-dataframe">Dataset is a pandas DataFrame</a></li>
 <li><a class="reference internal" href="#dataset-is-a-sparse-matrix">Dataset is a sparse matrix</a></li>
-<li><a class="reference internal" href="#dataset-is-a-pandas-sparse-dataframe">Dataset is a pandas sparse dataframe</a></li>
+<li><a class="reference internal" href="#dataset-is-a-pandas-dataframe-with-sparse-columns">Dataset is a pandas dataframe with sparse columns</a></li>
 </ul>
 
         </div>
@@ -242,7 +242,7 @@ expected format:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/34498
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/34783
 </pre></div>
 </div>
 </div>
@@ -318,7 +318,7 @@ OrderedDicts in the case of sparse data.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/34499
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/34784
 </pre></div>
 </div>
 </div>
@@ -343,11 +343,13 @@ function <code class="xref py py-func docutils literal notranslate"><span class=
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
 RangeIndex: 14 entries, 0 to 13
 Data columns (total 5 columns):
-outlook        14 non-null category
-temperature    14 non-null int64
-humidity       14 non-null int64
-windy          14 non-null bool
-play           14 non-null category
+ #   Column       Non-Null Count  Dtype
+---  ------       --------------  -----
+ 0   outlook      14 non-null     category
+ 1   temperature  14 non-null     int64
+ 2   humidity     14 non-null     int64
+ 3   windy        14 non-null     bool
+ 4   play         14 non-null     category
 dtypes: bool(1), category(2), int64(2)
 memory usage: 594.0 bytes
 None
@@ -375,17 +377,12 @@ call <code class="xref py py-func docutils literal notranslate"><span class="pre
 <span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/travis/build/openml/openml-python/openml/datasets/functions.py:690: FutureWarning: A future version of pandas will default to `skipna=True`. To silence this warning, pass `skipna=True|False` explicitly.
-  attributes_ = attributes_arff_from_df(data)
-</pre></div>
-</div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">weather_dataset</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{weather_dataset.openml_url}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/34500
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/34785
 </pre></div>
 </div>
 </div>
@@ -425,18 +422,18 @@ call <code class="xref py py-func docutils literal notranslate"><span class="pre
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/34501
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/34786
 </pre></div>
 </div>
 </div>
-<div class="section" id="dataset-is-a-pandas-sparse-dataframe">
-<h1>Dataset is a pandas sparse dataframe<a class="headerlink" href="#dataset-is-a-pandas-sparse-dataframe" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="dataset-is-a-pandas-dataframe-with-sparse-columns">
+<h1>Dataset is a pandas dataframe with sparse columns<a class="headerlink" href="#dataset-is-a-pandas-dataframe-with-sparse-columns" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sparse_data</span> <span class="o">=</span> <span class="n">coo_matrix</span><span class="p">((</span>
-    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
     <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 <span class="p">))</span>
 <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;input1&#39;</span><span class="p">,</span> <span class="s1">&#39;input2&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">SparseDataFrame</span><span class="p">(</span><span class="n">sparse_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">from_spmatrix</span><span class="p">(</span><span class="n">sparse_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
 
 <span class="n">xor_dataset</span> <span class="o">=</span> <span class="n">create_dataset</span><span class="p">(</span>
@@ -458,44 +455,16 @@ call <code class="xref py py-func docutils literal notranslate"><span class="pre
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/travis/build/openml/openml-python/examples/30_extended/create_upload_tutorial.py:294: FutureWarning: SparseDataFrame is deprecated and will be removed in a future version.
-Use a regular DataFrame whose columns are SparseArrays instead.
-
-See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-  df = pd.SparseDataFrame(sparse_data, columns=column_names)
-/home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/sparse/frame.py:257: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
-Use a Series with sparse values instead.
-
-    &gt;&gt;&gt; series = pd.Series(pd.SparseArray(...))
-
-See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-  sparse_index=BlockIndex(N, blocs, blens),
-/home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/frame.py:3471: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
-Use a Series with sparse values instead.
-
-    &gt;&gt;&gt; series = pd.Series(pd.SparseArray(...))
-
-See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-  return klass(values, index=self.index, name=items, fastpath=True)
-/home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/apply.py:345: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
-Use a Series with sparse values instead.
-
-    &gt;&gt;&gt; series = pd.Series(pd.SparseArray(...))
-
-See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-  result = self.obj._constructor_sliced(results)
-&lt;class &#39;pandas.core.sparse.frame.SparseDataFrame&#39;&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
 RangeIndex: 4 entries, 0 to 3
 Data columns (total 3 columns):
-input1    3 non-null Sparse[float64, nan]
-input2    2 non-null Sparse[float64, nan]
-y         2 non-null Sparse[float64, nan]
-dtypes: Sparse[float64, nan](3)
-memory usage: 224.0 bytes
+ #   Column  Non-Null Count  Dtype
+---  ------  --------------  -----
+ 0   input1  4 non-null      Sparse[float64, 0.0]
+ 1   input2  4 non-null      Sparse[float64, 0.0]
+ 2   y       4 non-null      Sparse[float64, 0.0]
+dtypes: Sparse[float64, 0.0](3)
+memory usage: 200.0 bytes
 None
 </pre></div>
 </div>
@@ -504,13 +473,13 @@ None
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/34502
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/34787
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.810 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.031 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-create-upload-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/0d1d1c06933bd6d32bda534cb0aa0e53/create_upload_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">create_upload_tutorial.py</span></code></a></p>

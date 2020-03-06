@@ -192,7 +192,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/34498
+    URL for dataset: https://test.openml.org/d/34783
 
 
 
@@ -292,7 +292,7 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/34499
+    URL for dataset: https://test.openml.org/d/34784
 
 
 
@@ -331,11 +331,13 @@ function :func:`create_dataset`. In this regard, you only need to pass
     <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 14 entries, 0 to 13
     Data columns (total 5 columns):
-    outlook        14 non-null category
-    temperature    14 non-null int64
-    humidity       14 non-null int64
-    windy          14 non-null bool
-    play           14 non-null category
+     #   Column       Non-Null Count  Dtype   
+    ---  ------       --------------  -----   
+     0   outlook      14 non-null     category
+     1   temperature  14 non-null     int64   
+     2   humidity     14 non-null     int64   
+     3   windy        14 non-null     bool    
+     4   play         14 non-null     category
     dtypes: bool(1), category(2), int64(2)
     memory usage: 594.0 bytes
     None
@@ -373,15 +375,6 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /home/travis/build/openml/openml-python/openml/datasets/functions.py:690: FutureWarning: A future version of pandas will default to `skipna=True`. To silence this warning, pass `skipna=True|False` explicitly.
-      attributes_ = attributes_arff_from_df(data)
-
 
 
 
@@ -402,7 +395,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/34500
+    URL for dataset: https://test.openml.org/d/34785
 
 
 
@@ -467,24 +460,24 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/34501
+    URL for dataset: https://test.openml.org/d/34786
 
 
 
 
-Dataset is a pandas sparse dataframe
-====================================
+Dataset is a pandas dataframe with sparse columns
+=================================================
 
 
 .. code-block:: default
 
 
     sparse_data = coo_matrix((
-        [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+        [1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0],
         ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
     ))
     column_names = ['input1', 'input2', 'y']
-    df = pd.SparseDataFrame(sparse_data, columns=column_names)
+    df = pd.DataFrame.sparse.from_spmatrix(sparse_data, columns=column_names)
     print(df.info())
 
     xor_dataset = create_dataset(
@@ -514,44 +507,16 @@ Dataset is a pandas sparse dataframe
 
  .. code-block:: none
 
-    /home/travis/build/openml/openml-python/examples/30_extended/create_upload_tutorial.py:294: FutureWarning: SparseDataFrame is deprecated and will be removed in a future version.
-    Use a regular DataFrame whose columns are SparseArrays instead.
-
-    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-      df = pd.SparseDataFrame(sparse_data, columns=column_names)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/sparse/frame.py:257: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
-    Use a Series with sparse values instead.
-
-        >>> series = pd.Series(pd.SparseArray(...))
-
-    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-      sparse_index=BlockIndex(N, blocs, blens),
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/frame.py:3471: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
-    Use a Series with sparse values instead.
-
-        >>> series = pd.Series(pd.SparseArray(...))
-
-    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-      return klass(values, index=self.index, name=items, fastpath=True)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/apply.py:345: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
-    Use a Series with sparse values instead.
-
-        >>> series = pd.Series(pd.SparseArray(...))
-
-    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-      result = self.obj._constructor_sliced(results)
-    <class 'pandas.core.sparse.frame.SparseDataFrame'>
+    <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 4 entries, 0 to 3
     Data columns (total 3 columns):
-    input1    3 non-null Sparse[float64, nan]
-    input2    2 non-null Sparse[float64, nan]
-    y         2 non-null Sparse[float64, nan]
-    dtypes: Sparse[float64, nan](3)
-    memory usage: 224.0 bytes
+     #   Column  Non-Null Count  Dtype               
+    ---  ------  --------------  -----               
+     0   input1  4 non-null      Sparse[float64, 0.0]
+     1   input2  4 non-null      Sparse[float64, 0.0]
+     2   y       4 non-null      Sparse[float64, 0.0]
+    dtypes: Sparse[float64, 0.0](3)
+    memory usage: 200.0 bytes
     None
 
 
@@ -575,7 +540,7 @@ Dataset is a pandas sparse dataframe
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/34502
+    URL for dataset: https://test.openml.org/d/34787
 
 
 
@@ -594,7 +559,7 @@ Dataset is a pandas sparse dataframe
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.810 seconds)
+   **Total running time of the script:** ( 0 minutes  6.031 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:

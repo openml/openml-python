@@ -763,7 +763,7 @@ Download datasets
 Get the actual data.
 
 The dataset can be returned in 2 possible formats: as a NumPy array, a SciPy
-sparse matrix, or as a Pandas DataFrame (or SparseDataFrame). The format is
+sparse matrix, or as a Pandas DataFrame. The format is
 controlled with the parameter ``dataset_format`` which can be either 'array'
 (default) or 'dataframe'. Let's first build our dataset from a NumPy array
 and manually create a dataframe.
@@ -840,20 +840,22 @@ dataframe with the correct dtypes.
     <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 14980 entries, 0 to 14979
     Data columns (total 14 columns):
-    V1     14980 non-null float64
-    V2     14980 non-null float64
-    V3     14980 non-null float64
-    V4     14980 non-null float64
-    V5     14980 non-null float64
-    V6     14980 non-null float64
-    V7     14980 non-null float64
-    V8     14980 non-null float64
-    V9     14980 non-null float64
-    V10    14980 non-null float64
-    V11    14980 non-null float64
-    V12    14980 non-null float64
-    V13    14980 non-null float64
-    V14    14980 non-null float64
+     #   Column  Non-Null Count  Dtype  
+    ---  ------  --------------  -----  
+     0   V1      14980 non-null  float64
+     1   V2      14980 non-null  float64
+     2   V3      14980 non-null  float64
+     3   V4      14980 non-null  float64
+     4   V5      14980 non-null  float64
+     5   V6      14980 non-null  float64
+     6   V7      14980 non-null  float64
+     7   V8      14980 non-null  float64
+     8   V9      14980 non-null  float64
+     9   V10     14980 non-null  float64
+     10  V11     14980 non-null  float64
+     11  V12     14980 non-null  float64
+     12  V13     14980 non-null  float64
+     13  V14     14980 non-null  float64
     dtypes: float64(14)
     memory usage: 1.6 MB
     None
@@ -909,16 +911,16 @@ Exercise 2
 
  .. code-block:: none
 
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/plotting/_matplotlib/tools.py:307: MatplotlibDeprecationWarning: 
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/plotting/_matplotlib/tools.py:298: MatplotlibDeprecationWarning: 
     The rowNum attribute was deprecated in Matplotlib 3.2 and will be removed two minor releases later. Use ax.get_subplotspec().rowspan.start instead.
       layout[ax.rowNum, ax.colNum] = ax.get_visible()
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/plotting/_matplotlib/tools.py:307: MatplotlibDeprecationWarning: 
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/plotting/_matplotlib/tools.py:298: MatplotlibDeprecationWarning: 
     The colNum attribute was deprecated in Matplotlib 3.2 and will be removed two minor releases later. Use ax.get_subplotspec().colspan.start instead.
       layout[ax.rowNum, ax.colNum] = ax.get_visible()
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/plotting/_matplotlib/tools.py:313: MatplotlibDeprecationWarning: 
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/plotting/_matplotlib/tools.py:304: MatplotlibDeprecationWarning: 
     The rowNum attribute was deprecated in Matplotlib 3.2 and will be removed two minor releases later. Use ax.get_subplotspec().rowspan.start instead.
       if not layout[ax.rowNum + 1, ax.colNum]:
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/plotting/_matplotlib/tools.py:313: MatplotlibDeprecationWarning: 
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/plotting/_matplotlib/tools.py:304: MatplotlibDeprecationWarning: 
     The colNum attribute was deprecated in Matplotlib 3.2 and will be removed two minor releases later. Use ax.get_subplotspec().colspan.start instead.
       if not layout[ax.rowNum + 1, ax.colNum]:
 
@@ -928,7 +930,7 @@ Exercise 2
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.604 seconds)
+   **Total running time of the script:** ( 0 minutes  6.686 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:
