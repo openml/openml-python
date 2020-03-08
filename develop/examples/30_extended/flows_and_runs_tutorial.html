@@ -166,7 +166,7 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
     <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">,</span>
     <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Categorical features: </span><span class="si">{categorical_indicator}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Categorical features: </span><span class="si">{</span><span class="n">categorical_indicator</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="n">transformer</span> <span class="o">=</span> <span class="n">compose</span><span class="o">.</span><span class="n">ColumnTransformer</span><span class="p">(</span>
     <span class="p">[(</span><span class="s1">&#39;one_hot_encoder&#39;</span><span class="p">,</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">categories</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span> <span class="n">categorical_indicator</span><span class="p">)])</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
@@ -214,7 +214,7 @@ Setup String.: Python_3.7.6. Sklearn_0.21.2. NumPy_1.18.1. SciPy_1.4.1. ExtraTre
                     max_features=&#39;auto&#39;, max_leaf_nodes=None,
                     min_impurity_decrease=0.0, min_impurity_split=None,
                     min_samples_leaf=1, min_samples_split=2,
-                    min_weight_fraction_leaf=0.0, random_state=20070,
+                    min_weight_fraction_leaf=0.0, random_state=22680,
                     splitter=&#39;random&#39;)
 Dataset ID...: 68
 Dataset URL..: https://test.openml.org/d/68
@@ -230,7 +230,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/53283
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/53404
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -296,7 +296,7 @@ scipy&gt;=0.9
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/53284
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/53405
 </pre></div>
 </div>
 </div>
@@ -332,8 +332,8 @@ a model on a task without uploading results or flows to the server immediately.<
 ==========
 Uploader Name: None
 Metric.......: None
-Run ID.......: 53285
-Run URL......: https://test.openml.org/r/53285
+Run ID.......: 53406
+Run URL......: https://test.openml.org/r/53406
 Task ID......: 6
 Task Type....: None
 Task URL.....: https://test.openml.org/t/6
@@ -387,17 +387,17 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
 
     <span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">myrun</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;kNN on </span><span class="si">{data.name}</span><span class="s2">: http://test.openml.org/r/</span><span class="si">{myrun.run_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;kNN on </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: http://test.openml.org/r/</span><span class="si">{</span><span class="n">myrun</span><span class="o">.</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/53286
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/53407
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  18.302 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  17.661 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9e0617073c8209f15abf91f273871776/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></p>
