@@ -45,8 +45,8 @@ openml.config.start_using_configuration_for_example()
 
 diabetes = sklearn.datasets.load_diabetes()
 name = 'Diabetes(scikit-learn)'
-X = diabetes.data
-y = diabetes.target
+features = diabetes.data
+labels = diabetes.target
 attribute_names = diabetes.feature_names
 description = diabetes.DESCR
 
@@ -57,7 +57,7 @@ description = diabetes.DESCR
 # The target feature is indicated as meta-data of the dataset (and tasks on
 # that data).
 
-data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
+data = np.concatenate((features, labels.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
 attributes = [
     (attribute_name, 'REAL') for attribute_name in attribute_names

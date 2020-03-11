@@ -23,27 +23,27 @@ from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipelin
 openml.config.start_using_configuration_for_example()
 # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
 dataset = openml.datasets.get_dataset(68)
-X, y, categorical_indicator, attribute_names = dataset.get_data(
+features, labels, categorical_indicator, attribute_names = dataset.get_data(
     dataset_format='array',
     target=dataset.default_target_attribute
 )
 clf = neighbors.KNeighborsClassifier(n_neighbors=1)
-clf.fit(X, y)
+clf.fit(features, labels)
 
 ############################################################################
 # You can also ask for meta-data to automatically preprocess the data.
 #
 # * e.g. categorical features -> do feature encoding
 dataset = openml.datasets.get_dataset(17)
-X, y, categorical_indicator, attribute_names = dataset.get_data(
+features, labels, categorical_indicator, attribute_names = dataset.get_data(
     dataset_format='array',
     target=dataset.default_target_attribute
 )
 print(f"Categorical features: {categorical_indicator}")
 transformer = compose.ColumnTransformer(
     [('one_hot_encoder', preprocessing.OneHotEncoder(categories='auto'), categorical_indicator)])
-X = transformer.fit_transform(X)
-clf.fit(X, y)
+features = transformer.fit_transform(features)
+clf.fit(features, labels)
 
 ############################################################################
 # Runs: Easily explore models

@@ -22,12 +22,12 @@ openml.config.start_using_configuration_for_example()
 
 # NOTE: We are using dataset 20 from the test server: https://test.openml.org/d/20
 dataset = openml.datasets.get_dataset(20)
-X, y, categorical_indicator, attribute_names = dataset.get_data(
+features, labels, categorical_indicator, attribute_names = dataset.get_data(
     dataset_format='array',
     target=dataset.default_target_attribute
 )
 clf = neighbors.KNeighborsClassifier(n_neighbors=3)
-clf.fit(X, y)
+clf.fit(features, labels)
 
 ############################################################################
 # Running a model on a task

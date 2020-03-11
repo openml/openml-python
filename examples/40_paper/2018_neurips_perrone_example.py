@@ -154,9 +154,9 @@ def list_categorical_attributes(flow_type='svm'):
 # pre-processing all retrieved evaluations.
 
 eval_df, task_ids, flow_id = fetch_evaluations(run_full=False, flow_type=flow_type)
-X, y = create_table_from_evaluations(eval_df, flow_type=flow_type)
-print(X.head())
-print("Y : ", y[:5])
+features, labels = create_table_from_evaluations(eval_df, flow_type=flow_type)
+print(features.head())
+print("Y : ", labels[:5])
 
 #############################################################################
 # Creating pre-processing and modelling pipelines
@@ -167,7 +167,7 @@ print("Y : ", y[:5])
 
 # Separating data into categorical and non-categorical (numeric for this example) columns
 cat_cols = list_categorical_attributes(flow_type=flow_type)
-num_cols = list(set(X.columns) - set(cat_cols))
+num_cols = list(set(features.columns) - set(cat_cols))
 
 # Missing value imputers
 cat_imputer = SimpleImputer(missing_values=np.nan, strategy='constant', fill_value='None')
@@ -197,12 +197,12 @@ model = Pipeline(steps=[('preprocess', ct), ('surrogate', clf)])
 # Selecting a task for the surrogate
 task_id = task_ids[-1]
 print("Task ID : ", task_id)
-X, y = create_table_from_evaluations(eval_df, task_ids=[task_id], flow_type='svm')
+features, labels = create_table_from_evaluations(eval_df, task_ids=[task_id], flow_type='svm')
 
-model.fit(X, y)
-y_pred = model.predict(X)
+model.fit(features, labels)
+y_pred = model.predict(features)
 
-print("Training RMSE : {:.5}".format(mean_squared_error(y, y_pred)))
+print("Training RMSE : {:.5}".format(mean_squared_error(labels, y_pred)))
 
 
 #############################################################################

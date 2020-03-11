@@ -378,8 +378,8 @@ class TestFlow(TestBase):
 
     def test_sklearn_to_upload_to_flow(self):
         iris = sklearn.datasets.load_iris()
-        X = iris.data
-        y = iris.target
+        features = iris.data
+        labels = iris.target
 
         # Test a more complicated flow
         ohe_params = {'handle_unknown': 'ignore'}
@@ -410,7 +410,7 @@ class TestFlow(TestBase):
         cv = sklearn.model_selection.StratifiedKFold(n_splits=5, shuffle=True)
         rs = sklearn.model_selection.RandomizedSearchCV(
             estimator=model, param_distributions=parameter_grid, cv=cv)
-        rs.fit(X, y)
+        rs.fit(features, labels)
         flow = self.extension.model_to_flow(rs)
         # Tags may be sorted in any order (by the server). Just using one tag
         # makes sure that the xml comparison does not fail because of that.
@@ -475,7 +475,7 @@ class TestFlow(TestBase):
             % (sentinel, module_name_encoder)
         )
         self.assertEqual(new_flow.name, fixture_name)
-        new_flow.model.fit(X, y)
+        new_flow.model.fit(features, labels)
 
     def test_extract_tags(self):
         flow_xml = "<oml:tag>study_14</oml:tag>"

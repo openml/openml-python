@@ -72,23 +72,23 @@ print(dataset.description[:500])
 # controlled with the parameter ``dataset_format`` which can be either 'array'
 # (default) or 'dataframe'. Let's first build our dataset from a NumPy array
 # and manually create a dataframe.
-X, y, categorical_indicator, attribute_names = dataset.get_data(
+features, labels, categorical_indicator, attribute_names = dataset.get_data(
     dataset_format='array',
     target=dataset.default_target_attribute
 )
-eeg = pd.DataFrame(X, columns=attribute_names)
-eeg['class'] = y
+eeg = pd.DataFrame(features, columns=attribute_names)
+eeg['class'] = labels
 print(eeg[:10])
 
 ############################################################################
 # Instead of manually creating the dataframe, you can already request a
 # dataframe with the correct dtypes.
-X, y, categorical_indicator, attribute_names = dataset.get_data(
+features, labels, categorical_indicator, attribute_names = dataset.get_data(
     target=dataset.default_target_attribute,
     dataset_format='dataframe'
 )
-print(X.head())
-print(X.info())
+print(features.head())
+print(features.info())
 
 ############################################################################
 # Sometimes you only need access to a dataset's metadata.

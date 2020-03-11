@@ -38,13 +38,13 @@ print(dataset.description[:500])
 # Load a dataset
 # ==============
 
-# X - An array/dataframe where each row represents one example with
+# features - An array/dataframe where each row represents one example with
 # the corresponding feature values.
-# y - the classes for each example
+# labels - the classes for each example
 # categorical_indicator - an array that indicates which feature is categorical
-# attribute_names - the names of the features for the examples (X) and
-# target feature (y)
-X, y, categorical_indicator, attribute_names = dataset.get_data(
+# attribute_names - the names of the features for the examples (features) and
+# target feature (labels)
+features, labels, categorical_indicator, attribute_names = dataset.get_data(
     dataset_format='dataframe',
     target=dataset.default_target_attribute
 )
@@ -64,7 +64,7 @@ def hide_current_axis(*args, **kwds):
 
 # We combine all the data so that we can map the different
 # examples to different colors according to the classes.
-combined_data = pd.concat([X, y], axis=1)
+combined_data = pd.concat([features, labels], axis=1)
 iris_plot = sns.pairplot(combined_data, hue="class")
 iris_plot.map_upper(hide_current_axis)
 plt.show()
