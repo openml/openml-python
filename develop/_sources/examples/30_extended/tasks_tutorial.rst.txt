@@ -95,7 +95,7 @@ to have better visualization capabilities and easier access:
            'NumberOfMissingValues', 'NumberOfNumericFeatures',
            'NumberOfSymbolicFeatures', 'cost_matrix'],
           dtype='object')
-    First 5 of 3308 tasks:
+    First 5 of 3310 tasks:
        tid  ttid  ...  NumberOfSymbolicFeatures cost_matrix
     2    2     1  ...                      33.0         NaN
     3    3     1  ...                      37.0         NaN
@@ -340,7 +340,7 @@ Finally, it is also possible to list all tasks on OpenML with:
 
  .. code-block:: none
 
-    22870
+    22872
 
 
 
@@ -1125,7 +1125,7 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  31.424 seconds)
+   **Total running time of the script:** ( 0 minutes  32.096 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:
