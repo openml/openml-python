@@ -156,7 +156,7 @@ def list_categorical_attributes(flow_type='svm'):
 eval_df, task_ids, flow_id = fetch_evaluations(run_full=False, flow_type=flow_type)
 features, labels = create_table_from_evaluations(eval_df, flow_type=flow_type)
 print(features.head())
-print("Y : ", labels[:5])
+print("labels : ", labels[:5])
 
 #############################################################################
 # Creating pre-processing and modelling pipelines
@@ -200,9 +200,9 @@ print("Task ID : ", task_id)
 features, labels = create_table_from_evaluations(eval_df, task_ids=[task_id], flow_type='svm')
 
 model.fit(features, labels)
-y_pred = model.predict(features)
+predictions = model.predict(features)
 
-print("Training RMSE : {:.5}".format(mean_squared_error(labels, y_pred)))
+print("Training RMSE : {:.5}".format(mean_squared_error(labels, predictions)))
 
 
 #############################################################################

@@ -42,7 +42,7 @@ print(dataset.description[:500])
 # the corresponding feature values.
 # labels - the classes for each example
 # categorical_indicator - an array that indicates which feature is categorical
-# attribute_names - the names of the features for the examples (features) and
+# attribute_names - the names of the attributes for the examples (features) and
 # target feature (labels)
 features, labels, categorical_indicator, attribute_names = dataset.get_data(
     dataset_format='dataframe',
