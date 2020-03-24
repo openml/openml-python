@@ -1786,7 +1786,8 @@ class SklearnExtension(Extension):
                             }
                         }
                         if len(subcomponent) == 3:
-                            if not isinstance(subcomponent[2], list):
+                            if not isinstance(subcomponent[2], list) and \
+                                    not isinstance(subcomponent[2], OrderedDict):
                                 raise TypeError('Subcomponent argument should be'
                                                 ' list')
                             current['value']['argument_1'] = subcomponent[2]
