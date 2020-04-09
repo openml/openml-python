@@ -17,11 +17,11 @@ def list_evaluations(
     function: str,
     offset: Optional[int] = None,
     size: Optional[int] = None,
-    task: Optional[List] = None,
-    setup: Optional[List] = None,
-    flow: Optional[List] = None,
-    run: Optional[List] = None,
-    uploader: Optional[List] = None,
+    tasks: Optional[List[Union[str,int]]] = None,
+    setups: Optional[List[Union[str,int]]] = None,
+    flows: Optional[List[Union[str,int]]] = None,
+    runs: Optional[List[Union[str,int]]] = None,
+    uploaders: Optional[List[Union[str,int]]] = None,
     tag: Optional[str] = None,
     study: Optional[int] = None,
     per_fold: Optional[bool] = None,
@@ -40,23 +40,20 @@ def list_evaluations(
         the number of runs to skip, starting from the first
     size : int, optional
         the maximum number of runs to show
-
-    task : list, optional
-
-    setup: list, optional
-
-    flow : list, optional
-
-    run : list, optional
-
-    uploader : list, optional
-
+    tasks : list[int,str], optional
+        the list of task IDs
+    setups: list[int,str], optional
+        the list of setup IDs
+    flows : list[int,str], optional
+        the list of flow IDs
+    runs :list[int,str], optional
+        the list of run IDs
+    uploaders : list[int,str], optional
+        the list of uploader IDs
     tag : str, optional
-
+        filter evaluation based on given tag
     study : int, optional
-
     per_fold : bool, optional
-
     sort_order : str, optional
        order of sorting evaluations, ascending ("asc") or descending ("desc")
 
@@ -83,11 +80,11 @@ def list_evaluations(
                                   function=function,
                                   offset=offset,
                                   size=size,
-                                  task=task,
-                                  setup=setup,
-                                  flow=flow,
-                                  run=run,
-                                  uploader=uploader,
+                                  tasks=tasks,
+                                  setups=setups,
+                                  flows=flows,
+                                  runs=runs,
+                                  uploaders=uploaders,
                                   tag=tag,
                                   study=study,
                                   sort_order=sort_order,
@@ -96,11 +93,11 @@ def list_evaluations(
 
 def _list_evaluations(
     function: str,
-    task: Optional[List] = None,
-    setup: Optional[List] = None,
-    flow: Optional[List] = None,
-    run: Optional[List] = None,
-    uploader: Optional[List] = None,
+    tasks: Optional[List[Union[str,int]]] = None,
+    setups: Optional[List[Union[str,int]]]= None,
+    flows: Optional[List[Union[str,int]]]= None,
+    runs: Optional[List[Union[str,int]]]= None,
+    uploaders: Optional[List[Union[str,int]]] = None,
     study: Optional[int] = None,
     sort_order: Optional[str] = None,
     output_format: str = 'object',
@@ -116,25 +113,21 @@ def _list_evaluations(
 
     function : str
         the evaluation function. e.g., predictive_accuracy
-
-    task : list, optional
-
-    setup: list, optional
-
-    flow : list, optional
-
-    run : list, optional
-
-    uploader : list, optional
-
+    tasks : list[int,str], optional
+        the list of task IDs
+    setups: list[int,str], optional
+        the list of setup IDs
+    flows : list[int,str], optional
+        the list of flow IDs
+    runs :list[int,str], optional
+        the list of run IDs
+    uploaders : list[int,str], optional
+        the list of uploader IDs
     study : int, optional
-
     kwargs: dict, optional
         Legal filter operators: tag, limit, offset.
-
     sort_order : str, optional
         order of sorting evaluations, ascending ("asc") or descending ("desc")
-
     output_format: str, optional (default='dict')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
@@ -146,22 +139,23 @@ def _list_evaluations(
     Returns
     -------
     dict of objects, or dataframe
+    :type uploaders: object
     """
 
     api_call = "evaluation/list/function/%s" % function
     if kwargs is not None:
         for operator, value in kwargs.items():
             api_call += "/%s/%s" % (operator, value)
-    if task is not None:
-        api_call += "/task/%s" % ','.join([str(int(i)) for i in task])
-    if setup is not None:
-        api_call += "/setup/%s" % ','.join([str(int(i)) for i in setup])
-    if flow is not None:
-        api_call += "/flow/%s" % ','.join([str(int(i)) for i in flow])
-    if run is not None:
-        api_call += "/run/%s" % ','.join([str(int(i)) for i in run])
-    if uploader is not None:
-        api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
+    if tasks is not None:
+        api_call += "/task/%s" % ','.join([str(int(i)) for i in tasks])
+    if setups is not None:
+        api_call += "/setup/%s" % ','.join([str(int(i)) for i in setups])
+    if flows is not None:
+        api_call += "/flow/%s" % ','.join([str(int(i)) for i in flows])
+    if runs is not None:
+        api_call += "/run/%s" % ','.join([str(int(i)) for i in runs])
+    if uploaders is not None:
+        api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploaders])
     if study is not None:
         api_call += "/study/%d" % study
     if sort_order is not None:
@@ -267,11 +261,11 @@ def list_evaluations_setups(
         function: str,
         offset: Optional[int] = None,
         size: Optional[int] = None,
-        task: Optional[List] = None,
-        setup: Optional[List] = None,
-        flow: Optional[List] = None,
-        run: Optional[List] = None,
-        uploader: Optional[List] = None,
+        tasks: Optional[List[Union[str,int]]] = None,
+        setups: Optional[List[Union[str,int]]] = None,
+        flows: Optional[List[Union[str,int]]] = None,
+        runs: Optional[List[Union[str,int]]] = None,
+        uploaders: Optional[List[Union[str,int]]] = None,
         tag: Optional[str] = None,
         per_fold: Optional[bool] = None,
         sort_order: Optional[str] = None,
@@ -290,15 +284,15 @@ def list_evaluations_setups(
         the number of runs to skip, starting from the first
     size : int, optional
         the maximum number of runs to show
-    task : list[int], optional
+    tasks : list[int,str], optional
         the list of task IDs
-    setup: list[int], optional
+    setups: list[int,str], optional
         the list of setup IDs
-    flow : list[int], optional
+    flows : list[int,str], optional
         the list of flow IDs
-    run : list[int], optional
+    runs :list[int,str], optional
         the list of run IDs
-    uploader : list[int], optional
+    uploaders : list[int,str], optional
         the list of uploader IDs
     tag : str, optional
         filter evaluation based on given tag
@@ -323,8 +317,8 @@ def list_evaluations_setups(
                          "only for single flow_id")
 
     # List evaluations
-    evals = list_evaluations(function=function, offset=offset, size=size, run=run, task=task,
-                             setup=setup, flow=flow, uploader=uploader, tag=tag,
+    evals = list_evaluations(function=function, offset=offset, size=size, runs=runs, tasks=tasks,
+                             setups=setups, flows=flows, uploaders=uploaders, tag=tag,
                              per_fold=per_fold, sort_order=sort_order, output_format='dataframe')
     # List setups
     # list_setups by setup id does not support large sizes (exceeds URL length limit)
@@ -337,23 +331,23 @@ def list_evaluations_setups(
         # array_split -length % N sub-arrays of size length//N + 1 and the rest of size length//N.
         setup_chunks = np.array_split(ary=evals['setup_id'].unique(),
                                       indices_or_sections=((length - 1) // N) + 1)
-        setups = pd.DataFrame()
+        setupp = pd.DataFrame()
         for setup in setup_chunks:
             result = pd.DataFrame(openml.setups.list_setups(setup=setup, output_format='dataframe'))
             result.drop('flow_id', axis=1, inplace=True)
             # concat resulting setup chunks into single datframe
-            setups = pd.concat([setups, result], ignore_index=True)
+            setupp = pd.concat([setupp, result], ignore_index=True)
         parameters = []
         # Convert parameters of setup into list of tuples of (hyperparameter, value)
-        for parameter_dict in setups['parameters']:
+        for parameter_dict in setupp['parameters']:
             if parameter_dict is not None:
                 parameters.append({param['full_name']: param['value']
                                    for param in parameter_dict.values()})
             else:
                 parameters.append({})
-        setups['parameters'] = parameters
+        setupp['parameters'] = parameters
         # Merge setups with evaluations
-        df = pd.merge(evals, setups, on='setup_id', how='left')
+        df = pd.merge(evals, setupp, on='setup_id', how='left')
 
     if parameters_in_separate_columns:
         df = pd.concat([df.drop('parameters', axis=1),
