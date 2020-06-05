@@ -872,7 +872,8 @@ class SklearnExtension(Extension):
                         # length 2 is for {VotingClassifier.estimators,
                         # Pipeline.steps, FeatureUnion.transformer_list}
                         # length 3 is for ColumnTransformer
-                        msg = 'Length of tuple does not match assumptions'
+                        msg = 'Length of tuple of type {} '\
+                              'does not match assumptions'.format(sub_component_type)
                         raise ValueError(msg)
 
                     if isinstance(sub_component, str):

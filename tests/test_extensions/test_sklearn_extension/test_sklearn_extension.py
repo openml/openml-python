@@ -1336,13 +1336,15 @@ class TestSklearnExtensionRunFunctions(TestBase):
     ################################################################################################
     # Test methods for performing runs with this extension module
 
+    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
+                     reason="model.fit fails on dataframe with categories for DummyClassifier")
     def test_run_model_on_task(self):
-        class MyPipe(sklearn.pipeline.Pipeline):
-            pass
+        # class MyPipe(sklearn.pipeline.Pipeline):
+        #     pass
         task = openml.tasks.get_task(1)
-        # using most_frequent imputer since dataste has mixed types and to keep things simple
-        pipe = MyPipe([('imp', SimpleImputer(strategy='most_frequent')),
-                       ('dummy', sklearn.dummy.DummyClassifier())])
+        # using most_frequent imputer since dataset has mixed types and to keep things simple
+        pipe = sklearn.pipeline.Pipeline([('imp', SimpleImputer(strategy='most_frequent')),
+                                          ('dummy', sklearn.dummy.DummyClassifier())])
         openml.runs.run_model_on_task(pipe, task)
 
     def test_seed_model(self):

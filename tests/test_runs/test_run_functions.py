@@ -8,7 +8,6 @@ import time
 import sys
 import unittest.mock
 
-import scipy
 import numpy as np
 import pytest
 
