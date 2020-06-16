@@ -1106,6 +1106,7 @@ class TestRun(TestBase):
             model=clf,
             task=task,
             add_local_measures=True,
+            dataset_format='dataframe'
         )
         arff_datacontent, trace, fold_evaluations, _ = res
         # predictions
@@ -1333,6 +1334,7 @@ class TestRun(TestBase):
             task=task,
             extension=self.extension,
             add_local_measures=True,
+            dataset_format='dataframe'
         )
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different

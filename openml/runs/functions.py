@@ -494,7 +494,7 @@ def _run_task_get_arffcontent(
                         arff_line.append(proba_y[i][j])
 
                     arff_line.append(pred_y[i])
-                    if isinstance(test_y, pd.DataFrame):
+                    if isinstance(test_y, pd.DataFrame) or isinstance(test_y, pd.Series):
                         arff_line.append(test_y.iloc[i])
                     else:
                         arff_line.append(test_y[i])
