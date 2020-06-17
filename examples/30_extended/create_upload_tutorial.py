@@ -217,8 +217,9 @@ df['play'] = df['play'].astype('category')
 print(df.info())
 
 ############################################################################
-# We enforce the column 'outlook', 'windy', and 'play' to be a categorical
-# dtype while the column 'rnd_str' is kept as a string column. Then, we can
+# We enforce the column 'outlook' and 'play' to be a categorical
+# dtype while the column 'windy' is kept as a boolean column. 'temperature'
+# and 'humidity' are kept as numeric columns. Then, we can
 # call :func:`create_dataset` by passing the dataframe and fixing the parameter
 # ``attributes`` to ``'auto'``.
 

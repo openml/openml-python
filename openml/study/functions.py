@@ -386,7 +386,7 @@ def detach_from_suite(suite_id: int, task_ids: List[int]) -> int:
         OpenML id of the study
 
     task_ids : list (int)
-        List of entities to link to the collection
+        List of entities to  de-link (detach) from the collection
 
     Returns
     -------
@@ -404,7 +404,7 @@ def detach_from_study(study_id: int, run_ids: List[int]) -> int:
         OpenML id of the study
 
     run_ids : list (int)
-        List of entities to link to the collection
+        List of entities to  de-link (detach) from the collection
 
     Returns
     -------
