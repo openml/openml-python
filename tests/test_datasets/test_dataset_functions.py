@@ -526,6 +526,11 @@ class TestOpenMLDataset(TestBase):
         # all users can deactivate their own datasets)
         openml.config.apikey = 'd488d8afd93b32331cf6ea9d7003d4c3'
 
+        temp = openml.datasets.list_datasets(status='in_preparation')
+        for d_id in temp:
+            if d_id == did:
+                print('\nDataset {} found with status \'{}\'\n'.format(did, temp.get(did)['status']))
+
         openml.datasets.status_update(did, 'active')
         # need to use listing fn, as this is immune to cache
         result = openml.datasets.list_datasets(data_id=[did], status='all')
