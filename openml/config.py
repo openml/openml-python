@@ -101,7 +101,7 @@ def get_server_base_url() -> str:
     =======
     str
     """
-    return server[:-len('/api/v1/xml')]
+    return server.split("/api")[0]
 
 
 apikey = _defaults['apikey']
