@@ -1,4 +1,5 @@
 # License: BSD 3-Clause
+from typing import Tuple, List, Union
 
 import arff
 from distutils.version import LooseVersion
@@ -46,8 +47,8 @@ class TestRun(TestBase):
     _multiprocess_can_split_ = True
     # diabetis dataset, 768 observations, 0 missing vals, 33% holdout set
     # (253 test obs), no nominal attributes, all numeric attributes
-    TEST_SERVER_TASK_SIMPLE = (119, 0, 253, list(), list(range(8)))
-    TEST_SERVER_TASK_REGRESSION = (738, 0, 718, list(), list(range(8)))
+    TEST_SERVER_TASK_SIMPLE: Tuple[Union[int, List], ...] = (119, 0, 253, [], [*range(8)])
+    TEST_SERVER_TASK_REGRESSION: Tuple[Union[int, List], ...] = (738, 0, 718, [], [*range(8)])
     # credit-a dataset, 690 observations, 67 missing vals, 33% holdout set
     # (227 test obs)
     TEST_SERVER_TASK_MISSING_VALS = (
