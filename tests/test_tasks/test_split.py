@@ -18,8 +18,15 @@ class OpenMLSplitTest(TestBase):
         self.directory = os.path.dirname(__file__)
         # This is for dataset
         self.arff_filename = os.path.join(
-            self.directory, "..", "files", "org", "openml", "test",
-            "tasks", "1882", "datasplits.arff"
+            self.directory,
+            "..",
+            "files",
+            "org",
+            "openml",
+            "test",
+            "tasks",
+            "1882",
+            "datasplits.arff",
         )
         self.pd_filename = self.arff_filename.replace(".arff", ".pkl.py3")
 
@@ -65,9 +72,9 @@ class OpenMLSplitTest(TestBase):
             for j in range(10):
                 self.assertGreaterEqual(split.split[i][j][0].train.shape[0], 808)
                 self.assertGreaterEqual(split.split[i][j][0].test.shape[0], 89)
-                self.assertEqual(split.split[i][j][0].train.shape[0]
-                                 + split.split[i][j][0].test.shape[0],
-                                 898)
+                self.assertEqual(
+                    split.split[i][j][0].train.shape[0] + split.split[i][j][0].test.shape[0], 898
+                )
 
     def test_get_split(self):
         split = OpenMLSplit._from_arff_file(self.arff_filename)
@@ -75,14 +82,8 @@ class OpenMLSplitTest(TestBase):
         self.assertEqual(train_split.shape[0], 808)
         self.assertEqual(test_split.shape[0], 90)
         self.assertRaisesRegex(
-            ValueError,
-            "Repeat 10 not known",
-            split.get,
-            10, 2,
+            ValueError, "Repeat 10 not known", split.get, 10, 2,
         )
         self.assertRaisesRegex(
-            ValueError,
-            "Fold 10 not known",
-            split.get,
-            2, 10,
+            ValueError, "Fold 10 not known", split.get, 2, 10,
         )

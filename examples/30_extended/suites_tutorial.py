@@ -35,7 +35,7 @@ import openml
 # * Default gives ``dict``, but we'll use ``dataframe`` to obtain an
 #   easier-to-work-with data structure
 
-suites = openml.study.list_suites(output_format='dataframe', status='all')
+suites = openml.study.list_suites(output_format="dataframe", status="all")
 print(suites.head(n=10))
 
 ############################################################################
@@ -57,12 +57,12 @@ print(suite.tasks)
 
 ############################################################################
 # And we can use the task listing functionality to learn more about them:
-tasks = openml.tasks.list_tasks(output_format='dataframe')
+tasks = openml.tasks.list_tasks(output_format="dataframe")
 
 # Using ``@`` in `pd.DataFrame.query <
 # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html>`_
 # accesses variables outside of the current dataframe.
-tasks = tasks.query('tid in @suite.tasks')
+tasks = tasks.query("tid in @suite.tasks")
 print(tasks.describe().transpose())
 
 ############################################################################
@@ -86,8 +86,8 @@ task_ids_for_suite = sorted(np.random.choice(all_tasks, replace=False, size=20))
 alias = uuid.uuid4().hex
 
 new_suite = openml.study.create_benchmark_suite(
-    name='Test-Suite',
-    description='Test suite for the Python tutorial on benchmark suites',
+    name="Test-Suite",
+    description="Test suite for the Python tutorial on benchmark suites",
     task_ids=task_ids_for_suite,
     alias=alias,
 )

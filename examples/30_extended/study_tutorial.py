@@ -39,7 +39,7 @@ import openml
 # * Default gives ``dict``, but we'll use ``dataframe`` to obtain an
 #   easier-to-work-with data structure
 
-studies = openml.study.list_studies(output_format='dataframe', status='all')
+studies = openml.study.list_studies(output_format="dataframe", status="all")
 print(studies.head(n=10))
 
 
@@ -64,9 +64,7 @@ print(study.runs)
 # And we can use the evaluation listing functionality to learn more about
 # the evaluations available for the conducted runs:
 evaluations = openml.evaluations.list_evaluations(
-    function='predictive_accuracy',
-    output_format='dataframe',
-    study=study.study_id,
+    function="predictive_accuracy", output_format="dataframe", study=study.study_id,
 )
 print(evaluations.head())
 
@@ -81,10 +79,12 @@ print(evaluations.head())
 openml.config.start_using_configuration_for_example()
 
 # Very simple classifier which ignores the feature type
-clf = sklearn.pipeline.Pipeline(steps=[
-    ('imputer', sklearn.impute.SimpleImputer()),
-    ('estimator', sklearn.tree.DecisionTreeClassifier(max_depth=5)),
-])
+clf = sklearn.pipeline.Pipeline(
+    steps=[
+        ("imputer", sklearn.impute.SimpleImputer()),
+        ("estimator", sklearn.tree.DecisionTreeClassifier(max_depth=5)),
+    ]
+)
 
 suite = openml.study.get_suite(1)
 # We'll create a study with one run on three random datasets each
@@ -101,8 +101,8 @@ for task_id in tasks:
 alias = uuid.uuid4().hex
 
 new_study = openml.study.create_study(
-    name='Test-Study',
-    description='Test study for the Python tutorial on studies',
+    name="Test-Study",
+    description="Test study for the Python tutorial on studies",
     run_ids=run_ids,
     alias=alias,
     benchmark_suite=suite.study_id,

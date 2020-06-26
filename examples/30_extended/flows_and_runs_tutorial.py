@@ -24,8 +24,7 @@ openml.config.start_using_configuration_for_example()
 # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
 dataset = openml.datasets.get_dataset(68)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    dataset_format='array',
-    target=dataset.default_target_attribute
+    dataset_format="array", target=dataset.default_target_attribute
 )
 clf = neighbors.KNeighborsClassifier(n_neighbors=1)
 clf.fit(X, y)
@@ -36,12 +35,12 @@ clf.fit(X, y)
 # * e.g. categorical features -> do feature encoding
 dataset = openml.datasets.get_dataset(17)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    dataset_format='array',
-    target=dataset.default_target_attribute
+    dataset_format="array", target=dataset.default_target_attribute
 )
 print(f"Categorical features: {categorical_indicator}")
 transformer = compose.ColumnTransformer(
-    [('one_hot_encoder', preprocessing.OneHotEncoder(categories='auto'), categorical_indicator)])
+    [("one_hot_encoder", preprocessing.OneHotEncoder(categories="auto"), categorical_indicator)]
+)
 X = transformer.fit_transform(X)
 clf.fit(X, y)
 
@@ -86,29 +85,37 @@ print(flow)
 task = openml.tasks.get_task(1)
 features = task.get_dataset().features
 nominal_feature_indices = [
-    i for i in range(len(features))
-    if features[i].name != task.target_name and features[i].data_type == 'nominal'
+    i
+    for i in range(len(features))
+    if features[i].name != task.target_name and features[i].data_type == "nominal"
 ]
-pipe = pipeline.Pipeline(steps=[
-    (
-        'Preprocessing',
-        compose.ColumnTransformer([
-            ('Nominal', pipeline.Pipeline(
+pipe = pipeline.Pipeline(
+    steps=[
+        (
+            "Preprocessing",
+            compose.ColumnTransformer(
                 [
-                    ('Imputer', impute.SimpleImputer(strategy='most_frequent')),
                     (
-                        'Encoder',
-                        preprocessing.OneHotEncoder(
-                            sparse=False, handle_unknown='ignore',
-                        )
+                        "Nominal",
+                        pipeline.Pipeline(
+                            [
+                                ("Imputer", impute.SimpleImputer(strategy="most_frequent")),
+                                (
+                                    "Encoder",
+                                    preprocessing.OneHotEncoder(
+                                        sparse=False, handle_unknown="ignore",
+                                    ),
+                                ),
+                            ]
+                        ),
+                        nominal_feature_indices,
                     ),
-                ]),
-                nominal_feature_indices,
-             ),
-        ]),
-    ),
-    ('Classifier', ensemble.RandomForestClassifier(n_estimators=10))
-])
+                ]
+            ),
+        ),
+        ("Classifier", ensemble.RandomForestClassifier(n_estimators=10)),
+    ]
+)
 
 run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
 myrun = run.publish()
@@ -125,17 +132,13 @@ print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 task = openml.tasks.get_task(6)
 
 # The following lines can then be executed offline:
-run = openml.runs.run_model_on_task(
-    pipe,
-    task,
-    avoid_duplicate_runs=False,
-    upload_flow=False)
+run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False, upload_flow=False)
 
 # The run may be stored offline, and the flow will be stored along with it:
-run.to_filesystem(directory='myrun')
+run.to_filesystem(directory="myrun")
 
 # They may be loaded and uploaded at a later time
-run = openml.runs.OpenMLRun.from_filesystem(directory='myrun')
+run = openml.runs.OpenMLRun.from_filesystem(directory="myrun")
 run.publish()
 
 # Publishing the run will automatically upload the related flow if
@@ -177,7 +180,7 @@ run = openml.runs.run_flow_on_task(flow, task)
 #   task_id:`52950 <http://www.openml.org/t/52950>`_, 100k instances, missing values.
 
 # Easy benchmarking:
-for task_id in [115, ]:  # Add further tasks. Disclaimer: they might take some time
+for task_id in [115]:  # Add further tasks. Disclaimer: they might take some time
     task = openml.tasks.get_task(task_id)
     data = openml.datasets.get_dataset(task.dataset_id)
     clf = neighbors.KNeighborsClassifier(n_neighbors=5)

@@ -40,10 +40,24 @@ class OpenMLEvaluation(object):
         list of information per class.
         (e.g., in case of precision, auroc, recall)
     """
-    def __init__(self, run_id, task_id, setup_id, flow_id, flow_name,
-                 data_id, data_name, function, upload_time, uploader: int,
-                 uploader_name: str, value, values,
-                 array_data=None):
+
+    def __init__(
+        self,
+        run_id,
+        task_id,
+        setup_id,
+        flow_id,
+        flow_name,
+        data_id,
+        data_name,
+        function,
+        upload_time,
+        uploader: int,
+        uploader_name: str,
+        value,
+        values,
+        array_data=None,
+    ):
         self.run_id = run_id
         self.task_id = task_id
         self.setup_id = setup_id
@@ -61,28 +75,41 @@ class OpenMLEvaluation(object):
 
     def __repr__(self):
         header = "OpenML Evaluation"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
+        header = "{}\n{}\n".format(header, "=" * len(header))
 
-        fields = {"Upload Date": self.upload_time,
-                  "Run ID": self.run_id,
-                  "OpenML Run URL": openml.runs.OpenMLRun.url_for_id(self.run_id),
-                  "Task ID": self.task_id,
-                  "OpenML Task URL": openml.tasks.OpenMLTask.url_for_id(self.task_id),
-                  "Flow ID": self.flow_id,
-                  "OpenML Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
-                  "Setup ID": self.setup_id,
-                  "Data ID": self.data_id,
-                  "Data Name": self.data_name,
-                  "OpenML Data URL": openml.datasets.OpenMLDataset.url_for_id(self.data_id),
-                  "Metric Used": self.function,
-                  "Result": self.value}
+        fields = {
+            "Upload Date": self.upload_time,
+            "Run ID": self.run_id,
+            "OpenML Run URL": openml.runs.OpenMLRun.url_for_id(self.run_id),
+            "Task ID": self.task_id,
+            "OpenML Task URL": openml.tasks.OpenMLTask.url_for_id(self.task_id),
+            "Flow ID": self.flow_id,
+            "OpenML Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
+            "Setup ID": self.setup_id,
+            "Data ID": self.data_id,
+            "Data Name": self.data_name,
+            "OpenML Data URL": openml.datasets.OpenMLDataset.url_for_id(self.data_id),
+            "Metric Used": self.function,
+            "Result": self.value,
+        }
 
-        order = ["Uploader Date", "Run ID", "OpenML Run URL", "Task ID", "OpenML Task URL"
-                 "Flow ID", "OpenML Flow URL", "Setup ID", "Data ID", "Data Name",
-                 "OpenML Data URL", "Metric Used", "Result"]
+        order = [
+            "Uploader Date",
+            "Run ID",
+            "OpenML Run URL",
+            "Task ID",
+            "OpenML Task URL" "Flow ID",
+            "OpenML Flow URL",
+            "Setup ID",
+            "Data ID",
+            "Data Name",
+            "OpenML Data URL",
+            "Metric Used",
+            "Result",
+        ]
         fields = [(key, fields[key]) for key in order if key in fields]
 
         longest_field_name_length = max(len(name) for name, value in fields)
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        body = "\n".join(field_line_format.format(name, value) for name, value in fields)
         return header + body
