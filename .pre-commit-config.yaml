@@ -8,9 +8,17 @@ repos:
     rev: v0.761
     hooks:
       - id: mypy
+        name: mypy openml
         files: openml/*
+      - id: mypy
+        name: mypy tests
+        files: tests/*
   - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.7.9
+    rev: 3.8.3
     hooks:
       - id: flake8
+        name: flake8 openml
         files: openml/*
+      - id: flake8
+        name: flake8 tests
+        files: tests/*

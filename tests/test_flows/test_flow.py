@@ -207,7 +207,7 @@ class TestFlow(TestBase):
 
     def test_publish_flow_with_similar_components(self):
         clf = sklearn.ensemble.VotingClassifier(
-            [("lr", sklearn.linear_model.LogisticRegression(solver="lbfgs")),]
+            [("lr", sklearn.linear_model.LogisticRegression(solver="lbfgs"))]
         )
         flow = self.extension.model_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
@@ -398,7 +398,7 @@ class TestFlow(TestBase):
             base_estimator=sklearn.tree.DecisionTreeClassifier()
         )
         model = sklearn.pipeline.Pipeline(
-            steps=[("ohe", ohe), ("scaler", scaler), ("fu", fu), ("boosting", boosting),]
+            steps=[("ohe", ohe), ("scaler", scaler), ("fu", fu), ("boosting", boosting)]
         )
         parameter_grid = {
             "boosting__n_estimators": [1, 5, 10, 100],

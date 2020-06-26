@@ -147,7 +147,7 @@ class TestRun(TestBase):
             model=model, task=task, add_local_measures=False, avoid_duplicate_runs=False,
         )
 
-        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)),)
+        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
@@ -161,12 +161,12 @@ class TestRun(TestBase):
     def test_to_from_filesystem_no_model(self):
 
         model = Pipeline(
-            [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier()),]
+            [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())]
         )
         task = openml.tasks.get_task(119)
-        run = openml.runs.run_model_on_task(model=model, task=task, add_local_measures=False,)
+        run = openml.runs.run_model_on_task(model=model, task=task, add_local_measures=False)
 
-        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)),)
+        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
         run.to_filesystem(cache_path, store_model=False)
         # obtain run from filesystem
         openml.runs.OpenMLRun.from_filesystem(cache_path, expect_model=False)
@@ -182,7 +182,7 @@ class TestRun(TestBase):
         extension = openml.extensions.sklearn.SklearnExtension()
 
         model = Pipeline(
-            [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier()),]
+            [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())]
         )
         task = openml.tasks.get_task(119)
 
@@ -202,7 +202,7 @@ class TestRun(TestBase):
         # Make sure that the flow has not been uploaded as requested.
         self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
 
-        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)),)
+        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
         run.to_filesystem(cache_path)
         # obtain run from filesystem
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)

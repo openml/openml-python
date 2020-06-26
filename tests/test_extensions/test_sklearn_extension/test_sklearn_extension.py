@@ -1484,7 +1484,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y[test_indices]
 
         pipeline = sklearn.pipeline.Pipeline(
-            steps=[("imp", SimpleImputer()), ("clf", sklearn.tree.DecisionTreeClassifier()),]
+            steps=[("imp", SimpleImputer()), ("clf", sklearn.tree.DecisionTreeClassifier())]
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
@@ -1538,7 +1538,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y[test_indices]
 
         pipeline = sklearn.model_selection.GridSearchCV(
-            sklearn.tree.DecisionTreeClassifier(), {"max_depth": [1, 2],},
+            sklearn.tree.DecisionTreeClassifier(), {"max_depth": [1, 2]},
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
@@ -1661,7 +1661,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y[test_indices]
 
         pipeline = sklearn.pipeline.Pipeline(
-            steps=[("imp", SimpleImputer()), ("clf", sklearn.tree.DecisionTreeRegressor()),]
+            steps=[("imp", SimpleImputer()), ("clf", sklearn.tree.DecisionTreeRegressor())]
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
@@ -1705,7 +1705,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         X = task.get_X(dataset_format="array")
 
         pipeline = sklearn.pipeline.Pipeline(
-            steps=[("imp", SimpleImputer()), ("clf", sklearn.cluster.KMeans()),]
+            steps=[("imp", SimpleImputer()), ("clf", sklearn.cluster.KMeans())]
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
