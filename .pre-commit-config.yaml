@@ -3,7 +3,7 @@ repos:
     rev: 19.10b0
     hooks:
       - id: black
-        args: [--line-length 80]
+        args: [--line-length=100]
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.761
     hooks:
