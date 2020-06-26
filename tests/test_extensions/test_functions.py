@@ -8,7 +8,7 @@ from openml.extensions import get_extension_by_model, get_extension_by_flow, reg
 
 
 class DummyFlow:
-    external_version = 'DummyFlow==0.1'
+    external_version = "DummyFlow==0.1"
 
 
 class DummyModel:
@@ -16,22 +16,20 @@ class DummyModel:
 
 
 class DummyExtension1:
-
     @staticmethod
     def can_handle_flow(flow):
-        if not inspect.stack()[2].filename.endswith('test_functions.py'):
+        if not inspect.stack()[2].filename.endswith("test_functions.py"):
             return False
         return True
 
     @staticmethod
     def can_handle_model(model):
-        if not inspect.stack()[2].filename.endswith('test_functions.py'):
+        if not inspect.stack()[2].filename.endswith("test_functions.py"):
             return False
         return True
 
 
 class DummyExtension2:
-
     @staticmethod
     def can_handle_flow(flow):
         return False
@@ -61,14 +59,13 @@ def _unregister():
 
 
 class TestInit(openml.testing.TestBase):
-
     def setUp(self):
         super().setUp()
         _unregister()
 
     def test_get_extension_by_flow(self):
         self.assertIsNone(get_extension_by_flow(DummyFlow()))
-        with self.assertRaisesRegex(ValueError, 'No extension registered which can handle flow:'):
+        with self.assertRaisesRegex(ValueError, "No extension registered which can handle flow:"):
             get_extension_by_flow(DummyFlow(), raise_if_no_extension=True)
         register_extension(DummyExtension1)
         self.assertIsInstance(get_extension_by_flow(DummyFlow()), DummyExtension1)
@@ -76,14 +73,13 @@ class TestInit(openml.testing.TestBase):
         self.assertIsInstance(get_extension_by_flow(DummyFlow()), DummyExtension1)
         register_extension(DummyExtension1)
         with self.assertRaisesRegex(
-            ValueError,
-            'Multiple extensions registered which can handle flow:',
+            ValueError, "Multiple extensions registered which can handle flow:",
         ):
             get_extension_by_flow(DummyFlow())
 
     def test_get_extension_by_model(self):
         self.assertIsNone(get_extension_by_model(DummyModel()))
-        with self.assertRaisesRegex(ValueError, 'No extension registered which can handle model:'):
+        with self.assertRaisesRegex(ValueError, "No extension registered which can handle model:"):
             get_extension_by_model(DummyModel(), raise_if_no_extension=True)
         register_extension(DummyExtension1)
         self.assertIsInstance(get_extension_by_model(DummyModel()), DummyExtension1)
@@ -91,7 +87,6 @@ class TestInit(openml.testing.TestBase):
         self.assertIsInstance(get_extension_by_model(DummyModel()), DummyExtension1)
         register_extension(DummyExtension1)
         with self.assertRaisesRegex(
-            ValueError,
-            'Multiple extensions registered which can handle model:',
+            ValueError, "Multiple extensions registered which can handle model:",
         ):
             get_extension_by_model(DummyModel())
