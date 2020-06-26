@@ -66,6 +66,8 @@ setuptools.setup(
             "oslo.concurrency",
             "flaky",
             "pyarrow",
+            "pre-commit",
+            "pytest-cov",
         ],
         "examples": [
             "matplotlib",
