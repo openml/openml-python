@@ -1517,11 +1517,7 @@ class SklearnExtension(Extension):
                         # mapping (decoding) the predictions to the categories
                         # creating a separate copy to not change the expected pred_y type
                         preds = [task.class_labels[pred] for pred in y]
-                        # proba_y = _prediction_to_probabilities(preds, model_classes)
                         y = preds
-                    else:
-                        # proba_y = _prediction_to_probabilities(pred_y, model_classes)
-                        y = pred_y
                 else:
                     raise ValueError('The task has no class labels')
                 classes = model_classes
@@ -1602,7 +1598,7 @@ class SklearnExtension(Extension):
             # to handle the case when dataset is numpy and categories are encoded
             # however the class labels stored in task are still categories
             if isinstance(y_train, np.ndarray) and \
-                    isinstance(typing.cast(List[str], task.class_labels)[0], str):
+                    isinstance(typing.cast(List, task.class_labels)[0], str):
                 model_classes = [typing.cast(List[str], task.class_labels)[i]
                                  for i in model_classes]
 
@@ -1636,17 +1632,6 @@ class SklearnExtension(Extension):
                 proba_y = model_copy.predict_proba(X_test)
             except AttributeError:  # predict_proba is not available when probability=False
                 proba_y = _prediction_to_probabilities(pred_y, model_classes)
-                # if task.class_labels is not None:
-                #     if isinstance(y_train, np.ndarray) and isinstance(task.class_labels[0], str):
-                #         # mapping (decoding) the predictions to the categories
-                #         # creating a separate copy to not change the expected pred_y type
-                #         preds = [task.class_labels[pred] for pred in pred_y]
-                #         proba_y = _prediction_to_probabilities(preds, model_classes)
-                #     else:
-                #         proba_y = _prediction_to_probabilities(pred_y, model_classes)
-                #
-                # else:
-                #     raise ValueError('The task has no class labels')
 
             if task.class_labels is not None:
                 if proba_y.shape[1] != len(task.class_labels):
