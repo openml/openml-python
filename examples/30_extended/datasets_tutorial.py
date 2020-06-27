@@ -67,7 +67,7 @@ print(dataset.description[:500])
 ############################################################################
 # Get the actual data.
 #
-# The dataset can be returned in 2 possible formats: as a NumPy array, a SciPy
+# The dataset can be returned in 3 possible formats: as a NumPy array, a SciPy
 # sparse matrix, or as a Pandas DataFrame. The format is
 # controlled with the parameter ``dataset_format`` which can be either 'array'
 # (default) or 'dataframe'. Let's first build our dataset from a NumPy array

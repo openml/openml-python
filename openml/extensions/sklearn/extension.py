@@ -1509,6 +1509,25 @@ class SklearnExtension(Extension):
             -------
             np.ndarray
             """
+
+            if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
+                print("\n\nInside _prediction_to_probabilities\n\n")
+                if task.class_labels is not None:
+                    if isinstance(y_train, np.ndarray) and isinstance(task.class_labels[0], str):
+                        # mapping (decoding) the predictions to the categories
+                        # creating a separate copy to not change the expected pred_y type
+                        preds = [task.class_labels[pred] for pred in y]
+                        # proba_y = _prediction_to_probabilities(preds, model_classes)
+                        y = preds
+                    else:
+                        # proba_y = _prediction_to_probabilities(pred_y, model_classes)
+                        y = pred_y
+                else:
+                    raise ValueError('The task has no class labels')
+                classes = model_classes
+            else:
+                return None
+
             # y: list or numpy array of predictions
             # model_classes: sklearn classifier mapping from original array id to
             # prediction index id
@@ -1616,17 +1635,18 @@ class SklearnExtension(Extension):
             try:
                 proba_y = model_copy.predict_proba(X_test)
             except AttributeError:  # predict_proba is not available when probability=False
-                if task.class_labels is not None:
-                    if isinstance(y_train, np.ndarray) and isinstance(task.class_labels[0], str):
-                        # mapping (decoding) the predictions to the categories
-                        # creating a separate copy to not change the expected pred_y type
-                        preds = [task.class_labels[pred] for pred in pred_y]
-                        proba_y = _prediction_to_probabilities(preds, model_classes)
-                    else:
-                        proba_y = _prediction_to_probabilities(pred_y, model_classes)
-
-                else:
-                    raise ValueError('The task has no class labels')
+                proba_y = _prediction_to_probabilities(pred_y, model_classes)
+                # if task.class_labels is not None:
+                #     if isinstance(y_train, np.ndarray) and isinstance(task.class_labels[0], str):
+                #         # mapping (decoding) the predictions to the categories
+                #         # creating a separate copy to not change the expected pred_y type
+                #         preds = [task.class_labels[pred] for pred in pred_y]
+                #         proba_y = _prediction_to_probabilities(preds, model_classes)
+                #     else:
+                #         proba_y = _prediction_to_probabilities(pred_y, model_classes)
+                #
+                # else:
+                #     raise ValueError('The task has no class labels')
 
             if task.class_labels is not None:
                 if proba_y.shape[1] != len(task.class_labels):
@@ -1790,7 +1810,7 @@ class SklearnExtension(Extension):
                             if not isinstance(subcomponent[2], list) and \
                                     not isinstance(subcomponent[2], OrderedDict):
                                 raise TypeError('Subcomponent argument should be'
-                                                ' list')
+                                                ' list or OrderedDict')
                             current['value']['argument_1'] = subcomponent[2]
                         parsed_values.append(current)
                     parsed_values = json.dumps(parsed_values)

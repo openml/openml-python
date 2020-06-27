@@ -343,7 +343,8 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(task_id)
         # internally dataframe is loaded and targets are categorical
         # which LinearRegression() cannot handle
-        with self.assertRaises(ValueError):
+        print("\nRegex check coming in \n")
+        with self.assertRaisesRegex(ValueError, 'could not convert string to float:*'):
             openml.runs.run_model_on_task(
                 model=clf,
                 task=task,
@@ -704,22 +705,23 @@ class TestRun(TestBase):
     @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.21",
                      reason="Pipelines don't support indexing (used for the assert check)")
     def test_initialize_cv_from_run(self):
-        randomsearch = RandomizedSearchCV(
-            RandomForestClassifier(n_estimators=5),
-            {"max_depth": [3, None],
-             "max_features": [1, 2, 3, 4],
-             "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
-             "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-             "bootstrap": [True, False],
-             "criterion": ["gini", "entropy"]},
-            cv=StratifiedKFold(n_splits=2, shuffle=True),
-            n_iter=2)
-
-        clf = make_pipeline(OneHotEncoder(handle_unknown='ignore'), randomsearch)
+        randomsearch = Pipeline([('enc', OneHotEncoder(handle_unknown='ignore')),
+                                 ('rs', RandomizedSearchCV(
+                                     RandomForestClassifier(n_estimators=5),
+                                     {"max_depth": [3, None],
+                                      "max_features": [1, 2, 3, 4],
+                                      "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                      "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                      "bootstrap": [True, False],
+                                      "criterion": ["gini", "entropy"]},
+                                     cv=StratifiedKFold(n_splits=2, shuffle=True),
+                                     n_iter=2)
+                                  )
+                                 ])
 
         task = openml.tasks.get_task(11)
         run = openml.runs.run_model_on_task(
-            model=clf,
+            model=randomsearch,
             task=task,
             avoid_duplicate_runs=False,
             seed=1,

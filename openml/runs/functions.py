@@ -74,8 +74,8 @@ def run_model_on_task(
     return_flow : bool (default=False)
         If True, returns the OpenMLFlow generated from the model in addition to the OpenMLRun.
     dataset_format : str (default='dataframe')
-        If 'array', the dataset is read as a numpy array
-        If 'dataframe', the dataset is read as a pandas dataframe
+        If 'array', the dataset is passed to the model as a numpy array.
+        If 'dataframe', the dataset is passed to the model as a pandas dataframe.
 
     Returns
     -------
@@ -168,8 +168,8 @@ def run_flow_on_task(
         If True, upload the flow to OpenML if it does not exist yet.
         If False, do not upload the flow to OpenML.
     dataset_format : str (default='dataframe')
-        If 'array', the dataset is read as a numpy array
-        If 'dataframe', the dataset is read as a pandas dataframe
+        If 'array', the dataset is passed to the model as a numpy array.
+        If 'dataframe', the dataset is passed to the model as a pandas dataframe.
 
     Returns
     -------
