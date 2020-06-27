@@ -529,7 +529,17 @@ class TestOpenMLDataset(TestBase):
         temp = openml.datasets.list_datasets(status='in_preparation')
         for d_id in temp:
             if d_id == did:
-                print('\nDataset {} found with status \'{}\'\n'.format(did, temp.get(did)['status']))
+                print('\nDataset {} found with status {}\n'.format(did, temp.get(did)['status']))
+
+        temp = openml.datasets.list_datasets(status='active')
+        for d_id in temp:
+            if d_id == did:
+                print('\nDataset {} found with status {}\n'.format(did, temp.get(did)['status']))
+
+        temp = openml.datasets.list_datasets(status='deactivated')
+        for d_id in temp:
+            if d_id == did:
+                print('\nDataset {} found with status {}\n'.format(did, temp.get(did)['status']))
 
         openml.datasets.status_update(did, 'active')
         # need to use listing fn, as this is immune to cache
