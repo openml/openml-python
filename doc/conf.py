@@ -343,7 +343,7 @@ autosectionlabel_prefix_document = True
 # Sphinx-gallery configuration.
 sphinx_gallery_conf = {
     # disable mini galleries clustered by the used functions
-    'backreferences_dir': False,
+    'backreferences_dir': None,
     # path to the examples
     'examples_dirs': '../examples',
     # path where to save gallery generated examples
@@ -355,4 +355,5 @@ sphinx_gallery_conf = {
 
 
 def setup(app):
-    app.add_stylesheet("codehighlightstyle.css")
+    app.add_css_file("codehighlightstyle.css")
+    # app.add_stylesheet("codehighlightstyle.css")
