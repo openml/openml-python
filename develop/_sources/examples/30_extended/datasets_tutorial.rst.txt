@@ -922,7 +922,7 @@ Exercise 2
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.006 seconds)
+   **Total running time of the script:** ( 0 minutes  6.041 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:

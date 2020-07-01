@@ -110,7 +110,7 @@ Running a model on a task
                            min_impurity_decrease=0.0, min_impurity_split=None,
                            min_samples_leaf=1, min_samples_split=2,
                            min_weight_fraction_leaf=0.0, n_estimators='warn',
-                           n_jobs=None, oob_score=False, random_state=20216,
+                           n_jobs=None, oob_score=False, random_state=40203,
                            verbose=0, warm_start=False)
     Dataset ID...: 20
     Dataset URL..: https://test.openml.org/d/20
@@ -139,7 +139,7 @@ Publishing the run
 
  .. code-block:: none
 
-    Run was uploaded to http://test.openml.org/r/76047
+    Run was uploaded to http://test.openml.org/r/76187
     The flow can be found at http://test.openml.org/f/26046
 
 
@@ -159,7 +159,7 @@ Publishing the run
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.857 seconds)
+   **Total running time of the script:** ( 0 minutes  6.799 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_flows_and_runs_tutorial.py:
