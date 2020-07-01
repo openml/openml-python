@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>APIs &#8212; OpenML 0.11.0dev documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -139,7 +142,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.OpenMLClassificationTask.html#openml.OpenMLClassificationTask" title="openml.OpenMLClassificationTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLClassificationTask</span></code></a>(task_type_id, …)</p></td>
 <td><p>OpenML Classification object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.OpenMLClusteringTask.html#openml.OpenMLClusteringTask" title="openml.OpenMLClusteringTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLClusteringTask</span></code></a>(task_type_id, …[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.OpenMLClusteringTask.html#openml.OpenMLClusteringTask" title="openml.OpenMLClusteringTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLClusteringTask</span></code></a>(task_type_id, …)</p></td>
 <td><p>OpenML Clustering object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.OpenMLDataFeature.html#openml.OpenMLDataFeature" title="openml.OpenMLDataFeature"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLDataFeature</span></code></a>(index, name, data_type, …)</p></td>
@@ -154,13 +157,13 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow" title="openml.OpenMLFlow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLFlow</span></code></a>(name, description, model, …[, …])</p></td>
 <td><p>OpenML Flow.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.OpenMLLearningCurveTask.html#openml.OpenMLLearningCurveTask" title="openml.OpenMLLearningCurveTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLLearningCurveTask</span></code></a>(task_type_id, …[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.OpenMLLearningCurveTask.html#openml.OpenMLLearningCurveTask" title="openml.OpenMLLearningCurveTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLLearningCurveTask</span></code></a>(task_type_id, …)</p></td>
 <td><p>OpenML Learning Curve object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.OpenMLParameter.html#openml.OpenMLParameter" title="openml.OpenMLParameter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLParameter</span></code></a>(input_id, flow_id, …)</p></td>
 <td><p>Parameter object (used in setup).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.OpenMLRegressionTask.html#openml.OpenMLRegressionTask" title="openml.OpenMLRegressionTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLRegressionTask</span></code></a>(task_type_id, …[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.OpenMLRegressionTask.html#openml.OpenMLRegressionTask" title="openml.OpenMLRegressionTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLRegressionTask</span></code></a>(task_type_id, …)</p></td>
 <td><p>OpenML Regression object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.OpenMLRun.html#openml.OpenMLRun" title="openml.OpenMLRun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLRun</span></code></a>(task_id, flow_id, dataset_id[, …])</p></td>
@@ -175,7 +178,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.OpenMLStudy.html#openml.OpenMLStudy" title="openml.OpenMLStudy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLStudy</span></code></a>(study_id, alias, …)</p></td>
 <td><p>An OpenMLStudy represents the OpenML concept of a study (a collection of runs).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.OpenMLSupervisedTask.html#openml.OpenMLSupervisedTask" title="openml.OpenMLSupervisedTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLSupervisedTask</span></code></a>(task_type_id, …[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.OpenMLSupervisedTask.html#openml.OpenMLSupervisedTask" title="openml.OpenMLSupervisedTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLSupervisedTask</span></code></a>(task_type_id, …)</p></td>
 <td><p>OpenML Supervised Classification object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.OpenMLTask.html#openml.OpenMLTask" title="openml.OpenMLTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLTask</span></code></a>(task_id, task_type_id, task_type, …)</p></td>
@@ -192,10 +195,10 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.extensions.Extension.html#openml.extensions.Extension" title="openml.extensions.Extension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Extension</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.extensions.Extension.html#openml.extensions.Extension" title="openml.extensions.Extension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Extension</span></code></a>()</p></td>
 <td><p>Defines the interface to connect machine learning libraries to OpenML-Python.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension" title="openml.extensions.sklearn.SklearnExtension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.SklearnExtension</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension" title="openml.extensions.sklearn.SklearnExtension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.SklearnExtension</span></code></a>()</p></td>
 <td><p>Connect scikit-learn to OpenML-Python.</p></td>
 </tr>
 </tbody>
@@ -448,7 +451,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.1.<br/>
     </p>
   </div>
 </footer>

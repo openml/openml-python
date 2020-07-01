@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_40_paper_2015_neurips_feurer_example.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_40_paper_2015_neurips_feurer_example.py:
+        Click :ref:`here <sphx_glr_download_examples_40_paper_2015_neurips_feurer_example.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_40_paper_2015_neurips_feurer_example.py:
 
 
 Feurer et al. (2015)
@@ -137,7 +139,7 @@ datasets can be found in the `online docs <https://docs.openml.org/#dataset-stat
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.213 seconds)
+   **Total running time of the script:** ( 0 minutes  2.127 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2015_neurips_feurer_example.py:
@@ -150,13 +152,13 @@ datasets can be found in the `online docs <https://docs.openml.org/#dataset-stat
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: 2015_neurips_feurer_example.py <2015_neurips_feurer_example.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: 2015_neurips_feurer_example.ipynb <2015_neurips_feurer_example.ipynb>`
 

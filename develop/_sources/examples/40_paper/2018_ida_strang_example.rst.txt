@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_40_paper_2018_ida_strang_example.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_40_paper_2018_ida_strang_example.py:
+        Click :ref:`here <sphx_glr_download_examples_40_paper_2018_ida_strang_example.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_40_paper_2018_ida_strang_example.py:
 
 
 Strang et al. (2018)
@@ -112,6 +114,7 @@ makes the s-plot
 
 
 .. image:: /examples/40_paper/images/sphx_glr_2018_ida_strang_example_001.png
+    :alt: SVM
     :class: sphx-glr-single-img
 
 
@@ -156,6 +159,7 @@ needed for the scatter plot
 
 
 .. image:: /examples/40_paper/images/sphx_glr_2018_ida_strang_example_002.png
+    :alt: SVM
     :class: sphx-glr-single-img
 
 
@@ -182,6 +186,7 @@ two algorithms on various axis (not in the paper)
 
 
 .. image:: /examples/40_paper/images/sphx_glr_2018_ida_strang_example_003.png
+    :alt: 2018 ida strang example
     :class: sphx-glr-single-img
 
 
@@ -191,7 +196,7 @@ two algorithms on various axis (not in the paper)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.944 seconds)
+   **Total running time of the script:** ( 0 minutes  1.827 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_ida_strang_example.py:
@@ -204,13 +209,13 @@ two algorithms on various axis (not in the paper)
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: 2018_ida_strang_example.py <2018_ida_strang_example.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: 2018_ida_strang_example.ipynb <2018_ida_strang_example.ipynb>`
 

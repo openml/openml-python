@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_40_paper_2018_kdd_rijn_example.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_40_paper_2018_kdd_rijn_example.py:
+        Click :ref:`here <sphx_glr_download_examples_40_paper_2018_kdd_rijn_example.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_40_paper_2018_kdd_rijn_example.py:
 
 
 van Rijn and Hutter (2018)
@@ -203,6 +205,7 @@ the reader is referred to the more elaborate script (referred to earlier)
 
 
 .. image:: /examples/40_paper/images/sphx_glr_2018_kdd_rijn_example_001.png
+    :alt: 2018 kdd rijn example
     :class: sphx-glr-single-img
 
 
@@ -212,7 +215,7 @@ the reader is referred to the more elaborate script (referred to earlier)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  5.402 seconds)
+   **Total running time of the script:** ( 1 minutes  2.994 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_kdd_rijn_example.py:
@@ -225,13 +228,13 @@ the reader is referred to the more elaborate script (referred to earlier)
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: 2018_kdd_rijn_example.py <2018_kdd_rijn_example.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: 2018_kdd_rijn_example.ipynb <2018_kdd_rijn_example.ipynb>`
 

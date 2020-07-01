@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_20_basic_simple_suites_tutorial.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_20_basic_simple_suites_tutorial.py:
+        Click :ref:`here <sphx_glr_download_examples_20_basic_simple_suites_tutorial.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_20_basic_simple_suites_tutorial.py:
 
 
 ================
@@ -176,7 +178,7 @@ Further examples
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  9.470 seconds)
+   **Total running time of the script:** ( 0 minutes  9.214 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_suites_tutorial.py:
@@ -189,13 +191,13 @@ Further examples
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: simple_suites_tutorial.py <simple_suites_tutorial.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: simple_suites_tutorial.ipynb <simple_suites_tutorial.ipynb>`
 

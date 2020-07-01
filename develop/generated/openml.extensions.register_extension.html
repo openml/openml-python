@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>openml.extensions.register_extension &#8212; OpenML 0.11.0dev documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
@@ -111,9 +114,9 @@
       
   <div class="section" id="openml-extensions-register-extension">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.extensions</span></code>.register_extension<a class="headerlink" href="#openml-extensions-register-extension" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="openml.extensions.register_extension">
-<code class="sig-prename descclassname">openml.extensions.</code><code class="sig-name descname">register_extension</code><span class="sig-paren">(</span><em class="sig-param">extension: Type[openml.extensions.extension_interface.Extension]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#openml.extensions.register_extension" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openml.extensions.</code><code class="sig-name descname">register_extension</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">extension</span><span class="p">:</span> <span class="n">Type<span class="p">[</span>openml.extensions.extension_interface.Extension<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#openml.extensions.register_extension" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register an extension.</p>
 <p>Registered extensions are considered by <code class="docutils literal notranslate"><span class="pre">get_extension_by_flow</span></code> and
 <code class="docutils literal notranslate"><span class="pre">get_extension_by_model</span></code>, which are used by <code class="docutils literal notranslate"><span class="pre">openml.flow</span></code> and <code class="docutils literal notranslate"><span class="pre">openml.runs</span></code>.</p>
@@ -146,7 +149,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.1.<br/>
     </p>
   </div>
 </footer>

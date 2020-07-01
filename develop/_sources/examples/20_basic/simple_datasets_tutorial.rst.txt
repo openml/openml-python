@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_20_basic_simple_datasets_tutorial.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_20_basic_simple_datasets_tutorial.py:
+        Click :ref:`here <sphx_glr_download_examples_20_basic_simple_datasets_tutorial.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_20_basic_simple_datasets_tutorial.py:
 
 
 ========
@@ -158,6 +160,7 @@ Visualize the dataset
 
 
 .. image:: /examples/20_basic/images/sphx_glr_simple_datasets_tutorial_001.png
+    :alt: simple datasets tutorial
     :class: sphx-glr-single-img
 
 
@@ -167,7 +170,7 @@ Visualize the dataset
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.720 seconds)
+   **Total running time of the script:** ( 0 minutes  6.410 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_datasets_tutorial.py:
@@ -180,13 +183,13 @@ Visualize the dataset
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: simple_datasets_tutorial.py <simple_datasets_tutorial.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: simple_datasets_tutorial.ipynb <simple_datasets_tutorial.ipynb>`
 

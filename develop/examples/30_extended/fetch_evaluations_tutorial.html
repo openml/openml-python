@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fetching Evaluations &#8212; OpenML 0.11.0dev documentation</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
@@ -123,7 +126,7 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-fetch-evaluations-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-fetch-evaluations-tutorial-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="fetching-evaluations">
 <span id="sphx-glr-examples-30-extended-fetch-evaluations-tutorial-py"></span><h1>Fetching Evaluations<a class="headerlink" href="#fetching-evaluations" title="Permalink to this headline">¶</a></h1>
@@ -227,10 +230,10 @@ Note that we now filter the evaluations based on another parameter ‘task’.</
 
 Displaying head of sorted dataframe:
         run_id  task_id  setup_id  ...     value values  array_data
-2780  10279797   167140   8166877  ...  0.968613   None        None
 2781  10279798   167140   8166877  ...  0.968613   None        None
-2255  10232987   167140   8157961  ...  0.967671   None        None
+2780  10279797   167140   8166877  ...  0.968613   None        None
 2238  10232158   167140   8157180  ...  0.967671   None        None
+2255  10232987   167140   8157961  ...  0.967671   None        None
 2306  10271558   167140   8154506  ...  0.967043   None        None
 
 [5 rows x 14 columns]
@@ -269,7 +272,7 @@ We shall now plot a cumulative distributive function (CDF) for the accuracies ob
 <span class="c1"># with non-zero probability. While the maximum accuracy seen till now is 96.5%.</span>
 </pre></div>
 </div>
-<img alt="../../_images/sphx_glr_fetch_evaluations_tutorial_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_fetch_evaluations_tutorial_001.png" />
+<img alt="CDF" class="sphx-glr-single-img" src="../../_images/sphx_glr_fetch_evaluations_tutorial_001.png" />
 </div>
 <div class="section" id="comparing-top-10-performing-flows">
 <h2>Comparing top 10 performing flows<a class="headerlink" href="#comparing-top-10-performing-flows" title="Permalink to this headline">¶</a></h2>
@@ -321,9 +324,11 @@ For this, we shall compare the top performing flows.</p>
     <span class="nb">print</span><span class="p">((</span><span class="n">flow_ids</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">flow_names</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
 </pre></div>
 </div>
-<img alt="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" />
+<img alt="Boxplot comparing predictive_accuracy for different flows" class="sphx-glr-single-img" src="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(12736, &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/numpy/core/_asarray.py:83: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify &#39;dtype=object&#39; when creating the ndarray
+  return array(a, dtype, copy=False, order=order)
+(12736, &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)&#39;)
 (8399, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)&#39;)
 (8353, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
 (12127, &#39;sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)&#39;)
@@ -387,12 +392,12 @@ For this, we shall compare the top performing flows.</p>
 &#39;&#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.795 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.397 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-fetch-evaluations-tutorial-py">
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ae7e73aff29ef9ace1e17781346a204b/fetch_evaluations_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_evaluations_tutorial.py</span></code></a></p>
 </div>
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/55fed401604e83ceb83e08221c96c779/fetch_evaluations_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">fetch_evaluations_tutorial.ipynb</span></code></a></p>
 </div>
 </div>
@@ -414,7 +419,7 @@ For this, we shall compare the top performing flows.</p>
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.1.<br/>
     </p>
   </div>
 </footer>

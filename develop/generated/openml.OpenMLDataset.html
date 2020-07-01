@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>openml.OpenMLDataset &#8212; OpenML 0.11.0dev documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
@@ -111,9 +114,9 @@
       
   <div class="section" id="openml-openmldataset">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLDataset<a class="headerlink" href="#openml-openmldataset" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="openml.OpenMLDataset">
-<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLDataset</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">description</em>, <em class="sig-param">format=None</em>, <em class="sig-param">data_format='arff'</em>, <em class="sig-param">cache_format='pickle'</em>, <em class="sig-param">dataset_id=None</em>, <em class="sig-param">version=None</em>, <em class="sig-param">creator=None</em>, <em class="sig-param">contributor=None</em>, <em class="sig-param">collection_date=None</em>, <em class="sig-param">upload_date=None</em>, <em class="sig-param">language=None</em>, <em class="sig-param">licence=None</em>, <em class="sig-param">url=None</em>, <em class="sig-param">default_target_attribute=None</em>, <em class="sig-param">row_id_attribute=None</em>, <em class="sig-param">ignore_attribute=None</em>, <em class="sig-param">version_label=None</em>, <em class="sig-param">citation=None</em>, <em class="sig-param">tag=None</em>, <em class="sig-param">visibility=None</em>, <em class="sig-param">original_data_url=None</em>, <em class="sig-param">paper_url=None</em>, <em class="sig-param">update_comment=None</em>, <em class="sig-param">md5_checksum=None</em>, <em class="sig-param">data_file=None</em>, <em class="sig-param">features=None</em>, <em class="sig-param">qualities=None</em>, <em class="sig-param">dataset=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">data_format</span><span class="o">=</span><span class="default_value">'arff'</span></em>, <em class="sig-param"><span class="n">cache_format</span><span class="o">=</span><span class="default_value">'pickle'</span></em>, <em class="sig-param"><span class="n">dataset_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">version</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">creator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">contributor</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">collection_date</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">upload_date</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">language</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">licence</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_target_attribute</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">row_id_attribute</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ignore_attribute</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">version_label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">citation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tag</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">visibility</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">original_data_url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">paper_url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">update_comment</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">md5_checksum</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">data_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">features</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">qualities</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dataset</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dataset object.</p>
 <p>Allows fetching and uploading datasets to OpenML.</p>
 <dl class="field-list simple">
@@ -191,149 +194,6 @@ which maps a quality name to a quality value.</p>
 </dl>
 </dd>
 </dl>
-<dl class="method">
-<dt id="openml.OpenMLDataset.get_data">
-<code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param">self, target: Union[List[str], str, NoneType] = None, include_row_id: bool = False, include_ignore_attribute: bool = False, dataset_format: str = 'dataframe'</em><span class="sig-paren">)</span> &#x2192; Tuple[Union[numpy.ndarray, pandas.core.frame.DataFrame, scipy.sparse.csr.csr_matrix], Union[numpy.ndarray, pandas.core.frame.DataFrame, NoneType], List[bool], List[str]]<a class="headerlink" href="#openml.OpenMLDataset.get_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns dataset content as dataframes or sparse matrices.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>target</strong><span class="classifier">string, List[str] or None (default=None)</span></dt><dd><p>Name of target column to separate from the data.
-Splitting multiple columns is currently not supported.</p>
-</dd>
-<dt><strong>include_row_id</strong><span class="classifier">boolean (default=False)</span></dt><dd><p>Whether to include row ids in the returned dataset.</p>
-</dd>
-<dt><strong>include_ignore_attribute</strong><span class="classifier">boolean (default=False)</span></dt><dd><p>Whether to include columns that are marked as “ignore”
-on the server in the dataset.</p>
-</dd>
-<dt><strong>dataset_format</strong><span class="classifier">string (default=’dataframe’)</span></dt><dd><p>The format of returned dataset.
-If <code class="docutils literal notranslate"><span class="pre">array</span></code>, the returned dataset will be a NumPy array or a SciPy sparse matrix.
-If <code class="docutils literal notranslate"><span class="pre">dataframe</span></code>, the returned dataset will be a Pandas DataFrame.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>X</strong><span class="classifier">ndarray, dataframe, or sparse matrix, shape (n_samples, n_columns)</span></dt><dd><p>Dataset</p>
-</dd>
-<dt><strong>y</strong><span class="classifier">ndarray or pd.Series, shape (n_samples, ) or None</span></dt><dd><p>Target column</p>
-</dd>
-<dt><strong>categorical_indicator</strong><span class="classifier">boolean ndarray</span></dt><dd><p>Mask that indicate categorical features.</p>
-</dd>
-<dt><strong>attribute_names</strong><span class="classifier">List[str]</span></dt><dd><p>List of attribute names.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLDataset.get_features_by_type">
-<code class="sig-name descname">get_features_by_type</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">data_type</em>, <em class="sig-param">exclude=None</em>, <em class="sig-param">exclude_ignore_attribute=True</em>, <em class="sig-param">exclude_row_id_attribute=True</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.get_features_by_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return indices of features of a given type, e.g. all nominal features.
-Optional parameters to exclude various features by index or ontology.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>data_type</strong><span class="classifier">str</span></dt><dd><p>The data type to return (e.g., nominal, numeric, date, string)</p>
-</dd>
-<dt><strong>exclude</strong><span class="classifier">list(int)</span></dt><dd><dl class="simple">
-<dt>Indices to exclude (and adapt the return values as if these indices</dt><dd><p>are not present)</p>
-</dd>
-</dl>
-</dd>
-<dt><strong>exclude_ignore_attribute</strong><span class="classifier">bool</span></dt><dd><p>Whether to exclude the defined ignore attributes (and adapt the
-return values as if these indices are not present)</p>
-</dd>
-<dt><strong>exclude_row_id_attribute</strong><span class="classifier">bool</span></dt><dd><p>Whether to exclude the defined row id attributes (and adapt the
-return values as if these indices are not present)</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>result</strong><span class="classifier">list</span></dt><dd><p>a list of indices that have the specified data type</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLDataset.id">
-<em class="property">property </em><code class="sig-name descname">id</code><a class="headerlink" href="#openml.OpenMLDataset.id" title="Permalink to this definition">¶</a></dt>
-<dd><p>The id of the entity, it is unique for its entity type.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLDataset.open_in_browser">
-<code class="sig-name descname">open_in_browser</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.open_in_browser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Opens the OpenML web page corresponding to this object in your default browser.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLDataset.openml_url">
-<em class="property">property </em><code class="sig-name descname">openml_url</code><a class="headerlink" href="#openml.OpenMLDataset.openml_url" title="Permalink to this definition">¶</a></dt>
-<dd><p>The URL of the object on the server, if it was uploaded, else None.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLDataset.push_tag">
-<code class="sig-name descname">push_tag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tag: str</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.push_tag" title="Permalink to this definition">¶</a></dt>
-<dd><p>Annotates this entity with a tag on the server.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLDataset.remove_tag">
-<code class="sig-name descname">remove_tag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tag: str</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset.remove_tag" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes a tag from this entity on the server.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLDataset.retrieve_class_labels">
-<code class="sig-name descname">retrieve_class_labels</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">target_name: str = 'class'</em><span class="sig-paren">)</span> &#x2192; Union[NoneType, List[str]]<a class="headerlink" href="#openml.OpenMLDataset.retrieve_class_labels" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads the datasets arff to determine the class-labels.</p>
-<p>If the task has no class labels (for example a regression problem)
-it returns None. Necessary because the data returned by get_data
-only contains the indices of the classes, while OpenML needs the real
-classname when uploading the results of a run.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>target_name</strong><span class="classifier">str</span></dt><dd><p>Name of the target attribute</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>list</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLDataset.url_for_id">
-<em class="property">classmethod </em><code class="sig-name descname">url_for_id</code><span class="sig-paren">(</span><em class="sig-param">id_: int</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#openml.OpenMLDataset.url_for_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the OpenML URL for the object of the class entity with the given id.</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -351,7 +211,7 @@ classname when uploading the results of a run.</p>
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.1.<br/>
     </p>
   </div>
 </footer>

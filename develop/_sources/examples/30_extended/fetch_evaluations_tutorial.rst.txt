@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_30_extended_fetch_evaluations_tutorial.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_30_extended_fetch_evaluations_tutorial.py:
+        Click :ref:`here <sphx_glr_download_examples_30_extended_fetch_evaluations_tutorial.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_30_extended_fetch_evaluations_tutorial.py:
 
 
 ====================
@@ -164,10 +166,10 @@ Note that we now filter the evaluations based on another parameter 'task'.
 
     Displaying head of sorted dataframe: 
             run_id  task_id  setup_id  ...     value values  array_data
-    2780  10279797   167140   8166877  ...  0.968613   None        None
     2781  10279798   167140   8166877  ...  0.968613   None        None
-    2255  10232987   167140   8157961  ...  0.967671   None        None
+    2780  10279797   167140   8166877  ...  0.968613   None        None
     2238  10232158   167140   8157180  ...  0.967671   None        None
+    2255  10232987   167140   8157961  ...  0.967671   None        None
     2306  10271558   167140   8154506  ...  0.967043   None        None
 
     [5 rows x 14 columns]
@@ -214,6 +216,7 @@ We shall now plot a cumulative distributive function (CDF) for the accuracies ob
 
 
 .. image:: /examples/30_extended/images/sphx_glr_fetch_evaluations_tutorial_001.png
+    :alt: CDF
     :class: sphx-glr-single-img
 
 
@@ -278,6 +281,7 @@ For this, we shall compare the top performing flows.
 
 
 .. image:: /examples/30_extended/images/sphx_glr_fetch_evaluations_tutorial_002.png
+    :alt: Boxplot comparing predictive_accuracy for different flows
     :class: sphx-glr-single-img
 
 
@@ -287,6 +291,8 @@ For this, we shall compare the top performing flows.
 
  .. code-block:: none
 
+    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/numpy/core/_asarray.py:83: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray
+      return array(a, dtype, copy=False, order=order)
     (12736, 'sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)')
     (8399, 'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)')
     (8353, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
@@ -369,7 +375,7 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  12.795 seconds)
+   **Total running time of the script:** ( 0 minutes  13.397 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_fetch_evaluations_tutorial.py:
@@ -382,13 +388,13 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: fetch_evaluations_tutorial.py <fetch_evaluations_tutorial.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: fetch_evaluations_tutorial.ipynb <fetch_evaluations_tutorial.ipynb>`
 

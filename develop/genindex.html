@@ -1,14 +1,16 @@
-
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index &#8212; OpenML 0.11.0dev documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -119,12 +121,9 @@
  | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
- | <a href="#M"><strong>M</strong></a>
  | <a href="#O"><strong>O</strong></a>
- | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
- | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
  
 </div>
@@ -147,32 +146,14 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/openml.extensions.Extension.html#openml.extensions.Extension.can_handle_flow">can_handle_flow() (openml.extensions.Extension class method)</a>
-
-      <ul>
-        <li><a href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension.can_handle_flow">(openml.extensions.sklearn.SklearnExtension class method)</a>
-</li>
-      </ul></li>
-      <li><a href="generated/openml.extensions.Extension.html#openml.extensions.Extension.can_handle_model">can_handle_model() (openml.extensions.Extension class method)</a>
-
-      <ul>
-        <li><a href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension.can_handle_model">(openml.extensions.sklearn.SklearnExtension class method)</a>
-</li>
-      </ul></li>
       <li><a href="generated/openml.datasets.check_datasets_active.html#openml.datasets.check_datasets_active">check_datasets_active() (in module openml.datasets)</a>
+</li>
+      <li><a href="generated/openml.study.create_benchmark_suite.html#openml.study.create_benchmark_suite">create_benchmark_suite() (in module openml.study)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/openml.study.create_benchmark_suite.html#openml.study.create_benchmark_suite">create_benchmark_suite() (in module openml.study)</a>
-</li>
       <li><a href="generated/openml.datasets.create_dataset.html#openml.datasets.create_dataset">create_dataset() (in module openml.datasets)</a>
 </li>
-      <li><a href="generated/openml.extensions.Extension.html#openml.extensions.Extension.create_setup_string">create_setup_string() (openml.extensions.Extension method)</a>
-
-      <ul>
-        <li><a href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension.create_setup_string">(openml.extensions.sklearn.SklearnExtension method)</a>
-</li>
-      </ul></li>
       <li><a href="generated/openml.study.create_study.html#openml.study.create_study">create_study() (in module openml.study)</a>
 </li>
   </ul></td>
@@ -185,24 +166,12 @@
 </li>
       <li><a href="generated/openml.study.delete_suite.html#openml.study.delete_suite">delete_suite() (in module openml.study)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/openml.study.detach_from_study.html#openml.study.detach_from_study">detach_from_study() (in module openml.study)</a>
 </li>
       <li><a href="generated/openml.study.detach_from_suite.html#openml.study.detach_from_suite">detach_from_suite() (in module openml.study)</a>
 </li>
-      <li><a href="generated/openml.OpenMLClassificationTask.html#openml.OpenMLClassificationTask.download_split">download_split() (openml.OpenMLClassificationTask method)</a>
-
-      <ul>
-        <li><a href="generated/openml.OpenMLClusteringTask.html#openml.OpenMLClusteringTask.download_split">(openml.OpenMLClusteringTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLLearningCurveTask.html#openml.OpenMLLearningCurveTask.download_split">(openml.OpenMLLearningCurveTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRegressionTask.html#openml.OpenMLRegressionTask.download_split">(openml.OpenMLRegressionTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLSupervisedTask.html#openml.OpenMLSupervisedTask.download_split">(openml.OpenMLSupervisedTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLTask.html#openml.OpenMLTask.download_split">(openml.OpenMLTask method)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -219,51 +188,21 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/openml.flows.flow_exists.html#openml.flows.flow_exists">flow_exists() (in module openml.flows)</a>
 </li>
-      <li><a href="generated/openml.extensions.Extension.html#openml.extensions.Extension.flow_to_model">flow_to_model() (openml.extensions.Extension method)</a>
-
-      <ul>
-        <li><a href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension.flow_to_model">(openml.extensions.sklearn.SklearnExtension method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/openml.OpenMLRun.html#openml.OpenMLRun.from_filesystem">from_filesystem() (openml.OpenMLRun class method)</a>
-</li>
   </ul></td>
 </tr></table>
 
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset.get_data">get_data() (openml.OpenMLDataset method)</a>
-</li>
       <li><a href="generated/openml.datasets.get_dataset.html#openml.datasets.get_dataset">get_dataset() (in module openml.datasets)</a>
-
-      <ul>
-        <li><a href="generated/openml.OpenMLClassificationTask.html#openml.OpenMLClassificationTask.get_dataset">(openml.OpenMLClassificationTask method)</a>
 </li>
-        <li><a href="generated/openml.OpenMLClusteringTask.html#openml.OpenMLClusteringTask.get_dataset">(openml.OpenMLClusteringTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLLearningCurveTask.html#openml.OpenMLLearningCurveTask.get_dataset">(openml.OpenMLLearningCurveTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRegressionTask.html#openml.OpenMLRegressionTask.get_dataset">(openml.OpenMLRegressionTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLSupervisedTask.html#openml.OpenMLSupervisedTask.get_dataset">(openml.OpenMLSupervisedTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLTask.html#openml.OpenMLTask.get_dataset">(openml.OpenMLTask method)</a>
-</li>
-      </ul></li>
       <li><a href="generated/openml.datasets.get_datasets.html#openml.datasets.get_datasets">get_datasets() (in module openml.datasets)</a>
 </li>
       <li><a href="generated/openml.extensions.get_extension_by_flow.html#openml.extensions.get_extension_by_flow">get_extension_by_flow() (in module openml.extensions)</a>
 </li>
       <li><a href="generated/openml.extensions.get_extension_by_model.html#openml.extensions.get_extension_by_model">get_extension_by_model() (in module openml.extensions)</a>
 </li>
-      <li><a href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset.get_features_by_type">get_features_by_type() (openml.OpenMLDataset method)</a>
-</li>
       <li><a href="generated/openml.flows.get_flow.html#openml.flows.get_flow">get_flow() (in module openml.flows)</a>
-</li>
-      <li><a href="generated/openml.OpenMLRun.html#openml.OpenMLRun.get_metric_fn">get_metric_fn() (openml.OpenMLRun method)</a>
 </li>
       <li><a href="generated/openml.runs.get_run.html#openml.runs.get_run">get_run() (in module openml.runs)</a>
 </li>
@@ -275,11 +214,7 @@
 </li>
       <li><a href="generated/openml.setups.get_setup.html#openml.setups.get_setup">get_setup() (in module openml.setups)</a>
 </li>
-      <li><a href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow.get_structure">get_structure() (openml.OpenMLFlow method)</a>
-</li>
       <li><a href="generated/openml.study.get_study.html#openml.study.get_study">get_study() (in module openml.study)</a>
-</li>
-      <li><a href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow.get_subflow">get_subflow() (openml.OpenMLFlow method)</a>
 </li>
       <li><a href="generated/openml.study.get_suite.html#openml.study.get_suite">get_suite() (in module openml.study)</a>
 </li>
@@ -287,74 +222,20 @@
 </li>
       <li><a href="generated/openml.tasks.get_tasks.html#openml.tasks.get_tasks">get_tasks() (in module openml.tasks)</a>
 </li>
-      <li><a href="generated/openml.extensions.Extension.html#openml.extensions.Extension.get_version_information">get_version_information() (openml.extensions.Extension method)</a>
-
-      <ul>
-        <li><a href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension.get_version_information">(openml.extensions.sklearn.SklearnExtension method)</a>
-</li>
-      </ul></li>
-      <li><a href="generated/openml.OpenMLClusteringTask.html#openml.OpenMLClusteringTask.get_X">get_X() (openml.OpenMLClusteringTask method)</a>
-</li>
-      <li><a href="generated/openml.OpenMLClassificationTask.html#openml.OpenMLClassificationTask.get_X_and_y">get_X_and_y() (openml.OpenMLClassificationTask method)</a>
-
-      <ul>
-        <li><a href="generated/openml.OpenMLLearningCurveTask.html#openml.OpenMLLearningCurveTask.get_X_and_y">(openml.OpenMLLearningCurveTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRegressionTask.html#openml.OpenMLRegressionTask.get_X_and_y">(openml.OpenMLRegressionTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLSupervisedTask.html#openml.OpenMLSupervisedTask.get_X_and_y">(openml.OpenMLSupervisedTask method)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/openml.OpenMLBenchmarkSuite.html#openml.OpenMLBenchmarkSuite.id">id() (openml.OpenMLBenchmarkSuite property)</a>
-
-      <ul>
-        <li><a href="generated/openml.OpenMLClassificationTask.html#openml.OpenMLClassificationTask.id">(openml.OpenMLClassificationTask property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLClusteringTask.html#openml.OpenMLClusteringTask.id">(openml.OpenMLClusteringTask property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset.id">(openml.OpenMLDataset property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow.id">(openml.OpenMLFlow property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLLearningCurveTask.html#openml.OpenMLLearningCurveTask.id">(openml.OpenMLLearningCurveTask property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRegressionTask.html#openml.OpenMLRegressionTask.id">(openml.OpenMLRegressionTask property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRun.html#openml.OpenMLRun.id">(openml.OpenMLRun property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLStudy.html#openml.OpenMLStudy.id">(openml.OpenMLStudy property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLSupervisedTask.html#openml.OpenMLSupervisedTask.id">(openml.OpenMLSupervisedTask property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLTask.html#openml.OpenMLTask.id">(openml.OpenMLTask property)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/openml.setups.initialize_model.html#openml.setups.initialize_model">initialize_model() (in module openml.setups)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/openml.runs.initialize_model_from_run.html#openml.runs.initialize_model_from_run">initialize_model_from_run() (in module openml.runs)</a>
 </li>
       <li><a href="generated/openml.runs.initialize_model_from_trace.html#openml.runs.initialize_model_from_trace">initialize_model_from_trace() (in module openml.runs)</a>
 </li>
-      <li><a href="generated/openml.extensions.Extension.html#openml.extensions.Extension.instantiate_model_from_hpo_class">instantiate_model_from_hpo_class() (openml.extensions.Extension method)</a>
-
-      <ul>
-        <li><a href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension.instantiate_model_from_hpo_class">(openml.extensions.sklearn.SklearnExtension method)</a>
-</li>
-      </ul></li>
-      <li><a href="generated/openml.extensions.Extension.html#openml.extensions.Extension.is_estimator">is_estimator() (openml.extensions.Extension method)</a>
-
-      <ul>
-        <li><a href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension.is_estimator">(openml.extensions.sklearn.SklearnExtension method)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -388,76 +269,8 @@
   </ul></td>
 </tr></table>
 
-<h2 id="M">M</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/openml.extensions.Extension.html#openml.extensions.Extension.model_to_flow">model_to_flow() (openml.extensions.Extension method)</a>
-
-      <ul>
-        <li><a href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension.model_to_flow">(openml.extensions.sklearn.SklearnExtension method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/openml.extensions.Extension.html#openml.extensions.Extension.obtain_parameter_values">obtain_parameter_values() (openml.extensions.Extension method)</a>
-
-      <ul>
-        <li><a href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension.obtain_parameter_values">(openml.extensions.sklearn.SklearnExtension method)</a>
-</li>
-      </ul></li>
-      <li><a href="generated/openml.OpenMLBenchmarkSuite.html#openml.OpenMLBenchmarkSuite.open_in_browser">open_in_browser() (openml.OpenMLBenchmarkSuite method)</a>
-
-      <ul>
-        <li><a href="generated/openml.OpenMLClassificationTask.html#openml.OpenMLClassificationTask.open_in_browser">(openml.OpenMLClassificationTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLClusteringTask.html#openml.OpenMLClusteringTask.open_in_browser">(openml.OpenMLClusteringTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset.open_in_browser">(openml.OpenMLDataset method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow.open_in_browser">(openml.OpenMLFlow method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLLearningCurveTask.html#openml.OpenMLLearningCurveTask.open_in_browser">(openml.OpenMLLearningCurveTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRegressionTask.html#openml.OpenMLRegressionTask.open_in_browser">(openml.OpenMLRegressionTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRun.html#openml.OpenMLRun.open_in_browser">(openml.OpenMLRun method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLStudy.html#openml.OpenMLStudy.open_in_browser">(openml.OpenMLStudy method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLSupervisedTask.html#openml.OpenMLSupervisedTask.open_in_browser">(openml.OpenMLSupervisedTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLTask.html#openml.OpenMLTask.open_in_browser">(openml.OpenMLTask method)</a>
-</li>
-      </ul></li>
-      <li><a href="generated/openml.OpenMLBenchmarkSuite.html#openml.OpenMLBenchmarkSuite.openml_url">openml_url() (openml.OpenMLBenchmarkSuite property)</a>
-
-      <ul>
-        <li><a href="generated/openml.OpenMLClassificationTask.html#openml.OpenMLClassificationTask.openml_url">(openml.OpenMLClassificationTask property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLClusteringTask.html#openml.OpenMLClusteringTask.openml_url">(openml.OpenMLClusteringTask property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset.openml_url">(openml.OpenMLDataset property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow.openml_url">(openml.OpenMLFlow property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLLearningCurveTask.html#openml.OpenMLLearningCurveTask.openml_url">(openml.OpenMLLearningCurveTask property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRegressionTask.html#openml.OpenMLRegressionTask.openml_url">(openml.OpenMLRegressionTask property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRun.html#openml.OpenMLRun.openml_url">(openml.OpenMLRun property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLStudy.html#openml.OpenMLStudy.openml_url">(openml.OpenMLStudy property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLSupervisedTask.html#openml.OpenMLSupervisedTask.openml_url">(openml.OpenMLSupervisedTask property)</a>
-</li>
-        <li><a href="generated/openml.OpenMLTask.html#openml.OpenMLTask.openml_url">(openml.OpenMLTask property)</a>
-</li>
-      </ul></li>
-  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/openml.OpenMLBenchmarkSuite.html#openml.OpenMLBenchmarkSuite">OpenMLBenchmarkSuite (class in openml)</a>
 </li>
@@ -475,6 +288,8 @@
 </li>
       <li><a href="generated/openml.OpenMLLearningCurveTask.html#openml.OpenMLLearningCurveTask">OpenMLLearningCurveTask (class in openml)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/openml.OpenMLParameter.html#openml.OpenMLParameter">OpenMLParameter (class in openml)</a>
 </li>
       <li><a href="generated/openml.OpenMLRegressionTask.html#openml.OpenMLRegressionTask">OpenMLRegressionTask (class in openml)</a>
@@ -494,73 +309,15 @@
   </ul></td>
 </tr></table>
 
-<h2 id="P">P</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow.publish">publish() (openml.OpenMLFlow method)</a>
-</li>
-      <li><a href="generated/openml.OpenMLBenchmarkSuite.html#openml.OpenMLBenchmarkSuite.push_tag">push_tag() (openml.OpenMLBenchmarkSuite method)</a>
-
-      <ul>
-        <li><a href="generated/openml.OpenMLClassificationTask.html#openml.OpenMLClassificationTask.push_tag">(openml.OpenMLClassificationTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLClusteringTask.html#openml.OpenMLClusteringTask.push_tag">(openml.OpenMLClusteringTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset.push_tag">(openml.OpenMLDataset method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow.push_tag">(openml.OpenMLFlow method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLLearningCurveTask.html#openml.OpenMLLearningCurveTask.push_tag">(openml.OpenMLLearningCurveTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRegressionTask.html#openml.OpenMLRegressionTask.push_tag">(openml.OpenMLRegressionTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRun.html#openml.OpenMLRun.push_tag">(openml.OpenMLRun method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLStudy.html#openml.OpenMLStudy.push_tag">(openml.OpenMLStudy method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLSupervisedTask.html#openml.OpenMLSupervisedTask.push_tag">(openml.OpenMLSupervisedTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLTask.html#openml.OpenMLTask.push_tag">(openml.OpenMLTask method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/openml.extensions.register_extension.html#openml.extensions.register_extension">register_extension() (in module openml.extensions)</a>
 </li>
-      <li><a href="generated/openml.OpenMLBenchmarkSuite.html#openml.OpenMLBenchmarkSuite.remove_tag">remove_tag() (openml.OpenMLBenchmarkSuite method)</a>
-
-      <ul>
-        <li><a href="generated/openml.OpenMLClassificationTask.html#openml.OpenMLClassificationTask.remove_tag">(openml.OpenMLClassificationTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLClusteringTask.html#openml.OpenMLClusteringTask.remove_tag">(openml.OpenMLClusteringTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset.remove_tag">(openml.OpenMLDataset method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow.remove_tag">(openml.OpenMLFlow method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLLearningCurveTask.html#openml.OpenMLLearningCurveTask.remove_tag">(openml.OpenMLLearningCurveTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRegressionTask.html#openml.OpenMLRegressionTask.remove_tag">(openml.OpenMLRegressionTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRun.html#openml.OpenMLRun.remove_tag">(openml.OpenMLRun method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLStudy.html#openml.OpenMLStudy.remove_tag">(openml.OpenMLStudy method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLSupervisedTask.html#openml.OpenMLSupervisedTask.remove_tag">(openml.OpenMLSupervisedTask method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLTask.html#openml.OpenMLTask.remove_tag">(openml.OpenMLTask method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset.retrieve_class_labels">retrieve_class_labels() (openml.OpenMLDataset method)</a>
-</li>
       <li><a href="generated/openml.runs.run_exists.html#openml.runs.run_exists">run_exists() (in module openml.runs)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/openml.runs.run_flow_on_task.html#openml.runs.run_flow_on_task">run_flow_on_task() (in module openml.runs)</a>
 </li>
       <li><a href="generated/openml.runs.run_model_on_task.html#openml.runs.run_model_on_task">run_model_on_task() (in module openml.runs)</a>
@@ -571,31 +328,13 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/openml.extensions.Extension.html#openml.extensions.Extension.seed_model">seed_model() (openml.extensions.Extension method)</a>
-
-      <ul>
-        <li><a href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension.seed_model">(openml.extensions.sklearn.SklearnExtension method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/openml.setups.setup_exists.html#openml.setups.setup_exists">setup_exists() (in module openml.setups)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension">SklearnExtension (class in openml.extensions.sklearn)</a>
 </li>
       <li><a href="generated/openml.datasets.status_update.html#openml.datasets.status_update">status_update() (in module openml.datasets)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="T">T</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/openml.OpenMLRun.html#openml.OpenMLRun.to_filesystem">to_filesystem() (openml.OpenMLRun method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension.trim_flow_name">trim_flow_name() (openml.extensions.sklearn.SklearnExtension class method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -605,32 +344,10 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/openml.study.update_study_status.html#openml.study.update_study_status">update_study_status() (in module openml.study)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/openml.study.update_suite_status.html#openml.study.update_suite_status">update_suite_status() (in module openml.study)</a>
 </li>
-      <li><a href="generated/openml.OpenMLBenchmarkSuite.html#openml.OpenMLBenchmarkSuite.url_for_id">url_for_id() (openml.OpenMLBenchmarkSuite class method)</a>
-
-      <ul>
-        <li><a href="generated/openml.OpenMLClassificationTask.html#openml.OpenMLClassificationTask.url_for_id">(openml.OpenMLClassificationTask class method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLClusteringTask.html#openml.OpenMLClusteringTask.url_for_id">(openml.OpenMLClusteringTask class method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset.url_for_id">(openml.OpenMLDataset class method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLFlow.html#openml.OpenMLFlow.url_for_id">(openml.OpenMLFlow class method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLLearningCurveTask.html#openml.OpenMLLearningCurveTask.url_for_id">(openml.OpenMLLearningCurveTask class method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRegressionTask.html#openml.OpenMLRegressionTask.url_for_id">(openml.OpenMLRegressionTask class method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLRun.html#openml.OpenMLRun.url_for_id">(openml.OpenMLRun class method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLStudy.html#openml.OpenMLStudy.url_for_id">(openml.OpenMLStudy class method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLSupervisedTask.html#openml.OpenMLSupervisedTask.url_for_id">(openml.OpenMLSupervisedTask class method)</a>
-</li>
-        <li><a href="generated/openml.OpenMLTask.html#openml.OpenMLTask.url_for_id">(openml.OpenMLTask class method)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -648,7 +365,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.1.<br/>
     </p>
   </div>
 </footer>

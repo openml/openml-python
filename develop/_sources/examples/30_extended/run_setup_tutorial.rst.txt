@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_30_extended_run_setup_tutorial.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_30_extended_run_setup_tutorial.py:
+        Click :ref:`here <sphx_glr_download_examples_30_extended_run_setup_tutorial.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_30_extended_run_setup_tutorial.py:
 
 
 =========
@@ -168,7 +170,7 @@ In this tutorial we will
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.064 seconds)
+   **Total running time of the script:** ( 0 minutes  7.046 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_run_setup_tutorial.py:
@@ -181,13 +183,13 @@ In this tutorial we will
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: run_setup_tutorial.py <run_setup_tutorial.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: run_setup_tutorial.ipynb <run_setup_tutorial.ipynb>`
 

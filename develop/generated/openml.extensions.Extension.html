@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>openml.extensions.Extension &#8212; OpenML 0.11.0dev documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
@@ -111,212 +114,11 @@
       
   <div class="section" id="openml-extensions-extension">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.extensions</span></code>.Extension<a class="headerlink" href="#openml-extensions-extension" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="openml.extensions.Extension">
 <em class="property">class </em><code class="sig-prename descclassname">openml.extensions.</code><code class="sig-name descname">Extension</code><a class="headerlink" href="#openml.extensions.Extension" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the interface to connect machine learning libraries to OpenML-Python.</p>
 <p>See <code class="docutils literal notranslate"><span class="pre">openml.extension.sklearn.extension</span></code> for an implementation to bootstrap from.</p>
-<dl class="method">
-<dt id="openml.extensions.Extension.can_handle_flow">
-<em class="property">abstract classmethod </em><code class="sig-name descname">can_handle_flow</code><span class="sig-paren">(</span><em class="sig-param">flow: 'OpenMLFlow'</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#openml.extensions.Extension.can_handle_flow" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check whether a given flow can be handled by this extension.</p>
-<p>This is typically done by parsing the <code class="docutils literal notranslate"><span class="pre">external_version</span></code> field.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>flow</strong><span class="classifier">OpenMLFlow</span></dt><dd></dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>bool</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.extensions.Extension.can_handle_model">
-<em class="property">abstract classmethod </em><code class="sig-name descname">can_handle_model</code><span class="sig-paren">(</span><em class="sig-param">model: Any</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#openml.extensions.Extension.can_handle_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check whether a model flow can be handled by this extension.</p>
-<p>This is typically done by checking the type of the model, or the package it belongs to.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>model</strong><span class="classifier">Any</span></dt><dd></dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>bool</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.extensions.Extension.create_setup_string">
-<em class="property">abstract </em><code class="sig-name descname">create_setup_string</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">model: Any</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#openml.extensions.Extension.create_setup_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a string which can be used to reinstantiate the given model.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>model</strong><span class="classifier">Any</span></dt><dd></dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>str</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.extensions.Extension.flow_to_model">
-<em class="property">abstract </em><code class="sig-name descname">flow_to_model</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">flow: 'OpenMLFlow'</em>, <em class="sig-param">initialize_with_defaults: bool = False</em>, <em class="sig-param">strict_version: bool = True</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#openml.extensions.Extension.flow_to_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instantiate a model from the flow representation.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>flow</strong><span class="classifier">OpenMLFlow</span></dt><dd></dd>
-<dt><strong>initialize_with_defaults</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If this flag is set, the hyperparameter values of flows will be
-ignored and a flow with its defaults is returned.</p>
-</dd>
-<dt><strong>strict_version</strong><span class="classifier">bool, default=True</span></dt><dd><p>Whether to fail if version requirements are not fulfilled.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>Any</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.extensions.Extension.get_version_information">
-<em class="property">abstract </em><code class="sig-name descname">get_version_information</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> &#x2192; List[str]<a class="headerlink" href="#openml.extensions.Extension.get_version_information" title="Permalink to this definition">¶</a></dt>
-<dd><p>List versions of libraries required by the flow.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><dl class="simple">
-<dt>List</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.extensions.Extension.instantiate_model_from_hpo_class">
-<em class="property">abstract </em><code class="sig-name descname">instantiate_model_from_hpo_class</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">model: Any</em>, <em class="sig-param">trace_iteration: 'OpenMLTraceIteration'</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#openml.extensions.Extension.instantiate_model_from_hpo_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instantiate a base model which can be searched over by the hyperparameter optimization
-model.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>model</strong><span class="classifier">Any</span></dt><dd><p>A hyperparameter optimization model which defines the model to be instantiated.</p>
-</dd>
-<dt><strong>trace_iteration</strong><span class="classifier">OpenMLTraceIteration</span></dt><dd><p>Describing the hyperparameter settings to instantiate.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>Any</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.extensions.Extension.is_estimator">
-<em class="property">abstract </em><code class="sig-name descname">is_estimator</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">model: Any</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#openml.extensions.Extension.is_estimator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check whether the given model is an estimator for the given extension.</p>
-<p>This function is only required for backwards compatibility and will be removed in the
-near future.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>model</strong><span class="classifier">Any</span></dt><dd></dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>bool</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.extensions.Extension.model_to_flow">
-<em class="property">abstract </em><code class="sig-name descname">model_to_flow</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">model: Any</em><span class="sig-paren">)</span> &#x2192; 'OpenMLFlow'<a class="headerlink" href="#openml.extensions.Extension.model_to_flow" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transform a model to a flow for uploading it to OpenML.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>model</strong><span class="classifier">Any</span></dt><dd></dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>OpenMLFlow</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.extensions.Extension.obtain_parameter_values">
-<em class="property">abstract </em><code class="sig-name descname">obtain_parameter_values</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">flow: 'OpenMLFlow'</em>, <em class="sig-param">model: Any = None</em><span class="sig-paren">)</span> &#x2192; List[Dict[str, Any]]<a class="headerlink" href="#openml.extensions.Extension.obtain_parameter_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extracts all parameter settings required for the flow from the model.</p>
-<p>If no explicit model is provided, the parameters will be extracted from <cite>flow.model</cite>
-instead.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>flow</strong><span class="classifier">OpenMLFlow</span></dt><dd><p>OpenMLFlow object (containing flow ids, i.e., it has to be downloaded from the server)</p>
-</dd>
-<dt><strong>model: Any, optional (default=None)</strong></dt><dd><p>The model from which to obtain the parameter values. Must match the flow signature.
-If None, use the model specified in <code class="docutils literal notranslate"><span class="pre">OpenMLFlow.model</span></code>.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>list</dt><dd><p>A list of dicts, where each dict has the following entries:
-- <code class="docutils literal notranslate"><span class="pre">oml:name</span></code> : str: The OpenML parameter name
-- <code class="docutils literal notranslate"><span class="pre">oml:value</span></code> : mixed: A representation of the parameter value
-- <code class="docutils literal notranslate"><span class="pre">oml:component</span></code> : int: flow id to which the parameter belongs</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.extensions.Extension.seed_model">
-<em class="property">abstract </em><code class="sig-name descname">seed_model</code><span class="sig-paren">(</span><em class="sig-param">self, model: Any, seed: Union[int, NoneType]</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#openml.extensions.Extension.seed_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the seed of all the unseeded components of a model and return the seeded model.</p>
-<p>Required so that all seed information can be uploaded to OpenML for reproducible results.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>model</strong><span class="classifier">Any</span></dt><dd><p>The model to be seeded</p>
-</dd>
-<dt><strong>seed</strong><span class="classifier">int</span></dt><dd></dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>model</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -334,7 +136,7 @@ If None, use the model specified in <code class="docutils literal notranslate"><
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.1.<br/>
     </p>
   </div>
 </footer>

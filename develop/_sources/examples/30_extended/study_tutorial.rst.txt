@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_30_extended_study_tutorial.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_30_extended_study_tutorial.py:
+        Click :ref:`here <sphx_glr_download_examples_30_extended_study_tutorial.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_30_extended_study_tutorial.py:
 
 
 =================
@@ -263,11 +265,11 @@ suite which is available on the OpenML test server.
 
     OpenML Study
     ============
-    ID..............: 7635
+    ID..............: 10253
     Name............: Test-Study
     Status..........: None
     Main Entity Type: run
-    Study URL.......: https://test.openml.org/s/7635
+    Study URL.......: https://test.openml.org/s/10253
     # of Runs.......: 3
 
 
@@ -287,7 +289,7 @@ suite which is available on the OpenML test server.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  38.802 seconds)
+   **Total running time of the script:** ( 0 minutes  32.197 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_study_tutorial.py:
@@ -300,13 +302,13 @@ suite which is available on the OpenML test server.
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: study_tutorial.py <study_tutorial.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: study_tutorial.ipynb <study_tutorial.ipynb>`
 

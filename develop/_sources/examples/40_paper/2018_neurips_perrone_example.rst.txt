@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_40_paper_2018_neurips_perrone_example.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_40_paper_2018_neurips_perrone_example.py:
+        Click :ref:`here <sphx_glr_download_examples_40_paper_2018_neurips_perrone_example.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_40_paper_2018_neurips_perrone_example.py:
 
 
 Perrone et al. (2018)
@@ -197,17 +199,17 @@ pre-processing all retrieved evaluations.
 
  .. code-block:: none
 
-                         cost degree              gamma      kernel
-    1464     2.01176469939023    NaN  0.769827356509151         NaN
-    5309     7.30156944285562    NaN                NaN      linear
-    2305     2.43942942850729    NaN  0.405744266182704         NaN
-    2356  0.00144299294180043    NaN                NaN      linear
-    4537  0.00381270067369007      4                NaN  polynomial
-    Y :  1464    0.854170
-    5309    0.992284
-    2305    0.808807
-    2356    0.798842
-    4537    0.731707
+                        cost degree               gamma      kernel
+    26     0.789081584412353    NaN                 NaN      linear
+    4375    27.5543369625097    NaN                 NaN      linear
+    4808    62.3944945801723    NaN   0.126031549359257         NaN
+    5171  0.0235497629387627    NaN  0.0080080957163021         NaN
+    3828    72.1578395295803      4                 NaN  polynomial
+    Y :  26      0.973311
+    4375    0.990051
+    4808    0.984554
+    5171    0.985757
+    3828    0.482104
     Name: value, dtype: float64
 
 
@@ -284,7 +286,7 @@ time simple and quick.
  .. code-block:: none
 
     Task ID :  145878
-    Training RMSE : 1.8559e-05
+    Training RMSE : 1.6093e-05
 
 
 
@@ -333,17 +335,17 @@ NOTE: This section is written exclusively for the SVM flow
  .. code-block:: none
 
                cost    degree       gamma      kernel
-    0    901.192920  3.836331  288.182694     sigmoid
-    1    399.663201  4.187775  353.284163  polynomial
-    2     11.475312  2.450318  632.146907     sigmoid
-    3    373.995204  3.794008  206.326106     sigmoid
-    4    951.759775  2.297613  161.142126      radial
+    0    598.343291  4.668215  564.633422      linear
+    1    847.255820  3.937694   42.838378      linear
+    2    715.222326  4.606428  786.939059  polynomial
+    3    692.567047  4.839216  569.899355      radial
+    4    474.893421  2.715342  421.593479  polynomial
     ..          ...       ...         ...         ...
-    995  626.851017  3.810600  354.094078     sigmoid
-    996  333.752913  3.369804  541.198226     sigmoid
-    997  293.598895  4.098793  749.848936     sigmoid
-    998  129.176153  4.599488  195.424422  polynomial
-    999  667.761538  4.529402  398.010729  polynomial
+    995  274.924535  4.814800   55.608201      linear
+    996  664.202325  2.261101  434.963120      linear
+    997  194.621035  2.658197  130.770397      linear
+    998  561.283544  4.012379  648.469497      linear
+    999  591.855546  4.240799  792.417837  polynomial
 
     [1000 rows x 4 columns]
 
@@ -369,6 +371,7 @@ NOTE: This section is written exclusively for the SVM flow
 
 
 .. image:: /examples/40_paper/images/sphx_glr_2018_neurips_perrone_example_001.png
+    :alt: AUC regret for Random Search on surrogate
     :class: sphx-glr-single-img
 
 
@@ -386,7 +389,7 @@ NOTE: This section is written exclusively for the SVM flow
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  25.925 seconds)
+   **Total running time of the script:** ( 0 minutes  24.411 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_neurips_perrone_example.py:
@@ -399,13 +402,13 @@ NOTE: This section is written exclusively for the SVM flow
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: 2018_neurips_perrone_example.py <2018_neurips_perrone_example.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: 2018_neurips_perrone_example.ipynb <2018_neurips_perrone_example.ipynb>`
 

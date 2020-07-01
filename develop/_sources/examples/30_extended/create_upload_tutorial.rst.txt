@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_30_extended_create_upload_tutorial.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_30_extended_create_upload_tutorial.py:
+        Click :ref:`here <sphx_glr_download_examples_30_extended_create_upload_tutorial.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_30_extended_create_upload_tutorial.py:
 
 
 Dataset upload tutorial
@@ -192,7 +194,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/37331
+    URL for dataset: https://test.openml.org/d/50268
 
 
 
@@ -292,7 +294,7 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/37332
+    URL for dataset: https://test.openml.org/d/50269
 
 
 
@@ -345,8 +347,9 @@ function :func:`create_dataset`. In this regard, you only need to pass
 
 
 
-We enforce the column 'outlook', 'windy', and 'play' to be a categorical
-dtype while the column 'rnd_str' is kept as a string column. Then, we can
+We enforce the column 'outlook' and 'play' to be a categorical
+dtype while the column 'windy' is kept as a boolean column. 'temperature'
+and 'humidity' are kept as numeric columns. Then, we can
 call :func:`create_dataset` by passing the dataframe and fixing the parameter
 ``attributes`` to ``'auto'``.
 
@@ -395,7 +398,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/37333
+    URL for dataset: https://test.openml.org/d/50270
 
 
 
@@ -460,7 +463,7 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/37334
+    URL for dataset: https://test.openml.org/d/50271
 
 
 
@@ -540,7 +543,7 @@ Dataset is a pandas dataframe with sparse columns
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/37335
+    URL for dataset: https://test.openml.org/d/50272
 
 
 
@@ -559,7 +562,7 @@ Dataset is a pandas dataframe with sparse columns
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.127 seconds)
+   **Total running time of the script:** ( 0 minutes  7.026 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:
@@ -572,13 +575,13 @@ Dataset is a pandas dataframe with sparse columns
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: create_upload_tutorial.py <create_upload_tutorial.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: create_upload_tutorial.ipynb <create_upload_tutorial.ipynb>`
 
