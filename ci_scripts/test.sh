@@ -28,7 +28,7 @@ run_tests() {
 }
 
 if [[ "$RUN_FLAKE8" == "true" ]]; then
-    source ci_scripts/flake8_diff.sh
+    pre-commit run --all-files
 fi
 
 if [[ "$SKIP_TESTS" != "true" ]]; then

@@ -17,27 +17,32 @@ class OpenMLDataFeature(object):
         list of the possible values, in case of nominal attribute
     number_missing_values : int
     """
-    LEGAL_DATA_TYPES = ['nominal', 'numeric', 'string', 'date']
 
-    def __init__(self, index, name, data_type, nominal_values,
-                 number_missing_values):
+    LEGAL_DATA_TYPES = ["nominal", "numeric", "string", "date"]
+
+    def __init__(self, index, name, data_type, nominal_values, number_missing_values):
         if type(index) != int:
-            raise ValueError('Index is of wrong datatype')
+            raise ValueError("Index is of wrong datatype")
         if data_type not in self.LEGAL_DATA_TYPES:
-            raise ValueError('data type should be in %s, found: %s' %
-                             (str(self.LEGAL_DATA_TYPES), data_type))
-        if data_type == 'nominal':
+            raise ValueError(
+                "data type should be in %s, found: %s" % (str(self.LEGAL_DATA_TYPES), data_type)
+            )
+        if data_type == "nominal":
             if nominal_values is None:
-                raise TypeError('Dataset features require attribute `nominal_values` for nominal '
-                                'feature type.')
+                raise TypeError(
+                    "Dataset features require attribute `nominal_values` for nominal "
+                    "feature type."
+                )
             elif not isinstance(nominal_values, list):
-                raise TypeError('Argument `nominal_values` is of wrong datatype, should be list, '
-                                'but is {}'.format(type(nominal_values)))
+                raise TypeError(
+                    "Argument `nominal_values` is of wrong datatype, should be list, "
+                    "but is {}".format(type(nominal_values))
+                )
         else:
             if nominal_values is not None:
-                raise TypeError('Argument `nominal_values` must be None for non-nominal feature.')
+                raise TypeError("Argument `nominal_values` must be None for non-nominal feature.")
         if type(number_missing_values) != int:
-            raise ValueError('number_missing_values is of wrong datatype')
+            raise ValueError("number_missing_values is of wrong datatype")
 
         self.index = index
         self.name = str(name)

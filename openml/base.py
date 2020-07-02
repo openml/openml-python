@@ -43,7 +43,7 @@ class OpenMLBase(ABC):
         """ Return the letter which represents the entity type in urls, e.g. 'f' for flow."""
         # We take advantage of the class naming convention (OpenMLX),
         # which holds for all entities except studies and tasks, which overwrite this method.
-        return cls.__name__.lower()[len('OpenML'):][0]
+        return cls.__name__.lower()[len("OpenML") :][0]
 
     @abstractmethod
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
@@ -68,18 +68,19 @@ class OpenMLBase(ABC):
             A list of (name, value) pairs to display in the body of the __repr__.
          """
         # We add spaces between capitals, e.g. ClassificationTask -> Classification Task
-        name_with_spaces = re.sub(r"(\w)([A-Z])", r"\1 \2",
-                                  self.__class__.__name__[len('OpenML'):])
-        header_text = 'OpenML {}'.format(name_with_spaces)
-        header = '{}\n{}\n'.format(header_text, '=' * len(header_text))
+        name_with_spaces = re.sub(
+            r"(\w)([A-Z])", r"\1 \2", self.__class__.__name__[len("OpenML") :]
+        )
+        header_text = "OpenML {}".format(name_with_spaces)
+        header = "{}\n{}\n".format(header_text, "=" * len(header_text))
 
         longest_field_name_length = max(len(name) for name, value in body_fields)
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in body_fields)
+        body = "\n".join(field_line_format.format(name, value) for name, value in body_fields)
         return header + body
 
     @abstractmethod
-    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
+    def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
         """ Creates a dictionary representation of self.
 
         Uses OrderedDict to ensure consistent ordering when converting to xml.
@@ -103,7 +104,7 @@ class OpenMLBase(ABC):
 
         # A task may not be uploaded with the xml encoding specification:
         # <?xml version="1.0" encoding="utf-8"?>
-        encoding_specification, xml_body = xml_representation.split('\n', 1)
+        encoding_specification, xml_body = xml_representation.split("\n", 1)
         return xml_body
 
     def _get_file_elements(self) -> Dict:
@@ -119,15 +120,15 @@ class OpenMLBase(ABC):
         """ Parse the id from the xml_response and assign it to self. """
         pass
 
-    def publish(self) -> 'OpenMLBase':
+    def publish(self) -> "OpenMLBase":
         file_elements = self._get_file_elements()
 
-        if 'description' not in file_elements:
-            file_elements['description'] = self._to_xml()
+        if "description" not in file_elements:
+            file_elements["description"] = self._to_xml()
 
-        call = '{}/'.format(_get_rest_api_type_alias(self))
+        call = "{}/".format(_get_rest_api_type_alias(self))
         response_text = openml._api_calls._perform_api_call(
-            call, 'post', file_elements=file_elements
+            call, "post", file_elements=file_elements
         )
         xml_response = xmltodict.parse(response_text)
 

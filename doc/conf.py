@@ -23,8 +23,8 @@ import openml
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 # sys.path.insert(0, os.path.abspath('.')# )
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 # -- General configuration ------------------------------------------------
 
@@ -35,38 +35,38 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 #  extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 #  ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.doctest',
-    'sphinx.ext.coverage',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.autosectionlabel',
-    'sphinx_gallery.gen_gallery',
-    'numpydoc'
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.doctest",
+    "sphinx.ext.coverage",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.ifconfig",
+    "sphinx.ext.autosectionlabel",
+    "sphinx_gallery.gen_gallery",
+    "numpydoc",
 ]
 
 autosummary_generate = True
 numpydoc_show_class_members = False
 
-autodoc_default_flags = ['members', 'inherited-members']
+autodoc_default_flags = ["members", "inherited-members"]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-project = u'OpenML'
-copyright = (
-    u'2014-{}, the OpenML-Python team.'.format(time.strftime("%Y,%m,%d,%H,%M,%S").split(',')[0])
+project = u"OpenML"
+copyright = u"2014-{}, the OpenML-Python team.".format(
+    time.strftime("%Y,%m,%d,%H,%M,%S").split(",")[0]
 )
 
 # The version info for the project you're documenting, acts as replacement for
@@ -90,7 +90,7 @@ release = openml.__version__
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build', '_templates', '_static']
+exclude_patterns = ["_build", "_templates", "_static"]
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -108,7 +108,7 @@ exclude_patterns = ['_build', '_templates', '_static']
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -121,39 +121,32 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'bootstrap'
+html_theme = "bootstrap"
 
 html_theme_options = {
     # Navigation bar title. (Default: ``project`` value)
-    'navbar_title': "OpenML",
-
+    "navbar_title": "OpenML",
     # Tab name for entire site. (Default: "Site")
     # 'navbar_site_name': "Site",
-
     # A list of tuples containting pages to link to.  The value should
     # be in the form [(name, page), ..]
-    'navbar_links': [
-        ('Start', 'index'),
-        ('User Guide', 'usage'),
-        ('API', 'api'),
-        ('Examples', 'examples/index'),
-        ('Contributing', 'contributing'),
-        ('Changelog', 'progress'),
+    "navbar_links": [
+        ("Start", "index"),
+        ("User Guide", "usage"),
+        ("API", "api"),
+        ("Examples", "examples/index"),
+        ("Contributing", "contributing"),
+        ("Changelog", "progress"),
     ],
-
     # Render the next and previous page links in navbar. (Default: true)
-    'navbar_sidebarrel': False,
-
+    "navbar_sidebarrel": False,
     # Render the current pages TOC in the navbar. (Default: true)
-    'navbar_pagenav': False,
-
+    "navbar_pagenav": False,
     # Tab name for the current pages TOC. (Default: "Page")
-    'navbar_pagenav_name': "On this page",
-
+    "navbar_pagenav_name": "On this page",
     # Global TOC depth for "site" navbar tab. (Default: 1)
     # Switching to -1 shows all levels.
-    'globaltoc_depth': 1,
-
+    "globaltoc_depth": 1,
     # Include hidden TOCs in Site navbar?
     #
     # Note: If this is "false", you cannot have mixed ``:hidden:`` and
@@ -161,29 +154,24 @@ html_theme_options = {
     # will break.
     #
     # Values: "true" (default) or "false"
-    'globaltoc_includehidden': "false",
-
+    "globaltoc_includehidden": "false",
     # HTML navbar class (Default: "navbar") to attach to <div> element.
     # For black navbar, do "navbar navbar-inverse"
-    'navbar_class': "navbar",
-
+    "navbar_class": "navbar",
     # Fix navigation bar to top of page?
     # Values: "true" (default) or "false"
-    'navbar_fixed_top': "true",
-
+    "navbar_fixed_top": "true",
     # Location of link to source.
     # Options are "nav" (default), "footer" or anything else to exclude.
-    'source_link_position': "None",
-
+    "source_link_position": "None",
     # Bootswatch (http://bootswatch.com/) theme.
     #
     # Options are nothing with "" (default) or the name of a valid theme
     # such as "amelia" or "cosmo".
-    'bootswatch_theme': "flatly",
-
+    "bootswatch_theme": "flatly",
     # Choose Bootstrap version.
     # Values: "3" (default) or "2" (in quotes)
-    'bootstrap_version': "3",
+    "bootstrap_version": "3",
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -224,7 +212,7 @@ html_static_path = ["_static"]
 # html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-html_sidebars = {'**': ['localtoc.html']}
+html_sidebars = {"**": ["localtoc.html"]}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -257,7 +245,7 @@ html_sidebars = {'**': ['localtoc.html']}
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'OpenMLdoc'
+htmlhelp_basename = "OpenMLdoc"
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -265,10 +253,8 @@ htmlhelp_basename = 'OpenMLdoc'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     # 'preamble': '',
 }
@@ -276,8 +262,9 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [('index', 'OpenML.tex', u'OpenML Documentation',
-                    u'Matthias Feurer', 'manual'), ]
+latex_documents = [
+    ("index", "OpenML.tex", u"OpenML Documentation", u"Matthias Feurer", "manual"),
+]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
@@ -304,10 +291,7 @@ latex_documents = [('index', 'OpenML.tex', u'OpenML Documentation',
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    ('index', 'openml', u'OpenML Documentation',
-     [u'Matthias Feurer'], 1)
-]
+man_pages = [("index", "openml", u"OpenML Documentation", [u"Matthias Feurer"], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -319,9 +303,15 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'OpenML', u'OpenML Documentation',
-     u'Matthias Feurer', 'OpenML', 'One line description of project.',
-     'Miscellaneous'),
+    (
+        "index",
+        "OpenML",
+        u"OpenML Documentation",
+        u"Matthias Feurer",
+        "OpenML",
+        "One line description of project.",
+        "Miscellaneous",
+    ),
 ]
 
 # Documents to append as an appendix to all manuals.
@@ -343,13 +333,13 @@ autosectionlabel_prefix_document = True
 # Sphinx-gallery configuration.
 sphinx_gallery_conf = {
     # disable mini galleries clustered by the used functions
-    'backreferences_dir': None,
+    "backreferences_dir": None,
     # path to the examples
-    'examples_dirs': '../examples',
+    "examples_dirs": "../examples",
     # path where to save gallery generated examples
-    'gallery_dirs': 'examples',
+    "gallery_dirs": "examples",
     # compile execute examples in the examples dir
-    'filename_pattern': '.*example.py$|.*tutorial.py$',
+    "filename_pattern": ".*example.py$|.*tutorial.py$",
     # TODO: fix back/forward references for the examples.
 }
 

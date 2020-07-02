@@ -14,11 +14,12 @@ A basic tutorial on how to list, load and visualize datasets.
 # License: BSD 3-Clause
 
 import openml
+
 ############################################################################
 # List datasets
 # =============
 
-datasets_df = openml.datasets.list_datasets(output_format='dataframe')
+datasets_df = openml.datasets.list_datasets(output_format="dataframe")
 print(datasets_df.head(n=10))
 
 ############################################################################
@@ -29,8 +30,10 @@ print(datasets_df.head(n=10))
 dataset = openml.datasets.get_dataset(61)
 
 # Print a summary
-print(f"This is dataset '{dataset.name}', the target feature is "
-      f"'{dataset.default_target_attribute}'")
+print(
+    f"This is dataset '{dataset.name}', the target feature is "
+    f"'{dataset.default_target_attribute}'"
+)
 print(f"URL: {dataset.url}")
 print(dataset.description[:500])
 
@@ -45,8 +48,7 @@ print(dataset.description[:500])
 # attribute_names - the names of the features for the examples (X) and
 # target feature (y)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    dataset_format='dataframe',
-    target=dataset.default_target_attribute
+    dataset_format="dataframe", target=dataset.default_target_attribute
 )
 ############################################################################
 # Visualize the dataset
@@ -55,6 +57,7 @@ X, y, categorical_indicator, attribute_names = dataset.get_data(
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+
 sns.set_style("darkgrid")
 
 

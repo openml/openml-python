@@ -58,7 +58,8 @@ if [[ "$COVERAGE" == "true" ]]; then
     pip install codecov pytest-cov
 fi
 if [[ "$RUN_FLAKE8" == "true" ]]; then
-    pip install flake8 mypy
+    pip install pre-commit
+    pre-commit install
 fi
 
 # Install scikit-learn last to make sure the openml package installation works
