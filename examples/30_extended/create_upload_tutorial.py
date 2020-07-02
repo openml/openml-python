@@ -67,7 +67,7 @@ citation = (
     "Robert Tibshirani (2004) (Least Angle Regression) "
     "Annals of Statistics (with discussion), 407-499"
 )
-paper_url = "http://web.stanford.edu/~hastie/Papers/" "LARS/LeastAngle_2002.pdf"
+paper_url = "http://web.stanford.edu/~hastie/Papers/LARS/LeastAngle_2002.pdf"
 
 ############################################################################
 # Create the dataset object
@@ -85,7 +85,7 @@ diabetes_dataset = create_dataset(
     # Textual description of the dataset.
     description=description,
     # The person who created the dataset.
-    creator="Bradley Efron, Trevor Hastie, " "Iain Johnstone and Robert Tibshirani",
+    creator="Bradley Efron, Trevor Hastie, Iain Johnstone and Robert Tibshirani",
     # People who contributed to the current version of the dataset.
     contributor=None,
     # The date the data was originally collected, given by the uploader.
@@ -110,7 +110,7 @@ diabetes_dataset = create_dataset(
     data=data,
     # A version label which is provided by the user.
     version_label="test",
-    original_data_url=("http://www4.stat.ncsu.edu/~boos/var.select/diabetes.html"),
+    original_data_url="http://www4.stat.ncsu.edu/~boos/var.select/diabetes.html",
     paper_url=paper_url,
 )
 

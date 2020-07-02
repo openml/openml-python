@@ -457,7 +457,7 @@ def _run_task_get_arffcontent(
             sample_no,
         )
 
-        (pred_y, proba_y, user_defined_measures_fold, trace,) = extension._run_model_on_fold(
+        pred_y, proba_y, user_defined_measures_fold, trace = extension._run_model_on_fold(
             model=model,
             task=task,
             X_train=train_x,
