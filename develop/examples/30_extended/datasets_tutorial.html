@@ -146,22 +146,19 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml_list</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">()</span>  <span class="c1"># returns a dict</span>
 
 <span class="c1"># Show a nice table with some key data properties</span>
-<span class="n">datalist</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">openml_list</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
-<span class="n">datalist</span> <span class="o">=</span> <span class="n">datalist</span><span class="p">[[</span>
-    <span class="s1">&#39;did&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;NumberOfInstances&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;NumberOfFeatures&#39;</span><span class="p">,</span> <span class="s1">&#39;NumberOfClasses&#39;</span>
-<span class="p">]]</span>
+<span class="n">datalist</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">openml_list</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
+<span class="n">datalist</span> <span class="o">=</span> <span class="n">datalist</span><span class="p">[[</span><span class="s2">&quot;did&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;NumberOfInstances&quot;</span><span class="p">,</span> <span class="s2">&quot;NumberOfFeatures&quot;</span><span class="p">,</span> <span class="s2">&quot;NumberOfClasses&quot;</span><span class="p">]]</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First 10 of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">datalist</span><span class="p">)</span><span class="si">}</span><span class="s2"> datasets...&quot;</span><span class="p">)</span>
 <span class="n">datalist</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 
 <span class="c1"># The same can be done with lesser lines of code</span>
-<span class="n">openml_df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span>
+<span class="n">openml_df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 <span class="n">openml_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 3120 datasets...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 3119 datasets...
 </pre></div>
 </div>
 <div>
@@ -403,8 +400,7 @@
 <li><p>Find a dataset called ‘eeg_eye_state’.</p></li>
 <li><p>Find all datasets with more than 50 classes.</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="p">[</span><span class="n">datalist</span><span class="o">.</span><span class="n">NumberOfInstances</span> <span class="o">&gt;</span> <span class="mi">10000</span>
-         <span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;NumberOfInstances&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="p">[</span><span class="n">datalist</span><span class="o">.</span><span class="n">NumberOfInstances</span> <span class="o">&gt;</span> <span class="mi">10000</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;NumberOfInstances&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 </pre></div>
 </div>
 <div>
@@ -638,7 +634,7 @@
 </table>
 </div>
 <br />
-<br /><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;NumberOfClasses &gt; 50&#39;</span><span class="p">)</span>
+<br /><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;NumberOfClasses &gt; 50&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div>
@@ -789,8 +785,10 @@
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">)</span>
 
 <span class="c1"># Print a summary</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This is dataset &#39;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, the target feature is &quot;</span>
-      <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;This is dataset &#39;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, the target feature is &quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL: </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">description</span><span class="p">[:</span><span class="mi">500</span><span class="p">])</span>
 </pre></div>
@@ -812,11 +810,10 @@ controlled with the parameter <code class="docutils literal notranslate"><span c
 (default) or ‘dataframe’. Let’s first build our dataset from a NumPy array
 and manually create a dataframe.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_indicator</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
-    <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">,</span>
-    <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
+    <span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
 <span class="p">)</span>
 <span class="n">eeg</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">attribute_names</span><span class="p">)</span>
-<span class="n">eeg</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+<span class="n">eeg</span><span class="p">[</span><span class="s2">&quot;class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">eeg</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -839,8 +836,7 @@ and manually create a dataframe.</p>
 <p>Instead of manually creating the dataframe, you can already request a
 dataframe with the correct dtypes.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_indicator</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
-    <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="p">,</span>
-    <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span>
+    <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="p">,</span> <span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
@@ -897,17 +893,17 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eegs</span> <span class="o">=</span> <span class="n">eeg</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">_</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">(</span>
     <span class="n">eegs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">100</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">],</span>
-    <span class="n">c</span><span class="o">=</span><span class="n">eegs</span><span class="p">[:</span><span class="mi">100</span><span class="p">][</span><span class="s1">&#39;class&#39;</span><span class="p">],</span>
+    <span class="n">c</span><span class="o">=</span><span class="n">eegs</span><span class="p">[:</span><span class="mi">100</span><span class="p">][</span><span class="s2">&quot;class&quot;</span><span class="p">],</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
-    <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span>
-    <span class="n">hist_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;bins&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span>
-    <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;plasma&#39;</span>
+    <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
+    <span class="n">hist_kwds</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bins&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;plasma&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <img alt="datasets tutorial" class="sphx-glr-single-img" src="../../_images/sphx_glr_datasets_tutorial_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.041 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.977 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-datasets-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/b95c071188526f5ef5d991e382df9fa5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>

@@ -47,8 +47,7 @@ Train a scikit-learn model on the data manually.
     # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
     dataset = openml.datasets.get_dataset(68)
     X, y, categorical_indicator, attribute_names = dataset.get_data(
-        dataset_format='array',
-        target=dataset.default_target_attribute
+        dataset_format="array", target=dataset.default_target_attribute
     )
     clf = neighbors.KNeighborsClassifier(n_neighbors=1)
     clf.fit(X, y)
@@ -79,12 +78,12 @@ You can also ask for meta-data to automatically preprocess the data.
 
     dataset = openml.datasets.get_dataset(17)
     X, y, categorical_indicator, attribute_names = dataset.get_data(
-        dataset_format='array',
-        target=dataset.default_target_attribute
+        dataset_format="array", target=dataset.default_target_attribute
     )
     print(f"Categorical features: {categorical_indicator}")
     transformer = compose.ColumnTransformer(
-        [('one_hot_encoder', preprocessing.OneHotEncoder(categories='auto'), categorical_indicator)])
+        [("one_hot_encoder", preprocessing.OneHotEncoder(categories="auto"), categorical_indicator)]
+    )
     X = transformer.fit_transform(X)
     clf.fit(X, y)
 
@@ -151,7 +150,7 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
                         max_features='auto', max_leaf_nodes=None,
                         min_impurity_decrease=0.0, min_impurity_split=None,
                         min_samples_leaf=1, min_samples_split=2,
-                        min_weight_fraction_leaf=0.0, random_state=31392,
+                        min_weight_fraction_leaf=0.0, random_state=1575,
                         splitter='random')
     Dataset ID...: 68
     Dataset URL..: https://test.openml.org/d/68
@@ -183,7 +182,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/76194
+    Uploaded to http://test.openml.org/r/76932
 
 
 
@@ -241,29 +240,37 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
     task = openml.tasks.get_task(1)
     features = task.get_dataset().features
     nominal_feature_indices = [
-        i for i in range(len(features))
-        if features[i].name != task.target_name and features[i].data_type == 'nominal'
+        i
+        for i in range(len(features))
+        if features[i].name != task.target_name and features[i].data_type == "nominal"
     ]
-    pipe = pipeline.Pipeline(steps=[
-        (
-            'Preprocessing',
-            compose.ColumnTransformer([
-                ('Nominal', pipeline.Pipeline(
+    pipe = pipeline.Pipeline(
+        steps=[
+            (
+                "Preprocessing",
+                compose.ColumnTransformer(
                     [
-                        ('Imputer', impute.SimpleImputer(strategy='most_frequent')),
                         (
-                            'Encoder',
-                            preprocessing.OneHotEncoder(
-                                sparse=False, handle_unknown='ignore',
-                            )
+                            "Nominal",
+                            pipeline.Pipeline(
+                                [
+                                    ("Imputer", impute.SimpleImputer(strategy="most_frequent")),
+                                    (
+                                        "Encoder",
+                                        preprocessing.OneHotEncoder(
+                                            sparse=False, handle_unknown="ignore",
+                                        ),
+                                    ),
+                                ]
+                            ),
+                            nominal_feature_indices,
                         ),
-                    ]),
-                    nominal_feature_indices,
-                 ),
-            ]),
-        ),
-        ('Classifier', ensemble.RandomForestClassifier(n_estimators=10))
-    ])
+                    ]
+                ),
+            ),
+            ("Classifier", ensemble.RandomForestClassifier(n_estimators=10)),
+        ]
+    )
 
     run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
     myrun = run.publish()
@@ -279,7 +286,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/76195
+    Uploaded to http://test.openml.org/r/76933
 
 
 
@@ -298,17 +305,13 @@ a model on a task without uploading results or flows to the server immediately.
     task = openml.tasks.get_task(6)
 
     # The following lines can then be executed offline:
-    run = openml.runs.run_model_on_task(
-        pipe,
-        task,
-        avoid_duplicate_runs=False,
-        upload_flow=False)
+    run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False, upload_flow=False)
 
     # The run may be stored offline, and the flow will be stored along with it:
-    run.to_filesystem(directory='myrun')
+    run.to_filesystem(directory="myrun")
 
     # They may be loaded and uploaded at a later time
-    run = openml.runs.OpenMLRun.from_filesystem(directory='myrun')
+    run = openml.runs.OpenMLRun.from_filesystem(directory="myrun")
     run.publish()
 
     # Publishing the run will automatically upload the related flow if
@@ -329,8 +332,8 @@ a model on a task without uploading results or flows to the server immediately.
     ==========
     Uploader Name: None
     Metric.......: None
-    Run ID.......: 76196
-    Run URL......: https://test.openml.org/r/76196
+    Run ID.......: 76934
+    Run URL......: https://test.openml.org/r/76934
     Task ID......: 6
     Task Type....: None
     Task URL.....: https://test.openml.org/t/6
@@ -393,7 +396,7 @@ them. Some tasks you could try (or browse openml.org):
 
 
     # Easy benchmarking:
-    for task_id in [115, ]:  # Add further tasks. Disclaimer: they might take some time
+    for task_id in [115]:  # Add further tasks. Disclaimer: they might take some time
         task = openml.tasks.get_task(task_id)
         data = openml.datasets.get_dataset(task.dataset_id)
         clf = neighbors.KNeighborsClassifier(n_neighbors=5)
@@ -413,7 +416,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/76197
+    kNN on diabetes: http://test.openml.org/r/76935
 
 
 
@@ -432,7 +435,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  18.325 seconds)
+   **Total running time of the script:** ( 0 minutes  18.266 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:

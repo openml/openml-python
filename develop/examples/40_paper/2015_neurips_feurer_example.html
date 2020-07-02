@@ -139,7 +139,8 @@
 </pre></div>
 </div>
 <p>List of dataset IDs given in the supplementary material of Feurer et al.:
-<a class="reference external" href="https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning-supplemental.zip">https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning-supplemental.zip</a></p>
+<a class="reference external" href="https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning-supplemental.zip">https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning-supplemental.zip</a>
+fmt: off</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset_ids</span> <span class="o">=</span> <span class="p">[</span>
     <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">38</span><span class="p">,</span> <span class="mi">44</span><span class="p">,</span> <span class="mi">46</span><span class="p">,</span>
     <span class="mi">57</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">179</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">181</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">184</span><span class="p">,</span> <span class="mi">185</span><span class="p">,</span> <span class="mi">273</span><span class="p">,</span> <span class="mi">293</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">351</span><span class="p">,</span> <span class="mi">354</span><span class="p">,</span> <span class="mi">357</span><span class="p">,</span> <span class="mi">389</span><span class="p">,</span>
@@ -152,6 +153,7 @@
     <span class="mi">1056</span><span class="p">,</span> <span class="mi">1067</span><span class="p">,</span> <span class="mi">1068</span><span class="p">,</span> <span class="mi">1069</span><span class="p">,</span> <span class="mi">1111</span><span class="p">,</span> <span class="mi">1112</span><span class="p">,</span> <span class="mi">1114</span><span class="p">,</span> <span class="mi">1116</span><span class="p">,</span> <span class="mi">1119</span><span class="p">,</span> <span class="mi">1120</span><span class="p">,</span> <span class="mi">1128</span><span class="p">,</span> <span class="mi">1130</span><span class="p">,</span>
     <span class="mi">1134</span><span class="p">,</span> <span class="mi">1138</span><span class="p">,</span> <span class="mi">1139</span><span class="p">,</span> <span class="mi">1142</span><span class="p">,</span> <span class="mi">1146</span><span class="p">,</span> <span class="mi">1161</span><span class="p">,</span> <span class="mi">1166</span><span class="p">,</span>
 <span class="p">]</span>
+<span class="c1"># fmt: on</span>
 </pre></div>
 </div>
 <p>The dataset IDs could be used directly to load the dataset and split the data into a training set
@@ -172,8 +174,8 @@ deactivated, which also deactivated the tasks on them. More information on activ
 datasets can be found in the <a class="reference external" href="https://docs.openml.org/#dataset-status">online docs</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span>
     <span class="n">task_type_id</span><span class="o">=</span><span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">TaskTypeEnum</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span>
-    <span class="n">status</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span>
-    <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">,</span>
+    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+    <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># Query only those with holdout as the resampling startegy.</span>
@@ -210,7 +212,7 @@ datasets can be found in the <a class="reference external" href="https://docs.op
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[233, 236, 242, 244, 246, 248, 251, 252, 253, 254, 256, 258, 260, 261, 262, 266, 273, 275, 288, 2117, 2118, 2119, 2120, 2122, 2123, 2350, 3043, 3044, 75090, 75092, 75093, 75098, 75099, 75100, 75103, 75104, 75105, 75106, 75107, 75108, 75111, 75112, 75113, 75114, 75115, 75116, 75117, 75119, 75120, 75121, 75122, 75125, 75126, 75129, 75131, 75133, 75136, 75137, 75138, 75139, 75140, 75142, 75143, 75146, 75147, 75148, 75149, 75150, 75151, 75152, 75153, 75155, 75157, 75159, 75160, 75161, 75162, 75163, 75164, 75165, 75166, 75168, 75169, 75170, 75171, 75172, 75173, 75174, 75175, 75176, 75179, 75180, 75182, 75183, 75184, 75185, 75186, 75188, 75189, 75190, 75191, 75192, 75194, 75195, 75196, 75197, 75198, 75199, 75200, 75201, 75202, 75203, 75204, 75205, 75206, 75207, 75208, 75209, 75210, 75212, 75213, 75216, 75218, 75220, 75222, 75224, 75226, 75228, 75229, 75233, 75238, 75240, 75244, 75245, 75246, 75247, 75248, 75249, 75251, 190400]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.051 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.121 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2015-neurips-feurer-example-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9cf694b89f927974f9d820e08352d33e/2015_neurips_feurer_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2015_neurips_feurer_example.py</span></code></a></p>

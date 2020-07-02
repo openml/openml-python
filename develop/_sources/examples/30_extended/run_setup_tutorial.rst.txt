@@ -76,8 +76,7 @@ In this tutorial we will
     # many potential hyperparameters. Of course, the model can be as complex and as
     # easy as you want it to be
     model_original = sklearn.pipeline.make_pipeline(
-        sklearn.impute.SimpleImputer(),
-        sklearn.ensemble.RandomForestClassifier()
+        sklearn.impute.SimpleImputer(), sklearn.ensemble.RandomForestClassifier()
     )
 
 
@@ -86,20 +85,17 @@ In this tutorial we will
     # the purpose of this tutorial we set them to some specific values that might
     # or might not be optimal
     hyperparameters_original = {
-        'simpleimputer__strategy': 'median',
-        'randomforestclassifier__criterion': 'entropy',
-        'randomforestclassifier__max_features': 0.2,
-        'randomforestclassifier__min_samples_leaf': 1,
-        'randomforestclassifier__n_estimators': 16,
-        'randomforestclassifier__random_state': 42,
+        "simpleimputer__strategy": "median",
+        "randomforestclassifier__criterion": "entropy",
+        "randomforestclassifier__max_features": 0.2,
+        "randomforestclassifier__min_samples_leaf": 1,
+        "randomforestclassifier__n_estimators": 16,
+        "randomforestclassifier__random_state": 42,
     }
     model_original.set_params(**hyperparameters_original)
 
     # solve the task and upload the result (this implicitly creates the flow)
-    run = openml.runs.run_model_on_task(
-        model_original,
-        task,
-        avoid_duplicate_runs=False)
+    run = openml.runs.run_model_on_task(model_original, task, avoid_duplicate_runs=False)
     run_original = run.publish()  # this implicitly uploads the flow
 
 
@@ -126,8 +122,7 @@ In this tutorial we will
     # it will automatically have all the hyperparameters set
 
     # and run the task again
-    run_duplicate = openml.runs.run_model_on_task(
-        model_duplicate, task, avoid_duplicate_runs=False)
+    run_duplicate = openml.runs.run_model_on_task(model_duplicate, task, avoid_duplicate_runs=False)
 
 
 
@@ -145,8 +140,7 @@ In this tutorial we will
 
 
     # the run has stored all predictions in the field data content
-    np.testing.assert_array_equal(run_original.data_content,
-                                  run_duplicate.data_content)
+    np.testing.assert_array_equal(run_original.data_content, run_duplicate.data_content)
 
 
 
@@ -170,7 +164,7 @@ In this tutorial we will
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.759 seconds)
+   **Total running time of the script:** ( 0 minutes  6.826 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_run_setup_tutorial.py:

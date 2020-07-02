@@ -46,17 +46,14 @@ Exercise 0
     openml_list = openml.datasets.list_datasets()  # returns a dict
 
     # Show a nice table with some key data properties
-    datalist = pd.DataFrame.from_dict(openml_list, orient='index')
-    datalist = datalist[[
-        'did', 'name', 'NumberOfInstances',
-        'NumberOfFeatures', 'NumberOfClasses'
-    ]]
+    datalist = pd.DataFrame.from_dict(openml_list, orient="index")
+    datalist = datalist[["did", "name", "NumberOfInstances", "NumberOfFeatures", "NumberOfClasses"]]
 
     print(f"First 10 of {len(datalist)} datasets...")
     datalist.head(n=10)
 
     # The same can be done with lesser lines of code
-    openml_df = openml.datasets.list_datasets(output_format='dataframe')
+    openml_df = openml.datasets.list_datasets(output_format="dataframe")
     openml_df.head(n=10)
 
 
@@ -69,7 +66,7 @@ Exercise 0
 
  .. code-block:: none
 
-    First 10 of 3120 datasets...
+    First 10 of 3119 datasets...
 
 
 .. only:: builder_html
@@ -319,8 +316,7 @@ Exercise 1
 
 .. code-block:: default
 
-    datalist[datalist.NumberOfInstances > 10000
-             ].sort_values(['NumberOfInstances']).head(n=20)
+    datalist[datalist.NumberOfInstances > 10000].sort_values(["NumberOfInstances"]).head(n=20)
 
 
 
@@ -578,7 +574,7 @@ Exercise 1
 
 .. code-block:: default
 
-    datalist.query('NumberOfClasses > 50')
+    datalist.query("NumberOfClasses > 50")
 
 
 
@@ -744,8 +740,10 @@ Download datasets
     dataset = openml.datasets.get_dataset(1471)
 
     # Print a summary
-    print(f"This is dataset '{dataset.name}', the target feature is "
-          f"'{dataset.default_target_attribute}'")
+    print(
+        f"This is dataset '{dataset.name}', the target feature is "
+        f"'{dataset.default_target_attribute}'"
+    )
     print(f"URL: {dataset.url}")
     print(dataset.description[:500])
 
@@ -782,11 +780,10 @@ and manually create a dataframe.
 .. code-block:: default
 
     X, y, categorical_indicator, attribute_names = dataset.get_data(
-        dataset_format='array',
-        target=dataset.default_target_attribute
+        dataset_format="array", target=dataset.default_target_attribute
     )
     eeg = pd.DataFrame(X, columns=attribute_names)
-    eeg['class'] = y
+    eeg["class"] = y
     print(eeg[:10])
 
 
@@ -823,8 +820,7 @@ dataframe with the correct dtypes.
 .. code-block:: default
 
     X, y, categorical_indicator, attribute_names = dataset.get_data(
-        target=dataset.default_target_attribute,
-        dataset_format='dataframe'
+        target=dataset.default_target_attribute, dataset_format="dataframe"
     )
     print(X.head())
     print(X.info())
@@ -901,12 +897,12 @@ Exercise 2
     eegs = eeg.sample(n=1000)
     _ = pd.plotting.scatter_matrix(
         eegs.iloc[:100, :4],
-        c=eegs[:100]['class'],
+        c=eegs[:100]["class"],
         figsize=(10, 10),
-        marker='o',
-        hist_kwds={'bins': 20},
-        alpha=.8,
-        cmap='plasma'
+        marker="o",
+        hist_kwds={"bins": 20},
+        alpha=0.8,
+        cmap="plasma",
     )
 
 
@@ -922,7 +918,7 @@ Exercise 2
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.041 seconds)
+   **Total running time of the script:** ( 0 minutes  5.977 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:

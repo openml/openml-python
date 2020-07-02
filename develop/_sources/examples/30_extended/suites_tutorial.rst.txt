@@ -55,7 +55,7 @@ Listing suites
 .. code-block:: default
 
 
-    suites = openml.study.list_suites(output_format='dataframe', status='all')
+    suites = openml.study.list_suites(output_format="dataframe", status="all")
     print(suites.head(n=10))
 
 
@@ -171,12 +171,12 @@ And we can use the task listing functionality to learn more about them:
 
 .. code-block:: default
 
-    tasks = openml.tasks.list_tasks(output_format='dataframe')
+    tasks = openml.tasks.list_tasks(output_format="dataframe")
 
     # Using ``@`` in `pd.DataFrame.query <
     # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html>`_
     # accesses variables outside of the current dataframe.
-    tasks = tasks.query('tid in @suite.tasks')
+    tasks = tasks.query("tid in @suite.tasks")
     print(tasks.describe().transpose())
 
 
@@ -234,8 +234,8 @@ because we upload some random data.
     alias = uuid.uuid4().hex
 
     new_suite = openml.study.create_benchmark_suite(
-        name='Test-Suite',
-        description='Test suite for the Python tutorial on benchmark suites',
+        name="Test-Suite",
+        description="Test suite for the Python tutorial on benchmark suites",
         task_ids=task_ids_for_suite,
         alias=alias,
     )
@@ -255,11 +255,11 @@ because we upload some random data.
 
     OpenML Benchmark Suite
     ======================
-    ID..............: 10272
+    ID..............: 10375
     Name............: Test-Suite
     Status..........: None
     Main Entity Type: task
-    Study URL.......: https://test.openml.org/s/10272
+    Study URL.......: https://test.openml.org/s/10375
     # of Tasks......: 20
 
 
@@ -279,7 +279,7 @@ because we upload some random data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  18.896 seconds)
+   **Total running time of the script:** ( 0 minutes  18.700 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_suites_tutorial.py:

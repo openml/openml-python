@@ -173,8 +173,7 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
 <span class="c1"># many potential hyperparameters. Of course, the model can be as complex and as</span>
 <span class="c1"># easy as you want it to be</span>
 <span class="n">model_original</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">make_pipeline</span><span class="p">(</span>
-    <span class="n">sklearn</span><span class="o">.</span><span class="n">impute</span><span class="o">.</span><span class="n">SimpleImputer</span><span class="p">(),</span>
-    <span class="n">sklearn</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">RandomForestClassifier</span><span class="p">()</span>
+    <span class="n">sklearn</span><span class="o">.</span><span class="n">impute</span><span class="o">.</span><span class="n">SimpleImputer</span><span class="p">(),</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">RandomForestClassifier</span><span class="p">()</span>
 <span class="p">)</span>
 
 
@@ -183,20 +182,17 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
 <span class="c1"># the purpose of this tutorial we set them to some specific values that might</span>
 <span class="c1"># or might not be optimal</span>
 <span class="n">hyperparameters_original</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;simpleimputer__strategy&#39;</span><span class="p">:</span> <span class="s1">&#39;median&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;randomforestclassifier__criterion&#39;</span><span class="p">:</span> <span class="s1">&#39;entropy&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;randomforestclassifier__max_features&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
-    <span class="s1">&#39;randomforestclassifier__min_samples_leaf&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s1">&#39;randomforestclassifier__n_estimators&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
-    <span class="s1">&#39;randomforestclassifier__random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
+    <span class="s2">&quot;simpleimputer__strategy&quot;</span><span class="p">:</span> <span class="s2">&quot;median&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;randomforestclassifier__criterion&quot;</span><span class="p">:</span> <span class="s2">&quot;entropy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;randomforestclassifier__max_features&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+    <span class="s2">&quot;randomforestclassifier__min_samples_leaf&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;randomforestclassifier__n_estimators&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="s2">&quot;randomforestclassifier__random_state&quot;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
 <span class="p">}</span>
 <span class="n">model_original</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="o">**</span><span class="n">hyperparameters_original</span><span class="p">)</span>
 
 <span class="c1"># solve the task and upload the result (this implicitly creates the flow)</span>
-<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
-    <span class="n">model_original</span><span class="p">,</span>
-    <span class="n">task</span><span class="p">,</span>
-    <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">model_original</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">run_original</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>  <span class="c1"># this implicitly uploads the flow</span>
 </pre></div>
 </div>
@@ -213,22 +209,20 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
 <span class="c1"># it will automatically have all the hyperparameters set</span>
 
 <span class="c1"># and run the task again</span>
-<span class="n">run_duplicate</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
-    <span class="n">model_duplicate</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">run_duplicate</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">model_duplicate</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="we-will-verify-that-the-obtained-results-are-exactly-the-same">
 <h2>3) We will verify that the obtained results are exactly the same.<a class="headerlink" href="#we-will-verify-that-the-obtained-results-are-exactly-the-same" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># the run has stored all predictions in the field data content</span>
-<span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">run_original</span><span class="o">.</span><span class="n">data_content</span><span class="p">,</span>
-                              <span class="n">run_duplicate</span><span class="o">.</span><span class="n">data_content</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">run_original</span><span class="o">.</span><span class="n">data_content</span><span class="p">,</span> <span class="n">run_duplicate</span><span class="o">.</span><span class="n">data_content</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.759 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.826 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-run-setup-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/6b1e091fbd3ac8d106b6552c91cf05cc/run_setup_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">run_setup_tutorial.py</span></code></a></p>

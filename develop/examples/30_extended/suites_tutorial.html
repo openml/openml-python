@@ -153,7 +153,7 @@ tasks, runs, and so on.</p>
 <li><p>Default gives <code class="docutils literal notranslate"><span class="pre">dict</span></code>, but we’ll use <code class="docutils literal notranslate"><span class="pre">dataframe</span></code> to obtain an
 easier-to-work-with data structure</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">suites</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">list_suites</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">suites</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">list_suites</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">suites</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -212,12 +212,12 @@ Major distinguishing features of OpenML benchmark suites are (i) ease of use thr
 </pre></div>
 </div>
 <p>And we can use the task listing functionality to learn more about them:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 
 <span class="c1"># Using ``@`` in `pd.DataFrame.query &lt;</span>
 <span class="c1"># https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html&gt;`_</span>
 <span class="c1"># accesses variables outside of the current dataframe.</span>
-<span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;tid in @suite.tasks&#39;</span><span class="p">)</span>
+<span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;tid in @suite.tasks&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -260,8 +260,8 @@ because we upload some random data.</p>
 <span class="n">alias</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
 
 <span class="n">new_suite</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">create_benchmark_suite</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Test-Suite&#39;</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Test suite for the Python tutorial on benchmark suites&#39;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test-Suite&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Test suite for the Python tutorial on benchmark suites&quot;</span><span class="p">,</span>
     <span class="n">task_ids</span><span class="o">=</span><span class="n">task_ids_for_suite</span><span class="p">,</span>
     <span class="n">alias</span><span class="o">=</span><span class="n">alias</span><span class="p">,</span>
 <span class="p">)</span>
@@ -272,18 +272,18 @@ because we upload some random data.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Benchmark Suite
 ======================
-ID..............: 10272
+ID..............: 10375
 Name............: Test-Suite
 Status..........: None
 Main Entity Type: task
-Study URL.......: https://test.openml.org/s/10272
+Study URL.......: https://test.openml.org/s/10375
 # of Tasks......: 20
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  18.896 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  18.700 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-suites-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/1ad3e73844b6bba64db63f52045fc1ae/suites_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">suites_tutorial.py</span></code></a></p>

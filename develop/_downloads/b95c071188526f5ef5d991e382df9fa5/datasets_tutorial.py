@@ -24,17 +24,14 @@ import pandas as pd
 openml_list = openml.datasets.list_datasets()  # returns a dict
 
 # Show a nice table with some key data properties
-datalist = pd.DataFrame.from_dict(openml_list, orient='index')
-datalist = datalist[[
-    'did', 'name', 'NumberOfInstances',
-    'NumberOfFeatures', 'NumberOfClasses'
-]]
+datalist = pd.DataFrame.from_dict(openml_list, orient="index")
+datalist = datalist[["did", "name", "NumberOfInstances", "NumberOfFeatures", "NumberOfClasses"]]
 
 print(f"First 10 of {len(datalist)} datasets...")
 datalist.head(n=10)
 
 # The same can be done with lesser lines of code
-openml_df = openml.datasets.list_datasets(output_format='dataframe')
+openml_df = openml.datasets.list_datasets(output_format="dataframe")
 openml_df.head(n=10)
 
 ############################################################################
@@ -44,12 +41,11 @@ openml_df.head(n=10)
 # * Find datasets with more than 10000 examples.
 # * Find a dataset called 'eeg_eye_state'.
 # * Find all datasets with more than 50 classes.
-datalist[datalist.NumberOfInstances > 10000
-         ].sort_values(['NumberOfInstances']).head(n=20)
+datalist[datalist.NumberOfInstances > 10000].sort_values(["NumberOfInstances"]).head(n=20)
 ############################################################################
 datalist.query('name == "eeg-eye-state"')
 ############################################################################
-datalist.query('NumberOfClasses > 50')
+datalist.query("NumberOfClasses > 50")
 
 ############################################################################
 # Download datasets
@@ -59,8 +55,10 @@ datalist.query('NumberOfClasses > 50')
 dataset = openml.datasets.get_dataset(1471)
 
 # Print a summary
-print(f"This is dataset '{dataset.name}', the target feature is "
-      f"'{dataset.default_target_attribute}'")
+print(
+    f"This is dataset '{dataset.name}', the target feature is "
+    f"'{dataset.default_target_attribute}'"
+)
 print(f"URL: {dataset.url}")
 print(dataset.description[:500])
 
@@ -73,19 +71,17 @@ print(dataset.description[:500])
 # (default) or 'dataframe'. Let's first build our dataset from a NumPy array
 # and manually create a dataframe.
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    dataset_format='array',
-    target=dataset.default_target_attribute
+    dataset_format="array", target=dataset.default_target_attribute
 )
 eeg = pd.DataFrame(X, columns=attribute_names)
-eeg['class'] = y
+eeg["class"] = y
 print(eeg[:10])
 
 ############################################################################
 # Instead of manually creating the dataframe, you can already request a
 # dataframe with the correct dtypes.
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    target=dataset.default_target_attribute,
-    dataset_format='dataframe'
+    target=dataset.default_target_attribute, dataset_format="dataframe"
 )
 print(X.head())
 print(X.info())
@@ -105,10 +101,10 @@ dataset = openml.datasets.get_dataset(1471, download_data=False)
 eegs = eeg.sample(n=1000)
 _ = pd.plotting.scatter_matrix(
     eegs.iloc[:100, :4],
-    c=eegs[:100]['class'],
+    c=eegs[:100]["class"],
     figsize=(10, 10),
-    marker='o',
-    hist_kwds={'bins': 20},
-    alpha=.8,
-    cmap='plasma'
+    marker="o",
+    hist_kwds={"bins": 20},
+    alpha=0.8,
+    cmap="plasma",
 )

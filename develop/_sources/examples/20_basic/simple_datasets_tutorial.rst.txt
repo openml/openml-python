@@ -34,6 +34,7 @@ the datasets directly.
 
 
 
+
 List datasets
 =============
 
@@ -41,7 +42,7 @@ List datasets
 .. code-block:: default
 
 
-    datasets_df = openml.datasets.list_datasets(output_format='dataframe')
+    datasets_df = openml.datasets.list_datasets(output_format="dataframe")
     print(datasets_df.head(n=10))
 
 
@@ -82,8 +83,10 @@ Download a dataset
     dataset = openml.datasets.get_dataset(61)
 
     # Print a summary
-    print(f"This is dataset '{dataset.name}', the target feature is "
-          f"'{dataset.default_target_attribute}'")
+    print(
+        f"This is dataset '{dataset.name}', the target feature is "
+        f"'{dataset.default_target_attribute}'"
+    )
     print(f"URL: {dataset.url}")
     print(dataset.description[:500])
 
@@ -123,8 +126,7 @@ Load a dataset
     # attribute_names - the names of the features for the examples (X) and
     # target feature (y)
     X, y, categorical_indicator, attribute_names = dataset.get_data(
-        dataset_format='dataframe',
-        target=dataset.default_target_attribute
+        dataset_format="dataframe", target=dataset.default_target_attribute
     )
 
 
@@ -143,6 +145,7 @@ Visualize the dataset
     import pandas as pd
     import seaborn as sns
     import matplotlib.pyplot as plt
+
     sns.set_style("darkgrid")
 
 
@@ -170,7 +173,7 @@ Visualize the dataset
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.406 seconds)
+   **Total running time of the script:** ( 0 minutes  6.382 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_datasets_tutorial.py:

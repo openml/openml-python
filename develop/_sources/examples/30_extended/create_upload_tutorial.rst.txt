@@ -74,7 +74,7 @@ via the API.
 
 
     diabetes = sklearn.datasets.load_diabetes()
-    name = 'Diabetes(scikit-learn)'
+    name = "Diabetes(scikit-learn)"
     X = diabetes.data
     y = diabetes.target
     attribute_names = diabetes.feature_names
@@ -99,18 +99,15 @@ that data).
 
     data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
     attribute_names = list(attribute_names)
-    attributes = [
-        (attribute_name, 'REAL') for attribute_name in attribute_names
-    ] + [('class', 'INTEGER')]
+    attributes = [(attribute_name, "REAL") for attribute_name in attribute_names] + [
+        ("class", "INTEGER")
+    ]
     citation = (
         "Bradley Efron, Trevor Hastie, Iain Johnstone and "
         "Robert Tibshirani (2004) (Least Angle Regression) "
         "Annals of Statistics (with discussion), 407-499"
     )
-    paper_url = (
-        'http://web.stanford.edu/~hastie/Papers/'
-        'LARS/LeastAngle_2002.pdf'
-    )
+    paper_url = "http://web.stanford.edu/~hastie/Papers/LARS/LeastAngle_2002.pdf"
 
 
 
@@ -138,19 +135,18 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
         # Textual description of the dataset.
         description=description,
         # The person who created the dataset.
-        creator="Bradley Efron, Trevor Hastie, "
-                "Iain Johnstone and Robert Tibshirani",
+        creator="Bradley Efron, Trevor Hastie, Iain Johnstone and Robert Tibshirani",
         # People who contributed to the current version of the dataset.
         contributor=None,
         # The date the data was originally collected, given by the uploader.
-        collection_date='09-01-2012',
+        collection_date="09-01-2012",
         # Language in which the data is represented.
         # Starts with 1 upper case letter, rest lower case, e.g. 'English'.
-        language='English',
+        language="English",
         # License under which the data is/will be distributed.
-        licence='BSD (from scikit-learn)',
+        licence="BSD (from scikit-learn)",
         # Name of the target. Can also have multiple values (comma-separated).
-        default_target_attribute='class',
+        default_target_attribute="class",
         # The attribute that represents the row-id column, if present in the
         # dataset.
         row_id_attribute=None,
@@ -163,10 +159,8 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
         attributes=attributes,
         data=data,
         # A version label which is provided by the user.
-        version_label='test',
-        original_data_url=(
-            'http://www4.stat.ncsu.edu/~boos/var.select/diabetes.html'
-        ),
+        version_label="test",
+        original_data_url="http://www4.stat.ncsu.edu/~boos/var.select/diabetes.html",
         paper_url=paper_url,
     )
 
@@ -194,7 +188,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/50363
+    URL for dataset: https://test.openml.org/d/50876
 
 
 
@@ -212,62 +206,62 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
 
     data = [
-        ['sunny', 85, 85, 'FALSE', 'no'],
-        ['sunny', 80, 90, 'TRUE', 'no'],
-        ['overcast', 83, 86, 'FALSE', 'yes'],
-        ['rainy', 70, 96, 'FALSE', 'yes'],
-        ['rainy', 68, 80, 'FALSE', 'yes'],
-        ['rainy', 65, 70, 'TRUE', 'no'],
-        ['overcast', 64, 65, 'TRUE', 'yes'],
-        ['sunny', 72, 95, 'FALSE', 'no'],
-        ['sunny', 69, 70, 'FALSE', 'yes'],
-        ['rainy', 75, 80, 'FALSE', 'yes'],
-        ['sunny', 75, 70, 'TRUE', 'yes'],
-        ['overcast', 72, 90, 'TRUE', 'yes'],
-        ['overcast', 81, 75, 'FALSE', 'yes'],
-        ['rainy', 71, 91, 'TRUE', 'no'],
+        ["sunny", 85, 85, "FALSE", "no"],
+        ["sunny", 80, 90, "TRUE", "no"],
+        ["overcast", 83, 86, "FALSE", "yes"],
+        ["rainy", 70, 96, "FALSE", "yes"],
+        ["rainy", 68, 80, "FALSE", "yes"],
+        ["rainy", 65, 70, "TRUE", "no"],
+        ["overcast", 64, 65, "TRUE", "yes"],
+        ["sunny", 72, 95, "FALSE", "no"],
+        ["sunny", 69, 70, "FALSE", "yes"],
+        ["rainy", 75, 80, "FALSE", "yes"],
+        ["sunny", 75, 70, "TRUE", "yes"],
+        ["overcast", 72, 90, "TRUE", "yes"],
+        ["overcast", 81, 75, "FALSE", "yes"],
+        ["rainy", 71, 91, "TRUE", "no"],
     ]
 
     attribute_names = [
-        ('outlook', ['sunny', 'overcast', 'rainy']),
-        ('temperature', 'REAL'),
-        ('humidity', 'REAL'),
-        ('windy', ['TRUE', 'FALSE']),
-        ('play', ['yes', 'no']),
+        ("outlook", ["sunny", "overcast", "rainy"]),
+        ("temperature", "REAL"),
+        ("humidity", "REAL"),
+        ("windy", ["TRUE", "FALSE"]),
+        ("play", ["yes", "no"]),
     ]
 
     description = (
-        'The weather problem is a tiny dataset that we will use repeatedly'
-        ' to illustrate machine learning methods. Entirely fictitious, it '
-        'supposedly concerns the conditions that are suitable for playing '
-        'some unspecified game. In general, instances in a dataset are '
-        'characterized by the values of features, or attributes, that measure '
-        'different aspects of the instance. In this case there are four '
-        'attributes: outlook, temperature, humidity, and windy. '
-        'The outcome is whether to play or not.'
+        "The weather problem is a tiny dataset that we will use repeatedly"
+        " to illustrate machine learning methods. Entirely fictitious, it "
+        "supposedly concerns the conditions that are suitable for playing "
+        "some unspecified game. In general, instances in a dataset are "
+        "characterized by the values of features, or attributes, that measure "
+        "different aspects of the instance. In this case there are four "
+        "attributes: outlook, temperature, humidity, and windy. "
+        "The outcome is whether to play or not."
     )
 
     citation = (
-        'I. H. Witten, E. Frank, M. A. Hall, and ITPro,'
-        'Data mining practical machine learning tools and techniques, '
-        'third edition. Burlington, Mass.: Morgan Kaufmann Publishers, 2011'
+        "I. H. Witten, E. Frank, M. A. Hall, and ITPro,"
+        "Data mining practical machine learning tools and techniques, "
+        "third edition. Burlington, Mass.: Morgan Kaufmann Publishers, 2011"
     )
 
     weather_dataset = create_dataset(
         name="Weather",
         description=description,
-        creator='I. H. Witten, E. Frank, M. A. Hall, and ITPro',
+        creator="I. H. Witten, E. Frank, M. A. Hall, and ITPro",
         contributor=None,
-        collection_date='01-01-2011',
-        language='English',
+        collection_date="01-01-2011",
+        language="English",
         licence=None,
-        default_target_attribute='play',
+        default_target_attribute="play",
         row_id_attribute=None,
         ignore_attribute=None,
         citation=citation,
         attributes=attribute_names,
         data=data,
-        version_label='example',
+        version_label="example",
     )
 
 
@@ -294,7 +288,7 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/50364
+    URL for dataset: https://test.openml.org/d/50877
 
 
 
@@ -315,9 +309,9 @@ function :func:`create_dataset`. In this regard, you only need to pass
 
     df = pd.DataFrame(data, columns=[col_name for col_name, _ in attribute_names])
     # enforce the categorical column to have a categorical dtype
-    df['outlook'] = df['outlook'].astype('category')
-    df['windy'] = df['windy'].astype('bool')
-    df['play'] = df['play'].astype('category')
+    df["outlook"] = df["outlook"].astype("category")
+    df["windy"] = df["windy"].astype("bool")
+    df["play"] = df["play"].astype("category")
     print(df.info())
 
 
@@ -360,18 +354,18 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
     weather_dataset = create_dataset(
         name="Weather",
         description=description,
-        creator='I. H. Witten, E. Frank, M. A. Hall, and ITPro',
+        creator="I. H. Witten, E. Frank, M. A. Hall, and ITPro",
         contributor=None,
-        collection_date='01-01-2011',
-        language='English',
+        collection_date="01-01-2011",
+        language="English",
         licence=None,
-        default_target_attribute='play',
+        default_target_attribute="play",
         row_id_attribute=None,
         ignore_attribute=None,
         citation=citation,
-        attributes='auto',
+        attributes="auto",
         data=df,
-        version_label='example',
+        version_label="example",
     )
 
 
@@ -398,7 +392,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/50365
+    URL for dataset: https://test.openml.org/d/50878
 
 
 
@@ -410,32 +404,31 @@ Dataset is a sparse matrix
 .. code-block:: default
 
 
-    sparse_data = coo_matrix((
-        [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-        ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
-    ))
+    sparse_data = coo_matrix(
+        ([0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1]))
+    )
 
     column_names = [
-        ('input1', 'REAL'),
-        ('input2', 'REAL'),
-        ('y', 'REAL'),
+        ("input1", "REAL"),
+        ("input2", "REAL"),
+        ("y", "REAL"),
     ]
 
     xor_dataset = create_dataset(
         name="XOR",
-        description='Dataset representing the XOR operation',
+        description="Dataset representing the XOR operation",
         creator=None,
         contributor=None,
         collection_date=None,
-        language='English',
+        language="English",
         licence=None,
-        default_target_attribute='y',
+        default_target_attribute="y",
         row_id_attribute=None,
         ignore_attribute=None,
         citation=None,
         attributes=column_names,
         data=sparse_data,
-        version_label='example',
+        version_label="example",
     )
 
 
@@ -463,7 +456,7 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/50366
+    URL for dataset: https://test.openml.org/d/50879
 
 
 
@@ -475,29 +468,28 @@ Dataset is a pandas dataframe with sparse columns
 .. code-block:: default
 
 
-    sparse_data = coo_matrix((
-        [1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-        ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
-    ))
-    column_names = ['input1', 'input2', 'y']
+    sparse_data = coo_matrix(
+        ([1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0], ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1]))
+    )
+    column_names = ["input1", "input2", "y"]
     df = pd.DataFrame.sparse.from_spmatrix(sparse_data, columns=column_names)
     print(df.info())
 
     xor_dataset = create_dataset(
         name="XOR",
-        description='Dataset representing the XOR operation',
+        description="Dataset representing the XOR operation",
         creator=None,
         contributor=None,
         collection_date=None,
-        language='English',
+        language="English",
         licence=None,
-        default_target_attribute='y',
+        default_target_attribute="y",
         row_id_attribute=None,
         ignore_attribute=None,
         citation=None,
-        attributes='auto',
+        attributes="auto",
         data=df,
-        version_label='example',
+        version_label="example",
     )
 
 
@@ -543,7 +535,7 @@ Dataset is a pandas dataframe with sparse columns
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/50367
+    URL for dataset: https://test.openml.org/d/50880
 
 
 
@@ -562,7 +554,7 @@ Dataset is a pandas dataframe with sparse columns
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.865 seconds)
+   **Total running time of the script:** ( 0 minutes  6.855 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:

@@ -138,7 +138,8 @@ When downloading a dataset from OpenML, a <cite>DEBUG</cite>-level message is wr
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
 
 <span class="kn">import</span> <span class="nn">openml</span>
-<span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+
+<span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s2">&quot;iris&quot;</span><span class="p">)</span>
 
 <span class="c1"># With default configuration, the above example will show no output to console.</span>
 <span class="c1"># However, in your cache directory you should find a file named &#39;openml_python.log&#39;,</span>
@@ -150,9 +151,10 @@ When downloading a dataset from OpenML, a <cite>DEBUG</cite>-level message is wr
 <span class="c1"># The processed log levels can be configured programmatically:</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
+
 <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">console_log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">file_log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
-<span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s2">&quot;iris&quot;</span><span class="p">)</span>
 
 <span class="c1"># Now the log level that was previously written to file should also be shown in the console.</span>
 <span class="c1"># The message is now no longer written to file as the `file_log` was set to level `WARNING`.</span>

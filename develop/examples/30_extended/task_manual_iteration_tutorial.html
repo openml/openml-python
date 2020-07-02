@@ -154,7 +154,7 @@ defined by the task:</p>
 <p>Task <code class="docutils literal notranslate"><span class="pre">233</span></code> is a simple task using the holdout estimation procedure and therefore has only a
 single repeat, a single fold and a single sample size:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span>
-    <span class="s1">&#39;Task </span><span class="si">{}</span><span class="s1">: number of repeats: </span><span class="si">{}</span><span class="s1">, number of folds: </span><span class="si">{}</span><span class="s1">, number of samples </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">task_id</span><span class="p">,</span> <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">)</span>
@@ -167,11 +167,7 @@ single repeat, a single fold and a single sample size:</p>
 <p>We can now retrieve the train/test split for this combination of repeats, folds and number of
 samples (indexing is zero-based). Usually, one would loop over all repeats, folds and sample
 sizes, but we can neglect this here as there is only a single repetition.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
-    <span class="n">repeat</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">fold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">sample</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span><span class="n">repeat</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="mi">0</span><span class="p">,)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">train_indices</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">train_indices</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">test_indices</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">test_indices</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
@@ -190,7 +186,7 @@ sizes, but we can neglect this here as there is only a single repetition.</p>
 <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">test_indices</span><span class="p">]</span>
 
 <span class="nb">print</span><span class="p">(</span>
-    <span class="s1">&#39;X_train.shape: </span><span class="si">{}</span><span class="s1">, y_train.shape: </span><span class="si">{}</span><span class="s1">, X_test.shape: </span><span class="si">{}</span><span class="s1">, y_test.shape: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="s2">&quot;X_train.shape: </span><span class="si">{}</span><span class="s2">, y_train.shape: </span><span class="si">{}</span><span class="s2">, X_test.shape: </span><span class="si">{}</span><span class="s2">, y_test.shape: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">)</span>
@@ -205,7 +201,7 @@ sizes, but we can neglect this here as there is only a single repetition.</p>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span>
-    <span class="s1">&#39;Task </span><span class="si">{}</span><span class="s1">: number of repeats: </span><span class="si">{}</span><span class="s1">, number of folds: </span><span class="si">{}</span><span class="s1">, number of samples </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">task_id</span><span class="p">,</span> <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">)</span>
@@ -220,9 +216,7 @@ sizes, but we can neglect this here as there is only a single repetition.</p>
     <span class="k">for</span> <span class="n">fold_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">sample_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
             <span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
-                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span>
-                <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span>
-                <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
+                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span> <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
             <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
@@ -230,9 +224,14 @@ sizes, but we can neglect this here as there is only a single repetition.</p>
             <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">test_indices</span><span class="p">]</span>
 
             <span class="nb">print</span><span class="p">(</span>
-                <span class="s1">&#39;Repeat #</span><span class="si">{}</span><span class="s1">, fold #</span><span class="si">{}</span><span class="s1">, samples </span><span class="si">{}</span><span class="s1">: X_train.shape: </span><span class="si">{}</span><span class="s1">, &#39;</span>
-                <span class="s1">&#39;y_train.shape </span><span class="si">{}</span><span class="s1">, X_test.shape </span><span class="si">{}</span><span class="s1">, y_test.shape </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">repeat_idx</span><span class="p">,</span> <span class="n">fold_idx</span><span class="p">,</span> <span class="n">sample_idx</span><span class="p">,</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                <span class="s2">&quot;Repeat #</span><span class="si">{}</span><span class="s2">, fold #</span><span class="si">{}</span><span class="s2">, samples </span><span class="si">{}</span><span class="s2">: X_train.shape: </span><span class="si">{}</span><span class="s2">, &quot;</span>
+                <span class="s2">&quot;y_train.shape </span><span class="si">{}</span><span class="s2">, X_test.shape </span><span class="si">{}</span><span class="s2">, y_test.shape </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">repeat_idx</span><span class="p">,</span>
+                    <span class="n">fold_idx</span><span class="p">,</span>
+                    <span class="n">sample_idx</span><span class="p">,</span>
+                    <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
                     <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">)</span>
@@ -256,7 +255,7 @@ Repeat #0, fold #9, samples 0: X_train.shape: (2877, 36), y_train.shape (2877,),
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span>
-    <span class="s1">&#39;Task </span><span class="si">{}</span><span class="s1">: number of repeats: </span><span class="si">{}</span><span class="s1">, number of folds: </span><span class="si">{}</span><span class="s1">, number of samples </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">task_id</span><span class="p">,</span> <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">)</span>
@@ -271,9 +270,7 @@ Repeat #0, fold #9, samples 0: X_train.shape: (2877, 36), y_train.shape (2877,),
     <span class="k">for</span> <span class="n">fold_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">sample_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
             <span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
-                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span>
-                <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span>
-                <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
+                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span> <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
             <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
@@ -281,9 +278,14 @@ Repeat #0, fold #9, samples 0: X_train.shape: (2877, 36), y_train.shape (2877,),
             <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">test_indices</span><span class="p">]</span>
 
             <span class="nb">print</span><span class="p">(</span>
-                <span class="s1">&#39;Repeat #</span><span class="si">{}</span><span class="s1">, fold #</span><span class="si">{}</span><span class="s1">, samples </span><span class="si">{}</span><span class="s1">: X_train.shape: </span><span class="si">{}</span><span class="s1">, &#39;</span>
-                <span class="s1">&#39;y_train.shape </span><span class="si">{}</span><span class="s1">, X_test.shape </span><span class="si">{}</span><span class="s1">, y_test.shape </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">repeat_idx</span><span class="p">,</span> <span class="n">fold_idx</span><span class="p">,</span> <span class="n">sample_idx</span><span class="p">,</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                <span class="s2">&quot;Repeat #</span><span class="si">{}</span><span class="s2">, fold #</span><span class="si">{}</span><span class="s2">, samples </span><span class="si">{}</span><span class="s2">: X_train.shape: </span><span class="si">{}</span><span class="s2">, &quot;</span>
+                <span class="s2">&quot;y_train.shape </span><span class="si">{}</span><span class="s2">, X_test.shape </span><span class="si">{}</span><span class="s2">, y_test.shape </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">repeat_idx</span><span class="p">,</span>
+                    <span class="n">fold_idx</span><span class="p">,</span>
+                    <span class="n">sample_idx</span><span class="p">,</span>
+                    <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
                     <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">)</span>
@@ -307,7 +309,7 @@ Repeat #4, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,),
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span>
-    <span class="s1">&#39;Task </span><span class="si">{}</span><span class="s1">: number of repeats: </span><span class="si">{}</span><span class="s1">, number of folds: </span><span class="si">{}</span><span class="s1">, number of samples </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">task_id</span><span class="p">,</span> <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">)</span>
@@ -322,9 +324,7 @@ Repeat #4, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,),
     <span class="k">for</span> <span class="n">fold_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">sample_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
             <span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
-                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span>
-                <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span>
-                <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
+                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span> <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
             <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
@@ -332,9 +332,14 @@ Repeat #4, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,),
             <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">test_indices</span><span class="p">]</span>
 
             <span class="nb">print</span><span class="p">(</span>
-                <span class="s1">&#39;Repeat #</span><span class="si">{}</span><span class="s1">, fold #</span><span class="si">{}</span><span class="s1">, samples </span><span class="si">{}</span><span class="s1">: X_train.shape: </span><span class="si">{}</span><span class="s1">, &#39;</span>
-                <span class="s1">&#39;y_train.shape </span><span class="si">{}</span><span class="s1">, X_test.shape </span><span class="si">{}</span><span class="s1">, y_test.shape </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">repeat_idx</span><span class="p">,</span> <span class="n">fold_idx</span><span class="p">,</span> <span class="n">sample_idx</span><span class="p">,</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                <span class="s2">&quot;Repeat #</span><span class="si">{}</span><span class="s2">, fold #</span><span class="si">{}</span><span class="s2">, samples </span><span class="si">{}</span><span class="s2">: X_train.shape: </span><span class="si">{}</span><span class="s2">, &quot;</span>
+                <span class="s2">&quot;y_train.shape </span><span class="si">{}</span><span class="s2">, X_test.shape </span><span class="si">{}</span><span class="s2">, y_test.shape </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">repeat_idx</span><span class="p">,</span>
+                    <span class="n">fold_idx</span><span class="p">,</span>
+                    <span class="n">sample_idx</span><span class="p">,</span>
+                    <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
                     <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">)</span>
@@ -463,7 +468,7 @@ Repeat #0, fold #9, samples 10: X_train.shape: (2048, 36), y_train.shape (2048,)
 Repeat #0, fold #9, samples 11: X_train.shape: (2877, 36), y_train.shape (2877,), X_test.shape (319, 36), y_test.shape (319,)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.472 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.501 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-task-manual-iteration-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c4948b7cf528f51a636efd320e0f6d57/task_manual_iteration_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">task_manual_iteration_tutorial.py</span></code></a></p>

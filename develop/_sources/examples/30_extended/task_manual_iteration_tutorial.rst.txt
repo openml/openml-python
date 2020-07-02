@@ -86,7 +86,7 @@ single repeat, a single fold and a single sample size:
 
 
     print(
-        'Task {}: number of repeats: {}, number of folds: {}, number of samples {}.'.format(
+        "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
             task_id, n_repeats, n_folds, n_samples,
         )
     )
@@ -114,11 +114,7 @@ sizes, but we can neglect this here as there is only a single repetition.
 .. code-block:: default
 
 
-    train_indices, test_indices = task.get_train_test_split_indices(
-        repeat=0,
-        fold=0,
-        sample=0,
-    )
+    train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0,)
 
     print(train_indices.shape, train_indices.dtype)
     print(test_indices.shape, test_indices.dtype)
@@ -152,7 +148,7 @@ And then split the data based on this:
     y_test = y[test_indices]
 
     print(
-        'X_train.shape: {}, y_train.shape: {}, X_test.shape: {}, y_test.shape: {}'.format(
+        "X_train.shape: {}, y_train.shape: {}, X_test.shape: {}, y_test.shape: {}".format(
             X_train.shape, y_train.shape, X_test.shape, y_test.shape,
         )
     )
@@ -182,7 +178,7 @@ Obviously, we can also retrieve cross-validation versions of the dataset used in
     task = openml.tasks.get_task(task_id)
     n_repeats, n_folds, n_samples = task.get_split_dimensions()
     print(
-        'Task {}: number of repeats: {}, number of folds: {}, number of samples {}.'.format(
+        "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
             task_id, n_repeats, n_folds, n_samples,
         )
     )
@@ -211,9 +207,7 @@ And then perform the aforementioned iteration over all splits:
         for fold_idx in range(n_folds):
             for sample_idx in range(n_samples):
                 train_indices, test_indices = task.get_train_test_split_indices(
-                    repeat=repeat_idx,
-                    fold=fold_idx,
-                    sample=sample_idx,
+                    repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
                 )
                 X_train = X.loc[train_indices]
                 y_train = y[train_indices]
@@ -221,9 +215,14 @@ And then perform the aforementioned iteration over all splits:
                 y_test = y[test_indices]
 
                 print(
-                    'Repeat #{}, fold #{}, samples {}: X_train.shape: {}, '
-                    'y_train.shape {}, X_test.shape {}, y_test.shape {}'.format(
-                        repeat_idx, fold_idx, sample_idx, X_train.shape, y_train.shape, X_test.shape,
+                    "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
+                    "y_train.shape {}, X_test.shape {}, y_test.shape {}".format(
+                        repeat_idx,
+                        fold_idx,
+                        sample_idx,
+                        X_train.shape,
+                        y_train.shape,
+                        X_test.shape,
                         y_test.shape,
                     )
                 )
@@ -262,7 +261,7 @@ And also versions with multiple repeats:
     task = openml.tasks.get_task(task_id)
     n_repeats, n_folds, n_samples = task.get_split_dimensions()
     print(
-        'Task {}: number of repeats: {}, number of folds: {}, number of samples {}.'.format(
+        "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
             task_id, n_repeats, n_folds, n_samples,
         )
     )
@@ -291,9 +290,7 @@ And then again perform the aforementioned iteration over all splits:
         for fold_idx in range(n_folds):
             for sample_idx in range(n_samples):
                 train_indices, test_indices = task.get_train_test_split_indices(
-                    repeat=repeat_idx,
-                    fold=fold_idx,
-                    sample=sample_idx,
+                    repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
                 )
                 X_train = X.loc[train_indices]
                 y_train = y[train_indices]
@@ -301,9 +298,14 @@ And then again perform the aforementioned iteration over all splits:
                 y_test = y[test_indices]
 
                 print(
-                    'Repeat #{}, fold #{}, samples {}: X_train.shape: {}, '
-                    'y_train.shape {}, X_test.shape {}, y_test.shape {}'.format(
-                        repeat_idx, fold_idx, sample_idx, X_train.shape, y_train.shape, X_test.shape,
+                    "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
+                    "y_train.shape {}, X_test.shape {}, y_test.shape {}".format(
+                        repeat_idx,
+                        fold_idx,
+                        sample_idx,
+                        X_train.shape,
+                        y_train.shape,
+                        X_test.shape,
                         y_test.shape,
                     )
                 )
@@ -342,7 +344,7 @@ And finally a task based on learning curves:
     task = openml.tasks.get_task(task_id)
     n_repeats, n_folds, n_samples = task.get_split_dimensions()
     print(
-        'Task {}: number of repeats: {}, number of folds: {}, number of samples {}.'.format(
+        "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
             task_id, n_repeats, n_folds, n_samples,
         )
     )
@@ -371,9 +373,7 @@ And then again perform the aforementioned iteration over all splits:
         for fold_idx in range(n_folds):
             for sample_idx in range(n_samples):
                 train_indices, test_indices = task.get_train_test_split_indices(
-                    repeat=repeat_idx,
-                    fold=fold_idx,
-                    sample=sample_idx,
+                    repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
                 )
                 X_train = X.loc[train_indices]
                 y_train = y[train_indices]
@@ -381,9 +381,14 @@ And then again perform the aforementioned iteration over all splits:
                 y_test = y[test_indices]
 
                 print(
-                    'Repeat #{}, fold #{}, samples {}: X_train.shape: {}, '
-                    'y_train.shape {}, X_test.shape {}, y_test.shape {}'.format(
-                        repeat_idx, fold_idx, sample_idx, X_train.shape, y_train.shape, X_test.shape,
+                    "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
+                    "y_train.shape {}, X_test.shape {}, y_test.shape {}".format(
+                        repeat_idx,
+                        fold_idx,
+                        sample_idx,
+                        X_train.shape,
+                        y_train.shape,
+                        X_test.shape,
                         y_test.shape,
                     )
                 )
@@ -524,7 +529,7 @@ And then again perform the aforementioned iteration over all splits:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.472 seconds)
+   **Total running time of the script:** ( 0 minutes  4.501 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_task_manual_iteration_tutorial.py:

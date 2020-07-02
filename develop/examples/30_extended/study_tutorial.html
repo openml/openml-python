@@ -156,7 +156,7 @@ tasks, runs, and so on.</p>
 <li><p>Default gives <code class="docutils literal notranslate"><span class="pre">dict</span></code>, but we’ll use <code class="docutils literal notranslate"><span class="pre">dataframe</span></code> to obtain an
 easier-to-work-with data structure</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">studies</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">list_studies</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">studies</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">list_studies</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">studies</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -220,9 +220,7 @@ Upload Time.....: 2019-02-21 19:55:30
 <p>And we can use the evaluation listing functionality to learn more about
 the evaluations available for the conducted runs:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evaluations</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations</span><span class="p">(</span>
-    <span class="n">function</span><span class="o">=</span><span class="s1">&#39;predictive_accuracy&#39;</span><span class="p">,</span>
-    <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">,</span>
-    <span class="n">study</span><span class="o">=</span><span class="n">study</span><span class="o">.</span><span class="n">study_id</span><span class="p">,</span>
+    <span class="n">function</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">,</span> <span class="n">study</span><span class="o">=</span><span class="n">study</span><span class="o">.</span><span class="n">study_id</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">evaluations</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
@@ -247,10 +245,12 @@ suite which is available on the OpenML test server.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
 
 <span class="c1"># Very simple classifier which ignores the feature type</span>
-<span class="n">clf</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
-    <span class="p">(</span><span class="s1">&#39;imputer&#39;</span><span class="p">,</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">impute</span><span class="o">.</span><span class="n">SimpleImputer</span><span class="p">()),</span>
-    <span class="p">(</span><span class="s1">&#39;estimator&#39;</span><span class="p">,</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">)),</span>
-<span class="p">])</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;imputer&quot;</span><span class="p">,</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">impute</span><span class="o">.</span><span class="n">SimpleImputer</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s2">&quot;estimator&quot;</span><span class="p">,</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">)),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 
 <span class="n">suite</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">get_suite</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="c1"># We&#39;ll create a study with one run on three random datasets each</span>
@@ -267,8 +267,8 @@ suite which is available on the OpenML test server.</p>
 <span class="n">alias</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
 
 <span class="n">new_study</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">create_study</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Test-Study&#39;</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Test study for the Python tutorial on studies&#39;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test-Study&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Test study for the Python tutorial on studies&quot;</span><span class="p">,</span>
     <span class="n">run_ids</span><span class="o">=</span><span class="n">run_ids</span><span class="p">,</span>
     <span class="n">alias</span><span class="o">=</span><span class="n">alias</span><span class="p">,</span>
     <span class="n">benchmark_suite</span><span class="o">=</span><span class="n">suite</span><span class="o">.</span><span class="n">study_id</span><span class="p">,</span>
@@ -280,18 +280,18 @@ suite which is available on the OpenML test server.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Study
 ============
-ID..............: 10273
+ID..............: 10376
 Name............: Test-Study
 Status..........: None
 Main Entity Type: run
-Study URL.......: https://test.openml.org/s/10273
+Study URL.......: https://test.openml.org/s/10376
 # of Runs.......: 3
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  28.768 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  43.024 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-study-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/006bd0fc770c8918e54252890f1e023e/study_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">study_tutorial.py</span></code></a></p>
