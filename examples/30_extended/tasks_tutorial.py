@@ -38,21 +38,21 @@ tasks = openml.tasks.list_tasks(task_type_id=1)
 # `pandas dataframe <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
 # to have better visualization capabilities and easier access:
 
-tasks = pd.DataFrame.from_dict(tasks, orient='index')
+tasks = pd.DataFrame.from_dict(tasks, orient="index")
 print(tasks.columns)
 print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
 # As conversion to a pandas dataframe is a common task, we have added this functionality to the
 # OpenML-Python library which can be used by passing ``output_format='dataframe'``:
-tasks_df = openml.tasks.list_tasks(task_type_id=1, output_format='dataframe')
+tasks_df = openml.tasks.list_tasks(task_type_id=1, output_format="dataframe")
 print(tasks_df.head())
 
 ############################################################################
 # We can filter the list of tasks to only contain datasets with more than
 # 500 samples, but less than 1000 samples:
 
-filtered_tasks = tasks.query('NumberOfInstances > 500 and NumberOfInstances < 1000')
+filtered_tasks = tasks.query("NumberOfInstances > 500 and NumberOfInstances < 1000")
 print(list(filtered_tasks.index))
 
 ############################################################################
@@ -77,21 +77,21 @@ print(len(filtered_tasks))
 #
 # Similar to listing tasks by task type, we can list tasks by tags:
 
-tasks = openml.tasks.list_tasks(tag='OpenML100', output_format='dataframe')
+tasks = openml.tasks.list_tasks(tag="OpenML100", output_format="dataframe")
 print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
 ############################################################################
 # Furthermore, we can list tasks based on the dataset id:
 
-tasks = openml.tasks.list_tasks(data_id=1471, output_format='dataframe')
+tasks = openml.tasks.list_tasks(data_id=1471, output_format="dataframe")
 print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
 ############################################################################
 # In addition, a size limit and an offset can be applied both separately and simultaneously:
 
-tasks = openml.tasks.list_tasks(size=10, offset=50, output_format='dataframe')
+tasks = openml.tasks.list_tasks(size=10, offset=50, output_format="dataframe")
 print(tasks)
 
 ############################################################################
@@ -107,7 +107,7 @@ print(tasks)
 # Finally, it is also possible to list all tasks on OpenML with:
 
 ############################################################################
-tasks = openml.tasks.list_tasks(output_format='dataframe')
+tasks = openml.tasks.list_tasks(output_format="dataframe")
 print(len(tasks))
 
 ############################################################################
@@ -192,16 +192,19 @@ try:
         dataset_id=128,
         target_name="class",
         evaluation_measure="predictive_accuracy",
-        estimation_procedure_id=1)
+        estimation_procedure_id=1,
+    )
     my_task.publish()
 except openml.exceptions.OpenMLServerException as e:
     # Error code for 'task already exists'
     if e.code == 614:
         # Lookup task
-        tasks = openml.tasks.list_tasks(data_id=128, output_format='dataframe')
-        tasks = tasks.query('task_type == "Supervised Classification" '
-                            'and estimation_procedure == "10-fold Crossvalidation" '
-                            'and evaluation_measures == "predictive_accuracy"')
+        tasks = openml.tasks.list_tasks(data_id=128, output_format="dataframe")
+        tasks = tasks.query(
+            'task_type == "Supervised Classification" '
+            'and estimation_procedure == "10-fold Crossvalidation" '
+            'and evaluation_measures == "predictive_accuracy"'
+        )
         task_id = tasks.loc[:, "tid"].values[0]
         print("Task already exists. Task ID is", task_id)
 

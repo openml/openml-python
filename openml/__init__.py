@@ -49,8 +49,7 @@ from .setups import OpenMLSetup, OpenMLParameter
 from .__version__ import __version__  # noqa: F401
 
 
-def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None,
-                   run_ids=None):
+def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None, run_ids=None):
     """
     Populate a cache for offline and parallel usage of the OpenML connector.
 

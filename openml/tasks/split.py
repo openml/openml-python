@@ -33,42 +33,45 @@ class OpenMLSplit(object):
             for fold in split[repetition]:
                 self.split[repetition][fold] = OrderedDict()
                 for sample in split[repetition][fold]:
-                    self.split[repetition][fold][sample] = split[
-                        repetition][fold][sample]
+                    self.split[repetition][fold][sample] = split[repetition][fold][sample]
 
         self.repeats = len(self.split)
-        if any([len(self.split[0]) != len(self.split[i])
-                for i in range(self.repeats)]):
-            raise ValueError('')
+        if any([len(self.split[0]) != len(self.split[i]) for i in range(self.repeats)]):
+            raise ValueError("")
         self.folds = len(self.split[0])
         self.samples = len(self.split[0][0])
 
     def __eq__(self, other):
-        if (type(self) != type(other)
-                or self.name != other.name
-                or self.description != other.description
-                or self.split.keys() != other.split.keys()):
+        if (
+            type(self) != type(other)
+            or self.name != other.name
+            or self.description != other.description
+            or self.split.keys() != other.split.keys()
+        ):
             return False
 
-        if any(self.split[repetition].keys() != other.split[repetition].keys()
-                for repetition in self.split):
+        if any(
+            self.split[repetition].keys() != other.split[repetition].keys()
+            for repetition in self.split
+        ):
             return False
 
-        samples = [(repetition, fold, sample)
-                   for repetition in self.split
-                   for fold in self.split[repetition]
-                   for sample in self.split[repetition][fold]]
+        samples = [
+            (repetition, fold, sample)
+            for repetition in self.split
+            for fold in self.split[repetition]
+            for sample in self.split[repetition][fold]
+        ]
 
         for repetition, fold, sample in samples:
             self_train, self_test = self.split[repetition][fold][sample]
             other_train, other_test = other.split[repetition][fold][sample]
-            if not (np.all(self_train == other_train)
-                    and np.all(self_test == other_test)):
+            if not (np.all(self_train == other_train) and np.all(self_test == other_test)):
                 return False
         return True
 
     @classmethod
-    def _from_arff_file(cls, filename: str) -> 'OpenMLSplit':
+    def _from_arff_file(cls, filename: str) -> "OpenMLSplit":
 
         repetitions = None
 
@@ -84,25 +87,19 @@ class OpenMLSplit(object):
         if repetitions is None:
             # Faster than liac-arff and sufficient in this situation!
             if not os.path.exists(filename):
-                raise FileNotFoundError(
-                    'Split arff %s does not exist!' % filename
-                )
+                raise FileNotFoundError("Split arff %s does not exist!" % filename)
             file_data = arff.load(open(filename), return_type=arff.DENSE_GEN)
-            splits = file_data['data']
-            name = file_data['relation']
-            attrnames = [attr[0] for attr in file_data['attributes']]
+            splits = file_data["data"]
+            name = file_data["relation"]
+            attrnames = [attr[0] for attr in file_data["attributes"]]
 
             repetitions = OrderedDict()
 
-            type_idx = attrnames.index('type')
-            rowid_idx = attrnames.index('rowid')
-            repeat_idx = attrnames.index('repeat')
-            fold_idx = attrnames.index('fold')
-            sample_idx = (
-                attrnames.index('sample')
-                if 'sample' in attrnames
-                else None
-            )
+            type_idx = attrnames.index("type")
+            rowid_idx = attrnames.index("rowid")
+            repeat_idx = attrnames.index("repeat")
+            fold_idx = attrnames.index("fold")
+            sample_idx = attrnames.index("sample") if "sample" in attrnames else None
 
             for line in splits:
                 # A line looks like type, rowid, repeat, fold
@@ -121,9 +118,9 @@ class OpenMLSplit(object):
                 split = repetitions[repetition][fold][sample]
 
                 type_ = line[type_idx]
-                if type_ == 'TRAIN':
+                if type_ == "TRAIN":
                     split[0].append(line[rowid_idx])
-                elif type_ == 'TEST':
+                elif type_ == "TEST":
                     split[1].append(line[rowid_idx])
                 else:
                     raise ValueError(type_)
@@ -132,16 +129,14 @@ class OpenMLSplit(object):
                 for fold in repetitions[repetition]:
                     for sample in repetitions[repetition][fold]:
                         repetitions[repetition][fold][sample] = Split(
-                            np.array(repetitions[repetition][fold][sample][0],
-                                     dtype=np.int32),
-                            np.array(repetitions[repetition][fold][sample][1],
-                                     dtype=np.int32))
+                            np.array(repetitions[repetition][fold][sample][0], dtype=np.int32),
+                            np.array(repetitions[repetition][fold][sample][1], dtype=np.int32),
+                        )
 
             with open(pkl_filename, "wb") as fh:
-                pickle.dump({"name": name, "repetitions": repetitions}, fh,
-                            protocol=2)
+                pickle.dump({"name": name, "repetitions": repetitions}, fh, protocol=2)
 
-        return cls(name, '', repetitions)
+        return cls(name, "", repetitions)
 
     def from_dataset(self, X, Y, folds, repeats):
         raise NotImplementedError()

@@ -1,0 +1,24 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 19.10b0
+    hooks:
+      - id: black
+        args: [--line-length=100]
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.761
+    hooks:
+      - id: mypy
+        name: mypy openml
+        files: openml/*
+      - id: mypy
+        name: mypy tests
+        files: tests/*
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.3
+    hooks:
+      - id: flake8
+        name: flake8 openml
+        files: openml/*
+      - id: flake8
+        name: flake8 tests
+        files: tests/*

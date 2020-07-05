@@ -2,6 +2,7 @@
 
 from typing import Any, Optional, Type, TYPE_CHECKING
 from . import Extension
+
 # Need to implement the following by its full path because otherwise it won't be possible to
 # access openml.extensions.extensions
 import openml.extensions
@@ -29,8 +30,7 @@ def register_extension(extension: Type[Extension]) -> None:
 
 
 def get_extension_by_flow(
-    flow: 'OpenMLFlow',
-    raise_if_no_extension: bool = False,
+    flow: "OpenMLFlow", raise_if_no_extension: bool = False,
 ) -> Optional[Extension]:
     """Get an extension which can handle the given flow.
 
@@ -54,22 +54,19 @@ def get_extension_by_flow(
             candidates.append(extension_class())
     if len(candidates) == 0:
         if raise_if_no_extension:
-            raise ValueError('No extension registered which can handle flow: {}'.format(flow))
+            raise ValueError("No extension registered which can handle flow: {}".format(flow))
         else:
             return None
     elif len(candidates) == 1:
         return candidates[0]
     else:
         raise ValueError(
-            'Multiple extensions registered which can handle flow: {}, but only one '
-            'is allowed ({}).'.format(flow, candidates)
+            "Multiple extensions registered which can handle flow: {}, but only one "
+            "is allowed ({}).".format(flow, candidates)
         )
 
 
-def get_extension_by_model(
-    model: Any,
-    raise_if_no_extension: bool = False,
-) -> Optional[Extension]:
+def get_extension_by_model(model: Any, raise_if_no_extension: bool = False,) -> Optional[Extension]:
     """Get an extension which can handle the given flow.
 
     Iterates all registered extensions and checks whether they can handle the presented model.
@@ -92,13 +89,13 @@ def get_extension_by_model(
             candidates.append(extension_class())
     if len(candidates) == 0:
         if raise_if_no_extension:
-            raise ValueError('No extension registered which can handle model: {}'.format(model))
+            raise ValueError("No extension registered which can handle model: {}".format(model))
         else:
             return None
     elif len(candidates) == 1:
         return candidates[0]
     else:
         raise ValueError(
-            'Multiple extensions registered which can handle model: {}, but only one '
-            'is allowed ({}).'.format(model, candidates)
+            "Multiple extensions registered which can handle model: {}, but only one "
+            "is allowed ({}).".format(model, candidates)
         )

@@ -25,7 +25,8 @@ Explains openml-python logging, and shows how to configure it.
 # License: BSD 3-Clause
 
 import openml
-openml.datasets.get_dataset('iris')
+
+openml.datasets.get_dataset("iris")
 
 # With default configuration, the above example will show no output to console.
 # However, in your cache directory you should find a file named 'openml_python.log',
@@ -37,9 +38,10 @@ openml.datasets.get_dataset('iris')
 # The processed log levels can be configured programmatically:
 
 import logging
+
 openml.config.console_log.setLevel(logging.DEBUG)
 openml.config.file_log.setLevel(logging.WARNING)
-openml.datasets.get_dataset('iris')
+openml.datasets.get_dataset("iris")
 
 # Now the log level that was previously written to file should also be shown in the console.
 # The message is now no longer written to file as the `file_log` was set to level `WARNING`.

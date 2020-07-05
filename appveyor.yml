@@ -36,6 +36,8 @@ install:
   - "cd C:\\projects\\openml-python"
   - "pip install .[examples,test]"
   - "pip install scikit-learn==0.21"
+  # Uninstall coverage, as it leads to an error on appveyor
+  - "pip uninstall -y pytest-cov"
 
 
 # Not a .NET project, we build scikit-learn in the install step instead
