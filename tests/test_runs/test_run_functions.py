@@ -342,7 +342,6 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(task_id)
         # internally dataframe is loaded and targets are categorical
         # which LinearRegression() cannot handle
-        print("\nRegex check coming in \n")
         with self.assertRaisesRegex(ValueError, 'could not convert string to float:*'):
             openml.runs.run_model_on_task(
                 model=clf, task=task, avoid_duplicate_runs=False,
@@ -867,8 +866,6 @@ class TestRun(TestBase):
             task=task,
             avoid_duplicate_runs=False,
         )
-        task = openml.tasks.get_task(11)
-        run = openml.runs.run_model_on_task(model=clf, task=task, avoid_duplicate_runs=False,)
         run_ = run.publish()
         TestBase._mark_entity_for_removal("run", run_.run_id)
         TestBase.logger.info("collected from test_run_functions: {}".format(run_.run_id))
