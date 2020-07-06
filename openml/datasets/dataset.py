@@ -456,6 +456,10 @@ class OpenMLDataset(OpenMLBase):
                     # The file is likely corrupt, see #780.
                     # We deal with this when loading the data in `_load_data`.
                     return data_pickle_file, data_feather_file, feather_attribute_file
+                except Exception:
+                    # There was some issue loading the file, see #918
+                    # We deal with this when loading the data in `_load_data`.
+                    return data_pickle_file, data_feather_file, feather_attribute_file
 
             # Between v0.8 and v0.9 the format of pickled data changed from
             # np.ndarray to pd.DataFrame. This breaks some backwards compatibility,
@@ -471,6 +475,10 @@ class OpenMLDataset(OpenMLBase):
                 data = pd.read_feather(data_feather_file)
             except EOFError:
                 # The file is likely corrupt, see #780.
+                # We deal with this when loading the data in `_load_data`.
+                return data_pickle_file, data_feather_file, feather_attribute_file
+            except Exception:
+                # There was some issue loading the file, see #918
                 # We deal with this when loading the data in `_load_data`.
                 return data_pickle_file, data_feather_file, feather_attribute_file
 
@@ -529,7 +537,7 @@ class OpenMLDataset(OpenMLBase):
                 "Detected a corrupt cache file loading dataset %d: '%s'. "
                 "We will continue loading data from the arff-file, "
                 "but this will be much slower for big datasets. "
-                "Please manually delete the cache file if you want openml-python "
+                "Please manually delete the cache file if you want OpenML-Python "
                 "to attempt to reconstruct it."
                 "" % (self.dataset_id, self.data_pickle_file)
             )
@@ -538,6 +546,16 @@ class OpenMLDataset(OpenMLBase):
             raise ValueError(
                 "Cannot find a pickle file for dataset {} at "
                 "location {} ".format(self.name, self.data_pickle_file)
+            )
+        except Exception as e:
+            logger.warning(
+                "Encountered error message when loading cached dataset %d: '%s'. "
+                "Error message was: %s. "
+                "We will continue loading data from the arff-file, "
+                "but this will be much slower for big datasets. "
+                "Please manually delete the cache file if you want OpenML-Python "
+                "to attempt to reconstruct it."
+                "" % (self.dataset_id, self.data_pickle_file, e.args[0]),
             )
 
         return data, categorical, attribute_names
