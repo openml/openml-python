@@ -84,7 +84,7 @@ class TestRun(TestBase):
             if len(run.evaluations) > 0:
                 return
             else:
-                time.sleep(3)
+                time.sleep(10)
         raise RuntimeError(
             "Could not find any evaluations! Please check whether run {} was "
             "evaluated correctly on the server".format(run_id)
@@ -915,7 +915,7 @@ class TestRun(TestBase):
             run = run.publish()
             TestBase._mark_entity_for_removal("run", run.run_id)
             TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
-            self._wait_for_processed_run(run.run_id, 200)
+            self._wait_for_processed_run(run.run_id, 400)
             run_id = run.run_id
         except openml.exceptions.OpenMLRunsExistError as e:
             # The only error we expect, should fail otherwise.
