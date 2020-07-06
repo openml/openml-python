@@ -81,7 +81,7 @@ class TestRun(TestBase):
         start_time = time.time()
         while time.time() - start_time < max_waiting_time_seconds:
             run = openml.runs.get_run(run_id, ignore_cache=True)
-            if len(run.evaluations) > 0:
+            if len(run.evaluations) > 0 and run.trace is not None:
                 return
             else:
                 time.sleep(10)
