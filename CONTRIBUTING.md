@@ -114,6 +114,10 @@ First install openml with its test dependencies by running
   $ pip install -e .[test]
   ```
 from the repository folder.
+Then configure pre-commit through
+ ```bash
+ $ pre-commit install
+ ```
 This will install dependencies to run unit tests, as well as [pre-commit](https://pre-commit.com/).
 To run the unit tests, and check their code coverage, run:
   ```bash
