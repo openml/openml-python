@@ -33,13 +33,11 @@ class TestStudyFunctions(TestBase):
         import sklearn.preprocessing
         import sklearn.tree
 
-        benchmark_suite = openml.study.get_study(
-            'OpenML100', 'tasks'
-        )  # obtain the benchmark suite
+        benchmark_suite = openml.study.get_study("OpenML100", "tasks")  # obtain the benchmark suite
         clf = sklearn.pipeline.Pipeline(
             steps=[
-                ('imputer', SimpleImputer()),
-                ('estimator', sklearn.tree.DecisionTreeClassifier())
+                ("imputer", SimpleImputer()),
+                ("estimator", sklearn.tree.DecisionTreeClassifier()),
             ]
         )  # build a sklearn classifier
         for task_id in benchmark_suite.tasks[:1]:  # iterate over all tasks
@@ -49,12 +47,11 @@ class TestStudyFunctions(TestBase):
             run = openml.runs.run_model_on_task(
                 clf, task, avoid_duplicate_runs=False
             )  # run classifier on splits (requires API key)
-            score = run.get_metric_fn(
-                sklearn.metrics.accuracy_score
-            )  # print accuracy score
-            print('Data set: %s; Accuracy: %0.2f' % (task.get_dataset().name, score.mean()))
+            score = run.get_metric_fn(sklearn.metrics.accuracy_score)  # print accuracy score
+            print("Data set: %s; Accuracy: %0.2f" % (task.get_dataset().name, score.mean()))
             run.publish()  # publish the experiment on OpenML (optional)
-            TestBase._mark_entity_for_removal('run', run.run_id)
-            TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                                run.run_id))
-            print('URL for run: %s/run/%d' % (openml.config.server, run.run_id))
+            TestBase._mark_entity_for_removal("run", run.run_id)
+            TestBase.logger.info(
+                "collected from {}: {}".format(__file__.split("/")[-1], run.run_id)
+            )
+            print("URL for run: %s/run/%d" % (openml.config.server, run.run_id))

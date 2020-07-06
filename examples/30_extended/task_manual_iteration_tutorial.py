@@ -43,7 +43,7 @@ n_repeats, n_folds, n_samples = task.get_split_dimensions()
 # single repeat, a single fold and a single sample size:
 
 print(
-    'Task {}: number of repeats: {}, number of folds: {}, number of samples {}.'.format(
+    "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
         task_id, n_repeats, n_folds, n_samples,
     )
 )
@@ -53,11 +53,7 @@ print(
 # samples (indexing is zero-based). Usually, one would loop over all repeats, folds and sample
 # sizes, but we can neglect this here as there is only a single repetition.
 
-train_indices, test_indices = task.get_train_test_split_indices(
-    repeat=0,
-    fold=0,
-    sample=0,
-)
+train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0,)
 
 print(train_indices.shape, train_indices.dtype)
 print(test_indices.shape, test_indices.dtype)
@@ -72,7 +68,7 @@ X_test = X.loc[test_indices]
 y_test = y[test_indices]
 
 print(
-    'X_train.shape: {}, y_train.shape: {}, X_test.shape: {}, y_test.shape: {}'.format(
+    "X_train.shape: {}, y_train.shape: {}, X_test.shape: {}, y_test.shape: {}".format(
         X_train.shape, y_train.shape, X_test.shape, y_test.shape,
     )
 )
@@ -84,7 +80,7 @@ task_id = 3
 task = openml.tasks.get_task(task_id)
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
-    'Task {}: number of repeats: {}, number of folds: {}, number of samples {}.'.format(
+    "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
         task_id, n_repeats, n_folds, n_samples,
     )
 )
@@ -95,9 +91,7 @@ for repeat_idx in range(n_repeats):
     for fold_idx in range(n_folds):
         for sample_idx in range(n_samples):
             train_indices, test_indices = task.get_train_test_split_indices(
-                repeat=repeat_idx,
-                fold=fold_idx,
-                sample=sample_idx,
+                repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
             )
             X_train = X.loc[train_indices]
             y_train = y[train_indices]
@@ -105,9 +99,14 @@ for repeat_idx in range(n_repeats):
             y_test = y[test_indices]
 
             print(
-                'Repeat #{}, fold #{}, samples {}: X_train.shape: {}, '
-                'y_train.shape {}, X_test.shape {}, y_test.shape {}'.format(
-                    repeat_idx, fold_idx, sample_idx, X_train.shape, y_train.shape, X_test.shape,
+                "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
+                "y_train.shape {}, X_test.shape {}, y_test.shape {}".format(
+                    repeat_idx,
+                    fold_idx,
+                    sample_idx,
+                    X_train.shape,
+                    y_train.shape,
+                    X_test.shape,
                     y_test.shape,
                 )
             )
@@ -119,7 +118,7 @@ task_id = 1767
 task = openml.tasks.get_task(task_id)
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
-    'Task {}: number of repeats: {}, number of folds: {}, number of samples {}.'.format(
+    "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
         task_id, n_repeats, n_folds, n_samples,
     )
 )
@@ -130,9 +129,7 @@ for repeat_idx in range(n_repeats):
     for fold_idx in range(n_folds):
         for sample_idx in range(n_samples):
             train_indices, test_indices = task.get_train_test_split_indices(
-                repeat=repeat_idx,
-                fold=fold_idx,
-                sample=sample_idx,
+                repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
             )
             X_train = X.loc[train_indices]
             y_train = y[train_indices]
@@ -140,9 +137,14 @@ for repeat_idx in range(n_repeats):
             y_test = y[test_indices]
 
             print(
-                'Repeat #{}, fold #{}, samples {}: X_train.shape: {}, '
-                'y_train.shape {}, X_test.shape {}, y_test.shape {}'.format(
-                    repeat_idx, fold_idx, sample_idx, X_train.shape, y_train.shape, X_test.shape,
+                "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
+                "y_train.shape {}, X_test.shape {}, y_test.shape {}".format(
+                    repeat_idx,
+                    fold_idx,
+                    sample_idx,
+                    X_train.shape,
+                    y_train.shape,
+                    X_test.shape,
                     y_test.shape,
                 )
             )
@@ -154,7 +156,7 @@ task_id = 1702
 task = openml.tasks.get_task(task_id)
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
-    'Task {}: number of repeats: {}, number of folds: {}, number of samples {}.'.format(
+    "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
         task_id, n_repeats, n_folds, n_samples,
     )
 )
@@ -165,9 +167,7 @@ for repeat_idx in range(n_repeats):
     for fold_idx in range(n_folds):
         for sample_idx in range(n_samples):
             train_indices, test_indices = task.get_train_test_split_indices(
-                repeat=repeat_idx,
-                fold=fold_idx,
-                sample=sample_idx,
+                repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
             )
             X_train = X.loc[train_indices]
             y_train = y[train_indices]
@@ -175,9 +175,14 @@ for repeat_idx in range(n_repeats):
             y_test = y[test_indices]
 
             print(
-                'Repeat #{}, fold #{}, samples {}: X_train.shape: {}, '
-                'y_train.shape {}, X_test.shape {}, y_test.shape {}'.format(
-                    repeat_idx, fold_idx, sample_idx, X_train.shape, y_train.shape, X_test.shape,
+                "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
+                "y_train.shape {}, X_test.shape {}, y_test.shape {}".format(
+                    repeat_idx,
+                    fold_idx,
+                    sample_idx,
+                    X_train.shape,
+                    y_train.shape,
+                    X_test.shape,
                     y_test.shape,
                 )
             )

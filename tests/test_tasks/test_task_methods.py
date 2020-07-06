@@ -8,7 +8,6 @@ from openml.testing import TestBase
 
 # Common methods between tasks
 class OpenMLTaskMethodsTest(TestBase):
-
     def setUp(self):
         super(OpenMLTaskMethodsTest, self).setUp()
 
@@ -41,7 +40,9 @@ class OpenMLTaskMethodsTest(TestBase):
         self.assertEqual(681, train_indices[-1])
         self.assertEqual(583, test_indices[0])
         self.assertEqual(24, test_indices[-1])
-        self.assertRaisesRegexp(ValueError, "Fold 10 not known",
-                                task.get_train_test_split_indices, 10, 0)
-        self.assertRaisesRegexp(ValueError, "Repeat 10 not known",
-                                task.get_train_test_split_indices, 0, 10)
+        self.assertRaisesRegexp(
+            ValueError, "Fold 10 not known", task.get_train_test_split_indices, 10, 0
+        )
+        self.assertRaisesRegexp(
+            ValueError, "Repeat 10 not known", task.get_train_test_split_indices, 0, 10
+        )

@@ -18,12 +18,12 @@ class OpenMLSetup(object):
 
     def __init__(self, setup_id, flow_id, parameters):
         if not isinstance(setup_id, int):
-            raise ValueError('setup id should be int')
+            raise ValueError("setup id should be int")
         if not isinstance(flow_id, int):
-            raise ValueError('flow id should be int')
+            raise ValueError("flow id should be int")
         if parameters is not None:
             if not isinstance(parameters, dict):
-                raise ValueError('parameters should be dict')
+                raise ValueError("parameters should be dict")
 
         self.setup_id = setup_id
         self.flow_id = flow_id
@@ -31,12 +31,14 @@ class OpenMLSetup(object):
 
     def __repr__(self):
         header = "OpenML Setup"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
+        header = "{}\n{}\n".format(header, "=" * len(header))
 
-        fields = {"Setup ID": self.setup_id,
-                  "Flow ID": self.flow_id,
-                  "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
-                  "# of Parameters": len(self.parameters)}
+        fields = {
+            "Setup ID": self.setup_id,
+            "Flow ID": self.flow_id,
+            "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
+            "# of Parameters": len(self.parameters),
+        }
 
         # determines the order in which the information will be printed
         order = ["Setup ID", "Flow ID", "Flow URL", "# of Parameters"]
@@ -44,7 +46,7 @@ class OpenMLSetup(object):
 
         longest_field_name_length = max(len(name) for name, value in fields)
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        body = "\n".join(field_line_format.format(name, value) for name, value in fields)
         return header + body
 
 
@@ -72,8 +74,18 @@ class OpenMLParameter(object):
     value : str
         If the parameter was set, the value that it was set to.
     """
-    def __init__(self, input_id, flow_id, flow_name, full_name, parameter_name,
-                 data_type, default_value, value):
+
+    def __init__(
+        self,
+        input_id,
+        flow_id,
+        flow_name,
+        full_name,
+        parameter_name,
+        data_type,
+        default_value,
+        value,
+    ):
         self.id = input_id
         self.flow_id = flow_id
         self.flow_name = flow_name
@@ -85,14 +97,16 @@ class OpenMLParameter(object):
 
     def __repr__(self):
         header = "OpenML Parameter"
-        header = '{}\n{}\n'.format(header, '=' * len(header))
+        header = "{}\n{}\n".format(header, "=" * len(header))
 
-        fields = {"ID": self.id,
-                  "Flow ID": self.flow_id,
-                  # "Flow Name": self.flow_name,
-                  "Flow Name": self.full_name,
-                  "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
-                  "Parameter Name": self.parameter_name}
+        fields = {
+            "ID": self.id,
+            "Flow ID": self.flow_id,
+            # "Flow Name": self.flow_name,
+            "Flow Name": self.full_name,
+            "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
+            "Parameter Name": self.parameter_name,
+        }
         # indented prints for parameter attributes
         # indention = 2 spaces + 1 | + 2 underscores
         indent = "{}|{}".format(" " * 2, "_" * 2)
@@ -104,11 +118,19 @@ class OpenMLParameter(object):
         fields[parameter_value] = self.value
 
         # determines the order in which the information will be printed
-        order = ["ID", "Flow ID", "Flow Name", "Flow URL", "Parameter Name",
-                 parameter_data_type, parameter_default, parameter_value]
+        order = [
+            "ID",
+            "Flow ID",
+            "Flow Name",
+            "Flow URL",
+            "Parameter Name",
+            parameter_data_type,
+            parameter_default,
+            parameter_value,
+        ]
         fields = [(key, fields[key]) for key in order if key in fields]
 
         longest_field_name_length = max(len(name) for name, value in fields)
         field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = '\n'.join(field_line_format.format(name, value) for name, value in fields)
+        body = "\n".join(field_line_format.format(name, value) for name, value in fields)
         return header + body
