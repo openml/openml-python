@@ -456,6 +456,17 @@ class OpenMLDataset(OpenMLBase):
                     # The file is likely corrupt, see #780.
                     # We deal with this when loading the data in `_load_data`.
                     return data_pickle_file, data_feather_file, feather_attribute_file
+                except ModuleNotFoundError:
+                    # There was some issue loading the file, see #918
+                    # We deal with this when loading the data in `_load_data`.
+                    return data_pickle_file, data_feather_file, feather_attribute_file
+                except ValueError as e:
+                    if "unsupported pickle protocol" in e.args[0]:
+                        # There was some issue loading the file, see #898
+                        # We deal with this when loading the data in `_load_data`.
+                        return data_pickle_file, data_feather_file, feather_attribute_file
+                    else:
+                        raise
 
             # Between v0.8 and v0.9 the format of pickled data changed from
             # np.ndarray to pd.DataFrame. This breaks some backwards compatibility,
@@ -473,6 +484,17 @@ class OpenMLDataset(OpenMLBase):
                 # The file is likely corrupt, see #780.
                 # We deal with this when loading the data in `_load_data`.
                 return data_pickle_file, data_feather_file, feather_attribute_file
+            except ModuleNotFoundError:
+                # There was some issue loading the file, see #918
+                # We deal with this when loading the data in `_load_data`.
+                return data_pickle_file, data_feather_file, feather_attribute_file
+            except ValueError as e:
+                if "unsupported pickle protocol" in e.args[0]:
+                    # There was some issue loading the file, see #898
+                    # We deal with this when loading the data in `_load_data`.
+                    return data_pickle_file, data_feather_file, feather_attribute_file
+                else:
+                    raise
 
             logger.debug("Data feather file already exists and is up to date.")
             return data_pickle_file, data_feather_file, feather_attribute_file
@@ -529,7 +551,7 @@ class OpenMLDataset(OpenMLBase):
                 "Detected a corrupt cache file loading dataset %d: '%s'. "
                 "We will continue loading data from the arff-file, "
                 "but this will be much slower for big datasets. "
-                "Please manually delete the cache file if you want openml-python "
+                "Please manually delete the cache file if you want OpenML-Python "
                 "to attempt to reconstruct it."
                 "" % (self.dataset_id, self.data_pickle_file)
             )
@@ -539,6 +561,32 @@ class OpenMLDataset(OpenMLBase):
                 "Cannot find a pickle file for dataset {} at "
                 "location {} ".format(self.name, self.data_pickle_file)
             )
+        except ModuleNotFoundError as e:
+            logger.warning(
+                "Encountered error message when loading cached dataset %d: '%s'. "
+                "Error message was: %s. "
+                "This is most likely due to  https://github.com/openml/openml-python/issues/918. "
+                "We will continue loading data from the arff-file, "
+                "but this will be much slower for big datasets. "
+                "Please manually delete the cache file if you want OpenML-Python "
+                "to attempt to reconstruct it."
+                "" % (self.dataset_id, self.data_pickle_file, e.args[0]),
+            )
+            data, categorical, attribute_names = self._parse_data_from_arff(self.data_file)
+        except ValueError as e:
+            if "unsupported pickle protocol" in e.args[0]:
+                logger.warning(
+                    "Encountered unsupported pickle protocol when loading cached dataset %d: '%s'. "
+                    "Error message was: %s. "
+                    "We will continue loading data from the arff-file, "
+                    "but this will be much slower for big datasets. "
+                    "Please manually delete the cache file if you want OpenML-Python "
+                    "to attempt to reconstruct it."
+                    "" % (self.dataset_id, self.data_pickle_file, e.args[0]),
+                )
+                data, categorical, attribute_names = self._parse_data_from_arff(self.data_file)
+            else:
+                raise
 
         return data, categorical, attribute_names
 
