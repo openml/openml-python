@@ -19,10 +19,10 @@ import numpy as np
 # evaluations conducted by the server with the hyperparameter settings extracted from the
 # uploaded runs (called *setup*).
 df = openml.evaluations.list_evaluations_setups(
-    function='predictive_accuracy',
+    function="predictive_accuracy",
     flow=[8353],
     task=[6],
-    output_format='dataframe',
+    output_format="dataframe",
     # Using this flag incorporates the hyperparameters into the returned dataframe. Otherwise,
     # the dataframe would contain a field ``paramaters`` containing an unparsed dictionary.
     parameters_in_separate_columns=True,
@@ -37,7 +37,7 @@ for name in df.columns:
 ####################################################################################################
 # Next, we cast and transform the hyperparameters of interest (``C`` and ``gamma``) so that we
 # can nicely plot them.
-hyperparameters = ['sklearn.svm.classes.SVC(16)_C', 'sklearn.svm.classes.SVC(16)_gamma']
+hyperparameters = ["sklearn.svm.classes.SVC(16)_C", "sklearn.svm.classes.SVC(16)_gamma"]
 df[hyperparameters] = df[hyperparameters].astype(float).apply(np.log10)
 
 ####################################################################################################
@@ -45,12 +45,12 @@ df[hyperparameters] = df[hyperparameters].astype(float).apply(np.log10)
 # ===================================================
 #
 df.plot.hexbin(
-    x='sklearn.svm.classes.SVC(16)_C',
-    y='sklearn.svm.classes.SVC(16)_gamma',
-    C='value',
+    x="sklearn.svm.classes.SVC(16)_C",
+    y="sklearn.svm.classes.SVC(16)_gamma",
+    C="value",
     reduce_C_function=np.mean,
     gridsize=25,
-    title='SVM performance landscape',
+    title="SVM performance landscape",
 )
 
 ####################################################################################################
@@ -61,12 +61,12 @@ import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots()
 
-C = df['sklearn.svm.classes.SVC(16)_C']
-gamma = df['sklearn.svm.classes.SVC(16)_gamma']
-score = df['value']
+C = df["sklearn.svm.classes.SVC(16)_C"]
+gamma = df["sklearn.svm.classes.SVC(16)_gamma"]
+score = df["value"]
 
 # Plotting all evaluations:
-ax.plot(C, gamma, 'ko', ms=1)
+ax.plot(C, gamma, "ko", ms=1)
 # Create a contour plot
 cntr = ax.tricontourf(C, gamma, score, levels=12, cmap="RdBu_r")
 # Adjusting the colorbar
@@ -78,4 +78,4 @@ ax.set(
     xlabel="C (log10)",
     ylabel="gamma (log10)",
 )
-ax.set_title('SVM performance landscape')
+ax.set_title("SVM performance landscape")

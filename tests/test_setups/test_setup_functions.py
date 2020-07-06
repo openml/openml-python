@@ -21,9 +21,9 @@ def get_sentinel():
     # identified by its name and external version online. Having a unique
     #  name allows us to publish the same flow in each test run
     md5 = hashlib.md5()
-    md5.update(str(time.time()).encode('utf-8'))
+    md5.update(str(time.time()).encode("utf-8"))
     sentinel = md5.hexdigest()[:10]
-    sentinel = 'TEST%s' % sentinel
+    sentinel = "TEST%s" % sentinel
     return sentinel
 
 
@@ -40,10 +40,10 @@ class TestSetupFunctions(TestBase):
         # because of the sentinel, we can not use flows that contain subflows
         dectree = sklearn.tree.DecisionTreeClassifier()
         flow = self.extension.model_to_flow(dectree)
-        flow.name = 'TEST%s%s' % (sentinel, flow.name)
+        flow.name = "TEST%s%s" % (sentinel, flow.name)
         flow.publish()
-        TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], flow.flow_id))
+        TestBase._mark_entity_for_removal("flow", (flow.flow_id, flow.name))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
 
         # although the flow exists (created as of previous statement),
         # we can be sure there are no setups (yet) as it was just created
@@ -54,10 +54,10 @@ class TestSetupFunctions(TestBase):
     def _existing_setup_exists(self, classif):
 
         flow = self.extension.model_to_flow(classif)
-        flow.name = 'TEST%s%s' % (get_sentinel(), flow.name)
+        flow.name = "TEST%s%s" % (get_sentinel(), flow.name)
         flow.publish()
-        TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], flow.flow_id))
+        TestBase._mark_entity_for_removal("flow", (flow.flow_id, flow.name))
+        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
 
         # although the flow exists, we can be sure there are no
         # setups (yet) as it hasn't been ran
@@ -72,8 +72,8 @@ class TestSetupFunctions(TestBase):
         # spoof flow id, otherwise the sentinel is ignored
         run.flow_id = flow.flow_id
         run.publish()
-        TestBase._mark_entity_for_removal('run', run.run_id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1], run.run_id))
+        TestBase._mark_entity_for_removal("run", run.run_id)
+        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], run.run_id))
         # download the run, as it contains the right setup id
         run = openml.runs.get_run(run.run_id)
 
@@ -85,10 +85,9 @@ class TestSetupFunctions(TestBase):
         def side_effect(self):
             self.var_smoothing = 1e-9
             self.priors = None
+
         with unittest.mock.patch.object(
-                sklearn.naive_bayes.GaussianNB,
-                '__init__',
-                side_effect,
+            sklearn.naive_bayes.GaussianNB, "__init__", side_effect,
         ):
             # Check a flow with zero hyperparameters
             nb = sklearn.naive_bayes.GaussianNB()
@@ -112,7 +111,7 @@ class TestSetupFunctions(TestBase):
 
     def test_get_setup(self):
         # no setups in default test server
-        openml.config.server = 'https://www.openml.org/api/v1/xml/'
+        openml.config.server = "https://www.openml.org/api/v1/xml/"
 
         # contains all special cases, 0 params, 1 param, n params.
         # Non scikitlearn flows.
@@ -141,24 +140,23 @@ class TestSetupFunctions(TestBase):
     def test_list_setups_empty(self):
         setups = openml.setups.list_setups(setup=[0])
         if len(setups) > 0:
-            raise ValueError('UnitTest Outdated, got somehow results')
+            raise ValueError("UnitTest Outdated, got somehow results")
 
         self.assertIsInstance(setups, dict)
 
     def test_list_setups_output_format(self):
         openml.config.server = self.production_server
         flow_id = 6794
-        setups = openml.setups.list_setups(flow=flow_id, output_format='object', size=10)
+        setups = openml.setups.list_setups(flow=flow_id, output_format="object", size=10)
         self.assertIsInstance(setups, Dict)
-        self.assertIsInstance(setups[list(setups.keys())[0]],
-                              openml.setups.setup.OpenMLSetup)
+        self.assertIsInstance(setups[list(setups.keys())[0]], openml.setups.setup.OpenMLSetup)
         self.assertEqual(len(setups), 10)
 
-        setups = openml.setups.list_setups(flow=flow_id, output_format='dataframe', size=10)
+        setups = openml.setups.list_setups(flow=flow_id, output_format="dataframe", size=10)
         self.assertIsInstance(setups, pd.DataFrame)
         self.assertEqual(len(setups), 10)
 
-        setups = openml.setups.list_setups(flow=flow_id, output_format='dict', size=10)
+        setups = openml.setups.list_setups(flow=flow_id, output_format="dict", size=10)
         self.assertIsInstance(setups, Dict)
         self.assertIsInstance(setups[list(setups.keys())[0]], Dict)
         self.assertEqual(len(setups), 10)

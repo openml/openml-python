@@ -109,29 +109,37 @@ following rules before you submit a pull request:
  - If any source file is being added to the repository, please add the BSD 3-Clause license to it.
 
 
-You can also check for common programming errors with the following
-tools:
-
--  Code with good unittest **coverage** (at least 80%), check with:
-
+First install openml with its test dependencies by running
   ```bash
-  $ pip install pytest pytest-cov
+  $ pip install -e .[test]
+  ```
+from the repository folder.
+This will install dependencies to run unit tests, as well as [pre-commit](https://pre-commit.com/).
+To run the unit tests, and check their code coverage, run:
+  ```bash
   $ pytest --cov=. path/to/tests_for_package
   ```
+Make sure your code has good unittest **coverage** (at least 80%).
 
--  No style warnings, check with:
-
+Pre-commit is used for various style checking and code formatting.
+Before each commit, it will automatically run:
+ - [black](https://black.readthedocs.io/en/stable/) a code formatter.
+   This will automatically format your code.
+   Make sure to take a second look after any formatting takes place,
+   if the resulting code is very bloated, consider a (small) refactor.
+   *note*: If Black reformats your code, the commit will automatically be aborted.
+   Make sure to add the formatted files (back) to your commit after checking them.
+ - [mypy](https://mypy.readthedocs.io/en/stable/) a static type checker.
+   In particular, make sure each function you work on has type hints.
+ - [flake8](https://flake8.pycqa.org/en/latest/index.html) style guide enforcement.
+   Almost all of the black-formatted code should automatically pass this check,
+   but make sure to make adjustments if it does fail.
+    
+If you want to run the pre-commit tests without doing a commit, run:
   ```bash
-  $ pip install flake8
-  $ flake8 --ignore E402,W503 --show-source --max-line-length 100
+  $ pre-commit run --all-files
   ```
-
--  No mypy (typing) issues, check with:
-
-  ```bash
-  $ pip install mypy
-  $ mypy openml --ignore-missing-imports --follow-imports skip
-  ```
+Make sure to do this at least once before your first commit to check your setup works.
 
 Filing bugs
 -----------

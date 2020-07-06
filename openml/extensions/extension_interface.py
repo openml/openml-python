@@ -26,7 +26,7 @@ class Extension(ABC):
 
     @classmethod
     @abstractmethod
-    def can_handle_flow(cls, flow: 'OpenMLFlow') -> bool:
+    def can_handle_flow(cls, flow: "OpenMLFlow") -> bool:
         """Check whether a given flow can be handled by this extension.
 
         This is typically done by parsing the ``external_version`` field.
@@ -60,9 +60,12 @@ class Extension(ABC):
     # Abstract methods for flow serialization and de-serialization
 
     @abstractmethod
-    def flow_to_model(self, flow: 'OpenMLFlow',
-                      initialize_with_defaults: bool = False,
-                      strict_version: bool = True) -> Any:
+    def flow_to_model(
+        self,
+        flow: "OpenMLFlow",
+        initialize_with_defaults: bool = False,
+        strict_version: bool = True,
+    ) -> Any:
         """Instantiate a model from the flow representation.
 
         Parameters
@@ -82,7 +85,7 @@ class Extension(ABC):
         """
 
     @abstractmethod
-    def model_to_flow(self, model: Any) -> 'OpenMLFlow':
+    def model_to_flow(self, model: Any) -> "OpenMLFlow":
         """Transform a model to a flow for uploading it to OpenML.
 
         Parameters
@@ -156,13 +159,13 @@ class Extension(ABC):
     def _run_model_on_fold(
         self,
         model: Any,
-        task: 'OpenMLTask',
+        task: "OpenMLTask",
         X_train: Union[np.ndarray, scipy.sparse.spmatrix],
         rep_no: int,
         fold_no: int,
         y_train: Optional[np.ndarray] = None,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix]] = None,
-    ) -> Tuple[np.ndarray, np.ndarray, 'OrderedDict[str, float]', Optional['OpenMLRunTrace']]:
+    ) -> Tuple[np.ndarray, np.ndarray, "OrderedDict[str, float]", Optional["OpenMLRunTrace"]]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction information.
 
         Returns the data that is necessary to construct the OpenML Run object. Is used by
@@ -201,9 +204,7 @@ class Extension(ABC):
 
     @abstractmethod
     def obtain_parameter_values(
-        self,
-        flow: 'OpenMLFlow',
-        model: Any = None,
+        self, flow: "OpenMLFlow", model: Any = None,
     ) -> List[Dict[str, Any]]:
         """Extracts all parameter settings required for the flow from the model.
 
@@ -233,9 +234,7 @@ class Extension(ABC):
 
     @abstractmethod
     def instantiate_model_from_hpo_class(
-        self,
-        model: Any,
-        trace_iteration: 'OpenMLTraceIteration',
+        self, model: Any, trace_iteration: "OpenMLTraceIteration",
     ) -> Any:
         """Instantiate a base model which can be searched over by the hyperparameter optimization
         model.
