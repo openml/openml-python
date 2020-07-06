@@ -81,10 +81,19 @@ class TestRun(TestBase):
         start_time = time.time()
         while time.time() - start_time < max_waiting_time_seconds:
             run = openml.runs.get_run(run_id, ignore_cache=True)
-            if len(run.evaluations) > 0 and run.trace is not None:
-                return
-            else:
+
+            try:
+                openml.runs.get_run_trace(run_id)
+            except openml.exceptions.OpenMLServerException:
                 time.sleep(10)
+                continue
+
+            if len(run.evaluations) == 0:
+                time.sleep(10)
+                continue
+
+            return
+
         raise RuntimeError(
             "Could not find any evaluations! Please check whether run {} was "
             "evaluated correctly on the server".format(run_id)
