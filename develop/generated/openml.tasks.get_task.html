@@ -116,7 +116,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>.get_task<a class="headerlink" href="#openml-tasks-get-task" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="openml.tasks.get_task">
-<code class="sig-prename descclassname">openml.tasks.</code><code class="sig-name descname">get_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; openml.tasks.task.OpenMLTask<a class="headerlink" href="#openml.tasks.get_task" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openml.tasks.</code><code class="sig-name descname">get_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_id</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">download_data</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; openml.tasks.task.OpenMLTask<a class="headerlink" href="#openml.tasks.get_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download OpenML task for a given task ID.</p>
 <p>Downloads the task representation, while the data splits can be
 downloaded optionally based on the additional parameter. Else,
@@ -153,7 +153,7 @@ splits will either way be downloaded when the task is being used.</p>
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
     </p>
   </div>
 </footer>

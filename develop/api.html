@@ -241,7 +241,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.datasets.create_dataset.html#openml.datasets.create_dataset" title="openml.datasets.create_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_dataset</span></code></a>(name, description, creator, …)</p></td>
 <td><p>Create a dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.datasets.get_dataset.html#openml.datasets.get_dataset" title="openml.datasets.get_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dataset</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.datasets.get_dataset.html#openml.datasets.get_dataset" title="openml.datasets.get_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dataset</span></code></a>(dataset_id[, download_data, …])</p></td>
 <td><p>Download the OpenML dataset representation, optionally also download actual data file.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.datasets.get_datasets.html#openml.datasets.get_datasets" title="openml.datasets.get_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_datasets</span></code></a>(dataset_ids[, download_data])</p></td>
@@ -293,7 +293,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.flows.flow_exists.html#openml.flows.flow_exists" title="openml.flows.flow_exists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flow_exists</span></code></a>(name, external_version)</p></td>
 <td><p>Retrieves the flow id.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.flows.get_flow.html#openml.flows.get_flow" title="openml.flows.get_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_flow</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.flows.get_flow.html#openml.flows.get_flow" title="openml.flows.get_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_flow</span></code></a>(flow_id[, reinstantiate, …])</p></td>
 <td><p>Download the OpenML flow for a given flow ID.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.flows.list_flows.html#openml.flows.list_flows" title="openml.flows.list_flows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_flows</span></code></a>([offset, size, tag, output_format])</p></td>
@@ -310,7 +310,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.runs.get_run.html#openml.runs.get_run" title="openml.runs.get_run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_run</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.runs.get_run.html#openml.runs.get_run" title="openml.runs.get_run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_run</span></code></a>(run_id[, ignore_cache])</p></td>
 <td><p>Gets run corresponding to run_id.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.runs.get_runs.html#openml.runs.get_runs" title="openml.runs.get_runs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_runs</span></code></a>(run_ids)</p></td>
@@ -424,7 +424,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.tasks.get_task.html#openml.tasks.get_task" title="openml.tasks.get_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_task</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.tasks.get_task.html#openml.tasks.get_task" title="openml.tasks.get_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_task</span></code></a>(task_id[, download_data])</p></td>
 <td><p>Download OpenML task for a given task ID.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.tasks.get_tasks.html#openml.tasks.get_tasks" title="openml.tasks.get_tasks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tasks</span></code></a>(task_ids[, download_data])</p></td>
@@ -451,7 +451,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
     </p>
   </div>
 </footer>
