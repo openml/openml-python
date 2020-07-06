@@ -1,7 +1,76 @@
-How to contribute
------------------
+This document describes the workflow on how to contribute to the openml-python package.
+If you are interested in connecting a machine learning package with OpenML (i.e.
+write an openml-python extension) or want to find other ways to contribute, see [this page](https://openml.github.io/openml-python/master/contributing.html#contributing).
 
-The preferred workflow for contributing to the OpenML python connector is to
+Scope of the package
+--------------------
+
+The scope of the OpenML Python package is to provide a Python interface to
+the OpenML platform which integrates well with Python's scientific stack, most
+notably [numpy](http://www.numpy.org/), [scipy](https://www.scipy.org/) and
+[pandas](https://pandas.pydata.org/).
+To reduce opportunity costs and demonstrate the usage of the package, it also
+implements an interface to the most popular machine learning package written
+in Python, [scikit-learn](http://scikit-learn.org/stable/index.html).
+Thereby it will automatically be compatible with many machine learning
+libraries written in Python.
+
+We aim to keep the package as light-weight as possible and we will try to
+keep the number of potential installation dependencies as low as possible.
+Therefore, the connection to other machine learning libraries such as
+*pytorch*, *keras* or *tensorflow* should not be done directly inside this
+package, but in a separate package using the OpenML Python connector.
+More information on OpenML Python connectors can be found [here](https://openml.github.io/openml-python/master/contributing.html#contributing).
+
+Reporting bugs
+--------------
+We use GitHub issues to track all bugs and feature requests; feel free to
+open an issue if you have found a bug or wish to see a feature implemented.
+
+It is recommended to check that your issue complies with the
+following rules before submitting:
+
+-  Verify that your issue is not being currently addressed by other
+   [issues](https://github.com/openml/openml-python/issues)
+   or [pull requests](https://github.com/openml/openml-python/pulls).
+
+-  Please ensure all code snippets and error messages are formatted in
+   appropriate code blocks.
+   See [Creating and highlighting code blocks](https://help.github.com/articles/creating-and-highlighting-code-blocks).
+
+-  Please include your operating system type and version number, as well
+   as your Python, openml, scikit-learn, numpy, and scipy versions. This information
+   can be found by running the following code snippet:
+```python
+import platform; print(platform.platform())
+import sys; print("Python", sys.version)
+import numpy; print("NumPy", numpy.__version__)
+import scipy; print("SciPy", scipy.__version__)
+import sklearn; print("Scikit-Learn", sklearn.__version__)
+import openml; print("OpenML", openml.__version__)
+```
+
+Determine what contribution to make
+-----------------------------------
+Great! You've decided you want to help out. Now what?
+All contributions should be linked to issues on the [Github issue tracker](https://github.com/openml/openml-python/issues).
+In particular for new contributors, the *good first issue* label should help you find
+issues which are suitable for beginners.  Resolving these issues allow you to start
+contributing to the project without much prior knowledge. Your assistance in this area 
+will be greatly appreciated by the more experienced developers as it helps free up 
+their time to concentrate on other issues.
+
+If you encountered a particular part of the documentation or code that you want to improve,
+but there is no related open issue yet, open one first.
+This is important since you can first get feedback or pointers from experienced contributors.
+
+To let everyone know you are working on an issue, please leave a comment that states you will work on the issue
+(or, if you have the permission, *assign* yourself to the issue). This avoids double work!
+
+General git workflow
+--------------------
+
+The preferred workflow for contributing to openml-python is to
 fork the [main repository](https://github.com/openml/openml-python) on
 GitHub, clone, check out the branch `develop`, and develop on a new branch
 branch. Steps:
@@ -145,51 +214,38 @@ If you want to run the pre-commit tests without doing a commit, run:
   ```
 Make sure to do this at least once before your first commit to check your setup works.
 
-Filing bugs
------------
-We use GitHub issues to track all bugs and feature requests; feel free to
-open an issue if you have found a bug or wish to see a feature implemented.
+Executing a specific unit test can be done by specifying the module, test case, and test.
+To obtain a hierarchical list of all tests, run
 
-It is recommended to check that your issue complies with the
-following rules before submitting:
+  ```bash
+  $  pytest --collect-only
 
--  Verify that your issue is not being currently addressed by other
-   [issues](https://github.com/openml/openml-python/issues)
-   or [pull requests](https://github.com/openml/openml-python/pulls).
+    <Module 'tests/test_datasets/test_dataset.py'>
+      <UnitTestCase 'OpenMLDatasetTest'>
+        <TestCaseFunction 'test_dataset_format_constructor'>
+        <TestCaseFunction 'test_get_data'>
+        <TestCaseFunction 'test_get_data_rowid_and_ignore_and_target'>
+        <TestCaseFunction 'test_get_data_with_ignore_attributes'>
+        <TestCaseFunction 'test_get_data_with_rowid'>
+        <TestCaseFunction 'test_get_data_with_target'>
+      <UnitTestCase 'OpenMLDatasetTestOnTestServer'>
+        <TestCaseFunction 'test_tagging'>
+   ```
 
--  Please ensure all code snippets and error messages are formatted in
-   appropriate code blocks.
-   See [Creating and highlighting code blocks](https://help.github.com/articles/creating-and-highlighting-code-blocks).
+You may then run a specific module, test case, or unit test respectively:
+```bash
+  $ pytest tests/test_datasets/test_dataset.py
+  $ pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest
+  $ pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest::test_get_data
+```
 
--  Please include your operating system type and version number, as well
-   as your Python, openml, scikit-learn, numpy, and scipy versions. This information
-   can be found by running the following code snippet:
-
-  ```python
-  import platform; print(platform.platform())
-  import sys; print("Python", sys.version)
-  import numpy; print("NumPy", numpy.__version__)
-  import scipy; print("SciPy", scipy.__version__)
-  import sklearn; print("Scikit-Learn", sklearn.__version__)
-  import openml; print("OpenML", openml.__version__)
-  ```
-
-New contributor tips
---------------------
-
-A great way to start contributing to openml-python is to pick an item
-from the list of [Good First Issues](https://github.com/openml/openml-python/labels/Good%20first%20issue)
-in the issue tracker. Resolving these issues allow you to start
-contributing to the project without much prior knowledge. Your
-assistance in this area will be greatly appreciated by the more
-experienced developers as it helps free up their time to concentrate on
-other issues.
+Happy testing!
 
 Documentation
 -------------
 
 We are glad to accept any sort of documentation: function docstrings,
-reStructuredText documents (like this one), tutorials, etc.
+reStructuredText documents, tutorials, etc.
 reStructuredText documents live in the source code repository under the
 doc/ directory.
 
