@@ -1349,7 +1349,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
     def test_obtain_parameter_values_flow_not_from_server(self):
         model = sklearn.linear_model.LogisticRegression(solver="lbfgs")
         flow = self.extension.model_to_flow(model)
-        msg = "Flow sklearn.linear_model.logistic.LogisticRegression has no " "flow_id!"
+        msg = "Flow sklearn.linear_model.logistic.LogisticRegression has no flow_id!"
 
         with self.assertRaisesRegex(ValueError, msg):
             self.extension.obtain_parameter_values(flow)
