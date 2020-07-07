@@ -106,17 +106,6 @@
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
 <li><a class="reference internal" href="#">Contributing</a><ul>
-<li><a class="reference internal" href="#scope-of-the-package">Scope of the package</a></li>
-<li><a class="reference internal" href="#open-issues-and-potential-todos">Open issues and potential todos</a></li>
-<li><a class="reference internal" href="#how-to-contribute">How to contribute</a><ul>
-<li><a class="reference internal" href="#contributing-code">Contributing code</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#installation">Installation</a><ul>
-<li><a class="reference internal" href="#installation-from-github">Installation from github</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#testing">Testing</a></li>
 <li><a class="reference internal" href="#connecting-new-machine-learning-libraries">Connecting new machine learning libraries</a><ul>
 <li><a class="reference internal" href="#content-of-the-library">Content of the Library</a><ul>
 <li><a class="reference internal" href="#api">API</a></li>
@@ -137,120 +126,36 @@
       
   <div class="section" id="contributing">
 <span id="id1"></span><h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
-<p>Contribution to the OpenML package is highly appreciated. Currently,
-there is a lot of work left on implementing API calls,
-testing them and providing examples to allow new users to easily use the
-OpenML package. See the <a class="reference internal" href="#issues"><span class="std std-ref">Open issues and potential todos</span></a> section for open tasks.</p>
-<p>Please mark yourself as contributor in a github issue if you start working on
-something to avoid duplicate work. If you’re part of the OpenML organization
-you can use github’s assign feature, otherwise you can just leave a comment.</p>
-<div class="section" id="scope-of-the-package">
-<span id="scope"></span><h2>Scope of the package<a class="headerlink" href="#scope-of-the-package" title="Permalink to this headline">¶</a></h2>
-<p>The scope of the OpenML Python package is to provide a Python interface to
-the OpenML platform which integrates well with Python’s scientific stack, most
-notably <a class="reference external" href="http://www.numpy.org/">numpy</a> and <a class="reference external" href="https://www.scipy.org/">scipy</a>.
-To reduce opportunity costs and demonstrate the usage of the package, it also
-implements an interface to the most popular machine learning package written
-in Python, <a class="reference external" href="http://scikit-learn.org/stable/index.html">scikit-learn</a>.
-Thereby it will automatically be compatible with many machine learning
-libraries written in Python.</p>
-<p>We aim to keep the package as light-weight as possible and we will try to
-keep the number of potential installation dependencies as low as possible.
-Therefore, the connection to other machine learning libraries such as
-<em>pytorch</em>, <em>keras</em> or <em>tensorflow</em> should not be done directly inside this
-package, but in a separate package using the OpenML Python connector.</p>
-</div>
-<div class="section" id="open-issues-and-potential-todos">
-<span id="issues"></span><h2>Open issues and potential todos<a class="headerlink" href="#open-issues-and-potential-todos" title="Permalink to this headline">¶</a></h2>
-<p>We collect open issues and feature requests in an <a class="reference external" href="https://github.com/openml/openml-python/issues">issue tracker on github</a>.
-The issue tracker contains issues marked as <em>Good first issue</em>, which shows
-issues which are good for beginners. We also maintain a somewhat up-to-date
-<a class="reference external" href="https://github.com/openml/openml-python/issues/410">roadmap</a> which
-contains longer-term goals.</p>
-</div>
-<div class="section" id="how-to-contribute">
-<span id="id2"></span><h2>How to contribute<a class="headerlink" href="#how-to-contribute" title="Permalink to this headline">¶</a></h2>
-<p>There are many ways to contribute to the development of the OpenML Python
-connector and OpenML in general. We welcome all kinds of contributions,
-especially:</p>
-<ul class="simple">
-<li><p>Source code which fixes an issue, improves usability or implements a new
-feature.</p></li>
-<li><p>Improvements to the documentation, which can be found in the <code class="docutils literal notranslate"><span class="pre">doc</span></code>
-directory.</p></li>
-<li><p>New examples - current examples can be found in the <code class="docutils literal notranslate"><span class="pre">examples</span></code> directory.</p></li>
-<li><p>Bug reports - if something doesn’t work for you or is cumbersome, please
-open a new issue to let us know about the problem.</p></li>
-<li><p>Use the package and spread the word.</p></li>
-<li><p><a class="reference external" href="https://www.openml.org/cite">Cite OpenML</a> if you use it in a scientific
-publication.</p></li>
-<li><p>Visit one of our <a class="reference external" href="https://meet.openml.org/">hackathons</a>.</p></li>
-<li><p>Check out how to <a class="reference external" href="https://github.com/openml/OpenML/blob/master/CONTRIBUTING.md">contribute to the main OpenML project</a>.</p></li>
+<p>Contribution to the OpenML package is highly appreciated in all forms.
+In particular, a few ways to contribute to openml-python are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A direct contribution to the package, by means of improving the
+code, documentation or examples. To get started, see <a class="reference external" href="https://github.com/openml/openml-python/blob/master/CONTRIBUTING.md">this file</a>
+with details on how to set up your environment to develop for openml-python.</p></li>
+<li><p>A contribution to an openml-python extension. An extension package allows OpenML to interface
+with a machine learning package (such as scikit-learn or keras). These extensions
+are hosted in separate repositories and may have their own guidelines.
+For more information, see the <a class="reference internal" href="#extensions"><span class="std std-ref">Connecting new machine learning libraries</span></a> below.</p></li>
+<li><p>Bug reports. If something doesn’t work for you or is cumbersome, please</p></li>
 </ul>
-<div class="section" id="contributing-code">
-<h3>Contributing code<a class="headerlink" href="#contributing-code" title="Permalink to this headline">¶</a></h3>
-<p>Our guidelines on code contribution can be found in <a class="reference external" href="https://github.com/openml/openml-python/blob/master/CONTRIBUTING.md">this file</a>.</p>
-</div>
-</div>
-<div class="section" id="installation">
-<span id="id3"></span><h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="installation-from-github">
-<h3>Installation from github<a class="headerlink" href="#installation-from-github" title="Permalink to this headline">¶</a></h3>
-<p>The package source code is available from
-<a class="reference external" href="https://github.com/openml/openml-python">github</a> and can be obtained with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/openml/openml-python.git
-</pre></div>
-</div>
-<p>Once you cloned the package, change into the new directory.
-If you are a regular user, install with</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -e .
-</pre></div>
-</div>
-<p>If you are a contributor, you will also need to install test dependencies</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -e <span class="s2">&quot;.[test]&quot;</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="testing">
-<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
-<p>From within the directory of the cloned package, execute:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest tests/
-</pre></div>
-</div>
-<p>Executing a specific test can be done by specifying the module, test case, and test.
-To obtain a hierarchical list of all tests, run</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest --collect-only
-</pre></div>
-</div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;Module <span class="s1">&#39;tests/test_datasets/test_dataset.py&#39;</span>&gt;
-  &lt;UnitTestCase <span class="s1">&#39;OpenMLDatasetTest&#39;</span>&gt;
-    &lt;TestCaseFunction <span class="s1">&#39;test_dataset_format_constructor&#39;</span>&gt;
-    &lt;TestCaseFunction <span class="s1">&#39;test_get_data&#39;</span>&gt;
-    &lt;TestCaseFunction <span class="s1">&#39;test_get_data_rowid_and_ignore_and_target&#39;</span>&gt;
-    &lt;TestCaseFunction <span class="s1">&#39;test_get_data_with_ignore_attributes&#39;</span>&gt;
-    &lt;TestCaseFunction <span class="s1">&#39;test_get_data_with_rowid&#39;</span>&gt;
-    &lt;TestCaseFunction <span class="s1">&#39;test_get_data_with_target&#39;</span>&gt;
-  &lt;UnitTestCase <span class="s1">&#39;OpenMLDatasetTestOnTestServer&#39;</span>&gt;
-    &lt;TestCaseFunction <span class="s1">&#39;test_tagging&#39;</span>&gt;
-</pre></div>
-</div>
-<p>To run a specific module, add the module name, for instance:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest tests/test_datasets/test_dataset.py
-</pre></div>
-</div>
-<p>To run a specific unit test case, add the test case name, for instance:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest
-</pre></div>
-</div>
-<p>To run a specific unit test, add the test name, for instance:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest::test_get_data
-</pre></div>
-</div>
-<p>Happy testing!</p>
-</div>
+<blockquote>
+<div><p>open a new issue to let us know about the problem.
+See <a class="reference external" href="https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md#reporting-bugs">this section</a>.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.openml.org/cite">Cite OpenML</a> if you use it in a scientific</p></li>
+</ul>
+<blockquote>
+<div><p>publication.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Visit one of our <a class="reference external" href="https://meet.openml.org/">hackathons</a>.</p></li>
+<li><p>Contribute to another OpenML project, such as <a class="reference external" href="https://github.com/openml/OpenML/blob/master/CONTRIBUTING.md">the main OpenML project</a>.</p></li>
+</ul>
+</div></blockquote>
 <div class="section" id="connecting-new-machine-learning-libraries">
-<h2>Connecting new machine learning libraries<a class="headerlink" href="#connecting-new-machine-learning-libraries" title="Permalink to this headline">¶</a></h2>
+<span id="extensions"></span><h2>Connecting new machine learning libraries<a class="headerlink" href="#connecting-new-machine-learning-libraries" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="content-of-the-library">
 <h3>Content of the Library<a class="headerlink" href="#content-of-the-library" title="Permalink to this headline">¶</a></h3>
 <p>To leverage support from the community and to tap in the potential of OpenML, interfacing
