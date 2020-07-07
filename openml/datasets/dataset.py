@@ -133,16 +133,40 @@ class OpenMLDataset(OpenMLBase):
         qualities=None,
         dataset=None,
     ):
+        def find_invalid_characters(string, pattern):
+            invalid_chars = set()
+            regex = re.compile(pattern)
+            for char in string:
+                if not regex.match(char):
+                    invalid_chars.add(char)
+            invalid_chars = ",".join(
+                [
+                    "'{}'".format(char) if char != "'" else '"{}"'.format(char)
+                    for char in invalid_chars
+                ]
+            )
+            return invalid_chars
+
         if dataset_id is None:
-            if description and not re.match("^[\x00-\x7F]*$", description):
+            pattern = "^[\x00-\x7F]*$"
+            if description and not re.match(pattern, description):
                 # not basiclatin (XSD complains)
-                raise ValueError("Invalid symbols in description: {}".format(description))
-            if citation and not re.match("^[\x00-\x7F]*$", citation):
+                invalid_characters = find_invalid_characters(description, pattern)
+                raise ValueError(
+                    "Invalid symbols {} in description: {}".format(invalid_characters, description)
+                )
+            pattern = "^[\x00-\x7F]*$"
+            if citation and not re.match(pattern, citation):
                 # not basiclatin (XSD complains)
-                raise ValueError("Invalid symbols in citation: {}".format(citation))
-            if not re.match("^[a-zA-Z0-9_\\-\\.\\(\\),]+$", name):
+                invalid_characters = find_invalid_characters(citation, pattern)
+                raise ValueError(
+                    "Invalid symbols {} in citation: {}".format(invalid_characters, citation)
+                )
+            pattern = "^[a-zA-Z0-9_\\-\\.\\(\\),]+$"
+            if not re.match(pattern, name):
                 # regex given by server in error message
-                raise ValueError("Invalid symbols in name: {}".format(name))
+                invalid_characters = find_invalid_characters(name, pattern)
+                raise ValueError("Invalid symbols {} in name: {}".format(invalid_characters, name))
         # TODO add function to check if the name is casual_string128
         # Attributes received by querying the RESTful API
         self.dataset_id = int(dataset_id) if dataset_id is not None else None

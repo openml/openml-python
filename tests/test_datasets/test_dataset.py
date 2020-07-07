@@ -38,13 +38,13 @@ class OpenMLDatasetTest(TestBase):
         str(data)
 
     def test_init_string_validation(self):
-        with pytest.raises(ValueError, match="Invalid symbols in name"):
+        with pytest.raises(ValueError, match="Invalid symbols ' ' in name"):
             openml.datasets.OpenMLDataset(name="some name", description="a description")
 
-        with pytest.raises(ValueError, match="Invalid symbols in description"):
+        with pytest.raises(ValueError, match="Invalid symbols 'ï' in description"):
             openml.datasets.OpenMLDataset(name="somename", description="a descriptïon")
 
-        with pytest.raises(ValueError, match="Invalid symbols in citation"):
+        with pytest.raises(ValueError, match="Invalid symbols 'ü' in citation"):
             openml.datasets.OpenMLDataset(
                 name="somename", description="a description", citation="Something by Müller"
             )
