@@ -1414,9 +1414,13 @@ class TestSklearnExtensionRunFunctions(TestBase):
     def test_run_model_on_task(self):
         task = openml.tasks.get_task(1)
         # using most_frequent imputer since dataset has mixed types and to keep things simple
-        pipe = sklearn.pipeline.Pipeline([('imp', SimpleImputer(strategy='most_frequent')),
-                                          ('dummy', sklearn.dummy.DummyClassifier())])
-        openml.runs.run_model_on_task(pipe, task, dataset_format='array')
+        pipe = sklearn.pipeline.Pipeline(
+            [
+                ("imp", SimpleImputer(strategy="most_frequent")),
+                ("dummy", sklearn.dummy.DummyClassifier()),
+            ]
+        )
+        openml.runs.run_model_on_task(pipe, task, dataset_format="array")
 
     def test_seed_model(self):
         # randomized models that are initialized without seeds, can be seeded

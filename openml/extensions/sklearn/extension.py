@@ -778,7 +778,7 @@ class SklearnExtension(Extension):
         # version of all subcomponents, which themselves already contain all
         # requirements for their subcomponents. The external version string is a
         # sorted concatenation of all modules which are present in this run.
-        model_package_name = model.__module__.split('.')[0]
+        model_package_name = model.__module__.split(".")[0]
         module = importlib.import_module(model_package_name)
         model_package_version_number = module.__version__  # type: ignore
         external_version = self._format_external_version(
@@ -885,8 +885,9 @@ class SklearnExtension(Extension):
                         # length 2 is for {VotingClassifier.estimators,
                         # Pipeline.steps, FeatureUnion.transformer_list}
                         # length 3 is for ColumnTransformer
-                        msg = 'Length of tuple of type {} '\
-                              'does not match assumptions'.format(sub_component_type)
+                        msg = "Length of tuple of type {} " "does not match assumptions".format(
+                            sub_component_type
+                        )
                         raise ValueError(msg)
 
                     if isinstance(sub_component, str):
@@ -1543,7 +1544,7 @@ class SklearnExtension(Extension):
                         preds = [task.class_labels[pred] for pred in y]
                         y = preds
                 else:
-                    raise ValueError('The task has no class labels')
+                    raise ValueError("The task has no class labels")
                 classes = model_classes
             else:
                 return None
@@ -1552,8 +1553,7 @@ class SklearnExtension(Extension):
             # model_classes: sklearn classifier mapping from original array id to
             # prediction index id
             if not isinstance(classes, list):
-                raise ValueError('please convert model classes to list prior to '
-                                 'calling this fn')
+                raise ValueError("please convert model classes to list prior to " "calling this fn")
             # DataFrame allows more accurate mapping of classes as column names
             result = pd.DataFrame(0, index=np.arange(len(y)), columns=classes, dtype=np.float32)
             for obs, prediction in enumerate(y):
@@ -1621,10 +1621,12 @@ class SklearnExtension(Extension):
 
             # to handle the case when dataset is numpy and categories are encoded
             # however the class labels stored in task are still categories
-            if isinstance(y_train, np.ndarray) and \
-                    isinstance(typing.cast(List, task.class_labels)[0], str):
-                model_classes = [typing.cast(List[str], task.class_labels)[i]
-                                 for i in model_classes]
+            if isinstance(y_train, np.ndarray) and isinstance(
+                typing.cast(List, task.class_labels)[0], str
+            ):
+                model_classes = [
+                    typing.cast(List[str], task.class_labels)[i] for i in model_classes
+                ]
 
         modelpredict_start_cputime = time.process_time()
         modelpredict_start_walltime = time.time()
@@ -1674,8 +1676,12 @@ class SklearnExtension(Extension):
                     # probabilities are ordered the same way as the classes are ordered).
 
                     # DataFrame allows more accurate mapping of classes as column names
-                    proba_y_new = pd.DataFrame(0, index=np.arange(proba_y.shape[0]),
-                                               columns=task.class_labels, dtype=np.float32)
+                    proba_y_new = pd.DataFrame(
+                        0,
+                        index=np.arange(proba_y.shape[0]),
+                        columns=task.class_labels,
+                        dtype=np.float32,
+                    )
                     for idx, model_class in enumerate(model_classes):
                         proba_y_new.loc[:, model_class] = proba_y[:, idx]
                     proba_y = proba_y_new.to_numpy()
@@ -1815,11 +1821,13 @@ class SklearnExtension(Extension):
                             },
                         }
                         if len(subcomponent) == 3:
-                            if not isinstance(subcomponent[2], list) and \
-                                    not isinstance(subcomponent[2], OrderedDict):
-                                raise TypeError('Subcomponent argument should be'
-                                                ' list or OrderedDict')
-                            current['value']['argument_1'] = subcomponent[2]
+                            if not isinstance(subcomponent[2], list) and not isinstance(
+                                subcomponent[2], OrderedDict
+                            ):
+                                raise TypeError(
+                                    "Subcomponent argument should be" " list or OrderedDict"
+                                )
+                            current["value"]["argument_1"] = subcomponent[2]
                         parsed_values.append(current)
                     parsed_values = json.dumps(parsed_values)
                 else:

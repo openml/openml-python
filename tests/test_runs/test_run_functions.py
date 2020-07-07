@@ -38,10 +38,8 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.linear_model import LogisticRegression, SGDClassifier, LinearRegression
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.svm import SVC
-from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, \
-    StratifiedKFold
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, StratifiedKFold
 from sklearn.pipeline import Pipeline, make_pipeline
-
 
 
 class TestRun(TestBase):
@@ -342,9 +340,12 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(task_id)
         # internally dataframe is loaded and targets are categorical
         # which LinearRegression() cannot handle
-        with self.assertRaisesRegex(ValueError, 'could not convert string to float:*'):
+        # with self.assertRaisesRegex(ValueError, "could not convert string to float:*"):
+        with self.assertRaisesRegex(
+            AttributeError, "'LinearRegression' object has no attribute 'classes_'"
+        ):
             openml.runs.run_model_on_task(
-                model=clf, task=task, avoid_duplicate_runs=False,
+                model=clf, task=task, avoid_duplicate_runs=False, dataset_format="array",
             )
 
     def test_check_erronous_sklearn_flow_fails(self):
@@ -547,19 +548,28 @@ class TestRun(TestBase):
         def get_ct_cf(nominal_indices, numeric_indices):
             inner = sklearn.compose.ColumnTransformer(
                 transformers=[
-                    ('numeric',
-                     make_pipeline(SimpleImputer(strategy='mean'),
-                                   sklearn.preprocessing.StandardScaler()),
-                     numeric_indices),
-                    ('nominal',
-                     make_pipeline(CustomImputer(strategy='most_frequent'),
-                                   sklearn.preprocessing.OneHotEncoder(handle_unknown='ignore')),
-                     nominal_indices)],
-                remainder='passthrough')
+                    (
+                        "numeric",
+                        make_pipeline(
+                            SimpleImputer(strategy="mean"), sklearn.preprocessing.StandardScaler()
+                        ),
+                        numeric_indices,
+                    ),
+                    (
+                        "nominal",
+                        make_pipeline(
+                            CustomImputer(strategy="most_frequent"),
+                            sklearn.preprocessing.OneHotEncoder(handle_unknown="ignore"),
+                        ),
+                        nominal_indices,
+                    ),
+                ],
+                remainder="passthrough",
+            )
             return sklearn.pipeline.Pipeline(
                 steps=[
-                    ('transformer', inner),
-                    ('classifier', sklearn.tree.DecisionTreeClassifier())
+                    ("transformer", inner),
+                    ("classifier", sklearn.tree.DecisionTreeClassifier()),
                 ]
             )
 
@@ -583,25 +593,37 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
-    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
-                     reason="columntransformer introduction in 0.20.0")
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="columntransformer introduction in 0.20.0",
+    )
     def test_run_and_upload_decision_tree_pipeline(self):
 
-        cat_imp = make_pipeline(SimpleImputer(strategy='most_frequent'),
-                                OneHotEncoder(handle_unknown='ignore'))
+        cat_imp = make_pipeline(
+            SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore")
+        )
         cont_imp = make_pipeline(CustomImputer(), StandardScaler())
         from sklearn.compose import ColumnTransformer
-        ct = ColumnTransformer([('cat', cat_imp, cat),
-                                ('cont', cont_imp, cont)])
-        pipeline2 = Pipeline(steps=[('Imputer', ct),
-                                    ('VarianceThreshold', VarianceThreshold()),
-                                    ('Estimator', RandomizedSearchCV(
-                                        DecisionTreeClassifier(),
-                                        {'min_samples_split':
-                                         [2 ** x for x in range(1, 8)],
-                                         'min_samples_leaf':
-                                         [2 ** x for x in range(0, 7)]},
-                                        cv=3, n_iter=10))])
+
+        ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
+        pipeline2 = Pipeline(
+            steps=[
+                ("Imputer", ct),
+                ("VarianceThreshold", VarianceThreshold()),
+                (
+                    "Estimator",
+                    RandomizedSearchCV(
+                        DecisionTreeClassifier(),
+                        {
+                            "min_samples_split": [2 ** x for x in range(1, 8)],
+                            "min_samples_leaf": [2 ** x for x in range(0, 7)],
+                        },
+                        cv=3,
+                        n_iter=10,
+                    ),
+                ),
+            ]
+        )
 
         task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
         n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
@@ -726,22 +748,32 @@ class TestRun(TestBase):
         )
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
-    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.21",
-                     reason="Pipelines don't support indexing (used for the assert check)")
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.21",
+        reason="Pipelines don't support indexing (used for the assert check)",
+    )
     def test_initialize_cv_from_run(self):
-        randomsearch = Pipeline([('enc', OneHotEncoder(handle_unknown='ignore')),
-                                 ('rs', RandomizedSearchCV(
-                                     RandomForestClassifier(n_estimators=5),
-                                     {"max_depth": [3, None],
-                                      "max_features": [1, 2, 3, 4],
-                                      "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
-                                      "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                                      "bootstrap": [True, False],
-                                      "criterion": ["gini", "entropy"]},
-                                     cv=StratifiedKFold(n_splits=2, shuffle=True),
-                                     n_iter=2)
-                                  )
-                                 ])
+        randomsearch = Pipeline(
+            [
+                ("enc", OneHotEncoder(handle_unknown="ignore")),
+                (
+                    "rs",
+                    RandomizedSearchCV(
+                        RandomForestClassifier(n_estimators=5),
+                        {
+                            "max_depth": [3, None],
+                            "max_features": [1, 2, 3, 4],
+                            "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
+                            "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                            "bootstrap": [True, False],
+                            "criterion": ["gini", "entropy"],
+                        },
+                        cv=StratifiedKFold(n_splits=2, shuffle=True),
+                        n_iter=2,
+                    ),
+                ),
+            ]
+        )
 
         task = openml.tasks.get_task(11)
         run = openml.runs.run_model_on_task(
@@ -786,15 +818,26 @@ class TestRun(TestBase):
                 self.assertGreaterEqual(alt_scores[idx], 0)
                 self.assertLessEqual(alt_scores[idx], 1)
 
-    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
-                     reason="SimpleImputer doesn't handle mixed type DataFrame as input")
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="SimpleImputer doesn't handle mixed type DataFrame as input",
+    )
     def test_local_run_swapped_parameter_order_model(self):
 
         # construct sci-kit learn classifier
-        clf = Pipeline(steps=[('imputer', make_pipeline(SimpleImputer(strategy='most_frequent'),
-                                                        OneHotEncoder(handle_unknown='ignore'))),
-                              # random forest doesn't take categoricals
-                              ('estimator', RandomForestClassifier())])
+        clf = Pipeline(
+            steps=[
+                (
+                    "imputer",
+                    make_pipeline(
+                        SimpleImputer(strategy="most_frequent"),
+                        OneHotEncoder(handle_unknown="ignore"),
+                    ),
+                ),
+                # random forest doesn't take categoricals
+                ("estimator", RandomForestClassifier()),
+            ]
+        )
 
         # download task
         task = openml.tasks.get_task(7)
@@ -806,14 +849,20 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
-    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
-                     reason="SimpleImputer doesn't handle mixed type DataFrame as input")
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="SimpleImputer doesn't handle mixed type DataFrame as input",
+    )
     def test_local_run_swapped_parameter_order_flow(self):
 
         # construct sci-kit learn classifier
-        clf = Pipeline(steps=[('imputer', SimpleImputer(strategy='most_frequent')),
-                              ('encoder', OneHotEncoder(handle_unknown='ignore')),
-                              ('estimator', RandomForestClassifier(n_estimators=10))])
+        clf = Pipeline(
+            steps=[
+                ("imputer", SimpleImputer(strategy="most_frequent")),
+                ("encoder", OneHotEncoder(handle_unknown="ignore")),
+                ("estimator", RandomForestClassifier(n_estimators=10)),
+            ]
+        )
 
         flow = self.extension.model_to_flow(clf)
         # download task
@@ -826,13 +875,19 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
-    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
-                     reason="SimpleImputer doesn't handle mixed type DataFrame as input")
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="SimpleImputer doesn't handle mixed type DataFrame as input",
+    )
     def test_local_run_metric_score(self):
         # construct sci-kit learn classifier
-        clf = Pipeline(steps=[('imputer', SimpleImputer(strategy='most_frequent')),
-                              ('encoder', OneHotEncoder(handle_unknown='ignore')),
-                              ('estimator', RandomForestClassifier(n_estimators=10))])
+        clf = Pipeline(
+            steps=[
+                ("imputer", SimpleImputer(strategy="most_frequent")),
+                ("encoder", OneHotEncoder(handle_unknown="ignore")),
+                ("estimator", RandomForestClassifier(n_estimators=10)),
+            ]
+        )
 
         # download task
         task = openml.tasks.get_task(7)
@@ -853,19 +908,20 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
-    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
-                     reason="SimpleImputer doesn't handle mixed type DataFrame as input")
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="SimpleImputer doesn't handle mixed type DataFrame as input",
+    )
     def test_initialize_model_from_run(self):
-        clf = sklearn.pipeline.Pipeline(steps=[
-            ('Imputer', SimpleImputer(strategy='most_frequent')),
-            ('VarianceThreshold', VarianceThreshold(threshold=0.05)),
-            ('Estimator', GaussianNB())])
-        task = openml.tasks.get_task(1198)
-        run = openml.runs.run_model_on_task(
-            model=clf,
-            task=task,
-            avoid_duplicate_runs=False,
+        clf = sklearn.pipeline.Pipeline(
+            steps=[
+                ("Imputer", SimpleImputer(strategy="most_frequent")),
+                ("VarianceThreshold", VarianceThreshold(threshold=0.05)),
+                ("Estimator", GaussianNB()),
+            ]
         )
+        task = openml.tasks.get_task(1198)
+        run = openml.runs.run_model_on_task(model=clf, task=task, avoid_duplicate_runs=False,)
         run_ = run.publish()
         TestBase._mark_entity_for_removal("run", run_.run_id)
         TestBase.logger.info("collected from test_run_functions: {}".format(run_.run_id))
@@ -880,10 +936,8 @@ class TestRun(TestBase):
         openml.flows.assert_flows_equal(flowR, flowL)
         openml.flows.assert_flows_equal(flowS, flowL)
 
-        self.assertEqual(flowS.components['Imputer'].
-                         parameters['strategy'], '"most_frequent"')
-        self.assertEqual(flowS.components['VarianceThreshold'].
-                         parameters['threshold'], '0.05')
+        self.assertEqual(flowS.components["Imputer"].parameters["strategy"], '"most_frequent"')
+        self.assertEqual(flowS.components["VarianceThreshold"].parameters["threshold"], "0.05")
 
     @pytest.mark.flaky()
     def test_get_run_trace(self):
@@ -934,8 +988,10 @@ class TestRun(TestBase):
         run_trace = openml.runs.get_run_trace(run_id)
         self.assertEqual(len(run_trace.trace_iterations), num_iterations * num_folds)
 
-    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
-                     reason="SimpleImputer doesn't handle mixed type DataFrame as input")
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="SimpleImputer doesn't handle mixed type DataFrame as input",
+    )
     def test__run_exists(self):
         # would be better to not sentinel these clfs,
         # so we do not have to perform the actual runs
@@ -1077,8 +1133,10 @@ class TestRun(TestBase):
             openml.exceptions.PyOpenMLError, expected_message_regex, loaded_run.publish
         )
 
-    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
-                     reason="OneHotEncoder cannot handle mixed type DataFrame as input")
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="OneHotEncoder cannot handle mixed type DataFrame as input",
+    )
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(7)
         num_instances = 3196
@@ -1086,16 +1144,17 @@ class TestRun(TestBase):
         num_repeats = 1
 
         flow = unittest.mock.Mock()
-        flow.name = 'dummy'
-        clf = make_pipeline(OneHotEncoder(handle_unknown='ignore'),
-                            SGDClassifier(loss='log', random_state=1))
+        flow.name = "dummy"
+        clf = make_pipeline(
+            OneHotEncoder(handle_unknown="ignore"), SGDClassifier(loss="log", random_state=1)
+        )
         res = openml.runs.functions._run_task_get_arffcontent(
             flow=flow,
             extension=self.extension,
             model=clf,
             task=task,
             add_local_measures=True,
-            dataset_format='dataframe'
+            dataset_format="dataframe",
         )
         arff_datacontent, trace, fold_evaluations, _ = res
         # predictions
@@ -1293,8 +1352,10 @@ class TestRun(TestBase):
         runs = openml.runs.list_runs(tag="curves")
         self.assertGreaterEqual(len(runs), 1)
 
-    @unittest.skipIf(LooseVersion(sklearn.__version__) < "0.20",
-                     reason="columntransformer introduction in 0.20.0")
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="columntransformer introduction in 0.20.0",
+    )
     def test_run_on_dataset_with_missing_labels(self):
         # Check that _run_task_get_arffcontent works when one of the class
         # labels only declared in the arff file, but is not present in the
@@ -1304,16 +1365,14 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(2)
 
         from sklearn.compose import ColumnTransformer
-        cat_imp = make_pipeline(SimpleImputer(strategy='most_frequent'),
-                                OneHotEncoder(handle_unknown='ignore'))
+
+        cat_imp = make_pipeline(
+            SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore")
+        )
         cont_imp = make_pipeline(CustomImputer(), StandardScaler())
-        ct = ColumnTransformer([('cat', cat_imp, cat),
-                                ('cont', cont_imp, cont)])
+        ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
         model = Pipeline(
-            steps=[
-                ('preprocess', ct),
-                ('estimator', sklearn.tree.DecisionTreeClassifier())
-            ]
+            steps=[("preprocess", ct), ("estimator", sklearn.tree.DecisionTreeClassifier())]
         )  # build a sklearn classifier
 
         data_content, _, _, _ = _run_task_get_arffcontent(
@@ -1322,7 +1381,7 @@ class TestRun(TestBase):
             task=task,
             extension=self.extension,
             add_local_measures=True,
-            dataset_format='dataframe'
+            dataset_format="dataframe",
         )
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different

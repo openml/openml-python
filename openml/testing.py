@@ -259,19 +259,20 @@ except ImportError:
 
 
 class CustomImputer(SimpleImputer):
-    '''Duplicate class alias for sklearn's SimpleImputer
+    """Duplicate class alias for sklearn's SimpleImputer
 
     Helps bypass the sklearn extension duplicate operation check
-    '''
+    """
+
     pass
 
 
 def cont(X):
-    return X.dtypes != 'category'
+    return X.dtypes != "category"
 
 
 def cat(X):
-    return X.dtypes == 'category'
+    return X.dtypes == "category"
 
 
-__all__ = ['TestBase', 'SimpleImputer', 'CustomImputer', 'cat', 'cont']
+__all__ = ["TestBase", "SimpleImputer", "CustomImputer", "cat", "cont"]
