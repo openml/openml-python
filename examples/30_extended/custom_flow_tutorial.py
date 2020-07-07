@@ -87,10 +87,47 @@ autosklearn_amlb_flow = openml.flows.OpenMLFlow(
 )
 autosklearn_amlb_flow.publish()
 print(f"autosklearn flow created: {autosklearn_amlb_flow.flow_id}")
-# for dev purposes, since we're rerunning this often, we want to double-check no new flows are created
 
 ####################################################################################################
 # 2. Using the flow
 # ====================
 # This Section will show how to upload run data for your custom flow.
-#
+# Take care to change the values of parameters as well as the task id,
+# to reflect the actual run.
+# Task and parameter values in the example are fictional.
+
+flow_id = autosklearn_amlb_flow.flow_id
+
+parameters = [
+    OrderedDict([("oml:name", "cores"), ("oml:value", 4), ("oml:component", flow_id)]),
+    OrderedDict([("oml:name", "memory"), ("oml:value", 16), ("oml:component", flow_id)]),
+    OrderedDict([("oml:name", "time"), ("oml:value", 120), ("oml:component", flow_id)]),
+]
+
+task_id = 115
+task = openml.tasks.get_task(task_id)  # Diabetes Task
+dataset_id = task.get_dataset().dataset_id
+
+
+####################################################################################################
+# The last bit of information for the run we need are the predicted values.
+# The exact format of the predictions will depend on the task.
+# [... add later, this clearly seems too complicated to expected users to do]
+
+predictions = []  #  load_format_predictions(task_id, predictions)
+
+####################################################################################################
+# Finally we can create the OpenMLRun object and upload.
+# We use the "setup string" because the used flow was a script.
+
+benchmark_command = f"python3 runbenchmark.py auto-sklearn medium -m aws -t 119"
+my_run = openml.runs.OpenMLRun(
+    task_id=task_id,
+    flow_id=flow_id,
+    dataset_id=dataset_id,
+    parameter_settings=parameters,
+    setup_string=benchmark_command,
+    data_content=predictions,
+    tags=["study_218"],
+)
+my_run.publish()
