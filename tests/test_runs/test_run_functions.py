@@ -597,31 +597,21 @@ class TestRun(TestBase):
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
     )
-    def test_run_and_upload_decision_tree_pipeline(self):
+    def test_run_and_upload_knn_pipeline(self):
 
         cat_imp = make_pipeline(
             SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore")
         )
         cont_imp = make_pipeline(CustomImputer(), StandardScaler())
         from sklearn.compose import ColumnTransformer
+        from sklearn.neighbors import KNeighborsClassifier
 
         ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
         pipeline2 = Pipeline(
             steps=[
                 ("Imputer", ct),
                 ("VarianceThreshold", VarianceThreshold()),
-                (
-                    "Estimator",
-                    RandomizedSearchCV(
-                        DecisionTreeClassifier(),
-                        {
-                            "min_samples_split": [2 ** x for x in range(1, 8)],
-                            "min_samples_leaf": [2 ** x for x in range(0, 7)],
-                        },
-                        cv=3,
-                        n_iter=10,
-                    ),
-                ),
+                ("Estimator", RandomizedSearchCV(KNeighborsClassifier(), {}, cv=3, n_iter=10,),),
             ]
         )
 
