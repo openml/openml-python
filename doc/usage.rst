@@ -29,6 +29,37 @@ the OpenML Python connector, followed up by a simple example.
 
 * `Introduction <examples/introduction_tutorial.html>`_
 
+~~~~~~~~~~~~~
+Configuration
+~~~~~~~~~~~~~
+
+The configuration file resides in a directory ``.openml`` in the home
+directory of the user and is called config. It consists of ``key = value`` pairs
+which are separated by newlines. The following keys are defined:
+
+* apikey:
+    * required to access the server
+
+* server:
+    * default: ``http://www.openml.org``
+
+* cachedir:
+    * if not given, will default to ``file.path(tempdir(), "cache")``.
+
+* avoid_duplicate_runs:
+    * if not given, will default to ``True``.
+
+* connection_n_retries:
+    * default: 2. Maximum number of retries: 20.
+
+* verbosity:
+    * 0: normal output
+    * 1: info output
+    * 2: debug output
+
+* arff.reader:
+    * ``RWeka``: This is the standard Java parser used in Weka.
+    * ``farff``: The `farff package <http://www.github.com/mlr-org/farff>`_ lives below the mlr-org and is a newer, faster parser without Java.
 
 ~~~~~~~~~~~~
 Key concepts
