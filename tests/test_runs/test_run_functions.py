@@ -611,7 +611,15 @@ class TestRun(TestBase):
             steps=[
                 ("Imputer", ct),
                 ("VarianceThreshold", VarianceThreshold()),
-                ("Estimator", RandomizedSearchCV(KNeighborsClassifier(), {}, cv=3, n_iter=10,),),
+                (
+                    "Estimator",
+                    RandomizedSearchCV(
+                        KNeighborsClassifier(),
+                        {"n_neighbors": [x for x in range(2, 10)]},
+                        cv=3,
+                        n_iter=10,
+                    ),
+                ),
             ]
         )
 
