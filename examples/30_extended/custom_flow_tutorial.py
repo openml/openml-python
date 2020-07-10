@@ -32,13 +32,13 @@ openml.config.start_using_configuration_for_example()
 # ====================
 # The first step is to define all the hyperparameters of your flow.
 # Check ... for the descriptions of each variable.
-# Note that `external version` and `name` together should uniquely identify a flow.
+# Note that `external version` and `name` together uniquely identify a flow.
 #
 # The AutoML Benchmark runs AutoML systems across a range of tasks.
-# We can not use the flows of the AutoML systems directly, as the benchmark adds performs
-# preprocessing as required.
+# OpenML stores Flows for each AutoML system. However, the AutoML benchmark adds
+# preprocessing to the flow, so should be described in a new flow.
 #
-# We will break down the flow parameters into several groups, for the tutorial.
+# We will break down the flow arguments into several groups, for the tutorial.
 # First we will define the name and version information.
 # Make sure to leave enough information so others can determine exactly which
 # version of the package/script is used. Use tags so users can find your flow easily.
@@ -57,7 +57,7 @@ general = dict(
 
 ####################################################################################################
 # Next we define the flow hyperparameters. We define their name and default value in `parameters`,
-# and provide meta-data for each parameter through `parameters_meta_info`.
+# and provide meta-data for each hyperparameter through `parameters_meta_info`.
 # Note that the use of ordered dicts is required.
 
 flow_hyperparameters = dict(
@@ -74,6 +74,7 @@ flow_hyperparameters = dict(
 # subflow, this means that the subflow is entirely executed as part of this flow.
 # Using this modularity also allows your runs to specify which hyperparameters of the
 # subflows were used!
+# Using a subflow is not required.
 #
 # Note: flow 15275 is not actually the right flow on the test server,
 # but that does not matter for this demonstration.
@@ -115,6 +116,7 @@ dataset_id = task.get_dataset().dataset_id
 ####################################################################################################
 # The last bit of information for the run we need are the predicted values.
 # The exact format of the predictions will depend on the task.
+#
 # The predictions should always be a list of lists, each list should contain:
 # - the repeat number: for repeated evaluation strategies. (e.g. repeated cross-validation)
 # - the fold number: for cross-validation. (what should this be for holdout?)
@@ -126,12 +128,18 @@ dataset_id = task.get_dataset().dataset_id
 # - the predicted class/value for the sample
 # - the true class/value for the sample
 #
+# When using openml-python extensions (such as through `run_model_on_task`),
+# all of this formatting is automatic.
+# Unfortunately we can not automate this procedure for custom flows,
+# which means a little additional effort is required.
+#
 # Here we generated some random predictions in place.
 # You can ignore this code, or use it to better understand the formatting of the predictions.
-# Find the repeats/folds/samples for this task:
+#
+# Find the repeats/folds for this task:
 n_repeats, n_folds, _ = task.get_split_dimensions()
 all_test_indices = [
-    (repeat, fold, 0, index)
+    (repeat, fold, index)
     for repeat in range(n_repeats)
     for fold in range(n_folds)
     for index in task.get_train_test_split_indices(fold, repeat)[1]
@@ -142,31 +150,31 @@ r = np.random.rand(150 * n_repeats, 3)
 # scale the random values so that the probabilities of each sample sum to 1:
 y_proba = r / r.sum(axis=1).reshape(-1, 1)
 y_pred = y_proba.argmax(axis=1)
+
 class_map = dict(zip(range(3), task.class_labels))
-y_true = ["Iris-setosa"] * 50 + ["Iris-versicolor"] * 50 + ["Iris-virginica"] * 50
+_, y_true = task.get_X_and_y()
+y_true = [class_map[y] for y in y_true]
 
+# We format the predictions with the utility function `format_prediction`.
+# It will organize the relevant data in the expected format/order.
 predictions = []
-ps = []
-
 for where, y, yp, proba in zip(all_test_indices, y_true, y_pred, y_proba):
-    predictions.append([*where, *proba, class_map[yp], y])
-    repeat, fold, sample, index = where
+    repeat, fold, index = where
 
-    p = format_prediction(
+    prediction = format_prediction(
         task=task,
         repeat=repeat,
         fold=fold,
-        sample=sample,
         index=index,
         prediction=class_map[yp],
         truth=y,
         proba={c: pb for (c, pb) in zip(task.class_labels, proba)},
     )
-    ps.append(p)
+    predictions.append(prediction)
 
 ####################################################################################################
 # Finally we can create the OpenMLRun object and upload.
-# We use the "setup string" because the used flow was a script.
+# We use the argument setup_string because the used flow was a script."
 
 benchmark_command = f"python3 runbenchmark.py auto-sklearn medium -m aws -t 119"
 my_run = openml.runs.OpenMLRun(
