@@ -500,7 +500,7 @@ def _run_task_get_arffcontent(
 
                 arff_line = [rep_no, fold_no, sample_no, tst_idx]  # type: List[Any]
                 if task.class_labels is not None:
-                    for j, class_label in enumerate(task.class_labels):
+                    for j, _ in enumerate(task.class_labels):
                         arff_line.append(proba_y[i][j])
 
                     arff_line.append(pred_y[i])
@@ -520,7 +520,7 @@ def _run_task_get_arffcontent(
 
         elif isinstance(task, OpenMLRegressionTask):
 
-            for i in range(0, len(test_indices)):
+            for i, _ in enumerate(test_indices):
                 arff_line = [rep_no, fold_no, test_indices[i], pred_y[i], test_y.iloc[i]]
                 arff_datacontent.append(arff_line)
 

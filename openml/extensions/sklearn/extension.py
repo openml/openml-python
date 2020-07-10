@@ -1519,7 +1519,7 @@ class SklearnExtension(Extension):
             information later on (in ``obtain_arff_trace``).
         """
 
-        def _prediction_to_probabilities(y: np.ndarray, classes: List[Any]) -> np.ndarray:
+        def _prediction_to_probabilities(y: np.ndarray, model_classes: List[Any]) -> np.ndarray:
             """Transforms predicted probabilities to match with OpenML class indices.
 
             Parameters
@@ -1536,29 +1536,28 @@ class SklearnExtension(Extension):
             """
 
             if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
-                print("\n\nInside _prediction_to_probabilities\n\n")
                 if task.class_labels is not None:
                     if isinstance(y_train, np.ndarray) and isinstance(task.class_labels[0], str):
                         # mapping (decoding) the predictions to the categories
                         # creating a separate copy to not change the expected pred_y type
-                        preds = [task.class_labels[pred] for pred in y]
-                        y = preds
+                        y = [task.class_labels[pred] for pred in y]
                 else:
                     raise ValueError("The task has no class labels")
-                classes = model_classes
             else:
                 return None
 
             # y: list or numpy array of predictions
             # model_classes: sklearn classifier mapping from original array id to
             # prediction index id
-            if not isinstance(classes, list):
-                raise ValueError("please convert model classes to list prior to " "calling this fn")
+            if not isinstance(model_classes, list):
+                raise ValueError("please convert model classes to list prior to calling this fn")
             # DataFrame allows more accurate mapping of classes as column names
-            result = pd.DataFrame(0, index=np.arange(len(y)), columns=classes, dtype=np.float32)
+            result = pd.DataFrame(
+                0, index=np.arange(len(y)), columns=model_classes, dtype=np.float32
+            )
             for obs, prediction in enumerate(y):
                 result.loc[obs, prediction] = 1.0
-            return result.to_numpy()
+            return result
 
         if isinstance(task, OpenMLSupervisedTask):
             if y_train is None:
@@ -1674,26 +1673,27 @@ class SklearnExtension(Extension):
                     # then we need to add a column full of zeros into the probabilities
                     # for class 3 because the rest of the library expects that the
                     # probabilities are ordered the same way as the classes are ordered).
-
-                    # DataFrame allows more accurate mapping of classes as column names
-                    proba_y_new = pd.DataFrame(
-                        0,
-                        index=np.arange(proba_y.shape[0]),
-                        columns=task.class_labels,
-                        dtype=np.float32,
-                    )
-                    for idx, model_class in enumerate(model_classes):
-                        proba_y_new.loc[:, model_class] = proba_y[:, idx]
-                    proba_y = proba_y_new.to_numpy()
-
-                if proba_y.shape[1] != len(task.class_labels):
                     message = "Estimator only predicted for {}/{} classes!".format(
                         proba_y.shape[1], len(task.class_labels),
                     )
                     warnings.warn(message)
                     openml.config.logger.warn(message)
+
+                    # True if predict_proba is successfully called with X_test as numpy
+                    # if X_test is dataframe, proba_y will be dataframe with model_classes columns
+                    if isinstance(proba_y, np.ndarray):
+                        proba_y = pd.DataFrame(proba_y, columns=model_classes)
+
+                    for i, col in enumerate(task.class_labels):
+                        # adding missing columns with 0 probability
+                        if col not in model_classes:
+                            proba_y[col] = 0
+                    proba_y = proba_y[task.class_labels]
             else:
                 raise ValueError("The task has no class labels")
+
+            if not isinstance(proba_y, np.ndarray):
+                proba_y = proba_y.to_numpy()
 
         elif isinstance(task, OpenMLRegressionTask):
             proba_y = None
