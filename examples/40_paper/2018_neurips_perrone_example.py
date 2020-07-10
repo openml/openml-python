@@ -91,9 +91,9 @@ def fetch_evaluations(run_full=False, flow_type="svm", metric="area_under_roc_cu
     # Fetching evaluations
     eval_df = openml.evaluations.list_evaluations_setups(
         function=metric,
-        task=task_ids,
-        flow=[flow_id],
-        uploader=[2702],
+        tasks=task_ids,
+        flows=[flow_id],
+        uploaders=[2702],
         output_format="dataframe",
         parameters_in_separate_columns=True,
     )

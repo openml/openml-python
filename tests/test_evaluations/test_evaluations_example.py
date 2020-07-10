@@ -14,8 +14,8 @@ class TestEvaluationsExample(unittest.TestCase):
 
         df = openml.evaluations.list_evaluations_setups(
             "predictive_accuracy",
-            flow=[8353],
-            task=[6],
+            flows=[8353],
+            tasks=[6],
             output_format="dataframe",
             parameters_in_separate_columns=True,
         )  # Choose an SVM flow, for example 8353, and a task.
