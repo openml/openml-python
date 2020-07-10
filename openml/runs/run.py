@@ -27,14 +27,37 @@ from ..tasks import (
 class OpenMLRun(OpenMLBase):
     """OpenML Run: result of running a model on an openml dataset.
 
-       Parameters
-       ----------
-       task_id : int
-           Refers to the task.
-       flow_id : int
-           Refers to the flow.
-       dataset_id: int
-           Refers to the data.
+    Parameters
+    ----------
+    task_id: int
+    flow_id: int
+    dataset_id: int
+    setup_string: str
+    output_files: Dict[str, str]
+        A dictionary that specifies where each related file can be found.
+    setup_id: int
+    tags: List[str]
+    uploader: int
+        User ID of the uploader.
+    uploader_name: str
+    evaluations: Dict
+    fold_evaluations: Dict
+    sample_evaluations: Dict
+    data_content: List[List]
+        The predictions generated from executing this run.
+    trace: OpenMLRunTrace
+    model: object
+    task_type: str
+    task_evaluation_measure: str
+    flow_name: str
+    parameter_settings: List[OrderedDict]
+    predictions_url: str
+    task: OpenMLTask
+    flow: OpenMLFlow
+    run_id: int
+    description_text: str, optional
+        Description text to add to the predictions file.
+        If left None,
     """
 
     def __init__(
