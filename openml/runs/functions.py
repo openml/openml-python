@@ -4,6 +4,7 @@ from collections import OrderedDict
 import io
 import itertools
 import os
+import time
 from typing import Any, List, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
 import warnings
 
@@ -250,7 +251,8 @@ def run_flow_on_task(
     )
 
     data_content, trace, fold_evaluations, sample_evaluations = res
-
+    fields = [*run_environment, time.strftime("%c"), "Created by run_flow_on_task"]
+    generated_description = "\n".join(fields)
     run = OpenMLRun(
         task_id=task.task_id,
         flow_id=flow_id,
@@ -262,6 +264,7 @@ def run_flow_on_task(
         data_content=data_content,
         flow=flow,
         setup_string=flow.extension.create_setup_string(flow.model),
+        description_text=generated_description,
     )
 
     if (upload_flow or avoid_duplicate_runs) and flow.flow_id is not None:
@@ -1004,3 +1007,58 @@ def __list_runs(api_call, output_format="dict"):
         runs = pd.DataFrame.from_dict(runs, orient="index")
 
     return runs
+
+
+def format_prediction(
+    task: OpenMLSupervisedTask,
+    repeat: int,
+    fold: int,
+    index: int,
+    prediction: Union[str, int, float],
+    truth: Union[str, int, float],
+    sample: Optional[int] = None,
+    proba: Optional[Dict[str, float]] = None,
+) -> List[Union[str, int, float]]:
+    """ Format the predictions in the specific order as required for the run results.
+
+    Parameters
+    ----------
+    task: OpenMLSupervisedTask
+        Task for which to format the predictions.
+    repeat: int
+        From which repeat this predictions is made.
+    fold: int
+        From which fold this prediction is made.
+    index: int
+        For which index this prediction is made.
+    prediction: str, int or float
+        The predicted class label or value.
+    truth: str, int or float
+        The true class label or value.
+    sample: int, optional (default=None)
+        From which sample set this prediction is made.
+        Required only for LearningCurve tasks.
+    proba: Dict[str, float], optional (default=None)
+        For classification tasks only.
+        A mapping from each class label to their predicted probability.
+        The dictionary should contain an entry for each of the `task.class_labels`.
+        E.g.: {"Iris-Setosa": 0.2, "Iris-Versicolor": 0.7, "Iris-Virginica": 0.1}
+
+    Returns
+    -------
+    A list with elements for the prediction results of a run.
+
+    """
+    if isinstance(task, OpenMLClassificationTask):
+        if proba is None:
+            raise ValueError("Predicted Class Probabilities are required for classification task")
+        if not set(task.class_labels) == set(proba):
+            raise ValueError("Each class should have a predicted probability")
+        if sample is None:
+            if isinstance(task, OpenMLLearningCurveTask):
+                raise ValueError("`sample` can not be none for LearningCurveTask")
+            else:
+                sample = 0
+        probabilities = [proba[c] for c in task.class_labels]
+        return [repeat, fold, sample, index, *probabilities, truth, prediction]
+    return [repeat, fold, index, truth, prediction]
