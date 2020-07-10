@@ -481,13 +481,17 @@ def _run_task_get_arffcontent(
 
             for i, tst_idx in enumerate(test_indices):
 
-                arff_line = [rep_no, fold_no, sample_no, tst_idx]  # type: List[Any]
                 if task.class_labels is not None:
-                    for j, class_label in enumerate(task.class_labels):
-                        arff_line.append(proba_y[i][j])
-
-                    arff_line.append(task.class_labels[pred_y[i]])
-                    arff_line.append(task.class_labels[test_y[i]])
+                    arff_line = format_prediction(
+                        task=task,
+                        repeat=rep_no,
+                        fold=fold_no,
+                        sample=sample_no,
+                        index=tst_idx,
+                        prediction=task.class_labels[pred_y[i]],
+                        truth=task.class_labels[test_y[i]],
+                        proba=dict(zip(task.class_labels, proba_y[i])),
+                    )
                 else:
                     raise ValueError("The task has no class labels")
 
@@ -501,7 +505,15 @@ def _run_task_get_arffcontent(
         elif isinstance(task, OpenMLRegressionTask):
 
             for i in range(0, len(test_indices)):
-                arff_line = [rep_no, fold_no, test_indices[i], pred_y[i], test_y[i]]
+                arff_line = format_prediction(
+                    task=task,
+                    repeat=rep_no,
+                    fold=fold_no,
+                    index=test_indices[i],
+                    prediction=pred_y[i],
+                    truth=test_y[i],
+                )
+
                 arff_datacontent.append(arff_line)
 
             if add_local_measures:
