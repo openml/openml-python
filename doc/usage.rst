@@ -38,28 +38,26 @@ directory of the user and is called config. It consists of ``key = value`` pairs
 which are separated by newlines. The following keys are defined:
 
 * apikey:
-    * required to access the server
+    * required to access the server. The `OpenML setup <https://openml.github.io/openml-python/master/examples/20_basic/introduction_tutorial.html#authentication>`_ describes how to obtain an API key.
 
 * server:
-    * default: ``http://www.openml.org``
+    * default: ``http://www.openml.org``. Alternatively, use ``test.openml.org`` for the test server.
 
 * cachedir:
-    * if not given, will default to ``file.path(tempdir(), "cache")``.
+    * if not given, will default to ``~/.openml/cache``
 
 * avoid_duplicate_runs:
+    * if set to ``True``, when ``run_flow_on_task`` or similar methods are called a lookup is performed to see if there already exists such a run on the server. If so, download those results instead.
     * if not given, will default to ``True``.
 
 * connection_n_retries:
+    * number of connection retries.
     * default: 2. Maximum number of retries: 20.
 
 * verbosity:
     * 0: normal output
     * 1: info output
     * 2: debug output
-
-* arff.reader:
-    * ``RWeka``: This is the standard Java parser used in Weka.
-    * ``farff``: The `farff package <http://www.github.com/mlr-org/farff>`_ lives below the mlr-org and is a newer, faster parser without Java.
 
 ~~~~~~~~~~~~
 Key concepts
