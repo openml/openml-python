@@ -62,6 +62,7 @@ class OpenMLRun(OpenMLBase):
         task=None,
         flow=None,
         run_id=None,
+        description_text=None,
     ):
         self.uploader = uploader
         self.uploader_name = uploader_name
@@ -87,6 +88,7 @@ class OpenMLRun(OpenMLBase):
         self.model = model
         self.tags = tags
         self.predictions_url = predictions_url
+        self.description_text = description_text
 
     @property
     def id(self) -> Optional[int]:
@@ -264,16 +266,13 @@ class OpenMLRun(OpenMLBase):
         if self.flow is None:
             self.flow = get_flow(self.flow_id)
 
-        run_environment = (
-            self.flow.extension.get_version_information()
-            + [time.strftime("%c")]
-            + ["Created by run_task()"]
-        )
+        if self.description_text is None:
+            self.description_text = time.strftime("%c")
         task = get_task(self.task_id)
 
         arff_dict = OrderedDict()  # type: 'OrderedDict[str, Any]'
         arff_dict["data"] = self.data_content
-        arff_dict["description"] = "\n".join(run_environment)
+        arff_dict["description"] = self.description_text
         arff_dict["relation"] = "openml_task_{}_predictions".format(task.task_id)
 
         if isinstance(task, OpenMLLearningCurveTask):
@@ -485,9 +484,9 @@ class OpenMLRun(OpenMLBase):
         Derived child classes should overwrite this method as necessary.
         The description field will be populated automatically if not provided.
         """
-        if self.model is None:
+        if self.parameter_settings is None and self.model is None:
             raise PyOpenMLError(
-                "OpenMLRun obj does not contain a model. " "(This should never happen.) "
+                "OpenMLRun must contain a model or be initialized with parameter_settings."
             )
         if self.flow_id is None:
             if self.flow is None:
