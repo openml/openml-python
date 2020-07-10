@@ -5,14 +5,14 @@
 
 Computation times
 =================
-**00:35.412** total execution time for **examples_20_basic** files:
+**00:34.192** total execution time for **examples_20_basic** files:
 
 +-------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py` (``introduction_tutorial.py``)                   | 00:12.124 | 0.0 MB |
+| :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py` (``introduction_tutorial.py``)                   | 00:11.844 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py` (``simple_suites_tutorial.py``)                 | 00:09.347 | 0.0 MB |
+| :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py` (``simple_suites_tutorial.py``)                 | 00:09.123 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py` (``simple_flows_and_runs_tutorial.py``) | 00:07.192 | 0.0 MB |
+| :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py` (``simple_flows_and_runs_tutorial.py``) | 00:06.839 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py` (``simple_datasets_tutorial.py``)             | 00:06.749 | 0.0 MB |
+| :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py` (``simple_datasets_tutorial.py``)             | 00:06.386 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------+-----------+--------+
