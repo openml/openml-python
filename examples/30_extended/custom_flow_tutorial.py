@@ -58,7 +58,8 @@ general = dict(
 ####################################################################################################
 # Next we define the flow hyperparameters. We define their name and default value in `parameters`,
 # and provide meta-data for each hyperparameter through `parameters_meta_info`.
-# Note that the use of ordered dicts is required.
+# Note that eventhough the argument name is `parameters` they describe the hyperparameters.
+# The use of ordered dicts is required.
 
 flow_hyperparameters = dict(
     parameters=OrderedDict(time="240", memory="32", cores="8"),
@@ -84,7 +85,13 @@ subflow = dict(components=OrderedDict(automl_tool=autosklearn_flow),)
 
 ####################################################################################################
 # With all parameters of the flow defined, we can now initialize the OpenMLFlow and publish.
-# Explicitly set the model of the flow to `None`, because we provided all the details already!
+# Because we provided all the details already, we do not need to provide a `model` to the flow.
+#
+# In our case, we don't even have a model. It is possible to have a model but still require
+# to follow these steps when the model (python object) does not have an extensions from which
+# to automatically extract the hyperparameters.
+# So whether you have a model with no extension or no model at all, explicitly set
+# the model of the flow to `None`.
 
 autosklearn_amlb_flow = openml.flows.OpenMLFlow(
     **general, **flow_hyperparameters, **subflow, model=None,
@@ -174,7 +181,7 @@ for where, y, yp, proba in zip(all_test_indices, y_true, y_pred, y_proba):
 
 ####################################################################################################
 # Finally we can create the OpenMLRun object and upload.
-# We use the argument setup_string because the used flow was a script."
+# We use the argument setup_string because the used flow was a script.
 
 benchmark_command = f"python3 runbenchmark.py auto-sklearn medium -m aws -t 119"
 my_run = openml.runs.OpenMLRun(
