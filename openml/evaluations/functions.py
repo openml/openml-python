@@ -17,11 +17,11 @@ def list_evaluations(
     function: str,
     offset: Optional[int] = None,
     size: Optional[int] = None,
-    tasks: Optional[List[Union[str,int]]] = None,
-    setups: Optional[List[Union[str,int]]] = None,
-    flows: Optional[List[Union[str,int]]] = None,
-    runs: Optional[List[Union[str,int]]] = None,
-    uploaders: Optional[List[Union[str,int]]] = None,
+    tasks: Optional[List[Union[str, int]]] = None,
+    setups: Optional[List[Union[str, int]]] = None,
+    flows: Optional[List[Union[str, int]]] = None,
+    runs: Optional[List[Union[str, int]]] = None,
+    uploaders: Optional[List[Union[str, int]]] = None,
     tag: Optional[str] = None,
     study: Optional[int] = None,
     per_fold: Optional[bool] = None,
@@ -363,7 +363,9 @@ def list_evaluations_setups(
         )
         setup_data = pd.DataFrame()
         for setups in setup_chunks:
-            result = pd.DataFrame(openml.setups.list_setups(setup=setups, output_format="dataframe"))
+            result = pd.DataFrame(
+                openml.setups.list_setups(setup=setups, output_format="dataframe")
+            )
             result.drop("flow_id", axis=1, inplace=True)
             # concat resulting setup chunks into single datframe
             setup_data = pd.concat([setup_data, result], ignore_index=True)
