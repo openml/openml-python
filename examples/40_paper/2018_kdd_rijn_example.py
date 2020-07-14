@@ -88,8 +88,8 @@ for idx, task_id in enumerate(suite.tasks):
     # note that we explicitly only include tasks from the benchmark suite that was specified (as per the for-loop)
     evals = openml.evaluations.list_evaluations_setups(
         evaluation_measure,
-        flow=[flow_id],
-        task=[task_id],
+        flows=[flow_id],
+        tasks=[task_id],
         size=limit_per_task,
         output_format="dataframe",
     )
