@@ -111,8 +111,8 @@ https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdcc
         # note that we explicitly only include tasks from the benchmark suite that was specified (as per the for-loop)
         evals = openml.evaluations.list_evaluations_setups(
             evaluation_measure,
-            flow=[flow_id],
-            task=[task_id],
+            flows=[flow_id],
+            tasks=[task_id],
             size=limit_per_task,
             output_format="dataframe",
         )
@@ -240,7 +240,7 @@ the reader is referred to the more elaborate script (referred to earlier)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  0.897 seconds)
+   **Total running time of the script:** ( 1 minutes  4.774 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_kdd_rijn_example.py:

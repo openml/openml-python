@@ -134,7 +134,7 @@ Note that we now filter the evaluations based on another parameter 'task'.
 
     metric = "predictive_accuracy"
     evals = openml.evaluations.list_evaluations(
-        function=metric, task=[task_id], output_format="dataframe"
+        function=metric, tasks=[task_id], output_format="dataframe"
     )
     # Displaying the first 10 rows
     print(evals.head(n=10))
@@ -320,7 +320,7 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
     # List evaluations in descending order based on predictive_accuracy with
     # hyperparameters
     evals_setups = openml.evaluations.list_evaluations_setups(
-        function="predictive_accuracy", task=[31], size=100, sort_order="desc"
+        function="predictive_accuracy", tasks=[31], size=100, sort_order="desc"
     )
 
     ""
@@ -331,7 +331,7 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
     # with hyperparameters. parameters_in_separate_columns returns parameters in
     # separate columns
     evals_setups = openml.evaluations.list_evaluations_setups(
-        function="predictive_accuracy", flow=[6767], size=100, parameters_in_separate_columns=True
+        function="predictive_accuracy", flows=[6767], size=100, parameters_in_separate_columns=True
     )
 
     ""
@@ -377,7 +377,7 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  12.255 seconds)
+   **Total running time of the script:** ( 0 minutes  12.724 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_fetch_evaluations_tutorial.py:

@@ -138,8 +138,8 @@ evaluations conducted by the server with the hyperparameter settings extracted f
 uploaded runs (called <em>setup</em>).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations_setups</span><span class="p">(</span>
     <span class="n">function</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">,</span>
-    <span class="n">flow</span><span class="o">=</span><span class="p">[</span><span class="mi">8353</span><span class="p">],</span>
-    <span class="n">task</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span>
+    <span class="n">flows</span><span class="o">=</span><span class="p">[</span><span class="mi">8353</span><span class="p">],</span>
+    <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span>
     <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">,</span>
     <span class="c1"># Using this flag incorporates the hyperparameters into the returned dataframe. Otherwise,</span>
     <span class="c1"># the dataframe would contain a field ``paramaters`` containing an unparsed dictionary.</span>
@@ -239,7 +239,7 @@ can nicely plot them.</p>
 </div>
 <img alt="SVM performance landscape" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_svm_hyperparameters_tutorial_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f9d8990ce90&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot object at 0x7effaa2950d0&gt;
 </pre></div>
 </div>
 </div>
@@ -274,7 +274,7 @@ can nicely plot them.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;SVM performance landscape&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.872 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.209 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-plot-svm-hyperparameters-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/cf8cbb59c00374b9cf27f6d0287267bd/plot_svm_hyperparameters_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_svm_hyperparameters_tutorial.py</span></code></a></p>

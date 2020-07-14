@@ -43,8 +43,8 @@ uploaded runs (called *setup*).
 
     df = openml.evaluations.list_evaluations_setups(
         function="predictive_accuracy",
-        flow=[8353],
-        task=[6],
+        flows=[8353],
+        tasks=[6],
         output_format="dataframe",
         # Using this flag incorporates the hyperparameters into the returned dataframe. Otherwise,
         # the dataframe would contain a field ``paramaters`` containing an unparsed dictionary.
@@ -194,7 +194,7 @@ Option 1 - plotting via the pandas helper functions
  .. code-block:: none
 
 
-    <matplotlib.axes._subplots.AxesSubplot object at 0x7f9d8990ce90>
+    <matplotlib.axes._subplots.AxesSubplot object at 0x7effaa2950d0>
 
 
 
@@ -249,7 +249,7 @@ Option 2 - plotting via matplotlib
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.872 seconds)
+   **Total running time of the script:** ( 0 minutes  8.209 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_plot_svm_hyperparameters_tutorial.py:

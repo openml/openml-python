@@ -206,7 +206,7 @@ we displayed previously.
 Note that we now filter the evaluations based on another parameter ‘task’.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">metric</span> <span class="o">=</span> <span class="s2">&quot;predictive_accuracy&quot;</span>
 <span class="n">evals</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations</span><span class="p">(</span>
-    <span class="n">function</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="p">[</span><span class="n">task_id</span><span class="p">],</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span>
+    <span class="n">function</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="n">task_id</span><span class="p">],</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span>
 <span class="p">)</span>
 <span class="c1"># Displaying the first 10 rows</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
@@ -348,7 +348,7 @@ For this, we shall compare the top performing flows.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># List evaluations in descending order based on predictive_accuracy with</span>
 <span class="c1"># hyperparameters</span>
 <span class="n">evals_setups</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations_setups</span><span class="p">(</span>
-    <span class="n">function</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="p">[</span><span class="mi">31</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="s2">&quot;desc&quot;</span>
+    <span class="n">function</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">,</span> <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="mi">31</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="s2">&quot;desc&quot;</span>
 <span class="p">)</span>
 
 <span class="s2">&quot;&quot;</span>
@@ -359,7 +359,7 @@ For this, we shall compare the top performing flows.</p>
 <span class="c1"># with hyperparameters. parameters_in_separate_columns returns parameters in</span>
 <span class="c1"># separate columns</span>
 <span class="n">evals_setups</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations_setups</span><span class="p">(</span>
-    <span class="n">function</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="p">[</span><span class="mi">6767</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">parameters_in_separate_columns</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">function</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">,</span> <span class="n">flows</span><span class="o">=</span><span class="p">[</span><span class="mi">6767</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">parameters_in_separate_columns</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 
 <span class="s2">&quot;&quot;</span>
@@ -394,7 +394,7 @@ For this, we shall compare the top performing flows.</p>
 &#39;&#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.255 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.724 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-fetch-evaluations-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ae7e73aff29ef9ace1e17781346a204b/fetch_evaluations_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_evaluations_tutorial.py</span></code></a></p>
