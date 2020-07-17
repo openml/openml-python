@@ -293,8 +293,6 @@ For this, we shall compare the top performing flows.
 
  .. code-block:: none
 
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/numpy/core/_asarray.py:83: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray
-      return array(a, dtype, copy=False, order=order)
     (12736, 'sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)')
     (8399, 'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)')
     (8353, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
@@ -377,7 +375,7 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.888 seconds)
+   **Total running time of the script:** ( 0 minutes  12.140 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_fetch_evaluations_tutorial.py:

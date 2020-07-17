@@ -194,7 +194,7 @@ Option 1 - plotting via the pandas helper functions
  .. code-block:: none
 
 
-    <matplotlib.axes._subplots.AxesSubplot object at 0x7f7a39062190>
+    <AxesSubplot:title={'center':'SVM performance landscape'}, xlabel='sklearn.svm.classes.SVC(16)_C', ylabel='sklearn.svm.classes.SVC(16)_gamma'>
 
 
 
@@ -249,7 +249,7 @@ Option 2 - plotting via matplotlib
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.762 seconds)
+   **Total running time of the script:** ( 0 minutes  7.876 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_plot_svm_hyperparameters_tutorial.py:
