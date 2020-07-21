@@ -815,14 +815,19 @@ def edit_dataset(
     original_data_url=None,
     paper_url=None,
 ):
-    """Create a dataset.
-
+    """
       Edits an OpenMLDataset.
+      Specify atleast one field to edit, apart from data_id
+       - For certain fields, a new dataset version is created : attributes, data, default_target_attribute,
+       ignore_attribute, row_id_attribute.
+
+       - For other fields, the uploader can edit the exisiting version. Noone except the uploader can edit
+       the exisitng version.
 
       Parameters
       ----------
       data_id : int
-          Name of the dataset.
+          ID of the dataset.
       description : str
           Description of the dataset.
       creator : str
@@ -870,38 +875,41 @@ def edit_dataset(
 
       Returns
       -------
-      error or data_id returned by server"""
+      data_id of the existing edited version or the new version created and published"""
     if not isinstance(data_id, int):
         raise TypeError(
             "`data_id` must be of type `int`, not {}.".format(type(data_id))
         )
 
     # case 1, changing these fields creates a new version of the dataset with changed field
-    if data is not None or attributes is not None or default_target_attribute is not None or row_id_attribute is not None or ignore_attribute is not None:
+    if any(field is not None for field in [data, attributes, default_target_attribute, row_id_attribute,
+                                           ignore_attribute]):
         logger.warning("Creating a new version of dataset, cannot edit existing version")
         old_version = get_dataset(data_id)
-        X, y, categorical, attribute_names = old_version.get_data()
-        data_new = data if data is not None else np.concatenate((X, y.reshape((-1, 1))), axis=1)
-        dataset_new = create_dataset(name=old_version.name,
-                                     description=description or old_version.description,
-                                     creator=creator or old_version.creator,
-                                     contributor=contributor or old_version.contributor,
-                                     collection_date=collection_date or old_version.collection_date,
-                                     language=language or old_version.language,
-                                     licence=old_version.licence,
-                                     attributes=attributes or attributes_arff_from_df(X),
-                                     data=data_new,
-                                     default_target_attribute=default_target_attribute or old_version.default_target_attribute,
-                                     ignore_attribute=ignore_attribute or old_version.ignore_attribute,
-                                     citation=citation or old_version.citation,
-                                     row_id_attribute=row_id_attribute or old_version.row_id_attribute,
-                                     original_data_url=original_data_url or old_version.original_data_url,
-                                     paper_url=paper_url or old_version.paper_url,
-                                     update_comment=old_version.update_comment,
-                                     version_label=old_version.version_label)
-        print("created dataset", dataset_new)
-        print("old dataset", old_version)
+        x, y, categorical, attribute_names = old_version.get_data()
+        data_new = data if data is not None else np.concatenate((x, y.reshape((-1, 1))), axis=1)
+        dataset_new = create_dataset(
+            name=old_version.name,
+            description=description or old_version.description,
+            creator=creator or old_version.creator,
+            contributor=contributor or old_version.contributor,
+            collection_date=collection_date or old_version.collection_date,
+            language=language or old_version.language,
+            licence=old_version.licence,
+            attributes=attributes or attributes_arff_from_df(x),
+            data=data_new,
+            default_target_attribute=default_target_attribute or old_version.default_target_attribute,
+            ignore_attribute=ignore_attribute or old_version.ignore_attribute,
+            citation=citation or old_version.citation,
+            row_id_attribute=row_id_attribute or old_version.row_id_attribute,
+            original_data_url=original_data_url or old_version.original_data_url,
+            paper_url=paper_url or old_version.paper_url,
+            update_comment=old_version.update_comment,
+            version_label=old_version.version_label
+        )
+        dataset_new.publish()
         return dataset_new.dataset_id
+
     # case 2, changing any of these fields will update existing dataset
     # compose data edit parameters as xml
     form_data = {"data_id": data_id}
@@ -916,14 +924,16 @@ def edit_dataset(
     xml["oml:data_edit_parameters"]["oml:citation"] = citation
     xml["oml:data_edit_parameters"]["oml:original_data_url"] = original_data_url
     xml["oml:data_edit_parameters"]["oml:paper_url"] = paper_url
+
     # delete None inputs
-    for k in xml["oml:data_edit_parameters"].keys():
+    for k in list(xml["oml:data_edit_parameters"]):
         if not xml["oml:data_edit_parameters"][k]:
             del xml["oml:data_edit_parameters"][k]
+
     file_elements = {"edit_parameters": ("description.xml", xmltodict.unparse(xml))}
     result_xml = openml._api_calls._perform_api_call("data/edit", "post", data=form_data, file_elements=file_elements)
-    result = xmltodict.parse(result_xml)
-    return result
+    data_id = result_xml["oml:data_edi"]["oml:id"]
+    return data_id
 
 
 def _get_dataset_description(did_cache_dir, dataset_id):
