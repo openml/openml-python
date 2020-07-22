@@ -1361,3 +1361,4 @@ class TestOpenMLDataset(TestBase):
                               original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor", paper_url="",
                               citation="kaggle", language="English")
         self.assertNotEqual(did, result)
+        self.assertEqual(get_dataset(result).description, desc)
