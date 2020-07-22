@@ -818,11 +818,11 @@ def edit_dataset(
     """
       Edits an OpenMLDataset.
       Specify atleast one field to edit, apart from data_id
-       - For certain fields, a new dataset version is created : attributes, data, default_target_attribute,
-       ignore_attribute, row_id_attribute.
+       - For certain fields, a new dataset version is created : attributes, data,
+       default_target_attribute, ignore_attribute, row_id_attribute.
 
-       - For other fields, the uploader can edit the exisiting version. Noone except the uploader can edit
-       the exisitng version.
+       - For other fields, the uploader can edit the exisiting version.
+        Noone except the uploader can edit the exisitng version.
 
       Parameters
       ----------
@@ -882,32 +882,32 @@ def edit_dataset(
         )
 
     # case 1, changing these fields creates a new version of the dataset with changed field
-    if any(field is not None for field in [data, attributes, default_target_attribute, row_id_attribute,
-                                           ignore_attribute]):
+    if any(field is not None for field in [data, attributes, default_target_attribute,
+                                           row_id_attribute, ignore_attribute]):
         logger.warning("Creating a new version of dataset, cannot edit existing version")
-        old_version = get_dataset(data_id)
+        dataset = get_dataset(data_id)
 
-        decoded_arff = old_version._get_arff(format='arff')
+        decoded_arff = dataset._get_arff(format='arff')
         data_old = decoded_arff['data']
         data_new = data if data is not None else data_old
         dataset_new = create_dataset(
-            name=old_version.name,
-            description=description or old_version.description,
-            creator=creator or old_version.creator,
-            contributor=contributor or old_version.contributor,
-            collection_date=collection_date or old_version.collection_date,
-            language=language or old_version.language,
-            licence=old_version.licence,
+            name=dataset.name,
+            description=description or dataset.description,
+            creator=creator or dataset.creator,
+            contributor=contributor or dataset.contributor,
+            collection_date=collection_date or dataset.collection_date,
+            language=language or dataset.language,
+            licence=dataset.licence,
             attributes=attributes or decoded_arff['attributes'],
             data=data_new,
-            default_target_attribute=default_target_attribute or old_version.default_target_attribute,
-            ignore_attribute=ignore_attribute or old_version.ignore_attribute,
-            citation=citation or old_version.citation,
-            row_id_attribute=row_id_attribute or old_version.row_id_attribute,
-            original_data_url=original_data_url or old_version.original_data_url,
-            paper_url=paper_url or old_version.paper_url,
-            update_comment=old_version.update_comment,
-            version_label=old_version.version_label
+            default_target_attribute=default_target_attribute or dataset.default_target_attribute,
+            ignore_attribute=ignore_attribute or dataset.ignore_attribute,
+            citation=citation or dataset.citation,
+            row_id_attribute=row_id_attribute or dataset.row_id_attribute,
+            original_data_url=original_data_url or dataset.original_data_url,
+            paper_url=paper_url or dataset.paper_url,
+            update_comment=dataset.update_comment,
+            version_label=dataset.version_label
         )
         dataset_new.publish()
         return dataset_new.dataset_id
