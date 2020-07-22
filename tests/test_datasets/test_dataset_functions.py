@@ -1339,7 +1339,8 @@ class TestOpenMLDataset(TestBase):
         # all users can edit their own datasets)
         openml.config.apikey = "d488d8afd93b32331cf6ea9d7003d4c3"
 
-        # case 1, existing version edit
+        # case 1, editing description, creator, contributor, collection_date, original_data_url,
+        # paper_url, citation, language edits existing dataset.
         did = 564
         result = edit_dataset(
             did,
@@ -1353,7 +1354,8 @@ class TestOpenMLDataset(TestBase):
         )
         self.assertEqual(result, did)
 
-        # case 2, new version edit
+        # case 2, editing data, attributes, default_target_attribute, row_id_attribute,
+        # ignore_attribute generates a new dataset
 
         column_names = [
             ("input1", "REAL"),

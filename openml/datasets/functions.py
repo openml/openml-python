@@ -1203,3 +1203,122 @@ def _get_online_dataset_format(dataset_id):
     dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id, "get")
     # build a dict from the xml and get the format from the dataset description
     return xmltodict.parse(dataset_xml)["oml:data_set_description"]["oml:format"].lower()
+
+
+def edit_dataset(
+    data_id,
+    description=None,
+    creator=None,
+    contributor=None,
+    collection_date=None,
+    language=None,
+    attributes=None,
+    data=None,
+    default_target_attribute=None,
+    ignore_attribute=None,
+    citation=None,
+    row_id_attribute=None,
+    original_data_url=None,
+    paper_url=None,
+) -> int:
+    """
+      Edits an OpenMLDataset.
+      Specify atleast one field to edit, apart from data_id
+       - For certain fields, a new dataset version is created : attributes, data,
+       default_target_attribute, ignore_attribute, row_id_attribute.
+
+       - For other fields, the uploader can edit the exisiting version.
+        Noone except the uploader can edit the exisitng version.
+
+      Parameters
+      ----------
+      data_id : int
+          ID of the dataset.
+      description : str
+          Description of the dataset.
+      creator : str
+          The person who created the dataset.
+      contributor : str
+          People who contributed to the current version of the dataset.
+      collection_date : str
+          The date the data was originally collected, given by the uploader.
+      language : str
+          Language in which the data is represented.
+          Starts with 1 upper case letter, rest lower case, e.g. 'English'.
+      attributes : list, dict, or 'auto'
+          A list of tuples. Each tuple consists of the attribute name and type.
+          If passing a pandas DataFrame, the attributes can be automatically
+          inferred by passing ``'auto'``. Specific attributes can be manually
+          specified by a passing a dictionary where the key is the name of the
+          attribute and the value is the data type of the attribute.
+      data : ndarray, list, dataframe, coo_matrix, shape (n_samples, n_features)
+          An array that contains both the attributes and the targets. When
+          providing a dataframe, the attribute names and type can be inferred by
+          passing ``attributes='auto'``.
+          The target feature is indicated as meta-data of the dataset.
+      default_target_attribute : str
+          The default target attribute, if it exists.
+          Can have multiple values, comma separated.
+      ignore_attribute : str | list
+          Attributes that should be excluded in modelling,
+          such as identifiers and indexes.
+      citation : str
+          Reference(s) that should be cited when building on this data.
+      row_id_attribute : str, optional
+          The attribute that represents the row-id column, if present in the
+          dataset. If ``data`` is a dataframe and ``row_id_attribute`` is not
+          specified, the index of the dataframe will be used as the
+          ``row_id_attribute``. If the name of the index is ``None``, it will
+          be discarded.
+
+          .. versionadded: 0.8
+              Inference of ``row_id_attribute`` from a dataframe.
+      original_data_url : str, optional
+          For derived data, the url to the original dataset.
+      paper_url : str, optional
+          Link to a paper describing the dataset.
+
+
+      Returns
+      -------
+      data_id of the existing edited version or the new version created and published"""
+    if not isinstance(data_id, int):
+        raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
+
+    # case 1, changing these fields creates a new version of the dataset with changed field
+    if any(
+        field is not None
+        for field in [
+            data,
+            attributes,
+            default_target_attribute,
+            row_id_attribute,
+            ignore_attribute,
+        ]
+    ):
+        logger.warning("Creating a new version of dataset, cannot edit existing version")
+        dataset = get_dataset(data_id)
+        decoded_arff = dataset._get_arff(format="arff")
+        data_old = decoded_arff["data"]
+        data_new = data if data is not None else data_old
+        dataset_new = create_dataset(
+            name=dataset.name,
+            description=description or dataset.description,
+            creator=creator or dataset.creator,
+            contributor=contributor or dataset.contributor,
+            collection_date=collection_date or dataset.collection_date,
+            language=language or dataset.language,
+            licence=dataset.licence,
+            attributes=attributes or decoded_arff["attributes"],
+            data=data_new,
+            default_target_attribute=default_target_attribute or dataset.default_target_attribute,
+            ignore_attribute=ignore_attribute or dataset.ignore_attribute,
+            citation=citation or dataset.citation,
+            row_id_attribute=row_id_attribute or dataset.row_id_attribute,
+            original_data_url=original_data_url or dataset.original_data_url,
+            paper_url=paper_url or dataset.paper_url,
+            update_comment=dataset.update_comment,
+            version_label=dataset.version_label,
+        )
+        dataset_new.publish()
+        return dataset_new.dataset_id
