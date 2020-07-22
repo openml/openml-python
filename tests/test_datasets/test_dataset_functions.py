@@ -21,7 +21,6 @@ from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (
     create_dataset,
-    get_dataset,
     edit_dataset,
     attributes_arff_from_df,
     _get_cached_dataset,
@@ -1361,4 +1360,3 @@ class TestOpenMLDataset(TestBase):
                               original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor", paper_url="",
                               citation="kaggle", language="English")
         self.assertNotEqual(did, result)
-        self.assertEqual(get_dataset(result).description, desc)
