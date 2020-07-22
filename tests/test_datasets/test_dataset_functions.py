@@ -21,6 +21,8 @@ from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (
     create_dataset,
+    get_dataset,
+    edit_dataset,
     attributes_arff_from_df,
     _get_cached_dataset,
     _get_cached_dataset_features,
@@ -1331,3 +1333,31 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(X.shape, (150, 5))
         self.assertEqual(len(categorical), X.shape[1])
         self.assertEqual(len(attribute_names), X.shape[1])
+
+    def test_data_edit(self):
+
+        # admin key for test server (only admins or owners can edit datasets).
+        # all users can edit their own datasets)
+        openml.config.apikey = "d488d8afd93b32331cf6ea9d7003d4c3"
+
+        # case 1, existing version edit
+        did = 564
+        result = edit_dataset(did, description="xor dataset represents XOR operation",
+                              contributor="", collection_date="2019-10-29 17:06:18",
+                              original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor", paper_url="",
+                              citation="kaggle", language="English")
+        self.assertEqual(result, did)
+
+        # case 2, new version edit
+
+        column_names = [
+            ("input1", "REAL"),
+            ("input2", "REAL"),
+            ("y", "REAL"),
+        ]
+        desc = "xor dataset represents XOR operation"
+        result = edit_dataset(564, description=desc,
+                              contributor="", collection_date="2019-10-29 17:06:18", attributes=column_names,
+                              original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor", paper_url="",
+                              citation="kaggle", language="English")
+        self.assertNotEqual(did, result)

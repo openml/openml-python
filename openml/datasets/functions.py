@@ -886,8 +886,10 @@ def edit_dataset(
                                            ignore_attribute]):
         logger.warning("Creating a new version of dataset, cannot edit existing version")
         old_version = get_dataset(data_id)
-        x, y, categorical, attribute_names = old_version.get_data()
-        data_new = data if data is not None else np.concatenate((x, y.reshape((-1, 1))), axis=1)
+
+        decoded_arff = old_version._get_arff(format='arff')
+        data_old = decoded_arff['data']
+        data_new = data if data is not None else data_old
         dataset_new = create_dataset(
             name=old_version.name,
             description=description or old_version.description,
@@ -896,7 +898,7 @@ def edit_dataset(
             collection_date=collection_date or old_version.collection_date,
             language=language or old_version.language,
             licence=old_version.licence,
-            attributes=attributes or attributes_arff_from_df(x),
+            attributes=attributes or decoded_arff['attributes'],
             data=data_new,
             default_target_attribute=default_target_attribute or old_version.default_target_attribute,
             ignore_attribute=ignore_attribute or old_version.ignore_attribute,
@@ -932,8 +934,9 @@ def edit_dataset(
 
     file_elements = {"edit_parameters": ("description.xml", xmltodict.unparse(xml))}
     result_xml = openml._api_calls._perform_api_call("data/edit", "post", data=form_data, file_elements=file_elements)
-    data_id = result_xml["oml:data_edi"]["oml:id"]
-    return data_id
+    result = xmltodict.parse(result_xml)
+    data_id = result["oml:data_edit"]["oml:id"]
+    return int(data_id)
 
 
 def _get_dataset_description(did_cache_dir, dataset_id):
