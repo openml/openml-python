@@ -1341,10 +1341,16 @@ class TestOpenMLDataset(TestBase):
 
         # case 1, existing version edit
         did = 564
-        result = edit_dataset(did, description="xor dataset represents XOR operation",
-                              contributor="", collection_date="2019-10-29 17:06:18",
-                              original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor", paper_url="",
-                              citation="kaggle", language="English")
+        result = edit_dataset(
+            did,
+            description="xor dataset represents XOR operation",
+            contributor="",
+            collection_date="2019-10-29 17:06:18",
+            original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor",
+            paper_url="",
+            citation="kaggle",
+            language="English",
+        )
         self.assertEqual(result, did)
 
         # case 2, new version edit
@@ -1355,8 +1361,15 @@ class TestOpenMLDataset(TestBase):
             ("y", "REAL"),
         ]
         desc = "xor dataset represents XOR operation"
-        result = edit_dataset(564, description=desc,
-                              contributor="", collection_date="2019-10-29 17:06:18", attributes=column_names,
-                              original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor", paper_url="",
-                              citation="kaggle", language="English")
+        result = edit_dataset(
+            564,
+            description=desc,
+            contributor="",
+            collection_date="2019-10-29 17:06:18",
+            attributes=column_names,
+            original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor",
+            paper_url="",
+            citation="kaggle",
+            language="English",
+        )
         self.assertNotEqual(did, result)
