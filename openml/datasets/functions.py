@@ -921,7 +921,7 @@ def edit_dataset(
     # case 2, changing any of these fields will update existing dataset
     # compose data edit parameters as xml
     form_data = {"data_id": data_id}
-    xml = OrderedDict()
+    xml = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
     xml["oml:data_edit_parameters"] = OrderedDict()
     xml["oml:data_edit_parameters"]["@xmlns:oml"] = "http://openml.org/openml"
     xml["oml:data_edit_parameters"]["oml:description"] = description
