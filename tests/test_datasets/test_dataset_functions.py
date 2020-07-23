@@ -16,7 +16,12 @@ from oslo_concurrency import lockutils
 
 import openml
 from openml import OpenMLDataset
-from openml.exceptions import OpenMLCacheException, OpenMLHashException, OpenMLPrivateDatasetError, OpenMLServerException
+from openml.exceptions import (
+    OpenMLCacheException,
+    OpenMLHashException,
+    OpenMLPrivateDatasetError,
+    OpenMLServerException,
+)
 from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (
@@ -1394,7 +1399,7 @@ class TestOpenMLDataset(TestBase):
             "Unknown dataset",
             edit_dataset,
             data_id=100000,
-            description="xor operation dataset"
+            description="xor operation dataset",
         )
         # Check server exception when a non-owner or non-admin tries to edit existing dataset
         openml.config.apikey = "5f0b74b33503e4ad4a7181a91e28719f"
