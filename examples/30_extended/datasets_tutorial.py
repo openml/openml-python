@@ -114,10 +114,10 @@ _ = pd.plotting.scatter_matrix(
 ############################################################################
 # Edit a created dataset
 # =================================================
-# Use test server
+# This example uses the test server, to avoid editing a dataset on the main server.
 openml.config.start_using_configuration_for_example()
 ############################################################################
-# Changes to these field edits existing version
+# Changes to these field edits existing version: allowed only for dataset owner
 data_id = edit_dataset(
     564,
     description="xor dataset represents XOR operation",
@@ -134,7 +134,7 @@ print(f"Edited dataset ID: {data_id}")
 
 ############################################################################
 # Changes to these fields: attributes, default_target_attribute,
-# row_id_attribute, ignore_attribute generates a new edited version
+# row_id_attribute, ignore_attribute generates a new edited version: allowed for anyone
 
 new_attributes = [
     ("x0", "REAL"),

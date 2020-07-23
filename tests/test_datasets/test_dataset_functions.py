@@ -16,7 +16,7 @@ from oslo_concurrency import lockutils
 
 import openml
 from openml import OpenMLDataset
-from openml.exceptions import OpenMLCacheException, OpenMLHashException, OpenMLPrivateDatasetError
+from openml.exceptions import OpenMLCacheException, OpenMLHashException, OpenMLPrivateDatasetError, OpenMLServerException
 from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (
@@ -1375,3 +1375,33 @@ class TestOpenMLDataset(TestBase):
             language="English",
         )
         self.assertNotEqual(did, result)
+
+    def test_data_edit_errors(self):
+
+        # admin key for test server (only admins or owners can edit datasets).
+        openml.config.apikey = "d488d8afd93b32331cf6ea9d7003d4c3"
+        # Check server exception when no field to edit is provided
+        self.assertRaisesRegex(
+            OpenMLServerException,
+            "Please provide atleast one field among description, creator, "
+            "contributor, collection_date, language, citation, original_data_url or paper_url to edit.",
+            edit_dataset,
+            data_id=564,
+        )
+        # Check server exception when unknown dataset is provided
+        self.assertRaisesRegex(
+            OpenMLServerException,
+            "Unknown dataset",
+            edit_dataset,
+            data_id=100000,
+            description="xor operation dataset"
+        )
+        # Check server exception when a non-owner or non-admin tries to edit existing dataset
+        openml.config.apikey = "5f0b74b33503e4ad4a7181a91e28719f"
+        self.assertRaisesRegex(
+            OpenMLServerException,
+            "Dataset is not owned by you",
+            edit_dataset,
+            data_id=564,
+            description="xor data",
+        )
