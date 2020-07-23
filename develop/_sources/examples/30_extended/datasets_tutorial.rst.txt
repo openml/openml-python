@@ -18,11 +18,13 @@ How to list and download datasets.
 
 .. code-block:: default
 
+    ""
 
     # License: BSD 3-Clauses
 
     import openml
     import pandas as pd
+    from openml.datasets.functions import edit_dataset, get_dataset
 
 
 
@@ -317,263 +319,9 @@ Exercise 1
 .. code-block:: default
 
     datalist[datalist.NumberOfInstances > 10000].sort_values(["NumberOfInstances"]).head(n=20)
-
-
-
-
-
-.. only:: builder_html
-
-    .. raw:: html
-
-        <div>
-        <style scoped>
-            .dataframe tbody tr th:only-of-type {
-                vertical-align: middle;
-            }
-
-            .dataframe tbody tr th {
-                vertical-align: top;
-            }
-
-            .dataframe thead th {
-                text-align: right;
-            }
-        </style>
-        <table border="1" class="dataframe">
-          <thead>
-            <tr style="text-align: right;">
-              <th></th>
-              <th>did</th>
-              <th>name</th>
-              <th>NumberOfInstances</th>
-              <th>NumberOfFeatures</th>
-              <th>NumberOfClasses</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>23515</th>
-              <td>23515</td>
-              <td>sulfur</td>
-              <td>10081.0</td>
-              <td>7.0</td>
-              <td>0.0</td>
-            </tr>
-            <tr>
-              <th>981</th>
-              <td>981</td>
-              <td>kdd_internet_usage</td>
-              <td>10108.0</td>
-              <td>69.0</td>
-              <td>2.0</td>
-            </tr>
-            <tr>
-              <th>372</th>
-              <td>372</td>
-              <td>internet_usage</td>
-              <td>10108.0</td>
-              <td>72.0</td>
-              <td>46.0</td>
-            </tr>
-            <tr>
-              <th>1536</th>
-              <td>1536</td>
-              <td>volcanoes-b6</td>
-              <td>10130.0</td>
-              <td>4.0</td>
-              <td>5.0</td>
-            </tr>
-            <tr>
-              <th>1531</th>
-              <td>1531</td>
-              <td>volcanoes-b1</td>
-              <td>10176.0</td>
-              <td>4.0</td>
-              <td>5.0</td>
-            </tr>
-            <tr>
-              <th>1534</th>
-              <td>1534</td>
-              <td>volcanoes-b4</td>
-              <td>10190.0</td>
-              <td>4.0</td>
-              <td>5.0</td>
-            </tr>
-            <tr>
-              <th>1459</th>
-              <td>1459</td>
-              <td>artificial-characters</td>
-              <td>10218.0</td>
-              <td>8.0</td>
-              <td>10.0</td>
-            </tr>
-            <tr>
-              <th>1478</th>
-              <td>1478</td>
-              <td>har</td>
-              <td>10299.0</td>
-              <td>562.0</td>
-              <td>6.0</td>
-            </tr>
-            <tr>
-              <th>1533</th>
-              <td>1533</td>
-              <td>volcanoes-b3</td>
-              <td>10386.0</td>
-              <td>4.0</td>
-              <td>5.0</td>
-            </tr>
-            <tr>
-              <th>1532</th>
-              <td>1532</td>
-              <td>volcanoes-b2</td>
-              <td>10668.0</td>
-              <td>4.0</td>
-              <td>5.0</td>
-            </tr>
-            <tr>
-              <th>42183</th>
-              <td>42183</td>
-              <td>dataset_sales</td>
-              <td>10738.0</td>
-              <td>15.0</td>
-              <td>0.0</td>
-            </tr>
-            <tr>
-              <th>1053</th>
-              <td>1053</td>
-              <td>jm1</td>
-              <td>10885.0</td>
-              <td>22.0</td>
-              <td>2.0</td>
-            </tr>
-            <tr>
-              <th>1414</th>
-              <td>1414</td>
-              <td>Kaggle_bike_sharing_demand_challange</td>
-              <td>10886.0</td>
-              <td>12.0</td>
-              <td>0.0</td>
-            </tr>
-            <tr>
-              <th>1044</th>
-              <td>1044</td>
-              <td>eye_movements</td>
-              <td>10936.0</td>
-              <td>28.0</td>
-              <td>3.0</td>
-            </tr>
-            <tr>
-              <th>32</th>
-              <td>32</td>
-              <td>pendigits</td>
-              <td>10992.0</td>
-              <td>17.0</td>
-              <td>10.0</td>
-            </tr>
-            <tr>
-              <th>1019</th>
-              <td>1019</td>
-              <td>pendigits</td>
-              <td>10992.0</td>
-              <td>17.0</td>
-              <td>2.0</td>
-            </tr>
-            <tr>
-              <th>42199</th>
-              <td>42199</td>
-              <td>Player_names</td>
-              <td>11009.0</td>
-              <td>3.0</td>
-              <td>NaN</td>
-            </tr>
-            <tr>
-              <th>4534</th>
-              <td>4534</td>
-              <td>PhishingWebsites</td>
-              <td>11055.0</td>
-              <td>31.0</td>
-              <td>2.0</td>
-            </tr>
-            <tr>
-              <th>399</th>
-              <td>399</td>
-              <td>ohscal.wc</td>
-              <td>11162.0</td>
-              <td>11466.0</td>
-              <td>10.0</td>
-            </tr>
-            <tr>
-              <th>310</th>
-              <td>310</td>
-              <td>mammography</td>
-              <td>11183.0</td>
-              <td>7.0</td>
-              <td>2.0</td>
-            </tr>
-          </tbody>
-        </table>
-        </div>
-        <br />
-        <br />
-
-
-.. code-block:: default
-
+    ""
     datalist.query('name == "eeg-eye-state"')
-
-
-
-
-
-.. only:: builder_html
-
-    .. raw:: html
-
-        <div>
-        <style scoped>
-            .dataframe tbody tr th:only-of-type {
-                vertical-align: middle;
-            }
-
-            .dataframe tbody tr th {
-                vertical-align: top;
-            }
-
-            .dataframe thead th {
-                text-align: right;
-            }
-        </style>
-        <table border="1" class="dataframe">
-          <thead>
-            <tr style="text-align: right;">
-              <th></th>
-              <th>did</th>
-              <th>name</th>
-              <th>NumberOfInstances</th>
-              <th>NumberOfFeatures</th>
-              <th>NumberOfClasses</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>1471</th>
-              <td>1471</td>
-              <td>eeg-eye-state</td>
-              <td>14980.0</td>
-              <td>15.0</td>
-              <td>2.0</td>
-            </tr>
-          </tbody>
-        </table>
-        </div>
-        <br />
-        <br />
-
-
-.. code-block:: default
-
+    ""
     datalist.query("NumberOfClasses > 50")
 
 
@@ -907,6 +655,8 @@ Exercise 2
 
 
 
+
+
 .. image:: /examples/30_extended/images/sphx_glr_datasets_tutorial_001.png
     :alt: datasets tutorial
     :class: sphx-glr-single-img
@@ -915,10 +665,90 @@ Exercise 2
 
 
 
+Edit a created dataset
+=================================================
+This example uses the test server, to avoid editing a dataset on the main server.
+
+
+.. code-block:: default
+
+    openml.config.start_using_configuration_for_example()
+
+
+
+
+
+
+
+Changes to these field edits existing version: allowed only for dataset owner
+
+
+.. code-block:: default
+
+    data_id = edit_dataset(
+        564,
+        description="xor dataset represents XOR operation",
+        contributor="",
+        collection_date="2019-10-29 17:06:18",
+        original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor",
+        paper_url="",
+        citation="kaggle",
+        language="English",
+    )
+    edited_dataset = get_dataset(data_id)
+    print(f"Edited dataset ID: {data_id}")
+
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Edited dataset ID: 564
+
+
+
+
+Changes to these fields: attributes, default_target_attribute,
+row_id_attribute, ignore_attribute generates a new edited version: allowed for anyone
+
+
+.. code-block:: default
+
+
+    new_attributes = [
+        ("x0", "REAL"),
+        ("x1", "REAL"),
+        ("y", "REAL"),
+    ]
+    data_id = edit_dataset(564, attributes=new_attributes)
+    print(f"Edited dataset ID: {data_id}")
+
+    openml.config.stop_using_configuration_for_example()
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Edited dataset ID: 60945
+
+
+
+
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.259 seconds)
+   **Total running time of the script:** ( 0 minutes  9.922 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:
