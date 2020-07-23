@@ -5,12 +5,13 @@ Datasets
 
 How to list and download datasets.
 """
-############################################################################
+""
 
 # License: BSD 3-Clauses
 
 import openml
 import pandas as pd
+from openml.datasets.functions import edit_dataset, get_dataset
 
 ############################################################################
 # Exercise 0
@@ -42,9 +43,9 @@ openml_df.head(n=10)
 # * Find a dataset called 'eeg_eye_state'.
 # * Find all datasets with more than 50 classes.
 datalist[datalist.NumberOfInstances > 10000].sort_values(["NumberOfInstances"]).head(n=20)
-############################################################################
+""
 datalist.query('name == "eeg-eye-state"')
-############################################################################
+""
 datalist.query("NumberOfClasses > 50")
 
 ############################################################################
@@ -108,3 +109,39 @@ _ = pd.plotting.scatter_matrix(
     alpha=0.8,
     cmap="plasma",
 )
+
+
+############################################################################
+# Edit a created dataset
+# =================================================
+# This example uses the test server, to avoid editing a dataset on the main server.
+openml.config.start_using_configuration_for_example()
+############################################################################
+# Changes to these field edits existing version: allowed only for dataset owner
+data_id = edit_dataset(
+    564,
+    description="xor dataset represents XOR operation",
+    contributor="",
+    collection_date="2019-10-29 17:06:18",
+    original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor",
+    paper_url="",
+    citation="kaggle",
+    language="English",
+)
+edited_dataset = get_dataset(data_id)
+print(f"Edited dataset ID: {data_id}")
+
+
+############################################################################
+# Changes to these fields: attributes, default_target_attribute,
+# row_id_attribute, ignore_attribute generates a new edited version: allowed for anyone
+
+new_attributes = [
+    ("x0", "REAL"),
+    ("x1", "REAL"),
+    ("y", "REAL"),
+]
+data_id = edit_dataset(564, attributes=new_attributes)
+print(f"Edited dataset ID: {data_id}")
+
+openml.config.stop_using_configuration_for_example()
