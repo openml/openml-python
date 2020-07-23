@@ -1383,8 +1383,8 @@ class TestOpenMLDataset(TestBase):
         # Check server exception when no field to edit is provided
         self.assertRaisesRegex(
             OpenMLServerException,
-            "Please provide atleast one field among description, creator, "
-            "contributor, collection_date, language, citation, original_data_url or paper_url to edit.",
+            "Please provide atleast one field among description, creator, contributor, "
+            "collection_date, language, citation, original_data_url or paper_url to edit.",
             edit_dataset,
             data_id=564,
         )
