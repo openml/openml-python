@@ -13,6 +13,7 @@ import warnings
 from packaging import version
 
 import numpy as np
+import pandas as pd
 import scipy.optimize
 import scipy.stats
 import sklearn.base
@@ -1505,14 +1506,16 @@ class TestSklearnExtensionRunFunctions(TestBase):
         # predictions
         self.assertIsInstance(y_hat, np.ndarray)
         self.assertEqual(y_hat.shape, y_test.shape)
-        self.assertIsInstance(y_hat_proba, np.ndarray)
+        self.assertIsInstance(y_hat_proba, pd.DataFrame)
         self.assertEqual(y_hat_proba.shape, (y_test.shape[0], 6))
         np.testing.assert_array_almost_equal(np.sum(y_hat_proba, axis=1), np.ones(y_test.shape))
         # The class '4' (at index 3) is not present in the training data. We check that the
         # predicted probabilities for that class are zero!
-        np.testing.assert_array_almost_equal(y_hat_proba[:, 3], np.zeros(y_test.shape))
+        np.testing.assert_array_almost_equal(
+            y_hat_proba.iloc[:, 3].to_numpy(), np.zeros(y_test.shape)
+        )
         for i in (0, 1, 2, 4, 5):
-            self.assertTrue(np.any(y_hat_proba[:, i] != np.zeros(y_test.shape)))
+            self.assertTrue(np.any(y_hat_proba.iloc[:, i].to_numpy() != np.zeros(y_test.shape)))
 
         # check user defined measures
         fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
@@ -1559,11 +1562,11 @@ class TestSklearnExtensionRunFunctions(TestBase):
         # predictions
         self.assertIsInstance(y_hat, np.ndarray)
         self.assertEqual(y_hat.shape, y_test.shape)
-        self.assertIsInstance(y_hat_proba, np.ndarray)
+        self.assertIsInstance(y_hat_proba, pd.DataFrame)
         self.assertEqual(y_hat_proba.shape, (y_test.shape[0], 2))
         np.testing.assert_array_almost_equal(np.sum(y_hat_proba, axis=1), np.ones(y_test.shape))
         for i in (0, 1):
-            self.assertTrue(np.any(y_hat_proba[:, i] != np.zeros(y_test.shape)))
+            self.assertTrue(np.any(y_hat_proba.to_numpy()[:, i] != np.zeros(y_test.shape)))
 
         # check user defined measures
         fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
@@ -1640,14 +1643,14 @@ class TestSklearnExtensionRunFunctions(TestBase):
             np.testing.assert_array_almost_equal(np.sum(proba_1, axis=1), np.ones(X_test.shape[0]))
             # Test that there are predictions other than ones and zeros
             self.assertLess(
-                np.sum(proba_1 == 0) + np.sum(proba_1 == 1),
+                np.sum(proba_1.to_numpy() == 0) + np.sum(proba_1.to_numpy() == 1),
                 X_test.shape[0] * len(task.class_labels),
             )
 
             np.testing.assert_array_almost_equal(np.sum(proba_2, axis=1), np.ones(X_test.shape[0]))
             # Test that there are only ones and zeros predicted
             self.assertEqual(
-                np.sum(proba_2 == 0) + np.sum(proba_2 == 1),
+                np.sum(proba_2.to_numpy() == 0) + np.sum(proba_2.to_numpy() == 1),
                 X_test.shape[0] * len(task.class_labels),
             )
 

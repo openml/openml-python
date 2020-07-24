@@ -501,7 +501,7 @@ def _run_task_get_arffcontent(
                 arff_line = [rep_no, fold_no, sample_no, tst_idx]  # type: List[Any]
                 if task.class_labels is not None:
                     for j, _ in enumerate(task.class_labels):
-                        arff_line.append(proba_y[i][j])
+                        arff_line.append(proba_y.iloc[i][j])
 
                     arff_line.append(pred_y[i])
                     if isinstance(test_y, pd.DataFrame) or isinstance(test_y, pd.Series):

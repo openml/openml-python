@@ -1692,8 +1692,8 @@ class SklearnExtension(Extension):
             else:
                 raise ValueError("The task has no class labels")
 
-            if not isinstance(proba_y, np.ndarray):
-                proba_y = proba_y.to_numpy()
+            if not isinstance(proba_y, pd.DataFrame):
+                proba_y = pd.DataFrame(proba_y, columns=task.class_labels)
 
         elif isinstance(task, OpenMLRegressionTask):
             proba_y = None
