@@ -305,15 +305,27 @@ class TestFlow(TestBase):
                 "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id)
             )
 
-        fixture = (
-            "The flow on the server is inconsistent with the local flow. "
-            "The server flow ID is 1. Please check manually and remove "
-            "the flow if necessary! Error is:\n"
-            "'Flow sklearn.ensemble.forest.RandomForestClassifier: "
-            "values for attribute 'name' differ: "
-            "'sklearn.ensemble.forest.RandomForestClassifier'"
-            "\nvs\n'sklearn.ensemble.forest.RandomForestClassifie'.'"
-        )
+        if LooseVersion(sklearn.__version__) < "0.22":
+            fixture = (
+                "The flow on the server is inconsistent with the local flow. "
+                "The server flow ID is 1. Please check manually and remove "
+                "the flow if necessary! Error is:\n"
+                "'Flow sklearn.ensemble.forest.RandomForestClassifier: "
+                "values for attribute 'name' differ: "
+                "'sklearn.ensemble.forest.RandomForestClassifier'"
+                "\nvs\n'sklearn.ensemble.forest.RandomForestClassifie'.'"
+            )
+        else:
+            # sklearn.ensemble.forest -> sklearn.ensemble._forest
+            fixture = (
+                "The flow on the server is inconsistent with the local flow. "
+                "The server flow ID is 1. Please check manually and remove "
+                "the flow if necessary! Error is:\n"
+                "'Flow sklearn.ensemble._forest.RandomForestClassifier: "
+                "values for attribute 'name' differ: "
+                "'sklearn.ensemble._forest.RandomForestClassifier'"
+                "\nvs\n'sklearn.ensemble._forest.RandomForestClassifie'.'"
+            )
 
         self.assertEqual(context_manager.exception.args[0], fixture)
         self.assertEqual(get_flow_mock.call_count, 2)
@@ -463,19 +475,40 @@ class TestFlow(TestBase):
 
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = "_encoders" if LooseVersion(sklearn.__version__) >= "0.20" else "data"
-        fixture_name = (
-            "%ssklearn.model_selection._search.RandomizedSearchCV("
-            "estimator=sklearn.pipeline.Pipeline("
-            "ohe=sklearn.preprocessing.%s.OneHotEncoder,"
-            "scaler=sklearn.preprocessing.data.StandardScaler,"
-            "fu=sklearn.pipeline.FeatureUnion("
-            "pca=sklearn.decomposition.truncated_svd.TruncatedSVD,"
-            "fs="
-            "sklearn.feature_selection.univariate_selection.SelectPercentile),"
-            "boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier("
-            "base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))"
-            % (sentinel, module_name_encoder)
-        )
+        if LooseVersion(sklearn.__version__) < "0.22":
+            fixture_name = (
+                "%ssklearn.model_selection._search.RandomizedSearchCV("
+                "estimator=sklearn.pipeline.Pipeline("
+                "ohe=sklearn.preprocessing.%s.OneHotEncoder,"
+                "scaler=sklearn.preprocessing.data.StandardScaler,"
+                "fu=sklearn.pipeline.FeatureUnion("
+                "pca=sklearn.decomposition.truncated_svd.TruncatedSVD,"
+                "fs="
+                "sklearn.feature_selection.univariate_selection.SelectPercentile),"
+                "boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier("
+                "base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))"
+                % (sentinel, module_name_encoder)
+            )
+        else:
+            # sklearn.sklearn.preprocessing.data -> sklearn.sklearn.preprocessing._data
+            # sklearn.sklearn.decomposition.truncated_svd -> sklearn.decomposition._truncated_svd
+            # sklearn.feature_selection.univariate_selection ->
+            #     sklearn.feature_selection._univariate_selection
+            # sklearn.ensemble.weight_boosting -> sklearn.ensemble._weight_boosting
+            # sklearn.tree.tree.DecisionTree... -> sklearn.tree._classes.DecisionTree...
+            fixture_name = (
+                "%ssklearn.model_selection._search.RandomizedSearchCV("
+                "estimator=sklearn.pipeline.Pipeline("
+                "ohe=sklearn.preprocessing.%s.OneHotEncoder,"
+                "scaler=sklearn.preprocessing._data.StandardScaler,"
+                "fu=sklearn.pipeline.FeatureUnion("
+                "pca=sklearn.decomposition._truncated_svd.TruncatedSVD,"
+                "fs="
+                "sklearn.feature_selection._univariate_selection.SelectPercentile),"
+                "boosting=sklearn.ensemble._weight_boosting.AdaBoostClassifier("
+                "base_estimator=sklearn.tree._classes.DecisionTreeClassifier)))"
+                % (sentinel, module_name_encoder)
+            )
         self.assertEqual(new_flow.name, fixture_name)
         new_flow.model.fit(X, y)
 
