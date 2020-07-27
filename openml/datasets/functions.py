@@ -947,6 +947,48 @@ def edit_dataset(
     return int(data_id)
 
 
+def fork_dataset(
+    data_id,
+) -> int:
+    """
+      Clones an existing dataset, with the configured new user as the creator
+
+      Parameters
+      ----------
+      data_id : int
+          ID of the dataset.
+
+      Returns
+      -------
+      data_id of the new version created and published"""
+    if not isinstance(data_id, int):
+        raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
+
+    dataset = get_dataset(data_id)
+    decoded_arff = dataset._get_arff(format="arff")
+    dataset_new = create_dataset(
+            name=dataset.name,
+            description=dataset.description,
+            creator= dataset.creator,
+            contributor=dataset.contributor,
+            collection_date=dataset.collection_date,
+            language=dataset.language,
+            licence=dataset.licence,
+            attributes=decoded_arff["attributes"],
+            data=decoded_arff["data"],
+            default_target_attribute=dataset.default_target_attribute,
+            ignore_attribute=dataset.ignore_attribute,
+            citation=dataset.citation,
+            row_id_attribute=dataset.row_id_attribute,
+            original_data_url=dataset.original_data_url,
+            paper_url=dataset.paper_url,
+            update_comment=dataset.update_comment,
+            version_label=dataset.version_label,
+    )
+
+    return dataset_new
+
+
 def _get_dataset_description(did_cache_dir, dataset_id):
     """Get the dataset description as xml dictionary.
 
