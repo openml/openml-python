@@ -41,7 +41,7 @@ class TestEvaluationFunctions(TestBase):
 
         task_id = 7312
 
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", task=[task_id])
+        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", tasks=[task_id])
 
         self.assertGreater(len(evaluations), 100)
         for run_id in evaluations.keys():
@@ -56,7 +56,7 @@ class TestEvaluationFunctions(TestBase):
 
         uploader_id = 16
         evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy", uploader=[uploader_id], output_format="dataframe"
+            "predictive_accuracy", uploaders=[uploader_id], output_format="dataframe"
         )
         self.assertEqual(evaluations["uploader"].unique(), [uploader_id])
 
@@ -66,7 +66,7 @@ class TestEvaluationFunctions(TestBase):
         openml.config.server = self.production_server
 
         setup_id = 10
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", setup=[setup_id])
+        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", setups=[setup_id])
 
         self.assertGreater(len(evaluations), 50)
         for run_id in evaluations.keys():
@@ -81,7 +81,7 @@ class TestEvaluationFunctions(TestBase):
 
         flow_id = 100
 
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", flow=[flow_id])
+        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", flows=[flow_id])
 
         self.assertGreater(len(evaluations), 2)
         for run_id in evaluations.keys():
@@ -96,7 +96,7 @@ class TestEvaluationFunctions(TestBase):
 
         run_id = 12
 
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", run=[run_id])
+        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", runs=[run_id])
 
         self.assertEqual(len(evaluations), 1)
         for run_id in evaluations.keys():
@@ -132,9 +132,9 @@ class TestEvaluationFunctions(TestBase):
             "predictive_accuracy",
             size=size,
             offset=0,
-            task=task_ids,
-            flow=flow_ids,
-            uploader=uploader_ids,
+            tasks=task_ids,
+            flows=flow_ids,
+            uploaders=uploader_ids,
             per_fold=True,
         )
 
@@ -149,9 +149,9 @@ class TestEvaluationFunctions(TestBase):
             "predictive_accuracy",
             size=size,
             offset=0,
-            task=task_ids,
-            flow=flow_ids,
-            uploader=uploader_ids,
+            tasks=task_ids,
+            flows=flow_ids,
+            uploaders=uploader_ids,
             per_fold=False,
         )
         for run_id in evaluations.keys():
@@ -164,11 +164,11 @@ class TestEvaluationFunctions(TestBase):
         task_id = 6
         # Get all evaluations of the task
         unsorted_eval = openml.evaluations.list_evaluations(
-            "predictive_accuracy", offset=0, task=[task_id]
+            "predictive_accuracy", offset=0, tasks=[task_id]
         )
         # Get top 10 evaluations of the same task
         sorted_eval = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=size, offset=0, task=[task_id], sort_order="desc"
+            "predictive_accuracy", size=size, offset=0, tasks=[task_id], sort_order="desc"
         )
         self.assertEqual(len(sorted_eval), size)
         self.assertGreater(len(unsorted_eval), 0)
@@ -191,11 +191,11 @@ class TestEvaluationFunctions(TestBase):
         openml.config.server = self.production_server
         flow_id = [405]
         size = 100
-        evals = self._check_list_evaluation_setups(flow=flow_id, size=size)
+        evals = self._check_list_evaluation_setups(flows=flow_id, size=size)
         # check if parameters in separate columns works
         evals_cols = openml.evaluations.list_evaluations_setups(
             "predictive_accuracy",
-            flow=flow_id,
+            flows=flow_id,
             size=size,
             sort_order="desc",
             output_format="dataframe",
@@ -209,4 +209,4 @@ class TestEvaluationFunctions(TestBase):
         openml.config.server = self.production_server
         task_id = [6]
         size = 121
-        self._check_list_evaluation_setups(task=task_id, size=size)
+        self._check_list_evaluation_setups(tasks=task_id, size=size)
