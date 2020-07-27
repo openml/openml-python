@@ -27,6 +27,7 @@ from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (
     create_dataset,
     edit_dataset,
+    fork_dataset,
     attributes_arff_from_df,
     _get_cached_dataset,
     _get_cached_dataset_features,
@@ -1409,4 +1410,19 @@ class TestOpenMLDataset(TestBase):
             edit_dataset,
             data_id=564,
             description="xor data",
+        )
+
+    def test_data_fork(self):
+        did = 128
+        dataset = openml.datasets.get_dataset(did)
+        cloned_data = fork_dataset(did)
+        self.assertEqual(dataset.description, cloned_data.description)
+
+        # Check server exception when unknown dataset is provided
+        self.assertRaisesRegex(
+            OpenMLServerException,
+            "Unknown dataset",
+            fork_dataset,
+            data_id=100000,
+
         )

@@ -965,7 +965,7 @@ def fork_dataset(
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
 
     dataset = get_dataset(data_id)
-    decoded_arff = dataset._get_arff(format="arff")
+    decoded_arff = dataset._get_arff(format=dataset.format)
     dataset_new = create_dataset(
             name=dataset.name,
             description=dataset.description,
