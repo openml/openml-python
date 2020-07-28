@@ -1415,12 +1415,16 @@ class TestOpenMLDataset(TestBase):
     def test_data_fork(self):
         # Dense dataset fork
         did = 20
+        old_dataset = openml.datasets.get_dataset(did)
         forked_id, forked_dataset = fork_dataset(did)
+        self.assertEqual(old_dataset.description, forked_dataset.description)
         self.assertNotEqual(forked_id, did)
 
         # Sparse dataset fork
         did = 564
+        old_dataset = openml.datasets.get_dataset(did)
         forked_id, forked_dataset = fork_dataset(did)
+        self.assertEqual(old_dataset.description, forked_dataset.description)
         self.assertNotEqual(forked_id, did)
 
         # Check server exception when unknown dataset is provided

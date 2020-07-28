@@ -149,7 +149,8 @@ print(f"Edited dataset ID: {data_id}")
 # =================================================
 # This example continues to use the test server, to avoid creating multiple copies on main server.
 ############################################################################
-data_id = fork_dataset(128)
-print(f"Forked dataset ID: {data_id}")
+forked_did, forked_dataset = fork_dataset(68)
+print(f"Forked dataset ID: {forked_did}")
+print(forked_dataset)
 
 openml.config.stop_using_configuration_for_example()
