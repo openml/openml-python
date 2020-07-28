@@ -77,11 +77,14 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 criterion="entropy", max_features="auto", max_leaf_nodes=2000
             )
 
-            fixture_name = "sklearn.tree.tree.DecisionTreeClassifier"
+            tree_name = "tree" if LooseVersion(sklearn.__version__) < "0.22" else "_classes"
+            fixture_name = "sklearn.tree.{}.DecisionTreeClassifier".format(tree_name)
             fixture_short_name = "sklearn.DecisionTreeClassifier"
             # str obtained from self.extension._get_sklearn_description(model)
             fixture_description = "A decision tree classifier."
             version_fixture = "sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9" % sklearn.__version__
+
+            presort_val = "false" if LooseVersion(sklearn.__version__) < "0.22" else '"deprecated"'
             # min_impurity_decrease has been introduced in 0.20
             # min_impurity_split has been deprecated in 0.20
             if LooseVersion(sklearn.__version__) < "0.19":
@@ -114,12 +117,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                         ("min_samples_leaf", "1"),
                         ("min_samples_split", "2"),
                         ("min_weight_fraction_leaf", "0.0"),
-                        ("presort", "false"),
+                        ("presort", presort_val),
                         ("random_state", "null"),
                         ("splitter", '"best"'),
                     )
                 )
-            structure_fixture = {"sklearn.tree.tree.DecisionTreeClassifier": []}
+            if LooseVersion(sklearn.__version__) >= "0.22":
+                fixture_parameters.update({"ccp_alpha": "0.0"})
+                fixture_parameters.move_to_end("ccp_alpha", last=False)
+
+            structure_fixture = {"sklearn.tree.{}.DecisionTreeClassifier".format(tree_name): []}
 
             serialization = self.extension.model_to_flow(model)
             structure = serialization.get_structure("name")
@@ -161,11 +168,18 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         with mock.patch.object(self.extension, "_check_dependencies") as check_dependencies_mock:
             model = sklearn.cluster.KMeans()
 
-            fixture_name = "sklearn.cluster.k_means_.KMeans"
+            cluster_name = "k_means_" if LooseVersion(sklearn.__version__) < "0.22" else "_kmeans"
+            fixture_name = "sklearn.cluster.{}.KMeans".format(cluster_name)
             fixture_short_name = "sklearn.KMeans"
             # str obtained from self.extension._get_sklearn_description(model)
-            fixture_description = "K-Means clustering"
+            fixture_description = "K-Means clustering{}".format(
+                "" if LooseVersion(sklearn.__version__) < "0.22" else "."
+            )
             version_fixture = "sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9" % sklearn.__version__
+
+            n_jobs_val = "null" if LooseVersion(sklearn.__version__) < "0.23" else '"deprecated"'
+            precomp_val = '"auto"' if LooseVersion(sklearn.__version__) < "0.23" else '"deprecated"'
+
             # n_jobs default has changed to None in 0.20
             if LooseVersion(sklearn.__version__) < "0.20":
                 fixture_parameters = OrderedDict(
@@ -192,14 +206,14 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                         ("max_iter", "300"),
                         ("n_clusters", "8"),
                         ("n_init", "10"),
-                        ("n_jobs", "null"),
-                        ("precompute_distances", '"auto"'),
+                        ("n_jobs", n_jobs_val),
+                        ("precompute_distances", precomp_val),
                         ("random_state", "null"),
                         ("tol", "0.0001"),
                         ("verbose", "0"),
                     )
                 )
-            fixture_structure = {"sklearn.cluster.k_means_.KMeans": []}
+            fixture_structure = {"sklearn.cluster.{}.KMeans".format(cluster_name): []}
 
             serialization = self.extension.model_to_flow(model)
             structure = serialization.get_structure("name")
@@ -230,11 +244,15 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             n_estimators=100, base_estimator=sklearn.tree.DecisionTreeClassifier()
         )
 
-        fixture_name = (
-            "sklearn.ensemble.weight_boosting.AdaBoostClassifier"
-            "(base_estimator=sklearn.tree.tree.DecisionTreeClassifier)"
+        weight_name = "{}weight_boosting".format(
+            "" if LooseVersion(sklearn.__version__) < "0.22" else "_"
         )
-        fixture_class_name = "sklearn.ensemble.weight_boosting.AdaBoostClassifier"
+        tree_name = "tree" if LooseVersion(sklearn.__version__) < "0.22" else "_classes"
+        fixture_name = (
+            "sklearn.ensemble.{}.AdaBoostClassifier"
+            "(base_estimator=sklearn.tree.{}.DecisionTreeClassifier)".format(weight_name, tree_name)
+        )
+        fixture_class_name = "sklearn.ensemble.{}.AdaBoostClassifier".format(weight_name)
         fixture_short_name = "sklearn.AdaBoostClassifier"
         # str obtained from self.extension._get_sklearn_description(model)
         fixture_description = (
@@ -246,13 +264,13 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             " on difficult cases.\n\nThis class implements the algorithm known "
             "as AdaBoost-SAMME [2]."
         )
-        fixture_subcomponent_name = "sklearn.tree.tree.DecisionTreeClassifier"
-        fixture_subcomponent_class_name = "sklearn.tree.tree.DecisionTreeClassifier"
+        fixture_subcomponent_name = "sklearn.tree.{}.DecisionTreeClassifier".format(tree_name)
+        fixture_subcomponent_class_name = "sklearn.tree.{}.DecisionTreeClassifier".format(tree_name)
         # str obtained from self.extension._get_sklearn_description(model.base_estimator)
         fixture_subcomponent_description = "A decision tree classifier."
         fixture_structure = {
             fixture_name: [],
-            "sklearn.tree.tree.DecisionTreeClassifier": ["base_estimator"],
+            "sklearn.tree.{}.DecisionTreeClassifier".format(tree_name): ["base_estimator"],
         }
 
         serialization = self.extension.model_to_flow(model)
@@ -298,10 +316,11 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         dummy = sklearn.dummy.DummyClassifier(strategy="prior")
         model = sklearn.pipeline.Pipeline(steps=[("scaler", scaler), ("dummy", dummy)])
 
+        scaler_name = "data" if LooseVersion(sklearn.__version__) < "0.22" else "_data"
         fixture_name = (
             "sklearn.pipeline.Pipeline("
-            "scaler=sklearn.preprocessing.data.StandardScaler,"
-            "dummy=sklearn.dummy.DummyClassifier)"
+            "scaler=sklearn.preprocessing.{}.StandardScaler,"
+            "dummy=sklearn.dummy.DummyClassifier)".format(scaler_name)
         )
         fixture_short_name = "sklearn.Pipeline(StandardScaler,DummyClassifier)"
 
@@ -327,7 +346,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         fixture_structure = {
             fixture_name: [],
-            "sklearn.preprocessing.data.StandardScaler": ["scaler"],
+            "sklearn.preprocessing.{}.StandardScaler".format(scaler_name): ["scaler"],
             "sklearn.dummy.DummyClassifier": ["dummy"],
         }
 
@@ -402,10 +421,12 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         km = sklearn.cluster.KMeans()
         model = sklearn.pipeline.Pipeline(steps=[("scaler", scaler), ("clusterer", km)])
 
+        scaler_name = "data" if LooseVersion(sklearn.__version__) < "0.22" else "_data"
+        cluster_name = "k_means_" if LooseVersion(sklearn.__version__) < "0.22" else "_kmeans"
         fixture_name = (
             "sklearn.pipeline.Pipeline("
-            "scaler=sklearn.preprocessing.data.StandardScaler,"
-            "clusterer=sklearn.cluster.k_means_.KMeans)"
+            "scaler=sklearn.preprocessing.{}.StandardScaler,"
+            "clusterer=sklearn.cluster.{}.KMeans)".format(scaler_name, cluster_name)
         )
         fixture_short_name = "sklearn.Pipeline(StandardScaler,KMeans)"
 
@@ -430,10 +451,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             fixture_description = self.extension._get_sklearn_description(model)
         fixture_structure = {
             fixture_name: [],
-            "sklearn.preprocessing.data.StandardScaler": ["scaler"],
-            "sklearn.cluster.k_means_.KMeans": ["clusterer"],
+            "sklearn.preprocessing.{}.StandardScaler".format(scaler_name): ["scaler"],
+            "sklearn.cluster.{}.KMeans".format(cluster_name): ["clusterer"],
         }
-
         serialization = self.extension.model_to_flow(model)
         structure = serialization.get_structure("name")
 
@@ -519,10 +539,12 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             ],
             remainder="passthrough",
         )
+
+        scaler_name = "data" if LooseVersion(sklearn.__version__) < "0.22" else "_data"
         fixture = (
             "sklearn.compose._column_transformer.ColumnTransformer("
-            "numeric=sklearn.preprocessing.data.StandardScaler,"
-            "nominal=sklearn.preprocessing._encoders.OneHotEncoder)"
+            "numeric=sklearn.preprocessing.{}.StandardScaler,"
+            "nominal=sklearn.preprocessing._encoders.OneHotEncoder)".format(scaler_name)
         )
         fixture_short_name = "sklearn.ColumnTransformer"
 
@@ -543,7 +565,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         fixture_structure = {
             fixture: [],
-            "sklearn.preprocessing.data.StandardScaler": ["numeric"],
+            "sklearn.preprocessing.{}.StandardScaler".format(scaler_name): ["numeric"],
             "sklearn.preprocessing._encoders.OneHotEncoder": ["nominal"],
         }
 
@@ -587,21 +609,26 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         model = sklearn.pipeline.Pipeline(
             steps=[("transformer", inner), ("classifier", sklearn.tree.DecisionTreeClassifier())]
         )
+        scaler_name = "data" if LooseVersion(sklearn.__version__) < "0.22" else "_data"
+        tree_name = "tree" if LooseVersion(sklearn.__version__) < "0.22" else "_classes"
         fixture_name = (
             "sklearn.pipeline.Pipeline("
             "transformer=sklearn.compose._column_transformer."
             "ColumnTransformer("
-            "numeric=sklearn.preprocessing.data.StandardScaler,"
+            "numeric=sklearn.preprocessing.{}.StandardScaler,"
             "nominal=sklearn.preprocessing._encoders.OneHotEncoder),"
-            "classifier=sklearn.tree.tree.DecisionTreeClassifier)"
+            "classifier=sklearn.tree.{}.DecisionTreeClassifier)".format(scaler_name, tree_name)
         )
         fixture_structure = {
-            "sklearn.preprocessing.data.StandardScaler": ["transformer", "numeric"],
+            "sklearn.preprocessing.{}.StandardScaler".format(scaler_name): [
+                "transformer",
+                "numeric",
+            ],
             "sklearn.preprocessing._encoders.OneHotEncoder": ["transformer", "nominal"],
             "sklearn.compose._column_transformer.ColumnTransformer(numeric="
-            "sklearn.preprocessing.data.StandardScaler,nominal=sklearn."
-            "preprocessing._encoders.OneHotEncoder)": ["transformer"],
-            "sklearn.tree.tree.DecisionTreeClassifier": ["classifier"],
+            "sklearn.preprocessing.{}.StandardScaler,nominal=sklearn."
+            "preprocessing._encoders.OneHotEncoder)".format(scaler_name): ["transformer"],
+            "sklearn.tree.{}.DecisionTreeClassifier".format(tree_name): ["classifier"],
             fixture_name: [],
         }
 
@@ -630,6 +657,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         structure = serialization.get_structure("name")
         self.assertEqual(serialization.name, fixture_name)
         self.assertEqual(serialization.description, fixture_description)
+
         self.assertDictEqual(structure, fixture_structure)
         # del serialization.model
         new_model = self.extension.flow_to_model(serialization)
@@ -656,15 +684,18 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         structure = serialization.get_structure("name")
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = "_encoders" if LooseVersion(sklearn.__version__) >= "0.20" else "data"
+        scaler_name = "data" if LooseVersion(sklearn.__version__) < "0.22" else "_data"
         fixture_name = (
             "sklearn.pipeline.FeatureUnion("
             "ohe=sklearn.preprocessing.{}.OneHotEncoder,"
-            "scaler=sklearn.preprocessing.data.StandardScaler)".format(module_name_encoder)
+            "scaler=sklearn.preprocessing.{}.StandardScaler)".format(
+                module_name_encoder, scaler_name
+            )
         )
         fixture_structure = {
             fixture_name: [],
             "sklearn.preprocessing.{}." "OneHotEncoder".format(module_name_encoder): ["ohe"],
-            "sklearn.preprocessing.data.StandardScaler": ["scaler"],
+            "sklearn.preprocessing.{}.StandardScaler".format(scaler_name): ["scaler"],
         }
         self.assertEqual(serialization.name, fixture_name)
         self.assertDictEqual(structure, fixture_structure)
@@ -728,17 +759,20 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fu2_serialization = self.extension.model_to_flow(fu2)
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = "_encoders" if LooseVersion(sklearn.__version__) >= "0.20" else "data"
+        scaler_name = "data" if LooseVersion(sklearn.__version__) < "0.22" else "_data"
         self.assertEqual(
             fu1_serialization.name,
             "sklearn.pipeline.FeatureUnion("
             "ohe=sklearn.preprocessing.{}.OneHotEncoder,"
-            "scaler=sklearn.preprocessing.data.StandardScaler)".format(module_name_encoder),
+            "scaler=sklearn.preprocessing.{}.StandardScaler)".format(
+                module_name_encoder, scaler_name
+            ),
         )
         self.assertEqual(
             fu2_serialization.name,
             "sklearn.pipeline.FeatureUnion("
             "scaler=sklearn.preprocessing.{}.OneHotEncoder,"
-            "ohe=sklearn.preprocessing.data.StandardScaler)".format(module_name_encoder),
+            "ohe=sklearn.preprocessing.{}.StandardScaler)".format(module_name_encoder, scaler_name),
         )
 
     def test_serialize_complex_flow(self):
@@ -766,8 +800,12 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = "_encoders" if LooseVersion(sklearn.__version__) >= "0.20" else "data"
         ohe_name = "sklearn.preprocessing.%s.OneHotEncoder" % module_name_encoder
-        scaler_name = "sklearn.preprocessing.data.StandardScaler"
-        tree_name = "sklearn.tree.tree.DecisionTreeClassifier"
+        scaler_name = "sklearn.preprocessing.{}.StandardScaler".format(
+            "data" if LooseVersion(sklearn.__version__) < "0.22" else "_data"
+        )
+        tree_name = "sklearn.tree.{}.DecisionTreeClassifier".format(
+            "tree" if LooseVersion(sklearn.__version__) < "0.22" else "_classes"
+        )
         boosting_name = (
             "sklearn.ensemble.weight_boosting.AdaBoostClassifier" "(base_estimator=%s)" % tree_name
         )
@@ -1195,11 +1233,23 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 1),
             ]
-        else:
+        elif sklearn_version < "0.22":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 16),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 2),
+            ]
+        elif sklearn_version < "0.23":
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 18),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 14),
+                (sklearn.pipeline.Pipeline.__init__, 2),
+            ]
+        else:
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 0),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 0),
+                (sklearn.pipeline.Pipeline.__init__, 0),
             ]
 
         for fn, num_params_with_defaults in fns:
@@ -1208,7 +1258,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.assertIsInstance(defaultless, set)
             # check whether we have both defaults and defaultless params
             self.assertEqual(len(defaults), num_params_with_defaults)
-            self.assertGreater(len(defaultless), 0)
+            if sklearn_version < "0.23":
+                self.assertGreater(len(defaultless), 0)
             # check no overlap
             self.assertSetEqual(set(defaults.keys()), set(defaults.keys()) - defaultless)
             self.assertSetEqual(defaultless, defaultless - set(defaults.keys()))
@@ -1225,11 +1276,18 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
 
         pipe_adjusted = sklearn.clone(pipe_orig)
-        params = {
-            "Imputer__strategy": "median",
-            "OneHotEncoder__sparse": False,
-            "Estimator__min_samples_leaf": 42,
-        }
+        if LooseVersion(sklearn.__version__) < "0.23":
+            params = {
+                "Imputer__strategy": "median",
+                "OneHotEncoder__sparse": False,
+                "Estimator__min_samples_leaf": 42,
+            }
+        else:
+            params = {
+                "Imputer__strategy": "mean",
+                "OneHotEncoder__sparse": True,
+                "Estimator__min_samples_leaf": 1,
+            }
         pipe_adjusted.set_params(**params)
         flow = self.extension.model_to_flow(pipe_adjusted)
         pipe_deserialized = self.extension.flow_to_model(flow, initialize_with_defaults=True)
@@ -1293,14 +1351,24 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
 
         pipe_adjusted = sklearn.clone(pipe_orig)
-        params = {
-            "Imputer__strategy": "median",
-            "OneHotEncoder__sparse": False,
-            "Estimator__n_estimators": 10,
-            "Estimator__base_estimator__n_estimators": 10,
-            "Estimator__base_estimator__base_estimator__learning_rate": 0.1,
-            "Estimator__base_estimator__base_estimator__loss__n_neighbors": 13,
-        }
+        if LooseVersion(sklearn.__version__) < "0.23":
+            params = {
+                "Imputer__strategy": "median",
+                "OneHotEncoder__sparse": False,
+                "Estimator__n_estimators": 10,
+                "Estimator__base_estimator__n_estimators": 10,
+                "Estimator__base_estimator__base_estimator__learning_rate": 0.1,
+                "Estimator__base_estimator__base_estimator__loss__n_neighbors": 13,
+            }
+        else:
+            params = {
+                "Imputer__strategy": "mean",
+                "OneHotEncoder__sparse": True,
+                "Estimator__n_estimators": 50,
+                "Estimator__base_estimator__n_estimators": 10,
+                "Estimator__base_estimator__base_estimator__learning_rate": 0.1,
+                "Estimator__base_estimator__base_estimator__loss__n_neighbors": 5,
+            }
         pipe_adjusted.set_params(**params)
         flow = self.extension.model_to_flow(pipe_adjusted)
         pipe_deserialized = self.extension.flow_to_model(flow, initialize_with_defaults=True)
@@ -1349,7 +1417,10 @@ class TestSklearnExtensionFlowFunctions(TestBase):
     def test_obtain_parameter_values_flow_not_from_server(self):
         model = sklearn.linear_model.LogisticRegression(solver="lbfgs")
         flow = self.extension.model_to_flow(model)
-        msg = "Flow sklearn.linear_model.logistic.LogisticRegression has no " "flow_id!"
+        logistic_name = "logistic" if LooseVersion(sklearn.__version__) < "0.22" else "_logistic"
+        msg = "Flow sklearn.linear_model.{}.LogisticRegression has no flow_id!".format(
+            logistic_name
+        )
 
         with self.assertRaisesRegex(ValueError, msg):
             self.extension.obtain_parameter_values(flow)
