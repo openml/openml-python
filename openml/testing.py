@@ -9,8 +9,6 @@ import time
 from typing import Dict
 import unittest
 import warnings
-import sklearn
-from distutils.version import LooseVersion
 
 # Currently, importing oslo raises a lot of warning that it will stop working
 # under python3.8; remove this once they disappear
@@ -225,10 +223,6 @@ class TestBase(unittest.TestCase):
             "wall_clock_time_millis_testing": (0, max_time_allowed),
             "wall_clock_time_millis": (0, max_time_allowed),
         }
-        if LooseVersion(sklearn.__version__) >= "0.23":
-            del check_measures["usercpu_time_millis_testing"]
-            del check_measures["usercpu_time_millis"]
-            del check_measures["usercpu_time_millis_training"]
 
         if check_scores:
             if task_type in (TaskTypeEnum.SUPERVISED_CLASSIFICATION, TaskTypeEnum.LEARNING_CURVE):

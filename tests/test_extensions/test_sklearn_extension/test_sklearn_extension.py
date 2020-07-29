@@ -806,8 +806,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         tree_name = "sklearn.tree.{}.DecisionTreeClassifier".format(
             "tree" if LooseVersion(sklearn.__version__) < "0.22" else "_classes"
         )
-        boosting_name = (
-            "sklearn.ensemble.weight_boosting.AdaBoostClassifier" "(base_estimator=%s)" % tree_name
+        weight_name = "weight" if LooseVersion(sklearn.__version__) < "0.22" else "_weight"
+        boosting_name = "sklearn.ensemble.{}_boosting.AdaBoostClassifier(base_estimator={})".format(
+            weight_name, tree_name
         )
         pipeline_name = "sklearn.pipeline.Pipeline(ohe=%s,scaler=%s," "boosting=%s)" % (
             ohe_name,
@@ -1314,11 +1315,18 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
 
         pipe_adjusted = sklearn.clone(pipe_orig)
-        params = {
-            "Imputer__strategy": "median",
-            "OneHotEncoder__sparse": False,
-            "Estimator__n_estimators": 10,
-        }
+        if LooseVersion(sklearn.__version__) < "0.22":
+            params = {
+                "Imputer__strategy": "median",
+                "OneHotEncoder__sparse": False,
+                "Estimator__n_estimators": 10,
+            }
+        else:
+            params = {
+                "Imputer__strategy": "mean",
+                "OneHotEncoder__sparse": True,
+                "Estimator__n_estimators": 50,
+            }
         pipe_adjusted.set_params(**params)
         flow = self.extension.model_to_flow(pipe_adjusted)
         pipe_deserialized = self.extension.flow_to_model(flow, initialize_with_defaults=True)

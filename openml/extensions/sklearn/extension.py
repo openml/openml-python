@@ -1346,7 +1346,7 @@ class SklearnExtension(Extension):
         # check the parameters for n_jobs
         n_jobs_vals = SklearnExtension._get_parameter_values_recursive(model.get_params(), "n_jobs")
         for val in n_jobs_vals:
-            if val is not None and val != 1:
+            if val is not None and val != 1 and val != "deprecated":
                 return False
         return True
 
