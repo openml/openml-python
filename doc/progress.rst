@@ -8,6 +8,7 @@ Changelog
 
 0.11.0
 ~~~~~~
+* ADD #929: Add fork API
 * ADD #929: Add data edit API
 * FIX #873: Fixes an issue which resulted in incorrect URLs when printing OpenML objects after
   switching the server.
