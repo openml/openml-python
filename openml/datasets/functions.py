@@ -4,7 +4,7 @@ import io
 import logging
 import os
 import re
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, Tuple
 
 import numpy as np
 import arff
@@ -891,10 +891,18 @@ def edit_dataset(
         ]
     ):
         logger.warning("Creating a new version of dataset, cannot edit existing version")
-        dataset = get_dataset(data_id)
 
-        decoded_arff = dataset._get_arff(format="arff")
-        data_old = decoded_arff["data"]
+        # Get old dataset and features
+        dataset = get_dataset(data_id)
+        df, y, categorical, attribute_names = dataset.get_data(dataset_format="dataframe")
+        attributes_old = attributes_arff_from_df(df)
+
+        # Sparse data needs to be provided in a different format from dense data
+        if dataset.format == "sparse_arff":
+            df, y, categorical, attribute_names = dataset.get_data(dataset_format="array")
+            data_old = coo_matrix(df)
+        else:
+            data_old = df
         data_new = data if data is not None else data_old
         dataset_new = create_dataset(
             name=dataset.name,
@@ -904,7 +912,7 @@ def edit_dataset(
             collection_date=collection_date or dataset.collection_date,
             language=language or dataset.language,
             licence=dataset.licence,
-            attributes=attributes or decoded_arff["attributes"],
+            attributes=attributes or attributes_old,
             data=data_new,
             default_target_attribute=default_target_attribute or dataset.default_target_attribute,
             ignore_attribute=ignore_attribute or dataset.ignore_attribute,
@@ -945,6 +953,57 @@ def edit_dataset(
     result = xmltodict.parse(result_xml)
     data_id = result["oml:data_edit"]["oml:id"]
     return int(data_id)
+
+
+def fork_dataset(data_id,) -> Tuple[int, OpenMLDataset]:
+    """
+      Clones an existing dataset, with the configured new user as the creator
+
+      Parameters
+      ----------
+      data_id : int
+          ID of the dataset.
+
+      Returns
+      -------
+      data_id of the new version created and published"""
+    if not isinstance(data_id, int):
+        raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
+
+    # Get dataset and features
+    dataset = get_dataset(data_id)
+    df, y, categorical, attribute_names = dataset.get_data(dataset_format="dataframe")
+    features = attributes_arff_from_df(df)
+
+    # Sparse data needs to be provided in a different format from dense data
+    if dataset.format == "sparse_arff":
+        df, y, categorical, attribute_names = dataset.get_data(dataset_format="array")
+        data = coo_matrix(df)
+    else:
+        data = df
+
+    # Clone the dataset
+    dataset_new = create_dataset(
+        name=dataset.name,
+        description=dataset.description,
+        creator=dataset.creator,
+        contributor=dataset.contributor,
+        collection_date=dataset.collection_date,
+        language=dataset.language,
+        licence=dataset.licence,
+        attributes=features,
+        data=data,
+        default_target_attribute=dataset.default_target_attribute,
+        ignore_attribute=dataset.ignore_attribute,
+        citation=dataset.citation,
+        row_id_attribute=dataset.row_id_attribute,
+        original_data_url=dataset.original_data_url,
+        paper_url=dataset.paper_url,
+        update_comment=dataset.update_comment,
+        version_label=dataset.version_label,
+    )
+    dataset_new.publish()
+    return dataset_new.dataset_id, dataset_new
 
 
 def _get_dataset_description(did_cache_dir, dataset_id):
