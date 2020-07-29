@@ -188,7 +188,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/61976
+    URL for dataset: https://test.openml.org/d/62714
 
 
 
@@ -288,7 +288,7 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/61977
+    URL for dataset: https://test.openml.org/d/62715
 
 
 
@@ -392,7 +392,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/61978
+    URL for dataset: https://test.openml.org/d/62716
 
 
 
@@ -456,7 +456,7 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/61979
+    URL for dataset: https://test.openml.org/d/62717
 
 
 
@@ -505,13 +505,13 @@ Dataset is a pandas dataframe with sparse columns
     <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 4 entries, 0 to 3
     Data columns (total 3 columns):
-     #   Column  Non-Null Count  Dtype               
-    ---  ------  --------------  -----               
-     0   input1  4 non-null      Sparse[float64, 0.0]
-     1   input2  4 non-null      Sparse[float64, 0.0]
-     2   y       4 non-null      Sparse[float64, 0.0]
-    dtypes: Sparse[float64, 0.0](3)
-    memory usage: 200.0 bytes
+     #   Column  Non-Null Count  Dtype             
+    ---  ------  --------------  -----             
+     0   input1  4 non-null      Sparse[float64, 0]
+     1   input2  4 non-null      Sparse[float64, 0]
+     2   y       4 non-null      Sparse[float64, 0]
+    dtypes: Sparse[float64, 0](3)
+    memory usage: 212.0 bytes
     None
 
 
@@ -535,7 +535,7 @@ Dataset is a pandas dataframe with sparse columns
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/61980
+    URL for dataset: https://test.openml.org/d/62718
 
 
 
@@ -554,7 +554,7 @@ Dataset is a pandas dataframe with sparse columns
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.700 seconds)
+   **Total running time of the script:** ( 0 minutes  7.683 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:
