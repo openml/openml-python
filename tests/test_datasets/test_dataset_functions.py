@@ -1160,7 +1160,9 @@ class TestOpenMLDataset(TestBase):
             except Exception as e:
                 # returned code 273: Dataset not processed yet
                 # returned code 362: No qualities found
-                print("Failed to fetch dataset:{} with '{}'.".format(dataset.id, str(e)))
+                TestBase.logger.error(
+                    "Failed to fetch dataset:{} with '{}'.".format(dataset.id, str(e))
+                )
                 time.sleep(10)
                 continue
         if downloaded_dataset is None:
