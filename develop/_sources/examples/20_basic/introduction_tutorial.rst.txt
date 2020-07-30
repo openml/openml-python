@@ -150,7 +150,7 @@ Download the OpenML task for the eeg-eye-state.
 
  .. code-block:: none
 
-    kNN on eeg-eye-state: http://test.openml.org/r/93374
+    kNN on eeg-eye-state: http://test.openml.org/r/94315
 
 
 
