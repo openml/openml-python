@@ -1248,9 +1248,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             ]
         else:
             fns = [
-                (sklearn.ensemble.RandomForestRegressor.__init__, 0),
-                (sklearn.tree.DecisionTreeClassifier.__init__, 0),
-                (sklearn.pipeline.Pipeline.__init__, 0),
+                (sklearn.ensemble.RandomForestRegressor.__init__, 18),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 14),
+                (sklearn.pipeline.Pipeline.__init__, 2),
             ]
 
         for fn, num_params_with_defaults in fns:
@@ -1259,8 +1259,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.assertIsInstance(defaultless, set)
             # check whether we have both defaults and defaultless params
             self.assertEqual(len(defaults), num_params_with_defaults)
-            if sklearn_version < "0.23":
-                self.assertGreater(len(defaultless), 0)
+            self.assertGreater(len(defaultless), 0)
             # check no overlap
             self.assertSetEqual(set(defaults.keys()), set(defaults.keys()) - defaultless)
             self.assertSetEqual(defaultless, defaultless - set(defaults.keys()))
