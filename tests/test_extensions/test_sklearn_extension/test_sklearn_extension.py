@@ -1939,7 +1939,11 @@ class TestSklearnExtensionRunFunctions(TestBase):
     def test_failed_serialization_of_custom_class(self):
         """Test to check if any custom class inherited from sklearn expectedly fails serialization
         """
-        from sklearn.impute import SimpleImputer
+        try:
+            from sklearn.impute import SimpleImputer
+        except ImportError:
+            # for lower versions
+            from sklearn.preprocessing import Imputer as SimpleImputer
 
         class CustomImputer(SimpleImputer):
             pass
