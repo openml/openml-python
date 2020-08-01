@@ -1694,6 +1694,12 @@ class SklearnExtension(Extension):
 
             if not isinstance(proba_y, pd.DataFrame):
                 proba_y = pd.DataFrame(proba_y, columns=task.class_labels)
+            elif isinstance(proba_y, pd.DataFrame):
+                if not np.all(set(proba_y.columns) == set(task.class_labels)):
+                    missing_cols = list(set(task.class_labels) - set(proba_y.columns))
+                    raise ValueError(
+                        "Predicted probabilities missing for the columns: ", missing_cols
+                    )
 
         elif isinstance(task, OpenMLRegressionTask):
             proba_y = None

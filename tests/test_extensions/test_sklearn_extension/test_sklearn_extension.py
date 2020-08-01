@@ -1935,3 +1935,41 @@ class TestSklearnExtensionRunFunctions(TestBase):
         )
         with self.assertRaisesRegex(ValueError, msg):
             self.extension.model_to_flow(clf)
+
+    def test_failed_serialization_of_custom_class(self):
+        """Test to check if any custom class inherited from sklearn expectedly fails serialization
+        """
+        from sklearn.impute import SimpleImputer
+
+        class CustomImputer(SimpleImputer):
+            pass
+
+        def cont(X):
+            return X.dtypes != "category"
+
+        def cat(X):
+            return X.dtypes == "category"
+
+        import sklearn.metrics
+        import sklearn.tree
+        from sklearn.pipeline import Pipeline, make_pipeline
+        from sklearn.compose import ColumnTransformer
+        from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+        cat_imp = make_pipeline(
+            SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore")
+        )
+        cont_imp = make_pipeline(CustomImputer(), StandardScaler())
+        ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
+        clf = Pipeline(
+            steps=[("preprocess", ct), ("estimator", sklearn.tree.DecisionTreeClassifier())]
+        )  # build a sklearn classifier
+
+        task = openml.tasks.get_task(253)  # data with mixed types from test server
+        try:
+            _ = openml.runs.run_model_on_task(clf, task)
+        except AttributeError as e:
+            if e.args[0] == "module '__main__' has no attribute '__version__'":
+                raise AttributeError(e)
+            else:
+                raise Exception(e)
