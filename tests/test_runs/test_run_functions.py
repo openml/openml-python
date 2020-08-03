@@ -80,10 +80,19 @@ class TestRun(TestBase):
         start_time = time.time()
         while time.time() - start_time < max_waiting_time_seconds:
             run = openml.runs.get_run(run_id, ignore_cache=True)
-            if len(run.evaluations) > 0:
-                return
-            else:
-                time.sleep(3)
+
+            try:
+                openml.runs.get_run_trace(run_id)
+            except openml.exceptions.OpenMLServerException:
+                time.sleep(10)
+                continue
+
+            if len(run.evaluations) == 0:
+                time.sleep(10)
+                continue
+
+            return
+
         raise RuntimeError(
             "Could not find any evaluations! Please check whether run {} was "
             "evaluated correctly on the server".format(run_id)
@@ -189,8 +198,11 @@ class TestRun(TestBase):
         classes_without_random_state = [
             "sklearn.model_selection._search.GridSearchCV",
             "sklearn.pipeline.Pipeline",
-            "sklearn.linear_model.base.LinearRegression",
         ]
+        if LooseVersion(sklearn.__version__) < "0.22":
+            classes_without_random_state.append("sklearn.linear_model.base.LinearRegression")
+        else:
+            classes_without_random_state.append("sklearn.linear_model._base.LinearRegression")
 
         def _remove_random_state(flow):
             if "random_state" in flow.parameters:
@@ -805,10 +817,13 @@ class TestRun(TestBase):
             (sklearn.metrics.cohen_kappa_score, {"weights": None}),
             (sklearn.metrics.roc_auc_score, {}),
             (sklearn.metrics.average_precision_score, {}),
-            (sklearn.metrics.jaccard_similarity_score, {}),
             (sklearn.metrics.precision_score, {"average": "macro"}),
             (sklearn.metrics.brier_score_loss, {}),
         ]
+        if LooseVersion(sklearn.__version__) < "0.23":
+            tests.append((sklearn.metrics.jaccard_similarity_score, {}))
+        else:
+            tests.append((sklearn.metrics.jaccard_score, {}))
         for test_idx, test in enumerate(tests):
             alt_scores = run.get_metric_fn(sklearn_fn=test[0], kwargs=test[1],)
             self.assertEqual(len(alt_scores), 10)
@@ -974,7 +989,7 @@ class TestRun(TestBase):
             run = run.publish()
             TestBase._mark_entity_for_removal("run", run.run_id)
             TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
-            self._wait_for_processed_run(run.run_id, 200)
+            self._wait_for_processed_run(run.run_id, 400)
             run_id = run.run_id
         except openml.exceptions.OpenMLRunsExistError as e:
             # The only error we expect, should fail otherwise.

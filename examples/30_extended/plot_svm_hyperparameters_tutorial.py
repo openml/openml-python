@@ -20,8 +20,8 @@ import numpy as np
 # uploaded runs (called *setup*).
 df = openml.evaluations.list_evaluations_setups(
     function="predictive_accuracy",
-    flow=[8353],
-    task=[6],
+    flows=[8353],
+    tasks=[6],
     output_format="dataframe",
     # Using this flag incorporates the hyperparameters into the returned dataframe. Otherwise,
     # the dataframe would contain a field ``paramaters`` containing an unparsed dictionary.

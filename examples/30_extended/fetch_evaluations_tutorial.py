@@ -63,7 +63,7 @@ print(task)
 
 metric = "predictive_accuracy"
 evals = openml.evaluations.list_evaluations(
-    function=metric, task=[task_id], output_format="dataframe"
+    function=metric, tasks=[task_id], output_format="dataframe"
 )
 # Displaying the first 10 rows
 print(evals.head(n=10))
@@ -162,7 +162,7 @@ for i in range(top_n):
 # List evaluations in descending order based on predictive_accuracy with
 # hyperparameters
 evals_setups = openml.evaluations.list_evaluations_setups(
-    function="predictive_accuracy", task=[31], size=100, sort_order="desc"
+    function="predictive_accuracy", tasks=[31], size=100, sort_order="desc"
 )
 
 ""
@@ -173,7 +173,7 @@ print(evals_setups.head())
 # with hyperparameters. parameters_in_separate_columns returns parameters in
 # separate columns
 evals_setups = openml.evaluations.list_evaluations_setups(
-    function="predictive_accuracy", flow=[6767], size=100, parameters_in_separate_columns=True
+    function="predictive_accuracy", flows=[6767], size=100, parameters_in_separate_columns=True
 )
 
 ""
