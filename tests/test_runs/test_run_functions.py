@@ -199,8 +199,11 @@ class TestRun(TestBase):
         classes_without_random_state = [
             "sklearn.model_selection._search.GridSearchCV",
             "sklearn.pipeline.Pipeline",
-            "sklearn.linear_model.base.LinearRegression",
         ]
+        if LooseVersion(sklearn.__version__) < "0.22":
+            classes_without_random_state.append("sklearn.linear_model.base.LinearRegression")
+        else:
+            classes_without_random_state.append("sklearn.linear_model._base.LinearRegression")
 
         def _remove_random_state(flow):
             if "random_state" in flow.parameters:
@@ -779,10 +782,13 @@ class TestRun(TestBase):
             (sklearn.metrics.cohen_kappa_score, {"weights": None}),
             (sklearn.metrics.roc_auc_score, {}),
             (sklearn.metrics.average_precision_score, {}),
-            (sklearn.metrics.jaccard_similarity_score, {}),
             (sklearn.metrics.precision_score, {"average": "macro"}),
             (sklearn.metrics.brier_score_loss, {}),
         ]
+        if LooseVersion(sklearn.__version__) < "0.23":
+            tests.append((sklearn.metrics.jaccard_similarity_score, {}))
+        else:
+            tests.append((sklearn.metrics.jaccard_score, {}))
         for test_idx, test in enumerate(tests):
             alt_scores = run.get_metric_fn(sklearn_fn=test[0], kwargs=test[1],)
             self.assertEqual(len(alt_scores), 10)
