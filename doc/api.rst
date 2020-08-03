@@ -162,6 +162,7 @@ Modules
    :toctree: generated/
    :template: function.rst
 
+    create_task
     get_task
     get_tasks
     list_tasks

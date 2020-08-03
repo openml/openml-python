@@ -994,12 +994,16 @@ class SklearnExtension(Extension):
             a set with all parameters that do not have a default value
         """
         # parameters with defaults are optional, all others are required.
-        signature = inspect.getfullargspec(fn_name)
-        if signature.defaults:
-            optional_params = dict(zip(reversed(signature.args), reversed(signature.defaults)))
-        else:
-            optional_params = dict()
-        required_params = {arg for arg in signature.args if arg not in optional_params}
+        parameters = inspect.signature(fn_name).parameters
+        required_params = set()
+        optional_params = dict()
+        for param in parameters.keys():
+            parameter = parameters.get(param)
+            default_val = parameter.default  # type: ignore
+            if default_val is inspect.Signature.empty:
+                required_params.add(param)
+            else:
+                optional_params[param] = default_val
         return optional_params, required_params
 
     def _deserialize_model(
@@ -1346,7 +1350,7 @@ class SklearnExtension(Extension):
         # check the parameters for n_jobs
         n_jobs_vals = SklearnExtension._get_parameter_values_recursive(model.get_params(), "n_jobs")
         for val in n_jobs_vals:
-            if val is not None and val != 1:
+            if val is not None and val != 1 and val != "deprecated":
                 return False
         return True
 
