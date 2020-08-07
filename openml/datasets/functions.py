@@ -891,10 +891,18 @@ def edit_dataset(
         ]
     ):
         logger.warning("Creating a new version of dataset, cannot edit existing version")
-        dataset = get_dataset(data_id)
 
-        decoded_arff = dataset._get_arff(format="arff")
-        data_old = decoded_arff["data"]
+        # Get old dataset and features
+        dataset = get_dataset(data_id)
+        df, y, categorical, attribute_names = dataset.get_data(dataset_format="dataframe")
+        attributes_old = attributes_arff_from_df(df)
+
+        # Sparse data needs to be provided in a different format from dense data
+        if dataset.format == "sparse_arff":
+            df, y, categorical, attribute_names = dataset.get_data(dataset_format="array")
+            data_old = coo_matrix(df)
+        else:
+            data_old = df
         data_new = data if data is not None else data_old
         dataset_new = create_dataset(
             name=dataset.name,
@@ -904,7 +912,7 @@ def edit_dataset(
             collection_date=collection_date or dataset.collection_date,
             language=language or dataset.language,
             licence=dataset.licence,
-            attributes=attributes or decoded_arff["attributes"],
+            attributes=attributes or attributes_old,
             data=data_new,
             default_target_attribute=default_target_attribute or dataset.default_target_attribute,
             ignore_attribute=ignore_attribute or dataset.ignore_attribute,
