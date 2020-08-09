@@ -1,4 +1,4 @@
-:mod:`openml.flows`.list_flows
+﻿:mod:`openml.flows`.list_flows
 ===========================================
 
 .. currentmodule:: openml.flows

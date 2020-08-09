@@ -1,4 +1,4 @@
-:mod:`openml.study`.create_benchmark_suite
+﻿:mod:`openml.study`.create_benchmark_suite
 =======================================================
 
 .. currentmodule:: openml.study

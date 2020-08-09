@@ -1,4 +1,4 @@
-:mod:`openml.study`.attach_to_suite
+﻿:mod:`openml.study`.attach_to_suite
 ================================================
 
 .. currentmodule:: openml.study

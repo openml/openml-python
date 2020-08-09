@@ -1,4 +1,4 @@
-:mod:`openml`.OpenMLStudy
+﻿:mod:`openml`.OpenMLStudy
 ================================
 
 .. currentmodule:: openml

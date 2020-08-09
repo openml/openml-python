@@ -1,4 +1,4 @@
-:mod:`openml.setups`.setup_exists
+﻿:mod:`openml.setups`.setup_exists
 ==============================================
 
 .. currentmodule:: openml.setups

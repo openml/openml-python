@@ -1,4 +1,4 @@
-:mod:`openml`.OpenMLBenchmarkSuite
+﻿:mod:`openml`.OpenMLBenchmarkSuite
 =========================================
 
 .. currentmodule:: openml

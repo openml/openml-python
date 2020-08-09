@@ -1,4 +1,4 @@
-:mod:`openml`.OpenMLTask
+﻿:mod:`openml`.OpenMLTask
 ===============================
 
 .. currentmodule:: openml

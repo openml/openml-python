@@ -1,4 +1,4 @@
-:mod:`openml.study`.list_studies
+﻿:mod:`openml.study`.list_studies
 =============================================
 
 .. currentmodule:: openml.study

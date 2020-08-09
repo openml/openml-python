@@ -1,4 +1,4 @@
-:mod:`openml.extensions`.get_extension_by_model
+﻿:mod:`openml.extensions`.get_extension_by_model
 ============================================================
 
 .. currentmodule:: openml.extensions

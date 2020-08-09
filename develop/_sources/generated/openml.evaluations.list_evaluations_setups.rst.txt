@@ -1,4 +1,4 @@
-:mod:`openml.evaluations`.list_evaluations_setups
+﻿:mod:`openml.evaluations`.list_evaluations_setups
 ==============================================================
 
 .. currentmodule:: openml.evaluations
