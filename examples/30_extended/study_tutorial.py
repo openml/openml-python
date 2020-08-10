@@ -81,6 +81,7 @@ print(evaluations.head())
 openml.config.start_using_configuration_for_example()
 
 # Model that can handle missing values
+from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn.ensemble import HistGradientBoostingClassifier
 
 

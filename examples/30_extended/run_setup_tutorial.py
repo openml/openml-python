@@ -37,6 +37,10 @@ import openml
 import sklearn.ensemble
 import sklearn.impute
 import sklearn.preprocessing
+from sklearn.pipeline import make_pipeline, Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder, FunctionTransformer
 
 
 openml.config.start_using_configuration_for_example()
@@ -52,24 +56,49 @@ task = openml.tasks.get_task(6)
 # we will create a fairly complex model, with many preprocessing components and
 # many potential hyperparameters. Of course, the model can be as complex and as
 # easy as you want it to be
-model_original = sklearn.pipeline.make_pipeline(
-    sklearn.impute.SimpleImputer(), sklearn.ensemble.RandomForestClassifier()
+
+from sklearn.experimental import enable_hist_gradient_boosting
+from sklearn.ensemble import HistGradientBoostingClassifier
+
+
+# Helper functions to return required columns for ColumnTransformer
+def cont(X):
+    return X.dtypes != "category"
+
+def cat(X):
+    return X.dtypes == "category"
+
+
+cat_imp = make_pipeline(SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore", sparse=False))
+ct = ColumnTransformer([
+    ("cat", cat_imp, cat),
+    ("cont", FunctionTransformer(lambda x: x, validate=False), cont)
+])
+model_original = sklearn.pipeline.Pipeline(
+    steps=[
+        ("transform", ct),
+        ("estimator", HistGradientBoostingClassifier()),
+    ]
 )
+
+# model_original = sklearn.pipeline.make_pipeline(
+#     sklearn.impute.SimpleImputer(), sklearn.ensemble.RandomForestClassifier()
+# )
 
 
 # Let's change some hyperparameters. Of course, in any good application we
 # would tune them using, e.g., Random Search or Bayesian Optimization, but for
 # the purpose of this tutorial we set them to some specific values that might
 # or might not be optimal
-hyperparameters_original = {
-    "simpleimputer__strategy": "median",
-    "randomforestclassifier__criterion": "entropy",
-    "randomforestclassifier__max_features": 0.2,
-    "randomforestclassifier__min_samples_leaf": 1,
-    "randomforestclassifier__n_estimators": 16,
-    "randomforestclassifier__random_state": 42,
-}
-model_original.set_params(**hyperparameters_original)
+# hyperparameters_original = {
+#     "simpleimputer__strategy": "median",
+#     "randomforestclassifier__criterion": "entropy",
+#     "randomforestclassifier__max_features": 0.2,
+#     "randomforestclassifier__min_samples_leaf": 1,
+#     "randomforestclassifier__n_estimators": 16,
+#     "randomforestclassifier__random_state": 42,
+# }
+# model_original.set_params(**hyperparameters_original)
 
 # solve the task and upload the result (this implicitly creates the flow)
 run = openml.runs.run_model_on_task(
