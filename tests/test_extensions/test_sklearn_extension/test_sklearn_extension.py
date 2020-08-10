@@ -1936,6 +1936,10 @@ class TestSklearnExtensionRunFunctions(TestBase):
         with self.assertRaisesRegex(ValueError, msg):
             self.extension.model_to_flow(clf)
 
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="columntransformer introduction in 0.20.0",
+    )
     def test_failed_serialization_of_custom_class(self):
         """Test to check if any custom class inherited from sklearn expectedly fails serialization
         """

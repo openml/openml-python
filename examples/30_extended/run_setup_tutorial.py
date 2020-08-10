@@ -73,7 +73,7 @@ model_original.set_params(**hyperparameters_original)
 
 # solve the task and upload the result (this implicitly creates the flow)
 run = openml.runs.run_model_on_task(
-    model_original, task, avoid_duplicate_runs=False, dataset_format="array"
+    model_original, task, avoid_duplicate_runs=False
 )
 run_original = run.publish()  # this implicitly uploads the flow
 
