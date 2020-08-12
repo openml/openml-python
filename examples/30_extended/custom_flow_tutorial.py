@@ -71,10 +71,14 @@ flow_hyperparameters = dict(
 )
 
 ####################################################################################################
-# It is possible for flows to contain subflows. In this example, the auto-sklearn flow is a
-# subflow, this means that the subflow is entirely executed as part of this flow.
-# Using this modularity also allows your runs to specify which hyperparameters of the
-# subflows were used!
+# It is possible to build a flow which uses other flows.
+# For example, the Random Forest Classifier is a flow, but you could also construct a flow
+# which uses a Random Forest Classifier in a ML pipeline. When constructing the pipeline flow,
+# you can use the Random Forest Classifier flow as a *subflow*. It allows for
+# all hyperparameters of the Random Classifier Flow to also be specified in your pipeline flow.
+#
+# In this example, the auto-sklearn flow is a subflow: the auto-sklearn flow is entirely executed as part of this flow.
+# This allows people to specify auto-sklearn hyperparameters used in this flow.
 # Using a subflow is not required.
 #
 # Note: flow 15275 is not actually the right flow on the test server,
