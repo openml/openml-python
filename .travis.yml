@@ -22,8 +22,6 @@ env:
   - DISTRIB="conda" PYTHON_VERSION="3.7" SKLEARN_VERSION="0.22.2" TEST_DIST="true"
   - DISTRIB="conda" PYTHON_VERSION="3.6" SKLEARN_VERSION="0.22.2" TEST_DIST="true"
   - DISTRIB="conda" PYTHON_VERSION="3.6" SKLEARN_VERSION="0.21.2" TEST_DIST="true"
-  - DISTRIB="conda" PYTHON_VERSION="3.7" SKLEARN_VERSION="0.21.2" RUN_FLAKE8="true" SKIP_TESTS="true"
-  - DISTRIB="conda" PYTHON_VERSION="3.7" SKLEARN_VERSION="0.21.2" COVERAGE="true" DOCPUSH="true" SKIP_TESTS="true"
   - DISTRIB="conda" PYTHON_VERSION="3.7" SKLEARN_VERSION="0.20.2"
   # Checks for older scikit-learn versions (which also don't nicely work with
   # Python3.7)

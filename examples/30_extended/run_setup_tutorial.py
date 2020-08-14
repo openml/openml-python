@@ -80,24 +80,17 @@ model_original = sklearn.pipeline.Pipeline(
     steps=[("transform", ct), ("estimator", HistGradientBoostingClassifier()),]
 )
 
-# model_original = sklearn.pipeline.make_pipeline(
-#     sklearn.impute.SimpleImputer(), sklearn.ensemble.RandomForestClassifier()
-# )
-
-
 # Let's change some hyperparameters. Of course, in any good application we
 # would tune them using, e.g., Random Search or Bayesian Optimization, but for
 # the purpose of this tutorial we set them to some specific values that might
 # or might not be optimal
-# hyperparameters_original = {
-#     "simpleimputer__strategy": "median",
-#     "randomforestclassifier__criterion": "entropy",
-#     "randomforestclassifier__max_features": 0.2,
-#     "randomforestclassifier__min_samples_leaf": 1,
-#     "randomforestclassifier__n_estimators": 16,
-#     "randomforestclassifier__random_state": 42,
-# }
-# model_original.set_params(**hyperparameters_original)
+hyperparameters_original = {
+    "estimator__loss": "auto",
+    "estimator__learning_rate": 0.15,
+    "estimator__max_iter": 50,
+    "estimator__min_samples_leaf": 1,
+}
+model_original.set_params(**hyperparameters_original)
 
 # solve the task and upload the result (this implicitly creates the flow)
 run = openml.runs.run_model_on_task(model_original, task, avoid_duplicate_runs=False)
