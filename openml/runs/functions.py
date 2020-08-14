@@ -1064,6 +1064,8 @@ def format_prediction(
     if isinstance(task, OpenMLClassificationTask):
         if proba is None:
             raise ValueError("Predicted Class Probabilities are required for classification task")
+        if task.class_labels is None:
+            raise ValueError("The classification task must have class labels set")
         if not set(task.class_labels) == set(proba):
             raise ValueError("Each class should have a predicted probability")
         if sample is None:
