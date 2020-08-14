@@ -89,31 +89,25 @@ from sklearn.ensemble import HistGradientBoostingClassifier
 def cont(X):
     return X.dtypes != "category"
 
+
 def cat(X):
     return X.dtypes == "category"
 
 
-cat_imp = make_pipeline(SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore", sparse=False))
-ct = ColumnTransformer([
-    ("cat", cat_imp, cat),
-    ("cont", FunctionTransformer(lambda x: x, validate=False), cont)
-])
+cat_imp = make_pipeline(
+    SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore", sparse=False)
+)
+ct = ColumnTransformer(
+    [("cat", cat_imp, cat), ("cont", FunctionTransformer(lambda x: x, validate=False), cont)]
+)
 clf = sklearn.pipeline.Pipeline(
-    steps=[
-        ("transform", ct),
-        ("estimator", HistGradientBoostingClassifier()),
-    ]
+    steps=[("transform", ct), ("estimator", HistGradientBoostingClassifier()),]
 )
 
 suite = openml.study.get_suite(1)
 # We'll create a study with one run on three random datasets each
 tasks = np.random.choice(suite.tasks, size=3, replace=False)
 run_ids = []
-# 391 is all numeric
-# task = openml.tasks.get_task(1)
-# run = openml.runs.run_model_on_task(clf, task)
-# run.publish()
-
 for task_id in tasks:
     task = openml.tasks.get_task(task_id)
     run = openml.runs.run_model_on_task(clf, task)
