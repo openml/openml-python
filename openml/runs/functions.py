@@ -830,7 +830,7 @@ def list_runs(
     study: Optional[int] = None,
     display_errors: bool = False,
     output_format: str = "dict",
-    **kwargs
+    **kwargs,
 ) -> Union[Dict, pd.DataFrame]:
     """
     List all runs matching all of the given filters.
@@ -902,7 +902,7 @@ def list_runs(
         tag=tag,
         study=study,
         display_errors=display_errors,
-        **kwargs
+        **kwargs,
     )
 
 
@@ -915,7 +915,7 @@ def _list_runs(
     study: Optional[int] = None,
     display_errors: bool = False,
     output_format: str = "dict",
-    **kwargs
+    **kwargs,
 ) -> Union[Dict, pd.DataFrame]:
     """
     Perform API call `/run/list/{filters}'
@@ -1075,4 +1075,7 @@ def format_prediction(
                 sample = 0
         probabilities = [proba[c] for c in task.class_labels]
         return [repeat, fold, sample, index, *probabilities, truth, prediction]
-    return [repeat, fold, index, truth, prediction]
+    elif isinstance(task, OpenMLRegressionTask):
+        return [repeat, fold, index, truth, prediction]
+    else:
+        raise TypeError(f"Formatting for {type(task)} is not supported.")
