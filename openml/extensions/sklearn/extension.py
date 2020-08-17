@@ -1319,7 +1319,7 @@ class SklearnExtension(Extension):
                         "Could not find attribute "
                         "param_distributions."
                     )
-                print(
+                logger.warning(
                     "Warning! Using subclass BaseSearchCV other than "
                     "{GridSearchCV, RandomizedSearchCV}. "
                     "Should implement param check. "
