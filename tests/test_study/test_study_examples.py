@@ -59,10 +59,12 @@ class TestStudyFunctions(TestBase):
                 clf, task, avoid_duplicate_runs=False
             )  # run classifier on splits (requires API key)
             score = run.get_metric_fn(sklearn.metrics.accuracy_score)  # print accuracy score
-            print("Data set: %s; Accuracy: %0.2f" % (task.get_dataset().name, score.mean()))
+            TestBase.logger.info(
+                "Data set: %s; Accuracy: %0.2f" % (task.get_dataset().name, score.mean())
+            )
             run.publish()  # publish the experiment on OpenML (optional)
             TestBase._mark_entity_for_removal("run", run.run_id)
             TestBase.logger.info(
                 "collected from {}: {}".format(__file__.split("/")[-1], run.run_id)
             )
-            print("URL for run: %s/run/%d" % (openml.config.server, run.run_id))
+            TestBase.logger.info("URL for run: %s/run/%d" % (openml.config.server, run.run_id))

@@ -40,7 +40,6 @@ directory = None
 # exploiting the fact that conftest.py always resides in the root directory for tests
 static_dir = os.path.dirname(os.path.abspath(__file__))
 logger.info("static directory: {}".format(static_dir))
-print("static directory: {}".format(static_dir))
 while True:
     if "openml" in os.listdir(static_dir):
         break
