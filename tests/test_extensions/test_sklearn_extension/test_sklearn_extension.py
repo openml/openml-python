@@ -32,6 +32,7 @@ import sklearn.preprocessing
 import sklearn.tree
 import sklearn.cluster
 from sklearn.pipeline import make_pipeline
+from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 import openml
@@ -40,7 +41,7 @@ from openml.exceptions import PyOpenMLError
 from openml.flows import OpenMLFlow
 from openml.flows.functions import assert_flows_equal
 from openml.runs.trace import OpenMLRunTrace
-from openml.testing import TestBase, SimpleImputer
+from openml.testing import TestBase, SimpleImputer, CustomImputer, cat, cont
 
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -1555,7 +1556,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             with self.assertRaises(ValueError):
                 self.extension.seed_model(model=clf, seed=42)
 
-    def test_run_model_on_fold_classification_1(self):
+    def test_run_model_on_fold_classification_1_array(self):
         task = openml.tasks.get_task(1)
 
         X, y = task.get_X_and_y()
@@ -1567,6 +1568,75 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
         pipeline = sklearn.pipeline.Pipeline(
             steps=[("imp", SimpleImputer()), ("clf", sklearn.tree.DecisionTreeClassifier())]
+        )
+        # TODO add some mocking here to actually test the innards of this function, too!
+        res = self.extension._run_model_on_fold(
+            model=pipeline,
+            task=task,
+            fold_no=0,
+            rep_no=0,
+            X_train=X_train,
+            y_train=y_train,
+            X_test=X_test,
+        )
+
+        y_hat, y_hat_proba, user_defined_measures, trace = res
+
+        # predictions
+        self.assertIsInstance(y_hat, np.ndarray)
+        self.assertEqual(y_hat.shape, y_test.shape)
+        self.assertIsInstance(y_hat_proba, pd.DataFrame)
+        self.assertEqual(y_hat_proba.shape, (y_test.shape[0], 6))
+        np.testing.assert_array_almost_equal(np.sum(y_hat_proba, axis=1), np.ones(y_test.shape))
+        # The class '4' (at index 3) is not present in the training data. We check that the
+        # predicted probabilities for that class are zero!
+        np.testing.assert_array_almost_equal(
+            y_hat_proba.iloc[:, 3].to_numpy(), np.zeros(y_test.shape)
+        )
+        for i in (0, 1, 2, 4, 5):
+            self.assertTrue(np.any(y_hat_proba.iloc[:, i].to_numpy() != np.zeros(y_test.shape)))
+
+        # check user defined measures
+        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        for measure in user_defined_measures:
+            fold_evaluations[measure][0][0] = user_defined_measures[measure]
+
+        # trace. SGD does not produce any
+        self.assertIsNone(trace)
+
+        self._check_fold_timing_evaluations(
+            fold_evaluations,
+            num_repeats=1,
+            num_folds=1,
+            task_type=task.task_type_id,
+            check_scores=False,
+        )
+
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.21",
+        reason="SimpleImputer, ColumnTransformer available only after 0.19 and "
+        "Pipeline till 0.20 doesn't support indexing and 'passthrough'",
+    )
+    def test_run_model_on_fold_classification_1_dataframe(self):
+        task = openml.tasks.get_task(1)
+
+        # diff test_run_model_on_fold_classification_1_array()
+        X, y = task.get_X_and_y(dataset_format="dataframe")
+        train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0)
+        X_train = X.iloc[train_indices]
+        y_train = y.iloc[train_indices]
+        X_test = X.iloc[test_indices]
+        y_test = y.iloc[test_indices]
+
+        # Helper functions to return required columns for ColumnTransformer
+        cat_imp = make_pipeline(
+            SimpleImputer(strategy="most_frequent"),
+            OneHotEncoder(handle_unknown="ignore", sparse=False),
+        )
+        cont_imp = make_pipeline(CustomImputer(strategy="mean"), StandardScaler())
+        ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
+        pipeline = sklearn.pipeline.Pipeline(
+            steps=[("transform", ct), ("estimator", sklearn.tree.DecisionTreeClassifier())]
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(

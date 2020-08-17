@@ -1369,7 +1369,7 @@ class TestRun(TestBase):
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
     )
-    def test_run_on_dataset_with_missing_labels(self):
+    def test_run_on_dataset_with_missing_labels_dataframe(self):
         # Check that _run_task_get_arffcontent works when one of the class
         # labels only declared in the arff file, but is not present in the
         # actual data
@@ -1395,6 +1395,47 @@ class TestRun(TestBase):
             extension=self.extension,
             add_local_measures=True,
             dataset_format="dataframe",
+        )
+        # 2 folds, 5 repeats; keep in mind that this task comes from the test
+        # server, the task on the live server is different
+        self.assertEqual(len(data_content), 4490)
+        for row in data_content:
+            # repeat, fold, row_id, 6 confidences, prediction and correct label
+            self.assertEqual(len(row), 12)
+
+    def test_run_on_dataset_with_missing_labels_array(self):
+        # Check that _run_task_get_arffcontent works when one of the class
+        # labels only declared in the arff file, but is not present in the
+        # actual data
+        flow = unittest.mock.Mock()
+        flow.name = "dummy"
+        task = openml.tasks.get_task(2)
+        # task_id=2 on test server has 38 columns with 6 numeric columns
+        cont_idx = [3, 4, 8, 32, 33, 34]
+        cat_idx = list(set(np.arange(38)) - set(cont_idx))
+        cont = np.array([False] * 38)
+        cat = np.array([False] * 38)
+        cont[cont_idx] = True
+        cat[cat_idx] = True
+
+        from sklearn.compose import ColumnTransformer
+
+        cat_imp = make_pipeline(
+            SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore")
+        )
+        cont_imp = make_pipeline(CustomImputer(), StandardScaler())
+        ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
+        model = Pipeline(
+            steps=[("preprocess", ct), ("estimator", sklearn.tree.DecisionTreeClassifier())]
+        )  # build a sklearn classifier
+
+        data_content, _, _, _ = _run_task_get_arffcontent(
+            flow=flow,
+            model=model,
+            task=task,
+            extension=self.extension,
+            add_local_measures=True,
+            dataset_format="array",  # diff test_run_on_dataset_with_missing_labels_dataframe()
         )
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
