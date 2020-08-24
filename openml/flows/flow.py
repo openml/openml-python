@@ -263,7 +263,13 @@ class OpenMLFlow(OpenMLBase):
         for key in self.components:
             component_dict = OrderedDict()  # type: 'OrderedDict[str, Dict]'
             component_dict["oml:identifier"] = key
-            component_dict["oml:flow"] = self.components[key]._to_dict()["oml:flow"]
+            if self.components[key] in ["passthrough", "drop"]:
+                component_dict["oml:flow"] = {
+                    "oml-python:serialized_object": "component_reference",
+                    "value": {"key": self.components[key], "step_name": self.components[key]},
+                }
+            else:
+                component_dict["oml:flow"] = self.components[key]._to_dict()["oml:flow"]
 
             for key_ in component_dict:
                 # We only need to check if the key is a string, because the

@@ -95,7 +95,9 @@ def cat(X):
 
 
 cat_imp = make_pipeline(
-    SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore", sparse=False)
+    SimpleImputer(strategy="most_frequent"),
+    OneHotEncoder(handle_unknown="ignore", sparse=False),
+    TruncatedSVD(),
 )
 ct = ColumnTransformer(
     [("cat", cat_imp, cat), ("cont", FunctionTransformer(lambda x: x, validate=False), cont)]

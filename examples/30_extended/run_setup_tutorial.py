@@ -59,6 +59,7 @@ task = openml.tasks.get_task(6)
 
 from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn.ensemble import HistGradientBoostingClassifier
+from sklearn.decomposition import TruncatedSVD
 
 
 # Helper functions to return required columns for ColumnTransformer
@@ -71,11 +72,11 @@ def cat(X):
 
 
 cat_imp = make_pipeline(
-    SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore", sparse=False)
+    SimpleImputer(strategy="most_frequent"),
+    OneHotEncoder(handle_unknown="ignore", sparse=False),
+    TruncatedSVD(),
 )
-ct = ColumnTransformer(
-    [("cat", cat_imp, cat), ("cont", FunctionTransformer(lambda x: x, validate=False), cont)]
-)
+ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", "passthrough", cont)])
 model_original = sklearn.pipeline.Pipeline(
     steps=[("transform", ct), ("estimator", HistGradientBoostingClassifier()),]
 )
