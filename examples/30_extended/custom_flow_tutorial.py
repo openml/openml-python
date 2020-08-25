@@ -4,7 +4,8 @@ Creating and Using a Custom Flow
 ================================
 
 The most convenient way to create a flow for your machine learning workflow is to generate it
-automatically as described in <>. However, there are scenarios where this is not possible, such
+automatically as described in the `Obtain Flow IDs <https://openml.github.io/openml-python/master/examples/30_extended/flow_id_tutorial.html#sphx-glr-examples-30-extended-flow-id-tutorial-py>`_ tutorial.  # noqa E501
+However, there are scenarios where this is not possible, such
 as when the flow uses a framework without an extension or when the flow is described by a script.
 
 In those cases you can still create a custom flow by following the steps of this tutorial.
@@ -58,7 +59,7 @@ general = dict(
 ####################################################################################################
 # Next we define the flow hyperparameters. We define their name and default value in `parameters`,
 # and provide meta-data for each hyperparameter through `parameters_meta_info`.
-# Note that eventhough the argument name is `parameters` they describe the hyperparameters.
+# Note that even though the argument name is `parameters` they describe the hyperparameters.
 # The use of ordered dicts is required.
 
 flow_hyperparameters = dict(
@@ -79,7 +80,7 @@ flow_hyperparameters = dict(
 #
 # In this example, the auto-sklearn flow is a subflow: the auto-sklearn flow is entirely executed as part of this flow.
 # This allows people to specify auto-sklearn hyperparameters used in this flow.
-# Using a subflow is not required.
+# In general, using a subflow is not required.
 #
 # Note: flow 15275 is not actually the right flow on the test server,
 # but that does not matter for this demonstration.
