@@ -817,12 +817,12 @@ def edit_dataset(
 ) -> int:
     """
       Edits an OpenMLDataset.
-      Specify atleast one field to edit, apart from data_id
+      Specify at least one field to edit, apart from data_id
        - For certain fields, a new dataset version is created : attributes, data,
        default_target_attribute, ignore_attribute, row_id_attribute.
 
-       - For other fields, the uploader can edit the exisiting version.
-        Noone except the uploader can edit the exisitng version.
+       - For other fields, the uploader can edit the existing version.
+        No one except the uploader can edit the existing version.
 
       Parameters
       ----------

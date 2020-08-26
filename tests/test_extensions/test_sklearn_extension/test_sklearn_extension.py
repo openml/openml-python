@@ -32,7 +32,6 @@ import sklearn.preprocessing
 import sklearn.tree
 import sklearn.cluster
 from sklearn.pipeline import make_pipeline
-from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 import openml
@@ -1618,6 +1617,8 @@ class TestSklearnExtensionRunFunctions(TestBase):
         "Pipeline till 0.20 doesn't support indexing and 'passthrough'",
     )
     def test_run_model_on_fold_classification_1_dataframe(self):
+        from sklearn.compose import ColumnTransformer
+
         task = openml.tasks.get_task(1)
 
         # diff test_run_model_on_fold_classification_1_array()

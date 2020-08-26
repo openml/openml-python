@@ -1390,15 +1390,19 @@ class TestOpenMLDataset(TestBase):
         # Check server exception when no field to edit is provided
         self.assertRaisesRegex(
             OpenMLServerException,
+            # "Please provide atleast one field among description, creator, contributor, "
+            # "collection_date, language, citation, original_data_url or paper_url to edit. - None",
+            # edit_dataset,
             "Please provide atleast one field among description, creator, contributor, "
-            "collection_date, language, citation, original_data_url or paper_url to edit.",
+            "collection_date, language, citation, original_data_url, default_target_attribute, "
+            "row_id_attribute, ignore_attribute or paper_url to edit. - None",
             edit_dataset,
             data_id=564,
         )
         # Check server exception when unknown dataset is provided
         self.assertRaisesRegex(
             OpenMLServerException,
-            "Unknown dataset",
+            "Unknown dataset - None",
             edit_dataset,
             data_id=100000,
             description="xor operation dataset",
@@ -1410,5 +1414,5 @@ class TestOpenMLDataset(TestBase):
             "Dataset is not owned by you",
             edit_dataset,
             data_id=564,
-            description="xor data",
+            description="XOR data",
         )
