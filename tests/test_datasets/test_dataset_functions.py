@@ -1343,16 +1343,18 @@ class TestOpenMLDataset(TestBase):
     def test_data_edit(self):
         # Case 1
         # All users can edit non-critical fields of datasets
-        desc = "xor dataset representing XOR operation"
-        did = 564
+        desc = (
+            "This data sets consists of 3 different types of irises' "
+            "(Setosa, Versicolour, and Virginica) petal and sepal length,"
+            " stored in a 150x4 numpy.ndarray"
+        )
+        did = 128
         result = edit_dataset(
             did,
             description=desc,
-            contributor="xxx",
-            collection_date="2019-10-29 17:06:18",
-            original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor",
-            paper_url="",
-            citation="kaggle",
+            creator="R.A.Fisher",
+            collection_date="1937",
+            citation="The use of multiple measurements in taxonomic problems",
             language="English",
         )
         self.assertEqual(did, result)
@@ -1360,20 +1362,15 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(edited_dataset.description, desc)
 
         # Case 2
-        # only admins or owners can edit all critical fields of datasets
-        # admin key for test server
-        openml.config.apikey = "d488d8afd93b32331cf6ea9d7003d4c3"
-        desc = "xor dataset represents XOR operation"
-        did = 565
-        result = edit_dataset(did, default_target_attribute="y", ignore_attribute="input1")
+        # only owners (or admin) can edit all critical fields of datasets
+        # this is a dataset created by CI, so it is editable by this test
+        did = 315
+        result = edit_dataset(did, default_target_attribute="col_1", ignore_attribute="col_2")
         self.assertEqual(did, result)
         edited_dataset = openml.datasets.get_dataset(did)
-        self.assertEqual(edited_dataset.ignore_attribute, ["input1"])
+        self.assertEqual(edited_dataset.ignore_attribute, ["col_2"])
 
     def test_data_edit_errors(self):
-
-        # admin key for test server (only admins or owners can edit datasets).
-        openml.config.apikey = "d488d8afd93b32331cf6ea9d7003d4c3"
         # Check server exception when no field to edit is provided
         self.assertRaisesRegex(
             OpenMLServerException,
@@ -1398,16 +1395,15 @@ class TestOpenMLDataset(TestBase):
             "Critical features default_target_attribute, row_id_attribute and ignore_attribute "
             "can only be edited for datasets without any tasks.",
             edit_dataset,
-            data_id=1,
+            data_id=223,
             default_target_attribute="y",
         )
         # Check server exception when a non-owner or non-admin tries to edit critical features
-        openml.config.apikey = "5f0b74b33503e4ad4a7181a91e28719f"
         self.assertRaisesRegex(
             OpenMLServerException,
             "Critical features default_target_attribute, row_id_attribute and ignore_attribute "
             "can be edited only by the owner. Fork the dataset if changes are required.",
             edit_dataset,
-            data_id=564,
+            data_id=128,
             default_target_attribute="y",
         )
