@@ -142,9 +142,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             new_model = self.extension.flow_to_model(serialization)
             # compares string representations of the dict, as it potentially
             # contains complex objects that can not be compared with == op
-            # Only in Python 3.x, as Python 2 has Unicode issues
-            if sys.version_info[0] >= 3:
-                self.assertEqual(str(model.get_params()), str(new_model.get_params()))
+            self.assertEqual(str(model.get_params()), str(new_model.get_params()))
 
             self.assertEqual(type(new_model), type(model))
             self.assertIsNot(new_model, model)
@@ -153,6 +151,18 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             new_model.fit(self.X, self.y)
 
             self.assertEqual(check_dependencies_mock.call_count, 1)
+
+            xml = serialization._to_dict()
+            new_model2 = self.extension.flow_to_model(OpenMLFlow._from_dict(xml))
+            self.assertEqual(str(model.get_params()), str(new_model2.get_params()))
+
+            self.assertEqual(type(new_model2), type(model))
+            self.assertIsNot(new_model2, model)
+
+            self.assertEqual(new_model2.get_params(), model.get_params())
+            new_model2.fit(self.X, self.y)
+
+            self.assertEqual(check_dependencies_mock.call_count, 2)
 
     def test_can_handle_flow(self):
         openml.config.server = self.production_server
@@ -239,6 +249,18 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
             self.assertEqual(check_dependencies_mock.call_count, 1)
 
+            xml = serialization._to_dict()
+            new_model2 = self.extension.flow_to_model(OpenMLFlow._from_dict(xml))
+            self.assertEqual(str(model.get_params()), str(new_model2.get_params()))
+
+            self.assertEqual(type(new_model2), type(model))
+            self.assertIsNot(new_model2, model)
+
+            self.assertEqual(new_model2.get_params(), model.get_params())
+            new_model2.fit(self.X, self.y)
+
+            self.assertEqual(check_dependencies_mock.call_count, 2)
+
     def test_serialize_model_with_subcomponent(self):
         model = sklearn.ensemble.AdaBoostClassifier(
             n_estimators=100, base_estimator=sklearn.tree.DecisionTreeClassifier()
@@ -310,6 +332,23 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         self.assertEqual(new_model_params, model_params)
         new_model.fit(self.X, self.y)
+
+        xml = serialization._to_dict()
+        new_model2 = self.extension.flow_to_model(OpenMLFlow._from_dict(xml))
+        self.assertEqual(str(model.get_params()), str(new_model2.get_params()))
+
+        self.assertEqual(type(new_model2), type(model))
+        self.assertIsNot(new_model2, model)
+
+        self.assertIsNot(new_model2.base_estimator, model.base_estimator)
+        self.assertEqual(new_model2.base_estimator.get_params(), model.base_estimator.get_params())
+        new_model2_params = new_model2.get_params()
+        del new_model2_params["base_estimator"]
+        model_params = model.get_params()
+        del model_params["base_estimator"]
+
+        self.assertEqual(new_model2_params, model_params)
+        new_model2.fit(self.X, self.y)
 
     def test_serialize_pipeline(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
@@ -1978,14 +2017,18 @@ class TestSklearnExtensionRunFunctions(TestBase):
         run, flow = openml.runs.run_model_on_task(model=clf, task=task, return_flow=True)
 
         self.assertEqual(len(flow.components), 3)
-        self.assertEqual(flow.components["dummystep"], "passthrough")
-        self.assertTrue(isinstance(flow.components["classifier"], OpenMLFlow))
-        self.assertTrue(isinstance(flow.components["prep"], OpenMLFlow))
-        self.assertTrue(
-            isinstance(flow.components["prep"].components["columntransformer"], OpenMLFlow)
+        self.assertIsInstance(flow.components["dummystep"], OpenMLFlow)
+        self.assertEqual(flow.components["dummystep"].name, "passthrough")
+        self.assertIsInstance(flow.components["classifier"], OpenMLFlow)
+        self.assertEqual(flow.components["classifier"].name, "sklearn.svm._classes.SVC")
+        self.assertIsInstance(flow.components["prep"], OpenMLFlow)
+        self.assertEqual(flow.components["prep"].class_name, "sklearn.pipeline.Pipeline")
+        self.assertIsInstance(flow.components["prep"].components["columntransformer"], OpenMLFlow)
+        self.assertIsInstance(
+            flow.components["prep"].components["columntransformer"].components["cat"], OpenMLFlow,
         )
         self.assertEqual(
-            flow.components["prep"].components["columntransformer"].components["cat"], "drop"
+            flow.components["prep"].components["columntransformer"].components["cat"].name, "drop"
         )
 
         # de-serializing flow to a model with non-actionable step
@@ -1995,6 +2038,15 @@ class TestSklearnExtensionRunFunctions(TestBase):
         self.assertNotEqual(model, clf)
         self.assertEqual(len(model.named_steps), 3)
         self.assertEqual(model.named_steps["dummystep"], "passthrough")
+
+        xml = flow._to_dict()
+        new_model = self.extension.flow_to_model(OpenMLFlow._from_dict(xml))
+
+        new_model.fit(X, y)
+        self.assertEqual(type(new_model), type(clf))
+        self.assertNotEqual(new_model, clf)
+        self.assertEqual(len(new_model.named_steps), 3)
+        self.assertEqual(new_model.named_steps["dummystep"], "passthrough")
 
     def test_sklearn_serialization_with_none_step(self):
         msg = (
