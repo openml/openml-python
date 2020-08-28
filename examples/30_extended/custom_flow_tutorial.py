@@ -9,7 +9,7 @@ However, there are scenarios where this is not possible, such
 as when the flow uses a framework without an extension or when the flow is described by a script.
 
 In those cases you can still create a custom flow by following the steps of this tutorial.
-As an example we will use the flows generated for the AutoML Benchmark (...),
+As an example we will use the flows generated for the `AutoML Benchmark <https://openml.github.io/automlbenchmark/>`_,
 and also show how to link runs to the custom flow.
 """
 
@@ -32,7 +32,7 @@ openml.config.start_using_configuration_for_example()
 # 1. Defining the flow
 # ====================
 # The first step is to define all the hyperparameters of your flow.
-# Check ... for the descriptions of each variable.
+# The API pages feature a descriptions of each variable of the `OpenMLFlow <https://openml.github.io/openml-python/master/generated/openml.OpenMLFlow.html#openml.OpenMLFlow>`_.  # noqa E501
 # Note that `external version` and `name` together uniquely identify a flow.
 #
 # The AutoML Benchmark runs AutoML systems across a range of tasks.
@@ -201,3 +201,5 @@ my_run = openml.runs.OpenMLRun(
 )
 my_run.publish()
 print("run created:", my_run.run_id)
+
+openml.config.stop_using_configuration_for_example()

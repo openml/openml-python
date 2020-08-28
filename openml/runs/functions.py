@@ -1063,7 +1063,7 @@ def format_prediction(
     """
     if isinstance(task, OpenMLClassificationTask):
         if proba is None:
-            raise ValueError("Predicted Class Probabilities are required for classification task")
+            raise ValueError("`proba` is required for classification task")
         if task.class_labels is None:
             raise ValueError("The classification task must have class labels set")
         if not set(task.class_labels) == set(proba):
@@ -1078,4 +1078,4 @@ def format_prediction(
     elif isinstance(task, OpenMLRegressionTask):
         return [repeat, fold, index, truth, prediction]
     else:
-        raise TypeError(f"Formatting for {type(task)} is not supported.")
+        raise NotImplementedError(f"Formatting for {type(task)} is not supported.")
