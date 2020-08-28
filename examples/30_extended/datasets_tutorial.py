@@ -119,7 +119,7 @@ openml.config.start_using_configuration_for_example()
 ############################################################################
 # Edit non-critical fields, allowed for all authorized users:
 # description, creator, contributor, collection_date, language, citation,
-# row_id_attribute, original_data_url,paper_url
+# original_data_url, paper_url
 desc = (
     "This data sets consists of 3 different types of irises' "
     "(Setosa, Versicolour, and Virginica) petal and sepal length,"
