@@ -1345,34 +1345,38 @@ class TestRun(TestBase):
         openml.config.server = self.production_server
         clustering = openml.tasks.get_task(126033, download_data=False)
         ignored_input = [0] * 5
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(
+            NotImplementedError, r"Formatting for <class '[\w.]+'> is not supported."
+        ):
             format_prediction(clustering, *ignored_input)
 
     def test_format_prediction_classification_no_probabilities(self):
         classification = openml.tasks.get_task(self.TEST_SERVER_TASK_SIMPLE[0], download_data=False)
         ignored_input = [0] * 5
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, "`proba` is required for classification task"):
             format_prediction(classification, *ignored_input, proba=None)
 
     def test_format_prediction_classification_incomplete_probabilities(self):
         classification = openml.tasks.get_task(self.TEST_SERVER_TASK_SIMPLE[0], download_data=False)
         ignored_input = [0] * 5
         incomplete_probabilities = {c: 0.2 for c in classification.class_labels[1:]}
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, "Each class should have a predicted probability"):
             format_prediction(classification, *ignored_input, proba=incomplete_probabilities)
 
     def test_format_prediction_task_without_classlabels_set(self):
         classification = openml.tasks.get_task(self.TEST_SERVER_TASK_SIMPLE[0], download_data=False)
         classification.class_labels = None
         ignored_input = [0] * 5
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(
+            ValueError, "The classification task must have class labels set"
+        ):
             format_prediction(classification, *ignored_input, proba={})
 
     def test_format_prediction_task_learning_curve_sample_not_set(self):
         learning_curve = openml.tasks.get_task(801, download_data=False)
         probabilities = {c: 0.2 for c in learning_curve.class_labels}
         ignored_input = [0] * 5
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, "`sample` can not be none for LearningCurveTask"):
             format_prediction(learning_curve, *ignored_input, sample=None, proba=probabilities)
 
     def test_format_prediction_task_regression(self):
