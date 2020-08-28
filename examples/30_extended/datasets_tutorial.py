@@ -117,7 +117,9 @@ _ = pd.plotting.scatter_matrix(
 # This example uses the test server, to avoid editing a dataset on the main server.
 openml.config.start_using_configuration_for_example()
 ############################################################################
-# Change the non-critical fields
+# Edit non-critical fields, allowed for all authorized users:
+# description, creator, contributor, collection_date, language, citation,
+# row_id_attribute, original_data_url,paper_url
 desc = (
     "This data sets consists of 3 different types of irises' "
     "(Setosa, Versicolour, and Virginica) petal and sepal length,"
@@ -137,8 +139,8 @@ print(f"Edited dataset ID: {data_id}")
 
 
 ############################################################################
-# Changes to these fields: default_target_attribute, row_id_attribute,
-# ignore_attribute can only be performed by owner
+# Edit critical fields, allowed only for owners of the dataset:
+# default_target_attribute, row_id_attribute, ignore_attribute
 # To edit critical fields of a dataset owned by you, configure the API key:
 # openml.config.apikey = 'FILL_IN_OPENML_API_KEY'
 data_id = edit_dataset(564, default_target_attribute="y")
