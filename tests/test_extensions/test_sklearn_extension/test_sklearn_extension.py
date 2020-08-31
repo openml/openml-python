@@ -2020,7 +2020,10 @@ class TestSklearnExtensionRunFunctions(TestBase):
         self.assertIsInstance(flow.components["dummystep"], OpenMLFlow)
         self.assertEqual(flow.components["dummystep"].name, "passthrough")
         self.assertIsInstance(flow.components["classifier"], OpenMLFlow)
-        self.assertEqual(flow.components["classifier"].name, "sklearn.svm._classes.SVC")
+        if LooseVersion(sklearn.__version__) < "0.22":
+            self.assertEqual(flow.components["classifier"].name, "sklearn.svm.classes.SVC")
+        else:
+            self.assertEqual(flow.components["classifier"].name, "sklearn.svm._classes.SVC")
         self.assertIsInstance(flow.components["prep"], OpenMLFlow)
         self.assertEqual(flow.components["prep"].class_name, "sklearn.pipeline.Pipeline")
         self.assertIsInstance(flow.components["prep"].components["columntransformer"], OpenMLFlow)
