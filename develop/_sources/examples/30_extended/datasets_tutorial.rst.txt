@@ -42,8 +42,8 @@ Exercise 0
   * Default gives 'dict' (other option: 'dataframe', see below)
 
 
-.. code-block:: default
 
+.. code-block:: default
 
     openml_list = openml.datasets.list_datasets()  # returns a dict
 
@@ -68,7 +68,7 @@ Exercise 0
 
  .. code-block:: none
 
-    First 10 of 3125 datasets...
+    First 10 of 3151 datasets...
 
 
 .. only:: builder_html
@@ -680,19 +680,25 @@ This example uses the test server, to avoid editing a dataset on the main server
 
 
 
-Changes to these field edits existing version: allowed only for dataset owner
+Edit non-critical fields, allowed for all authorized users:
+description, creator, contributor, collection_date, language, citation,
+original_data_url, paper_url
 
 
 .. code-block:: default
 
+    desc = (
+        "This data sets consists of 3 different types of irises' "
+        "(Setosa, Versicolour, and Virginica) petal and sepal length,"
+        " stored in a 150x4 numpy.ndarray"
+    )
+    did = 128
     data_id = edit_dataset(
-        564,
-        description="xor dataset represents XOR operation",
-        contributor="",
-        collection_date="2019-10-29 17:06:18",
-        original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor",
-        paper_url="",
-        citation="kaggle",
+        did,
+        description=desc,
+        creator="R.A.Fisher",
+        collection_date="1937",
+        citation="The use of multiple measurements in taxonomic problems",
         language="English",
     )
     edited_dataset = get_dataset(data_id)
@@ -709,24 +715,20 @@ Changes to these field edits existing version: allowed only for dataset owner
 
  .. code-block:: none
 
-    Edited dataset ID: 564
+    Edited dataset ID: 128
 
 
 
 
-Changes to these fields: attributes, default_target_attribute,
-row_id_attribute, ignore_attribute generates a new edited version: allowed for anyone
+Edit critical fields, allowed only for owners of the dataset:
+default_target_attribute, row_id_attribute, ignore_attribute
+To edit critical fields of a dataset owned by you, configure the API key:
+openml.config.apikey = 'FILL_IN_OPENML_API_KEY'
 
 
 .. code-block:: default
 
-
-    new_attributes = [
-        ("x0", "REAL"),
-        ("x1", "REAL"),
-        ("y", "REAL"),
-    ]
-    data_id = edit_dataset(564, attributes=new_attributes)
+    data_id = edit_dataset(564, default_target_attribute="y")
     print(f"Edited dataset ID: {data_id}")
 
     openml.config.stop_using_configuration_for_example()
@@ -740,7 +742,7 @@ row_id_attribute, ignore_attribute generates a new edited version: allowed for a
 
  .. code-block:: none
 
-    Edited dataset ID: 72406
+    Edited dataset ID: 564
 
 
 
@@ -748,7 +750,7 @@ row_id_attribute, ignore_attribute generates a new edited version: allowed for a
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  9.954 seconds)
+   **Total running time of the script:** ( 0 minutes  9.443 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:

@@ -164,7 +164,7 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 3125 datasets...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 3151 datasets...
 </pre></div>
 </div>
 <div>
@@ -685,15 +685,21 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Changes to these field edits existing version: allowed only for dataset owner</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_id</span> <span class="o">=</span> <span class="n">edit_dataset</span><span class="p">(</span>
-    <span class="mi">564</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;xor dataset represents XOR operation&quot;</span><span class="p">,</span>
-    <span class="n">contributor</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">collection_date</span><span class="o">=</span><span class="s2">&quot;2019-10-29 17:06:18&quot;</span><span class="p">,</span>
-    <span class="n">original_data_url</span><span class="o">=</span><span class="s2">&quot;https://www.kaggle.com/ancientaxe/and-or-xor&quot;</span><span class="p">,</span>
-    <span class="n">paper_url</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">citation</span><span class="o">=</span><span class="s2">&quot;kaggle&quot;</span><span class="p">,</span>
+<p>Edit non-critical fields, allowed for all authorized users:
+description, creator, contributor, collection_date, language, citation,
+original_data_url, paper_url</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">desc</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;This data sets consists of 3 different types of irises&#39; &quot;</span>
+    <span class="s2">&quot;(Setosa, Versicolour, and Virginica) petal and sepal length,&quot;</span>
+    <span class="s2">&quot; stored in a 150x4 numpy.ndarray&quot;</span>
+<span class="p">)</span>
+<span class="n">did</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">data_id</span> <span class="o">=</span> <span class="n">edit_dataset</span><span class="p">(</span>
+    <span class="n">did</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span>
+    <span class="n">creator</span><span class="o">=</span><span class="s2">&quot;R.A.Fisher&quot;</span><span class="p">,</span>
+    <span class="n">collection_date</span><span class="o">=</span><span class="s2">&quot;1937&quot;</span><span class="p">,</span>
+    <span class="n">citation</span><span class="o">=</span><span class="s2">&quot;The use of multiple measurements in taxonomic problems&quot;</span><span class="p">,</span>
     <span class="n">language</span><span class="o">=</span><span class="s2">&quot;English&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">edited_dataset</span> <span class="o">=</span> <span class="n">get_dataset</span><span class="p">(</span><span class="n">data_id</span><span class="p">)</span>
@@ -701,27 +707,24 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Edited dataset ID: 564
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Edited dataset ID: 128
 </pre></div>
 </div>
-<p>Changes to these fields: attributes, default_target_attribute,
-row_id_attribute, ignore_attribute generates a new edited version: allowed for anyone</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new_attributes</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="s2">&quot;x0&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;x1&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
-<span class="p">]</span>
-<span class="n">data_id</span> <span class="o">=</span> <span class="n">edit_dataset</span><span class="p">(</span><span class="mi">564</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">new_attributes</span><span class="p">)</span>
+<p>Edit critical fields, allowed only for owners of the dataset:
+default_target_attribute, row_id_attribute, ignore_attribute
+To edit critical fields of a dataset owned by you, configure the API key:
+openml.config.apikey = ‘FILL_IN_OPENML_API_KEY’</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_id</span> <span class="o">=</span> <span class="n">edit_dataset</span><span class="p">(</span><span class="mi">564</span><span class="p">,</span> <span class="n">default_target_attribute</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Edited dataset ID: </span><span class="si">{</span><span class="n">data_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Edited dataset ID: 72406
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Edited dataset ID: 564
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.954 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.443 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-datasets-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/b95c071188526f5ef5d991e382df9fa5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>
