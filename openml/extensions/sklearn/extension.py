@@ -56,6 +56,10 @@ SIMPLE_NUMPY_TYPES = [
 ]
 SIMPLE_TYPES = tuple([bool, int, float, str] + SIMPLE_NUMPY_TYPES)
 
+SKLEARN_PIPELINE_STRING_COMPONENTS = ("drop", "passthrough")
+COMPONENT_REFERENCE = "component_reference"
+COMPOSITION_STEP_CONSTANT = "composition_step_constant"
+
 
 class SklearnExtension(Extension):
     """Connect scikit-learn to OpenML-Python."""
@@ -249,8 +253,11 @@ class SklearnExtension(Extension):
     ) -> Any:
         """Recursive function to deserialize a scikit-learn flow.
 
-        This function delegates all work to the respective functions to deserialize special data
-        structures etc.
+        This function inspects an object to deserialize and decides how to do so. This function
+        delegates all work to the respective functions to deserialize special data structures etc.
+        This function works on everything that has been serialized to OpenML: OpenMLFlow,
+        components (which are flows themselves), functions, hyperparameter distributions (for
+        random search) and the actual hyperparameter values themselves.
 
         Parameters
         ----------
@@ -258,8 +265,9 @@ class SklearnExtension(Extension):
             the object to deserialize (can be flow object, or any serialized
             parameter value that is accepted by)
 
-        components : dict
-
+        components : Optional[dict]
+            Components of the current flow being de-serialized. These will not be used when
+            de-serializing the actual flow, but when de-serializing a component reference.
 
         initialize_with_defaults : bool, optional (default=False)
             If this flag is set, the hyperparameter values of flows will be
@@ -307,10 +315,10 @@ class SklearnExtension(Extension):
                     rval = self._deserialize_rv_frozen(value)
                 elif serialized_type == "function":
                     rval = self._deserialize_function(value)
-                elif serialized_type in ("composition_step_constant", "component_reference"):
-                    if serialized_type == "composition_step_constant":
-                        value = self._deserialize_parameter_step_constants(value)
-                    elif serialized_type == "component_reference":
+                elif serialized_type in (COMPOSITION_STEP_CONSTANT, COMPONENT_REFERENCE):
+                    if serialized_type == COMPOSITION_STEP_CONSTANT:
+                        pass
+                    elif serialized_type == COMPONENT_REFERENCE:
                         value = self._deserialize_sklearn(
                             value, recursion_depth=depth_pp, strict_version=strict_version
                         )
@@ -415,7 +423,7 @@ class SklearnExtension(Extension):
         elif (
             isinstance(o, (list, tuple))
             and len(o) == 2
-            and o[1] in ("passthrough", "drop")
+            and o[1] in SKLEARN_PIPELINE_STRING_COMPONENTS
             and isinstance(parent_model, sklearn.pipeline._BaseComposition)
         ):
             rval = o
@@ -723,7 +731,10 @@ class SklearnExtension(Extension):
         for key in subcomponents:
             if isinstance(subcomponents[key], OpenMLFlow):
                 name = subcomponents[key].name
-            elif isinstance(subcomponents[key], str):  # 'drop', 'passthrough' can be passed
+            elif (
+                isinstance(subcomponents[key], str)
+                and subcomponents[key] in SKLEARN_PIPELINE_STRING_COMPONENTS
+            ):
                 name = subcomponents[key]
             else:
                 raise TypeError(type(subcomponents[key]))
@@ -800,6 +811,7 @@ class SklearnExtension(Extension):
 
         external_versions = set()
 
+        # The model is None if the flow is a placeholder flow such as 'passthrough' or 'drop'
         if model is not None:
             model_package_name = model.__module__.split(".")[0]
             module = importlib.import_module(model_package_name)
@@ -814,8 +826,7 @@ class SklearnExtension(Extension):
         external_versions.add(openml_version)
         external_versions.add(sklearn_version)
         for visitee in sub_components.values():
-            # 'drop', 'passthrough', None can be passed as estimators
-            if isinstance(visitee, str):
+            if isinstance(visitee, str) and visitee in SKLEARN_PIPELINE_STRING_COMPONENTS:
                 continue
             for external_version in visitee.external_version.split(","):
                 external_versions.add(external_version)
@@ -830,7 +841,7 @@ class SklearnExtension(Extension):
 
         while len(to_visit_stack) > 0:
             visitee = to_visit_stack.pop()
-            if isinstance(visitee, str):  # 'drop', 'passthrough' can be passed as estimators
+            if isinstance(visitee, str) and visitee in SKLEARN_PIPELINE_STRING_COMPONENTS:
                 known_sub_components.add(visitee)
             elif visitee.name in known_sub_components:
                 raise ValueError(
@@ -891,7 +902,7 @@ class SklearnExtension(Extension):
             nested_list_of_simple_types = (
                 is_non_empty_list_of_lists_with_same_type
                 and all([isinstance(el, SIMPLE_TYPES) for el in flatten_all(rval)])
-                and (len(rval) in (2, 3) and rval[1] not in ("passthrough", "drop"))
+                and (len(rval) in (2, 3) and rval[1] not in SKLEARN_PIPELINE_STRING_COMPONENTS)
             )
 
             if is_non_empty_list_of_lists_with_same_type and not nested_list_of_simple_types:
@@ -909,13 +920,13 @@ class SklearnExtension(Extension):
                         # length 2 is for {VotingClassifier.estimators,
                         # Pipeline.steps, FeatureUnion.transformer_list}
                         # length 3 is for ColumnTransformer
-                        msg = "Length of tuple of type {} " "does not match assumptions".format(
+                        msg = "Length of tuple of type {} does not match assumptions".format(
                             sub_component_type
                         )
                         raise ValueError(msg)
 
                     if isinstance(sub_component, str):
-                        if sub_component != "drop" and sub_component != "passthrough":
+                        if sub_component not in SKLEARN_PIPELINE_STRING_COMPONENTS:
                             msg = (
                                 "Second item of tuple does not match assumptions. "
                                 "If string, can be only 'drop' or 'passthrough' but"
@@ -970,7 +981,7 @@ class SklearnExtension(Extension):
                         component_reference = OrderedDict()  # type: Dict[str, Union[str, Dict]]
                         component_reference[
                             "oml-python:serialized_object"
-                        ] = "composition_step_constant"
+                        ] = COMPOSITION_STEP_CONSTANT
                         cr_value = OrderedDict()  # type: Dict[str, Any]
                         cr_value["key"] = identifier
                         cr_value["step_name"] = identifier
@@ -980,7 +991,7 @@ class SklearnExtension(Extension):
                     else:
                         sub_components[identifier] = sub_component
                         component_reference = OrderedDict()
-                        component_reference["oml-python:serialized_object"] = "component_reference"
+                        component_reference["oml-python:serialized_object"] = COMPONENT_REFERENCE
                         cr_value = OrderedDict()
                         cr_value["key"] = identifier
                         cr_value["step_name"] = identifier
@@ -1006,7 +1017,7 @@ class SklearnExtension(Extension):
                 sub_components[k] = rval
                 sub_components_explicit.add(k)
                 component_reference = OrderedDict()
-                component_reference["oml-python:serialized_object"] = "component_reference"
+                component_reference["oml-python:serialized_object"] = COMPONENT_REFERENCE
                 cr_value = OrderedDict()
                 cr_value["key"] = k
                 cr_value["step_name"] = None
@@ -1109,7 +1120,7 @@ class SklearnExtension(Extension):
             )
             parameter_dict[name] = rval
 
-        if model_name is None and flow.name in ("drop", "passthrough"):
+        if model_name is None and flow.name in SKLEARN_PIPELINE_STRING_COMPONENTS:
             return flow.name
         else:
             module_name = model_name.rsplit(".", 1)
@@ -1243,9 +1254,6 @@ class SklearnExtension(Extension):
         module_name = name.rsplit(".", 1)
         function_handle = getattr(importlib.import_module(module_name[0]), module_name[1])
         return function_handle
-
-    def _deserialize_parameter_step_constants(self, step: Dict[str, str]) -> Dict[str, Any]:
-        return step
 
     def _serialize_cross_validator(self, o: Any) -> "OrderedDict[str, Union[str, Dict]]":
         ret = OrderedDict()  # type: 'OrderedDict[str, Union[str, Dict]]'
@@ -1794,7 +1802,10 @@ class SklearnExtension(Extension):
                     if len(item) < 2:
                         return False
                     if not isinstance(item[1], (openml.flows.OpenMLFlow, str)):
-                        if isinstance(item[1], str) and item[1] in ["drop", "passthrough"]:
+                        if (
+                            isinstance(item[1], str)
+                            and item[1] in SKLEARN_PIPELINE_STRING_COMPONENTS
+                        ):
                             pass
                         else:
                             return False
@@ -1805,7 +1816,10 @@ class SklearnExtension(Extension):
             # unit tests / sentinels) this way, for flows without subflows we do
             # not have to rely on _flow_dict
             exp_parameters = set(_flow.parameters)
-            if isinstance(component_model, str) and component_model in ("passthrough", "drop"):
+            if (
+                isinstance(component_model, str)
+                and component_model in SKLEARN_PIPELINE_STRING_COMPONENTS
+            ):
                 model_parameters = set()
             else:
                 model_parameters = set([mp for mp in component_model.get_params(deep=False)])
@@ -1819,7 +1833,10 @@ class SklearnExtension(Extension):
                     "%s\nmodel parameters: %s" % (flow_params, model_params)
                 )
             exp_components = set(_flow.components)
-            if isinstance(component_model, str) and component_model in ("passthrough", "drop"):
+            if (
+                isinstance(component_model, str)
+                and component_model in SKLEARN_PIPELINE_STRING_COMPONENTS
+            ):
                 model_components = set()
             else:
                 _ = set([mp for mp in component_model.get_params(deep=False)])
@@ -1886,9 +1903,9 @@ class SklearnExtension(Extension):
                                 "but is {}".format(type(subcomponent_identifier))
                             )
                         if not isinstance(subcomponent_flow, (openml.flows.OpenMLFlow, str)):
-                            if isinstance(subcomponent_flow, str) and subcomponent_flow in (
-                                "passthrough",
-                                "drop",
+                            if (
+                                isinstance(subcomponent_flow, str)
+                                and subcomponent_flow in SKLEARN_PIPELINE_STRING_COMPONENTS
                             ):
                                 pass
                             else:
@@ -1899,7 +1916,7 @@ class SklearnExtension(Extension):
                                 )
 
                         current = {
-                            "oml-python:serialized_object": "component_reference",
+                            "oml-python:serialized_object": COMPONENT_REFERENCE,
                             "value": {
                                 "key": subcomponent_identifier,
                                 "step_name": subcomponent_identifier,
