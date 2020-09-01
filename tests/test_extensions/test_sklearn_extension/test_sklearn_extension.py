@@ -996,6 +996,10 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         self.assertEqual(new_model2_params, model_params)
 
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.21",
+        reason="Pipeline till 0.20 doesn't support 'passthrough'",
+    )
     def test_serialize_strings_as_pipeline_steps(self):
         import sklearn.compose
 
