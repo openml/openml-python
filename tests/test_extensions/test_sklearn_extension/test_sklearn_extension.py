@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 
 import collections
+import copy
 import json
 import re
 import os
@@ -455,6 +456,21 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(new_model_params, fu_params)
         new_model.fit(self.X, self.y)
 
+        xml = serialization._to_dict()
+        new_model2 = self.extension.flow_to_model(OpenMLFlow._from_dict(xml))
+        self.assertEqual(str(model.get_params()), str(new_model2.get_params()))
+
+        self.assertEqual(type(new_model2), type(model))
+        self.assertIsNot(new_model2, model)
+
+        new_model2_params = new_model2.get_params()
+        del new_model2_params["scaler"]
+        del new_model2_params["dummy"]
+        del new_model2_params["steps"]
+
+        self.assertEqual(new_model2_params, fu_params)
+        new_model2.fit(self.X, self.y)
+
     def test_serialize_pipeline_clustering(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         km = sklearn.cluster.KMeans()
@@ -559,6 +575,21 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(new_model_params, fu_params)
         new_model.fit(self.X, self.y)
 
+        xml = serialization._to_dict()
+        new_model2 = self.extension.flow_to_model(OpenMLFlow._from_dict(xml))
+        self.assertEqual(str(model.get_params()), str(new_model2.get_params()))
+
+        self.assertEqual(type(new_model2), type(model))
+        self.assertIsNot(new_model2, model)
+
+        new_model2_params = new_model2.get_params()
+        del new_model2_params["scaler"]
+        del new_model2_params["clusterer"]
+        del new_model2_params["steps"]
+
+        self.assertEqual(new_model2_params, fu_params)
+        new_model2.fit(self.X, self.y)
+
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
@@ -575,6 +606,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     sklearn.preprocessing.OneHotEncoder(handle_unknown="ignore"),
                     [3, 4, 5],
                 ),
+                ("drop", "drop", [6, 7, 8]),
             ],
             remainder="passthrough",
         )
@@ -583,7 +615,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture = (
             "sklearn.compose._column_transformer.ColumnTransformer("
             "numeric=sklearn.preprocessing.{}.StandardScaler,"
-            "nominal=sklearn.preprocessing._encoders.OneHotEncoder)".format(scaler_name)
+            "nominal=sklearn.preprocessing._encoders.OneHotEncoder,"
+            "drop=drop)".format(scaler_name)
         )
         fixture_short_name = "sklearn.ColumnTransformer"
 
@@ -606,6 +639,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             fixture: [],
             "sklearn.preprocessing.{}.StandardScaler".format(scaler_name): ["numeric"],
             "sklearn.preprocessing._encoders.OneHotEncoder": ["nominal"],
+            "drop": ["drop"],
         }
 
         serialization = self.extension.model_to_flow(model)
@@ -625,6 +659,23 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertIsNot(new_model, model)
         serialization2 = self.extension.model_to_flow(new_model)
         assert_flows_equal(serialization, serialization2)
+
+        xml = serialization._to_dict()
+        new_model2 = self.extension.flow_to_model(OpenMLFlow._from_dict(xml))
+        self.assertEqual(str(model.get_params()), str(new_model2.get_params()))
+
+        self.assertEqual(type(new_model2), type(model))
+        self.assertIsNot(new_model2, model)
+
+        model_params = copy.deepcopy(model.get_params())
+        new_model2_params = copy.deepcopy(new_model2.get_params())
+
+        for mp in (model_params, new_model2_params):
+            del mp["transformers"]
+            del mp["numeric"]
+            del mp["nominal"]
+
+        self.assertEqual(new_model2_params, model_params)
 
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
@@ -708,6 +759,26 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         serialization2 = self.extension.model_to_flow(new_model)
         assert_flows_equal(serialization, serialization2)
 
+        xml = serialization._to_dict()
+        new_model2 = self.extension.flow_to_model(OpenMLFlow._from_dict(xml))
+        self.assertEqual(str(model.get_params()), str(new_model2.get_params()))
+
+        self.assertEqual(type(new_model2), type(model))
+        self.assertIsNot(new_model2, model)
+
+        model_params = copy.deepcopy(model.get_params())
+        new_model2_params = copy.deepcopy(new_model2.get_params())
+
+        for mp in (model_params, new_model2_params):
+            del mp["transformer"]
+            del mp["classifier"]
+            del mp["transformer__transformers"]
+            del mp["steps"]
+            del mp["transformer__nominal"]
+            del mp["transformer__numeric"]
+
+        self.assertEqual(new_model2_params, model_params)
+
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20", reason="Pipeline processing behaviour updated"
     )
@@ -787,6 +858,23 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(type(new_model), type(fu))
         self.assertIsNot(new_model, fu)
         self.assertIs(new_model.transformer_list[1][1], "drop")
+
+        xml = serialization._to_dict()
+        fu2 = self.extension.flow_to_model(OpenMLFlow._from_dict(xml))
+        self.assertEqual(str(fu.get_params()), str(fu2.get_params()))
+
+        self.assertEqual(type(fu2), type(fu))
+        self.assertIsNot(fu2, fu)
+
+        model_params = copy.deepcopy(fu.get_params())
+        new_model2_params = copy.deepcopy(fu2.get_params())
+
+        for mp in (model_params, new_model2_params):
+            del mp["ohe"]
+            del mp["scaler"]
+            del mp["transformer_list"]
+
+        self.assertEqual(new_model2_params, model_params)
 
     def test_serialize_feature_union_switched_names(self):
         ohe_params = {"categories": "auto"} if LooseVersion(sklearn.__version__) >= "0.20" else {}
@@ -880,6 +968,111 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertNotEqual(rs, deserialized)
         # Would raise an exception if the flows would be unequal
         assert_flows_equal(serialized, serialized2)
+
+        pattern = re.compile("0x[0-9a-f]{12}")
+
+        xml = serialized._to_dict()
+        rs2 = self.extension.flow_to_model(OpenMLFlow._from_dict(xml))
+        self.assertEqual(
+            re.sub(pattern, str(rs.get_params()), ""), re.sub(pattern, str(rs2.get_params()), "")
+        )
+
+        self.assertEqual(type(rs2), type(rs))
+        self.assertIsNot(rs2, rs)
+
+        model_params = copy.deepcopy(rs.get_params())
+        new_model2_params = copy.deepcopy(rs2.get_params())
+
+        for mp in (model_params, new_model2_params):
+            del mp["cv"]
+            del mp["estimator"]
+            del mp["param_distributions"]
+            del mp["estimator__boosting"]
+            del mp["estimator__boosting__base_estimator"]
+            del mp["estimator__ohe"]
+            del mp["estimator__steps"]
+            del mp["estimator__scaler"]
+            del mp["error_score"]
+
+        self.assertEqual(new_model2_params, model_params)
+
+    def test_serialize_strings_as_pipeline_steps(self):
+        import sklearn.compose
+
+        # First check: test whether a passthrough in a pipeline is serialized correctly
+        model = sklearn.pipeline.Pipeline(steps=[("transformer", "passthrough")])
+        serialized = self.extension.model_to_flow(model)
+        self.assertIsInstance(serialized, OpenMLFlow)
+        self.assertEqual(len(serialized.components), 1)
+        self.assertEqual(serialized.components["transformer"].name, "passthrough")
+        serialized = self.extension._serialize_sklearn(
+            ("transformer", "passthrough"), parent_model=model
+        )
+        self.assertEqual(serialized, ("transformer", "passthrough"))
+        extracted_info = self.extension._extract_information_from_model(model)
+        self.assertEqual(len(extracted_info[2]), 1)
+        self.assertIsInstance(extracted_info[2]["transformer"], OpenMLFlow)
+        self.assertEqual(extracted_info[2]["transformer"].name, "passthrough")
+
+        # Second check: test whether a lone passthrough in a column transformer is serialized
+        # correctly
+        model = sklearn.compose.ColumnTransformer([("passthrough", "passthrough", (0,))])
+        serialized = self.extension.model_to_flow(model)
+        self.assertIsInstance(serialized, OpenMLFlow)
+        self.assertEqual(len(serialized.components), 1)
+        self.assertEqual(serialized.components["passthrough"].name, "passthrough")
+        serialized = self.extension._serialize_sklearn(
+            ("passthrough", "passthrough"), parent_model=model
+        )
+        self.assertEqual(serialized, ("passthrough", "passthrough"))
+        extracted_info = self.extension._extract_information_from_model(model)
+        self.assertEqual(len(extracted_info[2]), 1)
+        self.assertIsInstance(extracted_info[2]["passthrough"], OpenMLFlow)
+        self.assertEqual(extracted_info[2]["passthrough"].name, "passthrough")
+
+        # Third check: passthrough and drop in a column transformer
+        model = sklearn.compose.ColumnTransformer(
+            [("passthrough", "passthrough", (0,)), ("drop", "drop", (1,))]
+        )
+        serialized = self.extension.model_to_flow(model)
+        self.assertIsInstance(serialized, OpenMLFlow)
+        self.assertEqual(len(serialized.components), 2)
+        self.assertEqual(serialized.components["passthrough"].name, "passthrough")
+        self.assertEqual(serialized.components["drop"].name, "drop")
+        serialized = self.extension._serialize_sklearn(
+            ("passthrough", "passthrough"), parent_model=model
+        )
+        self.assertEqual(serialized, ("passthrough", "passthrough"))
+        extracted_info = self.extension._extract_information_from_model(model)
+        self.assertEqual(len(extracted_info[2]), 2)
+        self.assertIsInstance(extracted_info[2]["passthrough"], OpenMLFlow)
+        self.assertIsInstance(extracted_info[2]["drop"], OpenMLFlow)
+        self.assertEqual(extracted_info[2]["passthrough"].name, "passthrough")
+        self.assertEqual(extracted_info[2]["drop"].name, "drop")
+
+        # Fourth check: having an actual preprocessor in the column transformer, too
+        model = sklearn.compose.ColumnTransformer(
+            [
+                ("passthrough", "passthrough", (0,)),
+                ("drop", "drop", (1,)),
+                ("test", sklearn.preprocessing.StandardScaler(), (2,)),
+            ]
+        )
+        serialized = self.extension.model_to_flow(model)
+        self.assertIsInstance(serialized, OpenMLFlow)
+        self.assertEqual(len(serialized.components), 3)
+        self.assertEqual(serialized.components["passthrough"].name, "passthrough")
+        self.assertEqual(serialized.components["drop"].name, "drop")
+        serialized = self.extension._serialize_sklearn(
+            ("passthrough", "passthrough"), parent_model=model
+        )
+        self.assertEqual(serialized, ("passthrough", "passthrough"))
+        extracted_info = self.extension._extract_information_from_model(model)
+        self.assertEqual(len(extracted_info[2]), 3)
+        self.assertIsInstance(extracted_info[2]["passthrough"], OpenMLFlow)
+        self.assertIsInstance(extracted_info[2]["drop"], OpenMLFlow)
+        self.assertEqual(extracted_info[2]["passthrough"].name, "passthrough")
+        self.assertEqual(extracted_info[2]["drop"].name, "drop")
 
     def test_serialize_type(self):
         supported_types = [float, np.float, np.float32, np.float64, int, np.int, np.int32, np.int64]

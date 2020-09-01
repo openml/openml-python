@@ -902,7 +902,12 @@ class SklearnExtension(Extension):
             nested_list_of_simple_types = (
                 is_non_empty_list_of_lists_with_same_type
                 and all([isinstance(el, SIMPLE_TYPES) for el in flatten_all(rval)])
-                and (len(rval) in (2, 3) and rval[1] not in SKLEARN_PIPELINE_STRING_COMPONENTS)
+                and all(
+                    [
+                        len(rv) in (2, 3) and rv[1] not in SKLEARN_PIPELINE_STRING_COMPONENTS
+                        for rv in rval
+                    ]
+                )
             )
 
             if is_non_empty_list_of_lists_with_same_type and not nested_list_of_simple_types:
