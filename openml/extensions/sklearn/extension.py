@@ -1828,7 +1828,7 @@ class SklearnExtension(Extension):
                 model_parameters = set()
             else:
                 model_parameters = set([mp for mp in component_model.get_params(deep=False)])
-            if len(exp_parameters ^ model_parameters) != 0:
+            if len(exp_parameters.symmetric_difference(model_parameters)) != 0:
                 flow_params = sorted(exp_parameters)
                 model_params = sorted(model_parameters)
                 raise ValueError(
@@ -1852,7 +1852,7 @@ class SklearnExtension(Extension):
                         if "__" not in mp and mp not in _
                     ]
                 )
-            if len(exp_components ^ model_components) != 0:
+            if len(exp_components.symmetric_difference(model_components)) != 0:
                 is_problem = True
                 if len(exp_components - model_components) > 0:
                     # If an expected component is not returned as a component by get_params(),
