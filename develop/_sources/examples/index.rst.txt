@@ -291,6 +291,27 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="The most convenient way to create a flow for your machine learning workflow is to generate it a...">
+
+.. only:: html
+
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_custom_flow_tutorial_thumb.png
+     :alt: Creating and Using a Custom Flow
+
+     :ref:`sphx_glr_examples_30_extended_custom_flow_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/30_extended/custom_flow_tutorial
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="How to train/run a model and how to upload the results.">
 
 .. only:: html

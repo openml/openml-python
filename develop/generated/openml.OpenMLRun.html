@@ -116,16 +116,39 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLRun<a class="headerlink" href="#openml-openmlrun" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="openml.OpenMLRun">
-<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLRun</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_id</span></em>, <em class="sig-param"><span class="n">flow_id</span></em>, <em class="sig-param"><span class="n">dataset_id</span></em>, <em class="sig-param"><span class="n">setup_string</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_files</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">setup_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">uploader</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">uploader_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">evaluations</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fold_evaluations</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_evaluations</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">data_content</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">trace</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">task_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">task_evaluation_measure</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flow_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parameter_settings</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">predictions_url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">task</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flow</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">run_id</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLRun</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_id</span></em>, <em class="sig-param"><span class="n">flow_id</span></em>, <em class="sig-param"><span class="n">dataset_id</span></em>, <em class="sig-param"><span class="n">setup_string</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_files</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">setup_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">uploader</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">uploader_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">evaluations</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fold_evaluations</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_evaluations</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">data_content</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">trace</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">task_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">task_evaluation_measure</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flow_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parameter_settings</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">predictions_url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">task</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flow</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">run_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description_text</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun" title="Permalink to this definition">¶</a></dt>
 <dd><p>OpenML Run: result of running a model on an openml dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>task_id</strong><span class="classifier">int</span></dt><dd><p>Refers to the task.</p>
+<dt><strong>task_id: int</strong></dt><dd></dd>
+<dt><strong>flow_id: int</strong></dt><dd></dd>
+<dt><strong>dataset_id: int</strong></dt><dd></dd>
+<dt><strong>setup_string: str</strong></dt><dd></dd>
+<dt><strong>output_files: Dict[str, str]</strong></dt><dd><p>A dictionary that specifies where each related file can be found.</p>
 </dd>
-<dt><strong>flow_id</strong><span class="classifier">int</span></dt><dd><p>Refers to the flow.</p>
+<dt><strong>setup_id: int</strong></dt><dd></dd>
+<dt><strong>tags: List[str]</strong></dt><dd></dd>
+<dt><strong>uploader: int</strong></dt><dd><p>User ID of the uploader.</p>
 </dd>
-<dt><strong>dataset_id: int</strong></dt><dd><p>Refers to the data.</p>
+<dt><strong>uploader_name: str</strong></dt><dd></dd>
+<dt><strong>evaluations: Dict</strong></dt><dd></dd>
+<dt><strong>fold_evaluations: Dict</strong></dt><dd></dd>
+<dt><strong>sample_evaluations: Dict</strong></dt><dd></dd>
+<dt><strong>data_content: List[List]</strong></dt><dd><p>The predictions generated from executing this run.</p>
+</dd>
+<dt><strong>trace: OpenMLRunTrace</strong></dt><dd></dd>
+<dt><strong>model: object</strong></dt><dd></dd>
+<dt><strong>task_type: str</strong></dt><dd></dd>
+<dt><strong>task_evaluation_measure: str</strong></dt><dd></dd>
+<dt><strong>flow_name: str</strong></dt><dd></dd>
+<dt><strong>parameter_settings: List[OrderedDict]</strong></dt><dd></dd>
+<dt><strong>predictions_url: str</strong></dt><dd></dd>
+<dt><strong>task: OpenMLTask</strong></dt><dd></dd>
+<dt><strong>flow: OpenMLFlow</strong></dt><dd></dd>
+<dt><strong>run_id: int</strong></dt><dd></dd>
+<dt><strong>description_text: str, optional</strong></dt><dd><p>Description text to add to the predictions file.
+If left None,</p>
 </dd>
 </dl>
 </dd>
