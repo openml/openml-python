@@ -11,7 +11,7 @@ How to list and download datasets.
 
 import openml
 import pandas as pd
-from openml.datasets.functions import edit_dataset, get_dataset
+from openml.datasets.functions import edit_dataset, get_dataset, fork_dataset
 
 ############################################################################
 # Exercise 0
@@ -145,5 +145,14 @@ print(f"Edited dataset ID: {data_id}")
 # openml.config.apikey = 'FILL_IN_OPENML_API_KEY'
 data_id = edit_dataset(564, default_target_attribute="y")
 print(f"Edited dataset ID: {data_id}")
+
+
+############################################################################
+# Fork dataset
+# Used to create a copy of the dataset with a different owner
+
+data_id = fork_dataset(564)
+print(f"Forked dataset ID: {data_id}")
+print(get_dataset(data_id))
 
 openml.config.stop_using_configuration_for_example()

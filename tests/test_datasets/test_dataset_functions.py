@@ -27,6 +27,7 @@ from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (
     create_dataset,
     edit_dataset,
+    fork_dataset,
     attributes_arff_from_df,
     _get_cached_dataset,
     _get_cached_dataset_features,
@@ -1406,4 +1407,13 @@ class TestOpenMLDataset(TestBase):
             edit_dataset,
             data_id=128,
             default_target_attribute="y",
+        )
+
+    def test_data_fork(self):
+        did = 1
+        result = fork_dataset(did,)
+        self.assertNotEqual(did, result)
+        # Check server exception when unknown dataset is provided
+        self.assertRaisesRegex(
+            OpenMLServerException, "Unknown dataset", fork_dataset, data_id=100000,
         )

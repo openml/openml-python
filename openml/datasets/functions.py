@@ -862,7 +862,7 @@ def edit_dataset(
 
       Returns
       -------
-      data_id of the existing edited version or the new version created and published"""
+      data_id of the edited dataset """
     if not isinstance(data_id, int):
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
 
@@ -894,6 +894,31 @@ def edit_dataset(
     )
     result = xmltodict.parse(result_xml)
     data_id = result["oml:data_edit"]["oml:id"]
+    return int(data_id)
+
+
+def fork_dataset(data_id) -> int:
+    """
+    Create a fork of the dataset with the calling authorized user as owner.
+    Note that the data arff file remains the same.
+
+    Parameters
+    ----------
+    data_id : int
+        ID of the dataset.
+
+    Returns
+    -------
+    data_id of the forked dataset
+
+    """
+    if not isinstance(data_id, int):
+        raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
+    # compose data fork parameters
+    form_data = {"data_id": data_id}
+    result_xml = openml._api_calls._perform_api_call("data/fork", "post", data=form_data)
+    result = xmltodict.parse(result_xml)
+    data_id = result["oml:data_fork"]["oml:id"]
     return int(data_id)
 
 
