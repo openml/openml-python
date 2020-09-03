@@ -71,242 +71,240 @@ Exercise 0
     First 10 of 3152 datasets...
 
 
-.. only:: builder_html
+.. raw:: html
 
-    .. raw:: html
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
 
-        <div>
-        <style scoped>
-            .dataframe tbody tr th:only-of-type {
-                vertical-align: middle;
-            }
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
 
-            .dataframe tbody tr th {
-                vertical-align: top;
-            }
-
-            .dataframe thead th {
-                text-align: right;
-            }
-        </style>
-        <table border="1" class="dataframe">
-          <thead>
-            <tr style="text-align: right;">
-              <th></th>
-              <th>did</th>
-              <th>name</th>
-              <th>version</th>
-              <th>uploader</th>
-              <th>status</th>
-              <th>format</th>
-              <th>MajorityClassSize</th>
-              <th>MaxNominalAttDistinctValues</th>
-              <th>MinorityClassSize</th>
-              <th>NumberOfClasses</th>
-              <th>NumberOfFeatures</th>
-              <th>NumberOfInstances</th>
-              <th>NumberOfInstancesWithMissingValues</th>
-              <th>NumberOfMissingValues</th>
-              <th>NumberOfNumericFeatures</th>
-              <th>NumberOfSymbolicFeatures</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>2</th>
-              <td>2</td>
-              <td>anneal</td>
-              <td>1</td>
-              <td>1</td>
-              <td>active</td>
-              <td>ARFF</td>
-              <td>684.0</td>
-              <td>7.0</td>
-              <td>8.0</td>
-              <td>5.0</td>
-              <td>39.0</td>
-              <td>898.0</td>
-              <td>898.0</td>
-              <td>22175.0</td>
-              <td>6.0</td>
-              <td>33.0</td>
-            </tr>
-            <tr>
-              <th>3</th>
-              <td>3</td>
-              <td>kr-vs-kp</td>
-              <td>1</td>
-              <td>1</td>
-              <td>active</td>
-              <td>ARFF</td>
-              <td>1669.0</td>
-              <td>3.0</td>
-              <td>1527.0</td>
-              <td>2.0</td>
-              <td>37.0</td>
-              <td>3196.0</td>
-              <td>0.0</td>
-              <td>0.0</td>
-              <td>0.0</td>
-              <td>37.0</td>
-            </tr>
-            <tr>
-              <th>4</th>
-              <td>4</td>
-              <td>labor</td>
-              <td>1</td>
-              <td>1</td>
-              <td>active</td>
-              <td>ARFF</td>
-              <td>37.0</td>
-              <td>3.0</td>
-              <td>20.0</td>
-              <td>2.0</td>
-              <td>17.0</td>
-              <td>57.0</td>
-              <td>56.0</td>
-              <td>326.0</td>
-              <td>8.0</td>
-              <td>9.0</td>
-            </tr>
-            <tr>
-              <th>5</th>
-              <td>5</td>
-              <td>arrhythmia</td>
-              <td>1</td>
-              <td>1</td>
-              <td>active</td>
-              <td>ARFF</td>
-              <td>245.0</td>
-              <td>13.0</td>
-              <td>2.0</td>
-              <td>13.0</td>
-              <td>280.0</td>
-              <td>452.0</td>
-              <td>384.0</td>
-              <td>408.0</td>
-              <td>206.0</td>
-              <td>74.0</td>
-            </tr>
-            <tr>
-              <th>6</th>
-              <td>6</td>
-              <td>letter</td>
-              <td>1</td>
-              <td>1</td>
-              <td>active</td>
-              <td>ARFF</td>
-              <td>813.0</td>
-              <td>26.0</td>
-              <td>734.0</td>
-              <td>26.0</td>
-              <td>17.0</td>
-              <td>20000.0</td>
-              <td>0.0</td>
-              <td>0.0</td>
-              <td>16.0</td>
-              <td>1.0</td>
-            </tr>
-            <tr>
-              <th>7</th>
-              <td>7</td>
-              <td>audiology</td>
-              <td>1</td>
-              <td>1</td>
-              <td>active</td>
-              <td>ARFF</td>
-              <td>57.0</td>
-              <td>24.0</td>
-              <td>1.0</td>
-              <td>24.0</td>
-              <td>70.0</td>
-              <td>226.0</td>
-              <td>222.0</td>
-              <td>317.0</td>
-              <td>0.0</td>
-              <td>70.0</td>
-            </tr>
-            <tr>
-              <th>8</th>
-              <td>8</td>
-              <td>liver-disorders</td>
-              <td>1</td>
-              <td>1</td>
-              <td>active</td>
-              <td>ARFF</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>NaN</td>
-              <td>0.0</td>
-              <td>6.0</td>
-              <td>345.0</td>
-              <td>0.0</td>
-              <td>0.0</td>
-              <td>6.0</td>
-              <td>0.0</td>
-            </tr>
-            <tr>
-              <th>9</th>
-              <td>9</td>
-              <td>autos</td>
-              <td>1</td>
-              <td>1</td>
-              <td>active</td>
-              <td>ARFF</td>
-              <td>67.0</td>
-              <td>22.0</td>
-              <td>3.0</td>
-              <td>6.0</td>
-              <td>26.0</td>
-              <td>205.0</td>
-              <td>46.0</td>
-              <td>59.0</td>
-              <td>15.0</td>
-              <td>11.0</td>
-            </tr>
-            <tr>
-              <th>10</th>
-              <td>10</td>
-              <td>lymph</td>
-              <td>1</td>
-              <td>1</td>
-              <td>active</td>
-              <td>ARFF</td>
-              <td>81.0</td>
-              <td>8.0</td>
-              <td>2.0</td>
-              <td>4.0</td>
-              <td>19.0</td>
-              <td>148.0</td>
-              <td>0.0</td>
-              <td>0.0</td>
-              <td>3.0</td>
-              <td>16.0</td>
-            </tr>
-            <tr>
-              <th>11</th>
-              <td>11</td>
-              <td>balance-scale</td>
-              <td>1</td>
-              <td>1</td>
-              <td>active</td>
-              <td>ARFF</td>
-              <td>288.0</td>
-              <td>3.0</td>
-              <td>49.0</td>
-              <td>3.0</td>
-              <td>5.0</td>
-              <td>625.0</td>
-              <td>0.0</td>
-              <td>0.0</td>
-              <td>4.0</td>
-              <td>1.0</td>
-            </tr>
-          </tbody>
-        </table>
-        </div>
-        <br />
-        <br />
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>did</th>
+          <th>name</th>
+          <th>version</th>
+          <th>uploader</th>
+          <th>status</th>
+          <th>format</th>
+          <th>MajorityClassSize</th>
+          <th>MaxNominalAttDistinctValues</th>
+          <th>MinorityClassSize</th>
+          <th>NumberOfClasses</th>
+          <th>NumberOfFeatures</th>
+          <th>NumberOfInstances</th>
+          <th>NumberOfInstancesWithMissingValues</th>
+          <th>NumberOfMissingValues</th>
+          <th>NumberOfNumericFeatures</th>
+          <th>NumberOfSymbolicFeatures</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>2</th>
+          <td>2</td>
+          <td>anneal</td>
+          <td>1</td>
+          <td>1</td>
+          <td>active</td>
+          <td>ARFF</td>
+          <td>684.0</td>
+          <td>7.0</td>
+          <td>8.0</td>
+          <td>5.0</td>
+          <td>39.0</td>
+          <td>898.0</td>
+          <td>898.0</td>
+          <td>22175.0</td>
+          <td>6.0</td>
+          <td>33.0</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>3</td>
+          <td>kr-vs-kp</td>
+          <td>1</td>
+          <td>1</td>
+          <td>active</td>
+          <td>ARFF</td>
+          <td>1669.0</td>
+          <td>3.0</td>
+          <td>1527.0</td>
+          <td>2.0</td>
+          <td>37.0</td>
+          <td>3196.0</td>
+          <td>0.0</td>
+          <td>0.0</td>
+          <td>0.0</td>
+          <td>37.0</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>4</td>
+          <td>labor</td>
+          <td>1</td>
+          <td>1</td>
+          <td>active</td>
+          <td>ARFF</td>
+          <td>37.0</td>
+          <td>3.0</td>
+          <td>20.0</td>
+          <td>2.0</td>
+          <td>17.0</td>
+          <td>57.0</td>
+          <td>56.0</td>
+          <td>326.0</td>
+          <td>8.0</td>
+          <td>9.0</td>
+        </tr>
+        <tr>
+          <th>5</th>
+          <td>5</td>
+          <td>arrhythmia</td>
+          <td>1</td>
+          <td>1</td>
+          <td>active</td>
+          <td>ARFF</td>
+          <td>245.0</td>
+          <td>13.0</td>
+          <td>2.0</td>
+          <td>13.0</td>
+          <td>280.0</td>
+          <td>452.0</td>
+          <td>384.0</td>
+          <td>408.0</td>
+          <td>206.0</td>
+          <td>74.0</td>
+        </tr>
+        <tr>
+          <th>6</th>
+          <td>6</td>
+          <td>letter</td>
+          <td>1</td>
+          <td>1</td>
+          <td>active</td>
+          <td>ARFF</td>
+          <td>813.0</td>
+          <td>26.0</td>
+          <td>734.0</td>
+          <td>26.0</td>
+          <td>17.0</td>
+          <td>20000.0</td>
+          <td>0.0</td>
+          <td>0.0</td>
+          <td>16.0</td>
+          <td>1.0</td>
+        </tr>
+        <tr>
+          <th>7</th>
+          <td>7</td>
+          <td>audiology</td>
+          <td>1</td>
+          <td>1</td>
+          <td>active</td>
+          <td>ARFF</td>
+          <td>57.0</td>
+          <td>24.0</td>
+          <td>1.0</td>
+          <td>24.0</td>
+          <td>70.0</td>
+          <td>226.0</td>
+          <td>222.0</td>
+          <td>317.0</td>
+          <td>0.0</td>
+          <td>70.0</td>
+        </tr>
+        <tr>
+          <th>8</th>
+          <td>8</td>
+          <td>liver-disorders</td>
+          <td>1</td>
+          <td>1</td>
+          <td>active</td>
+          <td>ARFF</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>0.0</td>
+          <td>6.0</td>
+          <td>345.0</td>
+          <td>0.0</td>
+          <td>0.0</td>
+          <td>6.0</td>
+          <td>0.0</td>
+        </tr>
+        <tr>
+          <th>9</th>
+          <td>9</td>
+          <td>autos</td>
+          <td>1</td>
+          <td>1</td>
+          <td>active</td>
+          <td>ARFF</td>
+          <td>67.0</td>
+          <td>22.0</td>
+          <td>3.0</td>
+          <td>6.0</td>
+          <td>26.0</td>
+          <td>205.0</td>
+          <td>46.0</td>
+          <td>59.0</td>
+          <td>15.0</td>
+          <td>11.0</td>
+        </tr>
+        <tr>
+          <th>10</th>
+          <td>10</td>
+          <td>lymph</td>
+          <td>1</td>
+          <td>1</td>
+          <td>active</td>
+          <td>ARFF</td>
+          <td>81.0</td>
+          <td>8.0</td>
+          <td>2.0</td>
+          <td>4.0</td>
+          <td>19.0</td>
+          <td>148.0</td>
+          <td>0.0</td>
+          <td>0.0</td>
+          <td>3.0</td>
+          <td>16.0</td>
+        </tr>
+        <tr>
+          <th>11</th>
+          <td>11</td>
+          <td>balance-scale</td>
+          <td>1</td>
+          <td>1</td>
+          <td>active</td>
+          <td>ARFF</td>
+          <td>288.0</td>
+          <td>3.0</td>
+          <td>49.0</td>
+          <td>3.0</td>
+          <td>5.0</td>
+          <td>625.0</td>
+          <td>0.0</td>
+          <td>0.0</td>
+          <td>4.0</td>
+          <td>1.0</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <br />
+    <br />
 
 Exercise 1
 **********
@@ -329,153 +327,151 @@ Exercise 1
 
 
 
-.. only:: builder_html
+.. raw:: html
 
-    .. raw:: html
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
 
-        <div>
-        <style scoped>
-            .dataframe tbody tr th:only-of-type {
-                vertical-align: middle;
-            }
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
 
-            .dataframe tbody tr th {
-                vertical-align: top;
-            }
-
-            .dataframe thead th {
-                text-align: right;
-            }
-        </style>
-        <table border="1" class="dataframe">
-          <thead>
-            <tr style="text-align: right;">
-              <th></th>
-              <th>did</th>
-              <th>name</th>
-              <th>NumberOfInstances</th>
-              <th>NumberOfFeatures</th>
-              <th>NumberOfClasses</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>1491</th>
-              <td>1491</td>
-              <td>one-hundred-plants-margin</td>
-              <td>1600.0</td>
-              <td>65.0</td>
-              <td>100.0</td>
-            </tr>
-            <tr>
-              <th>1492</th>
-              <td>1492</td>
-              <td>one-hundred-plants-shape</td>
-              <td>1600.0</td>
-              <td>65.0</td>
-              <td>100.0</td>
-            </tr>
-            <tr>
-              <th>1493</th>
-              <td>1493</td>
-              <td>one-hundred-plants-texture</td>
-              <td>1599.0</td>
-              <td>65.0</td>
-              <td>100.0</td>
-            </tr>
-            <tr>
-              <th>4552</th>
-              <td>4552</td>
-              <td>BachChoralHarmony</td>
-              <td>5665.0</td>
-              <td>17.0</td>
-              <td>102.0</td>
-            </tr>
-            <tr>
-              <th>41167</th>
-              <td>41167</td>
-              <td>dionis</td>
-              <td>416188.0</td>
-              <td>61.0</td>
-              <td>355.0</td>
-            </tr>
-            <tr>
-              <th>41169</th>
-              <td>41169</td>
-              <td>helena</td>
-              <td>65196.0</td>
-              <td>28.0</td>
-              <td>100.0</td>
-            </tr>
-            <tr>
-              <th>41960</th>
-              <td>41960</td>
-              <td>seattlecrime6</td>
-              <td>523590.0</td>
-              <td>8.0</td>
-              <td>144.0</td>
-            </tr>
-            <tr>
-              <th>42078</th>
-              <td>42078</td>
-              <td>beer_reviews</td>
-              <td>1586614.0</td>
-              <td>13.0</td>
-              <td>104.0</td>
-            </tr>
-            <tr>
-              <th>42087</th>
-              <td>42087</td>
-              <td>beer_reviews</td>
-              <td>1586614.0</td>
-              <td>13.0</td>
-              <td>104.0</td>
-            </tr>
-            <tr>
-              <th>42088</th>
-              <td>42088</td>
-              <td>beer_reviews</td>
-              <td>1586614.0</td>
-              <td>13.0</td>
-              <td>104.0</td>
-            </tr>
-            <tr>
-              <th>42089</th>
-              <td>42089</td>
-              <td>vancouver_employee</td>
-              <td>1586614.0</td>
-              <td>13.0</td>
-              <td>104.0</td>
-            </tr>
-            <tr>
-              <th>42123</th>
-              <td>42123</td>
-              <td>article_influence</td>
-              <td>3615.0</td>
-              <td>7.0</td>
-              <td>3169.0</td>
-            </tr>
-            <tr>
-              <th>42223</th>
-              <td>42223</td>
-              <td>dataset-autoHorse_fixed</td>
-              <td>201.0</td>
-              <td>69.0</td>
-              <td>186.0</td>
-            </tr>
-            <tr>
-              <th>42396</th>
-              <td>42396</td>
-              <td>aloi</td>
-              <td>108000.0</td>
-              <td>129.0</td>
-              <td>1000.0</td>
-            </tr>
-          </tbody>
-        </table>
-        </div>
-        <br />
-        <br />
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>did</th>
+          <th>name</th>
+          <th>NumberOfInstances</th>
+          <th>NumberOfFeatures</th>
+          <th>NumberOfClasses</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>1491</th>
+          <td>1491</td>
+          <td>one-hundred-plants-margin</td>
+          <td>1600.0</td>
+          <td>65.0</td>
+          <td>100.0</td>
+        </tr>
+        <tr>
+          <th>1492</th>
+          <td>1492</td>
+          <td>one-hundred-plants-shape</td>
+          <td>1600.0</td>
+          <td>65.0</td>
+          <td>100.0</td>
+        </tr>
+        <tr>
+          <th>1493</th>
+          <td>1493</td>
+          <td>one-hundred-plants-texture</td>
+          <td>1599.0</td>
+          <td>65.0</td>
+          <td>100.0</td>
+        </tr>
+        <tr>
+          <th>4552</th>
+          <td>4552</td>
+          <td>BachChoralHarmony</td>
+          <td>5665.0</td>
+          <td>17.0</td>
+          <td>102.0</td>
+        </tr>
+        <tr>
+          <th>41167</th>
+          <td>41167</td>
+          <td>dionis</td>
+          <td>416188.0</td>
+          <td>61.0</td>
+          <td>355.0</td>
+        </tr>
+        <tr>
+          <th>41169</th>
+          <td>41169</td>
+          <td>helena</td>
+          <td>65196.0</td>
+          <td>28.0</td>
+          <td>100.0</td>
+        </tr>
+        <tr>
+          <th>41960</th>
+          <td>41960</td>
+          <td>seattlecrime6</td>
+          <td>523590.0</td>
+          <td>8.0</td>
+          <td>144.0</td>
+        </tr>
+        <tr>
+          <th>42078</th>
+          <td>42078</td>
+          <td>beer_reviews</td>
+          <td>1586614.0</td>
+          <td>13.0</td>
+          <td>104.0</td>
+        </tr>
+        <tr>
+          <th>42087</th>
+          <td>42087</td>
+          <td>beer_reviews</td>
+          <td>1586614.0</td>
+          <td>13.0</td>
+          <td>104.0</td>
+        </tr>
+        <tr>
+          <th>42088</th>
+          <td>42088</td>
+          <td>beer_reviews</td>
+          <td>1586614.0</td>
+          <td>13.0</td>
+          <td>104.0</td>
+        </tr>
+        <tr>
+          <th>42089</th>
+          <td>42089</td>
+          <td>vancouver_employee</td>
+          <td>1586614.0</td>
+          <td>13.0</td>
+          <td>104.0</td>
+        </tr>
+        <tr>
+          <th>42123</th>
+          <td>42123</td>
+          <td>article_influence</td>
+          <td>3615.0</td>
+          <td>7.0</td>
+          <td>3169.0</td>
+        </tr>
+        <tr>
+          <th>42223</th>
+          <td>42223</td>
+          <td>dataset-autoHorse_fixed</td>
+          <td>201.0</td>
+          <td>69.0</td>
+          <td>186.0</td>
+        </tr>
+        <tr>
+          <th>42396</th>
+          <td>42396</td>
+          <td>aloi</td>
+          <td>108000.0</td>
+          <td>129.0</td>
+          <td>1000.0</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <br />
+    <br />
 
 Download datasets
 =================
@@ -750,7 +746,7 @@ openml.config.apikey = 'FILL_IN_OPENML_API_KEY'
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  9.994 seconds)
+   **Total running time of the script:** ( 0 minutes  9.422 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:
