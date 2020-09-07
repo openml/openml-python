@@ -21,7 +21,7 @@ from openml.datasets.functions import edit_dataset, get_dataset
 #
 #   * Use the output_format parameter to select output type
 #   * Default gives 'dict' (other option: 'dataframe', see below)
-
+#
 openml_list = openml.datasets.list_datasets()  # returns a dict
 
 # Show a nice table with some key data properties
@@ -117,15 +117,21 @@ _ = pd.plotting.scatter_matrix(
 # This example uses the test server, to avoid editing a dataset on the main server.
 openml.config.start_using_configuration_for_example()
 ############################################################################
-# Changes to these field edits existing version: allowed only for dataset owner
+# Edit non-critical fields, allowed for all authorized users:
+# description, creator, contributor, collection_date, language, citation,
+# original_data_url, paper_url
+desc = (
+    "This data sets consists of 3 different types of irises' "
+    "(Setosa, Versicolour, and Virginica) petal and sepal length,"
+    " stored in a 150x4 numpy.ndarray"
+)
+did = 128
 data_id = edit_dataset(
-    564,
-    description="xor dataset represents XOR operation",
-    contributor="",
-    collection_date="2019-10-29 17:06:18",
-    original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor",
-    paper_url="",
-    citation="kaggle",
+    did,
+    description=desc,
+    creator="R.A.Fisher",
+    collection_date="1937",
+    citation="The use of multiple measurements in taxonomic problems",
     language="English",
 )
 edited_dataset = get_dataset(data_id)
@@ -133,15 +139,11 @@ print(f"Edited dataset ID: {data_id}")
 
 
 ############################################################################
-# Changes to these fields: attributes, default_target_attribute,
-# row_id_attribute, ignore_attribute generates a new edited version: allowed for anyone
-
-new_attributes = [
-    ("x0", "REAL"),
-    ("x1", "REAL"),
-    ("y", "REAL"),
-]
-data_id = edit_dataset(564, attributes=new_attributes)
+# Edit critical fields, allowed only for owners of the dataset:
+# default_target_attribute, row_id_attribute, ignore_attribute
+# To edit critical fields of a dataset owned by you, configure the API key:
+# openml.config.apikey = 'FILL_IN_OPENML_API_KEY'
+data_id = edit_dataset(564, default_target_attribute="y")
 print(f"Edited dataset ID: {data_id}")
 
 openml.config.stop_using_configuration_for_example()

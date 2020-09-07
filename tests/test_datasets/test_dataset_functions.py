@@ -1341,78 +1341,69 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(len(attribute_names), X.shape[1])
 
     def test_data_edit(self):
-
-        # admin key for test server (only admins or owners can edit datasets).
-        # all users can edit their own datasets)
-        openml.config.apikey = "d488d8afd93b32331cf6ea9d7003d4c3"
-
-        # case 1, editing description, creator, contributor, collection_date, original_data_url,
-        # paper_url, citation, language edits existing dataset.
-        did = 564
+        # Case 1
+        # All users can edit non-critical fields of datasets
+        desc = (
+            "This data sets consists of 3 different types of irises' "
+            "(Setosa, Versicolour, and Virginica) petal and sepal length,"
+            " stored in a 150x4 numpy.ndarray"
+        )
+        did = 128
         result = edit_dataset(
             did,
-            description="xor dataset represents XOR operation",
-            contributor="",
-            collection_date="2019-10-29 17:06:18",
-            original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor",
-            paper_url="",
-            citation="kaggle",
-            language="English",
-        )
-        self.assertEqual(result, did)
-
-        # case 2, editing data, attributes, default_target_attribute, row_id_attribute,
-        # ignore_attribute generates a new dataset
-
-        column_names = [
-            ("input1", "REAL"),
-            ("input2", "REAL"),
-            ("y", "REAL"),
-        ]
-        desc = "xor dataset represents XOR operation"
-        result = edit_dataset(
-            564,
             description=desc,
-            contributor="",
-            collection_date="2019-10-29 17:06:18",
-            attributes=column_names,
-            original_data_url="https://www.kaggle.com/ancientaxe/and-or-xor",
-            paper_url="",
-            citation="kaggle",
+            creator="R.A.Fisher",
+            collection_date="1937",
+            citation="The use of multiple measurements in taxonomic problems",
             language="English",
         )
-        self.assertNotEqual(did, result)
+        self.assertEqual(did, result)
+        edited_dataset = openml.datasets.get_dataset(did)
+        self.assertEqual(edited_dataset.description, desc)
+
+        # Case 2
+        # only owners (or admin) can edit all critical fields of datasets
+        # this is a dataset created by CI, so it is editable by this test
+        did = 315
+        result = edit_dataset(did, default_target_attribute="col_1", ignore_attribute="col_2")
+        self.assertEqual(did, result)
+        edited_dataset = openml.datasets.get_dataset(did)
+        self.assertEqual(edited_dataset.ignore_attribute, ["col_2"])
 
     def test_data_edit_errors(self):
-
-        # admin key for test server (only admins or owners can edit datasets).
-        openml.config.apikey = "d488d8afd93b32331cf6ea9d7003d4c3"
         # Check server exception when no field to edit is provided
         self.assertRaisesRegex(
             OpenMLServerException,
-            # "Please provide atleast one field among description, creator, contributor, "
-            # "collection_date, language, citation, original_data_url or paper_url to edit. - None",
-            # edit_dataset,
-            "Please provide atleast one field among description, creator, contributor, "
-            "collection_date, language, citation, original_data_url, default_target_attribute, "
-            "row_id_attribute, ignore_attribute or paper_url to edit. - None",
+            "Please provide atleast one field among description, creator, "
+            "contributor, collection_date, language, citation, "
+            "original_data_url, default_target_attribute, row_id_attribute, "
+            "ignore_attribute or paper_url to edit.",
             edit_dataset,
             data_id=564,
         )
         # Check server exception when unknown dataset is provided
         self.assertRaisesRegex(
             OpenMLServerException,
-            "Unknown dataset - None",
+            "Unknown dataset",
             edit_dataset,
             data_id=100000,
             description="xor operation dataset",
         )
-        # Check server exception when a non-owner or non-admin tries to edit existing dataset
-        openml.config.apikey = "5f0b74b33503e4ad4a7181a91e28719f"
+        # Check server exception when owner/admin edits critical features of dataset with tasks
         self.assertRaisesRegex(
             OpenMLServerException,
-            "Dataset is not owned by you",
+            "Critical features default_target_attribute, row_id_attribute and ignore_attribute "
+            "can only be edited for datasets without any tasks.",
             edit_dataset,
-            data_id=564,
-            description="XOR data",
+            data_id=223,
+            default_target_attribute="y",
+        )
+        # Check server exception when a non-owner or non-admin tries to edit critical features
+        self.assertRaisesRegex(
+            OpenMLServerException,
+            "Critical features default_target_attribute, row_id_attribute and ignore_attribute "
+            "can be edited only by the owner. Fork the dataset if changes are required.",
+            edit_dataset,
+            data_id=128,
+            default_target_attribute="y",
         )

@@ -806,8 +806,6 @@ def edit_dataset(
     contributor=None,
     collection_date=None,
     language=None,
-    attributes=None,
-    data=None,
     default_target_attribute=None,
     ignore_attribute=None,
     citation=None,
@@ -839,17 +837,6 @@ def edit_dataset(
       language : str
           Language in which the data is represented.
           Starts with 1 upper case letter, rest lower case, e.g. 'English'.
-      attributes : list, dict, or 'auto'
-          A list of tuples. Each tuple consists of the attribute name and type.
-          If passing a pandas DataFrame, the attributes can be automatically
-          inferred by passing ``'auto'``. Specific attributes can be manually
-          specified by a passing a dictionary where the key is the name of the
-          attribute and the value is the data type of the attribute.
-      data : ndarray, list, dataframe, coo_matrix, shape (n_samples, n_features)
-          An array that contains both the attributes and the targets. When
-          providing a dataframe, the attribute names and type can be inferred by
-          passing ``attributes='auto'``.
-          The target feature is indicated as meta-data of the dataset.
       default_target_attribute : str
           The default target attribute, if it exists.
           Can have multiple values, comma separated.
@@ -879,54 +866,6 @@ def edit_dataset(
     if not isinstance(data_id, int):
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
 
-    # case 1, changing these fields creates a new version of the dataset with changed field
-    if any(
-        field is not None
-        for field in [
-            data,
-            attributes,
-            default_target_attribute,
-            row_id_attribute,
-            ignore_attribute,
-        ]
-    ):
-        logger.warning("Creating a new version of dataset, cannot edit existing version")
-
-        # Get old dataset and features
-        dataset = get_dataset(data_id)
-        df, y, categorical, attribute_names = dataset.get_data(dataset_format="dataframe")
-        attributes_old = attributes_arff_from_df(df)
-
-        # Sparse data needs to be provided in a different format from dense data
-        if dataset.format == "sparse_arff":
-            df, y, categorical, attribute_names = dataset.get_data(dataset_format="array")
-            data_old = coo_matrix(df)
-        else:
-            data_old = df
-        data_new = data if data is not None else data_old
-        dataset_new = create_dataset(
-            name=dataset.name,
-            description=description or dataset.description,
-            creator=creator or dataset.creator,
-            contributor=contributor or dataset.contributor,
-            collection_date=collection_date or dataset.collection_date,
-            language=language or dataset.language,
-            licence=dataset.licence,
-            attributes=attributes or attributes_old,
-            data=data_new,
-            default_target_attribute=default_target_attribute or dataset.default_target_attribute,
-            ignore_attribute=ignore_attribute or dataset.ignore_attribute,
-            citation=citation or dataset.citation,
-            row_id_attribute=row_id_attribute or dataset.row_id_attribute,
-            original_data_url=original_data_url or dataset.original_data_url,
-            paper_url=paper_url or dataset.paper_url,
-            update_comment=dataset.update_comment,
-            version_label=dataset.version_label,
-        )
-        dataset_new.publish()
-        return dataset_new.dataset_id
-
-    # case 2, changing any of these fields will update existing dataset
     # compose data edit parameters as xml
     form_data = {"data_id": data_id}
     xml = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
@@ -937,6 +876,9 @@ def edit_dataset(
     xml["oml:data_edit_parameters"]["oml:contributor"] = contributor
     xml["oml:data_edit_parameters"]["oml:collection_date"] = collection_date
     xml["oml:data_edit_parameters"]["oml:language"] = language
+    xml["oml:data_edit_parameters"]["oml:default_target_attribute"] = default_target_attribute
+    xml["oml:data_edit_parameters"]["oml:row_id_attribute"] = row_id_attribute
+    xml["oml:data_edit_parameters"]["oml:ignore_attribute"] = ignore_attribute
     xml["oml:data_edit_parameters"]["oml:citation"] = citation
     xml["oml:data_edit_parameters"]["oml:original_data_url"] = original_data_url
     xml["oml:data_edit_parameters"]["oml:paper_url"] = paper_url

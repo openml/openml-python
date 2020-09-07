@@ -22,16 +22,14 @@ import pandas as pd
 
 import openml.extensions.sklearn
 from openml.testing import TestBase, SimpleImputer, CustomImputer, cat, cont
-from openml.runs.functions import (
-    _run_task_get_arffcontent,
-    run_exists,
-)
+from openml.runs.functions import _run_task_get_arffcontent, run_exists, format_prediction
 from openml.runs.trace import OpenMLRunTrace
 from openml.tasks import TaskTypeEnum
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
 from sklearn.tree import DecisionTreeClassifier
+
 from sklearn.dummy import DummyClassifier
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.feature_selection import VarianceThreshold
@@ -352,7 +350,6 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(task_id)
         # internally dataframe is loaded and targets are categorical
         # which LinearRegression() cannot handle
-        # with self.assertRaisesRegex(ValueError, "could not convert string to float:*"):
         with self.assertRaisesRegex(
             AttributeError, "'LinearRegression' object has no attribute 'classes_'"
         ):
@@ -560,6 +557,7 @@ class TestRun(TestBase):
         def get_ct_cf(nominal_indices, numeric_indices):
             inner = sklearn.compose.ColumnTransformer(
                 transformers=[
+                    ("numeric", sklearn.preprocessing.StandardScaler(), nominal_indices),
                     (
                         "numeric",
                         make_pipeline(
@@ -580,6 +578,7 @@ class TestRun(TestBase):
             )
             return sklearn.pipeline.Pipeline(
                 steps=[
+                    ("imputer", sklearn.impute.SimpleImputer(strategy="constant", fill_value=-1)),
                     ("transformer", inner),
                     ("classifier", sklearn.tree.DecisionTreeClassifier()),
                 ]
@@ -893,6 +892,7 @@ class TestRun(TestBase):
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     def test_local_run_metric_score(self):
+
         # construct sci-kit learn classifier
         clf = Pipeline(
             steps=[
@@ -1473,3 +1473,48 @@ class TestRun(TestBase):
         run.publish()
         TestBase._mark_entity_for_removal("run", run.run_id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], run.run_id))
+
+    def test_format_prediction_non_supervised(self):
+        # non-supervised tasks don't exist on the test server
+        openml.config.server = self.production_server
+        clustering = openml.tasks.get_task(126033, download_data=False)
+        ignored_input = [0] * 5
+        with self.assertRaisesRegex(
+            NotImplementedError, r"Formatting for <class '[\w.]+'> is not supported."
+        ):
+            format_prediction(clustering, *ignored_input)
+
+    def test_format_prediction_classification_no_probabilities(self):
+        classification = openml.tasks.get_task(self.TEST_SERVER_TASK_SIMPLE[0], download_data=False)
+        ignored_input = [0] * 5
+        with self.assertRaisesRegex(ValueError, "`proba` is required for classification task"):
+            format_prediction(classification, *ignored_input, proba=None)
+
+    def test_format_prediction_classification_incomplete_probabilities(self):
+        classification = openml.tasks.get_task(self.TEST_SERVER_TASK_SIMPLE[0], download_data=False)
+        ignored_input = [0] * 5
+        incomplete_probabilities = {c: 0.2 for c in classification.class_labels[1:]}
+        with self.assertRaisesRegex(ValueError, "Each class should have a predicted probability"):
+            format_prediction(classification, *ignored_input, proba=incomplete_probabilities)
+
+    def test_format_prediction_task_without_classlabels_set(self):
+        classification = openml.tasks.get_task(self.TEST_SERVER_TASK_SIMPLE[0], download_data=False)
+        classification.class_labels = None
+        ignored_input = [0] * 5
+        with self.assertRaisesRegex(
+            ValueError, "The classification task must have class labels set"
+        ):
+            format_prediction(classification, *ignored_input, proba={})
+
+    def test_format_prediction_task_learning_curve_sample_not_set(self):
+        learning_curve = openml.tasks.get_task(801, download_data=False)
+        probabilities = {c: 0.2 for c in learning_curve.class_labels}
+        ignored_input = [0] * 5
+        with self.assertRaisesRegex(ValueError, "`sample` can not be none for LearningCurveTask"):
+            format_prediction(learning_curve, *ignored_input, sample=None, proba=probabilities)
+
+    def test_format_prediction_task_regression(self):
+        regression = openml.tasks.get_task(self.TEST_SERVER_TASK_REGRESSION[0], download_data=False)
+        ignored_input = [0] * 5
+        res = format_prediction(regression, *ignored_input)
+        self.assertListEqual(res, [0] * 5)
