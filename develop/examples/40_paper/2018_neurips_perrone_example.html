@@ -285,17 +285,17 @@ pre-processing all retrieved evaluations.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                  cost degree gamma      kernel
-4004  480.938721906328      2   NaN  polynomial
-4822  915.363748814926    NaN   NaN  polynomial
-4174  14.3575374566055      2   NaN  polynomial
-5041  24.0748144884177    NaN   NaN      linear
-3226  52.9470904205912      5   NaN  polynomial
-Y :  4004    0.400238
-4822    0.986675
-4174    0.922216
-5041    0.990209
-3226    0.483496
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                    cost degree                gamma      kernel
+3208   0.250172831878092    NaN                  NaN      linear
+239     8.62502725354679    NaN    0.023348762326925         NaN
+733   0.0242994914378754    NaN  0.00326196610148325         NaN
+1222  0.0641131916350038      5                  NaN  polynomial
+3526    69.5534605577007    NaN                  NaN      linear
+Y :  3208    0.618340
+239     0.888817
+733     0.921125
+1222    0.619283
+3526    0.658644
 Name: value, dtype: float64
 </pre></div>
 </div>
@@ -346,7 +346,7 @@ time simple and quick.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 2.2412e-05
+Training RMSE : 1.3799e-05
 </pre></div>
 </div>
 </div>
@@ -381,17 +381,17 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
-0    982.606263  3.250120  661.650657     sigmoid
-1    566.523643  4.414742  743.658083      linear
-2    616.394938  4.711182  782.436728  polynomial
-3    875.788918  4.282783   84.125587  polynomial
-4    140.342199  3.913452   36.678734     sigmoid
+0    759.865420  4.883521  910.647480  polynomial
+1    848.180092  4.948654  180.689790      radial
+2    208.464174  2.277339   62.527319      radial
+3    161.184589  2.210907  739.370918     sigmoid
+4    315.851407  4.197313  813.544433      linear
 ..          ...       ...         ...         ...
-995  498.796850  4.237613  392.251018      linear
-996  939.842693  3.736535  758.348254  polynomial
-997  138.848826  4.297531  690.430957  polynomial
-998   14.239726  2.631760  104.071120     sigmoid
-999  594.895660  3.930299  801.821382      linear
+995  835.337113  4.828885  228.928821  polynomial
+996  656.690947  3.786260   27.410926     sigmoid
+997  202.016243  4.108927   21.673776     sigmoid
+998  984.101593  3.738884  272.829504      radial
+999  839.105286  4.130004   43.389881      linear
 
 [1000 rows x 4 columns]
 </pre></div>
@@ -415,7 +415,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(42.722222222222214, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  24.581 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  24.173 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
