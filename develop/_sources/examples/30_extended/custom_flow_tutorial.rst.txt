@@ -302,7 +302,7 @@ We use the argument setup_string because the used flow was a script.
 
  .. code-block:: none
 
-    run created: 122310
+    run created: 122585
 
 
 
@@ -310,7 +310,7 @@ We use the argument setup_string because the used flow was a script.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.237 seconds)
+   **Total running time of the script:** ( 0 minutes  4.209 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_custom_flow_tutorial.py:
