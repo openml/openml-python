@@ -97,7 +97,7 @@ to have better visualization capabilities and easier access:
            'NumberOfMissingValues', 'NumberOfNumericFeatures',
            'NumberOfSymbolicFeatures', 'cost_matrix'],
           dtype='object')
-    First 5 of 3440 tasks:
+    First 5 of 3442 tasks:
        tid  ttid  ...  NumberOfSymbolicFeatures cost_matrix
     2    2     1  ...                      33.0         NaN
     3    3     1  ...                      37.0         NaN
@@ -267,7 +267,7 @@ Furthermore, we can list tasks based on the dataset id:
 
  .. code-block:: none
 
-    First 5 of 18 tasks:
+    First 5 of 22 tasks:
              tid  ttid   did  ... target_value evaluation_measures number_samples
     9983    9983     1  1471  ...          NaN                 NaN            NaN
     14951  14951     1  1471  ...          NaN                 NaN            NaN
@@ -342,7 +342,7 @@ Finally, it is also possible to list all tasks on OpenML with:
 
  .. code-block:: none
 
-    26423
+    39062
 
 
 
@@ -972,6 +972,130 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
           <td>NaN</td>
         </tr>
+        <tr>
+          <th>27577</th>
+          <td>234435</td>
+          <td>5</td>
+          <td>1471</td>
+          <td>eeg-eye-state</td>
+          <td>Clustering</td>
+          <td>active</td>
+          <td>50 times Clustering</td>
+          <td>NaN</td>
+          <td>1471</td>
+          <td>NaN</td>
+          <td>8257.0</td>
+          <td>2.0</td>
+          <td>6723.0</td>
+          <td>2.0</td>
+          <td>15.0</td>
+          <td>14980.0</td>
+          <td>0.0</td>
+          <td>0.0</td>
+          <td>14.0</td>
+          <td>1.0</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <th>31881</th>
+          <td>256739</td>
+          <td>5</td>
+          <td>1471</td>
+          <td>eeg-eye-state</td>
+          <td>Clustering</td>
+          <td>active</td>
+          <td>50 times Clustering</td>
+          <td>NaN</td>
+          <td>1471</td>
+          <td>NaN</td>
+          <td>8257.0</td>
+          <td>2.0</td>
+          <td>6723.0</td>
+          <td>2.0</td>
+          <td>15.0</td>
+          <td>14980.0</td>
+          <td>0.0</td>
+          <td>0.0</td>
+          <td>14.0</td>
+          <td>1.0</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <th>31891</th>
+          <td>256750</td>
+          <td>5</td>
+          <td>1471</td>
+          <td>eeg-eye-state</td>
+          <td>Clustering</td>
+          <td>active</td>
+          <td>50 times Clustering</td>
+          <td>NaN</td>
+          <td>1471</td>
+          <td>NaN</td>
+          <td>8257.0</td>
+          <td>2.0</td>
+          <td>6723.0</td>
+          <td>2.0</td>
+          <td>15.0</td>
+          <td>14980.0</td>
+          <td>0.0</td>
+          <td>0.0</td>
+          <td>14.0</td>
+          <td>1.0</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <th>37042</th>
+          <td>297708</td>
+          <td>5</td>
+          <td>1471</td>
+          <td>eeg-eye-state</td>
+          <td>Clustering</td>
+          <td>active</td>
+          <td>50 times Clustering</td>
+          <td>NaN</td>
+          <td>1471</td>
+          <td>NaN</td>
+          <td>8257.0</td>
+          <td>2.0</td>
+          <td>6723.0</td>
+          <td>2.0</td>
+          <td>15.0</td>
+          <td>14980.0</td>
+          <td>0.0</td>
+          <td>0.0</td>
+          <td>14.0</td>
+          <td>1.0</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+        </tr>
       </tbody>
     </table>
     </div>
@@ -1159,7 +1283,7 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  31.962 seconds)
+   **Total running time of the script:** ( 0 minutes  42.999 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:
