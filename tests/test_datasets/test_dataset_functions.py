@@ -1389,7 +1389,7 @@ class TestOpenMLDataset(TestBase):
             data_id=100000,
             description="xor operation dataset",
         )
-        # Check server exception when owner/admin edits critical features of dataset with tasks
+        # Check server exception when owner/admin edits critical fields of dataset with tasks
         self.assertRaisesRegex(
             OpenMLServerException,
             "Critical features default_target_attribute, row_id_attribute and ignore_attribute "
@@ -1398,7 +1398,7 @@ class TestOpenMLDataset(TestBase):
             data_id=223,
             default_target_attribute="y",
         )
-        # Check server exception when a non-owner or non-admin tries to edit critical features
+        # Check server exception when a non-owner or non-admin tries to edit critical fields
         self.assertRaisesRegex(
             OpenMLServerException,
             "Critical features default_target_attribute, row_id_attribute and ignore_attribute "
@@ -1410,7 +1410,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_data_fork(self):
         did = 1
-        result = fork_dataset(did,)
+        result = fork_dataset(did)
         self.assertNotEqual(did, result)
         # Check server exception when unknown dataset is provided
         self.assertRaisesRegex(

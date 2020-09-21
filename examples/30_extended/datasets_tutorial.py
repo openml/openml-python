@@ -149,10 +149,12 @@ print(f"Edited dataset ID: {data_id}")
 
 ############################################################################
 # Fork dataset
-# Used to create a copy of the dataset with a different owner
+# Used to create a copy of the dataset with you as the owner.
+# Use this API only if you are unable to edit the critical fields (default_target_attribute, ignore_attribute,
+# row_id_attribute) of a dataset through the edit_dataset API.
+# After the dataset is forked, you can edit the new version of the dataset using edit_dataset.
 
 data_id = fork_dataset(564)
 print(f"Forked dataset ID: {data_id}")
-print(get_dataset(data_id))
 
 openml.config.stop_using_configuration_for_example()

@@ -815,13 +815,16 @@ def edit_dataset(
 ) -> int:
     """
       Edits an OpenMLDataset.
-      Specify atleast one field to edit, apart from data_id.
+      In addition to providing the dataset id of the dataset to edit (through data_id),
+      you must specify a value for at least one of the optional function arguments,
+       i.e. one value for a field to edit.
 
-      This API has non-critical and critical fields.
-      Critical features are default_target_attribute, ignore_attribute, row_id_attribute.
+      This function allows editing of both non-critical and critical fields.
+      Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.
 
        - Editing non-critical data fields is allowed for all authenticated users.
-       - Editing critical fields is allowed only for the owner, provided there are no tasks.
+       - Editing critical fields is allowed only for the owner, provided there are no tasks
+         associated with this dataset.
 
       If dataset has tasks or if the user is not the owner, the only way
       to edit critical fields is to use fork_dataset followed by edit_dataset.
@@ -866,7 +869,7 @@ def edit_dataset(
 
       Returns
       -------
-      data_id of the edited dataset """
+      Dataset id """
     if not isinstance(data_id, int):
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
 
@@ -903,20 +906,19 @@ def edit_dataset(
 
 def fork_dataset(data_id: int) -> int:
     """
-     Creates a new dataset version, with possibly a different owner.
-     The authenticated user becomes the new owner.
-     This function does not result in any change in the dataset ARFF file.
+     Creates a new dataset version, with the authenticated user as the new owner.
+     The forked dataset can have distinct dataset meta-data,
+     but the actual data itself is shared with the original version.
 
-
-     This API is intended for use when a user is unable to edit the critical features of a dataset
+     This API is intended for use when a user is unable to edit the critical fields of a dataset
      through the edit_dataset API.
-     (Critical features are default_target_attribute, ignore_attribute, row_id_attribute.)
+     (Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.)
 
      Specifically, this happens when the user is:
             1. Not the owner of the dataset.
             2. User is the owner of the dataset, but the dataset has tasks.
 
-     In these two cases the only way to edit critical features is:
+     In these two cases the only way to edit critical fields is:
             1. STEP 1: Fork the dataset using fork_dataset API
             2. STEP 2: Call edit_dataset API on the forked version.
 
@@ -924,11 +926,11 @@ def fork_dataset(data_id: int) -> int:
     Parameters
     ----------
     data_id : int
-        ID of the dataset.
+        id of the dataset to be forked
 
     Returns
     -------
-    data_id of the forked dataset
+    Dataset id of the forked dataset
 
     """
     if not isinstance(data_id, int):
