@@ -26,8 +26,6 @@ from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (
     create_dataset,
-    edit_dataset,
-    fork_dataset,
     attributes_arff_from_df,
     _get_cached_dataset,
     _get_cached_dataset_features,
@@ -41,6 +39,7 @@ from openml.datasets.functions import (
     _get_online_dataset_format,
     DATASETS_CACHE_DIR_NAME,
 )
+from openml.datasets import fork_dataset, edit_dataset
 
 
 class TestOpenMLDataset(TestBase):
