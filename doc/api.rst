@@ -74,6 +74,8 @@ Modules
     list_datasets
     list_qualities
     status_update
+    edit_dataset
+    fork_dataset
 
 :mod:`openml.evaluations`: Evaluation Functions
 -----------------------------------------------

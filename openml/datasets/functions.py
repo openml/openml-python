@@ -815,12 +815,16 @@ def edit_dataset(
 ) -> int:
     """
       Edits an OpenMLDataset.
-      Specify atleast one field to edit, apart from data_id
-       - For certain fields, a new dataset version is created : attributes, data,
-       default_target_attribute, ignore_attribute, row_id_attribute.
+      Specify atleast one field to edit, apart from data_id.
 
-       - For other fields, the uploader can edit the exisiting version.
-        Noone except the uploader can edit the exisitng version.
+      This API has non-critical and critical fields.
+      Critical features are default_target_attribute, ignore_attribute, row_id_attribute.
+
+       - Editing non-critical data fields is allowed for all authenticated users.
+       - Editing critical fields is allowed only for the owner, provided there are no tasks.
+
+      If dataset has tasks or if the user is not the owner, the only way
+      to edit critical fields is to use fork_dataset followed by edit_dataset.
 
       Parameters
       ----------
@@ -897,10 +901,25 @@ def edit_dataset(
     return int(data_id)
 
 
-def fork_dataset(data_id) -> int:
+def fork_dataset(data_id: int) -> int:
     """
-    Create a fork of the dataset with the calling authorized user as owner.
-    Note that the data arff file remains the same.
+     Creates a new dataset version, with possibly a different owner.
+     The authenticated user becomes the new owner.
+     This function does not result in any change in the dataset ARFF file.
+
+
+     This API is intended for use when a user is unable to edit the critical features of a dataset
+     through the edit_dataset API.
+     (Critical features are default_target_attribute, ignore_attribute, row_id_attribute.)
+
+     Specifically, this happens when the user is:
+            1. Not the owner of the dataset.
+            2. User is the owner of the dataset, but the dataset has tasks.
+
+     In these two cases the only way to edit critical features is:
+            1. STEP 1: Fork the dataset using fork_dataset API
+            2. STEP 2: Call edit_dataset API on the forked version.
+
 
     Parameters
     ----------

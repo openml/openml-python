@@ -11,7 +11,7 @@ How to list and download datasets.
 
 import openml
 import pandas as pd
-from openml.datasets.functions import edit_dataset, get_dataset, fork_dataset
+from openml.datasets import edit_dataset, fork_dataset, get_dataset
 
 ############################################################################
 # Exercise 0

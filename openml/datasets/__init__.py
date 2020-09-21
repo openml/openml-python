@@ -24,4 +24,6 @@ __all__ = [
     "OpenMLDataFeature",
     "status_update",
     "list_qualities",
+    "edit_dataset",
+    "fork_dataset",
 ]
