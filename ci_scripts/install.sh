@@ -52,6 +52,7 @@ fi
 python -c "import numpy; print('numpy %s' % numpy.__version__)"
 python -c "import scipy; print('scipy %s' % scipy.__version__)"
 
+
 if [[ "$DOCPUSH" == "true" ]]; then
     conda install --yes gxx_linux-64 gcc_linux-64 swig
     pip install -e '.[examples,examples_unix]'
@@ -62,6 +63,15 @@ fi
 if [[ "$RUN_FLAKE8" == "true" ]]; then
     pip install pre-commit
     pre-commit install
+fi
+
+# PEP 561 compliance check
+# Assumes mypy relies solely on the PEP 561 standard
+# Also assumes mypy to be available
+if ! python -m mypy -c "import openml"; then
+   echo "Failed: PEP 561 compliance"
+else
+   echo "Success: 561 compliance"
 fi
 
 # Install scikit-learn last to make sure the openml package installation works

@@ -42,7 +42,7 @@ setuptools.setup(
     packages=setuptools.find_packages(
         include=["openml.*", "openml"], exclude=["*.tests", "*.tests.*", "tests.*", "tests"],
     ),
-    package_data={"": ["*.txt", "*.md"]},
+    package_data={"": ["*.txt", "*.md", "py.typed"]},
     python_requires=">=3.6",
     install_requires=[
         "liac-arff>=2.4.0",
