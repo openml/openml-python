@@ -67,11 +67,11 @@ fi
 
 # PEP 561 compliance check
 # Assumes mypy relies solely on the PEP 561 standard
-# Also assumes mypy to be available
 if ! python -m mypy -c "import openml"; then
    echo "Failed: PEP 561 compliance"
+   exit 1
 else
-   echo "Success: 561 compliance"
+   echo "Success: PEP 561 compliant"
 fi
 
 # Install scikit-learn last to make sure the openml package installation works
