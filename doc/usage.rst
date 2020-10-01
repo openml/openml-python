@@ -138,7 +138,7 @@ available metadata. The tutorial which follows explains how to get a list of
 datasets, how to filter the list to find the dataset that suits your
 requirements and how to download a dataset:
 
-* `Filter and explore datasets <examples/datasets_tutorial.html>`_
+* `Filter and explore datasets <examples/30_extended/datasets_tutorial.html>`_
 
 OpenML is about sharing machine learning results and the datasets they were
 obtained on. Learn how to share your datasets in the following tutorial:
@@ -152,14 +152,3 @@ Extending OpenML-Python
 OpenML-Python provides an extension interface to connect other machine learning libraries than
 scikit-learn to OpenML. Please check the :ref:`api_extensions` and use the
 scikit-learn extension in :class:`openml.extensions.sklearn.SklearnExtension` as a starting point.
-
-~~~~~~~~~~~~~~~
-Advanced topics
-~~~~~~~~~~~~~~~
-
-We are working on tutorials for the following topics:
-
-* Querying datasets (TODO)
-* Creating tasks (TODO)
-* Working offline (TODO)
-* Analyzing large amounts of results (TODO)
