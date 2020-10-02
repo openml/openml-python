@@ -30,7 +30,7 @@ import pandas as pd
 #
 # We will start by simply listing only *supervised classification* tasks:
 
-tasks = openml.tasks.list_tasks(task_type_id=1)
+tasks = openml.tasks.list_tasks(task_type_id=tasktypes.SUPERVISED_CLASSIFICATION)
 
 ############################################################################
 # **openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, which we convert
@@ -45,7 +45,9 @@ print(tasks.head())
 
 # As conversion to a pandas dataframe is a common task, we have added this functionality to the
 # OpenML-Python library which can be used by passing ``output_format='dataframe'``:
-tasks_df = openml.tasks.list_tasks(task_type_id=1, output_format="dataframe")
+tasks_df = openml.tasks.list_tasks(
+    task_type_id=tasktypes.SUPERVISED_CLASSIFICATION, output_format="dataframe"
+)
 print(tasks_df.head())
 
 ############################################################################
@@ -186,7 +188,7 @@ print(tasks[0])
 openml.config.start_using_configuration_for_example()
 
 try:
-    tasktypes = openml.tasks.TaskTypeEnum
+    tasktypes = openml.tasks.TaskType
     my_task = openml.tasks.create_task(
         task_type_id=tasktypes.SUPERVISED_CLASSIFICATION,
         dataset_id=128,

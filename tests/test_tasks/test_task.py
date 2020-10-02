@@ -10,7 +10,7 @@ from openml.datasets import (
     get_dataset,
     list_datasets,
 )
-from openml.tasks import create_task, get_task
+from openml.tasks import TaskType, create_task, get_task
 
 
 class OpenMLTaskTest(TestBase):
@@ -81,13 +81,13 @@ class OpenMLTaskTest(TestBase):
         # depending on the task type, find either datasets
         # with only symbolic features or datasets with only
         # numerical features.
-        if self.task_type_id == 2:
+        if self.task_type_id == TaskType.SUPERVISED_REGRESSION:
             # regression task
             for dataset_id, dataset_info in active_datasets.items():
                 if "NumberOfSymbolicFeatures" in dataset_info:
                     if dataset_info["NumberOfSymbolicFeatures"] == 0:
                         compatible_datasets.append(dataset_id)
-        elif self.task_type_id == 5:
+        elif self.task_type_id == TaskType.CLUSTERING:
             # clustering task
             compatible_datasets = list(active_datasets.keys())
         else:
@@ -114,7 +114,7 @@ class OpenMLTaskTest(TestBase):
         while True:
             random_feature_index = randint(0, len(random_dataset.features) - 1)
             random_feature = random_dataset.features[random_feature_index]
-            if self.task_type_id == 2:
+            if self.task_type_id == TaskType.SUPERVISED_REGRESSION:
                 if random_feature.data_type == "numeric":
                     break
             else:

@@ -32,7 +32,7 @@ from ..tasks import (
 )
 from .run import OpenMLRun
 from .trace import OpenMLRunTrace
-from ..tasks import TaskTypeEnum, get_task
+from ..tasks import TaskType, get_task
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
@@ -274,7 +274,7 @@ def run_flow_on_task(
         run.parameter_settings = flow.extension.obtain_parameter_values(flow)
 
     # now we need to attach the detailed evaluations
-    if task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
+    if task.task_type_id == TaskType.LEARNING_CURVE:
         run.sample_evaluations = sample_evaluations
     else:
         run.fold_evaluations = fold_evaluations
@@ -772,7 +772,7 @@ def _create_run_from_xml(xml, from_server=True):
 
     if "predictions" not in files and from_server is True:
         task = openml.tasks.get_task(task_id)
-        if task.task_type_id == TaskTypeEnum.SUBGROUP_DISCOVERY:
+        if task.task_type_id == TaskType.SUBGROUP_DISCOVERY:
             raise NotImplementedError("Subgroup discovery tasks are not yet supported.")
         else:
             # JvR: actually, I am not sure whether this error should be raised.
@@ -1008,7 +1008,7 @@ def __list_runs(api_call, output_format="dict"):
             "setup_id": int(run_["oml:setup_id"]),
             "flow_id": int(run_["oml:flow_id"]),
             "uploader": int(run_["oml:uploader"]),
-            "task_type": int(run_["oml:task_type_id"]),
+            "task_type": TaskType(int(run_["oml:task_type_id"])),
             "upload_time": str(run_["oml:upload_time"]),
             "error_message": str((run_["oml:error_message"]) or ""),
         }

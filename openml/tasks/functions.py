@@ -15,7 +15,7 @@ from .task import (
     OpenMLClassificationTask,
     OpenMLClusteringTask,
     OpenMLLearningCurveTask,
-    TaskTypeEnum,
+    TaskType,
     OpenMLRegressionTask,
     OpenMLSupervisedTask,
     OpenMLTask,
@@ -109,7 +109,7 @@ def _get_estimation_procedure_list():
         procs.append(
             {
                 "id": int(proc_["oml:id"]),
-                "task_type_id": int(proc_["oml:ttid"]),
+                "task_type_id": TaskType(int(proc_["oml:ttid"])),
                 "name": proc_["oml:name"],
                 "type": proc_["oml:type"],
             }
@@ -119,7 +119,7 @@ def _get_estimation_procedure_list():
 
 
 def list_tasks(
-    task_type_id: Optional[int] = None,
+    task_type_id: Optional[TaskType] = None,
     offset: Optional[int] = None,
     size: Optional[int] = None,
     tag: Optional[str] = None,
@@ -221,7 +221,7 @@ def _list_tasks(task_type_id=None, output_format="dict", **kwargs):
     """
     api_call = "task/list"
     if task_type_id is not None:
-        api_call += "/type/%d" % int(task_type_id)
+        api_call += "/type/%d" % task_type_id.value
     if kwargs is not None:
         for operator, value in kwargs.items():
             if operator == "task_id":
@@ -259,7 +259,7 @@ def __list_tasks(api_call, output_format="dict"):
             tid = int(task_["oml:task_id"])
             task = {
                 "tid": tid,
-                "ttid": int(task_["oml:task_type_id"]),
+                "ttid": TaskType(int(task_["oml:task_type_id"])),
                 "did": int(task_["oml:did"]),
                 "name": task_["oml:name"],
                 "task_type": task_["oml:task_type"],
@@ -417,18 +417,18 @@ def _create_task_from_xml(xml):
             "oml:evaluation_measure"
         ]
 
-    task_type_id = int(dic["oml:task_type_id"])
+    task_type_id = TaskType(int(dic["oml:task_type_id"]))
     common_kwargs = {
         "task_id": dic["oml:task_id"],
         "task_type": dic["oml:task_type"],
-        "task_type_id": dic["oml:task_type_id"],
+        "task_type_id": task_type_id,
         "data_set_id": inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
         "evaluation_measure": evaluation_measures,
     }
     if task_type_id in (
-        TaskTypeEnum.SUPERVISED_CLASSIFICATION,
-        TaskTypeEnum.SUPERVISED_REGRESSION,
-        TaskTypeEnum.LEARNING_CURVE,
+        TaskType.SUPERVISED_CLASSIFICATION,
+        TaskType.SUPERVISED_REGRESSION,
+        TaskType.LEARNING_CURVE,
     ):
         # Convert some more parameters
         for parameter in inputs["estimation_procedure"]["oml:estimation_procedure"][
@@ -448,10 +448,10 @@ def _create_task_from_xml(xml):
         ]["oml:data_splits_url"]
 
     cls = {
-        TaskTypeEnum.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
-        TaskTypeEnum.SUPERVISED_REGRESSION: OpenMLRegressionTask,
-        TaskTypeEnum.CLUSTERING: OpenMLClusteringTask,
-        TaskTypeEnum.LEARNING_CURVE: OpenMLLearningCurveTask,
+        TaskType.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
+        TaskType.SUPERVISED_REGRESSION: OpenMLRegressionTask,
+        TaskType.CLUSTERING: OpenMLClusteringTask,
+        TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
     }.get(task_type_id)
     if cls is None:
         raise NotImplementedError("Task type %s not supported." % common_kwargs["task_type"])
@@ -459,7 +459,7 @@ def _create_task_from_xml(xml):
 
 
 def create_task(
-    task_type_id: int,
+    task_type_id: TaskType,
     dataset_id: int,
     estimation_procedure_id: int,
     target_name: Optional[str] = None,
@@ -501,10 +501,10 @@ def create_task(
     OpenMLLearningCurveTask, OpenMLClusteringTask
     """
     task_cls = {
-        TaskTypeEnum.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
-        TaskTypeEnum.SUPERVISED_REGRESSION: OpenMLRegressionTask,
-        TaskTypeEnum.CLUSTERING: OpenMLClusteringTask,
-        TaskTypeEnum.LEARNING_CURVE: OpenMLLearningCurveTask,
+        TaskType.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
+        TaskType.SUPERVISED_REGRESSION: OpenMLRegressionTask,
+        TaskType.CLUSTERING: OpenMLClusteringTask,
+        TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
     }.get(task_type_id)
 
     if task_cls is None:

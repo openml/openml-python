@@ -3,6 +3,7 @@
 import os
 from unittest import mock
 
+from openml.tasks import TaskType
 from openml.testing import TestBase
 from openml import OpenMLSplit, OpenMLTask
 from openml.exceptions import OpenMLCacheException
@@ -45,12 +46,14 @@ class TestTask(TestBase):
         estimation_procedures = openml.tasks.functions._get_estimation_procedure_list()
         self.assertIsInstance(estimation_procedures, list)
         self.assertIsInstance(estimation_procedures[0], dict)
-        self.assertEqual(estimation_procedures[0]["task_type_id"], 1)
+        self.assertEqual(
+            estimation_procedures[0]["task_type_id"], TaskType.SUPERVISED_CLASSIFICATION
+        )
 
     def test_list_clustering_task(self):
         # as shown by #383, clustering tasks can give list/dict casting problems
         openml.config.server = self.production_server
-        openml.tasks.list_tasks(task_type_id=5, size=10)
+        openml.tasks.list_tasks(task_type_id=TaskType.CLUSTERING, size=10)
         # the expected outcome is that it doesn't crash. No assertions.
 
     def _check_task(self, task):
@@ -64,7 +67,7 @@ class TestTask(TestBase):
 
     def test_list_tasks_by_type(self):
         num_curves_tasks = 200  # number is flexible, check server if fails
-        ttid = 3
+        ttid = TaskType.LEARNING_CURVE
         tasks = openml.tasks.list_tasks(task_type_id=ttid)
         self.assertGreaterEqual(len(tasks), num_curves_tasks)
         for tid in tasks:
@@ -72,7 +75,7 @@ class TestTask(TestBase):
             self._check_task(tasks[tid])
 
     def test_list_tasks_output_format(self):
-        ttid = 3
+        ttid = TaskType.LEARNING_CURVE
         tasks = openml.tasks.list_tasks(task_type_id=ttid, output_format="dataframe")
         self.assertIsInstance(tasks, pd.DataFrame)
         self.assertGreater(len(tasks), 100)
@@ -109,8 +112,12 @@ class TestTask(TestBase):
     def test_list_tasks_per_type_paginate(self):
         size = 10
         max = 100
-        task_types = 4
-        for j in range(1, task_types):
+        task_types = [
+            TaskType.SUPERVISED_CLASSIFICATION,
+            TaskType.SUPERVISED_REGRESSION,
+            TaskType.LEARNING_CURVE,
+        ]
+        for j in task_types:
             for i in range(0, max, size):
                 tasks = openml.tasks.list_tasks(task_type_id=j, offset=i, size=size)
                 self.assertGreaterEqual(size, len(tasks))
