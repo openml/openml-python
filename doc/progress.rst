@@ -8,7 +8,7 @@ Changelog
 
 0.11.0
 ~~~~~~
-
+* ADD #929: Add data edit API
 * FIX #873: Fixes an issue which resulted in incorrect URLs when printing OpenML objects after
   switching the server.
 * FIX #885: Logger no longer registered by default. Added utility functions to easily register
@@ -18,6 +18,7 @@ Changelog
 * MAINT #865: OpenML no longer bundles test files in the source distribution.
 * MAINT #897: Dropping support for Python 3.5.
 * ADD #894: Support caching of datasets using feather format as an option.
+* ADD #945: PEP 561 compliance for distributing Type information
 
 0.10.2
 ~~~~~~

@@ -40,12 +40,13 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
                 task = openml.tasks.create_task(
                     task_type_id=self.task_type_id,
                     dataset_id=dataset_id,
-                    estimation_procedure_id=self.estimation_procedure
+                    estimation_procedure_id=self.estimation_procedure,
                 )
                 task = task.publish()
-                TestBase._mark_entity_for_removal('task', task.id)
-                TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                                    task.id))
+                TestBase._mark_entity_for_removal("task", task.id)
+                TestBase.logger.info(
+                    "collected from {}: {}".format(__file__.split("/")[-1], task.id)
+                )
                 # success
                 break
             except OpenMLServerException as e:
@@ -58,5 +59,5 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
                     raise e
         else:
             raise ValueError(
-                'Could not create a valid task for task type ID {}'.format(self.task_type_id)
+                "Could not create a valid task for task type ID {}".format(self.task_type_id)
             )

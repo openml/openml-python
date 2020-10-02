@@ -10,8 +10,8 @@ extensions = []  # type: List[Type[Extension]]
 
 
 __all__ = [
-    'Extension',
-    'register_extension',
-    'get_extension_by_model',
-    'get_extension_by_flow',
+    "Extension",
+    "register_extension",
+    "get_extension_by_model",
+    "get_extension_by_flow",
 ]

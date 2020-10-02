@@ -22,7 +22,7 @@ class OpenMLLearningCurveTaskTest(OpenMLSupervisedTaskTest):
         X, Y = super(OpenMLLearningCurveTaskTest, self).test_get_X_and_Y()
         self.assertEqual((768, 8), X.shape)
         self.assertIsInstance(X, np.ndarray)
-        self.assertEqual((768, ), Y.shape)
+        self.assertEqual((768,), Y.shape)
         self.assertIsInstance(Y, np.ndarray)
         self.assertEqual(Y.dtype, int)
 
@@ -36,7 +36,4 @@ class OpenMLLearningCurveTaskTest(OpenMLSupervisedTaskTest):
     def test_class_labels(self):
 
         task = get_task(self.task_id)
-        self.assertEqual(
-            task.class_labels,
-            ['tested_negative', 'tested_positive']
-        )
+        self.assertEqual(task.class_labels, ["tested_negative", "tested_positive"])
