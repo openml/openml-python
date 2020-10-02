@@ -134,7 +134,7 @@ def list_tasks(
     Filter task_type_id is separated from the other filters because
     it is used as task_type_id in the task description, but it is named
     type when used as a filter in list tasks call.
-    task_type_id : int, optional
+    task_type_id : TaskType, optional
         ID of the task type as detailed `here <https://www.openml.org/search?type=task_type>`_.
         - Supervised classification: 1
         - Supervised regression: 2
@@ -195,7 +195,7 @@ def _list_tasks(task_type_id=None, output_format="dict", **kwargs):
     Filter task_type_id is separated from the other filters because
     it is used as task_type_id in the task description, but it is named
     type when used as a filter in list tasks call.
-    task_type_id : int, optional
+    task_type_id : TaskType, optional
         ID of the task type as detailed
         `here <https://www.openml.org/search?type=task_type>`_.
         - Supervised classification: 1
@@ -480,7 +480,7 @@ def create_task(
 
     Parameters
     ----------
-    task_type_id : int
+    task_type_id : TaskType
         Id of the task type.
     dataset_id : int
         The id of the dataset for the task.

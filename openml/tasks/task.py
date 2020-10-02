@@ -36,7 +36,7 @@ class OpenMLTask(OpenMLBase):
 
        Parameters
        ----------
-       task_type_id : int
+       task_type_id : TaskType
            Refers to the type of task.
        task_type : str
            Refers to the task.
