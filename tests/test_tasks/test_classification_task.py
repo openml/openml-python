@@ -14,7 +14,7 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
 
         super(OpenMLClassificationTaskTest, self).setUp()
         self.task_id = 119
-        self.task_type_id = TaskType.SUPERVISED_CLASSIFICATION
+        self.task_type = TaskType.SUPERVISED_CLASSIFICATION
         self.estimation_procedure = 1
 
     def test_get_X_and_Y(self):

@@ -119,7 +119,7 @@ def _get_estimation_procedure_list():
 
 
 def list_tasks(
-    task_type_id: Optional[TaskType] = None,
+    task_type: Optional[TaskType] = None,
     offset: Optional[int] = None,
     size: Optional[int] = None,
     tag: Optional[str] = None,
@@ -127,14 +127,14 @@ def list_tasks(
     **kwargs
 ) -> Union[Dict, pd.DataFrame]:
     """
-    Return a number of tasks having the given tag and task_type_id
+    Return a number of tasks having the given tag and task_type
 
     Parameters
     ----------
-    Filter task_type_id is separated from the other filters because
-    it is used as task_type_id in the task description, but it is named
+    Filter task_type is separated from the other filters because
+    it is used as task_type in the task description, but it is named
     type when used as a filter in list tasks call.
-    task_type_id : TaskType, optional
+    task_type : TaskType, optional
         ID of the task type as detailed `here <https://www.openml.org/search?type=task_type>`_.
         - Supervised classification: 1
         - Supervised regression: 2
@@ -162,12 +162,12 @@ def list_tasks(
     Returns
     -------
     dict
-        All tasks having the given task_type_id and the give tag. Every task is
+        All tasks having the given task_type and the give tag. Every task is
         represented by a dictionary containing the following information:
         task id, dataset id, task_type and status. If qualities are calculated
         for the associated dataset, some of these are also returned.
     dataframe
-        All tasks having the given task_type_id and the give tag. Every task is
+        All tasks having the given task_type and the give tag. Every task is
         represented by a row in the data frame containing the following information
         as columns: task id, dataset id, task_type and status. If qualities are
         calculated for the associated dataset, some of these are also returned.
@@ -179,7 +179,7 @@ def list_tasks(
     return openml.utils._list_all(
         output_format=output_format,
         listing_call=_list_tasks,
-        task_type_id=task_type_id,
+        task_type=task_type,
         offset=offset,
         size=size,
         tag=tag,
@@ -187,15 +187,15 @@ def list_tasks(
     )
 
 
-def _list_tasks(task_type_id=None, output_format="dict", **kwargs):
+def _list_tasks(task_type=None, output_format="dict", **kwargs):
     """
     Perform the api call to return a number of tasks having the given filters.
     Parameters
     ----------
-    Filter task_type_id is separated from the other filters because
-    it is used as task_type_id in the task description, but it is named
+    Filter task_type is separated from the other filters because
+    it is used as task_type in the task description, but it is named
     type when used as a filter in list tasks call.
-    task_type_id : TaskType, optional
+    task_type : TaskType, optional
         ID of the task type as detailed
         `here <https://www.openml.org/search?type=task_type>`_.
         - Supervised classification: 1
@@ -220,8 +220,8 @@ def _list_tasks(task_type_id=None, output_format="dict", **kwargs):
     dict or dataframe
     """
     api_call = "task/list"
-    if task_type_id is not None:
-        api_call += "/type/%d" % task_type_id.value
+    if task_type is not None:
+        api_call += "/type/%d" % task_type.value
     if kwargs is not None:
         for operator, value in kwargs.items():
             if operator == "task_id":
@@ -417,15 +417,15 @@ def _create_task_from_xml(xml):
             "oml:evaluation_measure"
         ]
 
-    task_type_id = TaskType(int(dic["oml:task_type_id"]))
+    task_type = TaskType(int(dic["oml:task_type_id"]))
     common_kwargs = {
         "task_id": dic["oml:task_id"],
         "task_type": dic["oml:task_type"],
-        "task_type_id": task_type_id,
+        "task_type_id": task_type,
         "data_set_id": inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
         "evaluation_measure": evaluation_measures,
     }
-    if task_type_id in (
+    if task_type in (
         TaskType.SUPERVISED_CLASSIFICATION,
         TaskType.SUPERVISED_REGRESSION,
         TaskType.LEARNING_CURVE,
@@ -452,14 +452,14 @@ def _create_task_from_xml(xml):
         TaskType.SUPERVISED_REGRESSION: OpenMLRegressionTask,
         TaskType.CLUSTERING: OpenMLClusteringTask,
         TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
-    }.get(task_type_id)
+    }.get(task_type)
     if cls is None:
         raise NotImplementedError("Task type %s not supported." % common_kwargs["task_type"])
     return cls(**common_kwargs)
 
 
 def create_task(
-    task_type_id: TaskType,
+    task_type: TaskType,
     dataset_id: int,
     estimation_procedure_id: int,
     target_name: Optional[str] = None,
@@ -480,7 +480,7 @@ def create_task(
 
     Parameters
     ----------
-    task_type_id : TaskType
+    task_type : TaskType
         Id of the task type.
     dataset_id : int
         The id of the dataset for the task.
@@ -505,13 +505,13 @@ def create_task(
         TaskType.SUPERVISED_REGRESSION: OpenMLRegressionTask,
         TaskType.CLUSTERING: OpenMLClusteringTask,
         TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
-    }.get(task_type_id)
+    }.get(task_type)
 
     if task_cls is None:
-        raise NotImplementedError("Task type {0:d} not supported.".format(task_type_id))
+        raise NotImplementedError("Task type {0:d} not supported.".format(task_type))
     else:
         return task_cls(
-            task_type_id=task_type_id,
+            task_type_id=task_type,
             task_type=None,
             data_set_id=dataset_id,
             target_name=target_name,

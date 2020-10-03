@@ -31,7 +31,7 @@ import pandas as pd
 #
 # We will start by simply listing only *supervised classification* tasks:
 
-tasks = openml.tasks.list_tasks(task_type_id=TaskType.SUPERVISED_CLASSIFICATION)
+tasks = openml.tasks.list_tasks(task_type=TaskType.SUPERVISED_CLASSIFICATION)
 
 ############################################################################
 # **openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, which we convert
@@ -47,7 +47,7 @@ print(tasks.head())
 # As conversion to a pandas dataframe is a common task, we have added this functionality to the
 # OpenML-Python library which can be used by passing ``output_format='dataframe'``:
 tasks_df = openml.tasks.list_tasks(
-    task_type_id=TaskType.SUPERVISED_CLASSIFICATION, output_format="dataframe"
+    task_type=TaskType.SUPERVISED_CLASSIFICATION, output_format="dataframe"
 )
 print(tasks_df.head())
 
@@ -158,7 +158,7 @@ print(tasks[0])
 #
 # Creating a task requires the following input:
 #
-# * task_type_id: The task type ID, required (see below). Required.
+# * task_type: The task type ID, required (see below). Required.
 # * dataset_id: The dataset ID. Required.
 # * target_name: The name of the attribute you aim to predict. Optional.
 # * estimation_procedure_id : The ID of the estimation procedure used to create train-test
@@ -190,7 +190,7 @@ openml.config.start_using_configuration_for_example()
 
 try:
     my_task = openml.tasks.create_task(
-        task_type_id=TaskType.SUPERVISED_CLASSIFICATION,
+        task_type=TaskType.SUPERVISED_CLASSIFICATION,
         dataset_id=128,
         target_name="class",
         evaluation_measure="predictive_accuracy",

@@ -15,7 +15,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
 
         super(OpenMLClusteringTaskTest, self).setUp()
         self.task_id = 146714
-        self.task_type_id = TaskType.CLUSTERING
+        self.task_type = TaskType.CLUSTERING
         self.estimation_procedure = 17
 
     def test_get_dataset(self):
@@ -39,7 +39,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
                 dataset_id = compatible_datasets[i % len(compatible_datasets)]
                 # Upload a clustering task without a ground truth.
                 task = openml.tasks.create_task(
-                    task_type_id=self.task_type_id,
+                    task_type=self.task_type,
                     dataset_id=dataset_id,
                     estimation_procedure_id=self.estimation_procedure,
                 )
@@ -60,5 +60,5 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
                     raise e
         else:
             raise ValueError(
-                "Could not create a valid task for task type ID {}".format(self.task_type_id)
+                "Could not create a valid task for task type ID {}".format(self.task_type)
             )

@@ -53,7 +53,7 @@ class TestTask(TestBase):
     def test_list_clustering_task(self):
         # as shown by #383, clustering tasks can give list/dict casting problems
         openml.config.server = self.production_server
-        openml.tasks.list_tasks(task_type_id=TaskType.CLUSTERING, size=10)
+        openml.tasks.list_tasks(task_type=TaskType.CLUSTERING, size=10)
         # the expected outcome is that it doesn't crash. No assertions.
 
     def _check_task(self, task):
@@ -68,7 +68,7 @@ class TestTask(TestBase):
     def test_list_tasks_by_type(self):
         num_curves_tasks = 200  # number is flexible, check server if fails
         ttid = TaskType.LEARNING_CURVE
-        tasks = openml.tasks.list_tasks(task_type_id=ttid)
+        tasks = openml.tasks.list_tasks(task_type=ttid)
         self.assertGreaterEqual(len(tasks), num_curves_tasks)
         for tid in tasks:
             self.assertEqual(ttid, tasks[tid]["ttid"])
@@ -76,7 +76,7 @@ class TestTask(TestBase):
 
     def test_list_tasks_output_format(self):
         ttid = TaskType.LEARNING_CURVE
-        tasks = openml.tasks.list_tasks(task_type_id=ttid, output_format="dataframe")
+        tasks = openml.tasks.list_tasks(task_type=ttid, output_format="dataframe")
         self.assertIsInstance(tasks, pd.DataFrame)
         self.assertGreater(len(tasks), 100)
 
@@ -119,7 +119,7 @@ class TestTask(TestBase):
         ]
         for j in task_types:
             for i in range(0, max, size):
-                tasks = openml.tasks.list_tasks(task_type_id=j, offset=i, size=size)
+                tasks = openml.tasks.list_tasks(task_type=j, offset=i, size=size)
                 self.assertGreaterEqual(size, len(tasks))
                 for tid in tasks:
                     self.assertEqual(j, tasks[tid]["ttid"])
