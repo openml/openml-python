@@ -68,7 +68,7 @@ Exercise 0
 
  .. code-block:: none
 
-    First 10 of 3201 datasets...
+    First 10 of 3205 datasets...
 
 
 .. raw:: html
@@ -746,7 +746,7 @@ openml.config.apikey = 'FILL_IN_OPENML_API_KEY'
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  9.553 seconds)
+   **Total running time of the script:** ( 0 minutes  9.678 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:
