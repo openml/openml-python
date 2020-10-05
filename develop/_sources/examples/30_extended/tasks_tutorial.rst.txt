@@ -21,6 +21,7 @@ A tutorial on how to list and download tasks.
     # License: BSD 3-Clause
 
     import openml
+    from openml.tasks import TaskType
     import pandas as pd
 
 
@@ -51,7 +52,7 @@ We will start by simply listing only *supervised classification* tasks:
 .. code-block:: default
 
 
-    tasks = openml.tasks.list_tasks(task_type_id=1)
+    tasks = openml.tasks.list_tasks(task_type=TaskType.SUPERVISED_CLASSIFICATION)
 
 
 
@@ -76,7 +77,9 @@ to have better visualization capabilities and easier access:
 
     # As conversion to a pandas dataframe is a common task, we have added this functionality to the
     # OpenML-Python library which can be used by passing ``output_format='dataframe'``:
-    tasks_df = openml.tasks.list_tasks(task_type_id=1, output_format="dataframe")
+    tasks_df = openml.tasks.list_tasks(
+        task_type=TaskType.SUPERVISED_CLASSIFICATION, output_format="dataframe"
+    )
     print(tasks_df.head())
 
 
@@ -98,20 +101,20 @@ to have better visualization capabilities and easier access:
            'NumberOfSymbolicFeatures', 'cost_matrix'],
           dtype='object')
     First 5 of 3450 tasks:
-       tid  ttid  ...  NumberOfSymbolicFeatures cost_matrix
-    2    2     1  ...                      33.0         NaN
-    3    3     1  ...                      37.0         NaN
-    4    4     1  ...                       9.0         NaN
-    5    5     1  ...                      74.0         NaN
-    6    6     1  ...                       1.0         NaN
+       tid  ... cost_matrix
+    2    2  ...         NaN
+    3    3  ...         NaN
+    4    4  ...         NaN
+    5    5  ...         NaN
+    6    6  ...         NaN
 
     [5 rows x 21 columns]
-       tid  ttid  ...  NumberOfSymbolicFeatures cost_matrix
-    2    2     1  ...                      33.0         NaN
-    3    3     1  ...                      37.0         NaN
-    4    4     1  ...                       9.0         NaN
-    5    5     1  ...                      74.0         NaN
-    6    6     1  ...                       1.0         NaN
+       tid  ... cost_matrix
+    2    2  ...         NaN
+    3    3  ...         NaN
+    4    4  ...         NaN
+    5    5  ...         NaN
+    6    6  ...         NaN
 
     [5 rows x 21 columns]
 
@@ -235,12 +238,12 @@ Similar to listing tasks by task type, we can list tasks by tags:
  .. code-block:: none
 
     First 5 of 91 tasks:
-        tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
-    3     3     1  ...                        0                       37
-    6     6     1  ...                       16                        1
-    11   11     1  ...                        4                        1
-    12   12     1  ...                      216                        1
-    14   14     1  ...                       76                        1
+        tid  ... NumberOfSymbolicFeatures
+    3     3  ...                       37
+    6     6  ...                        1
+    11   11  ...                        1
+    12   12  ...                        1
+    14   14  ...                        1
 
     [5 rows x 19 columns]
 
@@ -268,12 +271,12 @@ Furthermore, we can list tasks based on the dataset id:
  .. code-block:: none
 
     First 5 of 22 tasks:
-             tid  ttid   did  ... target_value evaluation_measures number_samples
-    9983    9983     1  1471  ...          NaN                 NaN            NaN
-    14951  14951     1  1471  ...          NaN                 NaN            NaN
-    56483  56483     8  1471  ...            1                 NaN            NaN
-    56484  56484     8  1471  ...            1                 NaN            NaN
-    56485  56485     8  1471  ...            1                 NaN            NaN
+             tid  ... number_samples
+    9983    9983  ...            NaN
+    14951  14951  ...            NaN
+    56483  56483  ...            NaN
+    56484  56484  ...            NaN
+    56485  56485  ...            NaN
 
     [5 rows x 23 columns]
 
@@ -299,17 +302,17 @@ In addition, a size limit and an offset can be applied both separately and simul
 
  .. code-block:: none
 
-        tid  ttid  ...  NumberOfSymbolicFeatures number_samples
-    59   59     1  ...                         1            NaN
-    60   60     1  ...                        16            NaN
-    62   62     3  ...                        33              9
-    63   63     3  ...                        37             12
-    64   64     3  ...                         9              1
-    65   65     3  ...                        74              7
-    66   66     3  ...                        70              5
-    67   67     3  ...                         0              6
-    68   68     3  ...                        11              5
-    69   69     3  ...                        16              4
+        tid  ... number_samples
+    59   59  ...            NaN
+    60   60  ...            NaN
+    62   62  ...              9
+    63   63  ...             12
+    64   64  ...              1
+    65   65  ...              7
+    66   66  ...              5
+    67   67  ...              6
+    68   68  ...              5
+    69   69  ...              4
 
     [10 rows x 21 columns]
 
@@ -417,7 +420,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>3509</th>
           <td>9983</td>
-          <td>1</td>
+          <td>TaskType.SUPERVISED_CLASSIFICATION</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Supervised Classification</td>
@@ -448,7 +451,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>4690</th>
           <td>14951</td>
-          <td>1</td>
+          <td>TaskType.SUPERVISED_CLASSIFICATION</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Supervised Classification</td>
@@ -479,7 +482,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>8030</th>
           <td>56483</td>
-          <td>8</td>
+          <td>TaskType.SUBGROUP_DISCOVERY</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Subgroup Discovery</td>
@@ -510,7 +513,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>8031</th>
           <td>56484</td>
-          <td>8</td>
+          <td>TaskType.SUBGROUP_DISCOVERY</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Subgroup Discovery</td>
@@ -541,7 +544,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>8032</th>
           <td>56485</td>
-          <td>8</td>
+          <td>TaskType.SUBGROUP_DISCOVERY</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Subgroup Discovery</td>
@@ -572,7 +575,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>8033</th>
           <td>56486</td>
-          <td>8</td>
+          <td>TaskType.SUBGROUP_DISCOVERY</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Subgroup Discovery</td>
@@ -603,7 +606,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>8034</th>
           <td>56487</td>
-          <td>8</td>
+          <td>TaskType.SUBGROUP_DISCOVERY</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Subgroup Discovery</td>
@@ -634,7 +637,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>8035</th>
           <td>56488</td>
-          <td>8</td>
+          <td>TaskType.SUBGROUP_DISCOVERY</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Subgroup Discovery</td>
@@ -665,7 +668,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>8036</th>
           <td>56489</td>
-          <td>8</td>
+          <td>TaskType.SUBGROUP_DISCOVERY</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Subgroup Discovery</td>
@@ -696,7 +699,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>8037</th>
           <td>56490</td>
-          <td>8</td>
+          <td>TaskType.SUBGROUP_DISCOVERY</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Subgroup Discovery</td>
@@ -727,7 +730,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>8579</th>
           <td>75219</td>
-          <td>1</td>
+          <td>TaskType.SUPERVISED_CLASSIFICATION</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Supervised Classification</td>
@@ -758,7 +761,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>8661</th>
           <td>125901</td>
-          <td>3</td>
+          <td>TaskType.LEARNING_CURVE</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Learning Curve</td>
@@ -789,7 +792,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>9858</th>
           <td>127251</td>
-          <td>5</td>
+          <td>TaskType.CLUSTERING</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Clustering</td>
@@ -820,7 +823,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>11910</th>
           <td>146761</td>
-          <td>5</td>
+          <td>TaskType.CLUSTERING</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Clustering</td>
@@ -851,7 +854,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>13191</th>
           <td>148117</td>
-          <td>5</td>
+          <td>TaskType.CLUSTERING</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Clustering</td>
@@ -882,7 +885,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>17285</th>
           <td>170139</td>
-          <td>5</td>
+          <td>TaskType.CLUSTERING</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Clustering</td>
@@ -913,7 +916,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>20718</th>
           <td>191646</td>
-          <td>5</td>
+          <td>TaskType.CLUSTERING</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Clustering</td>
@@ -944,7 +947,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>24384</th>
           <td>213320</td>
-          <td>5</td>
+          <td>TaskType.CLUSTERING</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Clustering</td>
@@ -975,7 +978,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>27577</th>
           <td>234435</td>
-          <td>5</td>
+          <td>TaskType.CLUSTERING</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Clustering</td>
@@ -1006,7 +1009,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>31881</th>
           <td>256739</td>
-          <td>5</td>
+          <td>TaskType.CLUSTERING</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Clustering</td>
@@ -1037,7 +1040,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>31891</th>
           <td>256750</td>
-          <td>5</td>
+          <td>TaskType.CLUSTERING</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Clustering</td>
@@ -1068,7 +1071,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
         <tr>
           <th>37042</th>
           <td>297708</td>
-          <td>5</td>
+          <td>TaskType.CLUSTERING</td>
           <td>1471</td>
           <td>eeg-eye-state</td>
           <td>Clustering</td>
@@ -1143,7 +1146,7 @@ Properties of the task are stored as member variables:
 
     OpenML Classification Task
     ==========================
-    Task Type Description: https://www.openml.org/tt/1
+    Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
     Task ID..............: 31
     Task URL.............: https://www.openml.org/t/31
     Estimation Procedure.: crossvalidation
@@ -1176,7 +1179,7 @@ And:
 
     OpenML Classification Task
     ==========================
-    Task Type Description: https://www.openml.org/tt/1
+    Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
     Task ID..............: 2
     Task URL.............: https://www.openml.org/t/2
     Estimation Procedure.: crossvalidation
@@ -1201,7 +1204,7 @@ You can also create new tasks. Take the following into account:
 
 Creating a task requires the following input:
 
-* task_type_id: The task type ID, required (see below). Required.
+* task_type: The task type ID, required (see below). Required.
 * dataset_id: The dataset ID. Required.
 * target_name: The name of the attribute you aim to predict. Optional.
 * estimation_procedure_id : The ID of the estimation procedure used to create train-test
@@ -1234,9 +1237,8 @@ will be returned.
     openml.config.start_using_configuration_for_example()
 
     try:
-        tasktypes = openml.tasks.TaskTypeEnum
         my_task = openml.tasks.create_task(
-            task_type_id=tasktypes.SUPERVISED_CLASSIFICATION,
+            task_type=TaskType.SUPERVISED_CLASSIFICATION,
             dataset_id=128,
             target_name="class",
             evaluation_measure="predictive_accuracy",
@@ -1283,7 +1285,7 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  41.367 seconds)
+   **Total running time of the script:** ( 0 minutes  42.969 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:

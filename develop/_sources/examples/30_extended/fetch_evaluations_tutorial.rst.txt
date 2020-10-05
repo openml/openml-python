@@ -111,7 +111,7 @@ Over here we shall briefly take a look at the details of the task.
 
     OpenML Classification Task
     ==========================
-    Task Type Description: https://www.openml.org/tt/1
+    Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
     Task ID..............: 167140
     Task URL.............: https://www.openml.org/t/167140
     Estimation Procedure.: crossvalidation
@@ -375,7 +375,7 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  13.321 seconds)
+   **Total running time of the script:** ( 0 minutes  13.405 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_fetch_evaluations_tutorial.py:

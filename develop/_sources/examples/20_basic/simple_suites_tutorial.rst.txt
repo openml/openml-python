@@ -138,7 +138,7 @@ and iterated over for benchmarking. For speed reasons we only iterate over the f
 
     OpenML Classification Task
     ==========================
-    Task Type Description: https://www.openml.org/tt/1
+    Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
     Task ID..............: 3
     Task URL.............: https://www.openml.org/t/3
     Estimation Procedure.: crossvalidation
@@ -147,7 +147,7 @@ and iterated over for benchmarking. For speed reasons we only iterate over the f
     Cost Matrix..........: Available
     OpenML Classification Task
     ==========================
-    Task Type Description: https://www.openml.org/tt/1
+    Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
     Task ID..............: 6
     Task URL.............: https://www.openml.org/t/6
     Estimation Procedure.: crossvalidation
@@ -156,7 +156,7 @@ and iterated over for benchmarking. For speed reasons we only iterate over the f
     Cost Matrix..........: Available
     OpenML Classification Task
     ==========================
-    Task Type Description: https://www.openml.org/tt/1
+    Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
     Task ID..............: 11
     Task URL.............: https://www.openml.org/t/11
     Estimation Procedure.: crossvalidation
@@ -178,7 +178,7 @@ Further examples
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  9.040 seconds)
+   **Total running time of the script:** ( 0 minutes  8.970 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_suites_tutorial.py:

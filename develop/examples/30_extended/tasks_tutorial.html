@@ -133,6 +133,7 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
 
 <span class="kn">import</span> <span class="nn">openml</span>
+<span class="kn">from</span> <span class="nn">openml.tasks</span> <span class="kn">import</span> <span class="n">TaskType</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 </pre></div>
 </div>
@@ -151,7 +152,7 @@ splits in a useful manner.</p></li>
 <div class="section" id="listing-tasks">
 <h2>Listing tasks<a class="headerlink" href="#listing-tasks" title="Permalink to this headline">¶</a></h2>
 <p>We will start by simply listing only <em>supervised classification</em> tasks:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">task_type_id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>openml.tasks.list_tasks()</strong> returns a dictionary of dictionaries by default, which we convert
@@ -165,7 +166,9 @@ to have better visualization capabilities and easier access:</p>
 
 <span class="c1"># As conversion to a pandas dataframe is a common task, we have added this functionality to the</span>
 <span class="c1"># OpenML-Python library which can be used by passing ``output_format=&#39;dataframe&#39;``:</span>
-<span class="n">tasks_df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">task_type_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
+<span class="n">tasks_df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span>
+    <span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks_df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -179,20 +182,20 @@ to have better visualization capabilities and easier access:</p>
        &#39;NumberOfSymbolicFeatures&#39;, &#39;cost_matrix&#39;],
       dtype=&#39;object&#39;)
 First 5 of 3450 tasks:
-   tid  ttid  ...  NumberOfSymbolicFeatures cost_matrix
-2    2     1  ...                      33.0         NaN
-3    3     1  ...                      37.0         NaN
-4    4     1  ...                       9.0         NaN
-5    5     1  ...                      74.0         NaN
-6    6     1  ...                       1.0         NaN
+   tid  ... cost_matrix
+2    2  ...         NaN
+3    3  ...         NaN
+4    4  ...         NaN
+5    5  ...         NaN
+6    6  ...         NaN
 
 [5 rows x 21 columns]
-   tid  ttid  ...  NumberOfSymbolicFeatures cost_matrix
-2    2     1  ...                      33.0         NaN
-3    3     1  ...                      37.0         NaN
-4    4     1  ...                       9.0         NaN
-5    5     1  ...                      74.0         NaN
-6    6     1  ...                       1.0         NaN
+   tid  ... cost_matrix
+2    2  ...         NaN
+3    3  ...         NaN
+4    4  ...         NaN
+5    5  ...         NaN
+6    6  ...         NaN
 
 [5 rows x 21 columns]
 </pre></div>
@@ -242,12 +245,12 @@ First 5 of 3450 tasks:
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 5 of 91 tasks:
-    tid  ttid  ...  NumberOfNumericFeatures NumberOfSymbolicFeatures
-3     3     1  ...                        0                       37
-6     6     1  ...                       16                        1
-11   11     1  ...                        4                        1
-12   12     1  ...                      216                        1
-14   14     1  ...                       76                        1
+    tid  ... NumberOfSymbolicFeatures
+3     3  ...                       37
+6     6  ...                        1
+11   11  ...                        1
+12   12  ...                        1
+14   14  ...                        1
 
 [5 rows x 19 columns]
 </pre></div>
@@ -260,12 +263,12 @@ First 5 of 3450 tasks:
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 5 of 22 tasks:
-         tid  ttid   did  ... target_value evaluation_measures number_samples
-9983    9983     1  1471  ...          NaN                 NaN            NaN
-14951  14951     1  1471  ...          NaN                 NaN            NaN
-56483  56483     8  1471  ...            1                 NaN            NaN
-56484  56484     8  1471  ...            1                 NaN            NaN
-56485  56485     8  1471  ...            1                 NaN            NaN
+         tid  ... number_samples
+9983    9983  ...            NaN
+14951  14951  ...            NaN
+56483  56483  ...            NaN
+56484  56484  ...            NaN
+56485  56485  ...            NaN
 
 [5 rows x 23 columns]
 </pre></div>
@@ -276,17 +279,17 @@ First 5 of 3450 tasks:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>    tid  ttid  ...  NumberOfSymbolicFeatures number_samples
-59   59     1  ...                         1            NaN
-60   60     1  ...                        16            NaN
-62   62     3  ...                        33              9
-63   63     3  ...                        37             12
-64   64     3  ...                         9              1
-65   65     3  ...                        74              7
-66   66     3  ...                        70              5
-67   67     3  ...                         0              6
-68   68     3  ...                        11              5
-69   69     3  ...                        16              4
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>    tid  ... number_samples
+59   59  ...            NaN
+60   60  ...            NaN
+62   62  ...              9
+63   63  ...             12
+64   64  ...              1
+65   65  ...              7
+66   66  ...              5
+67   67  ...              6
+68   68  ...              5
+69   69  ...              4
 
 [10 rows x 21 columns]
 </pre></div>
@@ -365,7 +368,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>3509</th>
       <td>9983</td>
-      <td>1</td>
+      <td>TaskType.SUPERVISED_CLASSIFICATION</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Supervised Classification</td>
@@ -396,7 +399,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>4690</th>
       <td>14951</td>
-      <td>1</td>
+      <td>TaskType.SUPERVISED_CLASSIFICATION</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Supervised Classification</td>
@@ -427,7 +430,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>8030</th>
       <td>56483</td>
-      <td>8</td>
+      <td>TaskType.SUBGROUP_DISCOVERY</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Subgroup Discovery</td>
@@ -458,7 +461,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>8031</th>
       <td>56484</td>
-      <td>8</td>
+      <td>TaskType.SUBGROUP_DISCOVERY</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Subgroup Discovery</td>
@@ -489,7 +492,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>8032</th>
       <td>56485</td>
-      <td>8</td>
+      <td>TaskType.SUBGROUP_DISCOVERY</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Subgroup Discovery</td>
@@ -520,7 +523,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>8033</th>
       <td>56486</td>
-      <td>8</td>
+      <td>TaskType.SUBGROUP_DISCOVERY</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Subgroup Discovery</td>
@@ -551,7 +554,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>8034</th>
       <td>56487</td>
-      <td>8</td>
+      <td>TaskType.SUBGROUP_DISCOVERY</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Subgroup Discovery</td>
@@ -582,7 +585,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>8035</th>
       <td>56488</td>
-      <td>8</td>
+      <td>TaskType.SUBGROUP_DISCOVERY</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Subgroup Discovery</td>
@@ -613,7 +616,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>8036</th>
       <td>56489</td>
-      <td>8</td>
+      <td>TaskType.SUBGROUP_DISCOVERY</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Subgroup Discovery</td>
@@ -644,7 +647,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>8037</th>
       <td>56490</td>
-      <td>8</td>
+      <td>TaskType.SUBGROUP_DISCOVERY</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Subgroup Discovery</td>
@@ -675,7 +678,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>8579</th>
       <td>75219</td>
-      <td>1</td>
+      <td>TaskType.SUPERVISED_CLASSIFICATION</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Supervised Classification</td>
@@ -706,7 +709,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>8661</th>
       <td>125901</td>
-      <td>3</td>
+      <td>TaskType.LEARNING_CURVE</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Learning Curve</td>
@@ -737,7 +740,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>9858</th>
       <td>127251</td>
-      <td>5</td>
+      <td>TaskType.CLUSTERING</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Clustering</td>
@@ -768,7 +771,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>11910</th>
       <td>146761</td>
-      <td>5</td>
+      <td>TaskType.CLUSTERING</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Clustering</td>
@@ -799,7 +802,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>13191</th>
       <td>148117</td>
-      <td>5</td>
+      <td>TaskType.CLUSTERING</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Clustering</td>
@@ -830,7 +833,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>17285</th>
       <td>170139</td>
-      <td>5</td>
+      <td>TaskType.CLUSTERING</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Clustering</td>
@@ -861,7 +864,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>20718</th>
       <td>191646</td>
-      <td>5</td>
+      <td>TaskType.CLUSTERING</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Clustering</td>
@@ -892,7 +895,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>24384</th>
       <td>213320</td>
-      <td>5</td>
+      <td>TaskType.CLUSTERING</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Clustering</td>
@@ -923,7 +926,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>27577</th>
       <td>234435</td>
-      <td>5</td>
+      <td>TaskType.CLUSTERING</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Clustering</td>
@@ -954,7 +957,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>31881</th>
       <td>256739</td>
-      <td>5</td>
+      <td>TaskType.CLUSTERING</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Clustering</td>
@@ -985,7 +988,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>31891</th>
       <td>256750</td>
-      <td>5</td>
+      <td>TaskType.CLUSTERING</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Clustering</td>
@@ -1016,7 +1019,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
     <tr>
       <th>37042</th>
       <td>297708</td>
-      <td>5</td>
+      <td>TaskType.CLUSTERING</td>
       <td>1471</td>
       <td>eeg-eye-state</td>
       <td>Clustering</td>
@@ -1066,7 +1069,7 @@ all of these tasks:</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Classification Task
 ==========================
-Task Type Description: https://www.openml.org/tt/1
+Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
 Task ID..............: 31
 Task URL.............: https://www.openml.org/t/31
 Estimation Procedure.: crossvalidation
@@ -1084,7 +1087,7 @@ Cost Matrix..........: Available
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Classification Task
 ==========================
-Task Type Description: https://www.openml.org/tt/1
+Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
 Task ID..............: 2
 Task URL.............: https://www.openml.org/t/2
 Estimation Procedure.: crossvalidation
@@ -1107,7 +1110,7 @@ clustering, and learning curve analysis.</p></li>
 </ul>
 <p>Creating a task requires the following input:</p>
 <ul class="simple">
-<li><p>task_type_id: The task type ID, required (see below). Required.</p></li>
+<li><p>task_type: The task type ID, required (see below). Required.</p></li>
 <li><p>dataset_id: The dataset ID. Required.</p></li>
 <li><p>target_name: The name of the attribute you aim to predict. Optional.</p></li>
 <li><p>estimation_procedure_id : The ID of the estimation procedure used to create train-test
@@ -1132,9 +1135,8 @@ will be returned.</p>
 <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">tasktypes</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">TaskTypeEnum</span>
     <span class="n">my_task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
-        <span class="n">task_type_id</span><span class="o">=</span><span class="n">tasktypes</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span>
+        <span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span>
         <span class="n">dataset_id</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
         <span class="n">target_name</span><span class="o">=</span><span class="s2">&quot;class&quot;</span><span class="p">,</span>
         <span class="n">evaluation_measure</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">,</span>
@@ -1167,7 +1169,7 @@ will be returned.</p>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&amp;type=measure">Complete list of model estimation procedures</a>.</p></li>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=measure_type%3Aevaluation_measure&amp;type=measure">Complete list of evaluation measures</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  41.367 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  42.969 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-tasks-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e6648ddbb54e75b09dd01d69be33f340/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></p>

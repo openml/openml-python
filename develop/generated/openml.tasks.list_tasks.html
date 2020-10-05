@@ -116,15 +116,15 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>.list_tasks<a class="headerlink" href="#openml-tasks-list-tasks" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="openml.tasks.list_tasks">
-<code class="sig-prename descclassname">openml.tasks.</code><code class="sig-name descname">list_tasks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_type_id</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">offset</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tag</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'dict'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>Dict<span class="p">, </span>pandas.core.frame.DataFrame<span class="p">]</span><a class="headerlink" href="#openml.tasks.list_tasks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a number of tasks having the given tag and task_type_id</p>
+<code class="sig-prename descclassname">openml.tasks.</code><code class="sig-name descname">list_tasks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_type</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>openml.tasks.task.TaskType<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">offset</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tag</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'dict'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>Dict<span class="p">, </span>pandas.core.frame.DataFrame<span class="p">]</span><a class="headerlink" href="#openml.tasks.list_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a number of tasks having the given tag and task_type</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>Filter task_type_id is separated from the other filters because</strong></dt><dd></dd>
-<dt><strong>it is used as task_type_id in the task description, but it is named</strong></dt><dd></dd>
+<dt><strong>Filter task_type is separated from the other filters because</strong></dt><dd></dd>
+<dt><strong>it is used as task_type in the task description, but it is named</strong></dt><dd></dd>
 <dt><strong>type when used as a filter in list tasks call.</strong></dt><dd></dd>
-<dt><strong>task_type_id</strong><span class="classifier">int, optional</span></dt><dd><p>ID of the task type as detailed <a class="reference external" href="https://www.openml.org/search?type=task_type">here</a>.
+<dt><strong>task_type</strong><span class="classifier">TaskType, optional</span></dt><dd><p>ID of the task type as detailed <a class="reference external" href="https://www.openml.org/search?type=task_type">here</a>.
 - Supervised classification: 1
 - Supervised regression: 2
 - Learning curve: 3
@@ -152,12 +152,12 @@ number_classes, number_missing_values.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>dict</dt><dd><p>All tasks having the given task_type_id and the give tag. Every task is
+<dt>dict</dt><dd><p>All tasks having the given task_type and the give tag. Every task is
 represented by a dictionary containing the following information:
 task id, dataset id, task_type and status. If qualities are calculated
 for the associated dataset, some of these are also returned.</p>
 </dd>
-<dt>dataframe</dt><dd><p>All tasks having the given task_type_id and the give tag. Every task is
+<dt>dataframe</dt><dd><p>All tasks having the given task_type and the give tag. Every task is
 represented by a row in the data frame containing the following information
 as columns: task id, dataset id, task_type and status. If qualities are
 calculated for the associated dataset, some of these are also returned.</p>
