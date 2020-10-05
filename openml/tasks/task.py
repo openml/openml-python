@@ -2,6 +2,7 @@
 
 from abc import ABC
 from collections import OrderedDict
+from enum import Enum
 import io
 import os
 from typing import Union, Tuple, Dict, List, Optional, Any
@@ -18,12 +19,24 @@ from .split import OpenMLSplit
 from ..utils import _create_cache_directory_for_id
 
 
+class TaskType(Enum):
+    SUPERVISED_CLASSIFICATION = 1
+    SUPERVISED_REGRESSION = 2
+    LEARNING_CURVE = 3
+    SUPERVISED_DATASTREAM_CLASSIFICATION = 4
+    CLUSTERING = 5
+    MACHINE_LEARNING_CHALLENGE = 6
+    SURVIVAL_ANALYSIS = 7
+    SUBGROUP_DISCOVERY = 8
+    MULTITASK_REGRESSION = 9
+
+
 class OpenMLTask(OpenMLBase):
     """OpenML Task object.
 
        Parameters
        ----------
-       task_type_id : int
+       task_type_id : TaskType
            Refers to the type of task.
        task_type : str
            Refers to the task.
@@ -36,7 +49,7 @@ class OpenMLTask(OpenMLBase):
     def __init__(
         self,
         task_id: Optional[int],
-        task_type_id: int,
+        task_type_id: TaskType,
         task_type: str,
         data_set_id: int,
         estimation_procedure_id: int = 1,
@@ -47,7 +60,7 @@ class OpenMLTask(OpenMLBase):
     ):
 
         self.task_id = int(task_id) if task_id is not None else None
-        self.task_type_id = int(task_type_id)
+        self.task_type_id = task_type_id
         self.task_type = task_type
         self.dataset_id = int(data_set_id)
         self.evaluation_measure = evaluation_measure
@@ -155,10 +168,10 @@ class OpenMLTask(OpenMLBase):
         task_container = OrderedDict()  # type: OrderedDict[str, OrderedDict]
         task_dict = OrderedDict(
             [("@xmlns:oml", "http://openml.org/openml")]
-        )  # type: OrderedDict[str, Union[List, str, int]]
+        )  # type: OrderedDict[str, Union[List, str, TaskType]]
 
         task_container["oml:task_inputs"] = task_dict
-        task_dict["oml:task_type_id"] = self.task_type_id
+        task_dict["oml:task_type_id"] = self.task_type_id.value
 
         # having task_inputs and adding a type annotation
         # solves wrong warnings
@@ -196,7 +209,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
     def __init__(
         self,
-        task_type_id: int,
+        task_type_id: TaskType,
         task_type: str,
         data_set_id: int,
         target_name: str,
@@ -240,7 +253,11 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
         """
         dataset = self.get_dataset()
-        if self.task_type_id not in (1, 2, 3):
+        if self.task_type_id not in (
+            TaskType.SUPERVISED_CLASSIFICATION,
+            TaskType.SUPERVISED_REGRESSION,
+            TaskType.LEARNING_CURVE,
+        ):
             raise NotImplementedError(self.task_type)
         X, y, _, _ = dataset.get_data(dataset_format=dataset_format, target=self.target_name,)
         return X, y
@@ -286,7 +303,7 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
 
     def __init__(
         self,
-        task_type_id: int,
+        task_type_id: TaskType,
         task_type: str,
         data_set_id: int,
         target_name: str,
@@ -327,7 +344,7 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
 
     def __init__(
         self,
-        task_type_id: int,
+        task_type_id: TaskType,
         task_type: str,
         data_set_id: int,
         target_name: str,
@@ -366,7 +383,7 @@ class OpenMLClusteringTask(OpenMLTask):
 
     def __init__(
         self,
-        task_type_id: int,
+        task_type_id: TaskType,
         task_type: str,
         data_set_id: int,
         estimation_procedure_id: int = 17,
@@ -440,7 +457,7 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
 
     def __init__(
         self,
-        task_type_id: int,
+        task_type_id: TaskType,
         task_type: str,
         data_set_id: int,
         target_name: str,
@@ -467,14 +484,3 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
             class_labels=class_labels,
             cost_matrix=cost_matrix,
         )
-
-
-class TaskTypeEnum(object):
-    SUPERVISED_CLASSIFICATION = 1
-    SUPERVISED_REGRESSION = 2
-    LEARNING_CURVE = 3
-    SUPERVISED_DATASTREAM_CLASSIFICATION = 4
-    CLUSTERING = 5
-    MACHINE_LEARNING_CHALLENGE = 6
-    SURVIVAL_ANALYSIS = 7
-    SUBGROUP_DISCOVERY = 8

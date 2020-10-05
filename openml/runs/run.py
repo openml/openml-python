@@ -16,7 +16,7 @@ from ..exceptions import PyOpenMLError
 from ..flows import get_flow
 from ..tasks import (
     get_task,
-    TaskTypeEnum,
+    TaskType,
     OpenMLClassificationTask,
     OpenMLLearningCurveTask,
     OpenMLClusteringTask,
@@ -401,17 +401,13 @@ class OpenMLRun(OpenMLBase):
 
         attribute_names = [att[0] for att in predictions_arff["attributes"]]
         if (
-            task.task_type_id
-            in [TaskTypeEnum.SUPERVISED_CLASSIFICATION, TaskTypeEnum.LEARNING_CURVE]
+            task.task_type_id in [TaskType.SUPERVISED_CLASSIFICATION, TaskType.LEARNING_CURVE]
             and "correct" not in attribute_names
         ):
             raise ValueError('Attribute "correct" should be set for ' "classification task runs")
-        if (
-            task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION
-            and "truth" not in attribute_names
-        ):
+        if task.task_type_id == TaskType.SUPERVISED_REGRESSION and "truth" not in attribute_names:
             raise ValueError('Attribute "truth" should be set for ' "regression task runs")
-        if task.task_type_id != TaskTypeEnum.CLUSTERING and "prediction" not in attribute_names:
+        if task.task_type_id != TaskType.CLUSTERING and "prediction" not in attribute_names:
             raise ValueError('Attribute "predict" should be set for ' "supervised task runs")
 
         def _attribute_list_to_dict(attribute_list):
@@ -431,11 +427,11 @@ class OpenMLRun(OpenMLBase):
         predicted_idx = attribute_dict["prediction"]  # Assume supervised task
 
         if (
-            task.task_type_id == TaskTypeEnum.SUPERVISED_CLASSIFICATION
-            or task.task_type_id == TaskTypeEnum.LEARNING_CURVE
+            task.task_type_id == TaskType.SUPERVISED_CLASSIFICATION
+            or task.task_type_id == TaskType.LEARNING_CURVE
         ):
             correct_idx = attribute_dict["correct"]
-        elif task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION:
+        elif task.task_type_id == TaskType.SUPERVISED_REGRESSION:
             correct_idx = attribute_dict["truth"]
         has_samples = False
         if "sample" in attribute_dict:
@@ -465,14 +461,14 @@ class OpenMLRun(OpenMLBase):
                 samp = 0  # No learning curve sample, always 0
 
             if task.task_type_id in [
-                TaskTypeEnum.SUPERVISED_CLASSIFICATION,
-                TaskTypeEnum.LEARNING_CURVE,
+                TaskType.SUPERVISED_CLASSIFICATION,
+                TaskType.LEARNING_CURVE,
             ]:
                 prediction = predictions_arff["attributes"][predicted_idx][1].index(
                     line[predicted_idx]
                 )
                 correct = predictions_arff["attributes"][predicted_idx][1].index(line[correct_idx])
-            elif task.task_type_id == TaskTypeEnum.SUPERVISED_REGRESSION:
+            elif task.task_type_id == TaskType.SUPERVISED_REGRESSION:
                 prediction = line[predicted_idx]
                 correct = line[correct_idx]
             if rep not in values_predict:
