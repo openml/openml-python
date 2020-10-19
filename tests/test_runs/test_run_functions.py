@@ -24,7 +24,7 @@ import openml.extensions.sklearn
 from openml.testing import TestBase, SimpleImputer, CustomImputer, cat, cont
 from openml.runs.functions import _run_task_get_arffcontent, run_exists, format_prediction
 from openml.runs.trace import OpenMLRunTrace
-from openml.tasks import TaskTypeEnum
+from openml.tasks import TaskType
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
@@ -395,7 +395,7 @@ class TestRun(TestBase):
         seed=1,
         metric=sklearn.metrics.accuracy_score,
         metric_name="predictive_accuracy",
-        task_type=TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+        task_type=TaskType.SUPERVISED_CLASSIFICATION,
         sentinel=None,
     ):
         def determine_grid_size(param_grid):
@@ -480,7 +480,7 @@ class TestRun(TestBase):
         num_iterations = 5  # for base search algorithms
         metric = sklearn.metrics.accuracy_score  # metric class
         metric_name = "predictive_accuracy"  # openml metric name
-        task_type = TaskTypeEnum.SUPERVISED_CLASSIFICATION  # task type
+        task_type = TaskType.SUPERVISED_CLASSIFICATION  # task type
 
         return self._run_and_upload(
             clf=clf,
@@ -503,7 +503,7 @@ class TestRun(TestBase):
         num_iterations = 5  # for base search algorithms
         metric = sklearn.metrics.mean_absolute_error  # metric class
         metric_name = "mean_absolute_error"  # openml metric name
-        task_type = TaskTypeEnum.SUPERVISED_REGRESSION  # task type
+        task_type = TaskType.SUPERVISED_REGRESSION  # task type
 
         return self._run_and_upload(
             clf=clf,
@@ -557,7 +557,6 @@ class TestRun(TestBase):
         def get_ct_cf(nominal_indices, numeric_indices):
             inner = sklearn.compose.ColumnTransformer(
                 transformers=[
-                    ("numeric", sklearn.preprocessing.StandardScaler(), nominal_indices),
                     (
                         "numeric",
                         make_pipeline(
@@ -578,7 +577,6 @@ class TestRun(TestBase):
             )
             return sklearn.pipeline.Pipeline(
                 steps=[
-                    ("imputer", sklearn.impute.SimpleImputer(strategy="constant", fill_value=-1)),
                     ("transformer", inner),
                     ("classifier", sklearn.tree.DecisionTreeClassifier()),
                 ]
@@ -1175,7 +1173,7 @@ class TestRun(TestBase):
         # trace. SGD does not produce any
         self.assertIsInstance(trace, type(None))
 
-        task_type = TaskTypeEnum.SUPERVISED_CLASSIFICATION
+        task_type = TaskType.SUPERVISED_CLASSIFICATION
         self._check_fold_timing_evaluations(
             fold_evaluations, num_repeats, num_folds, task_type=task_type
         )

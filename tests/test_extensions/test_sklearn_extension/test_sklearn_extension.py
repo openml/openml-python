@@ -538,8 +538,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture = (
             "sklearn.compose._column_transformer.ColumnTransformer("
             "numeric=sklearn.preprocessing.{}.StandardScaler,"
-            "nominal=sklearn.preprocessing._encoders.OneHotEncoder,"
-            "drop=drop)".format(scaler_name)
+            "nominal=sklearn.preprocessing._encoders.OneHotEncoder,drop=drop)".format(scaler_name)
         )
         fixture_short_name = "sklearn.ColumnTransformer"
 
@@ -565,13 +564,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             "drop": ["drop"],
         }
 
-        serialization, new_model = self._serialization_test_helper(
-            model,
-            X=None,
-            y=None,
-            subcomponent_parameters=["transformers", "numeric", "nominal"],
-            dependencies_mock_call_count=(4, 8),
-        )
+        serialization = self.extension.model_to_flow(model)
         structure = serialization.get_structure("name")
         self.assertEqual(serialization.name, fixture)
         self.assertEqual(serialization.custom_name, fixture_short_name)

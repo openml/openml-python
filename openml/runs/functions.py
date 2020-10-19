@@ -32,7 +32,7 @@ from ..tasks import (
 )
 from .run import OpenMLRun
 from .trace import OpenMLRunTrace
-from ..tasks import TaskTypeEnum, get_task
+from ..tasks import TaskType, get_task
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
@@ -284,7 +284,7 @@ def run_flow_on_task(
         run.parameter_settings = flow.extension.obtain_parameter_values(flow)
 
     # now we need to attach the detailed evaluations
-    if task.task_type_id == TaskTypeEnum.LEARNING_CURVE:
+    if task.task_type_id == TaskType.LEARNING_CURVE:
         run.sample_evaluations = sample_evaluations
     else:
         run.fold_evaluations = fold_evaluations
@@ -502,15 +502,26 @@ def _run_task_get_arffcontent(
             for i, tst_idx in enumerate(test_indices):
 
                 if task.class_labels is not None:
+
+                    prediction = task.class_labels[pred_y[i]] \
+                        if isinstance(pred_y[i], int) else pred_y[i]
+                    if isinstance(test_y, pd.Series):
+                        test_prediction = task.class_labels[test_y.iloc[i]] \
+                            if isinstance(test_y.iloc[i], int) else test_y.iloc[i]
+                    else:
+                        test_prediction = task.class_labels[test_y[i]] \
+                            if isinstance(test_y[i], int) else test_y[i]
+                    pred_prob = proba_y.iloc[i] if isinstance(proba_y, pd.DataFrame) else proba_y[i]
+
                     arff_line = format_prediction(
                         task=task,
                         repeat=rep_no,
                         fold=fold_no,
                         sample=sample_no,
                         index=tst_idx,
-                        prediction=task.class_labels[pred_y[i]],
-                        truth=task.class_labels[test_y[i]],
-                        proba=dict(zip(task.class_labels, proba_y[i])),
+                        prediction=prediction,
+                        truth=test_prediction,
+                        proba=dict(zip(task.class_labels, pred_prob)),
                     )
                 else:
                     raise ValueError("The task has no class labels")
@@ -523,15 +534,16 @@ def _run_task_get_arffcontent(
                 )
 
         elif isinstance(task, OpenMLRegressionTask):
-
+            
             for i in range(0, len(test_indices)):
+                test_prediction = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
                 arff_line = format_prediction(
                     task=task,
                     repeat=rep_no,
                     fold=fold_no,
                     index=test_indices[i],
                     prediction=pred_y[i],
-                    truth=test_y[i],
+                    truth=test_prediction,
                 )
 
                 arff_datacontent.append(arff_line)
@@ -792,7 +804,7 @@ def _create_run_from_xml(xml, from_server=True):
 
     if "predictions" not in files and from_server is True:
         task = openml.tasks.get_task(task_id)
-        if task.task_type_id == TaskTypeEnum.SUBGROUP_DISCOVERY:
+        if task.task_type_id == TaskType.SUBGROUP_DISCOVERY:
             raise NotImplementedError("Subgroup discovery tasks are not yet supported.")
         else:
             # JvR: actually, I am not sure whether this error should be raised.
@@ -1028,7 +1040,7 @@ def __list_runs(api_call, output_format="dict"):
             "setup_id": int(run_["oml:setup_id"]),
             "flow_id": int(run_["oml:flow_id"]),
             "uploader": int(run_["oml:uploader"]),
-            "task_type": int(run_["oml:task_type_id"]),
+            "task_type": TaskType(int(run_["oml:task_type_id"])),
             "upload_time": str(run_["oml:upload_time"]),
             "error_message": str((run_["oml:error_message"]) or ""),
         }

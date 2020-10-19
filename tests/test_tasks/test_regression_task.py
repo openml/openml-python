@@ -2,6 +2,7 @@
 
 import numpy as np
 
+from openml.tasks import TaskType
 from .test_supervised_task import OpenMLSupervisedTaskTest
 
 
@@ -13,7 +14,7 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
 
         super(OpenMLRegressionTaskTest, self).setUp()
         self.task_id = 625
-        self.task_type_id = 2
+        self.task_type = TaskType.SUPERVISED_REGRESSION
         self.estimation_procedure = 7
 
     def test_get_X_and_Y(self):
@@ -29,5 +30,5 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
 
         task = super(OpenMLRegressionTaskTest, self).test_download_task()
         self.assertEqual(task.task_id, self.task_id)
-        self.assertEqual(task.task_type_id, 2)
+        self.assertEqual(task.task_type_id, TaskType.SUPERVISED_REGRESSION)
         self.assertEqual(task.dataset_id, 105)

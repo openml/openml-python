@@ -17,7 +17,7 @@ with warnings.catch_warnings():
     from oslo_concurrency import lockutils
 
 import openml
-from openml.tasks import TaskTypeEnum
+from openml.tasks import TaskType
 
 import logging
 
@@ -199,7 +199,7 @@ class TestBase(unittest.TestCase):
         num_repeats: int,
         num_folds: int,
         max_time_allowed: float = 60000.0,
-        task_type: int = TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+        task_type: TaskType = TaskType.SUPERVISED_CLASSIFICATION,
         check_scores: bool = True,
     ):
         """
@@ -225,9 +225,9 @@ class TestBase(unittest.TestCase):
         }
 
         if check_scores:
-            if task_type in (TaskTypeEnum.SUPERVISED_CLASSIFICATION, TaskTypeEnum.LEARNING_CURVE):
+            if task_type in (TaskType.SUPERVISED_CLASSIFICATION, TaskType.LEARNING_CURVE):
                 check_measures["predictive_accuracy"] = (0, 1.0)
-            elif task_type == TaskTypeEnum.SUPERVISED_REGRESSION:
+            elif task_type == TaskType.SUPERVISED_REGRESSION:
                 check_measures["mean_absolute_error"] = (0, float("inf"))
 
         self.assertIsInstance(fold_evaluations, dict)

@@ -58,7 +58,7 @@ dataset_ids = [
 # deactivated, which also deactivated the tasks on them. More information on active or inactive
 # datasets can be found in the `online docs <https://docs.openml.org/#dataset-status>`_.
 tasks = openml.tasks.list_tasks(
-    task_type_id=openml.tasks.TaskTypeEnum.SUPERVISED_CLASSIFICATION,
+    task_type=openml.tasks.TaskType.SUPERVISED_CLASSIFICATION,
     status="all",
     output_format="dataframe",
 )
