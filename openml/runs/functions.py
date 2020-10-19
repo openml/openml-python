@@ -52,6 +52,7 @@ def run_model_on_task(
     add_local_measures: bool = True,
     upload_flow: bool = False,
     return_flow: bool = False,
+    dataset_format: str = "dataframe",
 ) -> Union[OpenMLRun, Tuple[OpenMLRun, OpenMLFlow]]:
     """Run the model on the dataset defined by the task.
 
@@ -79,6 +80,9 @@ def run_model_on_task(
         If False, do not upload the flow to OpenML.
     return_flow : bool (default=False)
         If True, returns the OpenMLFlow generated from the model in addition to the OpenMLRun.
+    dataset_format : str (default='dataframe')
+        If 'array', the dataset is passed to the model as a numpy array.
+        If 'dataframe', the dataset is passed to the model as a pandas dataframe.
 
     Returns
     -------
@@ -125,6 +129,7 @@ def run_model_on_task(
         seed=seed,
         add_local_measures=add_local_measures,
         upload_flow=upload_flow,
+        dataset_format=dataset_format,
     )
     if return_flow:
         return run, flow
@@ -139,6 +144,7 @@ def run_flow_on_task(
     seed: int = None,
     add_local_measures: bool = True,
     upload_flow: bool = False,
+    dataset_format: str = "dataframe",
 ) -> OpenMLRun:
 
     """Run the model provided by the flow on the dataset defined by task.
@@ -171,6 +177,9 @@ def run_flow_on_task(
     upload_flow : bool (default=False)
         If True, upload the flow to OpenML if it does not exist yet.
         If False, do not upload the flow to OpenML.
+    dataset_format : str (default='dataframe')
+        If 'array', the dataset is passed to the model as a numpy array.
+        If 'dataframe', the dataset is passed to the model as a pandas dataframe.
 
     Returns
     -------
@@ -248,6 +257,7 @@ def run_flow_on_task(
         task=task,
         extension=flow.extension,
         add_local_measures=add_local_measures,
+        dataset_format=dataset_format,
     )
 
     data_content, trace, fold_evaluations, sample_evaluations = res
@@ -407,6 +417,7 @@ def _run_task_get_arffcontent(
     task: OpenMLTask,
     extension: "Extension",
     add_local_measures: bool,
+    dataset_format: str,
 ) -> Tuple[
     List[List],
     Optional[OpenMLRunTrace],
@@ -437,14 +448,23 @@ def _run_task_get_arffcontent(
             repeat=rep_no, fold=fold_no, sample=sample_no
         )
         if isinstance(task, OpenMLSupervisedTask):
-            x, y = task.get_X_and_y(dataset_format="array")
-            train_x = x[train_indices]
-            train_y = y[train_indices]
-            test_x = x[test_indices]
-            test_y = y[test_indices]
+            x, y = task.get_X_and_y(dataset_format=dataset_format)
+            if dataset_format == "dataframe":
+                train_x = x.iloc[train_indices]
+                train_y = y.iloc[train_indices]
+                test_x = x.iloc[test_indices]
+                test_y = y.iloc[test_indices]
+            else:
+                train_x = x[train_indices]
+                train_y = y[train_indices]
+                test_x = x[test_indices]
+                test_y = y[test_indices]
         elif isinstance(task, OpenMLClusteringTask):
-            x = task.get_X(dataset_format="array")
-            train_x = x[train_indices]
+            x = task.get_X(dataset_format=dataset_format)
+            if dataset_format == "dataframe":
+                train_x = x.iloc[train_indices]
+            else:
+                train_x = x[train_indices]
             train_y = None
             test_x = None
             test_y = None

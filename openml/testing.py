@@ -258,4 +258,21 @@ except ImportError:
     from sklearn.preprocessing import Imputer as SimpleImputer
 
 
-__all__ = ["TestBase", "SimpleImputer"]
+class CustomImputer(SimpleImputer):
+    """Duplicate class alias for sklearn's SimpleImputer
+
+    Helps bypass the sklearn extension duplicate operation check
+    """
+
+    pass
+
+
+def cont(X):
+    return X.dtypes != "category"
+
+
+def cat(X):
+    return X.dtypes == "category"
+
+
+__all__ = ["TestBase", "SimpleImputer", "CustomImputer", "cat", "cont"]
