@@ -503,14 +503,21 @@ def _run_task_get_arffcontent(
 
                 if task.class_labels is not None:
 
-                    prediction = task.class_labels[pred_y[i]] \
-                        if isinstance(pred_y[i], int) else pred_y[i]
+                    prediction = (
+                        task.class_labels[pred_y[i]] if isinstance(pred_y[i], int) else pred_y[i]
+                    )
                     if isinstance(test_y, pd.Series):
-                        test_prediction = task.class_labels[test_y.iloc[i]] \
-                            if isinstance(test_y.iloc[i], int) else test_y.iloc[i]
+                        test_prediction = (
+                            task.class_labels[test_y.iloc[i]]
+                            if isinstance(test_y.iloc[i], int)
+                            else test_y.iloc[i]
+                        )
                     else:
-                        test_prediction = task.class_labels[test_y[i]] \
-                            if isinstance(test_y[i], int) else test_y[i]
+                        test_prediction = (
+                            task.class_labels[test_y[i]]
+                            if isinstance(test_y[i], int)
+                            else test_y[i]
+                        )
                     pred_prob = proba_y.iloc[i] if isinstance(proba_y, pd.DataFrame) else proba_y[i]
 
                     arff_line = format_prediction(
