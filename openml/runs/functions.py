@@ -534,7 +534,7 @@ def _run_task_get_arffcontent(
                 )
 
         elif isinstance(task, OpenMLRegressionTask):
-            
+
             for i in range(0, len(test_indices)):
                 test_prediction = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
                 arff_line = format_prediction(
