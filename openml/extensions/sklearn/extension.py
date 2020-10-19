@@ -326,9 +326,6 @@ class SklearnExtension(Extension):
                     else:
                         raise NotImplementedError(serialized_type)
                     assert components is not None  # Necessary for mypy
-                    # value = self._deserialize_sklearn(
-                    #     value, recursion_depth=depth_pp, strict_version=strict_version
-                    # )
                     step_name = value["step_name"]
                     key = value["key"]
                     component = self._deserialize_sklearn(
