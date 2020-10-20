@@ -85,8 +85,6 @@ class OpenMLDataset(OpenMLBase):
         Link to a paper describing the dataset.
     update_comment : str, optional
         An explanation for when the dataset is uploaded.
-    status : str, optional
-        Whether the dataset is active.
     md5_checksum : str, optional
         MD5 checksum to check if the dataset is downloaded without corruption.
     data_file : str, optional
