@@ -20,6 +20,7 @@ import sklearn.tree
 from sklearn.pipeline import make_pipeline, Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
+from sklearn.decomposition import TruncatedSVD
 from sklearn.preprocessing import OneHotEncoder, FunctionTransformer
 
 import openml
