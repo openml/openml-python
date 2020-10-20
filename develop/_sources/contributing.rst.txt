@@ -18,12 +18,10 @@ In particular, a few ways to contribute to openml-python are:
    are hosted in separate repositories and may have their own guidelines.
    For more information, see the :ref:`extensions` below.
 
- * Bug reports. If something doesn't work for you or is cumbersome, please
-  open a new issue to let us know about the problem.
-  See `this section <https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md#reporting-bugs>`_.
+ * Bug reports. If something doesn't work for you or is cumbersome, please open a new issue to let
+   us know about the problem. See `this section <https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md#reporting-bugs>`_.
 
- * `Cite OpenML <https://www.openml.org/cite>`_ if you use it in a scientific
-  publication.
+ * `Cite OpenML <https://www.openml.org/cite>`_ if you use it in a scientific publication.
 
  * Visit one of our `hackathons <https://meet.openml.org/>`_.
 
