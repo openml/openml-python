@@ -239,8 +239,10 @@ You may then run a specific module, test case, or unit test respectively:
   $ pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest::test_get_data
 ```
 
-*NOTE*: In the case the examples build fails during the Continuous Integration test online, please check if
-the first failing example file changed the server that the example fetches from.
+*NOTE*: In the case the examples build fails during the Continuous Integration test online, please 
+fix the first failing example. If the first failing example switched the server from live to test 
+or vice-versa, and the subsequent examples expect the other server, the ensuing examples will fail 
+to be built as well.
 
 Happy testing!
 
