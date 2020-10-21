@@ -500,9 +500,7 @@ def _run_task_get_arffcontent(
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
 
             for i, tst_idx in enumerate(test_indices):
-
                 if task.class_labels is not None:
-
                     prediction = (
                         task.class_labels[pred_y[i]] if isinstance(pred_y[i], int) else pred_y[i]
                     )
@@ -542,8 +540,9 @@ def _run_task_get_arffcontent(
 
         elif isinstance(task, OpenMLRegressionTask):
 
-            for i in range(0, len(test_indices)):
-                test_prediction = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
+            for i, test_idx in enumerate(test_indices):
+                test_prediction = test_y.iloc[i] if isinstance(test_y, pd.Series) \
+                    else test_y[i]
                 arff_line = format_prediction(
                     task=task,
                     repeat=rep_no,
@@ -561,7 +560,8 @@ def _run_task_get_arffcontent(
                 )
 
         elif isinstance(task, OpenMLClusteringTask):
-            for i in range(0, len(test_indices)):
+
+            for i, test_idx in enumerate(test_indices):
                 arff_line = [test_indices[i], pred_y[i]]  # row_id, cluster ID
                 arff_datacontent.append(arff_line)
 

@@ -1546,7 +1546,7 @@ class SklearnExtension(Extension):
         fold_no: int,
         y_train: Optional[np.ndarray] = None,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
-    ) -> Tuple[np.ndarray, np.ndarray, "OrderedDict[str, float]", Optional[OpenMLRunTrace]]:
+    ) -> Tuple[np.ndarray, pd.DataFrame, "OrderedDict[str, float]", Optional[OpenMLRunTrace]]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction
         information.
 
@@ -1596,7 +1596,7 @@ class SklearnExtension(Extension):
             information later on (in ``obtain_arff_trace``).
         """
 
-        def _prediction_to_probabilities(y: np.ndarray, model_classes: List[Any]) -> np.ndarray:
+        def _prediction_to_probabilities(y: np.ndarray, model_classes: List[Any]) -> pd.DataFrame:
             """Transforms predicted probabilities to match with OpenML class indices.
 
             Parameters
@@ -1609,7 +1609,7 @@ class SklearnExtension(Extension):
 
             Returns
             -------
-            np.ndarray
+            pd.DataFrame
             """
 
             if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
