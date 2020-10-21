@@ -41,6 +41,7 @@ from sklearn.pipeline import make_pipeline, Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, FunctionTransformer
+from sklearn.experimental import enable_hist_gradient_boosting
 
 
 openml.config.start_using_configuration_for_example()
@@ -57,7 +58,6 @@ task = openml.tasks.get_task(6)
 # many potential hyperparameters. Of course, the model can be as complex and as
 # easy as you want it to be
 
-from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.decomposition import TruncatedSVD
 

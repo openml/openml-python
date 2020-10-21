@@ -16,11 +16,6 @@ import sklearn.tree
 import openml
 
 
-print(openml.config.server)
-# Configuring the example to work with the test server so as to not bloat the main server
-openml.config.start_using_configuration_for_example()
-print(openml.config.server)
-
 clf = sklearn.tree.DecisionTreeClassifier()
 
 ####################################################################################################
@@ -75,7 +70,3 @@ print(flow_ids)
 # This also works with the actual model (generalizing the first part of this example):
 flow_ids = openml.flows.get_flow_id(model=clf, exact_version=False)
 print(flow_ids)
-
-
-# Closing test server
-openml.config.stop_using_configuration_for_example()
