@@ -1700,9 +1700,7 @@ class SklearnExtension(Extension):
             if isinstance(y_train, np.ndarray) and isinstance(
                 cast(List, task.class_labels)[0], str
             ):
-                model_classes = [
-                    cast(List[str], task.class_labels)[i] for i in model_classes
-                ]
+                model_classes = [cast(List[str], task.class_labels)[i] for i in model_classes]
 
         modelpredict_start_cputime = time.process_time()
         modelpredict_start_walltime = time.time()
