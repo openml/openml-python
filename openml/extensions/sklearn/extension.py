@@ -1730,6 +1730,7 @@ class SklearnExtension(Extension):
 
             try:
                 proba_y = model_copy.predict_proba(X_test)
+                proba_y = pd.DataFrame(proba_y, columns=model_classes)  # handles X_test as numpy
             except AttributeError:  # predict_proba is not available when probability=False
                 if task.class_labels is not None:
                     proba_y = _prediction_to_probabilities(pred_y, model_classes)
@@ -1754,11 +1755,6 @@ class SklearnExtension(Extension):
                     warnings.warn(message)
                     openml.config.logger.warn(message)
 
-                    # True if predict_proba is successfully called with X_test as numpy
-                    # if X_test is dataframe, proba_y will be dataframe with model_classes columns
-                    if isinstance(proba_y, np.ndarray):
-                        proba_y = pd.DataFrame(proba_y, columns=model_classes)
-
                     for i, col in enumerate(task.class_labels):
                         # adding missing columns with 0 probability
                         if col not in model_classes:
@@ -1767,14 +1763,9 @@ class SklearnExtension(Extension):
             else:
                 raise ValueError("The task has no class labels")
 
-            if not isinstance(proba_y, pd.DataFrame):
-                proba_y = pd.DataFrame(proba_y, columns=task.class_labels)
-            elif isinstance(proba_y, pd.DataFrame):
-                if not np.all(set(proba_y.columns) == set(task.class_labels)):
-                    missing_cols = list(set(task.class_labels) - set(proba_y.columns))
-                    raise ValueError(
-                        "Predicted probabilities missing for the columns: ", missing_cols
-                    )
+            if not np.all(set(proba_y.columns) == set(task.class_labels)):
+                missing_cols = list(set(task.class_labels) - set(proba_y.columns))
+                raise ValueError("Predicted probabilities missing for the columns: ", missing_cols)
 
         elif isinstance(task, OpenMLRegressionTask):
             proba_y = None
