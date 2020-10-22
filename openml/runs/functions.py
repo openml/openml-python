@@ -499,7 +499,7 @@ def _run_task_get_arffcontent(
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
 
-            for i, _ in enumerate(test_indices):
+            for i, tst_idx in enumerate(test_indices):
                 if task.class_labels is not None:
                     prediction = (
                         task.class_labels[pred_y[i]] if isinstance(pred_y[i], int) else pred_y[i]
@@ -523,7 +523,7 @@ def _run_task_get_arffcontent(
                         repeat=rep_no,
                         fold=fold_no,
                         sample=sample_no,
-                        index=test_indices[i],
+                        index=tst_idx,
                         prediction=prediction,
                         truth=test_prediction,
                         proba=dict(zip(task.class_labels, pred_prob)),
