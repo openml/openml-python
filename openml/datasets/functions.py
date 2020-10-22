@@ -817,7 +817,7 @@ def edit_dataset(
       Edits an OpenMLDataset.
       In addition to providing the dataset id of the dataset to edit (through data_id),
       you must specify a value for at least one of the optional function arguments,
-       i.e. one value for a field to edit.
+      i.e. one value for a field to edit.
 
       This function allows editing of both non-critical and critical fields.
       Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.
