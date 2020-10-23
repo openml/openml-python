@@ -16,7 +16,6 @@ tasks, all required information about a study can be retrieved.
 import uuid
 
 import numpy as np
-import sklearn.tree
 from sklearn.pipeline import make_pipeline, Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -71,7 +70,7 @@ evaluations = openml.evaluations.list_evaluations(
 )
 print(evaluations.head())
 
-###########################################################from openml.testing import cat, cont#################
+############################################################################
 # Uploading studies
 # =================
 #

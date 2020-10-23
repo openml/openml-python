@@ -1581,8 +1581,8 @@ class SklearnExtension(Extension):
         -------
         pred_y : np.ndarray
             Predictions on the training/test set, depending on the task type.
-            For supervised tasks, predicitons are on the test set.
-            For unsupervised tasks, predicitons are on the training set.
+            For supervised tasks, predictions are on the test set.
+            For unsupervised tasks, predictions are on the training set.
         proba_y : pd.DataFrame
             Predicted probabilities for the test set.
             None, if task is not Classification or Learning Curve prediction.
@@ -1759,6 +1759,7 @@ class SklearnExtension(Extension):
                         # adding missing columns with 0 probability
                         if col not in model_classes:
                             proba_y[col] = 0
+                    # We re-order the columns to move possibly added missing columns into place.
                     proba_y = proba_y[task.class_labels]
             else:
                 raise ValueError("The task has no class labels")
