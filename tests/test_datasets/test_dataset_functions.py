@@ -26,7 +26,6 @@ from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (
     create_dataset,
-    edit_dataset,
     attributes_arff_from_df,
     _get_cached_dataset,
     _get_cached_dataset_features,
@@ -40,6 +39,7 @@ from openml.datasets.functions import (
     _get_online_dataset_format,
     DATASETS_CACHE_DIR_NAME,
 )
+from openml.datasets import fork_dataset, edit_dataset
 
 
 class TestOpenMLDataset(TestBase):
@@ -1386,10 +1386,10 @@ class TestOpenMLDataset(TestBase):
             OpenMLServerException,
             "Unknown dataset",
             edit_dataset,
-            data_id=100000,
+            data_id=999999,
             description="xor operation dataset",
         )
-        # Check server exception when owner/admin edits critical features of dataset with tasks
+        # Check server exception when owner/admin edits critical fields of dataset with tasks
         self.assertRaisesRegex(
             OpenMLServerException,
             "Critical features default_target_attribute, row_id_attribute and ignore_attribute "
@@ -1398,7 +1398,7 @@ class TestOpenMLDataset(TestBase):
             data_id=223,
             default_target_attribute="y",
         )
-        # Check server exception when a non-owner or non-admin tries to edit critical features
+        # Check server exception when a non-owner or non-admin tries to edit critical fields
         self.assertRaisesRegex(
             OpenMLServerException,
             "Critical features default_target_attribute, row_id_attribute and ignore_attribute "
@@ -1406,4 +1406,13 @@ class TestOpenMLDataset(TestBase):
             edit_dataset,
             data_id=128,
             default_target_attribute="y",
+        )
+
+    def test_data_fork(self):
+        did = 1
+        result = fork_dataset(did)
+        self.assertNotEqual(did, result)
+        # Check server exception when unknown dataset is provided
+        self.assertRaisesRegex(
+            OpenMLServerException, "Unknown dataset", fork_dataset, data_id=999999,
         )

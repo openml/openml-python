@@ -12,7 +12,7 @@ Changelog
 * ADD #777: Allows running a flow on pandas dataframes (in addition to numpy arrays).
 * ADD #888: Allow passing a `task_id` to `run_model_on_task`.
 * ADD #894: Support caching of datasets using feather format as an option.
-* ADD #929: Add data edit API.
+* ADD #929: Add ``edit_dataset`` and ``fork_dataset`` to allow editing and forking of uploaded datasets.
 * ADD #866, #943: Add support for scikit-learn's `passthrough` and `drop` when uploading flows to
   OpenML.
 * AYY #879: Add support for scikit-learn's MLP hyperparameter `layer_sizes`.
