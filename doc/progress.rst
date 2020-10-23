@@ -8,17 +8,40 @@ Changelog
 
 0.11.0
 ~~~~~~
-* ADD #929: Add data edit API
+* ADD #753: Allows uploading custom flows to OpenML via OpenML-Python.
+* ADD #777: Allows running a flow on pandas dataframes (in addition to numpy arrays).
+* ADD #888: Allow passing a `task_id` to `run_model_on_task`.
+* ADD #894: Support caching of datasets using feather format as an option.
+* ADD #929: Add data edit API.
+* ADD #866, #943: Add support for scikit-learn's `passthrough` and `drop` when uploading flows to
+  OpenML.
+* AYY #879: Add support for scikit-learn's MLP hyperparameter `layer_sizes`.
+* ADD #945: PEP 561 compliance for distributing Type information.
+* DOC #660: Remove nonexistent argument from docstring.
+* DOC #901: The API reference now documents the config file and its options.
+* DOC #912: API reference now shows `create_task`.
+* DOC #954: Remove TODO text from documentation.
+* DOC #960: document how to upload multiple ignore attributes.
 * FIX #873: Fixes an issue which resulted in incorrect URLs when printing OpenML objects after
   switching the server.
 * FIX #885: Logger no longer registered by default. Added utility functions to easily register
   logging to console and file.
+* FIX #890: Correct the scaling of data in the SVM example.
 * MAINT #767: Source distribution installation is now unit-tested.
+* MAINT #781: Add pre-commit and automated code formatting with black.
+* MAINT #804: Rename arguments of list_evaluations to indicate they expect lists of ids.
 * MAINT #836: OpenML supports only pandas version 1.0.0 or above.
 * MAINT #865: OpenML no longer bundles test files in the source distribution.
+* MAINT #881: Improve the error message for too-long URIs.
 * MAINT #897: Dropping support for Python 3.5.
-* ADD #894: Support caching of datasets using feather format as an option.
-* ADD #945: PEP 561 compliance for distributing Type information
+* MAINT #916: Adding support for Python 3.8.
+* MAINT #920: Improve error messages for dataset upload.
+* MAINT #921: Improve hangling of the OpenML server URL in the config file.
+* MAINT #925: Improve error handling and error message when loading datasets.
+* MAINT #928: Restructures the contributing documentation.
+* MAINT #936: Adding support for scikit-learn 0.23.X.
+* MAINT #945: Make OpenML-Python PEP562 compliant.
+* MAINT #951: Converts TaskType class to a TaskType enum.
 
 0.10.2
 ~~~~~~
