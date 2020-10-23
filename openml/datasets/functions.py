@@ -813,64 +813,63 @@ def edit_dataset(
     original_data_url=None,
     paper_url=None,
 ) -> int:
+    """ Edits an OpenMLDataset.
+
+    In addition to providing the dataset id of the dataset to edit (through data_id),
+    you must specify a value for at least one of the optional function arguments,
+    i.e. one value for a field to edit.
+
+    This function allows editing of both non-critical and critical fields.
+    Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.
+
+     - Editing non-critical data fields is allowed for all authenticated users.
+     - Editing critical fields is allowed only for the owner, provided there are no tasks
+       associated with this dataset.
+
+    If dataset has tasks or if the user is not the owner, the only way
+    to edit critical fields is to use fork_dataset followed by edit_dataset.
+
+    Parameters
+    ----------
+    data_id : int
+        ID of the dataset.
+    description : str
+        Description of the dataset.
+    creator : str
+        The person who created the dataset.
+    contributor : str
+        People who contributed to the current version of the dataset.
+    collection_date : str
+        The date the data was originally collected, given by the uploader.
+    language : str
+        Language in which the data is represented.
+        Starts with 1 upper case letter, rest lower case, e.g. 'English'.
+    default_target_attribute : str
+        The default target attribute, if it exists.
+        Can have multiple values, comma separated.
+    ignore_attribute : str | list
+        Attributes that should be excluded in modelling,
+        such as identifiers and indexes.
+    citation : str
+        Reference(s) that should be cited when building on this data.
+    row_id_attribute : str, optional
+        The attribute that represents the row-id column, if present in the
+        dataset. If ``data`` is a dataframe and ``row_id_attribute`` is not
+        specified, the index of the dataframe will be used as the
+        ``row_id_attribute``. If the name of the index is ``None``, it will
+        be discarded.
+
+        .. versionadded: 0.8
+            Inference of ``row_id_attribute`` from a dataframe.
+    original_data_url : str, optional
+        For derived data, the url to the original dataset.
+    paper_url : str, optional
+        Link to a paper describing the dataset.
+
+    Returns
+    -------
+    Dataset id
     """
-      Edits an OpenMLDataset.
-      
-      In addition to providing the dataset id of the dataset to edit (through data_id),
-      you must specify a value for at least one of the optional function arguments,
-      i.e. one value for a field to edit.
-
-      This function allows editing of both non-critical and critical fields.
-      Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.
-
-       - Editing non-critical data fields is allowed for all authenticated users.
-       - Editing critical fields is allowed only for the owner, provided there are no tasks
-         associated with this dataset.
-
-      If dataset has tasks or if the user is not the owner, the only way
-      to edit critical fields is to use fork_dataset followed by edit_dataset.
-
-      Parameters
-      ----------
-      data_id : int
-          ID of the dataset.
-      description : str
-          Description of the dataset.
-      creator : str
-          The person who created the dataset.
-      contributor : str
-          People who contributed to the current version of the dataset.
-      collection_date : str
-          The date the data was originally collected, given by the uploader.
-      language : str
-          Language in which the data is represented.
-          Starts with 1 upper case letter, rest lower case, e.g. 'English'.
-      default_target_attribute : str
-          The default target attribute, if it exists.
-          Can have multiple values, comma separated.
-      ignore_attribute : str | list
-          Attributes that should be excluded in modelling,
-          such as identifiers and indexes.
-      citation : str
-          Reference(s) that should be cited when building on this data.
-      row_id_attribute : str, optional
-          The attribute that represents the row-id column, if present in the
-          dataset. If ``data`` is a dataframe and ``row_id_attribute`` is not
-          specified, the index of the dataframe will be used as the
-          ``row_id_attribute``. If the name of the index is ``None``, it will
-          be discarded.
-
-          .. versionadded: 0.8
-              Inference of ``row_id_attribute`` from a dataframe.
-      original_data_url : str, optional
-          For derived data, the url to the original dataset.
-      paper_url : str, optional
-          Link to a paper describing the dataset.
-
-
-      Returns
-      -------
-      Dataset id """
     if not isinstance(data_id, int):
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
 
