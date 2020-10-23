@@ -8,7 +8,7 @@ Changelog
 
 0.11.0
 ~~~~~~
-* ADD #929: Add data edit API
+* ADD #929: Add ``edit_dataset`` and ``fork_dataset`` to allow editing and forking of uploaded datasets.
 * FIX #873: Fixes an issue which resulted in incorrect URLs when printing OpenML objects after
   switching the server.
 * FIX #885: Logger no longer registered by default. Added utility functions to easily register

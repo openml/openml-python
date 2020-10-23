@@ -813,56 +813,63 @@ def edit_dataset(
     original_data_url=None,
     paper_url=None,
 ) -> int:
+    """ Edits an OpenMLDataset.
+
+    In addition to providing the dataset id of the dataset to edit (through data_id),
+    you must specify a value for at least one of the optional function arguments,
+    i.e. one value for a field to edit.
+
+    This function allows editing of both non-critical and critical fields.
+    Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.
+
+     - Editing non-critical data fields is allowed for all authenticated users.
+     - Editing critical fields is allowed only for the owner, provided there are no tasks
+       associated with this dataset.
+
+    If dataset has tasks or if the user is not the owner, the only way
+    to edit critical fields is to use fork_dataset followed by edit_dataset.
+
+    Parameters
+    ----------
+    data_id : int
+        ID of the dataset.
+    description : str
+        Description of the dataset.
+    creator : str
+        The person who created the dataset.
+    contributor : str
+        People who contributed to the current version of the dataset.
+    collection_date : str
+        The date the data was originally collected, given by the uploader.
+    language : str
+        Language in which the data is represented.
+        Starts with 1 upper case letter, rest lower case, e.g. 'English'.
+    default_target_attribute : str
+        The default target attribute, if it exists.
+        Can have multiple values, comma separated.
+    ignore_attribute : str | list
+        Attributes that should be excluded in modelling,
+        such as identifiers and indexes.
+    citation : str
+        Reference(s) that should be cited when building on this data.
+    row_id_attribute : str, optional
+        The attribute that represents the row-id column, if present in the
+        dataset. If ``data`` is a dataframe and ``row_id_attribute`` is not
+        specified, the index of the dataframe will be used as the
+        ``row_id_attribute``. If the name of the index is ``None``, it will
+        be discarded.
+
+        .. versionadded: 0.8
+            Inference of ``row_id_attribute`` from a dataframe.
+    original_data_url : str, optional
+        For derived data, the url to the original dataset.
+    paper_url : str, optional
+        Link to a paper describing the dataset.
+
+    Returns
+    -------
+    Dataset id
     """
-      Edits an OpenMLDataset.
-      Specify at least one field to edit, apart from data_id
-       - For certain fields, a new dataset version is created : attributes, data,
-       default_target_attribute, ignore_attribute, row_id_attribute.
-
-       - For other fields, the uploader can edit the existing version.
-        No one except the uploader can edit the existing version.
-
-      Parameters
-      ----------
-      data_id : int
-          ID of the dataset.
-      description : str
-          Description of the dataset.
-      creator : str
-          The person who created the dataset.
-      contributor : str
-          People who contributed to the current version of the dataset.
-      collection_date : str
-          The date the data was originally collected, given by the uploader.
-      language : str
-          Language in which the data is represented.
-          Starts with 1 upper case letter, rest lower case, e.g. 'English'.
-      default_target_attribute : str
-          The default target attribute, if it exists.
-          Can have multiple values, comma separated.
-      ignore_attribute : str | list
-          Attributes that should be excluded in modelling,
-          such as identifiers and indexes.
-      citation : str
-          Reference(s) that should be cited when building on this data.
-      row_id_attribute : str, optional
-          The attribute that represents the row-id column, if present in the
-          dataset. If ``data`` is a dataframe and ``row_id_attribute`` is not
-          specified, the index of the dataframe will be used as the
-          ``row_id_attribute``. If the name of the index is ``None``, it will
-          be discarded.
-
-          .. versionadded: 0.8
-              Inference of ``row_id_attribute`` from a dataframe.
-      original_data_url : str, optional
-          For derived data, the url to the original dataset.
-      paper_url : str, optional
-          Link to a paper describing the dataset.
-
-
-      Returns
-      -------
-      data_id of the existing edited version or the new version created and published"""
     if not isinstance(data_id, int):
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
 
@@ -894,6 +901,45 @@ def edit_dataset(
     )
     result = xmltodict.parse(result_xml)
     data_id = result["oml:data_edit"]["oml:id"]
+    return int(data_id)
+
+
+def fork_dataset(data_id: int) -> int:
+    """
+     Creates a new dataset version, with the authenticated user as the new owner.
+     The forked dataset can have distinct dataset meta-data,
+     but the actual data itself is shared with the original version.
+
+     This API is intended for use when a user is unable to edit the critical fields of a dataset
+     through the edit_dataset API.
+     (Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.)
+
+     Specifically, this happens when the user is:
+            1. Not the owner of the dataset.
+            2. User is the owner of the dataset, but the dataset has tasks.
+
+     In these two cases the only way to edit critical fields is:
+            1. STEP 1: Fork the dataset using fork_dataset API
+            2. STEP 2: Call edit_dataset API on the forked version.
+
+
+    Parameters
+    ----------
+    data_id : int
+        id of the dataset to be forked
+
+    Returns
+    -------
+    Dataset id of the forked dataset
+
+    """
+    if not isinstance(data_id, int):
+        raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
+    # compose data fork parameters
+    form_data = {"data_id": data_id}
+    result_xml = openml._api_calls._perform_api_call("data/fork", "post", data=form_data)
+    result = xmltodict.parse(result_xml)
+    data_id = result["oml:data_fork"]["oml:id"]
     return int(data_id)
 
 
