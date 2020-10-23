@@ -1639,10 +1639,6 @@ class SklearnExtension(Extension):
             if X_test is None:
                 raise TypeError("argument X_test must not be of type None")
 
-        # TODO: if possible, give a warning if model is already fitted (acceptable
-        # in case of custom experimentation,
-        # but not desirable if we want to upload to OpenML).
-
         model_copy = sklearn.base.clone(model, safe=True)
         # sanity check: prohibit users from optimizing n_jobs
         self._prevent_optimize_n_jobs(model_copy)
