@@ -63,7 +63,7 @@ print(task)
 
 metric = "predictive_accuracy"
 evals = openml.evaluations.list_evaluations(
-    function=metric, tasks=[task_id], output_format="dataframe"
+    function=metric, size=None, tasks=[task_id], output_format="dataframe"
 )
 # Displaying the first 10 rows
 print(evals.head(n=10))

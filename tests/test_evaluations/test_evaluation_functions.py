@@ -41,7 +41,9 @@ class TestEvaluationFunctions(TestBase):
 
         task_id = 7312
 
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", tasks=[task_id])
+        evaluations = openml.evaluations.list_evaluations(
+            "predictive_accuracy", size=None, tasks=[task_id]
+        )
 
         self.assertGreater(len(evaluations), 100)
         for run_id in evaluations.keys():
@@ -56,7 +58,7 @@ class TestEvaluationFunctions(TestBase):
 
         uploader_id = 16
         evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy", uploaders=[uploader_id], output_format="dataframe"
+            "predictive_accuracy", size=None, uploaders=[uploader_id], output_format="dataframe"
         )
         self.assertEqual(evaluations["uploader"].unique(), [uploader_id])
 
@@ -66,7 +68,9 @@ class TestEvaluationFunctions(TestBase):
         openml.config.server = self.production_server
 
         setup_id = 10
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", setups=[setup_id])
+        evaluations = openml.evaluations.list_evaluations(
+            "predictive_accuracy", size=None, setups=[setup_id]
+        )
 
         self.assertGreater(len(evaluations), 50)
         for run_id in evaluations.keys():
@@ -81,7 +85,9 @@ class TestEvaluationFunctions(TestBase):
 
         flow_id = 100
 
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", flows=[flow_id])
+        evaluations = openml.evaluations.list_evaluations(
+            "predictive_accuracy", size=None, flows=[flow_id]
+        )
 
         self.assertGreater(len(evaluations), 2)
         for run_id in evaluations.keys():
@@ -96,7 +102,9 @@ class TestEvaluationFunctions(TestBase):
 
         run_id = 12
 
-        evaluations = openml.evaluations.list_evaluations("predictive_accuracy", runs=[run_id])
+        evaluations = openml.evaluations.list_evaluations(
+            "predictive_accuracy", size=None, runs=[run_id]
+        )
 
         self.assertEqual(len(evaluations), 1)
         for run_id in evaluations.keys():
@@ -115,7 +123,7 @@ class TestEvaluationFunctions(TestBase):
         self.assertEqual(len(evaluations), 100)
 
     def test_list_evaluations_empty(self):
-        evaluations = openml.evaluations.list_evaluations("unexisting_measure")
+        evaluations = openml.evaluations.list_evaluations("unexisting_measure", size=None)
         if len(evaluations) > 0:
             raise ValueError("UnitTest Outdated, got somehow results")
 
@@ -164,7 +172,7 @@ class TestEvaluationFunctions(TestBase):
         task_id = 6
         # Get all evaluations of the task
         unsorted_eval = openml.evaluations.list_evaluations(
-            "predictive_accuracy", offset=0, tasks=[task_id]
+            "predictive_accuracy", size=None, offset=0, tasks=[task_id]
         )
         # Get top 10 evaluations of the same task
         sorted_eval = openml.evaluations.list_evaluations(
