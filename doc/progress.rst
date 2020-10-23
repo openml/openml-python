@@ -18,6 +18,7 @@ Changelog
 * MAINT #865: OpenML no longer bundles test files in the source distribution.
 * MAINT #897: Dropping support for Python 3.5.
 * ADD #894: Support caching of datasets using feather format as an option.
+* ADD #945: PEP 561 compliance for distributing Type information
 
 0.10.2
 ~~~~~~

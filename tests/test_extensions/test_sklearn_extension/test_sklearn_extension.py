@@ -13,6 +13,7 @@ import warnings
 from packaging import version
 
 import numpy as np
+import pandas as pd
 import scipy.optimize
 import scipy.stats
 import sklearn.base
@@ -39,7 +40,7 @@ from openml.exceptions import PyOpenMLError
 from openml.flows import OpenMLFlow
 from openml.flows.functions import assert_flows_equal
 from openml.runs.trace import OpenMLRunTrace
-from openml.testing import TestBase, SimpleImputer
+from openml.testing import TestBase, SimpleImputer, CustomImputer, cat, cont
 
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -537,8 +538,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture = (
             "sklearn.compose._column_transformer.ColumnTransformer("
             "numeric=sklearn.preprocessing.{}.StandardScaler,"
-            "nominal=sklearn.preprocessing._encoders.OneHotEncoder,"
-            "drop=drop)".format(scaler_name)
+            "nominal=sklearn.preprocessing._encoders.OneHotEncoder,drop=drop)".format(scaler_name)
         )
         fixture_short_name = "sklearn.ColumnTransformer"
 
@@ -564,13 +564,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             "drop": ["drop"],
         }
 
-        serialization, new_model = self._serialization_test_helper(
-            model,
-            X=None,
-            y=None,
-            subcomponent_parameters=["transformers", "numeric", "nominal"],
-            dependencies_mock_call_count=(4, 8),
-        )
+        serialization = self.extension.model_to_flow(model)
         structure = serialization.get_structure("name")
         self.assertEqual(serialization.name, fixture)
         self.assertEqual(serialization.custom_name, fixture_short_name)
@@ -1566,12 +1560,15 @@ class TestSklearnExtensionRunFunctions(TestBase):
     # Test methods for performing runs with this extension module
 
     def test_run_model_on_task(self):
-        class MyPipe(sklearn.pipeline.Pipeline):
-            pass
-
         task = openml.tasks.get_task(1)
-        pipe = MyPipe([("imp", SimpleImputer()), ("dummy", sklearn.dummy.DummyClassifier())])
-        openml.runs.run_model_on_task(pipe, task)
+        # using most_frequent imputer since dataset has mixed types and to keep things simple
+        pipe = sklearn.pipeline.Pipeline(
+            [
+                ("imp", SimpleImputer(strategy="most_frequent")),
+                ("dummy", sklearn.dummy.DummyClassifier()),
+            ]
+        )
+        openml.runs.run_model_on_task(pipe, task, dataset_format="array")
 
     def test_seed_model(self):
         # randomized models that are initialized without seeds, can be seeded
@@ -1627,7 +1624,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             with self.assertRaises(ValueError):
                 self.extension.seed_model(model=clf, seed=42)
 
-    def test_run_model_on_fold_classification_1(self):
+    def test_run_model_on_fold_classification_1_array(self):
         task = openml.tasks.get_task(1)
 
         X, y = task.get_X_and_y()
@@ -1656,14 +1653,87 @@ class TestSklearnExtensionRunFunctions(TestBase):
         # predictions
         self.assertIsInstance(y_hat, np.ndarray)
         self.assertEqual(y_hat.shape, y_test.shape)
-        self.assertIsInstance(y_hat_proba, np.ndarray)
+        self.assertIsInstance(y_hat_proba, pd.DataFrame)
         self.assertEqual(y_hat_proba.shape, (y_test.shape[0], 6))
         np.testing.assert_array_almost_equal(np.sum(y_hat_proba, axis=1), np.ones(y_test.shape))
         # The class '4' (at index 3) is not present in the training data. We check that the
         # predicted probabilities for that class are zero!
-        np.testing.assert_array_almost_equal(y_hat_proba[:, 3], np.zeros(y_test.shape))
+        np.testing.assert_array_almost_equal(
+            y_hat_proba.iloc[:, 3].to_numpy(), np.zeros(y_test.shape)
+        )
         for i in (0, 1, 2, 4, 5):
-            self.assertTrue(np.any(y_hat_proba[:, i] != np.zeros(y_test.shape)))
+            self.assertTrue(np.any(y_hat_proba.iloc[:, i].to_numpy() != np.zeros(y_test.shape)))
+
+        # check user defined measures
+        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        for measure in user_defined_measures:
+            fold_evaluations[measure][0][0] = user_defined_measures[measure]
+
+        # trace. SGD does not produce any
+        self.assertIsNone(trace)
+
+        self._check_fold_timing_evaluations(
+            fold_evaluations,
+            num_repeats=1,
+            num_folds=1,
+            task_type=task.task_type_id,
+            check_scores=False,
+        )
+
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.21",
+        reason="SimpleImputer, ColumnTransformer available only after 0.19 and "
+        "Pipeline till 0.20 doesn't support indexing and 'passthrough'",
+    )
+    def test_run_model_on_fold_classification_1_dataframe(self):
+        from sklearn.compose import ColumnTransformer
+
+        task = openml.tasks.get_task(1)
+
+        # diff test_run_model_on_fold_classification_1_array()
+        X, y = task.get_X_and_y(dataset_format="dataframe")
+        train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0)
+        X_train = X.iloc[train_indices]
+        y_train = y.iloc[train_indices]
+        X_test = X.iloc[test_indices]
+        y_test = y.iloc[test_indices]
+
+        # Helper functions to return required columns for ColumnTransformer
+        cat_imp = make_pipeline(
+            SimpleImputer(strategy="most_frequent"),
+            OneHotEncoder(handle_unknown="ignore", sparse=False),
+        )
+        cont_imp = make_pipeline(CustomImputer(strategy="mean"), StandardScaler())
+        ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
+        pipeline = sklearn.pipeline.Pipeline(
+            steps=[("transform", ct), ("estimator", sklearn.tree.DecisionTreeClassifier())]
+        )
+        # TODO add some mocking here to actually test the innards of this function, too!
+        res = self.extension._run_model_on_fold(
+            model=pipeline,
+            task=task,
+            fold_no=0,
+            rep_no=0,
+            X_train=X_train,
+            y_train=y_train,
+            X_test=X_test,
+        )
+
+        y_hat, y_hat_proba, user_defined_measures, trace = res
+
+        # predictions
+        self.assertIsInstance(y_hat, np.ndarray)
+        self.assertEqual(y_hat.shape, y_test.shape)
+        self.assertIsInstance(y_hat_proba, pd.DataFrame)
+        self.assertEqual(y_hat_proba.shape, (y_test.shape[0], 6))
+        np.testing.assert_array_almost_equal(np.sum(y_hat_proba, axis=1), np.ones(y_test.shape))
+        # The class '4' (at index 3) is not present in the training data. We check that the
+        # predicted probabilities for that class are zero!
+        np.testing.assert_array_almost_equal(
+            y_hat_proba.iloc[:, 3].to_numpy(), np.zeros(y_test.shape)
+        )
+        for i in (0, 1, 2, 4, 5):
+            self.assertTrue(np.any(y_hat_proba.iloc[:, i].to_numpy() != np.zeros(y_test.shape)))
 
         # check user defined measures
         fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
@@ -1710,11 +1780,11 @@ class TestSklearnExtensionRunFunctions(TestBase):
         # predictions
         self.assertIsInstance(y_hat, np.ndarray)
         self.assertEqual(y_hat.shape, y_test.shape)
-        self.assertIsInstance(y_hat_proba, np.ndarray)
+        self.assertIsInstance(y_hat_proba, pd.DataFrame)
         self.assertEqual(y_hat_proba.shape, (y_test.shape[0], 2))
         np.testing.assert_array_almost_equal(np.sum(y_hat_proba, axis=1), np.ones(y_test.shape))
         for i in (0, 1):
-            self.assertTrue(np.any(y_hat_proba[:, i] != np.zeros(y_test.shape)))
+            self.assertTrue(np.any(y_hat_proba.to_numpy()[:, i] != np.zeros(y_test.shape)))
 
         # check user defined measures
         fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
@@ -1791,14 +1861,14 @@ class TestSklearnExtensionRunFunctions(TestBase):
             np.testing.assert_array_almost_equal(np.sum(proba_1, axis=1), np.ones(X_test.shape[0]))
             # Test that there are predictions other than ones and zeros
             self.assertLess(
-                np.sum(proba_1 == 0) + np.sum(proba_1 == 1),
+                np.sum(proba_1.to_numpy() == 0) + np.sum(proba_1.to_numpy() == 1),
                 X_test.shape[0] * len(task.class_labels),
             )
 
             np.testing.assert_array_almost_equal(np.sum(proba_2, axis=1), np.ones(X_test.shape[0]))
             # Test that there are only ones and zeros predicted
             self.assertEqual(
-                np.sum(proba_2 == 0) + np.sum(proba_2 == 1),
+                np.sum(proba_2.to_numpy() == 0) + np.sum(proba_2.to_numpy() == 1),
                 X_test.shape[0] * len(task.class_labels),
             )
 
@@ -2099,3 +2169,49 @@ class TestSklearnExtensionRunFunctions(TestBase):
         )
         with self.assertRaisesRegex(ValueError, msg):
             self.extension.model_to_flow(clf)
+
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="columntransformer introduction in 0.20.0",
+    )
+    def test_failed_serialization_of_custom_class(self):
+        """Test to check if any custom class inherited from sklearn expectedly fails serialization
+        """
+        try:
+            from sklearn.impute import SimpleImputer
+        except ImportError:
+            # for lower versions
+            from sklearn.preprocessing import Imputer as SimpleImputer
+
+        class CustomImputer(SimpleImputer):
+            pass
+
+        def cont(X):
+            return X.dtypes != "category"
+
+        def cat(X):
+            return X.dtypes == "category"
+
+        import sklearn.metrics
+        import sklearn.tree
+        from sklearn.pipeline import Pipeline, make_pipeline
+        from sklearn.compose import ColumnTransformer
+        from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+        cat_imp = make_pipeline(
+            SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore")
+        )
+        cont_imp = make_pipeline(CustomImputer(), StandardScaler())
+        ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
+        clf = Pipeline(
+            steps=[("preprocess", ct), ("estimator", sklearn.tree.DecisionTreeClassifier())]
+        )  # build a sklearn classifier
+
+        task = openml.tasks.get_task(253)  # data with mixed types from test server
+        try:
+            _ = openml.runs.run_model_on_task(clf, task)
+        except AttributeError as e:
+            if e.args[0] == "module '__main__' has no attribute '__version__'":
+                raise AttributeError(e)
+            else:
+                raise Exception(e)
