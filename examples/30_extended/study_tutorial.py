@@ -17,8 +17,11 @@ import uuid
 
 import numpy as np
 import sklearn.tree
-import sklearn.pipeline
-import sklearn.impute
+from sklearn.pipeline import make_pipeline, Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.decomposition import TruncatedSVD
+from sklearn.preprocessing import OneHotEncoder, FunctionTransformer
 
 import openml
 
@@ -68,7 +71,7 @@ evaluations = openml.evaluations.list_evaluations(
 )
 print(evaluations.head())
 
-############################################################################
+###########################################################from openml.testing import cat, cont#################
 # Uploading studies
 # =================
 #
@@ -78,12 +81,30 @@ print(evaluations.head())
 
 openml.config.start_using_configuration_for_example()
 
-# Very simple classifier which ignores the feature type
+# Model that can handle missing values
+from sklearn.experimental import enable_hist_gradient_boosting
+from sklearn.ensemble import HistGradientBoostingClassifier
+
+
+# Helper functions to return required columns for ColumnTransformer
+def cont(X):
+    return X.dtypes != "category"
+
+
+def cat(X):
+    return X.dtypes == "category"
+
+
+cat_imp = make_pipeline(
+    SimpleImputer(strategy="most_frequent"),
+    OneHotEncoder(handle_unknown="ignore", sparse=False),
+    TruncatedSVD(),
+)
+ct = ColumnTransformer(
+    [("cat", cat_imp, cat), ("cont", FunctionTransformer(lambda x: x, validate=False), cont)]
+)
 clf = sklearn.pipeline.Pipeline(
-    steps=[
-        ("imputer", sklearn.impute.SimpleImputer()),
-        ("estimator", sklearn.tree.DecisionTreeClassifier(max_depth=5)),
-    ]
+    steps=[("transform", ct), ("estimator", HistGradientBoostingClassifier()),]
 )
 
 suite = openml.study.get_suite(1)
