@@ -1386,7 +1386,7 @@ class TestOpenMLDataset(TestBase):
             OpenMLServerException,
             "Unknown dataset",
             edit_dataset,
-            data_id=100000,
+            data_id=999999,
             description="xor operation dataset",
         )
         # Check server exception when owner/admin edits critical fields of dataset with tasks
