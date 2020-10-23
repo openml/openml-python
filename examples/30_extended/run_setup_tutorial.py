@@ -34,9 +34,6 @@ In this tutorial we will
 
 import numpy as np
 import openml
-import sklearn.ensemble
-import sklearn.impute
-import sklearn.preprocessing
 from sklearn.pipeline import make_pipeline, Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -77,7 +74,7 @@ cat_imp = make_pipeline(
     TruncatedSVD(),
 )
 ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", "passthrough", cont)])
-model_original = sklearn.pipeline.Pipeline(
+model_original = Pipeline(
     steps=[("transform", ct), ("estimator", HistGradientBoostingClassifier()),]
 )
 
