@@ -1414,5 +1414,5 @@ class TestOpenMLDataset(TestBase):
         self.assertNotEqual(did, result)
         # Check server exception when unknown dataset is provided
         self.assertRaisesRegex(
-            OpenMLServerException, "Unknown dataset", fork_dataset, data_id=100000,
+            OpenMLServerException, "Unknown dataset", fork_dataset, data_id=999999,
         )
