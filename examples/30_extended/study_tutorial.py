@@ -64,7 +64,7 @@ print(study.runs)
 # And we can use the evaluation listing functionality to learn more about
 # the evaluations available for the conducted runs:
 evaluations = openml.evaluations.list_evaluations(
-    function="predictive_accuracy", size=None, output_format="dataframe", study=study.study_id,
+    function="predictive_accuracy", output_format="dataframe", study=study.study_id,
 )
 print(evaluations.head())
 

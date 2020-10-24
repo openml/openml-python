@@ -42,7 +42,7 @@ class TestEvaluationFunctions(TestBase):
         task_id = 7312
 
         evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=None, tasks=[task_id]
+            "predictive_accuracy", size=110, tasks=[task_id]
         )
 
         self.assertGreater(len(evaluations), 100)
@@ -58,7 +58,7 @@ class TestEvaluationFunctions(TestBase):
 
         uploader_id = 16
         evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=None, uploaders=[uploader_id], output_format="dataframe"
+            "predictive_accuracy", size=60, uploaders=[uploader_id], output_format="dataframe"
         )
         self.assertEqual(evaluations["uploader"].unique(), [uploader_id])
 
@@ -69,7 +69,7 @@ class TestEvaluationFunctions(TestBase):
 
         setup_id = 10
         evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=None, setups=[setup_id]
+            "predictive_accuracy", size=60, setups=[setup_id]
         )
 
         self.assertGreater(len(evaluations), 50)
@@ -86,7 +86,7 @@ class TestEvaluationFunctions(TestBase):
         flow_id = 100
 
         evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=None, flows=[flow_id]
+            "predictive_accuracy", size=10, flows=[flow_id]
         )
 
         self.assertGreater(len(evaluations), 2)
@@ -103,7 +103,7 @@ class TestEvaluationFunctions(TestBase):
         run_id = 12
 
         evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=None, runs=[run_id]
+            "predictive_accuracy", size=2, runs=[run_id]
         )
 
         self.assertEqual(len(evaluations), 1)
@@ -123,7 +123,7 @@ class TestEvaluationFunctions(TestBase):
         self.assertEqual(len(evaluations), 100)
 
     def test_list_evaluations_empty(self):
-        evaluations = openml.evaluations.list_evaluations("unexisting_measure", size=None)
+        evaluations = openml.evaluations.list_evaluations("unexisting_measure")
         if len(evaluations) > 0:
             raise ValueError("UnitTest Outdated, got somehow results")
 
