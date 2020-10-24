@@ -19,6 +19,7 @@ Changelog
 * MAINT #897: Dropping support for Python 3.5.
 * ADD #894: Support caching of datasets using feather format as an option.
 * ADD #945: PEP 561 compliance for distributing Type information
+* MAINT #371: ``list_evaluations`` default ``size`` changed from ``None`` to ``10_000``.
 
 0.10.2
 ~~~~~~

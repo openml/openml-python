@@ -152,7 +152,9 @@ class TestStudyFunctions(TestBase):
         self.assertSetEqual(set(run_ids), set(study_downloaded.runs))
 
         # test whether the list evaluation function also handles study data fine
-        run_ids = openml.evaluations.list_evaluations("predictive_accuracy", study=study.id)
+        run_ids = openml.evaluations.list_evaluations(
+            "predictive_accuracy", size=None, study=study.id
+        )
         self.assertSetEqual(set(run_ids), set(study_downloaded.runs))
 
         # attach more runs
