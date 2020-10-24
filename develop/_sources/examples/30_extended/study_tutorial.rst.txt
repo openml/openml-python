@@ -29,8 +29,11 @@ tasks, all required information about a study can be retrieved.
 
     import numpy as np
     import sklearn.tree
-    import sklearn.pipeline
-    import sklearn.impute
+    from sklearn.pipeline import make_pipeline, Pipeline
+    from sklearn.compose import ColumnTransformer
+    from sklearn.impute import SimpleImputer
+    from sklearn.decomposition import TruncatedSVD
+    from sklearn.preprocessing import OneHotEncoder, FunctionTransformer
 
     import openml
 
@@ -220,12 +223,30 @@ suite which is available on the OpenML test server.
 
     openml.config.start_using_configuration_for_example()
 
-    # Very simple classifier which ignores the feature type
+    # Model that can handle missing values
+    from sklearn.experimental import enable_hist_gradient_boosting
+    from sklearn.ensemble import HistGradientBoostingClassifier
+
+
+    # Helper functions to return required columns for ColumnTransformer
+    def cont(X):
+        return X.dtypes != "category"
+
+
+    def cat(X):
+        return X.dtypes == "category"
+
+
+    cat_imp = make_pipeline(
+        SimpleImputer(strategy="most_frequent"),
+        OneHotEncoder(handle_unknown="ignore", sparse=False),
+        TruncatedSVD(),
+    )
+    ct = ColumnTransformer(
+        [("cat", cat_imp, cat), ("cont", FunctionTransformer(lambda x: x, validate=False), cont)]
+    )
     clf = sklearn.pipeline.Pipeline(
-        steps=[
-            ("imputer", sklearn.impute.SimpleImputer()),
-            ("estimator", sklearn.tree.DecisionTreeClassifier(max_depth=5)),
-        ]
+        steps=[("transform", ct), ("estimator", HistGradientBoostingClassifier()),]
     )
 
     suite = openml.study.get_suite(1)
@@ -265,11 +286,11 @@ suite which is available on the OpenML test server.
 
     OpenML Study
     ============
-    ID..............: 20174
+    ID..............: 20545
     Name............: Test-Study
     Status..........: None
     Main Entity Type: run
-    Study URL.......: https://test.openml.org/s/20174
+    Study URL.......: https://test.openml.org/s/20545
     # of Runs.......: 3
 
 
@@ -289,7 +310,7 @@ suite which is available on the OpenML test server.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  46.169 seconds)
+   **Total running time of the script:** ( 1 minutes  45.646 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_study_tutorial.py:

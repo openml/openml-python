@@ -47,7 +47,7 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A simple tutorial on how to train/run a model and how to upload the results.">
+    <div class="sphx-glr-thumbcontainer" tooltip="A simple tutorial on how to train/run a model and how to upload the results. ">
 
 .. only:: html
 
@@ -68,7 +68,7 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="An example how to set up OpenML-Python followed up by a simple example.">
+    <div class="sphx-glr-thumbcontainer" tooltip="An example how to set up OpenML-Python followed up by a simple example. ">
 
 .. only:: html
 
@@ -89,7 +89,7 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A basic tutorial on how to list, load and visualize datasets.">
+    <div class="sphx-glr-thumbcontainer" tooltip="A basic tutorial on how to list, load and visualize datasets. ">
 
 .. only:: html
 
@@ -165,7 +165,7 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Explains openml-python logging, and shows how to configure it.">
+    <div class="sphx-glr-thumbcontainer" tooltip="Explains openml-python logging, and shows how to configure it. ">
 
 .. only:: html
 
@@ -228,28 +228,7 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="By: Jan N. van Rijn">
-
-.. only:: html
-
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_run_setup_tutorial_thumb.png
-     :alt: Run Setup
-
-     :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/run_setup_tutorial
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="How to list and download datasets.">
+    <div class="sphx-glr-thumbcontainer" tooltip="How to list and download datasets. ">
 
 .. only:: html
 
@@ -270,7 +249,7 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to list and download tasks.">
+    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to list and download tasks. ">
 
 .. only:: html
 
@@ -288,6 +267,27 @@ Extended examples for the usage of the OpenML python connector.
    :hidden:
 
    /examples/30_extended/tasks_tutorial
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="By: Jan N. van Rijn">
+
+.. only:: html
+
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_run_setup_tutorial_thumb.png
+     :alt: Run Setup
+
+     :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/30_extended/run_setup_tutorial
 
 .. raw:: html
 
@@ -312,7 +312,7 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="How to train/run a model and how to upload the results.">
+    <div class="sphx-glr-thumbcontainer" tooltip="How to train/run a model and how to upload the results. ">
 
 .. only:: html
 
@@ -375,7 +375,7 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to create and upload a dataset to OpenML.">
+    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to create and upload a dataset to OpenML. ">
 
 .. only:: html
 

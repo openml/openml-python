@@ -100,7 +100,7 @@ diabetes_dataset = create_dataset(
     # The attribute that represents the row-id column, if present in the
     # dataset.
     row_id_attribute=None,
-    # Attribute or list of attributes that should be excluded in modelling, such as 
+    # Attribute or list of attributes that should be excluded in modelling, such as
     # identifiers and indexes. E.g. "feat1" or ["feat1","feat2"]
     ignore_attribute=None,
     # How to cite the paper.

@@ -11,7 +11,7 @@ How to list and download datasets.
 
 import openml
 import pandas as pd
-from openml.datasets.functions import edit_dataset, get_dataset
+from openml.datasets import edit_dataset, fork_dataset, get_dataset
 
 ############################################################################
 # Exercise 0
@@ -66,7 +66,7 @@ print(dataset.description[:500])
 ############################################################################
 # Get the actual data.
 #
-# The dataset can be returned in 2 possible formats: as a NumPy array, a SciPy
+# The dataset can be returned in 3 possible formats: as a NumPy array, a SciPy
 # sparse matrix, or as a Pandas DataFrame. The format is
 # controlled with the parameter ``dataset_format`` which can be either 'array'
 # (default) or 'dataframe'. Let's first build our dataset from a NumPy array
@@ -139,11 +139,23 @@ print(f"Edited dataset ID: {data_id}")
 
 
 ############################################################################
-# Edit critical fields, allowed only for owners of the dataset:
-# default_target_attribute, row_id_attribute, ignore_attribute
-# To edit critical fields of a dataset owned by you, configure the API key:
+# Editing critical fields (default_target_attribute, row_id_attribute, ignore_attribute) is allowed
+# only for the dataset owner. Further, critical fields cannot be edited if the dataset has any
+# tasks associated with it. To edit critical fields of a dataset (without tasks) owned by you,
+# configure the API key:
 # openml.config.apikey = 'FILL_IN_OPENML_API_KEY'
 data_id = edit_dataset(564, default_target_attribute="y")
 print(f"Edited dataset ID: {data_id}")
+
+
+############################################################################
+# Fork dataset
+# Used to create a copy of the dataset with you as the owner.
+# Use this API only if you are unable to edit the critical fields (default_target_attribute,
+# ignore_attribute, row_id_attribute) of a dataset through the edit_dataset API.
+# After the dataset is forked, you can edit the new version of the dataset using edit_dataset.
+
+data_id = fork_dataset(564)
+print(f"Forked dataset ID: {data_id}")
 
 openml.config.stop_using_configuration_for_example()

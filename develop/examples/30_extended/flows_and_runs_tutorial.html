@@ -154,9 +154,7 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>KNeighborsClassifier(algorithm=&#39;auto&#39;, leaf_size=30, metric=&#39;minkowski&#39;,
-                     metric_params=None, n_jobs=None, n_neighbors=1, p=2,
-                     weights=&#39;uniform&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>KNeighborsClassifier(n_neighbors=1)
 </pre></div>
 </div>
 <p>You can also ask for meta-data to automatically preprocess the data.</p>
@@ -178,9 +176,7 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Categorical features: [True, False, True, True, False, True, True, False, True, True, False, True, False, True, True, False, True, False, True, True]
 
-KNeighborsClassifier(algorithm=&#39;auto&#39;, leaf_size=30, metric=&#39;minkowski&#39;,
-                     metric_params=None, n_jobs=None, n_neighbors=1, p=2,
-                     weights=&#39;uniform&#39;)
+KNeighborsClassifier(n_neighbors=1)
 </pre></div>
 </div>
 </div>
@@ -208,16 +204,11 @@ Run ID.......: None
 Task ID......: 403
 Task Type....: None
 Task URL.....: https://test.openml.org/t/403
-Flow ID......: 26987
-Flow Name....: sklearn.tree.tree.ExtraTreeClassifier
-Flow URL.....: https://test.openml.org/f/26987
+Flow ID......: 268354
+Flow Name....: sklearn.tree._classes.ExtraTreeClassifier
+Flow URL.....: https://test.openml.org/f/268354
 Setup ID.....: None
-Setup String.: Python_3.7.9. Sklearn_0.21.2. NumPy_1.19.2. SciPy_1.5.3. ExtraTreeClassifier(class_weight=None, criterion=&#39;gini&#39;, max_depth=None,
-                    max_features=&#39;auto&#39;, max_leaf_nodes=None,
-                    min_impurity_decrease=0.0, min_impurity_split=None,
-                    min_samples_leaf=1, min_samples_split=2,
-                    min_weight_fraction_leaf=0.0, random_state=41276,
-                    splitter=&#39;random&#39;)
+Setup String.: Python_3.6.12. Sklearn_0.23.1. NumPy_1.19.2. SciPy_1.5.3. ExtraTreeClassifier(random_state=44939)
 Dataset ID...: 68
 Dataset URL..: https://test.openml.org/d/68
 </pre></div>
@@ -232,7 +223,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/148236
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/150982
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -243,9 +234,9 @@ the run is sent to the OpenML server:</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Flow
 ===========
-Flow ID.........: 26987 (version 5)
-Flow URL........: https://test.openml.org/f/26987
-Flow Name.......: sklearn.tree.tree.ExtraTreeClassifier
+Flow ID.........: 268354 (version 2)
+Flow URL........: https://test.openml.org/f/268354
+Flow Name.......: sklearn.tree._classes.ExtraTreeClassifier
 Flow Description: An extremely randomized tree classifier.
 
 Extra-trees differ from classic decision trees in the way they are built.
@@ -256,8 +247,8 @@ selected features and the best split among those is chosen. When
 decision tree.
 
 Warning: Extra-trees should only be used within ensemble methods.
-Upload Date.....: 2019-11-07 16:26:58
-Dependencies....: sklearn==0.21.2
+Upload Date.....: 2020-08-10 14:33:32
+Dependencies....: sklearn==0.23.1
 numpy&gt;=1.6.1
 scipy&gt;=0.9
 </pre></div>
@@ -306,7 +297,27 @@ scipy&gt;=0.9
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/148237
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+Uploaded to http://test.openml.org/r/150985
 </pre></div>
 </div>
 </div>
@@ -334,18 +345,21 @@ a model on a task without uploading results or flows to the server immediately.<
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Run
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+
+OpenML Run
 ==========
 Uploader Name: None
 Metric.......: None
-Run ID.......: 148238
-Run URL......: https://test.openml.org/r/148238
+Run ID.......: 150986
+Run URL......: https://test.openml.org/r/150986
 Task ID......: 6
 Task Type....: None
 Task URL.....: https://test.openml.org/t/6
-Flow ID......: 26988
-Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(Nominal=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder)),Classifier=sklearn.ensemble.forest.RandomForestClassifier)
-Flow URL.....: https://test.openml.org/f/26988
+Flow ID......: 268386
+Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(Nominal=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder)),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
+Flow URL.....: https://test.openml.org/f/268386
 Setup ID.....: None
 Setup String.: None
 Dataset ID...: None
@@ -397,13 +411,13 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/148239
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/150991
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  20.493 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  22.340 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9e0617073c8209f15abf91f273871776/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></p>

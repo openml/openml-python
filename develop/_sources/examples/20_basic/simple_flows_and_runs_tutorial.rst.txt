@@ -62,9 +62,7 @@ Train a machine learning model
  .. code-block:: none
 
 
-    KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
-                         metric_params=None, n_jobs=None, n_neighbors=3, p=2,
-                         weights='uniform')
+    KNeighborsClassifier(n_neighbors=3)
 
 
 
@@ -90,8 +88,6 @@ Running a model on a task
 
  .. code-block:: none
 
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/sklearn/ensemble/forest.py:245: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.
-      "10 in version 0.20 to 100 in 0.22.", FutureWarning)
     OpenML Run
     ==========
     Uploader Name: None
@@ -100,17 +96,11 @@ Running a model on a task
     Task ID......: 119
     Task Type....: None
     Task URL.....: https://test.openml.org/t/119
-    Flow ID......: 26046
-    Flow Name....: sklearn.ensemble.forest.RandomForestClassifier
-    Flow URL.....: https://test.openml.org/f/26046
+    Flow ID......: 187521
+    Flow Name....: sklearn.ensemble._forest.RandomForestClassifier
+    Flow URL.....: https://test.openml.org/f/187521
     Setup ID.....: None
-    Setup String.: Python_3.7.9. Sklearn_0.21.2. NumPy_1.19.2. SciPy_1.5.3. RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
-                           max_depth=None, max_features='auto', max_leaf_nodes=None,
-                           min_impurity_decrease=0.0, min_impurity_split=None,
-                           min_samples_leaf=1, min_samples_split=2,
-                           min_weight_fraction_leaf=0.0, n_estimators='warn',
-                           n_jobs=None, oob_score=False, random_state=14095,
-                           verbose=0, warm_start=False)
+    Setup String.: Python_3.6.12. Sklearn_0.23.1. NumPy_1.19.2. SciPy_1.5.3. RandomForestClassifier(random_state=11423)
     Dataset ID...: 20
     Dataset URL..: https://test.openml.org/d/20
 
@@ -138,8 +128,8 @@ Publishing the run
 
  .. code-block:: none
 
-    Run was uploaded to http://test.openml.org/r/148229
-    The flow can be found at http://test.openml.org/f/26046
+    Run was uploaded to http://test.openml.org/r/150912
+    The flow can be found at http://test.openml.org/f/187521
 
 
 
@@ -158,7 +148,7 @@ Publishing the run
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.347 seconds)
+   **Total running time of the script:** ( 0 minutes  7.458 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_flows_and_runs_tutorial.py:

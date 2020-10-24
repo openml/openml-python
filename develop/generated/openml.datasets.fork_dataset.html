@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>openml.tasks.create_task &#8212; OpenML 0.11.0dev documentation</title>
+    <title>openml.datasets.fork_dataset &#8212; OpenML 0.11.0dev documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
@@ -105,49 +105,48 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>.create_task</a></li>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.fork_dataset</a></li>
 </ul>
 
         </div>
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="openml-tasks-create-task">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>.create_task<a class="headerlink" href="#openml-tasks-create-task" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="openml-datasets-fork-dataset">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.fork_dataset<a class="headerlink" href="#openml-datasets-fork-dataset" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="openml.tasks.create_task">
-<code class="sig-prename descclassname">openml.tasks.</code><code class="sig-name descname">create_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_type</span><span class="p">:</span> <span class="n">openml.tasks.task.TaskType</span></em>, <em class="sig-param"><span class="n">dataset_id</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">estimation_procedure_id</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">target_name</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">evaluation_measure</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>openml.tasks.task.OpenMLClassificationTask<span class="p">, </span>openml.tasks.task.OpenMLRegressionTask<span class="p">, </span>openml.tasks.task.OpenMLClusteringTask<span class="p">]</span><a class="headerlink" href="#openml.tasks.create_task" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a task based on different given attributes.</p>
-<p>Builds a task object with the function arguments as
-attributes. The type of the task object built is
-determined from the task type id.
-More information on how the arguments (task attributes),
-relate to the different possible tasks can be found in
-the individual task objects at the openml.tasks.task
-module.</p>
+<dt id="openml.datasets.fork_dataset">
+<code class="sig-prename descclassname">openml.datasets.</code><code class="sig-name descname">fork_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_id</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#openml.datasets.fork_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Creates a new dataset version, with the authenticated user as the new owner.
+The forked dataset can have distinct dataset meta-data,
+but the actual data itself is shared with the original version.</p>
+<p>This API is intended for use when a user is unable to edit the critical fields of a dataset
+through the edit_dataset API.
+(Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.)</p>
+<dl class="simple">
+<dt>Specifically, this happens when the user is:</dt><dd><ol class="arabic simple">
+<li><p>Not the owner of the dataset.</p></li>
+<li><p>User is the owner of the dataset, but the dataset has tasks.</p></li>
+</ol>
+</dd>
+<dt>In these two cases the only way to edit critical fields is:</dt><dd><ol class="arabic simple">
+<li><p>STEP 1: Fork the dataset using fork_dataset API</p></li>
+<li><p>STEP 2: Call edit_dataset API on the forked version.</p></li>
+</ol>
+</dd>
+</dl>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>task_type</strong><span class="classifier">TaskType</span></dt><dd><p>Id of the task type.</p>
-</dd>
-<dt><strong>dataset_id</strong><span class="classifier">int</span></dt><dd><p>The id of the dataset for the task.</p>
-</dd>
-<dt><strong>target_name</strong><span class="classifier">str, optional</span></dt><dd><p>The name of the feature used as a target.
-At the moment, only optional for the clustering tasks.</p>
-</dd>
-<dt><strong>estimation_procedure_id</strong><span class="classifier">int</span></dt><dd><p>The id of the estimation procedure.</p>
-</dd>
-<dt><strong>evaluation_measure</strong><span class="classifier">str, optional</span></dt><dd><p>The name of the evaluation measure.</p>
-</dd>
-<dt><strong>kwargs</strong><span class="classifier">dict, optional</span></dt><dd><p>Other task attributes that are not mandatory
-for task upload.</p>
+<dt><strong>data_id</strong><span class="classifier">int</span></dt><dd><p>id of the dataset to be forked</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>OpenMLClassificationTask, OpenMLRegressionTask,</dt><dd></dd>
-<dt>OpenMLLearningCurveTask, OpenMLClusteringTask</dt><dd></dd>
+<dt>Dataset id of the forked dataset</dt><dd></dd>
 </dl>
 </dd>
 </dl>

@@ -136,7 +136,7 @@
 
 <span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">openml.datasets.functions</span> <span class="kn">import</span> <span class="n">edit_dataset</span><span class="p">,</span> <span class="n">get_dataset</span>
+<span class="kn">from</span> <span class="nn">openml.datasets</span> <span class="kn">import</span> <span class="n">edit_dataset</span><span class="p">,</span> <span class="n">fork_dataset</span><span class="p">,</span> <span class="n">get_dataset</span>
 </pre></div>
 </div>
 <div class="section" id="exercise-0">
@@ -580,7 +580,7 @@ All data is from one continuous EEG measurement with the Emotiv EEG Neuroheadset
 </pre></div>
 </div>
 <p>Get the actual data.</p>
-<p>The dataset can be returned in 2 possible formats: as a NumPy array, a SciPy
+<p>The dataset can be returned in 3 possible formats: as a NumPy array, a SciPy
 sparse matrix, or as a Pandas DataFrame. The format is
 controlled with the parameter <code class="docutils literal notranslate"><span class="pre">dataset_format</span></code> which can be either ‘array’
 (default) or ‘dataframe’. Let’s first build our dataset from a NumPy array
@@ -710,21 +710,35 @@ original_data_url, paper_url</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Edited dataset ID: 128
 </pre></div>
 </div>
-<p>Edit critical fields, allowed only for owners of the dataset:
-default_target_attribute, row_id_attribute, ignore_attribute
-To edit critical fields of a dataset owned by you, configure the API key:
+<p>Editing critical fields (default_target_attribute, row_id_attribute, ignore_attribute) is allowed
+only for the dataset owner. Further, critical fields cannot be edited if the dataset has any
+tasks associated with it. To edit critical fields of a dataset (without tasks) owned by you,
+configure the API key:
 openml.config.apikey = ‘FILL_IN_OPENML_API_KEY’</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_id</span> <span class="o">=</span> <span class="n">edit_dataset</span><span class="p">(</span><span class="mi">564</span><span class="p">,</span> <span class="n">default_target_attribute</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Edited dataset ID: </span><span class="si">{</span><span class="n">data_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Edited dataset ID: 564
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.534 seconds)</p>
+<p>Fork dataset
+Used to create a copy of the dataset with you as the owner.
+Use this API only if you are unable to edit the critical fields (default_target_attribute,
+ignore_attribute, row_id_attribute) of a dataset through the edit_dataset API.
+After the dataset is forked, you can edit the new version of the dataset using edit_dataset.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_id</span> <span class="o">=</span> <span class="n">fork_dataset</span><span class="p">(</span><span class="mi">564</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Forked dataset ID: </span><span class="si">{</span><span class="n">data_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Forked dataset ID: 101924
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  10.737 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-datasets-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/b95c071188526f5ef5d991e382df9fa5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>

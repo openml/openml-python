@@ -63,9 +63,7 @@ Train a scikit-learn model on the data manually.
  .. code-block:: none
 
 
-    KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
-                         metric_params=None, n_jobs=None, n_neighbors=1, p=2,
-                         weights='uniform')
+    KNeighborsClassifier(n_neighbors=1)
 
 
 
@@ -99,9 +97,7 @@ You can also ask for meta-data to automatically preprocess the data.
 
     Categorical features: [True, False, True, True, False, True, True, False, True, True, False, True, False, True, True, False, True, False, True, True]
 
-    KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
-                         metric_params=None, n_jobs=None, n_neighbors=1, p=2,
-                         weights='uniform')
+    KNeighborsClassifier(n_neighbors=1)
 
 
 
@@ -142,16 +138,11 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     Task ID......: 403
     Task Type....: None
     Task URL.....: https://test.openml.org/t/403
-    Flow ID......: 26987
-    Flow Name....: sklearn.tree.tree.ExtraTreeClassifier
-    Flow URL.....: https://test.openml.org/f/26987
+    Flow ID......: 268354
+    Flow Name....: sklearn.tree._classes.ExtraTreeClassifier
+    Flow URL.....: https://test.openml.org/f/268354
     Setup ID.....: None
-    Setup String.: Python_3.7.9. Sklearn_0.21.2. NumPy_1.19.2. SciPy_1.5.3. ExtraTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
-                        max_features='auto', max_leaf_nodes=None,
-                        min_impurity_decrease=0.0, min_impurity_split=None,
-                        min_samples_leaf=1, min_samples_split=2,
-                        min_weight_fraction_leaf=0.0, random_state=41276,
-                        splitter='random')
+    Setup String.: Python_3.6.12. Sklearn_0.23.1. NumPy_1.19.2. SciPy_1.5.3. ExtraTreeClassifier(random_state=44939)
     Dataset ID...: 68
     Dataset URL..: https://test.openml.org/d/68
 
@@ -182,7 +173,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/148236
+    Uploaded to http://test.openml.org/r/150982
 
 
 
@@ -208,9 +199,9 @@ We can now also inspect the flow object which was automatically created:
 
     OpenML Flow
     ===========
-    Flow ID.........: 26987 (version 5)
-    Flow URL........: https://test.openml.org/f/26987
-    Flow Name.......: sklearn.tree.tree.ExtraTreeClassifier
+    Flow ID.........: 268354 (version 2)
+    Flow URL........: https://test.openml.org/f/268354
+    Flow Name.......: sklearn.tree._classes.ExtraTreeClassifier
     Flow Description: An extremely randomized tree classifier.
 
     Extra-trees differ from classic decision trees in the way they are built.
@@ -221,8 +212,8 @@ We can now also inspect the flow object which was automatically created:
     decision tree.
 
     Warning: Extra-trees should only be used within ensemble methods.
-    Upload Date.....: 2019-11-07 16:26:58
-    Dependencies....: sklearn==0.21.2
+    Upload Date.....: 2020-08-10 14:33:32
+    Dependencies....: sklearn==0.23.1
     numpy>=1.6.1
     scipy>=0.9
 
@@ -286,7 +277,27 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/148237
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    Uploaded to http://test.openml.org/r/150985
 
 
 
@@ -327,19 +338,21 @@ a model on a task without uploading results or flows to the server immediately.
 
  .. code-block:: none
 
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
 
     OpenML Run
     ==========
     Uploader Name: None
     Metric.......: None
-    Run ID.......: 148238
-    Run URL......: https://test.openml.org/r/148238
+    Run ID.......: 150986
+    Run URL......: https://test.openml.org/r/150986
     Task ID......: 6
     Task Type....: None
     Task URL.....: https://test.openml.org/t/6
-    Flow ID......: 26988
-    Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(Nominal=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder)),Classifier=sklearn.ensemble.forest.RandomForestClassifier)
-    Flow URL.....: https://test.openml.org/f/26988
+    Flow ID......: 268386
+    Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(Nominal=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder)),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
+    Flow URL.....: https://test.openml.org/f/268386
     Setup ID.....: None
     Setup String.: None
     Dataset ID...: None
@@ -416,7 +429,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/148239
+    kNN on diabetes: http://test.openml.org/r/150991
 
 
 
@@ -435,7 +448,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  20.493 seconds)
+   **Total running time of the script:** ( 0 minutes  22.340 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:
