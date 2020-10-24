@@ -15,7 +15,8 @@ Changelog
 * ADD #929: Add ``edit_dataset`` and ``fork_dataset`` to allow editing and forking of uploaded datasets.
 * ADD #866, #943: Add support for scikit-learn's `passthrough` and `drop` when uploading flows to
   OpenML.
-* AYY #879: Add support for scikit-learn's MLP hyperparameter `layer_sizes`.
+* ADD #879: Add support for scikit-learn's MLP hyperparameter `layer_sizes`.
+* ADD #894: Support caching of datasets using feather format as an option.
 * ADD #945: PEP 561 compliance for distributing Type information.
 * DOC #660: Remove nonexistent argument from docstring.
 * DOC #901: The API reference now documents the config file and its options.
@@ -27,6 +28,7 @@ Changelog
 * FIX #885: Logger no longer registered by default. Added utility functions to easily register
   logging to console and file.
 * FIX #890: Correct the scaling of data in the SVM example.
+* MAINT #371: ``list_evaluations`` default ``size`` changed from ``None`` to ``10_000``.
 * MAINT #767: Source distribution installation is now unit-tested.
 * MAINT #781: Add pre-commit and automated code formatting with black.
 * MAINT #804: Rename arguments of list_evaluations to indicate they expect lists of ids.
