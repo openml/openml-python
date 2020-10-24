@@ -138,11 +138,11 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     Task ID......: 403
     Task Type....: None
     Task URL.....: https://test.openml.org/t/403
-    Flow ID......: 268354
+    Flow ID......: 407755
     Flow Name....: sklearn.tree._classes.ExtraTreeClassifier
-    Flow URL.....: https://test.openml.org/f/268354
+    Flow URL.....: https://test.openml.org/f/407755
     Setup ID.....: None
-    Setup String.: Python_3.6.12. Sklearn_0.23.1. NumPy_1.19.2. SciPy_1.5.3. ExtraTreeClassifier(random_state=44939)
+    Setup String.: Python_3.6.12. Sklearn_0.23.1. NumPy_1.19.2. SciPy_1.5.3. ExtraTreeClassifier(random_state=38690)
     Dataset ID...: 68
     Dataset URL..: https://test.openml.org/d/68
 
@@ -173,7 +173,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/150982
+    Uploaded to http://test.openml.org/r/151949
 
 
 
@@ -199,8 +199,8 @@ We can now also inspect the flow object which was automatically created:
 
     OpenML Flow
     ===========
-    Flow ID.........: 268354 (version 2)
-    Flow URL........: https://test.openml.org/f/268354
+    Flow ID.........: 407755 (version 3)
+    Flow URL........: https://test.openml.org/f/407755
     Flow Name.......: sklearn.tree._classes.ExtraTreeClassifier
     Flow Description: An extremely randomized tree classifier.
 
@@ -212,7 +212,7 @@ We can now also inspect the flow object which was automatically created:
     decision tree.
 
     Warning: Extra-trees should only be used within ensemble methods.
-    Upload Date.....: 2020-08-10 14:33:32
+    Upload Date.....: 2020-10-24 00:08:28
     Dependencies....: sklearn==0.23.1
     numpy>=1.6.1
     scipy>=0.9
@@ -297,7 +297,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
       warnings.warn(message)
     /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
-    Uploaded to http://test.openml.org/r/150985
+    Uploaded to http://test.openml.org/r/151951
 
 
 
@@ -345,14 +345,14 @@ a model on a task without uploading results or flows to the server immediately.
     ==========
     Uploader Name: None
     Metric.......: None
-    Run ID.......: 150986
-    Run URL......: https://test.openml.org/r/150986
+    Run ID.......: 151952
+    Run URL......: https://test.openml.org/r/151952
     Task ID......: 6
     Task Type....: None
     Task URL.....: https://test.openml.org/t/6
-    Flow ID......: 268386
+    Flow ID......: 407756
     Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(Nominal=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder)),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
-    Flow URL.....: https://test.openml.org/f/268386
+    Flow URL.....: https://test.openml.org/f/407756
     Setup ID.....: None
     Setup String.: None
     Dataset ID...: None
@@ -429,7 +429,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/150991
+    kNN on diabetes: http://test.openml.org/r/151953
 
 
 
@@ -448,7 +448,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  22.340 seconds)
+   **Total running time of the script:** ( 0 minutes  24.765 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:

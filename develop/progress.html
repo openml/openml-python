@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Changelog &#8212; OpenML 0.11.0dev documentation</title>
+    <title>Changelog &#8212; OpenML 0.11.0 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11.0dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -128,18 +128,42 @@
 <div class="section" id="id1">
 <h2>0.11.0<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
+<li><p>ADD #753: Allows uploading custom flows to OpenML via OpenML-Python.</p></li>
+<li><p>ADD #777: Allows running a flow on pandas dataframes (in addition to numpy arrays).</p></li>
+<li><p>ADD #888: Allow passing a <cite>task_id</cite> to <cite>run_model_on_task</cite>.</p></li>
+<li><p>ADD #894: Support caching of datasets using feather format as an option.</p></li>
 <li><p>ADD #929: Add <code class="docutils literal notranslate"><span class="pre">edit_dataset</span></code> and <code class="docutils literal notranslate"><span class="pre">fork_dataset</span></code> to allow editing and forking of uploaded datasets.</p></li>
+<li><p>ADD #866, #943: Add support for scikit-learn’s <cite>passthrough</cite> and <cite>drop</cite> when uploading flows to
+OpenML.</p></li>
+<li><p>ADD #879: Add support for scikit-learn’s MLP hyperparameter <cite>layer_sizes</cite>.</p></li>
+<li><p>ADD #894: Support caching of datasets using feather format as an option.</p></li>
+<li><p>ADD #945: PEP 561 compliance for distributing Type information.</p></li>
+<li><p>DOC #660: Remove nonexistent argument from docstring.</p></li>
+<li><p>DOC #901: The API reference now documents the config file and its options.</p></li>
+<li><p>DOC #912: API reference now shows <cite>create_task</cite>.</p></li>
+<li><p>DOC #954: Remove TODO text from documentation.</p></li>
+<li><p>DOC #960: document how to upload multiple ignore attributes.</p></li>
 <li><p>FIX #873: Fixes an issue which resulted in incorrect URLs when printing OpenML objects after
 switching the server.</p></li>
 <li><p>FIX #885: Logger no longer registered by default. Added utility functions to easily register
 logging to console and file.</p></li>
+<li><p>FIX #890: Correct the scaling of data in the SVM example.</p></li>
+<li><p>MAINT #371: <code class="docutils literal notranslate"><span class="pre">list_evaluations</span></code> default <code class="docutils literal notranslate"><span class="pre">size</span></code> changed from <code class="docutils literal notranslate"><span class="pre">None</span></code> to <code class="docutils literal notranslate"><span class="pre">10_000</span></code>.</p></li>
 <li><p>MAINT #767: Source distribution installation is now unit-tested.</p></li>
+<li><p>MAINT #781: Add pre-commit and automated code formatting with black.</p></li>
+<li><p>MAINT #804: Rename arguments of list_evaluations to indicate they expect lists of ids.</p></li>
 <li><p>MAINT #836: OpenML supports only pandas version 1.0.0 or above.</p></li>
 <li><p>MAINT #865: OpenML no longer bundles test files in the source distribution.</p></li>
+<li><p>MAINT #881: Improve the error message for too-long URIs.</p></li>
 <li><p>MAINT #897: Dropping support for Python 3.5.</p></li>
-<li><p>ADD #894: Support caching of datasets using feather format as an option.</p></li>
-<li><p>ADD #945: PEP 561 compliance for distributing Type information</p></li>
-<li><p>MAINT #371: <code class="docutils literal notranslate"><span class="pre">list_evaluations</span></code> default <code class="docutils literal notranslate"><span class="pre">size</span></code> changed from <code class="docutils literal notranslate"><span class="pre">None</span></code> to <code class="docutils literal notranslate"><span class="pre">10_000</span></code>.</p></li>
+<li><p>MAINT #916: Adding support for Python 3.8.</p></li>
+<li><p>MAINT #920: Improve error messages for dataset upload.</p></li>
+<li><p>MAINT #921: Improve hangling of the OpenML server URL in the config file.</p></li>
+<li><p>MAINT #925: Improve error handling and error message when loading datasets.</p></li>
+<li><p>MAINT #928: Restructures the contributing documentation.</p></li>
+<li><p>MAINT #936: Adding support for scikit-learn 0.23.X.</p></li>
+<li><p>MAINT #945: Make OpenML-Python PEP562 compliant.</p></li>
+<li><p>MAINT #951: Converts TaskType class to a TaskType enum.</p></li>
 </ul>
 </div>
 <div class="section" id="id2">
