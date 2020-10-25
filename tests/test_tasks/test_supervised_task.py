@@ -20,10 +20,7 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
     @classmethod
     def setUpClass(cls):
         if cls is OpenMLSupervisedTaskTest:
-            raise unittest.SkipTest(
-                "Skip OpenMLSupervisedTaskTest tests,"
-                " it's a base class"
-            )
+            raise unittest.SkipTest("Skip OpenMLSupervisedTaskTest tests," " it's a base class")
         super(OpenMLSupervisedTaskTest, cls).setUpClass()
 
     def setUp(self, n_levels: int = 1):

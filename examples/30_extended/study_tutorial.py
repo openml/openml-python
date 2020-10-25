@@ -17,8 +17,11 @@ import uuid
 
 import numpy as np
 import sklearn.tree
-import sklearn.pipeline
-import sklearn.impute
+from sklearn.pipeline import make_pipeline, Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.decomposition import TruncatedSVD
+from sklearn.preprocessing import OneHotEncoder, FunctionTransformer
 
 import openml
 
@@ -39,7 +42,7 @@ import openml
 # * Default gives ``dict``, but we'll use ``dataframe`` to obtain an
 #   easier-to-work-with data structure
 
-studies = openml.study.list_studies(output_format='dataframe', status='all')
+studies = openml.study.list_studies(output_format="dataframe", status="all")
 print(studies.head(n=10))
 
 
@@ -64,13 +67,11 @@ print(study.runs)
 # And we can use the evaluation listing functionality to learn more about
 # the evaluations available for the conducted runs:
 evaluations = openml.evaluations.list_evaluations(
-    function='predictive_accuracy',
-    output_format='dataframe',
-    study=study.study_id,
+    function="predictive_accuracy", output_format="dataframe", study=study.study_id,
 )
 print(evaluations.head())
 
-############################################################################
+###########################################################from openml.testing import cat, cont#################
 # Uploading studies
 # =================
 #
@@ -80,11 +81,31 @@ print(evaluations.head())
 
 openml.config.start_using_configuration_for_example()
 
-# Very simple classifier which ignores the feature type
-clf = sklearn.pipeline.Pipeline(steps=[
-    ('imputer', sklearn.impute.SimpleImputer()),
-    ('estimator', sklearn.tree.DecisionTreeClassifier(max_depth=5)),
-])
+# Model that can handle missing values
+from sklearn.experimental import enable_hist_gradient_boosting
+from sklearn.ensemble import HistGradientBoostingClassifier
+
+
+# Helper functions to return required columns for ColumnTransformer
+def cont(X):
+    return X.dtypes != "category"
+
+
+def cat(X):
+    return X.dtypes == "category"
+
+
+cat_imp = make_pipeline(
+    SimpleImputer(strategy="most_frequent"),
+    OneHotEncoder(handle_unknown="ignore", sparse=False),
+    TruncatedSVD(),
+)
+ct = ColumnTransformer(
+    [("cat", cat_imp, cat), ("cont", FunctionTransformer(lambda x: x, validate=False), cont)]
+)
+clf = sklearn.pipeline.Pipeline(
+    steps=[("transform", ct), ("estimator", HistGradientBoostingClassifier()),]
+)
 
 suite = openml.study.get_suite(1)
 # We'll create a study with one run on three random datasets each
@@ -101,8 +122,8 @@ for task_id in tasks:
 alias = uuid.uuid4().hex
 
 new_study = openml.study.create_study(
-    name='Test-Study',
-    description='Test study for the Python tutorial on studies',
+    name="Test-Study",
+    description="Test study for the Python tutorial on studies",
     run_ids=run_ids,
     alias=alias,
     benchmark_suite=suite.study_id,

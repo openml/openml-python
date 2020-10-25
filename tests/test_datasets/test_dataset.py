@@ -34,100 +34,96 @@ class OpenMLDatasetTest(TestBase):
     def test_repr(self):
         # create a bare-bones dataset as would be returned by
         # create_dataset
-        data = openml.datasets.OpenMLDataset(name="somename",
-                                             description="a description")
+        data = openml.datasets.OpenMLDataset(name="somename", description="a description")
         str(data)
 
     def test_init_string_validation(self):
-        with pytest.raises(ValueError, match="Invalid symbols in name"):
-            openml.datasets.OpenMLDataset(name="some name",
-                                          description="a description")
+        with pytest.raises(ValueError, match="Invalid symbols ' ' in name"):
+            openml.datasets.OpenMLDataset(name="some name", description="a description")
 
-        with pytest.raises(ValueError, match="Invalid symbols in description"):
-            openml.datasets.OpenMLDataset(name="somename",
-                                          description="a descriptïon")
+        with pytest.raises(ValueError, match="Invalid symbols 'ï' in description"):
+            openml.datasets.OpenMLDataset(name="somename", description="a descriptïon")
 
-        with pytest.raises(ValueError, match="Invalid symbols in citation"):
-            openml.datasets.OpenMLDataset(name="somename",
-                                          description="a description",
-                                          citation="Something by Müller")
+        with pytest.raises(ValueError, match="Invalid symbols 'ü' in citation"):
+            openml.datasets.OpenMLDataset(
+                name="somename", description="a description", citation="Something by Müller"
+            )
 
     def test_get_data_array(self):
         # Basic usage
-        rval, _, categorical, attribute_names = self.dataset.get_data(dataset_format='array')
+        rval, _, categorical, attribute_names = self.dataset.get_data(dataset_format="array")
         self.assertIsInstance(rval, np.ndarray)
         self.assertEqual(rval.dtype, np.float32)
         self.assertEqual((898, 39), rval.shape)
         self.assertEqual(len(categorical), 39)
         self.assertTrue(all([isinstance(cat, bool) for cat in categorical]))
         self.assertEqual(len(attribute_names), 39)
-        self.assertTrue(all([isinstance(att, str)
-                             for att in attribute_names]))
+        self.assertTrue(all([isinstance(att, str) for att in attribute_names]))
         self.assertIsNone(_)
 
         # check that an error is raised when the dataset contains string
         err_msg = "PyOpenML cannot handle string when returning numpy arrays"
         with pytest.raises(PyOpenMLError, match=err_msg):
-            self.titanic.get_data(dataset_format='array')
+            self.titanic.get_data(dataset_format="array")
 
     def test_get_data_pandas(self):
-        data, _, _, _ = self.titanic.get_data(dataset_format='dataframe')
+        data, _, _, _ = self.titanic.get_data(dataset_format="dataframe")
         self.assertTrue(isinstance(data, pd.DataFrame))
         self.assertEqual(data.shape[1], len(self.titanic.features))
         self.assertEqual(data.shape[0], 1309)
         col_dtype = {
-            'pclass': 'float64',
-            'survived': 'category',
-            'name': 'object',
-            'sex': 'category',
-            'age': 'float64',
-            'sibsp': 'float64',
-            'parch': 'float64',
-            'ticket': 'object',
-            'fare': 'float64',
-            'cabin': 'object',
-            'embarked': 'category',
-            'boat': 'object',
-            'body': 'float64',
-            'home.dest': 'object'
+            "pclass": "float64",
+            "survived": "category",
+            "name": "object",
+            "sex": "category",
+            "age": "float64",
+            "sibsp": "float64",
+            "parch": "float64",
+            "ticket": "object",
+            "fare": "float64",
+            "cabin": "object",
+            "embarked": "category",
+            "boat": "object",
+            "body": "float64",
+            "home.dest": "object",
         }
         for col_name in data.columns:
             self.assertTrue(data[col_name].dtype.name == col_dtype[col_name])
 
         X, y, _, _ = self.titanic.get_data(
-            dataset_format='dataframe',
-            target=self.titanic.default_target_attribute)
+            dataset_format="dataframe", target=self.titanic.default_target_attribute
+        )
         self.assertTrue(isinstance(X, pd.DataFrame))
         self.assertTrue(isinstance(y, pd.Series))
         self.assertEqual(X.shape, (1309, 13))
         self.assertEqual(y.shape, (1309,))
         for col_name in X.columns:
             self.assertTrue(X[col_name].dtype.name == col_dtype[col_name])
-        self.assertTrue(y.dtype.name == col_dtype['survived'])
+        self.assertTrue(y.dtype.name == col_dtype["survived"])
 
     def test_get_data_boolean_pandas(self):
         # test to check that we are converting properly True and False even
         # with some inconsistency when dumping the data on openml
         data, _, _, _ = self.jm1.get_data()
-        self.assertTrue(data['defects'].dtype.name == 'category')
-        self.assertTrue(set(data['defects'].cat.categories) == {True, False})
+        self.assertTrue(data["defects"].dtype.name == "category")
+        self.assertTrue(set(data["defects"].cat.categories) == {True, False})
 
         data, _, _, _ = self.pc4.get_data()
-        self.assertTrue(data['c'].dtype.name == 'category')
-        self.assertTrue(set(data['c'].cat.categories) == {True, False})
+        self.assertTrue(data["c"].dtype.name == "category")
+        self.assertTrue(set(data["c"].cat.categories) == {True, False})
 
     def test_get_data_no_str_data_for_nparrays(self):
         # check that an error is raised when the dataset contains string
         err_msg = "PyOpenML cannot handle string when returning numpy arrays"
         with pytest.raises(PyOpenMLError, match=err_msg):
-            self.titanic.get_data(dataset_format='array')
+            self.titanic.get_data(dataset_format="array")
 
     def test_get_data_with_rowid(self):
         self.dataset.row_id_attribute = "condition"
         rval, _, categorical, _ = self.dataset.get_data(include_row_id=True)
         self.assertIsInstance(rval, pd.DataFrame)
         for (dtype, is_cat) in zip(rval.dtypes, categorical):
-            expected_type = 'category' if is_cat else 'float64'
+            expected_type = "category" if is_cat else "float64"
             self.assertEqual(dtype.name, expected_type)
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
@@ -135,18 +131,18 @@ class OpenMLDatasetTest(TestBase):
         rval, _, categorical, _ = self.dataset.get_data()
         self.assertIsInstance(rval, pd.DataFrame)
         for (dtype, is_cat) in zip(rval.dtypes, categorical):
-            expected_type = 'category' if is_cat else 'float64'
+            expected_type = "category" if is_cat else "float64"
             self.assertEqual(dtype.name, expected_type)
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
 
     def test_get_data_with_target_array(self):
-        X, y, _, attribute_names = self.dataset.get_data(dataset_format='array', target="class")
+        X, y, _, attribute_names = self.dataset.get_data(dataset_format="array", target="class")
         self.assertIsInstance(X, np.ndarray)
         self.assertEqual(X.dtype, np.float32)
         self.assertEqual(X.shape, (898, 38))
         self.assertIn(y.dtype, [np.int32, np.int64])
-        self.assertEqual(y.shape, (898, ))
+        self.assertEqual(y.shape, (898,))
         self.assertEqual(len(attribute_names), 38)
         self.assertNotIn("class", attribute_names)
 
@@ -154,14 +150,14 @@ class OpenMLDatasetTest(TestBase):
         X, y, categorical, attribute_names = self.dataset.get_data(target="class")
         self.assertIsInstance(X, pd.DataFrame)
         for (dtype, is_cat) in zip(X.dtypes, categorical):
-            expected_type = 'category' if is_cat else 'float64'
+            expected_type = "category" if is_cat else "float64"
             self.assertEqual(dtype.name, expected_type)
         self.assertIsInstance(y, pd.Series)
-        self.assertEqual(y.dtype.name, 'category')
+        self.assertEqual(y.dtype.name, "category")
 
         self.assertEqual(X.shape, (898, 38))
         self.assertEqual(len(attribute_names), 38)
-        self.assertEqual(y.shape, (898, ))
+        self.assertEqual(y.shape, (898,))
 
         self.assertNotIn("class", attribute_names)
 
@@ -173,20 +169,20 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual(len(categorical), 36)
         cats = [True] * 3 + [False, True, True, False] + [True] * 23 + [False] * 3 + [True] * 3
         self.assertListEqual(categorical, cats)
-        self.assertEqual(y.shape, (898, ))
+        self.assertEqual(y.shape, (898,))
 
     def test_get_data_with_ignore_attributes(self):
         self.dataset.ignore_attribute = ["condition"]
         rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=True)
         for (dtype, is_cat) in zip(rval.dtypes, categorical):
-            expected_type = 'category' if is_cat else 'float64'
+            expected_type = "category" if is_cat else "float64"
             self.assertEqual(dtype.name, expected_type)
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
 
         rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=False)
         for (dtype, is_cat) in zip(rval.dtypes, categorical):
-            expected_type = 'category' if is_cat else 'float64'
+            expected_type = "category" if is_cat else "float64"
             self.assertEqual(dtype.name, expected_type)
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
@@ -194,22 +190,18 @@ class OpenMLDatasetTest(TestBase):
     def test_dataset_format_constructor(self):
 
         with catch_warnings():
-            filterwarnings('error')
+            filterwarnings("error")
             self.assertRaises(
-                DeprecationWarning,
-                openml.OpenMLDataset,
-                'Test',
-                'Test',
-                format='arff'
+                DeprecationWarning, openml.OpenMLDataset, "Test", "Test", format="arff"
             )
 
     def test_get_data_with_nonexisting_class(self):
         # This class is using the anneal dataset with labels [1, 2, 3, 4, 5, 'U']. However,
         # label 4 does not exist and we test that the features 5 and 'U' are correctly mapped to
         # indices 4 and 5, and that nothing is mapped to index 3.
-        _, y, _, _ = self.dataset.get_data('class', dataset_format='dataframe')
-        self.assertEqual(list(y.dtype.categories), ['1', '2', '3', '4', '5', 'U'])
-        _, y, _, _ = self.dataset.get_data('class', dataset_format='array')
+        _, y, _, _ = self.dataset.get_data("class", dataset_format="dataframe")
+        self.assertEqual(list(y.dtype.categories), ["1", "2", "3", "4", "5", "U"])
+        _, y, _, _ = self.dataset.get_data("class", dataset_format="array")
         self.assertEqual(np.min(y), 0)
         self.assertEqual(np.max(y), 5)
         # Check that no label is mapped to 3, since it is reserved for label '4'.
@@ -258,7 +250,7 @@ class OpenMLDatasetTestSparse(TestBase):
 
     def test_get_sparse_dataset_with_target(self):
         X, y, _, attribute_names = self.sparse_dataset.get_data(
-            dataset_format='array', target="class"
+            dataset_format="array", target="class"
         )
 
         self.assertTrue(sparse.issparse(X))
@@ -267,13 +259,13 @@ class OpenMLDatasetTestSparse(TestBase):
 
         self.assertIsInstance(y, np.ndarray)
         self.assertIn(y.dtype, [np.int32, np.int64])
-        self.assertEqual(y.shape, (600, ))
+        self.assertEqual(y.shape, (600,))
 
         self.assertEqual(len(attribute_names), 20000)
         self.assertNotIn("class", attribute_names)
 
     def test_get_sparse_dataset(self):
-        rval, _, categorical, attribute_names = self.sparse_dataset.get_data(dataset_format='array')
+        rval, _, categorical, attribute_names = self.sparse_dataset.get_data(dataset_format="array")
         self.assertTrue(sparse.issparse(rval))
         self.assertEqual(rval.dtype, np.float32)
         self.assertEqual((600, 20001), rval.shape)
@@ -286,13 +278,16 @@ class OpenMLDatasetTestSparse(TestBase):
 
     def test_get_sparse_dataframe(self):
         rval, *_ = self.sparse_dataset.get_data()
-        self.assertTrue(isinstance(rval, pd.SparseDataFrame))
+        self.assertIsInstance(rval, pd.DataFrame)
+        np.testing.assert_array_equal(
+            [pd.SparseDtype(np.float32, fill_value=0.0)] * len(rval.dtypes), rval.dtypes
+        )
         self.assertEqual((600, 20001), rval.shape)
 
     def test_get_sparse_dataset_with_rowid(self):
         self.sparse_dataset.row_id_attribute = ["V256"]
         rval, _, categorical, _ = self.sparse_dataset.get_data(
-            dataset_format='array', include_row_id=True
+            dataset_format="array", include_row_id=True
         )
         self.assertTrue(sparse.issparse(rval))
         self.assertEqual(rval.dtype, np.float32)
@@ -300,7 +295,7 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertEqual(len(categorical), 20001)
 
         rval, _, categorical, _ = self.sparse_dataset.get_data(
-            dataset_format='array', include_row_id=False
+            dataset_format="array", include_row_id=False
         )
         self.assertTrue(sparse.issparse(rval))
         self.assertEqual(rval.dtype, np.float32)
@@ -310,7 +305,7 @@ class OpenMLDatasetTestSparse(TestBase):
     def test_get_sparse_dataset_with_ignore_attributes(self):
         self.sparse_dataset.ignore_attribute = ["V256"]
         rval, _, categorical, _ = self.sparse_dataset.get_data(
-            dataset_format='array', include_ignore_attribute=True
+            dataset_format="array", include_ignore_attribute=True
         )
         self.assertTrue(sparse.issparse(rval))
         self.assertEqual(rval.dtype, np.float32)
@@ -318,7 +313,7 @@ class OpenMLDatasetTestSparse(TestBase):
 
         self.assertEqual(len(categorical), 20001)
         rval, _, categorical, _ = self.sparse_dataset.get_data(
-            dataset_format='array', include_ignore_attribute=False
+            dataset_format="array", include_ignore_attribute=False
         )
         self.assertTrue(sparse.issparse(rval))
         self.assertEqual(rval.dtype, np.float32)
@@ -330,7 +325,7 @@ class OpenMLDatasetTestSparse(TestBase):
         self.sparse_dataset.ignore_attribute = ["V256"]
         self.sparse_dataset.row_id_attribute = ["V512"]
         X, y, categorical, _ = self.sparse_dataset.get_data(
-            dataset_format='array',
+            dataset_format="array",
             target="class",
             include_row_id=False,
             include_ignore_attribute=False,
@@ -342,29 +337,29 @@ class OpenMLDatasetTestSparse(TestBase):
 
         self.assertEqual(len(categorical), 19998)
         self.assertListEqual(categorical, [False] * 19998)
-        self.assertEqual(y.shape, (600, ))
+        self.assertEqual(y.shape, (600,))
 
     def test_get_sparse_categorical_data_id_395(self):
         dataset = openml.datasets.get_dataset(395, download_data=True)
         feature = dataset.features[3758]
         self.assertTrue(isinstance(dataset, OpenMLDataset))
         self.assertTrue(isinstance(feature, OpenMLDataFeature))
-        self.assertEqual(dataset.name, 're1.wc')
-        self.assertEqual(feature.name, 'CLASS_LABEL')
-        self.assertEqual(feature.data_type, 'nominal')
+        self.assertEqual(dataset.name, "re1.wc")
+        self.assertEqual(feature.name, "CLASS_LABEL")
+        self.assertEqual(feature.data_type, "nominal")
         self.assertEqual(len(feature.nominal_values), 25)
 
 
 class OpenMLDatasetQualityTest(TestBase):
     def test__check_qualities(self):
-        qualities = [{'oml:name': 'a', 'oml:value': '0.5'}]
+        qualities = [{"oml:name": "a", "oml:value": "0.5"}]
         qualities = openml.datasets.dataset._check_qualities(qualities)
-        self.assertEqual(qualities['a'], 0.5)
+        self.assertEqual(qualities["a"], 0.5)
 
-        qualities = [{'oml:name': 'a', 'oml:value': 'null'}]
+        qualities = [{"oml:name": "a", "oml:value": "null"}]
         qualities = openml.datasets.dataset._check_qualities(qualities)
-        self.assertNotEqual(qualities['a'], qualities['a'])
+        self.assertNotEqual(qualities["a"], qualities["a"])
 
-        qualities = [{'oml:name': 'a', 'oml:value': None}]
+        qualities = [{"oml:name": "a", "oml:value": None}]
         qualities = openml.datasets.dataset._check_qualities(qualities)
-        self.assertNotEqual(qualities['a'], qualities['a'])
+        self.assertNotEqual(qualities["a"], qualities["a"])

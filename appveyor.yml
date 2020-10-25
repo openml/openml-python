@@ -5,10 +5,10 @@ environment:
 #     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\scikit-learn-contrib\\run_with_env.cmd"
 
  matrix:
-    - PYTHON: "C:\\Python35-x64"
-      PYTHON_VERSION: "3.5"
+    - PYTHON: "C:\\Python3-x64"
+      PYTHON_VERSION: "3.6"
       PYTHON_ARCH: "64"
-      MINICONDA: "C:\\Miniconda35-x64"
+      MINICONDA: "C:\\Miniconda36-x64"
 
 matrix:
     fast_finish: true
@@ -35,7 +35,9 @@ install:
   # Install the build and runtime dependencies of the project.
   - "cd C:\\projects\\openml-python"
   - "pip install .[examples,test]"
-  - conda install --quiet --yes scikit-learn=0.20.0
+  - "pip install scikit-learn==0.21"
+  # Uninstall coverage, as it leads to an error on appveyor
+  - "pip uninstall -y pytest-cov"
 
 
 # Not a .NET project, we build scikit-learn in the install step instead

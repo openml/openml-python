@@ -15,22 +15,19 @@ class OpenMLTaskTest(TestBase):
 
     def mocked_perform_api_call(call, request_method):
         # TODO: JvR: Why is this not a staticmethod?
-        url = openml.config.server + '/' + call
-        return openml._api_calls._read_url(url, request_method=request_method)
+        url = openml.config.server + "/" + call
+        return openml._api_calls._download_text_file(url)
 
     def test_list_all(self):
         openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
 
-    @mock.patch('openml._api_calls._perform_api_call',
-                side_effect=mocked_perform_api_call)
+    @mock.patch("openml._api_calls._perform_api_call", side_effect=mocked_perform_api_call)
     def test_list_all_few_results_available(self, _perform_api_call):
         # we want to make sure that the number of api calls is only 1.
         # Although we have multiple versions of the iris dataset, there is only
         # one with this name/version combination
 
-        datasets = openml.datasets.list_datasets(size=1000,
-                                                 data_name='iris',
-                                                 data_version=1)
+        datasets = openml.datasets.list_datasets(size=1000, data_name="iris", data_version=1)
         self.assertEqual(len(datasets), 1)
         self.assertEqual(_perform_api_call.call_count, 1)
 
@@ -84,8 +81,9 @@ class OpenMLTaskTest(TestBase):
     def test_list_all_for_evaluations(self):
         required_size = 22
         # TODO apparently list_evaluations function does not support kwargs
-        evaluations = openml.evaluations.list_evaluations(function='predictive_accuracy',
-                                                          size=required_size)
+        evaluations = openml.evaluations.list_evaluations(
+            function="predictive_accuracy", size=required_size
+        )
 
         # might not be on test server after reset, please rerun test at least once if fails
         self.assertEqual(len(evaluations), required_size)

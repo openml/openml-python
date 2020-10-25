@@ -32,12 +32,14 @@ import openml
 # Required filters can be applied to retrieve results from runs as required.
 
 # We shall retrieve a small set (only 10 entries) to test the listing function for evaluations
-openml.evaluations.list_evaluations(function='predictive_accuracy', size=10,
-                                    output_format='dataframe')
+openml.evaluations.list_evaluations(
+    function="predictive_accuracy", size=10, output_format="dataframe"
+)
 
 # Using other evaluation metrics, 'precision' in this case
-evals = openml.evaluations.list_evaluations(function='precision', size=10,
-                                            output_format='dataframe')
+evals = openml.evaluations.list_evaluations(
+    function="precision", size=10, output_format="dataframe"
+)
 
 # Querying the returned results for precision above 0.98
 print(evals[evals.value > 0.98])
@@ -48,7 +50,7 @@ print(evals[evals.value > 0.98])
 # Over here we shall briefly take a look at the details of the task.
 
 # We will start by displaying a simple *supervised classification* task:
-task_id = 167140        # https://www.openml.org/t/167140
+task_id = 167140  # https://www.openml.org/t/167140
 task = openml.tasks.get_task(task_id)
 print(task)
 
@@ -59,13 +61,14 @@ print(task)
 # we displayed previously.
 # Note that we now filter the evaluations based on another parameter 'task'.
 
-metric = 'predictive_accuracy'
-evals = openml.evaluations.list_evaluations(function=metric, task=[task_id],
-                                            output_format='dataframe')
+metric = "predictive_accuracy"
+evals = openml.evaluations.list_evaluations(
+    function=metric, tasks=[task_id], output_format="dataframe"
+)
 # Displaying the first 10 rows
 print(evals.head(n=10))
 # Sorting the evaluations in decreasing order of the metric chosen
-evals = evals.sort_values(by='value', ascending=False)
+evals = evals.sort_values(by="value", ascending=False)
 print("\nDisplaying head of sorted dataframe: ")
 print(evals.head())
 
@@ -79,19 +82,18 @@ print(evals.head())
 from matplotlib import pyplot as plt
 
 
-def plot_cdf(values, metric='predictive_accuracy'):
+def plot_cdf(values, metric="predictive_accuracy"):
     max_val = max(values)
-    n, bins, patches = plt.hist(values, density=True, histtype='step',
-                                cumulative=True, linewidth=3)
+    n, bins, patches = plt.hist(values, density=True, histtype="step", cumulative=True, linewidth=3)
     patches[0].set_xy(patches[0].get_xy()[:-1])
     plt.xlim(max(0, min(values) - 0.1), 1)
-    plt.title('CDF')
+    plt.title("CDF")
     plt.xlabel(metric)
-    plt.ylabel('Likelihood')
-    plt.grid(b=True, which='major', linestyle='-')
+    plt.ylabel("Likelihood")
+    plt.grid(b=True, which="major", linestyle="-")
     plt.minorticks_on()
-    plt.grid(b=True, which='minor', linestyle='--')
-    plt.axvline(max_val, linestyle='--', color='gray')
+    plt.grid(b=True, which="minor", linestyle="--")
+    plt.axvline(max_val, linestyle="--", color="gray")
     plt.text(max_val, 0, "%.3f" % max_val, fontsize=9)
     plt.show()
 
@@ -111,7 +113,7 @@ import numpy as np
 import pandas as pd
 
 
-def plot_flow_compare(evaluations, top_n=10, metric='predictive_accuracy'):
+def plot_flow_compare(evaluations, top_n=10, metric="predictive_accuracy"):
     # Collecting the top 10 performing unique flow_id
     flow_ids = evaluations.flow_id.unique()[:top_n]
 
@@ -123,18 +125,18 @@ def plot_flow_compare(evaluations, top_n=10, metric='predictive_accuracy'):
         df = pd.concat([df, flow_values], ignore_index=True, axis=1)
     fig, axs = plt.subplots()
     df.boxplot()
-    axs.set_title('Boxplot comparing ' + metric + ' for different flows')
+    axs.set_title("Boxplot comparing " + metric + " for different flows")
     axs.set_ylabel(metric)
-    axs.set_xlabel('Flow ID')
+    axs.set_xlabel("Flow ID")
     axs.set_xticklabels(flow_ids)
-    axs.grid(which='major', linestyle='-', linewidth='0.5', color='gray', axis='y')
+    axs.grid(which="major", linestyle="-", linewidth="0.5", color="gray", axis="y")
     axs.minorticks_on()
-    axs.grid(which='minor', linestyle='--', linewidth='0.5', color='gray', axis='y')
+    axs.grid(which="minor", linestyle="--", linewidth="0.5", color="gray", axis="y")
     # Counting the number of entries for each flow in the data frame
     #   which gives the number of runs for each flow
     flow_freq = list(df.count(axis=0, numeric_only=True))
     for i in range(len(flow_ids)):
-        axs.text(i + 1.05, np.nanmin(df.values), str(flow_freq[i]) + '\nrun(s)', fontsize=7)
+        axs.text(i + 1.05, np.nanmin(df.values), str(flow_freq[i]) + "\nrun(s)", fontsize=7)
     plt.show()
 
 
@@ -159,8 +161,9 @@ for i in range(top_n):
 
 # List evaluations in descending order based on predictive_accuracy with
 # hyperparameters
-evals_setups = openml.evaluations.list_evaluations_setups(function='predictive_accuracy', task=[31],
-                                                          size=100, sort_order='desc')
+evals_setups = openml.evaluations.list_evaluations_setups(
+    function="predictive_accuracy", tasks=[31], size=100, sort_order="desc"
+)
 
 ""
 print(evals_setups.head())
@@ -169,10 +172,9 @@ print(evals_setups.head())
 # Return evaluations for flow_id in descending order based on predictive_accuracy
 # with hyperparameters. parameters_in_separate_columns returns parameters in
 # separate columns
-evals_setups = openml.evaluations.list_evaluations_setups(function='predictive_accuracy',
-                                                          flow=[6767],
-                                                          size=100,
-                                                          parameters_in_separate_columns=True)
+evals_setups = openml.evaluations.list_evaluations_setups(
+    function="predictive_accuracy", flows=[6767], size=100, parameters_in_separate_columns=True
+)
 
 ""
 print(evals_setups.head(10))

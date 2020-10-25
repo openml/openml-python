@@ -7,69 +7,120 @@ Store module level information like the API key, cache directory and the server
 import logging
 import logging.handlers
 import os
-from typing import cast
+from typing import Tuple, cast
 
 from io import StringIO
 import configparser
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
+openml_logger = logging.getLogger("openml")
+console_handler = None
+file_handler = None
 
 
-def configure_logging(console_output_level: int, file_output_level: int):
-    """ Sets the OpenML logger to DEBUG, with attached Stream- and FileHandler. """
-    # Verbosity levels as defined (https://github.com/openml/OpenML/wiki/Client-API-Standards)
-    # don't match Python values directly:
-    verbosity_map = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
+def _create_log_handlers():
+    """ Creates but does not attach the log handlers. """
+    global console_handler, file_handler
+    if console_handler is not None or file_handler is not None:
+        logger.debug("Requested to create log handlers, but they are already created.")
+        return
 
-    openml_logger = logging.getLogger('openml')
-    openml_logger.setLevel(logging.DEBUG)
-    message_format = '[%(levelname)s] [%(asctime)s:%(name)s] %(message)s'
-    output_formatter = logging.Formatter(message_format, datefmt='%H:%M:%S')
+    message_format = "[%(levelname)s] [%(asctime)s:%(name)s] %(message)s"
+    output_formatter = logging.Formatter(message_format, datefmt="%H:%M:%S")
 
-    console_stream = logging.StreamHandler()
-    console_stream.setFormatter(output_formatter)
-    console_stream.setLevel(verbosity_map[console_output_level])
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(output_formatter)
 
-    one_mb = 2**20
-    log_path = os.path.join(cache_directory, 'openml_python.log')
-    file_stream = logging.handlers.RotatingFileHandler(log_path, maxBytes=one_mb, backupCount=1)
-    file_stream.setLevel(verbosity_map[file_output_level])
-    file_stream.setFormatter(output_formatter)
+    one_mb = 2 ** 20
+    log_path = os.path.join(cache_directory, "openml_python.log")
+    file_handler = logging.handlers.RotatingFileHandler(
+        log_path, maxBytes=one_mb, backupCount=1, delay=True
+    )
+    file_handler.setFormatter(output_formatter)
 
-    openml_logger.addHandler(console_stream)
-    openml_logger.addHandler(file_stream)
-    return console_stream, file_stream
+
+def _convert_log_levels(log_level: int) -> Tuple[int, int]:
+    """ Converts a log level that's either defined by OpenML/Python to both specifications. """
+    # OpenML verbosity level don't match Python values directly:
+    openml_to_python = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
+    python_to_openml = {
+        logging.DEBUG: 2,
+        logging.INFO: 1,
+        logging.WARNING: 0,
+        logging.CRITICAL: 0,
+        logging.ERROR: 0,
+    }
+    # Because the dictionaries share no keys, we use `get` to convert as necessary:
+    openml_level = python_to_openml.get(log_level, log_level)
+    python_level = openml_to_python.get(log_level, log_level)
+    return openml_level, python_level
+
+
+def _set_level_register_and_store(handler: logging.Handler, log_level: int):
+    """ Set handler log level, register it if needed, save setting to config file if specified. """
+    oml_level, py_level = _convert_log_levels(log_level)
+    handler.setLevel(py_level)
+
+    if openml_logger.level > py_level or openml_logger.level == logging.NOTSET:
+        openml_logger.setLevel(py_level)
+
+    if handler not in openml_logger.handlers:
+        openml_logger.addHandler(handler)
+
+
+def set_console_log_level(console_output_level: int):
+    """ Set console output to the desired level and register it with openml logger if needed. """
+    global console_handler
+    _set_level_register_and_store(cast(logging.Handler, console_handler), console_output_level)
+
+
+def set_file_log_level(file_output_level: int):
+    """ Set file output to the desired level and register it with openml logger if needed. """
+    global file_handler
+    _set_level_register_and_store(cast(logging.Handler, file_handler), file_output_level)
 
 
 # Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
 _defaults = {
-    'apikey': None,
-    'server': "https://www.openml.org/api/v1/xml",
-    'verbosity': 0,  # WARNING
-    'file_verbosity': 2,  # DEBUG
-    'cachedir': os.path.expanduser(os.path.join('~', '.openml', 'cache')),
-    'avoid_duplicate_runs': 'True',
-    'connection_n_retries': 2,
+    "apikey": None,
+    "server": "https://www.openml.org/api/v1/xml",
+    "cachedir": os.path.expanduser(os.path.join("~", ".openml", "cache")),
+    "avoid_duplicate_runs": "True",
+    "connection_n_retries": 2,
 }
 
-config_file = os.path.expanduser(os.path.join('~', '.openml', 'config'))
+config_file = os.path.expanduser(os.path.join("~", ".openml", "config"))
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
-server = str(_defaults['server'])  # so mypy knows it is a string
-server_base_url = server[:-len('/api/v1/xml')]
-apikey = _defaults['apikey']
+server = str(_defaults["server"])  # so mypy knows it is a string
+
+
+def get_server_base_url() -> str:
+    """Return the base URL of the currently configured server.
+
+    Turns ``"https://www.openml.org/api/v1/xml"`` in ``"https://www.openml.org/"``
+
+    Returns
+    =======
+    str
+    """
+    return server.split("/api")[0]
+
+
+apikey = _defaults["apikey"]
 # The current cache directory (without the server name)
-cache_directory = str(_defaults['cachedir'])  # so mypy knows it is a string
-avoid_duplicate_runs = True if _defaults['avoid_duplicate_runs'] == 'True' else False
+cache_directory = str(_defaults["cachedir"])  # so mypy knows it is a string
+avoid_duplicate_runs = True if _defaults["avoid_duplicate_runs"] == "True" else False
 
 # Number of retries if the connection breaks
-connection_n_retries = _defaults['connection_n_retries']
+connection_n_retries = _defaults["connection_n_retries"]
 
 
 class ConfigurationForExamples:
     """ Allows easy switching to and from a test configuration, used for examples. """
+
     _last_used_server = None
     _last_used_key = None
     _start_last_called = False
@@ -105,8 +156,10 @@ class ConfigurationForExamples:
         if not cls._start_last_called:
             # We don't want to allow this because it will (likely) result in the `server` and
             # `apikey` variables being set to None.
-            raise RuntimeError("`stop_use_example_configuration` called without a saved config."
-                               "`start_use_example_configuration` must be called first.")
+            raise RuntimeError(
+                "`stop_use_example_configuration` called without a saved config."
+                "`start_use_example_configuration` must be called first."
+            )
 
         global server
         global apikey
@@ -133,16 +186,16 @@ def _setup():
 
     # read config file, create cache directory
     try:
-        os.mkdir(os.path.expanduser(os.path.join('~', '.openml')))
+        os.mkdir(os.path.expanduser(os.path.join("~", ".openml")))
     except FileExistsError:
         # For other errors, we want to propagate the error as openml does not work without cache
         pass
 
     config = _parse_config()
-    apikey = config.get('FAKE_SECTION', 'apikey')
-    server = config.get('FAKE_SECTION', 'server')
+    apikey = config.get("FAKE_SECTION", "apikey")
+    server = config.get("FAKE_SECTION", "server")
 
-    short_cache_dir = config.get('FAKE_SECTION', 'cachedir')
+    short_cache_dir = config.get("FAKE_SECTION", "cachedir")
     cache_directory = os.path.expanduser(short_cache_dir)
 
     # create the cache subdirectory
@@ -152,30 +205,30 @@ def _setup():
         # For other errors, we want to propagate the error as openml does not work without cache
         pass
 
-    avoid_duplicate_runs = config.getboolean('FAKE_SECTION',
-                                             'avoid_duplicate_runs')
-    connection_n_retries = config.get('FAKE_SECTION', 'connection_n_retries')
+    avoid_duplicate_runs = config.getboolean("FAKE_SECTION", "avoid_duplicate_runs")
+    connection_n_retries = config.get("FAKE_SECTION", "connection_n_retries")
     if connection_n_retries > 20:
         raise ValueError(
-            'A higher number of retries than 20 is not allowed to keep the '
-            'server load reasonable'
+            "A higher number of retries than 20 is not allowed to keep the "
+            "server load reasonable"
         )
 
 
 def _parse_config():
-    """Parse the config file, set up defaults.
-    """
-
+    """ Parse the config file, set up defaults. """
     config = configparser.RawConfigParser(defaults=_defaults)
 
     if not os.path.exists(config_file):
         # Create an empty config file if there was none so far
         fh = open(config_file, "w")
         fh.close()
-        logger.info("Could not find a configuration file at %s. Going to "
-                    "create an empty file there." % config_file)
+        logger.info(
+            "Could not find a configuration file at %s. Going to "
+            "create an empty file there." % config_file
+        )
 
     try:
+        # The ConfigParser requires a [SECTION_HEADER], which we do not expect in our config file.
         # Cheat the ConfigParser module by adding a fake section header
         config_file_ = StringIO()
         config_file_.write("[FAKE_SECTION]\n")
@@ -199,7 +252,7 @@ def get_cache_directory():
 
     """
     url_suffix = urlparse(server).netloc
-    reversed_url_suffix = os.sep.join(url_suffix.split('.')[::-1])
+    reversed_url_suffix = os.sep.join(url_suffix.split(".")[::-1])
     if not cache_directory:
         _cachedir = _defaults(cache_directory)
     else:
@@ -230,19 +283,14 @@ def set_cache_directory(cachedir):
 start_using_configuration_for_example = (
     ConfigurationForExamples.start_using_configuration_for_example
 )
-stop_using_configuration_for_example = (
-    ConfigurationForExamples.stop_using_configuration_for_example
-)
+stop_using_configuration_for_example = ConfigurationForExamples.stop_using_configuration_for_example
 
 __all__ = [
-    'get_cache_directory',
-    'set_cache_directory',
-    'start_using_configuration_for_example',
-    'stop_using_configuration_for_example',
+    "get_cache_directory",
+    "set_cache_directory",
+    "start_using_configuration_for_example",
+    "stop_using_configuration_for_example",
 ]
 
 _setup()
-
-_console_log_level = cast(int, _defaults['verbosity'])
-_file_log_level = cast(int, _defaults['file_verbosity'])
-console_log, file_log = configure_logging(_console_log_level, _file_log_level)
+_create_log_handlers()

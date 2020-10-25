@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from openml.tasks import get_task
+from openml.tasks import TaskType, get_task
 from .test_supervised_task import OpenMLSupervisedTaskTest
 
 
@@ -14,7 +14,7 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
 
         super(OpenMLClassificationTaskTest, self).setUp()
         self.task_id = 119
-        self.task_type_id = 1
+        self.task_type = TaskType.SUPERVISED_CLASSIFICATION
         self.estimation_procedure = 1
 
     def test_get_X_and_Y(self):
@@ -22,7 +22,7 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
         X, Y = super(OpenMLClassificationTaskTest, self).test_get_X_and_Y()
         self.assertEqual((768, 8), X.shape)
         self.assertIsInstance(X, np.ndarray)
-        self.assertEqual((768, ), Y.shape)
+        self.assertEqual((768,), Y.shape)
         self.assertIsInstance(Y, np.ndarray)
         self.assertEqual(Y.dtype, int)
 
@@ -30,13 +30,10 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
 
         task = super(OpenMLClassificationTaskTest, self).test_download_task()
         self.assertEqual(task.task_id, self.task_id)
-        self.assertEqual(task.task_type_id, 1)
+        self.assertEqual(task.task_type_id, TaskType.SUPERVISED_CLASSIFICATION)
         self.assertEqual(task.dataset_id, 20)
 
     def test_class_labels(self):
 
         task = get_task(self.task_id)
-        self.assertEqual(
-            task.class_labels,
-            ['tested_negative', 'tested_positive']
-        )
+        self.assertEqual(task.class_labels, ["tested_negative", "tested_positive"])

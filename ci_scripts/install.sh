@@ -1,5 +1,7 @@
 # License: BSD 3-Clause
 
+set -e
+
 # Deactivate the travis-provided virtual environment and setup a
 # conda-based environment instead
 deactivate
@@ -32,15 +34,25 @@ source activate testenv
 if [[ -v SCIPY_VERSION ]]; then
     conda install --yes scipy=$SCIPY_VERSION
 fi
-
 python --version
-pip install -e '.[test]'
+
+if [[ "$TEST_DIST" == "true" ]]; then
+    pip install twine nbconvert jupyter_client matplotlib pyarrow pytest pytest-xdist pytest-timeout \
+        nbformat oslo.concurrency flaky mypy
+    python setup.py sdist
+    # Find file which was modified last as done in https://stackoverflow.com/a/4561987
+    dist=`find dist -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" "`
+    echo "Installing $dist"
+    pip install "$dist"
+    twine check "$dist"
+else
+    pip install -e '.[test]'
+fi
+
 python -c "import numpy; print('numpy %s' % numpy.__version__)"
 python -c "import scipy; print('scipy %s' % scipy.__version__)"
 
-if [[ "$DOCTEST" == "true" ]]; then
-    pip install sphinx_bootstrap_theme
-fi
+
 if [[ "$DOCPUSH" == "true" ]]; then
     conda install --yes gxx_linux-64 gcc_linux-64 swig
     pip install -e '.[examples,examples_unix]'
@@ -49,7 +61,17 @@ if [[ "$COVERAGE" == "true" ]]; then
     pip install codecov pytest-cov
 fi
 if [[ "$RUN_FLAKE8" == "true" ]]; then
-    pip install flake8 mypy
+    pip install pre-commit
+    pre-commit install
+fi
+
+# PEP 561 compliance check
+# Assumes mypy relies solely on the PEP 561 standard
+if ! python -m mypy -c "import openml"; then
+   echo "Failed: PEP 561 compliance"
+   exit 1
+else
+   echo "Success: PEP 561 compliant"
 fi
 
 # Install scikit-learn last to make sure the openml package installation works

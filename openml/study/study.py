@@ -54,6 +54,7 @@ class BaseStudy(OpenMLBase):
     setups : list
         a list of setup ids associated with this study
     """
+
     def __init__(
         self,
         study_id: Optional[int],
@@ -91,7 +92,7 @@ class BaseStudy(OpenMLBase):
 
     @classmethod
     def _entity_letter(cls) -> str:
-        return 's'
+        return "s"
 
     @property
     def id(self) -> Optional[int]:
@@ -99,16 +100,18 @@ class BaseStudy(OpenMLBase):
 
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
         """ Collect all information to display in the __repr__ body. """
-        fields = {"Name": self.name,
-                  "Status": self.status,
-                  "Main Entity Type": self.main_entity_type}  # type: Dict[str, Any]
+        fields = {
+            "Name": self.name,
+            "Status": self.status,
+            "Main Entity Type": self.main_entity_type,
+        }  # type: Dict[str, Any]
         if self.study_id is not None:
             fields["ID"] = self.study_id
             fields["Study URL"] = self.openml_url
         if self.creator is not None:
-            fields["Creator"] = "{}/u/{}".format(openml.config.server_base_url, self.creator)
+            fields["Creator"] = "{}/u/{}".format(openml.config.get_server_base_url(), self.creator)
         if self.creation_date is not None:
-            fields["Upload Time"] = self.creation_date.replace('T', ' ')
+            fields["Upload Time"] = self.creation_date.replace("T", " ")
         if self.data is not None:
             fields["# of Data"] = len(self.data)
         if self.tasks is not None:
@@ -119,31 +122,41 @@ class BaseStudy(OpenMLBase):
             fields["# of Runs"] = len(self.runs)
 
         # determines the order in which the information will be printed
-        order = ["ID", "Name", "Status", "Main Entity Type", "Study URL",
-                 "# of Data", "# of Tasks", "# of Flows", "# of Runs",
-                 "Creator", "Upload Time"]
+        order = [
+            "ID",
+            "Name",
+            "Status",
+            "Main Entity Type",
+            "Study URL",
+            "# of Data",
+            "# of Tasks",
+            "# of Flows",
+            "# of Runs",
+            "Creator",
+            "Upload Time",
+        ]
         return [(key, fields[key]) for key in order if key in fields]
 
     def _parse_publish_response(self, xml_response: Dict):
         """ Parse the id from the xml_response and assign it to self. """
-        self.study_id = int(xml_response['oml:study_upload']['oml:id'])
+        self.study_id = int(xml_response["oml:study_upload"]["oml:id"])
 
-    def _to_dict(self) -> 'OrderedDict[str, OrderedDict]':
+    def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
         """ Creates a dictionary representation of self. """
         # some can not be uploaded, e.g., id, creator, creation_date
-        simple_props = ['alias', 'main_entity_type', 'name', 'description']
+        simple_props = ["alias", "main_entity_type", "name", "description"]
         # maps from attribute name (which is used as outer tag name) to immer
         # tag name (e.g., self.tasks -> <oml:tasks><oml:task_id>1987
         # </oml:task_id></oml:tasks>)
         complex_props = {
-            'tasks': 'task_id',
-            'runs': 'run_id',
+            "tasks": "task_id",
+            "runs": "run_id",
         }
 
         study_container = OrderedDict()  # type: 'OrderedDict'
-        namespace_list = [('@xmlns:oml', 'http://openml.org/openml')]
+        namespace_list = [("@xmlns:oml", "http://openml.org/openml")]
         study_dict = OrderedDict(namespace_list)  # type: 'OrderedDict'
-        study_container['oml:study'] = study_dict
+        study_container["oml:study"] = study_dict
 
         for prop_name in simple_props:
             content = getattr(self, prop_name, None)
@@ -152,9 +165,7 @@ class BaseStudy(OpenMLBase):
         for prop_name, inner_name in complex_props.items():
             content = getattr(self, prop_name, None)
             if content is not None:
-                sub_dict = {
-                    'oml:' + inner_name: content
-                }
+                sub_dict = {"oml:" + inner_name: content}
                 study_dict["oml:" + prop_name] = sub_dict
         return study_container
 
@@ -210,6 +221,7 @@ class OpenMLStudy(BaseStudy):
     setups : list
         a list of setup ids associated with this study
     """
+
     def __init__(
         self,
         study_id: Optional[int],
@@ -230,7 +242,7 @@ class OpenMLStudy(BaseStudy):
         super().__init__(
             study_id=study_id,
             alias=alias,
-            main_entity_type='run',
+            main_entity_type="run",
             benchmark_suite=benchmark_suite,
             name=name,
             description=description,
@@ -302,7 +314,7 @@ class OpenMLBenchmarkSuite(BaseStudy):
         super().__init__(
             study_id=suite_id,
             alias=alias,
-            main_entity_type='task',
+            main_entity_type="task",
             benchmark_suite=None,
             name=name,
             description=description,

@@ -10,10 +10,7 @@ from openml.datasets import (
     get_dataset,
     list_datasets,
 )
-from openml.tasks import (
-    create_task,
-    get_task
-)
+from openml.tasks import TaskType, create_task, get_task
 
 
 class OpenMLTaskTest(TestBase):
@@ -27,10 +24,7 @@ class OpenMLTaskTest(TestBase):
     @classmethod
     def setUpClass(cls):
         if cls is OpenMLTaskTest:
-            raise unittest.SkipTest(
-                "Skip OpenMLTaskTest tests,"
-                " it's a base class"
-            )
+            raise unittest.SkipTest("Skip OpenMLTaskTest tests," " it's a base class")
         super(OpenMLTaskTest, cls).setUpClass()
 
     def setUp(self, n_levels: int = 1):
@@ -53,16 +47,17 @@ class OpenMLTaskTest(TestBase):
                 dataset_id = compatible_datasets[i % len(compatible_datasets)]
                 # TODO consider implementing on the diff task types.
                 task = create_task(
-                    task_type_id=self.task_type_id,
+                    task_type=self.task_type,
                     dataset_id=dataset_id,
                     target_name=self._get_random_feature(dataset_id),
-                    estimation_procedure_id=self.estimation_procedure
+                    estimation_procedure_id=self.estimation_procedure,
                 )
 
                 task.publish()
-                TestBase._mark_entity_for_removal('task', task.id)
-                TestBase.logger.info("collected from {}: {}".format(__file__.split('/')[-1],
-                                                                    task.id))
+                TestBase._mark_entity_for_removal("task", task.id)
+                TestBase.logger.info(
+                    "collected from {}: {}".format(__file__.split("/")[-1], task.id)
+                )
                 # success
                 break
             except OpenMLServerException as e:
@@ -75,32 +70,32 @@ class OpenMLTaskTest(TestBase):
                     raise e
         else:
             raise ValueError(
-                'Could not create a valid task for task type ID {}'.format(self.task_type_id)
+                "Could not create a valid task for task type ID {}".format(self.task_type)
             )
 
     def _get_compatible_rand_dataset(self) -> List:
 
         compatible_datasets = []
-        active_datasets = list_datasets(status='active')
+        active_datasets = list_datasets(status="active")
 
         # depending on the task type, find either datasets
         # with only symbolic features or datasets with only
         # numerical features.
-        if self.task_type_id == 2:
+        if self.task_type == TaskType.SUPERVISED_REGRESSION:
             # regression task
             for dataset_id, dataset_info in active_datasets.items():
-                if 'NumberOfSymbolicFeatures' in dataset_info:
-                    if dataset_info['NumberOfSymbolicFeatures'] == 0:
+                if "NumberOfSymbolicFeatures" in dataset_info:
+                    if dataset_info["NumberOfSymbolicFeatures"] == 0:
                         compatible_datasets.append(dataset_id)
-        elif self.task_type_id == 5:
+        elif self.task_type == TaskType.CLUSTERING:
             # clustering task
             compatible_datasets = list(active_datasets.keys())
         else:
             for dataset_id, dataset_info in active_datasets.items():
                 # extra checks because of:
                 # https://github.com/openml/OpenML/issues/959
-                if 'NumberOfNumericFeatures' in dataset_info:
-                    if dataset_info['NumberOfNumericFeatures'] == 0:
+                if "NumberOfNumericFeatures" in dataset_info:
+                    if dataset_info["NumberOfNumericFeatures"] == 0:
                         compatible_datasets.append(dataset_id)
 
         # in-place shuffling
@@ -119,10 +114,10 @@ class OpenMLTaskTest(TestBase):
         while True:
             random_feature_index = randint(0, len(random_dataset.features) - 1)
             random_feature = random_dataset.features[random_feature_index]
-            if self.task_type_id == 2:
-                if random_feature.data_type == 'numeric':
+            if self.task_type == TaskType.SUPERVISED_REGRESSION:
+                if random_feature.data_type == "numeric":
                     break
             else:
-                if random_feature.data_type == 'nominal':
+                if random_feature.data_type == "nominal":
                     break
         return random_feature.name
