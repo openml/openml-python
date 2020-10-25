@@ -1050,7 +1050,6 @@ def __list_runs(api_call, output_format="dict"):
             "upload_time": str(run_["oml:upload_time"]),
             "error_message": str((run_["oml:error_message"]) or ""),
         }
-
         runs[run_id] = run
 
     if output_format == "dataframe":
