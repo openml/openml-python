@@ -22,6 +22,8 @@ Possible Future: class TestBase from openml/testing.py can be included
 
 # License: BSD 3-Clause
 
+# License: BSD 3-Clause
+
 import os
 import logging
 from typing import List
