@@ -142,7 +142,7 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     Flow Name....: sklearn.tree._classes.ExtraTreeClassifier
     Flow URL.....: https://test.openml.org/f/407755
     Setup ID.....: None
-    Setup String.: Python_3.6.12. Sklearn_0.23.1. NumPy_1.19.2. SciPy_1.5.3. ExtraTreeClassifier(random_state=9362)
+    Setup String.: Python_3.6.12. Sklearn_0.23.1. NumPy_1.19.2. SciPy_1.5.3. ExtraTreeClassifier(random_state=59094)
     Dataset ID...: 68
     Dataset URL..: https://test.openml.org/d/68
 
@@ -173,7 +173,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/152307
+    Uploaded to http://test.openml.org/r/153302
 
 
 
@@ -297,7 +297,7 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
       warnings.warn(message)
     /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
-    Uploaded to http://test.openml.org/r/152310
+    Uploaded to http://test.openml.org/r/153303
 
 
 
@@ -345,8 +345,8 @@ a model on a task without uploading results or flows to the server immediately.
     ==========
     Uploader Name: None
     Metric.......: None
-    Run ID.......: 152312
-    Run URL......: https://test.openml.org/r/152312
+    Run ID.......: 153304
+    Run URL......: https://test.openml.org/r/153304
     Task ID......: 6
     Task Type....: None
     Task URL.....: https://test.openml.org/t/6
@@ -429,7 +429,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/152313
+    kNN on diabetes: http://test.openml.org/r/153305
 
 
 
@@ -448,7 +448,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  25.602 seconds)
+   **Total running time of the script:** ( 0 minutes  25.190 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:

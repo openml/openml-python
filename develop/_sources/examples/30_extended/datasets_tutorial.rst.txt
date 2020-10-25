@@ -18,7 +18,6 @@ How to list and download datasets.
 
 .. code-block:: default
 
-    ""
 
     # License: BSD 3-Clauses
 
@@ -768,7 +767,7 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
  .. code-block:: none
 
-    Forked dataset ID: 102840
+    Forked dataset ID: 103508
 
 
 
@@ -776,7 +775,7 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.500 seconds)
+   **Total running time of the script:** ( 0 minutes  10.189 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:
