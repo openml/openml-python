@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>OpenML &#8212; OpenML 0.10.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenML &#8212; OpenML 0.11.0 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
 <meta charset='utf-8'>
@@ -52,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="#">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -108,6 +111,7 @@
 <li><a class="reference internal" href="#content">Content</a></li>
 <li><a class="reference internal" href="#further-information">Further information</a></li>
 <li><a class="reference internal" href="#contributing">Contributing</a></li>
+<li><a class="reference internal" href="#citing-openml-python">Citing OpenML-Python</a></li>
 </ul>
 </li>
 </ul>
@@ -143,7 +147,7 @@ with scikit-learn and share the results online.</p>
 <span class="c1"># Publish the experiment on OpenML (optional, requires an API key.</span>
 <span class="c1"># You can get your own API key by signing up to OpenML.org)</span>
 <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;View the run online: </span><span class="si">{openml.config.server}</span><span class="s1">/run/</span><span class="si">{run.run_id}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;View the run online: </span><span class="si">{</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span><span class="si">}</span><span class="s1">/run/</span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">run_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You can find more examples in our <a class="reference external" href="examples/index.html">examples gallery</a>.</p>
@@ -155,7 +159,7 @@ with scikit-learn and share the results online.</p>
 </pre></div>
 </div>
 <p>For more advanced installation information, please see the
-<a class="reference internal" href="contributing.html#installation"><span class="std std-ref">Installation</span></a> section.</p>
+<span class="xref std std-ref">installation</span> section.</p>
 </div>
 <div class="section" id="content">
 <h2>Content<a class="headerlink" href="#content" title="Permalink to this headline">¶</a></h2>
@@ -186,6 +190,24 @@ currently has a 1/4 position for the development and all help possible is
 needed to extend and maintain the package, create new examples and improve
 the usability. Please see the <a class="reference internal" href="contributing.html#contributing"><span class="std std-ref">Contributing</span></a> page for more information.</p>
 </div>
+<div class="section" id="citing-openml-python">
+<h2>Citing OpenML-Python<a class="headerlink" href="#citing-openml-python" title="Permalink to this headline">¶</a></h2>
+<p>If you use OpenML-Python in a scientific publication, we would appreciate a
+reference to the following paper:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://arxiv.org/abs/1911.02490">OpenML-Python: an extensible Python API for OpenML</a>,
+Feurer <em>et al.</em>, arXiv:1911.02490.</p>
+<p>Bibtex entry:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@article</span><span class="p">{</span><span class="n">feurer</span><span class="o">-</span><span class="n">arxiv19a</span><span class="p">,</span>
+    <span class="n">author</span>    <span class="o">=</span> <span class="p">{</span><span class="n">Matthias</span> <span class="n">Feurer</span> <span class="ow">and</span> <span class="n">Jan</span> <span class="n">N</span><span class="o">.</span> <span class="n">van</span> <span class="n">Rijn</span> <span class="ow">and</span> <span class="n">Arlind</span> <span class="n">Kadra</span> <span class="ow">and</span> <span class="n">Pieter</span> <span class="n">Gijsbers</span> <span class="ow">and</span> <span class="n">Neeratyoy</span> <span class="n">Mallik</span> <span class="ow">and</span> <span class="n">Sahithya</span> <span class="n">Ravi</span> <span class="ow">and</span> <span class="n">Andreas</span> <span class="n">Müller</span> <span class="ow">and</span> <span class="n">Joaquin</span> <span class="n">Vanschoren</span> <span class="ow">and</span> <span class="n">Frank</span> <span class="n">Hutter</span><span class="p">},</span>
+    <span class="n">title</span>     <span class="o">=</span> <span class="p">{</span><span class="n">OpenML</span><span class="o">-</span><span class="n">Python</span><span class="p">:</span> <span class="n">an</span> <span class="n">extensible</span> <span class="n">Python</span> <span class="n">API</span> <span class="k">for</span> <span class="n">OpenML</span><span class="p">},</span>
+    <span class="n">journal</span>   <span class="o">=</span> <span class="p">{</span><span class="n">arXiv</span><span class="p">:</span><span class="mf">1911.02490</span><span class="p">},</span>
+    <span class="n">year</span>      <span class="o">=</span> <span class="p">{</span><span class="mi">2019</span><span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
 </div>
 
 
@@ -201,7 +223,7 @@ the usability. Please see the <a class="reference internal" href="contributing.h
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

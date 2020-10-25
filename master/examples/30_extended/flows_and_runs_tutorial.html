@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>Flows and Runs &#8212; OpenML 0.10.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flows and Runs &#8212; OpenML 0.11.0 documentation</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -52,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -120,7 +123,7 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="flows-and-runs">
 <span id="sphx-glr-examples-30-extended-flows-and-runs-tutorial-py"></span><h1>Flows and Runs<a class="headerlink" href="#flows-and-runs" title="Permalink to this headline">¶</a></h1>
@@ -144,17 +147,14 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
 <span class="c1"># NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">68</span><span class="p">)</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_indicator</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
-    <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">,</span>
-    <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
+    <span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
 <span class="p">)</span>
 <span class="n">clf</span> <span class="o">=</span> <span class="n">neighbors</span><span class="o">.</span><span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>KNeighborsClassifier(algorithm=&#39;auto&#39;, leaf_size=30, metric=&#39;minkowski&#39;,
-                     metric_params=None, n_jobs=None, n_neighbors=1, p=2,
-                     weights=&#39;uniform&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>KNeighborsClassifier(n_neighbors=1)
 </pre></div>
 </div>
 <p>You can also ask for meta-data to automatically preprocess the data.</p>
@@ -163,12 +163,12 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">17</span><span class="p">)</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_indicator</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
-    <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">,</span>
-    <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
+    <span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Categorical features: </span><span class="si">{categorical_indicator}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Categorical features: </span><span class="si">{</span><span class="n">categorical_indicator</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="n">transformer</span> <span class="o">=</span> <span class="n">compose</span><span class="o">.</span><span class="n">ColumnTransformer</span><span class="p">(</span>
-    <span class="p">[(</span><span class="s1">&#39;one_hot_encoder&#39;</span><span class="p">,</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">categories</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span> <span class="n">categorical_indicator</span><span class="p">)])</span>
+    <span class="p">[(</span><span class="s2">&quot;one_hot_encoder&quot;</span><span class="p">,</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">categories</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">),</span> <span class="n">categorical_indicator</span><span class="p">)]</span>
+<span class="p">)</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
@@ -176,9 +176,7 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Categorical features: [True, False, True, True, False, True, True, False, True, True, False, True, False, True, True, False, True, False, True, True]
 
-KNeighborsClassifier(algorithm=&#39;auto&#39;, leaf_size=30, metric=&#39;minkowski&#39;,
-                     metric_params=None, n_jobs=None, n_neighbors=1, p=2,
-                     weights=&#39;uniform&#39;)
+KNeighborsClassifier(n_neighbors=1)
 </pre></div>
 </div>
 </div>
@@ -205,19 +203,14 @@ Metric.......: None
 Run ID.......: None
 Task ID......: 403
 Task Type....: None
-Task URL.....: https://www.openml.org/t/403
-Flow ID......: 24258
-Flow Name....: sklearn.tree.tree.ExtraTreeClassifier
-Flow URL.....: https://www.openml.org/f/24258
+Task URL.....: https://test.openml.org/t/403
+Flow ID......: 407755
+Flow Name....: sklearn.tree._classes.ExtraTreeClassifier
+Flow URL.....: https://test.openml.org/f/407755
 Setup ID.....: None
-Setup String.: Python_3.7.6. Sklearn_0.21.2. NumPy_1.18.1. SciPy_1.4.1. ExtraTreeClassifier(class_weight=None, criterion=&#39;gini&#39;, max_depth=None,
-                    max_features=&#39;auto&#39;, max_leaf_nodes=None,
-                    min_impurity_decrease=0.0, min_impurity_split=None,
-                    min_samples_leaf=1, min_samples_split=2,
-                    min_weight_fraction_leaf=0.0, random_state=9840,
-                    splitter=&#39;random&#39;)
+Setup String.: Python_3.6.12. Sklearn_0.23.1. NumPy_1.19.2. SciPy_1.5.3. ExtraTreeClassifier(random_state=28064)
 Dataset ID...: 68
-Dataset URL..: https://www.openml.org/d/68
+Dataset URL..: https://test.openml.org/d/68
 </pre></div>
 </div>
 <p>Share the run on the OpenML server</p>
@@ -230,7 +223,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/37836
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/153905
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -241,9 +234,9 @@ the run is sent to the OpenML server:</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Flow
 ===========
-Flow ID.........: 24258 (version 4)
-Flow URL........: https://www.openml.org/f/24258
-Flow Name.......: sklearn.tree.tree.ExtraTreeClassifier
+Flow ID.........: 407755 (version 3)
+Flow URL........: https://test.openml.org/f/407755
+Flow Name.......: sklearn.tree._classes.ExtraTreeClassifier
 Flow Description: An extremely randomized tree classifier.
 
 Extra-trees differ from classic decision trees in the way they are built.
@@ -254,8 +247,8 @@ selected features and the best split among those is chosen. When
 decision tree.
 
 Warning: Extra-trees should only be used within ensemble methods.
-Upload Date.....: 2019-11-07 11:10:01
-Dependencies....: sklearn==0.21.2
+Upload Date.....: 2020-10-24 00:08:28
+Dependencies....: sklearn==0.23.1
 numpy&gt;=1.6.1
 scipy&gt;=0.9
 </pre></div>
@@ -266,29 +259,37 @@ scipy&gt;=0.9
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">features</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">()</span><span class="o">.</span><span class="n">features</span>
 <span class="n">nominal_feature_indices</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">features</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">task</span><span class="o">.</span><span class="n">target_name</span> <span class="ow">and</span> <span class="n">features</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s1">&#39;nominal&#39;</span>
+    <span class="n">i</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">features</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">task</span><span class="o">.</span><span class="n">target_name</span> <span class="ow">and</span> <span class="n">features</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;nominal&quot;</span>
 <span class="p">]</span>
-<span class="n">pipe</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
-    <span class="p">(</span>
-        <span class="s1">&#39;Preprocessing&#39;</span><span class="p">,</span>
-        <span class="n">compose</span><span class="o">.</span><span class="n">ColumnTransformer</span><span class="p">([</span>
-            <span class="p">(</span><span class="s1">&#39;Nominal&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
+<span class="n">pipe</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span>
+            <span class="s2">&quot;Preprocessing&quot;</span><span class="p">,</span>
+            <span class="n">compose</span><span class="o">.</span><span class="n">ColumnTransformer</span><span class="p">(</span>
                 <span class="p">[</span>
-                    <span class="p">(</span><span class="s1">&#39;Imputer&#39;</span><span class="p">,</span> <span class="n">impute</span><span class="o">.</span><span class="n">SimpleImputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;most_frequent&#39;</span><span class="p">)),</span>
                     <span class="p">(</span>
-                        <span class="s1">&#39;Encoder&#39;</span><span class="p">,</span>
-                        <span class="n">preprocessing</span><span class="o">.</span><span class="n">OneHotEncoder</span><span class="p">(</span>
-                            <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span>
-                        <span class="p">)</span>
+                        <span class="s2">&quot;Nominal&quot;</span><span class="p">,</span>
+                        <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
+                            <span class="p">[</span>
+                                <span class="p">(</span><span class="s2">&quot;Imputer&quot;</span><span class="p">,</span> <span class="n">impute</span><span class="o">.</span><span class="n">SimpleImputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;most_frequent&quot;</span><span class="p">)),</span>
+                                <span class="p">(</span>
+                                    <span class="s2">&quot;Encoder&quot;</span><span class="p">,</span>
+                                    <span class="n">preprocessing</span><span class="o">.</span><span class="n">OneHotEncoder</span><span class="p">(</span>
+                                        <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">handle_unknown</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+                                    <span class="p">),</span>
+                                <span class="p">),</span>
+                            <span class="p">]</span>
+                        <span class="p">),</span>
+                        <span class="n">nominal_feature_indices</span><span class="p">,</span>
                     <span class="p">),</span>
-                <span class="p">]),</span>
-                <span class="n">nominal_feature_indices</span><span class="p">,</span>
-             <span class="p">),</span>
-        <span class="p">]),</span>
-    <span class="p">),</span>
-    <span class="p">(</span><span class="s1">&#39;Classifier&#39;</span><span class="p">,</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
-<span class="p">])</span>
+                <span class="p">]</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Classifier&quot;</span><span class="p">,</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">10</span><span class="p">)),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 
 <span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">myrun</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
@@ -296,7 +297,27 @@ scipy&gt;=0.9
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/37837
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+Uploaded to http://test.openml.org/r/153909
 </pre></div>
 </div>
 </div>
@@ -310,17 +331,13 @@ a model on a task without uploading results or flows to the server immediately.<
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
 
 <span class="c1"># The following lines can then be executed offline:</span>
-<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
-    <span class="n">pipe</span><span class="p">,</span>
-    <span class="n">task</span><span class="p">,</span>
-    <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">upload_flow</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">upload_flow</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># The run may be stored offline, and the flow will be stored along with it:</span>
-<span class="n">run</span><span class="o">.</span><span class="n">to_filesystem</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="s1">&#39;myrun&#39;</span><span class="p">)</span>
+<span class="n">run</span><span class="o">.</span><span class="n">to_filesystem</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="s2">&quot;myrun&quot;</span><span class="p">)</span>
 
 <span class="c1"># They may be loaded and uploaded at a later time</span>
-<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">OpenMLRun</span><span class="o">.</span><span class="n">from_filesystem</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="s1">&#39;myrun&#39;</span><span class="p">)</span>
+<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">OpenMLRun</span><span class="o">.</span><span class="n">from_filesystem</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="s2">&quot;myrun&quot;</span><span class="p">)</span>
 <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
 
 <span class="c1"># Publishing the run will automatically upload the related flow if</span>
@@ -328,22 +345,25 @@ a model on a task without uploading results or flows to the server immediately.<
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Run
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+
+OpenML Run
 ==========
 Uploader Name: None
 Metric.......: None
-Run ID.......: 37839
-Run URL......: https://www.openml.org/r/37839
+Run ID.......: 153910
+Run URL......: https://test.openml.org/r/153910
 Task ID......: 6
 Task Type....: None
-Task URL.....: https://www.openml.org/t/6
-Flow ID......: 24261
-Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(Nominal=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder)),Classifier=sklearn.ensemble.forest.RandomForestClassifier)
-Flow URL.....: https://www.openml.org/f/24261
+Task URL.....: https://test.openml.org/t/6
+Flow ID......: 407756
+Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(Nominal=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder)),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
+Flow URL.....: https://test.openml.org/f/407756
 Setup ID.....: None
 Setup String.: None
 Dataset ID...: None
-Dataset URL..: https://www.openml.org/d/None
+Dataset URL..: https://test.openml.org/d/None
 </pre></div>
 </div>
 <p>Alternatively, one can also directly run flows.</p>
@@ -380,29 +400,29 @@ task_id:<a class="reference external" href="http://www.openml.org/t/218">218</a>
 task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950</a>, 100k instances, missing values.</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Easy benchmarking:</span>
-<span class="k">for</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">115</span><span class="p">,</span> <span class="p">]:</span>  <span class="c1"># Add further tasks. Disclaimer: they might take some time</span>
+<span class="k">for</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">115</span><span class="p">]:</span>  <span class="c1"># Add further tasks. Disclaimer: they might take some time</span>
     <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">)</span>
     <span class="n">clf</span> <span class="o">=</span> <span class="n">neighbors</span><span class="o">.</span><span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
     <span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">myrun</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;kNN on </span><span class="si">{data.name}</span><span class="s2">: http://test.openml.org/r/</span><span class="si">{myrun.run_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;kNN on </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: http://test.openml.org/r/</span><span class="si">{</span><span class="n">myrun</span><span class="o">.</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/37840
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/153911
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  17.937 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  25.887 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py">
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9e0617073c8209f15abf91f273871776/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></p>
 </div>
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/d2ac26453b3a61789aac1d07c7d96d8f/flows_and_runs_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">flows_and_runs_tutorial.ipynb</span></code></a></p>
 </div>
 </div>
@@ -423,7 +443,7 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

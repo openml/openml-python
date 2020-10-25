@@ -20,8 +20,10 @@ Publication
 
 import sys
 
-if sys.platform == 'win32':  # noqa
-    print('The pyrfr library (requirement of fanova) can currently not be installed on Windows systems')
+if sys.platform == "win32":  # noqa
+    print(
+        "The pyrfr library (requirement of fanova) can currently not be installed on Windows systems"
+    )
     exit()
 
 import json
@@ -65,12 +67,10 @@ import openml
 # this, please see:
 # https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdccc7b9265/examples/plot/plot_fanova_aggregates.py # noqa F401
 
-suite = openml.study.get_suite('OpenML100')
+suite = openml.study.get_suite("OpenML100")
 flow_id = 7707
-parameter_filters = {
-    'sklearn.svm.classes.SVC(17)_kernel': 'sigmoid'
-}
-evaluation_measure = 'predictive_accuracy'
+parameter_filters = {"sklearn.svm.classes.SVC(17)_kernel": "sigmoid"}
+evaluation_measure = "predictive_accuracy"
 limit_per_task = 500
 limit_nr_tasks = 15
 n_trees = 16
@@ -81,13 +81,20 @@ fanova_results = []
 for idx, task_id in enumerate(suite.tasks):
     if limit_nr_tasks is not None and idx >= limit_nr_tasks:
         continue
-    print('Starting with task %d (%d/%d)'
-          % (task_id, idx+1, len(suite.tasks) if limit_nr_tasks is None else limit_nr_tasks))
+    print(
+        "Starting with task %d (%d/%d)"
+        % (task_id, idx + 1, len(suite.tasks) if limit_nr_tasks is None else limit_nr_tasks)
+    )
     # note that we explicitly only include tasks from the benchmark suite that was specified (as per the for-loop)
     evals = openml.evaluations.list_evaluations_setups(
-        evaluation_measure, flow=[flow_id], task=[task_id], size=limit_per_task, output_format='dataframe')
+        evaluation_measure,
+        flows=[flow_id],
+        tasks=[task_id],
+        size=limit_per_task,
+        output_format="dataframe",
+    )
 
-    performance_column = 'value'
+    performance_column = "value"
     # make a DataFrame consisting of all hyperparameters (which is a dict in setup['parameters']) and the performance
     # value (in setup['value']). The following line looks a bit complicated, but combines 2 tasks: a) combine
     # hyperparameters and performance data in a single dict, b) cast hyperparameter values to the appropriate format
@@ -95,40 +102,58 @@ for idx, task_id in enumerate(suite.tasks):
     # scikit-learn setups (and even there some legacy setups might violate this requirement). It will work for the
     # setups that belong to the flows embedded in this example though.
     try:
-        setups_evals = pd.DataFrame([dict(**{name: json.loads(value) for name, value in setup['parameters'].items()},
-                                          **{performance_column: setup[performance_column]})
-                                     for _, setup in evals.iterrows()])
+        setups_evals = pd.DataFrame(
+            [
+                dict(
+                    **{name: json.loads(value) for name, value in setup["parameters"].items()},
+                    **{performance_column: setup[performance_column]}
+                )
+                for _, setup in evals.iterrows()
+            ]
+        )
     except json.decoder.JSONDecodeError as e:
-        print('Task %d error: %s' % (task_id, e))
+        print("Task %d error: %s" % (task_id, e))
         continue
     # apply our filters, to have only the setups that comply to the hyperparameters we want
     for filter_key, filter_value in parameter_filters.items():
         setups_evals = setups_evals[setups_evals[filter_key] == filter_value]
     # in this simplified example, we only display numerical and float hyperparameters. For categorical hyperparameters,
     # the fanova library needs to be informed by using a configspace object.
-    setups_evals = setups_evals.select_dtypes(include=['int64', 'float64'])
+    setups_evals = setups_evals.select_dtypes(include=["int64", "float64"])
     # drop rows with unique values. These are by definition not an interesting hyperparameter, e.g., ``axis``,
     # ``verbose``.
-    setups_evals = setups_evals[[c for c in list(setups_evals)
-                                 if len(setups_evals[c].unique()) > 1 or c == performance_column]]
+    setups_evals = setups_evals[
+        [
+            c
+            for c in list(setups_evals)
+            if len(setups_evals[c].unique()) > 1 or c == performance_column
+        ]
+    ]
     # We are done with processing ``setups_evals``. Note that we still might have some irrelevant hyperparameters, e.g.,
     # ``random_state``. We have dropped some relevant hyperparameters, i.e., several categoricals. Let's check it out:
 
     # determine x values to pass to fanova library
-    parameter_names = [pname for pname in setups_evals.columns.to_numpy() if pname != performance_column]
+    parameter_names = [
+        pname for pname in setups_evals.columns.to_numpy() if pname != performance_column
+    ]
     evaluator = fanova.fanova.fANOVA(
-        X=setups_evals[parameter_names].to_numpy(), Y=setups_evals[performance_column].to_numpy(), n_trees=n_trees)
+        X=setups_evals[parameter_names].to_numpy(),
+        Y=setups_evals[performance_column].to_numpy(),
+        n_trees=n_trees,
+    )
     for idx, pname in enumerate(parameter_names):
         try:
-            fanova_results.append({
-                'hyperparameter': pname.split(".")[-1],
-                'fanova': evaluator.quantify_importance([idx])[(idx,)]['individual importance']
-            })
+            fanova_results.append(
+                {
+                    "hyperparameter": pname.split(".")[-1],
+                    "fanova": evaluator.quantify_importance([idx])[(idx,)]["individual importance"],
+                }
+            )
         except RuntimeError as e:
             # functional ANOVA sometimes crashes with a RuntimeError, e.g., on tasks where the performance is constant
             # for all configurations (there is no variance). We will skip these tasks (like the authors did in the
             # paper).
-            print('Task %d error: %s' % (task_id, e))
+            print("Task %d error: %s" % (task_id, e))
             continue
 
 # transform ``fanova_results`` from a list of dicts into a DataFrame
@@ -140,9 +165,9 @@ fanova_results = pd.DataFrame(fanova_results)
 # ``Orange`` dependency (``pip install Orange3``). For the complete example,
 # the reader is referred to the more elaborate script (referred to earlier)
 fig, ax = plt.subplots()
-sns.boxplot(x='hyperparameter', y='fanova', data=fanova_results, ax=ax)
-ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
-ax.set_ylabel('Variance Contribution')
+sns.boxplot(x="hyperparameter", y="fanova", data=fanova_results, ax=ax)
+ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
+ax.set_ylabel("Variance Contribution")
 ax.set_xlabel(None)
 plt.tight_layout()
 plt.show()

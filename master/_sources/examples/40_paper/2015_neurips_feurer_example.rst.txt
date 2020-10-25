@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_40_paper_2015_neurips_feurer_example.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_40_paper_2015_neurips_feurer_example.py:
+        Click :ref:`here <sphx_glr_download_examples_40_paper_2015_neurips_feurer_example.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_40_paper_2015_neurips_feurer_example.py:
 
 
 Feurer et al. (2015)
@@ -41,6 +43,7 @@ Publication
 
 List of dataset IDs given in the supplementary material of Feurer et al.:
 https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning-supplemental.zip
+fmt: off
 
 
 .. code-block:: default
@@ -57,6 +60,7 @@ https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learnin
         1056, 1067, 1068, 1069, 1111, 1112, 1114, 1116, 1119, 1120, 1128, 1130,
         1134, 1138, 1139, 1142, 1146, 1161, 1166,
     ]
+    # fmt: on
 
 
 
@@ -86,9 +90,9 @@ datasets can be found in the `online docs <https://docs.openml.org/#dataset-stat
 .. code-block:: default
 
     tasks = openml.tasks.list_tasks(
-        task_type_id=openml.tasks.TaskTypeEnum.SUPERVISED_CLASSIFICATION,
-        status='all',
-        output_format='dataframe',
+        task_type=openml.tasks.TaskType.SUPERVISED_CLASSIFICATION,
+        status="all",
+        output_format="dataframe",
     )
 
     # Query only those with holdout as the resampling startegy.
@@ -137,7 +141,7 @@ datasets can be found in the `online docs <https://docs.openml.org/#dataset-stat
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.397 seconds)
+   **Total running time of the script:** ( 0 minutes  2.258 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2015_neurips_feurer_example.py:
@@ -150,13 +154,13 @@ datasets can be found in the `online docs <https://docs.openml.org/#dataset-stat
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: 2015_neurips_feurer_example.py <2015_neurips_feurer_example.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: 2015_neurips_feurer_example.ipynb <2015_neurips_feurer_example.ipynb>`
 

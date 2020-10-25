@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>Datasets &#8212; OpenML 0.10.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Datasets &#8212; OpenML 0.11.0 documentation</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -52,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -108,7 +111,10 @@
 <li><a class="reference internal" href="#download-datasets">Download datasets</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#exercise-2">Exercise 2</a></li>
+<li><a class="reference internal" href="#exercise-2">Exercise 2</a><ul>
+<li><a class="reference internal" href="#edit-a-created-dataset">Edit a created dataset</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -119,7 +125,7 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-datasets-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-datasets-tutorial-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="datasets">
 <span id="sphx-glr-examples-30-extended-datasets-tutorial-py"></span><h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h1>
@@ -128,6 +134,7 @@
 
 <span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">openml.datasets</span> <span class="kn">import</span> <span class="n">edit_dataset</span><span class="p">,</span> <span class="n">fork_dataset</span><span class="p">,</span> <span class="n">get_dataset</span>
 </pre></div>
 </div>
 <div class="section" id="exercise-0">
@@ -143,22 +150,19 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml_list</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">()</span>  <span class="c1"># returns a dict</span>
 
 <span class="c1"># Show a nice table with some key data properties</span>
-<span class="n">datalist</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">openml_list</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
-<span class="n">datalist</span> <span class="o">=</span> <span class="n">datalist</span><span class="p">[[</span>
-    <span class="s1">&#39;did&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;NumberOfInstances&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;NumberOfFeatures&#39;</span><span class="p">,</span> <span class="s1">&#39;NumberOfClasses&#39;</span>
-<span class="p">]]</span>
+<span class="n">datalist</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">openml_list</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
+<span class="n">datalist</span> <span class="o">=</span> <span class="n">datalist</span><span class="p">[[</span><span class="s2">&quot;did&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;NumberOfInstances&quot;</span><span class="p">,</span> <span class="s2">&quot;NumberOfFeatures&quot;</span><span class="p">,</span> <span class="s2">&quot;NumberOfClasses&quot;</span><span class="p">]]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First 10 of {len(datalist)} datasets...&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First 10 of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">datalist</span><span class="p">)</span><span class="si">}</span><span class="s2"> datasets...&quot;</span><span class="p">)</span>
 <span class="n">datalist</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 
 <span class="c1"># The same can be done with lesser lines of code</span>
-<span class="n">openml_df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">)</span>
+<span class="n">openml_df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 <span class="n">openml_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 2989 datasets...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 3212 datasets...
 </pre></div>
 </div>
 <div>
@@ -400,242 +404,11 @@
 <li><p>Find a dataset called ‘eeg_eye_state’.</p></li>
 <li><p>Find all datasets with more than 50 classes.</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="p">[</span><span class="n">datalist</span><span class="o">.</span><span class="n">NumberOfInstances</span> <span class="o">&gt;</span> <span class="mi">10000</span>
-         <span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;NumberOfInstances&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-</pre></div>
-</div>
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>did</th>
-      <th>name</th>
-      <th>NumberOfInstances</th>
-      <th>NumberOfFeatures</th>
-      <th>NumberOfClasses</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>23515</th>
-      <td>23515</td>
-      <td>sulfur</td>
-      <td>10081.0</td>
-      <td>7.0</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>372</th>
-      <td>372</td>
-      <td>internet_usage</td>
-      <td>10108.0</td>
-      <td>72.0</td>
-      <td>46.0</td>
-    </tr>
-    <tr>
-      <th>981</th>
-      <td>981</td>
-      <td>kdd_internet_usage</td>
-      <td>10108.0</td>
-      <td>69.0</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>1536</th>
-      <td>1536</td>
-      <td>volcanoes-b6</td>
-      <td>10130.0</td>
-      <td>4.0</td>
-      <td>5.0</td>
-    </tr>
-    <tr>
-      <th>1531</th>
-      <td>1531</td>
-      <td>volcanoes-b1</td>
-      <td>10176.0</td>
-      <td>4.0</td>
-      <td>5.0</td>
-    </tr>
-    <tr>
-      <th>1534</th>
-      <td>1534</td>
-      <td>volcanoes-b4</td>
-      <td>10190.0</td>
-      <td>4.0</td>
-      <td>5.0</td>
-    </tr>
-    <tr>
-      <th>1459</th>
-      <td>1459</td>
-      <td>artificial-characters</td>
-      <td>10218.0</td>
-      <td>8.0</td>
-      <td>10.0</td>
-    </tr>
-    <tr>
-      <th>1478</th>
-      <td>1478</td>
-      <td>har</td>
-      <td>10299.0</td>
-      <td>562.0</td>
-      <td>6.0</td>
-    </tr>
-    <tr>
-      <th>1533</th>
-      <td>1533</td>
-      <td>volcanoes-b3</td>
-      <td>10386.0</td>
-      <td>4.0</td>
-      <td>5.0</td>
-    </tr>
-    <tr>
-      <th>1532</th>
-      <td>1532</td>
-      <td>volcanoes-b2</td>
-      <td>10668.0</td>
-      <td>4.0</td>
-      <td>5.0</td>
-    </tr>
-    <tr>
-      <th>42183</th>
-      <td>42183</td>
-      <td>dataset_sales</td>
-      <td>10738.0</td>
-      <td>15.0</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>1053</th>
-      <td>1053</td>
-      <td>jm1</td>
-      <td>10885.0</td>
-      <td>22.0</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>1414</th>
-      <td>1414</td>
-      <td>Kaggle_bike_sharing_demand_challange</td>
-      <td>10886.0</td>
-      <td>12.0</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>1044</th>
-      <td>1044</td>
-      <td>eye_movements</td>
-      <td>10936.0</td>
-      <td>28.0</td>
-      <td>3.0</td>
-    </tr>
-    <tr>
-      <th>32</th>
-      <td>32</td>
-      <td>pendigits</td>
-      <td>10992.0</td>
-      <td>17.0</td>
-      <td>10.0</td>
-    </tr>
-    <tr>
-      <th>1019</th>
-      <td>1019</td>
-      <td>pendigits</td>
-      <td>10992.0</td>
-      <td>17.0</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>42199</th>
-      <td>42199</td>
-      <td>Player_names</td>
-      <td>11009.0</td>
-      <td>3.0</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4534</th>
-      <td>4534</td>
-      <td>PhishingWebsites</td>
-      <td>11055.0</td>
-      <td>31.0</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>399</th>
-      <td>399</td>
-      <td>ohscal.wc</td>
-      <td>11162.0</td>
-      <td>11466.0</td>
-      <td>10.0</td>
-    </tr>
-    <tr>
-      <th>310</th>
-      <td>310</td>
-      <td>mammography</td>
-      <td>11183.0</td>
-      <td>7.0</td>
-      <td>2.0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-<br />
-<br /><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;name == &quot;eeg-eye-state&quot;&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>did</th>
-      <th>name</th>
-      <th>NumberOfInstances</th>
-      <th>NumberOfFeatures</th>
-      <th>NumberOfClasses</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>1471</th>
-      <td>1471</td>
-      <td>eeg-eye-state</td>
-      <td>14980.0</td>
-      <td>15.0</td>
-      <td>2.0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-<br />
-<br /><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;NumberOfClasses &gt; 50&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="p">[</span><span class="n">datalist</span><span class="o">.</span><span class="n">NumberOfInstances</span> <span class="o">&gt;</span> <span class="mi">10000</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;NumberOfInstances&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="s2">&quot;&quot;</span>
+<span class="n">datalist</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;name == &quot;eeg-eye-state&quot;&#39;</span><span class="p">)</span>
+<span class="s2">&quot;&quot;</span>
+<span class="n">datalist</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;NumberOfClasses &gt; 50&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div>
@@ -761,20 +534,20 @@
       <td>3169.0</td>
     </tr>
     <tr>
-      <th>42222</th>
-      <td>42222</td>
-      <td>Suicide_Dataset</td>
-      <td>27820.0</td>
-      <td>11.0</td>
-      <td>101.0</td>
-    </tr>
-    <tr>
       <th>42223</th>
       <td>42223</td>
       <td>dataset-autoHorse_fixed</td>
       <td>201.0</td>
       <td>69.0</td>
       <td>186.0</td>
+    </tr>
+    <tr>
+      <th>42396</th>
+      <td>42396</td>
+      <td>aloi</td>
+      <td>108000.0</td>
+      <td>129.0</td>
+      <td>1000.0</td>
     </tr>
   </tbody>
 </table>
@@ -786,9 +559,11 @@
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">)</span>
 
 <span class="c1"># Print a summary</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This is dataset &#39;</span><span class="si">{dataset.name}</span><span class="s2">&#39;, the target feature is &quot;</span>
-      <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{dataset.default_target_attribute}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL: </span><span class="si">{dataset.url}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;This is dataset &#39;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, the target feature is &quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL: </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">description</span><span class="p">[:</span><span class="mi">500</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -803,17 +578,16 @@ All data is from one continuous EEG measurement with the Emotiv EEG Neuroheadset
 </pre></div>
 </div>
 <p>Get the actual data.</p>
-<p>The dataset can be returned in 2 possible formats: as a NumPy array, a SciPy
-sparse matrix, or as a Pandas DataFrame (or SparseDataFrame). The format is
+<p>The dataset can be returned in 3 possible formats: as a NumPy array, a SciPy
+sparse matrix, or as a Pandas DataFrame. The format is
 controlled with the parameter <code class="docutils literal notranslate"><span class="pre">dataset_format</span></code> which can be either ‘array’
 (default) or ‘dataframe’. Let’s first build our dataset from a NumPy array
 and manually create a dataframe.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_indicator</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
-    <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">,</span>
-    <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
+    <span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
 <span class="p">)</span>
 <span class="n">eeg</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">attribute_names</span><span class="p">)</span>
-<span class="n">eeg</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+<span class="n">eeg</span><span class="p">[</span><span class="s2">&quot;class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">eeg</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -836,8 +610,7 @@ and manually create a dataframe.</p>
 <p>Instead of manually creating the dataframe, you can already request a
 dataframe with the correct dtypes.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_indicator</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
-    <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="p">,</span>
-    <span class="n">dataset_format</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span>
+    <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="p">,</span> <span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
@@ -855,20 +628,22 @@ dataframe with the correct dtypes.</p>
 &lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
 RangeIndex: 14980 entries, 0 to 14979
 Data columns (total 14 columns):
-V1     14980 non-null float64
-V2     14980 non-null float64
-V3     14980 non-null float64
-V4     14980 non-null float64
-V5     14980 non-null float64
-V6     14980 non-null float64
-V7     14980 non-null float64
-V8     14980 non-null float64
-V9     14980 non-null float64
-V10    14980 non-null float64
-V11    14980 non-null float64
-V12    14980 non-null float64
-V13    14980 non-null float64
-V14    14980 non-null float64
+ #   Column  Non-Null Count  Dtype
+---  ------  --------------  -----
+ 0   V1      14980 non-null  float64
+ 1   V2      14980 non-null  float64
+ 2   V3      14980 non-null  float64
+ 3   V4      14980 non-null  float64
+ 4   V5      14980 non-null  float64
+ 5   V6      14980 non-null  float64
+ 6   V7      14980 non-null  float64
+ 7   V8      14980 non-null  float64
+ 8   V9      14980 non-null  float64
+ 9   V10     14980 non-null  float64
+ 10  V11     14980 non-null  float64
+ 11  V12     14980 non-null  float64
+ 12  V13     14980 non-null  float64
+ 13  V14     14980 non-null  float64
 dtypes: float64(14)
 memory usage: 1.6 MB
 None
@@ -892,26 +667,86 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eegs</span> <span class="o">=</span> <span class="n">eeg</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">_</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">(</span>
     <span class="n">eegs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">100</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">],</span>
-    <span class="n">c</span><span class="o">=</span><span class="n">eegs</span><span class="p">[:</span><span class="mi">100</span><span class="p">][</span><span class="s1">&#39;class&#39;</span><span class="p">],</span>
+    <span class="n">c</span><span class="o">=</span><span class="n">eegs</span><span class="p">[:</span><span class="mi">100</span><span class="p">][</span><span class="s2">&quot;class&quot;</span><span class="p">],</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
-    <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span>
-    <span class="n">hist_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;bins&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span>
-    <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;plasma&#39;</span>
+    <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
+    <span class="n">hist_kwds</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bins&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;plasma&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../../_images/sphx_glr_datasets_tutorial_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_datasets_tutorial_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.903 seconds)</p>
+<img alt="datasets tutorial" class="sphx-glr-single-img" src="../../_images/sphx_glr_datasets_tutorial_001.png" />
+<div class="section" id="edit-a-created-dataset">
+<h3>Edit a created dataset<a class="headerlink" href="#edit-a-created-dataset" title="Permalink to this headline">¶</a></h3>
+<p>This example uses the test server, to avoid editing a dataset on the main server.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Edit non-critical fields, allowed for all authorized users:
+description, creator, contributor, collection_date, language, citation,
+original_data_url, paper_url</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">desc</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;This data sets consists of 3 different types of irises&#39; &quot;</span>
+    <span class="s2">&quot;(Setosa, Versicolour, and Virginica) petal and sepal length,&quot;</span>
+    <span class="s2">&quot; stored in a 150x4 numpy.ndarray&quot;</span>
+<span class="p">)</span>
+<span class="n">did</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">data_id</span> <span class="o">=</span> <span class="n">edit_dataset</span><span class="p">(</span>
+    <span class="n">did</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span>
+    <span class="n">creator</span><span class="o">=</span><span class="s2">&quot;R.A.Fisher&quot;</span><span class="p">,</span>
+    <span class="n">collection_date</span><span class="o">=</span><span class="s2">&quot;1937&quot;</span><span class="p">,</span>
+    <span class="n">citation</span><span class="o">=</span><span class="s2">&quot;The use of multiple measurements in taxonomic problems&quot;</span><span class="p">,</span>
+    <span class="n">language</span><span class="o">=</span><span class="s2">&quot;English&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">edited_dataset</span> <span class="o">=</span> <span class="n">get_dataset</span><span class="p">(</span><span class="n">data_id</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Edited dataset ID: </span><span class="si">{</span><span class="n">data_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Edited dataset ID: 128
+</pre></div>
+</div>
+<p>Editing critical fields (default_target_attribute, row_id_attribute, ignore_attribute) is allowed
+only for the dataset owner. Further, critical fields cannot be edited if the dataset has any
+tasks associated with it. To edit critical fields of a dataset (without tasks) owned by you,
+configure the API key:
+openml.config.apikey = ‘FILL_IN_OPENML_API_KEY’</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_id</span> <span class="o">=</span> <span class="n">edit_dataset</span><span class="p">(</span><span class="mi">564</span><span class="p">,</span> <span class="n">default_target_attribute</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Edited dataset ID: </span><span class="si">{</span><span class="n">data_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Edited dataset ID: 564
+</pre></div>
+</div>
+<p>Fork dataset
+Used to create a copy of the dataset with you as the owner.
+Use this API only if you are unable to edit the critical fields (default_target_attribute,
+ignore_attribute, row_id_attribute) of a dataset through the edit_dataset API.
+After the dataset is forked, you can edit the new version of the dataset using edit_dataset.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_id</span> <span class="o">=</span> <span class="n">fork_dataset</span><span class="p">(</span><span class="mi">564</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Forked dataset ID: </span><span class="si">{</span><span class="n">data_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Forked dataset ID: 103951
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  10.462 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-datasets-tutorial-py">
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/b95c071188526f5ef5d991e382df9fa5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>
 </div>
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ea59c0f4a0e0075b24ecbb3b84c5744d/datasets_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">datasets_tutorial.ipynb</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
 </div>
 </div>
 
@@ -928,7 +763,7 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

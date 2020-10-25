@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_20_basic_introduction_tutorial.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_20_basic_introduction_tutorial.py:
+        Click :ref:`here <sphx_glr_download_examples_20_basic_introduction_tutorial.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_20_basic_introduction_tutorial.py:
 
 
 Setup
@@ -148,7 +150,7 @@ Download the OpenML task for the eeg-eye-state.
 
  .. code-block:: none
 
-    kNN on eeg-eye-state: http://test.openml.org/r/37816
+    kNN on eeg-eye-state: http://test.openml.org/r/153842
 
 
 
@@ -167,7 +169,7 @@ Download the OpenML task for the eeg-eye-state.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.809 seconds)
+   **Total running time of the script:** ( 0 minutes  14.141 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_introduction_tutorial.py:
@@ -180,13 +182,13 @@ Download the OpenML task for the eeg-eye-state.
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: introduction_tutorial.py <introduction_tutorial.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: introduction_tutorial.ipynb <introduction_tutorial.ipynb>`
 

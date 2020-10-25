@@ -1,4 +1,4 @@
-:mod:`openml.tasks`.list_tasks
+﻿:mod:`openml.tasks`.list_tasks
 ===========================================
 
 .. currentmodule:: openml.tasks

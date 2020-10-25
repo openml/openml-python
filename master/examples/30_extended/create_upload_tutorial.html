@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>Dataset upload tutorial &#8212; OpenML 0.10.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dataset upload tutorial &#8212; OpenML 0.11.0 documentation</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -52,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -111,7 +114,7 @@
 <li><a class="reference internal" href="#dataset-is-a-list">Dataset is a list</a></li>
 <li><a class="reference internal" href="#dataset-is-a-pandas-dataframe">Dataset is a pandas DataFrame</a></li>
 <li><a class="reference internal" href="#dataset-is-a-sparse-matrix">Dataset is a sparse matrix</a></li>
-<li><a class="reference internal" href="#dataset-is-a-pandas-sparse-dataframe">Dataset is a pandas sparse dataframe</a></li>
+<li><a class="reference internal" href="#dataset-is-a-pandas-dataframe-with-sparse-columns">Dataset is a pandas dataframe with sparse columns</a></li>
 </ul>
 
         </div>
@@ -120,7 +123,7 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-create-upload-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-create-upload-tutorial-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="dataset-upload-tutorial">
 <span id="sphx-glr-examples-30-extended-create-upload-tutorial-py"></span><h1>Dataset upload tutorial<a class="headerlink" href="#dataset-upload-tutorial" title="Permalink to this headline">¶</a></h1>
@@ -163,7 +166,7 @@ OrderedDicts in the case of sparse data.</p>
 <p>Load an example dataset from scikit-learn which we will upload to OpenML.org
 via the API.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">diabetes</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">load_diabetes</span><span class="p">()</span>
-<span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Diabetes(scikit-learn)&#39;</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Diabetes(scikit-learn)&quot;</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">diabetes</span><span class="o">.</span><span class="n">data</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">diabetes</span><span class="o">.</span><span class="n">target</span>
 <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">diabetes</span><span class="o">.</span><span class="n">feature_names</span>
@@ -176,18 +179,15 @@ level and stores all data in a single matrix.</p>
 that data).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">attribute_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">attribute_names</span><span class="p">)</span>
-<span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="n">attribute_name</span><span class="p">,</span> <span class="s1">&#39;REAL&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">attribute_name</span> <span class="ow">in</span> <span class="n">attribute_names</span>
-<span class="p">]</span> <span class="o">+</span> <span class="p">[(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER&#39;</span><span class="p">)]</span>
+<span class="n">attributes</span> <span class="o">=</span> <span class="p">[(</span><span class="n">attribute_name</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">attribute_name</span> <span class="ow">in</span> <span class="n">attribute_names</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER&quot;</span><span class="p">)</span>
+<span class="p">]</span>
 <span class="n">citation</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s2">&quot;Bradley Efron, Trevor Hastie, Iain Johnstone and &quot;</span>
     <span class="s2">&quot;Robert Tibshirani (2004) (Least Angle Regression) &quot;</span>
     <span class="s2">&quot;Annals of Statistics (with discussion), 407-499&quot;</span>
 <span class="p">)</span>
-<span class="n">paper_url</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s1">&#39;http://web.stanford.edu/~hastie/Papers/&#39;</span>
-    <span class="s1">&#39;LARS/LeastAngle_2002.pdf&#39;</span>
-<span class="p">)</span>
+<span class="n">paper_url</span> <span class="o">=</span> <span class="s2">&quot;http://web.stanford.edu/~hastie/Papers/LARS/LeastAngle_2002.pdf&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -204,24 +204,23 @@ expected format:</p>
     <span class="c1"># Textual description of the dataset.</span>
     <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
     <span class="c1"># The person who created the dataset.</span>
-    <span class="n">creator</span><span class="o">=</span><span class="s2">&quot;Bradley Efron, Trevor Hastie, &quot;</span>
-            <span class="s2">&quot;Iain Johnstone and Robert Tibshirani&quot;</span><span class="p">,</span>
+    <span class="n">creator</span><span class="o">=</span><span class="s2">&quot;Bradley Efron, Trevor Hastie, Iain Johnstone and Robert Tibshirani&quot;</span><span class="p">,</span>
     <span class="c1"># People who contributed to the current version of the dataset.</span>
     <span class="n">contributor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="c1"># The date the data was originally collected, given by the uploader.</span>
-    <span class="n">collection_date</span><span class="o">=</span><span class="s1">&#39;09-01-2012&#39;</span><span class="p">,</span>
+    <span class="n">collection_date</span><span class="o">=</span><span class="s2">&quot;09-01-2012&quot;</span><span class="p">,</span>
     <span class="c1"># Language in which the data is represented.</span>
     <span class="c1"># Starts with 1 upper case letter, rest lower case, e.g. &#39;English&#39;.</span>
-    <span class="n">language</span><span class="o">=</span><span class="s1">&#39;English&#39;</span><span class="p">,</span>
+    <span class="n">language</span><span class="o">=</span><span class="s2">&quot;English&quot;</span><span class="p">,</span>
     <span class="c1"># License under which the data is/will be distributed.</span>
-    <span class="n">licence</span><span class="o">=</span><span class="s1">&#39;BSD (from scikit-learn)&#39;</span><span class="p">,</span>
+    <span class="n">licence</span><span class="o">=</span><span class="s2">&quot;BSD (from scikit-learn)&quot;</span><span class="p">,</span>
     <span class="c1"># Name of the target. Can also have multiple values (comma-separated).</span>
-    <span class="n">default_target_attribute</span><span class="o">=</span><span class="s1">&#39;class&#39;</span><span class="p">,</span>
+    <span class="n">default_target_attribute</span><span class="o">=</span><span class="s2">&quot;class&quot;</span><span class="p">,</span>
     <span class="c1"># The attribute that represents the row-id column, if present in the</span>
     <span class="c1"># dataset.</span>
     <span class="n">row_id_attribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="c1"># Attributes that should be excluded in modelling, such as identifiers and</span>
-    <span class="c1"># indexes.</span>
+    <span class="c1"># Attribute or list of attributes that should be excluded in modelling, such as</span>
+    <span class="c1"># identifiers and indexes. E.g. &quot;feat1&quot; or [&quot;feat1&quot;,&quot;feat2&quot;]</span>
     <span class="n">ignore_attribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="c1"># How to cite the paper.</span>
     <span class="n">citation</span><span class="o">=</span><span class="n">citation</span><span class="p">,</span>
@@ -229,20 +228,18 @@ expected format:</p>
     <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">,</span>
     <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
     <span class="c1"># A version label which is provided by the user.</span>
-    <span class="n">version_label</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">,</span>
-    <span class="n">original_data_url</span><span class="o">=</span><span class="p">(</span>
-        <span class="s1">&#39;http://www4.stat.ncsu.edu/~boos/var.select/diabetes.html&#39;</span>
-    <span class="p">),</span>
+    <span class="n">version_label</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
+    <span class="n">original_data_url</span><span class="o">=</span><span class="s2">&quot;http://www4.stat.ncsu.edu/~boos/var.select/diabetes.html&quot;</span><span class="p">,</span>
     <span class="n">paper_url</span><span class="o">=</span><span class="n">paper_url</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">diabetes_dataset</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{diabetes_dataset.openml_url}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{</span><span class="n">diabetes_dataset</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://www.openml.org/d/24863
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/103953
 </pre></div>
 </div>
 </div>
@@ -254,71 +251,71 @@ OrderedDicts in the case of sparse data.</p>
 <p>Weather dataset:
 <a class="reference external" href="http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html">http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">[</span><span class="s1">&#39;sunny&#39;</span><span class="p">,</span> <span class="mi">85</span><span class="p">,</span> <span class="mi">85</span><span class="p">,</span> <span class="s1">&#39;FALSE&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;sunny&#39;</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="s1">&#39;TRUE&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;overcast&#39;</span><span class="p">,</span> <span class="mi">83</span><span class="p">,</span> <span class="mi">86</span><span class="p">,</span> <span class="s1">&#39;FALSE&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;rainy&#39;</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">96</span><span class="p">,</span> <span class="s1">&#39;FALSE&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;rainy&#39;</span><span class="p">,</span> <span class="mi">68</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="s1">&#39;FALSE&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;rainy&#39;</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="s1">&#39;TRUE&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;overcast&#39;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="s1">&#39;TRUE&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;sunny&#39;</span><span class="p">,</span> <span class="mi">72</span><span class="p">,</span> <span class="mi">95</span><span class="p">,</span> <span class="s1">&#39;FALSE&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;sunny&#39;</span><span class="p">,</span> <span class="mi">69</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="s1">&#39;FALSE&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;rainy&#39;</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="s1">&#39;FALSE&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;sunny&#39;</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="s1">&#39;TRUE&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;overcast&#39;</span><span class="p">,</span> <span class="mi">72</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="s1">&#39;TRUE&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;overcast&#39;</span><span class="p">,</span> <span class="mi">81</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="s1">&#39;FALSE&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;rainy&#39;</span><span class="p">,</span> <span class="mi">71</span><span class="p">,</span> <span class="mi">91</span><span class="p">,</span> <span class="s1">&#39;TRUE&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;sunny&quot;</span><span class="p">,</span> <span class="mi">85</span><span class="p">,</span> <span class="mi">85</span><span class="p">,</span> <span class="s2">&quot;FALSE&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;sunny&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="s2">&quot;TRUE&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;overcast&quot;</span><span class="p">,</span> <span class="mi">83</span><span class="p">,</span> <span class="mi">86</span><span class="p">,</span> <span class="s2">&quot;FALSE&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;rainy&quot;</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">96</span><span class="p">,</span> <span class="s2">&quot;FALSE&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;rainy&quot;</span><span class="p">,</span> <span class="mi">68</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="s2">&quot;FALSE&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;rainy&quot;</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="s2">&quot;TRUE&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;overcast&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="s2">&quot;TRUE&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;sunny&quot;</span><span class="p">,</span> <span class="mi">72</span><span class="p">,</span> <span class="mi">95</span><span class="p">,</span> <span class="s2">&quot;FALSE&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;sunny&quot;</span><span class="p">,</span> <span class="mi">69</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="s2">&quot;FALSE&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;rainy&quot;</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="s2">&quot;FALSE&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;sunny&quot;</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="s2">&quot;TRUE&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;overcast&quot;</span><span class="p">,</span> <span class="mi">72</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="s2">&quot;TRUE&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;overcast&quot;</span><span class="p">,</span> <span class="mi">81</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="s2">&quot;FALSE&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;rainy&quot;</span><span class="p">,</span> <span class="mi">71</span><span class="p">,</span> <span class="mi">91</span><span class="p">,</span> <span class="s2">&quot;TRUE&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">],</span>
 <span class="p">]</span>
 
 <span class="n">attribute_names</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="s1">&#39;outlook&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;sunny&#39;</span><span class="p">,</span> <span class="s1">&#39;overcast&#39;</span><span class="p">,</span> <span class="s1">&#39;rainy&#39;</span><span class="p">]),</span>
-    <span class="p">(</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="s1">&#39;REAL&#39;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">&#39;humidity&#39;</span><span class="p">,</span> <span class="s1">&#39;REAL&#39;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">&#39;windy&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;TRUE&#39;</span><span class="p">,</span> <span class="s1">&#39;FALSE&#39;</span><span class="p">]),</span>
-    <span class="p">(</span><span class="s1">&#39;play&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;yes&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">]),</span>
+    <span class="p">(</span><span class="s2">&quot;outlook&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;sunny&quot;</span><span class="p">,</span> <span class="s2">&quot;overcast&quot;</span><span class="p">,</span> <span class="s2">&quot;rainy&quot;</span><span class="p">]),</span>
+    <span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;humidity&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;windy&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;TRUE&quot;</span><span class="p">,</span> <span class="s2">&quot;FALSE&quot;</span><span class="p">]),</span>
+    <span class="p">(</span><span class="s2">&quot;play&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">]),</span>
 <span class="p">]</span>
 
 <span class="n">description</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s1">&#39;The weather problem is a tiny dataset that we will use repeatedly&#39;</span>
-    <span class="s1">&#39; to illustrate machine learning methods. Entirely fictitious, it &#39;</span>
-    <span class="s1">&#39;supposedly concerns the conditions that are suitable for playing &#39;</span>
-    <span class="s1">&#39;some unspecified game. In general, instances in a dataset are &#39;</span>
-    <span class="s1">&#39;characterized by the values of features, or attributes, that measure &#39;</span>
-    <span class="s1">&#39;different aspects of the instance. In this case there are four &#39;</span>
-    <span class="s1">&#39;attributes: outlook, temperature, humidity, and windy. &#39;</span>
-    <span class="s1">&#39;The outcome is whether to play or not.&#39;</span>
+    <span class="s2">&quot;The weather problem is a tiny dataset that we will use repeatedly&quot;</span>
+    <span class="s2">&quot; to illustrate machine learning methods. Entirely fictitious, it &quot;</span>
+    <span class="s2">&quot;supposedly concerns the conditions that are suitable for playing &quot;</span>
+    <span class="s2">&quot;some unspecified game. In general, instances in a dataset are &quot;</span>
+    <span class="s2">&quot;characterized by the values of features, or attributes, that measure &quot;</span>
+    <span class="s2">&quot;different aspects of the instance. In this case there are four &quot;</span>
+    <span class="s2">&quot;attributes: outlook, temperature, humidity, and windy. &quot;</span>
+    <span class="s2">&quot;The outcome is whether to play or not.&quot;</span>
 <span class="p">)</span>
 
 <span class="n">citation</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s1">&#39;I. H. Witten, E. Frank, M. A. Hall, and ITPro,&#39;</span>
-    <span class="s1">&#39;Data mining practical machine learning tools and techniques, &#39;</span>
-    <span class="s1">&#39;third edition. Burlington, Mass.: Morgan Kaufmann Publishers, 2011&#39;</span>
+    <span class="s2">&quot;I. H. Witten, E. Frank, M. A. Hall, and ITPro,&quot;</span>
+    <span class="s2">&quot;Data mining practical machine learning tools and techniques, &quot;</span>
+    <span class="s2">&quot;third edition. Burlington, Mass.: Morgan Kaufmann Publishers, 2011&quot;</span>
 <span class="p">)</span>
 
 <span class="n">weather_dataset</span> <span class="o">=</span> <span class="n">create_dataset</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Weather&quot;</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
-    <span class="n">creator</span><span class="o">=</span><span class="s1">&#39;I. H. Witten, E. Frank, M. A. Hall, and ITPro&#39;</span><span class="p">,</span>
+    <span class="n">creator</span><span class="o">=</span><span class="s2">&quot;I. H. Witten, E. Frank, M. A. Hall, and ITPro&quot;</span><span class="p">,</span>
     <span class="n">contributor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">collection_date</span><span class="o">=</span><span class="s1">&#39;01-01-2011&#39;</span><span class="p">,</span>
-    <span class="n">language</span><span class="o">=</span><span class="s1">&#39;English&#39;</span><span class="p">,</span>
+    <span class="n">collection_date</span><span class="o">=</span><span class="s2">&quot;01-01-2011&quot;</span><span class="p">,</span>
+    <span class="n">language</span><span class="o">=</span><span class="s2">&quot;English&quot;</span><span class="p">,</span>
     <span class="n">licence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">default_target_attribute</span><span class="o">=</span><span class="s1">&#39;play&#39;</span><span class="p">,</span>
+    <span class="n">default_target_attribute</span><span class="o">=</span><span class="s2">&quot;play&quot;</span><span class="p">,</span>
     <span class="n">row_id_attribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">ignore_attribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">citation</span><span class="o">=</span><span class="n">citation</span><span class="p">,</span>
     <span class="n">attributes</span><span class="o">=</span><span class="n">attribute_names</span><span class="p">,</span>
     <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-    <span class="n">version_label</span><span class="o">=</span><span class="s1">&#39;example&#39;</span><span class="p">,</span>
+    <span class="n">version_label</span><span class="o">=</span><span class="s2">&quot;example&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">weather_dataset</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{weather_dataset.openml_url}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{</span><span class="n">weather_dataset</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://www.openml.org/d/24864
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/103954
 </pre></div>
 </div>
 </div>
@@ -333,9 +330,9 @@ function <code class="xref py py-func docutils literal notranslate"><span class=
 <code class="docutils literal notranslate"><span class="pre">'auto'</span></code> to the <code class="docutils literal notranslate"><span class="pre">attributes</span></code> parameter.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">col_name</span> <span class="k">for</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">attribute_names</span><span class="p">])</span>
 <span class="c1"># enforce the categorical column to have a categorical dtype</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;outlook&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;outlook&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;windy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;windy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;bool&#39;</span><span class="p">)</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;play&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;play&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;outlook&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;outlook&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;windy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;windy&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;play&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;play&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -343,179 +340,147 @@ function <code class="xref py py-func docutils literal notranslate"><span class=
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
 RangeIndex: 14 entries, 0 to 13
 Data columns (total 5 columns):
-outlook        14 non-null category
-temperature    14 non-null int64
-humidity       14 non-null int64
-windy          14 non-null bool
-play           14 non-null category
+ #   Column       Non-Null Count  Dtype
+---  ------       --------------  -----
+ 0   outlook      14 non-null     category
+ 1   temperature  14 non-null     int64
+ 2   humidity     14 non-null     int64
+ 3   windy        14 non-null     bool
+ 4   play         14 non-null     category
 dtypes: bool(1), category(2), int64(2)
 memory usage: 594.0 bytes
 None
 </pre></div>
 </div>
-<p>We enforce the column ‘outlook’, ‘windy’, and ‘play’ to be a categorical
-dtype while the column ‘rnd_str’ is kept as a string column. Then, we can
+<p>We enforce the column ‘outlook’ and ‘play’ to be a categorical
+dtype while the column ‘windy’ is kept as a boolean column. ‘temperature’
+and ‘humidity’ are kept as numeric columns. Then, we can
 call <code class="xref py py-func docutils literal notranslate"><span class="pre">create_dataset()</span></code> by passing the dataframe and fixing the parameter
 <code class="docutils literal notranslate"><span class="pre">attributes</span></code> to <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">weather_dataset</span> <span class="o">=</span> <span class="n">create_dataset</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Weather&quot;</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
-    <span class="n">creator</span><span class="o">=</span><span class="s1">&#39;I. H. Witten, E. Frank, M. A. Hall, and ITPro&#39;</span><span class="p">,</span>
+    <span class="n">creator</span><span class="o">=</span><span class="s2">&quot;I. H. Witten, E. Frank, M. A. Hall, and ITPro&quot;</span><span class="p">,</span>
     <span class="n">contributor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">collection_date</span><span class="o">=</span><span class="s1">&#39;01-01-2011&#39;</span><span class="p">,</span>
-    <span class="n">language</span><span class="o">=</span><span class="s1">&#39;English&#39;</span><span class="p">,</span>
+    <span class="n">collection_date</span><span class="o">=</span><span class="s2">&quot;01-01-2011&quot;</span><span class="p">,</span>
+    <span class="n">language</span><span class="o">=</span><span class="s2">&quot;English&quot;</span><span class="p">,</span>
     <span class="n">licence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">default_target_attribute</span><span class="o">=</span><span class="s1">&#39;play&#39;</span><span class="p">,</span>
+    <span class="n">default_target_attribute</span><span class="o">=</span><span class="s2">&quot;play&quot;</span><span class="p">,</span>
     <span class="n">row_id_attribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">ignore_attribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">citation</span><span class="o">=</span><span class="n">citation</span><span class="p">,</span>
-    <span class="n">attributes</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
     <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
-    <span class="n">version_label</span><span class="o">=</span><span class="s1">&#39;example&#39;</span><span class="p">,</span>
+    <span class="n">version_label</span><span class="o">=</span><span class="s2">&quot;example&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/travis/build/openml/openml-python/openml/datasets/functions.py:682: FutureWarning: A future version of pandas will default to `skipna=True`. To silence this warning, pass `skipna=True|False` explicitly.
-  attributes_ = attributes_arff_from_df(data)
-</pre></div>
-</div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">weather_dataset</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{weather_dataset.openml_url}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{</span><span class="n">weather_dataset</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://www.openml.org/d/24865
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/103955
 </pre></div>
 </div>
 </div>
 <div class="section" id="dataset-is-a-sparse-matrix">
 <h1>Dataset is a sparse matrix<a class="headerlink" href="#dataset-is-a-sparse-matrix" title="Permalink to this headline">¶</a></h1>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sparse_data</span> <span class="o">=</span> <span class="n">coo_matrix</span><span class="p">((</span>
-    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-    <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sparse_data</span> <span class="o">=</span> <span class="n">coo_matrix</span><span class="p">(</span>
+    <span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+<span class="p">)</span>
 
 <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="s1">&#39;input1&#39;</span><span class="p">,</span> <span class="s1">&#39;REAL&#39;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">&#39;input2&#39;</span><span class="p">,</span> <span class="s1">&#39;REAL&#39;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;REAL&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;input1&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;input2&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
 <span class="p">]</span>
 
 <span class="n">xor_dataset</span> <span class="o">=</span> <span class="n">create_dataset</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;XOR&quot;</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Dataset representing the XOR operation&#39;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Dataset representing the XOR operation&quot;</span><span class="p">,</span>
     <span class="n">creator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">contributor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">collection_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">language</span><span class="o">=</span><span class="s1">&#39;English&#39;</span><span class="p">,</span>
+    <span class="n">language</span><span class="o">=</span><span class="s2">&quot;English&quot;</span><span class="p">,</span>
     <span class="n">licence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">default_target_attribute</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span>
+    <span class="n">default_target_attribute</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span>
     <span class="n">row_id_attribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">ignore_attribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">citation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">attributes</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span>
     <span class="n">data</span><span class="o">=</span><span class="n">sparse_data</span><span class="p">,</span>
-    <span class="n">version_label</span><span class="o">=</span><span class="s1">&#39;example&#39;</span><span class="p">,</span>
+    <span class="n">version_label</span><span class="o">=</span><span class="s2">&quot;example&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xor_dataset</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{xor_dataset.openml_url}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{</span><span class="n">xor_dataset</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://www.openml.org/d/24866
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/103956
 </pre></div>
 </div>
 </div>
-<div class="section" id="dataset-is-a-pandas-sparse-dataframe">
-<h1>Dataset is a pandas sparse dataframe<a class="headerlink" href="#dataset-is-a-pandas-sparse-dataframe" title="Permalink to this headline">¶</a></h1>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sparse_data</span> <span class="o">=</span> <span class="n">coo_matrix</span><span class="p">((</span>
-    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-    <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="p">))</span>
-<span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;input1&#39;</span><span class="p">,</span> <span class="s1">&#39;input2&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">SparseDataFrame</span><span class="p">(</span><span class="n">sparse_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
+<div class="section" id="dataset-is-a-pandas-dataframe-with-sparse-columns">
+<h1>Dataset is a pandas dataframe with sparse columns<a class="headerlink" href="#dataset-is-a-pandas-dataframe-with-sparse-columns" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sparse_data</span> <span class="o">=</span> <span class="n">coo_matrix</span><span class="p">(</span>
+    <span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+<span class="p">)</span>
+<span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;input1&quot;</span><span class="p">,</span> <span class="s2">&quot;input2&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">from_spmatrix</span><span class="p">(</span><span class="n">sparse_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
 
 <span class="n">xor_dataset</span> <span class="o">=</span> <span class="n">create_dataset</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;XOR&quot;</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Dataset representing the XOR operation&#39;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Dataset representing the XOR operation&quot;</span><span class="p">,</span>
     <span class="n">creator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">contributor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">collection_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">language</span><span class="o">=</span><span class="s1">&#39;English&#39;</span><span class="p">,</span>
+    <span class="n">language</span><span class="o">=</span><span class="s2">&quot;English&quot;</span><span class="p">,</span>
     <span class="n">licence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">default_target_attribute</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span>
+    <span class="n">default_target_attribute</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span>
     <span class="n">row_id_attribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">ignore_attribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">citation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">attributes</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
     <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
-    <span class="n">version_label</span><span class="o">=</span><span class="s1">&#39;example&#39;</span><span class="p">,</span>
+    <span class="n">version_label</span><span class="o">=</span><span class="s2">&quot;example&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/travis/build/openml/openml-python/examples/30_extended/create_upload_tutorial.py:294: FutureWarning: SparseDataFrame is deprecated and will be removed in a future version.
-Use a regular DataFrame whose columns are SparseArrays instead.
-
-See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-  df = pd.SparseDataFrame(sparse_data, columns=column_names)
-/home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/sparse/frame.py:257: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
-Use a Series with sparse values instead.
-
-    &gt;&gt;&gt; series = pd.Series(pd.SparseArray(...))
-
-See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-  sparse_index=BlockIndex(N, blocs, blens),
-/home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/frame.py:3471: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
-Use a Series with sparse values instead.
-
-    &gt;&gt;&gt; series = pd.Series(pd.SparseArray(...))
-
-See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-  return klass(values, index=self.index, name=items, fastpath=True)
-/home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/apply.py:345: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
-Use a Series with sparse values instead.
-
-    &gt;&gt;&gt; series = pd.Series(pd.SparseArray(...))
-
-See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-  result = self.obj._constructor_sliced(results)
-&lt;class &#39;pandas.core.sparse.frame.SparseDataFrame&#39;&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
 RangeIndex: 4 entries, 0 to 3
 Data columns (total 3 columns):
-input1    3 non-null Sparse[float64, nan]
-input2    2 non-null Sparse[float64, nan]
-y         2 non-null Sparse[float64, nan]
-dtypes: Sparse[float64, nan](3)
-memory usage: 224.0 bytes
+ #   Column  Non-Null Count  Dtype
+---  ------  --------------  -----
+ 0   input1  4 non-null      Sparse[float64, 0]
+ 1   input2  4 non-null      Sparse[float64, 0]
+ 2   y       4 non-null      Sparse[float64, 0]
+dtypes: Sparse[float64, 0](3)
+memory usage: 212.0 bytes
 None
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xor_dataset</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{xor_dataset.openml_url}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;URL for dataset: </span><span class="si">{</span><span class="n">xor_dataset</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://www.openml.org/d/24867
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>URL for dataset: https://test.openml.org/d/103957
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.652 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  10.401 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-create-upload-tutorial-py">
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/0d1d1c06933bd6d32bda534cb0aa0e53/create_upload_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">create_upload_tutorial.py</span></code></a></p>
 </div>
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/763456abfe22344e6b6aed250579eddb/create_upload_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">create_upload_tutorial.ipynb</span></code></a></p>
 </div>
 </div>
@@ -535,7 +500,7 @@ None
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

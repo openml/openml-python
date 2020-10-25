@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>openml.OpenMLRun &#8212; OpenML 0.10.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>openml.OpenMLRun &#8212; OpenML 0.11.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -52,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -111,145 +114,45 @@
       
   <div class="section" id="openml-openmlrun">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLRun<a class="headerlink" href="#openml-openmlrun" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="openml.OpenMLRun">
-<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLRun</code><span class="sig-paren">(</span><em class="sig-param">task_id</em>, <em class="sig-param">flow_id</em>, <em class="sig-param">dataset_id</em>, <em class="sig-param">setup_string=None</em>, <em class="sig-param">output_files=None</em>, <em class="sig-param">setup_id=None</em>, <em class="sig-param">tags=None</em>, <em class="sig-param">uploader=None</em>, <em class="sig-param">uploader_name=None</em>, <em class="sig-param">evaluations=None</em>, <em class="sig-param">fold_evaluations=None</em>, <em class="sig-param">sample_evaluations=None</em>, <em class="sig-param">data_content=None</em>, <em class="sig-param">trace=None</em>, <em class="sig-param">model=None</em>, <em class="sig-param">task_type=None</em>, <em class="sig-param">task_evaluation_measure=None</em>, <em class="sig-param">flow_name=None</em>, <em class="sig-param">parameter_settings=None</em>, <em class="sig-param">predictions_url=None</em>, <em class="sig-param">task=None</em>, <em class="sig-param">flow=None</em>, <em class="sig-param">run_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLRun</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_id</span></em>, <em class="sig-param"><span class="n">flow_id</span></em>, <em class="sig-param"><span class="n">dataset_id</span></em>, <em class="sig-param"><span class="n">setup_string</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_files</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">setup_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">uploader</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">uploader_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">evaluations</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fold_evaluations</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_evaluations</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">data_content</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">trace</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">task_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">task_evaluation_measure</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flow_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parameter_settings</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">predictions_url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">task</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flow</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">run_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description_text</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun" title="Permalink to this definition">¶</a></dt>
 <dd><p>OpenML Run: result of running a model on an openml dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>task_id</strong><span class="classifier">int</span></dt><dd><p>Refers to the task.</p>
+<dt><strong>task_id: int</strong></dt><dd></dd>
+<dt><strong>flow_id: int</strong></dt><dd></dd>
+<dt><strong>dataset_id: int</strong></dt><dd></dd>
+<dt><strong>setup_string: str</strong></dt><dd></dd>
+<dt><strong>output_files: Dict[str, str]</strong></dt><dd><p>A dictionary that specifies where each related file can be found.</p>
 </dd>
-<dt><strong>flow_id</strong><span class="classifier">int</span></dt><dd><p>Refers to the flow.</p>
+<dt><strong>setup_id: int</strong></dt><dd></dd>
+<dt><strong>tags: List[str]</strong></dt><dd></dd>
+<dt><strong>uploader: int</strong></dt><dd><p>User ID of the uploader.</p>
 </dd>
-<dt><strong>dataset_id: int</strong></dt><dd><p>Refers to the data.</p>
+<dt><strong>uploader_name: str</strong></dt><dd></dd>
+<dt><strong>evaluations: Dict</strong></dt><dd></dd>
+<dt><strong>fold_evaluations: Dict</strong></dt><dd></dd>
+<dt><strong>sample_evaluations: Dict</strong></dt><dd></dd>
+<dt><strong>data_content: List[List]</strong></dt><dd><p>The predictions generated from executing this run.</p>
 </dd>
-</dl>
-</dd>
-</dl>
-<dl class="method">
-<dt id="openml.OpenMLRun.from_filesystem">
-<em class="property">classmethod </em><code class="sig-name descname">from_filesystem</code><span class="sig-paren">(</span><em class="sig-param">directory: str</em>, <em class="sig-param">expect_model: bool = True</em><span class="sig-paren">)</span> &#x2192; 'OpenMLRun'<a class="headerlink" href="#openml.OpenMLRun.from_filesystem" title="Permalink to this definition">¶</a></dt>
-<dd><p>The inverse of the to_filesystem method. Instantiates an OpenMLRun
-object based on files stored on the file system.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>directory</strong><span class="classifier">str</span></dt><dd><p>a path leading to the folder where the results
-are stored</p>
-</dd>
-<dt><strong>expect_model</strong><span class="classifier">bool</span></dt><dd><p>if True, it requires the model pickle to be present, and an error
-will be thrown if not. Otherwise, the model might or might not
-be present.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>run</strong><span class="classifier">OpenMLRun</span></dt><dd><p>the re-instantiated run object</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLRun.get_metric_fn">
-<code class="sig-name descname">get_metric_fn</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">sklearn_fn</em>, <em class="sig-param">kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.get_metric_fn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates metric scores based on predicted values. Assumes the
-run has been executed locally (and contains run_data). Furthermore,
-it assumes that the ‘correct’ or ‘truth’ attribute is specified in
-the arff (which is an optional field, but always the case for
-openml-python runs)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>sklearn_fn</strong><span class="classifier">function</span></dt><dd><p>a function pointer to a sklearn function that
-accepts <code class="docutils literal notranslate"><span class="pre">y_true</span></code>, <code class="docutils literal notranslate"><span class="pre">y_pred</span></code> and <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code></p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>scores</strong><span class="classifier">list</span></dt><dd><p>a list of floats, of length num_folds * num_repeats</p>
+<dt><strong>trace: OpenMLRunTrace</strong></dt><dd></dd>
+<dt><strong>model: object</strong></dt><dd></dd>
+<dt><strong>task_type: str</strong></dt><dd></dd>
+<dt><strong>task_evaluation_measure: str</strong></dt><dd></dd>
+<dt><strong>flow_name: str</strong></dt><dd></dd>
+<dt><strong>parameter_settings: List[OrderedDict]</strong></dt><dd></dd>
+<dt><strong>predictions_url: str</strong></dt><dd></dd>
+<dt><strong>task: OpenMLTask</strong></dt><dd></dd>
+<dt><strong>flow: OpenMLFlow</strong></dt><dd></dd>
+<dt><strong>run_id: int</strong></dt><dd></dd>
+<dt><strong>description_text: str, optional</strong></dt><dd><p>Description text to add to the predictions file.
+If left None,</p>
 </dd>
 </dl>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLRun.id">
-<em class="property">property </em><code class="sig-name descname">id</code><a class="headerlink" href="#openml.OpenMLRun.id" title="Permalink to this definition">¶</a></dt>
-<dd><p>The id of the entity, it is unique for its entity type.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLRun.open_in_browser">
-<code class="sig-name descname">open_in_browser</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.open_in_browser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Opens the OpenML web page corresponding to this object in your default browser.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLRun.openml_url">
-<em class="property">property </em><code class="sig-name descname">openml_url</code><a class="headerlink" href="#openml.OpenMLRun.openml_url" title="Permalink to this definition">¶</a></dt>
-<dd><p>The URL of the object on the server, if it was uploaded, else None.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLRun.push_tag">
-<code class="sig-name descname">push_tag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tag: str</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.push_tag" title="Permalink to this definition">¶</a></dt>
-<dd><p>Annotates this entity with a tag on the server.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLRun.remove_tag">
-<code class="sig-name descname">remove_tag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tag: str</em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.remove_tag" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes a tag from this entity on the server.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLRun.to_filesystem">
-<code class="sig-name descname">to_filesystem</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">directory: str</em>, <em class="sig-param">store_model: bool = True</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#openml.OpenMLRun.to_filesystem" title="Permalink to this definition">¶</a></dt>
-<dd><p>The inverse of the from_filesystem method. Serializes a run
-on the filesystem, to be uploaded later.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>directory</strong><span class="classifier">str</span></dt><dd><p>a path leading to the folder where the results
-will be stored. Should be empty</p>
-</dd>
-<dt><strong>store_model</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>if True, a model will be pickled as well. As this is the most
-storage expensive part, it is often desirable to not store the
-model.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="openml.OpenMLRun.url_for_id">
-<em class="property">classmethod </em><code class="sig-name descname">url_for_id</code><span class="sig-paren">(</span><em class="sig-param">id_: int</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#openml.OpenMLRun.url_for_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the OpenML URL for the object of the class entity with the given id.</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -267,7 +170,7 @@ model.</p>
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

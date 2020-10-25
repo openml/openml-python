@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_30_extended_suites_tutorial.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_30_extended_suites_tutorial.py:
+        Click :ref:`here <sphx_glr_download_examples_30_extended_suites_tutorial.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_30_extended_suites_tutorial.py:
 
 
 ================
@@ -53,7 +55,7 @@ Listing suites
 .. code-block:: default
 
 
-    suites = openml.study.list_suites(output_format='dataframe', status='all')
+    suites = openml.study.list_suites(output_format="dataframe", status="all")
     print(suites.head(n=10))
 
 
@@ -66,16 +68,19 @@ Listing suites
 
  .. code-block:: none
 
-          id             alias  ...        creation_date creator
-    14    14         OpenML100  ...  2019-02-21 18:40:13       1
-    99    99       OpenML-CC18  ...  2019-02-21 18:47:13       1
-    216  216         CoolStudy  ...  2019-02-28 23:00:26    8006
-    217  217             Study  ...  2019-02-28 23:05:11    8006
-    218  218  AutoML-Benchmark  ...  2019-05-02 13:35:08     869
-    219  219             FOREX  ...  2019-06-04 00:45:17       1
-    225  225   OpenML-friendly  ...  2019-09-16 19:41:46       1
+          id                             alias  ...        creation_date creator
+    14    14                         OpenML100  ...  2019-02-21 18:40:13       1
+    99    99                       OpenML-CC18  ...  2019-02-21 18:47:13       1
+    216  216                         CoolStudy  ...  2019-02-28 23:00:26    8006
+    217  217                             Study  ...  2019-02-28 23:05:11    8006
+    218  218                  AutoML-Benchmark  ...  2019-05-02 13:35:08     869
+    219  219                             FOREX  ...  2019-06-04 00:45:17       1
+    225  225                   OpenML-friendly  ...  2019-09-16 19:41:46       1
+    236  236  a9ee1f0b2a4b48b6b6da1653fe92890e  ...  2020-04-06 21:38:55      64
+    239  239  c638a5d3d31241179f9b4853951fdb79  ...  2020-04-19 22:15:30      64
+    240  240  e5e7f56c8655433eb2418c240ec8b8c0  ...  2020-04-28 02:30:38    2902
 
-    [7 rows x 7 columns]
+    [10 rows x 7 columns]
 
 
 
@@ -166,12 +171,12 @@ And we can use the task listing functionality to learn more about them:
 
 .. code-block:: default
 
-    tasks = openml.tasks.list_tasks(output_format='dataframe')
+    tasks = openml.tasks.list_tasks(output_format="dataframe")
 
     # Using ``@`` in `pd.DataFrame.query <
     # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html>`_
     # accesses variables outside of the current dataframe.
-    tasks = tasks.query('tid in @suite.tasks')
+    tasks = tasks.query("tid in @suite.tasks")
     print(tasks.describe().transpose())
 
 
@@ -184,15 +189,9 @@ And we can use the task listing functionality to learn more about them:
 
  .. code-block:: none
 
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/frame.py:7138: FutureWarning: Sorting because non-concatenation axis is not aligned. A future version
-    of pandas will change to not sort by default.
-
-    To accept the future behavior, pass 'sort=False'.
-
-    To retain the current behavior and silence the warning, pass 'sort=True'.
-
-      sort=sort,
                                         count          mean  ...       75%       max
+    tid                                  72.0  41849.305556  ...  42707.50  167141.0
+    did                                  72.0  10472.263889  ...  10594.25   41027.0
     MajorityClassSize                    72.0   4820.166667  ...   2796.00   48658.0
     MaxNominalAttDistinctValues          72.0      8.638889  ...     10.00      71.0
     MinorityClassSize                    72.0   2199.777778  ...   1326.50   47662.0
@@ -203,12 +202,9 @@ And we can use the task listing functionality to learn more about them:
     NumberOfMissingValues                72.0    226.597222  ...      0.00    6465.0
     NumberOfNumericFeatures              72.0    166.875000  ...     64.00    3072.0
     NumberOfSymbolicFeatures             72.0     29.722222  ...      5.25    1556.0
-    did                                  72.0  10472.263889  ...  10594.25   41027.0
     target_feature_left                   0.0           NaN  ...       NaN       NaN
-    tid                                  72.0  41849.305556  ...  42707.50  167141.0
-    ttid                                 72.0      1.000000  ...      1.00       1.0
 
-    [14 rows x 8 columns]
+    [13 rows x 8 columns]
 
 
 
@@ -237,8 +233,8 @@ because we upload some random data.
     alias = uuid.uuid4().hex
 
     new_suite = openml.study.create_benchmark_suite(
-        name='Test-Suite',
-        description='Test suite for the Python tutorial on benchmark suites',
+        name="Test-Suite",
+        description="Test suite for the Python tutorial on benchmark suites",
         task_ids=task_ids_for_suite,
         alias=alias,
     )
@@ -258,11 +254,11 @@ because we upload some random data.
 
     OpenML Benchmark Suite
     ======================
-    ID..............: 5015
+    ID..............: 20925
     Name............: Test-Suite
     Status..........: None
     Main Entity Type: task
-    Study URL.......: https://www.openml.org/s/5015
+    Study URL.......: https://test.openml.org/s/20925
     # of Tasks......: 20
 
 
@@ -282,7 +278,7 @@ because we upload some random data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  19.620 seconds)
+   **Total running time of the script:** ( 0 minutes  32.334 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_suites_tutorial.py:
@@ -295,13 +291,13 @@ because we upload some random data.
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: suites_tutorial.py <suites_tutorial.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: suites_tutorial.ipynb <suites_tutorial.ipynb>`
 

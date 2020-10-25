@@ -1,4 +1,4 @@
-:mod:`openml.datasets`.attributes_arff_from_df
+﻿:mod:`openml.datasets`.attributes_arff_from_df
 ===========================================================
 
 .. currentmodule:: openml.datasets

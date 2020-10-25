@@ -74,6 +74,8 @@ Modules
     list_datasets
     list_qualities
     status_update
+    edit_dataset
+    fork_dataset
 
 :mod:`openml.evaluations`: Evaluation Functions
 -----------------------------------------------
@@ -162,6 +164,7 @@ Modules
    :toctree: generated/
    :template: function.rst
 
+    create_task
     get_task
     get_tasks
     list_tasks

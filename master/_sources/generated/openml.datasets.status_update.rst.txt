@@ -1,4 +1,4 @@
-:mod:`openml.datasets`.status_update
+﻿:mod:`openml.datasets`.status_update
 =================================================
 
 .. currentmodule:: openml.datasets

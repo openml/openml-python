@@ -1,4 +1,4 @@
-:mod:`openml.extensions`.Extension
+﻿:mod:`openml.extensions`.Extension
 =========================================
 
 .. currentmodule:: openml.extensions

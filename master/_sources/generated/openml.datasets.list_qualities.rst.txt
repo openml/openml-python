@@ -1,4 +1,4 @@
-:mod:`openml.datasets`.list_qualities
+﻿:mod:`openml.datasets`.list_qualities
 ==================================================
 
 .. currentmodule:: openml.datasets

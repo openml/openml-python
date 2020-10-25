@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_30_extended_create_upload_tutorial.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_30_extended_create_upload_tutorial.py:
+        Click :ref:`here <sphx_glr_download_examples_30_extended_create_upload_tutorial.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_30_extended_create_upload_tutorial.py:
 
 
 Dataset upload tutorial
@@ -72,7 +74,7 @@ via the API.
 
 
     diabetes = sklearn.datasets.load_diabetes()
-    name = 'Diabetes(scikit-learn)'
+    name = "Diabetes(scikit-learn)"
     X = diabetes.data
     y = diabetes.target
     attribute_names = diabetes.feature_names
@@ -97,18 +99,15 @@ that data).
 
     data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
     attribute_names = list(attribute_names)
-    attributes = [
-        (attribute_name, 'REAL') for attribute_name in attribute_names
-    ] + [('class', 'INTEGER')]
+    attributes = [(attribute_name, "REAL") for attribute_name in attribute_names] + [
+        ("class", "INTEGER")
+    ]
     citation = (
         "Bradley Efron, Trevor Hastie, Iain Johnstone and "
         "Robert Tibshirani (2004) (Least Angle Regression) "
         "Annals of Statistics (with discussion), 407-499"
     )
-    paper_url = (
-        'http://web.stanford.edu/~hastie/Papers/'
-        'LARS/LeastAngle_2002.pdf'
-    )
+    paper_url = "http://web.stanford.edu/~hastie/Papers/LARS/LeastAngle_2002.pdf"
 
 
 
@@ -136,24 +135,23 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
         # Textual description of the dataset.
         description=description,
         # The person who created the dataset.
-        creator="Bradley Efron, Trevor Hastie, "
-                "Iain Johnstone and Robert Tibshirani",
+        creator="Bradley Efron, Trevor Hastie, Iain Johnstone and Robert Tibshirani",
         # People who contributed to the current version of the dataset.
         contributor=None,
         # The date the data was originally collected, given by the uploader.
-        collection_date='09-01-2012',
+        collection_date="09-01-2012",
         # Language in which the data is represented.
         # Starts with 1 upper case letter, rest lower case, e.g. 'English'.
-        language='English',
+        language="English",
         # License under which the data is/will be distributed.
-        licence='BSD (from scikit-learn)',
+        licence="BSD (from scikit-learn)",
         # Name of the target. Can also have multiple values (comma-separated).
-        default_target_attribute='class',
+        default_target_attribute="class",
         # The attribute that represents the row-id column, if present in the
         # dataset.
         row_id_attribute=None,
-        # Attributes that should be excluded in modelling, such as identifiers and
-        # indexes.
+        # Attribute or list of attributes that should be excluded in modelling, such as
+        # identifiers and indexes. E.g. "feat1" or ["feat1","feat2"]
         ignore_attribute=None,
         # How to cite the paper.
         citation=citation,
@@ -161,10 +159,8 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
         attributes=attributes,
         data=data,
         # A version label which is provided by the user.
-        version_label='test',
-        original_data_url=(
-            'http://www4.stat.ncsu.edu/~boos/var.select/diabetes.html'
-        ),
+        version_label="test",
+        original_data_url="http://www4.stat.ncsu.edu/~boos/var.select/diabetes.html",
         paper_url=paper_url,
     )
 
@@ -192,7 +188,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/24863
+    URL for dataset: https://test.openml.org/d/103953
 
 
 
@@ -210,62 +206,62 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
 
     data = [
-        ['sunny', 85, 85, 'FALSE', 'no'],
-        ['sunny', 80, 90, 'TRUE', 'no'],
-        ['overcast', 83, 86, 'FALSE', 'yes'],
-        ['rainy', 70, 96, 'FALSE', 'yes'],
-        ['rainy', 68, 80, 'FALSE', 'yes'],
-        ['rainy', 65, 70, 'TRUE', 'no'],
-        ['overcast', 64, 65, 'TRUE', 'yes'],
-        ['sunny', 72, 95, 'FALSE', 'no'],
-        ['sunny', 69, 70, 'FALSE', 'yes'],
-        ['rainy', 75, 80, 'FALSE', 'yes'],
-        ['sunny', 75, 70, 'TRUE', 'yes'],
-        ['overcast', 72, 90, 'TRUE', 'yes'],
-        ['overcast', 81, 75, 'FALSE', 'yes'],
-        ['rainy', 71, 91, 'TRUE', 'no'],
+        ["sunny", 85, 85, "FALSE", "no"],
+        ["sunny", 80, 90, "TRUE", "no"],
+        ["overcast", 83, 86, "FALSE", "yes"],
+        ["rainy", 70, 96, "FALSE", "yes"],
+        ["rainy", 68, 80, "FALSE", "yes"],
+        ["rainy", 65, 70, "TRUE", "no"],
+        ["overcast", 64, 65, "TRUE", "yes"],
+        ["sunny", 72, 95, "FALSE", "no"],
+        ["sunny", 69, 70, "FALSE", "yes"],
+        ["rainy", 75, 80, "FALSE", "yes"],
+        ["sunny", 75, 70, "TRUE", "yes"],
+        ["overcast", 72, 90, "TRUE", "yes"],
+        ["overcast", 81, 75, "FALSE", "yes"],
+        ["rainy", 71, 91, "TRUE", "no"],
     ]
 
     attribute_names = [
-        ('outlook', ['sunny', 'overcast', 'rainy']),
-        ('temperature', 'REAL'),
-        ('humidity', 'REAL'),
-        ('windy', ['TRUE', 'FALSE']),
-        ('play', ['yes', 'no']),
+        ("outlook", ["sunny", "overcast", "rainy"]),
+        ("temperature", "REAL"),
+        ("humidity", "REAL"),
+        ("windy", ["TRUE", "FALSE"]),
+        ("play", ["yes", "no"]),
     ]
 
     description = (
-        'The weather problem is a tiny dataset that we will use repeatedly'
-        ' to illustrate machine learning methods. Entirely fictitious, it '
-        'supposedly concerns the conditions that are suitable for playing '
-        'some unspecified game. In general, instances in a dataset are '
-        'characterized by the values of features, or attributes, that measure '
-        'different aspects of the instance. In this case there are four '
-        'attributes: outlook, temperature, humidity, and windy. '
-        'The outcome is whether to play or not.'
+        "The weather problem is a tiny dataset that we will use repeatedly"
+        " to illustrate machine learning methods. Entirely fictitious, it "
+        "supposedly concerns the conditions that are suitable for playing "
+        "some unspecified game. In general, instances in a dataset are "
+        "characterized by the values of features, or attributes, that measure "
+        "different aspects of the instance. In this case there are four "
+        "attributes: outlook, temperature, humidity, and windy. "
+        "The outcome is whether to play or not."
     )
 
     citation = (
-        'I. H. Witten, E. Frank, M. A. Hall, and ITPro,'
-        'Data mining practical machine learning tools and techniques, '
-        'third edition. Burlington, Mass.: Morgan Kaufmann Publishers, 2011'
+        "I. H. Witten, E. Frank, M. A. Hall, and ITPro,"
+        "Data mining practical machine learning tools and techniques, "
+        "third edition. Burlington, Mass.: Morgan Kaufmann Publishers, 2011"
     )
 
     weather_dataset = create_dataset(
         name="Weather",
         description=description,
-        creator='I. H. Witten, E. Frank, M. A. Hall, and ITPro',
+        creator="I. H. Witten, E. Frank, M. A. Hall, and ITPro",
         contributor=None,
-        collection_date='01-01-2011',
-        language='English',
+        collection_date="01-01-2011",
+        language="English",
         licence=None,
-        default_target_attribute='play',
+        default_target_attribute="play",
         row_id_attribute=None,
         ignore_attribute=None,
         citation=citation,
         attributes=attribute_names,
         data=data,
-        version_label='example',
+        version_label="example",
     )
 
 
@@ -292,7 +288,7 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/24864
+    URL for dataset: https://test.openml.org/d/103954
 
 
 
@@ -313,9 +309,9 @@ function :func:`create_dataset`. In this regard, you only need to pass
 
     df = pd.DataFrame(data, columns=[col_name for col_name, _ in attribute_names])
     # enforce the categorical column to have a categorical dtype
-    df['outlook'] = df['outlook'].astype('category')
-    df['windy'] = df['windy'].astype('bool')
-    df['play'] = df['play'].astype('category')
+    df["outlook"] = df["outlook"].astype("category")
+    df["windy"] = df["windy"].astype("bool")
+    df["play"] = df["play"].astype("category")
     print(df.info())
 
 
@@ -331,11 +327,13 @@ function :func:`create_dataset`. In this regard, you only need to pass
     <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 14 entries, 0 to 13
     Data columns (total 5 columns):
-    outlook        14 non-null category
-    temperature    14 non-null int64
-    humidity       14 non-null int64
-    windy          14 non-null bool
-    play           14 non-null category
+     #   Column       Non-Null Count  Dtype   
+    ---  ------       --------------  -----   
+     0   outlook      14 non-null     category
+     1   temperature  14 non-null     int64   
+     2   humidity     14 non-null     int64   
+     3   windy        14 non-null     bool    
+     4   play         14 non-null     category
     dtypes: bool(1), category(2), int64(2)
     memory usage: 594.0 bytes
     None
@@ -343,8 +341,9 @@ function :func:`create_dataset`. In this regard, you only need to pass
 
 
 
-We enforce the column 'outlook', 'windy', and 'play' to be a categorical
-dtype while the column 'rnd_str' is kept as a string column. Then, we can
+We enforce the column 'outlook' and 'play' to be a categorical
+dtype while the column 'windy' is kept as a boolean column. 'temperature'
+and 'humidity' are kept as numeric columns. Then, we can
 call :func:`create_dataset` by passing the dataframe and fixing the parameter
 ``attributes`` to ``'auto'``.
 
@@ -355,32 +354,23 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
     weather_dataset = create_dataset(
         name="Weather",
         description=description,
-        creator='I. H. Witten, E. Frank, M. A. Hall, and ITPro',
+        creator="I. H. Witten, E. Frank, M. A. Hall, and ITPro",
         contributor=None,
-        collection_date='01-01-2011',
-        language='English',
+        collection_date="01-01-2011",
+        language="English",
         licence=None,
-        default_target_attribute='play',
+        default_target_attribute="play",
         row_id_attribute=None,
         ignore_attribute=None,
         citation=citation,
-        attributes='auto',
+        attributes="auto",
         data=df,
-        version_label='example',
+        version_label="example",
     )
 
 
 
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /home/travis/build/openml/openml-python/openml/datasets/functions.py:682: FutureWarning: A future version of pandas will default to `skipna=True`. To silence this warning, pass `skipna=True|False` explicitly.
-      attributes_ = attributes_arff_from_df(data)
 
 
 
@@ -402,7 +392,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/24865
+    URL for dataset: https://test.openml.org/d/103955
 
 
 
@@ -414,32 +404,31 @@ Dataset is a sparse matrix
 .. code-block:: default
 
 
-    sparse_data = coo_matrix((
-        [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-        ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
-    ))
+    sparse_data = coo_matrix(
+        ([0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1]))
+    )
 
     column_names = [
-        ('input1', 'REAL'),
-        ('input2', 'REAL'),
-        ('y', 'REAL'),
+        ("input1", "REAL"),
+        ("input2", "REAL"),
+        ("y", "REAL"),
     ]
 
     xor_dataset = create_dataset(
         name="XOR",
-        description='Dataset representing the XOR operation',
+        description="Dataset representing the XOR operation",
         creator=None,
         contributor=None,
         collection_date=None,
-        language='English',
+        language="English",
         licence=None,
-        default_target_attribute='y',
+        default_target_attribute="y",
         row_id_attribute=None,
         ignore_attribute=None,
         citation=None,
         attributes=column_names,
         data=sparse_data,
-        version_label='example',
+        version_label="example",
     )
 
 
@@ -467,41 +456,40 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/24866
+    URL for dataset: https://test.openml.org/d/103956
 
 
 
 
-Dataset is a pandas sparse dataframe
-====================================
+Dataset is a pandas dataframe with sparse columns
+=================================================
 
 
 .. code-block:: default
 
 
-    sparse_data = coo_matrix((
-        [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-        ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1])
-    ))
-    column_names = ['input1', 'input2', 'y']
-    df = pd.SparseDataFrame(sparse_data, columns=column_names)
+    sparse_data = coo_matrix(
+        ([1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0], ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1]))
+    )
+    column_names = ["input1", "input2", "y"]
+    df = pd.DataFrame.sparse.from_spmatrix(sparse_data, columns=column_names)
     print(df.info())
 
     xor_dataset = create_dataset(
         name="XOR",
-        description='Dataset representing the XOR operation',
+        description="Dataset representing the XOR operation",
         creator=None,
         contributor=None,
         collection_date=None,
-        language='English',
+        language="English",
         licence=None,
-        default_target_attribute='y',
+        default_target_attribute="y",
         row_id_attribute=None,
         ignore_attribute=None,
         citation=None,
-        attributes='auto',
+        attributes="auto",
         data=df,
-        version_label='example',
+        version_label="example",
     )
 
 
@@ -514,44 +502,16 @@ Dataset is a pandas sparse dataframe
 
  .. code-block:: none
 
-    /home/travis/build/openml/openml-python/examples/30_extended/create_upload_tutorial.py:294: FutureWarning: SparseDataFrame is deprecated and will be removed in a future version.
-    Use a regular DataFrame whose columns are SparseArrays instead.
-
-    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-      df = pd.SparseDataFrame(sparse_data, columns=column_names)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/sparse/frame.py:257: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
-    Use a Series with sparse values instead.
-
-        >>> series = pd.Series(pd.SparseArray(...))
-
-    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-      sparse_index=BlockIndex(N, blocs, blens),
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/frame.py:3471: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
-    Use a Series with sparse values instead.
-
-        >>> series = pd.Series(pd.SparseArray(...))
-
-    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-      return klass(values, index=self.index, name=items, fastpath=True)
-    /home/travis/miniconda/envs/testenv/lib/python3.7/site-packages/pandas/core/apply.py:345: FutureWarning: SparseSeries is deprecated and will be removed in a future version.
-    Use a Series with sparse values instead.
-
-        >>> series = pd.Series(pd.SparseArray(...))
-
-    See http://pandas.pydata.org/pandas-docs/stable/user_guide/sparse.html#migrating for more.
-
-      result = self.obj._constructor_sliced(results)
-    <class 'pandas.core.sparse.frame.SparseDataFrame'>
+    <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 4 entries, 0 to 3
     Data columns (total 3 columns):
-    input1    3 non-null Sparse[float64, nan]
-    input2    2 non-null Sparse[float64, nan]
-    y         2 non-null Sparse[float64, nan]
-    dtypes: Sparse[float64, nan](3)
-    memory usage: 224.0 bytes
+     #   Column  Non-Null Count  Dtype             
+    ---  ------  --------------  -----             
+     0   input1  4 non-null      Sparse[float64, 0]
+     1   input2  4 non-null      Sparse[float64, 0]
+     2   y       4 non-null      Sparse[float64, 0]
+    dtypes: Sparse[float64, 0](3)
+    memory usage: 212.0 bytes
     None
 
 
@@ -575,7 +535,7 @@ Dataset is a pandas sparse dataframe
 
  .. code-block:: none
 
-    URL for dataset: https://www.openml.org/d/24867
+    URL for dataset: https://test.openml.org/d/103957
 
 
 
@@ -594,7 +554,7 @@ Dataset is a pandas sparse dataframe
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.652 seconds)
+   **Total running time of the script:** ( 0 minutes  10.401 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:
@@ -607,13 +567,13 @@ Dataset is a pandas sparse dataframe
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: create_upload_tutorial.py <create_upload_tutorial.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: create_upload_tutorial.ipynb <create_upload_tutorial.ipynb>`
 

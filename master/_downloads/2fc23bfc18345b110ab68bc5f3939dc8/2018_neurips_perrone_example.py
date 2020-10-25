@@ -38,16 +38,14 @@ from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestRegressor
 
-flow_type = 'svm'  # this example will use the smaller svm flow evaluations
+flow_type = "svm"  # this example will use the smaller svm flow evaluations
 ############################################################################
 # The subsequent functions are defined to fetch tasks, flows, evaluations and preprocess them into
 # a tabular format that can be used to build models.
 
 
-def fetch_evaluations(run_full=False,
-                      flow_type='svm',
-                      metric='area_under_roc_curve'):
-    '''
+def fetch_evaluations(run_full=False, flow_type="svm", metric="area_under_roc_curve"):
+    """
     Fetch a list of evaluations based on the flows and tasks used in the experiments.
 
     Parameters
@@ -65,17 +63,18 @@ def fetch_evaluations(run_full=False,
     eval_df : dataframe
     task_ids : list
     flow_id : int
-    '''
+    """
     # Collecting task IDs as used by the experiments from the paper
-    if flow_type == 'svm' and run_full:
+    # fmt: off
+    if flow_type == "svm" and run_full:
         task_ids = [
             10101, 145878, 146064, 14951, 34537, 3485, 3492, 3493, 3494,
             37, 3889, 3891, 3899, 3902, 3903, 3913, 3918, 3950, 9889,
             9914, 9946, 9952, 9967, 9971, 9976, 9978, 9980, 9983,
         ]
-    elif flow_type == 'svm' and not run_full:
+    elif flow_type == "svm" and not run_full:
         task_ids = [9983, 3485, 3902, 3903, 145878]
-    elif flow_type == 'xgboost' and run_full:
+    elif flow_type == "xgboost" and run_full:
         task_ids = [
             10093, 10101, 125923, 145847, 145857, 145862, 145872, 145878,
             145953, 145972, 145976, 145979, 146064, 14951, 31, 3485,
@@ -84,25 +83,27 @@ def fetch_evaluations(run_full=False,
         ]
     else:  # flow_type == 'xgboost' and not run_full:
         task_ids = [3903, 37, 3485, 49, 3913]
+    # fmt: on
 
     # Fetching the relevant flow
-    flow_id = 5891 if flow_type == 'svm' else 6767
+    flow_id = 5891 if flow_type == "svm" else 6767
 
     # Fetching evaluations
-    eval_df = openml.evaluations.list_evaluations_setups(function=metric,
-                                                         task=task_ids,
-                                                         flow=[flow_id],
-                                                         uploader=[2702],
-                                                         output_format='dataframe',
-                                                         parameters_in_separate_columns=True)
+    eval_df = openml.evaluations.list_evaluations_setups(
+        function=metric,
+        tasks=task_ids,
+        flows=[flow_id],
+        uploaders=[2702],
+        output_format="dataframe",
+        parameters_in_separate_columns=True,
+    )
     return eval_df, task_ids, flow_id
 
 
-def create_table_from_evaluations(eval_df,
-                                  flow_type='svm',
-                                  run_count=np.iinfo(np.int64).max,
-                                  task_ids=None):
-    '''
+def create_table_from_evaluations(
+    eval_df, flow_type="svm", run_count=np.iinfo(np.int64).max, task_ids=None
+):
+    """
     Create a tabular data with its ground truth from a dataframe of evaluations.
     Optionally, can filter out records based on task ids.
 
@@ -121,29 +122,36 @@ def create_table_from_evaluations(eval_df,
     -------
     eval_table : dataframe
     values : list
-    '''
+    """
     if task_ids is not None:
-        eval_df = eval_df[eval_df['task_id'].isin(task_ids)]
-    if flow_type == 'svm':
-        colnames = ['cost', 'degree', 'gamma', 'kernel']
+        eval_df = eval_df[eval_df["task_id"].isin(task_ids)]
+    if flow_type == "svm":
+        colnames = ["cost", "degree", "gamma", "kernel"]
     else:
         colnames = [
-            'alpha', 'booster', 'colsample_bylevel', 'colsample_bytree',
-            'eta', 'lambda', 'max_depth', 'min_child_weight', 'nrounds',
-            'subsample',
+            "alpha",
+            "booster",
+            "colsample_bylevel",
+            "colsample_bytree",
+            "eta",
+            "lambda",
+            "max_depth",
+            "min_child_weight",
+            "nrounds",
+            "subsample",
         ]
     eval_df = eval_df.sample(frac=1)  # shuffling rows
     eval_df = eval_df.iloc[:run_count, :]
-    eval_df.columns = [column.split('_')[-1] for column in eval_df.columns]
+    eval_df.columns = [column.split("_")[-1] for column in eval_df.columns]
     eval_table = eval_df.loc[:, colnames]
-    value = eval_df.loc[:, 'value']
+    value = eval_df.loc[:, "value"]
     return eval_table, value
 
 
-def list_categorical_attributes(flow_type='svm'):
-    if flow_type == 'svm':
-        return ['kernel']
-    return ['booster']
+def list_categorical_attributes(flow_type="svm"):
+    if flow_type == "svm":
+        return ["kernel"]
+    return ["booster"]
 
 
 #############################################################################
@@ -170,21 +178,21 @@ cat_cols = list_categorical_attributes(flow_type=flow_type)
 num_cols = list(set(X.columns) - set(cat_cols))
 
 # Missing value imputers
-cat_imputer = SimpleImputer(missing_values=np.nan, strategy='constant', fill_value='None')
-num_imputer = SimpleImputer(missing_values=np.nan, strategy='constant', fill_value=-1)
+cat_imputer = SimpleImputer(missing_values=np.nan, strategy="constant", fill_value="None")
+num_imputer = SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=-1)
 
 # Creating the one-hot encoder
-enc = OneHotEncoder(handle_unknown='ignore')
+enc = OneHotEncoder(handle_unknown="ignore")
 
 # Pipeline to handle categorical column transformations
-cat_transforms = Pipeline(steps=[('impute', cat_imputer), ('encode', enc)])
+cat_transforms = Pipeline(steps=[("impute", cat_imputer), ("encode", enc)])
 
 # Combining column transformers
-ct = ColumnTransformer([('cat', cat_transforms, cat_cols), ('num', num_imputer, num_cols)])
+ct = ColumnTransformer([("cat", cat_transforms, cat_cols), ("num", num_imputer, num_cols)])
 
 # Creating the full pipeline with the surrogate model
 clf = RandomForestRegressor(n_estimators=50)
-model = Pipeline(steps=[('preprocess', ct), ('surrogate', clf)])
+model = Pipeline(steps=[("preprocess", ct), ("surrogate", clf)])
 
 
 #############################################################################
@@ -197,7 +205,7 @@ model = Pipeline(steps=[('preprocess', ct), ('surrogate', clf)])
 # Selecting a task for the surrogate
 task_id = task_ids[-1]
 print("Task ID : ", task_id)
-X, y = create_table_from_evaluations(eval_df, task_ids=[task_id], flow_type='svm')
+X, y = create_table_from_evaluations(eval_df, task_ids=[task_id], flow_type="svm")
 
 model.fit(X, y)
 y_pred = model.predict(X)
@@ -217,11 +225,13 @@ print("Training RMSE : {:.5}".format(mean_squared_error(y, y_pred)))
 
 # Sampling random configurations
 def random_sample_configurations(num_samples=100):
-    colnames = ['cost', 'degree', 'gamma', 'kernel']
-    ranges = [(0.000986, 998.492437),
-              (2.0, 5.0),
-              (0.000988, 913.373845),
-              (['linear', 'polynomial', 'radial', 'sigmoid'])]
+    colnames = ["cost", "degree", "gamma", "kernel"]
+    ranges = [
+        (0.000986, 998.492437),
+        (2.0, 5.0),
+        (0.000988, 913.373845),
+        (["linear", "polynomial", "radial", "sigmoid"]),
+    ]
     X = pd.DataFrame(np.nan, index=range(num_samples), columns=colnames)
     for i in range(len(colnames)):
         if len(ranges[i]) == 2:
@@ -245,6 +255,6 @@ regret = 1 - preds
 
 # plotting the regret curve
 plt.plot(regret)
-plt.title('AUC regret for Random Search on surrogate')
-plt.xlabel('Numbe of function evaluations')
-plt.ylabel('Regret')
+plt.title("AUC regret for Random Search on surrogate")
+plt.xlabel("Numbe of function evaluations")
+plt.ylabel("Regret")

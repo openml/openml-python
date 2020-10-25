@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>openml.flows.assert_flows_equal &#8212; OpenML 0.10.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>openml.flows.assert_flows_equal &#8212; OpenML 0.11.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -52,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -111,9 +114,9 @@
       
   <div class="section" id="openml-flows-assert-flows-equal">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>.assert_flows_equal<a class="headerlink" href="#openml-flows-assert-flows-equal" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="openml.flows.assert_flows_equal">
-<code class="sig-prename descclassname">openml.flows.</code><code class="sig-name descname">assert_flows_equal</code><span class="sig-paren">(</span><em class="sig-param">flow1: openml.flows.flow.OpenMLFlow</em>, <em class="sig-param">flow2: openml.flows.flow.OpenMLFlow</em>, <em class="sig-param">ignore_parameter_values_on_older_children: str = None</em>, <em class="sig-param">ignore_parameter_values: bool = False</em>, <em class="sig-param">ignore_custom_name_if_none: bool = False</em>, <em class="sig-param">check_description: bool = True</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#openml.flows.assert_flows_equal" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openml.flows.</code><code class="sig-name descname">assert_flows_equal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">flow1</span><span class="p">:</span> <span class="n">openml.flows.flow.OpenMLFlow</span></em>, <em class="sig-param"><span class="n">flow2</span><span class="p">:</span> <span class="n">openml.flows.flow.OpenMLFlow</span></em>, <em class="sig-param"><span class="n">ignore_parameter_values_on_older_children</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ignore_parameter_values</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ignore_custom_name_if_none</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">check_description</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#openml.flows.assert_flows_equal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check equality of two flows.</p>
 <p>Two flows are equal if their all keys which are not set by the server
 are equal, as well as all their parameters and components.</p>
@@ -151,7 +154,7 @@ flow if it’s upload date predates the upload date of the parent flow.</p>
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

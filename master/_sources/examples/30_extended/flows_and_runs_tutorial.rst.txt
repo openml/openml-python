@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_examples_30_extended_flows_and_runs_tutorial.py:
+        Click :ref:`here <sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_examples_30_extended_flows_and_runs_tutorial.py:
 
 
 Flows and Runs
@@ -45,8 +47,7 @@ Train a scikit-learn model on the data manually.
     # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
     dataset = openml.datasets.get_dataset(68)
     X, y, categorical_indicator, attribute_names = dataset.get_data(
-        dataset_format='array',
-        target=dataset.default_target_attribute
+        dataset_format="array", target=dataset.default_target_attribute
     )
     clf = neighbors.KNeighborsClassifier(n_neighbors=1)
     clf.fit(X, y)
@@ -62,9 +63,7 @@ Train a scikit-learn model on the data manually.
  .. code-block:: none
 
 
-    KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
-                         metric_params=None, n_jobs=None, n_neighbors=1, p=2,
-                         weights='uniform')
+    KNeighborsClassifier(n_neighbors=1)
 
 
 
@@ -77,12 +76,12 @@ You can also ask for meta-data to automatically preprocess the data.
 
     dataset = openml.datasets.get_dataset(17)
     X, y, categorical_indicator, attribute_names = dataset.get_data(
-        dataset_format='array',
-        target=dataset.default_target_attribute
+        dataset_format="array", target=dataset.default_target_attribute
     )
     print(f"Categorical features: {categorical_indicator}")
     transformer = compose.ColumnTransformer(
-        [('one_hot_encoder', preprocessing.OneHotEncoder(categories='auto'), categorical_indicator)])
+        [("one_hot_encoder", preprocessing.OneHotEncoder(categories="auto"), categorical_indicator)]
+    )
     X = transformer.fit_transform(X)
     clf.fit(X, y)
 
@@ -98,9 +97,7 @@ You can also ask for meta-data to automatically preprocess the data.
 
     Categorical features: [True, False, True, True, False, True, True, False, True, True, False, True, False, True, True, False, True, False, True, True]
 
-    KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
-                         metric_params=None, n_jobs=None, n_neighbors=1, p=2,
-                         weights='uniform')
+    KNeighborsClassifier(n_neighbors=1)
 
 
 
@@ -140,19 +137,14 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     Run ID.......: None
     Task ID......: 403
     Task Type....: None
-    Task URL.....: https://www.openml.org/t/403
-    Flow ID......: 24258
-    Flow Name....: sklearn.tree.tree.ExtraTreeClassifier
-    Flow URL.....: https://www.openml.org/f/24258
+    Task URL.....: https://test.openml.org/t/403
+    Flow ID......: 407755
+    Flow Name....: sklearn.tree._classes.ExtraTreeClassifier
+    Flow URL.....: https://test.openml.org/f/407755
     Setup ID.....: None
-    Setup String.: Python_3.7.6. Sklearn_0.21.2. NumPy_1.18.1. SciPy_1.4.1. ExtraTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
-                        max_features='auto', max_leaf_nodes=None,
-                        min_impurity_decrease=0.0, min_impurity_split=None,
-                        min_samples_leaf=1, min_samples_split=2,
-                        min_weight_fraction_leaf=0.0, random_state=9840,
-                        splitter='random')
+    Setup String.: Python_3.6.12. Sklearn_0.23.1. NumPy_1.19.2. SciPy_1.5.3. ExtraTreeClassifier(random_state=28064)
     Dataset ID...: 68
-    Dataset URL..: https://www.openml.org/d/68
+    Dataset URL..: https://test.openml.org/d/68
 
 
 
@@ -181,7 +173,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/37836
+    Uploaded to http://test.openml.org/r/153905
 
 
 
@@ -207,9 +199,9 @@ We can now also inspect the flow object which was automatically created:
 
     OpenML Flow
     ===========
-    Flow ID.........: 24258 (version 4)
-    Flow URL........: https://www.openml.org/f/24258
-    Flow Name.......: sklearn.tree.tree.ExtraTreeClassifier
+    Flow ID.........: 407755 (version 3)
+    Flow URL........: https://test.openml.org/f/407755
+    Flow Name.......: sklearn.tree._classes.ExtraTreeClassifier
     Flow Description: An extremely randomized tree classifier.
 
     Extra-trees differ from classic decision trees in the way they are built.
@@ -220,8 +212,8 @@ We can now also inspect the flow object which was automatically created:
     decision tree.
 
     Warning: Extra-trees should only be used within ensemble methods.
-    Upload Date.....: 2019-11-07 11:10:01
-    Dependencies....: sklearn==0.21.2
+    Upload Date.....: 2020-10-24 00:08:28
+    Dependencies....: sklearn==0.23.1
     numpy>=1.6.1
     scipy>=0.9
 
@@ -239,29 +231,37 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
     task = openml.tasks.get_task(1)
     features = task.get_dataset().features
     nominal_feature_indices = [
-        i for i in range(len(features))
-        if features[i].name != task.target_name and features[i].data_type == 'nominal'
+        i
+        for i in range(len(features))
+        if features[i].name != task.target_name and features[i].data_type == "nominal"
     ]
-    pipe = pipeline.Pipeline(steps=[
-        (
-            'Preprocessing',
-            compose.ColumnTransformer([
-                ('Nominal', pipeline.Pipeline(
+    pipe = pipeline.Pipeline(
+        steps=[
+            (
+                "Preprocessing",
+                compose.ColumnTransformer(
                     [
-                        ('Imputer', impute.SimpleImputer(strategy='most_frequent')),
                         (
-                            'Encoder',
-                            preprocessing.OneHotEncoder(
-                                sparse=False, handle_unknown='ignore',
-                            )
+                            "Nominal",
+                            pipeline.Pipeline(
+                                [
+                                    ("Imputer", impute.SimpleImputer(strategy="most_frequent")),
+                                    (
+                                        "Encoder",
+                                        preprocessing.OneHotEncoder(
+                                            sparse=False, handle_unknown="ignore",
+                                        ),
+                                    ),
+                                ]
+                            ),
+                            nominal_feature_indices,
                         ),
-                    ]),
-                    nominal_feature_indices,
-                 ),
-            ]),
-        ),
-        ('Classifier', ensemble.RandomForestClassifier(n_estimators=10))
-    ])
+                    ]
+                ),
+            ),
+            ("Classifier", ensemble.RandomForestClassifier(n_estimators=10)),
+        ]
+    )
 
     run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
     myrun = run.publish()
@@ -277,7 +277,27 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/37837
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
+    Uploaded to http://test.openml.org/r/153909
 
 
 
@@ -296,17 +316,13 @@ a model on a task without uploading results or flows to the server immediately.
     task = openml.tasks.get_task(6)
 
     # The following lines can then be executed offline:
-    run = openml.runs.run_model_on_task(
-        pipe,
-        task,
-        avoid_duplicate_runs=False,
-        upload_flow=False)
+    run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False, upload_flow=False)
 
     # The run may be stored offline, and the flow will be stored along with it:
-    run.to_filesystem(directory='myrun')
+    run.to_filesystem(directory="myrun")
 
     # They may be loaded and uploaded at a later time
-    run = openml.runs.OpenMLRun.from_filesystem(directory='myrun')
+    run = openml.runs.OpenMLRun.from_filesystem(directory="myrun")
     run.publish()
 
     # Publishing the run will automatically upload the related flow if
@@ -322,23 +338,25 @@ a model on a task without uploading results or flows to the server immediately.
 
  .. code-block:: none
 
+    /home/travis/build/openml/openml-python/openml/extensions/sklearn/extension.py:1755: UserWarning: Estimator only predicted for 5/6 classes!
+      warnings.warn(message)
 
     OpenML Run
     ==========
     Uploader Name: None
     Metric.......: None
-    Run ID.......: 37839
-    Run URL......: https://www.openml.org/r/37839
+    Run ID.......: 153910
+    Run URL......: https://test.openml.org/r/153910
     Task ID......: 6
     Task Type....: None
-    Task URL.....: https://www.openml.org/t/6
-    Flow ID......: 24261
-    Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(Nominal=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder)),Classifier=sklearn.ensemble.forest.RandomForestClassifier)
-    Flow URL.....: https://www.openml.org/f/24261
+    Task URL.....: https://test.openml.org/t/6
+    Flow ID......: 407756
+    Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(Nominal=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder)),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
+    Flow URL.....: https://test.openml.org/f/407756
     Setup ID.....: None
     Setup String.: None
     Dataset ID...: None
-    Dataset URL..: https://www.openml.org/d/None
+    Dataset URL..: https://test.openml.org/d/None
 
 
 
@@ -391,7 +409,7 @@ them. Some tasks you could try (or browse openml.org):
 
 
     # Easy benchmarking:
-    for task_id in [115, ]:  # Add further tasks. Disclaimer: they might take some time
+    for task_id in [115]:  # Add further tasks. Disclaimer: they might take some time
         task = openml.tasks.get_task(task_id)
         data = openml.datasets.get_dataset(task.dataset_id)
         clf = neighbors.KNeighborsClassifier(n_neighbors=5)
@@ -411,7 +429,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/37840
+    kNN on diabetes: http://test.openml.org/r/153911
 
 
 
@@ -430,7 +448,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  17.937 seconds)
+   **Total running time of the script:** ( 0 minutes  25.887 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:
@@ -443,13 +461,13 @@ them. Some tasks you could try (or browse openml.org):
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: flows_and_runs_tutorial.py <flows_and_runs_tutorial.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: flows_and_runs_tutorial.ipynb <flows_and_runs_tutorial.ipynb>`
 

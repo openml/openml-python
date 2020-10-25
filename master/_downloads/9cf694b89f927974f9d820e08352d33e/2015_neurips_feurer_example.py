@@ -24,6 +24,7 @@ import openml
 ####################################################################################################
 # List of dataset IDs given in the supplementary material of Feurer et al.:
 # https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning-supplemental.zip
+# fmt: off
 dataset_ids = [
     3, 6, 12, 14, 16, 18, 21, 22, 23, 24, 26, 28, 30, 31, 32, 36, 38, 44, 46,
     57, 60, 179, 180, 181, 182, 184, 185, 273, 293, 300, 351, 354, 357, 389,
@@ -36,6 +37,7 @@ dataset_ids = [
     1056, 1067, 1068, 1069, 1111, 1112, 1114, 1116, 1119, 1120, 1128, 1130,
     1134, 1138, 1139, 1142, 1146, 1161, 1166,
 ]
+# fmt: on
 
 ####################################################################################################
 # The dataset IDs could be used directly to load the dataset and split the data into a training set
@@ -56,9 +58,9 @@ dataset_ids = [
 # deactivated, which also deactivated the tasks on them. More information on active or inactive
 # datasets can be found in the `online docs <https://docs.openml.org/#dataset-status>`_.
 tasks = openml.tasks.list_tasks(
-    task_type_id=openml.tasks.TaskTypeEnum.SUPERVISED_CLASSIFICATION,
-    status='all',
-    output_format='dataframe',
+    task_type=openml.tasks.TaskType.SUPERVISED_CLASSIFICATION,
+    status="all",
+    output_format="dataframe",
 )
 
 # Query only those with holdout as the resampling startegy.

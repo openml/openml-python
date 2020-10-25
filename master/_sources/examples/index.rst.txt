@@ -31,6 +31,7 @@ Introductory examples to the usage of the OpenML python connector.
 .. only:: html
 
  .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_suites_tutorial_thumb.png
+     :alt: Benchmark suites
 
      :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py`
 
@@ -46,11 +47,12 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A simple tutorial on how to train/run a model and how to upload the results.">
+    <div class="sphx-glr-thumbcontainer" tooltip="A simple tutorial on how to train/run a model and how to upload the results. ">
 
 .. only:: html
 
  .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_flows_and_runs_tutorial_thumb.png
+     :alt: Flows and Runs
 
      :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py`
 
@@ -66,11 +68,12 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="An example how to set up OpenML-Python followed up by a simple example.">
+    <div class="sphx-glr-thumbcontainer" tooltip="An example how to set up OpenML-Python followed up by a simple example. ">
 
 .. only:: html
 
  .. figure:: /examples/20_basic/images/thumb/sphx_glr_introduction_tutorial_thumb.png
+     :alt: Setup
 
      :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`
 
@@ -86,11 +89,12 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A basic tutorial on how to list, load and visualize datasets.">
+    <div class="sphx-glr-thumbcontainer" tooltip="A basic tutorial on how to list, load and visualize datasets. ">
 
 .. only:: html
 
  .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_datasets_tutorial_thumb.png
+     :alt: Datasets
 
      :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py`
 
@@ -124,6 +128,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
  .. figure:: /examples/30_extended/images/thumb/sphx_glr_flow_id_tutorial_thumb.png
+     :alt: Obtaining Flow IDs
 
      :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py`
 
@@ -144,6 +149,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
  .. figure:: /examples/30_extended/images/thumb/sphx_glr_suites_tutorial_thumb.png
+     :alt: Benchmark suites
 
      :ref:`sphx_glr_examples_30_extended_suites_tutorial.py`
 
@@ -159,11 +165,12 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Explains openml-python logging, and shows how to configure it.">
+    <div class="sphx-glr-thumbcontainer" tooltip="Explains openml-python logging, and shows how to configure it. ">
 
 .. only:: html
 
  .. figure:: /examples/30_extended/images/thumb/sphx_glr_configure_logging_thumb.png
+     :alt: Logging
 
      :ref:`sphx_glr_examples_30_extended_configure_logging.py`
 
@@ -184,6 +191,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
  .. figure:: /examples/30_extended/images/thumb/sphx_glr_plot_svm_hyperparameters_tutorial_thumb.png
+     :alt: Plotting hyperparameter surfaces
 
      :ref:`sphx_glr_examples_30_extended_plot_svm_hyperparameters_tutorial.py`
 
@@ -204,6 +212,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
  .. figure:: /examples/30_extended/images/thumb/sphx_glr_study_tutorial_thumb.png
+     :alt: Benchmark studies
 
      :ref:`sphx_glr_examples_30_extended_study_tutorial.py`
 
@@ -219,11 +228,12 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="How to list and download datasets.">
+    <div class="sphx-glr-thumbcontainer" tooltip="How to list and download datasets. ">
 
 .. only:: html
 
  .. figure:: /examples/30_extended/images/thumb/sphx_glr_datasets_tutorial_thumb.png
+     :alt: Datasets
 
      :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py`
 
@@ -239,31 +249,12 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="By: Jan N. van Rijn">
-
-.. only:: html
-
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_run_setup_tutorial_thumb.png
-
-     :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/run_setup_tutorial
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to list and download tasks.">
+    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to list and download tasks. ">
 
 .. only:: html
 
  .. figure:: /examples/30_extended/images/thumb/sphx_glr_tasks_tutorial_thumb.png
+     :alt: Tasks
 
      :ref:`sphx_glr_examples_30_extended_tasks_tutorial.py`
 
@@ -279,11 +270,54 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="How to train/run a model and how to upload the results.">
+    <div class="sphx-glr-thumbcontainer" tooltip="By: Jan N. van Rijn">
+
+.. only:: html
+
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_run_setup_tutorial_thumb.png
+     :alt: Run Setup
+
+     :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/30_extended/run_setup_tutorial
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The most convenient way to create a flow for your machine learning workflow is to generate it a...">
+
+.. only:: html
+
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_custom_flow_tutorial_thumb.png
+     :alt: Creating and Using a Custom Flow
+
+     :ref:`sphx_glr_examples_30_extended_custom_flow_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/30_extended/custom_flow_tutorial
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="How to train/run a model and how to upload the results. ">
 
 .. only:: html
 
  .. figure:: /examples/30_extended/images/thumb/sphx_glr_flows_and_runs_tutorial_thumb.png
+     :alt: Flows and Runs
 
      :ref:`sphx_glr_examples_30_extended_flows_and_runs_tutorial.py`
 
@@ -304,6 +338,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
  .. figure:: /examples/30_extended/images/thumb/sphx_glr_task_manual_iteration_tutorial_thumb.png
+     :alt: Tasks: retrieving splits
 
      :ref:`sphx_glr_examples_30_extended_task_manual_iteration_tutorial.py`
 
@@ -324,6 +359,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
  .. figure:: /examples/30_extended/images/thumb/sphx_glr_fetch_evaluations_tutorial_thumb.png
+     :alt: Fetching Evaluations
 
      :ref:`sphx_glr_examples_30_extended_fetch_evaluations_tutorial.py`
 
@@ -339,11 +375,12 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to create and upload a dataset to OpenML.">
+    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to create and upload a dataset to OpenML. ">
 
 .. only:: html
 
  .. figure:: /examples/30_extended/images/thumb/sphx_glr_create_upload_tutorial_thumb.png
+     :alt: Dataset upload tutorial
 
      :ref:`sphx_glr_examples_30_extended_create_upload_tutorial.py`
 
@@ -379,6 +416,7 @@ its use in recent publications.
 .. only:: html
 
  .. figure:: /examples/40_paper/images/thumb/sphx_glr_2015_neurips_feurer_example_thumb.png
+     :alt: Feurer et al. (2015)
 
      :ref:`sphx_glr_examples_40_paper_2015_neurips_feurer_example.py`
 
@@ -399,6 +437,7 @@ its use in recent publications.
 .. only:: html
 
  .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_ida_strang_example_thumb.png
+     :alt: Strang et al. (2018)
 
      :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py`
 
@@ -419,6 +458,7 @@ its use in recent publications.
 .. only:: html
 
  .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_kdd_rijn_example_thumb.png
+     :alt: van Rijn and Hutter (2018)
 
      :ref:`sphx_glr_examples_40_paper_2018_kdd_rijn_example.py`
 
@@ -439,6 +479,7 @@ its use in recent publications.
 .. only:: html
 
  .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_neurips_perrone_example_thumb.png
+     :alt: Perrone et al. (2018)
 
      :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py`
 
@@ -463,15 +504,15 @@ its use in recent publications.
     :class: sphx-glr-footer-gallery
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
-    :download:`Download all examples in Python source code: examples_python.zip <//home/travis/build/openml/openml-python/doc/examples/examples_python.zip>`
+    :download:`Download all examples in Python source code: examples_python.zip </examples/examples_python.zip>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-    :download:`Download all examples in Jupyter notebooks: examples_jupyter.zip <//home/travis/build/openml/openml-python/doc/examples/examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: examples_jupyter.zip </examples/examples_jupyter.zip>`
 
 
 .. only:: html
