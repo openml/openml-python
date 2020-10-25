@@ -6,6 +6,9 @@
 Changelog
 =========
 
+0.11.1
+~~~~~~
+
 0.11.0
 ~~~~~~
 * ADD #753: Allows uploading custom flows to OpenML via OpenML-Python.
