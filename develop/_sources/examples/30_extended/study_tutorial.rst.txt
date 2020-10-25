@@ -286,11 +286,11 @@ suite which is available on the OpenML test server.
 
     OpenML Study
     ============
-    ID..............: 20672
+    ID..............: 20723
     Name............: Test-Study
     Status..........: None
     Main Entity Type: run
-    Study URL.......: https://test.openml.org/s/20672
+    Study URL.......: https://test.openml.org/s/20723
     # of Runs.......: 3
 
 
@@ -310,7 +310,7 @@ suite which is available on the OpenML test server.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  8.148 seconds)
+   **Total running time of the script:** ( 1 minutes  12.452 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_study_tutorial.py:
