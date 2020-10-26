@@ -20,6 +20,7 @@ jobs:
             scikit-learn: 0.19.2           
           - python-version: 3.6
             scikit-learn: 0.20.2
+      fail-fast:  false
     
     steps:
     - uses: actions/checkout@v2
