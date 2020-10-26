@@ -1595,7 +1595,9 @@ class SklearnExtension(Extension):
             repeatedly calling ``run_model_on_task``
         """
 
-        def _prediction_to_probabilities(y: np.ndarray, model_classes: List[Any]) -> pd.DataFrame:
+        def _prediction_to_probabilities(
+            y: np.ndarray, model_classes: List[Any], class_labels: Optional[List[str]]
+        ) -> pd.DataFrame:
             """Transforms predicted probabilities to match with OpenML class indices.
 
             Parameters
@@ -1605,21 +1607,20 @@ class SklearnExtension(Extension):
                 training data).
             model_classes : list
                 List of classes known_predicted by the model, ordered by their index.
+            class_labels : list
+                List of classes as stored in the task object fetched from server.
 
             Returns
             -------
             pd.DataFrame
             """
-            if not isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
-                return None
-
-            if task.class_labels is None:
+            if class_labels is None:
                 raise ValueError("The task has no class labels")
 
-            if isinstance(y_train, np.ndarray) and isinstance(task.class_labels[0], str):
+            if isinstance(y_train, np.ndarray) and isinstance(class_labels[0], str):
                 # mapping (decoding) the predictions to the categories
                 # creating a separate copy to not change the expected pred_y type
-                y = [task.class_labels[pred] for pred in y]  # list or numpy array of predictions
+                y = [class_labels[pred] for pred in y]  # list or numpy array of predictions
 
             # model_classes: sklearn classifier mapping from original array id to
             # prediction index id
@@ -1729,10 +1730,7 @@ class SklearnExtension(Extension):
                 proba_y = model_copy.predict_proba(X_test)
                 proba_y = pd.DataFrame(proba_y, columns=model_classes)  # handles X_test as numpy
             except AttributeError:  # predict_proba is not available when probability=False
-                if task.class_labels is not None:
-                    proba_y = _prediction_to_probabilities(pred_y, model_classes)
-                else:
-                    raise ValueError("The task has no class labels")
+                proba_y = _prediction_to_probabilities(pred_y, model_classes, task.class_labels)
 
             if task.class_labels is not None:
                 if proba_y.shape[1] != len(task.class_labels):
