@@ -1,6 +1,6 @@
-name: openml-python ci
+name: CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   unittest:
@@ -9,8 +9,18 @@ jobs:
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
-        scikit-learn: [0.22.2, 0.23.1]
-
+        scikit-learn: [0.21.2, 0.22.2, 0.23.1]
+        exclude:
+          - python-version: 3.8
+            scikit-learn: 0.21.2
+        include:
+          - python-version: 3.6
+            scikit-learn: 0.18.2            
+          - python-version: 3.6
+            scikit-learn: 0.19.2           
+          - python-version: 3.6
+            scikit-learn: 0.20.2
+    
     steps:
     - uses: actions/checkout@v2
     - name: CI Python ${{ matrix.python-version }} scikit-learn ${{ matrix.scikit-learn }}
