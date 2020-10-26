@@ -1,0 +1,25 @@
+name: openml-python ci
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies (.[test])
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[test]
+    - name: Pytest
+      run: |
+        pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread -sv $PYTEST_ARGS $test_dir
