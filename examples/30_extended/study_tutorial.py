@@ -103,7 +103,7 @@ ct = ColumnTransformer(
     [("cat", cat_imp, cat), ("cont", FunctionTransformer(lambda x: x, validate=False), cont)]
 )
 clf = sklearn.pipeline.Pipeline(
-    steps=[("transform", ct), ("estimator", HistGradientBoostingClassifier()),]
+    steps=[("transform", ct), ("estimator", HistGradientBoostingClassifier())]
 )
 
 suite = openml.study.get_suite(1)
