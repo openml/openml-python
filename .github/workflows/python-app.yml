@@ -22,7 +22,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e .[test]
     - name: Install scikit-learn ${{ matrix.scikit-learn }}
-        pip install scikit-learn==${{ matrix.scikit-learn }}
+      run: pip install scikit-learn==${{ matrix.scikit-learn }}
     - name: Pytest
       run: |
         pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread -sv $PYTEST_ARGS $test_dir
