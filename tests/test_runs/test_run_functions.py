@@ -828,31 +828,12 @@ class TestRun(TestBase):
                 self.assertGreaterEqual(alt_scores[idx], 0)
                 self.assertLessEqual(alt_scores[idx], 1)
 
-    @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
-        reason="SimpleImputer doesn't handle mixed type DataFrame as input",
-    )
     def test_local_run_swapped_parameter_order_model(self):
+        clf = DecisionTreeClassifier()
+        australian_task = 595
+        task = openml.tasks.get_task(australian_task)
 
-        # construct sci-kit learn classifier
-        clf = Pipeline(
-            steps=[
-                (
-                    "imputer",
-                    make_pipeline(
-                        SimpleImputer(strategy="most_frequent"),
-                        OneHotEncoder(handle_unknown="ignore"),
-                    ),
-                ),
-                # random forest doesn't take categoricals
-                ("estimator", RandomForestClassifier()),
-            ]
-        )
-
-        # download task
-        task = openml.tasks.get_task(7)
-
-        # invoke OpenML run
+        # task and clf are purposely in the old order
         run = openml.runs.run_model_on_task(
             task, clf, avoid_duplicate_runs=False, upload_flow=False,
         )
