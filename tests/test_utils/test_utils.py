@@ -11,7 +11,6 @@ else:
 
 class OpenMLTaskTest(TestBase):
     _multiprocess_can_split_ = True
-    _batch_size = 25
 
     def mocked_perform_api_call(call, request_method):
         # TODO: JvR: Why is this not a staticmethod?
@@ -33,7 +32,7 @@ class OpenMLTaskTest(TestBase):
 
     def test_list_all_for_datasets(self):
         required_size = 127  # default test server reset value
-        datasets = openml.datasets.list_datasets(batch_size=self._batch_size, size=required_size)
+        datasets = openml.datasets.list_datasets(batch_size=100, size=required_size)
 
         self.assertEqual(len(datasets), required_size)
         for did in datasets:
@@ -53,13 +52,13 @@ class OpenMLTaskTest(TestBase):
 
     def test_list_all_for_tasks(self):
         required_size = 1068  # default test server reset value
-        tasks = openml.tasks.list_tasks(batch_size=self._batch_size, size=required_size)
+        tasks = openml.tasks.list_tasks(batch_size=1000, size=required_size)
 
         self.assertEqual(len(tasks), required_size)
 
     def test_list_all_for_flows(self):
         required_size = 15  # default test server reset value
-        flows = openml.flows.list_flows(batch_size=self._batch_size, size=required_size)
+        flows = openml.flows.list_flows(batch_size=25, size=required_size)
 
         self.assertEqual(len(flows), required_size)
 
@@ -73,7 +72,7 @@ class OpenMLTaskTest(TestBase):
 
     def test_list_all_for_runs(self):
         required_size = 21
-        runs = openml.runs.list_runs(batch_size=self._batch_size, size=required_size)
+        runs = openml.runs.list_runs(batch_size=25, size=required_size)
 
         # might not be on test server after reset, please rerun test at least once if fails
         self.assertEqual(len(runs), required_size)
