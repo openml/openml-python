@@ -28,7 +28,7 @@ class TestEvaluationFunctions(TestBase):
         # Check if output and order of list_evaluations is preserved
         self.assertSequenceEqual(evals_setups["run_id"].tolist(), evals["run_id"].tolist())
         # Check if the hyper-parameter column is as accurate and flow_id
-        for index, row in evals_setups.iterrows():
+        for index, row in evals_setups.head(3).iterrows():
             params = openml.runs.get_run(row["run_id"]).parameter_settings
             list1 = [param["oml:value"] for param in params]
             list2 = list(row["parameters"].values())
