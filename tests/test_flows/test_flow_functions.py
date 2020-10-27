@@ -9,12 +9,14 @@ from distutils.version import LooseVersion
 import sklearn
 from sklearn import ensemble
 import pandas as pd
+import pytest
 
 import openml
 from openml.testing import TestBase
 import openml.extensions.sklearn
 
 
+@pytest.mark.usefixtures("long_version")
 class TestFlowFunctions(TestBase):
     _multiprocess_can_split_ = True
 
@@ -335,7 +337,8 @@ class TestFlowFunctions(TestBase):
             assert "0.19.1" not in flow.dependencies
 
     def test_get_flow_id(self):
-        openml.utils._list_all = functools.lru_cache()(openml.utils._list_all)
+        if not self.long_version:
+            openml.utils._list_all = functools.lru_cache()(openml.utils._list_all)
         clf = sklearn.tree.DecisionTreeClassifier()
         flow = openml.extensions.get_extension_by_model(clf).model_to_flow(clf).publish()
 
