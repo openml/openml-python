@@ -335,7 +335,7 @@ class TestRun(TestBase):
                         for sample in range(num_sample_entrees):
                             evaluation = sample_evaluations[measure][rep][fold][sample]
                             self.assertIsInstance(evaluation, float)
-                            if not os.environ.get("CI_WINDOWS"):
+                            if not (os.environ.get("CI_WINDOWS") or os.name == "nt"):
                                 # Either Appveyor is much faster than Travis
                                 # and/or measurements are not as accurate.
                                 # Either way, windows seems to get an eval-time
