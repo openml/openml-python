@@ -15,12 +15,7 @@ tasks, all required information about a study can be retrieved.
 
 import uuid
 
-import numpy as np
-from sklearn.pipeline import make_pipeline, Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
-from sklearn.decomposition import TruncatedSVD
-from sklearn.preprocessing import OneHotEncoder, FunctionTransformer
+from sklearn.ensemble import RandomForestClassifier
 
 import openml
 
@@ -77,38 +72,18 @@ print(evaluations.head())
 # Creating a study is as simple as creating any kind of other OpenML entity.
 # In this examples we'll create a few runs for the OpenML-100 benchmark
 # suite which is available on the OpenML test server.
-
 openml.config.start_using_configuration_for_example()
 
-# Model that can handle missing values
-from sklearn.experimental import enable_hist_gradient_boosting
-from sklearn.ensemble import HistGradientBoostingClassifier
+# Model to be used
+clf = RandomForestClassifier()
 
+# We'll create a study with one run on 5 datasets present in the suite
+tasks = [115, 259, 307]
 
-# Helper functions to return required columns for ColumnTransformer
-def cont(X):
-    return X.dtypes != "category"
-
-
-def cat(X):
-    return X.dtypes == "category"
-
-
-cat_imp = make_pipeline(
-    SimpleImputer(strategy="most_frequent"),
-    OneHotEncoder(handle_unknown="ignore", sparse=False),
-    TruncatedSVD(),
-)
-ct = ColumnTransformer(
-    [("cat", cat_imp, cat), ("cont", FunctionTransformer(lambda x: x, validate=False), cont)]
-)
-clf = sklearn.pipeline.Pipeline(
-    steps=[("transform", ct), ("estimator", HistGradientBoostingClassifier())]
-)
-
+# To verify
 suite = openml.study.get_suite(1)
-# We'll create a study with one run on three random datasets each
-tasks = np.random.choice(suite.tasks, size=3, replace=False)
+print(all([t_id in suite.tasks for t_id in tasks]))
+
 run_ids = []
 for task_id in tasks:
     task = openml.tasks.get_task(task_id)
