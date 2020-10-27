@@ -2,6 +2,7 @@
 
 from collections import OrderedDict
 import copy
+import functools
 import unittest
 
 from distutils.version import LooseVersion
@@ -334,6 +335,7 @@ class TestFlowFunctions(TestBase):
             assert "0.19.1" not in flow.dependencies
 
     def test_get_flow_id(self):
+        openml.utils._list_all = functools.lru_cache()(openml.utils._list_all)
         clf = sklearn.tree.DecisionTreeClassifier()
         flow = openml.extensions.get_extension_by_model(clf).model_to_flow(clf).publish()
 
