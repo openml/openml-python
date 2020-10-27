@@ -77,7 +77,7 @@ openml.config.start_using_configuration_for_example()
 # Model to be used
 clf = RandomForestClassifier()
 
-# We'll create a study with one run on 5 datasets present in the suite
+# We'll create a study with one run on 3 datasets present in the suite
 tasks = [115, 259, 307]
 
 # To verify
