@@ -950,7 +950,7 @@ class TestRun(TestBase):
         self.assertEqual(flowS.components["Imputer"].parameters["strategy"], '"most_frequent"')
         self.assertEqual(flowS.components["VarianceThreshold"].parameters["threshold"], "0.05")
 
-    @pytest.mark.flaky()
+    @pytest.mark.skip("Already covered by `test_run_and_upload_randomsearch`")
     def test_get_run_trace(self):
         # get_run_trace is already tested implicitly in test_run_and_publish
         # this test is a bit additional.
