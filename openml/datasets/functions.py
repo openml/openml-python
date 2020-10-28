@@ -333,6 +333,28 @@ def _load_features_from_file(features_file: str) -> Dict:
         return xml_dict["oml:data_features"]
 
 
+def _expand_parameter(parameter):
+    expanded_parameter = []
+    if isinstance(parameter, str):
+        expanded_parameter = [x.strip() for x in parameter.split(",")]
+    elif isinstance(parameter, list):
+        expanded_parameter = parameter
+    return expanded_parameter
+
+
+def _validated_data_attributes(attributes, data_attributes, parameter_name):
+    if attributes is not None:
+        for attribute_ in attributes:
+            is_row_id_an_attribute = any([attr[0] == attribute_ for attr in data_attributes])
+            if not is_row_id_an_attribute:
+                raise ValueError(
+                    "all attribute of '{}' should be one of the data attribute. "
+                    " Got '{}' while candidates are {}.".format(
+                        parameter_name, attribute_, [attr[0] for attr in data_attributes]
+                    )
+                )
+
+
 def check_datasets_active(dataset_ids: List[int]) -> Dict[int, bool]:
     """
     Check if the dataset ids provided are active.
@@ -636,6 +658,7 @@ def create_dataset(
     ignore_attribute : str | list
         Attributes that should be excluded in modelling,
         such as identifiers and indexes.
+        Can have multiple values, comma separated.
     citation : str
         Reference(s) that should be cited when building on this data.
     version_label : str, optional
@@ -687,6 +710,11 @@ def create_dataset(
                     attributes_[attr_idx] = (attr_name, attributes[attr_name])
     else:
         attributes_ = attributes
+    ignore_attributes = _expand_parameter(ignore_attribute)
+    _validated_data_attributes(ignore_attributes, attributes_, "ignore_attribute")
+
+    default_target_attributes = _expand_parameter(default_target_attribute)
+    _validated_data_attributes(default_target_attributes, attributes_, "default_target_attribute")
 
     if row_id_attribute is not None:
         is_row_id_an_attribute = any([attr[0] == row_id_attribute for attr in attributes_])
