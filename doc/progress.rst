@@ -11,6 +11,7 @@ Changelog
 
 0.11.0
 ~~~~~~
+* MAINT #671: Improved the performance of ``check_datasets_active`` by only querying the given list of datasets in contrast to querying all datasets. Modified the corresponding unit test.
 * ADD #753: Allows uploading custom flows to OpenML via OpenML-Python.
 * ADD #777: Allows running a flow on pandas dataframes (in addition to numpy arrays).
 * ADD #888: Allow passing a `task_id` to `run_model_on_task`.
