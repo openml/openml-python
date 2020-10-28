@@ -682,6 +682,8 @@ class TestRun(TestBase):
             flow_expected_rsv="12172",
         )
         self.assertEqual(len(run.trace.trace_iterations), 5)
+        trace = openml.runs.get_run_trace(run.run_id)
+        self.assertEqual(len(trace.trace_iterations), 5)
 
     def test_run_and_upload_maskedarrays(self):
         # This testcase is important for 2 reasons:
