@@ -1,6 +1,8 @@
 # License: BSD 3-Clause
 
+import os
 from time import time
+import unittest.mock
 from warnings import filterwarnings, catch_warnings
 
 import numpy as np
@@ -355,7 +357,36 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertEqual(len(feature.nominal_values), 25)
 
 
-class OpenMLDatasetQualityTest(TestBase):
+class OpenMLDatasetFunctionTest(TestBase):
+    @unittest.mock.patch("openml.datasets.dataset.pickle")
+    def test__read_features(self, pickle_mock):
+        pickle_mock.load.side_effect = FileNotFoundError
+        features = openml.datasets.dataset._read_features(
+            os.path.join(
+                self.static_cache_dir, "org", "openml", "test", "datasets", "1", "features.xml"
+            )
+        )
+        self.assertIsInstance(features, dict)
+        self.assertEqual(len(features), 39)
+        self.assertIsInstance(features[0], OpenMLDataFeature)
+        self.assertEqual(features[0].name, "family")
+        self.assertEqual(len(features[0].nominal_values), 9)
+        self.assertEqual(pickle_mock.load.call_count, 1)
+        self.assertEqual(pickle_mock.dump.call_count, 1)
+
+    @unittest.mock.patch("openml.datasets.dataset.pickle")
+    def test__read_qualities(self, pickle_mock):
+        pickle_mock.load.side_effect = FileNotFoundError
+        qualities = openml.datasets.dataset._read_qualities(
+            os.path.join(
+                self.static_cache_dir, "org", "openml", "test", "datasets", "1", "qualities.xml"
+            )
+        )
+        self.assertIsInstance(qualities, dict)
+        self.assertEqual(len(qualities), 107)
+        self.assertEqual(pickle_mock.load.call_count, 1)
+        self.assertEqual(pickle_mock.dump.call_count, 1)
+
     def test__check_qualities(self):
         qualities = [{"oml:name": "a", "oml:value": "0.5"}]
         qualities = openml.datasets.dataset._check_qualities(qualities)

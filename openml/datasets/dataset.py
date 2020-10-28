@@ -8,12 +8,13 @@ import logging
 import os
 import pickle
 from typing import List, Optional, Union, Tuple, Iterable, Dict
+from warnings import warn
 
 import arff
 import numpy as np
 import pandas as pd
 import scipy.sparse
-from warnings import warn
+import xmltodict
 
 from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
@@ -127,8 +128,8 @@ class OpenMLDataset(OpenMLBase):
         update_comment=None,
         md5_checksum=None,
         data_file=None,
-        features=None,
-        qualities=None,
+        features_file: Optional[str] = None,
+        qualities_file: Optional[str] = None,
         dataset=None,
     ):
         def find_invalid_characters(string, pattern):
@@ -198,7 +199,7 @@ class OpenMLDataset(OpenMLBase):
         self.default_target_attribute = default_target_attribute
         self.row_id_attribute = row_id_attribute
         if isinstance(ignore_attribute, str):
-            self.ignore_attribute = [ignore_attribute]
+            self.ignore_attribute = [ignore_attribute]  # type: Optional[List[str]]
         elif isinstance(ignore_attribute, list) or ignore_attribute is None:
             self.ignore_attribute = ignore_attribute
         else:
@@ -212,33 +213,25 @@ class OpenMLDataset(OpenMLBase):
         self.update_comment = update_comment
         self.md5_checksum = md5_checksum
         self.data_file = data_file
-        self.features = None
-        self.qualities = None
         self._dataset = dataset
 
-        if features is not None:
-            self.features = {}
-            for idx, xmlfeature in enumerate(features["oml:feature"]):
-                nr_missing = xmlfeature.get("oml:number_of_missing_values", 0)
-                feature = OpenMLDataFeature(
-                    int(xmlfeature["oml:index"]),
-                    xmlfeature["oml:name"],
-                    xmlfeature["oml:data_type"],
-                    xmlfeature.get("oml:nominal_value"),
-                    int(nr_missing),
-                )
-                if idx != feature.index:
-                    raise ValueError("Data features not provided " "in right order")
-                self.features[feature.index] = feature
+        if features_file is not None:
+            self.features = _read_features(
+                features_file
+            )  # type: Optional[Dict[int, OpenMLDataFeature]]
+        else:
+            self.features = None
 
-        self.qualities = _check_qualities(qualities)
+        if qualities_file:
+            self.qualities = _read_qualities(qualities_file)  # type: Optional[Dict[str, float]]
+        else:
+            self.qualities = None
 
         if data_file is not None:
-            (
-                self.data_pickle_file,
-                self.data_feather_file,
-                self.feather_attribute_file,
-            ) = self._create_pickle_in_cache(data_file)
+            rval = self._create_pickle_in_cache(data_file)
+            self.data_pickle_file = rval[0]  # type: Optional[str]
+            self.data_feather_file = rval[1]  # type: Optional[str]
+            self.feather_attribute_file = rval[2]  # type: Optional[str]
         else:
             self.data_pickle_file, self.data_feather_file, self.feather_attribute_file = (
                 None,
@@ -821,6 +814,10 @@ class OpenMLDataset(OpenMLBase):
         -------
         list
         """
+        if self.features is None:
+            raise ValueError(
+                "retrieve_class_labels can only be called if feature information is " "available."
+            )
         for feature in self.features.values():
             if (feature.name == target_name) and (feature.data_type == "nominal"):
                 return feature.nominal_values
@@ -949,18 +946,63 @@ class OpenMLDataset(OpenMLBase):
         return data_container
 
 
-def _check_qualities(qualities):
-    if qualities is not None:
-        qualities_ = {}
-        for xmlquality in qualities:
-            name = xmlquality["oml:name"]
-            if xmlquality.get("oml:value", None) is None:
-                value = float("NaN")
-            elif xmlquality["oml:value"] == "null":
-                value = float("NaN")
-            else:
-                value = float(xmlquality["oml:value"])
-            qualities_[name] = value
-        return qualities_
-    else:
-        return None
+def _read_features(features_file: str) -> Dict[int, OpenMLDataFeature]:
+    features_pickle_file = features_file + ".pkl"
+    try:
+        with open(features_pickle_file, "rb") as fh_binary:
+            features = pickle.load(fh_binary)
+    except:  # noqa E722
+        with io.open(features_file, encoding="utf8") as fh:
+            features_xml_string = fh.read()
+            xml_dict = xmltodict.parse(
+                features_xml_string, force_list=("oml:feature", "oml:nominal_value")
+            )
+            features_xml = xml_dict["oml:data_features"]
+
+            features = {}
+            for idx, xmlfeature in enumerate(features_xml["oml:feature"]):
+                nr_missing = xmlfeature.get("oml:number_of_missing_values", 0)
+                feature = OpenMLDataFeature(
+                    int(xmlfeature["oml:index"]),
+                    xmlfeature["oml:name"],
+                    xmlfeature["oml:data_type"],
+                    xmlfeature.get("oml:nominal_value"),
+                    int(nr_missing),
+                )
+                if idx != feature.index:
+                    raise ValueError("Data features not provided " "in right order")
+                features[feature.index] = feature
+
+            with open(features_pickle_file, "wb") as fh_binary:
+                pickle.dump(features, fh_binary)
+    return features
+
+
+def _read_qualities(qualities_file: str) -> Dict[str, float]:
+    qualities_pickle_file = qualities_file + ".pkl"
+    try:
+        with open(qualities_pickle_file, "rb") as fh_binary:
+            qualities = pickle.load(fh_binary)
+    except:  # noqa E722
+        with open(qualities_file, encoding="utf8") as fh:
+            qualities_xml = fh.read()
+        xml_as_dict = xmltodict.parse(qualities_xml, force_list=("oml:quality",))
+        qualities = xml_as_dict["oml:data_qualities"]["oml:quality"]
+        qualities = _check_qualities(qualities)
+        with open(qualities_pickle_file, "wb") as fh_binary:
+            pickle.dump(qualities, fh_binary)
+    return qualities
+
+
+def _check_qualities(qualities: List[Dict[str, str]]) -> Dict[str, float]:
+    qualities_ = {}
+    for xmlquality in qualities:
+        name = xmlquality["oml:name"]
+        if xmlquality.get("oml:value", None) is None:
+            value = float("NaN")
+        elif xmlquality["oml:value"] == "null":
+            value = float("NaN")
+        else:
+            value = float(xmlquality["oml:value"])
+        qualities_[name] = value
+    return qualities_

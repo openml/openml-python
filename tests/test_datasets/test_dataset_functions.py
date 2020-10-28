@@ -17,7 +17,6 @@ from oslo_concurrency import lockutils
 import openml
 from openml import OpenMLDataset
 from openml.exceptions import (
-    OpenMLCacheException,
     OpenMLHashException,
     OpenMLPrivateDatasetError,
     OpenMLServerException,
@@ -27,14 +26,10 @@ from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (
     create_dataset,
     attributes_arff_from_df,
-    _get_cached_dataset,
-    _get_cached_dataset_features,
-    _get_cached_dataset_qualities,
-    _get_cached_datasets,
     _get_dataset_arff,
     _get_dataset_description,
-    _get_dataset_features,
-    _get_dataset_qualities,
+    _get_dataset_features_file,
+    _get_dataset_qualities_file,
     _get_online_dataset_arff,
     _get_online_dataset_format,
     DATASETS_CACHE_DIR_NAME,
@@ -84,60 +79,6 @@ class TestOpenMLDataset(TestBase):
             "attributes": None,
             "data": None,
         }
-
-    def test__list_cached_datasets(self):
-        openml.config.cache_directory = self.static_cache_dir
-        cached_datasets = openml.datasets.functions._list_cached_datasets()
-        self.assertIsInstance(cached_datasets, list)
-        self.assertEqual(len(cached_datasets), 2)
-        self.assertIsInstance(cached_datasets[0], int)
-
-    @mock.patch("openml.datasets.functions._list_cached_datasets")
-    def test__get_cached_datasets(self, _list_cached_datasets_mock):
-        openml.config.cache_directory = self.static_cache_dir
-        _list_cached_datasets_mock.return_value = [-1, 2]
-        datasets = _get_cached_datasets()
-        self.assertIsInstance(datasets, dict)
-        self.assertEqual(len(datasets), 2)
-        self.assertIsInstance(list(datasets.values())[0], OpenMLDataset)
-
-    def test__get_cached_dataset(self,):
-        openml.config.cache_directory = self.static_cache_dir
-        dataset = _get_cached_dataset(2)
-        features = _get_cached_dataset_features(2)
-        qualities = _get_cached_dataset_qualities(2)
-        self.assertIsInstance(dataset, OpenMLDataset)
-        self.assertTrue(len(dataset.features) > 0)
-        self.assertTrue(len(dataset.features) == len(features["oml:feature"]))
-        self.assertTrue(len(dataset.qualities) == len(qualities))
-
-    def test_get_cached_dataset_description(self):
-        openml.config.cache_directory = self.static_cache_dir
-        description = openml.datasets.functions._get_cached_dataset_description(2)
-        self.assertIsInstance(description, dict)
-
-    def test_get_cached_dataset_description_not_cached(self):
-        openml.config.cache_directory = self.static_cache_dir
-        self.assertRaisesRegex(
-            OpenMLCacheException,
-            "Dataset description for dataset id 3 not cached",
-            openml.datasets.functions._get_cached_dataset_description,
-            dataset_id=3,
-        )
-
-    def test_get_cached_dataset_arff(self):
-        openml.config.cache_directory = self.static_cache_dir
-        description = openml.datasets.functions._get_cached_dataset_arff(dataset_id=2)
-        self.assertIsInstance(description, str)
-
-    def test_get_cached_dataset_arff_not_cached(self):
-        openml.config.cache_directory = self.static_cache_dir
-        self.assertRaisesRegex(
-            OpenMLCacheException,
-            "ARFF file for dataset id 3 not cached",
-            openml.datasets.functions._get_cached_dataset_arff,
-            dataset_id=3,
-        )
 
     def _check_dataset(self, dataset):
         self.assertEqual(type(dataset), dict)
@@ -459,7 +400,7 @@ class TestOpenMLDataset(TestBase):
 
     def test__getarff_path_dataset_arff(self):
         openml.config.cache_directory = self.static_cache_dir
-        description = openml.datasets.functions._get_cached_dataset_description(2)
+        description = _get_dataset_description(self.workdir, 2)
         arff_path = _get_dataset_arff(description, cache_directory=self.workdir)
         self.assertIsInstance(arff_path, str)
         self.assertTrue(os.path.exists(arff_path))
@@ -480,15 +421,16 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test__get_dataset_features(self):
-        features = _get_dataset_features(self.workdir, 2)
-        self.assertIsInstance(features, dict)
+        features_file = _get_dataset_features_file(self.workdir, 2)
+        self.assertIsInstance(features_file, str)
         features_xml_path = os.path.join(self.workdir, "features.xml")
         self.assertTrue(os.path.exists(features_xml_path))
 
     def test__get_dataset_qualities(self):
-        # Only a smoke check
-        qualities = _get_dataset_qualities(self.workdir, 2)
-        self.assertIsInstance(qualities, list)
+        qualities = _get_dataset_qualities_file(self.workdir, 2)
+        self.assertIsInstance(qualities, str)
+        qualities_xml_path = os.path.join(self.workdir, "qualities.xml")
+        self.assertTrue(os.path.exists(qualities_xml_path))
 
     def test_deletion_of_cache_dir(self):
         # Simple removal

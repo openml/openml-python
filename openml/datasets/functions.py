@@ -18,13 +18,11 @@ import openml.utils
 import openml._api_calls
 from .dataset import OpenMLDataset
 from ..exceptions import (
-    OpenMLCacheException,
     OpenMLHashException,
     OpenMLServerException,
     OpenMLPrivateDatasetError,
 )
 from ..utils import (
-    _create_cache_directory,
     _remove_cache_dir_for_id,
     _create_cache_directory_for_id,
 )
@@ -35,118 +33,6 @@ logger = logging.getLogger(__name__)
 
 ############################################################################
 # Local getters/accessors to the cache directory
-
-
-def _list_cached_datasets():
-    """ Return list with ids of all cached datasets.
-
-    Returns
-    -------
-    list
-        List with IDs of all cached datasets.
-    """
-    datasets = []
-
-    dataset_cache_dir = _create_cache_directory(DATASETS_CACHE_DIR_NAME)
-    directory_content = os.listdir(dataset_cache_dir)
-    directory_content.sort()
-
-    # Find all dataset ids for which we have downloaded the dataset
-    # description
-    for directory_name in directory_content:
-        # First check if the directory name could be an OpenML dataset id
-        if not re.match(r"[0-9]*", directory_name):
-            continue
-
-        dataset_id = int(directory_name)
-
-        directory_name = os.path.join(dataset_cache_dir, directory_name)
-        dataset_directory_content = os.listdir(directory_name)
-
-        if (
-            "dataset.arff" in dataset_directory_content
-            and "description.xml" in dataset_directory_content
-        ):
-            if dataset_id not in datasets:
-                datasets.append(dataset_id)
-
-    datasets.sort()
-    return datasets
-
-
-def _get_cached_datasets():
-    """Searches for all OpenML datasets in the OpenML cache dir.
-
-    Return a dictionary which maps dataset ids to dataset objects"""
-    dataset_list = _list_cached_datasets()
-    datasets = OrderedDict()
-
-    for dataset_id in dataset_list:
-        datasets[dataset_id] = _get_cached_dataset(dataset_id)
-
-    return datasets
-
-
-def _get_cached_dataset(dataset_id: int) -> OpenMLDataset:
-    """Get cached dataset for ID.
-
-    Returns
-    -------
-    OpenMLDataset
-    """
-    description = _get_cached_dataset_description(dataset_id)
-    arff_file = _get_cached_dataset_arff(dataset_id)
-    features = _get_cached_dataset_features(dataset_id)
-    qualities = _get_cached_dataset_qualities(dataset_id)
-    dataset = _create_dataset_from_description(description, features, qualities, arff_file)
-
-    return dataset
-
-
-def _get_cached_dataset_description(dataset_id):
-    did_cache_dir = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset_id,)
-    description_file = os.path.join(did_cache_dir, "description.xml")
-    try:
-        with io.open(description_file, encoding="utf8") as fh:
-            dataset_xml = fh.read()
-        return xmltodict.parse(dataset_xml)["oml:data_set_description"]
-    except (IOError, OSError):
-        raise OpenMLCacheException(
-            "Dataset description for dataset id %d not " "cached" % dataset_id
-        )
-
-
-def _get_cached_dataset_features(dataset_id):
-    did_cache_dir = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset_id,)
-    features_file = os.path.join(did_cache_dir, "features.xml")
-    try:
-        return _load_features_from_file(features_file)
-    except (IOError, OSError):
-        raise OpenMLCacheException("Dataset features for dataset id %d not " "cached" % dataset_id)
-
-
-def _get_cached_dataset_qualities(dataset_id):
-    did_cache_dir = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset_id,)
-    qualities_file = os.path.join(did_cache_dir, "qualities.xml")
-    try:
-        with io.open(qualities_file, encoding="utf8") as fh:
-            qualities_xml = fh.read()
-            qualities_dict = xmltodict.parse(qualities_xml)
-            return qualities_dict["oml:data_qualities"]["oml:quality"]
-    except (IOError, OSError):
-        raise OpenMLCacheException("Dataset qualities for dataset id %d not " "cached" % dataset_id)
-
-
-def _get_cached_dataset_arff(dataset_id):
-    did_cache_dir = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset_id,)
-    output_file = os.path.join(did_cache_dir, "dataset.arff")
-
-    try:
-        with io.open(output_file, encoding="utf8"):
-            pass
-        return output_file
-    except (OSError, IOError):
-        raise OpenMLCacheException("ARFF file for dataset id %d not " "cached" % dataset_id)
 
 
 def _get_cache_directory(dataset: OpenMLDataset) -> str:
@@ -326,11 +212,6 @@ def __list_datasets(api_call, output_format="dict"):
     return datasets
 
 
-def _load_features_from_file(features_file: str) -> Dict:
-    with io.open(features_file, encoding="utf8") as fh:
-        features_xml = fh.read()
-        xml_dict = xmltodict.parse(features_xml, force_list=("oml:feature", "oml:nominal_value"))
-        return xml_dict["oml:data_features"]
 
 
 def _expand_parameter(parameter: Union[str, List[str]]) -> List[str]:
@@ -521,17 +402,17 @@ def get_dataset(
 
     did_cache_dir = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset_id,)
 
+    remove_dataset_cache = True
     try:
-        remove_dataset_cache = True
         description = _get_dataset_description(did_cache_dir, dataset_id)
-        features = _get_dataset_features(did_cache_dir, dataset_id)
+        features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
 
         try:
-            qualities = _get_dataset_qualities(did_cache_dir, dataset_id)
+            qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
         except OpenMLServerException as e:
             if e.code == 362 and str(e) == "No qualities found - None":
                 logger.warning("No qualities found for dataset {}".format(dataset_id))
-                qualities = None
+                qualities_file = None
             else:
                 raise
 
@@ -549,7 +430,7 @@ def get_dataset(
             _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, did_cache_dir)
 
     dataset = _create_dataset_from_description(
-        description, features, qualities, arff_file, cache_format
+        description, features_file, qualities_file, arff_file, cache_format
     )
     return dataset
 
@@ -1007,8 +888,9 @@ def _get_dataset_description(did_cache_dir, dataset_id):
     description_file = os.path.join(did_cache_dir, "description.xml")
 
     try:
-        return _get_cached_dataset_description(dataset_id)
-    except OpenMLCacheException:
+        with io.open(description_file, encoding="utf8") as fh:
+            dataset_xml = fh.read()
+    except Exception:
         url_extension = "data/{}".format(dataset_id)
         dataset_xml = openml._api_calls._perform_api_call(url_extension, "get")
         with io.open(description_file, "w", encoding="utf8") as fh:
@@ -1069,8 +951,8 @@ def _get_dataset_arff(description: Union[Dict, OpenMLDataset], cache_directory: 
     return output_file_path
 
 
-def _get_dataset_features(did_cache_dir, dataset_id):
-    """API call to get dataset features (cached)
+def _get_dataset_features_file(did_cache_dir: str, dataset_id: int) -> str:
+    """API call to load dataset features. Loads the from cache or downloads them.
 
     Features are feature descriptions for each column.
     (name, index, categorical, ...)
@@ -1087,8 +969,8 @@ def _get_dataset_features(did_cache_dir, dataset_id):
 
     Returns
     -------
-    features : dict
-        Dictionary containing dataset feature descriptions, parsed from XML.
+    str
+        Path of the cached dataset feature file
     """
     features_file = os.path.join(did_cache_dir, "features.xml")
 
@@ -1099,11 +981,11 @@ def _get_dataset_features(did_cache_dir, dataset_id):
         with io.open(features_file, "w", encoding="utf8") as fh:
             fh.write(features_xml)
 
-    return _load_features_from_file(features_file)
+    return features_file
 
 
-def _get_dataset_qualities(did_cache_dir, dataset_id):
-    """API call to get dataset qualities (cached)
+def _get_dataset_qualities_file(did_cache_dir, dataset_id):
+    """API call to load dataset qualities. Loads the from cache or downloads them.
 
     Features are metafeatures (number of features, number of classes, ...)
 
@@ -1119,8 +1001,8 @@ def _get_dataset_qualities(did_cache_dir, dataset_id):
 
     Returns
     -------
-    qualities : dict
-        Dictionary containing dataset qualities, parsed from XML.
+    str
+        Path of the cached qualities file
     """
     # Dataset qualities are subject to change and must be fetched every time
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")
@@ -1134,16 +1016,13 @@ def _get_dataset_qualities(did_cache_dir, dataset_id):
         with io.open(qualities_file, "w", encoding="utf8") as fh:
             fh.write(qualities_xml)
 
-    xml_as_dict = xmltodict.parse(qualities_xml, force_list=("oml:quality",))
-    qualities = xml_as_dict["oml:data_qualities"]["oml:quality"]
-
-    return qualities
+    return qualities_file
 
 
 def _create_dataset_from_description(
     description: Dict[str, str],
-    features: Dict,
-    qualities: List,
+    features_file: str,
+    qualities_file: str,
     arff_file: str = None,
     cache_format: str = "pickle",
 ) -> OpenMLDataset:
@@ -1153,10 +1032,10 @@ def _create_dataset_from_description(
     ----------
     description : dict
         Description of a dataset in xml dict.
-    features : dict
-        Description of a dataset features.
+    featuresfile : str
+        Path of the dataset features as xml file.
     qualities : list
-        Description of a dataset qualities.
+        Path of the dataset qualities as xml file.
     arff_file : string, optional
         Path of dataset ARFF file.
     cache_format: string, optional
@@ -1193,8 +1072,8 @@ def _create_dataset_from_description(
         md5_checksum=description.get("oml:md5_checksum"),
         data_file=arff_file,
         cache_format=cache_format,
-        features=features,
-        qualities=qualities,
+        features_file=features_file,
+        qualities_file=qualities_file,
     )
 
 
