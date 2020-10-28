@@ -1653,6 +1653,22 @@ class SklearnExtension(Extension):
         user_defined_measures = OrderedDict()  # type: 'OrderedDict[str, float]'
 
         try:
+            # check if model is fitted
+            # 'predict' internally calls sklearn.utils.validation.check_is_fitted for every
+            # model-specific attribute it excepts, thus offering a more robust check than
+            # a generic simplified call of check_is_fitted(model_copy)
+            from sklearn.exceptions import NotFittedError
+
+            model_copy.predict(X_train)
+            warnings.warn(
+                "The model is already fitted!"
+                " This might cause inconsistency in comparison of results."
+            )
+        except NotFittedError:
+            # model is not fitted, as is required
+            pass
+
+        try:
             # for measuring runtime. Only available since Python 3.3
             modelfit_start_cputime = time.process_time()
             modelfit_start_walltime = time.time()
