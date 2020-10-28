@@ -333,7 +333,7 @@ def _load_features_from_file(features_file: str) -> Dict:
         return xml_dict["oml:data_features"]
 
 
-def _expand_parameter(parameter: Union[str, list]):
+def _expand_parameter(parameter: Union[str, List[str]]) -> List[str]:
     expanded_parameter = []
     if isinstance(parameter, str):
         expanded_parameter = [x.strip() for x in parameter.split(",")]
@@ -342,7 +342,9 @@ def _expand_parameter(parameter: Union[str, list]):
     return expanded_parameter
 
 
-def _validated_data_attributes(attributes: list, data_attributes: list, parameter_name: str):
+def _validated_data_attributes(
+    attributes: List[str], data_attributes: List[str], parameter_name: str
+) -> None:
     for attribute_ in attributes:
         is_attribute_a_data_attribute = any([attr[0] == attribute_ for attr in data_attributes])
         if not is_attribute_a_data_attribute:

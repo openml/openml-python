@@ -875,8 +875,11 @@ class TestOpenMLDataset(TestBase):
             _get_online_dataset_format(dataset_id),
             "The format of the ARFF files is different",
         )
-    @pytest.mark.parametrize("default_target_attribute,row_id_attribute,ignore_attribute", 
-    [("wrong", None,None), (None,"wrong",None), (None,None,"wrong")])
+
+    @pytest.mark.parametrize(
+        "default_target_attribute,row_id_attribute,ignore_attribute",
+        [("wrong", None, None), (None, "wrong", None), (None, None, "wrong")],
+    )
     def test_attribute_validations(self):
         data = [
             ["a", "sunny", 85.0, 85.0, "FALSE", "no"],
