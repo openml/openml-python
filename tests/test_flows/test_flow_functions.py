@@ -341,7 +341,7 @@ class TestFlowFunctions(TestBase):
         if self.long_version:
             list_all = openml.utils._list_all
         else:
-            list_all = functools.lru_cache(openml.utils._list_all)
+            list_all = functools.lru_cache()(openml.utils._list_all)
         with patch("openml.utils._list_all", list_all):
             clf = sklearn.tree.DecisionTreeClassifier()
             flow = openml.extensions.get_extension_by_model(clf).model_to_flow(clf).publish()
