@@ -407,7 +407,7 @@ class OpenMLDataset(OpenMLBase):
         categories_names = {}
         categorical = []
         for i, (name, type_) in enumerate(data["attributes"]):
-            # if the feature is nominal and the a sparse matrix is
+            # if the feature is nominal and a sparse matrix is
             # requested, the categories need to be numeric
             if isinstance(type_, list) and self.format.lower() == "sparse_arff":
                 try:
@@ -456,6 +456,18 @@ class OpenMLDataset(OpenMLBase):
                     col.append(
                         self._unpack_categories(X[column_name], categories_names[column_name])
                     )
+                elif attribute_dtype[column_name] in ('floating',
+                                                      'integer'):
+                    X_col = X[column_name]
+                    if X_col.min() >= 0 and X_col.max() <= 255:
+                        try:
+                            X_col_uint = X_col.astype('uint8')
+                            if (X_col == X_col_uint).all():
+                                col.append(X_col_uint)
+                                continue
+                        except ValueError:
+                            pass
+                    col.append(X[column_name])
                 else:
                     col.append(X[column_name])
             X = pd.concat(col, axis=1)
