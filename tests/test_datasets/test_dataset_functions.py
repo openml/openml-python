@@ -1419,11 +1419,19 @@ class TestOpenMLDataset(TestBase):
 
 @pytest.mark.parametrize(
     "default_target_attribute,row_id_attribute,ignore_attribute",
-    [("wrong", None, None), (None, "wrong", None), (None, None, "wrong"),
-    ("wrong,sunny", None, None),(None, None, "wrong,sunny"),
-    (["wrong","sunny"], None, None), (None, None, ["wrong","sunny"])],
+    [
+        ("wrong", None, None),
+        (None, "wrong", None),
+        (None, None, "wrong"),
+        ("wrong,sunny", None, None),
+        (None, None, "wrong,sunny"),
+        (["wrong", "sunny"], None, None),
+        (None, None, ["wrong", "sunny"]),
+    ],
 )
-def test_invalid_attribute_validations(default_target_attribute, row_id_attribute, ignore_attribute):
+def test_invalid_attribute_validations(
+    default_target_attribute, row_id_attribute, ignore_attribute
+):
     data = [
         ["a", "sunny", 85.0, 85.0, "FALSE", "no"],
         ["b", "sunny", 80.0, 90.0, "TRUE", "no"],
@@ -1467,11 +1475,18 @@ def test_invalid_attribute_validations(default_target_attribute, row_id_attribut
             paper_url=paper_url,
         )
 
+
 @pytest.mark.parametrize(
     "default_target_attribute,row_id_attribute,ignore_attribute",
-    [("outlook", None, None), (None, "outlook", None), (None, None, "outlook"),
-    ("outlook,windy", None, None), (None, None, "outlook,windy"),
-    (["outlook","windy"], None, None), (None, None, ["outlook","windy"])],
+    [
+        ("outlook", None, None),
+        (None, "outlook", None),
+        (None, None, "outlook"),
+        ("outlook,windy", None, None),
+        (None, None, "outlook,windy"),
+        (["outlook", "windy"], None, None),
+        (None, None, ["outlook", "windy"]),
+    ],
 )
 def test_valid_attribute_validations(default_target_attribute, row_id_attribute, ignore_attribute):
     data = [
