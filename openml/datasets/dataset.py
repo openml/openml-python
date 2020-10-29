@@ -3,7 +3,6 @@
 from collections import OrderedDict
 import re
 import gzip
-import io
 import logging
 import os
 import pickle
@@ -360,7 +359,7 @@ class OpenMLDataset(OpenMLBase):
             with gzip.open(filename) as fh:
                 return decode_arff(fh)
         else:
-            with io.open(filename, encoding="utf8") as fh:
+            with open(filename, encoding="utf8") as fh:
                 return decode_arff(fh)
 
     def _parse_data_from_arff(
@@ -408,12 +407,10 @@ class OpenMLDataset(OpenMLBase):
                     # can be encoded into integers
                     pd.factorize(type_)[0]
                 except ValueError:
-                    raise ValueError(
-                        "Categorical data needs to be numeric when " "using sparse ARFF."
-                    )
+                    raise ValueError("Categorical data needs to be numeric when using sparse ARFF.")
             # string can only be supported with pandas DataFrame
             elif type_ == "STRING" and self.format.lower() == "sparse_arff":
-                raise ValueError("Dataset containing strings is not supported " "with sparse ARFF.")
+                raise ValueError("Dataset containing strings is not supported with sparse ARFF.")
 
             # infer the dtype from the ARFF header
             if isinstance(type_, list):
@@ -747,7 +744,7 @@ class OpenMLDataset(OpenMLBase):
                 to_exclude.extend(self.ignore_attribute)
 
         if len(to_exclude) > 0:
-            logger.info("Going to remove the following attributes:" " %s" % to_exclude)
+            logger.info("Going to remove the following attributes: %s" % to_exclude)
             keep = np.array(
                 [True if column not in to_exclude else False for column in attribute_names]
             )
@@ -816,7 +813,7 @@ class OpenMLDataset(OpenMLBase):
         """
         if self.features is None:
             raise ValueError(
-                "retrieve_class_labels can only be called if feature information is " "available."
+                "retrieve_class_labels can only be called if feature information is available."
             )
         for feature in self.features.values():
             if (feature.name == target_name) and (feature.data_type == "nominal"):
@@ -952,29 +949,29 @@ def _read_features(features_file: str) -> Dict[int, OpenMLDataFeature]:
         with open(features_pickle_file, "rb") as fh_binary:
             features = pickle.load(fh_binary)
     except:  # noqa E722
-        with io.open(features_file, encoding="utf8") as fh:
+        with open(features_file, encoding="utf8") as fh:
             features_xml_string = fh.read()
-            xml_dict = xmltodict.parse(
-                features_xml_string, force_list=("oml:feature", "oml:nominal_value")
+        xml_dict = xmltodict.parse(
+            features_xml_string, force_list=("oml:feature", "oml:nominal_value")
+        )
+        features_xml = xml_dict["oml:data_features"]
+
+        features = {}
+        for idx, xmlfeature in enumerate(features_xml["oml:feature"]):
+            nr_missing = xmlfeature.get("oml:number_of_missing_values", 0)
+            feature = OpenMLDataFeature(
+                int(xmlfeature["oml:index"]),
+                xmlfeature["oml:name"],
+                xmlfeature["oml:data_type"],
+                xmlfeature.get("oml:nominal_value"),
+                int(nr_missing),
             )
-            features_xml = xml_dict["oml:data_features"]
+            if idx != feature.index:
+                raise ValueError("Data features not provided in right order")
+            features[feature.index] = feature
 
-            features = {}
-            for idx, xmlfeature in enumerate(features_xml["oml:feature"]):
-                nr_missing = xmlfeature.get("oml:number_of_missing_values", 0)
-                feature = OpenMLDataFeature(
-                    int(xmlfeature["oml:index"]),
-                    xmlfeature["oml:name"],
-                    xmlfeature["oml:data_type"],
-                    xmlfeature.get("oml:nominal_value"),
-                    int(nr_missing),
-                )
-                if idx != feature.index:
-                    raise ValueError("Data features not provided " "in right order")
-                features[feature.index] = feature
-
-            with open(features_pickle_file, "wb") as fh_binary:
-                pickle.dump(features, fh_binary)
+        with open(features_pickle_file, "wb") as fh_binary:
+            pickle.dump(features, fh_binary)
     return features
 
 

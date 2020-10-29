@@ -952,7 +952,7 @@ def _get_dataset_arff(description: Union[Dict, OpenMLDataset], cache_directory: 
 
 
 def _get_dataset_features_file(did_cache_dir: str, dataset_id: int) -> str:
-    """API call to load dataset features. Loads the from cache or downloads them.
+    """API call to load dataset features. Loads from cache or downloads them.
 
     Features are feature descriptions for each column.
     (name, index, categorical, ...)
@@ -985,7 +985,7 @@ def _get_dataset_features_file(did_cache_dir: str, dataset_id: int) -> str:
 
 
 def _get_dataset_qualities_file(did_cache_dir, dataset_id):
-    """API call to load dataset qualities. Loads the from cache or downloads them.
+    """API call to load dataset qualities. Loads from cache or downloads them.
 
     Features are metafeatures (number of features, number of classes, ...)
 

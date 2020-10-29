@@ -360,10 +360,13 @@ class OpenMLDatasetTestSparse(TestBase):
 class OpenMLDatasetFunctionTest(TestBase):
     @unittest.mock.patch("openml.datasets.dataset.pickle")
     def test__read_features(self, pickle_mock):
+        """Test we read the features from the xml if no cache pickle is available.
+
+        This test also does some simple checks to verify that the features are read correctly"""
         pickle_mock.load.side_effect = FileNotFoundError
         features = openml.datasets.dataset._read_features(
             os.path.join(
-                self.static_cache_dir, "org", "openml", "test", "datasets", "1", "features.xml"
+                self.static_cache_dir, "org", "openml", "test", "datasets", "2", "features.xml"
             )
         )
         self.assertIsInstance(features, dict)
@@ -376,14 +379,17 @@ class OpenMLDatasetFunctionTest(TestBase):
 
     @unittest.mock.patch("openml.datasets.dataset.pickle")
     def test__read_qualities(self, pickle_mock):
+        """Test we read the qualities from the xml if no cache pickle is available.
+
+        This test also does some minor checks to ensure that the qualities are read correctly."""
         pickle_mock.load.side_effect = FileNotFoundError
         qualities = openml.datasets.dataset._read_qualities(
             os.path.join(
-                self.static_cache_dir, "org", "openml", "test", "datasets", "1", "qualities.xml"
+                self.static_cache_dir, "org", "openml", "test", "datasets", "2", "qualities.xml"
             )
         )
         self.assertIsInstance(qualities, dict)
-        self.assertEqual(len(qualities), 107)
+        self.assertEqual(len(qualities), 106)
         self.assertEqual(pickle_mock.load.call_count, 1)
         self.assertEqual(pickle_mock.dump.call_count, 1)
 
