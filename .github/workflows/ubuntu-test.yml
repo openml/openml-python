@@ -1,4 +1,4 @@
-name: CI
+name: ubuntu
 
 on: [push, pull_request]
 
