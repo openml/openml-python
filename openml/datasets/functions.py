@@ -333,27 +333,37 @@ def _load_features_from_file(features_file: str) -> Dict:
         return xml_dict["oml:data_features"]
 
 
-def check_datasets_active(dataset_ids: List[int]) -> Dict[int, bool]:
+def check_datasets_active(
+    dataset_ids: List[int],
+    raise_error_if_not_exist: bool = True,
+) -> Dict[int, bool]:
     """
     Check if the dataset ids provided are active.
+
+    Raises an error if a dataset_id in the given list
+    of dataset_ids does not exist on the server.
 
     Parameters
     ----------
     dataset_ids : List[int]
         A list of integers representing dataset ids.
+    raise_error_if_not_exist : bool (default=True)
+        Flag that if activated can raise an error, if one or more of the
+        given dataset ids do not exist on the server.
 
     Returns
     -------
     dict
         A dictionary with items {did: bool}
     """
-    dataset_list = list_datasets(status="all")
+    dataset_list = list_datasets(status="all", data_id=dataset_ids)
     active = {}
 
     for did in dataset_ids:
         dataset = dataset_list.get(did, None)
         if dataset is None:
-            raise ValueError("Could not find dataset {} in OpenML dataset list.".format(did))
+            if raise_error_if_not_exist:
+                raise ValueError(f'Could not find dataset {did} in OpenML dataset list.')
         else:
             active[did] = dataset["status"] == "active"
 
