@@ -297,6 +297,10 @@ class OpenMLDataset(OpenMLBase):
             "url",
             "dataset",
             "data_file",
+            "_dataset",
+            "data_pickle_file",
+            "data_feather_file",
+            "feather_attribute_file",
         }
 
         # check that the keys are identical
