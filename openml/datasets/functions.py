@@ -183,7 +183,7 @@ def list_datasets(
     status: Optional[str] = None,
     tag: Optional[str] = None,
     output_format: str = "dict",
-    **kwargs
+    **kwargs,
 ) -> Union[Dict, pd.DataFrame]:
 
     """
@@ -251,7 +251,7 @@ def list_datasets(
         size=size,
         status=status,
         tag=tag,
-        **kwargs
+        **kwargs,
     )
 
 
@@ -334,8 +334,7 @@ def _load_features_from_file(features_file: str) -> Dict:
 
 
 def check_datasets_active(
-    dataset_ids: List[int],
-    raise_error_if_not_exist: bool = True,
+    dataset_ids: List[int], raise_error_if_not_exist: bool = True,
 ) -> Dict[int, bool]:
     """
     Check if the dataset ids provided are active.
@@ -363,7 +362,7 @@ def check_datasets_active(
         dataset = dataset_list.get(did, None)
         if dataset is None:
             if raise_error_if_not_exist:
-                raise ValueError(f'Could not find dataset {did} in OpenML dataset list.')
+                raise ValueError(f"Could not find dataset {did} in OpenML dataset list.")
         else:
             active[did] = dataset["status"] == "active"
 
