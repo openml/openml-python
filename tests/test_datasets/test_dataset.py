@@ -219,6 +219,11 @@ class OpenMLDatasetTest(TestBase):
         self.assertIsInstance(xy, pd.DataFrame)
         self.assertEqual(xy.shape, (150, 5))
 
+    def test_equality_comparison(self):
+        self.assertEqual(self.iris, self.iris)
+        self.assertNotEqual(self.iris, self.titanic)
+        self.assertNotEqual(self.titanic, 'Wrong_object')
+
 
 class OpenMLDatasetTestOnTestServer(TestBase):
     def setUp(self):
