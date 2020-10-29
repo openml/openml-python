@@ -227,9 +227,13 @@ class TestOpenMLDataset(TestBase):
     def test_check_datasets_active(self):
         # Have to test on live because there is no deactivated dataset on the test server.
         openml.config.server = self.production_server
-        active = openml.datasets.check_datasets_active([2, 17])
+        active = openml.datasets.check_datasets_active(
+            [2, 17, 79],
+            raise_error_if_not_exist=False,
+        )
         self.assertTrue(active[2])
         self.assertFalse(active[17])
+        self.assertIsNone(active.get(79))
         self.assertRaisesRegex(
             ValueError,
             "Could not find dataset 79 in OpenML dataset list.",
