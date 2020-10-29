@@ -1,0 +1,24 @@
+name: dist-check
+
+on: [push, pull_request]
+
+jobs:
+  dist:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: build dist
+      run: |
+        python setup.py sdist
+        last_dist="dist/$(ls -t dist/openml-*.tar.gz | head -n 1)"
+    - name: twine check
+      run: |
+        pip install twine
+        twine check $last_dist
+    - name: install dist
+      run: |
+        pip install $last_dist
