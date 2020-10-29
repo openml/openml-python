@@ -347,7 +347,7 @@ def check_datasets_active(dataset_ids: List[int]) -> Dict[int, bool]:
     dict
         A dictionary with items {did: bool}
     """
-    dataset_list = list_datasets(status="all")
+    dataset_list = list_datasets(status="all", data_id=dataset_ids)
     active = {}
 
     for did in dataset_ids:
