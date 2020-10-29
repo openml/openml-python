@@ -347,7 +347,7 @@ def check_datasets_active(
     ----------
     dataset_ids : List[int]
         A list of integers representing dataset ids.
-    raise_error_if_not_exist : bool, optional (default=True)
+    raise_error_if_not_exist : bool (default=True)
         Flag that if activated can raise an error, if one or more of the
         given dataset ids do not exist on the server.
 
@@ -357,7 +357,7 @@ def check_datasets_active(
         A dictionary with items {did: bool}
     """
     dataset_list = list_datasets(
-        dataset_ids=dataset_ids,
+        data_id=dataset_ids,
         status="all",
     )
     active = {}
