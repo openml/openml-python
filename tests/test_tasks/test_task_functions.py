@@ -110,7 +110,7 @@ class TestTask(TestBase):
                 self._check_task(tasks[tid])
 
     def test_list_tasks_per_type_paginate(self):
-        size = 10
+        size = 40
         max = 100
         task_types = [
             TaskType.SUPERVISED_CLASSIFICATION,

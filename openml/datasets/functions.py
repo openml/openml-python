@@ -356,10 +356,7 @@ def check_datasets_active(
     dict
         A dictionary with items {did: bool}
     """
-    dataset_list = list_datasets(
-        data_id=dataset_ids,
-        status="all",
-    )
+    dataset_list = list_datasets(status="all", data_id=dataset_ids)
     active = {}
 
     for did in dataset_ids:

@@ -19,7 +19,7 @@ run_tests() {
     cd $TEST_DIR
 
     if [[ "$COVERAGE" == "true" ]]; then
-        PYTEST_ARGS='--cov=openml'
+        PYTEST_ARGS='--cov=openml --long'
     else
         PYTEST_ARGS=''
     fi
