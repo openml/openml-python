@@ -295,7 +295,6 @@ class OpenMLDataset(OpenMLBase):
             "version",
             "upload_date",
             "url",
-            "dataset",
             "data_file",
             "_dataset",
             "data_pickle_file",
