@@ -8,6 +8,7 @@ Changelog
 
 0.11.1
 ~~~~~~
+* MAINT #981: Added unit test to verify how the dataset object handles comparisons.
 * MAINT #671: Improved the performance of ``check_datasets_active`` by only querying the given list of datasets in contrast to querying all datasets. Modified the corresponding unit test.
 
 0.11.0
