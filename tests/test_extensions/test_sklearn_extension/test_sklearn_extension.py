@@ -40,7 +40,8 @@ from openml.exceptions import PyOpenMLError
 from openml.flows import OpenMLFlow
 from openml.flows.functions import assert_flows_equal
 from openml.runs.trace import OpenMLRunTrace
-from openml.testing import TestBase, SimpleImputer, CustomImputer, cat, cont
+from openml.testing import TestBase, SimpleImputer, CustomImputer
+from openml.extensions.sklearn import cat, cont
 
 
 this_directory = os.path.dirname(os.path.abspath(__file__))

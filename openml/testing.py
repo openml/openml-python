@@ -267,12 +267,4 @@ class CustomImputer(SimpleImputer):
     pass
 
 
-def cont(X):
-    return X.dtypes != "category"
-
-
-def cat(X):
-    return X.dtypes == "category"
-
-
-__all__ = ["TestBase", "SimpleImputer", "CustomImputer", "cat", "cont"]
+__all__ = ["TestBase", "SimpleImputer", "CustomImputer"]
