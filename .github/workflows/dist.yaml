@@ -14,11 +14,12 @@ jobs:
     - name: build dist
       run: |
         python setup.py sdist
-        last_dist="dist/$(ls -t dist/openml-*.tar.gz | head -n 1)"
     - name: twine check
       run: |
         pip install twine
+        last_dist="dist/$(ls -t dist/openml-*.tar.gz | head -n 1)"
         twine check $last_dist
     - name: install dist
       run: |
+        last_dist="dist/$(ls -t dist/openml-*.tar.gz | head -n 1)"
         pip install $last_dist
