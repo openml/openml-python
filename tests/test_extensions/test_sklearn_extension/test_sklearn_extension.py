@@ -2184,16 +2184,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
             # for lower versions
             from sklearn.preprocessing import Imputer as SimpleImputer
 
-        class CustomImputer(SimpleImputer):
-            pass
-
-        def cont(X):
-            return X.dtypes != "category"
-
-        def cat(X):
-            return X.dtypes == "category"
-
-        import sklearn.metrics
         import sklearn.tree
         from sklearn.pipeline import Pipeline, make_pipeline
         from sklearn.compose import ColumnTransformer
@@ -2216,3 +2206,37 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 raise AttributeError(e)
             else:
                 raise Exception(e)
+
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="columntransformer introduction in 0.20.0",
+    )
+    def test_setupid_with_column_transformer(self):
+        """Test to check if inclusion of ColumnTransformer in a pipleline is treated as a new
+        flow each time.
+        """
+        import sklearn.compose
+        from sklearn.svm import SVC
+
+        def column_transformer_pipe(task_id):
+            task = openml.tasks.get_task(task_id)
+            # make columntransformer
+            preprocessor = sklearn.compose.ColumnTransformer(
+                transformers=[
+                    ("num", StandardScaler(), cont),
+                    ("cat", OneHotEncoder(handle_unknown="ignore"), cat),
+                ]
+            )
+            # make pipeline
+            clf = SVC(gamma="scale", random_state=1)
+            pipe = make_pipeline(preprocessor, clf)
+            # run task
+            run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=True)
+            run.publish()
+            new_run = openml.runs.get_run(run.run_id)
+            return new_run.setup_id
+
+        setup1 = column_transformer_pipe(23)
+        setup2 = column_transformer_pipe(230)
+
+        self.assertEqual(setup1, setup2)
