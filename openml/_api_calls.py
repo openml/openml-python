@@ -188,28 +188,26 @@ def _send_request(
                     response = session.post(url, data=data, files=files)
                 else:
                     raise NotImplementedError()
-                pass
-            except (requests.exceptions.ConnectionError, requests.exceptions.SSLError,) as e:
+                __check_response(response=response, url=url, file_elements=files)
+                break
+            except (
+                requests.exceptions.ConnectionError,
+                requests.exceptions.SSLError,
+                OpenMLServerException,
+            ) as e:
+                if isinstance(e, OpenMLServerException):
+                    if e.code != 107:
+                        # 107 is a database connection error - only then do retries
+                        raise
+                    else:
+                        wait_time = 0.3
+                else:
+                    wait_time = 0.1
                 if i == n_retries:
                     raise e
                 else:
-                    time.sleep(0.1 * i)
+                    time.sleep(wait_time * i)
                     continue
-
-            try:
-                __check_response(response=response, url=url, file_elements=files)
-            except OpenMLServerException as e:
-                # Do retries in case of a database connection error
-                if e.code == 107:
-                    if i == n_retries:
-                        raise e
-                    else:
-                        time.sleep(i * 0.3)
-                        continue
-                else:
-                    raise e
-
-            break
     if response is None:
         raise ValueError("This should never happen!")
     return response
