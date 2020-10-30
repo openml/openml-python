@@ -23,3 +23,8 @@ jobs:
       run: |
         last_dist=$(ls -t dist/openml-*.tar.gz | head -n 1)
         pip install $last_dist
+    - name: PEP 561 Compliance
+      run: |
+        pip install mypy
+        cd ..  # required to use the installed version of openml
+        if ! python -m mypy -c "import openml"; then exit 1; fi
