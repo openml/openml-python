@@ -4,6 +4,7 @@ import os
 import random
 from itertools import product
 from unittest import mock
+import shutil
 
 import arff
 import time
@@ -1154,6 +1155,10 @@ class TestOpenMLDataset(TestBase):
         # test if publish was successful
         self.assertIsInstance(dataset.id, int)
 
+        downloaded_dataset = self._wait_for_dataset_being_processed(dataset.id)
+        self.assertEqual(downloaded_dataset.ignore_attribute, ignore_attribute)
+
+    def _wait_for_dataset_being_processed(self, dataset_id):
         downloaded_dataset = None
         # fetching from server
         # loop till timeout or fetch not successful
@@ -1162,19 +1167,19 @@ class TestOpenMLDataset(TestBase):
         start_time = time.time()
         while time.time() - start_time < max_waiting_time_seconds:
             try:
-                downloaded_dataset = openml.datasets.get_dataset(dataset.id)
+                downloaded_dataset = openml.datasets.get_dataset(dataset_id)
                 break
             except Exception as e:
                 # returned code 273: Dataset not processed yet
                 # returned code 362: No qualities found
                 TestBase.logger.error(
-                    "Failed to fetch dataset:{} with '{}'.".format(dataset.id, str(e))
+                    "Failed to fetch dataset:{} with '{}'.".format(dataset_id, str(e))
                 )
                 time.sleep(10)
                 continue
         if downloaded_dataset is None:
-            raise ValueError("TIMEOUT: Failed to fetch uploaded dataset - {}".format(dataset.id))
-        self.assertEqual(downloaded_dataset.ignore_attribute, ignore_attribute)
+            raise ValueError("TIMEOUT: Failed to fetch uploaded dataset - {}".format(dataset_id))
+        return downloaded_dataset
 
     def test_create_dataset_row_id_attribute_error(self):
         # meta-information
@@ -1370,12 +1375,28 @@ class TestOpenMLDataset(TestBase):
 
         # Case 2
         # only owners (or admin) can edit all critical fields of datasets
-        # this is a dataset created by CI, so it is editable by this test
-        did = 315
-        result = edit_dataset(did, default_target_attribute="col_1", ignore_attribute="col_2")
+        # for this, we need to first clone a dataset to do changes
+        did = fork_dataset(1)
+        self._wait_for_dataset_being_processed(did)
+        result = edit_dataset(did, default_target_attribute="shape", ignore_attribute="oil")
         self.assertEqual(did, result)
-        edited_dataset = openml.datasets.get_dataset(did)
-        self.assertEqual(edited_dataset.ignore_attribute, ["col_2"])
+
+        n_tries = 10
+        # we need to wait for the edit to be reflected on the server
+        for i in range(n_tries):
+            edited_dataset = openml.datasets.get_dataset(did)
+            try:
+                self.assertEqual(edited_dataset.default_target_attribute, "shape", edited_dataset)
+                self.assertEqual(edited_dataset.ignore_attribute, ["oil"], edited_dataset)
+                break
+            except AssertionError as e:
+                if i == n_tries - 1:
+                    raise e
+                time.sleep(10)
+                # Delete the cache dir to get the newer version of the dataset
+                shutil.rmtree(
+                    os.path.join(self.workdir, "org", "openml", "test", "datasets", str(did))
+                )
 
     def test_data_edit_errors(self):
         # Check server exception when no field to edit is provided
