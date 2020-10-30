@@ -944,7 +944,7 @@ class OpenMLDataset(OpenMLBase):
 
 
 def _read_features(features_file: str) -> Dict[int, OpenMLDataFeature]:
-    features_pickle_file = features_file + ".pkl"
+    features_pickle_file = _get_features_pickle_file(features_file)
     try:
         with open(features_pickle_file, "rb") as fh_binary:
             features = pickle.load(fh_binary)
@@ -975,8 +975,13 @@ def _read_features(features_file: str) -> Dict[int, OpenMLDataFeature]:
     return features
 
 
+def _get_features_pickle_file(features_file: str) -> str:
+    """This function only exists so it can be mocked during unit testing"""
+    return features_file + ".pkl"
+
+
 def _read_qualities(qualities_file: str) -> Dict[str, float]:
-    qualities_pickle_file = qualities_file + ".pkl"
+    qualities_pickle_file = _get_qualities_pickle_file(qualities_file)
     try:
         with open(qualities_pickle_file, "rb") as fh_binary:
             qualities = pickle.load(fh_binary)
@@ -989,6 +994,11 @@ def _read_qualities(qualities_file: str) -> Dict[str, float]:
         with open(qualities_pickle_file, "wb") as fh_binary:
             pickle.dump(qualities, fh_binary)
     return qualities
+
+
+def _get_qualities_pickle_file(qualities_file: str) -> str:
+    """This function only exists so it can be mocked during unit testing"""
+    return qualities_file + ".pkl"
 
 
 def _check_qualities(qualities: List[Dict[str, str]]) -> Dict[str, float]:
