@@ -3,7 +3,6 @@
 import io
 import logging
 import os
-import re
 from typing import List, Dict, Union, Optional
 
 import numpy as np
@@ -210,8 +209,6 @@ def __list_datasets(api_call, output_format="dict"):
         datasets = pd.DataFrame.from_dict(datasets, orient="index")
 
     return datasets
-
-
 
 
 def _expand_parameter(parameter: Union[str, List[str]]) -> List[str]:
