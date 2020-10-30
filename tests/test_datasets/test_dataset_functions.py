@@ -373,9 +373,9 @@ class TestOpenMLDataset(TestBase):
     def test_get_dataset_uint8_dtype(self):
         dataset = openml.datasets.get_dataset(1)
         self.assertEqual(type(dataset), OpenMLDataset)
-        self.assertEqual(dataset.name, 'anneal')
+        self.assertEqual(dataset.name, "anneal")
         df, _, _, _ = dataset.get_data()
-        self.assertEqual(df['carbon'].dtype, 'uint8')
+        self.assertEqual(df["carbon"].dtype, "uint8")
 
     def test_get_dataset(self):
         # This is the only non-lazy load to ensure default behaviour works.
@@ -1157,7 +1157,7 @@ class TestOpenMLDataset(TestBase):
         downloaded_dataset = None
         # fetching from server
         # loop till timeout or fetch not successful
-        max_waiting_time_seconds = 400
+        max_waiting_time_seconds = 600
         # time.time() works in seconds
         start_time = time.time()
         while time.time() - start_time < max_waiting_time_seconds:

@@ -120,11 +120,11 @@ class OpenMLDatasetTest(TestBase):
 
     def _check_expected_type(self, dtype, is_cat, col):
         if is_cat:
-            expected_type = 'category'
-        elif not col.isna().any() and (col.astype('uint8') == col).all():
-            expected_type = 'uint8'
+            expected_type = "category"
+        elif not col.isna().any() and (col.astype("uint8") == col).all():
+            expected_type = "uint8"
         else:
-            expected_type = 'float64'
+            expected_type = "float64"
 
         self.assertEqual(dtype.name, expected_type)
 
@@ -197,7 +197,7 @@ class OpenMLDatasetTest(TestBase):
         with catch_warnings():
             filterwarnings("error")
             self.assertRaises(
-                DeprecationWarning, openml.OpenMLDataset, "Test", "Test", format="arff"
+                DeprecationWarning, openml.OpenMLDataset, "Test", "Test", data_format="arff"
             )
 
     def test_get_data_with_nonexisting_class(self):

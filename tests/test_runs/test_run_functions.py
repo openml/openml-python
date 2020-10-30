@@ -442,7 +442,7 @@ class TestRun(TestBase):
             # suboptimal (slow), and not guaranteed to work if evaluation
             # engine is behind.
             # TODO: mock this? We have the arff already on the server
-            self._wait_for_processed_run(run.run_id, 400)
+            self._wait_for_processed_run(run.run_id, 600)
             try:
                 model_prime = openml.runs.initialize_model_from_trace(
                     run_id=run.run_id, repeat=0, fold=0,
