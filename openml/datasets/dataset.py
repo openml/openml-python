@@ -456,12 +456,11 @@ class OpenMLDataset(OpenMLBase):
                     col.append(
                         self._unpack_categories(X[column_name], categories_names[column_name])
                     )
-                elif attribute_dtype[column_name] in ('floating',
-                                                      'integer'):
+                elif attribute_dtype[column_name] in ("floating", "integer"):
                     X_col = X[column_name]
                     if X_col.min() >= 0 and X_col.max() <= 255:
                         try:
-                            X_col_uint = X_col.astype('uint8')
+                            X_col_uint = X_col.astype("uint8")
                             if (X_col == X_col_uint).all():
                                 col.append(X_col_uint)
                                 continue

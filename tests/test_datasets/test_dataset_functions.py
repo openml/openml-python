@@ -373,9 +373,9 @@ class TestOpenMLDataset(TestBase):
     def test_get_dataset_uint8_dtype(self):
         dataset = openml.datasets.get_dataset(1)
         self.assertEqual(type(dataset), OpenMLDataset)
-        self.assertEqual(dataset.name, 'anneal')
+        self.assertEqual(dataset.name, "anneal")
         df, _, _, _ = dataset.get_data()
-        self.assertEqual(df['carbon'].dtype, 'uint8')
+        self.assertEqual(df["carbon"].dtype, "uint8")
 
     def test_get_dataset(self):
         # This is the only non-lazy load to ensure default behaviour works.

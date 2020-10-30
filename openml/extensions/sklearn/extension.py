@@ -1641,6 +1641,22 @@ class SklearnExtension(Extension):
             if X_test is None:
                 raise TypeError("argument X_test must not be of type None")
 
+        try:
+            # check if model is fitted
+            # 'predict' internally calls sklearn.utils.validation.check_is_fitted for every
+            # model-specific attribute it excepts, thus offering a more robust check than
+            # a generic simplified call of check_is_fitted(model_copy)
+            from sklearn.exceptions import NotFittedError
+
+            model.predict(X_train)
+            warnings.warn(
+                "The model is already fitted!"
+                " This might cause inconsistency in comparison of results."
+            )
+        except NotFittedError:
+            # model is not fitted, as is required
+            pass
+
         model_copy = sklearn.base.clone(model, safe=True)
         # sanity check: prohibit users from optimizing n_jobs
         self._prevent_optimize_n_jobs(model_copy)
@@ -1649,22 +1665,6 @@ class SklearnExtension(Extension):
         can_measure_wallclocktime = self._can_measure_wallclocktime(model_copy)
 
         user_defined_measures = OrderedDict()  # type: 'OrderedDict[str, float]'
-
-        try:
-            # check if model is fitted
-            # 'predict' internally calls sklearn.utils.validation.check_is_fitted for every
-            # model-specific attribute it excepts, thus offering a more robust check than
-            # a generic simplified call of check_is_fitted(model_copy)
-            from sklearn.exceptions import NotFittedError
-
-            model_copy.predict(X_train)
-            warnings.warn(
-                "The model is already fitted!"
-                " This might cause inconsistency in comparison of results."
-            )
-        except NotFittedError:
-            # model is not fitted, as is required
-            pass
 
         try:
             # for measuring runtime. Only available since Python 3.3
