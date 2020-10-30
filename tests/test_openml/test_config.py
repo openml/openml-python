@@ -1,15 +1,26 @@
 # License: BSD 3-Clause
 
+import tempfile
 import os
+import unittest.mock
 
 import openml.config
 import openml.testing
 
 
 class TestConfig(openml.testing.TestBase):
-    def test_config_loading(self):
-        self.assertTrue(os.path.exists(openml.config.config_file))
-        self.assertTrue(os.path.isdir(os.path.expanduser("~/.openml")))
+    @unittest.mock.patch("os.path.expanduser")
+    @unittest.mock.patch("warnings.warn")
+    def test_non_writable_home(self, warnings_mock, expanduser_mock):
+        with tempfile.TemporaryDirectory(dir=self.workdir) as td:
+            expanduser_mock.side_effect = (
+                os.path.join(td, "openmldir"),
+                os.path.join(td, "cachedir"),
+            )
+            os.chmod(td, 0o444)
+            openml.config._setup()
+
+        self.assertEqual(warnings_mock.call_count, 2)
 
 
 class TestConfigurationForExamples(openml.testing.TestBase):

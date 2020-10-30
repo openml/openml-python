@@ -7,7 +7,9 @@ Store module level information like the API key, cache directory and the server
 import logging
 import logging.handlers
 import os
+from pathlib import Path
 from typing import Tuple, cast
+import warnings
 
 from io import StringIO
 import configparser
@@ -85,13 +87,16 @@ def set_file_log_level(file_output_level: int):
 _defaults = {
     "apikey": None,
     "server": "https://www.openml.org/api/v1/xml",
-    "cachedir": os.path.expanduser(os.path.join("~", ".openml", "cache")),
+    "cachedir": Path(
+        os.environ.get("XDG_CACHE_HOME", Path("~") / ".cache" / "openml",)
+    ).expanduser(),
     "avoid_duplicate_runs": "True",
     "connection_n_retries": 10,
     "max_retries": 20,
 }
 
-config_file = os.path.expanduser(os.path.join("~", ".openml", "config"))
+config_dir = Path(os.environ.get("XDG_CONFIG_HOME", Path("~") / ".config" / "openml")).expanduser()
+config_file = config_dir / "config"
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
@@ -187,26 +192,35 @@ def _setup():
     global connection_n_retries
     global max_retries
 
-    # read config file, create cache directory
-    try:
-        os.mkdir(os.path.expanduser(os.path.join("~", ".openml")))
-    except FileExistsError:
-        # For other errors, we want to propagate the error as openml does not work without cache
-        pass
+    # read config file, create openml directory
+    expanded_openml_dir = os.path.expanduser(os.path.join("~", ".openml"))
+    if not os.path.exists(expanded_openml_dir):
+        try:
+            os.mkdir(expanded_openml_dir)
+        except PermissionError:
+            warnings.warn(
+                "No permission to create openml directory at %s! This can result in OpenML-Python "
+                "not working properly." % expanded_openml_dir
+            )
+            pass
 
     config = _parse_config()
     apikey = config.get("FAKE_SECTION", "apikey")
     server = config.get("FAKE_SECTION", "server")
 
-    short_cache_dir = config.get("FAKE_SECTION", "cachedir")
-    cache_directory = os.path.expanduser(short_cache_dir)
+    cache_dir = config.get("FAKE_SECTION", "cachedir")
+    cache_directory = os.path.expanduser(cache_dir)
 
     # create the cache subdirectory
-    try:
-        os.mkdir(cache_directory)
-    except FileExistsError:
-        # For other errors, we want to propagate the error as openml does not work without cache
-        pass
+    if not os.path.exists(cache_directory):
+        try:
+            os.mkdir(cache_directory)
+        except PermissionError:
+            warnings.warn(
+                "No permission to create openml cache directory at %s! This can result in "
+                "OpenML-Python not working properly." % cache_directory
+            )
+            pass
 
     avoid_duplicate_runs = config.getboolean("FAKE_SECTION", "avoid_duplicate_runs")
     connection_n_retries = config.get("FAKE_SECTION", "connection_n_retries")
@@ -222,27 +236,20 @@ def _parse_config():
     """ Parse the config file, set up defaults. """
     config = configparser.RawConfigParser(defaults=_defaults)
 
-    if not os.path.exists(config_file):
-        # Create an empty config file if there was none so far
-        fh = open(config_file, "w")
-        fh.close()
-        logger.info(
-            "Could not find a configuration file at %s. Going to "
-            "create an empty file there." % config_file
-        )
-
+    # The ConfigParser requires a [SECTION_HEADER], which we do not expect in our config file.
+    # Cheat the ConfigParser module by adding a fake section header
+    config_file_ = StringIO()
+    config_file_.write("[FAKE_SECTION]\n")
     try:
-        # The ConfigParser requires a [SECTION_HEADER], which we do not expect in our config file.
-        # Cheat the ConfigParser module by adding a fake section header
-        config_file_ = StringIO()
-        config_file_.write("[FAKE_SECTION]\n")
         with open(config_file) as fh:
             for line in fh:
                 config_file_.write(line)
-        config_file_.seek(0)
-        config.read_file(config_file_)
+    except FileNotFoundError:
+        logger.info("No config file found at %s, using default configuration.", config_file)
     except OSError as e:
         logger.info("Error opening file %s: %s", config_file, e.message)
+    config_file_.seek(0)
+    config.read_file(config_file_)
     return config
 
 
@@ -257,11 +264,7 @@ def get_cache_directory():
     """
     url_suffix = urlparse(server).netloc
     reversed_url_suffix = os.sep.join(url_suffix.split(".")[::-1])
-    if not cache_directory:
-        _cachedir = _defaults(cache_directory)
-    else:
-        _cachedir = cache_directory
-    _cachedir = os.path.join(_cachedir, reversed_url_suffix)
+    _cachedir = os.path.join(cache_directory, reversed_url_suffix)
     return _cachedir
 
 
