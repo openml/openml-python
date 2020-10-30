@@ -227,9 +227,10 @@ class TestOpenMLDataset(TestBase):
     def test_check_datasets_active(self):
         # Have to test on live because there is no deactivated dataset on the test server.
         openml.config.server = self.production_server
-        active = openml.datasets.check_datasets_active([2, 17])
+        active = openml.datasets.check_datasets_active([2, 17, 79], raise_error_if_not_exist=False,)
         self.assertTrue(active[2])
         self.assertFalse(active[17])
+        self.assertIsNone(active.get(79))
         self.assertRaisesRegex(
             ValueError,
             "Could not find dataset 79 in OpenML dataset list.",
@@ -368,6 +369,13 @@ class TestOpenMLDataset(TestBase):
         # Issue324 Properly handle private datasets when trying to access them
         openml.config.server = self.production_server
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
+
+    def test_get_dataset_uint8_dtype(self):
+        dataset = openml.datasets.get_dataset(1)
+        self.assertEqual(type(dataset), OpenMLDataset)
+        self.assertEqual(dataset.name, 'anneal')
+        df, _, _, _ = dataset.get_data()
+        self.assertEqual(df['carbon'].dtype, 'uint8')
 
     def test_get_dataset(self):
         # This is the only non-lazy load to ensure default behaviour works.
@@ -897,7 +905,6 @@ class TestOpenMLDataset(TestBase):
         collection_date = "01-01-2018"
         language = "English"
         licence = "MIT"
-        default_target_attribute = "play"
         citation = "None"
         original_data_url = "http://openml.github.io/openml-python"
         paper_url = "http://openml.github.io/openml-python"
@@ -909,7 +916,7 @@ class TestOpenMLDataset(TestBase):
             collection_date=collection_date,
             language=language,
             licence=licence,
-            default_target_attribute=default_target_attribute,
+            default_target_attribute="play",
             row_id_attribute=None,
             ignore_attribute=None,
             citation=citation,
@@ -944,7 +951,7 @@ class TestOpenMLDataset(TestBase):
             collection_date=collection_date,
             language=language,
             licence=licence,
-            default_target_attribute=default_target_attribute,
+            default_target_attribute="y",
             row_id_attribute=None,
             ignore_attribute=None,
             citation=citation,
@@ -980,7 +987,7 @@ class TestOpenMLDataset(TestBase):
             collection_date=collection_date,
             language=language,
             licence=licence,
-            default_target_attribute=default_target_attribute,
+            default_target_attribute="rnd_str",
             row_id_attribute=None,
             ignore_attribute=None,
             citation=citation,
@@ -1416,3 +1423,118 @@ class TestOpenMLDataset(TestBase):
         self.assertRaisesRegex(
             OpenMLServerException, "Unknown dataset", fork_dataset, data_id=999999,
         )
+
+
+@pytest.mark.parametrize(
+    "default_target_attribute,row_id_attribute,ignore_attribute",
+    [
+        ("wrong", None, None),
+        (None, "wrong", None),
+        (None, None, "wrong"),
+        ("wrong,sunny", None, None),
+        (None, None, "wrong,sunny"),
+        (["wrong", "sunny"], None, None),
+        (None, None, ["wrong", "sunny"]),
+    ],
+)
+def test_invalid_attribute_validations(
+    default_target_attribute, row_id_attribute, ignore_attribute
+):
+    data = [
+        ["a", "sunny", 85.0, 85.0, "FALSE", "no"],
+        ["b", "sunny", 80.0, 90.0, "TRUE", "no"],
+        ["c", "overcast", 83.0, 86.0, "FALSE", "yes"],
+        ["d", "rainy", 70.0, 96.0, "FALSE", "yes"],
+        ["e", "rainy", 68.0, 80.0, "FALSE", "yes"],
+    ]
+    column_names = ["rnd_str", "outlook", "temperature", "humidity", "windy", "play"]
+    df = pd.DataFrame(data, columns=column_names)
+    # enforce the type of each column
+    df["outlook"] = df["outlook"].astype("category")
+    df["windy"] = df["windy"].astype("bool")
+    df["play"] = df["play"].astype("category")
+    # meta-information
+    name = "pandas_testing_dataset"
+    description = "Synthetic dataset created from a Pandas DataFrame"
+    creator = "OpenML tester"
+    collection_date = "01-01-2018"
+    language = "English"
+    licence = "MIT"
+    citation = "None"
+    original_data_url = "http://openml.github.io/openml-python"
+    paper_url = "http://openml.github.io/openml-python"
+    with pytest.raises(ValueError, match="should be one of the data attribute"):
+        _ = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute=default_target_attribute,
+            row_id_attribute=row_id_attribute,
+            ignore_attribute=ignore_attribute,
+            citation=citation,
+            attributes="auto",
+            data=df,
+            version_label="test",
+            original_data_url=original_data_url,
+            paper_url=paper_url,
+        )
+
+
+@pytest.mark.parametrize(
+    "default_target_attribute,row_id_attribute,ignore_attribute",
+    [
+        ("outlook", None, None),
+        (None, "outlook", None),
+        (None, None, "outlook"),
+        ("outlook,windy", None, None),
+        (None, None, "outlook,windy"),
+        (["outlook", "windy"], None, None),
+        (None, None, ["outlook", "windy"]),
+    ],
+)
+def test_valid_attribute_validations(default_target_attribute, row_id_attribute, ignore_attribute):
+    data = [
+        ["a", "sunny", 85.0, 85.0, "FALSE", "no"],
+        ["b", "sunny", 80.0, 90.0, "TRUE", "no"],
+        ["c", "overcast", 83.0, 86.0, "FALSE", "yes"],
+        ["d", "rainy", 70.0, 96.0, "FALSE", "yes"],
+        ["e", "rainy", 68.0, 80.0, "FALSE", "yes"],
+    ]
+    column_names = ["rnd_str", "outlook", "temperature", "humidity", "windy", "play"]
+    df = pd.DataFrame(data, columns=column_names)
+    # enforce the type of each column
+    df["outlook"] = df["outlook"].astype("category")
+    df["windy"] = df["windy"].astype("bool")
+    df["play"] = df["play"].astype("category")
+    # meta-information
+    name = "pandas_testing_dataset"
+    description = "Synthetic dataset created from a Pandas DataFrame"
+    creator = "OpenML tester"
+    collection_date = "01-01-2018"
+    language = "English"
+    licence = "MIT"
+    citation = "None"
+    original_data_url = "http://openml.github.io/openml-python"
+    paper_url = "http://openml.github.io/openml-python"
+    _ = openml.datasets.functions.create_dataset(
+        name=name,
+        description=description,
+        creator=creator,
+        contributor=None,
+        collection_date=collection_date,
+        language=language,
+        licence=licence,
+        default_target_attribute=default_target_attribute,
+        row_id_attribute=row_id_attribute,
+        ignore_attribute=ignore_attribute,
+        citation=citation,
+        attributes="auto",
+        data=df,
+        version_label="test",
+        original_data_url=original_data_url,
+        paper_url=paper_url,
+    )

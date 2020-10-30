@@ -55,7 +55,7 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
     if file_elements is not None:
         if request_method != "post":
             raise ValueError("request method must be post when file elements are present")
-        response = __read_url_files(url, data=data, file_elements=file_elements)
+        response = _read_url_files(url, data=data, file_elements=file_elements)
     else:
         response = __read_url(url, request_method, data)
 
@@ -106,7 +106,6 @@ def _download_text_file(
     logging.info("Starting [%s] request for the URL %s", "get", source)
     start = time.time()
     response = __read_url(source, request_method="get")
-    __check_response(response, source, None)
     downloaded_file = response.text
 
     if md5_checksum is not None:
@@ -138,15 +137,6 @@ def _download_text_file(
         return None
 
 
-def __check_response(response, url, file_elements):
-    if response.status_code != 200:
-        raise __parse_server_exception(response, url, file_elements=file_elements)
-    elif (
-        "Content-Encoding" not in response.headers or response.headers["Content-Encoding"] != "gzip"
-    ):
-        logging.warning("Received uncompressed content from OpenML for {}.".format(url))
-
-
 def _file_id_to_url(file_id, filename=None):
     """
      Presents the URL how to download a given file id
@@ -159,7 +149,7 @@ def _file_id_to_url(file_id, filename=None):
     return url
 
 
-def __read_url_files(url, data=None, file_elements=None):
+def _read_url_files(url, data=None, file_elements=None):
     """do a post request to url with data
     and sending file_elements as files"""
 
@@ -169,7 +159,7 @@ def __read_url_files(url, data=None, file_elements=None):
         file_elements = {}
     # Using requests.post sets header 'Accept-encoding' automatically to
     # 'gzip,deflate'
-    response = __send_request(request_method="post", url=url, data=data, files=file_elements,)
+    response = _send_request(request_method="post", url=url, data=data, files=file_elements,)
     return response
 
 
@@ -178,10 +168,10 @@ def __read_url(url, request_method, data=None):
     if config.apikey is not None:
         data["api_key"] = config.apikey
 
-    return __send_request(request_method=request_method, url=url, data=data)
+    return _send_request(request_method=request_method, url=url, data=data)
 
 
-def __send_request(
+def _send_request(
     request_method, url, data, files=None,
 ):
     n_retries = config.connection_n_retries
@@ -198,15 +188,38 @@ def __send_request(
                     response = session.post(url, data=data, files=files)
                 else:
                     raise NotImplementedError()
+                __check_response(response=response, url=url, file_elements=files)
                 break
-            except (requests.exceptions.ConnectionError, requests.exceptions.SSLError,) as e:
+            except (
+                requests.exceptions.ConnectionError,
+                requests.exceptions.SSLError,
+                OpenMLServerException,
+            ) as e:
+                if isinstance(e, OpenMLServerException):
+                    if e.code != 107:
+                        # 107 is a database connection error - only then do retries
+                        raise
+                    else:
+                        wait_time = 0.3
+                else:
+                    wait_time = 0.1
                 if i == n_retries:
                     raise e
                 else:
-                    time.sleep(0.1 * i)
+                    time.sleep(wait_time * i)
+                    continue
     if response is None:
         raise ValueError("This should never happen!")
     return response
+
+
+def __check_response(response, url, file_elements):
+    if response.status_code != 200:
+        raise __parse_server_exception(response, url, file_elements=file_elements)
+    elif (
+        "Content-Encoding" not in response.headers or response.headers["Content-Encoding"] != "gzip"
+    ):
+        logging.warning("Received uncompressed content from OpenML for {}.".format(url))
 
 
 def __parse_server_exception(

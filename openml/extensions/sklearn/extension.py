@@ -1546,7 +1546,9 @@ class SklearnExtension(Extension):
         fold_no: int,
         y_train: Optional[np.ndarray] = None,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
-    ) -> Tuple[np.ndarray, pd.DataFrame, "OrderedDict[str, float]", Optional[OpenMLRunTrace]]:
+    ) -> Tuple[
+        np.ndarray, Optional[pd.DataFrame], "OrderedDict[str, float]", Optional[OpenMLRunTrace]
+    ]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction
         information.
 
@@ -1581,19 +1583,21 @@ class SklearnExtension(Extension):
         -------
         pred_y : np.ndarray
             Predictions on the training/test set, depending on the task type.
-            For supervised tasks, predicitons are on the test set.
-            For unsupervised tasks, predicitons are on the training set.
-        proba_y : pd.DataFrame
+            For supervised tasks, predictions are on the test set.
+            For unsupervised tasks, predictions are on the training set.
+        proba_y : pd.DataFrame, optional
             Predicted probabilities for the test set.
             None, if task is not Classification or Learning Curve prediction.
         user_defined_measures : OrderedDict[str, float]
             User defined measures that were generated on this fold
-        trace : Optional[OpenMLRunTrace]]
+        trace : OpenMLRunTrace, optional
             arff trace object from a fitted model and the trace content obtained by
             repeatedly calling ``run_model_on_task``
         """
 
-        def _prediction_to_probabilities(y: np.ndarray, model_classes: List[Any]) -> pd.DataFrame:
+        def _prediction_to_probabilities(
+            y: np.ndarray, model_classes: List[Any], class_labels: Optional[List[str]]
+        ) -> pd.DataFrame:
             """Transforms predicted probabilities to match with OpenML class indices.
 
             Parameters
@@ -1603,28 +1607,26 @@ class SklearnExtension(Extension):
                 training data).
             model_classes : list
                 List of classes known_predicted by the model, ordered by their index.
+            class_labels : list
+                List of classes as stored in the task object fetched from server.
 
             Returns
             -------
             pd.DataFrame
             """
+            if class_labels is None:
+                raise ValueError("The task has no class labels")
 
-            if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
-                if task.class_labels is not None:
-                    if isinstance(y_train, np.ndarray) and isinstance(task.class_labels[0], str):
-                        # mapping (decoding) the predictions to the categories
-                        # creating a separate copy to not change the expected pred_y type
-                        y = [task.class_labels[pred] for pred in y]
-                else:
-                    raise ValueError("The task has no class labels")
-            else:
-                return None
+            if isinstance(y_train, np.ndarray) and isinstance(class_labels[0], str):
+                # mapping (decoding) the predictions to the categories
+                # creating a separate copy to not change the expected pred_y type
+                y = [class_labels[pred] for pred in y]  # list or numpy array of predictions
 
-            # y: list or numpy array of predictions
             # model_classes: sklearn classifier mapping from original array id to
             # prediction index id
             if not isinstance(model_classes, list):
                 raise ValueError("please convert model classes to list prior to calling this fn")
+
             # DataFrame allows more accurate mapping of classes as column names
             result = pd.DataFrame(
                 0, index=np.arange(len(y)), columns=model_classes, dtype=np.float32
@@ -1638,10 +1640,6 @@ class SklearnExtension(Extension):
                 raise TypeError("argument y_train must not be of type None")
             if X_test is None:
                 raise TypeError("argument X_test must not be of type None")
-
-        # TODO: if possible, give a warning if model is already fitted (acceptable
-        # in case of custom experimentation,
-        # but not desirable if we want to upload to OpenML).
 
         model_copy = sklearn.base.clone(model, safe=True)
         # sanity check: prohibit users from optimizing n_jobs
@@ -1748,10 +1746,7 @@ class SklearnExtension(Extension):
                 proba_y = model_copy.predict_proba(X_test)
                 proba_y = pd.DataFrame(proba_y, columns=model_classes)  # handles X_test as numpy
             except AttributeError:  # predict_proba is not available when probability=False
-                if task.class_labels is not None:
-                    proba_y = _prediction_to_probabilities(pred_y, model_classes)
-                else:
-                    raise ValueError("The task has no class labels")
+                proba_y = _prediction_to_probabilities(pred_y, model_classes, task.class_labels)
 
             if task.class_labels is not None:
                 if proba_y.shape[1] != len(task.class_labels):
@@ -1775,6 +1770,7 @@ class SklearnExtension(Extension):
                         # adding missing columns with 0 probability
                         if col not in model_classes:
                             proba_y[col] = 0
+                    # We re-order the columns to move possibly added missing columns into place.
                     proba_y = proba_y[task.class_labels]
             else:
                 raise ValueError("The task has no class labels")

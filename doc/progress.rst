@@ -8,6 +8,8 @@ Changelog
 
 0.11.1
 ~~~~~~
+* MAINT #891: Changed the way that numerical features are stored. Numerical features that range from 0 to 255 are now stored as uint8, which reduces the storage space required as well as storing and loading times.
+* MAINT #671: Improved the performance of ``check_datasets_active`` by only querying the given list of datasets in contrast to querying all datasets. Modified the corresponding unit test.
 
 0.11.0
 ~~~~~~
