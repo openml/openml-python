@@ -116,12 +116,17 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.check_datasets_active<a class="headerlink" href="#openml-datasets-check-datasets-active" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="openml.datasets.check_datasets_active">
-<code class="sig-prename descclassname">openml.datasets.</code><code class="sig-name descname">check_datasets_active</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset_ids</span><span class="p">:</span> <span class="n">List<span class="p">[</span>int<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span>int<span class="p">, </span>bool<span class="p">]</span><a class="headerlink" href="#openml.datasets.check_datasets_active" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openml.datasets.</code><code class="sig-name descname">check_datasets_active</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset_ids</span><span class="p">:</span> <span class="n">List<span class="p">[</span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">raise_error_if_not_exist</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span>int<span class="p">, </span>bool<span class="p">]</span><a class="headerlink" href="#openml.datasets.check_datasets_active" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the dataset ids provided are active.</p>
+<p>Raises an error if a dataset_id in the given list
+of dataset_ids does not exist on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>dataset_ids</strong><span class="classifier">List[int]</span></dt><dd><p>A list of integers representing dataset ids.</p>
+</dd>
+<dt><strong>raise_error_if_not_exist</strong><span class="classifier">bool (default=True)</span></dt><dd><p>Flag that if activated can raise an error, if one or more of the
+given dataset ids do not exist on the server.</p>
 </dd>
 </dl>
 </dd>
