@@ -13,7 +13,6 @@ import arff
 import numpy as np
 import pandas as pd
 import scipy.sparse
-from warnings import warn
 
 from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
@@ -103,7 +102,6 @@ class OpenMLDataset(OpenMLBase):
         self,
         name,
         description,
-        format=None,
         data_format="arff",
         cache_format="pickle",
         dataset_id=None,
@@ -178,16 +176,7 @@ class OpenMLDataset(OpenMLBase):
             )
 
         self.cache_format = cache_format
-        if format is None:
-            self.format = data_format
-        else:
-            warn(
-                "The format parameter in the init will be deprecated "
-                "in the future."
-                "Please use data_format instead",
-                DeprecationWarning,
-            )
-            self.format = format
+        self.data_format = data_format
         self.creator = creator
         self.contributor = contributor
         self.collection_date = collection_date
@@ -255,7 +244,7 @@ class OpenMLDataset(OpenMLBase):
         fields = {
             "Name": self.name,
             "Version": self.version,
-            "Format": self.format,
+            "Format": self.data_format,
             "Licence": self.licence,
             "Download URL": self.url,
             "Data file": self.data_file,
@@ -388,7 +377,7 @@ class OpenMLDataset(OpenMLBase):
             List[str]: List of column names.
         """
         try:
-            data = self._get_arff(self.format)
+            data = self._get_arff(self.data_format)
         except OSError as e:
             logger.critical(
                 "Please check that the data file {} is "
@@ -409,7 +398,7 @@ class OpenMLDataset(OpenMLBase):
         for i, (name, type_) in enumerate(data["attributes"]):
             # if the feature is nominal and a sparse matrix is
             # requested, the categories need to be numeric
-            if isinstance(type_, list) and self.format.lower() == "sparse_arff":
+            if isinstance(type_, list) and self.data_format.lower() == "sparse_arff":
                 try:
                     # checks if the strings which should be the class labels
                     # can be encoded into integers
@@ -419,7 +408,7 @@ class OpenMLDataset(OpenMLBase):
                         "Categorical data needs to be numeric when " "using sparse ARFF."
                     )
             # string can only be supported with pandas DataFrame
-            elif type_ == "STRING" and self.format.lower() == "sparse_arff":
+            elif type_ == "STRING" and self.data_format.lower() == "sparse_arff":
                 raise ValueError("Dataset containing strings is not supported " "with sparse ARFF.")
 
             # infer the dtype from the ARFF header
@@ -442,12 +431,12 @@ class OpenMLDataset(OpenMLBase):
                 attribute_dtype[name] = ARFF_DTYPES_TO_PD_DTYPE[type_]
             attribute_names.append(name)
 
-        if self.format.lower() == "sparse_arff":
+        if self.data_format.lower() == "sparse_arff":
             X = data["data"]
             X_shape = (max(X[1]) + 1, max(X[2]) + 1)
             X = scipy.sparse.coo_matrix((X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
             X = X.tocsr()
-        elif self.format.lower() == "arff":
+        elif self.data_format.lower() == "arff":
             X = pd.DataFrame(data["data"], columns=attribute_names)
 
             col = []
@@ -471,7 +460,7 @@ class OpenMLDataset(OpenMLBase):
                     col.append(X[column_name])
             X = pd.concat(col, axis=1)
         else:
-            raise ValueError("Dataset format '{}' is not a valid format.".format(self.format))
+            raise ValueError("Dataset format '{}' is not a valid format.".format(self.data_format))
 
         return X, categorical, attribute_names
 

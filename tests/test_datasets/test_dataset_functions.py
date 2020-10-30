@@ -860,7 +860,7 @@ class TestOpenMLDataset(TestBase):
         decoder = arff.ArffDecoder()
         # check if the arff from the dataset is
         # the same as the arff from _get_arff function
-        d_format = (dataset.format).lower()
+        d_format = (dataset.data_format).lower()
 
         self.assertEqual(
             dataset._get_arff(d_format),
@@ -879,7 +879,7 @@ class TestOpenMLDataset(TestBase):
         dataset = openml.datasets.get_dataset(dataset_id, download_data=False)
 
         self.assertEqual(
-            (dataset.format).lower(),
+            (dataset.data_format).lower(),
             _get_online_dataset_format(dataset_id),
             "The format of the ARFF files is different",
         )
