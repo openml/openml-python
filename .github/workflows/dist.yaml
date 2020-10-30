@@ -17,9 +17,9 @@ jobs:
     - name: twine check
       run: |
         pip install twine
-        last_dist="dist/$(ls -t dist/openml-*.tar.gz | head -n 1)"
+        last_dist=$(ls -t dist/openml-*.tar.gz | head -n 1)
         twine check $last_dist
     - name: install dist
       run: |
-        last_dist="dist/$(ls -t dist/openml-*.tar.gz | head -n 1)"
+        last_dist=$(ls -t dist/openml-*.tar.gz | head -n 1)
         pip install $last_dist
