@@ -1,0 +1,10 @@
+﻿:mod:`openml.setups`.initialize_model
+==================================================
+
+.. currentmodule:: openml.setups
+
+.. autofunction:: initialize_model
+
+.. raw:: html
+
+    <div class="clearer"></div>

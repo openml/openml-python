@@ -1,0 +1,10 @@
+﻿:mod:`openml.tasks`.get_tasks
+==========================================
+
+.. currentmodule:: openml.tasks
+
+.. autofunction:: get_tasks
+
+.. raw:: html
+
+    <div class="clearer"></div>

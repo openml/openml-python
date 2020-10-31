@@ -1,0 +1,10 @@
+﻿:mod:`openml.study`.list_studies
+=============================================
+
+.. currentmodule:: openml.study
+
+.. autofunction:: list_studies
+
+.. raw:: html
+
+    <div class="clearer"></div>

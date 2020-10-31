@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>openml.OpenMLFlow &#8212; OpenML 0.11.1dev documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.11.1dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../index.html">Start</a></li>
+                <li><a href="../usage.html">User Guide</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../examples/index.html">Examples</a></li>
+                <li><a href="../contributing.html">Contributing</a></li>
+                <li><a href="../progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLFlow</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="section" id="openml-openmlflow">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLFlow<a class="headerlink" href="#openml-openmlflow" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="openml.OpenMLFlow">
+<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLFlow</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">components</span></em>, <em class="sig-param"><span class="n">parameters</span></em>, <em class="sig-param"><span class="n">parameters_meta_info</span></em>, <em class="sig-param"><span class="n">external_version</span></em>, <em class="sig-param"><span class="n">tags</span></em>, <em class="sig-param"><span class="n">language</span></em>, <em class="sig-param"><span class="n">dependencies</span></em>, <em class="sig-param"><span class="n">class_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">binary_url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">binary_format</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">binary_md5</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">uploader</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">upload_date</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flow_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">extension</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">version</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLFlow" title="Permalink to this definition">¶</a></dt>
+<dd><p>OpenML Flow. Stores machine learning models.</p>
+<p>Flows should not be generated manually, but by the function
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">openml.flows.create_flow_from_model()</span></code>. Using this helper function
+ensures that all relevant fields are filled in.</p>
+<p>Implements <a class="reference external" href="https://github.com/openml/website/blob/master/openml_OS/">https://github.com/openml/website/blob/master/openml_OS/</a>         views/pages/api_new/v1/xsd/openml.implementation.upload.xsd.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Name of the flow. Is used together with the attribute
+<cite>external_version</cite> as a unique identifier of the flow.</p>
+</dd>
+<dt><strong>description</strong><span class="classifier">str</span></dt><dd><p>Human-readable description of the flow (free text).</p>
+</dd>
+<dt><strong>model</strong><span class="classifier">object</span></dt><dd><p>ML model which is described by this flow.</p>
+</dd>
+<dt><strong>components</strong><span class="classifier">OrderedDict</span></dt><dd><p>Mapping from component identifier to an OpenMLFlow object. Components
+are usually subfunctions of an algorithm (e.g. kernels), base learners
+in ensemble algorithms (decision tree in adaboost) or building blocks
+of a machine learning pipeline. Components are modeled as independent
+flows and can be shared between flows (different pipelines can use
+the same components).</p>
+</dd>
+<dt><strong>parameters</strong><span class="classifier">OrderedDict</span></dt><dd><p>Mapping from parameter name to the parameter default value. The
+parameter default value must be of type <cite>str</cite>, so that the respective
+toolbox plugin can take care of casting the parameter default value to
+the correct type.</p>
+</dd>
+<dt><strong>parameters_meta_info</strong><span class="classifier">OrderedDict</span></dt><dd><p>Mapping from parameter name to <cite>dict</cite>. Stores additional information
+for each parameter. Required keys are <cite>data_type</cite> and <cite>description</cite>.</p>
+</dd>
+<dt><strong>external_version</strong><span class="classifier">str</span></dt><dd><p>Version number of the software the flow is implemented in. Is used
+together with the attribute <cite>name</cite> as a uniquer identifier of the flow.</p>
+</dd>
+<dt><strong>tags</strong><span class="classifier">list</span></dt><dd><p>List of tags. Created on the server by other API calls.</p>
+</dd>
+<dt><strong>language</strong><span class="classifier">str</span></dt><dd><p>Natural language the flow is described in (not the programming
+language).</p>
+</dd>
+<dt><strong>dependencies</strong><span class="classifier">str</span></dt><dd><p>A list of dependencies necessary to run the flow. This field should
+contain all libraries the flow depends on. To allow reproducibility
+it should also specify the exact version numbers.</p>
+</dd>
+<dt><strong>class_name</strong><span class="classifier">str</span></dt><dd><p>The development language name of the class which is described by this
+flow.</p>
+</dd>
+<dt><strong>custom_name</strong><span class="classifier">str</span></dt><dd><p>Custom name of the flow given by the owner.</p>
+</dd>
+<dt><strong>binary_url</strong><span class="classifier">str, optional</span></dt><dd><p>Url from which the binary can be downloaded. Added by the server.
+Ignored when uploaded manually. Will not be used by the python API
+because binaries aren’t compatible across machines.</p>
+</dd>
+<dt><strong>binary_format</strong><span class="classifier">str, optional</span></dt><dd><p>Format in which the binary code was uploaded. Will not be used by the
+python API because binaries aren’t compatible across machines.</p>
+</dd>
+<dt><strong>binary_md5</strong><span class="classifier">str, optional</span></dt><dd><p>MD5 checksum to check if the binary code was correctly downloaded. Will
+not be used by the python API because binaries aren’t compatible across
+machines.</p>
+</dd>
+<dt><strong>uploader</strong><span class="classifier">str, optional</span></dt><dd><p>OpenML user ID of the uploader. Filled in by the server.</p>
+</dd>
+<dt><strong>upload_date</strong><span class="classifier">str, optional</span></dt><dd><p>Date the flow was uploaded. Filled in by the server.</p>
+</dd>
+<dt><strong>flow_id</strong><span class="classifier">int, optional</span></dt><dd><p>Flow ID. Assigned by the server.</p>
+</dd>
+<dt><strong>version</strong><span class="classifier">str, optional</span></dt><dd><p>OpenML version of the flow. Assigned by the server.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

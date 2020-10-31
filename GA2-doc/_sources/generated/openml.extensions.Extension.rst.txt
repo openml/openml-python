@@ -1,0 +1,6 @@
+﻿:mod:`openml.extensions`.Extension
+=========================================
+
+.. currentmodule:: openml.extensions
+
+.. autoclass:: Extension

@@ -1,0 +1,10 @@
+﻿:mod:`openml.extensions`.get_extension_by_model
+============================================================
+
+.. currentmodule:: openml.extensions
+
+.. autofunction:: get_extension_by_model
+
+.. raw:: html
+
+    <div class="clearer"></div>

@@ -1,0 +1,10 @@
+﻿:mod:`openml.runs`.initialize_model_from_trace
+===========================================================
+
+.. currentmodule:: openml.runs
+
+.. autofunction:: initialize_model_from_trace
+
+.. raw:: html
+
+    <div class="clearer"></div>

@@ -1,0 +1,10 @@
+﻿:mod:`openml.study`.update_study_status
+====================================================
+
+.. currentmodule:: openml.study
+
+.. autofunction:: update_study_status
+
+.. raw:: html
+
+    <div class="clearer"></div>

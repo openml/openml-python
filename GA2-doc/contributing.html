@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contributing &#8212; OpenML 0.11.1dev documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.11.1dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="index.html">Start</a></li>
+                <li><a href="usage.html">User Guide</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="examples/index.html">Examples</a></li>
+                <li><a href="#">Contributing</a></li>
+                <li><a href="progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">Contributing</a><ul>
+<li><a class="reference internal" href="#connecting-new-machine-learning-libraries">Connecting new machine learning libraries</a><ul>
+<li><a class="reference internal" href="#content-of-the-library">Content of the Library</a><ul>
+<li><a class="reference internal" href="#api">API</a></li>
+<li><a class="reference internal" href="#interfacing-with-openml-python">Interfacing with OpenML-Python</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hosting-the-library">Hosting the library</a></li>
+<li><a class="reference internal" href="#recommended">Recommended</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="section" id="contributing">
+<span id="id1"></span><h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
+<p>Contribution to the OpenML package is highly appreciated in all forms.
+In particular, a few ways to contribute to openml-python are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A direct contribution to the package, by means of improving the
+code, documentation or examples. To get started, see <a class="reference external" href="https://github.com/openml/openml-python/blob/master/CONTRIBUTING.md">this file</a>
+with details on how to set up your environment to develop for openml-python.</p></li>
+<li><p>A contribution to an openml-python extension. An extension package allows OpenML to interface
+with a machine learning package (such as scikit-learn or keras). These extensions
+are hosted in separate repositories and may have their own guidelines.
+For more information, see the <a class="reference internal" href="#extensions"><span class="std std-ref">Connecting new machine learning libraries</span></a> below.</p></li>
+<li><p>Bug reports. If something doesn’t work for you or is cumbersome, please open a new issue to let
+us know about the problem. See <a class="reference external" href="https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md#reporting-bugs">this section</a>.</p></li>
+<li><p><a class="reference external" href="https://www.openml.org/cite">Cite OpenML</a> if you use it in a scientific publication.</p></li>
+<li><p>Visit one of our <a class="reference external" href="https://meet.openml.org/">hackathons</a>.</p></li>
+<li><p>Contribute to another OpenML project, such as <a class="reference external" href="https://github.com/openml/OpenML/blob/master/CONTRIBUTING.md">the main OpenML project</a>.</p></li>
+</ul>
+</div></blockquote>
+<div class="section" id="connecting-new-machine-learning-libraries">
+<span id="extensions"></span><h2>Connecting new machine learning libraries<a class="headerlink" href="#connecting-new-machine-learning-libraries" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="content-of-the-library">
+<h3>Content of the Library<a class="headerlink" href="#content-of-the-library" title="Permalink to this headline">¶</a></h3>
+<p>To leverage support from the community and to tap in the potential of OpenML, interfacing
+with popular machine learning libraries is essential. However, the OpenML-Python team does
+not have the capacity to develop and maintain such interfaces on its own. For this, we
+have built an extension interface to allows others to contribute back. Building a suitable
+extension for therefore requires an understanding of the current OpenML-Python support.</p>
+<p><a class="reference external" href="examples/20_basic/simple_flows_and_runs_tutorial.html">This example</a>
+shows how scikit-learn currently works with OpenML-Python as an extension. The <em>sklearn</em>
+extension packaged with the <a class="reference external" href="https://github.com/openml/openml-python">openml-python</a>
+repository can be used as a template/benchmark to build the new extension.</p>
+<div class="section" id="api">
+<h4>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p>The extension scripts must import the <cite>openml</cite> package and be able to interface with
+any function from the OpenML-Python <a class="reference external" href="api.html">API</a>.</p></li>
+<li><p>The extension has to be defined as a Python class and must inherit from
+<a class="reference internal" href="generated/openml.extensions.Extension.html#openml.extensions.Extension" title="openml.extensions.Extension"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.extensions.Extension</span></code></a>.</p></li>
+<li><p>This class needs to have all the functions from <cite>class Extension</cite> overloaded as required.</p></li>
+<li><p>The redefined functions should have adequate and appropriate docstrings. The
+<cite>Sklearn Extension API :class:`openml.extensions.sklearn.SklearnExtension.html</cite>
+is a good benchmark to follow.</p></li>
+</ul>
+</div>
+<div class="section" id="interfacing-with-openml-python">
+<h4>Interfacing with OpenML-Python<a class="headerlink" href="#interfacing-with-openml-python" title="Permalink to this headline">¶</a></h4>
+<p>Once the new extension class has been defined, the openml-python module to
+<a class="reference internal" href="generated/openml.extensions.register_extension.html#openml.extensions.register_extension" title="openml.extensions.register_extension"><code class="xref py py-meth docutils literal notranslate"><span class="pre">openml.extensions.register_extension()</span></code></a> must be called to allow OpenML-Python to
+interface the new extension.</p>
+</div>
+</div>
+<div class="section" id="hosting-the-library">
+<h3>Hosting the library<a class="headerlink" href="#hosting-the-library" title="Permalink to this headline">¶</a></h3>
+<p>Each extension created should be a stand-alone repository, compatible with the
+<a class="reference external" href="https://github.com/openml/openml-python">OpenML-Python repository</a>.
+The extension repository should work off-the-shelf with <em>OpenML-Python</em> installed.</p>
+<p>Create a <a class="reference external" href="https://help.github.com/en/articles/create-a-repo">public Github repo</a> with
+the following directory structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="p">[</span><span class="n">repo</span> <span class="n">name</span><span class="p">]</span>
+<span class="o">|</span>    <span class="o">|--</span> <span class="p">[</span><span class="n">extension</span> <span class="n">name</span><span class="p">]</span>
+<span class="o">|</span>    <span class="o">|</span>    <span class="o">|--</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span>
+<span class="o">|</span>    <span class="o">|</span>    <span class="o">|--</span> <span class="n">extension</span><span class="o">.</span><span class="n">py</span>
+<span class="o">|</span>    <span class="o">|</span>    <span class="o">|--</span> <span class="n">config</span><span class="o">.</span><span class="n">py</span> <span class="p">(</span><span class="n">optionally</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="recommended">
+<h3>Recommended<a class="headerlink" href="#recommended" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Test cases to keep the extension up to date with the <cite>openml-python</cite> upstream changes.</p></li>
+<li><p>Documentation of the extension API, especially if any new functionality added to OpenML-Python’s
+extension design.</p></li>
+<li><p>Examples to show how the new extension interfaces and works with OpenML-Python.</p></li>
+<li><p>Create a PR to add the new extension to the OpenML-Python API documentation.</p></li>
+</ul>
+<p>Happy contributing!</p>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

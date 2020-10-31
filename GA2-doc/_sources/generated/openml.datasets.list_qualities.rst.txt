@@ -1,0 +1,10 @@
+﻿:mod:`openml.datasets`.list_qualities
+==================================================
+
+.. currentmodule:: openml.datasets
+
+.. autofunction:: list_qualities
+
+.. raw:: html
+
+    <div class="clearer"></div>

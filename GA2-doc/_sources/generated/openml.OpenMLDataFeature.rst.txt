@@ -1,0 +1,6 @@
+﻿:mod:`openml`.OpenMLDataFeature
+======================================
+
+.. currentmodule:: openml
+
+.. autoclass:: OpenMLDataFeature

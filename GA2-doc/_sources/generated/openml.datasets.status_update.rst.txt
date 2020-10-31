@@ -1,0 +1,10 @@
+﻿:mod:`openml.datasets`.status_update
+=================================================
+
+.. currentmodule:: openml.datasets
+
+.. autofunction:: status_update
+
+.. raw:: html
+
+    <div class="clearer"></div>

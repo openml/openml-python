@@ -1,0 +1,10 @@
+﻿:mod:`openml.study`.delete_study
+=============================================
+
+.. currentmodule:: openml.study
+
+.. autofunction:: delete_study
+
+.. raw:: html
+
+    <div class="clearer"></div>

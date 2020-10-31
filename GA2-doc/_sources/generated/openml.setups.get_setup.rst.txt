@@ -1,0 +1,10 @@
+﻿:mod:`openml.setups`.get_setup
+===========================================
+
+.. currentmodule:: openml.setups
+
+.. autofunction:: get_setup
+
+.. raw:: html
+
+    <div class="clearer"></div>
