@@ -11,15 +11,15 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
-    - name: build dist
+    - name: Build dist
       run: |
         python setup.py sdist
-    - name: twine check
+    - name: Twine check
       run: |
         pip install twine
         last_dist=$(ls -t dist/openml-*.tar.gz | head -n 1)
         twine check $last_dist
-    - name: install dist
+    - name: Install dist
       run: |
         last_dist=$(ls -t dist/openml-*.tar.gz | head -n 1)
         pip install $last_dist

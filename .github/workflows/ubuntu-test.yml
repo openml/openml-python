@@ -1,9 +1,9 @@
-name: ubuntu
+name: Tests
 
 on: [push, pull_request]
 
 jobs:
-  unittest:
+  ubuntu:
 
     runs-on: ubuntu-latest
     strategy:
@@ -29,23 +29,26 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: CI Python ${{ matrix.python-version }} scikit-learn ${{ matrix.scikit-learn }}
+    - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies (.[test])
+    - name: Install test dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -e .[test]
     - name: Install scikit-learn ${{ matrix.scikit-learn }}
       run: |
         pip install scikit-learn==${{ matrix.scikit-learn }}
-        if [ ${{ matrix.scipy }} ]; then pip install scipy==${{ matrix.scipy }}; fi
-    - name: Run Tests
+    - name: Install scipy ${{ matrix.scipy }}
+      if: ${{ matrix.scipy }}
+      run: |
+        pip install scipy==${{ matrix.scipy }}
+    - name: Run tests
       run: |
         if [ ${{ matrix.code-cov }} ]; then codecov='--cov=openml --long  --cov-report=xml'; fi
         pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread -sv $codecov
-    - name: Upload Coverage
+    - name: Upload coverage
       if: ${{ matrix.code-cov }} && ${{ always() }}
       uses: codecov/codecov-action@v1
       with:
