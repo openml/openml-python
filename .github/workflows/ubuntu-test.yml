@@ -10,7 +10,7 @@ jobs:
       matrix:
         python-version: [3.6, 3.7, 3.8]
         scikit-learn: [0.21.2, 0.22.2, 0.23.1]
-        exclude:
+        exclude:  # no scikit-learn 0.21.2 release for Python 3.8
           - python-version: 3.8
             scikit-learn: 0.21.2
         include:
@@ -44,10 +44,25 @@ jobs:
       if: ${{ matrix.scipy }}
       run: |
         pip install scipy==${{ matrix.scipy }}
+    - name: Store repository status
+      id: status-before
+      run: |
+        echo "::set-output name=BEFORE::$(git status --porcelain -b)"
     - name: Run tests
       run: |
         if [ ${{ matrix.code-cov }} ]; then codecov='--cov=openml --long  --cov-report=xml'; fi
         pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread -sv $codecov
+    - name: Check for files left behind by test
+      if: ${{ always() }}
+      run: |
+        before="${{ steps.status-before.outputs.BEFORE }}"
+        after="$(git status --porcelain -b)"
+        if [[ "$before" != "$after" ]]; then
+            echo "git status from before: $before"
+            echo "git status from after: $after"
+            echo "Not all generated files have been deleted!"
+            exit 1
+        fi
     - name: Upload coverage
       if: ${{ matrix.code-cov }} && ${{ always() }}
       uses: codecov/codecov-action@v1
