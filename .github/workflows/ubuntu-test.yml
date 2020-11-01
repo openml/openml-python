@@ -10,6 +10,7 @@ jobs:
       matrix:
         python-version: [3.6, 3.7, 3.8]
         scikit-learn: [0.21.2, 0.22.2, 0.23.1]
+        code-cov: [false]
         exclude:  # no scikit-learn 0.21.2 release for Python 3.8
           - python-version: 3.8
             scikit-learn: 0.21.2
