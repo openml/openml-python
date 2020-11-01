@@ -10,7 +10,6 @@ jobs:
       matrix:
         python-version: [3.6, 3.7, 3.8]
         scikit-learn: [0.21.2, 0.22.2, 0.23.1]
-        code-cov: [false]
         exclude:  # no scikit-learn 0.21.2 release for Python 3.8
           - python-version: 3.8
             scikit-learn: 0.21.2
@@ -65,7 +64,7 @@ jobs:
             exit 1
         fi
     - name: Upload coverage
-      if: ${{ matrix.code-cov }} && ${{ always() }}
+      if: matrix.code-cov && always()
       uses: codecov/codecov-action@v1
       with:
         fail_ci_if_error: true
