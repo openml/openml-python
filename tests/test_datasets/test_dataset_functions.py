@@ -1352,7 +1352,7 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(len(categorical), X.shape[1])
         self.assertEqual(len(attribute_names), X.shape[1])
 
-    def test_data_edit(self):
+    def test_data_edit_non_critical_field(self):
         # Case 1
         # All users can edit non-critical fields of datasets
         desc = (
@@ -1373,6 +1373,7 @@ class TestOpenMLDataset(TestBase):
         edited_dataset = openml.datasets.get_dataset(did)
         self.assertEqual(edited_dataset.description, desc)
 
+    def test_data_edit_critical_field(self):
         # Case 2
         # only owners (or admin) can edit all critical fields of datasets
         # for this, we need to first clone a dataset to do changes

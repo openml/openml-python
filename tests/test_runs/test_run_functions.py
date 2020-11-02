@@ -518,14 +518,12 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
-    @unittest.mock.patch("warnings.warn")
-    def test_run_and_upload_logistic_regression(self, warn_mock):
-        lr = LogisticRegression(solver="lbfgs")
+    def test_run_and_upload_logistic_regression(self):
+        lr = LogisticRegression(solver="lbfgs", max_iter=1000)
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
         self._run_and_upload_classification(lr, task_id, n_missing_vals, n_test_obs, "62501")
-        self.assertLessEqual(warn_mock.call_count, 3)
 
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
@@ -638,6 +636,11 @@ class TestRun(TestBase):
         n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
         n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
         self._run_and_upload_classification(pipeline2, task_id, n_missing_vals, n_test_obs, "62501")
+        # The warning raised is:
+        # The total space of parameters 8 is smaller than n_iter=10.
+        # Running 8 iterations. For exhaustive searches, use GridSearchCV.'
+        # It is raised three times because we once run the model to upload something and then run
+        # it again twice to compare that the predictions are reproducible.
         self.assertEqual(warnings_mock.call_count, 3)
 
     def test_run_and_upload_gridsearch(self):
