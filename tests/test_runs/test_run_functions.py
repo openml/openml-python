@@ -525,7 +525,7 @@ class TestRun(TestBase):
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
         self._run_and_upload_classification(lr, task_id, n_missing_vals, n_test_obs, "62501")
-        self.assertEqual(warn_mock.call_count, 3)
+        self.assertLessEqual(warn_mock.call_count, 3)
 
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
