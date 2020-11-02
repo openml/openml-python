@@ -1537,6 +1537,28 @@ class SklearnExtension(Extension):
         model.set_params(**random_states)
         return model
 
+    def check_if_model_fitted(self, model: Any) -> bool:
+        """Returns True/False denoting if the model has already been fitted/trained
+
+        Parameters
+        ----------
+        model : Any
+
+        Returns
+        -------
+        bool
+        """
+        try:
+            # check if model is fitted
+            from sklearn.exceptions import NotFittedError
+            from sklearn.utils.validation import check_is_fitted
+
+            check_is_fitted(model)  # raises a NotFittedError if the model has not been trained
+            return True
+        except NotFittedError:
+            # model is not fitted, as is required
+            return False
+
     def _run_model_on_fold(
         self,
         model: Any,
@@ -1640,22 +1662,6 @@ class SklearnExtension(Extension):
                 raise TypeError("argument y_train must not be of type None")
             if X_test is None:
                 raise TypeError("argument X_test must not be of type None")
-
-        try:
-            # check if model is fitted
-            # 'predict' internally calls sklearn.utils.validation.check_is_fitted for every
-            # model-specific attribute it excepts, thus offering a more robust check than
-            # a generic simplified call of check_is_fitted(model_copy)
-            from sklearn.exceptions import NotFittedError
-
-            model.predict(X_train)
-            warnings.warn(
-                "The model is already fitted!"
-                " This might cause inconsistency in comparison of results."
-            )
-        except NotFittedError:
-            # model is not fitted, as is required
-            pass
 
         model_copy = sklearn.base.clone(model, safe=True)
         # sanity check: prohibit users from optimizing n_jobs
