@@ -53,7 +53,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="http://pgijsbers.github.io"><img src="https://avatars2.githubusercontent.com/u/15890747?v=4" width="100px;" alt=""/><br /><sub><b>pgijsbers</b></sub></a><br /><a href="https://github.com/openml/openml-python/commits?author=pgijsbers" title="Tests">⚠️</a></td>
+    <td align="center"><a href="http://pgijsbers.github.io"><img src="https://avatars2.githubusercontent.com/u/15890747?v=4" width="100px;" alt=""/><br /><sub><b>pgijsbers</b></sub></a><br /><a href="https://github.com/openml/openml-python/commits?author=pgijsbers" title="Tests">⚠️</a> <a href="https://github.com/openml/openml-python/commits?author=pgijsbers" title="Code">💻</a></td>
   </tr>
 </table>
 
