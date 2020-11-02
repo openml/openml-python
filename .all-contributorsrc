@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "ArlindKadra",
+      "name": "Arlind Kadra",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/24679211?v=4",
+      "profile": "https://github.com/ArlindKadra",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "openml-python",
+  "projectOwner": "openml",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
