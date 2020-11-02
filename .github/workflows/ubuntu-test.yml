@@ -51,7 +51,7 @@ jobs:
     - name: Run tests
       run: |
         if [ ${{ matrix.code-cov }} ]; then codecov='--cov=openml --long  --cov-report=xml'; fi
-        pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread -sv $codecov
+        pytest -n 4 --random-order-bucket=global --durations=20 --timeout=600 --timeout-method=thread -sv $codecov
     - name: Check for files left behind by test
       if: ${{ always() }}
       run: |
