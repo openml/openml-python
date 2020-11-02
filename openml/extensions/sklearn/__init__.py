@@ -12,8 +12,8 @@ register_extension(SklearnExtension)
 def cont(X):
     """Returns True for all non-categorical columns, False for the rest.
 
-    This function is required to work with default OpenML datasets as DataFrames allowing
-    mixed data types. To build sklearn models on mixed data types, a ColumnTransformer is
+    This is a helper function for OpenML datasets encoded as DataFrames simplifying the handling
+    of mixed data types. To build sklearn models on mixed data types, a ColumnTransformer is
     required to process each type of columns separately.
     This function allows transformations meant for continuous/numeric columns to access the
     continuous/numeric columns given the dataset as DataFrame.
@@ -26,8 +26,8 @@ def cont(X):
 def cat(X):
     """Returns True for all categorical columns, False for the rest.
 
-    This function is required to work with default OpenML datasets as DataFrames allowing
-    mixed data types. To build sklearn models on mixed data types, a ColumnTransformer is
+    This is a helper function for OpenML datasets encoded as DataFrames simplifying the handling
+    of mixed data types. To build sklearn models on mixed data types, a ColumnTransformer is
     required to process each type of columns separately.
     This function allows transformations meant for categorical columns to access the
     categorical columns given the dataset as DataFrame.

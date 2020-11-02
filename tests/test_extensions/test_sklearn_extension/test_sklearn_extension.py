@@ -2236,7 +2236,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             new_run = openml.runs.get_run(run.run_id)
             return new_run.setup_id
 
-        setup1 = column_transformer_pipe(23)
-        setup2 = column_transformer_pipe(230)
+        setup1 = column_transformer_pipe(11)  # only categorical
+        setup2 = column_transformer_pipe(23)  # only numeric
 
         self.assertEqual(setup1, setup2)
