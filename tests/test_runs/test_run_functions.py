@@ -518,14 +518,14 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
-    def test_run_and_upload_logistic_regression(self):
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore")
-            lr = LogisticRegression(solver="lbfgs")
-            task_id = self.TEST_SERVER_TASK_SIMPLE[0]
-            n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
-            n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-            self._run_and_upload_classification(lr, task_id, n_missing_vals, n_test_obs, "62501")
+    @unittest.mock.patch("warnings.warn")
+    def test_run_and_upload_logistic_regression(self, warn_mock):
+        lr = LogisticRegression(solver="lbfgs")
+        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
+        self._run_and_upload_classification(lr, task_id, n_missing_vals, n_test_obs, "62501")
+        self.assertEqual(warn_mock.call_count, 3)
 
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
