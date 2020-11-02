@@ -1644,7 +1644,7 @@ class SklearnExtension(Extension):
         try:
             # check if model is fitted
             # 'predict' internally calls sklearn.utils.validation.check_is_fitted for every
-            # model-specific attribute it excepts, thus offering a more robust check than
+            # model-specific attribute it expects, thus offering a more robust check than
             # a generic simplified call of check_is_fitted(model_copy)
             from sklearn.exceptions import NotFittedError
 
