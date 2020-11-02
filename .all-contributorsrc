@@ -14,6 +14,17 @@
         "doc",
         "example"
       ]
+    },
+    {
+      "login": "Neeratyoy",
+      "name": "Neeratyoy Mallik",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/3191233?v=4",
+      "profile": "https://github.com/Neeratyoy",
+      "contributions": [
+        "code",
+        "doc",
+        "example"
+      ]
     }
   ],
   "contributorsPerLine": 7,
