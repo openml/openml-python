@@ -62,7 +62,7 @@ analysis.
 
  .. code-block:: none
 
-    420453
+    511579
 
 
 
@@ -94,7 +94,7 @@ To simplify the usage we have created a helper function which automates all thes
 
  .. code-block:: none
 
-    420453
+    511579
 
 
 
@@ -125,7 +125,7 @@ algorithm or implementation introduces, renames or drop hyperparameters over tim
 
  .. code-block:: none
 
-    sklearn.tree._classes.DecisionTreeClassifier openml==0.11.1dev,sklearn==0.23.1
+    sklearn.tree._classes.DecisionTreeClassifier openml==0.11.1dev,sklearn==0.23.2
 
 
 
@@ -150,7 +150,7 @@ model. We can then use them to retrieve the flow id as follows:
 
  .. code-block:: none
 
-    420453
+    511579
 
 
 
@@ -173,7 +173,7 @@ We can also retrieve all flows for a given name:
 
  .. code-block:: none
 
-    [41010, 73428, 153938, 166338, 187487, 231321, 232488, 249196, 332802, 335887, 358739, 406901, 407072, 415481, 420453, 420672, 440943, 511579]
+    [41010, 73428, 153938, 166338, 187487, 231321, 232488, 332802, 335887, 358739, 407072, 415481, 420453, 420672, 440943, 511579]
 
 
 
@@ -198,7 +198,7 @@ This also works with the actual model (generalizing the first part of this examp
 
  .. code-block:: none
 
-    [41010, 73428, 153938, 166338, 187487, 231321, 232488, 249196, 332802, 335887, 358739, 406901, 407072, 415481, 420453, 420672, 440943, 511579]
+    [41010, 73428, 153938, 166338, 187487, 231321, 232488, 332802, 335887, 358739, 407072, 415481, 420453, 420672, 440943, 511579]
 
 
 
@@ -206,7 +206,7 @@ This also works with the actual model (generalizing the first part of this examp
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  28.370 seconds)
+   **Total running time of the script:** ( 1 minutes  20.470 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flow_id_tutorial.py:

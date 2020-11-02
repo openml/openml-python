@@ -96,11 +96,11 @@ Running a model on a task
     Task ID......: 119
     Task Type....: None
     Task URL.....: https://test.openml.org/t/119
-    Flow ID......: 420515
+    Flow ID......: 424314
     Flow Name....: sklearn.ensemble._forest.RandomForestClassifier
-    Flow URL.....: https://test.openml.org/f/420515
+    Flow URL.....: https://test.openml.org/f/424314
     Setup ID.....: None
-    Setup String.: Python_3.6.12. Sklearn_0.23.1. NumPy_1.19.3. SciPy_1.5.3. RandomForestClassifier(random_state=8357)
+    Setup String.: Python_3.8.6. Sklearn_0.23.2. NumPy_1.19.3. SciPy_1.5.3. RandomForestClassifier(random_state=34018)
     Dataset ID...: 20
     Dataset URL..: https://test.openml.org/d/20
 
@@ -128,8 +128,8 @@ Publishing the run
 
  .. code-block:: none
 
-    Run was uploaded to http://test.openml.org/r/184449
-    The flow can be found at http://test.openml.org/f/420515
+    Run was uploaded to http://test.openml.org/r/185536
+    The flow can be found at http://test.openml.org/f/424314
 
 
 
@@ -148,7 +148,7 @@ Publishing the run
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.380 seconds)
+   **Total running time of the script:** ( 0 minutes  6.778 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_flows_and_runs_tutorial.py:
