@@ -1,6 +1,6 @@
 # OpenML-Python
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 A python interface for [OpenML](http://openml.org), an online platform for open science collaboration in machine learning.
@@ -54,6 +54,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://github.com/a-moadel"><img src="https://avatars0.githubusercontent.com/u/46557866?v=4" width="100px;" alt=""/><br /><sub><b>a-moadel</b></sub></a><br /><a href="https://github.com/openml/openml-python/commits?author=a-moadel" title="Documentation">📖</a> <a href="#example-a-moadel" title="Examples">💡</a></td>
+    <td align="center"><a href="https://github.com/Neeratyoy"><img src="https://avatars2.githubusercontent.com/u/3191233?v=4" width="100px;" alt=""/><br /><sub><b>Neeratyoy Mallik</b></sub></a><br /><a href="https://github.com/openml/openml-python/commits?author=Neeratyoy" title="Code">💻</a></td>
   </tr>
 </table>
 
