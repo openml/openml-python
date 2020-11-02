@@ -8,7 +8,8 @@ Changelog
 
 0.11.1
 ~~~~~~
-
+* FIX #964 : Add attribute validation for create_dataset parameters.
+* DOC #973 : Update first page examples.
 0.11.0
 ~~~~~~
 * ADD #753: Allows uploading custom flows to OpenML via OpenML-Python.
