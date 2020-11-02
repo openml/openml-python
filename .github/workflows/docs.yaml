@@ -12,8 +12,7 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
-        pip install -e .[examples,examples_unix]
-        pip install sphinx-gallery sphinx_bootstrap_theme numpydoc
+        pip install -e .[docs,examples,examples_unix]
     - name: Make docs
       run: |
         cd doc
