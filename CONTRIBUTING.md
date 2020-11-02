@@ -260,14 +260,9 @@ The resulting HTML files will be placed in ``build/html/`` and are viewable in
 a web browser. See the ``README`` file in the ``doc/`` directory for more
 information.
 
-For building the documentation, you will need
-[sphinx](http://sphinx.pocoo.org/),
-[sphinx-bootstrap-theme](https://ryan-roemer.github.io/sphinx-bootstrap-theme/),
-[sphinx-gallery](https://sphinx-gallery.github.io/)
-and
-[numpydoc](https://numpydoc.readthedocs.io/en/latest/).
+For building the documentation, you will need to install a few additional dependencies:
 ```bash
-$ pip install sphinx sphinx-bootstrap-theme sphinx-gallery numpydoc
+$ pip install -e .[docs]
 ```
 When dependencies are installed, run
 ```bash
