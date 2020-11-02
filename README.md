@@ -53,7 +53,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/a-moadel"><img src="https://avatars0.githubusercontent.com/u/46557866?v=4" width="100px;" alt=""/><br /><sub><b>a-moadel</b></sub></a><br /><a href="https://github.com/openml/openml-python/commits?author=a-moadel" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/a-moadel"><img src="https://avatars0.githubusercontent.com/u/46557866?v=4" width="100px;" alt=""/><br /><sub><b>a-moadel</b></sub></a><br /><a href="https://github.com/openml/openml-python/commits?author=a-moadel" title="Documentation">📖</a> <a href="#example-a-moadel" title="Examples">💡</a></td>
   </tr>
 </table>
 
