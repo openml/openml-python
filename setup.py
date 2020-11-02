@@ -68,7 +68,6 @@ setuptools.setup(
             "pyarrow",
             "pre-commit",
             "pytest-cov",
-            "pytest-random-order",
             "mypy",
         ],
         "examples": [
