@@ -183,7 +183,7 @@ def list_datasets(
     status: Optional[str] = None,
     tag: Optional[str] = None,
     output_format: str = "dict",
-    **kwargs
+    **kwargs,
 ) -> Union[Dict, pd.DataFrame]:
 
     """
@@ -251,7 +251,7 @@ def list_datasets(
         size=size,
         status=status,
         tag=tag,
-        **kwargs
+        **kwargs,
     )
 
 
@@ -333,27 +333,59 @@ def _load_features_from_file(features_file: str) -> Dict:
         return xml_dict["oml:data_features"]
 
 
-def check_datasets_active(dataset_ids: List[int]) -> Dict[int, bool]:
+def _expand_parameter(parameter: Union[str, List[str]]) -> List[str]:
+    expanded_parameter = []
+    if isinstance(parameter, str):
+        expanded_parameter = [x.strip() for x in parameter.split(",")]
+    elif isinstance(parameter, list):
+        expanded_parameter = parameter
+    return expanded_parameter
+
+
+def _validated_data_attributes(
+    attributes: List[str], data_attributes: List[str], parameter_name: str
+) -> None:
+    for attribute_ in attributes:
+        is_attribute_a_data_attribute = any([attr[0] == attribute_ for attr in data_attributes])
+        if not is_attribute_a_data_attribute:
+            raise ValueError(
+                "all attribute of '{}' should be one of the data attribute. "
+                " Got '{}' while candidates are {}.".format(
+                    parameter_name, attribute_, [attr[0] for attr in data_attributes]
+                )
+            )
+
+
+def check_datasets_active(
+    dataset_ids: List[int], raise_error_if_not_exist: bool = True,
+) -> Dict[int, bool]:
     """
     Check if the dataset ids provided are active.
+
+    Raises an error if a dataset_id in the given list
+    of dataset_ids does not exist on the server.
 
     Parameters
     ----------
     dataset_ids : List[int]
         A list of integers representing dataset ids.
+    raise_error_if_not_exist : bool (default=True)
+        Flag that if activated can raise an error, if one or more of the
+        given dataset ids do not exist on the server.
 
     Returns
     -------
     dict
         A dictionary with items {did: bool}
     """
-    dataset_list = list_datasets(status="all")
+    dataset_list = list_datasets(status="all", data_id=dataset_ids)
     active = {}
 
     for did in dataset_ids:
         dataset = dataset_list.get(did, None)
         if dataset is None:
-            raise ValueError("Could not find dataset {} in OpenML dataset list.".format(did))
+            if raise_error_if_not_exist:
+                raise ValueError(f"Could not find dataset {did} in OpenML dataset list.")
         else:
             active[did] = dataset["status"] == "active"
 
@@ -636,6 +668,7 @@ def create_dataset(
     ignore_attribute : str | list
         Attributes that should be excluded in modelling,
         such as identifiers and indexes.
+        Can have multiple values, comma separated.
     citation : str
         Reference(s) that should be cited when building on this data.
     version_label : str, optional
@@ -687,6 +720,11 @@ def create_dataset(
                     attributes_[attr_idx] = (attr_name, attributes[attr_name])
     else:
         attributes_ = attributes
+    ignore_attributes = _expand_parameter(ignore_attribute)
+    _validated_data_attributes(ignore_attributes, attributes_, "ignore_attribute")
+
+    default_target_attributes = _expand_parameter(default_target_attribute)
+    _validated_data_attributes(default_target_attributes, attributes_, "default_target_attribute")
 
     if row_id_attribute is not None:
         is_row_id_an_attribute = any([attr[0] == row_id_attribute for attr in attributes_])

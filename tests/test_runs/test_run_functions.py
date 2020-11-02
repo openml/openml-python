@@ -10,7 +10,6 @@ import sys
 import unittest.mock
 
 import numpy as np
-import pytest
 
 import openml
 import openml.exceptions
@@ -335,7 +334,7 @@ class TestRun(TestBase):
                         for sample in range(num_sample_entrees):
                             evaluation = sample_evaluations[measure][rep][fold][sample]
                             self.assertIsInstance(evaluation, float)
-                            if not os.environ.get("CI_WINDOWS"):
+                            if not (os.environ.get("CI_WINDOWS") or os.name == "nt"):
                                 # Either Appveyor is much faster than Travis
                                 # and/or measurements are not as accurate.
                                 # Either way, windows seems to get an eval-time
@@ -682,6 +681,8 @@ class TestRun(TestBase):
             flow_expected_rsv="12172",
         )
         self.assertEqual(len(run.trace.trace_iterations), 5)
+        trace = openml.runs.get_run_trace(run.run_id)
+        self.assertEqual(len(trace.trace_iterations), 5)
 
     def test_run_and_upload_maskedarrays(self):
         # This testcase is important for 2 reasons:
@@ -828,31 +829,12 @@ class TestRun(TestBase):
                 self.assertGreaterEqual(alt_scores[idx], 0)
                 self.assertLessEqual(alt_scores[idx], 1)
 
-    @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
-        reason="SimpleImputer doesn't handle mixed type DataFrame as input",
-    )
     def test_local_run_swapped_parameter_order_model(self):
+        clf = DecisionTreeClassifier()
+        australian_task = 595
+        task = openml.tasks.get_task(australian_task)
 
-        # construct sci-kit learn classifier
-        clf = Pipeline(
-            steps=[
-                (
-                    "imputer",
-                    make_pipeline(
-                        SimpleImputer(strategy="most_frequent"),
-                        OneHotEncoder(handle_unknown="ignore"),
-                    ),
-                ),
-                # random forest doesn't take categoricals
-                ("estimator", RandomForestClassifier()),
-            ]
-        )
-
-        # download task
-        task = openml.tasks.get_task(7)
-
-        # invoke OpenML run
+        # task and clf are purposely in the old order
         run = openml.runs.run_model_on_task(
             task, clf, avoid_duplicate_runs=False, upload_flow=False,
         )
@@ -949,55 +931,6 @@ class TestRun(TestBase):
 
         self.assertEqual(flowS.components["Imputer"].parameters["strategy"], '"most_frequent"')
         self.assertEqual(flowS.components["VarianceThreshold"].parameters["threshold"], "0.05")
-
-    @pytest.mark.flaky()
-    def test_get_run_trace(self):
-        # get_run_trace is already tested implicitly in test_run_and_publish
-        # this test is a bit additional.
-        num_iterations = 10
-        num_folds = 1
-        task_id = 119
-
-        task = openml.tasks.get_task(task_id)
-
-        # IMPORTANT! Do not sentinel this flow. is faster if we don't wait
-        # on openml server
-        clf = RandomizedSearchCV(
-            RandomForestClassifier(random_state=42, n_estimators=5),
-            {
-                "max_depth": [3, None],
-                "max_features": [1, 2, 3, 4],
-                "bootstrap": [True, False],
-                "criterion": ["gini", "entropy"],
-            },
-            num_iterations,
-            random_state=42,
-            cv=3,
-        )
-
-        # [SPEED] make unit test faster by exploiting run information
-        # from the past
-        try:
-            # in case the run did not exists yet
-            run = openml.runs.run_model_on_task(model=clf, task=task, avoid_duplicate_runs=True,)
-
-            self.assertEqual(
-                len(run.trace.trace_iterations), num_iterations * num_folds,
-            )
-            run = run.publish()
-            TestBase._mark_entity_for_removal("run", run.run_id)
-            TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
-            self._wait_for_processed_run(run.run_id, 400)
-            run_id = run.run_id
-        except openml.exceptions.OpenMLRunsExistError as e:
-            # The only error we expect, should fail otherwise.
-            run_ids = [int(run_id) for run_id in e.run_ids]
-            self.assertGreater(len(run_ids), 0)
-            run_id = random.choice(list(run_ids))
-
-        # now the actual unit test ...
-        run_trace = openml.runs.get_run_trace(run_id)
-        self.assertEqual(len(run_trace.trace_iterations), num_iterations * num_folds)
 
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
