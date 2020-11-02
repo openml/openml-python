@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "pgijsbers",
+      "name": "pgijsbers",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/15890747?v=4",
+      "profile": "http://pgijsbers.github.io",
+      "contributions": [
+        "test"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "openml-python",
+  "projectOwner": "openml",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
