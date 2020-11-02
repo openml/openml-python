@@ -25,6 +25,7 @@ Possible Future: class TestBase from openml/testing.py can be included
 import os
 import logging
 from typing import List
+import pytest
 
 import openml
 from openml.testing import TestBase
@@ -182,3 +183,17 @@ def pytest_sessionfinish() -> None:
         logger.info("Local files deleted")
 
     logger.info("{} is killed".format(worker))
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--long",
+        action="store_true",
+        default=False,
+        help="Run the long version of tests which support both short and long scenarios.",
+    )
+
+
+@pytest.fixture(scope="class")
+def long_version(request):
+    request.cls.long_version = request.config.getoption("--long")

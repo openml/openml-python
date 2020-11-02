@@ -81,7 +81,8 @@ setuptools.setup(
             "ipykernel",
             "seaborn",
         ],
-        "examples_unix": ["fanova",],
+        "examples_unix": ["fanova"],
+        "docs": ["sphinx", "sphinx-gallery", "sphinx_bootstrap_theme", "numpydoc"],
     },
     test_suite="pytest",
     classifiers=[
