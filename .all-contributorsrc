@@ -21,7 +21,9 @@
       "avatar_url": "https://avatars2.githubusercontent.com/u/3191233?v=4",
       "profile": "https://github.com/Neeratyoy",
       "contributions": [
-        "code"
+        "code",
+        "doc",
+        "example"
       ]
     }
   ],
