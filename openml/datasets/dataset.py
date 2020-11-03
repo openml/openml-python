@@ -7,7 +7,6 @@ import logging
 import os
 import pickle
 from typing import List, Optional, Union, Tuple, Iterable, Dict
-from warnings import warn
 
 import arff
 import numpy as np
