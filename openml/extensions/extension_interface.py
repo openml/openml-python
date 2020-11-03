@@ -229,6 +229,19 @@ class Extension(ABC):
             - ``oml:component`` : int: flow id to which the parameter belongs
         """
 
+    @abstractmethod
+    def check_if_model_fitted(self, model: Any) -> bool:
+        """Returns True/False denoting if the model has already been fitted/trained.
+
+        Parameters
+        ----------
+        model : Any
+
+        Returns
+        -------
+        bool
+        """
+
     ################################################################################################
     # Abstract methods for hyperparameter optimization
 
