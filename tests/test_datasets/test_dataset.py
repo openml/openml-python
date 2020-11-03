@@ -1,7 +1,6 @@
 # License: BSD 3-Clause
 
 from time import time
-from warnings import filterwarnings, catch_warnings
 
 import numpy as np
 import pandas as pd
@@ -72,13 +71,13 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual(data.shape[1], len(self.titanic.features))
         self.assertEqual(data.shape[0], 1309)
         col_dtype = {
-            "pclass": "float64",
+            "pclass": "uint8",
             "survived": "category",
             "name": "object",
             "sex": "category",
             "age": "float64",
-            "sibsp": "float64",
-            "parch": "float64",
+            "sibsp": "uint8",
+            "parch": "uint8",
             "ticket": "object",
             "fare": "float64",
             "cabin": "object",
@@ -118,21 +117,29 @@ class OpenMLDatasetTest(TestBase):
         with pytest.raises(PyOpenMLError, match=err_msg):
             self.titanic.get_data(dataset_format="array")
 
+    def _check_expected_type(self, dtype, is_cat, col):
+        if is_cat:
+            expected_type = "category"
+        elif not col.isna().any() and (col.astype("uint8") == col).all():
+            expected_type = "uint8"
+        else:
+            expected_type = "float64"
+
+        self.assertEqual(dtype.name, expected_type)
+
     def test_get_data_with_rowid(self):
         self.dataset.row_id_attribute = "condition"
         rval, _, categorical, _ = self.dataset.get_data(include_row_id=True)
         self.assertIsInstance(rval, pd.DataFrame)
-        for (dtype, is_cat) in zip(rval.dtypes, categorical):
-            expected_type = "category" if is_cat else "float64"
-            self.assertEqual(dtype.name, expected_type)
+        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+            self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
 
         rval, _, categorical, _ = self.dataset.get_data()
         self.assertIsInstance(rval, pd.DataFrame)
-        for (dtype, is_cat) in zip(rval.dtypes, categorical):
-            expected_type = "category" if is_cat else "float64"
-            self.assertEqual(dtype.name, expected_type)
+        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+            self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
 
@@ -149,9 +156,8 @@ class OpenMLDatasetTest(TestBase):
     def test_get_data_with_target_pandas(self):
         X, y, categorical, attribute_names = self.dataset.get_data(target="class")
         self.assertIsInstance(X, pd.DataFrame)
-        for (dtype, is_cat) in zip(X.dtypes, categorical):
-            expected_type = "category" if is_cat else "float64"
-            self.assertEqual(dtype.name, expected_type)
+        for (dtype, is_cat, col) in zip(X.dtypes, categorical, X):
+            self._check_expected_type(dtype, is_cat, X[col])
         self.assertIsInstance(y, pd.Series)
         self.assertEqual(y.dtype.name, "category")
 
@@ -174,26 +180,16 @@ class OpenMLDatasetTest(TestBase):
     def test_get_data_with_ignore_attributes(self):
         self.dataset.ignore_attribute = ["condition"]
         rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=True)
-        for (dtype, is_cat) in zip(rval.dtypes, categorical):
-            expected_type = "category" if is_cat else "float64"
-            self.assertEqual(dtype.name, expected_type)
+        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+            self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
 
         rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=False)
-        for (dtype, is_cat) in zip(rval.dtypes, categorical):
-            expected_type = "category" if is_cat else "float64"
-            self.assertEqual(dtype.name, expected_type)
+        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+            self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
-
-    def test_dataset_format_constructor(self):
-
-        with catch_warnings():
-            filterwarnings("error")
-            self.assertRaises(
-                DeprecationWarning, openml.OpenMLDataset, "Test", "Test", format="arff"
-            )
 
     def test_get_data_with_nonexisting_class(self):
         # This class is using the anneal dataset with labels [1, 2, 3, 4, 5, 'U']. However,
