@@ -58,7 +58,7 @@ def get_study(
             "of things have changed since then. Please use `get_suite('OpenML100')` instead."
         )
         warnings.warn(message, DeprecationWarning)
-        openml.config.logger.warn(message)
+        openml.config.logger.warning(message)
         study = _get_study(study_id, entity_type="task")
         return cast(OpenMLBenchmarkSuite, study)  # type: ignore
     else:
