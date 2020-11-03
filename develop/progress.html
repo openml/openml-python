@@ -5,8 +5,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Changelog &#8212; OpenML 0.11.1dev documentation</title>
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
@@ -131,6 +131,8 @@
 <ul class="simple">
 <li><p>MAINT #891: Changed the way that numerical features are stored. Numerical features that range from 0 to 255 are now stored as uint8, which reduces the storage space required as well as storing and loading times.</p></li>
 <li><p>MAINT #671: Improved the performance of <code class="docutils literal notranslate"><span class="pre">check_datasets_active</span></code> by only querying the given list of datasets in contrast to querying all datasets. Modified the corresponding unit test.</p></li>
+<li><p>FIX #964 : AValidate <cite>ignore_attribute</cite>, <cite>default_target_attribute</cite>, <cite>row_id_attribute</cite> are set to attributes that exist on the dataset when calling <code class="docutils literal notranslate"><span class="pre">create_dataset</span></code>.</p></li>
+<li><p>DOC #973 : Change the task used in the welcome page example so it no longer fails using numerical dataset.</p></li>
 </ul>
 </div>
 <div class="section" id="id2">
@@ -366,7 +368,7 @@ failing to create a flow from the OpenML description.</p></li>
     </p>
     <p>
         &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
     </p>
   </div>
 </footer>
