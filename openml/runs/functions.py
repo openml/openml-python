@@ -250,6 +250,12 @@ def run_flow_on_task(
     run_environment = flow.extension.get_version_information()
     tags = ["openml-python", run_environment[1]]
 
+    if flow.extension.check_if_model_fitted(flow.model):
+        warnings.warn(
+            "The model is already fitted!"
+            " This might cause inconsistency in comparison of results."
+        )
+
     # execute the run
     res = _run_task_get_arffcontent(
         flow=flow,

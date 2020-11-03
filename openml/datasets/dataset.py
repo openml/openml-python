@@ -34,7 +34,7 @@ class OpenMLDataset(OpenMLBase):
         Name of the dataset.
     description : str
         Description of the dataset.
-    format : str
+    data_format : str
         Format of the dataset which can be either 'arff' or 'sparse_arff'.
     cache_format : str
         Format for caching the dataset which can be either 'feather' or 'pickle'.
@@ -103,7 +103,6 @@ class OpenMLDataset(OpenMLBase):
         self,
         name,
         description,
-        format=None,
         data_format="arff",
         cache_format="pickle",
         dataset_id=None,
@@ -178,16 +177,8 @@ class OpenMLDataset(OpenMLBase):
             )
 
         self.cache_format = cache_format
-        if format is None:
-            self.format = data_format
-        else:
-            warn(
-                "The format parameter in the init will be deprecated "
-                "in the future."
-                "Please use data_format instead",
-                DeprecationWarning,
-            )
-            self.format = format
+        # Has to be called format, otherwise there will be an XML upload error
+        self.format = data_format
         self.creator = creator
         self.contributor = contributor
         self.collection_date = collection_date

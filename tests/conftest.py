@@ -126,7 +126,7 @@ def delete_remote_files(tracker) -> None:
                 openml.utils._delete_entity(entity_type, entity)
                 logger.info("Deleted ({}, {})".format(entity_type, entity))
             except Exception as e:
-                logger.warn("Cannot delete ({},{}): {}".format(entity_type, entity, e))
+                logger.warning("Cannot delete ({},{}): {}".format(entity_type, entity, e))
 
 
 def pytest_sessionstart() -> None:

@@ -194,14 +194,6 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
 
-    def test_dataset_format_constructor(self):
-
-        with catch_warnings():
-            filterwarnings("error")
-            self.assertRaises(
-                DeprecationWarning, openml.OpenMLDataset, "Test", "Test", format="arff"
-            )
-
     def test_get_data_with_nonexisting_class(self):
         # This class is using the anneal dataset with labels [1, 2, 3, 4, 5, 'U']. However,
         # label 4 does not exist and we test that the features 5 and 'U' are correctly mapped to
