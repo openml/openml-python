@@ -13,7 +13,6 @@ import arff
 import numpy as np
 import pandas as pd
 import scipy.sparse
-from warnings import warn
 
 from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
@@ -34,7 +33,7 @@ class OpenMLDataset(OpenMLBase):
         Name of the dataset.
     description : str
         Description of the dataset.
-    format : str
+    data_format : str
         Format of the dataset which can be either 'arff' or 'sparse_arff'.
     cache_format : str
         Format for caching the dataset which can be either 'feather' or 'pickle'.
@@ -103,7 +102,6 @@ class OpenMLDataset(OpenMLBase):
         self,
         name,
         description,
-        format=None,
         data_format="arff",
         cache_format="pickle",
         dataset_id=None,
@@ -178,16 +176,8 @@ class OpenMLDataset(OpenMLBase):
             )
 
         self.cache_format = cache_format
-        if format is None:
-            self.format = data_format
-        else:
-            warn(
-                "The format parameter in the init will be deprecated "
-                "in the future."
-                "Please use data_format instead",
-                DeprecationWarning,
-            )
-            self.format = format
+        # Has to be called format, otherwise there will be an XML upload error
+        self.format = data_format
         self.creator = creator
         self.contributor = contributor
         self.collection_date = collection_date
@@ -456,12 +446,11 @@ class OpenMLDataset(OpenMLBase):
                     col.append(
                         self._unpack_categories(X[column_name], categories_names[column_name])
                     )
-                elif attribute_dtype[column_name] in ('floating',
-                                                      'integer'):
+                elif attribute_dtype[column_name] in ("floating", "integer"):
                     X_col = X[column_name]
                     if X_col.min() >= 0 and X_col.max() <= 255:
                         try:
-                            X_col_uint = X_col.astype('uint8')
+                            X_col_uint = X_col.astype("uint8")
                             if (X_col == X_col_uint).all():
                                 col.append(X_col_uint)
                                 continue

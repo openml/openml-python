@@ -1748,7 +1748,7 @@ class SklearnExtension(Extension):
                         proba_y.shape[1], len(task.class_labels),
                     )
                     warnings.warn(message)
-                    openml.config.logger.warn(message)
+                    openml.config.logger.warning(message)
 
                     for i, col in enumerate(task.class_labels):
                         # adding missing columns with 0 probability

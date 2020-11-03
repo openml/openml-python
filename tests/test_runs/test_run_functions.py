@@ -442,7 +442,7 @@ class TestRun(TestBase):
             # suboptimal (slow), and not guaranteed to work if evaluation
             # engine is behind.
             # TODO: mock this? We have the arff already on the server
-            self._wait_for_processed_run(run.run_id, 400)
+            self._wait_for_processed_run(run.run_id, 600)
             try:
                 model_prime = openml.runs.initialize_model_from_trace(
                     run_id=run.run_id, repeat=0, fold=0,
@@ -519,7 +519,7 @@ class TestRun(TestBase):
         )
 
     def test_run_and_upload_logistic_regression(self):
-        lr = LogisticRegression(solver="lbfgs")
+        lr = LogisticRegression(solver="lbfgs", max_iter=1000)
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
@@ -605,7 +605,8 @@ class TestRun(TestBase):
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
     )
-    def test_run_and_upload_knn_pipeline(self):
+    @unittest.mock.patch("warnings.warn")
+    def test_run_and_upload_knn_pipeline(self, warnings_mock):
 
         cat_imp = make_pipeline(
             SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore")
@@ -635,11 +636,18 @@ class TestRun(TestBase):
         n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
         n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
         self._run_and_upload_classification(pipeline2, task_id, n_missing_vals, n_test_obs, "62501")
+        # The warning raised is:
+        # The total space of parameters 8 is smaller than n_iter=10.
+        # Running 8 iterations. For exhaustive searches, use GridSearchCV.'
+        # It is raised three times because we once run the model to upload something and then run
+        # it again twice to compare that the predictions are reproducible.
+        self.assertEqual(warnings_mock.call_count, 3)
 
     def test_run_and_upload_gridsearch(self):
         gridsearch = GridSearchCV(
             BaggingClassifier(base_estimator=SVC()),
             {"base_estimator__C": [0.01, 0.1, 10], "base_estimator__gamma": [0.01, 0.1, 10]},
+            cv=3,
         )
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]

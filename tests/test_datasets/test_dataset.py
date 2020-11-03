@@ -1,7 +1,6 @@
 # License: BSD 3-Clause
 
 from time import time
-from warnings import filterwarnings, catch_warnings
 
 import numpy as np
 import pandas as pd
@@ -120,11 +119,11 @@ class OpenMLDatasetTest(TestBase):
 
     def _check_expected_type(self, dtype, is_cat, col):
         if is_cat:
-            expected_type = 'category'
-        elif not col.isna().any() and (col.astype('uint8') == col).all():
-            expected_type = 'uint8'
+            expected_type = "category"
+        elif not col.isna().any() and (col.astype("uint8") == col).all():
+            expected_type = "uint8"
         else:
-            expected_type = 'float64'
+            expected_type = "float64"
 
         self.assertEqual(dtype.name, expected_type)
 
@@ -191,14 +190,6 @@ class OpenMLDatasetTest(TestBase):
             self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
-
-    def test_dataset_format_constructor(self):
-
-        with catch_warnings():
-            filterwarnings("error")
-            self.assertRaises(
-                DeprecationWarning, openml.OpenMLDataset, "Test", "Test", format="arff"
-            )
 
     def test_get_data_with_nonexisting_class(self):
         # This class is using the anneal dataset with labels [1, 2, 3, 4, 5, 'U']. However,
