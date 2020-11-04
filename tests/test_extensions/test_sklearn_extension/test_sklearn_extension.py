@@ -2234,9 +2234,10 @@ class TestSklearnExtensionRunFunctions(TestBase):
             run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=True)
             run.publish()
             new_run = openml.runs.get_run(run.run_id)
-            return new_run.setup_id
+            return new_run
 
-        setup1 = column_transformer_pipe(11)  # only categorical
-        setup2 = column_transformer_pipe(23)  # only numeric
-
-        self.assertEqual(setup1, setup2)
+        run1 = column_transformer_pipe(11)  # only categorical
+        TestBase._mark_entity_for_removal("run", run1.run_id)
+        run2 = column_transformer_pipe(23)  # only numeric
+        TestBase._mark_entity_for_removal("run", run2.run_id)
+        self.assertEqual(run1.setup_id, run2.setup_id)
