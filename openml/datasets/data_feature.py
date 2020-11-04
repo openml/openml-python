@@ -1,5 +1,7 @@
 # License: BSD 3-Clause
 
+from typing import List
+
 
 class OpenMLDataFeature(object):
     """
@@ -20,7 +22,14 @@ class OpenMLDataFeature(object):
 
     LEGAL_DATA_TYPES = ["nominal", "numeric", "string", "date"]
 
-    def __init__(self, index, name, data_type, nominal_values, number_missing_values):
+    def __init__(
+        self,
+        index: int,
+        name: str,
+        data_type: str,
+        nominal_values: List[str],
+        number_missing_values: int,
+    ):
         if type(index) != int:
             raise ValueError("Index is of wrong datatype")
         if data_type not in self.LEGAL_DATA_TYPES:

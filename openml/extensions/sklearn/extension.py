@@ -1537,6 +1537,37 @@ class SklearnExtension(Extension):
         model.set_params(**random_states)
         return model
 
+    def check_if_model_fitted(self, model: Any) -> bool:
+        """Returns True/False denoting if the model has already been fitted/trained
+
+        Parameters
+        ----------
+        model : Any
+
+        Returns
+        -------
+        bool
+        """
+        try:
+            # check if model is fitted
+            from sklearn.exceptions import NotFittedError
+
+            # Creating random dummy data of arbitrary size
+            dummy_data = np.random.uniform(size=(10, 3))
+            # Using 'predict' instead of 'sklearn.utils.validation.check_is_fitted' for a more
+            # robust check that works across sklearn versions and models. Internally, 'predict'
+            # should call 'check_is_fitted' for every concerned attribute, thus offering a more
+            # assured check than explicit calls to 'check_is_fitted'
+            model.predict(dummy_data)
+            # Will reach here if the model was fit on a dataset with 3 features
+            return True
+        except NotFittedError:  # needs to be the first exception to be caught
+            # Model is not fitted, as is required
+            return False
+        except ValueError:
+            # Will reach here if the model was fit on a dataset with more or less than 3 features
+            return True
+
     def _run_model_on_fold(
         self,
         model: Any,
