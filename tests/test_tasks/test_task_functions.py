@@ -66,7 +66,7 @@ class TestTask(TestBase):
         self.assertIn(task["status"], ["in_preparation", "active", "deactivated"])
 
     def test_list_tasks_by_type(self):
-        num_curves_tasks = 200  # number is flexible, check server if fails
+        num_curves_tasks = 198  # number is flexible, check server if fails
         ttid = TaskType.LEARNING_CURVE
         tasks = openml.tasks.list_tasks(task_type=ttid)
         self.assertGreaterEqual(len(tasks), num_curves_tasks)
