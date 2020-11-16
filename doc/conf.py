@@ -65,7 +65,7 @@ master_doc = "index"
 
 # General information about the project.
 project = u"OpenML"
-copyright = u"2014-{}, the OpenML-Python team.".format(
+copyright = u"2014-{}, the OpenML-Python team".format(
     time.strftime("%Y,%m,%d,%H,%M,%S").split(",")[0]
 )
 
