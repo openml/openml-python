@@ -65,9 +65,7 @@ master_doc = "index"
 
 # General information about the project.
 project = u"OpenML"
-copyright = u"2014-{}, the OpenML-Python team".format(
-    time.strftime("%Y,%m,%d,%H,%M,%S").split(",")[0]
-)
+copyright = f"2014-{time.localtime().tm_year}, the OpenML-Python team"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
