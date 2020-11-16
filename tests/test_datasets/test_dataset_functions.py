@@ -1367,7 +1367,7 @@ class TestOpenMLDataset(TestBase):
         #  to edit meta-data of a dataset
         did = fork_dataset(1)
         self._wait_for_dataset_being_processed(did)
-        TestBase._mark_entity_for_removal("dataset", did)
+        TestBase._mark_entity_for_removal("data", did)
         # Need to upload a task attached to this data to test edit failure
         task = create_task(
             task_type=TaskType.SUPERVISED_CLASSIFICATION,
