@@ -1366,6 +1366,7 @@ class TestOpenMLDataset(TestBase):
         # Will be creating a forked version of an existing dataset to allow the unit test user
         #  to edit meta-data of a dataset
         did = fork_dataset(1)
+        self._wait_for_dataset_being_processed(did)
         TestBase._mark_entity_for_removal("dataset", did)
         # Need to upload a task attached to this data to test edit failure
         task = create_task(
