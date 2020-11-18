@@ -321,7 +321,7 @@ def get_run_trace(run_id: int) -> OpenMLRunTrace:
     return run_trace
 
 
-def initialize_model_from_run(run_id: int) -> Any:
+def initialize_model_from_run(run_id: int, strict_version: bool = True) -> Any:
     """
     Initialized a model based on a run_id (i.e., using the exact
     same parameter settings)
@@ -331,12 +331,15 @@ def initialize_model_from_run(run_id: int) -> Any:
     run_id : int
         The Openml run_id
 
+    strict_version: bool (default=True)
+        See `flow_to_model` strict_version.
+
     Returns
     -------
     model
     """
     run = get_run(run_id)
-    return initialize_model(run.setup_id)
+    return initialize_model(run.setup_id, strict_version)
 
 
 def initialize_model_from_trace(
