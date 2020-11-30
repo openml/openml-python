@@ -45,7 +45,7 @@ class TestRun(TestBase):
     # diabetis dataset, 768 observations, 0 missing vals, 33% holdout set
     # (253 test obs), no nominal attributes, all numeric attributes
     TEST_SERVER_TASK_SIMPLE: Tuple[Union[int, List], ...] = (119, 0, 253, [], [*range(8)])
-    TEST_SERVER_TASK_REGRESSION: Tuple[Union[int, List], ...] = (738, 0, 718, [], [*range(8)])
+    TEST_SERVER_TASK_REGRESSION: Tuple[Union[int, List], ...] = (1605, 0, 2178, [], [*range(8)])
     # credit-a dataset, 690 observations, 67 missing vals, 33% holdout set
     # (227 test obs)
     TEST_SERVER_TASK_MISSING_VALS = (
@@ -55,6 +55,24 @@ class TestRun(TestBase):
         [0, 3, 4, 5, 6, 8, 9, 11, 12],
         [1, 2, 7, 10, 13, 14],
     )
+
+    # if task IDs are deleted during test server maintenance, these meta data should still allow
+    # unit tests to pass by uploading a similar task at runtime
+    TASK_META_DATA = {
+        1605: {
+            "task_type": "Supervised Regression",
+            "dataset_id": 123,
+            "estimation_procedure_id": 7,
+            "target_name": "richter",
+        },
+        1481: {
+            "task_type": "Supervised Classification",
+            "dataset_id": 128,  # iris
+            "estimation_procedure_id": 1,
+            "class_labels": ["Iris-setosa", "Iris-versicolor", "Iris-virginica"],
+            "target_name": "class",
+        },
+    }
 
     # Suppress warnings to facilitate testing
     hide_warnings = True
@@ -499,7 +517,7 @@ class TestRun(TestBase):
     def _run_and_upload_regression(
         self, clf, task_id, n_missing_vals, n_test_obs, flow_expected_rsv, sentinel=None
     ):
-        num_folds = 1  # because of holdout
+        num_folds = 10  # because of holdout
         num_iterations = 5  # for base search algorithms
         metric = sklearn.metrics.mean_absolute_error  # metric class
         metric_name = "mean_absolute_error"  # openml metric name
@@ -529,6 +547,18 @@ class TestRun(TestBase):
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
         task_id = self.TEST_SERVER_TASK_REGRESSION[0]
+
+        task_meta_data = self.TASK_META_DATA[task_id]
+        if not check_task_existence(task_id, task_meta_data):
+            task_meta_data["task_type"] = TaskType.SUPERVISED_REGRESSION
+            new_task = openml.tasks.create_task(**task_meta_data)
+            # publishes the new task
+            new_task = new_task.publish()
+            task_id = new_task.task_id
+            # mark to remove the uploaded task
+            TestBase._mark_entity_for_removal("task", task_id)
+            TestBase.logger.info("collected from test_run_functions: {}".format(task_id))
+
         n_missing_vals = self.TEST_SERVER_TASK_REGRESSION[1]
         n_test_obs = self.TEST_SERVER_TASK_REGRESSION[2]
         self._run_and_upload_regression(lr, task_id, n_missing_vals, n_test_obs, "62501")
@@ -653,7 +683,7 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        run = self._run_and_upload_classification(
+        run = self.TEST_SERVER_TASK_SIMPLE(
             clf=gridsearch,
             task_id=task_id,
             n_missing_vals=n_missing_vals,
@@ -924,13 +954,7 @@ class TestRun(TestBase):
         )
 
         task_id = 1481  # this task may be deleted during test server maintenance
-        task_meta_data = {  # this meta-data should allow the task to be recreated during this test
-            "task_type": "Supervised Classification",
-            "dataset_id": 128,  # iris
-            "estimation_procedure_id": 1,
-            "class_labels": ["Iris-setosa", "Iris-versicolor", "Iris-virginica"],
-            "target_name": "class",
-        }
+        task_meta_data = self.TASK_META_DATA[task_id]
         if not check_task_existence(task_id, task_meta_data):
             task_meta_data["task_type"] = TaskType.SUPERVISED_CLASSIFICATION
             new_task = openml.tasks.create_task(**task_meta_data)
@@ -1473,7 +1497,20 @@ class TestRun(TestBase):
             format_prediction(learning_curve, *ignored_input, sample=None, proba=probabilities)
 
     def test_format_prediction_task_regression(self):
-        regression = openml.tasks.get_task(self.TEST_SERVER_TASK_REGRESSION[0], download_data=False)
+        task_id = self.TEST_SERVER_TASK_REGRESSION[0]
+
+        task_meta_data = self.TASK_META_DATA[task_id]
+        if not check_task_existence(task_id, task_meta_data):
+            task_meta_data["task_type"] = TaskType.SUPERVISED_REGRESSION
+            new_task = openml.tasks.create_task(**task_meta_data)
+            # publishes the new task
+            new_task = new_task.publish()
+            task_id = new_task.task_id
+            # mark to remove the uploaded task
+            TestBase._mark_entity_for_removal("task", task_id)
+            TestBase.logger.info("collected from test_run_functions: {}".format(task_id))
+
+        regression = openml.tasks.get_task(task_id, download_data=False)
         ignored_input = [0] * 5
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
