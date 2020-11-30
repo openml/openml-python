@@ -45,25 +45,14 @@ def check_task_existence(task_id, task_meta_data):
     ------
     bool
     """
-    test_server_already_on = False
-    if openml.config.server == "https://test.openml.org/api/v1/xml":
-        test_server_already_on = True
-
-    if not test_server_already_on:  # turn on test server if it was not already on
-        openml.config.start_using_configuration_for_example()
-
     try:
         task = openml.tasks.get_task(task_id)
         for k, v in task_meta_data.items():
             if getattr(task, k) != v:
-                raise Exception("Task meta data doesn't match")
-        return_val = True
-    except Exception:
-        return_val = False
-
-    if not test_server_already_on:  # turn off test server if it was not already on
-        openml.config.stop_using_configuration_for_example()
-    return return_val
+                return False
+    except openml.exceptions.OpenMLServerException:
+        return False
+    return True
 
 
 def extract_xml_tags(xml_tag_name, node, allow_none=True):
