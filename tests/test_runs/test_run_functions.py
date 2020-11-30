@@ -683,7 +683,7 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
-        run = self.TEST_SERVER_TASK_SIMPLE(
+        run = self._run_and_upload_classification(
             clf=gridsearch,
             task_id=task_id,
             n_missing_vals=n_missing_vals,
