@@ -9,6 +9,7 @@ import pandas as pd
 from functools import wraps
 import collections
 
+import openml
 import openml._api_calls
 import openml.exceptions
 from . import config
@@ -29,6 +30,40 @@ try:
         oslo_installed = True
 except ImportError:
     pass
+
+
+def check_task_existence(task_id, task_meta_data):
+    """Checks if task with task_id exists on test server and matches the meta data.
+
+    Parameter
+    ---------
+    task_id : int
+    task_meta_data : dict
+        A dictionary containing meta-information on the task fetched from the test server.
+
+    Return
+    ------
+    bool
+    """
+    test_server_already_on = False
+    if openml.config.server == "https://test.openml.org/api/v1/xml":
+        test_server_already_on = True
+
+    if not test_server_already_on:  # turn on test server if it was not already on
+        openml.config.start_using_configuration_for_example()
+
+    try:
+        task = openml.tasks.get_task(task_id)
+        for k, v in task_meta_data.items():
+            if getattr(task, k) != v:
+                raise Exception("Task meta data doesn't match")
+        return_val = True
+    except Exception:
+        return_val = False
+
+    if not test_server_already_on:  # turn off test server if it was not already on
+        openml.config.stop_using_configuration_for_example()
+    return return_val
 
 
 def extract_xml_tags(xml_tag_name, node, allow_none=True):
