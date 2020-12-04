@@ -16,14 +16,16 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
     def setUp(self, n_levels: int = 1):
         super(OpenMLRegressionTaskTest, self).setUp()
 
-        task_id = 1734
         task_meta_data = {
             "task_type": "Supervised Regression",
             "dataset_id": 105,
             "estimation_procedure_id": 7,
             "target_name": "time",
         }
-        if not check_task_existence(task_id, task_meta_data):
+        _task_id = check_task_existence(task_meta_data)
+        if _task_id is not None:
+            task_id = _task_id
+        else:
             task_meta_data["task_type"] = TaskType.SUPERVISED_REGRESSION
             new_task = openml.tasks.create_task(**task_meta_data)
             # publishes the new task

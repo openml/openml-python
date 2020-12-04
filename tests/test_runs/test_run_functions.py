@@ -549,7 +549,10 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_REGRESSION[0]
 
         task_meta_data = self.TASK_META_DATA[task_id]
-        if not check_task_existence(task_id, task_meta_data):
+        _task_id = check_task_existence(task_meta_data)
+        if _task_id is not None:
+            task_id = _task_id
+        else:
             task_meta_data["task_type"] = TaskType.SUPERVISED_REGRESSION
             new_task = openml.tasks.create_task(**task_meta_data)
             # publishes the new task
@@ -955,7 +958,10 @@ class TestRun(TestBase):
 
         task_id = 1481  # this task may be deleted during test server maintenance
         task_meta_data = self.TASK_META_DATA[task_id]
-        if not check_task_existence(task_id, task_meta_data):
+        _task_id = check_task_existence(task_meta_data)
+        if _task_id is not None:
+            task_id = _task_id
+        else:
             task_meta_data["task_type"] = TaskType.SUPERVISED_CLASSIFICATION
             new_task = openml.tasks.create_task(**task_meta_data)
             # publishes the new task
@@ -1500,7 +1506,10 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_REGRESSION[0]
 
         task_meta_data = self.TASK_META_DATA[task_id]
-        if not check_task_existence(task_id, task_meta_data):
+        _task_id = check_task_existence(task_meta_data)
+        if _task_id is not None:
+            task_id = _task_id
+        else:
             task_meta_data["task_type"] = TaskType.SUPERVISED_REGRESSION
             new_task = openml.tasks.create_task(**task_meta_data)
             # publishes the new task
