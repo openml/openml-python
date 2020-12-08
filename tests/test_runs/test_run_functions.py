@@ -671,11 +671,19 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
         self._run_and_upload_classification(pipeline2, task_id, n_missing_vals, n_test_obs, "62501")
         # The warning raised is:
-        # The total space of parameters 8 is smaller than n_iter=10.
-        # Running 8 iterations. For exhaustive searches, use GridSearchCV.'
+        # "The total space of parameters 8 is smaller than n_iter=10.
+        # Running 8 iterations. For exhaustive searches, use GridSearchCV."
         # It is raised three times because we once run the model to upload something and then run
         # it again twice to compare that the predictions are reproducible.
-        self.assertEqual(warnings_mock.call_count, 3)
+        warning_msg = (
+            "The total space of parameters 8 is smaller than n_iter=10. "
+            "Running 8 iterations. For exhaustive searches, use GridSearchCV."
+        )
+        call_count = 0
+        for _warnings in warnings_mock.call_args_list:
+            if _warnings[0][0] == warning_msg:
+                call_count += 1
+        self.assertEqual(call_count, 3)
 
     def test_run_and_upload_gridsearch(self):
         gridsearch = GridSearchCV(

@@ -3,6 +3,7 @@
 import os
 import xmltodict
 import shutil
+import typing
 from typing import TYPE_CHECKING, List, Tuple, Union, Type
 import warnings
 import pandas as pd
@@ -47,7 +48,9 @@ def check_task_existence(task_meta_data: dict) -> Union[int, None]:
     return_val = None
     try:
         tasks = openml.tasks.list_tasks(output_format="dataframe")
-        tasks = tasks.loc[tasks.task_type == task_meta_data["task_type"]]
+        tasks = typing.cast(pd.DataFrame, tasks).loc[
+            tasks["task_type"] == task_meta_data["task_type"]
+        ]
         if len(tasks) == 0:
             return None
         tasks = tasks.loc[tasks.did == task_meta_data["dataset_id"]]
