@@ -942,6 +942,48 @@ class TestRun(TestBase):
 
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
+        reason="sklearn flows and pipelines changed drastically post 0.20 version",
+    )
+    def test_initialize_model_from_run_nonstrict(self):
+        # available runs on the test server, sorted based on the sklearn versions it uses
+        sklearn_runs = {
+            "sklearn==0.23.2": [
+                100,
+                111,
+                112,
+                120,
+                123,
+                130,
+                153,
+                164,
+                166,
+                167,
+                168,
+                803,
+                806,
+                807,
+                808,
+                814,
+                1373,
+                1374,
+                1375,
+                1376,
+                1377,
+                1378,
+            ],
+            "sklearn==0.23.1": [386, 480, 512, 516, 520, 772, 1085, 1124, 1178, 1646],
+            "sklearn==0.20.2": [481],
+            "sklearn==0.22.2": [1108, 1612, 1642],
+            "sklearn==0.21.0": [1838],
+        }
+        current_version = "sklearn=={}".format(LooseVersion(sklearn.__version__).vstring)
+        sklearn_runs.pop(current_version)
+        version_choice = np.random.choice(list(sklearn_runs.keys()))
+        run_id_choice = np.random.choice(sklearn_runs[version_choice])
+        _ = openml.runs.initialize_model_from_run(run_id=run_id_choice, strict_version=False)
+
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     def test__run_exists(self):
