@@ -3,7 +3,6 @@
 import os
 import xmltodict
 import shutil
-import typing
 from typing import TYPE_CHECKING, List, Tuple, Union, Type
 import warnings
 import pandas as pd
@@ -31,52 +30,6 @@ try:
         oslo_installed = True
 except ImportError:
     pass
-
-
-def check_task_existence(task_meta_data: dict) -> Union[int, None]:
-    """Checks if any task with exists on test server that matches the meta data.
-
-    Parameter
-    ---------
-    task_meta_data : dict
-        A dictionary containing meta-information on the task fetched from the test server.
-
-    Return
-    ------
-    int, None
-    """
-    return_val = None
-    try:
-        tasks = openml.tasks.list_tasks(output_format="dataframe")
-        tasks = typing.cast(pd.DataFrame, tasks).loc[
-            tasks["task_type"] == task_meta_data["task_type"]
-        ]
-        if len(tasks) == 0:
-            return None
-        tasks = tasks.loc[tasks.did == task_meta_data["dataset_id"]]
-        if len(tasks) == 0:
-            return None
-        tasks = tasks.loc[tasks.target_feature == task_meta_data["target_name"]]
-        if len(tasks) == 0:
-            return None
-        task_match = []
-        for task_id in tasks.tid.values:
-            task_match.append(task_id)
-            task = openml.tasks.get_task(task_id)
-            for k, v in task_meta_data.items():
-                if getattr(task, k) != v:
-                    # even if one of the meta-data key mismatches, then task_id is not a match
-                    task_match.pop(-1)
-                    break
-            # if task_id is retained in the task_match list, it passed all meta key-value matches
-            if len(task_match) == 1:
-                return_val = task_id
-                break
-        if len(task_match) == 0:
-            return_val = None
-    except openml.exceptions.OpenMLServerException:
-        return_val = None
-    return return_val
 
 
 def extract_xml_tags(xml_tag_name, node, allow_none=True):

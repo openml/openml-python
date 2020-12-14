@@ -1351,7 +1351,7 @@ class TestOpenMLDataset(TestBase):
             "original_data_url, default_target_attribute, row_id_attribute, "
             "ignore_attribute or paper_url to edit.",
             edit_dataset,
-            data_id=64,
+            data_id=64,  # blood-transfusion-service-center
         )
         # Check server exception when unknown dataset is provided
         self.assertRaisesRegex(

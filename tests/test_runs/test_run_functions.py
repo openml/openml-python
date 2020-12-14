@@ -7,6 +7,7 @@ import os
 import random
 import time
 import sys
+import ast
 import unittest.mock
 
 import numpy as np
@@ -24,7 +25,8 @@ from openml.testing import TestBase, SimpleImputer, CustomImputer, cat, cont
 from openml.runs.functions import _run_task_get_arffcontent, run_exists, format_prediction
 from openml.runs.trace import OpenMLRunTrace
 from openml.tasks import TaskType
-from openml.utils import check_task_existence
+from openml.testing import check_task_existence
+from openml.exceptions import OpenMLServerException
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
@@ -60,13 +62,13 @@ class TestRun(TestBase):
     # unit tests to pass by uploading a similar task at runtime
     TASK_META_DATA = {
         1605: {
-            "task_type": "Supervised Regression",
-            "dataset_id": 123,
+            "task_type": TaskType.SUPERVISED_REGRESSION,
+            "dataset_id": 123,  # quake
             "estimation_procedure_id": 7,
             "target_name": "richter",
         },
         1481: {
-            "task_type": "Supervised Classification",
+            "task_type": TaskType.SUPERVISED_CLASSIFICATION,
             "dataset_id": 128,  # iris
             "estimation_procedure_id": 1,
             "class_labels": ["Iris-setosa", "Iris-versicolor", "Iris-virginica"],
@@ -517,7 +519,7 @@ class TestRun(TestBase):
     def _run_and_upload_regression(
         self, clf, task_id, n_missing_vals, n_test_obs, flow_expected_rsv, sentinel=None
     ):
-        num_folds = 10  # because of holdout
+        num_folds = 10  # because of cross-validation
         num_iterations = 5  # for base search algorithms
         metric = sklearn.metrics.mean_absolute_error  # metric class
         metric_name = "mean_absolute_error"  # openml metric name
@@ -549,15 +551,23 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_REGRESSION[0]
 
         task_meta_data = self.TASK_META_DATA[task_id]
-        _task_id = check_task_existence(task_meta_data)
+        _task_id = check_task_existence(**task_meta_data)
         if _task_id is not None:
             task_id = _task_id
         else:
             task_meta_data["task_type"] = TaskType.SUPERVISED_REGRESSION
             new_task = openml.tasks.create_task(**task_meta_data)
             # publishes the new task
-            new_task = new_task.publish()
-            task_id = new_task.task_id
+            try:
+                new_task = new_task.publish()
+                task_id = new_task.task_id
+            except OpenMLServerException as e:
+                if e.code == 614:  # Task already exists
+                    # the exception message contains the task_id that was matched in the format
+                    # 'Task already exists. - matched id(s): [xxxx]'
+                    task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
+                else:
+                    raise Exception(repr(e))
             # mark to remove the uploaded task
             TestBase._mark_entity_for_removal("task", task_id)
             TestBase.logger.info("collected from test_run_functions: {}".format(task_id))
@@ -966,15 +976,23 @@ class TestRun(TestBase):
 
         task_id = 1481  # this task may be deleted during test server maintenance
         task_meta_data = self.TASK_META_DATA[task_id]
-        _task_id = check_task_existence(task_meta_data)
+        _task_id = check_task_existence(**task_meta_data)
         if _task_id is not None:
             task_id = _task_id
         else:
             task_meta_data["task_type"] = TaskType.SUPERVISED_CLASSIFICATION
             new_task = openml.tasks.create_task(**task_meta_data)
             # publishes the new task
-            new_task = new_task.publish()
-            task_id = new_task.task_id
+            try:
+                new_task = new_task.publish()
+                task_id = new_task.task_id
+            except OpenMLServerException as e:
+                if e.code == 614:  # Task already exists
+                    # the exception message contains the task_id that was matched in the format
+                    # 'Task already exists. - matched id(s): [xxxx]'
+                    task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
+                else:
+                    raise Exception(repr(e))
             # mark to remove the uploaded task
             TestBase._mark_entity_for_removal("task", task_id)
             TestBase.logger.info("collected from test_run_functions: {}".format(task_id))
@@ -1514,15 +1532,23 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_REGRESSION[0]
 
         task_meta_data = self.TASK_META_DATA[task_id]
-        _task_id = check_task_existence(task_meta_data)
+        _task_id = check_task_existence(**task_meta_data)
         if _task_id is not None:
             task_id = _task_id
         else:
             task_meta_data["task_type"] = TaskType.SUPERVISED_REGRESSION
             new_task = openml.tasks.create_task(**task_meta_data)
             # publishes the new task
-            new_task = new_task.publish()
-            task_id = new_task.task_id
+            try:
+                new_task = new_task.publish()
+                task_id = new_task.task_id
+            except OpenMLServerException as e:
+                if e.code == 614:  # Task already exists
+                    # the exception message contains the task_id that was matched in the format
+                    # 'Task already exists. - matched id(s): [xxxx]'
+                    task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
+                else:
+                    raise Exception(repr(e))
             # mark to remove the uploaded task
             TestBase._mark_entity_for_removal("task", task_id)
             TestBase.logger.info("collected from test_run_functions: {}".format(task_id))
@@ -1530,5 +1556,4 @@ class TestRun(TestBase):
         regression = openml.tasks.get_task(task_id, download_data=False)
         ignored_input = [0] * 5
         res = format_prediction(regression, *ignored_input)
-        self.assertListEqual(res, [0] * 5)
         self.assertListEqual(res, [0] * 5)
