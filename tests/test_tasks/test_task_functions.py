@@ -139,7 +139,7 @@ class TestTask(TestBase):
         openml.tasks.get_task(34536)
 
     def test_get_task(self):
-        task = openml.tasks.get_task(1)
+        task = openml.tasks.get_task(1)  # anneal; crossvalidation
         self.assertIsInstance(task, OpenMLTask)
         self.assertTrue(
             os.path.exists(
@@ -158,7 +158,7 @@ class TestTask(TestBase):
         )
 
     def test_get_task_lazy(self):
-        task = openml.tasks.get_task(2, download_data=False)
+        task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
         self.assertIsInstance(task, OpenMLTask)
         self.assertTrue(
             os.path.exists(
@@ -198,7 +198,7 @@ class TestTask(TestBase):
 
         get_dataset.side_effect = assert_and_raise
         try:
-            openml.tasks.get_task(1)
+            openml.tasks.get_task(1)  # anneal; crossvalidation
         except WeirdException:
             pass
         # Now the file should no longer exist
@@ -219,7 +219,7 @@ class TestTask(TestBase):
         openml.tasks.functions.get_task(126033)
 
     def test_download_split(self):
-        task = openml.tasks.get_task(1)
+        task = openml.tasks.get_task(1)  # anneal; crossvalidation
         split = task.download_split()
         self.assertEqual(type(split), OpenMLSplit)
         self.assertTrue(

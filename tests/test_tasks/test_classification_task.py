@@ -13,7 +13,7 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
     def setUp(self, n_levels: int = 1):
 
         super(OpenMLClassificationTaskTest, self).setUp()
-        self.task_id = 119
+        self.task_id = 119  # diabetes
         self.task_type = TaskType.SUPERVISED_CLASSIFICATION
         self.estimation_procedure = 1
 
