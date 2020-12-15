@@ -1465,7 +1465,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         model = sklearn.pipeline.Pipeline(steps=[("scaler", scaler), ("boosting", boosting)])
         flow = self.extension.model_to_flow(model)
-        task = openml.tasks.get_task(115)
+        task = openml.tasks.get_task(115)  # diabetes; crossvalidation
         run = openml.runs.run_flow_on_task(flow, task)
         run = run.publish()
         TestBase._mark_entity_for_removal("run", run.run_id)
@@ -1561,7 +1561,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
     # Test methods for performing runs with this extension module
 
     def test_run_model_on_task(self):
-        task = openml.tasks.get_task(1)
+        task = openml.tasks.get_task(1)  # anneal; crossvalidation
         # using most_frequent imputer since dataset has mixed types and to keep things simple
         pipe = sklearn.pipeline.Pipeline(
             [
@@ -1626,7 +1626,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 self.extension.seed_model(model=clf, seed=42)
 
     def test_run_model_on_fold_classification_1_array(self):
-        task = openml.tasks.get_task(1)
+        task = openml.tasks.get_task(1)  # anneal; crossvalidation
 
         X, y = task.get_X_and_y()
         train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0)
@@ -1689,7 +1689,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
     def test_run_model_on_fold_classification_1_dataframe(self):
         from sklearn.compose import ColumnTransformer
 
-        task = openml.tasks.get_task(1)
+        task = openml.tasks.get_task(1)  # anneal; crossvalidation
 
         # diff test_run_model_on_fold_classification_1_array()
         X, y = task.get_X_and_y(dataset_format="dataframe")
@@ -1753,7 +1753,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         )
 
     def test_run_model_on_fold_classification_2(self):
-        task = openml.tasks.get_task(7)
+        task = openml.tasks.get_task(7)  # kr-vs-kp; crossvalidation
 
         X, y = task.get_X_and_y()
         train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0)
@@ -1815,7 +1815,11 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 raise AttributeError("predict_proba is not available when " "probability=False")
 
         # task 1 (test server) is important: it is a task with an unused class
-        tasks = [1, 3, 115]
+        tasks = [
+            1,  # anneal; crossvalidation
+            3,  # anneal; crossvalidation
+            115,  # diabetes; crossvalidation
+        ]
         flow = unittest.mock.Mock()
         flow.name = "dummy"
 
@@ -1969,7 +1973,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             "max_iter": [10, 20, 40, 80],
         }
         num_iters = 10
-        task = openml.tasks.get_task(20)
+        task = openml.tasks.get_task(20)  # balance-scale; crossvalidation
         clf = sklearn.model_selection.RandomizedSearchCV(
             sklearn.neural_network.MLPClassifier(), param_grid, num_iters,
         )
@@ -2080,8 +2084,8 @@ class TestSklearnExtensionRunFunctions(TestBase):
         from sklearn.compose import ColumnTransformer
 
         # testing 'drop', 'passthrough', None as non-actionable sklearn estimators
-        dataset = openml.datasets.get_dataset(128)
-        task = openml.tasks.get_task(59)
+        dataset = openml.datasets.get_dataset(128)  # iris
+        task = openml.tasks.get_task(59)  # mfeat-pixel; crossvalidation
 
         X, y, categorical_ind, feature_names = dataset.get_data(
             target=dataset.default_target_attribute, dataset_format="array"
@@ -2198,7 +2202,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             steps=[("preprocess", ct), ("estimator", sklearn.tree.DecisionTreeClassifier())]
         )  # build a sklearn classifier
 
-        task = openml.tasks.get_task(253)  # data with mixed types from test server
+        task = openml.tasks.get_task(253)  # profb; crossvalidation
         try:
             _ = openml.runs.run_model_on_task(clf, task)
         except AttributeError as e:

@@ -9,6 +9,7 @@ import pandas as pd
 from functools import wraps
 import collections
 
+import openml
 import openml._api_calls
 import openml.exceptions
 from . import config
