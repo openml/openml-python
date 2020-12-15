@@ -280,7 +280,7 @@ def _create_cache_directory(key):
         os.makedirs(cache_dir, exist_ok=True)
     except Exception as e:
         raise openml.exceptions.OpenMLCacheException(
-            f"Cannot create cache directory {cache_dir} due to exception {e}"
+            f"Cannot create cache directory {cache_dir}."
         ) from e
     return cache_dir
 

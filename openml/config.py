@@ -9,7 +9,6 @@ import logging.handlers
 import os
 from pathlib import Path
 from typing import Tuple, cast
-import warnings
 
 from io import StringIO
 import configparser
@@ -21,7 +20,7 @@ console_handler = None
 file_handler = None
 
 
-def _create_log_handlers():
+def _create_log_handlers(create_file_handler=True):
     """ Creates but does not attach the log handlers. """
     global console_handler, file_handler
     if console_handler is not None or file_handler is not None:
@@ -34,12 +33,13 @@ def _create_log_handlers():
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(output_formatter)
 
-    one_mb = 2 ** 20
-    log_path = os.path.join(cache_directory, "openml_python.log")
-    file_handler = logging.handlers.RotatingFileHandler(
-        log_path, maxBytes=one_mb, backupCount=1, delay=True
-    )
-    file_handler.setFormatter(output_formatter)
+    if create_file_handler:
+        one_mb = 2 ** 20
+        log_path = os.path.join(cache_directory, "openml_python.log")
+        file_handler = logging.handlers.RotatingFileHandler(
+            log_path, maxBytes=one_mb, backupCount=1, delay=True
+        )
+        file_handler.setFormatter(output_formatter)
 
 
 def _convert_log_levels(log_level: int) -> Tuple[int, int]:
@@ -197,12 +197,20 @@ def _setup():
     if not os.path.exists(expanded_openml_dir):
         try:
             os.mkdir(expanded_openml_dir)
+            cache_exists = True
         except PermissionError:
-            warnings.warn(
-                "No permission to create openml directory at %s! This can result in OpenML-Python "
-                "not working properly." % expanded_openml_dir
-            )
-            pass
+            cache_exists = False
+    else:
+        cache_exists = True
+
+    if cache_exists:
+        _create_log_handlers()
+    else:
+        _create_log_handlers(create_file_handler=False)
+        openml_logger.warning(
+            "No permission to create openml directory at %s! This can result in OpenML-Python "
+            "not working properly." % expanded_openml_dir
+        )
 
     config = _parse_config()
     apikey = config.get("FAKE_SECTION", "apikey")
@@ -216,14 +224,13 @@ def _setup():
         try:
             os.mkdir(cache_directory)
         except PermissionError:
-            warnings.warn(
+            openml_logger.warning(
                 "No permission to create openml cache directory at %s! This can result in "
                 "OpenML-Python not working properly." % cache_directory
             )
-            pass
 
     avoid_duplicate_runs = config.getboolean("FAKE_SECTION", "avoid_duplicate_runs")
-    connection_n_retries = config.get("FAKE_SECTION", "connection_n_retries")
+    connection_n_retries = int(config.get("FAKE_SECTION", "connection_n_retries"))
     max_retries = config.get("FAKE_SECTION", "max_retries")
     if connection_n_retries > max_retries:
         raise ValueError(
@@ -300,4 +307,3 @@ __all__ = [
 ]
 
 _setup()
-_create_log_handlers()

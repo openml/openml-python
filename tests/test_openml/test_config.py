@@ -10,8 +10,9 @@ import openml.testing
 
 class TestConfig(openml.testing.TestBase):
     @unittest.mock.patch("os.path.expanduser")
-    @unittest.mock.patch("warnings.warn")
-    def test_non_writable_home(self, warnings_mock, expanduser_mock):
+    @unittest.mock.patch("openml.config.openml_logger.warning")
+    @unittest.mock.patch("openml.config._create_log_handlers")
+    def test_non_writable_home(self, log_handler_mock, warnings_mock, expanduser_mock):
         with tempfile.TemporaryDirectory(dir=self.workdir) as td:
             expanduser_mock.side_effect = (
                 os.path.join(td, "openmldir"),
@@ -21,6 +22,8 @@ class TestConfig(openml.testing.TestBase):
             openml.config._setup()
 
         self.assertEqual(warnings_mock.call_count, 2)
+        self.assertEqual(log_handler_mock.call_count, 1)
+        self.assertFalse(log_handler_mock.call_args_list[0][1]["create_file_handler"])
 
 
 class TestConfigurationForExamples(openml.testing.TestBase):
