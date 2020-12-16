@@ -1279,7 +1279,7 @@ class TestRun(TestBase):
             self._check_run(runs[rid])
 
     def test_list_runs_empty(self):
-        runs = openml.runs.list_runs(task=[1])
+        runs = openml.runs.list_runs(task=[0])
         if len(runs) > 0:
             raise ValueError("UnitTest Outdated, got somehow results")
 

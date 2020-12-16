@@ -175,10 +175,13 @@ def _send_request(
     request_method, url, data, files=None,
 ):
     n_retries = config.connection_n_retries
+    max_retries = 10
+    retry_counter = 0
     response = None
     with requests.Session() as session:
         # Start at one to have a non-zero multiplier for the sleep
-        for i in range(1, n_retries + 1):
+        while retry_counter < n_retries:
+            retry_counter += 1
             try:
                 if request_method == "get":
                     response = session.get(url, params=data)
@@ -198,15 +201,17 @@ def _send_request(
                 if isinstance(e, OpenMLServerException):
                     if e.code != 107:
                         # 107 is a database connection error - only then do retries
-                        raise
+                        raise e
                     else:
                         wait_time = 0.3
+                        # increase retries if database connection error
+                        n_retries = min(n_retries + 1, max_retries)
                 else:
                     wait_time = 0.1
-                if i == n_retries:
+                if retry_counter == n_retries:
                     raise e
                 else:
-                    time.sleep(wait_time * i)
+                    time.sleep(wait_time * retry_counter)
                     continue
     if response is None:
         raise ValueError("This should never happen!")
