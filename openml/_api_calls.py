@@ -114,9 +114,8 @@ def _download_text_file(
         md5_checksum_download = md5.hexdigest()
         if md5_checksum != md5_checksum_download:
             raise OpenMLHashException(
-                "Checksum {} of downloaded file is unequal to the expected checksum {}.".format(
-                    md5_checksum_download, md5_checksum
-                )
+                "Checksum {} of downloaded file is unequal to the expected checksum {} "
+                "when downloading {}.".format(md5_checksum_download, md5_checksum, source)
             )
 
     if output_path is None:
