@@ -203,7 +203,7 @@ def _send_request(
                         # 107: database connection error
                         # 500: internal server error
                         wait_time = 0.3
-                        n_retries = min(n_retries + 1, max_retries)  # increase retries
+                        n_retries = min(n_retries + 1, max_retries)
                     else:
                         raise
                 else:
