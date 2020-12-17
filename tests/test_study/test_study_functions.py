@@ -213,9 +213,8 @@ class TestStudyFunctions(TestBase):
     def test_study_list(self):
         study_list = openml.study.list_studies(status="in_preparation")
         # might fail if server is recently resetted
-        self.assertGreater(len(study_list), 2)
+        self.assertGreaterEqual(len(study_list), 2)
 
     def test_study_list_output_format(self):
         study_list = openml.study.list_studies(status="in_preparation", output_format="dataframe")
         self.assertIsInstance(study_list, pd.DataFrame)
-        self.assertGreater(len(study_list), 2)

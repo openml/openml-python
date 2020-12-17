@@ -175,7 +175,7 @@ def _send_request(
     request_method, url, data, files=None,
 ):
     n_retries = config.connection_n_retries
-    max_retries = 10
+    max_retries = config.max_retries
     retry_counter = 0
     response = None
     with requests.Session() as session:
@@ -199,13 +199,13 @@ def _send_request(
                 OpenMLServerException,
             ) as e:
                 if isinstance(e, OpenMLServerException):
-                    if e.code != 107:
-                        # 107 is a database connection error - only then do retries
-                        raise e
-                    else:
+                    if e.code in [107, 500]:
+                        # 107: database connection error
+                        # 500: internal server error
                         wait_time = 0.3
-                        # increase retries if database connection error
-                        n_retries = min(n_retries + 1, max_retries)
+                        n_retries = min(n_retries + 1, max_retries)  # increase retries
+                    else:
+                        raise
                 else:
                     wait_time = 0.1
                 if retry_counter == n_retries:
