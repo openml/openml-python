@@ -5,7 +5,7 @@ import hashlib
 import logging
 import requests
 import xmltodict
-from typing import Dict, Optional
+from typing import Dict, Optional, cast
 
 from . import config
 from .exceptions import (
@@ -103,20 +103,32 @@ def _download_text_file(
         except FileNotFoundError:
             pass
 
+    n_retries = cast(int, config.connection_n_retries)
+    wait_time = 0.2
+    raise_error = None
     logging.info("Starting [%s] request for the URL %s", "get", source)
     start = time.time()
-    response = __read_url(source, request_method="get")
-    downloaded_file = response.text
+    for retry in range(n_retries):
+        response = __read_url(source, request_method="get")
+        downloaded_file = response.text
 
-    if md5_checksum is not None:
-        md5 = hashlib.md5()
-        md5.update(downloaded_file.encode("utf-8"))
-        md5_checksum_download = md5.hexdigest()
-        if md5_checksum != md5_checksum_download:
-            raise OpenMLHashException(
-                "Checksum {} of downloaded file is unequal to the expected checksum {} "
-                "when downloading {}.".format(md5_checksum_download, md5_checksum, source)
-            )
+        if md5_checksum is not None:
+            md5 = hashlib.md5()
+            md5.update(downloaded_file.encode("utf-8"))
+            md5_checksum_download = md5.hexdigest()
+            if md5_checksum == md5_checksum_download:
+                raise_error = False
+                break
+            else:
+                raise_error = True
+                time.sleep(wait_time)
+    # raise_error can be set to True only if the variables md5_checksum_download and md5_checksum
+    # were initialized and compared during retries
+    if raise_error:
+        raise OpenMLHashException(
+            "Checksum {} of downloaded file is unequal to the expected checksum {} "
+            "when downloading {}.".format(md5_checksum_download, md5_checksum, source)
+        )
 
     if output_path is None:
         logging.info(
