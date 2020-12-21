@@ -4,6 +4,7 @@ import time
 import hashlib
 import logging
 import requests
+import xml
 import xmltodict
 from typing import Dict, Optional, cast
 
@@ -185,8 +186,8 @@ def __read_url(url, request_method, data=None):
 def _send_request(
     request_method, url, data, files=None,
 ):
-    n_retries = config.connection_n_retries
-    max_retries = config.max_retries
+    n_retries = max(1, min(config.connection_n_retries, config.max_retries))
+
     retry_counter = 0
     response = None
     with requests.Session() as session:
@@ -208,21 +209,29 @@ def _send_request(
                 requests.exceptions.ConnectionError,
                 requests.exceptions.SSLError,
                 OpenMLServerException,
+                OpenMLServerError,
+                xml.parsers.expat.ExpatError,
             ) as e:
                 if isinstance(e, OpenMLServerException):
-                    if e.code in [107, 500]:
+                    if e.code not in [107, 500]:
                         # 107: database connection error
                         # 500: internal server error
-                        wait_time = 0.3
-                        n_retries = min(n_retries + 1, max_retries)
-                    else:
                         raise
+                elif isinstance(e, OpenMLServerError):
+                    if request_method != "get":
+                        raise
+                elif isinstance(e, xml.parsers.expat.ExpatError):
+                    if request_method != "get" or retry_counter >= n_retries:
+                        raise OpenMLServerError(
+                            "Unexpected server error when calling {}. Please contact the "
+                            "developers!\nStatus code: {}\n{}".format(
+                                url, response.status_code, response.text,
+                            )
+                        )
+                if retry_counter >= n_retries:
+                    raise
                 else:
-                    wait_time = 0.1
-                if retry_counter == n_retries:
-                    raise e
-                else:
-                    time.sleep(wait_time * retry_counter)
+                    time.sleep(retry_counter)
                     continue
     if response is None:
         raise ValueError("This should never happen!")
@@ -246,6 +255,8 @@ def __parse_server_exception(
         raise OpenMLServerError("URI too long! ({})".format(url))
     try:
         server_exception = xmltodict.parse(response.text)
+    except xml.parsers.expat.ExpatError:
+        raise
     except Exception:
         # OpenML has a sophisticated error system
         # where information about failures is provided. try to parse this
