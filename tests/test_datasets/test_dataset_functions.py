@@ -499,6 +499,7 @@ class TestOpenMLDataset(TestBase):
         )
         self.assertIsInstance(dataset.dataset_id, int)
 
+    @pytest.mark.flaky()
     def test_data_status(self):
         dataset = OpenMLDataset(
             "%s-UploadTestWithURL" % self._get_sentinel(),
