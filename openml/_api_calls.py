@@ -213,16 +213,13 @@ def _send_request(
                     if e.code in [107, 500]:
                         # 107: database connection error
                         # 500: internal server error
-                        wait_time = 0.3
                         n_retries = min(n_retries + 1, max_retries)
                     else:
                         raise
-                else:
-                    wait_time = 0.1
                 if retry_counter == n_retries:
-                    raise e
+                    raise
                 else:
-                    time.sleep(wait_time * retry_counter)
+                    time.sleep(retry_counter)
                     continue
     if response is None:
         raise ValueError("This should never happen!")
