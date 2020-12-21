@@ -228,7 +228,6 @@ def _send_request(
                     raise
                 else:
                     time.sleep(retry_counter)
-                    continue
     if response is None:
         raise ValueError("This should never happen!")
     return response
