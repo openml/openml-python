@@ -261,15 +261,6 @@ def check_task_existence(
     Parameter
     ---------
     task_type : openml.tasks.TaskType
-        ID of the task type as detailed `here <https://www.openml.org/search?type=task_type>`_.
-        - Supervised classification: 1
-        - Supervised regression: 2
-        - Learning curve: 3
-        - Supervised data stream classification: 4
-        - Clustering: 5
-        - Machine Learning Challenge: 6
-        - Survival Analysis: 7
-        - Subgroup Discovery: 8
     dataset_id : int
     target_name : str
 

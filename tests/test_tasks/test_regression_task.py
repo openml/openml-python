@@ -28,7 +28,6 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
         if _task_id is not None:
             task_id = _task_id
         else:
-            task_meta_data["task_type"] = TaskType.SUPERVISED_REGRESSION
             new_task = openml.tasks.create_task(**task_meta_data)
             # publishes the new task
             try:

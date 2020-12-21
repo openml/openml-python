@@ -563,7 +563,6 @@ class TestRun(TestBase):
         if _task_id is not None:
             task_id = _task_id
         else:
-            task_meta_data["task_type"] = TaskType.SUPERVISED_REGRESSION
             new_task = openml.tasks.create_task(**task_meta_data)
             # publishes the new task
             try:
@@ -997,7 +996,6 @@ class TestRun(TestBase):
         if _task_id is not None:
             task_id = _task_id
         else:
-            task_meta_data["task_type"] = TaskType.SUPERVISED_CLASSIFICATION
             new_task = openml.tasks.create_task(**task_meta_data)
             # publishes the new task
             try:
@@ -1280,7 +1278,7 @@ class TestRun(TestBase):
             self._check_run(runs[rid])
 
     def test_list_runs_empty(self):
-        runs = openml.runs.list_runs(task=[1])
+        runs = openml.runs.list_runs(task=[0])
         if len(runs) > 0:
             raise ValueError("UnitTest Outdated, got somehow results")
 
@@ -1557,7 +1555,6 @@ class TestRun(TestBase):
         if _task_id is not None:
             task_id = _task_id
         else:
-            task_meta_data["task_type"] = TaskType.SUPERVISED_REGRESSION
             new_task = openml.tasks.create_task(**task_meta_data)
             # publishes the new task
             try:

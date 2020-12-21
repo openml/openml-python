@@ -416,8 +416,8 @@ class TestOpenMLDataset(TestBase):
         self.assertRaisesRegex(
             OpenMLHashException,
             "Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded file "
-            "is unequal to the expected checksum abc. "
-            "Raised when downloading dataset 5.",
+            "is unequal to the expected checksum abc when downloading "
+            "https://www.openml.org/data/download/61. Raised when downloading dataset 5.",
             _get_dataset_arff,
             description,
         )
@@ -499,6 +499,7 @@ class TestOpenMLDataset(TestBase):
         )
         self.assertIsInstance(dataset.dataset_id, int)
 
+    @pytest.mark.flaky()
     def test_data_status(self):
         dataset = OpenMLDataset(
             "%s-UploadTestWithURL" % self._get_sentinel(),
