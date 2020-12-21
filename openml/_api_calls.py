@@ -209,16 +209,12 @@ def _send_request(
                 requests.exceptions.ConnectionError,
                 requests.exceptions.SSLError,
                 OpenMLServerException,
-                OpenMLServerError,
                 xml.parsers.expat.ExpatError,
             ) as e:
                 if isinstance(e, OpenMLServerException):
                     if e.code not in [107, 500]:
                         # 107: database connection error
                         # 500: internal server error
-                        raise
-                elif isinstance(e, OpenMLServerError):
-                    if request_method != "get":
                         raise
                 elif isinstance(e, xml.parsers.expat.ExpatError):
                     if request_method != "get" or retry_counter >= n_retries:
