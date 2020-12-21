@@ -762,6 +762,7 @@ def _create_run_from_xml(xml, from_server=True):
     if "oml:output_data" not in run:
         if from_server:
             raise ValueError("Run does not contain output_data " "(OpenML server error?)")
+        predictions_url = None
     else:
         output_data = run["oml:output_data"]
         predictions_url = None

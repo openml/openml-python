@@ -518,18 +518,6 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
-    def test_upload_run_with_setup_string(self):
-        SETUP_STRING = "setup-string"
-        run = openml.runs.run_model_on_task(
-            DummyClassifier(strategy="prior"),
-            self.TEST_SERVER_TASK_SIMPLE[0],
-            avoid_duplicate_runs=False,
-        )
-        run.setup_string = SETUP_STRING
-        run.publish()
-        server_run = openml.runs.get_run(run.id)
-        assert server_run.setup_string == SETUP_STRING
-
     def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression(solver="lbfgs", max_iter=1000)
         task_id = self.TEST_SERVER_TASK_SIMPLE[0]

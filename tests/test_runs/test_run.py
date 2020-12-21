@@ -5,11 +5,13 @@ import random
 import os
 from time import time
 
+import xmltodict
 from sklearn.dummy import DummyClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 
+from openml import OpenMLRun
 from openml.testing import TestBase, SimpleImputer
 import openml
 import openml.extensions.sklearn
@@ -215,3 +217,19 @@ class TestRun(TestBase):
         # make sure the flow is published as part of publishing the run.
         self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))
         openml.runs.get_run(loaded_run.run_id)
+
+    def test_run_setup_string_included_in_xml(self):
+        SETUP_STRING = "setup-string"
+        run = OpenMLRun(
+            task_id=0,
+            flow_id=None,  # if not none, flow parameters are required.
+            dataset_id=0,
+            setup_string=SETUP_STRING,
+        )
+        xml = run._to_xml()
+        run_dict = xmltodict.parse(xml)["oml:run"]
+        assert "oml:setup_string" in run_dict
+        assert run_dict["oml:setup_string"] == SETUP_STRING
+
+        recreated_run = openml.runs.functions._create_run_from_xml(xml, from_server=False)
+        assert recreated_run.setup_string == SETUP_STRING
