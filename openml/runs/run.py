@@ -543,6 +543,8 @@ class OpenMLRun(OpenMLBase):
         description["oml:run"]["@xmlns:oml"] = "http://openml.org/openml"
         description["oml:run"]["oml:task_id"] = self.task_id
         description["oml:run"]["oml:flow_id"] = self.flow_id
+        if self.setup_string is not None:
+            description["oml:run"]["oml:setup_string"] = self.setup_string
         if self.error_message is not None:
             description["oml:run"]["oml:error_message"] = self.error_message
         description["oml:run"]["oml:parameter_setting"] = self.parameter_settings
