@@ -4,6 +4,7 @@ import openml
 import openml.study
 from openml.testing import TestBase
 import pandas as pd
+import pytest
 
 
 class TestStudyFunctions(TestBase):
@@ -113,6 +114,7 @@ class TestStudyFunctions(TestBase):
         self.assertEqual(study_downloaded.status, "deactivated")
         # can't delete study, now it's not longer in preparation
 
+    @pytest.mark.flaky()
     def test_publish_study(self):
         # get some random runs to attach
         run_list = openml.evaluations.list_evaluations("predictive_accuracy", size=10)
