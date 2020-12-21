@@ -87,7 +87,7 @@ _defaults = {
     "server": "https://www.openml.org/api/v1/xml",
     "cachedir": os.path.expanduser(os.path.join("~", ".openml", "cache")),
     "avoid_duplicate_runs": "True",
-    "connection_n_retries": 5,
+    "connection_n_retries": 10,
     "max_retries": 20,
 }
 
