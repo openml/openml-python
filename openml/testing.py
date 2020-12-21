@@ -19,6 +19,7 @@ with warnings.catch_warnings():
 
 import openml
 from openml.tasks import TaskType
+from openml.exceptions import OpenMLServerException
 
 import logging
 
@@ -281,7 +282,13 @@ def check_task_existence(
     task_match = []
     for task_id in tasks["tid"].to_list():
         task_match.append(task_id)
-        task = openml.tasks.get_task(task_id)
+        try:
+            task = openml.tasks.get_task(task_id)
+        except OpenMLServerException:
+            # can fail if task_id deleted by another parallely run unit test
+            task_match.pop(-1)
+            return_val = None
+            continue
         for k, v in kwargs.items():
             if getattr(task, k) != v:
                 # even if one of the meta-data key mismatches, then task_id is not a match
