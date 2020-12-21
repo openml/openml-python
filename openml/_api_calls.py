@@ -6,7 +6,7 @@ import logging
 import requests
 import xml
 import xmltodict
-from typing import Dict, Optional, cast
+from typing import Dict, Optional
 
 from . import config
 from .exceptions import (
@@ -104,32 +104,10 @@ def _download_text_file(
         except FileNotFoundError:
             pass
 
-    n_retries = cast(int, config.connection_n_retries)
-    wait_time = 0.2
-    raise_error = None
     logging.info("Starting [%s] request for the URL %s", "get", source)
     start = time.time()
-    for retry in range(n_retries):
-        response = __read_url(source, request_method="get")
-        downloaded_file = response.text
-
-        if md5_checksum is not None:
-            md5 = hashlib.md5()
-            md5.update(downloaded_file.encode("utf-8"))
-            md5_checksum_download = md5.hexdigest()
-            if md5_checksum == md5_checksum_download:
-                raise_error = False
-                break
-            else:
-                raise_error = True
-                time.sleep(wait_time)
-    # raise_error can be set to True only if the variables md5_checksum_download and md5_checksum
-    # were initialized and compared during retries
-    if raise_error:
-        raise OpenMLHashException(
-            "Checksum {} of downloaded file is unequal to the expected checksum {} "
-            "when downloading {}.".format(md5_checksum_download, md5_checksum, source)
-        )
+    response = __read_url(source, request_method="get", md5_checksum=md5_checksum)
+    downloaded_file = response.text
 
     if output_path is None:
         logging.info(
@@ -175,25 +153,33 @@ def _read_url_files(url, data=None, file_elements=None):
     return response
 
 
-def __read_url(url, request_method, data=None):
+def __read_url(url, request_method, data=None, md5_checksum=None):
     data = {} if data is None else data
     if config.apikey is not None:
         data["api_key"] = config.apikey
+    return _send_request(
+        request_method=request_method, url=url, data=data, md5_checksum=md5_checksum
+    )
 
-    return _send_request(request_method=request_method, url=url, data=data)
+
+def __is_checksum_equal(downloaded_file, md5_checksum=None):
+    if md5_checksum is None:
+        return True
+    md5 = hashlib.md5()
+    md5.update(downloaded_file.encode("utf-8"))
+    md5_checksum_download = md5.hexdigest()
+    if md5_checksum == md5_checksum_download:
+        return True
+    return False
 
 
-def _send_request(
-    request_method, url, data, files=None,
-):
+def _send_request(request_method, url, data, files=None, md5_checksum=None):
     n_retries = max(1, min(config.connection_n_retries, config.max_retries))
 
-    retry_counter = 0
     response = None
     with requests.Session() as session:
         # Start at one to have a non-zero multiplier for the sleep
-        while retry_counter < n_retries:
-            retry_counter += 1
+        for retry_counter in range(1, n_retries + 1):
             try:
                 if request_method == "get":
                     response = session.get(url, params=data)
@@ -204,12 +190,18 @@ def _send_request(
                 else:
                     raise NotImplementedError()
                 __check_response(response=response, url=url, file_elements=files)
+                if request_method == "get" and not __is_checksum_equal(response.text, md5_checksum):
+                    raise OpenMLHashException(
+                        "Checksum of downloaded file is unequal to the expected checksum {} "
+                        "when downloading {}.".format(md5_checksum, url)
+                    )
                 break
             except (
                 requests.exceptions.ConnectionError,
                 requests.exceptions.SSLError,
                 OpenMLServerException,
                 xml.parsers.expat.ExpatError,
+                OpenMLHashException,
             ) as e:
                 if isinstance(e, OpenMLServerException):
                     if e.code not in [107, 500]:
