@@ -367,7 +367,7 @@ class TestRun(TestBase):
                                 # and/or measurements are not as accurate.
                                 # Either way, windows seems to get an eval-time
                                 # of 0 sometimes.
-                                self.assertGreater(evaluation, 0)
+                                self.assertGreaterEqual(evaluation, 0)
                             self.assertLess(evaluation, max_time_allowed)
 
     def test_run_regression_on_classif_task(self):
