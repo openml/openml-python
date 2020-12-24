@@ -6,9 +6,10 @@ import os
 import shutil
 import sys
 import time
-from typing import Dict
+from typing import Dict, Union, cast
 import unittest
 import warnings
+import pandas as pd
 
 # Currently, importing oslo raises a lot of warning that it will stop working
 # under python3.8; remove this once they disappear
@@ -18,6 +19,7 @@ with warnings.catch_warnings():
 
 import openml
 from openml.tasks import TaskType
+from openml.exceptions import OpenMLServerException
 
 import logging
 
@@ -252,6 +254,55 @@ class TestBase(unittest.TestCase):
                         self.assertLessEqual(evaluation, max_val)
 
 
+def check_task_existence(
+    task_type: TaskType, dataset_id: int, target_name: str, **kwargs
+) -> Union[int, None]:
+    """Checks if any task with exists on test server that matches the meta data.
+
+    Parameter
+    ---------
+    task_type : openml.tasks.TaskType
+    dataset_id : int
+    target_name : str
+
+    Return
+    ------
+    int, None
+    """
+    return_val = None
+    tasks = openml.tasks.list_tasks(task_type=task_type, output_format="dataframe")
+    if len(tasks) == 0:
+        return None
+    tasks = cast(pd.DataFrame, tasks).loc[tasks["did"] == dataset_id]
+    if len(tasks) == 0:
+        return None
+    tasks = tasks.loc[tasks["target_feature"] == target_name]
+    if len(tasks) == 0:
+        return None
+    task_match = []
+    for task_id in tasks["tid"].to_list():
+        task_match.append(task_id)
+        try:
+            task = openml.tasks.get_task(task_id)
+        except OpenMLServerException:
+            # can fail if task_id deleted by another parallely run unit test
+            task_match.pop(-1)
+            return_val = None
+            continue
+        for k, v in kwargs.items():
+            if getattr(task, k) != v:
+                # even if one of the meta-data key mismatches, then task_id is not a match
+                task_match.pop(-1)
+                break
+        # if task_id is retained in the task_match list, it passed all meta key-value matches
+        if len(task_match) == 1:
+            return_val = task_id
+            break
+    if len(task_match) == 0:
+        return_val = None
+    return return_val
+
+
 try:
     from sklearn.impute import SimpleImputer
 except ImportError:
@@ -275,4 +326,4 @@ def cat(X):
     return X.dtypes == "category"
 
 
-__all__ = ["TestBase", "SimpleImputer", "CustomImputer", "cat", "cont"]
+__all__ = ["TestBase", "SimpleImputer", "CustomImputer", "cat", "cont", "check_task_existence"]

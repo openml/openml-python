@@ -102,7 +102,7 @@ class TestRun(TestBase):
                 ("classifier", DecisionTreeClassifier(max_depth=1)),
             ]
         )
-        task = openml.tasks.get_task(119)
+        task = openml.tasks.get_task(119)  # diabetes; crossvalidation
         run = openml.runs.run_model_on_task(
             model=model,
             task=task,
@@ -142,7 +142,7 @@ class TestRun(TestBase):
             },
         )
 
-        task = openml.tasks.get_task(119)
+        task = openml.tasks.get_task(119)  # diabetes; crossvalidation
         run = openml.runs.run_model_on_task(
             model=model, task=task, add_local_measures=False, avoid_duplicate_runs=False,
         )
@@ -163,7 +163,7 @@ class TestRun(TestBase):
         model = Pipeline(
             [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())]
         )
-        task = openml.tasks.get_task(119)
+        task = openml.tasks.get_task(119)  # diabetes; crossvalidation
         run = openml.runs.run_model_on_task(model=model, task=task, add_local_measures=False)
 
         cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
@@ -184,7 +184,7 @@ class TestRun(TestBase):
         model = Pipeline(
             [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())]
         )
-        task = openml.tasks.get_task(119)
+        task = openml.tasks.get_task(119)  # diabetes; crossvalidation
 
         # Make sure the flow does not exist on the server yet.
         flow = extension.model_to_flow(model)

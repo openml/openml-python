@@ -1,5 +1,4 @@
 # License: BSD 3-Clause
-from typing import Tuple, List, Union
 
 import arff
 from distutils.version import LooseVersion
@@ -7,6 +6,7 @@ import os
 import random
 import time
 import sys
+import ast
 import unittest.mock
 
 import numpy as np
@@ -24,6 +24,8 @@ from openml.testing import TestBase, SimpleImputer, CustomImputer, cat, cont
 from openml.runs.functions import _run_task_get_arffcontent, run_exists, format_prediction
 from openml.runs.trace import OpenMLRunTrace
 from openml.tasks import TaskType
+from openml.testing import check_task_existence
+from openml.exceptions import OpenMLServerException
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
@@ -41,19 +43,45 @@ from sklearn.pipeline import Pipeline, make_pipeline
 
 class TestRun(TestBase):
     _multiprocess_can_split_ = True
-    # diabetis dataset, 768 observations, 0 missing vals, 33% holdout set
-    # (253 test obs), no nominal attributes, all numeric attributes
-    TEST_SERVER_TASK_SIMPLE: Tuple[Union[int, List], ...] = (119, 0, 253, [], [*range(8)])
-    TEST_SERVER_TASK_REGRESSION: Tuple[Union[int, List], ...] = (738, 0, 718, [], [*range(8)])
-    # credit-a dataset, 690 observations, 67 missing vals, 33% holdout set
-    # (227 test obs)
-    TEST_SERVER_TASK_MISSING_VALS = (
-        96,
-        67,
-        227,
-        [0, 3, 4, 5, 6, 8, 9, 11, 12],
-        [1, 2, 7, 10, 13, 14],
-    )
+    TEST_SERVER_TASK_MISSING_VALS = {
+        "task_id": 96,
+        "n_missing_vals": 67,
+        "n_test_obs": 227,
+        "nominal_indices": [0, 3, 4, 5, 6, 8, 9, 11, 12],
+        "numeric_indices": [1, 2, 7, 10, 13, 14],
+        "task_meta_data": {
+            "task_type": TaskType.SUPERVISED_CLASSIFICATION,
+            "dataset_id": 16,  # credit-a
+            "estimation_procedure_id": 1,
+            "target_name": "class",
+        },
+    }
+    TEST_SERVER_TASK_SIMPLE = {
+        "task_id": 119,
+        "n_missing_vals": 0,
+        "n_test_obs": 253,
+        "nominal_indices": [],
+        "numeric_indices": [*range(8)],
+        "task_meta_data": {
+            "task_type": TaskType.SUPERVISED_CLASSIFICATION,
+            "dataset_id": 20,  # diabetes
+            "estimation_procedure_id": 1,
+            "target_name": "class",
+        },
+    }
+    TEST_SERVER_TASK_REGRESSION = {
+        "task_id": 1605,
+        "n_missing_vals": 0,
+        "n_test_obs": 2178,
+        "nominal_indices": [],
+        "numeric_indices": [*range(8)],
+        "task_meta_data": {
+            "task_type": TaskType.SUPERVISED_REGRESSION,
+            "dataset_id": 123,  # quake
+            "estimation_procedure_id": 7,
+            "target_name": "richter",
+        },
+    }
 
     # Suppress warnings to facilitate testing
     hide_warnings = True
@@ -343,7 +371,7 @@ class TestRun(TestBase):
                             self.assertLess(evaluation, max_time_allowed)
 
     def test_run_regression_on_classif_task(self):
-        task_id = 115
+        task_id = 115  # diabetes; crossvalidation
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
@@ -357,7 +385,7 @@ class TestRun(TestBase):
             )
 
     def test_check_erronous_sklearn_flow_fails(self):
-        task_id = 115
+        task_id = 115  # diabetes; crossvalidation
         task = openml.tasks.get_task(task_id)
 
         # Invalid parameter values
@@ -498,7 +526,7 @@ class TestRun(TestBase):
     def _run_and_upload_regression(
         self, clf, task_id, n_missing_vals, n_test_obs, flow_expected_rsv, sentinel=None
     ):
-        num_folds = 1  # because of holdout
+        num_folds = 10  # because of cross-validation
         num_iterations = 5  # for base search algorithms
         metric = sklearn.metrics.mean_absolute_error  # metric class
         metric_name = "mean_absolute_error"  # openml metric name
@@ -520,16 +548,38 @@ class TestRun(TestBase):
 
     def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression(solver="lbfgs", max_iter=1000)
-        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
-        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
-        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
+        task_id = self.TEST_SERVER_TASK_SIMPLE["task_id"]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE["n_missing_vals"]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
-        task_id = self.TEST_SERVER_TASK_REGRESSION[0]
-        n_missing_vals = self.TEST_SERVER_TASK_REGRESSION[1]
-        n_test_obs = self.TEST_SERVER_TASK_REGRESSION[2]
+        task_id = self.TEST_SERVER_TASK_REGRESSION["task_id"]
+
+        task_meta_data = self.TEST_SERVER_TASK_REGRESSION["task_meta_data"]
+        _task_id = check_task_existence(**task_meta_data)
+        if _task_id is not None:
+            task_id = _task_id
+        else:
+            new_task = openml.tasks.create_task(**task_meta_data)
+            # publishes the new task
+            try:
+                new_task = new_task.publish()
+                task_id = new_task.task_id
+            except OpenMLServerException as e:
+                if e.code == 614:  # Task already exists
+                    # the exception message contains the task_id that was matched in the format
+                    # 'Task already exists. - matched id(s): [xxxx]'
+                    task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
+                else:
+                    raise Exception(repr(e))
+            # mark to remove the uploaded task
+            TestBase._mark_entity_for_removal("task", task_id)
+            TestBase.logger.info("collected from test_run_functions: {}".format(task_id))
+
+        n_missing_vals = self.TEST_SERVER_TASK_REGRESSION["n_missing_vals"]
+        n_test_obs = self.TEST_SERVER_TASK_REGRESSION["n_test_obs"]
         self._run_and_upload_regression(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
     def test_run_and_upload_pipeline_dummy_pipeline(self):
@@ -540,9 +590,9 @@ class TestRun(TestBase):
                 ("dummy", DummyClassifier(strategy="prior")),
             ]
         )
-        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
-        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
-        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
+        task_id = self.TEST_SERVER_TASK_SIMPLE["task_id"]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE["n_missing_vals"]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(pipeline1, task_id, n_missing_vals, n_test_obs, "62501")
 
     @unittest.skipIf(
@@ -583,20 +633,26 @@ class TestRun(TestBase):
 
         sentinel = self._get_sentinel()
         self._run_and_upload_classification(
-            get_ct_cf(self.TEST_SERVER_TASK_SIMPLE[3], self.TEST_SERVER_TASK_SIMPLE[4]),
-            self.TEST_SERVER_TASK_SIMPLE[0],
-            self.TEST_SERVER_TASK_SIMPLE[1],
-            self.TEST_SERVER_TASK_SIMPLE[2],
+            get_ct_cf(
+                self.TEST_SERVER_TASK_SIMPLE["nominal_indices"],
+                self.TEST_SERVER_TASK_SIMPLE["numeric_indices"],
+            ),
+            self.TEST_SERVER_TASK_SIMPLE["task_id"],
+            self.TEST_SERVER_TASK_SIMPLE["n_missing_vals"],
+            self.TEST_SERVER_TASK_SIMPLE["n_test_obs"],
             "62501",
             sentinel=sentinel,
         )
         # Due to #602, it is important to test this model on two tasks
         # with different column specifications
         self._run_and_upload_classification(
-            get_ct_cf(self.TEST_SERVER_TASK_MISSING_VALS[3], self.TEST_SERVER_TASK_MISSING_VALS[4]),
-            self.TEST_SERVER_TASK_MISSING_VALS[0],
-            self.TEST_SERVER_TASK_MISSING_VALS[1],
-            self.TEST_SERVER_TASK_MISSING_VALS[2],
+            get_ct_cf(
+                self.TEST_SERVER_TASK_MISSING_VALS["nominal_indices"],
+                self.TEST_SERVER_TASK_MISSING_VALS["numeric_indices"],
+            ),
+            self.TEST_SERVER_TASK_MISSING_VALS["task_id"],
+            self.TEST_SERVER_TASK_MISSING_VALS["n_missing_vals"],
+            self.TEST_SERVER_TASK_MISSING_VALS["n_test_obs"],
             "62501",
             sentinel=sentinel,
         )
@@ -632,16 +688,24 @@ class TestRun(TestBase):
             ]
         )
 
-        task_id = self.TEST_SERVER_TASK_MISSING_VALS[0]
-        n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS[1]
-        n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS[2]
+        task_id = self.TEST_SERVER_TASK_MISSING_VALS["task_id"]
+        n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS["n_missing_vals"]
+        n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS["n_test_obs"]
         self._run_and_upload_classification(pipeline2, task_id, n_missing_vals, n_test_obs, "62501")
         # The warning raised is:
-        # The total space of parameters 8 is smaller than n_iter=10.
-        # Running 8 iterations. For exhaustive searches, use GridSearchCV.'
+        # "The total space of parameters 8 is smaller than n_iter=10.
+        # Running 8 iterations. For exhaustive searches, use GridSearchCV."
         # It is raised three times because we once run the model to upload something and then run
         # it again twice to compare that the predictions are reproducible.
-        self.assertEqual(warnings_mock.call_count, 3)
+        warning_msg = (
+            "The total space of parameters 8 is smaller than n_iter=10. "
+            "Running 8 iterations. For exhaustive searches, use GridSearchCV."
+        )
+        call_count = 0
+        for _warnings in warnings_mock.call_args_list:
+            if _warnings[0][0] == warning_msg:
+                call_count += 1
+        self.assertEqual(call_count, 3)
 
     def test_run_and_upload_gridsearch(self):
         gridsearch = GridSearchCV(
@@ -649,9 +713,9 @@ class TestRun(TestBase):
             {"base_estimator__C": [0.01, 0.1, 10], "base_estimator__gamma": [0.01, 0.1, 10]},
             cv=3,
         )
-        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
-        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
-        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
+        task_id = self.TEST_SERVER_TASK_SIMPLE["task_id"]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE["n_missing_vals"]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         run = self._run_and_upload_classification(
             clf=gridsearch,
             task_id=task_id,
@@ -678,9 +742,9 @@ class TestRun(TestBase):
         # The random states for the RandomizedSearchCV is set after the
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
-        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
-        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
-        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
+        task_id = self.TEST_SERVER_TASK_SIMPLE["task_id"]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE["n_missing_vals"]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         run = self._run_and_upload_classification(
             clf=randomsearch,
             task_id=task_id,
@@ -705,9 +769,9 @@ class TestRun(TestBase):
         # The random states for the GridSearchCV is set after the
         # random state of the RandomForestClassifier is set, therefore,
         # it has a different value than the other examples before
-        task_id = self.TEST_SERVER_TASK_SIMPLE[0]
-        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE[1]
-        n_test_obs = self.TEST_SERVER_TASK_SIMPLE[2]
+        task_id = self.TEST_SERVER_TASK_SIMPLE["task_id"]
+        n_missing_vals = self.TEST_SERVER_TASK_SIMPLE["n_missing_vals"]
+        n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(
             gridsearch, task_id, n_missing_vals, n_test_obs, "12172"
         )
@@ -791,7 +855,7 @@ class TestRun(TestBase):
             ]
         )
 
-        task = openml.tasks.get_task(11)
+        task = openml.tasks.get_task(11)  # kr-vs-kp; holdout
         run = openml.runs.run_model_on_task(
             model=randomsearch, task=task, avoid_duplicate_runs=False, seed=1,
         )
@@ -839,7 +903,7 @@ class TestRun(TestBase):
 
     def test_local_run_swapped_parameter_order_model(self):
         clf = DecisionTreeClassifier()
-        australian_task = 595
+        australian_task = 595  # Australian; crossvalidation
         task = openml.tasks.get_task(australian_task)
 
         # task and clf are purposely in the old order
@@ -866,7 +930,7 @@ class TestRun(TestBase):
 
         flow = self.extension.model_to_flow(clf)
         # download task
-        task = openml.tasks.get_task(7)
+        task = openml.tasks.get_task(7)  # kr-vs-kp; crossvalidation
 
         # invoke OpenML run
         run = openml.runs.run_flow_on_task(
@@ -891,7 +955,7 @@ class TestRun(TestBase):
         )
 
         # download task
-        task = openml.tasks.get_task(7)
+        task = openml.tasks.get_task(7)  # kr-vs-kp; crossvalidation
 
         # invoke OpenML run
         run = openml.runs.run_model_on_task(
@@ -921,7 +985,33 @@ class TestRun(TestBase):
                 ("Estimator", GaussianNB()),
             ]
         )
-        task = openml.tasks.get_task(1198)
+        task_meta_data = {
+            "task_type": TaskType.SUPERVISED_CLASSIFICATION,
+            "dataset_id": 128,  # iris
+            "estimation_procedure_id": 1,
+            "target_name": "class",
+        }
+        _task_id = check_task_existence(**task_meta_data)
+        if _task_id is not None:
+            task_id = _task_id
+        else:
+            new_task = openml.tasks.create_task(**task_meta_data)
+            # publishes the new task
+            try:
+                new_task = new_task.publish()
+                task_id = new_task.task_id
+            except OpenMLServerException as e:
+                if e.code == 614:  # Task already exists
+                    # the exception message contains the task_id that was matched in the format
+                    # 'Task already exists. - matched id(s): [xxxx]'
+                    task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
+                else:
+                    raise Exception(repr(e))
+            # mark to remove the uploaded task
+            TestBase._mark_entity_for_removal("task", task_id)
+            TestBase.logger.info("collected from test_run_functions: {}".format(task_id))
+
+        task = openml.tasks.get_task(task_id)
         run = openml.runs.run_model_on_task(model=clf, task=task, avoid_duplicate_runs=False,)
         run_ = run.publish()
         TestBase._mark_entity_for_removal("run", run_.run_id)
@@ -966,7 +1056,7 @@ class TestRun(TestBase):
             ),
         ]
 
-        task = openml.tasks.get_task(115)
+        task = openml.tasks.get_task(115)  # diabetes; crossvalidation
 
         for clf in clfs:
             try:
@@ -996,8 +1086,8 @@ class TestRun(TestBase):
 
     def test_run_with_illegal_flow_id(self):
         # check the case where the user adds an illegal flow id to a
-        # non-existing flow
-        task = openml.tasks.get_task(115)
+        # non-existing flo
+        task = openml.tasks.get_task(115)  # diabetes; crossvalidation
         clf = DecisionTreeClassifier()
         flow = self.extension.model_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
@@ -1013,7 +1103,7 @@ class TestRun(TestBase):
     def test_run_with_illegal_flow_id_after_load(self):
         # Same as `test_run_with_illegal_flow_id`, but test this error is also
         # caught if the run is stored to and loaded from disk first.
-        task = openml.tasks.get_task(115)
+        task = openml.tasks.get_task(115)  # diabetes; crossvalidation
         clf = DecisionTreeClassifier()
         flow = self.extension.model_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
@@ -1037,7 +1127,7 @@ class TestRun(TestBase):
     def test_run_with_illegal_flow_id_1(self):
         # Check the case where the user adds an illegal flow id to an existing
         # flow. Comes to a different value error than the previous test
-        task = openml.tasks.get_task(115)
+        task = openml.tasks.get_task(115)  # diabetes; crossvalidation
         clf = DecisionTreeClassifier()
         flow_orig = self.extension.model_to_flow(clf)
         try:
@@ -1059,7 +1149,7 @@ class TestRun(TestBase):
     def test_run_with_illegal_flow_id_1_after_load(self):
         # Same as `test_run_with_illegal_flow_id_1`, but test this error is
         # also caught if the run is stored to and loaded from disk first.
-        task = openml.tasks.get_task(115)
+        task = openml.tasks.get_task(115)  # diabetes; crossvalidation
         clf = DecisionTreeClassifier()
         flow_orig = self.extension.model_to_flow(clf)
         try:
@@ -1090,7 +1180,7 @@ class TestRun(TestBase):
         reason="OneHotEncoder cannot handle mixed type DataFrame as input",
     )
     def test__run_task_get_arffcontent(self):
-        task = openml.tasks.get_task(7)
+        task = openml.tasks.get_task(7)  # kr-vs-kp; crossvalidation
         num_instances = 3196
         num_folds = 10
         num_repeats = 1
@@ -1314,7 +1404,7 @@ class TestRun(TestBase):
         # actual data
         flow = unittest.mock.Mock()
         flow.name = "dummy"
-        task = openml.tasks.get_task(2)
+        task = openml.tasks.get_task(2)  # anneal; crossvalidation
 
         from sklearn.compose import ColumnTransformer
 
@@ -1352,7 +1442,7 @@ class TestRun(TestBase):
         # actual data
         flow = unittest.mock.Mock()
         flow.name = "dummy"
-        task = openml.tasks.get_task(2)
+        task = openml.tasks.get_task(2)  # anneal; crossvalidation
         # task_id=2 on test server has 38 columns with 6 numeric columns
         cont_idx = [3, 4, 8, 32, 33, 34]
         cat_idx = list(set(np.arange(38)) - set(cont_idx))
@@ -1404,7 +1494,7 @@ class TestRun(TestBase):
         TestBase.logger.info("collected from test_run_functions: {}".format(flow.flow_id))
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id)
-        task = openml.tasks.get_task(119)  # diabetes
+        task = openml.tasks.get_task(self.TEST_SERVER_TASK_SIMPLE["task_id"])
         run = openml.runs.run_flow_on_task(
             flow=downloaded_flow, task=task, avoid_duplicate_runs=False, upload_flow=False,
         )
@@ -1424,20 +1514,26 @@ class TestRun(TestBase):
             format_prediction(clustering, *ignored_input)
 
     def test_format_prediction_classification_no_probabilities(self):
-        classification = openml.tasks.get_task(self.TEST_SERVER_TASK_SIMPLE[0], download_data=False)
+        classification = openml.tasks.get_task(
+            self.TEST_SERVER_TASK_SIMPLE["task_id"], download_data=False
+        )
         ignored_input = [0] * 5
         with self.assertRaisesRegex(ValueError, "`proba` is required for classification task"):
             format_prediction(classification, *ignored_input, proba=None)
 
     def test_format_prediction_classification_incomplete_probabilities(self):
-        classification = openml.tasks.get_task(self.TEST_SERVER_TASK_SIMPLE[0], download_data=False)
+        classification = openml.tasks.get_task(
+            self.TEST_SERVER_TASK_SIMPLE["task_id"], download_data=False
+        )
         ignored_input = [0] * 5
         incomplete_probabilities = {c: 0.2 for c in classification.class_labels[1:]}
         with self.assertRaisesRegex(ValueError, "Each class should have a predicted probability"):
             format_prediction(classification, *ignored_input, proba=incomplete_probabilities)
 
     def test_format_prediction_task_without_classlabels_set(self):
-        classification = openml.tasks.get_task(self.TEST_SERVER_TASK_SIMPLE[0], download_data=False)
+        classification = openml.tasks.get_task(
+            self.TEST_SERVER_TASK_SIMPLE["task_id"], download_data=False
+        )
         classification.class_labels = None
         ignored_input = [0] * 5
         with self.assertRaisesRegex(
@@ -1446,14 +1542,35 @@ class TestRun(TestBase):
             format_prediction(classification, *ignored_input, proba={})
 
     def test_format_prediction_task_learning_curve_sample_not_set(self):
-        learning_curve = openml.tasks.get_task(801, download_data=False)
+        learning_curve = openml.tasks.get_task(801, download_data=False)  # diabetes;crossvalidation
         probabilities = {c: 0.2 for c in learning_curve.class_labels}
         ignored_input = [0] * 5
         with self.assertRaisesRegex(ValueError, "`sample` can not be none for LearningCurveTask"):
             format_prediction(learning_curve, *ignored_input, sample=None, proba=probabilities)
 
     def test_format_prediction_task_regression(self):
-        regression = openml.tasks.get_task(self.TEST_SERVER_TASK_REGRESSION[0], download_data=False)
+        task_meta_data = self.TEST_SERVER_TASK_REGRESSION["task_meta_data"]
+        _task_id = check_task_existence(**task_meta_data)
+        if _task_id is not None:
+            task_id = _task_id
+        else:
+            new_task = openml.tasks.create_task(**task_meta_data)
+            # publishes the new task
+            try:
+                new_task = new_task.publish()
+                task_id = new_task.task_id
+            except OpenMLServerException as e:
+                if e.code == 614:  # Task already exists
+                    # the exception message contains the task_id that was matched in the format
+                    # 'Task already exists. - matched id(s): [xxxx]'
+                    task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
+                else:
+                    raise Exception(repr(e))
+            # mark to remove the uploaded task
+            TestBase._mark_entity_for_removal("task", task_id)
+            TestBase.logger.info("collected from test_run_functions: {}".format(task_id))
+
+        regression = openml.tasks.get_task(task_id, download_data=False)
         ignored_input = [0] * 5
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
