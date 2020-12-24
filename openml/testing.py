@@ -318,4 +318,4 @@ class CustomImputer(SimpleImputer):
     pass
 
 
-__all__ = ["TestBase", "SimpleImputer", "CustomImputer"]
+__all__ = ["TestBase", "SimpleImputer", "CustomImputer", "check_task_existence"]

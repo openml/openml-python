@@ -16,7 +16,7 @@ if sys.version_info < (3, 6):
         )
     )
 
-with open(os.path.join("README.md")) as fid:
+with open(os.path.join("README.md"), encoding="utf-8") as fid:
     README = fid.read()
 
 setuptools.setup(
